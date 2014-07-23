@@ -9,25 +9,8 @@
 
 #include "libsyntax/types.h"
 #include "libsyntax/symbols.h"
+#include "libsyntax/value.h"
 #include "libsyntax/location.hh" // reuse bison's location class
-
-struct rational_t {
-  int64_t numerator;
-  int64_t denominator;
-
-  rational_t();
-  rational_t(int64_t num, int64_t denom);
-  rational_t(const rational_t& other);
-
-  bool operator==(const rational_t& other) const;
-  const rational_t& operator+(const rational_t& other) const;
-  const rational_t& operator-(const rational_t& other) const;
-  const rational_t& operator*(const rational_t& other) const;
-  const rational_t& operator/(const rational_t& other) const;
-  const rational_t& operator%(const rational_t& other) const;
-
-  const std::string to_str() const;
-};
 
 class value_t;
 
