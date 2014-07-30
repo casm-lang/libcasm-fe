@@ -1,6 +1,6 @@
 LEX = flex
 CXX = clang
-CFLAGS = -Isrc -Ibuild/src -std=c++11 -static
+CFLAGS = -Isrc -Ibuild/src -std=c++11
 BUILD_DIR = build
 AR = /usr/bin/ar
 

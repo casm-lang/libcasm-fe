@@ -21,8 +21,8 @@ class Driver {
     bool error_;
 
   public:
-    Driver ();
-    virtual ~Driver ();
+    Driver();
+    virtual ~Driver();
 
     std::map<std::string, RuleNode*> rules_map_;
     AstNode *result;

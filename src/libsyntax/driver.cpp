@@ -25,7 +25,7 @@ Driver::Driver ()
   std::vector<Type*> args;
   args.push_back(new Type(TypeType::SELF));
   function_table.add(new Function("program", args, new Type(TypeType::RULEREF), nullptr));
-  
+
   lines_.push_back("");
 }
 

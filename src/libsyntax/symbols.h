@@ -107,78 +107,22 @@ class SymbolTable {
   public:
     std::map<std::string, Symbol*> table_;
 
-    SymbolTable() {}
+    SymbolTable();
 
-    ~SymbolTable() {
+    ~SymbolTable();
 
-      // cleanup symbol table
-      /* TODO: check if element wise cleanup is needed
-      for (auto entry : table_) {
-        delete entry.second;
-      }
-      */
-    }
+    size_t size() const;
 
-    size_t size() const {
-      return table_.size();
-    }
+    bool add(Symbol *sym);
 
-    bool add(Symbol *sym) {
-      try {
-        table_.at(sym->name);
-        return false;
-      } catch (const std::out_of_range& e) {
-        table_[sym->name] = sym;
-        return true;
-      }
-    }
-
-   bool add_enum_element(const std::string& name, Enum *enum_) {
-      try {
-        table_.at(name);
-        return false;
-      } catch (const std::out_of_range& e) {
-        table_[name] = enum_;
-        return true;
-      }
-    }
+   bool add_enum_element(const std::string& name, Enum *enum_);
 
  
-    Symbol* get(const std::string& name) const {
-      try {
-        return table_.at(name);
-      } catch (const std::out_of_range& e) {
-        return nullptr;
-      }
-    }
+    Symbol* get(const std::string& name) const;
 
-     Function* get_function(const std::string& name) const {
-      try {
-        Symbol* sym = table_.at(name);
-        // TODO split Function and Derived symbols?
-        if (sym->type == Symbol::SymbolType::FUNCTION || sym->type == Symbol::SymbolType::DERIVED) {
-          return reinterpret_cast<Function*>(sym);
-        } else {
-          return nullptr;
-        }
-      } catch (const std::out_of_range& e) {
-        return nullptr;
-      }
-    }
+    Function* get_function(const std::string& name) const;
 
-    Enum* get_enum(const std::string& name) const {
-      try {
-        Symbol* sym = table_.at(name);
-        // TODO split Function and Derived symbols?
-        if (sym->type == Symbol::SymbolType::ENUM) {
-          return reinterpret_cast<Enum*>(sym);
-        } else {
-          return nullptr;
-        }
-      } catch (const std::out_of_range& e) {
-        return nullptr;
-      }
-    }
+    Enum* get_enum(const std::string& name) const;
 
 };
 
