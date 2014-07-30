@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/fhahn/luna.png?branch=master)](https://travis-ci.org/fhahn/libcasm-syntax)
-
 libcasm-syntax
 ==============
 [![Build Status](https://travis-ci.org/fhahn/libcasm-syntax.png?branch=master)](https://travis-ci.org/fhahn/libcasm-syntax)
