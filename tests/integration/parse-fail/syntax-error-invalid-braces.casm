@@ -1,0 +1,7 @@
+function x : -> List(Int)
+
+init main
+
+rule main = { 
+    x := 1 
+}} //~ syntax error, unexpected }, expecting end of file

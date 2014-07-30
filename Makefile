@@ -1,5 +1,4 @@
 LEX = flex
-CXX = clang
 CFLAGS = -Isrc -Ibuild/src -std=c++11
 BUILD_DIR = build
 AR = /usr/bin/ar
@@ -8,12 +7,15 @@ SRC = $(shell find src -name '*.cpp' | cut -d'.' -f1)
 
 OBJS = $(SRC:%=build/%.o)
 
-.PHONY: all clean
+.PHONY: all clean test
 
 all: lib
 
 clean:
 	rm -r build
+
+test: build/test_main
+	python tests/integration/test_runner.py
 
 $(BUILD_DIR):
 	mkdir -p $@/src/libsyntax
@@ -40,7 +42,7 @@ $(BUILD_DIR)/src/libutil/%.o: src/libutil/%.cpp
 $(BUILD_DIR)/src/libsyntax/%.o: src/libsyntax/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
-build/test_main: build/libfrontend.a tests/integration/test_main.cpp
+build/test_main: $(BUILD_DIR) build/libfrontend.a tests/integration/test_main.cpp
 	$(CXX) $(CFLAGS) -o $@ tests/integration/test_main.cpp build/libfrontend.a -lstdc++ -lm
 
 
