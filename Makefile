@@ -1,4 +1,5 @@
 LEX = flex
+CXX = clang
 CFLAGS = -Isrc -Ibuild/src -std=c++11
 BUILD_DIR = build
 AR = /usr/bin/ar
@@ -20,6 +21,7 @@ test: build/test_main
 $(BUILD_DIR):
 	mkdir -p $@/src/libsyntax
 	mkdir -p $@/src/libutil
+	mkdir -p $@/src/libmiddle
 
 build/libfrontend.a: build/src/libsyntax/parser.o build/src/libsyntax/lexer.o $(OBJS)
 	$(AR) rsc build/libfrontend.a $(OBJS) build/src/libsyntax/lexer.o build/src/libsyntax/parser.o
@@ -40,6 +42,9 @@ $(BUILD_DIR)/src/libutil/%.o: src/libutil/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/src/libsyntax/%.o: src/libsyntax/%.cpp
+	$(CXX) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/src/libmiddle/%.o: src/libmiddle/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 build/test_main: $(BUILD_DIR) build/libfrontend.a tests/integration/test_main.cpp
