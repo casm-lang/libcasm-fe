@@ -44,7 +44,10 @@ $(BUILD_DIR)/src/libutil/%.o: src/libutil/%.cpp
 $(BUILD_DIR)/src/libsyntax/%.o: src/libsyntax/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/src/libmiddle/%.o: src/libmiddle/%.cpp
+$(build_dir)/src/libmiddle/%.o: src/libmiddle/%.cpp
+	$(cxx) $(cflags) -c $< -o $@
+
+$(BUILD_DIR)/src/%.o: src/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 build/test_main: $(BUILD_DIR) build/libfrontend.a tests/integration/test_main.cpp
