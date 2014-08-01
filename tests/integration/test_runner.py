@@ -4,13 +4,20 @@ import subprocess
 import os
 import re
 
-test_exe = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        '../../build/test_main')
+test_parse = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        '../../build/test_parse')
+
+test_typecheck = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        '../../build/test_typecheck')
+
 PARSE_PASS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         'parse-pass/')
 
 PARSE_FAIL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                'parse-fail/')
+
+TYPECHECK_FAIL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                   'typecheck-fail/')
 
 FAILURE_TEMPLATE = ("{}\n"
                      "failed test {}\n"
@@ -22,7 +29,7 @@ HR_LEN = 65
 HR = '-' * 65
 
 def test_parse_pass(filename):
-    p1 = subprocess.Popen([test_exe, filename], stderr=subprocess.PIPE)
+    p1 = subprocess.Popen([test_parse, filename], stderr=subprocess.PIPE)
     err = p1.communicate()[1]
 
     short_filename = filename.replace(PARSE_PASS_PATH, '')
@@ -37,9 +44,16 @@ def test_parse_pass(filename):
             HR))
 
 
+
 def test_parse_fail(filename):
-    short_filename = filename.replace(PARSE_FAIL_PATH, '')
-    sys.stdout.write('\t[parse-fail] '+short_filename )
+    return test_fail(test_parse, 'parse-fail', PARSE_FAIL_PATH, filename)
+
+def test_typecheck_fail(filename):
+    return test_fail(test_typecheck, 'typecheck-fail', TYPECHECK_FAIL_PATH, filename)
+
+def test_fail(test_exe, name, path_prefix, filename):
+    short_filename = filename.replace(path_prefix, '')
+    sys.stdout.write('\t['+name+'] '+short_filename )
     sys.stdout.flush()
 
     expected_errors = {}
@@ -65,7 +79,7 @@ def test_parse_fail(filename):
 
     if p1.returncode == 0:
         sys.stdout.write('... fail\n')
-        return (False, RUN_FAIL_TEMPLATE.format(HR,
+        return (False, FAILURE_TEMPLATE.format(HR,
                                                     filename,
                                                     'Test did run, but should fail',
                                                     HR
@@ -77,7 +91,7 @@ def test_parse_fail(filename):
                 m = re.search(error_re, l)
                 if int(m.groupdict()['line']) not in expected_errors:
                     sys.stdout.write('... fail\n')
-                    return (False, RUN_FAIL_TEMPLATE.format(HR,
+                    return (False, FAILURE_TEMPLATE.format(HR,
                                     filename,
                                     'unexpected error message: '+l,
                                     HR))
@@ -88,7 +102,7 @@ def test_parse_fail(filename):
 
                 if not found:
                     sys.stdout.write('... fail\n')
-                    return (False, RUN_FAIL_TEMPLATE.format(HR,
+                    return (False, FAILURE_TEMPLATE.format(HR,
                                                 filename,
                                                 ('expected error message not thrown; expected: '+expected_error,
                                                 '\ngot error messages: '+m.groupdict()['msg']),
@@ -133,6 +147,10 @@ if __name__ == '__main__':
     fail_count_sum += fail
 
     ok, fail = run_tests(PARSE_FAIL_PATH, test_parse_fail)
+    ok_count_sum += ok
+    fail_count_sum += fail
+
+    ok, fail = run_tests(TYPECHECK_FAIL_PATH, test_typecheck_fail)
     ok_count_sum += ok
     fail_count_sum += fail
 

@@ -17,7 +17,7 @@ AstNode* casm_frontend_pass_1_parse(const std::string& filename) {
   return global_driver->parse(filename);
 }
 
-bool casm_frontend_pass_1_parse(AstNode *root) {
+bool casm_frontend_pass_2_typecheck(AstNode *root) {
   TypecheckVisitor typecheck_visitor(*global_driver);
   AstWalker<TypecheckVisitor, Type*> typecheck_walker(typecheck_visitor);
   typecheck_walker.walk_specification(root);

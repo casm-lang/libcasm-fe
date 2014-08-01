@@ -15,7 +15,7 @@ all: lib
 clean:
 	rm -r build
 
-test: build/test_main
+test: build/test_parse build/test_typecheck
 	python tests/integration/test_runner.py
 
 $(BUILD_DIR):
@@ -50,7 +50,8 @@ $(build_dir)/src/libmiddle/%.o: src/libmiddle/%.cpp
 $(BUILD_DIR)/src/%.o: src/%.cpp
 	$(CXX) $(CFLAGS) -c $< -o $@
 
-build/test_main: $(BUILD_DIR) build/libfrontend.a tests/integration/test_main.cpp
-	$(CXX) $(CFLAGS) -o $@ tests/integration/test_main.cpp build/libfrontend.a -lstdc++ -lm
+build/test_parse: $(BUILD_DIR) build/libfrontend.a tests/integration/test_parse.cpp
+	$(CXX) $(CFLAGS) -o $@ tests/integration/test_parse.cpp build/libfrontend.a -lstdc++ -lm
 
-
+build/test_typecheck: $(BUILD_DIR) build/libfrontend.a tests/integration/test_typecheck.cpp
+	$(CXX) $(CFLAGS) -o $@ tests/integration/test_typecheck.cpp build/libfrontend.a -lstdc++ -lm

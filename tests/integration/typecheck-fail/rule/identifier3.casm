@@ -1,0 +1,10 @@
+// error annotation @6
+
+function x: -> Int
+
+rule main = {
+    call (@x)
+    //~^ no rule with name `x` found
+}
+
+init main
