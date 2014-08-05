@@ -25,8 +25,19 @@ FAILURE_TEMPLATE = ("{}\n"
                      "{}\n"
 )
 
+STATUS_OK = 1
+STATUS_FAIL = 2
+STATUS_IGNORED = 3
+
 HR_LEN = 65
 HR = '-' * 65
+
+def is_ignored(filename):
+    with open(filename) as f:
+        if f.read().startswith("// IGNORE"):
+            return True
+        else:
+            return False
 
 def test_parse_pass(filename):
     p1 = subprocess.Popen([test_parse, filename], stderr=subprocess.PIPE)
@@ -35,10 +46,10 @@ def test_parse_pass(filename):
     short_filename = filename.replace(PARSE_PASS_PATH, '')
     if p1.returncode == 0:
         print('\t[parse-pass] '+short_filename+' ... ok')
-        return (True, '')
+        return (STATUS_OK, '')
     else:
         print('\t[parse-pass] '+short_filename+' ... fail')
-        return (False, FAILURE_TEMPLATE.format(HR,
+        return (STATUS_FAIL, FAILURE_TEMPLATE.format(HR,
             filename,
             err.decode(encoding='UTF-8'),
             HR))
@@ -55,6 +66,10 @@ def test_fail(test_exe, name, path_prefix, filename):
     short_filename = filename.replace(path_prefix, '')
     sys.stdout.write('\t['+name+'] '+short_filename )
     sys.stdout.flush()
+
+    if is_ignored(filename):
+        sys.stdout.write('... fail\n')
+        return (STATUS_IGNORED, 'test case ignored')
 
     expected_errors = {}
 
@@ -79,7 +94,7 @@ def test_fail(test_exe, name, path_prefix, filename):
 
     if p1.returncode == 0:
         sys.stdout.write('... fail\n')
-        return (False, FAILURE_TEMPLATE.format(HR,
+        return (STATUS_FAIL, FAILURE_TEMPLATE.format(HR,
                                                     filename,
                                                     'Test did run, but should fail',
                                                     HR
@@ -91,7 +106,7 @@ def test_fail(test_exe, name, path_prefix, filename):
                 m = re.search(error_re, l)
                 if int(m.groupdict()['line']) not in expected_errors:
                     sys.stdout.write('... fail\n')
-                    return (False, FAILURE_TEMPLATE.format(HR,
+                    return (STATUS_FAIL, FAILURE_TEMPLATE.format(HR,
                                     filename,
                                     'unexpected error message: '+l,
                                     HR))
@@ -102,17 +117,17 @@ def test_fail(test_exe, name, path_prefix, filename):
 
                 if not found:
                     sys.stdout.write('... fail\n')
-                    return (False, FAILURE_TEMPLATE.format(HR,
+                    return (STATUS_FAIL, FAILURE_TEMPLATE.format(HR,
                                                 filename,
                                                 ('expected error message not thrown; expected: '+expected_error,
                                                 '\ngot error messages: '+m.groupdict()['msg']),
                                                 HR))
 
         sys.stdout.write('... ok\n')
-        return (True, '')
+        return (STATUS_OK, '')
     else:
         sys.stdout.write('... fail\n')
-        return (False, FAILURE_TEMPLATE.format(HR,
+        return (STATUS_FAIL, FAILURE_TEMPLATE.format(HR,
                                                filename,
                                                'Test did fail with error code != 1',
                                                  HR
@@ -123,36 +138,42 @@ def run_tests(directory, test_fn, verbose=False):
     for dirname, dirnames, filenames in os.walk(directory):
         results += [test_fn(os.path.join(dirname, test_file)) for test_file in filenames if test_file.endswith(".casm")]
 
-    ok_results = [ok for (ok,_) in results if ok]
-    fail_results = [msg for (ok, msg) in results if not ok]
+    ok_results = [True for (status,_) in results if status == STATUS_OK]
+    fail_results = [msg for (status, msg) in results if status == STATUS_FAIL]
+    ignored_results = [msg for (status, msg) in results if status == STATUS_IGNORED]
 
-    print('run {} tests, ok: {}\tfailed: {}'.format(
-        len(ok_results)+len(fail_results),
+    print('run {} tests, ok: {}\tfailed: {}\tignored: {}'.format(
+        len(ok_results)+len(fail_results)+len(ignored_results),
         len(ok_results),
-        len(fail_results)
+        len(fail_results),
+        len(ignored_results)
     ))
 
     if verbose:
         print('\n'.join(fail_results))
 
-    return (len(ok_results), len(fail_results))
+    return (len(ok_results), len(fail_results), len(ignored_results))
 
 
 if __name__ == '__main__':
     ok_count_sum = 0
     fail_count_sum = 0
+    ignored_count_sum = 0
 
-    ok, fail = run_tests(PARSE_PASS_PATH, test_parse_pass)
+    ok, fail, ignored = run_tests(PARSE_PASS_PATH, test_parse_pass)
     ok_count_sum += ok
     fail_count_sum += fail
+    ignored_count_sum += ignored
 
-    ok, fail = run_tests(PARSE_FAIL_PATH, test_parse_fail)
+    ok, fail, ignored = run_tests(PARSE_FAIL_PATH, test_parse_fail)
     ok_count_sum += ok
     fail_count_sum += fail
+    ignored_count_sum += ignored
 
-    ok, fail = run_tests(TYPECHECK_FAIL_PATH, test_typecheck_fail)
+    ok, fail, ignored = run_tests(TYPECHECK_FAIL_PATH, test_typecheck_fail)
     ok_count_sum += ok
     fail_count_sum += fail
+    ignored_count_sum += ignored
 
     print('')
     print(HR)
@@ -160,10 +181,11 @@ if __name__ == '__main__':
         print('\n\nTest summary (OK):')
     else:
         print('\nTest summary (FAIL):')
-    print('  run {} tests, ok: {}\tfailed: {}\n'.format(
-        ok_count_sum+fail_count_sum,
+    print('  run {} tests, ok: {}\tfailed: {}\tignored: {}\n'.format(
+        ok_count_sum+fail_count_sum+ignored_count_sum,
         ok_count_sum,
-        fail_count_sum
+        fail_count_sum,
+        ignored_count_sum
     ))
     print(HR)
 
