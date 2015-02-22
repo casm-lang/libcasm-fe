@@ -45,8 +45,8 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     bool visit_print(PrintNode *node, std::vector<bool>& argument_results);
 
     void visit_let(LetNode*, bool);
-    void visit_pop(PopNode*) { throw "Not implemented"; }
-    void visit_push(PushNode*, bool, bool)  { throw "Not implemented"; }
+    void visit_pop(PopNode*);
+    void visit_push(PushNode*, bool, bool);
     void visit_case(CaseNode*, const bool, const std::vector<bool>&) { throw "not implemented case astdump"; }
 
     void visit_forall_post(ForallNode*) { throw "not implemented"; }
@@ -56,15 +56,15 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     bool visit_expression_single(Expression *expr, bool);
     bool visit_int_atom(IntAtom *atom);
     bool visit_float_atom(FloatAtom *atom);
-    bool visit_undef_atom(UndefAtom*) { throw "not impleemented"; }
+    bool visit_undef_atom(UndefAtom*);
     bool visit_function_atom(FunctionAtom *atom, bool[], uint16_t);
-    bool visit_builtin_atom(BuiltinAtom *, bool[], uint16_t) { throw "not implemented"; }
+    bool visit_builtin_atom(BuiltinAtom *, bool[], uint16_t);
     bool visit_derived_function_atom(FunctionAtom*, bool) { throw "not implemented"; }
     bool visit_self_atom(SelfAtom *atom);
     bool visit_rule_atom(RuleAtom *atom);
     bool visit_boolean_atom(BooleanAtom *atom);
     bool visit_string_atom(StringAtom *atom);
-    bool visit_list_atom(ListAtom*, std::vector<bool>&) { throw "not implemented"; }
+    bool visit_list_atom(ListAtom*, std::vector<bool>&);
     bool visit_number_range_atom(NumberRangeAtom*) { throw "not implemented"; }
 };
 

@@ -230,7 +230,6 @@ class BaseFunctionAtom: public AtomNode {
 
 class FunctionAtom : public BaseFunctionAtom {
   public:
-
     enum class SymbolType {
       FUNCTION,
       DERIVED,
@@ -287,6 +286,7 @@ class BuiltinAtom: public BaseFunctionAtom {
  
     virtual ~BuiltinAtom();
     bool equals(AstNode *other);
+    std::string to_string();
 };
 
 

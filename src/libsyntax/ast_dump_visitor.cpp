@@ -136,6 +136,18 @@ void AstDumpVisitor::visit_let(LetNode *node, bool) {
   dump_link(node, node->stmt);
 }
 
+void AstDumpVisitor::visit_pop(PopNode *node) {
+  dump_node(node, "Pop");
+  dump_link(node, node->to);
+  dump_link(node, node->from);
+}
+
+void AstDumpVisitor::visit_push(PushNode *node, bool, bool) {
+  dump_node(node, "Push");
+  dump_link(node, node->expr);
+  dump_link(node, node->to);
+}
+
 bool AstDumpVisitor::visit_expression(Expression *expr, bool, bool) {
   dump_node(expr, "Expression:"+operator_to_str(expr->op));
   if (expr->left_ != nullptr) {
@@ -163,8 +175,19 @@ bool AstDumpVisitor::visit_float_atom(FloatAtom *atom) {
   return true;
 }
 
+bool AstDumpVisitor::visit_undef_atom(UndefAtom *atom) {
+  dump_node(atom, std::string("UndefAtom"));
+  return true;
+}
+
+
 bool AstDumpVisitor::visit_function_atom(FunctionAtom *atom, bool[], uint16_t) {
   dump_node(atom, std::string("FunctionAtom:"+atom->name));
+  return true;
+}
+
+bool AstDumpVisitor::visit_builtin_atom(BuiltinAtom *atom, bool[], uint16_t) {
+  dump_node(atom, std::string("BuiltinAtom:"+atom->to_string()));
   return true;
 }
 
@@ -185,5 +208,15 @@ bool AstDumpVisitor::visit_boolean_atom(BooleanAtom *atom) {
 
 bool AstDumpVisitor::visit_string_atom(StringAtom *atom) {
   dump_node(atom, std::string("StringAtom: "+atom->string));
+  return true;
+}
+
+bool AstDumpVisitor::visit_list_atom(ListAtom* atom, std::vector<bool>&) {
+  dump_node(atom, std::string("ListAtom"));
+
+  for (ExpressionBase* a : *(atom->expr_list)) {
+    dump_link(atom, a);
+  }
+
   return true;
 }

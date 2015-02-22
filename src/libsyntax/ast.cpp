@@ -422,6 +422,27 @@ bool BuiltinAtom::equals(AstNode*) {
   throw "BuiltinAtom::equals() not implemented";
 }
 
+std::string BuiltinAtom::to_string() {
+  switch(id) {
+    case Id::POW: return "pow";
+    case Id::HEX: return "hex";
+    case Id::NTH: return "nth";
+    case Id::CONS: return "cons";
+    case Id::APP: return "app";
+    case Id::LEN: return "len";
+    case Id::TAIL: return "tail";
+    case Id::PEEK: return "peek";
+    case Id::BOOLEAN2INT: return "Boolean2Int";
+    case Id::INT2BOOLEAN: return "Int2Boolean";
+    case Id::ENUM2INT: return "Enum2Int";
+    case Id::ASINT: return "asInt";
+    case Id::ASFLOAT: return "asFloat";
+    case Id::ASRATIONAL: return "asFloat";
+    case Id::SYMBOLIC: return "symbolic";
+    default: return "UNKNOWN";
+  }
+}
+
 ListAtom::ListAtom(yy::location& loc, std::vector<ExpressionBase*> *exprs)
     : AtomNode(loc, NodeType::LIST_ATOM, TypeType::UNKNOWN), expr_list(exprs) {
   // TODO LEAK!
