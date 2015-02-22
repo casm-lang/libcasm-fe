@@ -55,3 +55,6 @@ build/test_parse: $(BUILD_DIR) build/libfrontend.a tests/integration/test_parse.
 
 build/test_typecheck: $(BUILD_DIR) build/libfrontend.a tests/integration/test_typecheck.cpp
 	$(CXX) $(CFLAGS) -o $@ tests/integration/test_typecheck.cpp build/libfrontend.a -lstdc++ -lm
+
+build/test_dump: $(BUILD_DIR) build/libfrontend.a tests/integration/test_dump.cpp
+	$(CXX) $(CFLAGS) -o $@ tests/integration/test_dump.cpp build/libfrontend.a -lstdc++ -lm

@@ -1,6 +1,7 @@
 #include "frontend.h"
 
 #include "libsyntax/driver.h"
+#include "libsyntax/ast_dump_visitor.h"
 #include "libmiddle/typecheck_visitor.h"
 
 extern Driver *global_driver;
@@ -22,4 +23,11 @@ bool casm_frontend_pass_2_typecheck(AstNode *root) {
   AstWalker<TypecheckVisitor, Type*> typecheck_walker(typecheck_visitor);
   typecheck_walker.walk_specification(root);
   return global_driver->ok();
+}
+
+std::string casm_dump_ast(AstNode *root) {
+  AstDumpVisitor dump_visitor;
+  AstWalker<AstDumpVisitor, bool> dump_walker(dump_visitor);
+  dump_walker.walk_specification(root);
+  return dump_visitor.get_dump();
 }
