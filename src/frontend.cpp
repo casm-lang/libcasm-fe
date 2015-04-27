@@ -28,6 +28,7 @@ bool casm_frontend_pass_2_typecheck(AstNode *root) {
 std::string casm_dump_ast(AstNode *root) {
   AstDumpVisitor dump_visitor;
   AstWalker<AstDumpVisitor, bool> dump_walker(dump_visitor);
+  dump_walker.suppress_calls = true;
   dump_walker.walk_specification(root);
   return dump_visitor.get_dump();
 }

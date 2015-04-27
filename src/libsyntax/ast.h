@@ -426,7 +426,7 @@ class CallNode: public AstNode {
     RuleNode *rule;
     std::vector<ExpressionBase*> *arguments;
     ExpressionBase *ruleref;
-
+    
     CallNode(yy::location& loc, const std::string& rule_name, ExpressionBase *ruleref);
     CallNode(yy::location& loc, const std::string& rule_name, ExpressionBase *ruleref,
              std::vector<ExpressionBase*> *args);

@@ -9,16 +9,21 @@ class AstNode;
 template<class T, class V> class AstWalker {
   public:
     T& visitor;
-
-    AstWalker(T& v) : visitor(v) {}
-
+    bool suppress_calls;
+    
+    AstWalker(T& v)
+    : visitor(v)
+    , suppress_calls(false)
+    {
+    }
+    
     void walk_specification(AstNode *spec) {
       if (spec->node_type_ == NodeType::BODY_ELEMENTS) {
         visitor.visit_specification(spec);
         walk_body_elements(reinterpret_cast<AstListNode*>(spec));
       }
     }
-
+    
     void walk_body_elements(AstListNode *body_elements) {
       for (auto e : body_elements->nodes) {
         switch(e->node_type_) {
@@ -225,7 +230,7 @@ template<class T, class V> class AstWalker {
         V v = walk_expression_base(call->ruleref);
         visitor.visit_call_pre(call, v);
       }
-
+      
       // we must evaluate all arguments, to set correct offset for bindings
       std::vector<V> argument_results;
       if (call->arguments != nullptr) {
@@ -235,7 +240,12 @@ template<class T, class V> class AstWalker {
       }
       if (call->rule != nullptr) {
         visitor.visit_call(call, argument_results);
-        walk_rule(call->rule);
+
+        if( !suppress_calls )
+        {
+            walk_rule(call->rule);
+        }
+        
         visitor.visit_call_post(call);
       } else {
         DEBUG("rule not set!");
