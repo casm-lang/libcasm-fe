@@ -187,6 +187,12 @@ bool AstDumpVisitor::visit_undef_atom(UndefAtom *atom) {
 
 bool AstDumpVisitor::visit_function_atom(FunctionAtom *atom, bool[], uint16_t) {
   dump_node(atom, std::string("FunctionAtom:"+atom->name));
+  
+  for( auto arg : *(atom->arguments) )
+  {
+      dump_link( atom, arg );
+  }
+  
   return true;
 }
 
