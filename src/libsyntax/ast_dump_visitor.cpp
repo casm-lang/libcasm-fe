@@ -32,12 +32,12 @@ void AstDumpVisitor::visit_body_elements(AstListNode *body_elements) {
 }
 
 void AstDumpVisitor::visit_function_def(FunctionDefNode *def, const std::vector<std::pair<bool, bool>>&) {
-  dump_node(def, "Function Definition: "+def->sym->to_str());
+  dump_node(def, "Function Definition: " + def->sym->name + " " + def->sym->to_str());
   DEBUG("TODO: implement initializers");
 }
 
 void AstDumpVisitor::visit_derived_def(FunctionDefNode *def, bool) {
-  dump_node(def, "Derived Definition: "+def->sym->to_str());
+    dump_node(def, "Derived Definition: " + def->sym->name + " " + def->sym->to_str());
   dump_link(def, def->sym->derived);
 }
 
@@ -187,10 +187,13 @@ bool AstDumpVisitor::visit_undef_atom(UndefAtom *atom) {
 
 bool AstDumpVisitor::visit_function_atom(FunctionAtom *atom, bool[], uint16_t) {
   dump_node(atom, std::string("FunctionAtom:"+atom->name));
-  
-  for( auto arg : *(atom->arguments) )
+
+  if( atom->arguments )
   {
-      dump_link( atom, arg );
+      for( auto arg : *(atom->arguments) )
+      {
+          dump_link( atom, arg );
+      }
   }
   
   return true;
