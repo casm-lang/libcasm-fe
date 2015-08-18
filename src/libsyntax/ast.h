@@ -328,7 +328,7 @@ class NumberRangeAtom : public AtomNode {
 };
 
 enum class ExpressionOperation {
-  ADD,
+  ADD = 0,
   SUB,
   MUL,
   DIV,
