@@ -224,8 +224,8 @@ class BaseFunctionAtom: public AtomNode {
 
     BaseFunctionAtom(yy::location& loc, NodeType t, const std::string name,
                  std::vector<ExpressionBase*> *args);
- 
-
+    
+    
 };
 
 class FunctionAtom : public BaseFunctionAtom {

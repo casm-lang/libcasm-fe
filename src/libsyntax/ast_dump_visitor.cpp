@@ -41,6 +41,13 @@ void AstDumpVisitor::visit_derived_def(FunctionDefNode *def, bool) {
   dump_link(def, def->sym->derived);
 }
 
+bool AstDumpVisitor::visit_derived_function_atom( FunctionAtom* node, bool )
+{
+    dump_node( node, node->name );
+    return 0;
+}
+
+
 void AstDumpVisitor::visit_init(AstNode *init) {
   dump_node(init, "Init");
 }
@@ -226,7 +233,7 @@ bool AstDumpVisitor::visit_string_atom(StringAtom *atom) {
 
 bool AstDumpVisitor::visit_list_atom(ListAtom* atom, std::vector<bool>&) {
   dump_node(atom, std::string("ListAtom"));
-
+  
   for (ExpressionBase* a : *(atom->expr_list)) {
     dump_link(atom, a);
   }

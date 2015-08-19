@@ -59,7 +59,7 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     bool visit_undef_atom(UndefAtom*);
     bool visit_function_atom(FunctionAtom *atom, bool[], uint16_t);
     bool visit_builtin_atom(BuiltinAtom *, bool[], uint16_t);
-    bool visit_derived_function_atom(FunctionAtom*, bool) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); return 0; }
+    bool visit_derived_function_atom(FunctionAtom*, bool); // { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); return 0; }
     bool visit_self_atom(SelfAtom *atom);
     bool visit_rule_atom(RuleAtom *atom);
     bool visit_boolean_atom(BooleanAtom *atom);
