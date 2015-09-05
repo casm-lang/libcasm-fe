@@ -180,6 +180,17 @@ bool SymbolTable::add(Symbol *sym) {
   }
 }
 
+bool SymbolTable::remove(const std::string& name) {
+  try {
+    table_.at(name);
+    table_.erase(name);
+    return true;
+  } catch (const std::out_of_range& e) {
+    return false;
+  }
+}
+
+
 bool SymbolTable::add_enum_element(const std::string& name, Enum *enum_) {
   try {
     table_.at(name);

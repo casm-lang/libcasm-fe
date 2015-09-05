@@ -678,11 +678,27 @@ IFTHENELSE: IF EXPRESSION THEN STATEMENT %prec XIF {
           }
           ;
 
-LET_SYNTAX: LET IDENTIFIER "=" EXPRESSION IN STATEMENT {
-              $$ = new LetNode(@$, Type(TypeType::UNKNOWN), $2, $4, $6);
+LET_SYNTAX: LET IDENTIFIER "=" 
+            {
+                auto var = Symbol($2, Symbol::SymbolType::LET);
+                if (!driver.function_table.add(&var)) {
+                    driver.error(@$, "redefinition of symbol `"+$2+"`");
+                }
+            }
+            EXPRESSION IN STATEMENT {
+              driver.function_table.remove($2);
+              $$ = new LetNode(@$, Type(TypeType::UNKNOWN), $2, $5, $7);
           }
-          | LET IDENTIFIER ":" TYPE_SYNTAX "=" EXPRESSION IN STATEMENT {
-              $$ = new LetNode(@$, $4, $2, $6, $8);
+          | LET IDENTIFIER ":" TYPE_SYNTAX "="
+            {
+                auto var = Symbol($2, Symbol::SymbolType::LET);
+                if (!driver.function_table.add(&var)) {
+                    driver.error(@$, "redefinition of symbol `"+$2+"`");
+                }
+            }
+          EXPRESSION IN STATEMENT {
+              driver.function_table.remove($2);
+              $$ = new LetNode(@$, $4, $2, $7, $9);
           }
           ;
 

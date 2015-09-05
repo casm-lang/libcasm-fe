@@ -1,0 +1,12 @@
+CASM issue
+init foo
+function x : Int -> Int
+
+rule foo =
+{
+    let x = 10 in
+    //~^ redefinition of symbol `x`
+    {
+        print x
+    }
+}

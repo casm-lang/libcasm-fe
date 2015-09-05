@@ -25,6 +25,7 @@ class Symbol {
       DERIVED,
       BUILTIN,
       ENUM,
+      LET,
     };
     
     SymbolType type;
@@ -115,9 +116,10 @@ class SymbolTable {
 
     bool add(Symbol *sym);
 
-   bool add_enum_element(const std::string& name, Enum *enum_);
+    bool remove(const std::string &name);
 
- 
+    bool add_enum_element(const std::string& name, Enum *enum_);
+
     Symbol* get(const std::string& name) const;
 
     Function* get_function(const std::string& name) const;

@@ -178,7 +178,6 @@ void TypecheckVisitor::visit_call_pre(CallNode *call, Type* expr) {
   }
 }
 
-
 void TypecheckVisitor::visit_call(CallNode *call, std::vector<Type*>& argument_results) {
   // typecheck for indirect calls happens during execution
   if (call->ruleref) {
@@ -199,8 +198,8 @@ void TypecheckVisitor::visit_call(CallNode *call, std::vector<Type*>& argument_r
                       "` must be `"+call->rule->arguments[i]->to_str()+"` but was `"+
                       argument_results[i]->to_str()+"`");
       }
+    }
   }
-}
 }
 
 void TypecheckVisitor::visit_call_post(CallNode *call) {
