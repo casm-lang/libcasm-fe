@@ -1,13 +1,13 @@
 // error annotation @9
 
-function a: -> Int
+function a: -> Integer
 function b: -> String
 
 rule main = {
   let x = undef in {
     a := x
     b := x
-    //~^ type `String` of `b` does not match type `Int` of expression
+    //~^ type `String` of `b` does not match type `Integer` of expression
   }
 
   program( self ) := undef

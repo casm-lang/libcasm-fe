@@ -1,6 +1,6 @@
-function i: -> Int initially {1}
+function i: -> Integer initially {1}
 
-function a: Int -> List(Int) initially { 0 -> [] }
+function a: Integer -> List(Integer) initially { 0 -> [] }
 
 rule main = {
     i := i + 1 

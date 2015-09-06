@@ -1,4 +1,4 @@
-function(symbolic, static, symbolic) a: -> List(Int)
+function(symbolic, static, symbolic) a: -> List(Integer)
 //~^ `symbolic` attribute can only be used once per function
 
 rule main = skip

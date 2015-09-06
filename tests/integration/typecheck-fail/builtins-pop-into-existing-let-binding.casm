@@ -1,4 +1,4 @@
-function a: -> List(Int) initially { [0] }
+function a: -> List(Integer) initially { [0] }
 
 rule main = {
     let x = 1 in pop x from a

@@ -1,6 +1,6 @@
 CASM push_pop_are_updates
 
-function lst : -> List(Int)
+function lst : -> List(Integer)
 
 init initR
 

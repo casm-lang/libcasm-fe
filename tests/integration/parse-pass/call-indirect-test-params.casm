@@ -3,7 +3,7 @@ rule main = {
 
 }
 
-rule ruleWithParams( a : Int, b : Int ) = {
+rule ruleWithParams( a : Integer, b : Integer ) = {
     assert 2=a
     assert b=3
 

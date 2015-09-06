@@ -1,5 +1,5 @@
-function(static) a: Int * Int -> Int initially { [1, 1, 1] -> 1 }
-//~^ type of initializer arguments of function `a` is Tuple (Int,Int,Int,) but should be Tuple (Int,Int,)
+function(static) a: Integer * Integer -> Integer initially { [1, 1, 1] -> 1 }
+//~^ type of initializer arguments of function `a` is Tuple (Integer,Integer,Integer,) but should be Tuple (Integer,Integer,)
 
 
 rule main = skip

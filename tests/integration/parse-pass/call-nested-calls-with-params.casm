@@ -6,12 +6,12 @@ rule main = {
     call foo(10)
 }
 
-rule foo(a: Int) = {
+rule foo(a: Integer) = {
     call bar(a)
     assert a = 10
 }
 
-rule bar(b:Int) = {
+rule bar(b:Integer) = {
     assert b = 10
     program(self) := undef
 }

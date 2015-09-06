@@ -1,7 +1,7 @@
 CASM symbolic
 
-function a: -> List(Int)
-function b: -> List(Int)
+function a: -> List(Integer)
+function b: -> List(Integer)
 
 init main
 

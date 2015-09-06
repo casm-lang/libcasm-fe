@@ -2,7 +2,7 @@ CASM c
 
 init initR
 
-function f : -> Int
+function f : -> Integer
 
 rule initR = {|
     assure 2 >= 1

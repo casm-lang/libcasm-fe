@@ -1,4 +1,4 @@
-function x: Int -> Int
+function x: Integer -> Integer
 
 rule main = {
   x( 1 ) := 1

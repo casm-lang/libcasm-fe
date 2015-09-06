@@ -82,7 +82,7 @@ Type::Type(TypeType enum_type, const std::string& name) : unify_with_left(nullpt
 
 Type::Type(const std::string& type_name) : unify_with_left(nullptr),
     unify_with_right(nullptr), constraints(), subtypes() {
-  if (type_name == "Int") { t = TypeType::INT; }
+  if (type_name == "Integer") { t = TypeType::INTEGER; }
   else if (type_name == "Float") { t = TypeType::FLOAT; }
   else if (type_name == "Rational") { t = TypeType::RATIONAL; }
   else if (type_name == "Undef") { t = TypeType::UNDEF; }
@@ -129,7 +129,7 @@ bool Type::operator!=(const Type& other) const {
 
 const std::string Type::to_str() const {
   switch (t) {
-    case TypeType::INT: return "Int";
+    case TypeType::INTEGER: return "Integer";
     case TypeType::FLOAT: return "Float";
     case TypeType::RATIONAL: return "Rational";
     case TypeType::UNDEF: return "Undef";

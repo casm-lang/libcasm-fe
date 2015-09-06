@@ -1,6 +1,6 @@
-function f: -> Int
+function f: -> Integer
 
 init main
 
 rule main = pop x from f
-//~^ `pop from` argument must be List(A) but was Int
+//~^ `pop from` argument must be List(A) but was Integer

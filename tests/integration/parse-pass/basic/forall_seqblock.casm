@@ -1,9 +1,9 @@
 init initR
 
 function a : -> RuleRef
-function b : Int -> Int initially {1->0, 2->0}
+function b : Integer -> Integer initially {1->0, 2->0}
 
-rule foo(m:Int, x:Int, y:Int) =
+rule foo(m:Integer, x:Integer, y:Integer) =
 {|
 	if m = 1 then {
 		b(x) := 1

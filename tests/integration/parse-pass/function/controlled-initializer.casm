@@ -1,7 +1,7 @@
-function (controlled) a: -> Int initially { 1 }
-function (controlled) b: Int -> Int initially { 1 -> 2, 2 -> 3, 3 -> 4 }
-function c: -> Int initially { 1 }
-function d: Int -> Int initially { 1 -> 2, 2 -> 3, 3 -> 4 }
+function (controlled) a: -> Integer initially { 1 }
+function (controlled) b: Integer -> Integer initially { 1 -> 2, 2 -> 3, 3 -> 4 }
+function c: -> Integer initially { 1 }
+function d: Integer -> Integer initially { 1 -> 2, 2 -> 3, 3 -> 4 }
 
 init main
 

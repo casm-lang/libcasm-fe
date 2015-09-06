@@ -1,8 +1,8 @@
 // cmdline "-u"
 
-function a : -> Int initially { 1 }
-function b : -> List(Int) initially { [] }
-function c : Int * List(Int) -> List(Int)
+function a : -> Integer initially { 1 }
+function b : -> List(Integer) initially { [] }
+function c : Integer * List(Integer) -> List(Integer)
 
 init main
 

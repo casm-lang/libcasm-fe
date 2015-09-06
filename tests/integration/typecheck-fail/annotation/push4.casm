@@ -1,10 +1,10 @@
 // error annotation @6
 
-function a: -> List(Int)
+function a: -> List(Integer)
 
 rule main = {
   push "hallo" into a
-  //~^ cannot push String into List(Int)
+  //~^ cannot push String into List(Integer)
 
   program( self ) := undef
 }

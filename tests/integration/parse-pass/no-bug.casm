@@ -2,7 +2,7 @@
 
 CASM bugSegmentationFault
 
-function a: Int -> Int
+function a: Integer -> Integer
 
 init main
 

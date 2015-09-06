@@ -1,5 +1,5 @@
-function f : -> Int initially { 2.0 }
-//~^ type of initializer of function `f` is Float but should be Int
+function f : -> Integer initially { 2.0 }
+//~^ type of initializer of function `f` is Float but should be Integer
 
 init main
 

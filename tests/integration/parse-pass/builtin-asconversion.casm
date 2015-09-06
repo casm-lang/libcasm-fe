@@ -4,14 +4,14 @@ init main
 
 rule main = {
     let x = 4/10 in 
-        assert asInt(x) = 0
+        assert asInteger(x) = 0
     let x = 10/5 in 
-        assert asInt(x) = 2
+        assert asInteger(x) = 2
 
     let x = 0.4 in 
-        assert asInt(x) = 0
+        assert asInteger(x) = 0
     let x = 2.0 in 
-        assert asInt(x) = 2
+        assert asInteger(x) = 2
 
     let x = 4/10 in 
         assert asFloat(x) = 0.4

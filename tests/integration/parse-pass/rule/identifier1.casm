@@ -5,6 +5,6 @@ rule main = {
     //~^ rule `x` expects 2 arguments but 0 where provided
 }
 
-rule x( a:Int, b:Boolean ) = skip
+rule x( a:Integer, b:Boolean ) = skip
 
 init main

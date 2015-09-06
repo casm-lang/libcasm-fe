@@ -3,7 +3,7 @@ CASM t2
 
 init initR
 
-function x : -> Int
+function x : -> Integer
 
 rule initR =
 {|

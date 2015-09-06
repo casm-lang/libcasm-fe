@@ -1,4 +1,4 @@
-function pow: Int-> Int
+function pow: Integer-> Integer
 //~^ cannot use `pow` as function identifier because it is a builtin name
 //~^^ redefinition of symbol
 

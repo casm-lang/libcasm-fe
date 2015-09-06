@@ -1,8 +1,8 @@
 CASM bubblesort
 
-function array : Int -> Int
+function array : Integer -> Integer
 function changes : -> Boolean
-function i : -> Int initially { -1 }
+function i : -> Integer initially { -1 }
 
 
 init initR

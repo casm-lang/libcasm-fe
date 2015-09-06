@@ -1,6 +1,6 @@
 CASM foo
 
-function x: -> List(Int)
+function x: -> List(Integer)
 
 init main
 

@@ -136,12 +136,12 @@ objdump { return yy::casmi_parser::make_OBJDUMP(loc); }
 [a-zA-Z_][a-zA-Z0-9\_]* { return yy::casmi_parser::make_IDENTIFIER(yytext, loc); }
 
 0x[0-9a-fA-F]+ { 
-            INT_T val = convert_to_long(yytext+2, 16, driver, loc);
-            return yy::casmi_parser::make_INTCONST(val, loc);
+            INTEGER_T val = convert_to_long(yytext+2, 16, driver, loc);
+            return yy::casmi_parser::make_INTEGERCONST(val, loc);
             }
 [0-9]+ {
-          INT_T val = convert_to_long(yytext, 10, driver, loc);
-          return yy::casmi_parser::make_INTCONST(val, loc);
+          INTEGER_T val = convert_to_long(yytext, 10, driver, loc);
+          return yy::casmi_parser::make_INTEGERCONST(val, loc);
        }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? { 

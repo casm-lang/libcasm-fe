@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#define INT_T int64_t
+#define INTEGER_T int64_t
 #define FLOAT_T double
 
 class CompoundType;
@@ -13,7 +13,7 @@ class CompoundType;
 enum class TypeType {
   STRING,
   RULEREF,
-  INT,
+  INTEGER,
   FLOAT,
   BOOLEAN,
   SELF,
@@ -50,8 +50,8 @@ class Type {
 
     std::string enum_name;
 
-    INT_T subrange_start = 0;
-    INT_T subrange_end = -1;
+    INTEGER_T subrange_start = 0;
+    INTEGER_T subrange_end = -1;
 
     Type();
     Type(TypeType t);

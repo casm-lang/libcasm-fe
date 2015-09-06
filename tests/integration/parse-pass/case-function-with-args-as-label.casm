@@ -1,4 +1,4 @@
-function a: List(Int) -> Int initially { [1,2,3] -> 1}
+function a: List(Integer) -> Integer initially { [1,2,3] -> 1}
 
 rule main = {
     case 1 of

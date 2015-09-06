@@ -1,4 +1,4 @@
-function f: Int * Int(1..5) * Int -> Int
+function f: Integer * Integer(1..5) * Integer -> Integer
 
 init main
 

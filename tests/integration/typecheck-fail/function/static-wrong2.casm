@@ -1,6 +1,6 @@
 // error annotation
 
-function (static) a: -> Int initially { 2 -> 3 }
+function (static) a: -> Integer initially { 2 -> 3 }
 //~^ function `a` does not accept arguments but initializer provides some
 
 

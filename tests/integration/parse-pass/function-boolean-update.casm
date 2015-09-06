@@ -1,6 +1,6 @@
 CASM foo
 
-function a: Int -> Boolean initially { 0 -> false, 1 -> true }
+function a: Integer -> Boolean initially { 0 -> false, 1 -> true }
 
 rule main = {
     a(0) := true

@@ -1,8 +1,8 @@
-function stop: -> Int
+function stop: -> Integer
 
 function s: -> String initially { "FOO" }
 
-function a: String -> Int
+function a: String -> Integer
 
 rule main = {
     let x = "Hallo" in {

@@ -2,13 +2,13 @@ CASM foo
 
 init main
 
-derived dev1(a:Int) = 2 * a
+derived dev1(a:Integer) = 2 * a
 
 rule main = {
     call foo(10)
 }
 
-rule foo(a: Int) = {
+rule foo(a: Integer) = {
     assert dev1(a) = 20
     assert a = 10
     program(self) := undef

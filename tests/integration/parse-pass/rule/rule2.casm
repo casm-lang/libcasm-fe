@@ -2,7 +2,7 @@
 
 rule main = {
   call (@bar)(3)
-  //~^ argument 1 of indirectly called rule `bar` must be `String` but was `Int`
+  //~^ argument 1 of indirectly called rule `bar` must be `String` but was `Integer`
   program( self ) := undef
 }
 

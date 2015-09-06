@@ -1,6 +1,6 @@
-function stop: -> Int
+function stop: -> Integer
 
-function a: List(Int) -> Int
+function a: List(Integer) -> Integer
 
 rule main = {
     let x = [] in {

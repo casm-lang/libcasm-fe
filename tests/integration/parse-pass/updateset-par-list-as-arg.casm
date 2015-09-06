@@ -1,4 +1,4 @@
-function a : List(Int) -> Int
+function a : List(Integer) -> Integer
 
 init main
 

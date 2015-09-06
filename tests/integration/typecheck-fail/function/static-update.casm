@@ -1,5 +1,5 @@
 // error annotation
-function (static) a: -> Int initially { 2 }
+function (static) a: -> Integer initially { 2 }
 
 rule main = {
   a := 3

@@ -5,7 +5,7 @@ CASM foo
 
 rule main = {
     print BVadd_result(32, 13, 2.0)
-    //~^ type of 3 argument of `BVadd_result` is Float but should be Int
+    //~^ type of 3 argument of `BVadd_result` is Float but should be Integer
 
     print BVsb(32, 13, 2)
     //~^ number of provided arguments does not match definition of `BVsb`

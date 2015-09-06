@@ -1,5 +1,5 @@
-function i: -> Int initially {0}
-function a: -> List(Int) initially { [] }
+function i: -> Integer initially {0}
+function a: -> List(Integer) initially { [] }
 
 rule main = {
     i := i + 1 

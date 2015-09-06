@@ -1,6 +1,6 @@
 CASM foo
 
-function x : Int * Int(1..5) * Int -> Int
+function x : Integer * Integer(1..5) * Integer -> Integer
 
 init initR
 

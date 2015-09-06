@@ -1,4 +1,4 @@
-function a : ->Int
+function a : ->Integer
 
 enum fpp = {a}
 //~^  redefinition of symbol `a`

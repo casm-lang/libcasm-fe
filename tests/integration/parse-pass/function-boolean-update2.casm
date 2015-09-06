@@ -1,6 +1,6 @@
 CASM Gray
 
-function input  : Int -> Boolean
+function input  : Integer -> Boolean
 
 
 init main

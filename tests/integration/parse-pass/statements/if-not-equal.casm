@@ -1,6 +1,6 @@
 CASM neq
 
-function a: -> Int initially { 2 }
+function a: -> Integer initially { 2 }
 
 init main_rule
 

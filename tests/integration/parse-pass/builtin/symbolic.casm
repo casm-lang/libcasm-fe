@@ -1,8 +1,8 @@
 // cmdline "-s"
 CASM symbolic
 
-function (symbolic) a: -> Int
-function b: -> Int initially { 2 }
+function (symbolic) a: -> Integer
+function b: -> Integer initially { 2 }
 
 init main
 

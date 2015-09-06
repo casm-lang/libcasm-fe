@@ -1,10 +1,10 @@
 CASM issue
 init foo
-function x : Int -> Int
+function x : Integer -> Integer
 
 rule foo =
 {
-    let x : Int = 10 in
+    let x : Integer = 10 in
     //~^ redefinition of symbol `x`
     {
         print x

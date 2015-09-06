@@ -3,5 +3,5 @@ function x : -> Float
 init main
 
 rule main = { 
-    x := 1 //~ type `Float` of `x` does not match type `Int` of expression
+    x := 1 //~ type `Float` of `x` does not match type `Integer` of expression
 }

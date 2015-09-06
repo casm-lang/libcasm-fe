@@ -1,4 +1,4 @@
-function a: Int * List(Int) -> Int
+function a: Integer * List(Integer) -> Integer
 
 rule main = {
   let x = undef in

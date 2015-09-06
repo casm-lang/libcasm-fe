@@ -6,11 +6,11 @@ rule main = {
     case y of
       x: skip
       2: skip
-      //~^ type of case expression (Tuple ()) and label (Int) do not match
+      //~^ type of case expression (Tuple ()) and label (Integer) do not match
       3: skip
-      //~^ type of case expression (Tuple ()) and label (Int) do not match
+      //~^ type of case expression (Tuple ()) and label (Integer) do not match
       4: skip
-      //~^ type of case expression (Tuple ()) and label (Int) do not match
+      //~^ type of case expression (Tuple ()) and label (Integer) do not match
       default: skip
     endcase
   }

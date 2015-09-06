@@ -1,7 +1,7 @@
 //function stop: -> Boolean initially { false }
-function stop: -> Int initially { 0 }
+function stop: -> Integer initially { 0 }
 
-function map: Int -> List(Int)
+function map: Integer -> List(Integer)
 
 rule main = {
     map(1) := app([], 5)

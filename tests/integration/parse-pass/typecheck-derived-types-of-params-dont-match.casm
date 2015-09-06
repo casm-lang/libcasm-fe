@@ -2,7 +2,7 @@ CASM foo
 
 init main
 
-derived dev1(a: Int, b: Int) = a + b
+derived dev1(a: Integer, b: Integer) = a + b
 
 rule main = print dev1("Hallo", 1)
-//~^ type of 1 argument of `dev1` is String but should be Int
+//~^ type of 1 argument of `dev1` is String but should be Integer

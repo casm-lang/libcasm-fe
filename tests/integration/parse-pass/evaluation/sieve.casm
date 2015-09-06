@@ -4,9 +4,9 @@ CASM sieve
 
 init initR
 
-function array : Int -> Int
-function i : -> Int
-function j : -> Int
+function array : Integer -> Integer
+function i : -> Integer
+function j : -> Integer
 
 rule initR =
 {|

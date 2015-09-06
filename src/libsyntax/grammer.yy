@@ -106,7 +106,7 @@
     SLASH   "/"
     PERCENT "%"
     ;
-%token FLOATCONST INTCONST RATIONALCONST STRCONST
+%token FLOATCONST INTEGERCONST RATIONALCONST STRCONST
 %token <std::string> IDENTIFIER "identifier"
 
 %type <AstNode*> INIT_SYNTAX BODY_ELEMENT SPECIFICATION RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX
@@ -114,13 +114,13 @@
 %type <UnaryNode*> ASSERT_SYNTAX ASSURE_SYNTAX KW_SEQBLOCK_SYNTAX ITERATE_SYNTAX
 %type <AstListNode*> BODY_ELEMENTS STATEMENTS
 %type <AtomNode*> NUMBER VALUE NUMBER_RANGE
-%type <IntAtom*> INT_NUMBER 
+%type <IntegerAtom*> INTEGER_NUMBER 
 %type <std::pair<ExpressionBase*, ExpressionBase*>> INITIALIZER
 %type <std::vector<std::pair<ExpressionBase*, ExpressionBase*>>*> INITIALIZER_LIST INITIALIZERS
 %type <ExpressionBase*> EXPRESSION BRACKET_EXPRESSION ATOM
 %type <std::vector<ExpressionBase*>*> EXPRESSION_LIST EXPRESSION_LIST_NO_COMMA LISTCONST
 %type <UpdateNode*> UPDATE_SYNTAX
-%type <INT_T> INTCONST
+%type <INTEGER_T> INTEGERCONST
 %type <FLOAT_T> FLOATCONST
 %type <std::string> STRCONST
 %type <rational_t> RATIONALCONST
@@ -162,7 +162,7 @@
 %precedence UPDATE PRINT ASSURE ASSERT DIEDIE NOT
 
 %nonassoc ","
-%nonassoc FLOATCONST INTCONST STRCONST RATIONALCONST IDENTIFIER
+%nonassoc FLOATCONST INTEGERCONST STRCONST RATIONALCONST IDENTIFIER
 %nonassoc AND OR
 %nonassoc "=" "<" ">"  NEQUAL LESSEQ GREATEREQ
 %left "-" "+" XOR
@@ -320,7 +320,7 @@ PARAM: IDENTIFIER ":" TYPE_SYNTAX {
         size_t size = driver.binding_offsets.size();
         driver.binding_offsets[$1] = size;
         // TODO: fail for rules without types and print warnings
-        $$ = new Type(TypeType::INT);
+        $$ = new Type(TypeType::INTEGER);
      }
      ;
 
@@ -353,7 +353,7 @@ TYPE_SYNTAX: IDENTIFIER { $$ = new Type($1); /* TODO check invalid types */}
            | IDENTIFIER "(" TYPE_SYNTAX_LIST ")" {
                $$ = new Type($1, $3);
            }
-           | IDENTIFIER "(" INT_NUMBER DOTDOT INT_NUMBER ")" {
+           | IDENTIFIER "(" INTEGER_NUMBER DOTDOT INTEGER_NUMBER ")" {
                $$ = new Type($1);
                $$->subrange_start = $3->val_;
                $$->subrange_end = $5->val_;
@@ -398,17 +398,17 @@ VALUE: RULEREF { $$ = new RuleAtom(@$, std::move($1)); }
      | STRCONST { $$ = new StringAtom(@$, std::move($1)); }
      | LISTCONST { $$ = new ListAtom(@$, $1); }
      | NUMBER_RANGE { $$ = $1; }
-     | SYMBOL { $$ = new IntAtom(@$, 0); }
+     | SYMBOL { $$ = new IntegerAtom(@$, 0); }
      | SELF { $$ = new SelfAtom(@$); }
      | UNDEF { $$ = new UndefAtom(@$); }
      | TRUE { $$ = new BooleanAtom(@$, true); }
      | FALSE { $$ = new BooleanAtom(@$, false); }
      ;
 
-INT_NUMBER: "+" INTCONST %prec UPLUS { $$ = new IntAtom(@$, $2); }
-          | "-" INTCONST %prec UMINUS { $$ = new IntAtom(@$, (-1) * $2); }
-          | INTCONST { $$ = new IntAtom(@$, $1); }
-NUMBER: INT_NUMBER { $$ = $1; }
+INTEGER_NUMBER: "+" INTEGERCONST %prec UPLUS { $$ = new IntegerAtom(@$, $2); }
+          | "-" INTEGERCONST %prec UMINUS { $$ = new IntegerAtom(@$, (-1) * $2); }
+          | INTEGERCONST { $$ = new IntegerAtom(@$, $1); }
+NUMBER: INTEGER_NUMBER { $$ = $1; }
       | "+" FLOATCONST %prec UPLUS { $$ = new FloatAtom(@$, $2); }
       | "-" FLOATCONST %prec UMINUS { $$ = new FloatAtom(@$, (-1) * $2); }
       | FLOATCONST { $$ = new FloatAtom(@$, $1); }
@@ -424,10 +424,10 @@ RULEREF: "@" IDENTIFIER { $$ = $2; }
        ;
 
 NUMBER_RANGE: "[" NUMBER DOTDOT NUMBER "]" {
-              if ($2->node_type_ == NodeType::INT_ATOM && $4->node_type_ == NodeType::INT_ATOM) {
-                $$ = new NumberRangeAtom(@$, reinterpret_cast<IntAtom*>($2), reinterpret_cast<IntAtom*>($4));
+              if ($2->node_type_ == NodeType::INTEGER_ATOM && $4->node_type_ == NodeType::INTEGER_ATOM) {
+                $$ = new NumberRangeAtom(@$, reinterpret_cast<IntegerAtom*>($2), reinterpret_cast<IntegerAtom*>($4));
               } else {
-                driver.error(@$, "numbers in range expression must be Int");
+                driver.error(@$, "numbers in range expression must be Integer");
                 $$ = nullptr;
               }
             }

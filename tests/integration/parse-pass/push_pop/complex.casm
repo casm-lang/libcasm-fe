@@ -1,5 +1,5 @@
 // cmdline "-d trace"
-function x : -> List(Tuple(Int,Int,Int))
+function x : -> List(Tuple(Integer,Integer,Integer))
 
 init initR
 

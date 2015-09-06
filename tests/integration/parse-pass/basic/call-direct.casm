@@ -4,4 +4,4 @@ init initR
 
 rule initR = call foo(1,2,3,4,"foo",6)
 
-rule foo(a:Int, b:Int, c:Int, d:Int, e:String, f:Int) = program(self) := undef
+rule foo(a:Integer, b:Integer, c:Integer, d:Integer, e:String, f:Integer) = program(self) := undef

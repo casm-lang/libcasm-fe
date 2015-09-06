@@ -3,7 +3,7 @@ CASM foo
 
 // cycle in initilizer dependencies
 
-function foo: -> Int initially { foo }
+function foo: -> Integer initially { foo }
 //~^ initializer dependency cycle detected: foo => foo
 
 init initR

@@ -1,7 +1,7 @@
 CASM foo
 
-derived foo:Int = "hallo"
-//~^ type of derived expression was `String` but should be `Int`
+derived foo:Integer = "hallo"
+//~^ type of derived expression was `String` but should be `Integer`
 
 
 rule main = {|

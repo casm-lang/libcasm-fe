@@ -1,6 +1,6 @@
 CASM hex
 
-function a: -> Int
+function a: -> Integer
 
 init main
 

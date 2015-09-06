@@ -1,5 +1,5 @@
-function i: -> Int
-function a: -> List(Int)
+function i: -> Integer
+function a: -> List(Integer)
 
 rule main = {
     a := [1,2,3]

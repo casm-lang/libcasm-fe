@@ -8,7 +8,7 @@
 #include "libsyntax/driver.h"
 #include "libsyntax/parser.tab.h"
 
-INT_T convert_to_long(const char* val, int base, Driver &driver, yy::location loc);
+INTEGER_T convert_to_long(const char* val, int base, Driver &driver, yy::location loc);
 FLOAT_T convert_to_float(const char* val, Driver &driver, yy::location loc);
 rational_t convert_to_rational(char* val, Driver &driver, yy::location loc);
 

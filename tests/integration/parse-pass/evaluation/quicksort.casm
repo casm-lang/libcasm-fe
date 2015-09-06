@@ -1,13 +1,13 @@
 CASM quicksort
 
-function stack : -> List(Tuple(Int, Int)) //initially { [] }
-function array : Int -> Int //initially { 0->9, 1->2, 2->10, 3->7, 4->8, 5->1, 6->6, 7->3, 8->4, 9->5}
-function p : -> Int //initially { undef }
-function pivot : -> Int
-function ll : -> Int
-function rr : -> Int
-function l : -> Int
-function r : -> Int
+function stack : -> List(Tuple(Integer, Integer)) //initially { [] }
+function array : Integer -> Integer //initially { 0->9, 1->2, 2->10, 3->7, 4->8, 5->1, 6->6, 7->3, 8->4, 9->5}
+function p : -> Integer //initially { undef }
+function pivot : -> Integer
+function ll : -> Integer
+function rr : -> Integer
+function l : -> Integer
+function r : -> Integer
 function need_pop : -> Boolean
 function need_partition : -> Boolean
 

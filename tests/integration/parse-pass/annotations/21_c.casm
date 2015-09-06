@@ -1,9 +1,9 @@
-function a: -> Int
+function a: -> Integer
 
 rule main = {
   let x = undef in
   let y = undef in
-  let z:Int = x + y in a := z
+  let z:Integer = x + y in a := z
 
   program( self ) := undef
 }

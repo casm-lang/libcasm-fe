@@ -4,8 +4,8 @@ function a: -> RuleRef initially { @bar }
 
 rule main = {
   call (a)(3,"hey")
-  //~^  argument 2 of indirectly called rule `bar` must be `Int` but was `String`
+  //~^  argument 2 of indirectly called rule `bar` must be `Integer` but was `String`
 }
 
-rule bar( p1 : Int, p2 : Int ) = skip
+rule bar( p1 : Integer, p2 : Integer ) = skip
 init main

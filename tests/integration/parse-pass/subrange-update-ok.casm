@@ -1,6 +1,6 @@
 CASM subr
 
-function x : -> Int(0..1) initially { 1 }
+function x : -> Integer(0..1) initially { 1 }
 
 init initR 
 

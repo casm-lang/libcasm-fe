@@ -1,4 +1,4 @@
-function a: Int -> Int
+function a: Integer -> Integer
 
 rule main = {
   let x = undef in

@@ -1,6 +1,6 @@
 CASM nth1
 
-function a: -> List(Int) initially { [] }
+function a: -> List(Integer) initially { [] }
 
 init main
 

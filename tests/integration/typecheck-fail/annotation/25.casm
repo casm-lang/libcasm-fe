@@ -1,4 +1,4 @@
-function a: -> Int
+function a: -> Integer
 
 rule main = {
   let x = undef in //~ type inference for `x` failed

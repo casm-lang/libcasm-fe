@@ -1,4 +1,4 @@
-function x : -> Int
+function x : -> Integer
 
 init main
 
@@ -6,4 +6,4 @@ rule main = {
     x := 1
 }
 
-function x : -> Int  //~ redefinition of symbol
+function x : -> Integer  //~ redefinition of symbol

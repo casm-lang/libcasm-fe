@@ -330,23 +330,23 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
                                             Type* type,
                                             const ExpressionOperation op) {
   if (*type == TypeType::UNKNOWN) {
-    type->constraints.push_back(new Type(TypeType::INT));
+    type->constraints.push_back(new Type(TypeType::INTEGER));
     if (op != ExpressionOperation::MOD || op == ExpressionOperation::RAT_DIV) {
       type->constraints.push_back(new Type(TypeType::RATIONAL));
       type->constraints.push_back(new Type(TypeType::FLOAT));
     }
   } else {
     if (op == ExpressionOperation::MOD || op == ExpressionOperation::RAT_DIV) {
-      if (*type != TypeType::INT) {
+      if (*type != TypeType::INTEGER) {
       driver_.error(loc,
                     "operands of operator `"+operator_to_str(op)+
-                    "` must be Int but were "+type->to_str());
+                    "` must be Integer but were "+type->to_str());
       }
      
-    } else if (*type != TypeType::INT && *type != TypeType::FLOAT && *type != TypeType::RATIONAL) {
+    } else if (*type != TypeType::INTEGER && *type != TypeType::FLOAT && *type != TypeType::RATIONAL) {
       driver_.error(loc,
                     "operands of operator `"+operator_to_str(op)+
-                    "` must be Int, Float or Rational but were "+
+                    "` must be Integer, Float or Rational but were "+
                     type->to_str());
     }
   }
@@ -530,11 +530,11 @@ Type* TypecheckVisitor::visit_builtin_atom(BuiltinAtom *atom,
 
     if (*atom->types[0] == TypeType::TUPLE) {
       ExpressionBase *ind_expr = atom->arguments->at(1);
-      if (ind_expr->node_type_ == NodeType::INT_ATOM) {
-        INT_T ind = reinterpret_cast<IntAtom*>(ind_expr)->val_;
+      if (ind_expr->node_type_ == NodeType::INTEGER_ATOM) {
+        INTEGER_T ind = reinterpret_cast<IntegerAtom*>(ind_expr)->val_;
         if (ind <= 0) {
           driver_.error(atom->arguments->at(1)->location,
-                        "second argument of nth must be a positive (>0) Int constant for tuples");
+                        "second argument of nth must be a positive (>0) Integer constant for tuples");
 
           return &atom->type_;
         }
@@ -554,7 +554,7 @@ Type* TypecheckVisitor::visit_builtin_atom(BuiltinAtom *atom,
         }
       } else {
         driver_.error(atom->arguments->at(1)->location,
-                      "second argument of nth must be an Int constant for tuples but was `"+
+                      "second argument of nth must be an Integer constant for tuples but was `"+
                       type_to_str(ind_expr->node_type_)+"`");
       }
     } else {
@@ -640,12 +640,12 @@ void AstWalker<TypecheckVisitor, Type*>::walk_forall(ForallNode *node) {
 
   Type list_t = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
 
-  if (node->in_expr->type_ == TypeType::INT || node->in_expr->type_ == TypeType::ENUM) {
+  if (node->in_expr->type_ == TypeType::INTEGER || node->in_expr->type_ == TypeType::ENUM) {
     node->type_.unify(&node->in_expr->type_);
   } else if (node->in_expr->type_.unify(&list_t)) {
     node->type_.unify(node->in_expr->type_.subtypes[0]);
   } else {
-    visitor.driver_.error(node->location, "expression must be a List, an Int or enum, but is "
+    visitor.driver_.error(node->location, "expression must be a List, an Integer or enum, but is "
                                   +node->in_expr->type_.to_str());
   }
 

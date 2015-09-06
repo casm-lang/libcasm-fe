@@ -7,7 +7,7 @@ function pipe : E -> List(String) initially { one -> ["one"], two -> ["two"], th
 
 rule initR= {
 	forall s in E do
-	let e_rev:E = Int2Enum(Enum2Int(three) - Enum2Int(s)) in
+	let e_rev:E = Integer2Enum(Enum2Integer(three) - Enum2Integer(s)) in
 	forall o in pipe(e_rev) do
 	{|
 		print o

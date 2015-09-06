@@ -2,7 +2,7 @@
 
 rule main = {
   call (1) ( "hallo", "welt" )
-  //~^ Indirect target must be a `Ruleref` but was `Int`
+  //~^ Indirect target must be a `Ruleref` but was `Integer`
 }
 
 rule a( b : String, c : String) = {

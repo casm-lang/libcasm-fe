@@ -1,8 +1,8 @@
-function a: -> Int
+function a: -> Integer
 
 rule main = {
   let x = undef in
-  let y:Int = undef in
+  let y:Integer = undef in
   let z = x < y in skip
 
   program( self ) := undef

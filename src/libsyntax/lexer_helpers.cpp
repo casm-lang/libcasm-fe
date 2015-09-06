@@ -6,10 +6,10 @@
 #include "libsyntax/lexer_helpers.h"
 
 
-INT_T convert_to_long(const char* val, int base, Driver &driver, yy::location loc) {
+INTEGER_T convert_to_long(const char* val, int base, Driver &driver, yy::location loc) {
   char* endptr;
   errno = 0;
-  INT_T res = strtol(val, &endptr, base);
+  INTEGER_T res = strtol(val, &endptr, base);
 
   switch (errno) {
       case EINVAL:

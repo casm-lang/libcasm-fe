@@ -1,7 +1,7 @@
 // error annotation @6
 
-function a: -> List(Int)
-function(static) foo: -> Int
+function a: -> List(Integer)
+function(static) foo: -> Integer
 
 rule main = {
   pop foo from a

@@ -1,6 +1,6 @@
-function i: -> Int initially {1}
-function bar: Int -> Int initially {0 -> 0}
-function foo: Int -> Int initially {1 -> 1}
+function i: -> Integer initially {1}
+function bar: Integer -> Integer initially {0 -> 0}
+function foo: Integer -> Integer initially {1 -> 1}
 
 init main
 

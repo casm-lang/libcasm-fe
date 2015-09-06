@@ -1,6 +1,6 @@
 // error interpreter
 
-function x: Int -> Int
+function x: Integer -> Integer
 
 rule main = {
   forall i in [ 1, 1 ] do {

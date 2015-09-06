@@ -1,5 +1,5 @@
-function a: -> Int
-function b: -> Int
+function a: -> Integer
+function b: -> Integer
 
 rule main =  {|
   a := 3

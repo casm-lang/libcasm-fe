@@ -1,7 +1,7 @@
 CASM foo
 
-derived foo:Int = []
-//~^ type of derived expression was `Tuple ()` but should be `Int`
+derived foo:Integer = []
+//~^ type of derived expression was `Tuple ()` but should be `Integer`
 
 
 rule main = {|

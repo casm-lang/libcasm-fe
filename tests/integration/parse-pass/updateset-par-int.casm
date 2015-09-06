@@ -1,4 +1,4 @@
-function x : -> Int initially { 1 }
+function x : -> Integer initially { 1 }
 
 init main
 

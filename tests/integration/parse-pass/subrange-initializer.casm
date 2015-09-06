@@ -2,7 +2,7 @@
 
 CASM subr
 
-function x : -> Int(0..1) initially { 2 }
+function x : -> Integer(0..1) initially { 2 }
 //~^ 2 does violate the subrange 0..1 of `x`
 
 init initR 

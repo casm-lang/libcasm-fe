@@ -2,19 +2,19 @@ CASM foo
 
 rule main = {
     assert not 1
-    //~^ operand of `not` must be Boolean but is Int
+    //~^ operand of `not` must be Boolean but is Integer
 
     assert 1 and 1
-    //~^ operands of operator `and` must be Boolean but are Int
+    //~^ operands of operator `and` must be Boolean but are Integer
 
     assert 1 or 1
-    //~^ operands of operator `or` must be Boolean but are Int
+    //~^ operands of operator `or` must be Boolean but are Integer
 
     assert 1 xor 1
-    //~^ operands of operator `xor` must be Boolean but are Int
+    //~^ operands of operator `xor` must be Boolean but are Integer
 
     assert true and 1
-    //~^  type of expressions did not match: Boolean != Int
+    //~^  type of expressions did not match: Boolean != Integer
 
     program(self) := undef
 }

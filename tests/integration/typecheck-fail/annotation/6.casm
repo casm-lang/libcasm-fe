@@ -1,13 +1,13 @@
 // error annotation @9
 
-function a: List(Int) -> Int
-function b: List(String) -> Int
+function a: List(Integer) -> Integer
+function b: List(String) -> Integer
 
 rule main = {
     let x = [] in {
         a( x ) := 2
         b( x ) := 3
-        //~^ type of 1 argument of `b` is List(Int) but should be List(String)
+        //~^ type of 1 argument of `b` is List(Integer) but should be List(String)
     }
 
     program( self ) := undef

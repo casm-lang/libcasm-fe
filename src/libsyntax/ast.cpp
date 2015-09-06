@@ -7,7 +7,7 @@
 static std::map<NodeType, const std::string> node_type_names_ = {
     {NodeType::ASSERT, std::string("ASSERT")},
     {NodeType::UNDEF_ATOM, std::string("UNDEF ATOM")},
-    {NodeType::INT_ATOM, std::string("INT ATOM")},
+    {NodeType::INTEGER_ATOM, std::string("INTEGER ATOM")},
     {NodeType::FLOAT_ATOM, std::string("FLOAT ATOM")},
     {NodeType::SELF_ATOM, std::string("SELF ATOM")},
     {NodeType::STRING_ATOM, std::string("STRING ATOM")},
@@ -136,19 +136,19 @@ IfThenElseNode::IfThenElseNode(yy::location& loc, ExpressionBase *condition, Ast
     : AstNode(loc, NodeType::IFTHENELSE), condition_(condition), then_(then), else_(els) {}
 
 
-IntAtom::IntAtom(yy::location& loc, INT_T val) :
-        AtomNode(loc, NodeType::INT_ATOM, Type(TypeType::INT)) {
+IntegerAtom::IntegerAtom(yy::location& loc, INTEGER_T val) :
+        AtomNode(loc, NodeType::INTEGER_ATOM, Type(TypeType::INTEGER)) {
   val_ = val;
 }
 
-IntAtom::~IntAtom() {}
+IntegerAtom::~IntegerAtom() {}
 
-bool IntAtom::equals(AstNode *other) {
+bool IntegerAtom::equals(AstNode *other) {
   if (!AstNode::equals(other)) {
     return false;
   }
 
-  IntAtom *other_cast = static_cast<IntAtom*>(other);
+  IntegerAtom *other_cast = static_cast<IntegerAtom*>(other);
   return val_ == other_cast->val_;
 }
 
@@ -304,14 +304,14 @@ BuiltinAtom::BuiltinAtom(yy::location& loc, const std::string name,
     types = { a1, a2 };
     id = Id::POW;
   } else if (name == "hex") {
-    Type *a1 = new Type(TypeType::INT);
+    Type *a1 = new Type(TypeType::INTEGER);
     return_type = new Type(TypeType::STRING);
 
     types = { a1 };
     id = Id::HEX;
   } else if (name == "nth") {
     Type *a1 = new Type(TypeType::TUPLE_OR_LIST, new Type(TypeType::UNKNOWN));
-    Type *a2 = new Type(TypeType::INT);
+    Type *a2 = new Type(TypeType::INTEGER);
     return_type = new Type(TypeType::UNKNOWN);
 
     a1->subtypes[0]->unify(return_type);
@@ -337,7 +337,7 @@ BuiltinAtom::BuiltinAtom(yy::location& loc, const std::string name,
     id = Id::APP;
   } else if (name == "len") {
     Type *a1 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
-    return_type = new Type(TypeType::INT);
+    return_type = new Type(TypeType::INTEGER);
 
     types = { a1 };
     id = Id::LEN;
@@ -355,42 +355,42 @@ BuiltinAtom::BuiltinAtom(yy::location& loc, const std::string name,
 
     types = { a1 };
     id = Id::PEEK;
-  } else if (name == "Boolean2Int") {
+  } else if (name == "Boolean2Integer") {
     Type *a1 = new Type(TypeType::BOOLEAN);
-    return_type = new Type(TypeType::INT);
+    return_type = new Type(TypeType::INTEGER);
 
     types = { a1 };
-    id = Id::BOOLEAN2INT;
-  } else if (name == "Int2Boolean") {
-    Type *a1 = new Type(TypeType::INT);
+    id = Id::BOOLEAN2INTEGER;
+  } else if (name == "Integer2Boolean") {
+    Type *a1 = new Type(TypeType::INTEGER);
     return_type = new Type(TypeType::BOOLEAN);
 
     types = { a1 };
-    id = Id::INT2BOOLEAN;
-  } else if (name == "Enum2Int") {
+    id = Id::INTEGER2BOOLEAN;
+  } else if (name == "Enum2Integer") {
     Type *a1 = new Type(TypeType::ENUM);
-    return_type = new Type(TypeType::INT);
+    return_type = new Type(TypeType::INTEGER);
 
     types = { a1 };
-    id = Id::ENUM2INT;
-  } else if (name == "Int2Enum") {
-    Type *a1 = new Type(TypeType::INT);
+    id = Id::ENUM2INTEGER;
+  } else if (name == "Integer2Enum") {
+    Type *a1 = new Type(TypeType::INTEGER);
     return_type = new Type(TypeType::ENUM);
 
     types = { a1 };
-    id = Id::INT2ENUM;
-  } else if (name == "asInt") {
+    id = Id::INTEGER2ENUM;
+  } else if (name == "asInteger") {
     Type *a1 = new Type(TypeType::UNKNOWN);
-    a1->constraints.push_back(new Type(TypeType::INT));
+    a1->constraints.push_back(new Type(TypeType::INTEGER));
     a1->constraints.push_back(new Type(TypeType::FLOAT));
     a1->constraints.push_back(new Type(TypeType::RATIONAL));
-    return_type = new Type(TypeType::INT);
+    return_type = new Type(TypeType::INTEGER);
 
     types = { a1 };
-    id = Id::ASINT;
+    id = Id::ASINTEGER;
   } else if (name == "asFloat") {
     Type *a1 = new Type(TypeType::UNKNOWN);
-    a1->constraints.push_back(new Type(TypeType::INT));
+    a1->constraints.push_back(new Type(TypeType::INTEGER));
     a1->constraints.push_back(new Type(TypeType::FLOAT));
     a1->constraints.push_back(new Type(TypeType::RATIONAL));
     return_type = new Type(TypeType::FLOAT);
@@ -399,7 +399,7 @@ BuiltinAtom::BuiltinAtom(yy::location& loc, const std::string name,
     id = Id::ASFLOAT;
   } else if (name == "asRational") {
     Type *a1 = new Type(TypeType::UNKNOWN);
-    a1->constraints.push_back(new Type(TypeType::INT));
+    a1->constraints.push_back(new Type(TypeType::INTEGER));
     a1->constraints.push_back(new Type(TypeType::FLOAT));
     a1->constraints.push_back(new Type(TypeType::RATIONAL));
     return_type = new Type(TypeType::RATIONAL);
@@ -432,10 +432,10 @@ std::string BuiltinAtom::to_string() {
     case Id::LEN: return "len";
     case Id::TAIL: return "tail";
     case Id::PEEK: return "peek";
-    case Id::BOOLEAN2INT: return "Boolean2Int";
-    case Id::INT2BOOLEAN: return "Int2Boolean";
-    case Id::ENUM2INT: return "Enum2Int";
-    case Id::ASINT: return "asInt";
+    case Id::BOOLEAN2INTEGER: return "Boolean2Integer";
+    case Id::INTEGER2BOOLEAN: return "Integer2Boolean";
+    case Id::ENUM2INTEGER: return "Enum2Integer";
+    case Id::ASINTEGER: return "asInteger";
     case Id::ASFLOAT: return "asFloat";
     case Id::ASRATIONAL: return "asFloat";
     case Id::SYMBOLIC: return "symbolic";
@@ -449,20 +449,20 @@ ListAtom::ListAtom(yy::location& loc, std::vector<ExpressionBase*> *exprs)
   type_ = Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
 }
 
-NumberRangeAtom::NumberRangeAtom(yy::location& loc, IntAtom *start, IntAtom *end) :
+NumberRangeAtom::NumberRangeAtom(yy::location& loc, IntegerAtom *start, IntegerAtom *end) :
     AtomNode(loc, NodeType::NUMBER_RANGE_ATOM, TypeType::UNKNOWN) {
-  type_ = Type(TypeType::LIST, new Type(TypeType::INT));
-  INT_T i_start = start->val_;
-  INT_T i_end = end->val_;
+  type_ = Type(TypeType::LIST, new Type(TypeType::INTEGER));
+  INTEGER_T i_start = start->val_;
+  INTEGER_T i_end = end->val_;
 
   /*
   std::vector<value_t> vals;
   if (i_start <= i_end) {
-    for (INT_T i=i_end; i >= i_start; i--) {
+    for (INTEGER_T i=i_end; i >= i_start; i--) {
       vals.push_back(value_t(i));
     }
   } else {
-    for (INT_T i=i_end; i <= i_start; i++) {
+    for (INTEGER_T i=i_end; i <= i_start; i++) {
       vals.push_back(value_t(i));
     }
   }

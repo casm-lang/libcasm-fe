@@ -17,7 +17,7 @@ class value_t;
 enum NodeType {
   ASSERT,
   UNDEF_ATOM,
-  INT_ATOM,
+  INTEGER_ATOM,
   FLOAT_ATOM,
   RATIONAL_ATOM,
   SELF_ATOM,
@@ -169,12 +169,12 @@ class AtomNode: public ExpressionBase {
     AtomNode(yy::location& loc, NodeType node_type, Type type) : ExpressionBase(loc, node_type, type) {}
 };
 
-class IntAtom : public AtomNode {
+class IntegerAtom : public AtomNode {
   public:
-    INT_T val_;
+    INTEGER_T val_;
 
-    IntAtom(yy::location& loc, INT_T val);
-    virtual ~IntAtom();
+    IntegerAtom(yy::location& loc, INTEGER_T val);
+    virtual ~IntegerAtom();
     bool equals(AstNode *other);
 };
 
@@ -267,11 +267,11 @@ class BuiltinAtom: public BaseFunctionAtom {
       LEN,
       TAIL,
       PEEK,
-      BOOLEAN2INT,
-      INT2BOOLEAN,
-      ENUM2INT,
-      INT2ENUM,
-      ASINT,
+      BOOLEAN2INTEGER,
+      INTEGER2BOOLEAN,
+      ENUM2INTEGER,
+      INTEGER2ENUM,
+      ASINTEGER,
       ASFLOAT,
       ASRATIONAL,
       SYMBOLIC,
@@ -324,7 +324,7 @@ class NumberRangeAtom : public AtomNode {
   public:
     BottomList *list;
 
-    NumberRangeAtom(yy::location& loc, IntAtom *start, IntAtom *end);
+    NumberRangeAtom(yy::location& loc, IntegerAtom *start, IntegerAtom *end);
 };
 
 enum class ExpressionOperation {

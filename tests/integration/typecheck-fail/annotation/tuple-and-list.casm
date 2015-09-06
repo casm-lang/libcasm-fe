@@ -1,11 +1,11 @@
 // error annotation @7
 
-function a: -> Tuple(Int,Int)
+function a: -> Tuple(Integer,Integer)
 
 rule main = {
   a := [ 1, 2 ]
   let x = len( a ) in skip
-  //~^ type of 1 argument of `len` is Tuple (Int,Int,) but should be List(Unknown)
+  //~^ type of 1 argument of `len` is Tuple (Integer,Integer,) but should be List(Unknown)
 
 
   program( self ) := undef

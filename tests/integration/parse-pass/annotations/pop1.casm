@@ -1,4 +1,4 @@
-function a: -> List(Int) initially { [ 1, 2 ] }
+function a: -> List(Integer) initially { [ 1, 2 ] }
 
 rule main = 
 seqblock

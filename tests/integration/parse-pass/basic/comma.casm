@@ -1,6 +1,6 @@
-function (static) a: -> Int initially { 2, }
-function (static) b: Int -> Int initially { 1 -> 1, 2 -> 2, 3 -> 3, }
-function c: Int * Int * -> Int
+function (static) a: -> Integer initially { 2, }
+function (static) b: Integer -> Integer initially { 1 -> 1, 2 -> 2, 3 -> 3, }
+function c: Integer * Integer * -> Integer
 
 derived derived_mul( param_a, param_b, ) = a * b( 2 )
 derived d_no_params( ) = 2
@@ -19,7 +19,7 @@ rule r_no_params( ) = {
   skip
 }
 
-rule test_rule( rule_param_a : Int, rule_param_b : Int, ) = {
+rule test_rule( rule_param_a : Integer, rule_param_b : Integer, ) = {
   skip
 }
 init main

@@ -1,6 +1,6 @@
 // cmdline "-u"
 
-function a : -> Int initially { 1 }
+function a : -> Integer initially { 1 }
 
 init main
 

@@ -1,6 +1,6 @@
 // cmdline "-s"
 
-function(symbolic) b : Int -> Int initially { 1 -> 1, 2 -> 2 }
+function(symbolic) b : Integer -> Integer initially { 1 -> 1, 2 -> 2 }
 
 init main
 

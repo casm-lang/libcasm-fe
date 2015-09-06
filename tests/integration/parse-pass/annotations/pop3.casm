@@ -1,5 +1,5 @@
-function a: -> List(Int) initially { [ 1 ] }
-function b: -> Int
+function a: -> List(Integer) initially { [ 1 ] }
+function b: -> Integer
 
 rule main =  {|
   pop b from a

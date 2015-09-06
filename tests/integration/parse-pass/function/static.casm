@@ -1,10 +1,10 @@
-function (static) a: -> Int initially { 2 }
-function (static) b: -> Int initially { 3 }
-function (static) c: -> Int initially { 4 }
+function (static) a: -> Integer initially { 2 }
+function (static) b: -> Integer initially { 3 }
+function (static) c: -> Integer initially { 4 }
 
-function (static) d: Int -> Int initially { 1 -> 1, 2 -> 2, 3 -> 3 }
+function (static) d: Integer -> Integer initially { 1 -> 1, 2 -> 2, 3 -> 3 }
 
-function (static) e: Int * Int -> Int initially { [ 1,2 ] -> 3, [ 2,2 ] -> 4, [ 2,3 ] -> 5 }
+function (static) e: Integer * Integer -> Integer initially { [ 1,2 ] -> 3, [ 2,2 ] -> 4, [ 2,3 ] -> 5 }
 
 init main
 

@@ -2,9 +2,9 @@
 
 rule main = seqblock
   call (@a) ( "hallo", "welt" )
-  //~^ argument 1 of indirectly called rule `a` must be `Int` but was `String`
+  //~^ argument 1 of indirectly called rule `a` must be `Integer` but was `String`
 endseqblock
 
-rule a( b : Int, c : String ) = skip
+rule a( b : Integer, c : String ) = skip
 
 init main

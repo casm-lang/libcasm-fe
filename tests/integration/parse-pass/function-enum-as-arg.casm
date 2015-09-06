@@ -1,7 +1,7 @@
 CASM foo
 
-function stop: -> Int initially { 0 }
-function foo: my_e -> Int
+function stop: -> Integer initially { 0 }
+function foo: my_e -> Integer
 
 enum my_e = { e1, e2, e3 }
 

@@ -1,4 +1,4 @@
-function a: -> List(Int) initially { [] }
+function a: -> List(Integer) initially { [] }
 
 rule main =  {|
   let x = undef in

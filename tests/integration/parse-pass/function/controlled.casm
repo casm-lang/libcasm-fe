@@ -1,10 +1,10 @@
-function (controlled) a: -> Int
-function (controlled) b: Int -> Int
-function (controlled) c: Int * Int -> Int
+function (controlled) a: -> Integer
+function (controlled) b: Integer -> Integer
+function (controlled) c: Integer * Integer -> Integer
 
-function d: -> Int
-function e: Int -> Int
-function f: Int * Int -> Int
+function d: -> Integer
+function e: Integer -> Integer
+function f: Integer * Integer -> Integer
 
 init main
 

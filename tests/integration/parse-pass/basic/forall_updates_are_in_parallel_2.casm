@@ -1,7 +1,7 @@
 // error interpreter @10
 CASM te
 
-function x: -> Int
+function x: -> Integer
 
 init initR
 

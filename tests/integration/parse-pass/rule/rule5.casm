@@ -7,5 +7,5 @@ rule main = {
   //~^ indirectly called rule `bar` expects 2 arguments but 3 where provided
 }
 
-rule bar( p1 : Int, p2 : Int ) = skip
+rule bar( p1 : Integer, p2 : Integer ) = skip
 init main

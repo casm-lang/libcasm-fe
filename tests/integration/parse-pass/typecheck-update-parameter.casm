@@ -4,5 +4,5 @@ init main
 
 rule main = skip
 
-rule bar(a: Int) = a := 1
+rule bar(a: Integer) = a := 1
 //~^ cannot update `a` because it is a parameter, not a function
