@@ -6,12 +6,14 @@
 TypecheckVisitor::TypecheckVisitor(Driver& driver) : driver_(driver), rule_binding_types(), rule_binding_offsets(), forall_head(false) { }
 
 void TypecheckVisitor::check_type_valid(const yy::location& location, const Type& type) {
-  if (type == TypeType::ENUM &&
-      !driver_.function_table.get_enum(type.enum_name)) {
-    driver_.error(location,
-                  "unknown type "+type.enum_name+"");
+  if( type == TypeType::ENUM
+  &&  !driver_.function_table.get_enum(type.enum_name)
+  )
+  {
+      driver_.error( location, "unknown type " + type.enum_name + "" );
   }
 }
+
 
 void TypecheckVisitor::visit_function_def(FunctionDefNode *def,
                                           const std::vector<std::pair<Type*, Type*>>& initializers) {
@@ -147,6 +149,19 @@ void TypecheckVisitor::visit_update(UpdateNode *update, Type*, Type*) {
                                     update->expr_->type_.get_most_general_type()->to_str()+"` of expression");
   }
 
+  const Type* lhs = update->func->type_.get_most_general_type();
+  const Type* rhs = update->expr_->type_.get_most_general_type();
+  
+  if( lhs->t == TypeType::BIT
+   && lhs->bitsize != rhs->bitsize )
+  {      
+      driver_.error( update->location,
+                     "type of '" + lhs->to_str() +
+                     "' of '" + update->func->name +
+                     "' does not match type '" + rhs->to_str() +
+                     "' of expression" );   
+  }
+  
   if (update->func->symbol_type == FunctionAtom::SymbolType::PARAMETER) {
     driver_.error(update->location, "cannot update `"+update->func->name+
                                     "` because it is a parameter, not a function");
@@ -327,29 +342,40 @@ void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<
 }
 
 void TypecheckVisitor::check_numeric_operator(const yy::location& loc, 
-                                            Type* type,
-                                            const ExpressionOperation op) {
-  if (*type == TypeType::UNKNOWN) {
-    type->constraints.push_back(new Type(TypeType::INTEGER));
-    if (op != ExpressionOperation::MOD || op == ExpressionOperation::RAT_DIV) {
-      type->constraints.push_back(new Type(TypeType::RATIONAL));
-      type->constraints.push_back(new Type(TypeType::FLOAT));
+                                              Type* type,
+                                              const ExpressionOperation op)
+{
+    if( *type == TypeType::UNKNOWN )
+    {
+        type->constraints.push_back(new Type(TypeType::INTEGER));
+        if( op != ExpressionOperation::MOD || op == ExpressionOperation::RAT_DIV )
+        {
+            type->constraints.push_back(new Type(TypeType::RATIONAL));
+            type->constraints.push_back(new Type(TypeType::FLOAT));
+        }
     }
-  } else {
-    if (op == ExpressionOperation::MOD || op == ExpressionOperation::RAT_DIV) {
-      if (*type != TypeType::INTEGER) {
-      driver_.error(loc,
-                    "operands of operator `"+operator_to_str(op)+
-                    "` must be Integer but were "+type->to_str());
-      }
-     
-    } else if (*type != TypeType::INTEGER && *type != TypeType::FLOAT && *type != TypeType::RATIONAL) {
-      driver_.error(loc,
-                    "operands of operator `"+operator_to_str(op)+
-                    "` must be Integer, Float or Rational but were "+
-                    type->to_str());
+    else
+    {
+        if( op == ExpressionOperation::MOD || op == ExpressionOperation::RAT_DIV )
+        {
+            if( *type != TypeType::INTEGER )
+            {
+                driver_.error(loc,
+                              "operands of operator `"+operator_to_str(op)+
+                              "` must be Integer but were "+type->to_str());
+            }
+        }
+        else if( *type != TypeType::INTEGER
+              && *type != TypeType::FLOAT
+              && *type != TypeType::BIT
+              && *type != TypeType::RATIONAL )
+        {
+            driver_.error(loc,
+                          "operands of operator `"+operator_to_str(op)+
+                          "` must be Integer, Bit, Float or Rational but were "+
+                          type->to_str());
+        }
     }
-  }
 }
 
 
@@ -360,6 +386,15 @@ Type* TypecheckVisitor::visit_expression(Expression *expr, Type*, Type*) {
                                      expr->right_->type_.get_most_general_type()->to_str());
   }
 
+  const Type* lhs = expr->left_->type_.get_most_general_type();
+  const Type* rhs = expr->right_->type_.get_most_general_type();
+
+  if( lhs->t == TypeType::BIT
+   && lhs->bitsize != rhs->bitsize )
+  {      
+      driver_.error( expr->location, "size of 'Bit' types in expression did not match: " + lhs->to_str() + " != " + rhs->to_str() );   
+  }
+  
   switch (expr->op) {
     case ExpressionOperation::ADD:
     case ExpressionOperation::SUB:
@@ -493,80 +528,89 @@ Type* TypecheckVisitor::visit_function_atom(FunctionAtom *atom, Type* arguments[
 
 Type* TypecheckVisitor::visit_builtin_atom(BuiltinAtom *atom,
                                            Type* arguments[],
-                                           uint16_t num_arguments) {
-  if(atom->types.size() != num_arguments) {
-    driver_.error(atom->location,
-                  "number of provided arguments does not match definition of `"+
-                  atom->name+"`");
-  } else {
-    for (size_t i=0; i < atom->types.size(); i++) {
-
-     Type *argument_t = atom->types[i];
- 
-      if (!arguments[i]->unify(argument_t)) {
-        driver_.error(atom->arguments->at(i)->location,
-                      "type of "+std::to_string(i+1)+" argument of `"+atom->name+
-                      "` is "+arguments[i]->to_str()+" but should be "+
-                      argument_t->to_str());
-      }
-    }
-  }
-
-  if (atom->name == "nth") {
-    if (*atom->types[0] == TypeType::TUPLE_OR_LIST && atom->types[0]->subtypes.size() > 0 && atom->types[0]->subtypes[0]->t != TypeType::UNKNOWN) {
-      Type first = *atom->types[0]->subtypes[0];
-      bool all_equal = true;
-      for (size_t i=1; i < atom->types[0]->subtypes.size(); i++) {
-        if (first != *atom->types[0]->subtypes[i]) {
-          all_equal = false;
-          break;
-        }
-      }
-      if (all_equal) {
-        atom->types[0]->t = TypeType::LIST;
-        atom->types[0]->subtypes = {new Type(first)};
-      } 
-    }
-
-    if (*atom->types[0] == TypeType::TUPLE) {
-      ExpressionBase *ind_expr = atom->arguments->at(1);
-      if (ind_expr->node_type_ == NodeType::INTEGER_ATOM) {
-        INTEGER_T ind = reinterpret_cast<IntegerAtom*>(ind_expr)->val_;
-        if (ind <= 0) {
-          driver_.error(atom->arguments->at(1)->location,
-                        "second argument of nth must be a positive (>0) Integer constant for tuples");
-
-          return &atom->type_;
-        }
-
-        // this is needed to handle stuff like:
-        //          assert nth(undef, 2) = undef
-        if (atom->types[0]->is_unknown() && atom->type_.is_unknown()) {
-          return &atom->type_;
-        }
-        if ((size_t) ind < (atom->types[0]->subtypes.size()+1)) {
-          atom->type_.unify(atom->types[0]->subtypes[ind-1]);
-        } else {
-          driver_.error(atom->arguments->at(1)->location,
-                        "index out of bounds for tuple, currently tuple only has "+
-                        std::to_string(atom->arguments->size())+" types");
-
-        }
-      } else {
-        driver_.error(atom->arguments->at(1)->location,
-                      "second argument of nth must be an Integer constant for tuples but was `"+
-                      type_to_str(ind_expr->node_type_)+"`");
-      }
+                                           uint16_t num_arguments)
+{
+    Builtin* built_in = Builtin::get( atom->name );
+    assert( built_in );
+    
+    built_in->typecheck( driver_, atom, arguments, num_arguments );
+    
+    if(atom->types.size() != num_arguments) {
+        driver_.error(atom->location,
+                      "number of provided arguments does not match definition of `"+
+                      atom->name+"`");
     } else {
-      atom->type_.unify(atom->types[0]->subtypes[0]);
-      arguments[0]->unify(&atom->type_);
-      atom->type_.unify(atom->return_type);
+        for (size_t i=0; i < atom->types.size(); i++) {
+
+            Type *argument_t = atom->types[i];
+            
+            if (!arguments[i]->unify(argument_t)) {
+                driver_.error(atom->arguments->at(i)->location,
+                              "type of "+std::to_string(i+1)+" argument of `"+atom->name+
+                              "` is "+arguments[i]->to_str()+" but should be "+
+                              argument_t->to_str());
+            }
+        }
     }
-  } else {
-    // TODO use type_ as return_type_ for builtins
-    atom->type_.unify(atom->return_type);
-  }
-  return &atom->type_;
+    
+    
+    
+    
+    if (atom->name == "nth") {
+        if (*atom->types[0] == TypeType::TUPLE_OR_LIST && atom->types[0]->subtypes.size() > 0 && atom->types[0]->subtypes[0]->t != TypeType::UNKNOWN) {
+            Type first = *atom->types[0]->subtypes[0];
+            bool all_equal = true;
+            for (size_t i=1; i < atom->types[0]->subtypes.size(); i++) {
+                if (first != *atom->types[0]->subtypes[i]) {
+                    all_equal = false;
+                    break;
+                }
+            }
+            if (all_equal) {
+                atom->types[0]->t = TypeType::LIST;
+                atom->types[0]->subtypes = {new Type(first)};
+            } 
+        }
+
+        if (*atom->types[0] == TypeType::TUPLE) {
+            ExpressionBase *ind_expr = atom->arguments->at(1);
+            if (ind_expr->node_type_ == NodeType::INTEGER_ATOM) {
+                INTEGER_T ind = reinterpret_cast<IntegerAtom*>(ind_expr)->val_;
+                if (ind <= 0) {
+                    driver_.error(atom->arguments->at(1)->location,
+                                  "second argument of nth must be a positive (>0) Integer constant for tuples");
+
+                    return &atom->type_;
+                }
+
+                // this is needed to handle stuff like:
+                //          assert nth(undef, 2) = undef
+                if (atom->types[0]->is_unknown() && atom->type_.is_unknown()) {
+                    return &atom->type_;
+                }
+                if ((size_t) ind < (atom->types[0]->subtypes.size()+1)) {
+                    atom->type_.unify(atom->types[0]->subtypes[ind-1]);
+                } else {
+                    driver_.error(atom->arguments->at(1)->location,
+                                  "index out of bounds for tuple, currently tuple only has "+
+                                  std::to_string(atom->arguments->size())+" types");
+
+                }
+            } else {
+                driver_.error(atom->arguments->at(1)->location,
+                              "second argument of nth must be an Integer constant for tuples but was `"+
+                              type_to_str(ind_expr->node_type_)+"`");
+            }
+        } else {
+            atom->type_.unify(atom->types[0]->subtypes[0]);
+            arguments[0]->unify(&atom->type_);
+            atom->type_.unify(atom->return_type);
+        }
+    } else {
+        // TODO use type_ as return_type_ for builtins
+        atom->type_.unify(atom->return_type);
+    }
+    return &atom->type_;
 }
 
 void TypecheckVisitor::visit_derived_function_atom_pre(FunctionAtom *atom,

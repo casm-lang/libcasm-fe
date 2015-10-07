@@ -14,6 +14,7 @@ enum class TypeType {
   STRING,
   RULEREF,
   INTEGER,
+  BIT,
   FLOAT,
   BOOLEAN,
   SELF,
@@ -53,6 +54,8 @@ class Type {
     INTEGER_T subrange_start = 0;
     INTEGER_T subrange_end = -1;
 
+    INTEGER_T bitsize = -1;
+    
     Type();
     Type(TypeType t);
     Type(const Type& other);

@@ -291,127 +291,162 @@ bool FunctionAtom::equals(AstNode *other) {
   return false;
 }
 
-BuiltinAtom::BuiltinAtom(yy::location& loc, const std::string name,
-                           std::vector<ExpressionBase*> *args) 
-    : BaseFunctionAtom(loc, NodeType::BUILTIN_ATOM, name, args), return_type(nullptr) {
-  if (name == "pow") {
-    Type *a1 = new Type(TypeType::UNKNOWN);
-    Type *a2 = new Type(TypeType::UNKNOWN);
-    return_type = new Type(TypeType::UNKNOWN);
+BuiltinAtom::BuiltinAtom
+( yy::location& loc
+, const std::string name
+, std::vector<ExpressionBase*> *args) 
+: BaseFunctionAtom(loc, NodeType::BUILTIN_ATOM, name, args), return_type(nullptr)
+{
+    Builtin* built_in = Builtin::get( name );
+    
+    assert( built_in && "built-in cannot be null" );
+    
+    assert( built_in->ret_type.size() == 1 );
+    return_type = new Type( built_in->ret_type[ 0 ] );
+    
+    for( std::vector< TypeType > v : built_in->arg_type )
+    {
+        assert( v.size() >= 1 );
+        Type* t = new Type( v[0] );
+        
+        for( int i = 1; i < v.size(); i++)
+        {
+            t->constraints.push_back( new Type( v[i] ) );
+        }
 
-    a1->unify(a2);
-    a2->unify(return_type);
-    types = { a1, a2 };
-    id = Id::POW;
-  } else if (name == "hex") {
-    Type *a1 = new Type(TypeType::INTEGER);
-    return_type = new Type(TypeType::STRING);
+        types.push_back( t );
+    }
+    
+    id = built_in->id;
 
-    types = { a1 };
-    id = Id::HEX;
-  } else if (name == "nth") {
-    Type *a1 = new Type(TypeType::TUPLE_OR_LIST, new Type(TypeType::UNKNOWN));
-    Type *a2 = new Type(TypeType::INTEGER);
-    return_type = new Type(TypeType::UNKNOWN);
+    built_in->unify( return_type, types );
+    
+    //Type *a1 = new Type(TypeType::UNKNOWN);
+  //   a1->constraints.push_back(new Type(TypeType::INTEGER));
+  //   a1->constraints.push_back(new Type(TypeType::FLOAT));
+  //   a1->constraints.push_back(new Type(TypeType::RATIONAL));
+  //   
+    
+    
+    
+  // if (name == "pow") {
+  //   Type *a1 = new Type(TypeType::UNKNOWN);
+  //   Type *a2 = new Type(TypeType::UNKNOWN);
+  //   return_type = new Type(TypeType::UNKNOWN);
 
-    a1->subtypes[0]->unify(return_type);
-    types = { a1, a2 };
-    id = Id::NTH;
-  } else if (name == "cons"){
-    Type *a1 = new Type(TypeType::UNKNOWN);
-    Type *a2 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
-    return_type = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+  //   a1->unify(a2);
+  //   a2->unify(return_type);
+  //   types = { a1, a2 };
+  //   id = Id::POW;
+  // } else if (name == "hex") {
+  //   Type *a1 = new Type(TypeType::INTEGER);
+  //   return_type = new Type(TypeType::STRING);
 
-    a1->unify(a2->subtypes[0]);
-    a2->unify(return_type);
-    types = { a1, a2 };
-    id = Id::CONS;
-  } else if (name == "app"){
-    Type *a1 = new Type(TypeType::UNKNOWN);
-    Type *a2 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
-    return_type = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+  //   types = { a1 };
+  //   id = Id::HEX;
+  // } else if (name == "nth") {
+  //   Type *a1 = new Type(TypeType::TUPLE_OR_LIST, new Type(TypeType::UNKNOWN));
+  //   Type *a2 = new Type(TypeType::INTEGER);
+  //   return_type = new Type(TypeType::UNKNOWN);
 
-    a1->unify(a2->subtypes[0]);
-    a2->unify(return_type);
-    types = { a2, a1 };
-    id = Id::APP;
-  } else if (name == "len") {
-    Type *a1 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
-    return_type = new Type(TypeType::INTEGER);
+  //   a1->subtypes[0]->unify(return_type);
+  //   types = { a1, a2 };
+  //   id = Id::NTH;
+  // } else if (name == "cons"){
+  //   Type *a1 = new Type(TypeType::UNKNOWN);
+  //   Type *a2 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+  //   return_type = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
 
-    types = { a1 };
-    id = Id::LEN;
-  } else if (name == "tail") {
-    Type *a1 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
-    return_type = new Type(TypeType::UNKNOWN);
-    a1->unify(return_type);
+  //   a1->unify(a2->subtypes[0]);
+  //   a2->unify(return_type);
+  //   types = { a1, a2 };
+  //   id = Id::CONS;
+  // } else if (name == "app"){
+  //   Type *a1 = new Type(TypeType::UNKNOWN);
+  //   Type *a2 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+  //   return_type = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
 
-    types = { a1 };
-    id = Id::TAIL;
-  } else if (name == "peek") {
-    Type *a1 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
-    return_type = new Type(TypeType::UNKNOWN);
-    a1->subtypes[0]->unify(return_type);
+  //   a1->unify(a2->subtypes[0]);
+  //   a2->unify(return_type);
+  //   types = { a2, a1 };
+  //   id = Id::APP;
+  // } else if (name == "len") {
+  //   Type *a1 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+  //   return_type = new Type(TypeType::INTEGER);
 
-    types = { a1 };
-    id = Id::PEEK;
-  } else if (name == "Boolean2Integer") {
-    Type *a1 = new Type(TypeType::BOOLEAN);
-    return_type = new Type(TypeType::INTEGER);
+  //   types = { a1 };
+  //   id = Id::LEN;
+  // } else if (name == "tail") {
+  //   Type *a1 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+  //   return_type = new Type(TypeType::UNKNOWN);
+  //   a1->unify(return_type);
 
-    types = { a1 };
-    id = Id::BOOLEAN2INTEGER;
-  } else if (name == "Integer2Boolean") {
-    Type *a1 = new Type(TypeType::INTEGER);
-    return_type = new Type(TypeType::BOOLEAN);
+  //   types = { a1 };
+  //   id = Id::TAIL;
+  // } else if (name == "peek") {
+  //   Type *a1 = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+  //   return_type = new Type(TypeType::UNKNOWN);
+  //   a1->subtypes[0]->unify(return_type);
 
-    types = { a1 };
-    id = Id::INTEGER2BOOLEAN;
-  } else if (name == "Enum2Integer") {
-    Type *a1 = new Type(TypeType::ENUM);
-    return_type = new Type(TypeType::INTEGER);
+  //   types = { a1 };
+  //   id = Id::PEEK;
+  // } else if (name == "Boolean2Integer") {
+  //   Type *a1 = new Type(TypeType::BOOLEAN);
+  //   return_type = new Type(TypeType::INTEGER);
 
-    types = { a1 };
-    id = Id::ENUM2INTEGER;
-  } else if (name == "Integer2Enum") {
-    Type *a1 = new Type(TypeType::INTEGER);
-    return_type = new Type(TypeType::ENUM);
+  //   types = { a1 };
+  //   id = Id::BOOLEAN2INTEGER;
+  // } else if (name == "Integer2Boolean") {
+  //   Type *a1 = new Type(TypeType::INTEGER);
+  //   return_type = new Type(TypeType::BOOLEAN);
 
-    types = { a1 };
-    id = Id::INTEGER2ENUM;
-  } else if (name == "asInteger") {
-    Type *a1 = new Type(TypeType::UNKNOWN);
-    a1->constraints.push_back(new Type(TypeType::INTEGER));
-    a1->constraints.push_back(new Type(TypeType::FLOAT));
-    a1->constraints.push_back(new Type(TypeType::RATIONAL));
-    return_type = new Type(TypeType::INTEGER);
+  //   types = { a1 };
+  //   id = Id::INTEGER2BOOLEAN;
+  // } else if (name == "Enum2Integer") {
+  //   Type *a1 = new Type(TypeType::ENUM);
+  //   return_type = new Type(TypeType::INTEGER);
 
-    types = { a1 };
-    id = Id::ASINTEGER;
-  } else if (name == "asFloat") {
-    Type *a1 = new Type(TypeType::UNKNOWN);
-    a1->constraints.push_back(new Type(TypeType::INTEGER));
-    a1->constraints.push_back(new Type(TypeType::FLOAT));
-    a1->constraints.push_back(new Type(TypeType::RATIONAL));
-    return_type = new Type(TypeType::FLOAT);
+  //   types = { a1 };
+  //   id = Id::ENUM2INTEGER;
+  // } else if (name == "Integer2Enum") {
+  //   Type *a1 = new Type(TypeType::INTEGER);
+  //   return_type = new Type(TypeType::ENUM);
 
-    types = { a1 };
-    id = Id::ASFLOAT;
-  } else if (name == "asRational") {
-    Type *a1 = new Type(TypeType::UNKNOWN);
-    a1->constraints.push_back(new Type(TypeType::INTEGER));
-    a1->constraints.push_back(new Type(TypeType::FLOAT));
-    a1->constraints.push_back(new Type(TypeType::RATIONAL));
-    return_type = new Type(TypeType::RATIONAL);
+  //   types = { a1 };
+  //   id = Id::INTEGER2ENUM;
+  // } else if (name == "asInteger") {
+  //   Type *a1 = new Type(TypeType::UNKNOWN);
+  //   a1->constraints.push_back(new Type(TypeType::INTEGER));
+  //   a1->constraints.push_back(new Type(TypeType::FLOAT));
+  //   a1->constraints.push_back(new Type(TypeType::RATIONAL));
+  //   return_type = new Type(TypeType::INTEGER);
 
-    types = { a1 };
-    id = Id::ASRATIONAL;
-  } else if (name == "symbolic") {
-    Type *a1 = new Type(TypeType::UNKNOWN);
-    return_type = new Type(TypeType::BOOLEAN);
-    types = { a1 };
-    id = Id::SYMBOLIC;
-  }// else
+  //   types = { a1 };
+  //   id = Id::ASINTEGER;
+  // } else if (name == "asFloat") {
+  //   Type *a1 = new Type(TypeType::UNKNOWN);
+  //   a1->constraints.push_back(new Type(TypeType::INTEGER));
+  //   a1->constraints.push_back(new Type(TypeType::FLOAT));
+  //   a1->constraints.push_back(new Type(TypeType::RATIONAL));
+  //   return_type = new Type(TypeType::FLOAT);
+
+  //   types = { a1 };
+  //   id = Id::ASFLOAT;
+  // } else if (name == "asRational") {
+  //   Type *a1 = new Type(TypeType::UNKNOWN);
+  //   a1->constraints.push_back(new Type(TypeType::INTEGER));
+  //   a1->constraints.push_back(new Type(TypeType::FLOAT));
+  //   a1->constraints.push_back(new Type(TypeType::RATIONAL));
+  //   return_type = new Type(TypeType::RATIONAL);
+
+  //   types = { a1 };
+  //   id = Id::ASRATIONAL;
+  // } else if (name == "symbolic") {
+  //   Type *a1 = new Type(TypeType::UNKNOWN);
+  //   return_type = new Type(TypeType::BOOLEAN);
+  //   types = { a1 };
+  //   id = Id::SYMBOLIC;
+  // }// else
   // TODO shared stuff
   //SHARED_BUILTINS_TYPECHECK
 }
@@ -422,25 +457,30 @@ bool BuiltinAtom::equals(AstNode*) {
   throw "BuiltinAtom::equals() not implemented";
 }
 
-std::string BuiltinAtom::to_string() {
-  switch(id) {
-    case Id::POW: return "pow";
-    case Id::HEX: return "hex";
-    case Id::NTH: return "nth";
-    case Id::CONS: return "cons";
-    case Id::APP: return "app";
-    case Id::LEN: return "len";
-    case Id::TAIL: return "tail";
-    case Id::PEEK: return "peek";
-    case Id::BOOLEAN2INTEGER: return "Boolean2Integer";
-    case Id::INTEGER2BOOLEAN: return "Integer2Boolean";
-    case Id::ENUM2INTEGER: return "Enum2Integer";
-    case Id::ASINTEGER: return "asInteger";
-    case Id::ASFLOAT: return "asFloat";
-    case Id::ASRATIONAL: return "asFloat";
-    case Id::SYMBOLIC: return "symbolic";
-    default: return "UNKNOWN";
-  }
+std::string BuiltinAtom::to_string()
+{
+    Builtin* built_in = Builtin::get( name );
+    assert( built_in && "built-in cannot be null" );
+    return built_in->name;
+    
+  // switch(id) {
+  //   case Id::POW: return "pow";
+  //   case Id::HEX: return "hex";
+  //   case Id::NTH: return "nth";
+  //   case Id::CONS: return "cons";
+  //   case Id::APP: return "app";
+  //   case Id::LEN: return "len";
+  //   case Id::TAIL: return "tail";
+  //   case Id::PEEK: return "peek";
+  //   case Id::BOOLEAN2INTEGER: return "Boolean2Integer";
+  //   case Id::INTEGER2BOOLEAN: return "Integer2Boolean";
+  //   case Id::ENUM2INTEGER: return "Enum2Integer";
+  //   case Id::ASINTEGER: return "asInteger";
+  //   case Id::ASFLOAT: return "asFloat";
+  //   case Id::ASRATIONAL: return "asFloat";
+  //   case Id::SYMBOLIC: return "symbolic";
+  //   default: return "UNKNOWN";
+  // }
 }
 
 ListAtom::ListAtom(yy::location& loc, std::vector<ExpressionBase*> *exprs)

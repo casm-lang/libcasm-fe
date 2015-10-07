@@ -83,6 +83,7 @@ Type::Type(TypeType enum_type, const std::string& name) : unify_with_left(nullpt
 Type::Type(const std::string& type_name) : unify_with_left(nullptr),
     unify_with_right(nullptr), constraints(), subtypes() {
   if (type_name == "Integer") { t = TypeType::INTEGER; }
+  else if (type_name == "Bit") { t = TypeType::BIT; }
   else if (type_name == "Float") { t = TypeType::FLOAT; }
   else if (type_name == "Rational") { t = TypeType::RATIONAL; }
   else if (type_name == "Undef") { t = TypeType::UNDEF; }
@@ -130,6 +131,7 @@ bool Type::operator!=(const Type& other) const {
 const std::string Type::to_str() const {
   switch (t) {
     case TypeType::INTEGER: return "Integer";
+    case TypeType::BIT: return "Bit(" + std::to_string( bitsize ) + ")";
     case TypeType::FLOAT: return "Float";
     case TypeType::RATIONAL: return "Rational";
     case TypeType::UNDEF: return "Undef";
@@ -213,13 +215,17 @@ const Type* Type::get_most_general_type() const {
 }
 
 bool Type::unify(Type other) {
-  if (t == TypeType::UNKNOWN) {
-    t = other.t;
-    return true;
-  } else if (other.t == TypeType::UNKNOWN) {
-    other.t = t;
-    return true;
+  if( t == TypeType::UNKNOWN )
+  {
+      t = other.t;
+      return true;
   }
+  else if( other.t == TypeType::UNKNOWN )
+  {
+      other.t = t;
+      return true;
+  }
+  
   return t == other.t;
 }
 
@@ -372,8 +378,14 @@ bool Type::unify_nofollow(Type *other) {
     return t == other->t;
   }
 
-  if (other->t != TypeType::UNKNOWN) {
+  if( other->t != TypeType::UNKNOWN)
+  {
     t = other->t;
+    if( t == TypeType::BIT )
+    {
+        bitsize = other->bitsize;
+    }
+    
     bool matched_constraint = true;
     for (Type constraint : constraints) {
       if (unify(constraint)) {
@@ -391,8 +403,14 @@ bool Type::unify_nofollow(Type *other) {
     return true;
   }
 
-  if (t != TypeType::UNKNOWN) {
+  if( t != TypeType::UNKNOWN )
+  {
     other->t = t;
+    if( t == TypeType::BIT )
+    {
+        other->bitsize = bitsize;
+    }
+    
     bool matched_constraint = true;
     for (Type constraint : other->constraints) {
       if (unify(constraint)) {
@@ -450,54 +468,66 @@ bool Type::is_unknown() const {
   return false;
 }
 
-bool Type::unify(Type *other) {
-  if (is_unknown() && other->is_unknown() ) {
-    Type* left_link = this;
-    while (left_link->unify_with_left != nullptr) {
-      if (left_link == other) {
+bool Type::unify(Type *other)
+{
+    if (is_unknown() && other->is_unknown() )
+    {
+        Type* left_link = this;
+        while (left_link->unify_with_left != nullptr)
+        {
+            if (left_link == other)
+            {
+                return true;
+            }
+            left_link = left_link->unify_with_left;
+        }
+
+        Type* right_link = other;
+        while (right_link->unify_with_right != nullptr)
+        {
+            if (right_link == this)
+            {
+                return true;
+            }
+            right_link = right_link->unify_with_right;
+        }
+
+        left_link = other;
+        while (left_link->unify_with_left != nullptr)
+        {
+            if (left_link == this)
+            {
+                return true;
+            }
+            left_link = left_link->unify_with_left;
+        }
+        
+        right_link = this;
+        while (right_link->unify_with_right != nullptr)
+        {
+            if (right_link == other)
+            {
+                return true;
+            }
+            right_link = right_link->unify_with_right;
+        }
+        
+        left_link->unify_with_left = right_link;
+        right_link->unify_with_right = left_link;
         return true;
-      }
-      left_link = left_link->unify_with_left;
     }
-
-    Type* right_link = other;
-    while (right_link->unify_with_right != nullptr) {
-      if (right_link == this) {
-        return true;
-      }
-      right_link = right_link->unify_with_right;
+    
+    if( unify_nofollow(other) )
+    {
+        bool result = true;
+        result = result && unify_left(other->unify_with_left);
+        result = result && unify_left(unify_with_left);
+        result = result && unify_right(other->unify_with_right);
+        result = result && unify_right(unify_with_right);
+    
+        return result;
     }
-
-    left_link = other;
-    while (left_link->unify_with_left != nullptr) {
-      if (left_link == this) {
-        return true;
-      }
-      left_link = left_link->unify_with_left;
-    }
-
-    right_link = this;
-    while (right_link->unify_with_right != nullptr) {
-      if (right_link == other) {
-        return true;
-      }
-      right_link = right_link->unify_with_right;
-    }
-
-    left_link->unify_with_left = right_link;
-    right_link->unify_with_right = left_link;
-    return true;
-  }
-
-  if (unify_nofollow(other)) {
-    bool result = true;
-    result = result && unify_left(other->unify_with_left);
-    result = result && unify_left(unify_with_left);
-    result = result && unify_right(other->unify_with_right);
-    result = result && unify_right(unify_with_right);
-    return result;
-  }
-  return false;
+    return false;
 }
 
 

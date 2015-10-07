@@ -258,26 +258,8 @@ class FunctionAtom : public BaseFunctionAtom {
 
 class BuiltinAtom: public BaseFunctionAtom {
   public:
-    enum class Id {
-      POW,
-      HEX,
-      NTH,
-      CONS,
-      APP,
-      LEN,
-      TAIL,
-      PEEK,
-      BOOLEAN2INTEGER,
-      INTEGER2BOOLEAN,
-      ENUM2INTEGER,
-      INTEGER2ENUM,
-      ASINTEGER,
-      ASFLOAT,
-      ASRATIONAL,
-      SYMBOLIC,
-      SHARED_BUILTIN_IDS
-    } id;
-
+    Builtin::Id id;
+    
     std::vector<Type*> types;
     Type* return_type;
 

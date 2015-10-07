@@ -1,6 +1,7 @@
 LEX = flex
 CXX = clang
-CFLAGS = -Isrc -Ibuild/src -std=c++11 -stdlib=libstdc++ -O0 -g
+CFLAGS = -Isrc -Ibuild/src -std=c++11 -O0 -g
+# -stdlib=libstdc++
 BUILD_DIR = build
 AR = /usr/bin/ar
 
@@ -13,7 +14,7 @@ OBJS = $(SRC:%=build/%.o)
 all: lib
 
 clean:
-	rm -r build
+	rm -rf build
 
 test: build/test_parse build/test_typecheck
 	python tests/integration/test_runner.py

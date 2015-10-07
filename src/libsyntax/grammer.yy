@@ -361,6 +361,16 @@ TYPE_SYNTAX: IDENTIFIER { $$ = new Type($1); /* TODO check invalid types */}
                    driver.error(@$, "start of subrange must be smaller than the end");
                }
            }
+           /* new 'Bit' type */
+           | IDENTIFIER "(" INTEGER_NUMBER ")"
+           {
+               $$ = new Type( $1 );
+               $$->bitsize = $3->val_;
+               if( $$->bitsize < 0 || $$->bitsize > 256 )
+               {
+                   driver.error(@$, "invalid size for Bit type");
+               }
+           }
            ;
 
 TYPE_SYNTAX_LIST: TYPE_SYNTAX "," TYPE_SYNTAX_LIST {
@@ -493,13 +503,17 @@ BRACKET_EXPRESSION: "(" EXPRESSION ")"  { $$ = $2; }
 
 FUNCTION_SYNTAX: IDENTIFIER { $$ = new FunctionAtom(@$, $1); }
                | IDENTIFIER "(" ")" { $$ = new FunctionAtom(@$, $1); }
-               | IDENTIFIER "(" EXPRESSION_LIST ")" {
-                  if (is_builtin_name($1)) {
-                    $$ = new BuiltinAtom(@$, $1, $3);
-                  } else {
-                    $$ = new FunctionAtom(@$, $1, $3);
-                  }
-                }
+               | IDENTIFIER "(" EXPRESSION_LIST ")"
+               {
+                   if( Builtin::isBuiltin( $1 ) )
+                   {
+                       $$ = new BuiltinAtom(@$, $1, $3);
+                   }
+                   else
+                   {
+                       $$ = new FunctionAtom(@$, $1, $3);
+                   }
+               }
                ;
 
 RULE_SYNTAX: RULE IDENTIFIER "=" STATEMENT { $$ = new RuleNode(@$, $4, $2); }

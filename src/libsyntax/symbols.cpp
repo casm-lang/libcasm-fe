@@ -1,35 +1,256 @@
-#include <iostream>
+
+#include <cmath>
 
 #include "libsyntax/ast.h"
+#include "libsyntax/driver.h"
 #include "libsyntax/symbols.h"
 
-static std::map<const std::string, bool> builtin_names = {
-  {"pow", true},
-  {"hex", true},
-  {"nth", true},
-  {"cons", true},
-  {"app", true},
-  {"len", true},
-  {"tail", true},
-  {"peek", true},
-  {"Boolean2Integer", true},
-  {"Integer2Boolean", true},
-  {"Enum2Integer", true},
-  {"Integer2Enum", true},
-  {"asInteger", true},
-  {"asFloat", true},
-  {"asRational", true},
-  {"symbolic", true},
-  // TODO shared stuff
-  //SHARED_BUILTIN_NAMES
+std::map< Builtin::Id, Builtin* > Builtin::id2obj;
+std::map< std::string, Builtin* > Builtin::str2obj;
+
+
+//  { "builtinName"
+//  , Builtin::Id::BUILTIN_ID
+//  , { ... } possible return types
+//  , { { ... possible 0. argument types
+//      }
+//    , { ... possible 1. argument types
+//      }
+//    }
+//  , [] ( Type* ret, std::vector< Type* >& arg )
+//    {
+//        unification procedure for this builtin
+//    }
+//  , [] ( Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+//    {
+//        typecheck & type-patch procedure for this builtin
+//    }
+//  }
+
+Builtin built_ins[] =
+{ { "symbolic"
+  , Builtin::Id::SYMBOLIC
+  , { TypeType::BOOLEAN }
+  , { { TypeType::UNKNOWN
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg )
+    {
+    }
+  }
+
+, { "nth"
+  , Builtin::Id::NTH
+  , { TypeType::UNKNOWN }
+  , { { TypeType::TUPLE_OR_LIST
+      , TypeType::UNKNOWN
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg )
+    {
+    }
+  }
+  
+  
+    // {"symbolic", true},
+    // {"pow", true},
+    // {"hex", true},
+    // {"nth", true},
+    // {"cons", true},
+    // {"app", true},
+    // {"len", true},
+    // {"tail", true},
+    // {"peek", true},
+    // {"Boolean2Integer", true}, // TODO: FIXME: REMOVE: this built-in signature is deprecated
+    // {"Integer2Boolean", true}, // TODO: FIXME: REMOVE: this built-in signature is deprecated
+    // {"Enum2Integer", true},    // TODO: FIXME: REMOVE: this built-in signature is deprecated
+    // {"Integer2Enum", true},    // TODO: FIXME: REMOVE: this built-in signature is deprecated
+    // {"asFloat", true},         // TODO: FIXME: REMOVE: this built-in signature is deprecated
+  
+    // //===--- CASTING BUILT-INS ---====
+    // // asInteger : Boolean  -> Integer // false -> 0, true -> 1, undef -> undef
+    // // asInteger : Floating -> Integer // cut of comma value to integer, undef -> undef
+    // // asInteger : Bit( n ) -> Integer // n is a integer constant, always use unsigned semantics
+    // // asInteger : e        -> Integer // e -> index(e), e !in index(e) -> undef, undef -> undef
+    // //                                 // 'e' is a enumeration value of type 'e'
+    // {"asInteger", true},
+  
+    // // asBoolean : Integer  -> Boolean // 0 -> false, other -> true
+    // // asBoolean : Floating -> Boolean // SHALL NOT BE POSSIBLE !!! ERROR
+    // // asBoolean : Bit( n ) -> Boolean // SHALL NOT BE POSSIBLE where n != 1 !!! ERROR
+    // // asBoolean : Bit( 1 ) -> Boolean // 0b0 -> false, 0b1 -> true
+    // // asBoolean : e        -> Boolean // SHALL NOT BE POSSIBLE !!! ERROR
+    // //                                 // 'e' is a enumeration value of type 'e'
+    // {"asBoolean", true},
+
+    // // asFloating : Integer  -> Floating // int to float converstion!
+    // // asFloating : Boolean  -> Floating // false -> 0.0, true -> 1.0
+    // // asFloating : Bit( n ) -> Floating // SHALL NOT BE POSSIBLE
+    // // asFloating : e        -> Floating // e -> index(e).0, e !in index(e) -> undef, undef -> undef
+    // //                                   // 'e' is a enumeration value of type 'e'
+    // {"asFloating", true},
+  
+    // // asBit : Integer  * Integer (const, n) -> Bit( n ) // only possible if integer fits into bit-width,
+    // //                                                   // unsigned semantic only which means e.g.:
+    // //                                                   // -1 is a 64-bit integer value and has to fit in at least Bit( 64 )
+    // // asBit : Boolean  * Integer (const, n) -> Bit( n ) // false -> 0b0, true -> 0b1
+    // // asBit : Floating * Integer (const, n) -> Bit( n ) // SHALL NOT BE POSSIBLE (YET! maybe later!)
+    // // asBit : e        * Integer (const, n) -> Bit( n ) // only possible if enum value 'e' fits into bit-width!
+    // {"asBit", true},
+//,
+
+, { "asBit"
+  , Builtin::Id::AS_BIT
+  , { TypeType::BIT }
+  , { { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BOOLEAN
+      , TypeType::FLOAT
+      , TypeType::ENUM
+      }
+    , { TypeType::INTEGER }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg )
+    {
+        ret->unify( arg[1] );
+    }
+  , [] ( Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        assert( length == 2 && "invalid argument length for builtin" );
+        
+        ExpressionBase *expr_bitsize = atom->arguments->at( 1 );
+        if( expr_bitsize->node_type_ != NodeType::INTEGER_ATOM )
+        {
+            driver.error
+            ( atom->arguments->at(1)->location
+            , "second argument of 'asBit' builtin must be a Integer constant"
+            );
+        }
+        
+        INTEGER_T bitsize = static_cast< IntegerAtom* >( expr_bitsize )->val_;
+        if( bitsize <= 0 or bitsize > 256 )
+        {
+            driver.error
+            ( atom->arguments->at(1)->location
+            , "second argument of 'asBit' builtin must be in the range from 1 to 256"
+            );
+        }
+
+        INTEGER_T value = -1;
+        INTEGER_T value_bitsize = -1;
+        
+        ExpressionBase* expr_value = atom->arguments->at( 0 );
+        if( expr_bitsize->node_type_ == NodeType::INTEGER_ATOM )
+        {
+            value = static_cast< IntegerAtom* >( expr_value )->val_;
+            double v = (double)value;
+            v = log2( v );
+            v = std::ceil( v );
+            value_bitsize = (INTEGER_T)v;
+        }
+        else
+        {
+            assert( !"unimplemented value type for 'asBit' builtin to check value bitsize fitting!" );
+        }
+        
+        if( value_bitsize > bitsize )
+        {
+            driver.error
+            ( atom->arguments->at(0)->location
+              , "first argument of 'asBit' builtin does not fit into the bitsize of '" + std::to_string( bitsize ) + "'"
+            );            
+        }
+        
+        atom->return_type->bitsize = bitsize;        
+    }
+  }
+
+    // // asEnum : Integer  -> e // iff Integer value is in { indexes of e }
+    // // asEnum : Boolean  -> e // SHALL NOT BE POSSIBLE
+    // // asEnum : Floating -> e // SHALL NOT BE POSSIBLE
+    // // asEnum : Bit( n ) -> e // iff Bit(n) value is in { indexes of e }
+    // // // 'e' is a enumeration value of type 'e'
+    // {"asEnum", true},
+
+    // // asString : Integer  -> String // SHALL NOT BE POSSIBLE !!! ERROR  --> use 'dec'
+    // // asString : Boolean  -> String // false -> "false", true -> "true"
+    // // asString : Floating -> String // SHALL NOT BE POSSIBLE !!! ERROR  --> use 'dec'
+    // // asString : Bit( n ) -> String // SHALL NOT BE POSSIBLE !!! ERROR  --> use 'dec'
+    // // asString : e        -> String // string represenation of enum value 'e'
+    // {"asString", true},
+
+    // // TODO: PPA: define a clear semantic for this type cast!
+    // {"asRational", true},
+  
+  
+    // //===--- STRINGIFY BUILT-INS ---====
+    // // dec  : Integer  -> String  // decimal representation of integer
+    // // dec  : Boolean  -> String  // decimal representation of boolean
+    // // dec  : Floating -> String  // decimal representation of floating point value
+    // // dec  : Bit( n ) -> String  // decimal representation of bit-vector
+    // // dec  : e        -> String  // decimal representation of enumeration value of type 'e'
+    // {"dec", true},
+
+    // // hex  : Integer  -> String  // hexadecimal representation of integer WITHOUT prefix '0x'
+    // // hex  : Boolean  -> String  // hexadecimal representation of boolean WITHOUT prefix '0x'
+    // // hex  : Floating -> String  // hexadecimal representation of floating point value WITHOUT prefix '0x'
+    // // hex  : Bit( n ) -> String  // hexadecimal representation of bit-vector WITHOUT prefix '0x'
+    // // hex  : e        -> String  // hexadecimal representation of enumeration value of type 'e' WITHOUT prefix '0x'
+    // {"hex", true},
+
+    // // bin  : Integer  -> String  // binary representation of integer WITHOUT prefix '0b'
+    // // bin  : Boolean  -> String  // binary representation of boolean WITHOUT prefix '0b'
+    // // bin  : Floating -> String  // binary representation of floating point value WITHOUT prefix '0b'
+    // // bin  : Bit( n ) -> String  // binary representation of bit-vector WITHOUT prefix '0b'
+    // // bin  : e        -> String  // binary representation of enumeration value of type 'e' WITHOUT prefix '0b'
+    // {"bin", true},
+
+
+    // //===--- INTEGER MATH BUILT-INS ---====
+    // // pow  : Integer * Integer -> Integer
+    // // //     base      exponent
+    // {"pow", true},
+
+    // // rand : Integer * Integer -> Integer
+    // // //     start     end
+    // {"rand", true},
+
+  
+    // //===--- BIT OPERATION BUILT-INS ---====
+    // // zext  : Bit( n ) * Integer (const, m) -> Bit( m ) // zero extend to new size, if m < n then error!
+    // {"zext", true},
+
+    // // sext  : Bit( n ) * Integer (const, m) -> Bit( m ) // sign extend to new size, if m < n then error!
+    // {"sext", true},
+
+    // // trunc : Bit( n ) * Integer (const, m) -> Bit( m ) // truncate to new size, if m > n then error!
+    // {"trunc", true},
+
+    // // shl   : Bit( n ) * Integer  -> Bit( n ) // logic shift left of Integer value positions
+    // // shl   : Bit( n ) * Bit( n ) -> Bit( n ) // logic shift left of Bit(n) value positions
+    // {"shl", true},
+
+    // // shr   : Bit( n ) * Integer  -> Bit( n ) // logic shift right of Integer value positions
+    // // shr   : Bit( n ) * Bit( n ) -> Bit( n ) // logic shift right of Bit(n) value positions
+    // {"shr", true},
+
+    // // ashr  : Bit( n ) * Integer  -> Bit( n ) // arithmetic shift right of Integer value positions
+    // // ashr  : Bit( n ) * Bit( n ) -> Bit( n ) // arithmetic shift right of Bit(n) value positions
+    // {"ashr", true},
+  
+    // // clz   : Bit( n ) -> Bit( n ) // count leading zeros
+    // {"clz", true},
+  
+    // // clo   : Bit( n ) -> Bit( n ) // count leading ones
+    // {"clo", true},
+
+    // // cls   : Bit( n ) -> Bit( n ) // count leading sign bits
+    // {"cls", true},
+
+
 };
 
-bool is_builtin_name(const std::string& name) {
-  if(builtin_names.count(name) != 0) {
-    return true;
-  }
-  return false;
-}
+
 
 
 Symbol::Symbol(const std::string& name, SymbolType type) : name(std::move(name)), type(type) {}
@@ -122,12 +343,14 @@ bool Function::equals(Function *other) const {
   return return_type_ == other->return_type_;
 }
 
-bool Function::is_builtin() {
-  if(builtin_names.count(name) != 0) {
-    type = SymbolType::BUILTIN;
-    return true;
-  }
-  return false;
+bool Function::is_builtin()
+{
+    if( Builtin::isBuiltin( name ) )
+    {
+        type = SymbolType::BUILTIN;
+        return true;
+    }
+    return false;
 }
 
 enum_value_t::enum_value_t(const std::string *name, const uint16_t id)

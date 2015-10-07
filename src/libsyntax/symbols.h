@@ -1,20 +1,151 @@
 #ifndef CASMI_LIBPARSE_SYMBOLS_H
 #define CASMI_LIBPARSE_SYMBOLS_H
 
+#include <assert.h>
+
 #include <string>
 #include <stdexcept>
 #include <map>
 #include <vector>
 
+#include <iostream>
 #include "libsyntax/types.h"
 #include "libsyntax/location.hh" // reuse bison's location class
 
 class ExpressionBase;
 class Expression;
 class FunctionAtom;
+class BuiltinAtom;
+class Driver;
+
+struct Builtin
+{    
+public:
+    std::string name;
+    
+    enum class Id
+    { POW
+    , HEX
+    , CONS
+    , APP
+    , LEN
+    , TAIL
+    , PEEK
+    , BOOLEAN2INTEGER
+    , INTEGER2BOOLEAN
+    , ENUM2INTEGER
+    , INTEGER2ENUM
+    , ASINTEGER
+    , ASFLOAT
+    , ASRATIONAL
+    , SHARED_BUILTIN_IDS
+
+    , SYMBOLIC
+    
+    , NTH
+    
+    , AS_BIT
+    } id;
+    
+    std::vector< TypeType > ret_type;
+    std::vector< std::vector< TypeType > > arg_type;
+    
+    std::function< void( Type*, std::vector< Type* >& )> unify_lambda;
+    std::function< void( Driver&, BuiltinAtom*, Type*[], uint16_t )> typecheck_lambda;
+    
+private:
+    static std::map< Id, Builtin* > id2obj;
+    static std::map< std::string, Builtin* > str2obj;
+    static std::vector< Builtin > list;
+    
+public:
+    Builtin( const std::string name
+           , Id id
+           , std::vector< TypeType > ret_type
+           , std::vector< std::vector< TypeType >> arg_type
+           , std::function< void( Type*, std::vector< Type* >& )> unify
+           , std::function< void( Driver&, BuiltinAtom*, Type*[], uint16_t )> typecheck
+             = [] ( Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+             {
+             }
+           )
+    : name( name )
+    , id( id )
+    , ret_type( ret_type )
+    , arg_type( arg_type )
+    , unify_lambda( unify )
+    , typecheck_lambda( typecheck )
+    {
+        assert( !isBuiltin( id ) && "multiple IDs for built-ins symbol table" );
+        id2obj[ id ] = this;
+        
+        assert( ! isBuiltin( name ) && "multiple names for built-ins symbol table" );
+        str2obj[ name ] = this;
+    }
+    
+    void unify( Type* ret, std::vector< Type* >& arg )
+    {
+        assert( ret && "invalid return Type pointer" );
+
+        unify_lambda( ret, arg );
+    }
+    
+    void typecheck( Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        assert( atom && "invalid BUILTIN AST atom pointer" );
+        assert( arguments && "invalid argument Type array pointer" );
+        
+        typecheck_lambda( driver, atom, arguments, length );
+    }
+    
+    static bool isBuiltin( const std::string& name )
+    {
+        if( str2obj.count( name ) != 0 )
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    static bool isBuiltin( Id id )
+    {
+        if( id2obj.count( id ) != 0 )
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    static Builtin* get( const std::string& name )
+    {
+        //std::cout << std::string(__FUNCTION__) << ": lookup of '" << name << "'\n";
+        auto result = str2obj.find( name );
+        if( result != str2obj.end() )
+        {
+            //std::cout << std::string(__FUNCTION__) << ": lookup of '" << name << "' @ '" << result->second << "'\n";
+            return result->second;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    static Builtin* get( Id id )
+    {
+        auto result = id2obj.find( id );
+        if( result != id2obj.end() )
+        {
+            return result->second;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+};
 
 
-bool is_builtin_name(const std::string& name);
 
 class Symbol {
   public:

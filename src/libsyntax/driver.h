@@ -12,6 +12,7 @@
 #include "libsyntax/symbols.h"
 
 class AstNode;
+class RuleNode;
 
 class Driver {
   private:
