@@ -34,9 +34,6 @@ Builtin built_ins[] =
   , { { TypeType::UNKNOWN
       }
     }
-  , [] ( Type* ret, std::vector< Type* >& arg )
-    {
-    }
   }
 
 , { "nth"
@@ -45,27 +42,89 @@ Builtin built_ins[] =
   , { { TypeType::TUPLE_OR_LIST
       , TypeType::UNKNOWN
       }
+    , { TypeType::INTEGER
+      }
     }
   , [] ( Type* ret, std::vector< Type* >& arg )
     {
+        arg[0]->subtypes[0]->unify( ret );
     }
   }
+
+// {"cons", true},
+, { "cons"
+  , Builtin::Id::CONS
+  , { TypeType::LIST }
+  , { { TypeType::UNKNOWN
+      }
+    , { TypeType::LIST
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg )
+    {
+        arg[0]->unify( arg[1]->subtypes[0] );
+        arg[1]->unify( ret );
+    }
+  }
+
+// {"app", true},
+, { "app"
+  , Builtin::Id::APP
+  , { TypeType::LIST }
+  , { { TypeType::UNKNOWN
+      }
+    , { TypeType::LIST
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg )
+    {
+        arg[0]->unify( arg[1]->subtypes[0] );
+        arg[1]->unify( ret );
+        // TODO: PPA: FIXME: maybe swap arg 0 and 1, wha? @fhahn ?
+    }
+  }
+
+
+// {"len", true},
+, { "len"
+  , Builtin::Id::LEN
+  , { TypeType::INTEGER }
+  , { { TypeType::LIST
+      }
+    }
+  }
+
   
+// {"tail", true},
+, { "tail"
+  , Builtin::Id::TAIL
+  , { TypeType::UNKNOWN }
+  , { { TypeType::LIST
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg )
+    {
+        arg[0]->unify( ret );
+    }
+  }
+
   
-    // {"symbolic", true},
-    // {"pow", true},
-    // {"hex", true},
-    // {"nth", true},
-    // {"cons", true},
-    // {"app", true},
-    // {"len", true},
-    // {"tail", true},
-    // {"peek", true},
-    // {"Boolean2Integer", true}, // TODO: FIXME: REMOVE: this built-in signature is deprecated
-    // {"Integer2Boolean", true}, // TODO: FIXME: REMOVE: this built-in signature is deprecated
-    // {"Enum2Integer", true},    // TODO: FIXME: REMOVE: this built-in signature is deprecated
-    // {"Integer2Enum", true},    // TODO: FIXME: REMOVE: this built-in signature is deprecated
-    // {"asFloat", true},         // TODO: FIXME: REMOVE: this built-in signature is deprecated
+// {"peek", true},
+, { "peek"
+  , Builtin::Id::PEEK
+  , { TypeType::UNKNOWN }
+  , { { TypeType::LIST
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg )
+    {
+        arg[0]->subtypes[0]->unify( ret );
+    }
+  }
+
+
+
+
   
     // //===--- CASTING BUILT-INS ---====
     // // asInteger : Boolean  -> Integer // false -> 0, true -> 1, undef -> undef
@@ -74,6 +133,17 @@ Builtin built_ins[] =
     // // asInteger : e        -> Integer // e -> index(e), e !in index(e) -> undef, undef -> undef
     // //                                 // 'e' is a enumeration value of type 'e'
     // {"asInteger", true},
+, { "asInteger"
+  , Builtin::Id::AS_INTEGER
+  , { TypeType::INTEGER }
+  , { { TypeType::UNKNOWN
+      , TypeType::BOOLEAN
+      , TypeType::FLOAT
+      , TypeType::BIT
+      , TypeType::ENUM
+      }
+    }
+  }
   
     // // asBoolean : Integer  -> Boolean // 0 -> false, other -> true
     // // asBoolean : Floating -> Boolean // SHALL NOT BE POSSIBLE !!! ERROR
@@ -82,6 +152,17 @@ Builtin built_ins[] =
     // // asBoolean : e        -> Boolean // SHALL NOT BE POSSIBLE !!! ERROR
     // //                                 // 'e' is a enumeration value of type 'e'
     // {"asBoolean", true},
+, { "asBoolean"
+  , Builtin::Id::AS_BOOLEAN
+  , { TypeType::BOOLEAN }
+  , { { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BIT
+      , TypeType::ENUM
+      }
+    }
+    // PPA: TODO: FIXME: the Bit(1) check !!! see above!
+  }
 
     // // asFloating : Integer  -> Floating // int to float converstion!
     // // asFloating : Boolean  -> Floating // false -> 0.0, true -> 1.0
@@ -89,15 +170,25 @@ Builtin built_ins[] =
     // // asFloating : e        -> Floating // e -> index(e).0, e !in index(e) -> undef, undef -> undef
     // //                                   // 'e' is a enumeration value of type 'e'
     // {"asFloating", true},
+, { "asFloating"
+  , Builtin::Id::AS_FLOATING
+  , { TypeType::FLOAT }
+  , { { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BOOLEAN
+      , TypeType::BIT
+      , TypeType::ENUM
+      }
+    }
+  }
+
   
-    // // asBit : Integer  * Integer (const, n) -> Bit( n ) // only possible if integer fits into bit-width,
-    // //                                                   // unsigned semantic only which means e.g.:
-    // //                                                   // -1 is a 64-bit integer value and has to fit in at least Bit( 64 )
-    // // asBit : Boolean  * Integer (const, n) -> Bit( n ) // false -> 0b0, true -> 0b1
-    // // asBit : Floating * Integer (const, n) -> Bit( n ) // SHALL NOT BE POSSIBLE (YET! maybe later!)
-    // // asBit : e        * Integer (const, n) -> Bit( n ) // only possible if enum value 'e' fits into bit-width!
-    // {"asBit", true},
-//,
+  // // asBit : Integer  * Integer (const, n) -> Bit( n ) // only possible if integer fits into bit-width,
+  // //                                                   // unsigned semantic only which means e.g.:
+  // //                                                   // -1 is a 64-bit integer value and has to fit in at least Bit( 64 )
+  // // asBit : Boolean  * Integer (const, n) -> Bit( n ) // false -> 0b0, true -> 0b1
+  // // asBit : Floating * Integer (const, n) -> Bit( n ) // SHALL NOT BE POSSIBLE (YET! maybe later!)
+  // // asBit : e        * Integer (const, n) -> Bit( n ) // only possible if enum value 'e' fits into bit-width!
 
 , { "asBit"
   , Builtin::Id::AS_BIT
@@ -171,6 +262,17 @@ Builtin built_ins[] =
     // // asEnum : Bit( n ) -> e // iff Bit(n) value is in { indexes of e }
     // // // 'e' is a enumeration value of type 'e'
     // {"asEnum", true},
+, { "asEnum"
+  , Builtin::Id::AS_ENUM
+  , { TypeType::ENUM }
+  , { { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BOOLEAN
+      , TypeType::FLOAT
+      , TypeType::BIT
+      }
+    }
+  }
 
     // // asString : Integer  -> String // SHALL NOT BE POSSIBLE !!! ERROR  --> use 'dec'
     // // asString : Boolean  -> String // false -> "false", true -> "true"
@@ -178,10 +280,33 @@ Builtin built_ins[] =
     // // asString : Bit( n ) -> String // SHALL NOT BE POSSIBLE !!! ERROR  --> use 'dec'
     // // asString : e        -> String // string represenation of enum value 'e'
     // {"asString", true},
+, { "asString"
+  , Builtin::Id::AS_STRING
+  , { TypeType::STRING }
+  , { { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::FLOAT
+      , TypeType::BIT
+      , TypeType::ENUM
+//    , TypeType::RATIONAL
+      }
+    }
+  }
 
-    // // TODO: PPA: define a clear semantic for this type cast!
-    // {"asRational", true},
   
+// // TODO: PPA: define a clear semantic for this type cast!
+// {"asRational", true},
+, { "asRational"
+  , Builtin::Id::AS_RATIONAL
+  , { TypeType::RATIONAL }
+  , { { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::FLOAT
+      , TypeType::RATIONAL
+      }
+    }
+  }
+
   
     // //===--- STRINGIFY BUILT-INS ---====
     // // dec  : Integer  -> String  // decimal representation of integer
@@ -190,6 +315,19 @@ Builtin built_ins[] =
     // // dec  : Bit( n ) -> String  // decimal representation of bit-vector
     // // dec  : e        -> String  // decimal representation of enumeration value of type 'e'
     // {"dec", true},
+, { "dec"
+  , Builtin::Id::DEC
+  , { TypeType::STRING }
+  , { { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BOOLEAN
+      , TypeType::FLOAT
+      , TypeType::BIT
+      , TypeType::ENUM
+//    , TypeType::RATIONAL
+      }
+    }
+  }
 
     // // hex  : Integer  -> String  // hexadecimal representation of integer WITHOUT prefix '0x'
     // // hex  : Boolean  -> String  // hexadecimal representation of boolean WITHOUT prefix '0x'
@@ -197,6 +335,19 @@ Builtin built_ins[] =
     // // hex  : Bit( n ) -> String  // hexadecimal representation of bit-vector WITHOUT prefix '0x'
     // // hex  : e        -> String  // hexadecimal representation of enumeration value of type 'e' WITHOUT prefix '0x'
     // {"hex", true},
+, { "hex"
+  , Builtin::Id::HEX
+  , { TypeType::STRING }
+  , { { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BOOLEAN
+      , TypeType::FLOAT
+      , TypeType::BIT
+      , TypeType::ENUM
+//    , TypeType::RATIONAL
+      }
+    }
+  }
 
     // // bin  : Integer  -> String  // binary representation of integer WITHOUT prefix '0b'
     // // bin  : Boolean  -> String  // binary representation of boolean WITHOUT prefix '0b'
@@ -204,16 +355,47 @@ Builtin built_ins[] =
     // // bin  : Bit( n ) -> String  // binary representation of bit-vector WITHOUT prefix '0b'
     // // bin  : e        -> String  // binary representation of enumeration value of type 'e' WITHOUT prefix '0b'
     // {"bin", true},
+, { "bin"
+  , Builtin::Id::BIN
+  , { TypeType::STRING }
+  , { { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BOOLEAN
+      , TypeType::FLOAT
+      , TypeType::BIT
+      , TypeType::ENUM
+//    , TypeType::RATIONAL
+      }
+    }
+  }
 
 
     // //===--- INTEGER MATH BUILT-INS ---====
     // // pow  : Integer * Integer -> Integer
     // // //     base      exponent
     // {"pow", true},
+, { "pow"
+  , Builtin::Id::POW
+  , { TypeType::INTEGER }
+  , { { TypeType::INTEGER
+      }
+    , { TypeType::INTEGER
+      }
+    }
+  }
 
     // // rand : Integer * Integer -> Integer
     // // //     start     end
     // {"rand", true},
+, { "rand"
+  , Builtin::Id::RAND
+  , { TypeType::INTEGER }
+  , { { TypeType::INTEGER
+      }
+    , { TypeType::INTEGER
+      }
+    }
+  }
 
   
     // //===--- BIT OPERATION BUILT-INS ---====

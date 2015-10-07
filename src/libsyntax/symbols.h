@@ -24,28 +24,40 @@ public:
     std::string name;
     
     enum class Id
-    { POW
-    , HEX
+    // general built-ins
+    { SYMBOLIC
+
+    // tuple and list built-ins
+    , NTH
     , CONS
     , APP
     , LEN
     , TAIL
     , PEEK
-    , BOOLEAN2INTEGER
-    , INTEGER2BOOLEAN
-    , ENUM2INTEGER
-    , INTEGER2ENUM
-    , ASINTEGER
-    , ASFLOAT
-    , ASRATIONAL
-    , SHARED_BUILTIN_IDS
 
-    , SYMBOLIC
-    
-    , NTH
-    
+    // casting built-ins
+    , AS_INTEGER
+    , AS_BOOLEAN
+    , AS_FLOATING
     , AS_BIT
+    , AS_ENUM
+    , AS_STRING
+    , AS_RATIONAL
+    
+    // stringify built-ins
+    , DEC
+    , HEX
+    , BIN
+    
+    // math built-ins
+    , POW
+    , RAND
+
+    // bit-vector built-ins
+    // TODO: PPA: CONTINUE HERE!!!
+    
     } id;
+    
     
     std::vector< TypeType > ret_type;
     std::vector< std::vector< TypeType > > arg_type;
@@ -64,6 +76,9 @@ public:
            , std::vector< TypeType > ret_type
            , std::vector< std::vector< TypeType >> arg_type
            , std::function< void( Type*, std::vector< Type* >& )> unify
+             = [] ( Type* ret, std::vector< Type* >& arg )
+             {
+             }
            , std::function< void( Driver&, BuiltinAtom*, Type*[], uint16_t )> typecheck
              = [] ( Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
              {
