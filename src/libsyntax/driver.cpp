@@ -4,12 +4,16 @@
 
 #include "libsyntax/driver.h"
 
-#define BOLD_BLACK  "\x1b[1m"
-#define BOLD_RED    "\x1b[1;31m"
-#define BOLD_GREEN  "\x1b[1;32m"
-#define RED         "\x1b[31m"
-#define GREEN       "\x1b[32m"
-#define RESET       "\x1b[0m"
+#define BOLD_BLACK   "\x1b[1m"
+#define BOLD_RED     "\x1b[1;31m"
+#define BOLD_GREEN   "\x1b[1;32m"
+#define BOLD_YELLOW  "\x1b[1;33m"
+#define BOLD_MAGENTA "\x1b[1;35m"
+#define RED          "\x1b[31m"
+#define GREEN        "\x1b[32m"
+#define YELLOW       "\x1b[33m"
+#define MAGENTA      "\x1b[35m"
+#define RESET        "\x1b[0m"
 
 extern int yylex_destroy(void);
 
@@ -17,7 +21,7 @@ extern int yylex_destroy(void);
 Driver *global_driver;
 
 Driver::Driver () 
-    : error_(false), trace_parsing (false), trace_scanning (false), init_dependencies(),
+    : error_(false), warning_(0), trace_parsing (false), trace_scanning (false), init_dependencies(),
       function_table(), function_trace_map() {
   file_ = nullptr;
   result = nullptr;
@@ -86,46 +90,58 @@ AstNode *Driver::parse (const std::string &f) {
   return result;
 }
 
-void Driver::error (const yy::location& l, const std::string& m) {
-  // Set state to error!
-  error_ = true;
-
-  std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " <<
-     BOLD_RED << "error: " << RESET << BOLD_BLACK << m << RESET << std::endl;
-
-  if (l.begin.line == l.end.line && l.begin.line <= lines_.size()) {
-    const std::string& error_line = lines_[l.begin.line-1];
-    std::cerr << filename_ <<":" << l.begin.line <<" " << error_line;
-
-    size_t length_to_error = filename_.size()+1+std::to_string(l.begin.line).size()+l.begin.column;
-    std::cerr << std::string(length_to_error, ' ');
-    std::cerr << RED << std::string(l.end.column-l.begin.column, '^') << RESET;
-    std::cerr << std::endl;
-  } else {
-    for (size_t i=l.begin.line-1; (i < l.end.line && i < lines_.size()); i++) {
-      std::cerr << filename_ <<":" << i <<" " << lines_[i];
-    }
-  }
+void Driver::error( const yy::location& l, const std::string& m )
+{
+    // Set state to error!
+    error_ = true;
+    
+    std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " << BOLD_RED
+              << "error: " << RESET << BOLD_BLACK << m << RESET << std::endl;
+    
+    underline( l );
 }
 
-void Driver::info(const yy::location& l, const std::string& m) {
-  std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " <<
-     BOLD_GREEN << "info: " << RESET << BOLD_BLACK << m << RESET << std::endl;
+void Driver::warning( const yy::location& l, const std::string& m )
+{
+    // increment warning counter
+    warning_++;
 
-  if (l.begin.line == l.end.line && l.begin.line <= lines_.size()) {
-    const std::string& error_line = lines_[l.begin.line-1];
-    std::cerr << filename_ <<":" << l.begin.line <<" " << error_line;
-
-    size_t length_to_error = filename_.size()+1+std::to_string(l.begin.line).size()+l.begin.column;
-    std::cerr << std::string(length_to_error, ' ');
-    std::cerr << GREEN << std::string(l.end.column-l.begin.column, '^') << RESET;
-    std::cerr << std::endl;
-  } else {
-    for (size_t i=l.begin.line-1; (i < l.end.line && i < lines_.size()); i++) {
-      std::cerr << filename_ <<":" << i <<" " << lines_[i];
-    }
-  }
+    std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " << BOLD_MAGENTA
+              << "warning: " << RESET << BOLD_BLACK << m << RESET << std::endl;
+    
+    underline( l );
 }
+
+void Driver::info( const yy::location& l, const std::string& m )
+{
+    std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " << BOLD_GREEN
+              << "info: " << RESET << BOLD_BLACK << m << RESET << std::endl;
+    
+    underline( l );
+}
+
+
+void Driver::underline( const yy::location& l )
+{
+    if( l.begin.line == l.end.line && l.begin.line <= lines_.size() )
+    {
+        const std::string& error_line = lines_[l.begin.line-1];
+        std::cerr << filename_ <<":" << l.begin.line <<" " << error_line;
+        
+        size_t length_to_error = filename_.size()+1+std::to_string(l.begin.line).size()+l.begin.column;
+        std::cerr << std::string(length_to_error, ' ');
+        std::cerr << GREEN << "^" << std::string(l.end.column-(l.begin.column+1), '~') << RESET;
+        std::cerr << std::endl;
+    }
+    else
+    {
+        for( size_t i=l.begin.line-1; (i < l.end.line && i < lines_.size()); i++ )
+        {
+            std::cerr << filename_ << ":" << i <<" " << lines_[i];
+        }
+    }
+}
+
 
 
 bool Driver::ok() const {

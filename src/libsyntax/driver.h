@@ -14,14 +14,16 @@
 class AstNode;
 class RuleNode;
 
-class Driver {
-  private:
+class Driver
+{
+private:
     std::string filename_;
     FILE *file_;
     std::vector<std::string> lines_;
     bool error_;
-
-  public:
+    uint64_t warning_;
+    
+public:
     Driver();
     virtual ~Driver();
 
@@ -44,6 +46,7 @@ class Driver {
 
     // Error handling.
     void error(const yy::location& l, const std::string& m);
+    void warning(const yy::location& l, const std::string& m);
     void info(const yy::location& l, const std::string& m);
     bool ok() const;
 
@@ -61,6 +64,9 @@ class Driver {
     std::unordered_map<size_t, const std::string> function_trace_map;
 
     const std::string& get_filename();
+
+private:
+    void underline( const yy::location& l );
 };
 
 class StringDriver: public Driver {

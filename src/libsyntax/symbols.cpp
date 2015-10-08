@@ -216,6 +216,8 @@ Builtin built_ins[] =
             ( atom->arguments->at(1)->location
             , "second argument of 'asBit' builtin must be a Integer constant"
             );
+            
+            return;
         }
         
         INTEGER_T bitsize = static_cast< IntegerAtom* >( expr_bitsize )->val_;
@@ -225,13 +227,18 @@ Builtin built_ins[] =
             ( atom->arguments->at(1)->location
             , "second argument of 'asBit' builtin must be in the range from 1 to 256"
             );
+            
+            return;
         }
-
+        
+        atom->return_type->bitsize = bitsize;        
+        
+        
         INTEGER_T value = -1;
         INTEGER_T value_bitsize = -1;
         
         ExpressionBase* expr_value = atom->arguments->at( 0 );
-        if( expr_bitsize->node_type_ == NodeType::INTEGER_ATOM )
+        if( expr_value->node_type_ == NodeType::INTEGER_ATOM )
         {
             value = static_cast< IntegerAtom* >( expr_value )->val_;
             double v = (double)value;
@@ -239,20 +246,29 @@ Builtin built_ins[] =
             v = std::ceil( v );
             value_bitsize = (INTEGER_T)v;
         }
+        else if( expr_value->node_type_ == NodeType::FUNCTION_ATOM )
+        {
+            driver.warning
+            ( atom->arguments->at(0)->location
+            , "first argument of 'asBit' builtin will be truncated to bitsize '" + std::to_string( bitsize ) + "'"
+            );
+            
+            return;
+        }
         else
         {
             assert( !"unimplemented value type for 'asBit' builtin to check value bitsize fitting!" );
         }
         
+        printf( "%s: %i, %i\n", atom->name.c_str(), value, value_bitsize );
+        
         if( value_bitsize > bitsize )
         {
             driver.error
             ( atom->arguments->at(0)->location
-              , "first argument of 'asBit' builtin does not fit into the bitsize of '" + std::to_string( bitsize ) + "'"
+            , "first argument of 'asBit' builtin does not fit into the bitsize of '" + std::to_string( bitsize ) + "'"
             );            
         }
-        
-        atom->return_type->bitsize = bitsize;        
     }
   }
 
