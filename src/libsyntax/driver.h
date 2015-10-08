@@ -20,7 +20,7 @@ private:
     std::string filename_;
     FILE *file_;
     std::vector<std::string> lines_;
-    bool error_;
+    uint64_t error_;
     uint64_t warning_;
     
 public:
@@ -50,6 +50,9 @@ public:
     void info(const yy::location& l, const std::string& m);
     bool ok() const;
 
+    uint64_t get_error_count() const;
+    uint64_t get_warning_count() const;
+    
     // Rule handling
     bool add(RuleNode *rule_root);
     RuleNode *get_init_rule() const;

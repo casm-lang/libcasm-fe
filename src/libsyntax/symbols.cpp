@@ -260,8 +260,6 @@ Builtin built_ins[] =
             assert( !"unimplemented value type for 'asBit' builtin to check value bitsize fitting!" );
         }
         
-        printf( "%s: %i, %i\n", atom->name.c_str(), value, value_bitsize );
-        
         if( value_bitsize > bitsize )
         {
             driver.error

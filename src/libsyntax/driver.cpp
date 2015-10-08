@@ -21,7 +21,7 @@ extern int yylex_destroy(void);
 Driver *global_driver;
 
 Driver::Driver () 
-    : error_(false), warning_(0), trace_parsing (false), trace_scanning (false), init_dependencies(),
+    : error_(0), warning_(0), trace_parsing (false), trace_scanning (false), init_dependencies(),
       function_table(), function_trace_map() {
   file_ = nullptr;
   result = nullptr;
@@ -78,7 +78,8 @@ AstNode *Driver::parse (const std::string &f) {
     res = parser.parse ();
 
     // TODO check leak on parser error
-    if (res != 0 || error_) {
+    if( res != 0 || error_ > 0 )
+    {
       return nullptr;
     }
 
@@ -93,7 +94,7 @@ AstNode *Driver::parse (const std::string &f) {
 void Driver::error( const yy::location& l, const std::string& m )
 {
     // Set state to error!
-    error_ = true;
+    error_++;
     
     std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " << BOLD_RED
               << "error: " << RESET << BOLD_BLACK << m << RESET << std::endl;
@@ -144,8 +145,19 @@ void Driver::underline( const yy::location& l )
 
 
 
-bool Driver::ok() const {
-  return !error_;
+bool Driver::ok() const
+{
+  return error_ == 0;
+}
+
+uint64_t Driver::get_error_count() const
+{
+    return error_;
+}
+
+uint64_t Driver::get_warning_count() const
+{
+    return warning_;
 }
 
 bool Driver::add(RuleNode *rule_root) {
