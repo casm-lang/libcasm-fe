@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <map>
 #include <vector>
+#include <functional>
 
 #include <iostream>
 #include "libsyntax/types.h"
