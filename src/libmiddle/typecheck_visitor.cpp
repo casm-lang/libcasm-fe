@@ -351,11 +351,13 @@ void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<
             INTEGER_T value = static_cast< IntegerAtom* >( expr_value )->val_;
             INTEGER_T value_bitsize = -1;
             INTEGER_T bitsize = expr->bitsize;
+
+            value = ( value <= 0 ) ? 1 : value;
             
             double v = (double)value;
             v = floor(log2( v )) + 1;
             value_bitsize = (INTEGER_T)v;
-            printf( "%s: %li, %li\n", __FUNCTION__, value_bitsize, bitsize );
+            
             if( value_bitsize > bitsize )
             {
                 driver_.error
