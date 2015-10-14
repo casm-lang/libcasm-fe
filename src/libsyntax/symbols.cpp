@@ -12,7 +12,10 @@ std::map< std::string, Builtin* > Builtin::str2obj;
 static bool built_in_intconstarg_to_retbittype
 ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length, uint8_t len2check, uint8_t argpos )
 {
-    assert( length == len2check && "invalid argument length for builtin" );
+    if( length != len2check && "invalid argument length for builtin" )
+    {
+        return false;
+    }
     
     ExpressionBase *expr_bitsize = atom->arguments->at( argpos );
     if( expr_bitsize->node_type_ != NodeType::INTEGER_ATOM )
@@ -63,6 +66,42 @@ static void built_in_funcarg_to_retbittype
         assert( !"unimplemented" );
     }
 }
+
+static void built_in_check_bitargs
+( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+{
+    bool flag = false;
+    for( int i = 0; i < 2; i++ )
+    {
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, i );
+        
+        if( atom->types[i]->bitsize <= 0 )
+        {
+            driver.error
+                ( atom->arguments->at(i)->location
+                  , "first argument of '" + self.name +
+                  "' has invalid Bit type '" + atom->types[i]->to_str() + "'!"
+                    );
+            flag = true;
+        }
+    }
+        
+    if( flag )
+    {
+        return;
+    }
+
+    if( atom->types[0]->bitsize != atom->types[1]->bitsize )
+    {
+        driver.error
+        ( atom->location
+          , "arguments of '" + self.name +
+          "' have different Bit types: '" + atom->types[0]->to_str() +
+          "' != '" + atom->types[1]->to_str() + "'"
+            );
+    }
+}
+
 
 
 //  { "builtinName"
@@ -280,6 +319,14 @@ Builtin built_ins[] =
             double v = (double)value;
             v = floor(log2( v )) + 1;
             value_bitsize = (INTEGER_T)v;
+        }
+        else if( expr_value->node_type_ == NodeType::BOOLEAN_ATOM )
+        {
+            value_bitsize = 1;
+        }
+        else if( expr_value->node_type_ == NodeType::BUILTIN_ATOM )
+        {
+            value_bitsize = static_cast< BuiltinAtom* >( expr_value )->return_type->bitsize;
         }
         else if( expr_value->node_type_ == NodeType::FUNCTION_ATOM )
         {
@@ -524,8 +571,6 @@ Builtin built_ins[] =
             ( atom->arguments->at(0)->location
             , "cannot '" + self.name + "' from type '" + atom->types[0]->to_str() + "' to '" + atom->return_type->to_str() + "'!"
             );
-
-            assert(0);
         }
     }
   }
@@ -598,6 +643,38 @@ Builtin built_ins[] =
 
     // // cls   : Bit( n ) -> Bit( n ) // count leading sign bits
     // {"cls", true},
+
+
+//// lequ  : Bit( n ) * Bit( n ) -> Boolean // less equals than, unsigned
+, { "lequ"
+  , Builtin::Id::LEQU
+  , { TypeType::BOOLEAN }
+  , { { TypeType::BIT }
+    , { TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_check_bitargs( self, driver, atom, arguments, length );
+    }
+  }
+
+  
+//// leqs  : Bit( n ) * Bit( n ) -> Boolean // less equals than, signed
+, { "leqs"
+  , Builtin::Id::LEQS
+  , { TypeType::BOOLEAN }
+  , { { TypeType::BIT }
+    , { TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_check_bitargs( self, driver, atom, arguments, length );
+    }
+  }
 
 
 };

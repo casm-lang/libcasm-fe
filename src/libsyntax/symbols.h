@@ -62,7 +62,31 @@ public:
     , SHL
     , SHR
     , ASHR
+
+    , ADDU
+    , SUBU
+    , MULU
+    , DIVU
+    , MODU
+    , GREU
+    , GEQU
+    , LESU
+    , LEQU
+    , EQUU
+    , NEQU
     
+    , ADDS
+    , SUBS
+    , MULS
+    , DIVS
+    , MODS
+    , GRES
+    , GEQS
+    , LESS
+    , LEQS
+    , EQUS
+    , NEQS
+   
     } id;
     
     
