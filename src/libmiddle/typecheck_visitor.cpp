@@ -326,19 +326,56 @@ void TypecheckVisitor::visit_pop(PopNode *node) {
   }
 }
 
-void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<Type*>& case_labels) {
-  if (node->case_list.size() - case_labels.size() > 1) {
-   driver_.error(node->location,
-                 "more than one default label in case");
-  }
 
-  for (size_t i=0; i < case_labels.size(); i++) {
-    if (!expr->unify(case_labels[i])) {
-      driver_.error(node->case_list[i].first->location,
-                    "type of case expression ("+expr->get_most_general_type()->to_str()+") and label ("+
-                    case_labels[i]->get_most_general_type()->to_str()+") do not match");
+void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<Type*>& case_labels)
+{
+    if( node->case_list.size() - case_labels.size() > 1 )
+    {
+        driver_.error(node->location,"more than one default label in case");
     }
-  }
+
+    for( size_t i=0; i < case_labels.size(); i++ )
+    {
+        if( expr->t == TypeType::BIT && case_labels[i]->t == TypeType::INTEGER )
+        {
+            ExpressionBase *expr_value = node->case_list[i].first;
+            if( expr_value->node_type_ != NodeType::INTEGER_ATOM )
+            {
+                driver_.error
+                ( node->case_list[i].first->location
+                , "case item shall be an Integer constant"
+                );
+                continue;
+            }
+    
+            INTEGER_T value = static_cast< IntegerAtom* >( expr_value )->val_;
+            INTEGER_T value_bitsize = -1;
+            INTEGER_T bitsize = expr->bitsize;
+            
+            double v = (double)value;
+            v = floor(log2( v )) + 1;
+            value_bitsize = (INTEGER_T)v;
+            printf( "%s: %li, %li\n", __FUNCTION__, value_bitsize, bitsize );
+            if( value_bitsize > bitsize )
+            {
+                driver_.error
+                ( node->case_list[i].first->location
+                , "bitsize " + std::to_string(value_bitsize) +
+                  " of case list value does not fit into '" + expr->to_str() + "' of case expression"
+                );
+            }
+            continue;
+        }
+        
+        if( !expr->unify(case_labels[i]) )
+        {
+            driver_.error
+            ( node->case_list[i].first->location
+            , "type of case expression (" + expr->get_most_general_type()->to_str() + ") and label (" +
+              case_labels[i]->get_most_general_type()->to_str() + ") do not match"
+            );
+        }
+    }
 }
 
 void TypecheckVisitor::check_numeric_operator(const yy::location& loc, 
@@ -425,13 +462,25 @@ Type* TypecheckVisitor::visit_expression(Expression *expr, Type*, Type*) {
     case ExpressionOperation::OR:
     case ExpressionOperation::XOR:
     case ExpressionOperation::AND:
-      if (!expr->left_->type_.unify(new Type(TypeType::BOOLEAN))) {
-        driver_.error(expr->location,
-                  "operands of operator `"+operator_to_str(expr->op)+
-                  "` must be Boolean but are "+expr->left_->type_.to_str());
-      }
-      expr->type_.unify(Type(TypeType::BOOLEAN));
-      break;
+    {
+        if( expr->left_->type_.t == TypeType::BIT )
+        {
+            expr->type_.unify_nofollow( &expr->left_->type_ );
+        }
+        else
+        {
+            if( !expr->left_->type_.unify(new Type(TypeType::BOOLEAN)) )
+            {
+                driver_.error
+                ( expr->location
+                , "operands of operator `" + operator_to_str(expr->op) +
+                  "` must be Boolean or Bit but are " + expr->left_->type_.to_str()
+                );
+            }
+            expr->type_.unify(Type( TypeType::BOOLEAN ));
+        }
+        break;
+    }
     default: FAILURE();
   }
 

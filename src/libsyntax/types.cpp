@@ -131,7 +131,17 @@ bool Type::operator!=(const Type& other) const {
 const std::string Type::to_str() const {
   switch (t) {
     case TypeType::INTEGER: return "Integer";
-    case TypeType::BIT: return "Bit(" + std::to_string( bitsize ) + ")";
+    case TypeType::BIT:
+    {
+        if( bitsize > 0 )
+        {
+            return "Bit(" + std::to_string( bitsize ) + ")";
+        }
+        else
+        {
+            return "Bit";
+        }
+    }
     case TypeType::FLOAT: return "Float";
     case TypeType::RATIONAL: return "Rational";
     case TypeType::UNDEF: return "Undef";

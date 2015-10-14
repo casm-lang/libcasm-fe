@@ -136,7 +136,7 @@ void Driver::underline( const yy::location& l )
     }
     else
     {
-        for( size_t i=l.begin.line-1; (i < l.end.line && i < lines_.size()); i++ )
+        for( size_t i = l.begin.line-1; (i < l.end.line && i < lines_.size()); i++ )
         {
             std::cerr << filename_ << ":" << i <<" " << lines_[i];
         }

@@ -56,6 +56,12 @@ public:
 
     // bit-vector built-ins
     // TODO: PPA: CONTINUE HERE!!!
+    , ZEXT
+    , SEXT
+    , TRUNC
+    , SHL
+    , SHR
+    , ASHR
     
     } id;
     
@@ -64,7 +70,7 @@ public:
     std::vector< std::vector< TypeType > > arg_type;
     
     std::function< void( Type*, std::vector< Type* >& )> unify_lambda;
-    std::function< void( Driver&, BuiltinAtom*, Type*[], uint16_t )> typecheck_lambda;
+    std::function< void( Builtin&, Driver&, BuiltinAtom*, Type*[], uint16_t )> typecheck_lambda;
     
 private:
     static std::map< Id, Builtin* > id2obj;
@@ -80,8 +86,8 @@ public:
              = [] ( Type* ret, std::vector< Type* >& arg )
              {
              }
-           , std::function< void( Driver&, BuiltinAtom*, Type*[], uint16_t )> typecheck
-             = [] ( Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+           , std::function< void( Builtin&, Driver&, BuiltinAtom*, Type*[], uint16_t )> typecheck
+             = [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
              {
              }
            )
@@ -111,7 +117,7 @@ public:
         assert( atom && "invalid BUILTIN AST atom pointer" );
         assert( arguments && "invalid argument Type array pointer" );
         
-        typecheck_lambda( driver, atom, arguments, length );
+        typecheck_lambda( *this, driver, atom, arguments, length );
     }
     
     static bool isBuiltin( const std::string& name )

@@ -9,6 +9,62 @@ std::map< Builtin::Id, Builtin* > Builtin::id2obj;
 std::map< std::string, Builtin* > Builtin::str2obj;
 
 
+static bool built_in_intconstarg_to_retbittype
+( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length, uint8_t len2check, uint8_t argpos )
+{
+    assert( length == len2check && "invalid argument length for builtin" );
+    
+    ExpressionBase *expr_bitsize = atom->arguments->at( argpos );
+    if( expr_bitsize->node_type_ != NodeType::INTEGER_ATOM )
+    {
+        driver.error
+        ( atom->arguments->at(1)->location
+        , "second argument of '" + self.name + "' builtin must be a Integer constant"
+        );
+        return false;
+    }
+    
+    INTEGER_T bitsize = static_cast< IntegerAtom* >( expr_bitsize )->val_;
+    if( bitsize <= 0 or bitsize > 256 )
+    {
+        driver.error
+        ( atom->arguments->at(1)->location
+        , "second argument of '" + self.name + "' builtin must be in the range from 1 to 256"
+        );
+        return false;
+    }
+    
+    atom->return_type->bitsize = bitsize;
+    return true;
+}
+
+static void built_in_funcarg_to_retbittype
+( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length, uint8_t argpos )
+{
+    ExpressionBase *expr_bitsize = atom->arguments->at( argpos );
+    if( expr_bitsize->node_type_ == NodeType::FUNCTION_ATOM )
+    {
+        FunctionAtom* a = static_cast< FunctionAtom* >( expr_bitsize );
+        atom->types[argpos]->bitsize = a->type_.bitsize;
+    }
+    else if( expr_bitsize->node_type_ == NodeType::BUILTIN_ATOM )
+    {
+        BuiltinAtom* a = static_cast< BuiltinAtom* >( expr_bitsize );
+        atom->types[argpos]->bitsize = a->return_type->bitsize;
+    }
+    else
+    {
+        printf
+        ( "%s: %s: %s (%i): bitsize = %li\n"
+        , __FUNCTION__, self.name.c_str()
+        , type_to_str(expr_bitsize->node_type_).c_str(), expr_bitsize->node_type_, atom->types[argpos]->bitsize
+        );
+
+        assert( !"unimplemented" );
+    }
+}
+
+
 //  { "builtinName"
 //  , Builtin::Id::BUILTIN_ID
 //  , { ... } possible return types
@@ -49,6 +105,7 @@ Builtin built_ins[] =
     {
         arg[0]->subtypes[0]->unify( ret );
     }
+    // TODO: move 'nth' specific code from typecheckvisitor.cpp into this lambda function here !!!
   }
 
 // {"cons", true},
@@ -205,35 +262,14 @@ Builtin built_ins[] =
     {
         ret->unify( arg[1] );
     }
-  , [] ( Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
     {
-        assert( length == 2 && "invalid argument length for builtin" );
-        
-        ExpressionBase *expr_bitsize = atom->arguments->at( 1 );
-        if( expr_bitsize->node_type_ != NodeType::INTEGER_ATOM )
+        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, length, 2, 1 ) )
         {
-            driver.error
-            ( atom->arguments->at(1)->location
-            , "second argument of 'asBit' builtin must be a Integer constant"
-            );
-            
             return;
         }
         
-        INTEGER_T bitsize = static_cast< IntegerAtom* >( expr_bitsize )->val_;
-        if( bitsize <= 0 or bitsize > 256 )
-        {
-            driver.error
-            ( atom->arguments->at(1)->location
-            , "second argument of 'asBit' builtin must be in the range from 1 to 256"
-            );
-            
-            return;
-        }
-        
-        atom->return_type->bitsize = bitsize;        
-        
-        
+        INTEGER_T bitsize = atom->return_type->bitsize;
         INTEGER_T value = -1;
         INTEGER_T value_bitsize = -1;
         
@@ -242,8 +278,7 @@ Builtin built_ins[] =
         {
             value = static_cast< IntegerAtom* >( expr_value )->val_;
             double v = (double)value;
-            v = log2( v );
-            v = std::ceil( v );
+            v = floor(log2( v )) + 1;
             value_bitsize = (INTEGER_T)v;
         }
         else if( expr_value->node_type_ == NodeType::FUNCTION_ATOM )
@@ -251,6 +286,7 @@ Builtin built_ins[] =
             driver.warning
             ( atom->arguments->at(0)->location
             , "first argument of 'asBit' builtin will be truncated to bitsize '" + std::to_string( bitsize ) + "'"
+            // "conversion from 'TYPE' to 'TYPE', possible loss of data" // PPA: use this message in the future
             );
             
             return;
@@ -411,28 +447,148 @@ Builtin built_ins[] =
     }
   }
 
+
+
+////===--- BIT OPERATION BUILT-INS ---====
   
-    // //===--- BIT OPERATION BUILT-INS ---====
-    // // zext  : Bit( n ) * Integer (const, m) -> Bit( m ) // zero extend to new size, if m < n then error!
-    // {"zext", true},
+//// zext  : Bit( n ) * Integer (const, m) -> Bit( m ) // zero extend to new size, if m < n then error!
+, { "zext"
+  , Builtin::Id::ZEXT
+  , { TypeType::BIT }
+  , { { TypeType::BIT }
+    , { TypeType::INTEGER }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, length, 2, 1 ) )
+        {
+            return;
+        }
+        
+        if( atom->return_type->bitsize < atom->types[0]->bitsize )
+        {
+            driver.error
+            ( atom->arguments->at(0)->location
+            , "cannot '" + self.name + "' from type '" + atom->types[0]->to_str() + "' to '" + atom->return_type->to_str() + "'!"
+            );            
+        }
+    }
+  }
 
-    // // sext  : Bit( n ) * Integer (const, m) -> Bit( m ) // sign extend to new size, if m < n then error!
-    // {"sext", true},
+//// sext  : Bit( n ) * Integer (const, m) -> Bit( m ) // sign extend to new size, if m < n then error!
+, { "sext"
+  , Builtin::Id::SEXT
+  , { TypeType::BIT }
+  , { { TypeType::BIT }
+    , { TypeType::INTEGER }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, length, 2, 1 ) )
+        {
+            return;
+        }
+        
+        if( atom->return_type->bitsize < atom->types[0]->bitsize )
+        {
+            driver.error
+            ( atom->arguments->at(0)->location
+            , "cannot '" + self.name + "' from type '" + atom->types[0]->to_str() + "' to '" + atom->return_type->to_str() + "'!"
+            );            
+        }
+    }
+  }
 
-    // // trunc : Bit( n ) * Integer (const, m) -> Bit( m ) // truncate to new size, if m > n then error!
-    // {"trunc", true},
+//// trunc : Bit( n ) * Integer (const, m) -> Bit( m ) // truncate to new size, if m > n then error!
+, { "trunc"
+  , Builtin::Id::TRUNC
+  , { TypeType::BIT }
+  , { { TypeType::BIT }
+    , { TypeType::INTEGER }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, length, 2, 1 ) )
+        {
+            return;
+        }
 
-    // // shl   : Bit( n ) * Integer  -> Bit( n ) // logic shift left of Integer value positions
-    // // shl   : Bit( n ) * Bit( n ) -> Bit( n ) // logic shift left of Bit(n) value positions
-    // {"shl", true},
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, 0 );
+        
+        if( atom->return_type->bitsize > atom->types[0]->bitsize )
+        {
+            driver.error
+            ( atom->arguments->at(0)->location
+            , "cannot '" + self.name + "' from type '" + atom->types[0]->to_str() + "' to '" + atom->return_type->to_str() + "'!"
+            );
 
-    // // shr   : Bit( n ) * Integer  -> Bit( n ) // logic shift right of Integer value positions
-    // // shr   : Bit( n ) * Bit( n ) -> Bit( n ) // logic shift right of Bit(n) value positions
-    // {"shr", true},
+            assert(0);
+        }
+    }
+  }
 
-    // // ashr  : Bit( n ) * Integer  -> Bit( n ) // arithmetic shift right of Integer value positions
-    // // ashr  : Bit( n ) * Bit( n ) -> Bit( n ) // arithmetic shift right of Bit(n) value positions
-    // {"ashr", true},
+//// shl   : Bit( n ) * Integer  -> Bit( n ) // logic shift left of Integer value positions
+//// shl   : Bit( n ) * Bit( n ) -> Bit( n ) // logic shift left of Bit(n) value positions
+, { "shl"
+  , Builtin::Id::SHL
+  , { TypeType::BIT }
+  , { { TypeType::BIT }
+    , { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, 0 );
+
+        atom->return_type->bitsize = atom->types[0]->bitsize;
+    }
+  }
+
+//// shr   : Bit( n ) * Integer  -> Bit( n ) // logic shift right of Integer value positions
+//// shr   : Bit( n ) * Bit( n ) -> Bit( n ) // logic shift right of Bit(n) value positions
+, { "shr"
+  , Builtin::Id::SHR
+  , { TypeType::BIT }
+  , { { TypeType::BIT }
+    , { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, 0 );
+
+        atom->return_type->bitsize = atom->types[0]->bitsize;
+    }
+  }
+
+//// ashr  : Bit( n ) * Integer  -> Bit( n ) // arithmetic shift right of Integer value positions
+//// ashr  : Bit( n ) * Bit( n ) -> Bit( n ) // arithmetic shift right of Bit(n) value positions
+, { "ashr"
+  , Builtin::Id::ASHR
+  , { TypeType::BIT }
+  , { { TypeType::BIT }
+    , { TypeType::UNKNOWN
+      , TypeType::INTEGER
+      , TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, 0 );
+
+        atom->return_type->bitsize = atom->types[0]->bitsize;
+    }
+  }
   
     // // clz   : Bit( n ) -> Bit( n ) // count leading zeros
     // {"clz", true},
