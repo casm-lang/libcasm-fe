@@ -45,26 +45,7 @@ static void built_in_funcarg_to_retbittype
 ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length, uint8_t argpos )
 {
     ExpressionBase *expr_bitsize = atom->arguments->at( argpos );
-    if( expr_bitsize->node_type_ == NodeType::FUNCTION_ATOM )
-    {
-        FunctionAtom* a = static_cast< FunctionAtom* >( expr_bitsize );
-        atom->types[argpos]->bitsize = a->type_.bitsize;
-    }
-    else if( expr_bitsize->node_type_ == NodeType::BUILTIN_ATOM )
-    {
-        BuiltinAtom* a = static_cast< BuiltinAtom* >( expr_bitsize );
-        atom->types[argpos]->bitsize = a->return_type->bitsize;
-    }
-    else
-    {
-        printf
-        ( "%s: %s: %s (%i): bitsize = %li\n"
-        , __FUNCTION__, self.name.c_str()
-        , type_to_str(expr_bitsize->node_type_).c_str(), expr_bitsize->node_type_, atom->types[argpos]->bitsize
-        );
-
-        assert( !"unimplemented" );
-    }
+    atom->types[argpos]->bitsize = expr_bitsize->type_.bitsize;    
 }
 
 static void built_in_check_bitargs
@@ -645,6 +626,37 @@ Builtin built_ins[] =
     // {"cls", true},
 
 
+//// lesu  : Bit( n ) * Bit( n ) -> Boolean // less than, unsigned
+, { "lesu"
+  , Builtin::Id::LESU
+  , { TypeType::BOOLEAN }
+  , { { TypeType::BIT }
+    , { TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_check_bitargs( self, driver, atom, arguments, length );
+    }
+  }
+
+  
+//// less  : Bit( n ) * Bit( n ) -> Boolean // less than, signed
+, { "less"
+  , Builtin::Id::LESS
+  , { TypeType::BOOLEAN }
+  , { { TypeType::BIT }
+    , { TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_check_bitargs( self, driver, atom, arguments, length );
+    }
+  }
+
 //// lequ  : Bit( n ) * Bit( n ) -> Boolean // less equals than, unsigned
 , { "lequ"
   , Builtin::Id::LEQU
@@ -664,6 +676,69 @@ Builtin built_ins[] =
 //// leqs  : Bit( n ) * Bit( n ) -> Boolean // less equals than, signed
 , { "leqs"
   , Builtin::Id::LEQS
+  , { TypeType::BOOLEAN }
+  , { { TypeType::BIT }
+    , { TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_check_bitargs( self, driver, atom, arguments, length );
+    }
+  }
+
+
+  //// greu  : Bit( n ) * Bit( n ) -> Boolean // greater than, unsigned
+, { "greu"
+  , Builtin::Id::GREU
+  , { TypeType::BOOLEAN }
+  , { { TypeType::BIT }
+    , { TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_check_bitargs( self, driver, atom, arguments, length );
+    }
+  }
+
+  
+//// gres  : Bit( n ) * Bit( n ) -> Boolean // greater than, signed
+, { "gres"
+  , Builtin::Id::GRES
+  , { TypeType::BOOLEAN }
+  , { { TypeType::BIT }
+    , { TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_check_bitargs( self, driver, atom, arguments, length );
+    }
+  }
+
+//// gequ  : Bit( n ) * Bit( n ) -> Boolean // greater equals than, unsigned
+, { "gequ"
+  , Builtin::Id::GEQU
+  , { TypeType::BOOLEAN }
+  , { { TypeType::BIT }
+    , { TypeType::BIT
+      }
+    }
+  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+    {
+        built_in_check_bitargs( self, driver, atom, arguments, length );
+    }
+  }
+
+  
+//// geqs  : Bit( n ) * Bit( n ) -> Boolean // greater equals than, signed
+, { "geqs"
+  , Builtin::Id::GEQS
   , { TypeType::BOOLEAN }
   , { { TypeType::BIT }
     , { TypeType::BIT
