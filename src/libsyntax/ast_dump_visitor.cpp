@@ -108,26 +108,56 @@ bool AstDumpVisitor::visit_update_dumps(UpdateNode *update, bool v1, bool v2) {
   return visit_update(update, v1, v2);
 }
 
-bool AstDumpVisitor::visit_call_pre(CallNode *call) {
-  dump_node(call, "Direct Call: "+call->rule_name);
-  // TODO we need to populate the rule here!!!
-  //FAILURE();
-  fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ );
-  return 0;
+bool AstDumpVisitor::visit_call_pre(CallNode *call)
+{
+    dump_node(call, "Direct Call: " + call->rule_name);
+
+    if( call->arguments )
+    {
+        for( ExpressionBase* a : *(call->arguments) )
+        {
+            dump_link(call, a);
+        }
+    }
+    
+    return 0;
 }
 
-bool AstDumpVisitor::visit_call_pre(CallNode *call, bool) {
-  dump_node(call, "Indirect Call");
-  // TODO we need to populate the rule here!!!
-  //FAILURE();
-  fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ );  
-  return 0;
+bool AstDumpVisitor::visit_call_pre(CallNode *call, bool)
+{
+    dump_node(call, "Indirect Call");
+
+    dump_link(call, call->ruleref);
+    
+    if( call->arguments )
+    {
+        for( ExpressionBase* a : *(call->arguments) )
+        {
+            dump_link(call, a);
+        }
+    }
+    
+    return 0;
 }
 
-bool AstDumpVisitor::visit_call(CallNode *call, std::vector<bool>& argument_results) {
-  UNUSED(call);
-  UNUSED(argument_results);
-  return true;
+
+bool AstDumpVisitor::visit_call(CallNode *call, std::vector<bool>& argument_results)
+{
+    UNUSED(call);
+    UNUSED(argument_results);
+    return true;
+}
+
+void AstDumpVisitor::visit_case(CaseNode* node, const bool flag, const std::vector<bool>& result)
+{
+    dump_node(node, "Case");
+    dump_link(node, node->expr);
+ 
+    for( auto& a : node->case_list )
+    {
+        dump_link(node, a.first);
+        dump_link(a.first, a.second);
+    }
 }
 
 bool AstDumpVisitor::visit_print(PrintNode *node, std::vector<bool>& argument_results) {
@@ -208,6 +238,15 @@ bool AstDumpVisitor::visit_function_atom(FunctionAtom *atom, bool[], uint16_t) {
 
 bool AstDumpVisitor::visit_builtin_atom(BuiltinAtom *atom, bool[], uint16_t) {
   dump_node(atom, std::string("BuiltinAtom:"+atom->to_string()));
+
+  if( atom->arguments )
+  {
+      for( auto arg : *(atom->arguments) )
+      {
+          dump_link( atom, arg );
+      }
+  }
+  
   return true;
 }
 

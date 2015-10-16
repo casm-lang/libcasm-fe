@@ -291,17 +291,19 @@ template<class T, class V> class AstWalker {
     }
 
     void walk_case(CaseNode *node) {
-      std::vector<V> case_labels;
-      for (auto& pair : node->case_list) {
-        // pair.first == nullptr for default:
-        if (pair.first) {
-          case_labels.push_back(walk_atom(pair.first));
+        V web = walk_expression_base(node->expr);
+        visitor.visit_case_pre(node, web );
+        std::vector<V> case_labels;
+        for (auto& pair : node->case_list) {
+            // pair.first == nullptr for default:
+            if (pair.first) {
+                case_labels.push_back(walk_atom(pair.first));
+            }
+            walk_statement(pair.second);
         }
-        walk_statement(pair.second);
-      }
-      visitor.visit_case(node, walk_expression_base(node->expr), case_labels);
+        visitor.visit_case(node, web, case_labels);
     }
-
+    
     V walk_expression_base(ExpressionBase *expr) {
       if (expr->node_type_ == NodeType::EXPRESSION) {
         Expression *e = reinterpret_cast<Expression*>(expr);
@@ -437,6 +439,7 @@ template<class T> class BaseVisitor {
     void visit_let_post(LetNode*) {}
     void visit_pop(PopNode*) { }
     void visit_push(PushNode*, T , T)  { }
+    void visit_case_pre(CaseNode*, const T ) { }
     void visit_case(CaseNode*, const T, const std::vector<T>&) { }
 
     void visit_forall_pre(ForallNode*) { }

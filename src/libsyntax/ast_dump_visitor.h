@@ -47,11 +47,11 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     void visit_let(LetNode*, bool);
     void visit_pop(PopNode*);
     void visit_push(PushNode*, bool, bool);
-    void visit_case(CaseNode*, const bool, const std::vector<bool>&) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); }
+    void visit_case(CaseNode* node, const bool flag, const std::vector<bool>& result);
             
-            void visit_forall_post(ForallNode*) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); }
-        void visit_iterate(UnaryNode*) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); }
-
+    void visit_forall_post(ForallNode*) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); }
+    void visit_iterate(UnaryNode*) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); }
+    
     bool visit_expression(Expression *expr, bool, bool);
     bool visit_expression_single(Expression *expr, bool);
     bool visit_int_atom(IntegerAtom *atom);
