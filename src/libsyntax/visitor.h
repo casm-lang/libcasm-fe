@@ -86,6 +86,11 @@ template<class T, class V> class AstWalker {
       walk_statement(rule->child_);
     }
 
+    void walk_skip(AstNode* node)
+    {
+        visitor.visit_skip(node);
+    }
+    
     void walk_statement(AstNode *stmt) {
       switch(stmt->node_type_) {
         case NodeType::SEQBLOCK:
@@ -109,7 +114,12 @@ template<class T, class V> class AstWalker {
           visitor.visit_assure(assure, v);
           break;
         }
-        case NodeType::SKIP: break; // skip does nothing
+        case NodeType::SKIP:
+        {
+            // skip does nothing, but in the IR we need this "trivial" information for processing!
+            walk_skip(stmt);
+            break; 
+        }
         case NodeType::IFTHENELSE: {
           walk_ifthenelse(reinterpret_cast<IfThenElseNode*>(stmt));
           break;
@@ -296,7 +306,8 @@ template<class T, class V> class AstWalker {
         std::vector<V> case_labels;
         for (auto& pair : node->case_list) {
             // pair.first == nullptr for default:
-            if (pair.first) {
+            if( pair.first )
+            {
                 case_labels.push_back(walk_atom(pair.first));
             }
             walk_statement(pair.second);
@@ -441,7 +452,8 @@ template<class T> class BaseVisitor {
     void visit_push(PushNode*, T , T)  { }
     void visit_case_pre(CaseNode*, const T ) { }
     void visit_case(CaseNode*, const T, const std::vector<T>&) { }
-
+    void visit_skip( AstNode* node ) {}
+    
     void visit_forall_pre(ForallNode*) { }
     void visit_forall_post(ForallNode*) { }
 
