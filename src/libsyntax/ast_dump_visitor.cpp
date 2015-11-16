@@ -211,6 +211,19 @@ bool AstDumpVisitor::visit_int_atom(IntegerAtom *atom) {
   return true;
 }
 
+bool AstDumpVisitor::visit_bit_atom( IntegerAtom *atom )
+{
+    dump_node
+    ( atom
+    , std::string("Bit(")
+    + std::to_string( atom->type_.bitsize )
+    + std::string("): ")
+    + std::to_string( atom->val_ )
+    );
+    
+    return true;
+}
+
 bool AstDumpVisitor::visit_float_atom(FloatAtom *atom) {
   dump_node(atom, std::string("FloatAtom: ")+std::to_string(atom->val_));
   return true;

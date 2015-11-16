@@ -347,8 +347,9 @@ void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<
                 );
                 continue;
             }
-    
-            INTEGER_T value = static_cast< IntegerAtom* >( expr_value )->val_;
+
+            IntegerAtom* expr_atom = static_cast< IntegerAtom* >( expr_value );
+            INTEGER_T value = expr_atom->val_;
             INTEGER_T value_bitsize = -1;
             INTEGER_T bitsize = expr->bitsize;
 
@@ -366,7 +367,16 @@ void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<
                   " of case list value does not fit into '" + expr->to_str() + "' of case expression"
                 );
             }
-            continue;
+            else
+            {
+                case_labels[i]->t        = TypeType::BIT;
+                case_labels[i]->bitsize  = bitsize;
+                
+                node->case_list[i].first->type_.t       = TypeType::BIT;
+                node->case_list[i].first->type_.bitsize = bitsize;
+            }
+            
+            //continue;
         }
         
         if( !expr->unify(case_labels[i]) )

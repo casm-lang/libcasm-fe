@@ -216,7 +216,7 @@ class Function : public Symbol {
 
   public:
     std::vector<Type*> arguments_;
-
+    
     union {
       std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *intitializers_;
       ExpressionBase *derived;
