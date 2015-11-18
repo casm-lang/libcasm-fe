@@ -84,6 +84,7 @@ template<class T, class V> class AstWalker {
     void walk_rule(RuleNode *rule) {
       visitor.visit_rule(rule);
       walk_statement(rule->child_);
+      visitor.visit_rule_post(rule);
     }
 
     void walk_skip(AstNode* node)
@@ -436,6 +437,7 @@ template<class T> class BaseVisitor {
     void visit_derived_def_pre(FunctionDefNode*) {}
     void visit_derived_def(FunctionDefNode*, T) {}
     void visit_rule(RuleNode*) {}
+    void visit_rule_post(RuleNode*) {}
     void visit_statements(AstListNode*) {}
     void visit_statement(AstNode*) {}
     void visit_ifthenelse(IfThenElseNode*, T) {}

@@ -226,7 +226,8 @@ class Function : public Symbol {
     const uint64_t id;
 
     std::map<std::string, size_t> binding_offsets;
-
+    std::vector< const char* > parameter;
+    
     const bool is_static;
     const bool is_symbolic;
 

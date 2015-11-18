@@ -122,6 +122,8 @@ class RuleNode: public UnaryNode {
     const std::string name;
     std::vector<Type*> arguments;
     std::map<std::string, size_t> binding_offsets;
+    std::vector< const char* > parameter;
+    
     const std::vector<std::pair<std::string, std::vector<std::string>>> dump_list;
 
     RuleNode(yy::location& loc, AstNode *child, const std::string &name);

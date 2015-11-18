@@ -101,6 +101,25 @@ void TypecheckVisitor::visit_derived_def(FunctionDefNode *def, Type* expr) {
                                  "unknown because type of expression is "+expr->to_str());
   }
 
+  if( def->sym->return_type_->t == TypeType::BIT
+   && def->sym->return_type_->bitsize != def->sym->derived->type_.bitsize
+    )
+  {
+      driver_.error( def->location, "expression bit size does not match the return type bit size" );
+  }
+  
+  for( auto arg : def->sym->binding_offsets )
+  {
+      def->sym->parameter.push_back( 0 );
+  }
+
+  for( auto arg : def->sym->binding_offsets )
+  {
+      uint32_t i = arg.second;
+      assert( i < def->sym->parameter.size() and "invalid parameter index found!" );
+      
+      def->sym->parameter[i] = arg.first.c_str();
+  }
 }
 
 void TypecheckVisitor::visit_rule(RuleNode *rule) {
@@ -121,6 +140,19 @@ void TypecheckVisitor::visit_rule(RuleNode *rule) {
                                      " but `"+identifier+"` is not a function");
       }
     } 
+  }
+  
+  for( auto arg : rule->binding_offsets )
+  {
+      rule->parameter.push_back( 0 );
+  }
+
+  for( auto arg : rule->binding_offsets )
+  {
+      uint32_t i = arg.second;
+      assert( i < rule->parameter.size() and "invalid parameter index found!" );
+      
+      rule->parameter[i] = arg.first.c_str();
   }
 }
 
