@@ -93,16 +93,17 @@ void TypecheckVisitor::visit_derived_def(FunctionDefNode *def, Type* expr) {
   rule_binding_offsets.pop_back();
 
   if (!def->sym->return_type_->unify(expr)) {
-    driver_.error(def->location, "type of derived expression was `"+
-                                 expr->to_str()+"` but should be `"+
+    driver_.error(def->location, "type of derived expression is `"+
+                                 expr->to_str()+"`, but specified as `"+
                                  def->sym->return_type_->to_str()+"`");
   } else if (!def->sym->return_type_->is_complete()) {
     driver_.error(def->location, std::string("type of derived expression is ")+
                                  "unknown because type of expression is "+expr->to_str());
   }
 
-  if( def->sym->return_type_->t == TypeType::BIT
-   && def->sym->return_type_->bitsize != def->sym->derived->type_.bitsize
+  if( def->sym->return_type_->t  == TypeType::BIT
+   && def->sym->derived->type_.t == TypeType::BIT
+   && def->sym->return_type_->bitsize  != def->sym->derived->type_.bitsize
     )
   {
       driver_.error( def->location, "expression bit size does not match the return type bit size" );

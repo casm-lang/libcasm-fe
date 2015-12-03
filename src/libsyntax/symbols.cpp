@@ -321,7 +321,8 @@ Builtin built_ins[] =
         }
         else
         {
-            assert( !"unimplemented value type for 'asBit' builtin to check value bitsize fitting!" );
+            //assert( !"unimplemented value type for 'asBit' builtin to check value bitsize fitting!" );
+            value_bitsize = expr_value->type_.bitsize;
         }
         
         if( value_bitsize > bitsize )
