@@ -29,7 +29,8 @@ public:
 
     std::map<std::string, RuleNode*> rules_map_;
     AstNode *result;
-
+    std::string spec_name;
+    
     std::string init_name;
 
     // State information for the lexer

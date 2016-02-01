@@ -172,10 +172,13 @@
 
 
 SPECIFICATION: HEADER BODY_ELEMENTS { driver.result = $2; } /* TODO: header ignored atm */
-             | BODY_ELEMENTS { driver.result = $1; }
+             /* | BODY_ELEMENTS { driver.result = $1; } */
              ;
 
 HEADER: CASM IDENTIFIER
+        {
+            driver.spec_name = $2;
+        }
       ;
 
 BODY_ELEMENTS: BODY_ELEMENTS BODY_ELEMENT { $1->add($2); $$ = $1; }
