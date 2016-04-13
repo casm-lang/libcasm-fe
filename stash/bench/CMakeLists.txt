@@ -1,2 +1,0 @@
-add_subdirectory(cpp_micro_benchmarks)
-add_subdirectory(evaluation)
