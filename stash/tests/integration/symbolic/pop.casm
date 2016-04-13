@@ -1,0 +1,15 @@
+// symbolic
+
+CASM test
+
+function (symbolic) a: -> List(Int) initially { [1, 2] }
+
+rule main = {
+  
+  pop x from a
+
+  program( self ) := undef
+}
+
+init main
+

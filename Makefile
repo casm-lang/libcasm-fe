@@ -31,15 +31,16 @@ SRC = $(shell find src -name '*.cpp' | cut -d'.' -f1)
 
 OBJS = $(SRC:%=obj/%.o)
 
-.PHONY: all clean test
+.PHONY: all clean
+# test
 
 all: lib
 
 clean:
 	rm -rf obj
 
-test: obj/test_parse obj/test_typecheck
-	python tests/integration/test_runner.py
+# test: obj/test_parse obj/test_typecheck
+#	python tests/integration/test_runner.py
 
 $(OBJ_DIR):
 	mkdir -p $@/src/libsyntax
@@ -81,14 +82,14 @@ $(OBJ_DIR)/src/%.o: src/%.cpp
 	@echo "CPP " $<
 	@$(CXX) $(CFLAGS) -c $< -o $@
 
-obj/test_parse: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_parse.cpp
-	@echo "CPP " $<
-	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_parse.cpp obj/libfrontend.a -lstdc++ -lm
-
-obj/test_typecheck: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_typecheck.cpp
-	@echo "CPP " $<
-	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_typecheck.cpp obj/libfrontend.a -lstdc++ -lm
-
-obj/test_dump: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_dump.cpp
-	@echo "CPP " $<
-	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_dump.cpp obj/libfrontend.a -lstdc++ -lm
+# obj/test_parse: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_parse.cpp
+# 	@echo "CPP " $<
+# 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_parse.cpp obj/libfrontend.a -lstdc++ -lm
+# 
+# obj/test_typecheck: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_typecheck.cpp
+# 	@echo "CPP " $<
+# 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_typecheck.cpp obj/libfrontend.a -lstdc++ -lm
+# 
+# obj/test_dump: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_dump.cpp
+# 	@echo "CPP " $<
+# 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_dump.cpp obj/libfrontend.a -lstdc++ -lm

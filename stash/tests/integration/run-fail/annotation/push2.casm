@@ -1,0 +1,10 @@
+// error annotation @7
+
+function (static) a: -> List(Int) initially { [ 1, 2, 3 ] }
+
+rule main = {
+  let x = 1 in
+    push x into a
+    //~^ cannot push into static function `a`
+}
+init main

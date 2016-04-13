@@ -1,0 +1,14 @@
+init main
+
+function (symbolic) a: -> Boolean
+function (symbolic) b: -> Int
+
+rule main = {|
+  if a then {
+    b := 0
+  } else {
+    b := 1
+  }
+
+  program( self ) := undef
+|}

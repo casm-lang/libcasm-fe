@@ -1,0 +1,5 @@
+rule main = {
+  if 1 > undef then skip
+  //~^ condition must be true or false but was undef
+}
+init main
