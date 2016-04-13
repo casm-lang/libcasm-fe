@@ -5,10 +5,10 @@ import os
 import re
 
 test_parse = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        '../../build/test_parse')
+                        '../../obj/test_parse')
 
 test_typecheck = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        '../../build/test_typecheck')
+                        '../../obj/test_typecheck')
 
 PARSE_PASS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         'parse-pass/')
