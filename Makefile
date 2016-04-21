@@ -23,76 +23,181 @@
 #   along with this program. If not, see <http://www.gnu.org/licenses/>.
 #   
 
-LEX = flex
-CXX = clang
-CFLAGS = -Isrc -Iobj/src -std=c++11 -O0 -g
-# -stdlib=libstdc++
-OBJ_DIR = obj
-AR = /usr/bin/ar
+AR=ar
 
-SRC = $(shell find src -name '*.cpp' | cut -d'.' -f1)
+CC=clang
+CCFLAG += -std=c11
+CCFLAG += -g -O0
+CCFLAG += -Wall
 
-OBJS = $(SRC:%=obj/%.o)
+CPP=clang
+CPPFLAG += -std=c++11
+CPPFLAG += -g -O0
+CPPFLAG += -Wall
+#CPPFLAG += -Wextra
 
-.PHONY: all clean
-# test
+LEX=flex
+YAC=bison
 
-all: lib
+TARGET = libcasm-fe.a
+
+CPPOBJECTS += src/various/GrammarParser.cpp
+CPPOBJECTS += src/various/GrammarLexer.cpp
+CPPOBJECTS += obj/GrammarParser.o
+CPPOBJECTS += obj/GrammarLexer.o
+CPPOBJECTS += obj/AstDumpPass.o
+CPPOBJECTS += obj/TypeCheckPass.o
+CPPOBJECTS += obj/SourceToAstPass.o
+CPPOBJECTS += obj/NumericExecutionPass.o
+CPPOBJECTS += obj/SymbolicExecutionPass.o
+
+CPPOBJECTS += obj/Ast.o
+CPPOBJECTS += obj/AstDumpVisitor.o
+CPPOBJECTS += obj/Driver.o
+CPPOBJECTS += obj/Exceptions.o
+CPPOBJECTS += obj/Frontend.o
+CPPOBJECTS += obj/FunctionCycleVisitor.o
+CPPOBJECTS += obj/LexerHelpers.o
+CPPOBJECTS += obj/Symbols.o
+CPPOBJECTS += obj/TypeCheckVisitor.o
+CPPOBJECTS += obj/Types.o
+CPPOBJECTS += obj/Value.o
+
+INCLUDE += -I ./
+INCLUDE += -I ./src
+INCLUDE += -I ./src/analyze
+INCLUDE += -I ./src/transform
+INCLUDE += -I ./src/execute
+INCLUDE += -I ./src/various
+
+INCLUDE += -I ../
+INCLUDE += -I ../pass/src
+
+default: $(LIBRARY) obj $(TARGET)
+
+obj:
+	mkdir -p obj
+
+src/various/GrammarParser.cpp: src/GrammarParser.yy
+	@echo "YAC " $<
+	@cd src/various && $(YAC) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../$^
+
+src/various/GrammarLexer.cpp: src/GrammarLexer.l
+	@echo "LEX " $<
+	@$(LEX) $(LFLAGS) -o $@ $^
+
+obj/%.o: src/%.cpp
+	@echo "CPP " $<
+	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
+
+obj/%.o: src/analyze/%.cpp
+	@echo "CPP " $<
+	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
+
+obj/%.o: src/transform/%.cpp
+	@echo "CPP " $<
+	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
+
+obj/%.o: src/execute/%.cpp
+	@echo "CPP " $<
+	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
+
+obj/%.o: src/various/%.cpp
+	@echo "CPP " $<
+	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
+
+$(TARGET): $(CPPOBJECTS) $(LIBRARY)
+	@echo "AR  " $@
+	@$(AR) rsc $@ $(filter %.o,$^)
+	@ranlib $@
 
 clean:
-	rm -rf obj
+	@echo "RM  " obj
+	@rm -rf obj
+	@echo "RM  " $(TARGET)
+	@rm -f $(TARGET)
 
-# test: obj/test_parse obj/test_typecheck
-#	python tests/integration/test_runner.py
 
-$(OBJ_DIR):
-	mkdir -p $@/src/libsyntax
-	mkdir -p $@/src/libutil
-	mkdir -p $@/src/libmiddle
 
-obj/libfrontend.a: obj/src/libsyntax/parser.o obj/src/libsyntax/lexer.o $(OBJS)
-	@echo "AR  " $@
-	@$(AR) rsc obj/libfrontend.a $(OBJS) obj/src/libsyntax/lexer.o obj/src/libsyntax/parser.o
-	@ranlib obj/libfrontend.a
 
-lib: $(OBJ_DIR) obj/libfrontend.a
 
-obj/src/libsyntax/parser.cpp: src/libsyntax/grammer.yy
-	@echo "YAC " $<
-	@cd obj/src/libsyntax && bison --output parser.cpp --defines=parser.tab.h ../../../src/libsyntax/grammer.yy
+# LEX = flex
+# CXX = clang
+# CFLAGS = -Isrc -Iobj/src -std=c++11 -O0 -g
+# # -stdlib=libstdc++
+# OBJ_DIR = obj
+# AR = /usr/bin/ar
 
-$(OBJ_DIR)/src/libsyntax/lexer.cpp: src/libsyntax/lexer.l
-	@echo "LEX " $<
-	@$(LEX) $(LFLAGS) -o $(OBJ_DIR)/src/libsyntax/lexer.cpp src/libsyntax/lexer.l
+# SRC = $(shell find src -name '*.cpp' | cut -d'.' -f1)
 
-$(OBJ_DIR)/src/libsyntax/%.o: obj/src/libsyntax/%.cpp
-	@echo "CPP " $<
-	@$(CXX) $(CFLAGS) -c $< -o $@
+# OBJS = $(SRC:%=obj/%.o)
 
-$(OBJ_DIR)/src/libutil/%.o: src/libutil/%.cpp
-	@echo "CPP " $<
-	@$(CXX) $(CFLAGS) -c $< -o $@
+# .PHONY: all clean
+# # test
 
-$(OBJ_DIR)/src/libsyntax/%.o: src/libsyntax/%.cpp
-	@echo "CPP " $<
-	@$(CXX) $(CFLAGS) -c $< -o $@
+# all: lib
 
-$(obj_dir)/src/libmiddle/%.o: src/libmiddle/%.cpp
-	@echo "CPP " $<
-	@$(cxx) $(cflags) -c $< -o $@
+# clean:
+# 	rm -rf obj
 
-$(OBJ_DIR)/src/%.o: src/%.cpp
-	@echo "CPP " $<
-	@$(CXX) $(CFLAGS) -c $< -o $@
+# # test: obj/test_parse obj/test_typecheck
+# #	python tests/integration/test_runner.py
 
-# obj/test_parse: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_parse.cpp
+# $(OBJ_DIR):
+# 	mkdir -p $@/src/libsyntax
+# 	mkdir -p $@/src/libutil
+# 	mkdir -p $@/src/libmiddle
+# 	mkdir -p $@/src/execute
+
+# obj/libfrontend.a: obj/src/libsyntax/parser.o obj/src/libsyntax/lexer.o $(OBJS)
+# 	@echo "AR  " $@
+# 	@$(AR) rsc obj/libfrontend.a $(OBJS) obj/src/libsyntax/lexer.o obj/src/libsyntax/parser.o
+# 	@ranlib obj/libfrontend.a
+
+# lib: $(OBJ_DIR) obj/libfrontend.a
+
+# obj/src/libsyntax/parser.cpp: src/libsyntax/grammer.yy
+# 	@echo "YAC " $<
+# 	@cd obj/src/libsyntax && bison --output parser.cpp --defines=parser.tab.h ../../../src/libsyntax/grammer.yy
+
+# $(OBJ_DIR)/src/libsyntax/lexer.cpp: src/libsyntax/lexer.l
+# 	@echo "LEX " $<
+# 	@$(LEX) $(LFLAGS) -o $(OBJ_DIR)/src/libsyntax/lexer.cpp src/libsyntax/lexer.l
+
+# $(OBJ_DIR)/src/libsyntax/%.o: obj/src/libsyntax/%.cpp
 # 	@echo "CPP " $<
-# 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_parse.cpp obj/libfrontend.a -lstdc++ -lm
-# 
-# obj/test_typecheck: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_typecheck.cpp
+# 	@$(CXX) $(CFLAGS) -c $< -o $@
+
+# $(OBJ_DIR)/src/libutil/%.o: src/libutil/%.cpp
 # 	@echo "CPP " $<
-# 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_typecheck.cpp obj/libfrontend.a -lstdc++ -lm
-# 
-# obj/test_dump: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_dump.cpp
+# 	@$(CXX) $(CFLAGS) -c $< -o $@
+
+# $(OBJ_DIR)/src/libsyntax/%.o: src/libsyntax/%.cpp
 # 	@echo "CPP " $<
-# 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_dump.cpp obj/libfrontend.a -lstdc++ -lm
+# 	@$(CXX) $(CFLAGS) -c $< -o $@
+
+# $(obj_dir)/src/libmiddle/%.o: src/libmiddle/%.cpp
+# 	@echo "CPP " $<
+# 	@$(cxx) $(cflags) -c $< -o $@
+
+# $(OBJ_DIR)/src/%.o: src/%.cpp
+# 	@echo "CPP " $<
+# 	@$(CXX) $(CFLAGS) -c $< -o $@
+
+# $(obj_dir)/src/execute/%.o: src/execute/%.cpp
+# 	@echo "CPP " $<
+# 	@$(cxx) $(cflags) -c $< -o $@
+
+
+# # obj/test_parse: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_parse.cpp
+# # 	@echo "CPP " $<
+# # 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_parse.cpp obj/libfrontend.a -lstdc++ -lm
+# # 
+# # obj/test_typecheck: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_typecheck.cpp
+# # 	@echo "CPP " $<
+# # 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_typecheck.cpp obj/libfrontend.a -lstdc++ -lm
+# # 
+# # obj/test_dump: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_dump.cpp
+# # 	@echo "CPP " $<
+# # 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_dump.cpp obj/libfrontend.a -lstdc++ -lm
+
