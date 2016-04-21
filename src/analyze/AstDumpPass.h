@@ -26,7 +26,7 @@
 #ifndef _LIB_CASMFE_ASTDUMPPASS_H_
 #define _LIB_CASMFE_ASTDUMPPASS_H_
 
-#include "Pass.h"
+#include "libpass.h"
 #include "libcasm-fe.h"
 
 /**

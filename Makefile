@@ -72,7 +72,7 @@ INCLUDE += -I ./src/execute
 INCLUDE += -I ./src/various
 
 INCLUDE += -I ../
-INCLUDE += -I ../pass/src
+INCLUDE += -I ../pass
 
 default: $(LIBRARY) obj $(TARGET)
 
