@@ -45,11 +45,6 @@ CPPOBJECTS += src/various/GrammarParser.cpp
 CPPOBJECTS += src/various/GrammarLexer.cpp
 CPPOBJECTS += obj/GrammarParser.o
 CPPOBJECTS += obj/GrammarLexer.o
-CPPOBJECTS += obj/AstDumpPass.o
-CPPOBJECTS += obj/TypeCheckPass.o
-CPPOBJECTS += obj/SourceToAstPass.o
-CPPOBJECTS += obj/NumericExecutionPass.o
-CPPOBJECTS += obj/SymbolicExecutionPass.o
 
 CPPOBJECTS += obj/Ast.o
 CPPOBJECTS += obj/AstDumpVisitor.o
@@ -62,6 +57,12 @@ CPPOBJECTS += obj/Symbols.o
 CPPOBJECTS += obj/TypeCheckVisitor.o
 CPPOBJECTS += obj/Types.o
 CPPOBJECTS += obj/Value.o
+
+CPPOBJECTS += obj/AstDumpPass.o
+CPPOBJECTS += obj/TypeCheckPass.o
+CPPOBJECTS += obj/SourceToAstPass.o
+CPPOBJECTS += obj/NumericExecutionPass.o
+CPPOBJECTS += obj/SymbolicExecutionPass.o
 
 INCLUDE += -I ./
 INCLUDE += -I ./src
