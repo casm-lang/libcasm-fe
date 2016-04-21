@@ -1,8 +1,10 @@
 //  
-//  Copyright (c) 2015-2016 CASM Organization
+//  Copyright (c) 2014-2016 CASM Organization
 //  All rights reserved.
 //  
-//  Developed by: Philipp Paulweber
+//  Developed by: Florian Hahn
+//                Philipp Paulweber
+//                Emmanuel Pescosta
 //                https://github.com/ppaulweber/libcasm-fe
 //  
 //  This file is part of libcasm-fe.
@@ -18,7 +20,7 @@
 //  GNU General Public License for more details.
 //  
 //  You should have received a copy of the GNU General Public License
-//  along with this program. If not, see <http://www.gnu.org/licenses/>.
+//  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
 #ifndef _LIB_CASMFE_NUMERICEXECUTIONPASS_H_
