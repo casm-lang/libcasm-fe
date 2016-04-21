@@ -42,7 +42,7 @@ namespace libcasm_fe
 	public:
 		static char id;
 	
-	virtual bool run( libpass::PassResult& pr );
+		virtual bool run( libpass::PassResult& pr );
 	};
 }
 

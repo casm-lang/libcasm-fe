@@ -23,14 +23,14 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#include "NumericExecutionPass.h"
+#include "SymbolicExecutionPass.h"
 
 using namespace libcasm_fe;
 
 
-char NumericExecutionPass::id = 0;
+char SymbolicExecutionPass::id = 0;
 
-static libpass::PassRegistration< NumericExecutionPass > PASS
+static libpass::PassRegistration< SymbolicExecutionPass > PASS
 ( "Symbolic Execution Pass"
 , "execute symbolically over the AST the input specification"
 , "ast-sym"
@@ -38,10 +38,10 @@ static libpass::PassRegistration< NumericExecutionPass > PASS
 );
 
 
-bool NumericExecutionPass::run( libpass::PassResult& pr )
+bool SymbolicExecutionPass::run( libpass::PassResult& pr )
 {
 	AstNode* node = (AstNode*)pr.getResult< TypeCheckPass >();
-	fprintf( stderr, "%s:%i: TODO of %p/n", __FILE__, __LINE__, node );
+	fprintf( stderr, "%s:%i: TODO of %p\n", __FILE__, __LINE__, node );
 	
 	// TODO: FIXME: 
 

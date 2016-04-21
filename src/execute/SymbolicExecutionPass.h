@@ -23,8 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#ifndef _LIB_CASMFE_NUMERICEXECUTIONPASS_H_
-#define _LIB_CASMFE_NUMERICEXECUTIONPASS_H_
+#ifndef _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_
+#define _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_
 
 #include "libpass.h"
 #include "libcasm-fe.h"
@@ -37,16 +37,16 @@
 
 namespace libcasm_fe
 {
-	class NumericExecutionPass : public libpass::Pass
+	class SymbolicExecutionPass : public libpass::Pass
 	{
 	public:
 		static char id;
 	
-	virtual bool run( libpass::PassResult& pr );
+		virtual bool run( libpass::PassResult& pr );
 	};
 }
 
-#endif /* _LIB_CASMFE_NUMERICEXECUTIONPASS_H_ */
+#endif /* _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_ */
 
 
 //  

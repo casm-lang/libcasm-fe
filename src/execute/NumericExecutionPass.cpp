@@ -41,8 +41,8 @@ static libpass::PassRegistration< NumericExecutionPass > PASS
 bool NumericExecutionPass::run( libpass::PassResult& pr )
 {
 	AstNode* node = (AstNode*)pr.getResult< TypeCheckPass >();
-    fprintf( stderr, "%s:%i: TODO of %p/n", __FILE__, __LINE__, node );
-		
+    fprintf( stderr, "%s:%i: TODO of %p\n", __FILE__, __LINE__, node );
+	
 	// TODO: FIXME: 
 
 	// return false if something went wrong!!!
