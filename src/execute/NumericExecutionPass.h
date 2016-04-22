@@ -27,7 +27,7 @@
 #define _LIB_CASMFE_NUMERICEXECUTIONPASS_H_
 
 #include "libpass.h"
-#include "libcasm-fe.h"
+#include "libcasm-fe.all.h"
 
 /**
    @brief    TODO

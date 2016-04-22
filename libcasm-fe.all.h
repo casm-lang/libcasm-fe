@@ -23,22 +23,21 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#ifndef _LIB_CASMFE_H_
-#define _LIB_CASMFE_H_
+#ifndef _LIB_CASMFE_ALL_H_
+#define _LIB_CASMFE_ALL_H_
 
-#include "src/AstInterface.h"
+#include "libcasm-fe.h"
 
-// TODO: FIXME: PPA: list here all internal header files etc.
-// use the class below to create a nice inheritance tree!
+#include "src/analyze/AstDumpPass.h"
+#include "src/analyze/TypeCheckPass.h"
 
-namespace libcasm_fe
-{
-	class CasmFE
-	{
-	};
-}
+#include "src/transform/SourceToAstPass.h"
 
-#endif /* _LIB_CASMFE_H_ */
+#include "src/execute/NumericExecutionPass.h"
+#include "src/execute/SymbolicExecutionPass.h"
+
+
+#endif /* _LIB_CASMFE_ALL_H_ */
 
 //  
 //  Local variables:
