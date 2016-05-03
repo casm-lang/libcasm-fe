@@ -290,12 +290,12 @@ template<class T, class V> class AstWalker {
 
     void walk_print(PrintNode *node) {
       std::vector<V> argument_results;
-      for (ExpressionBase *e: node->atoms) {
+      for (ExpressionBase *e: node->atoms) {          
           argument_results.push_back(walk_expression_base(e));
         }
       visitor.visit_print(node, argument_results);
     }
-
+    
     void walk_let(LetNode *node) {
       V v = walk_expression_base(node->expr);
       visitor.visit_let(node, v);

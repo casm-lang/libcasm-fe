@@ -279,6 +279,17 @@ void TypecheckVisitor::visit_call_post(CallNode *call) {
   UNUSED(call);
 }
 
+void TypecheckVisitor::visit_print( PrintNode* node, std::vector<Type*>& types )
+{
+    for( auto a : node->atoms )
+    {
+        if( a->type_.t == TypeType::UNKNOWN )
+        {
+            a->type_.t = TypeType::STRING;
+        }
+    }
+}
+
 void TypecheckVisitor::visit_diedie(DiedieNode *node, Type* msg) {
   if (node->msg && !node->msg->type_.unify(TypeType::STRING)) {
     driver_.error(node->msg->location,
