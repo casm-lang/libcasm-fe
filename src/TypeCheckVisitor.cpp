@@ -26,7 +26,7 @@
 #include "FunctionCycleVisitor.h"
 #include "TypeCheckVisitor.h"
 
-
+#include <cmath>
 
 TypecheckVisitor::TypecheckVisitor(Driver& driver) : driver_(driver), rule_binding_types(), rule_binding_offsets(), forall_head(false) { }
 
