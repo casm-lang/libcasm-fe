@@ -746,7 +746,7 @@ LET_SYNTAX: LET IDENTIFIER "="
 
 PUSH_SYNTAX: PUSH EXPRESSION INTO FUNCTION_SYNTAX {
                 if ($4->node_type_ == NodeType::BUILTIN_ATOM) {
-                  driver.error(@$, "cannot push to builtin `"+$4->name+"`");
+                  driver.error(@$, "cannot push to builtin `"+$4->to_str()+"`");
                 } else {
                     $$ = new PushNode(@$, $2, reinterpret_cast<FunctionAtom*>($4));
                 }
@@ -756,9 +756,9 @@ PUSH_SYNTAX: PUSH EXPRESSION INTO FUNCTION_SYNTAX {
 
 POP_SYNTAX: POP FUNCTION_SYNTAX FROM FUNCTION_SYNTAX {
                 if ($2->node_type_ == NodeType::BUILTIN_ATOM) {
-                  driver.error(@$, "cannot pop to builtin `"+$2->name+"`");
+                  driver.error(@$, "cannot pop to builtin `"+$2->to_str()+"`");
                 } else if ($4->node_type_ == NodeType::BUILTIN_ATOM) {
-                  driver.error(@$, "cannot pop from builtin `"+$4->name+"`");
+                  driver.error(@$, "cannot pop from builtin `"+$4->to_str()+"`");
                 } else {
                     $$ = new PopNode(@$, reinterpret_cast<FunctionAtom*>($2), reinterpret_cast<FunctionAtom*>($4));
                 }
