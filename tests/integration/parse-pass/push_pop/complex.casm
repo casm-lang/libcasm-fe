@@ -16,7 +16,7 @@ rule doit = {
 }
 
 rule runner = {
-	debuginfo trace x
+	debug trace x
 	call doit
 	let y = peek(x) in 
 		if nth(y,3) = 0 then

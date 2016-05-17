@@ -356,7 +356,7 @@ namespace yy {
       // POP_SYNTAX
       char dummy17[sizeof(PopNode*)];
 
-      // DEBUGINFO_SYNTAX
+      // DEBUG_SYNTAX
       // PRINT_SYNTAX
       char dummy18[sizeof(PrintNode*)];
 
@@ -472,7 +472,7 @@ namespace yy {
         THEN = 274,
         ELSE = 275,
         PRINT = 276,
-        DEBUGINFO = 277,
+        DEBUG = 277,
         DUMPS = 278,
         PUSH = 279,
         INTO = 280,
@@ -793,7 +793,7 @@ namespace yy {
 
     static inline
     symbol_type
-    make_DEBUGINFO (const location_type& l);
+    make_DEBUG (const location_type& l);
 
     static inline
     symbol_type
@@ -1426,7 +1426,7 @@ namespace yy {
         value.copy< PopNode* > (other.value);
         break;
 
-      case 130: // DEBUGINFO_SYNTAX
+      case 130: // DEBUG_SYNTAX
       case 132: // PRINT_SYNTAX
         value.copy< PrintNode* > (other.value);
         break;
@@ -1615,7 +1615,7 @@ namespace yy {
         value.copy< PopNode* > (v);
         break;
 
-      case 130: // DEBUGINFO_SYNTAX
+      case 130: // DEBUG_SYNTAX
       case 132: // PRINT_SYNTAX
         value.copy< PrintNode* > (v);
         break;
@@ -2073,7 +2073,7 @@ namespace yy {
         value.template destroy< PopNode* > ();
         break;
 
-      case 130: // DEBUGINFO_SYNTAX
+      case 130: // DEBUG_SYNTAX
       case 132: // PRINT_SYNTAX
         value.template destroy< PrintNode* > ();
         break;
@@ -2268,7 +2268,7 @@ namespace yy {
         value.move< PopNode* > (s.value);
         break;
 
-      case 130: // DEBUGINFO_SYNTAX
+      case 130: // DEBUG_SYNTAX
       case 132: // PRINT_SYNTAX
         value.move< PrintNode* > (s.value);
         break;
@@ -2550,9 +2550,9 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_DEBUGINFO (const location_type& l)
+  casmi_parser::make_DEBUG (const location_type& l)
   {
-    return symbol_type (token::DEBUGINFO, l);
+    return symbol_type (token::DEBUG, l);
   }
 
   casmi_parser::symbol_type

@@ -1,10 +1,10 @@
 // cmdline "-dall"
 
 rule main = {
-  debuginfo trace "Das ist ein Test: " + 2
-  debuginfo a "a"
-  debuginfo b "b"
-  debuginfo c "c"
+  debug trace "Das ist ein Test: " + 2
+  debug a "a"
+  debug b "b"
+  debug c "c"
   program( self ) := undef
 }
 init main

@@ -97,7 +97,7 @@ if { return yy::casmi_parser::make_IF(loc); }
 then { return yy::casmi_parser::make_THEN(loc); }
 else { return yy::casmi_parser::make_ELSE(loc); }
 print { return yy::casmi_parser::make_PRINT(loc); }
-debuginfo { return yy::casmi_parser::make_DEBUGINFO(loc); }
+debug { return yy::casmi_parser::make_DEBUG(loc); }
 dumps { return yy::casmi_parser::make_DUMPS(loc); }
 push { return yy::casmi_parser::make_PUSH(loc); }
 into { return yy::casmi_parser::make_INTO(loc); }

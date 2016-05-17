@@ -103,7 +103,7 @@
 }
 
 %token AND OR XOR NOT ASSERT ASSURE DIEDIE IMPOSSIBLE SKIP SEQBLOCK ENDSEQBLOCK
-%token PARBLOCK ENDPARBLOCK LET IN IF THEN ELSE PRINT DEBUGINFO DUMPS PUSH INTO
+%token PARBLOCK ENDPARBLOCK LET IN IF THEN ELSE PRINT DEBUG DUMPS PUSH INTO
 %token POP FROM FORALL ITERATE DO CALL CASE DEFAULT OF ENDCASE INITIALLY FUNCTION
 %token DERIVED ENUM RULE PROVIDER INIT OPTION SELF UNDEF TRUE FALSE CASM SYMBOL
 %token INTERN RATIONAL_DIV OBJDUMP
@@ -160,7 +160,7 @@
 %type <IfThenElseNode*> IFTHENELSE
 %type <CallNode*> CALL_SYNTAX
 %type <std::vector<ExpressionBase*>> DEBUG_ATOM_LIST
-%type <PrintNode*> PRINT_SYNTAX DEBUGINFO_SYNTAX
+%type <PrintNode*> PRINT_SYNTAX DEBUG_SYNTAX
 %type <LetNode*> LET_SYNTAX
 %type<std::vector<Type*>> TYPE_SYNTAX_LIST
 %type <PushNode*> PUSH_SYNTAX
@@ -582,7 +582,7 @@ STATEMENT: ASSERT_SYNTAX { $$ = $1; }
          | ASSURE_SYNTAX { $$ = $1; }
          | DIEDIE_SYNTAX { $$ = $1; }
          | IMPOSSIBLE_SYNTAX { $$ = $1; }
-         | DEBUGINFO_SYNTAX { $$ = $1; }
+         | DEBUG_SYNTAX { $$ = $1; }
          | PRINT_SYNTAX { $$ = $1; }
          | UPDATE_SYNTAX { $$ = $1; }
          | CASE_SYNTAX { $$ = $1; }
@@ -622,7 +622,7 @@ DIEDIE_SYNTAX: DIEDIE EXPRESSION { $$ = new DiedieNode(@$, $2); }
 IMPOSSIBLE_SYNTAX: IMPOSSIBLE { $$ = new AstNode(@$, NodeType::IMPOSSIBLE); }
          ;
 
-DEBUGINFO_SYNTAX: DEBUGINFO IDENTIFIER DEBUG_ATOM_LIST { $$ = new PrintNode(@$, $2, $3); }
+DEBUG_SYNTAX: DEBUG IDENTIFIER DEBUG_ATOM_LIST { $$ = new PrintNode(@$, $2, $3); }
                 ;
 
 DEBUG_ATOM_LIST: DEBUG_ATOM_LIST "+" ATOM { $$ = std::move($1); $$.push_back($3); }

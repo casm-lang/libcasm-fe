@@ -369,7 +369,7 @@ namespace yy {
         value.move< PopNode* > (that.value);
         break;
 
-      case 130: // DEBUGINFO_SYNTAX
+      case 130: // DEBUG_SYNTAX
       case 132: // PRINT_SYNTAX
         value.move< PrintNode* > (that.value);
         break;
@@ -556,7 +556,7 @@ namespace yy {
         value.copy< PopNode* > (that.value);
         break;
 
-      case 130: // DEBUGINFO_SYNTAX
+      case 130: // DEBUG_SYNTAX
       case 132: // PRINT_SYNTAX
         value.copy< PrintNode* > (that.value);
         break;
@@ -967,7 +967,7 @@ namespace yy {
         yylhs.value.build< PopNode* > ();
         break;
 
-      case 130: // DEBUGINFO_SYNTAX
+      case 130: // DEBUG_SYNTAX
       case 132: // PRINT_SYNTAX
         yylhs.value.build< PrintNode* > ();
         break;
@@ -3048,7 +3048,7 @@ namespace yy {
   "\"end of file\"", "error", "$undefined", "AND", "OR", "XOR", "NOT",
   "ASSERT", "ASSURE", "DIEDIE", "IMPOSSIBLE", "SKIP", "SEQBLOCK",
   "ENDSEQBLOCK", "PARBLOCK", "ENDPARBLOCK", "LET", "IN", "IF", "THEN",
-  "ELSE", "PRINT", "DEBUGINFO", "DUMPS", "PUSH", "INTO", "POP", "FROM",
+  "ELSE", "PRINT", "DEBUG", "DUMPS", "PUSH", "INTO", "POP", "FROM",
   "FORALL", "ITERATE", "DO", "CALL", "CASE", "DEFAULT", "OF", "ENDCASE",
   "INITIALLY", "FUNCTION", "DERIVED", "ENUM", "RULE", "PROVIDER", "INIT",
   "OPTION", "SELF", "UNDEF", "TRUE", "FALSE", "CASM", "SYMBOL", "INTERN",
@@ -3068,14 +3068,13 @@ namespace yy {
   "LISTCONST", "EXPRESSION_LIST", "EXPRESSION_LIST_NO_COMMA", "EXPRESSION",
   "BRACKET_EXPRESSION", "FUNCTION_SYNTAX", "RULE_SYNTAX", "DUMPSPEC_LIST",
   "DUMPSPEC", "STATEMENT", "ASSERT_SYNTAX", "ASSURE_SYNTAX",
-  "DIEDIE_SYNTAX", "IMPOSSIBLE_SYNTAX", "DEBUGINFO_SYNTAX",
-  "DEBUG_ATOM_LIST", "PRINT_SYNTAX", "UPDATE_SYNTAX", "CASE_SYNTAX",
-  "CASE_LABEL_LIST", "CASE_LABEL", "CASE_LABEL_DEFAULT",
-  "CASE_LABEL_NUMBER", "CASE_LABEL_IDENT", "CASE_LABEL_STRING",
-  "CALL_SYNTAX", "KW_SEQBLOCK_SYNTAX", "SEQBLOCK_SYNTAX",
-  "KW_PARBLOCK_SYNTAX", "PARBLOCK_SYNTAX", "STATEMENTS", "IFTHENELSE",
-  "LET_SYNTAX", "$@1", "$@2", "PUSH_SYNTAX", "POP_SYNTAX", "FORALL_SYNTAX",
-  "ITERATE_SYNTAX", YY_NULLPTR
+  "DIEDIE_SYNTAX", "IMPOSSIBLE_SYNTAX", "DEBUG_SYNTAX", "DEBUG_ATOM_LIST",
+  "PRINT_SYNTAX", "UPDATE_SYNTAX", "CASE_SYNTAX", "CASE_LABEL_LIST",
+  "CASE_LABEL", "CASE_LABEL_DEFAULT", "CASE_LABEL_NUMBER",
+  "CASE_LABEL_IDENT", "CASE_LABEL_STRING", "CALL_SYNTAX",
+  "KW_SEQBLOCK_SYNTAX", "SEQBLOCK_SYNTAX", "KW_PARBLOCK_SYNTAX",
+  "PARBLOCK_SYNTAX", "STATEMENTS", "IFTHENELSE", "LET_SYNTAX", "$@1",
+  "$@2", "PUSH_SYNTAX", "POP_SYNTAX", "FORALL_SYNTAX", "ITERATE_SYNTAX", YY_NULLPTR
   };
 
 #if YYDEBUG
@@ -3135,7 +3134,7 @@ namespace yy {
 
 
 } // yy
-#line 3139 "GrammarParser.cpp" // lalr1.cc:1167
+#line 3138 "GrammarParser.cpp" // lalr1.cc:1167
 #line 777 "../../src/GrammarParser.yy" // lalr1.cc:1168
 
 
