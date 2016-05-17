@@ -87,11 +87,11 @@ AstNode::~AstNode() {
   // no dynamically alloceted stuff here
 }
 
-std::string AstNode::to_str() {
+std::string AstNode::to_str() const {
     return std::string("AStNode: ") + type_to_str(node_type_);
 }
 
-bool AstNode::equals(AstNode *other) {
+bool AstNode::equals(AstNode *other) const {
   return node_type_ == other->node_type_;
 }
 
@@ -117,7 +117,7 @@ void AstListNode::add(AstNode* n) {
     this->nodes.push_back(n);
 }
 
-bool AstListNode::equals(AstNode *other) {
+bool AstListNode::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -168,7 +168,7 @@ IntegerAtom::IntegerAtom(yy::location& loc, INTEGER_T val) :
 
 IntegerAtom::~IntegerAtom() {}
 
-bool IntegerAtom::equals(AstNode *other) {
+bool IntegerAtom::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -184,7 +184,7 @@ FloatingAtom::FloatingAtom(yy::location& loc, FLOATING_T val) :
 
 FloatingAtom::~FloatingAtom() {}
 
-bool FloatingAtom::equals(AstNode *other) {
+bool FloatingAtom::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -201,7 +201,7 @@ RationalAtom::RationalAtom(yy::location& loc, const rational_t& val) :
 UndefAtom::UndefAtom(yy::location& loc) :
         AtomNode(loc, NodeType::UNDEF_ATOM, Type(TypeType::UNKNOWN)) {}
 
-bool UndefAtom::equals(AstNode *other) {
+bool UndefAtom::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   } else {
@@ -213,7 +213,7 @@ bool UndefAtom::equals(AstNode *other) {
 SelfAtom::SelfAtom(yy::location& loc) :
         AtomNode(loc, NodeType::SELF_ATOM, Type(TypeType::SELF)) { DEBUG("TRUE");}
 
-bool SelfAtom::equals(AstNode *other) {
+bool SelfAtom::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   } else {
@@ -225,7 +225,7 @@ bool SelfAtom::equals(AstNode *other) {
 BooleanAtom::BooleanAtom(yy::location& loc, bool value) :
         AtomNode(loc, NodeType::BOOLEAN_ATOM, Type(TypeType::BOOLEAN)), value(value) {}
 
-bool BooleanAtom::equals(AstNode *other) {
+bool BooleanAtom::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -241,7 +241,7 @@ RuleAtom::RuleAtom(yy::location& loc, const std::string&& name) :
 
 RuleAtom::~RuleAtom() {}
 
-bool RuleAtom::equals(AstNode*) {
+bool RuleAtom::equals(AstNode*) const {
   throw "NOT IMPLEMENTED";
 }
 
@@ -253,7 +253,7 @@ StringAtom::StringAtom(yy::location& loc, std::string&& string) :
 
 StringAtom::~StringAtom() {}
 
-bool StringAtom::equals(AstNode*) {
+bool StringAtom::equals(AstNode*) const {
   throw "NOT IMPLEMENTED";
 }
 
@@ -263,7 +263,7 @@ BaseFunctionAtom::BaseFunctionAtom(yy::location& loc, NodeType t, const std::str
        name(name), arguments(args) {
 }
 
-std::string BaseFunctionAtom::to_str()
+std::string BaseFunctionAtom::to_str() const
 {
     return name;
 }
@@ -280,7 +280,7 @@ FunctionAtom::FunctionAtom(yy::location& loc, const std::string name,
 FunctionAtom::~FunctionAtom() {
 }
 
-bool FunctionAtom::equals(AstNode *other) {
+bool FunctionAtom::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -365,11 +365,11 @@ BuiltinAtom::BuiltinAtom
 
 BuiltinAtom::~BuiltinAtom() {}
 
-bool BuiltinAtom::equals(AstNode*) {
+bool BuiltinAtom::equals(AstNode*) const {
   throw "BuiltinAtom::equals() not implemented";
 }
 
-std::string BuiltinAtom::to_str()
+std::string BuiltinAtom::to_str() const
 {
     Builtin* built_in = Builtin::get( name );
     assert( built_in && "built-in cannot be null" );
@@ -432,7 +432,7 @@ Expression::~Expression() {
   delete right_;
 }
 
-bool Expression::equals(AstNode *other) {
+bool Expression::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -484,7 +484,7 @@ UpdateNode::~UpdateNode() {
   delete expr_;
 }
 
-bool UpdateNode::equals(AstNode *other) {
+bool UpdateNode::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -504,7 +504,7 @@ PushNode::~PushNode() {
   delete to;
 }
 
-bool PushNode::equals(AstNode *other) {
+bool PushNode::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -522,7 +522,7 @@ PopNode::~PopNode() {
   delete from;
 }
 
-bool PopNode::equals(AstNode *other) {
+bool PopNode::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -545,7 +545,7 @@ CaseNode::~CaseNode() {
   delete expr;
 }
 
-bool CaseNode::equals(AstNode *other) {
+bool CaseNode::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
@@ -560,7 +560,7 @@ UnaryNode::~UnaryNode() {
   delete child_;
 }
 
-bool UnaryNode::equals(AstNode *other) {
+bool UnaryNode::equals(AstNode *other) const {
   if (!AstNode::equals(other)) {
     return false;
   }
