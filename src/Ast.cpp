@@ -263,6 +263,10 @@ BaseFunctionAtom::BaseFunctionAtom(yy::location& loc, NodeType t, const std::str
        name(name), arguments(args) {
 }
 
+std::string BaseFunctionAtom::to_str()
+{
+    return name;
+}
 
 FunctionAtom::FunctionAtom(yy::location& loc, const std::string name)
     : FunctionAtom(loc, name, nullptr)  {

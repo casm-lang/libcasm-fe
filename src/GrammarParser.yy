@@ -636,7 +636,7 @@ UPDATE_SYNTAX: FUNCTION_SYNTAX UPDATE EXPRESSION {
                     $$ = new UpdateNode(@$, reinterpret_cast<FunctionAtom*>($1), $3);
                   } else {
                     driver.error(@$, "can only use functions for updates but `"+
-                                     std::string("TODO NAME HERE")+"` is a `"+type_to_str($1->node_type_));
+                                     $1->to_str()+"` is a `"+type_to_str($1->node_type_));
                   }
                 }
              ;
