@@ -101,7 +101,7 @@ Type::Type(const std::string& type_name) : unify_with_left(nullptr),
     unify_with_right(nullptr), constraints(), subtypes() {
   if (type_name == "Integer") { t = TypeType::INTEGER; }
   else if (type_name == "Bit") { t = TypeType::BIT; }
-  else if (type_name == "Float") { t = TypeType::FLOAT; }
+  else if (type_name == "Floating") { t = TypeType::FLOATING; }
   else if (type_name == "Rational") { t = TypeType::RATIONAL; }
   else if (type_name == "Undef") { t = TypeType::UNDEF; }
   else if (type_name == "Boolean") { t = TypeType::BOOLEAN; }
@@ -159,7 +159,7 @@ const std::string Type::to_str() const {
             return "Bit";
         }
     }
-    case TypeType::FLOAT: return "Float";
+    case TypeType::FLOATING: return "Floating";
     case TypeType::RATIONAL: return "Rational";
     case TypeType::UNDEF: return "Undef";
     case TypeType::BOOLEAN: return "Boolean";

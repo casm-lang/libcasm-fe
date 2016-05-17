@@ -417,7 +417,7 @@ template<class T, class V> class AstWalker {
             
             return visitor.visit_int_atom(ia);
         }
-        case NodeType::FLOAT_ATOM: {
+        case NodeType::FLOATING_ATOM: {
           return visitor.visit_float_atom(reinterpret_cast<FloatAtom*>(atom));
         }
         case NodeType::RATIONAL_ATOM: {

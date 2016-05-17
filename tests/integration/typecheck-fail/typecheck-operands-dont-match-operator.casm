@@ -4,16 +4,16 @@ init main
 
 rule main = {
     assert true + true
-    //~^ operands of operator `+` must be Integer, Float or Rational but were Boolean
+    //~^ operands of operator `+` must be Integer, Floating or Rational but were Boolean
 
     assert true - true
-    //~^ operands of operator `-` must be Integer, Float or Rational but were Boolean
+    //~^ operands of operator `-` must be Integer, Floating or Rational but were Boolean
 
     assert true * true
-    //~^ operands of operator `*` must be Integer, Float or Rational but were Boolean
+    //~^ operands of operator `*` must be Integer, Floating or Rational but were Boolean
 
     assert true / true
-    //~^ operands of operator `/` must be Integer, Float or Rational but were Boolean
+    //~^ operands of operator `/` must be Integer, Floating or Rational but were Boolean
 
     assert true % true
     //~^ operands of operator `%` must be Integer but were Boolean
@@ -23,14 +23,14 @@ rule main = {
     //~^^ type of expression should be `Bool` but was `Rational`
 
     assert true < true
-    //~^ operands of operator `<` must be Integer, Float or Rational but were Boolean
+    //~^ operands of operator `<` must be Integer, Floating or Rational but were Boolean
 
     assert true > true
-    //~^ operands of operator `>` must be Integer, Float or Rational but were Boolean
+    //~^ operands of operator `>` must be Integer, Floating or Rational but were Boolean
 
     assert true <= true
-    //~^ operands of operator `<=` must be Integer, Float or Rational but were Boolean
+    //~^ operands of operator `<=` must be Integer, Floating or Rational but were Boolean
 
     assert true >= true
-    //~^ operands of operator `>=` must be Integer, Float or Rational but were Boolean
+    //~^ operands of operator `>=` must be Integer, Floating or Rational but were Boolean
 }

@@ -45,7 +45,7 @@ enum class TypeType {
   RULEREF,
   INTEGER,
   BIT,
-  FLOAT,
+  FLOATING,
   BOOLEAN,
   SELF,
   UNKNOWN,

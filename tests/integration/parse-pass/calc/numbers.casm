@@ -1,5 +1,5 @@
 // Test module to exercise numerical calculations on all supported types:
-// Integer, Float, and Rational. This should try to execute literal syntax, all
+// Integer, Floating, and Rational. This should try to execute literal syntax, all
 // conversions, and arithmetic operators.
 CASM numbers
 
@@ -7,11 +7,11 @@ init main
 
 function ints: Integer -> Integer initially { 0 -> 0, 1 -> +1, 2 -> -3 }
 
-// Float syntax requires a mantissa containing a decimal point and digits
+// Floating syntax requires a mantissa containing a decimal point and digits
 // both before and after the decimal point (that is, .25 and 2. are not
 // allowed) and allows an optional exponent declared with e or E.
-function e: -> Float initially { 2.718281828459045 }
-function flts: Integer -> Float initially { 1 -> -2.0001, 2 -> +3.14159,
+function e: -> Floating initially { 2.718281828459045 }
+function flts: Integer -> Floating initially { 1 -> -2.0001, 2 -> +3.14159,
                                         8 -> 1.2345E-6, 9 -> 2.0e-10 }
 
 // Rational constants can be written A/B without spaces, or Ar for an
@@ -67,34 +67,34 @@ rule calc_rat = {
 
 rule conversions = {
     if ints(10) = undef and ints(11) = undef then {
-        // Go Integer -> Rational -> Float -> Integer...
+        // Go Integer -> Rational -> Floating -> Integer...
         rats(10) := asRational(ints(42)) + 1/16
-        flts(10) := asFloat(rats(10))
+        flts(10) := asFloating(rats(10))
         ints(10) := asInteger(flts(10))
-        // and Integer -> Float -> Rational -> Integer.
-        flts(11) := asFloat(ints(42)) + 0.125
+        // and Integer -> Floating -> Rational -> Integer.
+        flts(11) := asFloating(ints(42)) + 0.125
         rats(11) := asRational(flts(11))
         ints(11) := asInteger(rats(11))
     }
 
     // Here are some type errors.
  // flts(66) := asInteger(rats(10))
- // flts(67) := asFloat("this is not a number!")
+ // flts(67) := asFloating("this is not a number!")
 }
 
 // Approximate the value of e by computing a series expansion. Terminate
-// when close enough to the expected value (given as a Float constant
+// when close enough to the expected value (given as a Floating constant
 // above). Also computes factorials as a by-product.
 function n: -> Integer initially { 0 }
 function e_approx: Integer -> Rational initially { 0 -> 0r }
 function factorial: Integer -> Rational initially { 0 -> 1r }
-function e_approx_float: -> Float
-function delta: -> Float
+function e_approx_float: -> Floating
+function delta: -> Floating
 
 rule approx = {
     e_approx(n+1) := e_approx(n) + 1r / factorial(n)
     factorial(n+1) := asRational(n+1) * factorial(n)
-    e_approx_float := asFloat(e_approx(n))
+    e_approx_float := asFloating(e_approx(n))
     delta := e - e_approx_float
     e := e  // fun hack to make this visible in every update set
     n := n + 1

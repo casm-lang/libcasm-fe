@@ -469,7 +469,7 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
         if( op != ExpressionOperation::MOD || op == ExpressionOperation::RAT_DIV )
         {
             type->constraints.push_back(new Type(TypeType::RATIONAL));
-            type->constraints.push_back(new Type(TypeType::FLOAT));
+            type->constraints.push_back(new Type(TypeType::FLOATING));
         }
     }
     else
@@ -484,7 +484,7 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
             }
         }
         else if( *type != TypeType::INTEGER
-              && *type != TypeType::FLOAT
+              && *type != TypeType::FLOATING
               && *type != TypeType::BIT
               && *type != TypeType::RATIONAL )
         {

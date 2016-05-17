@@ -9,8 +9,8 @@ rule initR = {
 
     call bar(1, true)
     //~^ argument 1 of rule `bar` must be `Boolean` but was `Integer`
-    //~^^ argument 2 of rule `bar` must be `Float` but was `Boolean`
+    //~^^ argument 2 of rule `bar` must be `Floating` but was `Boolean`
 }
 
 rule foo(a:Integer, b:Integer) = skip
-rule bar(a:Boolean, b:Float) = skip
+rule bar(a:Boolean, b:Floating) = skip

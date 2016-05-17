@@ -33,7 +33,7 @@ static std::map<NodeType, const std::string> node_type_names_ = {
     {NodeType::ASSERT, std::string("ASSERT")},
     {NodeType::UNDEF_ATOM, std::string("UNDEF ATOM")},
     {NodeType::INTEGER_ATOM, std::string("INTEGER ATOM")},
-    {NodeType::FLOAT_ATOM, std::string("FLOAT ATOM")},
+    {NodeType::FLOATING_ATOM, std::string("FLOAT ATOM")},
     {NodeType::SELF_ATOM, std::string("SELF ATOM")},
     {NodeType::STRING_ATOM, std::string("STRING ATOM")},
     {NodeType::RULE_ATOM, std::string("RULE ATOM")},
@@ -178,7 +178,7 @@ bool IntegerAtom::equals(AstNode *other) {
 }
 
 FloatAtom::FloatAtom(yy::location& loc, FLOAT_T val) :
-        AtomNode(loc, NodeType::FLOAT_ATOM, Type(TypeType::FLOAT)) {
+        AtomNode(loc, NodeType::FLOATING_ATOM, Type(TypeType::FLOATING)) {
   val_ = val;
 }
 

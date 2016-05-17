@@ -239,7 +239,7 @@ Builtin built_ins[] =
   , { TypeType::INTEGER }
   , { { TypeType::UNKNOWN
       , TypeType::BOOLEAN
-      , TypeType::FLOAT
+      , TypeType::FLOATING
       , TypeType::BIT
       , TypeType::ENUM
       }
@@ -273,7 +273,7 @@ Builtin built_ins[] =
     // {"asFloating", true},
 , { "asFloating"
   , Builtin::Id::AS_FLOATING
-  , { TypeType::FLOAT }
+  , { TypeType::FLOATING }
   , { { TypeType::UNKNOWN
       , TypeType::INTEGER
       , TypeType::BOOLEAN
@@ -297,7 +297,7 @@ Builtin built_ins[] =
   , { { TypeType::UNKNOWN
       , TypeType::INTEGER
       , TypeType::BOOLEAN
-      , TypeType::FLOAT
+      , TypeType::FLOATING
       , TypeType::ENUM
       }
     , { TypeType::INTEGER }
@@ -371,7 +371,7 @@ Builtin built_ins[] =
   , { { TypeType::UNKNOWN
       , TypeType::INTEGER
       , TypeType::BOOLEAN
-      , TypeType::FLOAT
+      , TypeType::FLOATING
       , TypeType::BIT
       }
     }
@@ -388,7 +388,7 @@ Builtin built_ins[] =
   , { TypeType::STRING }
   , { { TypeType::UNKNOWN
       , TypeType::INTEGER
-      , TypeType::FLOAT
+      , TypeType::FLOATING
       , TypeType::BIT
       , TypeType::ENUM
 //    , TypeType::RATIONAL
@@ -404,7 +404,7 @@ Builtin built_ins[] =
   , { TypeType::RATIONAL }
   , { { TypeType::UNKNOWN
       , TypeType::INTEGER
-      , TypeType::FLOAT
+      , TypeType::FLOATING
       , TypeType::RATIONAL
       }
     }
@@ -424,7 +424,7 @@ Builtin built_ins[] =
   , { { TypeType::UNKNOWN
       , TypeType::INTEGER
       , TypeType::BOOLEAN
-      , TypeType::FLOAT
+      , TypeType::FLOATING
       , TypeType::BIT
       , TypeType::ENUM
 //    , TypeType::RATIONAL
@@ -444,7 +444,7 @@ Builtin built_ins[] =
   , { { TypeType::UNKNOWN
       , TypeType::INTEGER
       , TypeType::BOOLEAN
-      , TypeType::FLOAT
+      , TypeType::FLOATING
       , TypeType::BIT
       , TypeType::ENUM
 //    , TypeType::RATIONAL
@@ -464,7 +464,7 @@ Builtin built_ins[] =
   , { { TypeType::UNKNOWN
       , TypeType::INTEGER
       , TypeType::BOOLEAN
-      , TypeType::FLOAT
+      , TypeType::FLOATING
       , TypeType::BIT
       , TypeType::ENUM
 //    , TypeType::RATIONAL

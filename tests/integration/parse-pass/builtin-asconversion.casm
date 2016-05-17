@@ -14,9 +14,9 @@ rule main = {
         assert asInteger(x) = 2
 
     let x = 4/10 in 
-        assert asFloat(x) = 0.4
+        assert asFloating(x) = 0.4
     let x = 10/5 in 
-        assert asFloat(x) = 2.0
+        assert asFloating(x) = 2.0
 
     let x = 0 in 
         assert asRational(x) = 0r
