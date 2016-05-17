@@ -127,9 +127,9 @@ class AstListNode: public AstNode {
         std::vector<AstNode*> nodes;
 
         AstListNode(yy::location& loc, NodeType node_type);
-        virtual ~AstListNode();
+        ~AstListNode() override;
         void add(AstNode* n);
-        virtual bool equals(AstNode *other);
+        bool equals(AstNode *other) override;
 };
 
 
@@ -138,8 +138,8 @@ class UnaryNode: public AstNode {
     AstNode *child_;
 
     UnaryNode(yy::location& loc, NodeType node_type, AstNode *child);
-    virtual ~UnaryNode();
-    virtual bool equals(AstNode *other);
+    ~UnaryNode() override;
+    bool equals(AstNode *other) override;
 };
 
 
@@ -166,14 +166,14 @@ class FunctionDefNode: public AstNode {
   public:
     Function *sym;
     FunctionDefNode(yy::location& loc, Function *sym);
-    ~FunctionDefNode();
+    ~FunctionDefNode() override;
 };
 
 class EnumDefNode: public AstNode {
   public:
     Enum *enum_;
     EnumDefNode(yy::location& loc, Enum *enum_);
-    ~EnumDefNode();
+    ~EnumDefNode() override;
 };
 
 class IfThenElseNode : public AstNode {
@@ -202,8 +202,8 @@ class IntegerAtom : public AtomNode {
     INTEGER_T val_;
 
     IntegerAtom(yy::location& loc, INTEGER_T val);
-    virtual ~IntegerAtom();
-    bool equals(AstNode *other);
+    ~IntegerAtom() override;
+    bool equals(AstNode *other) override;
 };
 
 class FloatingAtom : public AtomNode {
@@ -211,8 +211,8 @@ class FloatingAtom : public AtomNode {
     FLOATING_T val_;
 
     FloatingAtom(yy::location& loc, FLOATING_T val);
-    virtual ~FloatingAtom();
-    bool equals(AstNode *other);
+    ~FloatingAtom() override;
+    bool equals(AstNode *other) override;
 };
 
 class RationalAtom : public AtomNode {
@@ -226,14 +226,14 @@ class RationalAtom : public AtomNode {
 class UndefAtom : public AtomNode {
   public:
     UndefAtom(yy::location& loc);
-    bool equals(AstNode *other);
+    bool equals(AstNode *other) override;
 };
 
 
 class SelfAtom : public AtomNode {
   public:
     SelfAtom(yy::location& loc);
-    bool equals(AstNode *other);
+    bool equals(AstNode *other) override;
 };
 
 
@@ -241,7 +241,7 @@ class BooleanAtom : public AtomNode {
   public:
     bool value;
     BooleanAtom(yy::location& loc, bool value);
-    bool equals(AstNode *other);
+    bool equals(AstNode *other) override;
 };
 
 
@@ -280,8 +280,8 @@ class FunctionAtom : public BaseFunctionAtom {
     FunctionAtom(yy::location& loc, const std::string name,
                  std::vector<ExpressionBase*> *args);
  
-    virtual ~FunctionAtom();
-    bool equals(AstNode *other);
+    ~FunctionAtom() override;
+    bool equals(AstNode *other) override;
 };
 
 class BuiltinAtom: public BaseFunctionAtom {
@@ -294,9 +294,9 @@ class BuiltinAtom: public BaseFunctionAtom {
     BuiltinAtom(yy::location& loc, const std::string name,
                  std::vector<ExpressionBase*> *args);
  
-    virtual ~BuiltinAtom();
-    bool equals(AstNode *other);
-    std::string to_string();
+    ~BuiltinAtom() override;
+    bool equals(AstNode *other) override;
+    std::string to_str() override;
 };
 
 
@@ -308,8 +308,8 @@ class RuleAtom : public AtomNode {
 
     RuleAtom(yy::location& loc, const std::string&& name);
  
-    virtual ~RuleAtom();
-    bool equals(AstNode *other);
+    ~RuleAtom() override;
+    bool equals(AstNode *other) override;
 };
 
 
@@ -319,8 +319,8 @@ class StringAtom : public AtomNode {
 
     StringAtom(yy::location& loc, std::string&& name);
  
-    virtual ~StringAtom();
-    bool equals(AstNode *other);
+    ~StringAtom() override;
+    bool equals(AstNode *other) override;
 };
 
 class ListAtom : public AtomNode {
@@ -365,8 +365,8 @@ class Expression : public ExpressionBase {
     ExpressionOperation op;
 
     Expression(yy::location& loc, ExpressionBase *left, ExpressionBase *right, ExpressionOperation op);
-    virtual ~Expression();
-    virtual bool equals(AstNode *other);
+    ~Expression() override;
+    bool equals(AstNode *other) override;
 };
 
 std::string operator_to_str(const ExpressionOperation op);
@@ -377,8 +377,8 @@ class UpdateNode: public AstNode {
     ExpressionBase *expr_;
 
     UpdateNode(yy::location& loc, FunctionAtom *func, ExpressionBase *expr);
-    virtual ~UpdateNode();
-    virtual bool equals(AstNode *other);
+    ~UpdateNode() override;
+    bool equals(AstNode *other) override;
 };
 
 class PushNode: public AstNode {
@@ -387,8 +387,8 @@ class PushNode: public AstNode {
     FunctionAtom *to;
 
     PushNode(yy::location& loc, ExpressionBase *expr, FunctionAtom *to);
-    virtual ~PushNode();
-    virtual bool equals(AstNode *other);
+    ~PushNode() override;
+    bool equals(AstNode *other) override;
 };
 
 class PopNode: public AstNode {
@@ -399,8 +399,8 @@ class PopNode: public AstNode {
     Type from_type;
 
     PopNode(yy::location& loc, FunctionAtom *to, FunctionAtom *from);
-    virtual ~PopNode();
-    virtual bool equals(AstNode *other);
+    ~PopNode() override;
+    bool equals(AstNode *other) override;
 };
 
 class ForallNode: public AstNode {
@@ -410,7 +410,7 @@ class ForallNode: public AstNode {
     AstNode *statement;
 
     ForallNode(yy::location& loc, const std::string& ident, ExpressionBase *expr, AstNode *stmt);
-    virtual ~ForallNode();
+    ~ForallNode() override;
 };
 
 
@@ -425,8 +425,8 @@ class CaseNode: public AstNode {
 
     CaseNode(yy::location& loc, ExpressionBase *expr,
              std::vector<std::pair<AtomNode*, AstNode*>>& case_list);
-    virtual ~CaseNode();
-    virtual bool equals(AstNode *other);
+    ~CaseNode() override;
+    bool equals(AstNode *other) override;
 };
 
 

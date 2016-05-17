@@ -275,7 +275,7 @@ bool AstDumpVisitor::visit_function_atom(FunctionAtom *atom, bool[], uint16_t) {
 }
 
 bool AstDumpVisitor::visit_builtin_atom(BuiltinAtom *atom, bool[], uint16_t) {
-  dump_node(atom, std::string("BuiltinAtom:"+atom->to_string()));
+  dump_node(atom, std::string("BuiltinAtom:"+atom->to_str()));
 
   if( atom->arguments )
   {

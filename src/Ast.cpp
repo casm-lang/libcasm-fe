@@ -365,7 +365,7 @@ bool BuiltinAtom::equals(AstNode*) {
   throw "BuiltinAtom::equals() not implemented";
 }
 
-std::string BuiltinAtom::to_string()
+std::string BuiltinAtom::to_str()
 {
     Builtin* built_in = Builtin::get( name );
     assert( built_in && "built-in cannot be null" );
