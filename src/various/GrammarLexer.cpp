@@ -1416,8 +1416,8 @@ case 81:
 YY_RULE_SETUP
 #line 177 "src/GrammarLexer.l"
 { 
-            FLOAT_T val = convert_to_float(yytext, driver, loc);
-            return yy::casmi_parser::make_FLOATCONST(val, loc);
+            FLOATING_T val = convert_to_float(yytext, driver, loc);
+            return yy::casmi_parser::make_FLOATINGCONST(val, loc);
           }
 	YY_BREAK
 case 82:

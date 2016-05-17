@@ -175,8 +175,8 @@ objdump { return yy::casmi_parser::make_OBJDUMP(loc); }
        }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? { 
-            FLOAT_T val = convert_to_float(yytext, driver, loc);
-            return yy::casmi_parser::make_FLOATCONST(val, loc);
+            FLOATING_T val = convert_to_float(yytext, driver, loc);
+            return yy::casmi_parser::make_FLOATINGCONST(val, loc);
           }
 [0-9]+[/][0-9]+ { 
             rational_t val = convert_to_rational(yytext, driver, loc);

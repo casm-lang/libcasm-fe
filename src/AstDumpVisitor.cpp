@@ -249,8 +249,8 @@ bool AstDumpVisitor::visit_bit_atom( IntegerAtom *atom )
     return true;
 }
 
-bool AstDumpVisitor::visit_float_atom(FloatAtom *atom) {
-  dump_node(atom, std::string("FloatAtom: ")+std::to_string(atom->val_));
+bool AstDumpVisitor::visit_floating_atom(FloatingAtom *atom) {
+  dump_node(atom, std::string("FloatingAtom: ")+std::to_string(atom->val_));
   return true;
 }
 

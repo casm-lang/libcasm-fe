@@ -490,7 +490,7 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
         {
             driver_.error(loc,
                           "operands of operator `"+operator_to_str(op)+
-                          "` must be Integer, Bit, Float or Rational but were "+
+                          "` must be Integer, Bit, Floating or Rational but were "+
                           type->to_str());
         }
     }

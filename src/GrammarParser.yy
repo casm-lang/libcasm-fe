@@ -131,7 +131,7 @@
     SLASH   "/"
     PERCENT "%"
     ;
-%token FLOATCONST INTEGERCONST RATIONALCONST STRCONST
+%token FLOATINGCONST INTEGERCONST RATIONALCONST STRCONST
 %token <std::string> IDENTIFIER "identifier"
 
 %type <AstNode*> INIT_SYNTAX BODY_ELEMENT SPECIFICATION RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX
@@ -146,7 +146,7 @@
 %type <std::vector<ExpressionBase*>*> EXPRESSION_LIST EXPRESSION_LIST_NO_COMMA LISTCONST
 %type <UpdateNode*> UPDATE_SYNTAX
 %type <INTEGER_T> INTEGERCONST
-%type <FLOAT_T> FLOATCONST
+%type <FLOATING_T> FLOATINGCONST
 %type <std::string> STRCONST
 %type <rational_t> RATIONALCONST
 %type <Function*> FUNCTION_DEFINITION DERIVED_SYNTAX
@@ -187,7 +187,7 @@
 %precedence UPDATE PRINT ASSURE ASSERT DIEDIE NOT
 
 %nonassoc ","
-%nonassoc FLOATCONST INTEGERCONST STRCONST RATIONALCONST IDENTIFIER
+%nonassoc FLOATINGCONST INTEGERCONST STRCONST RATIONALCONST IDENTIFIER
 %nonassoc AND OR
 %nonassoc "=" "<" ">"  NEQUAL LESSEQ GREATEREQ
 %left "-" "+" XOR
@@ -447,9 +447,9 @@ INTEGER_NUMBER: "+" INTEGERCONST %prec UPLUS { $$ = new IntegerAtom(@$, $2); }
           | "-" INTEGERCONST %prec UMINUS { $$ = new IntegerAtom(@$, (-1) * $2); }
           | INTEGERCONST { $$ = new IntegerAtom(@$, $1); }
 NUMBER: INTEGER_NUMBER { $$ = $1; }
-      | "+" FLOATCONST %prec UPLUS { $$ = new FloatAtom(@$, $2); }
-      | "-" FLOATCONST %prec UMINUS { $$ = new FloatAtom(@$, (-1) * $2); }
-      | FLOATCONST { $$ = new FloatAtom(@$, $1); }
+      | "+" FLOATINGCONST %prec UPLUS { $$ = new FloatingAtom(@$, $2); }
+      | "-" FLOATINGCONST %prec UMINUS { $$ = new FloatingAtom(@$, (-1) * $2); }
+      | FLOATINGCONST { $$ = new FloatingAtom(@$, $1); }
       | "+" RATIONALCONST %prec UPLUS { $$ = new RationalAtom(@$, $2); }
       | "-" RATIONALCONST %prec UMINUS {
           $2.numerator *= -1;

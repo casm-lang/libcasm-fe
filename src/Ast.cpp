@@ -33,7 +33,7 @@ static std::map<NodeType, const std::string> node_type_names_ = {
     {NodeType::ASSERT, std::string("ASSERT")},
     {NodeType::UNDEF_ATOM, std::string("UNDEF ATOM")},
     {NodeType::INTEGER_ATOM, std::string("INTEGER ATOM")},
-    {NodeType::FLOATING_ATOM, std::string("FLOAT ATOM")},
+    {NodeType::FLOATING_ATOM, std::string("FLOATING ATOM")},
     {NodeType::SELF_ATOM, std::string("SELF ATOM")},
     {NodeType::STRING_ATOM, std::string("STRING ATOM")},
     {NodeType::RULE_ATOM, std::string("RULE ATOM")},
@@ -177,19 +177,19 @@ bool IntegerAtom::equals(AstNode *other) {
   return val_ == other_cast->val_;
 }
 
-FloatAtom::FloatAtom(yy::location& loc, FLOAT_T val) :
+FloatingAtom::FloatingAtom(yy::location& loc, FLOATING_T val) :
         AtomNode(loc, NodeType::FLOATING_ATOM, Type(TypeType::FLOATING)) {
   val_ = val;
 }
 
-FloatAtom::~FloatAtom() {}
+FloatingAtom::~FloatingAtom() {}
 
-bool FloatAtom::equals(AstNode *other) {
+bool FloatingAtom::equals(AstNode *other) {
   if (!AstNode::equals(other)) {
     return false;
   }
 
-  FloatAtom *other_cast = static_cast<FloatAtom*>(other);
+  FloatingAtom *other_cast = static_cast<FloatingAtom*>(other);
   return val_ == other_cast->val_;
 }
 

@@ -209,7 +209,7 @@ namespace libcasm_fe
 
 		virtual T visit_bit_atom( IntegerAtom* node ) = 0;
 		
-		T visit_float_atom( FloatAtom* node )
+                T visit_floating_atom( FloatingAtom* node )
 		{
 			return 0;
 		}

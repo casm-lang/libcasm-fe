@@ -336,8 +336,8 @@ namespace yy {
         value.move< ExpressionBase* > (that.value);
         break;
 
-      case 79: // FLOATCONST
-        value.move< FLOAT_T > (that.value);
+      case 79: // FLOATINGCONST
+        value.move< FLOATING_T > (that.value);
         break;
 
       case 153: // FORALL_SYNTAX
@@ -523,8 +523,8 @@ namespace yy {
         value.copy< ExpressionBase* > (that.value);
         break;
 
-      case 79: // FLOATCONST
-        value.copy< FLOAT_T > (that.value);
+      case 79: // FLOATINGCONST
+        value.copy< FLOATING_T > (that.value);
         break;
 
       case 153: // FORALL_SYNTAX
@@ -934,8 +934,8 @@ namespace yy {
         yylhs.value.build< ExpressionBase* > ();
         break;
 
-      case 79: // FLOATCONST
-        yylhs.value.build< FLOAT_T > ();
+      case 79: // FLOATINGCONST
+        yylhs.value.build< FLOATING_T > ();
         break;
 
       case 153: // FORALL_SYNTAX
@@ -1617,19 +1617,19 @@ namespace yy {
 
   case 73:
 #line 450 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AtomNode* > () = new FloatAtom(yylhs.location, yystack_[0].value.as< FLOAT_T > ()); }
+    { yylhs.value.as< AtomNode* > () = new FloatingAtom(yylhs.location, yystack_[0].value.as< FLOATING_T > ()); }
 #line 1622 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 74:
 #line 451 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AtomNode* > () = new FloatAtom(yylhs.location, (-1) * yystack_[0].value.as< FLOAT_T > ()); }
+    { yylhs.value.as< AtomNode* > () = new FloatingAtom(yylhs.location, (-1) * yystack_[0].value.as< FLOATING_T > ()); }
 #line 1628 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 75:
 #line 452 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AtomNode* > () = new FloatAtom(yylhs.location, yystack_[0].value.as< FLOAT_T > ()); }
+    { yylhs.value.as< AtomNode* > () = new FloatingAtom(yylhs.location, yystack_[0].value.as< FLOATING_T > ()); }
 #line 1634 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
@@ -3056,7 +3056,7 @@ namespace yy {
   "LESSEQ", "GREATEREQ", "SEQBLOCK_BRACKET", "ENDSEQBLOCK_BRACKET",
   "\"+\"", "\"-\"", "\"=\"", "\"(\"", "\")\"", "\"[\"", "\"]\"", "\"{\"",
   "\"}\"", "\".\"", "\":\"", "\"@\"", "\",\"", "\"<\"", "\">\"", "\"*\"",
-  "\"/\"", "\"%\"", "FLOATCONST", "INTEGERCONST", "RATIONALCONST",
+  "\"/\"", "\"%\"", "FLOATINGCONST", "INTEGERCONST", "RATIONALCONST",
   "STRCONST", "\"identifier\"", "UMINUS", "UPLUS", "XIF", "$accept",
   "SPECIFICATION", "HEADER", "BODY_ELEMENTS", "BODY_ELEMENT",
   "INIT_SYNTAX", "PROVIDER_SYNTAX", "OPTION_SYNTAX", "ENUM_SYNTAX",

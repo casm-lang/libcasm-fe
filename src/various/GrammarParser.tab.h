@@ -331,8 +331,8 @@ namespace yy {
       // BRACKET_EXPRESSION
       char dummy9[sizeof(ExpressionBase*)];
 
-      // FLOATCONST
-      char dummy10[sizeof(FLOAT_T)];
+      // FLOATINGCONST
+      char dummy10[sizeof(FLOATING_T)];
 
       // FORALL_SYNTAX
       char dummy11[sizeof(ForallNode*)];
@@ -529,7 +529,7 @@ namespace yy {
         STAR = 331,
         SLASH = 332,
         PERCENT = 333,
-        FLOATCONST = 334,
+        FLOATINGCONST = 334,
         INTEGERCONST = 335,
         RATIONALCONST = 336,
         STRCONST = 337,
@@ -592,7 +592,7 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const ExpressionBase* v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const FLOAT_T v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const FLOATING_T v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const ForallNode* v, const location_type& l);
 
@@ -1021,7 +1021,7 @@ namespace yy {
 
     static inline
     symbol_type
-    make_FLOATCONST (const FLOAT_T& v, const location_type& l);
+    make_FLOATINGCONST (const FLOATING_T& v, const location_type& l);
 
     static inline
     symbol_type
@@ -1393,8 +1393,8 @@ namespace yy {
         value.copy< ExpressionBase* > (other.value);
         break;
 
-      case 79: // FLOATCONST
-        value.copy< FLOAT_T > (other.value);
+      case 79: // FLOATINGCONST
+        value.copy< FLOATING_T > (other.value);
         break;
 
       case 153: // FORALL_SYNTAX
@@ -1582,8 +1582,8 @@ namespace yy {
         value.copy< ExpressionBase* > (v);
         break;
 
-      case 79: // FLOATCONST
-        value.copy< FLOAT_T > (v);
+      case 79: // FLOATINGCONST
+        value.copy< FLOATING_T > (v);
         break;
 
       case 153: // FORALL_SYNTAX
@@ -1787,7 +1787,7 @@ namespace yy {
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FLOAT_T v, const location_type& l)
+  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FLOATING_T v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2040,8 +2040,8 @@ namespace yy {
         value.template destroy< ExpressionBase* > ();
         break;
 
-      case 79: // FLOATCONST
-        value.template destroy< FLOAT_T > ();
+      case 79: // FLOATINGCONST
+        value.template destroy< FLOATING_T > ();
         break;
 
       case 153: // FORALL_SYNTAX
@@ -2235,8 +2235,8 @@ namespace yy {
         value.move< ExpressionBase* > (s.value);
         break;
 
-      case 79: // FLOATCONST
-        value.move< FLOAT_T > (s.value);
+      case 79: // FLOATINGCONST
+        value.move< FLOATING_T > (s.value);
         break;
 
       case 153: // FORALL_SYNTAX
@@ -2892,9 +2892,9 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_FLOATCONST (const FLOAT_T& v, const location_type& l)
+  casmi_parser::make_FLOATINGCONST (const FLOATING_T& v, const location_type& l)
   {
-    return symbol_type (token::FLOATCONST, v, l);
+    return symbol_type (token::FLOATINGCONST, v, l);
   }
 
   casmi_parser::symbol_type

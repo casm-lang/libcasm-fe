@@ -206,12 +206,12 @@ class IntegerAtom : public AtomNode {
     bool equals(AstNode *other);
 };
 
-class FloatAtom : public AtomNode {
+class FloatingAtom : public AtomNode {
   public:
-    FLOAT_T val_;
+    FLOATING_T val_;
 
-    FloatAtom(yy::location& loc, FLOAT_T val);
-    virtual ~FloatAtom();
+    FloatingAtom(yy::location& loc, FLOATING_T val);
+    virtual ~FloatingAtom();
     bool equals(AstNode *other);
 };
 

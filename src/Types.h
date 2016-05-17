@@ -36,7 +36,7 @@
 #include "Macros.h"
 
 #define INTEGER_T int64_t
-#define FLOAT_T double
+#define FLOATING_T double
 
 class CompoundType;
 

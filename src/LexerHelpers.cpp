@@ -54,10 +54,10 @@ INTEGER_T convert_to_long(const char* val, int base, Driver &driver, yy::locatio
   return res;
 }
 
-FLOAT_T convert_to_float(const char* val, Driver &driver, yy::location loc) {
+FLOATING_T convert_to_float(const char* val, Driver &driver, yy::location loc) {
   char* endptr;
   errno = 0;
-  FLOAT_T res = strtod(val, &endptr);
+  FLOATING_T res = strtod(val, &endptr);
 
   if (errno == ERANGE) {
     driver.error(loc, "value out of range");

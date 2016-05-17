@@ -78,7 +78,7 @@ class TypecheckVisitor : public BaseVisitor<Type*> {
     Type* visit_expression(Expression *expr, Type* left_val, Type* right_val);
     Type* visit_expression_single(Expression *expr, Type* val);
     Type* visit_int_atom(IntegerAtom *atom) { return &atom->type_; }
-    Type* visit_float_atom(FloatAtom *atom) {  return &atom->type_; }
+    Type* visit_floating_atom(FloatingAtom *atom) {  return &atom->type_; }
     Type* visit_rational_atom(RationalAtom *atom) { return &atom->type_; }
     Type* visit_undef_atom(UndefAtom *atom) { return &atom->type_; }
     Type* visit_function_atom(FunctionAtom *atom, Type* arguments[], uint16_t num_arguments);
