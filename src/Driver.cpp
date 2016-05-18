@@ -185,17 +185,19 @@ uint64_t Driver::get_warning_count() const
     return warning_;
 }
 
-bool Driver::add(RuleNode *rule_root) {
+void Driver::add(RuleNode *rule_root) {
   // TODO can rules and functions have the same name?
-  try {
-    rules_map_.at(rule_root->name);
-    return false;
-  } catch (const std::out_of_range& e) {
+  const auto result = rules_map_.emplace(rule_root->name, rule_root);
+  if (result.second) {
     DEBUG("Add symbol "+rule_root->name);
     rule_root->binding_offsets = std::move(binding_offsets);
     binding_offsets.clear(); // is this necessary? move should empty map
-    rules_map_[rule_root->name] = rule_root;
-    return true;
+  } else {
+    const auto it = result.first;
+    RuleNode *existingRule = it->second;
+    throw RuleAlreadyExists("redefinition of rule `" + rule_root->name +
+                            "` which is defined in line " +
+                            std::to_string(existingRule->location.begin.line));
   }
 }
 

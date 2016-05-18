@@ -81,7 +81,11 @@ public:
     uint64_t get_warning_count() const;
     
     // Rule handling
-    bool add(RuleNode *rule_root);
+    /**
+     * @throws RuleAlreadyExists when the rules table contains a rule with
+     *         the same name as the name of \a rule_root.
+     */
+    void add(RuleNode *rule_root);
     RuleNode *get_init_rule() const;
 
     // functions

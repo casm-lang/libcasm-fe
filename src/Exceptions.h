@@ -49,4 +49,9 @@ public:
     using logic_error::logic_error;
 };
 
+class RuleAlreadyExists : public std::logic_error {
+public:
+    using logic_error::logic_error;
+};
+
 #endif //CASMI_EXCEPTIONS_H

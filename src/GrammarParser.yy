@@ -245,13 +245,15 @@ BODY_ELEMENT: PROVIDER_SYNTAX { $$ = new AstNode(NodeType::PROVIDER); }
             }
            | INIT_SYNTAX { $$ = $1; }
            | RULE_SYNTAX {
-              $$ = $1;
-              // TODO check, we trust bison to pass only RuleNodes up
-              if (!driver.add(reinterpret_cast<RuleNode*>($1))) {
-                    driver.error(@$, "redefinition of rule");
+                $$ = $1;
+                // TODO check, we trust bison to pass only RuleNodes up
+                try {
+                    driver.add(reinterpret_cast<RuleNode*>($1));
+                } catch (const RuleAlreadyExists& e) {
+                    driver.error(@$, e.what());
                     // we do not need to delete $1 here, because it's already in
                     // the AST, so it will be deleted later
-              }
+                }
            }
            ;
 
