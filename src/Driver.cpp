@@ -151,19 +151,19 @@ void Driver::underline( const yy::location& l )
 {
     if( l.begin.line == l.end.line && l.begin.line <= lines_.size() )
     {
-        const std::string& error_line = lines_[l.begin.line-1];
-        std::cerr << filename_ <<":" << l.begin.line <<" " << error_line;
-        
-        size_t length_to_error = filename_.size()+1+std::to_string(l.begin.line).size()+l.begin.column;
-        std::cerr << std::string(length_to_error, ' ');
-        std::cerr << GREEN << "^" << std::string(l.end.column-l.begin.column+1, '~') << RESET;
-        std::cerr << std::endl;
+        const std::string location_info = filename_ + ":" + std::to_string(l.begin.line) + " ";
+        const std::string& error_line = lines_[l.begin.line - 1];
+
+        std::cerr << location_info << error_line
+                  << std::string(location_info.size() + l.begin.column - 1, ' ')
+                  << GREEN << "^" << std::string(l.end.column - l.begin.column + 1, '~') << RESET
+                  << std::endl;
     }
     else
     {
         for( size_t i = l.begin.line; (i <= l.end.line && i <= lines_.size()); i++ )
         {
-            std::cerr << filename_ << ":" << i <<" " << lines_[i - 1];
+            std::cerr << filename_ << ":" << i << " " << lines_[i - 1];
         }
     }
 }
