@@ -923,34 +923,18 @@ size_t SymbolTable::size() const {
 }
 
 bool SymbolTable::add(Symbol *sym) {
-  try {
-    table_.at(sym->name);
-    return false;
-  } catch (const std::out_of_range& e) {
-    table_[sym->name] = sym;
-    return true;
-  }
+  const auto result = table_.emplace(sym->name, sym);
+  return result.second;
 }
 
 bool SymbolTable::remove(const std::string& name) {
-  try {
-    table_.at(name);
-    table_.erase(name);
-    return true;
-  } catch (const std::out_of_range& e) {
-    return false;
-  }
+  return table_.erase(name) != 0;
 }
 
 
 bool SymbolTable::add_enum_element(const std::string& name, Enum *enum_) {
-  try {
-    table_.at(name);
-    return false;
-  } catch (const std::out_of_range& e) {
-    table_[name] = enum_;
-    return true;
-  }
+  const auto result = table_.emplace(name, enum_);
+  return result.second;
 }
 
 
