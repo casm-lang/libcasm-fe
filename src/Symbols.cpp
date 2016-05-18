@@ -955,37 +955,26 @@ void SymbolTable::add_enum_element(const std::string& name, Enum *enum_) {
 
 
 Symbol* SymbolTable::get(const std::string& name) const {
-  try {
-    return table_.at(name);
-  } catch (const std::out_of_range& e) {
-    return nullptr;
-  }
+  const auto it = table_.find(name);
+  return (it != table_.cend()) ? it->second : nullptr;
 }
 
  Function* SymbolTable::get_function(const std::string& name) const {
-  try {
-    Symbol* sym = table_.at(name);
-    // TODO split Function and Derived symbols?
-    if (sym->type == Symbol::SymbolType::FUNCTION || sym->type == Symbol::SymbolType::DERIVED) {
-      return reinterpret_cast<Function*>(sym);
-    } else {
-      return nullptr;
-    }
-  } catch (const std::out_of_range& e) {
+  // TODO split Function and Derived symbols?
+  Symbol* sym = get(name);
+  if (sym && (sym->type == Symbol::SymbolType::FUNCTION || sym->type == Symbol::SymbolType::DERIVED)) {
+    return reinterpret_cast<Function*>(sym);
+  } else {
     return nullptr;
   }
 }
 
 Enum* SymbolTable::get_enum(const std::string& name) const {
-  try {
-    Symbol* sym = table_.at(name);
-    // TODO split Function and Derived symbols?
-    if (sym->type == Symbol::SymbolType::ENUM) {
-      return reinterpret_cast<Enum*>(sym);
-    } else {
-      return nullptr;
-    }
-  } catch (const std::out_of_range& e) {
+  // TODO split Function and Derived symbols?
+  Symbol* sym = get(name);
+  if (sym && sym->type == Symbol::SymbolType::ENUM) {
+    return reinterpret_cast<Enum*>(sym);
+  } else {
     return nullptr;
   }
 }
