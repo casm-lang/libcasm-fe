@@ -922,9 +922,11 @@ size_t SymbolTable::size() const {
   return table_.size();
 }
 
-bool SymbolTable::add(Symbol *sym) {
+void SymbolTable::add(Symbol *sym) {
   const auto result = table_.emplace(sym->name, sym);
-  return result.second;
+  if (!result.second) {
+    throw SymbolAlreadyExists("redefinition of symbol `" + sym->name + "`");
+  }
 }
 
 bool SymbolTable::remove(const std::string& name) {
@@ -932,9 +934,11 @@ bool SymbolTable::remove(const std::string& name) {
 }
 
 
-bool SymbolTable::add_enum_element(const std::string& name, Enum *enum_) {
+void SymbolTable::add_enum_element(const std::string& name, Enum *enum_) {
   const auto result = table_.emplace(name, enum_);
-  return result.second;
+  if (!result.second) {
+    throw SymbolAlreadyExists("redefinition of symbol `" + name + "`");
+  }
 }
 
 

@@ -221,8 +221,10 @@ BODY_ELEMENT: PROVIDER_SYNTAX { $$ = new AstNode(NodeType::PROVIDER); }
                 if ($1->is_builtin()) {
                     driver.error(@$, "cannot use `"+$1->name+"` as function identifier because it is a builtin name");
                 }
-                if (!driver.function_table.add($1)) {
-                    driver.error(@$, "redefinition of symbol");
+                try {
+                    driver.function_table.add($1);
+                } catch (const SymbolAlreadyExists& e) {
+                    driver.error(@$, e.what());
                     // if another symbol with same name exists we need to delete
                     // the symbol here, because it is not inserted in the symbol table
                     delete $1;
@@ -232,8 +234,10 @@ BODY_ELEMENT: PROVIDER_SYNTAX { $$ = new AstNode(NodeType::PROVIDER); }
                 $1->binding_offsets = std::move(driver.binding_offsets);
                 driver.binding_offsets.clear();
                 $$ = new FunctionDefNode(@$, $1);
-                if (!driver.function_table.add($1)) {
-                    driver.error(@$, "redefinition of symbol");
+                try {
+                    driver.function_table.add($1);
+                } catch (const SymbolAlreadyExists& e) {
+                    driver.error(@$, e.what());
                     // if another symbol with same name exists we need to delete
                     // the symbol here, because it is not inserted in the symbol table
                     delete $1;
@@ -264,13 +268,17 @@ OPTION_SYNTAX: OPTION IDENTIFIER "." IDENTIFIER IDENTIFIER;
 
 ENUM_SYNTAX: ENUM IDENTIFIER "=" "{" IDENTIFIER_LIST "}" {
                 $$ = new Enum($2);
-                if (!driver.function_table.add($$)) {
-                    driver.error(@$, "redefinition of symbol `"+$2+"`");
+                try {
+                    driver.function_table.add($$);
+                } catch (const SymbolAlreadyExists& e) {
+                    driver.error(@$, e.what());
                 }
                 for (const std::string& name : $5) {
                     if ($$->add_enum_element(name)) {
-                        if (!driver.function_table.add_enum_element(name, $$)) {
-                            driver.error(@$, "redefinition of symbol `"+name+"`");
+                        try {
+                            driver.function_table.add_enum_element(name, $$);
+                        } catch (const SymbolAlreadyExists& e) {
+                            driver.error(@$, e.what());
                         }
                     } else {
                         driver.error(@$, "name `"+name+"` already used in enum");
@@ -723,8 +731,10 @@ IFTHENELSE: IF EXPRESSION THEN STATEMENT %prec XIF {
 LET_SYNTAX: LET IDENTIFIER "=" 
             {
                 auto var = Symbol($2, Symbol::SymbolType::LET);
-                if (!driver.function_table.add(&var)) {
-                    driver.error(@$, "redefinition of symbol `"+$2+"`");
+                try {
+                    driver.function_table.add(&var);
+                } catch (const SymbolAlreadyExists& e) {
+                    driver.error(@$, e.what());
                 }
             }
             EXPRESSION IN STATEMENT {
@@ -734,8 +744,10 @@ LET_SYNTAX: LET IDENTIFIER "="
           | LET IDENTIFIER ":" TYPE_SYNTAX "="
             {
                 auto var = Symbol($2, Symbol::SymbolType::LET);
-                if (!driver.function_table.add(&var)) {
-                    driver.error(@$, "redefinition of symbol `"+$2+"`");
+                try {
+                    driver.function_table.add(&var);
+                } catch (const SymbolAlreadyExists& e) {
+                    driver.error(@$, e.what());
                 }
             }
           EXPRESSION IN STATEMENT {

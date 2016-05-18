@@ -29,13 +29,13 @@
 #include <assert.h>
 
 #include <string>
-#include <stdexcept>
 #include <map>
 #include <vector>
 #include <functional>
 
 #include <iostream>
 #include "Types.h"
+#include "Exceptions.h"
 #include "various/location.hh" // reuse bison's location class
 
 class ExpressionBase;
@@ -317,11 +317,19 @@ class SymbolTable {
 
     size_t size() const;
 
-    bool add(Symbol *sym);
+    /**
+     * @throws SymbolAlreadyExists when the symbol table contains a symbol with
+     *         the same name as the name of \a sym.
+     */
+    void add(Symbol *sym);
 
     bool remove(const std::string &name);
 
-    bool add_enum_element(const std::string& name, Enum *enum_);
+    /**
+     * @throws SymbolAlreadyExists when the symbol table contains a symbol with
+     *         the same name as \a name.
+     */
+    void add_enum_element(const std::string& name, Enum *enum_);
 
     Symbol* get(const std::string& name) const;
 

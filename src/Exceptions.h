@@ -27,6 +27,7 @@
 #define CASMI_EXCEPTIONS_H
 
 #include <exception>
+#include <stdexcept>
 #include <string>
 
 class RuntimeException : public std::exception {
@@ -41,6 +42,11 @@ class RuntimeException : public std::exception {
 
 class ImpossibleException : public std::exception {
     virtual const char* what() const throw();
+};
+
+class SymbolAlreadyExists : public std::logic_error {
+public:
+    using logic_error::logic_error;
 };
 
 #endif //CASMI_EXCEPTIONS_H
