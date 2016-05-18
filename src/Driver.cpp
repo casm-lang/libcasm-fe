@@ -156,7 +156,7 @@ void Driver::underline( const yy::location& l )
         
         size_t length_to_error = filename_.size()+1+std::to_string(l.begin.line).size()+l.begin.column;
         std::cerr << std::string(length_to_error, ' ');
-        std::cerr << GREEN << "^" << std::string(l.end.column-(l.begin.column+1), '~') << RESET;
+        std::cerr << GREEN << "^" << std::string(l.end.column-l.begin.column+1, '~') << RESET;
         std::cerr << std::endl;
     }
     else
