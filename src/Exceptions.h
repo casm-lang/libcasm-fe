@@ -44,14 +44,19 @@ class ImpossibleException : public std::exception {
     virtual const char* what() const throw();
 };
 
-class SymbolAlreadyExists : public std::logic_error {
+class IdentifierAlreadyUsed : public std::logic_error {
 public:
     using logic_error::logic_error;
 };
 
-class RuleAlreadyExists : public std::logic_error {
+class SymbolAlreadyExists : public IdentifierAlreadyUsed {
 public:
-    using logic_error::logic_error;
+    using IdentifierAlreadyUsed::IdentifierAlreadyUsed;
+};
+
+class RuleAlreadyExists : public IdentifierAlreadyUsed {
+public:
+    using IdentifierAlreadyUsed::IdentifierAlreadyUsed;
 };
 
 #endif //CASMI_EXCEPTIONS_H

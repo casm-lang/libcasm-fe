@@ -222,8 +222,8 @@ BODY_ELEMENT: PROVIDER_SYNTAX { $$ = new AstNode(NodeType::PROVIDER); }
                     driver.error(@$, "cannot use `"+$1->name+"` as function identifier because it is a builtin name");
                 }
                 try {
-                    driver.function_table.add($1);
-                } catch (const SymbolAlreadyExists& e) {
+                    driver.add($1);
+                } catch (const IdentifierAlreadyUsed& e) {
                     driver.error(@$, e.what());
                     // if another symbol with same name exists we need to delete
                     // the symbol here, because it is not inserted in the symbol table
@@ -235,8 +235,8 @@ BODY_ELEMENT: PROVIDER_SYNTAX { $$ = new AstNode(NodeType::PROVIDER); }
                 driver.binding_offsets.clear();
                 $$ = new FunctionDefNode(@$, $1);
                 try {
-                    driver.function_table.add($1);
-                } catch (const SymbolAlreadyExists& e) {
+                    driver.add($1);
+                } catch (const IdentifierAlreadyUsed& e) {
                     driver.error(@$, e.what());
                     // if another symbol with same name exists we need to delete
                     // the symbol here, because it is not inserted in the symbol table
@@ -249,7 +249,7 @@ BODY_ELEMENT: PROVIDER_SYNTAX { $$ = new AstNode(NodeType::PROVIDER); }
                 // TODO check, we trust bison to pass only RuleNodes up
                 try {
                     driver.add(reinterpret_cast<RuleNode*>($1));
-                } catch (const RuleAlreadyExists& e) {
+                } catch (const IdentifierAlreadyUsed& e) {
                     driver.error(@$, e.what());
                     // we do not need to delete $1 here, because it's already in
                     // the AST, so it will be deleted later

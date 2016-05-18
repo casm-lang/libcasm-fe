@@ -1132,8 +1132,8 @@ namespace yy {
                     driver.error(yylhs.location, "cannot use `"+yystack_[0].value.as< Function* > ()->name+"` as function identifier because it is a builtin name");
                 }
                 try {
-                    driver.function_table.add(yystack_[0].value.as< Function* > ());
-                } catch (const SymbolAlreadyExists& e) {
+                    driver.add(yystack_[0].value.as< Function* > ());
+                } catch (const IdentifierAlreadyUsed& e) {
                     driver.error(yylhs.location, e.what());
                     // if another symbol with same name exists we need to delete
                     // the symbol here, because it is not inserted in the symbol table
@@ -1150,8 +1150,8 @@ namespace yy {
                 driver.binding_offsets.clear();
                 yylhs.value.as< AstNode* > () = new FunctionDefNode(yylhs.location, yystack_[0].value.as< Function* > ());
                 try {
-                    driver.function_table.add(yystack_[0].value.as< Function* > ());
-                } catch (const SymbolAlreadyExists& e) {
+                    driver.add(yystack_[0].value.as< Function* > ());
+                } catch (const IdentifierAlreadyUsed& e) {
                     driver.error(yylhs.location, e.what());
                     // if another symbol with same name exists we need to delete
                     // the symbol here, because it is not inserted in the symbol table
@@ -1174,7 +1174,7 @@ namespace yy {
                 // TODO check, we trust bison to pass only RuleNodes up
                 try {
                     driver.add(reinterpret_cast<RuleNode*>(yystack_[0].value.as< AstNode* > ()));
-                } catch (const RuleAlreadyExists& e) {
+                } catch (const IdentifierAlreadyUsed& e) {
                     driver.error(yylhs.location, e.what());
                     // we do not need to delete $1 here, because it's already in
                     // the AST, so it will be deleted later

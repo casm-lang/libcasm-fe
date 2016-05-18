@@ -186,7 +186,13 @@ uint64_t Driver::get_warning_count() const
 }
 
 void Driver::add(RuleNode *rule_root) {
-  // TODO can rules and functions have the same name?
+  Function *function = function_table.get_function(rule_root->name);
+  if (function != nullptr) { // rules and functions can't have the same name
+    throw IdentifierAlreadyUsed("identifier `" + rule_root->name +
+                                "` already used as name for a function in line " +
+                                std::to_string(function->location.begin.line));
+  }
+
   const auto result = rules_map_.emplace(rule_root->name, rule_root);
   if (result.second) {
     DEBUG("Add symbol "+rule_root->name);
@@ -203,6 +209,19 @@ void Driver::add(RuleNode *rule_root) {
 
 RuleNode *Driver::get_init_rule() const {
   return rules_map_.at(init_name);
+}
+
+void Driver::add(Function *function)
+{
+  const auto it = rules_map_.find(function->name);
+  if (it != rules_map_.cend()) { // rules and functions can't have the same name
+    RuleNode *existingRule = it->second;
+    throw IdentifierAlreadyUsed("identifier `" + function->name +
+                                "` already used as name for a rule in line " +
+                                std::to_string(existingRule->location.begin.line));
+  }
+
+  function_table.add(function);
 }
 
 const std::string& Driver::get_filename() {

@@ -83,12 +83,21 @@ public:
     // Rule handling
     /**
      * @throws RuleAlreadyExists when the rules table contains a rule with
-     *         the same name as the name of \a rule_root.
+     *         the same name as the name of the \a rule_root.
+     * @throws IdentifierAlreadyUsed when the name of the \a rule_root is already
+     *         used somewhere else (e.g. for a function).
      */
     void add(RuleNode *rule_root);
     RuleNode *get_init_rule() const;
 
     // functions
+    /**
+     * @throws SymbolAlreadyExists when the symbol table contains a symbol with
+     *         the same name as the name of the \a function.
+     * @throws IdentifierAlreadyUsed when the name of the \a function is already
+     *         used somewhere else (e.g. for a rule).
+     */
+    void add(Function *function);
     SymbolTable function_table;
 
     // Bindings
