@@ -267,7 +267,7 @@ PROVIDER_SYNTAX: PROVIDER IDENTIFIER
 OPTION_SYNTAX: OPTION IDENTIFIER "." IDENTIFIER IDENTIFIER;
 
 ENUM_SYNTAX: ENUM IDENTIFIER "=" "{" IDENTIFIER_LIST "}" {
-                $$ = new Enum($2);
+                $$ = new Enum($2, @$);
                 try {
                     driver.function_table.add($$);
                 } catch (const SymbolAlreadyExists& e) {
@@ -289,39 +289,39 @@ ENUM_SYNTAX: ENUM IDENTIFIER "=" "{" IDENTIFIER_LIST "}" {
 
 DERIVED_SYNTAX: DERIVED IDENTIFIER "(" PARAM_LIST ")" "=" EXPRESSION {
                   // TODO: 2nd argument should be a reference
-                  $$ = new Function($2, $4, $7, new Type(TypeType::UNKNOWN));
+                  $$ = new Function($2, @$, $4, $7, new Type(TypeType::UNKNOWN));
                 }
               | DERIVED IDENTIFIER "=" EXPRESSION {
-                  $$ = new Function($2, $4, new Type(TypeType::UNKNOWN));
+                  $$ = new Function($2, @$, $4, new Type(TypeType::UNKNOWN));
                 }
               | DERIVED IDENTIFIER "(" ")" "=" EXPRESSION {
-                  $$ = new Function($2, $6, new Type(TypeType::UNKNOWN));
+                  $$ = new Function($2, @$, $6, new Type(TypeType::UNKNOWN));
                 }
               /* again with type syntax */
               | DERIVED IDENTIFIER "(" PARAM_LIST ")" ":" TYPE_SYNTAX "=" EXPRESSION {
-                  $$ = new Function($2, $4, $9, $7);
+                  $$ = new Function($2, @$, $4, $9, $7);
                 }
               | DERIVED IDENTIFIER ":" TYPE_SYNTAX "=" EXPRESSION {
-                  $$ = new Function($2, $6, $4);
+                  $$ = new Function($2, @$, $6, $4);
                 }
               | DERIVED IDENTIFIER "(" ")" ":" TYPE_SYNTAX "=" EXPRESSION {
-                  $$ = new Function($2, $8, $6);
+                  $$ = new Function($2, @$, $8, $6);
                 }
               ;
 
 FUNCTION_DEFINITION: FUNCTION "(" IDENTIFIER_LIST ")" IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS {
                       auto attrs = parse_function_attributes(driver, @$, $3);
-                      $$ = new Function(attrs.first, attrs.second, $5, $6.first, $6.second, $7);
+                      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, $7);
                    }
                    | FUNCTION "(" IDENTIFIER_LIST ")" IDENTIFIER FUNCTION_SIGNATURE {
                       auto attrs = parse_function_attributes(driver, @$, $3);
-                      $$ = new Function(attrs.first, attrs.second, $5, $6.first, $6.second, nullptr);
+                      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, nullptr);
                    }
                    | FUNCTION IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS {
-                      $$ = new Function($2, $3.first, $3.second, $4);
+                      $$ = new Function($2, @$, $3.first, $3.second, $4);
                    }
                    | FUNCTION IDENTIFIER FUNCTION_SIGNATURE
-                   { $$ = new Function($2, $3.first, $3.second, nullptr); }
+                   { $$ = new Function($2, @$, $3.first, $3.second, nullptr); }
                    ;
 
 IDENTIFIER_LIST: IDENTIFIER_LIST_NO_COMMA "," { $$ = std::move($1); }
@@ -730,7 +730,7 @@ IFTHENELSE: IF EXPRESSION THEN STATEMENT %prec XIF {
 
 LET_SYNTAX: LET IDENTIFIER "=" 
             {
-                auto var = Symbol($2, Symbol::SymbolType::LET);
+                auto var = Symbol($2, @$, Symbol::SymbolType::LET);
                 try {
                     driver.function_table.add(&var);
                 } catch (const SymbolAlreadyExists& e) {
@@ -743,7 +743,7 @@ LET_SYNTAX: LET IDENTIFIER "="
           }
           | LET IDENTIFIER ":" TYPE_SYNTAX "="
             {
-                auto var = Symbol($2, Symbol::SymbolType::LET);
+                auto var = Symbol($2, @$, Symbol::SymbolType::LET);
                 try {
                     driver.function_table.add(&var);
                 } catch (const SymbolAlreadyExists& e) {

@@ -782,7 +782,25 @@ Builtin built_ins[] =
 
 
 
-Symbol::Symbol(const std::string& name, SymbolType type) : name(std::move(name)), type(type) {}
+Symbol::Symbol(const std::string& name, const yy::location& location, SymbolType type) :
+    name(std::move(name)), location(std::move(location)), type(type) {}
+
+static std::string to_string(Symbol::SymbolType type)
+{
+    using Type = Symbol::SymbolType;
+    switch (type) {
+        case Type::FUNCTION:
+            return "function";
+        case Type::DERIVED:
+            return "derived";
+        case Type::BUILTIN:
+            return "builtin";
+        case Type::ENUM:
+            return "enum";
+        case Type::LET:
+            return "let";
+    };
+}
 
 // -------------------------------------------------------------------------
 // Implementation of Function
@@ -790,17 +808,17 @@ Symbol::Symbol(const std::string& name, SymbolType type) : name(std::move(name))
 
 uint64_t Function::counter = 0;
 
-Function::Function(const std::string name, std::vector<Type*>& args,
+Function::Function(const std::string name, const yy::location& location, std::vector<Type*>& args,
                   Type* return_type,
                   std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *init) :
-    Function(false, false, name, args, return_type, init) {
+    Function(false, false, name, location, args, return_type, init) {
     
 }
 
-Function::Function(bool is_static, bool is_symbolic, const std::string name,
+Function::Function(bool is_static, bool is_symbolic, const std::string name, const yy::location& location,
              std::vector<Type*>& args, Type* return_type,
              std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *init) :
-                Symbol(name, SymbolType::FUNCTION), arguments_(std::move(args)), intitializers_(init),
+                Symbol(name, location, SymbolType::FUNCTION), arguments_(std::move(args)), intitializers_(init),
                 return_type_(return_type), id(counter),
                 is_static(is_static), is_symbolic(is_symbolic),
                 subrange_arguments(), subrange_return(false) {
@@ -817,17 +835,17 @@ Function::Function(bool is_static, bool is_symbolic, const std::string name,
   }
 }
 
-Function::Function(const std::string name, std::vector<Type*>& args,
+Function::Function(const std::string name, const yy::location& location, std::vector<Type*>& args,
                    ExpressionBase *expr, Type* return_type) :
-                Symbol(name, SymbolType::DERIVED), arguments_(std::move(args)), derived(expr),
+                Symbol(name, location, SymbolType::DERIVED), arguments_(std::move(args)), derived(expr),
                 return_type_(return_type), id(counter),
                 is_static(false), is_symbolic(false) {
   counter += 1;
 }
 
-Function::Function(const std::string name,
+Function::Function(const std::string name, const yy::location& location,
                    ExpressionBase *expr, Type* return_type) :
-                Symbol(name, SymbolType::DERIVED), arguments_(), derived(expr),
+                Symbol(name, location, SymbolType::DERIVED), arguments_(), derived(expr),
                 return_type_(return_type), id(counter), is_static(false), is_symbolic(false) {
   counter += 1;
 }
@@ -885,7 +903,7 @@ bool Function::is_builtin()
 enum_value_t::enum_value_t(const std::string *name, const uint16_t id)
     : name(name), id(id) {}
 
-Enum::Enum(const std::string& name) : Symbol(name, Symbol::SymbolType::ENUM), mapping() {}
+Enum::Enum(const std::string& name, const yy::location& location) : Symbol(name, location, Symbol::SymbolType::ENUM), mapping() {}
 
 bool Enum::add_enum_element(const std::string& name) {
   if (mapping.count(name) == 0) {
@@ -923,10 +941,7 @@ size_t SymbolTable::size() const {
 }
 
 void SymbolTable::add(Symbol *sym) {
-  const auto result = table_.emplace(sym->name, sym);
-  if (!result.second) {
-    throw SymbolAlreadyExists("redefinition of symbol `" + sym->name + "`");
-  }
+  add_or_throw(sym->name, sym);
 }
 
 bool SymbolTable::remove(const std::string& name) {
@@ -935,10 +950,7 @@ bool SymbolTable::remove(const std::string& name) {
 
 
 void SymbolTable::add_enum_element(const std::string& name, Enum *enum_) {
-  const auto result = table_.emplace(name, enum_);
-  if (!result.second) {
-    throw SymbolAlreadyExists("redefinition of symbol `" + name + "`");
-  }
+  add_or_throw(name, enum_);
 }
 
 
@@ -976,4 +988,15 @@ Enum* SymbolTable::get_enum(const std::string& name) const {
   } catch (const std::out_of_range& e) {
     return nullptr;
   }
+}
+
+void SymbolTable::add_or_throw(const std::string& name, Symbol *sym) {
+  const auto result = table_.emplace(name, sym);
+  if (!result.second) {
+      const auto it = result.first;
+      Symbol *existingSymbol = it->second;
+      throw SymbolAlreadyExists("redefinition of symbol `" + name +
+                                "` which is defined as " + to_string(existingSymbol->type) +
+                                " in line " + std::to_string(existingSymbol->location.begin.line));
+    }
 }

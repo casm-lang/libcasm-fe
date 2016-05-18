@@ -221,6 +221,7 @@ public:
 class Symbol {
   public:
     const std::string name;
+    const yy::location location;
 
     enum class SymbolType {
       FUNCTION,
@@ -232,7 +233,7 @@ class Symbol {
     
     SymbolType type;
 
-    Symbol(const std::string& name, SymbolType type);
+    Symbol(const std::string& name, const yy::location& location, SymbolType type);
 };
 
 class Function : public Symbol {
@@ -259,13 +260,13 @@ class Function : public Symbol {
     std::vector<uint32_t> subrange_arguments;
     bool subrange_return;
 
-    Function(const std::string name, std::vector<Type*>& args, Type* return_type,
+    Function(const std::string name, const yy::location& location, std::vector<Type*>& args, Type* return_type,
            std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *init);
-    Function(bool is_static, bool is_symbolic, const std::string name,
+    Function(bool is_static, bool is_symbolic, const std::string name, const yy::location& location,
              std::vector<Type*>& args, Type* return_type,
              std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *init);
-    Function(const std::string name, std::vector<Type*>& args, ExpressionBase *expr, Type* return_type);
-    Function(const std::string name, ExpressionBase *expr, Type *return_type);
+    Function(const std::string name, const yy::location& location, std::vector<Type*>& args, ExpressionBase *expr, Type* return_type);
+    Function(const std::string name, const yy::location& location, ExpressionBase *expr, Type *return_type);
     ~Function();
 
     bool equals(Function *other) const;
@@ -290,7 +291,7 @@ class Enum : public Symbol {
     // forall
     std::map<std::string, enum_value_t*> mapping;
 
-    Enum(const std::string& name);
+    Enum(const std::string& name, const yy::location& location);
     bool add_enum_element(const std::string& name);
 };
 
@@ -337,6 +338,8 @@ class SymbolTable {
 
     Enum* get_enum(const std::string& name) const;
 
+  private:
+    void add_or_throw(const std::string& name, Symbol *sym);
 };
 
 #endif
