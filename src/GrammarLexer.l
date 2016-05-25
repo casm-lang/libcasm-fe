@@ -89,8 +89,8 @@ impossible { return yy::casmi_parser::make_IMPOSSIBLE(loc); }
 skip { return yy::casmi_parser::make_SKIP(loc); }
 seq { return yy::casmi_parser::make_SEQ(loc); }
 endseq { return yy::casmi_parser::make_ENDSEQ(loc); }
-par { return yy::casmi_parser::make_PARBLOCK(loc); }
-endpar { return yy::casmi_parser::make_ENDPARBLOCK(loc); }
+par { return yy::casmi_parser::make_PAR(loc); }
+endpar { return yy::casmi_parser::make_ENDPAR(loc); }
 let { return yy::casmi_parser::make_LET(loc); }
 in { return yy::casmi_parser::make_IN(loc); }
 if { return yy::casmi_parser::make_IF(loc); }

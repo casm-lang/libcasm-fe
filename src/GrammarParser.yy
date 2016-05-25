@@ -103,7 +103,7 @@
 }
 
 %token AND OR XOR NOT ASSERT ASSURE DIEDIE IMPOSSIBLE SKIP SEQ ENDSEQ
-%token PARBLOCK ENDPARBLOCK LET IN IF THEN ELSE PRINT DEBUG DUMPS PUSH INTO
+%token PAR ENDPAR LET IN IF THEN ELSE PRINT DEBUG DUMPS PUSH INTO
 %token POP FROM FORALL ITERATE DO CALL CASE DEFAULT OF ENDCASE INITIALLY FUNCTION
 %token DERIVED ENUM RULE PROVIDER INIT OPTION SELF UNDEF TRUE FALSE CASM SYMBOL
 %token INTERN RATIONAL_DIV OBJDUMP
@@ -135,7 +135,7 @@
 %token <std::string> IDENTIFIER "identifier"
 
 %type <AstNode*> INIT_SYNTAX BODY_ELEMENT SPECIFICATION RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX
-%type <UnaryNode*> PARBLOCK_SYNTAX KW_PARBLOCK_SYNTAX SEQ_SYNTAX
+%type <UnaryNode*> PAR_SYNTAX KW_PAR_SYNTAX SEQ_SYNTAX
 %type <UnaryNode*> ASSERT_SYNTAX ASSURE_SYNTAX KW_SEQ_SYNTAX ITERATE_SYNTAX
 %type <AstListNode*> BODY_ELEMENTS STATEMENTS
 %type <AtomNode*> NUMBER VALUE NUMBER_RANGE
@@ -599,8 +599,8 @@ STATEMENT: ASSERT_SYNTAX { $$ = $1; }
          | CALL_SYNTAX { $$ = $1; }
          | KW_SEQ_SYNTAX { $$ = $1 ; }
          | SEQ_SYNTAX { $$ = $1; }
-         | KW_PARBLOCK_SYNTAX { $$ = $1; }
-         | PARBLOCK_SYNTAX { $$ = $1; }
+         | KW_PAR_SYNTAX { $$ = $1; }
+         | PAR_SYNTAX { $$ = $1; }
          | IFTHENELSE { $$ = $1; }
          | LET_SYNTAX { $$ = $1; }
          | PUSH_SYNTAX { $$ = $1; }
@@ -709,11 +709,11 @@ SEQ_SYNTAX: SEQ_BRACKET STATEMENTS ENDSEQ_BRACKET {
                }
                ;
 
-KW_PARBLOCK_SYNTAX: PARBLOCK STATEMENTS ENDPARBLOCK {
+KW_PAR_SYNTAX: PAR STATEMENTS ENDPAR {
                       $$ = new UnaryNode(@$, NodeType::PARBLOCK, $2);
                   }
                   ;
-PARBLOCK_SYNTAX: "{" STATEMENTS "}" {
+PAR_SYNTAX: "{" STATEMENTS "}" {
                     $$ = new UnaryNode(@$, NodeType::PARBLOCK, $2);
                }
                ;

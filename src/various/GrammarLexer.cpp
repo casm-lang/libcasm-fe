@@ -1056,12 +1056,12 @@ YY_RULE_SETUP
 case 12:
 YY_RULE_SETUP
 #line 92 "src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PARBLOCK(loc); }
+{ return yy::casmi_parser::make_PAR(loc); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 93 "src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENDPARBLOCK(loc); }
+{ return yy::casmi_parser::make_ENDPAR(loc); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP

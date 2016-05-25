@@ -371,8 +371,8 @@ namespace yy {
       // ASSURE_SYNTAX
       // KW_SEQ_SYNTAX
       // SEQ_SYNTAX
-      // KW_PARBLOCK_SYNTAX
-      // PARBLOCK_SYNTAX
+      // KW_PAR_SYNTAX
+      // PAR_SYNTAX
       // ITERATE_SYNTAX
       char dummy21[sizeof(UnaryNode*)];
 
@@ -464,8 +464,8 @@ namespace yy {
         SKIP = 266,
         SEQ = 267,
         ENDSEQ = 268,
-        PARBLOCK = 269,
-        ENDPARBLOCK = 270,
+        PAR = 269,
+        ENDPAR = 270,
         LET = 271,
         IN = 272,
         IF = 273,
@@ -761,11 +761,11 @@ namespace yy {
 
     static inline
     symbol_type
-    make_PARBLOCK (const location_type& l);
+    make_PAR (const location_type& l);
 
     static inline
     symbol_type
-    make_ENDPARBLOCK (const location_type& l);
+    make_ENDPAR (const location_type& l);
 
     static inline
     symbol_type
@@ -1444,8 +1444,8 @@ namespace yy {
       case 127: // ASSURE_SYNTAX
       case 142: // KW_SEQ_SYNTAX
       case 143: // SEQ_SYNTAX
-      case 144: // KW_PARBLOCK_SYNTAX
-      case 145: // PARBLOCK_SYNTAX
+      case 144: // KW_PAR_SYNTAX
+      case 145: // PAR_SYNTAX
       case 154: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (other.value);
         break;
@@ -1633,8 +1633,8 @@ namespace yy {
       case 127: // ASSURE_SYNTAX
       case 142: // KW_SEQ_SYNTAX
       case 143: // SEQ_SYNTAX
-      case 144: // KW_PARBLOCK_SYNTAX
-      case 145: // PARBLOCK_SYNTAX
+      case 144: // KW_PAR_SYNTAX
+      case 145: // PAR_SYNTAX
       case 154: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (v);
         break;
@@ -2091,8 +2091,8 @@ namespace yy {
       case 127: // ASSURE_SYNTAX
       case 142: // KW_SEQ_SYNTAX
       case 143: // SEQ_SYNTAX
-      case 144: // KW_PARBLOCK_SYNTAX
-      case 145: // PARBLOCK_SYNTAX
+      case 144: // KW_PAR_SYNTAX
+      case 145: // PAR_SYNTAX
       case 154: // ITERATE_SYNTAX
         value.template destroy< UnaryNode* > ();
         break;
@@ -2286,8 +2286,8 @@ namespace yy {
       case 127: // ASSURE_SYNTAX
       case 142: // KW_SEQ_SYNTAX
       case 143: // SEQ_SYNTAX
-      case 144: // KW_PARBLOCK_SYNTAX
-      case 145: // PARBLOCK_SYNTAX
+      case 144: // KW_PAR_SYNTAX
+      case 145: // PAR_SYNTAX
       case 154: // ITERATE_SYNTAX
         value.move< UnaryNode* > (s.value);
         break;
@@ -2502,15 +2502,15 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_PARBLOCK (const location_type& l)
+  casmi_parser::make_PAR (const location_type& l)
   {
-    return symbol_type (token::PARBLOCK, l);
+    return symbol_type (token::PAR, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_ENDPARBLOCK (const location_type& l)
+  casmi_parser::make_ENDPAR (const location_type& l)
   {
-    return symbol_type (token::ENDPARBLOCK, l);
+    return symbol_type (token::ENDPAR, l);
   }
 
   casmi_parser::symbol_type
