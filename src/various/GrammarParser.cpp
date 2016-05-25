@@ -291,7 +291,7 @@ namespace yy {
       switch (that.type_get ())
     {
       case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 144: // STATEMENTS
         value.move< AstListNode* > (that.value);
         break;
 
@@ -340,7 +340,7 @@ namespace yy {
         value.move< FLOATING_T > (that.value);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 151: // FORALL_SYNTAX
         value.move< ForallNode* > (that.value);
         break;
 
@@ -353,7 +353,7 @@ namespace yy {
         value.move< INTEGER_T > (that.value);
         break;
 
-      case 147: // IFTHENELSE
+      case 145: // IFTHENELSE
         value.move< IfThenElseNode* > (that.value);
         break;
 
@@ -361,11 +361,11 @@ namespace yy {
         value.move< IntegerAtom* > (that.value);
         break;
 
-      case 148: // LET_SYNTAX
+      case 146: // LET_SYNTAX
         value.move< LetNode* > (that.value);
         break;
 
-      case 152: // POP_SYNTAX
+      case 150: // POP_SYNTAX
         value.move< PopNode* > (that.value);
         break;
 
@@ -374,7 +374,7 @@ namespace yy {
         value.move< PrintNode* > (that.value);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 149: // PUSH_SYNTAX
         value.move< PushNode* > (that.value);
         break;
 
@@ -385,11 +385,9 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQ_SYNTAX
-      case 143: // SEQ_SYNTAX
-      case 144: // KW_PAR_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 142: // SEQ_SYNTAX
+      case 143: // PAR_SYNTAX
+      case 152: // ITERATE_SYNTAX
         value.move< UnaryNode* > (that.value);
         break;
 
@@ -478,7 +476,7 @@ namespace yy {
       switch (that.type_get ())
     {
       case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 144: // STATEMENTS
         value.copy< AstListNode* > (that.value);
         break;
 
@@ -527,7 +525,7 @@ namespace yy {
         value.copy< FLOATING_T > (that.value);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 151: // FORALL_SYNTAX
         value.copy< ForallNode* > (that.value);
         break;
 
@@ -540,7 +538,7 @@ namespace yy {
         value.copy< INTEGER_T > (that.value);
         break;
 
-      case 147: // IFTHENELSE
+      case 145: // IFTHENELSE
         value.copy< IfThenElseNode* > (that.value);
         break;
 
@@ -548,11 +546,11 @@ namespace yy {
         value.copy< IntegerAtom* > (that.value);
         break;
 
-      case 148: // LET_SYNTAX
+      case 146: // LET_SYNTAX
         value.copy< LetNode* > (that.value);
         break;
 
-      case 152: // POP_SYNTAX
+      case 150: // POP_SYNTAX
         value.copy< PopNode* > (that.value);
         break;
 
@@ -561,7 +559,7 @@ namespace yy {
         value.copy< PrintNode* > (that.value);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 149: // PUSH_SYNTAX
         value.copy< PushNode* > (that.value);
         break;
 
@@ -572,11 +570,9 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQ_SYNTAX
-      case 143: // SEQ_SYNTAX
-      case 144: // KW_PAR_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 142: // SEQ_SYNTAX
+      case 143: // PAR_SYNTAX
+      case 152: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (that.value);
         break;
 
@@ -798,7 +794,7 @@ namespace yy {
   // @$.begin.filename = @$.end.filename = driver.get_filename_ptr();
 }
 
-#line 802 "GrammarParser.cpp" // lalr1.cc:741
+#line 798 "GrammarParser.cpp" // lalr1.cc:741
 
     /* Initialize the stack.  The initial state will be set in
        yynewstate, since the latter expects the semantical and the
@@ -889,7 +885,7 @@ namespace yy {
         switch (yyr1_[yyn])
     {
       case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 144: // STATEMENTS
         yylhs.value.build< AstListNode* > ();
         break;
 
@@ -938,7 +934,7 @@ namespace yy {
         yylhs.value.build< FLOATING_T > ();
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 151: // FORALL_SYNTAX
         yylhs.value.build< ForallNode* > ();
         break;
 
@@ -951,7 +947,7 @@ namespace yy {
         yylhs.value.build< INTEGER_T > ();
         break;
 
-      case 147: // IFTHENELSE
+      case 145: // IFTHENELSE
         yylhs.value.build< IfThenElseNode* > ();
         break;
 
@@ -959,11 +955,11 @@ namespace yy {
         yylhs.value.build< IntegerAtom* > ();
         break;
 
-      case 148: // LET_SYNTAX
+      case 146: // LET_SYNTAX
         yylhs.value.build< LetNode* > ();
         break;
 
-      case 152: // POP_SYNTAX
+      case 150: // POP_SYNTAX
         yylhs.value.build< PopNode* > ();
         break;
 
@@ -972,7 +968,7 @@ namespace yy {
         yylhs.value.build< PrintNode* > ();
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 149: // PUSH_SYNTAX
         yylhs.value.build< PushNode* > ();
         break;
 
@@ -983,11 +979,9 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQ_SYNTAX
-      case 143: // SEQ_SYNTAX
-      case 144: // KW_PAR_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 142: // SEQ_SYNTAX
+      case 143: // PAR_SYNTAX
+      case 152: // ITERATE_SYNTAX
         yylhs.value.build< UnaryNode* > ();
         break;
 
@@ -1078,54 +1072,54 @@ namespace yy {
           switch (yyn)
             {
   case 2:
-#line 199 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 198 "../../src/GrammarParser.yy" // lalr1.cc:859
     { driver.result = yystack_[0].value.as< AstListNode* > (); }
-#line 1084 "GrammarParser.cpp" // lalr1.cc:859
+#line 1078 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 3:
-#line 204 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 203 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
             driver.spec_name = yystack_[0].value.as< std::string > ();
         }
-#line 1092 "GrammarParser.cpp" // lalr1.cc:859
+#line 1086 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 4:
-#line 209 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 208 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yystack_[1].value.as< AstListNode* > ()->add(yystack_[0].value.as< AstNode* > ()); yylhs.value.as< AstListNode* > () = yystack_[1].value.as< AstListNode* > (); }
-#line 1098 "GrammarParser.cpp" // lalr1.cc:859
+#line 1092 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 5:
-#line 210 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 209 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< AstListNode* > () = new AstListNode(yylhs.location, NodeType::BODY_ELEMENTS);
                 yylhs.value.as< AstListNode* > ()->add(yystack_[0].value.as< AstNode* > ());
              }
-#line 1107 "GrammarParser.cpp" // lalr1.cc:859
+#line 1101 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 6:
-#line 216 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 215 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AstNode* > () = new AstNode(NodeType::PROVIDER); }
-#line 1113 "GrammarParser.cpp" // lalr1.cc:859
+#line 1107 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 7:
-#line 217 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 216 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AstNode* > () = new AstNode(NodeType::OPTION); }
-#line 1119 "GrammarParser.cpp" // lalr1.cc:859
+#line 1113 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 8:
-#line 218 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 217 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AstNode* > () = new EnumDefNode(yylhs.location, yystack_[0].value.as< Enum* > ()); }
-#line 1125 "GrammarParser.cpp" // lalr1.cc:859
+#line 1119 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 9:
-#line 219 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 218 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< AstNode* > () = new FunctionDefNode(yylhs.location, yystack_[0].value.as< Function* > ());
                 if (yystack_[0].value.as< Function* > ()->is_builtin()) {
@@ -1140,11 +1134,11 @@ namespace yy {
                     delete yystack_[0].value.as< Function* > ();
                 }
             }
-#line 1144 "GrammarParser.cpp" // lalr1.cc:859
+#line 1138 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 10:
-#line 233 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 232 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yystack_[0].value.as< Function* > ()->binding_offsets = std::move(driver.binding_offsets);
                 driver.binding_offsets.clear();
@@ -1158,17 +1152,17 @@ namespace yy {
                     delete yystack_[0].value.as< Function* > ();
                 }
             }
-#line 1162 "GrammarParser.cpp" // lalr1.cc:859
+#line 1156 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 11:
-#line 246 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 245 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AstNode* > () = yystack_[0].value.as< AstNode* > (); }
-#line 1168 "GrammarParser.cpp" // lalr1.cc:859
+#line 1162 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 12:
-#line 247 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 246 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< AstNode* > () = yystack_[0].value.as< AstNode* > ();
                 // TODO check, we trust bison to pass only RuleNodes up
@@ -1180,20 +1174,20 @@ namespace yy {
                     // the AST, so it will be deleted later
                 }
            }
-#line 1184 "GrammarParser.cpp" // lalr1.cc:859
+#line 1178 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 13:
-#line 260 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 259 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
               yylhs.value.as< AstNode* > () = new AstNode(NodeType::INIT);
               driver.init_name = yystack_[0].value.as< std::string > ();
            }
-#line 1193 "GrammarParser.cpp" // lalr1.cc:859
+#line 1187 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 16:
-#line 271 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 270 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< Enum* > () = new Enum(yystack_[4].value.as< std::string > (), yylhs.location);
                 try {
@@ -1213,226 +1207,226 @@ namespace yy {
                     }
                 }
            }
-#line 1217 "GrammarParser.cpp" // lalr1.cc:859
+#line 1211 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 17:
-#line 292 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 291 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                   // TODO: 2nd argument should be a reference
                   yylhs.value.as< Function* > () = new Function(yystack_[5].value.as< std::string > (), yylhs.location, yystack_[3].value.as< std::vector<Type*> > (), yystack_[0].value.as< ExpressionBase* > (), new Type(TypeType::UNKNOWN));
                 }
-#line 1226 "GrammarParser.cpp" // lalr1.cc:859
+#line 1220 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 18:
-#line 296 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 295 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                   yylhs.value.as< Function* > () = new Function(yystack_[2].value.as< std::string > (), yylhs.location, yystack_[0].value.as< ExpressionBase* > (), new Type(TypeType::UNKNOWN));
                 }
-#line 1234 "GrammarParser.cpp" // lalr1.cc:859
+#line 1228 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 19:
-#line 299 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 298 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                   yylhs.value.as< Function* > () = new Function(yystack_[4].value.as< std::string > (), yylhs.location, yystack_[0].value.as< ExpressionBase* > (), new Type(TypeType::UNKNOWN));
                 }
-#line 1242 "GrammarParser.cpp" // lalr1.cc:859
+#line 1236 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 20:
-#line 303 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 302 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                   yylhs.value.as< Function* > () = new Function(yystack_[7].value.as< std::string > (), yylhs.location, yystack_[5].value.as< std::vector<Type*> > (), yystack_[0].value.as< ExpressionBase* > (), yystack_[2].value.as< Type* > ());
                 }
-#line 1250 "GrammarParser.cpp" // lalr1.cc:859
+#line 1244 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 21:
-#line 306 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 305 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                   yylhs.value.as< Function* > () = new Function(yystack_[4].value.as< std::string > (), yylhs.location, yystack_[0].value.as< ExpressionBase* > (), yystack_[2].value.as< Type* > ());
                 }
-#line 1258 "GrammarParser.cpp" // lalr1.cc:859
+#line 1252 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 22:
-#line 309 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 308 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                   yylhs.value.as< Function* > () = new Function(yystack_[6].value.as< std::string > (), yylhs.location, yystack_[0].value.as< ExpressionBase* > (), yystack_[2].value.as< Type* > ());
                 }
-#line 1266 "GrammarParser.cpp" // lalr1.cc:859
+#line 1260 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 23:
-#line 314 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 313 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                       auto attrs = parse_function_attributes(driver, yylhs.location, yystack_[4].value.as< std::vector<std::string> > ());
                       yylhs.value.as< Function* > () = new Function(attrs.first, attrs.second, yystack_[2].value.as< std::string > (), yylhs.location, yystack_[1].value.as< std::pair<std::vector<Type*>, Type*> > ().first, yystack_[1].value.as< std::pair<std::vector<Type*>, Type*> > ().second, yystack_[0].value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > ());
                    }
-#line 1275 "GrammarParser.cpp" // lalr1.cc:859
+#line 1269 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 24:
-#line 318 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 317 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                       auto attrs = parse_function_attributes(driver, yylhs.location, yystack_[3].value.as< std::vector<std::string> > ());
                       yylhs.value.as< Function* > () = new Function(attrs.first, attrs.second, yystack_[1].value.as< std::string > (), yylhs.location, yystack_[0].value.as< std::pair<std::vector<Type*>, Type*> > ().first, yystack_[0].value.as< std::pair<std::vector<Type*>, Type*> > ().second, nullptr);
                    }
-#line 1284 "GrammarParser.cpp" // lalr1.cc:859
+#line 1278 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 25:
-#line 322 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 321 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                       yylhs.value.as< Function* > () = new Function(yystack_[2].value.as< std::string > (), yylhs.location, yystack_[1].value.as< std::pair<std::vector<Type*>, Type*> > ().first, yystack_[1].value.as< std::pair<std::vector<Type*>, Type*> > ().second, yystack_[0].value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > ());
                    }
-#line 1292 "GrammarParser.cpp" // lalr1.cc:859
+#line 1286 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 26:
-#line 326 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 325 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< Function* > () = new Function(yystack_[1].value.as< std::string > (), yylhs.location, yystack_[0].value.as< std::pair<std::vector<Type*>, Type*> > ().first, yystack_[0].value.as< std::pair<std::vector<Type*>, Type*> > ().second, nullptr); }
-#line 1298 "GrammarParser.cpp" // lalr1.cc:859
+#line 1292 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 27:
-#line 329 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 328 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<std::string> > () = std::move(yystack_[1].value.as< std::vector<std::string> > ()); }
-#line 1304 "GrammarParser.cpp" // lalr1.cc:859
+#line 1298 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 28:
-#line 330 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 329 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<std::string> > () = std::move(yystack_[0].value.as< std::vector<std::string> > ()); }
-#line 1310 "GrammarParser.cpp" // lalr1.cc:859
+#line 1304 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 29:
-#line 333 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 332 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                             yylhs.value.as< std::vector<std::string> > () = std::move(yystack_[2].value.as< std::vector<std::string> > ());
                             yylhs.value.as< std::vector<std::string> > ().push_back(yystack_[0].value.as< std::string > ());
                         }
-#line 1319 "GrammarParser.cpp" // lalr1.cc:859
+#line 1313 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 30:
-#line 337 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 336 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                             yylhs.value.as< std::vector<std::string> > () = std::vector<std::string>();
                             yylhs.value.as< std::vector<std::string> > ().push_back(yystack_[0].value.as< std::string > ());
                         }
-#line 1328 "GrammarParser.cpp" // lalr1.cc:859
+#line 1322 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 31:
-#line 343 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 342 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                     /* this constructor is implementation dependant! */
                     std::vector<Type*> foo;
                     yylhs.value.as< std::pair<std::vector<Type*>, Type*> > () = std::pair<std::vector<Type*>, Type*>(foo, yystack_[0].value.as< Type* > ());
                   }
-#line 1338 "GrammarParser.cpp" // lalr1.cc:859
+#line 1332 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 32:
-#line 349 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 348 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::pair<std::vector<Type*>, Type*> > () = std::pair<std::vector<Type*>, Type*>(yystack_[2].value.as< std::vector<Type*> > (), yystack_[0].value.as< Type* > ()); }
-#line 1344 "GrammarParser.cpp" // lalr1.cc:859
+#line 1338 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 33:
-#line 352 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 351 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
         size_t size = driver.binding_offsets.size();
         driver.binding_offsets[yystack_[2].value.as< std::string > ()] = size;
         yylhs.value.as< Type* > () = yystack_[0].value.as< Type* > ();
      }
-#line 1354 "GrammarParser.cpp" // lalr1.cc:859
+#line 1348 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 34:
-#line 357 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 356 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
         size_t size = driver.binding_offsets.size();
         driver.binding_offsets[yystack_[0].value.as< std::string > ()] = size;
         // TODO: fail for rules without types and print warnings
         yylhs.value.as< Type* > () = new Type(TypeType::INTEGER);
      }
-#line 1365 "GrammarParser.cpp" // lalr1.cc:859
+#line 1359 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 35:
-#line 366 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 365 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<Type*> > () = std::move(yystack_[0].value.as< std::vector<Type*> > ()); }
-#line 1371 "GrammarParser.cpp" // lalr1.cc:859
+#line 1365 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 36:
-#line 367 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 366 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<Type*> > () = std::move(yystack_[1].value.as< std::vector<Type*> > ()); }
-#line 1377 "GrammarParser.cpp" // lalr1.cc:859
+#line 1371 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 37:
-#line 369 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 368 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                         yylhs.value.as< std::vector<Type*> > () = std::move(yystack_[2].value.as< std::vector<Type*> > ());
                         yylhs.value.as< std::vector<Type*> > ().push_back(yystack_[0].value.as< Type* > ());
                    }
-#line 1386 "GrammarParser.cpp" // lalr1.cc:859
+#line 1380 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 38:
-#line 373 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 372 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<Type*> > ().push_back(yystack_[0].value.as< Type* > ()); }
-#line 1392 "GrammarParser.cpp" // lalr1.cc:859
+#line 1386 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 39:
-#line 377 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 376 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                             yystack_[0].value.as< std::vector<Type*> > ().insert(yystack_[0].value.as< std::vector<Type*> > ().begin(), yystack_[2].value.as< Type* > ());
                             yylhs.value.as< std::vector<Type*> > () = std::move(yystack_[0].value.as< std::vector<Type*> > ());
                         }
-#line 1401 "GrammarParser.cpp" // lalr1.cc:859
+#line 1395 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 40:
-#line 381 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 380 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                           // TODO: limit memory size
                             yylhs.value.as< std::vector<Type*> > ().push_back(yystack_[1].value.as< Type* > ());
                         }
-#line 1410 "GrammarParser.cpp" // lalr1.cc:859
+#line 1404 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 41:
-#line 385 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 384 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                             yylhs.value.as< std::vector<Type*> > ().push_back(yystack_[0].value.as< Type* > ());
                         }
-#line 1418 "GrammarParser.cpp" // lalr1.cc:859
+#line 1412 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 42:
-#line 390 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 389 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< Type* > () = new Type(yystack_[0].value.as< std::string > ()); /* TODO check invalid types */}
-#line 1424 "GrammarParser.cpp" // lalr1.cc:859
+#line 1418 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 43:
-#line 391 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 390 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                yylhs.value.as< Type* > () = new Type(yystack_[3].value.as< std::string > (), yystack_[1].value.as< std::vector<Type*> > ());
            }
-#line 1432 "GrammarParser.cpp" // lalr1.cc:859
+#line 1426 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 44:
-#line 394 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 393 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                yylhs.value.as< Type* > () = new Type(yystack_[5].value.as< std::string > ());
                yylhs.value.as< Type* > ()->subrange_start = yystack_[3].value.as< IntegerAtom* > ()->val_;
@@ -1441,11 +1435,11 @@ namespace yy {
                    driver.error(yylhs.location, "start of subrange must be smaller than the end");
                }
            }
-#line 1445 "GrammarParser.cpp" // lalr1.cc:859
+#line 1439 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 45:
-#line 404 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 403 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                yylhs.value.as< Type* > () = new Type( yystack_[3].value.as< std::string > () );
                yylhs.value.as< Type* > ()->bitsize = yystack_[1].value.as< IntegerAtom* > ()->val_;
@@ -1454,224 +1448,224 @@ namespace yy {
                    driver.error(yylhs.location, "invalid size for Bit type");
                }
            }
-#line 1458 "GrammarParser.cpp" // lalr1.cc:859
+#line 1452 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 46:
-#line 414 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 413 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                       yystack_[0].value.as< std::vector<Type*> > ().push_back(yystack_[2].value.as< Type* > ());
                       yylhs.value.as< std::vector<Type*> > () = std::move(yystack_[0].value.as< std::vector<Type*> > ());
                     }
-#line 1467 "GrammarParser.cpp" // lalr1.cc:859
+#line 1461 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 47:
-#line 418 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 417 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<Type*> > ().push_back(yystack_[1].value.as< Type* > ()); }
-#line 1473 "GrammarParser.cpp" // lalr1.cc:859
+#line 1467 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 48:
-#line 419 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 418 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<Type*> > ().push_back(yystack_[0].value.as< Type* > ()); }
-#line 1479 "GrammarParser.cpp" // lalr1.cc:859
+#line 1473 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 49:
-#line 422 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 421 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > () = yystack_[1].value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (); }
-#line 1485 "GrammarParser.cpp" // lalr1.cc:859
+#line 1479 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 50:
-#line 423 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 422 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > () = nullptr; }
-#line 1491 "GrammarParser.cpp" // lalr1.cc:859
+#line 1485 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 51:
-#line 426 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 425 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > () = yystack_[2].value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (); yystack_[2].value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > ()->push_back(yystack_[0].value.as< std::pair<ExpressionBase*, ExpressionBase*> > ()); }
-#line 1497 "GrammarParser.cpp" // lalr1.cc:859
+#line 1491 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 52:
-#line 427 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 426 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > () = yystack_[1].value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (); }
-#line 1503 "GrammarParser.cpp" // lalr1.cc:859
+#line 1497 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 53:
-#line 428 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 427 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                     yylhs.value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > () = new std::vector<std::pair<ExpressionBase*, ExpressionBase*>>();
                     yylhs.value.as< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > ()->push_back(yystack_[0].value.as< std::pair<ExpressionBase*, ExpressionBase*> > ());
                 }
-#line 1512 "GrammarParser.cpp" // lalr1.cc:859
+#line 1506 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 54:
-#line 435 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 434 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::pair<ExpressionBase*, ExpressionBase*> > () = std::pair<ExpressionBase*, ExpressionBase*>(nullptr, yystack_[0].value.as< ExpressionBase* > ()); }
-#line 1518 "GrammarParser.cpp" // lalr1.cc:859
+#line 1512 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 55:
-#line 436 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 435 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::pair<ExpressionBase*, ExpressionBase*> > () = std::pair<ExpressionBase*, ExpressionBase*>(yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > ()); }
-#line 1524 "GrammarParser.cpp" // lalr1.cc:859
+#line 1518 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 56:
-#line 439 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 438 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = yystack_[0].value.as< BaseFunctionAtom* > (); }
-#line 1530 "GrammarParser.cpp" // lalr1.cc:859
+#line 1524 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 57:
-#line 440 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 439 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = yystack_[0].value.as< AtomNode* > (); }
-#line 1536 "GrammarParser.cpp" // lalr1.cc:859
+#line 1530 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 58:
-#line 441 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 440 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = yystack_[0].value.as< ExpressionBase* > (); }
-#line 1542 "GrammarParser.cpp" // lalr1.cc:859
+#line 1536 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 59:
-#line 444 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 443 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new RuleAtom(yylhs.location, std::move(yystack_[0].value.as< std::string > ())); }
-#line 1548 "GrammarParser.cpp" // lalr1.cc:859
+#line 1542 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 60:
-#line 445 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 444 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = yystack_[0].value.as< AtomNode* > (); }
-#line 1554 "GrammarParser.cpp" // lalr1.cc:859
+#line 1548 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 61:
-#line 446 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 445 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new StringAtom(yylhs.location, std::move(yystack_[0].value.as< std::string > ())); }
-#line 1560 "GrammarParser.cpp" // lalr1.cc:859
+#line 1554 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 62:
-#line 447 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 446 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new ListAtom(yylhs.location, yystack_[0].value.as< std::vector<ExpressionBase*>* > ()); }
-#line 1566 "GrammarParser.cpp" // lalr1.cc:859
+#line 1560 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 63:
-#line 448 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 447 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = yystack_[0].value.as< AtomNode* > (); }
-#line 1572 "GrammarParser.cpp" // lalr1.cc:859
+#line 1566 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 64:
-#line 449 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 448 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new IntegerAtom(yylhs.location, 0); }
-#line 1578 "GrammarParser.cpp" // lalr1.cc:859
+#line 1572 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 65:
-#line 450 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 449 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new SelfAtom(yylhs.location); }
-#line 1584 "GrammarParser.cpp" // lalr1.cc:859
+#line 1578 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 66:
-#line 451 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 450 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new UndefAtom(yylhs.location); }
-#line 1590 "GrammarParser.cpp" // lalr1.cc:859
+#line 1584 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 67:
-#line 452 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 451 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new BooleanAtom(yylhs.location, true); }
-#line 1596 "GrammarParser.cpp" // lalr1.cc:859
+#line 1590 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 68:
-#line 453 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 452 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new BooleanAtom(yylhs.location, false); }
-#line 1602 "GrammarParser.cpp" // lalr1.cc:859
+#line 1596 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 69:
-#line 456 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 455 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< IntegerAtom* > () = new IntegerAtom(yylhs.location, yystack_[0].value.as< INTEGER_T > ()); }
-#line 1608 "GrammarParser.cpp" // lalr1.cc:859
+#line 1602 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 70:
-#line 457 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 456 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< IntegerAtom* > () = new IntegerAtom(yylhs.location, (-1) * yystack_[0].value.as< INTEGER_T > ()); }
-#line 1614 "GrammarParser.cpp" // lalr1.cc:859
+#line 1608 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 71:
-#line 458 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 457 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< IntegerAtom* > () = new IntegerAtom(yylhs.location, yystack_[0].value.as< INTEGER_T > ()); }
-#line 1620 "GrammarParser.cpp" // lalr1.cc:859
+#line 1614 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 72:
-#line 459 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 458 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = yystack_[0].value.as< IntegerAtom* > (); }
-#line 1626 "GrammarParser.cpp" // lalr1.cc:859
+#line 1620 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 73:
-#line 460 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 459 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new FloatingAtom(yylhs.location, yystack_[0].value.as< FLOATING_T > ()); }
-#line 1632 "GrammarParser.cpp" // lalr1.cc:859
+#line 1626 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 74:
-#line 461 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 460 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new FloatingAtom(yylhs.location, (-1) * yystack_[0].value.as< FLOATING_T > ()); }
-#line 1638 "GrammarParser.cpp" // lalr1.cc:859
+#line 1632 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 75:
-#line 462 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 461 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new FloatingAtom(yylhs.location, yystack_[0].value.as< FLOATING_T > ()); }
-#line 1644 "GrammarParser.cpp" // lalr1.cc:859
+#line 1638 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 76:
-#line 463 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 462 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new RationalAtom(yylhs.location, yystack_[0].value.as< rational_t > ()); }
-#line 1650 "GrammarParser.cpp" // lalr1.cc:859
+#line 1644 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 77:
-#line 464 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 463 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
           yystack_[0].value.as< rational_t > ().numerator *= -1;
           yylhs.value.as< AtomNode* > () = new RationalAtom(yylhs.location, yystack_[0].value.as< rational_t > ());
         }
-#line 1659 "GrammarParser.cpp" // lalr1.cc:859
+#line 1653 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 78:
-#line 468 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 467 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AtomNode* > () = new RationalAtom(yylhs.location, yystack_[0].value.as< rational_t > ()); }
-#line 1665 "GrammarParser.cpp" // lalr1.cc:859
+#line 1659 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 79:
-#line 471 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 470 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::string > () = yystack_[0].value.as< std::string > (); }
-#line 1671 "GrammarParser.cpp" // lalr1.cc:859
+#line 1665 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 80:
-#line 474 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 473 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
               if (yystack_[3].value.as< AtomNode* > ()->node_type_ == NodeType::INTEGER_ATOM && yystack_[1].value.as< AtomNode* > ()->node_type_ == NodeType::INTEGER_ATOM) {
                 yylhs.value.as< AtomNode* > () = new NumberRangeAtom(yylhs.location, reinterpret_cast<IntegerAtom*>(yystack_[3].value.as< AtomNode* > ()), reinterpret_cast<IntegerAtom*>(yystack_[1].value.as< AtomNode* > ()));
@@ -1680,173 +1674,173 @@ namespace yy {
                 yylhs.value.as< AtomNode* > () = nullptr;
               }
             }
-#line 1684 "GrammarParser.cpp" // lalr1.cc:859
+#line 1678 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 81:
-#line 485 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 484 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<ExpressionBase*>* > () = yystack_[1].value.as< std::vector<ExpressionBase*>* > (); }
-#line 1690 "GrammarParser.cpp" // lalr1.cc:859
+#line 1684 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 82:
-#line 486 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 485 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<ExpressionBase*>* > () = new std::vector<ExpressionBase*>(); }
-#line 1696 "GrammarParser.cpp" // lalr1.cc:859
+#line 1690 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 83:
-#line 490 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 489 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<ExpressionBase*>* > () = yystack_[0].value.as< std::vector<ExpressionBase*>* > (); }
-#line 1702 "GrammarParser.cpp" // lalr1.cc:859
+#line 1696 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 84:
-#line 491 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 490 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<ExpressionBase*>* > () = yystack_[1].value.as< std::vector<ExpressionBase*>* > (); }
-#line 1708 "GrammarParser.cpp" // lalr1.cc:859
+#line 1702 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 85:
-#line 493 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 492 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                           yylhs.value.as< std::vector<ExpressionBase*>* > () = yystack_[2].value.as< std::vector<ExpressionBase*>* > ();
                           yylhs.value.as< std::vector<ExpressionBase*>* > ()->push_back(yystack_[0].value.as< ExpressionBase* > ());
                         }
-#line 1717 "GrammarParser.cpp" // lalr1.cc:859
+#line 1711 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 86:
-#line 497 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 496 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                           yylhs.value.as< std::vector<ExpressionBase*>* > () = new std::vector<ExpressionBase*>;
                           yylhs.value.as< std::vector<ExpressionBase*>* > ()->push_back(yystack_[0].value.as< ExpressionBase* > ());
                         }
-#line 1726 "GrammarParser.cpp" // lalr1.cc:859
+#line 1720 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 87:
-#line 505 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 504 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::ADD); }
-#line 1732 "GrammarParser.cpp" // lalr1.cc:859
+#line 1726 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 88:
-#line 507 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 506 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::SUB); }
-#line 1738 "GrammarParser.cpp" // lalr1.cc:859
+#line 1732 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 89:
-#line 509 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 508 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::MUL); }
-#line 1744 "GrammarParser.cpp" // lalr1.cc:859
+#line 1738 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 90:
-#line 511 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 510 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::DIV); }
-#line 1750 "GrammarParser.cpp" // lalr1.cc:859
+#line 1744 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 91:
-#line 513 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 512 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::MOD); }
-#line 1756 "GrammarParser.cpp" // lalr1.cc:859
+#line 1750 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 92:
-#line 515 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 514 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::RAT_DIV); }
-#line 1762 "GrammarParser.cpp" // lalr1.cc:859
+#line 1756 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 93:
-#line 517 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 516 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::NEQ); }
-#line 1768 "GrammarParser.cpp" // lalr1.cc:859
+#line 1762 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 94:
-#line 519 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 518 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::EQ); }
-#line 1774 "GrammarParser.cpp" // lalr1.cc:859
+#line 1768 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 95:
-#line 521 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 520 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::LESSER); }
-#line 1780 "GrammarParser.cpp" // lalr1.cc:859
+#line 1774 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 96:
-#line 523 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 522 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::GREATER); }
-#line 1786 "GrammarParser.cpp" // lalr1.cc:859
+#line 1780 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 97:
-#line 525 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 524 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::LESSEREQ); }
-#line 1792 "GrammarParser.cpp" // lalr1.cc:859
+#line 1786 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 98:
-#line 527 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 526 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::GREATEREQ); }
-#line 1798 "GrammarParser.cpp" // lalr1.cc:859
+#line 1792 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 99:
-#line 529 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 528 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::OR); }
-#line 1804 "GrammarParser.cpp" // lalr1.cc:859
+#line 1798 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 100:
-#line 531 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 530 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::XOR); }
-#line 1810 "GrammarParser.cpp" // lalr1.cc:859
+#line 1804 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 101:
-#line 533 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 532 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< ExpressionBase* > (), ExpressionOperation::AND); }
-#line 1816 "GrammarParser.cpp" // lalr1.cc:859
+#line 1810 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 102:
-#line 535 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 534 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = new Expression(yylhs.location, yystack_[0].value.as< ExpressionBase* > (), nullptr, ExpressionOperation::NOT);}
-#line 1822 "GrammarParser.cpp" // lalr1.cc:859
+#line 1816 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 103:
-#line 536 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 535 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = yystack_[0].value.as< ExpressionBase* > (); }
-#line 1828 "GrammarParser.cpp" // lalr1.cc:859
+#line 1822 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 104:
-#line 539 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 538 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< ExpressionBase* > () = yystack_[1].value.as< ExpressionBase* > (); }
-#line 1834 "GrammarParser.cpp" // lalr1.cc:859
+#line 1828 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 105:
-#line 542 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 541 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< BaseFunctionAtom* > () = new FunctionAtom(yylhs.location, yystack_[0].value.as< std::string > ()); }
-#line 1840 "GrammarParser.cpp" // lalr1.cc:859
+#line 1834 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 106:
-#line 543 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 542 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< BaseFunctionAtom* > () = new FunctionAtom(yylhs.location, yystack_[2].value.as< std::string > ()); }
-#line 1846 "GrammarParser.cpp" // lalr1.cc:859
+#line 1840 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 107:
-#line 545 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 544 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                    if( Builtin::isBuiltin( yystack_[3].value.as< std::string > () ) )
                    {
@@ -1857,275 +1851,263 @@ namespace yy {
                        yylhs.value.as< BaseFunctionAtom* > () = new FunctionAtom(yylhs.location, yystack_[3].value.as< std::string > (), yystack_[1].value.as< std::vector<ExpressionBase*>* > ());
                    }
                }
-#line 1861 "GrammarParser.cpp" // lalr1.cc:859
+#line 1855 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 108:
-#line 557 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 556 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AstNode* > () = new RuleNode(yylhs.location, yystack_[0].value.as< AstNode* > (), yystack_[2].value.as< std::string > ()); }
-#line 1867 "GrammarParser.cpp" // lalr1.cc:859
+#line 1861 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 109:
-#line 558 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 557 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< AstNode* > () = new RuleNode(yylhs.location, yystack_[0].value.as< AstNode* > (), yystack_[4].value.as< std::string > ());
            }
-#line 1875 "GrammarParser.cpp" // lalr1.cc:859
+#line 1869 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 110:
-#line 561 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 560 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< AstNode* > () = new RuleNode(yylhs.location, yystack_[0].value.as< AstNode* > (), yystack_[5].value.as< std::string > (), yystack_[3].value.as< std::vector<Type*> > ());
            }
-#line 1883 "GrammarParser.cpp" // lalr1.cc:859
+#line 1877 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 111:
-#line 565 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 564 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 std::vector<Type*> tmp;
                 yylhs.value.as< AstNode* > () = new RuleNode(yylhs.location, yystack_[0].value.as< AstNode* > (), yystack_[4].value.as< std::string > (), tmp, yystack_[2].value.as< std::vector<std::pair<std::string, std::vector<std::string>>> > ());
            }
-#line 1892 "GrammarParser.cpp" // lalr1.cc:859
+#line 1886 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 112:
-#line 569 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 568 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 std::vector<Type*> tmp;
                 yylhs.value.as< AstNode* > () = new RuleNode(yylhs.location, yystack_[0].value.as< AstNode* > (), yystack_[6].value.as< std::string > (), tmp, yystack_[2].value.as< std::vector<std::pair<std::string, std::vector<std::string>>> > ());
            }
-#line 1901 "GrammarParser.cpp" // lalr1.cc:859
+#line 1895 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 113:
-#line 573 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 572 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 std::vector<Type*> tmp;
                 yylhs.value.as< AstNode* > () = new RuleNode(yylhs.location, yystack_[0].value.as< AstNode* > (), yystack_[7].value.as< std::string > (), tmp, yystack_[2].value.as< std::vector<std::pair<std::string, std::vector<std::string>>> > ());
            }
-#line 1910 "GrammarParser.cpp" // lalr1.cc:859
+#line 1904 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 114:
-#line 579 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 578 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::vector<std::pair<std::string, std::vector<std::string>>> > () = std::move(yystack_[2].value.as< std::vector<std::pair<std::string, std::vector<std::string>>> > ()); yylhs.value.as< std::vector<std::pair<std::string, std::vector<std::string>>> > ().push_back(yystack_[0].value.as< std::pair<std::string, std::vector<std::string>> > ()); }
-#line 1916 "GrammarParser.cpp" // lalr1.cc:859
+#line 1910 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 115:
-#line 580 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 579 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< std::vector<std::pair<std::string, std::vector<std::string>>> > () = std::vector<std::pair<std::string,std::vector<std::string>>>();
                 yylhs.value.as< std::vector<std::pair<std::string, std::vector<std::string>>> > ().push_back(std::move(yystack_[0].value.as< std::pair<std::string, std::vector<std::string>> > ()));
              }
-#line 1925 "GrammarParser.cpp" // lalr1.cc:859
+#line 1919 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 116:
-#line 586 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 585 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
             yylhs.value.as< std::pair<std::string, std::vector<std::string>> > () = std::pair<std::string, std::vector<std::string>>(yystack_[0].value.as< std::string > (), yystack_[3].value.as< std::vector<std::string> > ());
         }
-#line 1933 "GrammarParser.cpp" // lalr1.cc:859
+#line 1927 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 117:
+#line 590 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
+#line 1933 "GrammarParser.cpp" // lalr1.cc:859
+    break;
+
+  case 118:
 #line 591 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
 #line 1939 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 118:
+  case 119:
 #line 592 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< DiedieNode* > (); }
 #line 1945 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 119:
+  case 120:
 #line 593 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< DiedieNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< AstNode* > (); }
 #line 1951 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 120:
+  case 121:
 #line 594 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< AstNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< PrintNode* > (); }
 #line 1957 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 121:
+  case 122:
 #line 595 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< AstNode* > () = yystack_[0].value.as< PrintNode* > (); }
 #line 1963 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 122:
+  case 123:
 #line 596 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< PrintNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UpdateNode* > (); }
 #line 1969 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 123:
+  case 124:
 #line 597 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UpdateNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< CaseNode* > (); }
 #line 1975 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 124:
+  case 125:
 #line 598 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< CaseNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< CallNode* > (); }
 #line 1981 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 125:
+  case 126:
 #line 599 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< CallNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
 #line 1987 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 126:
+  case 127:
 #line 600 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > () ; }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
 #line 1993 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 127:
+  case 128:
 #line 601 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< IfThenElseNode* > (); }
 #line 1999 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 128:
+  case 129:
 #line 602 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< LetNode* > (); }
 #line 2005 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 129:
+  case 130:
 #line 603 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< PushNode* > (); }
 #line 2011 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 130:
+  case 131:
 #line 604 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< IfThenElseNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< PopNode* > (); }
 #line 2017 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 131:
+  case 132:
 #line 605 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< LetNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< ForallNode* > (); }
 #line 2023 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 132:
+  case 133:
 #line 606 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< PushNode* > (); }
+    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
 #line 2029 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 133:
+  case 134:
 #line 607 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< PopNode* > (); }
+    { yylhs.value.as< AstNode* > () = new AstNode(NodeType::SKIP); }
 #line 2035 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 134:
+  case 135:
 #line 608 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< ForallNode* > (); }
+    { driver.error(yylhs.location, "this call syntax is obsolete, use `call "+yystack_[0].value.as< std::string > ()+"`"); }
 #line 2041 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 135:
+  case 136:
 #line 609 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = yystack_[0].value.as< UnaryNode* > (); }
+    { yylhs.value.as< AstNode* > () = new AstNode(NodeType::STATEMENT); }
 #line 2047 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 136:
+  case 137:
 #line 610 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = new AstNode(NodeType::SKIP); }
+    { yylhs.value.as< AstNode* > () = new AstNode(NodeType::STATEMENT);}
 #line 2053 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 137:
-#line 611 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { driver.error(yylhs.location, "this call syntax is obsolete, use `call "+yystack_[0].value.as< std::string > ()+"`"); }
+  case 138:
+#line 613 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::ASSERT, yystack_[0].value.as< ExpressionBase* > ()); }
 #line 2059 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 138:
-#line 612 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = new AstNode(NodeType::STATEMENT); }
+  case 139:
+#line 615 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::ASSURE, yystack_[0].value.as< ExpressionBase* > ()); }
 #line 2065 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 139:
-#line 613 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = new AstNode(NodeType::STATEMENT);}
+  case 140:
+#line 618 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< DiedieNode* > () = new DiedieNode(yylhs.location, yystack_[0].value.as< ExpressionBase* > ()); }
 #line 2071 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 140:
-#line 616 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::ASSERT, yystack_[0].value.as< ExpressionBase* > ()); }
+  case 141:
+#line 619 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< DiedieNode* > () = new DiedieNode(yylhs.location, nullptr); }
 #line 2077 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 141:
-#line 618 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::ASSURE, yystack_[0].value.as< ExpressionBase* > ()); }
+  case 142:
+#line 629 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< AstNode* > () = new AstNode(yylhs.location, NodeType::IMPOSSIBLE); }
 #line 2083 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 142:
-#line 621 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< DiedieNode* > () = new DiedieNode(yylhs.location, yystack_[0].value.as< ExpressionBase* > ()); }
+  case 143:
+#line 632 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< PrintNode* > () = new PrintNode(yylhs.location, yystack_[1].value.as< std::string > (), yystack_[0].value.as< std::vector<ExpressionBase*> > ()); }
 #line 2089 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 143:
-#line 622 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< DiedieNode* > () = new DiedieNode(yylhs.location, nullptr); }
+  case 144:
+#line 635 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< std::vector<ExpressionBase*> > () = std::move(yystack_[2].value.as< std::vector<ExpressionBase*> > ()); yylhs.value.as< std::vector<ExpressionBase*> > ().push_back(yystack_[0].value.as< ExpressionBase* > ()); }
 #line 2095 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 144:
-#line 632 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstNode* > () = new AstNode(yylhs.location, NodeType::IMPOSSIBLE); }
-#line 2101 "GrammarParser.cpp" // lalr1.cc:859
-    break;
-
   case 145:
-#line 635 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< PrintNode* > () = new PrintNode(yylhs.location, yystack_[1].value.as< std::string > (), yystack_[0].value.as< std::vector<ExpressionBase*> > ()); }
-#line 2107 "GrammarParser.cpp" // lalr1.cc:859
+#line 636 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< std::vector<ExpressionBase*> > ().push_back(yystack_[0].value.as< ExpressionBase* > ()); }
+#line 2101 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 146:
 #line 638 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< std::vector<ExpressionBase*> > () = std::move(yystack_[2].value.as< std::vector<ExpressionBase*> > ()); yylhs.value.as< std::vector<ExpressionBase*> > ().push_back(yystack_[0].value.as< ExpressionBase* > ()); }
-#line 2113 "GrammarParser.cpp" // lalr1.cc:859
+    { yylhs.value.as< PrintNode* > () = new PrintNode(yylhs.location, yystack_[0].value.as< std::vector<ExpressionBase*> > ()); }
+#line 2107 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 147:
-#line 639 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< std::vector<ExpressionBase*> > ().push_back(yystack_[0].value.as< ExpressionBase* > ()); }
-#line 2119 "GrammarParser.cpp" // lalr1.cc:859
-    break;
-
-  case 148:
 #line 641 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< PrintNode* > () = new PrintNode(yylhs.location, yystack_[0].value.as< std::vector<ExpressionBase*> > ()); }
-#line 2125 "GrammarParser.cpp" // lalr1.cc:859
-    break;
-
-  case 149:
-#line 644 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                   if (yystack_[2].value.as< BaseFunctionAtom* > ()->node_type_ == NodeType::FUNCTION_ATOM) {
                     yylhs.value.as< UpdateNode* > () = new UpdateNode(yylhs.location, reinterpret_cast<FunctionAtom*>(yystack_[2].value.as< BaseFunctionAtom* > ()), yystack_[0].value.as< ExpressionBase* > ());
@@ -2134,177 +2116,177 @@ namespace yy {
                                      yystack_[2].value.as< BaseFunctionAtom* > ()->to_str()+"` is a `"+type_to_str(yystack_[2].value.as< BaseFunctionAtom* > ()->node_type_));
                   }
                 }
-#line 2138 "GrammarParser.cpp" // lalr1.cc:859
+#line 2120 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 150:
-#line 654 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 148:
+#line 651 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< CaseNode* > () = new CaseNode(yylhs.location, yystack_[3].value.as< ExpressionBase* > (), yystack_[1].value.as< std::vector<std::pair<AtomNode*, AstNode*>> > ());
            }
-#line 2146 "GrammarParser.cpp" // lalr1.cc:859
+#line 2128 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 151:
-#line 659 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 149:
+#line 656 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                     yylhs.value.as< std::vector<std::pair<AtomNode*, AstNode*>> > () = std::move(yystack_[1].value.as< std::vector<std::pair<AtomNode*, AstNode*>> > ());
                     yylhs.value.as< std::vector<std::pair<AtomNode*, AstNode*>> > ().push_back(yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > ());
                }
-#line 2155 "GrammarParser.cpp" // lalr1.cc:859
+#line 2137 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 152:
-#line 663 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 150:
+#line 660 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                     yylhs.value.as< std::vector<std::pair<AtomNode*, AstNode*>> > () = std::move(std::vector<std::pair<AtomNode*, AstNode*>>());
                     yylhs.value.as< std::vector<std::pair<AtomNode*, AstNode*>> > ().push_back(yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > ());
                }
-#line 2164 "GrammarParser.cpp" // lalr1.cc:859
+#line 2146 "GrammarParser.cpp" // lalr1.cc:859
+    break;
+
+  case 151:
+#line 666 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< std::pair<AtomNode*, AstNode*> > () =yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > (); }
+#line 2152 "GrammarParser.cpp" // lalr1.cc:859
+    break;
+
+  case 152:
+#line 667 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< std::pair<AtomNode*, AstNode*> > () = yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > (); }
+#line 2158 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 153:
-#line 669 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< std::pair<AtomNode*, AstNode*> > () =yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > (); }
-#line 2170 "GrammarParser.cpp" // lalr1.cc:859
+#line 668 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< std::pair<AtomNode*, AstNode*> > () = yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > (); }
+#line 2164 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 154:
-#line 670 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 669 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< std::pair<AtomNode*, AstNode*> > () = yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > (); }
-#line 2176 "GrammarParser.cpp" // lalr1.cc:859
+#line 2170 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 155:
-#line 671 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< std::pair<AtomNode*, AstNode*> > () = yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > (); }
-#line 2182 "GrammarParser.cpp" // lalr1.cc:859
-    break;
-
-  case 156:
 #line 672 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< std::pair<AtomNode*, AstNode*> > () = yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > (); }
-#line 2188 "GrammarParser.cpp" // lalr1.cc:859
-    break;
-
-  case 157:
-#line 675 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                     yylhs.value.as< std::pair<AtomNode*, AstNode*> > () = std::pair<AtomNode*, AstNode*>(nullptr, yystack_[0].value.as< AstNode* > ());
                   }
-#line 2196 "GrammarParser.cpp" // lalr1.cc:859
+#line 2178 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 158:
-#line 680 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 156:
+#line 677 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                     yylhs.value.as< std::pair<AtomNode*, AstNode*> > () = std::pair<AtomNode*, AstNode*>(yystack_[2].value.as< AtomNode* > (), yystack_[0].value.as< AstNode* > ());
                  }
-#line 2204 "GrammarParser.cpp" // lalr1.cc:859
+#line 2186 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 159:
-#line 685 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 157:
+#line 682 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                     yylhs.value.as< std::pair<AtomNode*, AstNode*> > () = std::pair<AtomNode*, AstNode*>(yystack_[2].value.as< BaseFunctionAtom* > (), yystack_[0].value.as< AstNode* > ());
                 }
-#line 2212 "GrammarParser.cpp" // lalr1.cc:859
+#line 2194 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 160:
-#line 690 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 158:
+#line 687 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                     yylhs.value.as< std::pair<AtomNode*, AstNode*> > () = std::pair<AtomNode*, AstNode*>(new StringAtom(yylhs.location, std::move(yystack_[2].value.as< std::string > ())), yystack_[0].value.as< AstNode* > ());
                  }
-#line 2220 "GrammarParser.cpp" // lalr1.cc:859
+#line 2202 "GrammarParser.cpp" // lalr1.cc:859
+    break;
+
+  case 159:
+#line 692 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< CallNode* > () = new CallNode(yylhs.location, "", yystack_[4].value.as< ExpressionBase* > (), yystack_[1].value.as< std::vector<ExpressionBase*>* > ()); }
+#line 2208 "GrammarParser.cpp" // lalr1.cc:859
+    break;
+
+  case 160:
+#line 693 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< CallNode* > () = new CallNode(yylhs.location, "", yystack_[1].value.as< ExpressionBase* > ()); }
+#line 2214 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 161:
-#line 695 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< CallNode* > () = new CallNode(yylhs.location, "", yystack_[4].value.as< ExpressionBase* > (), yystack_[1].value.as< std::vector<ExpressionBase*>* > ()); }
-#line 2226 "GrammarParser.cpp" // lalr1.cc:859
+#line 694 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< CallNode* > () = new CallNode(yylhs.location, yystack_[3].value.as< std::string > (), nullptr, yystack_[1].value.as< std::vector<ExpressionBase*>* > ()); }
+#line 2220 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 162:
-#line 696 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< CallNode* > () = new CallNode(yylhs.location, "", yystack_[1].value.as< ExpressionBase* > ()); }
-#line 2232 "GrammarParser.cpp" // lalr1.cc:859
+#line 695 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< CallNode* > () = new CallNode(yylhs.location, yystack_[0].value.as< std::string > (), nullptr); }
+#line 2226 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 163:
-#line 697 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< CallNode* > () = new CallNode(yylhs.location, yystack_[3].value.as< std::string > (), nullptr, yystack_[1].value.as< std::vector<ExpressionBase*>* > ()); }
-#line 2238 "GrammarParser.cpp" // lalr1.cc:859
+#line 698 "../../src/GrammarParser.yy" // lalr1.cc:859
+    {
+                yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::SEQBLOCK, yystack_[1].value.as< AstListNode* > ());
+          }
+#line 2234 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 164:
-#line 698 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< CallNode* > () = new CallNode(yylhs.location, yystack_[0].value.as< std::string > (), nullptr); }
-#line 2244 "GrammarParser.cpp" // lalr1.cc:859
+#line 701 "../../src/GrammarParser.yy" // lalr1.cc:859
+    {
+                yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::SEQBLOCK, yystack_[1].value.as< AstListNode* > ());
+          }
+#line 2242 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 165:
-#line 702 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 706 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
-                      yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::SEQBLOCK, yystack_[1].value.as< AstListNode* > ());
-                  }
-#line 2252 "GrammarParser.cpp" // lalr1.cc:859
+                yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::PARBLOCK, yystack_[1].value.as< AstListNode* > ());
+          }
+#line 2250 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 166:
-#line 707 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 709 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
-                      yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::SEQBLOCK, yystack_[1].value.as< AstListNode* > ());
-               }
-#line 2260 "GrammarParser.cpp" // lalr1.cc:859
+                yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::PARBLOCK, yystack_[1].value.as< AstListNode* > ());
+          }
+#line 2258 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 167:
-#line 712 "../../src/GrammarParser.yy" // lalr1.cc:859
-    {
-                      yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::PARBLOCK, yystack_[1].value.as< AstListNode* > ());
-                  }
-#line 2268 "GrammarParser.cpp" // lalr1.cc:859
+#line 714 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yystack_[1].value.as< AstListNode* > ()->add(yystack_[0].value.as< AstNode* > ()); yylhs.value.as< AstListNode* > () = yystack_[1].value.as< AstListNode* > (); }
+#line 2264 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 168:
-#line 716 "../../src/GrammarParser.yy" // lalr1.cc:859
-    {
-                    yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::PARBLOCK, yystack_[1].value.as< AstListNode* > ());
-               }
-#line 2276 "GrammarParser.cpp" // lalr1.cc:859
+#line 715 "../../src/GrammarParser.yy" // lalr1.cc:859
+    { yylhs.value.as< AstListNode* > () = new AstListNode(yylhs.location, NodeType::STATEMENTS); yylhs.value.as< AstListNode* > ()->add(yystack_[0].value.as< AstNode* > ()); }
+#line 2270 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
   case 169:
-#line 721 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yystack_[1].value.as< AstListNode* > ()->add(yystack_[0].value.as< AstNode* > ()); yylhs.value.as< AstListNode* > () = yystack_[1].value.as< AstListNode* > (); }
-#line 2282 "GrammarParser.cpp" // lalr1.cc:859
-    break;
-
-  case 170:
-#line 722 "../../src/GrammarParser.yy" // lalr1.cc:859
-    { yylhs.value.as< AstListNode* > () = new AstListNode(yylhs.location, NodeType::STATEMENTS); yylhs.value.as< AstListNode* > ()->add(yystack_[0].value.as< AstNode* > ()); }
-#line 2288 "GrammarParser.cpp" // lalr1.cc:859
-    break;
-
-  case 171:
-#line 725 "../../src/GrammarParser.yy" // lalr1.cc:859
+#line 718 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< IfThenElseNode* > () = new IfThenElseNode(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< AstNode* > (), nullptr);
           }
-#line 2296 "GrammarParser.cpp" // lalr1.cc:859
+#line 2278 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 172:
-#line 728 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 170:
+#line 721 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< IfThenElseNode* > () = new IfThenElseNode(yylhs.location, yystack_[4].value.as< ExpressionBase* > (), yystack_[2].value.as< AstNode* > (), yystack_[0].value.as< AstNode* > ());
           }
-#line 2304 "GrammarParser.cpp" // lalr1.cc:859
+#line 2286 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 173:
-#line 734 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 171:
+#line 727 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 auto var = Symbol(yystack_[1].value.as< std::string > (), yylhs.location, Symbol::SymbolType::LET);
                 try {
@@ -2313,20 +2295,20 @@ namespace yy {
                     driver.error(yylhs.location, e.what());
                 }
             }
-#line 2317 "GrammarParser.cpp" // lalr1.cc:859
+#line 2299 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 174:
-#line 742 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 172:
+#line 735 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
               driver.function_table.remove(yystack_[5].value.as< std::string > ());
               yylhs.value.as< LetNode* > () = new LetNode(yylhs.location, Type(TypeType::UNKNOWN), yystack_[5].value.as< std::string > (), yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< AstNode* > ());
           }
-#line 2326 "GrammarParser.cpp" // lalr1.cc:859
+#line 2308 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 175:
-#line 747 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 173:
+#line 740 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 auto var = Symbol(yystack_[3].value.as< std::string > (), yylhs.location, Symbol::SymbolType::LET);
                 try {
@@ -2335,20 +2317,20 @@ namespace yy {
                     driver.error(yylhs.location, e.what());
                 }
             }
-#line 2339 "GrammarParser.cpp" // lalr1.cc:859
+#line 2321 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 176:
-#line 755 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 174:
+#line 748 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
               driver.function_table.remove(yystack_[7].value.as< std::string > ());
               yylhs.value.as< LetNode* > () = new LetNode(yylhs.location, yystack_[5].value.as< Type* > (), yystack_[7].value.as< std::string > (), yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< AstNode* > ());
           }
-#line 2348 "GrammarParser.cpp" // lalr1.cc:859
+#line 2330 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 177:
-#line 761 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 175:
+#line 754 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 if (yystack_[0].value.as< BaseFunctionAtom* > ()->node_type_ == NodeType::BUILTIN_ATOM) {
                   driver.error(yylhs.location, "cannot push to builtin `"+yystack_[0].value.as< BaseFunctionAtom* > ()->to_str()+"`");
@@ -2356,11 +2338,11 @@ namespace yy {
                     yylhs.value.as< PushNode* > () = new PushNode(yylhs.location, yystack_[2].value.as< ExpressionBase* > (), reinterpret_cast<FunctionAtom*>(yystack_[0].value.as< BaseFunctionAtom* > ()));
                 }
           }
-#line 2360 "GrammarParser.cpp" // lalr1.cc:859
+#line 2342 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 178:
-#line 771 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 176:
+#line 764 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 if (yystack_[2].value.as< BaseFunctionAtom* > ()->node_type_ == NodeType::BUILTIN_ATOM) {
                   driver.error(yylhs.location, "cannot pop to builtin `"+yystack_[2].value.as< BaseFunctionAtom* > ()->to_str()+"`");
@@ -2370,25 +2352,25 @@ namespace yy {
                     yylhs.value.as< PopNode* > () = new PopNode(yylhs.location, reinterpret_cast<FunctionAtom*>(yystack_[2].value.as< BaseFunctionAtom* > ()), reinterpret_cast<FunctionAtom*>(yystack_[0].value.as< BaseFunctionAtom* > ()));
                 }
           }
-#line 2374 "GrammarParser.cpp" // lalr1.cc:859
+#line 2356 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 179:
-#line 782 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 177:
+#line 775 "../../src/GrammarParser.yy" // lalr1.cc:859
     {
                 yylhs.value.as< ForallNode* > () = new ForallNode(yylhs.location, yystack_[4].value.as< std::string > (), yystack_[2].value.as< ExpressionBase* > (), yystack_[0].value.as< AstNode* > ());
              }
-#line 2382 "GrammarParser.cpp" // lalr1.cc:859
+#line 2364 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
-  case 180:
-#line 787 "../../src/GrammarParser.yy" // lalr1.cc:859
+  case 178:
+#line 780 "../../src/GrammarParser.yy" // lalr1.cc:859
     { yylhs.value.as< UnaryNode* > () = new UnaryNode(yylhs.location, NodeType::ITERATE, yystack_[0].value.as< AstNode* > ()); }
-#line 2388 "GrammarParser.cpp" // lalr1.cc:859
+#line 2370 "GrammarParser.cpp" // lalr1.cc:859
     break;
 
 
-#line 2392 "GrammarParser.cpp" // lalr1.cc:859
+#line 2374 "GrammarParser.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -2643,49 +2625,48 @@ namespace yy {
   }
 
 
-  const short int casmi_parser::yypact_ninf_ = -201;
+  const short int casmi_parser::yypact_ninf_ = -202;
 
   const signed char casmi_parser::yytable_ninf_ = -106;
 
   const short int
   casmi_parser::yypact_[] =
   {
-     -37,   -69,    54,   170,  -201,  -201,   -54,    -5,    31,    47,
-      56,    57,    63,   170,  -201,  -201,  -201,  -201,  -201,  -201,
-    -201,  -201,    64,    -6,    26,    11,   -18,  -201,  -201,    67,
-    -201,  -201,    86,    79,   -51,   117,   321,   -52,    71,    90,
-      91,   577,     3,    76,    80,    88,    71,   110,   121,   101,
-     111,  -201,   321,  -201,  -201,  -201,  -201,  -201,    13,    55,
-     321,   193,    97,  -201,  -201,  -201,  -201,   118,  -201,  -201,
-    -201,  -201,  -201,  -201,  -201,   804,  -201,  -201,    50,   131,
-    -201,   116,   132,   141,    64,    64,   -15,  -201,   321,   321,
-     321,  -201,  -201,   577,   577,   134,   321,   912,   135,   321,
-     138,   139,   577,   -46,   321,   321,   150,   577,   577,   -13,
-     172,  -201,  -201,  -201,  -201,  -201,  -201,  -201,  -201,  -201,
-    -201,  -201,  -201,  -201,  -201,  -201,  -201,  -201,  -201,  -201,
-    -201,   -16,   164,   148,    -6,  -201,  -201,     8,    71,    71,
-     883,   804,  -201,  -201,  -201,  -201,  -201,  -201,   493,  -201,
-     180,   167,   162,   804,  -201,   277,   321,   321,   321,   321,
-     321,   321,   321,   321,   321,   321,   321,   321,   321,   321,
-     321,   321,    71,    71,    61,   153,   321,   177,   176,   577,
-      91,   804,   804,   804,  -201,    12,   398,    62,   556,  -201,
-     186,   912,   617,   221,   232,  -201,   321,   187,   647,  -201,
-     169,   451,   514,   321,    91,   577,   -14,  -201,   117,   173,
-     178,   183,   197,   -38,  -201,  -201,  -201,   -34,  -201,   209,
-    -201,    48,  -201,   321,  -201,   199,   832,   832,    -1,  -201,
-     863,   863,   863,    -1,    -1,   863,   863,   863,  -201,  -201,
-    -201,   804,   203,  -201,   321,    71,  -201,   804,  -201,   213,
-    -201,  -201,  -201,  -201,  -201,  -201,    71,   577,   912,   186,
-     138,   138,   321,   679,   321,    87,   204,  -201,  -201,   804,
-      33,  -201,    91,   577,  -201,    71,  -201,    20,  -201,  -201,
-     912,   912,   210,   804,  -201,   321,   804,   207,   195,   321,
-     216,   264,  -201,  -201,  -201,   708,   226,   231,   220,   230,
-     234,   235,    22,  -201,  -201,  -201,  -201,  -201,  -201,   577,
-      49,  -201,  -201,   237,  -201,  -201,  -201,   804,   321,  -201,
-     743,  -201,   577,   577,   321,  -201,   577,   577,   577,   577,
-    -201,  -201,  -201,   577,  -201,   804,   577,   321,  -201,  -201,
-     238,  -201,  -201,  -201,  -201,  -201,  -201,   771,  -201,   577,
-    -201
+     -23,   -63,    94,   168,  -202,  -202,   -13,   -21,    19,    21,
+      24,    44,    46,   168,  -202,  -202,  -202,  -202,  -202,  -202,
+    -202,  -202,    47,    37,   -45,    72,   -20,  -202,  -202,    79,
+    -202,  -202,    85,    78,   -44,   116,   275,   -54,    70,    88,
+      93,   598,     6,    81,    82,    83,    70,    97,   113,    92,
+     101,  -202,   275,  -202,  -202,  -202,  -202,  -202,    58,    66,
+     275,    31,    89,  -202,  -202,  -202,  -202,   109,  -202,  -202,
+    -202,  -202,  -202,  -202,  -202,   790,  -202,  -202,    -3,   104,
+    -202,   112,   105,   117,    47,    47,   -39,  -202,   275,   275,
+     275,  -202,  -202,   598,   598,    96,   275,   872,   119,   275,
+     120,   129,   598,    -9,   275,   275,   136,   598,   598,    35,
+     160,  -202,  -202,  -202,  -202,  -202,  -202,  -202,  -202,  -202,
+    -202,  -202,  -202,  -202,  -202,  -202,  -202,  -202,  -202,   -18,
+     151,   137,    37,  -202,  -202,   -48,    70,    70,   843,   790,
+    -202,  -202,  -202,  -202,  -202,  -202,   398,  -202,   166,   158,
+     154,   790,  -202,   191,   275,   275,   275,   275,   275,   275,
+     275,   275,   275,   275,   275,   275,   275,   275,   275,   275,
+      70,    70,    25,   146,   275,   162,   167,   598,    93,   790,
+     790,   790,  -202,   356,   419,    62,   514,  -202,   172,   872,
+     577,   207,   222,  -202,   275,   180,   638,  -202,   163,   472,
+     535,   275,    93,   598,   -16,  -202,   116,   165,   169,   174,
+     185,   -32,  -202,  -202,  -202,    59,  -202,   197,  -202,   -31,
+    -202,   275,  -202,   189,   823,   823,   -36,  -202,   335,   335,
+     335,   -36,   -36,   335,   335,   335,  -202,  -202,  -202,   790,
+     195,  -202,   275,    70,  -202,   790,  -202,   206,  -202,  -202,
+    -202,  -202,  -202,  -202,    70,   598,   872,   172,   120,   120,
+     275,   666,   275,    39,   196,  -202,  -202,   790,    18,  -202,
+      93,   598,  -202,    70,  -202,   -34,  -202,  -202,   872,   872,
+     198,   790,  -202,   275,   790,   199,   181,   275,   204,   248,
+    -202,  -202,  -202,   700,   211,   212,   205,   217,   218,   223,
+       3,  -202,  -202,  -202,  -202,  -202,  -202,   598,    61,  -202,
+    -202,   234,  -202,  -202,  -202,   790,   275,  -202,   729,  -202,
+     598,   598,   275,  -202,   598,   598,   598,   598,  -202,  -202,
+    -202,   598,  -202,   790,   598,   275,  -202,  -202,   235,  -202,
+    -202,  -202,  -202,  -202,  -202,   762,  -202,   598,  -202
   };
 
   const unsigned char
@@ -2700,158 +2681,153 @@ namespace yy {
        0,     0,     0,    75,    71,    78,    61,   105,   103,    57,
       72,    60,    59,    63,    62,    18,    58,    56,     0,    34,
       38,     0,    35,     0,     0,     0,     0,   115,     0,     0,
-     143,   144,   136,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,   137,
+     141,   142,   134,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,   135,
        0,   108,   117,   118,   119,   120,   121,   122,   123,   124,
-     125,   126,   127,   128,   129,   130,   131,   132,   133,   134,
-     135,     0,     0,     0,     0,    29,    31,     0,     0,    40,
-       0,   102,    73,    69,    76,    74,    70,    77,     0,    82,
-      60,     0,    83,    86,    79,     0,     0,     0,     0,     0,
+     125,   126,   127,   128,   129,   130,   131,   132,   133,     0,
+       0,     0,     0,    29,    31,     0,     0,    40,     0,   102,
+      73,    69,    76,    74,    70,    77,     0,    82,    60,     0,
+      83,    86,    79,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    36,     0,     0,     0,     0,
-       0,   140,   141,   142,   170,     0,     0,     0,     0,   147,
-     148,     0,     0,     0,     0,   180,     0,   164,     0,   138,
-       0,     0,     0,     0,     0,     0,     0,    15,    24,     0,
-       0,    48,     0,     0,    32,    39,    50,     0,    53,    54,
-     104,     0,    81,    84,   106,     0,   101,    99,   100,    92,
-      93,    97,    98,    87,    88,    94,    95,    96,    89,    90,
-      91,    19,     0,    33,     0,     0,    37,    21,    16,     0,
-     111,   114,   165,   169,   167,   173,     0,     0,     0,   145,
-       0,     0,     0,     0,     0,     0,     0,   166,   168,   149,
-       0,   109,     0,     0,    23,    47,    43,     0,    45,    49,
-      52,     0,     0,    85,   107,     0,    17,     0,     0,     0,
-       0,   171,   146,   177,   178,     0,   162,     0,     0,     0,
-       0,     0,     0,   152,   153,   154,   155,   156,   139,     0,
-       0,   110,    46,     0,    51,    55,    80,    22,     0,   116,
-       0,   175,     0,     0,     0,   163,     0,     0,     0,     0,
-     150,   151,   112,     0,    44,    20,     0,     0,   172,   179,
-       0,   157,   160,   158,   159,   113,   174,     0,   161,     0,
-     176
+       0,     0,     0,    36,     0,     0,     0,     0,     0,   138,
+     139,   140,   168,     0,     0,     0,     0,   145,   146,     0,
+       0,     0,     0,   178,     0,   162,     0,   136,     0,     0,
+       0,     0,     0,     0,     0,    15,    24,     0,     0,    48,
+       0,     0,    32,    39,    50,     0,    53,    54,   104,     0,
+      81,    84,   106,     0,   101,    99,   100,    92,    93,    97,
+      98,    87,    88,    94,    95,    96,    89,    90,    91,    19,
+       0,    33,     0,     0,    37,    21,    16,     0,   111,   114,
+     164,   167,   166,   171,     0,     0,     0,   143,     0,     0,
+       0,     0,     0,     0,     0,   163,   165,   147,     0,   109,
+       0,     0,    23,    47,    43,     0,    45,    49,    52,     0,
+       0,    85,   107,     0,    17,     0,     0,     0,     0,   169,
+     144,   175,   176,     0,   160,     0,     0,     0,     0,     0,
+       0,   150,   151,   152,   153,   154,   137,     0,     0,   110,
+      46,     0,    51,    55,    80,    22,     0,   116,     0,   173,
+       0,     0,     0,   161,     0,     0,     0,     0,   148,   149,
+     112,     0,    44,    20,     0,     0,   170,   177,     0,   155,
+     158,   156,   157,   113,   172,     0,   159,     0,   174
   };
 
   const short int
   casmi_parser::yypgoto_[] =
   {
-    -201,  -201,  -201,  -201,   296,  -201,  -201,  -201,  -201,  -201,
-    -201,    34,  -201,   179,   136,   268,  -201,   175,   -30,    40,
-     109,  -201,    38,   -80,  -201,  -136,   -59,  -201,  -201,  -201,
-     -99,  -201,    27,  -201,   -41,  -201,  -200,   145,   -29,  -201,
-    -201,  -201,  -201,  -201,   128,  -201,  -201,  -201,  -201,    28,
-    -201,  -201,  -201,  -201,  -201,  -201,  -201,  -201,  -201,    -9,
-    -201,  -201,  -201,  -201,  -201,  -201,  -201,  -201
+    -202,  -202,  -202,  -202,   269,  -202,  -202,  -202,  -202,  -202,
+    -202,   -28,  -202,   171,   128,   262,  -202,   170,   -30,    36,
+     102,  -202,    33,   -80,  -202,  -131,   -59,  -202,  -202,  -202,
+     -99,  -202,    27,  -202,   -41,  -202,  -201,   134,   -29,  -202,
+    -202,  -202,  -202,  -202,   124,  -202,  -202,  -202,  -202,    15,
+    -202,  -202,  -202,  -202,  -202,  -202,  -202,   -85,  -202,  -202,
+    -202,  -202,  -202,  -202,  -202,  -202
   };
 
   const short int
   casmi_parser::yydefgoto_[] =
   {
       -1,     2,     3,    13,    14,    15,    16,    17,    18,    19,
-      20,    32,    33,    35,    80,    81,    82,    48,    49,   212,
-      51,   217,   218,    68,    69,    70,    71,    72,    73,    74,
-     151,   152,   153,    76,    77,    21,    86,    87,   184,   112,
-     113,   114,   115,   116,   190,   117,   118,   119,   302,   303,
-     304,   305,   306,   307,   120,   121,   122,   123,   124,   185,
-     125,   126,   289,   337,   127,   128,   129,   130
+      20,    32,    33,    35,    80,    81,    82,    48,    49,   210,
+      51,   215,   216,    68,    69,    70,    71,    72,    73,    74,
+     149,   150,   151,    76,    77,    21,    86,    87,   182,   112,
+     113,   114,   115,   116,   188,   117,   118,   119,   300,   301,
+     302,   303,   304,   305,   120,   121,   122,   183,   123,   124,
+     287,   335,   125,   126,   127,   128
   };
 
   const short int
   casmi_parser::yytable_[] =
   {
-     110,   213,   150,    46,   270,    40,   199,   204,    83,   272,
-      22,     1,   111,    78,     4,   277,   136,   189,   196,    88,
-      89,    90,    91,    92,    93,   252,    94,   278,    95,    23,
-      96,    79,    47,    97,    98,   279,    99,   197,   100,   280,
-     101,   102,  -105,   103,   104,    41,    42,   205,   179,   273,
-     159,   155,   110,   110,     5,   298,   225,   330,   180,   193,
-     219,   110,   105,    75,   106,    34,   110,   110,   131,   209,
-     210,   107,   310,   195,    39,   168,   169,   170,    24,   141,
-     108,   209,   210,    58,    59,   186,    79,   148,    64,    36,
-      37,    47,   142,   143,   144,   109,   309,    38,   201,   202,
-      64,    63,    64,    65,   299,    67,   180,   211,   214,    58,
-      59,   189,   333,   171,    25,   181,   182,   183,   177,   178,
-     298,   172,   180,   188,   244,   255,   192,    63,    64,    65,
-      26,   198,   245,   256,   145,   146,   147,    43,   110,    27,
-      28,   313,   242,   243,   110,   110,    29,    31,    58,    59,
-     250,    44,    45,    50,    47,    85,   253,   253,    84,   133,
-     110,   110,   282,   134,   110,   297,    63,    64,    65,   299,
-      67,   135,   253,   253,   137,   138,   271,   139,   292,   140,
-     154,   174,   155,   226,   227,   228,   229,   230,   231,   232,
-     233,   234,   235,   236,   237,   238,   239,   240,   241,    52,
-     219,   315,   173,   247,   176,   175,   300,     6,     7,     8,
-       9,    10,    11,    12,   200,   287,   110,   187,   191,   293,
-     294,    67,   194,   263,   301,   340,   290,   203,   291,   206,
-     269,   207,   110,   221,   222,   223,    79,    53,    54,    55,
-      56,   249,    57,   300,   311,   211,   248,   258,   261,   262,
-     283,   264,   266,   143,    58,    59,   275,    60,   146,    61,
-     149,   301,   276,   281,   284,    62,   285,   288,   110,   308,
-     318,   286,    63,    64,    65,    66,    67,   316,   319,   321,
-     332,   110,   110,    52,   322,   110,   110,   110,   110,   295,
-     324,   326,   110,   338,   339,   110,   325,   341,   342,   343,
-     344,   327,   334,   348,   345,   328,   329,   346,   110,    30,
-     132,   246,   317,   208,   215,   312,   320,   274,   314,   259,
-     350,    53,    54,    55,    56,   251,    57,    52,     0,     0,
-     331,     0,     0,     0,     0,     0,     0,     0,    58,    59,
-       0,    60,   224,    61,     0,   335,     0,     0,     0,    62,
-       0,     0,     0,     0,     0,     0,    63,    64,    65,    66,
-      67,     0,     0,     0,   347,    53,    54,    55,    56,     0,
-      57,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    58,    59,     0,    60,     0,    61,     0,     0,
-       0,     0,     0,    62,     0,     0,     0,     0,     0,     0,
-      63,    64,    65,    66,    67,    88,    89,    90,    91,    92,
-      93,     0,    94,   254,    95,     0,    96,     0,     0,    97,
-      98,     0,    99,     0,   100,     0,   101,   102,     0,   103,
-     104,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,   105,     0,
-     106,     0,     0,     0,     0,     0,     0,   107,    88,    89,
-      90,    91,    92,    93,     0,    94,   108,    95,     0,    96,
-       0,     0,    97,    98,     0,    99,     0,   100,     0,   101,
-     102,   109,   103,   104,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,   156,   157,   158,     0,
-       0,   105,     0,   106,     0,     0,     0,     0,     0,     0,
-     107,   267,     0,     0,     0,     0,     0,     0,     0,   108,
-       0,    88,    89,    90,    91,    92,    93,     0,    94,     0,
-      95,     0,    96,     0,   109,    97,    98,     0,    99,     0,
-     100,     0,   101,   102,   159,   103,   104,     0,     0,   160,
-     161,   162,     0,     0,   163,   164,   165,     0,   220,   156,
-     157,   158,     0,     0,   105,     0,   106,   166,   167,   168,
-     169,   170,     0,   107,     0,   257,     0,     0,     0,     0,
-       0,     0,   108,   268,    88,    89,    90,    91,    92,    93,
-       0,    94,     0,    95,     0,    96,     0,   109,    97,    98,
-       0,    99,     0,   100,     0,   101,   102,   159,   103,   104,
-       0,     0,   160,   161,   162,     0,     0,   163,   164,   165,
-     156,   157,   158,     0,     0,     0,     0,   105,     0,   106,
-     166,   167,   168,   169,   170,     0,   107,     0,     0,     0,
-       0,     0,   260,     0,     0,   108,     0,     0,     0,     0,
-     156,   157,   158,     0,     0,     0,     0,     0,     0,     0,
-     109,     0,     0,     0,     0,     0,     0,     0,   159,     0,
-       0,     0,     0,   160,   161,   162,     0,     0,   163,   164,
-     165,   265,   156,   157,   158,     0,     0,     0,     0,     0,
-       0,   166,   167,   168,   169,   170,     0,     0,   159,     0,
-       0,     0,     0,   160,   161,   162,     0,     0,   163,   164,
-     165,   156,   157,   158,     0,     0,     0,     0,     0,     0,
-       0,   166,   167,   168,   169,   170,     0,     0,     0,     0,
-     159,     0,     0,     0,     0,   160,   161,   162,   323,     0,
-     163,   164,   165,     0,   296,     0,   156,   157,   158,     0,
-       0,     0,     0,   166,   167,   168,   169,   170,     0,   159,
-     336,     0,     0,     0,   160,   161,   162,     0,     0,   163,
-     164,   165,     0,     0,   156,   157,   158,     0,     0,     0,
-       0,     0,   166,   167,   168,   169,   170,     0,   349,     0,
-       0,     0,     0,     0,   159,     0,     0,     0,     0,   160,
-     161,   162,     0,     0,   163,   164,   165,   156,   157,   158,
-       0,     0,     0,     0,     0,     0,     0,   166,   167,   168,
-     169,   170,   159,     0,     0,     0,     0,   160,   161,   162,
-       0,     0,   163,   164,   165,  -106,  -106,   158,     0,     0,
-       0,     0,     0,     0,     0,   166,   167,   168,   169,   170,
-       0,     0,     0,     0,     0,   159,     0,     0,     0,     0,
-     160,   161,   162,     0,     0,   163,   164,   165,   158,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,   166,   167,
-     168,   169,   170,   159,     0,     0,     0,     0,   160,   161,
-     162,     0,     0,   163,   164,   165,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,   166,   167,   168,   169,
-     170,     0,     0,     0,   159,     0,     0,     0,     0,  -106,
-    -106,  -106,     0,     0,   163,   164,  -106,    53,    54,    55,
-      56,     0,    57,     0,     0,     0,     0,  -106,  -106,   168,
-     169,   170,     0,     0,    58,    59,     0,    60,     0,    61,
-       0,     0,   216,     0,     0,    62,    53,    54,    55,    56,
+     110,   268,   148,    40,   211,   202,   197,   270,    83,   184,
+      46,    78,   111,   207,   208,   157,   134,   187,    36,    37,
+       4,   275,   199,   200,   177,     1,    38,   207,   208,    79,
+      58,    59,    64,   276,   178,    47,   296,    52,   328,    47,
+     166,   167,   168,    41,    42,   203,    64,   271,    63,    64,
+      65,    22,   110,   110,   223,   194,   175,   176,   217,   191,
+     169,   110,    24,    75,    58,    59,   110,   110,   170,   308,
+      23,   129,   296,   193,   195,    53,    54,    55,    56,   139,
+      57,   307,    63,    64,    65,   297,    67,   146,   242,    79,
+    -105,   178,    58,    59,     5,    60,   243,    61,   147,   153,
+      58,    59,    25,    62,    26,   209,   212,    27,    34,   187,
+      63,    64,    65,    66,    67,   179,   180,   181,    63,    64,
+      65,   297,    67,   186,   331,   253,   190,    28,   277,    29,
+      31,   196,   278,   254,   178,    39,   110,   140,   141,   142,
+     240,   241,   110,   110,   311,   143,   144,   145,   248,    43,
+      44,    45,    50,    47,   251,   251,    84,    85,   110,   110,
+     280,   135,   110,   295,   131,   132,   133,   136,   137,   138,
+     251,   251,   152,   153,   269,   171,   290,   172,   173,   185,
+     174,   224,   225,   226,   227,   228,   229,   230,   231,   232,
+     233,   234,   235,   236,   237,   238,   239,    52,   217,   313,
+     198,   245,   189,    67,   298,     6,     7,     8,     9,    10,
+      11,    12,   192,   285,   110,   201,   204,   291,   292,   219,
+     205,   261,   299,   338,   288,   220,   289,   221,   267,    79,
+     110,   246,   247,   256,   259,    53,    54,    55,    56,   260,
+      57,   298,   309,   209,   262,   141,   264,   273,   281,   144,
+     274,   279,    58,    59,   282,    60,   222,    61,   283,   299,
+     286,   306,   316,    62,   317,   314,   110,   319,   320,   284,
+      63,    64,    65,    66,    67,   322,   324,   323,   330,   110,
+     110,    52,    30,   110,   110,   110,   110,   293,   325,   326,
+     110,   336,   337,   110,   327,   339,   340,   341,   342,   332,
+     346,   244,   343,   206,   130,   344,   110,   213,   272,   310,
+     315,   312,   249,   257,   318,   329,     0,     0,   348,    53,
+      54,    55,    56,     0,    57,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    58,    59,     0,    60,
+     156,    61,     0,   333,     0,     0,     0,    62,     0,     0,
+       0,     0,     0,     0,    63,    64,    65,    66,    67,     0,
+       0,     0,   345,    88,    89,    90,    91,    92,    93,   250,
+      94,     0,    95,     0,    96,     0,     0,    97,    98,     0,
+      99,     0,   100,     0,   101,   102,   157,   103,   104,     0,
+       0,  -106,  -106,  -106,     0,     0,   161,   162,  -106,     0,
+       0,   154,   155,   156,     0,     0,   105,     0,   106,  -106,
+    -106,   166,   167,   168,     0,   107,     0,     0,     0,     0,
+       0,     0,     0,     0,   108,     0,    88,    89,    90,    91,
+      92,    93,     0,    94,   252,    95,     0,    96,     0,   109,
+      97,    98,     0,    99,     0,   100,     0,   101,   102,   157,
+     103,   104,     0,     0,   158,   159,   160,     0,     0,   161,
+     162,   163,     0,   218,     0,     0,     0,     0,     0,   105,
+       0,   106,   164,   165,   166,   167,   168,     0,   107,    88,
+      89,    90,    91,    92,    93,     0,    94,   108,    95,     0,
+      96,     0,     0,    97,    98,     0,    99,     0,   100,     0,
+     101,   102,   109,   103,   104,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,   154,   155,   156,
+       0,     0,   105,     0,   106,     0,     0,     0,     0,     0,
+       0,   107,   265,   255,     0,     0,     0,     0,     0,     0,
+     108,     0,    88,    89,    90,    91,    92,    93,     0,    94,
+       0,    95,     0,    96,     0,   109,    97,    98,     0,    99,
+       0,   100,     0,   101,   102,   157,   103,   104,     0,     0,
+     158,   159,   160,     0,     0,   161,   162,   163,     0,     0,
+     154,   155,   156,     0,     0,   105,     0,   106,   164,   165,
+     166,   167,   168,     0,   107,     0,     0,     0,     0,     0,
+       0,     0,   258,   108,   266,    88,    89,    90,    91,    92,
+      93,     0,    94,     0,    95,     0,    96,     0,   109,    97,
+      98,     0,    99,     0,   100,     0,   101,   102,   157,   103,
+     104,     0,     0,   158,   159,   160,     0,     0,   161,   162,
+     163,   154,   155,   156,     0,     0,     0,     0,   105,     0,
+     106,   164,   165,   166,   167,   168,     0,   107,     0,     0,
+       0,     0,     0,     0,     0,     0,   108,     0,     0,   154,
+     155,   156,   263,     0,     0,     0,     0,     0,     0,     0,
+       0,   109,     0,     0,     0,     0,     0,     0,     0,   157,
+       0,     0,     0,     0,   158,   159,   160,     0,     0,   161,
+     162,   163,     0,   154,   155,   156,     0,     0,     0,     0,
+       0,     0,   164,   165,   166,   167,   168,   157,     0,     0,
+       0,     0,   158,   159,   160,     0,     0,   161,   162,   163,
+     321,   294,   154,   155,   156,     0,     0,     0,     0,     0,
+     164,   165,   166,   167,   168,     0,   334,     0,     0,     0,
+       0,   157,     0,     0,     0,     0,   158,   159,   160,     0,
+       0,   161,   162,   163,     0,   154,   155,   156,     0,     0,
+       0,     0,     0,     0,   164,   165,   166,   167,   168,   347,
+     157,     0,     0,     0,     0,   158,   159,   160,     0,     0,
+     161,   162,   163,   154,   155,   156,     0,     0,     0,     0,
+       0,     0,     0,   164,   165,   166,   167,   168,     0,     0,
+       0,     0,     0,   157,     0,     0,     0,     0,   158,   159,
+     160,     0,     0,   161,   162,   163,  -106,  -106,   156,     0,
+       0,     0,     0,     0,     0,     0,   164,   165,   166,   167,
+     168,   157,     0,     0,     0,     0,   158,   159,   160,     0,
+       0,   161,   162,   163,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,   164,   165,   166,   167,   168,     0,
+       0,     0,     0,     0,   157,     0,     0,     0,     0,   158,
+     159,   160,     0,     0,   161,   162,   163,    53,    54,    55,
+      56,     0,    57,     0,     0,     0,     0,   164,   165,   166,
+     167,   168,     0,     0,    58,    59,     0,    60,     0,    61,
+       0,     0,   214,     0,     0,    62,    53,    54,    55,    56,
        0,    57,    63,    64,    65,    66,    67,     0,     0,     0,
        0,     0,     0,    58,    59,     0,    60,     0,    61,     0,
        0,     0,     0,     0,    62,     0,     0,     0,     0,     0,
@@ -2861,98 +2837,94 @@ namespace yy {
   const short int
   casmi_parser::yycheck_[] =
   {
-      41,   137,    61,    54,   204,    23,   105,    23,    38,    23,
-      64,    48,    41,    65,    83,    53,    46,    97,    64,     7,
-       8,     9,    10,    11,    12,    13,    14,    65,    16,    83,
-      18,    83,    83,    21,    22,    69,    24,    83,    26,    73,
-      28,    29,    55,    31,    32,    63,    64,    63,    63,    63,
-      51,    64,    93,    94,     0,    33,   155,    35,    73,   100,
-     140,   102,    50,    36,    52,    71,   107,   108,    65,    61,
-      62,    59,   272,   102,    63,    76,    77,    78,    83,    52,
-      68,    61,    62,    61,    62,    94,    83,    60,    80,    63,
-      64,    83,    79,    80,    81,    83,    63,    71,   107,   108,
-      80,    79,    80,    81,    82,    83,    73,   137,   138,    61,
-      62,   191,    63,    63,    83,    88,    89,    90,    84,    85,
-      33,    71,    73,    96,    63,    63,    99,    79,    80,    81,
-      83,   104,    71,    71,    79,    80,    81,    70,   179,    83,
-      83,   277,   172,   173,   185,   186,    83,    83,    61,    62,
-     179,    65,    73,    36,    83,    64,   185,   186,    68,    83,
-     201,   202,   221,    83,   205,   264,    79,    80,    81,    82,
-      83,    83,   201,   202,    64,    54,   205,    76,   258,    68,
-      83,    65,    64,   156,   157,   158,   159,   160,   161,   162,
-     163,   164,   165,   166,   167,   168,   169,   170,   171,     6,
-     280,   281,    71,   176,    63,    73,   265,    37,    38,    39,
-      40,    41,    42,    43,    64,   245,   257,    83,    83,   260,
-     261,    83,    83,   196,   265,   324,   256,    55,   257,    65,
-     203,    83,   273,    53,    67,    73,    83,    44,    45,    46,
-      47,    65,    49,   302,   273,   275,    69,    61,    27,    17,
-     223,    64,    83,    80,    61,    62,    73,    64,    80,    66,
-      67,   302,    65,    54,    65,    72,    63,    54,   309,    65,
-      63,   244,    79,    80,    81,    82,    83,    67,    83,    63,
-     309,   322,   323,     6,    20,   326,   327,   328,   329,   262,
-      64,    71,   333,   322,   323,   336,    65,   326,   327,   328,
-     329,    71,    65,    65,   333,    71,    71,   336,   349,    13,
-      42,   175,   285,   134,   139,   275,   289,   208,   280,   191,
-     349,    44,    45,    46,    47,   180,    49,     6,    -1,    -1,
-     302,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    61,    62,
-      -1,    64,    65,    66,    -1,   318,    -1,    -1,    -1,    72,
-      -1,    -1,    -1,    -1,    -1,    -1,    79,    80,    81,    82,
-      83,    -1,    -1,    -1,   337,    44,    45,    46,    47,    -1,
-      49,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    61,    62,    -1,    64,    -1,    66,    -1,    -1,
-      -1,    -1,    -1,    72,    -1,    -1,    -1,    -1,    -1,    -1,
-      79,    80,    81,    82,    83,     7,     8,     9,    10,    11,
-      12,    -1,    14,    15,    16,    -1,    18,    -1,    -1,    21,
-      22,    -1,    24,    -1,    26,    -1,    28,    29,    -1,    31,
-      32,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    50,    -1,
-      52,    -1,    -1,    -1,    -1,    -1,    -1,    59,     7,     8,
-       9,    10,    11,    12,    -1,    14,    68,    16,    -1,    18,
-      -1,    -1,    21,    22,    -1,    24,    -1,    26,    -1,    28,
-      29,    83,    31,    32,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,     3,     4,     5,    -1,
-      -1,    50,    -1,    52,    -1,    -1,    -1,    -1,    -1,    -1,
-      59,    60,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    68,
-      -1,     7,     8,     9,    10,    11,    12,    -1,    14,    -1,
-      16,    -1,    18,    -1,    83,    21,    22,    -1,    24,    -1,
-      26,    -1,    28,    29,    51,    31,    32,    -1,    -1,    56,
-      57,    58,    -1,    -1,    61,    62,    63,    -1,    65,     3,
-       4,     5,    -1,    -1,    50,    -1,    52,    74,    75,    76,
-      77,    78,    -1,    59,    -1,    19,    -1,    -1,    -1,    -1,
-      -1,    -1,    68,    69,     7,     8,     9,    10,    11,    12,
-      -1,    14,    -1,    16,    -1,    18,    -1,    83,    21,    22,
-      -1,    24,    -1,    26,    -1,    28,    29,    51,    31,    32,
+      41,   202,    61,    23,   135,    23,   105,    23,    38,    94,
+      54,    65,    41,    61,    62,    51,    46,    97,    63,    64,
+      83,    53,   107,   108,    63,    48,    71,    61,    62,    83,
+      61,    62,    80,    65,    73,    83,    33,     6,    35,    83,
+      76,    77,    78,    63,    64,    63,    80,    63,    79,    80,
+      81,    64,    93,    94,   153,    64,    84,    85,   138,   100,
+      63,   102,    83,    36,    61,    62,   107,   108,    71,   270,
+      83,    65,    33,   102,    83,    44,    45,    46,    47,    52,
+      49,    63,    79,    80,    81,    82,    83,    60,    63,    83,
+      55,    73,    61,    62,     0,    64,    71,    66,    67,    64,
+      61,    62,    83,    72,    83,   135,   136,    83,    71,   189,
+      79,    80,    81,    82,    83,    88,    89,    90,    79,    80,
+      81,    82,    83,    96,    63,    63,    99,    83,    69,    83,
+      83,   104,    73,    71,    73,    63,   177,    79,    80,    81,
+     170,   171,   183,   184,   275,    79,    80,    81,   177,    70,
+      65,    73,    36,    83,   183,   184,    68,    64,   199,   200,
+     219,    64,   203,   262,    83,    83,    83,    54,    76,    68,
+     199,   200,    83,    64,   203,    71,   256,    65,    73,    83,
+      63,   154,   155,   156,   157,   158,   159,   160,   161,   162,
+     163,   164,   165,   166,   167,   168,   169,     6,   278,   279,
+      64,   174,    83,    83,   263,    37,    38,    39,    40,    41,
+      42,    43,    83,   243,   255,    55,    65,   258,   259,    53,
+      83,   194,   263,   322,   254,    67,   255,    73,   201,    83,
+     271,    69,    65,    61,    27,    44,    45,    46,    47,    17,
+      49,   300,   271,   273,    64,    80,    83,    73,   221,    80,
+      65,    54,    61,    62,    65,    64,    65,    66,    63,   300,
+      54,    65,    63,    72,    83,    67,   307,    63,    20,   242,
+      79,    80,    81,    82,    83,    64,    71,    65,   307,   320,
+     321,     6,    13,   324,   325,   326,   327,   260,    71,    71,
+     331,   320,   321,   334,    71,   324,   325,   326,   327,    65,
+      65,   173,   331,   132,    42,   334,   347,   137,   206,   273,
+     283,   278,   178,   189,   287,   300,    -1,    -1,   347,    44,
+      45,    46,    47,    -1,    49,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    61,    62,    -1,    64,
+       5,    66,    -1,   316,    -1,    -1,    -1,    72,    -1,    -1,
+      -1,    -1,    -1,    -1,    79,    80,    81,    82,    83,    -1,
+      -1,    -1,   335,     7,     8,     9,    10,    11,    12,    13,
+      14,    -1,    16,    -1,    18,    -1,    -1,    21,    22,    -1,
+      24,    -1,    26,    -1,    28,    29,    51,    31,    32,    -1,
+      -1,    56,    57,    58,    -1,    -1,    61,    62,    63,    -1,
+      -1,     3,     4,     5,    -1,    -1,    50,    -1,    52,    74,
+      75,    76,    77,    78,    -1,    59,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    68,    -1,     7,     8,     9,    10,
+      11,    12,    -1,    14,    15,    16,    -1,    18,    -1,    83,
+      21,    22,    -1,    24,    -1,    26,    -1,    28,    29,    51,
+      31,    32,    -1,    -1,    56,    57,    58,    -1,    -1,    61,
+      62,    63,    -1,    65,    -1,    -1,    -1,    -1,    -1,    50,
+      -1,    52,    74,    75,    76,    77,    78,    -1,    59,     7,
+       8,     9,    10,    11,    12,    -1,    14,    68,    16,    -1,
+      18,    -1,    -1,    21,    22,    -1,    24,    -1,    26,    -1,
+      28,    29,    83,    31,    32,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,     3,     4,     5,
+      -1,    -1,    50,    -1,    52,    -1,    -1,    -1,    -1,    -1,
+      -1,    59,    60,    19,    -1,    -1,    -1,    -1,    -1,    -1,
+      68,    -1,     7,     8,     9,    10,    11,    12,    -1,    14,
+      -1,    16,    -1,    18,    -1,    83,    21,    22,    -1,    24,
+      -1,    26,    -1,    28,    29,    51,    31,    32,    -1,    -1,
+      56,    57,    58,    -1,    -1,    61,    62,    63,    -1,    -1,
+       3,     4,     5,    -1,    -1,    50,    -1,    52,    74,    75,
+      76,    77,    78,    -1,    59,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    25,    68,    69,     7,     8,     9,    10,    11,
+      12,    -1,    14,    -1,    16,    -1,    18,    -1,    83,    21,
+      22,    -1,    24,    -1,    26,    -1,    28,    29,    51,    31,
+      32,    -1,    -1,    56,    57,    58,    -1,    -1,    61,    62,
+      63,     3,     4,     5,    -1,    -1,    -1,    -1,    50,    -1,
+      52,    74,    75,    76,    77,    78,    -1,    59,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    68,    -1,    -1,     3,
+       4,     5,    34,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    83,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    51,
+      -1,    -1,    -1,    -1,    56,    57,    58,    -1,    -1,    61,
+      62,    63,    -1,     3,     4,     5,    -1,    -1,    -1,    -1,
+      -1,    -1,    74,    75,    76,    77,    78,    51,    -1,    -1,
       -1,    -1,    56,    57,    58,    -1,    -1,    61,    62,    63,
-       3,     4,     5,    -1,    -1,    -1,    -1,    50,    -1,    52,
-      74,    75,    76,    77,    78,    -1,    59,    -1,    -1,    -1,
-      -1,    -1,    25,    -1,    -1,    68,    -1,    -1,    -1,    -1,
-       3,     4,     5,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      83,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    51,    -1,
-      -1,    -1,    -1,    56,    57,    58,    -1,    -1,    61,    62,
-      63,    34,     3,     4,     5,    -1,    -1,    -1,    -1,    -1,
-      -1,    74,    75,    76,    77,    78,    -1,    -1,    51,    -1,
-      -1,    -1,    -1,    56,    57,    58,    -1,    -1,    61,    62,
-      63,     3,     4,     5,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    74,    75,    76,    77,    78,    -1,    -1,    -1,    -1,
-      51,    -1,    -1,    -1,    -1,    56,    57,    58,    30,    -1,
-      61,    62,    63,    -1,    65,    -1,     3,     4,     5,    -1,
-      -1,    -1,    -1,    74,    75,    76,    77,    78,    -1,    51,
-      17,    -1,    -1,    -1,    56,    57,    58,    -1,    -1,    61,
-      62,    63,    -1,    -1,     3,     4,     5,    -1,    -1,    -1,
-      -1,    -1,    74,    75,    76,    77,    78,    -1,    17,    -1,
-      -1,    -1,    -1,    -1,    51,    -1,    -1,    -1,    -1,    56,
-      57,    58,    -1,    -1,    61,    62,    63,     3,     4,     5,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    74,    75,    76,
-      77,    78,    51,    -1,    -1,    -1,    -1,    56,    57,    58,
-      -1,    -1,    61,    62,    63,     3,     4,     5,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    74,    75,    76,    77,    78,
-      -1,    -1,    -1,    -1,    -1,    51,    -1,    -1,    -1,    -1,
-      56,    57,    58,    -1,    -1,    61,    62,    63,     5,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    74,    75,
-      76,    77,    78,    51,    -1,    -1,    -1,    -1,    56,    57,
-      58,    -1,    -1,    61,    62,    63,    -1,    -1,    -1,    -1,
+      30,    65,     3,     4,     5,    -1,    -1,    -1,    -1,    -1,
+      74,    75,    76,    77,    78,    -1,    17,    -1,    -1,    -1,
+      -1,    51,    -1,    -1,    -1,    -1,    56,    57,    58,    -1,
+      -1,    61,    62,    63,    -1,     3,     4,     5,    -1,    -1,
+      -1,    -1,    -1,    -1,    74,    75,    76,    77,    78,    17,
+      51,    -1,    -1,    -1,    -1,    56,    57,    58,    -1,    -1,
+      61,    62,    63,     3,     4,     5,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    74,    75,    76,    77,    78,    -1,    -1,
+      -1,    -1,    -1,    51,    -1,    -1,    -1,    -1,    56,    57,
+      58,    -1,    -1,    61,    62,    63,     3,     4,     5,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    74,    75,    76,    77,
-      78,    -1,    -1,    -1,    51,    -1,    -1,    -1,    -1,    56,
+      78,    51,    -1,    -1,    -1,    -1,    56,    57,    58,    -1,
+      -1,    61,    62,    63,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    74,    75,    76,    77,    78,    -1,
+      -1,    -1,    -1,    -1,    51,    -1,    -1,    -1,    -1,    56,
       57,    58,    -1,    -1,    61,    62,    63,    44,    45,    46,
       47,    -1,    49,    -1,    -1,    -1,    -1,    74,    75,    76,
       77,    78,    -1,    -1,    61,    62,    -1,    64,    -1,    66,
@@ -2978,30 +2950,29 @@ namespace yy {
        9,    10,    11,    12,    14,    16,    18,    21,    22,    24,
       26,    28,    29,    31,    32,    50,    52,    59,    68,    83,
      121,   125,   126,   127,   128,   129,   130,   132,   133,   134,
-     141,   142,   143,   144,   145,   147,   148,   151,   152,   153,
-     154,    65,   102,    83,    83,    83,   105,    64,    54,    76,
-      68,   119,    79,    80,    81,    79,    80,    81,   119,    67,
-     113,   117,   118,   119,    83,    64,     3,     4,     5,    51,
-      56,    57,    58,    61,    62,    63,    74,    75,    76,    77,
-      78,    63,    71,    71,    65,    73,    63,    98,    98,    63,
-      73,   119,   119,   119,   125,   146,   146,    83,   119,   110,
-     131,    83,   119,   121,    83,   125,    64,    83,   119,   117,
-      64,   146,   146,    55,    23,    63,    65,    83,   100,    61,
-      62,   105,   106,   112,   105,   104,    69,   108,   109,   110,
-      65,    53,    67,    73,    65,   117,   119,   119,   119,   119,
+     141,   142,   143,   145,   146,   149,   150,   151,   152,    65,
+     102,    83,    83,    83,   105,    64,    54,    76,    68,   119,
+      79,    80,    81,    79,    80,    81,   119,    67,   113,   117,
+     118,   119,    83,    64,     3,     4,     5,    51,    56,    57,
+      58,    61,    62,    63,    74,    75,    76,    77,    78,    63,
+      71,    71,    65,    73,    63,    98,    98,    63,    73,   119,
+     119,   119,   125,   144,   144,    83,   119,   110,   131,    83,
+     119,   121,    83,   125,    64,    83,   119,   117,    64,   144,
+     144,    55,    23,    63,    65,    83,   100,    61,    62,   105,
+     106,   112,   105,   104,    69,   108,   109,   110,    65,    53,
+      67,    73,    65,   117,   119,   119,   119,   119,   119,   119,
      119,   119,   119,   119,   119,   119,   119,   119,   119,   119,
-     119,   119,   105,   105,    63,    71,   101,   119,    69,    65,
-     125,   124,    13,   125,    15,    63,    71,    19,    61,   131,
-      25,    27,    17,   119,    64,    34,    83,    60,    69,   119,
-     123,   125,    23,    63,   107,    73,    65,    53,    65,    69,
-      73,    54,   113,   119,    65,    63,   119,   105,    54,   149,
-     105,   125,   110,   121,   121,   119,    65,   117,    33,    82,
-     113,   121,   135,   136,   137,   138,   139,   140,    65,    63,
-     123,   125,   106,   112,   109,   110,    67,   119,    63,    83,
-     119,    63,    20,    30,    64,    65,    71,    71,    71,    71,
-      35,   136,   125,    63,    65,   119,    17,   150,   125,   125,
-     117,   125,   125,   125,   125,   125,   125,   119,    65,    17,
-     125
+     105,   105,    63,    71,   101,   119,    69,    65,   125,   124,
+      13,   125,    15,    63,    71,    19,    61,   131,    25,    27,
+      17,   119,    64,    34,    83,    60,    69,   119,   123,   125,
+      23,    63,   107,    73,    65,    53,    65,    69,    73,    54,
+     113,   119,    65,    63,   119,   105,    54,   147,   105,   125,
+     110,   121,   121,   119,    65,   117,    33,    82,   113,   121,
+     135,   136,   137,   138,   139,   140,    65,    63,   123,   125,
+     106,   112,   109,   110,    67,   119,    63,    83,   119,    63,
+      20,    30,    64,    65,    71,    71,    71,    71,    35,   136,
+     125,    63,    65,   119,    17,   148,   125,   125,   117,   125,
+     125,   125,   125,   125,   125,   119,    65,    17,   125
   };
 
   const unsigned char
@@ -3020,12 +2991,11 @@ namespace yy {
      119,   119,   119,   119,   120,   121,   121,   121,   122,   122,
      122,   122,   122,   122,   123,   123,   124,   125,   125,   125,
      125,   125,   125,   125,   125,   125,   125,   125,   125,   125,
-     125,   125,   125,   125,   125,   125,   125,   125,   125,   125,
-     126,   127,   128,   128,   129,   130,   131,   131,   132,   133,
-     134,   135,   135,   136,   136,   136,   136,   137,   138,   139,
-     140,   141,   141,   141,   141,   142,   143,   144,   145,   146,
-     146,   147,   147,   149,   148,   150,   148,   151,   152,   153,
-     154
+     125,   125,   125,   125,   125,   125,   125,   125,   126,   127,
+     128,   128,   129,   130,   131,   131,   132,   133,   134,   135,
+     135,   136,   136,   136,   136,   137,   138,   139,   140,   141,
+     141,   141,   141,   142,   142,   143,   143,   144,   144,   145,
+     145,   147,   146,   148,   146,   149,   150,   151,   152
   };
 
   const unsigned char
@@ -3044,12 +3014,11 @@ namespace yy {
        3,     3,     2,     1,     3,     1,     3,     4,     4,     6,
        7,     6,     8,     9,     3,     1,     5,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     2,     4,
-       2,     2,     2,     1,     1,     3,     3,     1,     2,     3,
-       5,     2,     1,     1,     1,     1,     1,     3,     3,     3,
-       3,     7,     4,     5,     2,     3,     3,     3,     3,     2,
-       1,     4,     6,     0,     7,     0,     9,     4,     4,     6,
-       2
+       1,     1,     1,     1,     1,     1,     2,     4,     2,     2,
+       2,     1,     1,     3,     3,     1,     2,     3,     5,     2,
+       1,     1,     1,     1,     1,     3,     3,     3,     3,     7,
+       4,     5,     2,     3,     3,     3,     3,     2,     1,     4,
+       6,     0,     7,     0,     9,     4,     4,     6,     2
   };
 
 
@@ -3085,35 +3054,33 @@ namespace yy {
   "IMPOSSIBLE_SYNTAX", "DEBUG_SYNTAX", "DEBUG_ATOM_LIST", "PRINT_SYNTAX",
   "UPDATE_SYNTAX", "CASE_SYNTAX", "CASE_LABEL_LIST", "CASE_LABEL",
   "CASE_LABEL_DEFAULT", "CASE_LABEL_NUMBER", "CASE_LABEL_IDENT",
-  "CASE_LABEL_STRING", "CALL_SYNTAX", "KW_SEQ_SYNTAX", "SEQ_SYNTAX",
-  "KW_PAR_SYNTAX", "PAR_SYNTAX", "STATEMENTS", "IFTHENELSE", "LET_SYNTAX",
-  "$@1", "$@2", "PUSH_SYNTAX", "POP_SYNTAX", "FORALL_SYNTAX",
-  "ITERATE_SYNTAX", YY_NULLPTR
+  "CASE_LABEL_STRING", "CALL_SYNTAX", "SEQ_SYNTAX", "PAR_SYNTAX",
+  "STATEMENTS", "IFTHENELSE", "LET_SYNTAX", "$@1", "$@2", "PUSH_SYNTAX",
+  "POP_SYNTAX", "FORALL_SYNTAX", "ITERATE_SYNTAX", YY_NULLPTR
   };
 
 #if YYDEBUG
   const unsigned short int
   casmi_parser::yyrline_[] =
   {
-       0,   199,   199,   203,   209,   210,   216,   217,   218,   219,
-     233,   246,   247,   260,   266,   269,   271,   292,   296,   299,
-     303,   306,   309,   314,   318,   322,   325,   329,   330,   333,
-     337,   343,   348,   352,   357,   366,   367,   369,   373,   377,
-     381,   385,   390,   391,   394,   403,   414,   418,   419,   422,
-     423,   426,   427,   428,   435,   436,   439,   440,   441,   444,
-     445,   446,   447,   448,   449,   450,   451,   452,   453,   456,
-     457,   458,   459,   460,   461,   462,   463,   464,   468,   471,
-     474,   485,   486,   490,   491,   493,   497,   504,   506,   508,
-     510,   512,   514,   516,   518,   520,   522,   524,   526,   528,
-     530,   532,   534,   536,   539,   542,   543,   544,   557,   558,
-     561,   565,   569,   573,   579,   580,   586,   591,   592,   593,
-     594,   595,   596,   597,   598,   599,   600,   601,   602,   603,
-     604,   605,   606,   607,   608,   609,   610,   611,   612,   613,
-     616,   618,   621,   622,   632,   635,   638,   639,   641,   644,
-     654,   659,   663,   669,   670,   671,   672,   675,   680,   685,
-     690,   695,   696,   697,   698,   702,   707,   712,   716,   721,
-     722,   725,   728,   734,   733,   747,   746,   761,   771,   782,
-     787
+       0,   198,   198,   202,   208,   209,   215,   216,   217,   218,
+     232,   245,   246,   259,   265,   268,   270,   291,   295,   298,
+     302,   305,   308,   313,   317,   321,   324,   328,   329,   332,
+     336,   342,   347,   351,   356,   365,   366,   368,   372,   376,
+     380,   384,   389,   390,   393,   402,   413,   417,   418,   421,
+     422,   425,   426,   427,   434,   435,   438,   439,   440,   443,
+     444,   445,   446,   447,   448,   449,   450,   451,   452,   455,
+     456,   457,   458,   459,   460,   461,   462,   463,   467,   470,
+     473,   484,   485,   489,   490,   492,   496,   503,   505,   507,
+     509,   511,   513,   515,   517,   519,   521,   523,   525,   527,
+     529,   531,   533,   535,   538,   541,   542,   543,   556,   557,
+     560,   564,   568,   572,   578,   579,   585,   590,   591,   592,
+     593,   594,   595,   596,   597,   598,   599,   600,   601,   602,
+     603,   604,   605,   606,   607,   608,   609,   610,   613,   615,
+     618,   619,   629,   632,   635,   636,   638,   641,   651,   656,
+     660,   666,   667,   668,   669,   672,   677,   682,   687,   692,
+     693,   694,   695,   698,   701,   706,   709,   714,   715,   718,
+     721,   727,   726,   740,   739,   754,   764,   775,   780
   };
 
   // Print the state stack on the debug stream.
@@ -3148,8 +3115,8 @@ namespace yy {
 
 
 } // yy
-#line 3152 "GrammarParser.cpp" // lalr1.cc:1167
-#line 791 "../../src/GrammarParser.yy" // lalr1.cc:1168
+#line 3119 "GrammarParser.cpp" // lalr1.cc:1167
+#line 784 "../../src/GrammarParser.yy" // lalr1.cc:1168
 
 
 void yy::casmi_parser::error(const location_type& l,

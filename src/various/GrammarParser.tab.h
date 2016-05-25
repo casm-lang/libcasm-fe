@@ -369,9 +369,7 @@ namespace yy {
 
       // ASSERT_SYNTAX
       // ASSURE_SYNTAX
-      // KW_SEQ_SYNTAX
       // SEQ_SYNTAX
-      // KW_PAR_SYNTAX
       // PAR_SYNTAX
       // ITERATE_SYNTAX
       char dummy21[sizeof(UnaryNode*)];
@@ -1256,8 +1254,8 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 995,     ///< Last index in yytable_.
-      yynnts_ = 68,  ///< Number of nonterminal symbols.
+      yylast_ = 955,     ///< Last index in yytable_.
+      yynnts_ = 66,  ///< Number of nonterminal symbols.
       yyfinal_ = 5, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -1348,7 +1346,7 @@ namespace yy {
       switch (other.type_get ())
     {
       case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 144: // STATEMENTS
         value.copy< AstListNode* > (other.value);
         break;
 
@@ -1397,7 +1395,7 @@ namespace yy {
         value.copy< FLOATING_T > (other.value);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 151: // FORALL_SYNTAX
         value.copy< ForallNode* > (other.value);
         break;
 
@@ -1410,7 +1408,7 @@ namespace yy {
         value.copy< INTEGER_T > (other.value);
         break;
 
-      case 147: // IFTHENELSE
+      case 145: // IFTHENELSE
         value.copy< IfThenElseNode* > (other.value);
         break;
 
@@ -1418,11 +1416,11 @@ namespace yy {
         value.copy< IntegerAtom* > (other.value);
         break;
 
-      case 148: // LET_SYNTAX
+      case 146: // LET_SYNTAX
         value.copy< LetNode* > (other.value);
         break;
 
-      case 152: // POP_SYNTAX
+      case 150: // POP_SYNTAX
         value.copy< PopNode* > (other.value);
         break;
 
@@ -1431,7 +1429,7 @@ namespace yy {
         value.copy< PrintNode* > (other.value);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 149: // PUSH_SYNTAX
         value.copy< PushNode* > (other.value);
         break;
 
@@ -1442,11 +1440,9 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQ_SYNTAX
-      case 143: // SEQ_SYNTAX
-      case 144: // KW_PAR_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 142: // SEQ_SYNTAX
+      case 143: // PAR_SYNTAX
+      case 152: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (other.value);
         break;
 
@@ -1537,7 +1533,7 @@ namespace yy {
       switch (this->type_get ())
     {
       case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 144: // STATEMENTS
         value.copy< AstListNode* > (v);
         break;
 
@@ -1586,7 +1582,7 @@ namespace yy {
         value.copy< FLOATING_T > (v);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 151: // FORALL_SYNTAX
         value.copy< ForallNode* > (v);
         break;
 
@@ -1599,7 +1595,7 @@ namespace yy {
         value.copy< INTEGER_T > (v);
         break;
 
-      case 147: // IFTHENELSE
+      case 145: // IFTHENELSE
         value.copy< IfThenElseNode* > (v);
         break;
 
@@ -1607,11 +1603,11 @@ namespace yy {
         value.copy< IntegerAtom* > (v);
         break;
 
-      case 148: // LET_SYNTAX
+      case 146: // LET_SYNTAX
         value.copy< LetNode* > (v);
         break;
 
-      case 152: // POP_SYNTAX
+      case 150: // POP_SYNTAX
         value.copy< PopNode* > (v);
         break;
 
@@ -1620,7 +1616,7 @@ namespace yy {
         value.copy< PrintNode* > (v);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 149: // PUSH_SYNTAX
         value.copy< PushNode* > (v);
         break;
 
@@ -1631,11 +1627,9 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQ_SYNTAX
-      case 143: // SEQ_SYNTAX
-      case 144: // KW_PAR_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 142: // SEQ_SYNTAX
+      case 143: // PAR_SYNTAX
+      case 152: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (v);
         break;
 
@@ -1995,7 +1989,7 @@ namespace yy {
     switch (yytype)
     {
       case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 144: // STATEMENTS
         value.template destroy< AstListNode* > ();
         break;
 
@@ -2044,7 +2038,7 @@ namespace yy {
         value.template destroy< FLOATING_T > ();
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 151: // FORALL_SYNTAX
         value.template destroy< ForallNode* > ();
         break;
 
@@ -2057,7 +2051,7 @@ namespace yy {
         value.template destroy< INTEGER_T > ();
         break;
 
-      case 147: // IFTHENELSE
+      case 145: // IFTHENELSE
         value.template destroy< IfThenElseNode* > ();
         break;
 
@@ -2065,11 +2059,11 @@ namespace yy {
         value.template destroy< IntegerAtom* > ();
         break;
 
-      case 148: // LET_SYNTAX
+      case 146: // LET_SYNTAX
         value.template destroy< LetNode* > ();
         break;
 
-      case 152: // POP_SYNTAX
+      case 150: // POP_SYNTAX
         value.template destroy< PopNode* > ();
         break;
 
@@ -2078,7 +2072,7 @@ namespace yy {
         value.template destroy< PrintNode* > ();
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 149: // PUSH_SYNTAX
         value.template destroy< PushNode* > ();
         break;
 
@@ -2089,11 +2083,9 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQ_SYNTAX
-      case 143: // SEQ_SYNTAX
-      case 144: // KW_PAR_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 142: // SEQ_SYNTAX
+      case 143: // PAR_SYNTAX
+      case 152: // ITERATE_SYNTAX
         value.template destroy< UnaryNode* > ();
         break;
 
@@ -2190,7 +2182,7 @@ namespace yy {
       switch (this->type_get ())
     {
       case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 144: // STATEMENTS
         value.move< AstListNode* > (s.value);
         break;
 
@@ -2239,7 +2231,7 @@ namespace yy {
         value.move< FLOATING_T > (s.value);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 151: // FORALL_SYNTAX
         value.move< ForallNode* > (s.value);
         break;
 
@@ -2252,7 +2244,7 @@ namespace yy {
         value.move< INTEGER_T > (s.value);
         break;
 
-      case 147: // IFTHENELSE
+      case 145: // IFTHENELSE
         value.move< IfThenElseNode* > (s.value);
         break;
 
@@ -2260,11 +2252,11 @@ namespace yy {
         value.move< IntegerAtom* > (s.value);
         break;
 
-      case 148: // LET_SYNTAX
+      case 146: // LET_SYNTAX
         value.move< LetNode* > (s.value);
         break;
 
-      case 152: // POP_SYNTAX
+      case 150: // POP_SYNTAX
         value.move< PopNode* > (s.value);
         break;
 
@@ -2273,7 +2265,7 @@ namespace yy {
         value.move< PrintNode* > (s.value);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 149: // PUSH_SYNTAX
         value.move< PushNode* > (s.value);
         break;
 
@@ -2284,11 +2276,9 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQ_SYNTAX
-      case 143: // SEQ_SYNTAX
-      case 144: // KW_PAR_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 142: // SEQ_SYNTAX
+      case 143: // PAR_SYNTAX
+      case 152: // ITERATE_SYNTAX
         value.move< UnaryNode* > (s.value);
         break;
 
@@ -2942,7 +2932,7 @@ namespace yy {
 
 
 } // yy
-#line 2946 "GrammarParser.tab.h" // lalr1.cc:377
+#line 2936 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

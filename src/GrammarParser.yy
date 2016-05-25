@@ -135,8 +135,7 @@
 %token <std::string> IDENTIFIER "identifier"
 
 %type <AstNode*> INIT_SYNTAX BODY_ELEMENT SPECIFICATION RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX
-%type <UnaryNode*> PAR_SYNTAX KW_PAR_SYNTAX SEQ_SYNTAX
-%type <UnaryNode*> ASSERT_SYNTAX ASSURE_SYNTAX KW_SEQ_SYNTAX ITERATE_SYNTAX
+%type <UnaryNode*> PAR_SYNTAX SEQ_SYNTAX ASSERT_SYNTAX ASSURE_SYNTAX ITERATE_SYNTAX
 %type <AstListNode*> BODY_ELEMENTS STATEMENTS
 %type <AtomNode*> NUMBER VALUE NUMBER_RANGE
 %type <IntegerAtom*> INTEGER_NUMBER 
@@ -597,9 +596,7 @@ STATEMENT: ASSERT_SYNTAX { $$ = $1; }
          | UPDATE_SYNTAX { $$ = $1; }
          | CASE_SYNTAX { $$ = $1; }
          | CALL_SYNTAX { $$ = $1; }
-         | KW_SEQ_SYNTAX { $$ = $1 ; }
          | SEQ_SYNTAX { $$ = $1; }
-         | KW_PAR_SYNTAX { $$ = $1; }
          | PAR_SYNTAX { $$ = $1; }
          | IFTHENELSE { $$ = $1; }
          | LET_SYNTAX { $$ = $1; }
@@ -698,25 +695,21 @@ CALL_SYNTAX: CALL "(" EXPRESSION ")" "(" EXPRESSION_LIST ")" { $$ = new CallNode
            | CALL IDENTIFIER { $$ = new CallNode(@$, $2, nullptr); }
            ;
 
-
-KW_SEQ_SYNTAX: SEQ STATEMENTS ENDSEQ {
-                      $$ = new UnaryNode(@$, NodeType::SEQBLOCK, $2);
-                  }
-                  ;
-
 SEQ_SYNTAX: SEQ_BRACKET STATEMENTS ENDSEQ_BRACKET {
-                      $$ = new UnaryNode(@$, NodeType::SEQBLOCK, $2);
-               }
-               ;
+                $$ = new UnaryNode(@$, NodeType::SEQBLOCK, $2);
+          }
+          | SEQ STATEMENTS ENDSEQ {
+                $$ = new UnaryNode(@$, NodeType::SEQBLOCK, $2);
+          }
+          ;
 
-KW_PAR_SYNTAX: PAR STATEMENTS ENDPAR {
-                      $$ = new UnaryNode(@$, NodeType::PARBLOCK, $2);
-                  }
-                  ;
 PAR_SYNTAX: "{" STATEMENTS "}" {
-                    $$ = new UnaryNode(@$, NodeType::PARBLOCK, $2);
-               }
-               ;
+                $$ = new UnaryNode(@$, NodeType::PARBLOCK, $2);
+          }
+          | PAR STATEMENTS ENDPAR {
+                $$ = new UnaryNode(@$, NodeType::PARBLOCK, $2);
+          }
+          ;
 
 STATEMENTS: STATEMENTS STATEMENT { $1->add($2); $$ = $1; }
           | STATEMENT { $$ = new AstListNode(@$, NodeType::STATEMENTS); $$->add($1); }
