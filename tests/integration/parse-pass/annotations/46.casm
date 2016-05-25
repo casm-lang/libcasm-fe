@@ -7,7 +7,7 @@ function (static) bar : -> Integer initially { 3 }
 
 init initR
 
-rule initR = seqblock
+rule initR = seq
 	assert foo = 3
 	program(self) := undef
-endseqblock
+endseq

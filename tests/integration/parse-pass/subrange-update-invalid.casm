@@ -6,9 +6,9 @@ function x : -> Integer(0..5)
 init initR
 
 rule initR = 
-seqblock
+seq
     x := 5
     x := 7 //~ 7 does violate the subrange 0..5 of `x`
 
     program(self) := undef
-endseqblock
+endseq

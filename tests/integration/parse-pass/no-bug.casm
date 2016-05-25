@@ -6,8 +6,8 @@ function a: Integer -> Integer
 
 init main
 
-rule main = seqblock
+rule main = seq
   a( 1 ) := a( 0 )
 
   program( self ) := undef
-endseqblock
+endseq

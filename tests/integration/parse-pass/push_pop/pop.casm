@@ -3,7 +3,7 @@ function (controlled) a: -> List(Integer)
 
 function b : -> List(Integer)
 
-rule main = seqblock
+rule main = seq
   a := [ 1,2,3 ]
   pop x from a
 
@@ -17,6 +17,6 @@ rule main = seqblock
   assert y = undef
 
   program( self ) := undef
-endseqblock
+endseq
 
 init main

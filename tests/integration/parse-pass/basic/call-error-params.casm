@@ -1,9 +1,9 @@
 // error annotation @4
 
-rule main = seqblock
+rule main = seq
   call (@a) ( "hallo", "welt" )
   //~^ argument 1 of indirectly called rule `a` must be `Integer` but was `String`
-endseqblock
+endseq
 
 rule a( b : Integer, c : String ) = skip
 

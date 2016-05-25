@@ -17,10 +17,10 @@ rule initR =
  a := @foo
  par
  forall i in [1..2] do
-	seqblock
+	seq
 		call (a)(1,i,undef)
 		call (a)(2,i,1)
-	endseqblock
+	endseq
  endpar
  print b(1) + b(2)
  program(self) := undef

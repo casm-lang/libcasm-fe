@@ -12,7 +12,7 @@ function need_pop : -> Boolean
 function need_partition : -> Boolean
 
 rule partition_one_step =
-seqblock
+seq
 	iterate
 		if array(ll) < array(pivot) then ll := ll + 1
 	iterate 
@@ -22,7 +22,7 @@ seqblock
 		array(rr) := array(ll)
 	} else 
 		need_partition := false
-endseqblock
+endseq
 
 rule partition =
 if pivot = undef then {
@@ -45,13 +45,13 @@ rule quicksort_once =
 	if p = undef then
 		call partition
 	else	
-	seqblock
+	seq
 		if l < p-1 then 
 			push [l,p-1] into stack
 		if p+1 < r then 
 			push [p+1,r] into stack
 		need_pop := true
-	endseqblock
+	endseq
 
 rule quicksort =
 	if need_pop then {

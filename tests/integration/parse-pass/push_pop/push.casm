@@ -1,6 +1,6 @@
 function (controlled) a: -> List(Integer)
 
-rule main = seqblock
+rule main = seq
   a := [ 1,2,3 ]
 
   assert len( a ) = 3
@@ -17,6 +17,6 @@ rule main = seqblock
   assert nth( a, 4 ) = 3
 
   program( self ) := undef
-endseqblock
+endseq
 
 init main

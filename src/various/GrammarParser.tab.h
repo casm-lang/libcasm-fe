@@ -369,8 +369,8 @@ namespace yy {
 
       // ASSERT_SYNTAX
       // ASSURE_SYNTAX
-      // KW_SEQBLOCK_SYNTAX
-      // SEQBLOCK_SYNTAX
+      // KW_SEQ_SYNTAX
+      // SEQ_SYNTAX
       // KW_PARBLOCK_SYNTAX
       // PARBLOCK_SYNTAX
       // ITERATE_SYNTAX
@@ -462,8 +462,8 @@ namespace yy {
         DIEDIE = 264,
         IMPOSSIBLE = 265,
         SKIP = 266,
-        SEQBLOCK = 267,
-        ENDSEQBLOCK = 268,
+        SEQ = 267,
+        ENDSEQ = 268,
         PARBLOCK = 269,
         ENDPARBLOCK = 270,
         LET = 271,
@@ -509,8 +509,8 @@ namespace yy {
         NEQUAL = 311,
         LESSEQ = 312,
         GREATEREQ = 313,
-        SEQBLOCK_BRACKET = 314,
-        ENDSEQBLOCK_BRACKET = 315,
+        SEQ_BRACKET = 314,
+        ENDSEQ_BRACKET = 315,
         PLUS = 316,
         MINUS = 317,
         EQ = 318,
@@ -753,11 +753,11 @@ namespace yy {
 
     static inline
     symbol_type
-    make_SEQBLOCK (const location_type& l);
+    make_SEQ (const location_type& l);
 
     static inline
     symbol_type
-    make_ENDSEQBLOCK (const location_type& l);
+    make_ENDSEQ (const location_type& l);
 
     static inline
     symbol_type
@@ -941,11 +941,11 @@ namespace yy {
 
     static inline
     symbol_type
-    make_SEQBLOCK_BRACKET (const location_type& l);
+    make_SEQ_BRACKET (const location_type& l);
 
     static inline
     symbol_type
-    make_ENDSEQBLOCK_BRACKET (const location_type& l);
+    make_ENDSEQ_BRACKET (const location_type& l);
 
     static inline
     symbol_type
@@ -1442,8 +1442,8 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQBLOCK_SYNTAX
-      case 143: // SEQBLOCK_SYNTAX
+      case 142: // KW_SEQ_SYNTAX
+      case 143: // SEQ_SYNTAX
       case 144: // KW_PARBLOCK_SYNTAX
       case 145: // PARBLOCK_SYNTAX
       case 154: // ITERATE_SYNTAX
@@ -1631,8 +1631,8 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQBLOCK_SYNTAX
-      case 143: // SEQBLOCK_SYNTAX
+      case 142: // KW_SEQ_SYNTAX
+      case 143: // SEQ_SYNTAX
       case 144: // KW_PARBLOCK_SYNTAX
       case 145: // PARBLOCK_SYNTAX
       case 154: // ITERATE_SYNTAX
@@ -2089,8 +2089,8 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQBLOCK_SYNTAX
-      case 143: // SEQBLOCK_SYNTAX
+      case 142: // KW_SEQ_SYNTAX
+      case 143: // SEQ_SYNTAX
       case 144: // KW_PARBLOCK_SYNTAX
       case 145: // PARBLOCK_SYNTAX
       case 154: // ITERATE_SYNTAX
@@ -2284,8 +2284,8 @@ namespace yy {
 
       case 126: // ASSERT_SYNTAX
       case 127: // ASSURE_SYNTAX
-      case 142: // KW_SEQBLOCK_SYNTAX
-      case 143: // SEQBLOCK_SYNTAX
+      case 142: // KW_SEQ_SYNTAX
+      case 143: // SEQ_SYNTAX
       case 144: // KW_PARBLOCK_SYNTAX
       case 145: // PARBLOCK_SYNTAX
       case 154: // ITERATE_SYNTAX
@@ -2490,15 +2490,15 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_SEQBLOCK (const location_type& l)
+  casmi_parser::make_SEQ (const location_type& l)
   {
-    return symbol_type (token::SEQBLOCK, l);
+    return symbol_type (token::SEQ, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_ENDSEQBLOCK (const location_type& l)
+  casmi_parser::make_ENDSEQ (const location_type& l)
   {
-    return symbol_type (token::ENDSEQBLOCK, l);
+    return symbol_type (token::ENDSEQ, l);
   }
 
   casmi_parser::symbol_type
@@ -2772,15 +2772,15 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_SEQBLOCK_BRACKET (const location_type& l)
+  casmi_parser::make_SEQ_BRACKET (const location_type& l)
   {
-    return symbol_type (token::SEQBLOCK_BRACKET, l);
+    return symbol_type (token::SEQ_BRACKET, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_ENDSEQBLOCK_BRACKET (const location_type& l)
+  casmi_parser::make_ENDSEQ_BRACKET (const location_type& l)
   {
-    return symbol_type (token::ENDSEQBLOCK_BRACKET, l);
+    return symbol_type (token::ENDSEQ_BRACKET, l);
   }
 
   casmi_parser::symbol_type

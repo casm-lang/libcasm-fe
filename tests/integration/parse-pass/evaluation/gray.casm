@@ -37,16 +37,16 @@ rule initR =
 	}
 
 rule main =
-seqblock
+seq
 	call gray1(0)
 	call gray2(0)
 	program(self) := undef
-endseqblock
+endseq
 
 // all 4 bit numbers and their gray encoding
 rule main2 = {
 	if inputnr < pow(2,nrbits) then
-	seqblock
+	seq
 		forall i in [0..7] do	{
 			input(i) := Integer2Boolean((inputnr / pow(2,i)) % 2)
 		}
@@ -65,7 +65,7 @@ rule main2 = {
 		assert output1(5) = output2(5)
 		assert output1(6) = output2(6)
 		assert output1(7) = output2(7)
-	endseqblock
+	endseq
 	else
 		program(self) := undef
 }

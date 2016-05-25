@@ -87,8 +87,8 @@ assure { return yy::casmi_parser::make_ASSURE(loc); }
 diedie { return yy::casmi_parser::make_DIEDIE(loc); }
 impossible { return yy::casmi_parser::make_IMPOSSIBLE(loc); }
 skip { return yy::casmi_parser::make_SKIP(loc); }
-seqblock { return yy::casmi_parser::make_SEQBLOCK(loc); }
-endseqblock { return yy::casmi_parser::make_ENDSEQBLOCK(loc); }
+seq { return yy::casmi_parser::make_SEQ(loc); }
+endseq { return yy::casmi_parser::make_ENDSEQ(loc); }
 par { return yy::casmi_parser::make_PARBLOCK(loc); }
 endpar { return yy::casmi_parser::make_ENDPARBLOCK(loc); }
 let { return yy::casmi_parser::make_LET(loc); }
@@ -154,8 +154,8 @@ objdump { return yy::casmi_parser::make_OBJDUMP(loc); }
 "!=" { return yy::casmi_parser::make_NEQUAL(loc); }
 "<=" { return yy::casmi_parser::make_LESSEQ(loc); }
 ">=" { return yy::casmi_parser::make_GREATEREQ(loc); }
-"{|" { return yy::casmi_parser::make_SEQBLOCK_BRACKET(loc); }
-"|}" { return yy::casmi_parser::make_ENDSEQBLOCK_BRACKET(loc); }
+"{|" { return yy::casmi_parser::make_SEQ_BRACKET(loc); }
+"|}" { return yy::casmi_parser::make_ENDSEQ_BRACKET(loc); }
 
 [a-zA-Z_][a-zA-Z0-9\_]* { return yy::casmi_parser::make_IDENTIFIER(yytext, loc); }
 

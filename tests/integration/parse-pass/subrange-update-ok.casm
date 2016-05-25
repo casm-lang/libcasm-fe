@@ -5,8 +5,8 @@ function x : -> Integer(0..1) initially { 1 }
 init initR 
 
 rule initR =
-seqblock
+seq
 	x := 2*x - 2	// temporarily we leave the subrange, but as long as we do not assign no problem here
 	assert x = 0
 	program(self) := undef
-endseqblock
+endseq

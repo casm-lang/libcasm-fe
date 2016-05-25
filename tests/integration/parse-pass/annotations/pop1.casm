@@ -1,7 +1,7 @@
 function a: -> List(Integer) initially { [ 1, 2 ] }
 
 rule main = 
-seqblock
+seq
   pop x from a
   assert x = 1
 
@@ -9,6 +9,6 @@ seqblock
   assert y = 2
 
   program( self ) := undef
-endseqblock
+endseq
 
 init main
