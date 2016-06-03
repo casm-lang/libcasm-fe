@@ -129,10 +129,8 @@ TEST_INCLUDE += -I ../gtest/googletest
 TEST_LIBRARY  = -lstdc++
 TEST_LIBRARY += -lpthread
 
-obj/uts: obj
-	mkdir -p obj/uts
-
 obj/uts/%.o: uts/%.cpp
+	@mkdir -p `dirname $@`
 	@echo "CPP " $<
 	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) -c $< -o $@
 
