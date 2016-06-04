@@ -275,7 +275,11 @@ public:
 
     void clear()
     {
-        // TODO EP: delete all nodes
+        const auto end = m_map.end();
+        for (auto it = m_map.begin(); it != end; ++it) {
+            delete it->second;
+        }
+
         m_map.clear();
         m_lastNode = nullptr;
     }
