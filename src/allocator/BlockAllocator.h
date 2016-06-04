@@ -186,6 +186,8 @@ public:
         for (auto block = m_topBlock; block != nullptr; block = block->previous()) {
             block->free();
         }
+
+        m_currentBlock = m_topBlock;
     }
 
 private:
