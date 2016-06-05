@@ -126,35 +126,38 @@ void ExecutionContext::apply_updates() {
   std::vector<value_t*> to_fold;
   const auto end = updateSet->cend();
   for (auto it = updateSet->cbegin(); it != end; ++it) {
+    value_t* location = reinterpret_cast<value_t*>(it->first);
     Update* u = it->second;
 
-    auto& function_map = function_states[u->func];
     // TODO handle tuples
     if (u->value.type == TypeType::LIST) {
-      value_t& list = function_map[ArgumentsKey(u->args, u->num_args, false, u->sym_args)];
       if (u->value.is_symbolic()){
-        function_map[ArgumentsKey(u->args, u->num_args, true, u->sym_args)] = u->value;
-      } else if (u->value.is_undef()) {
-        // set list to undef
-        if (!list.is_undef()) {
-          list.value.list->decrease_usage();
-          list.type = TypeType::UNDEF;
-        }
+        *location = u->value;
       } else {
-        if (!list.is_undef() && !list.is_symbolic()) {
-          list.value.list->decrease_usage();
+        auto& function_map = function_states[u->func];
+        value_t& list = function_map[ArgumentsKey(u->args, u->num_args, false, u->sym_args)];
+        if (u->value.is_undef()) {
+          // set list to undef
+          if (!list.is_undef()) {
+            list.value.list->decrease_usage();
+            list.type = TypeType::UNDEF;
+          }
         } else {
-          list.type = u->value.type;
+          if (!list.is_undef() && !list.is_symbolic()) {
+            list.value.list->decrease_usage();
+          } else {
+            list.type = u->value.type;
+          }
+          list.value.list = u->value.value.list;
+          list.value.list->bump_usage();
+          to_fold.push_back(&list);
         }
-        list.value.list = u->value.value.list;
-        list.value.list->bump_usage();
-        to_fold.push_back(&list);
       }
     } else {
       // we could erase keys that store an undef value in concrete mode,
       // but we need to know if a key was set to undef explicitly in symbolic
       // mode
-      function_map[ArgumentsKey(u->args, u->num_args, true, u->sym_args)] = u->value;
+      *location = u->value;
     }
 
     if (symbolic || dump_updates) {
