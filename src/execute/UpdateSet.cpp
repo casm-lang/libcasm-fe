@@ -50,15 +50,12 @@ Update* UpdateSet::MergeError::existingUpdate() const noexcept
     return m_existingUpdate;
 }
 
-UpdateSet::UpdateSet(UpdateSet* parent) :
+UpdateSet::UpdateSet(Type type, UpdateSet* parent) :
     m_parent(parent),
+    m_type(type),
     m_set(100)
 {
-    if (parent) {
-        m_type = (parent->m_type == Type::Parallel) ? Type::Sequential : Type::Parallel;
-    } else {
-        m_type = Type::Parallel;
-    }
+
 }
 
 UpdateSet::~UpdateSet()
@@ -115,7 +112,8 @@ Update* UpdateSet::lookup(const uint64_t key) const
 
 UpdateSet *UpdateSet::fork()
 {
-    return new UpdateSet(this);
+    const auto forkType = (m_type == Type::Parallel) ? Type::Sequential : Type::Parallel;
+    return new UpdateSet(forkType, this);
 }
 
 static void mergeParallelIntoSequential(const LinkedHashMap<uint64_t, Update*>& from,
@@ -176,7 +174,7 @@ typename UpdateSet::const_iterator UpdateSet::cend() const noexcept
 UpdateSetManager::UpdateSetManager() :
     m_updateSets()
 {
-    m_updateSets.push(new UpdateSet);
+    m_updateSets.push(new UpdateSet(UpdateSet::Type::Parallel));
 }
 
 UpdateSetManager::~UpdateSetManager()

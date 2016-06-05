@@ -69,7 +69,7 @@ public:
 public:
     using const_iterator = typename LinkedHashMap<uint64_t, Update*>::const_iterator;
 
-    explicit UpdateSet(UpdateSet* parent = nullptr);
+    explicit UpdateSet(Type type, UpdateSet* parent = nullptr);
     virtual ~UpdateSet();
 
     Type type() const noexcept;
@@ -100,7 +100,7 @@ public:
 
 private:
     UpdateSet* m_parent;
-    Type m_type;
+    const Type m_type;
     LinkedHashMap<uint64_t, Update*> m_set;
 };
 
