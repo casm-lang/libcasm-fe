@@ -28,11 +28,9 @@
 #include <algorithm>
 #include <cassert>
 
-#include "../Exceptions.h"
-
-UpdateSet::MergeError::MergeError(const std::string& msg,
-                                  Update* conflictingUpdate,
-                                  Update* existingUpdate) :
+UpdateSet::Conflict::Conflict(const std::string& msg,
+                              Update* conflictingUpdate,
+                              Update* existingUpdate) :
     std::logic_error(msg),
     m_conflictingUpdate(conflictingUpdate),
     m_existingUpdate(existingUpdate)
@@ -40,12 +38,12 @@ UpdateSet::MergeError::MergeError(const std::string& msg,
 
 }
 
-Update* UpdateSet::MergeError::conflictingUpdate() const noexcept
+Update* UpdateSet::Conflict::conflictingUpdate() const noexcept
 {
     return m_conflictingUpdate;
 }
 
-Update* UpdateSet::MergeError::existingUpdate() const noexcept
+Update* UpdateSet::Conflict::existingUpdate() const noexcept
 {
     return m_existingUpdate;
 }
@@ -90,7 +88,10 @@ void UpdateSet::add(const uint64_t key, Update* update)
             }
         }*/
 
-        throw RuntimeException("Conflict in updateset");
+        const auto existingPair = *(result.first);
+        const auto existingUpdate = existingPair.second;
+
+        throw Conflict("Conflict in updateset", update, existingUpdate);
     }
 }
 
@@ -138,7 +139,7 @@ static void mergeSequentialIntoParallel(const LinkedHashMap<uint64_t, Update*>& 
             const auto conflictingUpdate = pair.second;
             const auto existingUpdate = existingPair.second;
             // FIXME EP: check values before merge (same values don't clash)
-            throw UpdateSet::MergeError("conflicting update-sets", conflictingUpdate, existingUpdate);
+            throw UpdateSet::Conflict("conflicting update-sets", conflictingUpdate, existingUpdate);
         }
     };
 }

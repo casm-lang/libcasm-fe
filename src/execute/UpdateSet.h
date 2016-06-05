@@ -47,10 +47,10 @@ struct Update
 class UpdateSet
 {
 public:
-    class MergeError : public std::logic_error
+    class Conflict : public std::logic_error
     {
     public:
-        MergeError(const std::string& msg, Update* conflictingUpdate, Update* existingUpdate);
+        Conflict(const std::string& msg, Update* conflictingUpdate, Update* existingUpdate);
 
         Update* conflictingUpdate() const noexcept;
         Update* existingUpdate() const noexcept;
@@ -79,7 +79,7 @@ public:
 
     /**
      *
-     * @throws RuntimeException
+     * @throws Conflict
      */
     void add(const uint64_t key, Update* update);
 
@@ -89,7 +89,7 @@ public:
 
     /**
      *
-     * @throws MergeError
+     * @throws Conflict
      */
     void merge();
 
@@ -112,7 +112,7 @@ public:
 
     /**
      *
-     * @throws RuntimeException
+     * @throws Conflict
      */
     void add(const uint64_t key, Update* update);
 
@@ -122,7 +122,7 @@ public:
 
     /**
      *
-     * @throws MergeError
+     * @throws Conflict
      */
     void merge();
 
