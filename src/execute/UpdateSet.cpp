@@ -55,7 +55,9 @@ UpdateSet::UpdateSet(UpdateSet* parent) :
     m_set(100)
 {
     if (parent) {
-        m_pseudoState = parent->m_pseudoState + 1;
+        m_type = (parent->m_type == Type::Parallel) ? Type::Sequential : Type::Parallel;
+    } else {
+        m_type = Type::Parallel;
     }
 }
 
@@ -64,19 +66,9 @@ UpdateSet::~UpdateSet()
     clear();
 }
 
-typename UpdateSet::Type UpdateSet::type() const noexcept
+UpdateSet::Type UpdateSet::type() const noexcept
 {
-    return (m_pseudoState % 2 == 0) ? Type::Parallel : Type::Sequential;
-}
-
-uint64_t UpdateSet::pseudoState() const noexcept
-{
-    return m_pseudoState;
-}
-
-void UpdateSet::setPseudoState(const uint64_t pseudoState) noexcept
-{
-    m_pseudoState = pseudoState;
+    return m_type;
 }
 
 bool UpdateSet::empty() const noexcept
@@ -107,7 +99,7 @@ void UpdateSet::add(const uint64_t key, Update* update)
 
 Update* UpdateSet::lookup(const uint64_t key) const
 {
-    if (type() == Type::Sequential) {
+    if (m_type == Type::Sequential) {
         const auto it = m_set.find(key);
         if (it != m_set.cend()) {
             return it->second;

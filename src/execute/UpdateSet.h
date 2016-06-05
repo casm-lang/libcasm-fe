@@ -74,9 +74,6 @@ public:
 
     Type type() const noexcept;
 
-    uint64_t pseudoState() const noexcept;
-    void setPseudoState(const uint64_t pseudoState) noexcept;
-
     bool empty() const noexcept;
     size_t size() const noexcept;
 
@@ -103,7 +100,7 @@ public:
 
 private:
     UpdateSet* m_parent;
-    uint64_t m_pseudoState = 0;
+    Type m_type;
     LinkedHashMap<uint64_t, Update*> m_set;
 };
 
