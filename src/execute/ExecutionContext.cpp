@@ -129,10 +129,8 @@ void ExecutionContext::apply_updates() {
     Update* u = it->second;
 
     auto& function_map = function_states[u->func];
-    const Function* function_symbol = function_symbols[u->func];
     // TODO handle tuples
-    if (function_symbol->return_type_->t == TypeType::LIST) {
-      assert(u->value.type == TypeType::LIST);
+    if (u->value.type == TypeType::LIST) {
       value_t& list = function_map[ArgumentsKey(u->args, u->num_args, false, u->sym_args)];
       if (u->value.is_symbolic()){
         function_map[ArgumentsKey(u->args, u->num_args, true, u->sym_args)] = u->value;
@@ -146,7 +144,7 @@ void ExecutionContext::apply_updates() {
         if (!list.is_undef() && !list.is_symbolic()) {
           list.value.list->decrease_usage();
         } else {
-          list.type = function_symbol->return_type_->t;
+          list.type = u->value.type;
         }
         list.value.list = u->value.value.list;
         list.value.list->bump_usage();
