@@ -29,8 +29,6 @@
 #include "Macros.h"
 #include "Types.h"
 
-#include "execute/UpdateSet.h"
-
 struct enum_value_t;
 
 class RuleNode;
@@ -72,7 +70,6 @@ class value_t {
     value_t(symbol_t *sym);
     value_t(const value_t& other);
     value_t(value_t&& other) noexcept;
-    value_t(TypeType type, Update* update);
 
     value_t& operator=(const value_t& other);
     bool operator==(const value_t &other) const;

@@ -74,52 +74,6 @@ value_t::value_t(const value_t& other) : type(other.type), value(other.value) {}
 
 value_t::value_t(value_t&& other) noexcept : type(other.type), value(other.value) {}
 
-value_t::value_t(TypeType t, Update* u) {
-  if (u->defined == 0) {
-    type = TypeType::UNDEF;
-    return;
-  }
-
-  if (u->symbolic) {
-    type = TypeType::SYMBOL;
-    value.sym = reinterpret_cast<symbol_t*>(u->value);
-    return;
-  }
-
-  type = t;
-  switch (t) {
-    case TypeType::UNDEF:
-    case TypeType::SELF:
-      break;
-    case TypeType::RULEREF:
-      value.rule = reinterpret_cast<RuleNode*>(u->value);
-      break;
-    case TypeType::INTEGER:
-      value.integer = (int64_t)u->value;
-      break;
-    case TypeType::FLOATING:
-      value.float_ = (int64_t)u->value;
-      break;
-    case TypeType::ENUM:
-      value.enum_val = reinterpret_cast<enum_value_t*>(u->value);
-      break;
-    case TypeType::RATIONAL:
-      value.rat = reinterpret_cast<const rational_t*>(u->value);
-      break;
-    case TypeType::STRING:
-      value.string = reinterpret_cast<std::string*>(u->value);
-      break;
-    case TypeType::LIST:
-      value.list = reinterpret_cast<List*>(u->value);
-      break;
-    case TypeType::BOOLEAN:
-      value.boolean = (bool) u->value;
-      break;
-    default: throw RuntimeException("Unsupported type in apply");
-  }
-}
-
-
 value_t& value_t::operator=(const value_t& other) {
   value = other.value;
   type = other.type;
