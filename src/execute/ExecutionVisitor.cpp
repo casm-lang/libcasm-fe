@@ -80,8 +80,6 @@ Update *ExecutionVisitor::add_update(const value_t& val, size_t sym_id) {
   uint64_t* args = reinterpret_cast<uint64_t*>(context_.pp_stack.allocate(sizeof(uint64_t) * num_arguments));
 
   up->value = val;
-  up->defined = (val.is_undef()) ? 0 : 1;
-  up->symbolic = val.is_symbolic();
   up->func = sym_id;
   up->args = args;
   // TODO: Do we need line here?

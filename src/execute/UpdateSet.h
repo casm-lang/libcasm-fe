@@ -41,8 +41,6 @@ struct Update
     uint32_t func; // function uid
     uint16_t sym_args;
     uint16_t num_args;
-    bool defined; // TODO correct data type
-    bool symbolic; // TODO correct data type
 };
 
 class UpdateSet

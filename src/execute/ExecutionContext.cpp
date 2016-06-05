@@ -68,8 +68,6 @@ std::string arguments_to_string(const Function *func, const uint64_t args[]) {
   }
   for (uint32_t i = 0; i < func->arguments_.size(); i++) {
     Update up = {
-        .defined = 1,
-        .symbolic = 0,
         .num_args = 0,
         .value = (void*) args[i],
     };
@@ -136,9 +134,9 @@ void ExecutionContext::apply_updates() {
     if (function_symbol->return_type_->t == TypeType::LIST) {
       assert(u->value.type == TypeType::LIST);
       value_t& list = function_map[ArgumentsKey(u->args, u->num_args, false, u->sym_args)];
-      if (u->symbolic){
+      if (u->value.is_symbolic()){
         function_map[ArgumentsKey(u->args, u->num_args, true, u->sym_args)] = u->value;
-      } else if (u->defined == 0) {
+      } else if (u->value.is_undef()) {
         // set list to undef
         if (!list.is_undef()) {
           list.value.list->decrease_usage();
