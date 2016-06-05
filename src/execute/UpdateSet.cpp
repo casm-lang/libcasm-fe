@@ -143,7 +143,7 @@ static void mergeSequentialIntoParallel(const LinkedHashMap<uint64_t, Update*>& 
     };
 }
 
-UpdateSet* UpdateSet::merge()
+void UpdateSet::merge()
 {
     if (type() == Type::Parallel) {
         mergeParallelIntoSequential(m_set, m_parent->m_set);
@@ -152,8 +152,6 @@ UpdateSet* UpdateSet::merge()
     }
 
     clear();
-
-    return m_parent;
 }
 
 void UpdateSet::clear()

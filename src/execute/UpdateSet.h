@@ -91,7 +91,7 @@ public:
      *
      * @throws MergeError
      */
-    UpdateSet* merge();
+    void merge();
 
     void clear();
 
