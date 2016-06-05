@@ -31,10 +31,11 @@
 #include <stack>
 
 #include "LinkedHashMap.h"
+#include "../Value.h"
 
 struct Update
 {
-    void* value;
+    value_t value;
     uint64_t* args;
     uint64_t line;
     uint32_t func; // function uid

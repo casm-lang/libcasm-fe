@@ -79,7 +79,7 @@ Update *ExecutionVisitor::add_update(const value_t& val, size_t sym_id) {
   Update* up = reinterpret_cast<Update*>(context_.pp_stack.allocate(sizeof(Update))); // FIXME make it nicer!!
   uint64_t* args = reinterpret_cast<uint64_t*>(context_.pp_stack.allocate(sizeof(uint64_t) * num_arguments));
 
-  up->value = (void*) val.to_uint64_t();
+  up->value = val;
   up->defined = (val.is_undef()) ? 0 : 1;
   up->symbolic = val.is_symbolic();
   up->func = sym_id;

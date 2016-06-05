@@ -73,7 +73,7 @@ std::string arguments_to_string(const Function *func, const uint64_t args[]) {
         .num_args = 0,
         .value = (void*) args[i],
     };
-    ss << value_t(func->arguments_[i]->t, &up).to_str();
+    ss << up.value.to_str();
     ss << ", ";
   }
   // Strip trailing comma
@@ -134,10 +134,10 @@ void ExecutionContext::apply_updates() {
     const Function* function_symbol = function_symbols[u->func];
     // TODO handle tuples
     if (function_symbol->return_type_->t == TypeType::LIST) {
+      assert(u->value.type == TypeType::LIST);
       value_t& list = function_map[ArgumentsKey(u->args, u->num_args, false, u->sym_args)];
       if (u->symbolic){
-        value_t v(function_symbol->return_type_->t, u);
-        function_map[ArgumentsKey(u->args, u->num_args, true, u->sym_args)] = v;
+        function_map[ArgumentsKey(u->args, u->num_args, true, u->sym_args)] = u->value;
       } else if (u->defined == 0) {
         // set list to undef
         if (!list.is_undef()) {
@@ -150,16 +150,15 @@ void ExecutionContext::apply_updates() {
         } else {
           list.type = function_symbol->return_type_->t;
         }
-        list.value.list = reinterpret_cast<List*>(u->value);
+        list.value.list = u->value.value.list;
         list.value.list->bump_usage();
         to_fold.push_back(&list);
       }
     } else {
-      value_t v(function_symbol->return_type_->t, u);
       // we could erase keys that store an undef value in concrete mode,
       // but we need to know if a key was set to undef explicitly in symbolic
       // mode
-      function_map[ArgumentsKey(u->args, u->num_args, true, u->sym_args)] = v;
+      function_map[ArgumentsKey(u->args, u->num_args, true, u->sym_args)] = u->value;
     }
 
     if (symbolic || dump_updates) {
@@ -274,7 +273,7 @@ const value_t ExecutionContext::get_function_value(Function *sym, uint64_t args[
     const value_t &v = function_map.at(ArgumentsKey(&args[0], sym->arguments_.size(), false, sym_args));
     const auto update = updateSetManager.lookup(reinterpret_cast<uint64_t>(&v));
     if (update) {
-        return value_t(sym->return_type_->t, update);
+        return update->value;
     } else {
         return v;
     }
