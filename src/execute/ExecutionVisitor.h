@@ -40,7 +40,6 @@ class ExecutionContext;
 class ExecutionVisitor : public BaseVisitor<value_t> {
   private:
     std::vector<value_t> main_bindings;
-    Update *add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[]);
 
   public:
     std::vector<value_t> value_list;

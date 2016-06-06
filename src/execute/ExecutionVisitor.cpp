@@ -62,28 +62,6 @@ void ExecutionVisitor::visit_assure(UnaryNode* assure, const value_t& val) {
   }
 }
 
-Update *ExecutionVisitor::add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[]) {
-  auto& function_map = context_.function_states[sym_id];
-  auto it = function_map.find(ArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
-  if (it == function_map.cend()) {
-    const auto pair = function_map.emplace(ArgumentsKey(arguments, num_arguments, true), value_t());
-    it = pair.first;
-  }
-
-  Update* up = reinterpret_cast<Update*>(context_.pp_stack.allocate(sizeof(Update))); // FIXME make it nicer!!
-  up->value = val;
-  up->func = sym_id;
-  up->args = const_cast<value_t*>(it->first.p);
-  up->num_args = num_arguments;
-  // TODO: Do we need line here?
-  //up->line = (uint64_t) loc.lines;
-
-  const value_t& ref = it->second;
-  context_.updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
-
-  return up;
-}
-
 void ExecutionVisitor::visit_update_dumps(UpdateNode *update, const value_t& expr_v) {
   const std::string& filter = driver_.function_trace_map[update->func->symbol->id];
   if (context_.filter_enabled(filter)) {
@@ -108,7 +86,7 @@ void ExecutionVisitor::visit_update_dumps(UpdateNode *update, const value_t& exp
 
 void ExecutionVisitor::visit_update(UpdateNode *update, const value_t& expr_v) {
   try {
-    Update *up = add_update(expr_v, update->func->symbol->id, num_arguments, arguments);
+    Update *up = context_.add_update(expr_v, update->func->symbol->id, num_arguments, arguments);
     up->line = (uint64_t) &update->location;
   } catch (const RuntimeException& ex) {
     // TODO EP: this is probably not the cleanest solutions
@@ -248,7 +226,7 @@ void ExecutionVisitor::visit_push(PushNode *node, const value_t& expr, const val
     }
 
     try {
-      Update *up = add_update(to_res, node->to->symbol->id, num_arguments, arguments);
+      Update *up = context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments);
       up->line = (uint64_t) &node->location;
     } catch (const RuntimeException& ex) {
       // TODO this is probably not the cleanest solutions
@@ -263,7 +241,7 @@ void ExecutionVisitor::visit_push(PushNode *node, const value_t& expr, const val
     const value_t to_res = builtins::cons(context_, expr, atom);
 
     try {
-      Update *up = add_update(to_res, node->to->symbol->id, num_arguments, arguments);
+      Update *up = context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments);
       up->line = (uint64_t) &node->location;
     } catch (const RuntimeException& ex) {
       // TODO this is probably not the cleanest solutions
@@ -284,7 +262,7 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
     Update *up = nullptr;
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
       try {
-        up = add_update(to_res, node->to->symbol->id, num_arguments, arguments);
+        up = context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments);
         up->line = (uint64_t) &node->location;
       } catch (const RuntimeException& ex) {
         // TODO this is probably not the cleanest solutions
@@ -306,7 +284,7 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
     symbolic::dump_builtin(context_.trace, "pop", args, 2, from_res);
 
     try {
-      up = add_update(from_res, node->from->symbol->id, num_arguments, arguments);
+      up = context_.add_update(from_res, node->from->symbol->id, num_arguments, arguments);
       up->line = (uint64_t) &node->location;
     } catch (const RuntimeException& ex) {
       // TODO this is probably not the cleanest solutions
@@ -320,7 +298,7 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
 
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
       try {
-        Update *up = add_update(to_res, node->to->symbol->id, num_arguments, arguments);
+        Update *up = context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments);
         up->line = (uint64_t) &node->location;
       } catch (const RuntimeException& ex) {
         // TODO this is probably not the cleanest solutions
@@ -334,7 +312,7 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
 
     const value_t from_res = builtins::tail(context_, val);
     try {
-      Update *up = add_update(from_res, node->from->symbol->id, num_arguments, arguments);
+      Update *up = context_.add_update(from_res, node->from->symbol->id, num_arguments, arguments);
       up->line = (uint64_t) &node->location;
     } catch (const RuntimeException& ex) {
       // TODO this is probably not the cleanest solutions

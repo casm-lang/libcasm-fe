@@ -107,6 +107,28 @@ ExecutionContext::ExecutionContext(const ExecutionContext& other) :
   //updateset.set =  pp_hashmap_new(&updateset_data_, UPDATESET_SIZE, "main updateset");
 }
 
+Update* ExecutionContext::add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[]) {
+  auto& function_map = function_states[sym_id];
+  auto it = function_map.find(ArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
+  if (it == function_map.cend()) {
+    const auto pair = function_map.emplace(ArgumentsKey(arguments, num_arguments, true), value_t());
+    it = pair.first;
+  }
+
+  Update* up = reinterpret_cast<Update*>(pp_stack.allocate(sizeof(Update))); // FIXME make it nicer!!
+  up->value = val;
+  up->func = sym_id;
+  up->args = const_cast<value_t*>(it->first.p);
+  up->num_args = num_arguments;
+  // TODO: Do we need line here?
+  //up->line = (uint64_t) loc.lines;
+
+  const value_t& ref = it->second;
+  updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
+
+  return up;
+}
+
 void ExecutionContext::apply_updates() {
   std::unordered_map<uint32_t, std::vector<ArgumentsKey>> updated_functions;
   if (symbolic || dump_updates) {

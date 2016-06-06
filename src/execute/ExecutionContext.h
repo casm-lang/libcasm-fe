@@ -88,6 +88,7 @@ namespace std {
 class ExecutionContext {
   private:
     BlockAllocator<UPDATESET_DATA_SIZE> updateset_data_;
+    BlockAllocator<TEMP_STACK_SIZE> pp_stack;
     std::map<const std::string, bool> debuginfo_filters;
 
   public:
@@ -95,7 +96,6 @@ class ExecutionContext {
     std::vector<const Function*> function_symbols;
     const SymbolTable symbol_table;
     UpdateSetManager updateSetManager;
-    BlockAllocator<TEMP_STACK_SIZE> pp_stack;
     std::vector<List*> temp_lists;
     static BlockAllocator<VALUE_STACK_SIZE> value_stack;
     const bool symbolic;
@@ -112,6 +112,7 @@ class ExecutionContext {
         const bool fileout, const bool dump_updates);
     ExecutionContext(const ExecutionContext& other);
 
+    Update* add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[]);
     void apply_updates();
 
     const value_t get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]);
