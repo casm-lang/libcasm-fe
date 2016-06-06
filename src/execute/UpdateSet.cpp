@@ -80,18 +80,12 @@ void UpdateSet::add(const uint64_t key, Update* update)
 {
     const auto result = m_set.insert(key, update);
     if (!result.second) {
-        // check if values match
-        /*const Function* function_symbol = context_.function_symbols[sym_id]; FIXME
-        for (int i=0; i < up->num_args; i++) {
-            if (!eq_uint64_value(function_symbol->arguments_[i], up->args[i], v->args[i])) {
-                return;
-            }
-        }*/
-
         const auto existingPair = *(result.first);
         const auto existingUpdate = existingPair.second;
 
-        throw Conflict("Conflict in updateset", update, existingUpdate);
+        if (update->value != existingUpdate->value) {
+            throw Conflict("Conflict in updateset", update, existingUpdate);
+        }
     }
 }
 
@@ -117,39 +111,19 @@ UpdateSet *UpdateSet::fork()
     return new UpdateSet(forkType, this);
 }
 
-static void mergeParallelIntoSequential(const LinkedHashMap<uint64_t, Update*>& from,
-                                        LinkedHashMap<uint64_t, Update*>& to)
-{
-    to.reserve(to.size() + from.size());
-
-    for(const auto& pair : from) {
-        to[pair.first] = pair.second;
-    };
-}
-
-static void mergeSequentialIntoParallel(const LinkedHashMap<uint64_t, Update*>& from,
-                                        LinkedHashMap<uint64_t, Update*>& to)
-{
-    to.reserve(to.size() + from.size());
-
-    for(const auto& pair : from) {
-        const auto result = to.insert(pair);
-        if (!result.second) {
-            const auto existingPair = *(result.first);
-            const auto conflictingUpdate = pair.second;
-            const auto existingUpdate = existingPair.second;
-            // FIXME EP: check values before merge (same values don't clash)
-            throw UpdateSet::Conflict("conflicting update-sets", conflictingUpdate, existingUpdate);
-        }
-    };
-}
-
 void UpdateSet::merge()
 {
-    if (type() == Type::Parallel) {
-        mergeParallelIntoSequential(m_set, m_parent->m_set);
-    } else {
-        mergeSequentialIntoParallel(m_set, m_parent->m_set);
+    m_parent->m_set.reserve(m_parent->m_set.size() + m_set.size());
+
+    if (type() == Type::Parallel) { // parallel into sequential
+        auto& to = m_parent->m_set;
+        for(const auto& pair : m_set) {
+            to[pair.first] = pair.second;
+        };
+    } else { // sequential into parallel
+        for(const auto& pair : m_set) {
+            m_parent->add(pair.first, pair.second);
+        }
     }
 
     clear();
