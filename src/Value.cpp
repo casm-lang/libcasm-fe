@@ -127,35 +127,6 @@ bool value_t::operator!=(const value_t &other) const {
   return !operator==(other);
 }
 
-uint64_t value_t::to_uint64_t() const {
-  switch (type) {
-    case TypeType::INTEGER:
-      return value.integer;
-    case TypeType::FLOATING:
-      return value.float_;
-    case TypeType::SELF:
-    case TypeType::UNDEF: // are UNDEF and SELF the same here?
-      return 0;
-    case TypeType::RULEREF:
-      return (uint64_t) value.rule;
-    case TypeType::ENUM:
-      return (uint64_t) value.enum_val;
-    case TypeType::RATIONAL:
-      return (uint64_t) value.rat;
-    case TypeType::STRING:
-      return (uint64_t) value.string;
-    case TypeType::TUPLE:
-    case TypeType::TUPLE_OR_LIST:
-    case TypeType::LIST:
-      return (uint64_t) value.list;
-    case TypeType::BOOLEAN:
-      return (uint64_t) value.boolean;
-    case TypeType::SYMBOL:
-      return (uint64_t) value.integer;
-    default: throw RuntimeException("Unsupported type in value_t.to_uint64_t");
-  }
-}
-
 bool value_t::is_undef() const {
   return type == TypeType::UNDEF;
 }
@@ -599,87 +570,31 @@ bool BottomList::check_allocated_and_set_to_false() {
 
 SkipList::SkipList(size_t skip, BottomList *btm) : List(ListType::SKIP), skip(skip), bottom(btm) {}
 
-static std::hash<std::string> str_hasher;
-
-size_t hash_uint64_value(const Type *type, uint64_t val) {
-  switch (type->t) {
-    case TypeType::INTEGER:
-      return val;
-    case TypeType::SELF:
-    case TypeType::UNDEF: // are UNDEF and SELF the same here?
-      return 0;
-    case TypeType::RULEREF:
-      return val;
-    case TypeType::STRING:
-      return (uint64_t) str_hasher(*reinterpret_cast<std::string*>(val));
-    case TypeType::TUPLE:
-    case TypeType::TUPLE_OR_LIST:
-      FAILURE();
-    case TypeType::LIST: {
-      size_t h = 0;
-      List *list = reinterpret_cast<List*>(val);
-      for (auto iter=list->begin(); iter!=list->end(); iter++) {
-        h += hash_uint64_value(type->subtypes[0], (*iter).to_uint64_t());
-      }
-      return h;
-    }
-    case TypeType::ENUM:
-      return (size_t) reinterpret_cast<enum_value_t*>(val)->id;
-    case TypeType::RATIONAL: {
-      rational_t *rat = reinterpret_cast<rational_t*>(val);
-      return (size_t) rat->numerator + rat->denominator;
-    }
-    case TypeType::SYMBOL:
-      return val;
-    default: FAILURE();
-  }
-}
-
-bool eq_uint64_value(const Type *type, uint64_t lhs, uint64_t rhs) {
-  switch (type->t) {
-    case TypeType::SELF: return true;
-    case TypeType::INTEGER:
-    case TypeType::FLOATING:
-    case TypeType::BOOLEAN:
-      return lhs == rhs;
-    case TypeType::STRING:
-      return *reinterpret_cast<std::string*>(lhs) ==
-             *reinterpret_cast<std::string*>(rhs);
-    case TypeType::TUPLE:
-    case TypeType::TUPLE_OR_LIST:
-    case TypeType::LIST:
-      return *reinterpret_cast<List*>(lhs) ==
-             *reinterpret_cast<List*>(rhs);
-    case TypeType::ENUM:
-      return reinterpret_cast<enum_value_t*>(lhs)->id ==
-             reinterpret_cast<enum_value_t*>(rhs)->id;
-    case TypeType::RATIONAL:
-      return *reinterpret_cast<rational_t*>(lhs) ==
-             *reinterpret_cast<rational_t*>(rhs);
-    default: FAILURE();
-  }
-}
-
 
 namespace std {
-
   size_t hash<value_t>::operator()(const value_t &key) const {
     switch (key.type) {
       case TypeType::INTEGER:
         return key.value.integer;
+      case TypeType::FLOATING:
+        static std::hash<FLOATING_T> floating_hasher;
+        return floating_hasher(key.value.float_);
+      case TypeType::BOOLEAN:
+        return key.value.boolean;
       case TypeType::SELF:
       case TypeType::UNDEF: // are UNDEF and SELF the same here?
         return 0;
       case TypeType::RULEREF:
-        return (uint64_t) key.value.rule;
+        return reinterpret_cast<size_t>(key.value.rule);
       case TypeType::STRING:
-        return (uint64_t) str_hasher(*key.value.string);
+        static std::hash<std::string> string_hasher;
+        return string_hasher(*key.value.string);
       case TypeType::TUPLE:
       case TypeType::TUPLE_OR_LIST:
       case TypeType::LIST: {
         size_t h = 0;
-        for (auto iter=key.value.list->begin(); iter!=key.value.list->end(); iter++) {
-          h += operator()(*iter);
+        for (const value_t& v : *key.value.list) {
+          h += operator()(v);
         }
         return h;
       }
@@ -687,6 +602,8 @@ namespace std {
         return (size_t) key.value.enum_val->id;
       case TypeType::RATIONAL:
         return (size_t) key.value.rat->numerator + key.value.rat->denominator;
+      case TypeType::SYMBOL:
+        return reinterpret_cast<size_t>(key.value.sym);
       default: throw RuntimeException("Unsupported type in std::hash<value_t>()");
     }
   }

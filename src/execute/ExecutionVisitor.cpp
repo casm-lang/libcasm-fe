@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstdio>
+#include <cstring>
 
 #include "ExecutionContext.h"
 #include "Symbolic.h"
@@ -40,19 +41,6 @@
 #include "Operators.h"
 #include "../Driver.h"
 #include "../Symbols.h"
-
-uint16_t pack_values_in_array(const value_t value_list[], uint64_t array[], uint32_t size) {
-  uint16_t sym_args = 0;
-  for (uint32_t i=0; i < size; i++) {
-    const value_t& v = value_list[i];
-    array[i] = v.to_uint64_t();
-    if (v.is_symbolic()) {
-      sym_args = sym_args | (1 << i);
-    }
-  }
-  return sym_args;
-}
-
 
 ExecutionVisitor::ExecutionVisitor(ExecutionContext &ctxt, Driver& driver)
     : driver_(driver), context_(ctxt) {
@@ -75,23 +63,23 @@ void ExecutionVisitor::visit_assure(UnaryNode* assure, const value_t& val) {
   }
 }
 
-Update *ExecutionVisitor::add_update(const value_t& val, size_t sym_id) {
+Update *ExecutionVisitor::add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[]) {
   Update* up = reinterpret_cast<Update*>(context_.pp_stack.allocate(sizeof(Update))); // FIXME make it nicer!!
-  uint64_t* args = reinterpret_cast<uint64_t*>(context_.pp_stack.allocate(sizeof(uint64_t) * num_arguments));
+
+  value_t* args = reinterpret_cast<value_t*>(context_.pp_stack.allocate(sizeof(value_t) * num_arguments));
+  memcpy(args, arguments, sizeof(value_t) * num_arguments);
 
   up->value = val;
   up->func = sym_id;
   up->args = args;
+  up->num_args = num_arguments;
   // TODO: Do we need line here?
   //up->line = (uint64_t) loc.lines;
-  // TODO use arg!
-  up->sym_args = pack_values_in_array(arguments, up->args, num_arguments);
-  up->num_args = num_arguments;
 
   auto& function_map = context_.function_states[sym_id];
-  const ArgumentsKey key(up->args, up->num_args, false, up->sym_args);
+  const ArgumentsKey key(up->args, up->num_args, false);
   if (function_map.count(key) == 0) {
-    function_map.emplace(ArgumentsKey(up->args, up->num_args, true, up->sym_args), value_t());
+    function_map.emplace(ArgumentsKey(up->args, up->num_args, true), value_t());
   }
   const value_t& ref = function_map[key];
   context_.updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
@@ -123,7 +111,7 @@ void ExecutionVisitor::visit_update_dumps(UpdateNode *update, const value_t& exp
 
 void ExecutionVisitor::visit_update(UpdateNode *update, const value_t& expr_v) {
   try {
-    Update *up = add_update(expr_v, update->func->symbol->id);
+    Update *up = add_update(expr_v, update->func->symbol->id, num_arguments, arguments);
     up->line = (uint64_t) &update->location;
   } catch (const RuntimeException& ex) {
     // TODO EP: this is probably not the cleanest solutions
@@ -263,7 +251,7 @@ void ExecutionVisitor::visit_push(PushNode *node, const value_t& expr, const val
     }
 
     try {
-      Update *up = add_update(to_res, node->to->symbol->id);
+      Update *up = add_update(to_res, node->to->symbol->id, num_arguments, arguments);
       up->line = (uint64_t) &node->location;
     } catch (const RuntimeException& ex) {
       // TODO this is probably not the cleanest solutions
@@ -278,7 +266,7 @@ void ExecutionVisitor::visit_push(PushNode *node, const value_t& expr, const val
     const value_t to_res = builtins::cons(context_, expr, atom);
 
     try {
-      Update *up = add_update(to_res, node->to->symbol->id);
+      Update *up = add_update(to_res, node->to->symbol->id, num_arguments, arguments);
       up->line = (uint64_t) &node->location;
     } catch (const RuntimeException& ex) {
       // TODO this is probably not the cleanest solutions
@@ -299,7 +287,7 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
     Update *up = nullptr;
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
       try {
-        up = add_update(to_res, node->to->symbol->id);
+        up = add_update(to_res, node->to->symbol->id, num_arguments, arguments);
         up->line = (uint64_t) &node->location;
       } catch (const RuntimeException& ex) {
         // TODO this is probably not the cleanest solutions
@@ -321,7 +309,7 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
     symbolic::dump_builtin(context_.trace, "pop", args, 2, from_res);
 
     try {
-      up = add_update(from_res, node->from->symbol->id);
+      up = add_update(from_res, node->from->symbol->id, num_arguments, arguments);
       up->line = (uint64_t) &node->location;
     } catch (const RuntimeException& ex) {
       // TODO this is probably not the cleanest solutions
@@ -335,7 +323,7 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
 
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
       try {
-        Update *up = add_update(to_res, node->to->symbol->id);
+        Update *up = add_update(to_res, node->to->symbol->id, num_arguments, arguments);
         up->line = (uint64_t) &node->location;
       } catch (const RuntimeException& ex) {
         // TODO this is probably not the cleanest solutions
@@ -349,7 +337,7 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
 
     const value_t from_res = builtins::tail(context_, val);
     try {
-      Update *up = add_update(from_res, node->from->symbol->id);
+      Update *up = add_update(from_res, node->from->symbol->id, num_arguments, arguments);
       up->line = (uint64_t) &node->location;
     } catch (const RuntimeException& ex) {
       // TODO this is probably not the cleanest solutions
@@ -380,10 +368,7 @@ const value_t ExecutionVisitor::visit_function_atom(FunctionAtom *atom,
       return value_t(rule_bindings.back()->at(atom->offset));
 
     case FunctionAtom::SymbolType::FUNCTION: {
-      uint64_t args[5];
-      uint16_t sym_args = pack_values_in_array(arguments, args, num_arguments);
-
-      return context_.get_function_value(atom->symbol, args, sym_args);
+      return context_.get_function_value(atom->symbol, num_arguments, arguments);
     }
     case FunctionAtom::SymbolType::ENUM: {
       enum_value_t *val = atom->enum_->mapping[atom->name];
@@ -476,15 +461,15 @@ const value_t ExecutionVisitor::visit_list_atom(ListAtom *atom,
   return value_t(atom->type_, list);
 }
 
-std::string args_to_str(uint64_t args[], size_t size) {
+static std::string args_to_str(const value_t args[], size_t size) {
   std::string res = "";
   size_t i = 0;
 
   if (size > 0) {
     for (; i < size-1; i++) {
-      res += std::to_string(args[i]) + ",";
+      res += args[i].to_str() + ",";
     }
-    res += std::to_string(args[i]);
+    res += args[i].to_str();
   }
   return res;
 }
@@ -860,16 +845,14 @@ bool ExecutionWalker::init_function(const std::string& name, std::set<std::strin
     }
   }
 
-  std::vector<uint64_t*> initializer_args;
+  std::vector<value_t> initializer_args;
 
   Function *func = visitor.context_.symbol_table.get_function(name);
   if (!func) {
     return true;
   }
 
-  visitor.context_.function_states[func->id] =
-            std::unordered_map<ArgumentsKey, value_t>(0, {func->arguments_}, {func->arguments_});
-
+  visitor.context_.function_states[func->id] = std::unordered_map<ArgumentsKey, value_t>(0);
   visitor.context_.function_symbols[func->id] = func;
 
   auto& function_map = visitor.context_.function_states[func->id];
@@ -877,26 +860,22 @@ bool ExecutionWalker::init_function(const std::string& name, std::set<std::strin
   if (func->intitializers_ != nullptr) {
     for (std::pair<ExpressionBase*, ExpressionBase*> init : *func->intitializers_) {
       uint32_t num_arguments = 0;
-      uint64_t *args = new uint64_t[10];
+      value_t *args = new value_t[10];
       if (init.first != nullptr) {
-        value_t arguments[10];
         const value_t argument_v = walk_expression_base(init.first);
         if (func->arguments_.size() > 1) {
           List *list = argument_v.value.list;
           for (auto iter = list->begin(); iter != list->end(); iter++) {
-            arguments[num_arguments] = *iter;
+            args[num_arguments] = *iter;
             num_arguments += 1;
           }
         } else {
-            arguments[num_arguments] = argument_v;
+          args[num_arguments] = argument_v;
             num_arguments += 1;
         }
-        pack_values_in_array(arguments, &args[0], num_arguments);
-      } else {
-        args[0] = 0;
       }
 
-      if (function_map.count(ArgumentsKey(&args[0], num_arguments, false, 0)) != 0) {
+      if (function_map.count(ArgumentsKey(args, num_arguments, false)) != 0) {
         yy::location loc = init.first ? init.first->location+init.second->location
                                       : init.second->location;
         visitor.driver_.error(loc, "function `"+func->name+"("+args_to_str(args, num_arguments)+")` already initialized");
@@ -905,9 +884,8 @@ bool ExecutionWalker::init_function(const std::string& name, std::set<std::strin
 
       if (visitor.context_.symbolic && func->is_symbolic) {
         const value_t v = walk_expression_base(init.second);
-        symbolic::dump_create(visitor.context_.trace_creates, func,
-            &args[0], 0, v);
-        function_map.emplace(std::pair<ArgumentsKey, value_t>(ArgumentsKey(&args[0], num_arguments, true, 0), v));
+        symbolic::dump_create(visitor.context_.trace_creates, func, num_arguments, args, v);
+        function_map.emplace(std::pair<ArgumentsKey, value_t>(ArgumentsKey(args, num_arguments, true), v));
       } else {
         value_t v = walk_expression_base(init.second);
         if (func->subrange_return) {
@@ -923,7 +901,7 @@ bool ExecutionWalker::init_function(const std::string& name, std::set<std::strin
             throw RuntimeException("Subrange violated");
           }
         }
-        function_map.emplace(std::pair<ArgumentsKey, value_t>(ArgumentsKey(&args[0], num_arguments, true, 0), v));
+        function_map.emplace(std::pair<ArgumentsKey, value_t>(ArgumentsKey(args, num_arguments, true), v));
       }
       initializer_args.push_back(args);
     }
@@ -968,9 +946,8 @@ void ExecutionWalker::run() {
   visitor.context_.temp_lists.clear();
 
   Function *program_sym = visitor.context_.symbol_table.get_function("program");
-  uint64_t args[10] = {0};
   while(true) {
-    const value_t program_val = visitor.context_.get_function_value(program_sym, args, 0);
+    const value_t program_val = visitor.context_.get_function_value(program_sym, 0, nullptr);
     if (program_val.type == TypeType::UNDEF) {
       break;
     }

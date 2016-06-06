@@ -27,32 +27,31 @@
 
 #include <sstream>
 #include <utility>
+#include <cstring>
 
 #include "Symbolic.h"
 #include "../Driver.h"
 #include "../Ast.h"
 
-ArgumentsKey::ArgumentsKey(uint64_t *args, uint16_t size, bool dyn,
-    uint16_t syms) : dynamic(dyn), sym_args(syms) {
+ArgumentsKey::ArgumentsKey(const value_t args[], uint32_t size, bool dyn) : size(size), dynamic(dyn) {
   if (dynamic) {
-    p = new uint64_t[size];
-    for (uint16_t i = 0; i < size; i++) {
-      p[i] = args[i];
-    }
+    auto argsDup = new value_t[size];
+    memcpy(argsDup, args, sizeof(value_t) * size);
+    p = argsDup;
   } else {
     p = args;
   }
 }
 
-ArgumentsKey::ArgumentsKey(const ArgumentsKey& other) : p(other.p),
-    dynamic(other.dynamic), sym_args(other.sym_args) {
+ArgumentsKey::ArgumentsKey(const ArgumentsKey& other) : p(other.p), size(other.size),
+    dynamic(other.dynamic) {
 }
 
 ArgumentsKey::ArgumentsKey(ArgumentsKey&& other) noexcept {
   p = other.p;
   dynamic = other.dynamic;
+  size = other.size;
   other.dynamic = false;
-  sym_args = other.sym_args;
 }
 
 ArgumentsKey::~ArgumentsKey() {
@@ -61,17 +60,13 @@ ArgumentsKey::~ArgumentsKey() {
   }
 }
 
-std::string arguments_to_string(const Function *func, const uint64_t args[]) {
+static std::string arguments_to_string(uint32_t num_arguments, const value_t arguments[]) {
   std::stringstream ss;
-  if (func->arguments_.size() == 0) {
+  if (num_arguments == 0) {
     return "";
   }
-  for (uint32_t i = 0; i < func->arguments_.size(); i++) {
-    Update up = {
-        .num_args = 0,
-        .value = (void*) args[i],
-    };
-    ss << up.value.to_str();
+  for (uint32_t i = 0; i < num_arguments; i++) {
+    ss << arguments[i].to_str();
     ss << ", ";
   }
   // Strip trailing comma
@@ -135,7 +130,7 @@ void ExecutionContext::apply_updates() {
         *location = u->value;
       } else {
         auto& function_map = function_states[u->func];
-        value_t& list = function_map[ArgumentsKey(u->args, u->num_args, false, u->sym_args)];
+        value_t& list = function_map[ArgumentsKey(u->args, u->num_args, false)];
         if (u->value.is_undef()) {
           // set list to undef
           if (!list.is_undef()) {
@@ -162,7 +157,7 @@ void ExecutionContext::apply_updates() {
 
     if (symbolic || dump_updates) {
       updated_functions[u->func].push_back(
-            ArgumentsKey(u->args, u->num_args, true, u->sym_args));
+            ArgumentsKey(u->args, u->num_args, true));
     }
   }
   updateSet->clear();
@@ -177,7 +172,7 @@ void ExecutionContext::apply_updates() {
         continue;
       }
 
-      std::equal_to<ArgumentsKey> eq = {function_symbol->arguments_};
+      std::equal_to<ArgumentsKey> eq;
       for (const auto& pair : function_map) {
         bool found = false;
         for (const auto& k : updated_keys) {
@@ -187,13 +182,11 @@ void ExecutionContext::apply_updates() {
           }
         }
         if (!found) {
-          symbolic::dump_symbolic(trace, function_symbol, pair.first.p,
-              pair.first.sym_args, pair.second);
+          symbolic::dump_symbolic(trace, function_symbol, pair.first.size, pair.first.p, pair.second);
         }
       }
       for (const auto& k : updated_keys) {
-        symbolic::dump_update(trace, function_symbol, k.p,
-         k.sym_args, function_map[k]);
+        symbolic::dump_update(trace, function_symbol, k.size, k.p, function_map[k]);
       }
     }
   }
@@ -206,7 +199,7 @@ void ExecutionContext::apply_updates() {
 
       for (const auto& k : updated_keys) {
         update_dump.push_back(function_symbol->name+
-            arguments_to_string(function_symbol, k.p)+" = "+
+            arguments_to_string(k.size, k.p)+" = "+
             function_map[k].to_str());
       }
     }
@@ -266,10 +259,10 @@ bool args_eq(uint64_t args1[], uint64_t args2[], size_t len) {
   return true;
 }
 
-const value_t ExecutionContext::get_function_value(Function *sym, uint64_t args[], uint16_t sym_args) {
+const value_t ExecutionContext::get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]) {
   auto& function_map = function_states[sym->id];
   try {
-    const value_t &v = function_map.at(ArgumentsKey(&args[0], sym->arguments_.size(), false, sym_args));
+    const value_t &v = function_map.at(ArgumentsKey(arguments, num_arguments, false));
     const auto update = updateSetManager.lookup(reinterpret_cast<uint64_t>(&v));
     if (update) {
         return update->value;
@@ -280,10 +273,10 @@ const value_t ExecutionContext::get_function_value(Function *sym, uint64_t args[
     if (symbolic && sym->is_symbolic) {
       // TODO cleanup symbol
       function_map.emplace(
-          ArgumentsKey(&args[0], sym->arguments_.size(), true, sym_args),
+          ArgumentsKey(ArgumentsKey(arguments, num_arguments, false)),
           value_t(new symbol_t(symbolic::next_symbol_id())));
-      value_t& v = function_map[ArgumentsKey(&args[0], sym->arguments_.size(), false, sym_args)];
-      symbolic::dump_create(trace_creates, sym, &args[0], sym_args, v);
+      value_t& v = function_map[ArgumentsKey(arguments, num_arguments, false)];
+      symbolic::dump_create(trace_creates, sym, num_arguments, arguments, v);
       return v;
     }
     undef.type = TypeType::UNDEF;

@@ -36,10 +36,9 @@
 struct Update
 {
     value_t value;
-    uint64_t* args;
+    value_t* args;
     uint64_t line;
     uint32_t func; // function uid
-    uint16_t sym_args;
     uint16_t num_args;
 };
 

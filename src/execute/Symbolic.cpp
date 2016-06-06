@@ -51,18 +51,17 @@ namespace symbolic {
     return current_time;
   }
 
-  std::string arguments_to_string(const Function *func, const uint64_t args[], 
-                                  uint16_t sym_args, bool strip=false) {
+  std::string arguments_to_string(uint32_t num_arguments, const value_t arguments[], bool strip=false) {
     std::stringstream ss;
     ss << ',';
 
-    for (uint32_t i = 0; i < func->arguments_.size(); i++) {
-      if ((sym_args & (1 << i)) != 0) {
-        ss << "sym" << (INTEGER_T) args[i];
+    for (uint32_t i = 0; i < num_arguments; i++) {
+      if (arguments[i].is_symbolic()) {
+        ss << "sym" << arguments[i].value.integer;
       } else {
-        switch (func->arguments_[i]->t) {
+        switch (arguments[i].type) {
           case TypeType::INTEGER:
-            ss << (INTEGER_T) args[i];
+            ss << arguments[i].value.integer;
             break;
           default: assert(0);
         }
@@ -78,8 +77,9 @@ namespace symbolic {
   }
 
 
-  std::string location_to_string(const Function *func, const uint64_t args[],
-                                 uint16_t sym_args, const value_t& val, uint32_t time) {
+  std::string location_to_string(const Function *func, uint32_t num_arguments,
+                                 const value_t arguments[], const value_t& val,
+                                 uint32_t time) {
     std::stringstream ss;
     if (func->is_static) {
       ss << "cs";
@@ -88,7 +88,7 @@ namespace symbolic {
     }
 
     ss << func->name << "(" << time
-       << arguments_to_string(func, args, sym_args) << val.to_str(true)
+       << arguments_to_string(num_arguments, arguments) << val.to_str(true)
        << ")";
     return ss.str();
   }
@@ -103,17 +103,17 @@ namespace symbolic {
   }
 
   void dump_create(std::vector<std::string>& trace, const Function *func,
-      const uint64_t args[], uint16_t sym_args, const value_t& v) {
+                   uint32_t num_arguments, const value_t arguments[], const value_t& v) {
     std::stringstream ss;
     dump_type(ss, v);
     ss << "fof(id%u,hypothesis,"
-       << location_to_string(func, args, sym_args, v, symbolic::get_timestamp()-1)
+       << location_to_string(func, num_arguments, arguments, v, symbolic::get_timestamp()-1)
        << ").%%CREATE: " << func->name;
 
-    if (func->arguments_.size() == 0) {
-       ss << arguments_to_string(func, args, sym_args, true);
+    if (num_arguments == 0) {
+      ss << arguments_to_string(num_arguments, arguments, true);
     } else {
-       ss << '(' << arguments_to_string(func, args, sym_args, true) << ')';
+      ss << '(' << arguments_to_string(num_arguments, arguments, true) << ')';
     }
 
     ss << std::endl;
@@ -123,13 +123,13 @@ namespace symbolic {
       for (uint32_t i=1; i < symbolic::get_timestamp()-1; i++) {
         std::stringstream ss;
         ss << "fof(id%u,hypothesis,"
-           << location_to_string(func, args, sym_args, v, i)
+           << location_to_string(func, num_arguments, arguments, v, i)
            << ").%%CATCHUP: " << func->name;
 
-        if (func->arguments_.size() == 0) {
-           ss << arguments_to_string(func, args, sym_args, true);
+        if (num_arguments == 0) {
+          ss << arguments_to_string(num_arguments, arguments, true);
         } else {
-           ss << '(' << arguments_to_string(func, args, sym_args, true) << ')';
+          ss << '(' << arguments_to_string(num_arguments, arguments, true) << ')';
         }
 
         ss << std::endl;
@@ -139,33 +139,33 @@ namespace symbolic {
   }
 
   void dump_symbolic(std::vector<std::string>& trace, const Function *func,
-      const uint64_t args[], uint16_t sym_args, const value_t& v) {
+                     uint32_t num_arguments, const value_t arguments[], const value_t& v) {
      std::stringstream ss;
     ss << "fof(id%u,hypothesis,"
-       << location_to_string(func, args, sym_args, v, get_timestamp())
+       << location_to_string(func, num_arguments, arguments, v, get_timestamp())
        << ").%%SYMBOLIC: " << func->name;
 
-    if (func->arguments_.size() == 0) {
-       ss << arguments_to_string(func, args, sym_args, true);
+    if (num_arguments == 0) {
+      ss << arguments_to_string(num_arguments, arguments, true);
     } else {
-       ss << '(' << arguments_to_string(func, args, sym_args, true) << ')';
+      ss << '(' << arguments_to_string(num_arguments, arguments, true) << ')';
     }
     ss << std::endl;
     trace.push_back(ss.str());
   }
 
   void dump_update(std::vector<std::string>& trace, const Function *func,
-      const uint64_t args[], uint16_t sym_args, const value_t& v) {
+                   uint32_t num_arguments, const value_t arguments[], const value_t& v) {
     std::stringstream ss;
     dump_type(ss, v);
     ss << "fof(id%u,hypothesis,"
-       << location_to_string(func, args, sym_args, v, get_timestamp())
+       << location_to_string(func, num_arguments, arguments, v, get_timestamp())
        << ").%%UPDATE: " << func->name;
 
-    if (func->arguments_.size() == 0) {
-       ss << arguments_to_string(func, args, sym_args, true);
+    if (num_arguments == 0) {
+      ss << arguments_to_string(num_arguments, arguments, true);
     } else {
-       ss << '(' << arguments_to_string(func, args, sym_args, true) << ')';
+      ss << '(' << arguments_to_string(num_arguments, arguments, true) << ')';
     }
     ss << std::endl;
     trace.push_back(ss.str());
@@ -198,12 +198,12 @@ namespace symbolic {
       }
       for (auto& value_pair : states[j]) {
         ss << "fof(final" << i << ",hypothesis,"
-           << location_to_string(symbols[j], value_pair.first.p, value_pair.first.sym_args, value_pair.second, 0)
+           << location_to_string(symbols[j], value_pair.first.size, value_pair.first.p, value_pair.second, 0)
            << ").%FINAL: " << symbols[j]->name;
         if (symbols[j]->arguments_.size() == 0) {
-          ss << arguments_to_string(symbols[j], value_pair.first.p, value_pair.first.sym_args, true);
+          ss << arguments_to_string(value_pair.first.size, value_pair.first.p, true);
         } else {
-          ss << '(' << arguments_to_string(symbols[j], value_pair.first.p, value_pair.first.sym_args, true) << ')' ;
+          ss << '(' << arguments_to_string(value_pair.first.size, value_pair.first.p, true) << ')' ;
         }
         ss << std::endl;
         i += 1;

@@ -41,15 +41,13 @@ class Driver;
 #define TEMP_STACK_SIZE 32768
 #define VALUE_STACK_SIZE 32768
 
-static Type symbol_type(TypeType::SYMBOL);
-
 struct ArgumentsKey {
-  uint64_t* p;
+  const value_t* p;
+  uint32_t size;
   bool dynamic;
-  uint16_t sym_args;
 
   // size must be equal to the size specified in the function type
-  ArgumentsKey(uint64_t *args, uint16_t size, bool dyn, uint16_t sym_args);
+  ArgumentsKey(const value_t args[], uint32_t size, bool dyn);
   ArgumentsKey(const ArgumentsKey& other);
   ArgumentsKey(ArgumentsKey&& other) noexcept;
   ~ArgumentsKey();
@@ -60,15 +58,14 @@ struct ArgumentsKey {
 namespace std {
 
   template <> struct hash<ArgumentsKey> {
-    std::vector<Type*> types;
-
     size_t operator()(const ArgumentsKey &key) const {
       size_t h = 0;
-      for(uint16_t i = 0; i < types.size(); i++) {
-        if ((key.sym_args & (1 << i)) != 0) {
-          h ^= hash_uint64_value(&symbol_type, key.p[i]);
+      for (uint32_t i = 0; i < key.size; i++) {
+        if (key.p[i].is_symbolic()) {
+          h ^= reinterpret_cast<size_t>(key.p[i].value.sym);
         } else {
-          h ^= hash_uint64_value(types[i], key.p[i]);
+          static std::hash<value_t> value_hasher;
+          h ^= value_hasher(key.p[i]);
         }
       }
       return h;
@@ -76,11 +73,9 @@ namespace std {
   };
 
   template <> struct equal_to<ArgumentsKey> {
-    std::vector<Type*> types;
-
     bool operator()(const ArgumentsKey &lhs, const ArgumentsKey &rhs) const {
-      for(uint16_t i = 0; i < types.size(); i++) {
-        if (!eq_uint64_value(types[i], lhs.p[i], rhs.p[i])) {
+      for (uint32_t i = 0; i < lhs.size; i++) {
+        if (lhs.p[i] != rhs.p[i]) {
           return false;
         }
       }
@@ -119,7 +114,7 @@ class ExecutionContext {
 
     void apply_updates();
 
-    const value_t get_function_value(Function *sym, uint64_t args[], uint16_t sym_args);
+    const value_t get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]);
 
     bool set_debuginfo_filter(const std::string& filters);
     bool filter_enabled(const std::string& filter);

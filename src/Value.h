@@ -75,8 +75,6 @@ class value_t {
     bool operator==(const value_t &other) const;
     bool operator!=(const value_t &other) const;
 
-    uint64_t to_uint64_t() const;
-
     bool is_undef() const;
     bool is_symbolic() const;
 
@@ -233,9 +231,6 @@ class SkipList : public List {
 
     SkipList(size_t skip, BottomList *btm);
 };
-
-size_t hash_uint64_value(const Type *type, uint64_t val);
-bool eq_uint64_value(const Type *type, uint64_t lhs, uint64_t rhs);
 
 namespace std {
 
