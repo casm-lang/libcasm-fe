@@ -33,7 +33,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstdio>
-#include <cstring>
 
 #include "ExecutionContext.h"
 #include "Symbolic.h"
@@ -64,24 +63,22 @@ void ExecutionVisitor::visit_assure(UnaryNode* assure, const value_t& val) {
 }
 
 Update *ExecutionVisitor::add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[]) {
+  auto& function_map = context_.function_states[sym_id];
+  auto it = function_map.find(ArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
+  if (it == function_map.cend()) {
+    const auto pair = function_map.emplace(ArgumentsKey(arguments, num_arguments, true), value_t());
+    it = pair.first;
+  }
+
   Update* up = reinterpret_cast<Update*>(context_.pp_stack.allocate(sizeof(Update))); // FIXME make it nicer!!
-
-  value_t* args = reinterpret_cast<value_t*>(context_.pp_stack.allocate(sizeof(value_t) * num_arguments));
-  memcpy(args, arguments, sizeof(value_t) * num_arguments);
-
   up->value = val;
   up->func = sym_id;
-  up->args = args;
+  up->args = const_cast<value_t*>(it->first.p);
   up->num_args = num_arguments;
   // TODO: Do we need line here?
   //up->line = (uint64_t) loc.lines;
 
-  auto& function_map = context_.function_states[sym_id];
-  const ArgumentsKey key(up->args, up->num_args, false);
-  if (function_map.count(key) == 0) {
-    function_map.emplace(ArgumentsKey(up->args, up->num_args, true), value_t());
-  }
-  const value_t& ref = function_map[key];
+  const value_t& ref = it->second;
   context_.updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
 
   return up;
