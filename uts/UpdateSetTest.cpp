@@ -78,6 +78,41 @@ TEST(UpdateSetTest, mergingSequentialUpdateSetsIntoParallelOnesShouldThrowWhenOv
     EXPECT_THROW(seqUpdateSet->merge(), UpdateSet::Conflict);
 }
 
+TEST(UpdateSetTest, lookupShouldPreferUpdatesOfCurrentUpdateSet) {
+    const auto seqUpdateSet1 = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
+    seqUpdateSet1->add(1, new Update{.value = make_integer_value(1)});
+
+    const auto parUpdateSet = std::unique_ptr<UpdateSet>(seqUpdateSet1->fork());
+
+    const auto seqUpdateSet2 = std::unique_ptr<UpdateSet>(parUpdateSet->fork());
+    seqUpdateSet2->add(1, new Update{.value = make_integer_value(2)}); // winner
+
+    EXPECT_EQ(make_integer_value(2), seqUpdateSet2->lookup(1)->value);
+}
+
+TEST(UpdateSetTest, lookupShouldConsiderAllSequentialParentUpdateSets) {
+    const auto seqUpdateSet1 = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
+    seqUpdateSet1->add(1, new Update{.value = make_integer_value(1)});
+
+    const auto parUpdateSet1 = std::unique_ptr<UpdateSet>(seqUpdateSet1->fork());
+
+    const auto seqUpdateSet2 = std::unique_ptr<UpdateSet>(parUpdateSet1->fork());
+    seqUpdateSet2->add(1, new Update{.value = make_integer_value(2)}); // winner
+
+    const auto parUpdateSet2 = std::unique_ptr<UpdateSet>(seqUpdateSet2->fork());
+    parUpdateSet2->add(1, new Update{.value = make_integer_value(0)});
+
+    const auto seqUpdateSet3 = std::unique_ptr<UpdateSet>(parUpdateSet2->fork());
+
+    EXPECT_EQ(make_integer_value(2), seqUpdateSet3->lookup(1)->value);
+}
+
+TEST(UpdateSetTest, lookupShouldReturnNullptrWhenUpdateDoesNotExist) {
+    const auto seqUpdateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
+
+    EXPECT_EQ(nullptr, seqUpdateSet->lookup(1));
+}
+
 TEST(UpdateSetManagerTest, forkAndMerge) {
     auto manager = std::unique_ptr<UpdateSetManager>(new UpdateSetManager());
 
