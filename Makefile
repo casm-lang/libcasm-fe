@@ -135,13 +135,14 @@ TEST_INCLUDE += -I ../gtest/googletest
 
 TEST_LIBRARY  = -lstdc++
 TEST_LIBRARY += -lpthread
+TEST_LIBRARY += libcasm-fe.a
 
 obj/uts/%.o: uts/%.cpp
 	@mkdir -p `dirname $@`
 	@echo "CPP " $<
 	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) -c $< -o $@
 
-test: default obj/uts $(TEST_OBJECTS)
+test: default $(TEST_OBJECTS)
 	@rm -f $@
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) $(TEST_LIBRARY) -o $@ $(filter %.o,$^) ../gtest/googletest/src/gtest-all.cc ../gtest/googletest/src/gtest_main.cc
