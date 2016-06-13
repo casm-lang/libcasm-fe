@@ -118,18 +118,9 @@ UpdateSet *UpdateSet::fork()
 void UpdateSet::merge()
 {
     m_parent->m_set.reserve(m_parent->m_set.size() + m_set.size());
-
-    if (type() == Type::Parallel) { // parallel into sequential
-        auto& to = m_parent->m_set;
-        for(const auto& pair : m_set) {
-            to[pair.first] = pair.second;
-        };
-    } else { // sequential into parallel
-        for(const auto& pair : m_set) {
-            m_parent->add(pair.first, pair.second);
-        }
+    for(const auto& pair : m_set) {
+        m_parent->add(pair.first, pair.second);
     }
-
     clear();
 }
 
