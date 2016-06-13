@@ -470,7 +470,8 @@ class DiedieNode : public AstNode {
     DiedieNode(yy::location& loc, ExpressionBase *msg);
 };
 
-class InitNode: public AstNode {
+class InitNode: public AstNode
+{
   public:
     const std::string identifier;
     
@@ -482,6 +483,28 @@ class SpecificationNode: public AstNode {
     const std::string identifier;
     
     SpecificationNode(yy::location& loc, const std::string& identifier);
+};
+
+
+
+// root level AST node
+class Ast : public AstNode
+{
+    SpecificationNode* spec;
+
+    InitNode* init_rule;
+    
+    AstListNode* elements;
+    
+    
+public:
+    Ast( yy::location& loc, SpecificationNode* spec, AstListNode* elements );
+    
+    void setInitRule( InitNode* init_rule );
+    
+    SpecificationNode* getSpecification( void );
+    InitNode* getInitRule( void );
+    AstListNode* getElements( void );
 };
 
 

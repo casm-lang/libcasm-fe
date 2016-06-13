@@ -35,9 +35,10 @@ void casm_frontend_init();
 
 void casm_frontend_destroy();
 
-AstNode* casm_frontend_pass_1_parse(const std::string& filename);
+Ast* casm_frontend_pass_1_parse( const std::string& filename );
 
-bool casm_frontend_pass_2_typecheck(AstListNode *root);
+bool casm_frontend_pass_2_typecheck( Ast* root );
 
-std::string casm_dump_ast(AstNode *root);
+std::string casm_dump_ast( Ast* root );
+
 #endif

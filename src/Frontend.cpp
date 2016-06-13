@@ -39,21 +39,23 @@ void casm_frontend_destroy() {
   delete global_driver;
 }
 
-AstNode* casm_frontend_pass_1_parse(const std::string& filename) {
+Ast* casm_frontend_pass_1_parse(const std::string& filename) {
   return global_driver->parse(filename);
 }
 
-bool casm_frontend_pass_2_typecheck(AstListNode *root) {
-  TypecheckVisitor typecheck_visitor(*global_driver);
-  AstWalker<TypecheckVisitor, Type*> typecheck_walker(typecheck_visitor);
-  typecheck_walker.walk_specification(root);
-  return global_driver->ok();
+bool casm_frontend_pass_2_typecheck( Ast* root )
+{
+    TypecheckVisitor typecheck_visitor(*global_driver);
+    AstWalker<TypecheckVisitor, Type*> typecheck_walker(typecheck_visitor);
+    typecheck_walker.walk_specification(root);
+    return global_driver->ok();
 }
 
-std::string casm_dump_ast(AstListNode *root) {
-  AstDumpVisitor dump_visitor;
-  AstWalker<AstDumpVisitor, bool> dump_walker(dump_visitor);
-  dump_walker.suppress_calls = true;
-  dump_walker.walk_specification(root);
-  return dump_visitor.get_dump();
+std::string casm_dump_ast( Ast* root )
+{
+    AstDumpVisitor dump_visitor;
+    AstWalker<AstDumpVisitor, bool> dump_walker(dump_visitor);
+    dump_walker.suppress_calls = true;
+    dump_walker.walk_specification(root);
+    return dump_visitor.get_dump();
 }

@@ -42,14 +42,11 @@ template<class T, class V> class AstWalker {
     {
     }
     
-    void walk_specification(AstListNode *spec) {
-        
+    void walk_specification( Ast* spec )
+    {
         assert( spec->node_type_ == NodeType::SPECIFICATION );
-        assert( spec->nodes.size() == 2 );
-        
-        visitor.visit_specification( reinterpret_cast<SpecificationNode*>( spec->nodes[0]) );
-        
-        walk_body_elements( reinterpret_cast<AstListNode*>( spec->nodes[1]) );
+        visitor.visit_specification( spec->getSpecification() );
+        walk_body_elements( spec->getElements() );
     }
     
     
