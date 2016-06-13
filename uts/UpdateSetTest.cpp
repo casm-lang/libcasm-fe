@@ -113,6 +113,20 @@ TEST(UpdateSetTest, lookupShouldReturnNullptrWhenUpdateDoesNotExist) {
     EXPECT_EQ(nullptr, seqUpdateSet->lookup(1));
 }
 
+TEST(UpdateSetTest, parallelUpdateSetsShouldThrowIfAddingUpdatesWithSameKeyButDifferentValues) {
+    const auto updateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Parallel));
+    updateSet->add(1, new Update{.value = make_integer_value(1)});
+    EXPECT_THROW(updateSet->add(1, new Update{.value = make_integer_value(2)}), UpdateSet::Conflict);
+}
+
+TEST(UpdateSetTest, sequentialUpdateSetsShouldOverrideOldUpdatesIfAddingUpdatesWithSameKeyButDifferentValues) {
+    const auto updateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
+    updateSet->add(1, new Update{.value = make_integer_value(1)});
+    EXPECT_NO_THROW(updateSet->add(1, new Update{.value = make_integer_value(2)}));
+
+    EXPECT_EQ(make_integer_value(2), updateSet->lookup(1)->value);
+}
+
 TEST(UpdateSetManagerTest, forkAndMerge) {
     auto manager = std::unique_ptr<UpdateSetManager>(new UpdateSetManager());
 
