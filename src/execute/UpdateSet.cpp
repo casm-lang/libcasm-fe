@@ -78,14 +78,18 @@ size_t UpdateSet::size() const noexcept
 
 void UpdateSet::add(const uint64_t key, Update* update)
 {
-    const auto result = m_set.insert(key, update);
-    if (!result.second) {
-        const auto existingPair = *(result.first);
-        const auto existingUpdate = existingPair.second;
+    if (m_type == Type::Parallel) {
+        const auto result = m_set.insert(key, update);
+        if (!result.second) {
+            const auto existingPair = *(result.first);
+            const auto existingUpdate = existingPair.second;
 
-        if (update->value != existingUpdate->value) {
-            throw Conflict("Conflict in updateset", update, existingUpdate);
+            if (update->value != existingUpdate->value) {
+                throw Conflict("Conflict in updateset", update, existingUpdate);
+            }
         }
+    } else {
+        m_set[key] = update;
     }
 }
 
