@@ -40,7 +40,7 @@ static libpass::PassRegistration< TypeCheckPass > PASS
 
 bool TypeCheckPass::run( libpass::PassResult& pr )
 {
-	AstNode* node = (AstNode*)pr.getResult< SourceToAstPass >();
+	AstListNode* node = (AstListNode*)pr.getResult< SourceToAstPass >();
 	
 	if( !casm_frontend_pass_2_typecheck( node ) )
 	{

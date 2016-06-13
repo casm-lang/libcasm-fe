@@ -120,6 +120,8 @@ class AstNode {
         virtual std::string to_str() const;
         virtual bool equals(AstNode *other) const;
         std::string location_str() const;
+
+        
 };
 
 class AstListNode: public AstNode {
@@ -466,6 +468,20 @@ class DiedieNode : public AstNode {
     ExpressionBase *msg;
 
     DiedieNode(yy::location& loc, ExpressionBase *msg);
+};
+
+class InitNode: public AstNode {
+  public:
+    const std::string identifier;
+    
+    InitNode(yy::location& loc, const std::string& identifier);
+};
+
+class SpecificationNode: public AstNode {
+  public:
+    const std::string identifier;
+    
+    SpecificationNode(yy::location& loc, const std::string& identifier);
 };
 
 

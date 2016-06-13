@@ -47,8 +47,10 @@ static libpass::PassRegistration< NumericExecutionPass > PASS
 
 bool NumericExecutionPass::run( libpass::PassResult& pr )
 {
-    RuleNode* node = global_driver->rules_map_[global_driver->init_name];
+	AstListNode* root = (AstListNode*)pr.getResult< TypeCheckPass >();
 
+	assert(0);
+    RuleNode* node = global_driver->rules_map_[global_driver->init_name];
     ExecutionContext ctx(global_driver->function_table, node, false, false, false);
     ExecutionVisitor visitor(ctx, *global_driver);
     ExecutionWalker walker(visitor);

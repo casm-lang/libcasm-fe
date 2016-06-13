@@ -294,11 +294,12 @@ namespace yy {
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
+      // SPECIFICATION
       // BODY_ELEMENTS
       // STATEMENTS
       char dummy1[sizeof(AstListNode*)];
 
-      // SPECIFICATION
+      // HEADER
       // BODY_ELEMENT
       // INIT_SYNTAX
       // RULE_SYNTAX
@@ -1345,12 +1346,13 @@ namespace yy {
   {
       switch (other.type_get ())
     {
+      case 88: // SPECIFICATION
       case 90: // BODY_ELEMENTS
       case 144: // STATEMENTS
         value.copy< AstListNode* > (other.value);
         break;
 
-      case 88: // SPECIFICATION
+      case 89: // HEADER
       case 91: // BODY_ELEMENT
       case 92: // INIT_SYNTAX
       case 122: // RULE_SYNTAX
@@ -1532,12 +1534,13 @@ namespace yy {
     (void) v;
       switch (this->type_get ())
     {
+      case 88: // SPECIFICATION
       case 90: // BODY_ELEMENTS
       case 144: // STATEMENTS
         value.copy< AstListNode* > (v);
         break;
 
-      case 88: // SPECIFICATION
+      case 89: // HEADER
       case 91: // BODY_ELEMENT
       case 92: // INIT_SYNTAX
       case 122: // RULE_SYNTAX
@@ -1988,12 +1991,13 @@ namespace yy {
     // Type destructor.
     switch (yytype)
     {
+      case 88: // SPECIFICATION
       case 90: // BODY_ELEMENTS
       case 144: // STATEMENTS
         value.template destroy< AstListNode* > ();
         break;
 
-      case 88: // SPECIFICATION
+      case 89: // HEADER
       case 91: // BODY_ELEMENT
       case 92: // INIT_SYNTAX
       case 122: // RULE_SYNTAX
@@ -2181,12 +2185,13 @@ namespace yy {
     super_type::move(s);
       switch (this->type_get ())
     {
+      case 88: // SPECIFICATION
       case 90: // BODY_ELEMENTS
       case 144: // STATEMENTS
         value.move< AstListNode* > (s.value);
         break;
 
-      case 88: // SPECIFICATION
+      case 89: // HEADER
       case 91: // BODY_ELEMENT
       case 92: // INIT_SYNTAX
       case 122: // RULE_SYNTAX
@@ -2932,7 +2937,7 @@ namespace yy {
 
 
 } // yy
-#line 2936 "GrammarParser.tab.h" // lalr1.cc:377
+#line 2941 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

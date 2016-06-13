@@ -614,3 +614,9 @@ LetNode::LetNode(yy::location& loc, Type type, const std::string& identifier,
 
 DiedieNode::DiedieNode(yy::location& loc, ExpressionBase *msg)
     : AstNode(loc, NodeType::DIEDIE), msg(msg) {}
+
+InitNode::InitNode(yy::location& loc, const std::string& identifier) 
+    : AstNode(loc, NodeType::INIT), identifier(identifier) {}
+
+SpecificationNode::SpecificationNode(yy::location& loc, const std::string& identifier) 
+    : AstNode(loc, NodeType::SPECIFICATION), identifier(identifier) {}

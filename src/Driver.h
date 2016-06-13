@@ -54,7 +54,7 @@ public:
     virtual ~Driver();
 
     std::map<std::string, RuleNode*> rules_map_;
-    AstNode *result;
+    AstListNode *result;
     std::string spec_name;
     
     std::string init_name;
