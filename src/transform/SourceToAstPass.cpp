@@ -44,7 +44,7 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
 	
 	casm_frontend_init();
 	
-	AstNode* node = casm_frontend_pass_1_parse( file_name );
+	Ast* node = casm_frontend_pass_1_parse( file_name );
 	
     if( !node ) 
 	{
@@ -53,6 +53,15 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
 		
 		return false;
     }
+	
+	assert( node->getElements() );
+	for( auto e : node->getElements()->nodes )
+	{
+		if( e->node_type_ == NodeType::INIT )
+		{
+			node->setInitRule( (InitNode*)e );
+		}
+	}
 	
 	pr.setResult< SourceToAstPass >( node );
     

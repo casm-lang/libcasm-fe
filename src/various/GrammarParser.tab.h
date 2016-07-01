@@ -294,140 +294,147 @@ namespace yy {
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
+      // SPECIFICATION
+      char dummy1[sizeof(Ast*)];
+
       // BODY_ELEMENTS
       // STATEMENTS
-      char dummy1[sizeof(AstListNode*)];
+      char dummy2[sizeof(AstListNode*)];
 
-      // SPECIFICATION
       // BODY_ELEMENT
-      // INIT_SYNTAX
       // RULE_SYNTAX
       // STATEMENT
       // IMPOSSIBLE_SYNTAX
-      char dummy2[sizeof(AstNode*)];
+      char dummy3[sizeof(AstNode*)];
 
       // VALUE
       // NUMBER
       // NUMBER_RANGE
-      char dummy3[sizeof(AtomNode*)];
+      char dummy4[sizeof(AtomNode*)];
 
       // FUNCTION_SYNTAX
-      char dummy4[sizeof(BaseFunctionAtom*)];
+      char dummy5[sizeof(BaseFunctionAtom*)];
 
       // CALL_SYNTAX
-      char dummy5[sizeof(CallNode*)];
+      char dummy6[sizeof(CallNode*)];
 
       // CASE_SYNTAX
-      char dummy6[sizeof(CaseNode*)];
+      char dummy7[sizeof(CaseNode*)];
 
       // DIEDIE_SYNTAX
-      char dummy7[sizeof(DiedieNode*)];
+      char dummy8[sizeof(DiedieNode*)];
 
       // ENUM_SYNTAX
-      char dummy8[sizeof(Enum*)];
+      char dummy9[sizeof(Enum*)];
 
       // ATOM
       // EXPRESSION
       // BRACKET_EXPRESSION
-      char dummy9[sizeof(ExpressionBase*)];
+      char dummy10[sizeof(ExpressionBase*)];
 
       // FLOATINGCONST
-      char dummy10[sizeof(FLOATING_T)];
+      char dummy11[sizeof(FLOATING_T)];
 
       // FORALL_SYNTAX
-      char dummy11[sizeof(ForallNode*)];
+      char dummy12[sizeof(ForallNode*)];
 
       // DERIVED_SYNTAX
       // FUNCTION_DEFINITION
-      char dummy12[sizeof(Function*)];
+      char dummy13[sizeof(Function*)];
 
       // INTEGERCONST
-      char dummy13[sizeof(INTEGER_T)];
+      char dummy14[sizeof(INTEGER_T)];
 
       // IFTHENELSE
-      char dummy14[sizeof(IfThenElseNode*)];
+      char dummy15[sizeof(IfThenElseNode*)];
+
+      // INIT_SYNTAX
+      char dummy16[sizeof(InitNode*)];
 
       // INTEGER_NUMBER
-      char dummy15[sizeof(IntegerAtom*)];
+      char dummy17[sizeof(IntegerAtom*)];
 
       // LET_SYNTAX
-      char dummy16[sizeof(LetNode*)];
+      char dummy18[sizeof(LetNode*)];
 
       // POP_SYNTAX
-      char dummy17[sizeof(PopNode*)];
+      char dummy19[sizeof(PopNode*)];
 
       // DEBUG_SYNTAX
       // PRINT_SYNTAX
-      char dummy18[sizeof(PrintNode*)];
+      char dummy20[sizeof(PrintNode*)];
 
       // PUSH_SYNTAX
-      char dummy19[sizeof(PushNode*)];
+      char dummy21[sizeof(PushNode*)];
+
+      // HEADER
+      char dummy22[sizeof(SpecificationNode*)];
 
       // PARAM
       // TYPE_SYNTAX
-      char dummy20[sizeof(Type*)];
+      char dummy23[sizeof(Type*)];
 
       // ASSERT_SYNTAX
       // ASSURE_SYNTAX
       // SEQ_SYNTAX
       // PAR_SYNTAX
       // ITERATE_SYNTAX
-      char dummy21[sizeof(UnaryNode*)];
+      char dummy24[sizeof(UnaryNode*)];
 
       // UPDATE_SYNTAX
-      char dummy22[sizeof(UpdateNode*)];
+      char dummy25[sizeof(UpdateNode*)];
 
       // RATIONALCONST
-      char dummy23[sizeof(rational_t)];
+      char dummy26[sizeof(rational_t)];
 
       // CASE_LABEL
       // CASE_LABEL_DEFAULT
       // CASE_LABEL_NUMBER
       // CASE_LABEL_IDENT
       // CASE_LABEL_STRING
-      char dummy24[sizeof(std::pair<AtomNode*, AstNode*>)];
+      char dummy27[sizeof(std::pair<AtomNode*, AstNode*>)];
 
       // INITIALIZER
-      char dummy25[sizeof(std::pair<ExpressionBase*, ExpressionBase*>)];
+      char dummy28[sizeof(std::pair<ExpressionBase*, ExpressionBase*>)];
 
       // DUMPSPEC
-      char dummy26[sizeof(std::pair<std::string, std::vector<std::string>>)];
+      char dummy29[sizeof(std::pair<std::string, std::vector<std::string>>)];
 
       // FUNCTION_SIGNATURE
-      char dummy27[sizeof(std::pair<std::vector<Type*>, Type*>)];
+      char dummy30[sizeof(std::pair<std::vector<Type*>, Type*>)];
 
       // STRCONST
       // "identifier"
       // RULEREF
-      char dummy28[sizeof(std::string)];
+      char dummy31[sizeof(std::string)];
 
       // DEBUG_ATOM_LIST
-      char dummy29[sizeof(std::vector<ExpressionBase*>)];
+      char dummy32[sizeof(std::vector<ExpressionBase*>)];
 
       // LISTCONST
       // EXPRESSION_LIST
       // EXPRESSION_LIST_NO_COMMA
-      char dummy30[sizeof(std::vector<ExpressionBase*>*)];
+      char dummy33[sizeof(std::vector<ExpressionBase*>*)];
 
       // PARAM_LIST
       // PARAM_LIST_NO_COMMA
       // TYPE_IDENTIFIER_STARLIST
       // TYPE_SYNTAX_LIST
-      char dummy31[sizeof(std::vector<Type*>)];
+      char dummy34[sizeof(std::vector<Type*>)];
 
       // CASE_LABEL_LIST
-      char dummy32[sizeof(std::vector<std::pair<AtomNode*, AstNode*>>)];
+      char dummy35[sizeof(std::vector<std::pair<AtomNode*, AstNode*>>)];
 
       // INITIALIZERS
       // INITIALIZER_LIST
-      char dummy33[sizeof(std::vector<std::pair<ExpressionBase*, ExpressionBase*>>*)];
+      char dummy36[sizeof(std::vector<std::pair<ExpressionBase*, ExpressionBase*>>*)];
 
       // DUMPSPEC_LIST
-      char dummy34[sizeof(std::vector<std::pair<std::string, std::vector<std::string>>>)];
+      char dummy37[sizeof(std::vector<std::pair<std::string, std::vector<std::string>>>)];
 
       // IDENTIFIER_LIST
       // IDENTIFIER_LIST_NO_COMMA
-      char dummy35[sizeof(std::vector<std::string>)];
+      char dummy38[sizeof(std::vector<std::string>)];
 };
 
     /// Symbol semantic values.
@@ -572,6 +579,8 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const Ast* v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const AstListNode* v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const AstNode* v, const location_type& l);
@@ -600,6 +609,8 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const IfThenElseNode* v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const InitNode* v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const IntegerAtom* v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const LetNode* v, const location_type& l);
@@ -609,6 +620,8 @@ namespace yy {
   basic_symbol (typename Base::kind_type t, const PrintNode* v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const PushNode* v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const SpecificationNode* v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Type* v, const location_type& l);
 
@@ -1345,14 +1358,16 @@ namespace yy {
   {
       switch (other.type_get ())
     {
+      case 88: // SPECIFICATION
+        value.copy< Ast* > (other.value);
+        break;
+
       case 90: // BODY_ELEMENTS
       case 144: // STATEMENTS
         value.copy< AstListNode* > (other.value);
         break;
 
-      case 88: // SPECIFICATION
       case 91: // BODY_ELEMENT
-      case 92: // INIT_SYNTAX
       case 122: // RULE_SYNTAX
       case 125: // STATEMENT
       case 129: // IMPOSSIBLE_SYNTAX
@@ -1412,6 +1427,10 @@ namespace yy {
         value.copy< IfThenElseNode* > (other.value);
         break;
 
+      case 92: // INIT_SYNTAX
+        value.copy< InitNode* > (other.value);
+        break;
+
       case 112: // INTEGER_NUMBER
         value.copy< IntegerAtom* > (other.value);
         break;
@@ -1431,6 +1450,10 @@ namespace yy {
 
       case 149: // PUSH_SYNTAX
         value.copy< PushNode* > (other.value);
+        break;
+
+      case 89: // HEADER
+        value.copy< SpecificationNode* > (other.value);
         break;
 
       case 101: // PARAM
@@ -1532,14 +1555,16 @@ namespace yy {
     (void) v;
       switch (this->type_get ())
     {
+      case 88: // SPECIFICATION
+        value.copy< Ast* > (v);
+        break;
+
       case 90: // BODY_ELEMENTS
       case 144: // STATEMENTS
         value.copy< AstListNode* > (v);
         break;
 
-      case 88: // SPECIFICATION
       case 91: // BODY_ELEMENT
-      case 92: // INIT_SYNTAX
       case 122: // RULE_SYNTAX
       case 125: // STATEMENT
       case 129: // IMPOSSIBLE_SYNTAX
@@ -1599,6 +1624,10 @@ namespace yy {
         value.copy< IfThenElseNode* > (v);
         break;
 
+      case 92: // INIT_SYNTAX
+        value.copy< InitNode* > (v);
+        break;
+
       case 112: // INTEGER_NUMBER
         value.copy< IntegerAtom* > (v);
         break;
@@ -1618,6 +1647,10 @@ namespace yy {
 
       case 149: // PUSH_SYNTAX
         value.copy< PushNode* > (v);
+        break;
+
+      case 89: // HEADER
+        value.copy< SpecificationNode* > (v);
         break;
 
       case 101: // PARAM
@@ -1714,6 +1747,13 @@ namespace yy {
   casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const location_type& l)
     : Base (t)
     , value ()
+    , location (l)
+  {}
+
+  template <typename Base>
+  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Ast* v, const location_type& l)
+    : Base (t)
+    , value (v)
     , location (l)
   {}
 
@@ -1816,6 +1856,13 @@ namespace yy {
   {}
 
   template <typename Base>
+  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitNode* v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IntegerAtom* v, const location_type& l)
     : Base (t)
     , value (v)
@@ -1845,6 +1892,13 @@ namespace yy {
 
   template <typename Base>
   casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PushNode* v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SpecificationNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -1988,14 +2042,16 @@ namespace yy {
     // Type destructor.
     switch (yytype)
     {
+      case 88: // SPECIFICATION
+        value.template destroy< Ast* > ();
+        break;
+
       case 90: // BODY_ELEMENTS
       case 144: // STATEMENTS
         value.template destroy< AstListNode* > ();
         break;
 
-      case 88: // SPECIFICATION
       case 91: // BODY_ELEMENT
-      case 92: // INIT_SYNTAX
       case 122: // RULE_SYNTAX
       case 125: // STATEMENT
       case 129: // IMPOSSIBLE_SYNTAX
@@ -2055,6 +2111,10 @@ namespace yy {
         value.template destroy< IfThenElseNode* > ();
         break;
 
+      case 92: // INIT_SYNTAX
+        value.template destroy< InitNode* > ();
+        break;
+
       case 112: // INTEGER_NUMBER
         value.template destroy< IntegerAtom* > ();
         break;
@@ -2074,6 +2134,10 @@ namespace yy {
 
       case 149: // PUSH_SYNTAX
         value.template destroy< PushNode* > ();
+        break;
+
+      case 89: // HEADER
+        value.template destroy< SpecificationNode* > ();
         break;
 
       case 101: // PARAM
@@ -2181,14 +2245,16 @@ namespace yy {
     super_type::move(s);
       switch (this->type_get ())
     {
+      case 88: // SPECIFICATION
+        value.move< Ast* > (s.value);
+        break;
+
       case 90: // BODY_ELEMENTS
       case 144: // STATEMENTS
         value.move< AstListNode* > (s.value);
         break;
 
-      case 88: // SPECIFICATION
       case 91: // BODY_ELEMENT
-      case 92: // INIT_SYNTAX
       case 122: // RULE_SYNTAX
       case 125: // STATEMENT
       case 129: // IMPOSSIBLE_SYNTAX
@@ -2248,6 +2314,10 @@ namespace yy {
         value.move< IfThenElseNode* > (s.value);
         break;
 
+      case 92: // INIT_SYNTAX
+        value.move< InitNode* > (s.value);
+        break;
+
       case 112: // INTEGER_NUMBER
         value.move< IntegerAtom* > (s.value);
         break;
@@ -2267,6 +2337,10 @@ namespace yy {
 
       case 149: // PUSH_SYNTAX
         value.move< PushNode* > (s.value);
+        break;
+
+      case 89: // HEADER
+        value.move< SpecificationNode* > (s.value);
         break;
 
       case 101: // PARAM
@@ -2932,7 +3006,7 @@ namespace yy {
 
 
 } // yy
-#line 2936 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3010 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

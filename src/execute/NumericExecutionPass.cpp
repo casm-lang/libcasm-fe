@@ -47,12 +47,12 @@ static libpass::PassRegistration< NumericExecutionPass > PASS
 
 bool NumericExecutionPass::run( libpass::PassResult& pr )
 {
-    RuleNode* node = global_driver->rules_map_[global_driver->init_name];
-
+	Ast* root = (Ast*)pr.getResult< TypeCheckPass >();
+    RuleNode* node = global_driver->rules_map_[ root->getInitRule()->identifier ];
     ExecutionContext ctx(global_driver->function_table, node, false, false, false);
     ExecutionVisitor visitor(ctx, *global_driver);
     ExecutionWalker walker(visitor);
-
+	
     try {
         walker.run();
         return true;
@@ -62,7 +62,7 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
     } catch (char * e) {
         std::cerr << "Abort after catching a string: " << e << std::endl;
     }
-
+	
     return false;
 }
 

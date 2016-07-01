@@ -134,7 +134,10 @@
 %token FLOATINGCONST INTEGERCONST RATIONALCONST STRCONST
 %token <std::string> IDENTIFIER "identifier"
 
-%type <AstNode*> INIT_SYNTAX BODY_ELEMENT SPECIFICATION RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX
+%type <Ast*> SPECIFICATION
+%type <SpecificationNode*> HEADER
+%type <InitNode*> INIT_SYNTAX
+%type <AstNode*> BODY_ELEMENT RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX
 %type <UnaryNode*> PAR_SYNTAX SEQ_SYNTAX ASSERT_SYNTAX ASSURE_SYNTAX ITERATE_SYNTAX
 %type <AstListNode*> BODY_ELEMENTS STATEMENTS
 %type <AtomNode*> NUMBER VALUE NUMBER_RANGE
@@ -194,23 +197,35 @@
 
 %%
 
+     
+SPECIFICATION
+: HEADER BODY_ELEMENTS
+{
+    driver.result = new Ast( @$, $1, $2 );
+}
+;
 
-SPECIFICATION: HEADER BODY_ELEMENTS { driver.result = $2; } /* TODO: header ignored atm */
-             /* | BODY_ELEMENTS { driver.result = $1; } */
-             ;
 
-HEADER: CASM IDENTIFIER
-        {
-            driver.spec_name = $2;
-        }
-      ;
+HEADER
+: CASM IDENTIFIER
+{
+    $$ = new SpecificationNode( @$, $2 );
+}
+;
 
-BODY_ELEMENTS: BODY_ELEMENTS BODY_ELEMENT { $1->add($2); $$ = $1; }
-             | BODY_ELEMENT {
-                $$ = new AstListNode(@$, NodeType::BODY_ELEMENTS);
-                $$->add($1);
-             }
-             ;
+BODY_ELEMENTS
+: BODY_ELEMENTS BODY_ELEMENT
+{
+    $1->add($2);
+    $$ = $1;
+}
+| BODY_ELEMENT
+{
+    $$ = new AstListNode(@$, NodeType::BODY_ELEMENTS);
+    $$->add($1);
+}
+;
+
 
 BODY_ELEMENT: PROVIDER_SYNTAX { $$ = new AstNode(NodeType::PROVIDER); }
            | OPTION_SYNTAX { $$ = new AstNode(NodeType::OPTION); }
@@ -256,16 +271,20 @@ BODY_ELEMENT: PROVIDER_SYNTAX { $$ = new AstNode(NodeType::PROVIDER); }
            }
            ;
 
-INIT_SYNTAX: INIT IDENTIFIER {
-              $$ = new AstNode(NodeType::INIT);
-              driver.init_name = $2;
-           }
-           ;
+INIT_SYNTAX
+: INIT IDENTIFIER
+{
+    $$ = new InitNode( @$, $2 );
+}
+;
 
-PROVIDER_SYNTAX: PROVIDER IDENTIFIER
-          ;
+
+PROVIDER_SYNTAX: PROVIDER IDENTIFIER // TODO: PPA: REMOVE THIS, BECAUSE THIS IS AN OLD SYNTAX ELEMENT!!! 
+;
+
 
 OPTION_SYNTAX: OPTION IDENTIFIER "." IDENTIFIER IDENTIFIER;
+
 
 ENUM_SYNTAX: ENUM IDENTIFIER "=" "{" IDENTIFIER_LIST "}" {
                 $$ = new Enum($2, @$);

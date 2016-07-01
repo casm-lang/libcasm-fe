@@ -614,3 +614,55 @@ LetNode::LetNode(yy::location& loc, Type type, const std::string& identifier,
 
 DiedieNode::DiedieNode(yy::location& loc, ExpressionBase *msg)
     : AstNode(loc, NodeType::DIEDIE), msg(msg) {}
+
+InitNode::InitNode(yy::location& loc, const std::string& identifier) 
+    : AstNode(loc, NodeType::INIT), identifier(identifier) {}
+
+SpecificationNode::SpecificationNode(yy::location& loc, const std::string& identifier) 
+    : AstNode(loc, NodeType::SPECIFICATION), identifier(identifier) {}
+
+
+
+Ast::Ast( yy::location& loc, SpecificationNode* spec, AstListNode* elements ) 
+: AstNode( loc, NodeType::SPECIFICATION )
+, spec( spec )
+, init_rule( 0 )
+, elements( elements )
+{    
+}
+
+void Ast::setInitRule( InitNode* init_rule )
+{
+	assert( init_rule and "invalid init rule pointer!" );
+    this->init_rule = init_rule;
+}
+
+SpecificationNode* Ast::getSpecification( void )
+{
+	assert( spec and "invalid specification node pointer!" );
+	return spec;
+}
+
+InitNode* Ast::getInitRule( void )
+{
+	assert( init_rule and "invalid specification node pointer!" );
+	return init_rule;
+}
+
+AstListNode* Ast::getElements( void )
+{
+	assert( elements and "invalid specification node pointer!" );
+	return elements;	
+}
+
+
+
+//  
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: t
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//  
