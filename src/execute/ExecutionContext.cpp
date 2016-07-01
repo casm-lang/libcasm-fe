@@ -128,18 +128,13 @@ Update* ExecutionContext::add_update(const value_t& val, size_t sym_id, uint32_t
     const auto existingUpdate = e.existingUpdate();
 
     const auto function = function_symbols[conflictingUpdate->func];
-    std::string locationText = function->name;
-    if (conflictingUpdate->num_args > 0) {
-        locationText += "(" + conflictingUpdate->args[0].to_str();
-        for (uint16_t i = 1; i < conflictingUpdate->num_args; i++) {
-            locationText += ", " + conflictingUpdate->args[i].to_str();
-        }
-        locationText += ")";
-    }
+    const auto location = function->name + arguments_to_string(conflictingUpdate->num_args,
+                                                               conflictingUpdate->args);
 
-    auto info = "Conflict while adding update " + locationText + " = " + val.to_str()
-              + " at line " + std::to_string(line) + ", conflicting with line "
-              + std::to_string(existingUpdate->line) + ", value: " + existingUpdate->value.to_str();
+    const auto info = "Conflict while adding update " + location + " = " + val.to_str()
+                    + " at line " + std::to_string(line) + ", conflicting with line "
+                    + std::to_string(existingUpdate->line) + " with value '"
+                    + existingUpdate->value.to_str() + "'";
     throw RuntimeException(info);
   }
 
@@ -298,20 +293,14 @@ void ExecutionContext::merge()
         const auto existingUpdate = e.existingUpdate();
 
         const auto function = function_symbols[conflictingUpdate->func];
-        std::string locationText = function->name;
-        if (conflictingUpdate->num_args > 0) {
-            locationText += "(" + conflictingUpdate->args[0].to_str();
-            for (uint16_t i = 1; i < conflictingUpdate->num_args; i++) {
-                locationText += ", " + conflictingUpdate->args[i].to_str();
-            }
-            locationText += ")";
-        }
+        const auto location = function->name + arguments_to_string(conflictingUpdate->num_args,
+                                                                   conflictingUpdate->args);
 
-        auto info = "Conflict while merging updateset " + locationText + "\n"
-                  + "at line " + std::to_string(conflictingUpdate->line)
-                  + " with value: " + conflictingUpdate->value.to_str() + "\n"
-                  + "and at line " + std::to_string(existingUpdate->line)
-                  + " with value: " + existingUpdate->value.to_str();
+        const auto info = "Conflict while merging updateset " + location
+                        + " at line " + std::to_string(conflictingUpdate->line)
+                        + " with value '" + conflictingUpdate->value.to_str() + "'"
+                        + " and at line " + std::to_string(existingUpdate->line)
+                        + " with value '" + existingUpdate->value.to_str() + "'";
         throw RuntimeException(info);
     }
 }
