@@ -105,7 +105,7 @@ ExecutionContext::ExecutionContext(const ExecutionContext& other) :
   //updateset.set =  pp_hashmap_new(&updateset_data_, UPDATESET_SIZE, "main updateset");
 }
 
-Update* ExecutionContext::add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[]) {
+Update* ExecutionContext::add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[], uint64_t line) {
   auto& function_map = function_states[sym_id];
   auto it = function_map.find(ArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
   if (it == function_map.cend()) {
@@ -118,11 +118,30 @@ Update* ExecutionContext::add_update(const value_t& val, size_t sym_id, uint32_t
   up->func = sym_id;
   up->args = const_cast<value_t*>(it->first.p);
   up->num_args = num_arguments;
-  // TODO: Do we need line here?
-  //up->line = (uint64_t) loc.lines;
+  up->line = line;
 
-  const value_t& ref = it->second;
-  updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
+  try {
+    const value_t& ref = it->second;
+    updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
+  } catch (const UpdateSet::Conflict& e) {
+    const auto conflictingUpdate = e.conflictingUpdate();
+    const auto existingUpdate = e.existingUpdate();
+
+    const auto function = function_symbols[conflictingUpdate->func];
+    std::string locationText = function->name;
+    if (conflictingUpdate->num_args > 0) {
+        locationText += "(" + conflictingUpdate->args[0].to_str();
+        for (uint16_t i = 1; i < conflictingUpdate->num_args; i++) {
+            locationText += ", " + conflictingUpdate->args[i].to_str();
+        }
+        locationText += ")";
+    }
+
+    auto info = "Conflict while adding update " + locationText + " = " + val.to_str()
+              + " at line " + std::to_string(line) + ", conflicting with line "
+              + std::to_string(existingUpdate->line) + ", value: " + existingUpdate->value.to_str();
+    throw RuntimeException(info);
+  }
 
   return up;
 }

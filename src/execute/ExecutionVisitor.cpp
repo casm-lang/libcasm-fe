@@ -85,15 +85,8 @@ void ExecutionVisitor::visit_update_dumps(UpdateNode *update, const value_t& exp
 }
 
 void ExecutionVisitor::visit_update(UpdateNode *update, const value_t& expr_v) {
-  try {
-    Update *up = context_.add_update(expr_v, update->func->symbol->id, num_arguments, arguments);
-    up->line = (uint64_t) &update->location;
-  } catch (const RuntimeException& ex) {
-    // TODO EP: this is probably not the cleanest solutions
-    driver_.error(update->location,
-                  "update conflict in parallel block for function `"+update->func->name+"`");
-    throw ex;
-  }
+  context_.add_update(expr_v, update->func->symbol->id, num_arguments, arguments,
+                      update->location.begin.line);
 }
 
 void ExecutionVisitor::visit_update_subrange(UpdateNode *update, const value_t& expr_v) {
@@ -225,30 +218,15 @@ void ExecutionVisitor::visit_push(PushNode *node, const value_t& expr, const val
           value_t(TypeType::LIST, new BottomList())).value.list;
     }
 
-    try {
-      Update *up = context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments);
-      up->line = (uint64_t) &node->location;
-    } catch (const RuntimeException& ex) {
-      // TODO this is probably not the cleanest solutions
-      driver_.error(node->to->location,
-                    "update conflict in parallel block for function `"+node->to->name+"`");
-      throw ex;
-    }
+    context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments,
+                        node->location.begin.line);
 
     value_t args[] = {atom, expr};
     symbolic::dump_builtin(context_.trace, "push", args, 2, to_res);
   } else {
     const value_t to_res = builtins::cons(context_, expr, atom);
-
-    try {
-      Update *up = context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments);
-      up->line = (uint64_t) &node->location;
-    } catch (const RuntimeException& ex) {
-      // TODO this is probably not the cleanest solutions
-      driver_.error(node->to->location,
-                    "update conflict in parallel block for function `"+node->to->name+"`");
-      throw ex;
-    }
+    context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments,
+                        node->location.begin.line);
   }
 }
 
@@ -261,15 +239,8 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
 
     Update *up = nullptr;
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
-      try {
-        up = context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments);
-        up->line = (uint64_t) &node->location;
-      } catch (const RuntimeException& ex) {
-        // TODO this is probably not the cleanest solutions
-        driver_.error(node->to->location,
-                      "update conflict in parallel block for function `"+node->to->name+"`");
-        throw ex;
-      }
+      up = context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments,
+                               node->location.begin.line);
     } else {
       rule_bindings.back()->push_back(to_res);
     }
@@ -283,44 +254,21 @@ void ExecutionVisitor::visit_pop(PopNode *node, const value_t& val) {
     value_t args[] = {val, to_res};
     symbolic::dump_builtin(context_.trace, "pop", args, 2, from_res);
 
-    try {
-      up = context_.add_update(from_res, node->from->symbol->id, num_arguments, arguments);
-      up->line = (uint64_t) &node->location;
-    } catch (const RuntimeException& ex) {
-      // TODO this is probably not the cleanest solutions
-      driver_.error(node->location,
-                    "update conflict in parallel block for function `"+node->from->name+"`");
-      throw ex;
-    }
-
+    context_.add_update(from_res, node->from->symbol->id, num_arguments, arguments,
+                        node->location.begin.line);
   } else {
     const value_t to_res = builtins::peek(val);
 
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
-      try {
-        Update *up = context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments);
-        up->line = (uint64_t) &node->location;
-      } catch (const RuntimeException& ex) {
-        // TODO this is probably not the cleanest solutions
-        driver_.error(node->to->location,
-                      "update conflict in parallel block for function `"+node->to->name+"`");
-        throw ex;
-      }
+      context_.add_update(to_res, node->to->symbol->id, num_arguments, arguments,
+                          node->location.begin.line);
     } else {
       rule_bindings.back()->push_back(to_res);
     } 
 
     const value_t from_res = builtins::tail(context_, val);
-    try {
-      Update *up = context_.add_update(from_res, node->from->symbol->id, num_arguments, arguments);
-      up->line = (uint64_t) &node->location;
-    } catch (const RuntimeException& ex) {
-      // TODO this is probably not the cleanest solutions
-      driver_.error(node->location,
-                    "update conflict in parallel block for function `"+node->from->name+"`");
-      throw ex;
-    }
-
+    context_.add_update(from_res, node->from->symbol->id, num_arguments, arguments,
+                        node->location.begin.line);
   }
 }
 
