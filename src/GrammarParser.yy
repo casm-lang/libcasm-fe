@@ -61,37 +61,75 @@
 
 %code {
     #include "src/Driver.h"
+    #include "src/Codes.h"
 
-    std::pair<bool, bool> parse_function_attributes(Driver& driver, const yy::location& loc,
-                                                    const std::vector<std::string>& attribute_names) {
+    std::pair<bool, bool> parse_function_attributes
+    ( Driver& driver
+    , const yy::location& loc
+    , const std::vector<std::string>& attribute_names
+    )
+    {
         bool is_static = false;
         bool is_symbolic = false;
         bool is_controlled = false;
-
-        for (const auto& attribute_name : attribute_names) {
-            if (attribute_name == "static") {
-                if (is_static) {
-                    driver.error(loc, "`static` attribute can only be used once per function");
+        
+        for( const auto& attribute_name : attribute_names )
+        {
+            if( attribute_name == "static" )
+            {
+                if( is_static )
+                {
+                    driver.error
+                    ( loc
+                    , "`static` attribute can only be used once per function"
+                    , libcasm_fe::Codes::FunctionAttributeMultipleUseOfStatic
+                    );
                     break;
-                } else {
+                }
+                else
+                {
                     is_static = true;
                 }
-            } else if (attribute_name == "symbolic") {
-                if (is_symbolic) {
-                    driver.error(loc, "`symbolic` attribute can only be used once per function");
+            }
+            else if( attribute_name == "symbolic" )
+            {
+                if( is_symbolic )
+                {
+                    driver.error
+                    ( loc
+                    , "`symbolic` attribute can only be used once per function"
+                    , libcasm_fe::Codes::FunctionAttributeMultipleUseOfSymbolic
+                    );
                     break;
-                } else {
+                }
+                else
+                {
                     is_symbolic = true;
                 }
-            } else if (attribute_name == "controlled") {
-                if (is_controlled) {
-                    driver.error(loc, "`controlled` attribute can only be used once per function");
+            }
+            else if( attribute_name == "controlled" )
+            {
+                if( is_controlled )
+                {
+                    driver.error
+                    ( loc
+                    , "`controlled` attribute can only be used once per function"
+                      , libcasm_fe::Codes::FunctionAttributeMultipleUseOfControlled
+                    );
                     break;
-                } else {
+                }
+                else
+                {
                     is_controlled = true;
                 }
-            } else {
-              driver.error(loc, "`"+attribute_name+"` is no valid function attribute, only static, symbolic and controlled are allowed");
+            }
+            else
+            {
+                driver.error
+                ( loc
+                , "`"+attribute_name+"` is no valid function attribute, only static, symbolic and controlled are allowed"
+                , libcasm_fe::Codes::FunctionAttributeIsInvalid
+                );
             }
         }
         if (is_static && is_controlled) {
@@ -804,5 +842,5 @@ ITERATE_SYNTAX: ITERATE STATEMENT { $$ = new UnaryNode(@$, NodeType::ITERATE, $2
 
 void yy::casmi_parser::error(const location_type& l,
                               const std::string& m) {
-    driver.error (l, m);
+    driver.error (l, m + "\nasdf");
 }

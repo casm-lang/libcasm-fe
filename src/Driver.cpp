@@ -116,13 +116,24 @@ Ast *Driver::parse (const std::string &f) {
   return result;
 }
 
-void Driver::error( const yy::location& l, const std::string& m )
+void Driver::error( const yy::location& l, const std::string& m, libcasm_fe::Codes code )
 {
     // Set state to error!
     error_++;
-    
+
+    assert(0);
     std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " << BOLD_RED
               << "error: " << RESET << BOLD_BLACK << m << RESET << std::endl;
+    
+    if( code == libcasm_fe::Codes::Unspecified )
+    {
+        warning( l, "unspecified error code!" );
+    }
+    else
+    {
+        assert(0);
+        // fprintf( BOLD_BLACK "%s" )
+    }
     
     underline( l );
 }

@@ -84,7 +84,7 @@ ExecutionContext::ExecutionContext(const SymbolTable& st, RuleNode *init,
   //pp_mem_new(&updateset_data_, UPDATESET_DATA_SIZE, "mem for updateset hashmap"); FIXME?
   //updateset.set =  pp_hashmap_new(&updateset_data_, UPDATESET_SIZE, "main updateset");
 
-  assert(init->child_ && init->child_->node_type_ == NodeType::PARBLOCK);
+  //assert(init->child_ && init->child_->node_type_ == NodeType::PARBLOCK);
 
   function_states = std::vector<std::unordered_map<ArgumentsKey, value_t>>(symbol_table.size());
   function_symbols = std::vector<const Function*>(symbol_table.size());
