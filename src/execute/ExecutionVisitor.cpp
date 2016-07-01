@@ -560,16 +560,56 @@ void AstWalker<ExecutionVisitor, value_t>::walk_ifthenelse(IfThenElseNode* node)
 
 template <>
 void AstWalker<ExecutionVisitor, value_t>::walk_seqblock(UnaryNode* seqblock) {
-  UpdateSetForkGuard guard(UpdateSet::Type::Sequential, &visitor.context_.updateSetManager);
-  visitor.visit_seqblock(seqblock);
-  walk_statements(reinterpret_cast<AstListNode*>(seqblock->child_));
+  try {
+    UpdateSetForkGuard guard(UpdateSet::Type::Sequential, &visitor.context_.updateSetManager);
+    visitor.visit_seqblock(seqblock);
+    walk_statements(reinterpret_cast<AstListNode*>(seqblock->child_));
+  } catch (const UpdateSet::Conflict& e) {
+    const auto conflictingUpdate = e.conflictingUpdate();
+    const auto existingUpdate = e.existingUpdate();
+
+    const auto function = visitor.context_.function_symbols[conflictingUpdate->func];
+    std::string locationText = function->name;
+    if (conflictingUpdate->num_args > 0) {
+      locationText += "(" + conflictingUpdate->args[0].to_str();
+      for (uint16_t i = 1; i < conflictingUpdate->num_args; i++) {
+        locationText += ", " + conflictingUpdate->args[i].to_str();
+      }
+      locationText += ")";
+    }
+
+    auto info = "Conflict while merging sequential updateset " + locationText + "\n"
+              + "at line " + std::to_string(conflictingUpdate->line) + "with value: " + conflictingUpdate->value.to_str() + "\n"
+              + "and at line " + std::to_string(existingUpdate->line) + "with value: " + existingUpdate->value.to_str();
+    throw RuntimeException(info);
+  }
 }
 
 template <>
 void AstWalker<ExecutionVisitor, value_t>::walk_parblock(UnaryNode* parblock) {
-  UpdateSetForkGuard guard(UpdateSet::Type::Parallel, &visitor.context_.updateSetManager);
-  visitor.visit_parblock(parblock);
-  walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
+  try {
+    UpdateSetForkGuard guard(UpdateSet::Type::Parallel, &visitor.context_.updateSetManager);
+    visitor.visit_parblock(parblock);
+    walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
+  } catch (const UpdateSet::Conflict& e) {
+    const auto conflictingUpdate = e.conflictingUpdate();
+    const auto existingUpdate = e.existingUpdate();
+
+    const auto function = visitor.context_.function_symbols[conflictingUpdate->func];
+    std::string locationText = function->name;
+    if (conflictingUpdate->num_args > 0) {
+      locationText += "(" + conflictingUpdate->args[0].to_str();
+      for (uint16_t i = 1; i < conflictingUpdate->num_args; i++) {
+        locationText += ", " + conflictingUpdate->args[i].to_str();
+      }
+      locationText += ")";
+    }
+
+    auto info = "Conflict while merging parallel updateset " + locationText + "\n"
+              + "at line " + std::to_string(conflictingUpdate->line) + "with value: " + conflictingUpdate->value.to_str() + "\n"
+              + "and at line " + std::to_string(existingUpdate->line) + "with value: " + existingUpdate->value.to_str();
+    throw RuntimeException(info);
+  }
 }
 
 template <>
