@@ -120,10 +120,11 @@ void Driver::error( const yy::location& l, const std::string& m, libcasm_fe::Cod
 {
     // Set state to error!
     error_++;
-
-    assert(0);
+    
     std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " << BOLD_RED
               << "error: " << RESET << BOLD_BLACK << m << RESET << std::endl;
+    
+    underline( l );
     
     if( code == libcasm_fe::Codes::Unspecified )
     {
@@ -131,11 +132,14 @@ void Driver::error( const yy::location& l, const std::string& m, libcasm_fe::Cod
     }
     else
     {
-        assert(0);
-        // fprintf( BOLD_BLACK "%s" )
+        fprintf
+        ( stderr
+        , "%s:%i: " YELLOW "{%04x}" RESET "\n"
+        , filename_.c_str()
+          , l.begin.line
+        , code
+        );
     }
-    
-    underline( l );
 }
 
 void Driver::warning( const yy::location& l, const std::string& m )
@@ -162,7 +166,7 @@ void Driver::underline( const yy::location& l )
 {
     if( l.begin.line == l.end.line && l.begin.line <= lines_.size() )
     {
-        const std::string location_info = filename_ + ":" + std::to_string(l.begin.line) + " ";
+        const std::string location_info = filename_ + ":" + std::to_string(l.begin.line) + ": ";
         const std::string& error_line = lines_[l.begin.line - 1];
 
         std::cerr << location_info << error_line

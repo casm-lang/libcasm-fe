@@ -30,12 +30,17 @@
 namespace libcasm_fe
 {
     enum class Codes
-    { SyntaxError                                  = 0x0000
-	, FunctionAttributeIsInvalid                   = 0xf100
-	, FunctionAttributeMultipleUseOfStatic         = 0xf101
-	, FunctionAttributeMultipleUseOfSymbolic       = 0xf102
-	, FunctionAttributeMultipleUseOfControlled     = 0xf103
-	, Unspecified                                  = 0xffff
+    { SyntaxError                                   = 0x0000
+	, SyntaxErrorUnrecognizedCharacter              = 0x0001
+	, SyntaxErrorUnclosedString                     = 0x0002
+	
+	, FunctionAttributeIsInvalid                    = 0xfa00
+	, FunctionAttributeMultipleUseOfStatic          = 0xfa01
+	, FunctionAttributeMultipleUseOfSymbolic        = 0xfa02
+	, FunctionAttributeMultipleUseOfControlled      = 0xfa03
+	, FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
+	
+	, Unspecified                                   = 0xffff
 	};
 }
 

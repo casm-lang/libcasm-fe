@@ -132,10 +132,15 @@
                 );
             }
         }
-        if (is_static && is_controlled) {
-            driver.error(loc, "attributes `controlled` and `static` are mutually exclusive");
+        if( is_static && is_controlled )
+		{
+            driver.error
+			( loc
+			, "attributes `controlled` and `static` are mutually exclusive"
+			, libcasm_fe::Codes::FunctionAttributeControlledAndStaticIsInvalid
+			);
         }
-
+		
         return std::pair<bool, bool>(is_static, is_symbolic);
     }
 }
@@ -840,7 +845,21 @@ ITERATE_SYNTAX: ITERATE STATEMENT { $$ = new UnaryNode(@$, NodeType::ITERATE, $2
 
 %%
 
-void yy::casmi_parser::error(const location_type& l,
-                              const std::string& m) {
-    driver.error (l, m + "\nasdf");
+void yy::casmi_parser::error
+( const location_type& l
+, const std::string& m
+)
+{
+    driver.error (l, m, libcasm_fe::Codes::SyntaxError );
 }
+
+
+//  
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: t
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//  

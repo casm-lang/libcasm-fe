@@ -48,8 +48,10 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
 	
     if( !node ) 
 	{
-		// TODO: FIXME: PPA: better error messages, can be improved with the new libstdhl Verbose support
-        std::cerr << "Error parsing file" << std::endl;
+		// TODO: FIXME: PPA: better error messages,
+		// can be improved with the new libstdhl Verbose support
+
+		std::cerr << "Error parsing file" << std::endl;
 		
 		return false;
     }
