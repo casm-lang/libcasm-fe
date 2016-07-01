@@ -560,56 +560,18 @@ void AstWalker<ExecutionVisitor, value_t>::walk_ifthenelse(IfThenElseNode* node)
 
 template <>
 void AstWalker<ExecutionVisitor, value_t>::walk_seqblock(UnaryNode* seqblock) {
-  try {
-    UpdateSetForkGuard guard(UpdateSet::Type::Sequential, &visitor.context_.updateSetManager);
-    visitor.visit_seqblock(seqblock);
-    walk_statements(reinterpret_cast<AstListNode*>(seqblock->child_));
-  } catch (const UpdateSet::Conflict& e) {
-    const auto conflictingUpdate = e.conflictingUpdate();
-    const auto existingUpdate = e.existingUpdate();
-
-    const auto function = visitor.context_.function_symbols[conflictingUpdate->func];
-    std::string locationText = function->name;
-    if (conflictingUpdate->num_args > 0) {
-      locationText += "(" + conflictingUpdate->args[0].to_str();
-      for (uint16_t i = 1; i < conflictingUpdate->num_args; i++) {
-        locationText += ", " + conflictingUpdate->args[i].to_str();
-      }
-      locationText += ")";
-    }
-
-    auto info = "Conflict while merging sequential updateset " + locationText + "\n"
-              + "at line " + std::to_string(conflictingUpdate->line) + "with value: " + conflictingUpdate->value.to_str() + "\n"
-              + "and at line " + std::to_string(existingUpdate->line) + "with value: " + existingUpdate->value.to_str();
-    throw RuntimeException(info);
-  }
+  visitor.context_.fork(UpdateSet::Type::Sequential);
+  visitor.visit_seqblock(seqblock);
+  walk_statements(reinterpret_cast<AstListNode*>(seqblock->child_));
+  visitor.context_.merge();
 }
 
 template <>
 void AstWalker<ExecutionVisitor, value_t>::walk_parblock(UnaryNode* parblock) {
-  try {
-    UpdateSetForkGuard guard(UpdateSet::Type::Parallel, &visitor.context_.updateSetManager);
-    visitor.visit_parblock(parblock);
-    walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
-  } catch (const UpdateSet::Conflict& e) {
-    const auto conflictingUpdate = e.conflictingUpdate();
-    const auto existingUpdate = e.existingUpdate();
-
-    const auto function = visitor.context_.function_symbols[conflictingUpdate->func];
-    std::string locationText = function->name;
-    if (conflictingUpdate->num_args > 0) {
-      locationText += "(" + conflictingUpdate->args[0].to_str();
-      for (uint16_t i = 1; i < conflictingUpdate->num_args; i++) {
-        locationText += ", " + conflictingUpdate->args[i].to_str();
-      }
-      locationText += ")";
-    }
-
-    auto info = "Conflict while merging parallel updateset " + locationText + "\n"
-              + "at line " + std::to_string(conflictingUpdate->line) + "with value: " + conflictingUpdate->value.to_str() + "\n"
-              + "and at line " + std::to_string(existingUpdate->line) + "with value: " + existingUpdate->value.to_str();
-    throw RuntimeException(info);
-  }
+  visitor.context_.fork(UpdateSet::Type::Parallel);
+  visitor.visit_parblock(parblock);
+  walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
+  visitor.context_.merge();
 }
 
 template <>
@@ -709,7 +671,7 @@ template <>
 void AstWalker<ExecutionVisitor, value_t>::walk_forall(ForallNode *node) {
   const value_t in_list = walk_expression_base(node->in_expr);
 
-  UpdateSetForkGuard guard(UpdateSet::Type::Parallel, &visitor.context_.updateSetManager);
+  visitor.context_.fork(UpdateSet::Type::Parallel);
 
   switch (node->in_expr->type_.t) {
     case TypeType::LIST: {
@@ -761,22 +723,26 @@ void AstWalker<ExecutionVisitor, value_t>::walk_forall(ForallNode *node) {
     }
     default: assert(0);
   }
+
+  visitor.context_.merge();
 }
 
 template <>
 void AstWalker<ExecutionVisitor, value_t>::walk_iterate(UnaryNode *node) {
   bool running = true;
 
-  auto updateSetManager = &visitor.context_.updateSetManager;
-  UpdateSetForkGuard seqGuard(UpdateSet::Type::Sequential, updateSetManager);
+  visitor.context_.fork(UpdateSet::Type::Sequential);
 
   while (running) {
-    UpdateSetForkGuard parGuard(UpdateSet::Type::Parallel, updateSetManager);
+    visitor.context_.fork(UpdateSet::Type::Parallel);
     walk_statement(node->child_);
-    if (updateSetManager->currentUpdateSet()->empty()) {
+    if (visitor.context_.updateSetManager.currentUpdateSet()->empty()) {
       running = false;
     }
+    visitor.context_.merge();
   }
+
+  visitor.context_.merge();
 }
 
 template <>

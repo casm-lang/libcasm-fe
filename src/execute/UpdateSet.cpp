@@ -109,10 +109,9 @@ Update* UpdateSet::lookup(const uint64_t key) const
     return nullptr;
 }
 
-UpdateSet *UpdateSet::fork()
+UpdateSet *UpdateSet::fork(const UpdateSet::Type updateSetType)
 {
-    const auto forkType = (m_type == Type::Parallel) ? Type::Sequential : Type::Parallel;
-    return new UpdateSet(forkType, this);
+    return new UpdateSet(updateSetType, this);
 }
 
 void UpdateSet::merge()
@@ -165,16 +164,12 @@ Update* UpdateSetManager::lookup(const uint64_t key) const
     return m_updateSets.top()->lookup(key);
 }
 
-bool UpdateSetManager::fork(const UpdateSet::Type updateSetType)
+void UpdateSetManager::fork(const UpdateSet::Type updateSetType)
 {
     assert(!m_updateSets.empty());
     auto currentUpdateSet = m_updateSets.top();
-    if (currentUpdateSet->type() != updateSetType) {
-        auto forkedUpdateSet = currentUpdateSet->fork();
-        m_updateSets.push(forkedUpdateSet);
-        return true;
-    }
-    return false;
+    auto forkedUpdateSet = currentUpdateSet->fork(updateSetType);
+    m_updateSets.push(forkedUpdateSet);
 }
 
 void UpdateSetManager::merge()

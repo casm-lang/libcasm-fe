@@ -265,6 +265,38 @@ void ExecutionContext::apply_updates() {
   pp_stack.freeAll();
 }
 
+void ExecutionContext::fork(const UpdateSet::Type updateSetType)
+{
+    updateSetManager.fork(updateSetType);
+}
+
+void ExecutionContext::merge()
+{
+    try {
+        updateSetManager.merge();
+    } catch (const UpdateSet::Conflict& e) {
+        const auto conflictingUpdate = e.conflictingUpdate();
+        const auto existingUpdate = e.existingUpdate();
+
+        const auto function = function_symbols[conflictingUpdate->func];
+        std::string locationText = function->name;
+        if (conflictingUpdate->num_args > 0) {
+            locationText += "(" + conflictingUpdate->args[0].to_str();
+            for (uint16_t i = 1; i < conflictingUpdate->num_args; i++) {
+                locationText += ", " + conflictingUpdate->args[i].to_str();
+            }
+            locationText += ")";
+        }
+
+        auto info = "Conflict while merging updateset " + locationText + "\n"
+                  + "at line " + std::to_string(conflictingUpdate->line)
+                  + " with value: " + conflictingUpdate->value.to_str() + "\n"
+                  + "and at line " + std::to_string(existingUpdate->line)
+                  + " with value: " + existingUpdate->value.to_str();
+        throw RuntimeException(info);
+    }
+}
+
 static value_t undef = value_t();
 
 static value_t tmp;
