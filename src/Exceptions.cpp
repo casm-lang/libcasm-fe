@@ -28,6 +28,12 @@
 
 RuntimeException::RuntimeException(const std::string& msg): msg_(msg) {}
 
+RuntimeException::RuntimeException(const yy::location& location, const std::string& msg) :
+    RuntimeException(msg + " at line " + std::to_string(location.begin.line))
+{
+
+}
+
 const char* RuntimeException::what() const throw() {
   return msg_.c_str();
 }
