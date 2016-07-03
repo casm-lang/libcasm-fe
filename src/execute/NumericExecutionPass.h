@@ -63,12 +63,9 @@ namespace std {
         size_t operator()(const ArgumentsKey &key) const {
             size_t h = 0;
             for (uint32_t i = 0; i < key.size; i++) {
-                if (key.p[i].is_symbolic()) {
-                    h ^= reinterpret_cast<size_t>(key.p[i].value.sym);
-                } else {
-                    static std::hash<value_t> value_hasher;
-                    h ^= value_hasher(key.p[i]);
-                }
+                assert(not key.p[i].is_symbolic());
+                static std::hash<value_t> value_hasher;
+                h ^= value_hasher(key.p[i]);
             }
             return h;
         }
