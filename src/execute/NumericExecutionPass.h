@@ -34,8 +34,6 @@
 #include "../Visitor.h"
 #include "../Ast.h"
 
-#define UPDATESET_SIZE 65536 //* 64
-#define UPDATESET_DATA_SIZE UPDATESET_SIZE //* 50
 #define TEMP_STACK_SIZE 32768
 #define VALUE_STACK_SIZE 32768
 
@@ -162,8 +160,7 @@ namespace libcasm_fe
         const bool dump_updates = false;
         std::vector<std::string> update_dump;
 
-        BlockAllocator<UPDATESET_DATA_SIZE> updateset_data_;
-        BlockAllocator<TEMP_STACK_SIZE> pp_stack;
+        BlockAllocator<TEMP_STACK_SIZE> stack;
         std::map<const std::string, bool> debuginfo_filters;
 
     public:

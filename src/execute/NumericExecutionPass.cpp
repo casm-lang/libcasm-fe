@@ -114,7 +114,7 @@ Update* NumericExecutionPass::addUpdate(const value_t& val, size_t sym_id,
         it = pair.first;
     }
 
-    Update* up = reinterpret_cast<Update*>(pp_stack.allocate(sizeof(Update))); // FIXME make it nicer!!
+    Update* up = reinterpret_cast<Update*>(stack.allocate(sizeof(Update))); // FIXME make it nicer!!
     up->value = val;
     up->func = sym_id;
     up->args = const_cast<value_t*>(it->first.p);
@@ -241,9 +241,7 @@ void NumericExecutionPass::applyUpdates() {
     }
     // list handling done
 
-    // free allocated updateset data
-    updateset_data_.freeAll();
-    pp_stack.freeAll();
+    stack.freeAll();
 }
 
 void NumericExecutionPass::fork(const UpdateSet::Type updateSetType)
