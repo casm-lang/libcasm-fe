@@ -116,11 +116,15 @@ UpdateSet *UpdateSet::fork(const UpdateSet::Type updateSetType)
 
 void UpdateSet::merge()
 {
-    m_parent->m_set.reserve(m_parent->m_set.size() + m_set.size());
-    for(const auto& pair : m_set) {
-        m_parent->add(pair.first, pair.second);
+    if (m_parent->m_set.empty()) {
+        std::swap(m_parent->m_set, m_set);
+    } else {
+        m_parent->m_set.reserve(m_parent->m_set.size() + m_set.size());
+        for(const auto& pair : m_set) {
+            m_parent->add(pair.first, pair.second);
+        }
+        clear();
     }
-    clear();
 }
 
 void UpdateSet::clear()

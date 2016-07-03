@@ -70,6 +70,23 @@ TEST(UpdateSetTest, mergingParallelUpdateSetsIntoSequentialOnesShouldOverrideLoc
     EXPECT_EQ(make_integer_value(1000), seqUpdateSet->lookup(1)->value);
 }
 
+TEST(UpdateSetTest, mergingUpdateSetsIntoEmptyUpdateSetsShouldSwapValues) {
+    const auto seqUpdateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
+
+    const auto parUpdateSet = std::unique_ptr<UpdateSet>(seqUpdateSet->fork(UpdateSet::Type::Parallel));
+    parUpdateSet->add(1, new Update{.value = make_integer_value(1000)});
+    parUpdateSet->add(2, new Update{.value = make_integer_value(2000)});
+    parUpdateSet->add(3, new Update{.value = make_integer_value(3000)});
+
+    ASSERT_TRUE(seqUpdateSet->empty());
+    ASSERT_EQ(3, parUpdateSet->size());
+
+    parUpdateSet->merge();
+
+    EXPECT_TRUE(parUpdateSet->empty());
+    EXPECT_EQ(3, seqUpdateSet->size());
+}
+
 TEST(UpdateSetTest, mergingSequentialUpdateSetsIntoParallelOnesShouldNotThrowWhenOverridingLocationValuesWithSameValues) {
     const auto parUpdateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Parallel));
     parUpdateSet->add(1, new Update{.value = make_integer_value(10)});
