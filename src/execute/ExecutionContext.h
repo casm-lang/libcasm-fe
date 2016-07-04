@@ -112,8 +112,11 @@ class ExecutionContext {
         const bool fileout, const bool dump_updates);
     ExecutionContext(const ExecutionContext& other);
 
-    Update* add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[]);
+    Update* add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[], uint64_t line);
     void apply_updates();
+
+    void fork(const UpdateSet::Type updateSetType);
+    void merge();
 
     const value_t get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]);
 

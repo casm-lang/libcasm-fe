@@ -83,7 +83,7 @@ public:
 
     Update* lookup(const uint64_t key) const;
 
-    UpdateSet* fork();
+    UpdateSet* fork(const UpdateSet::Type updateSetType);
 
     /**
      *
@@ -116,7 +116,7 @@ public:
 
     Update* lookup(const uint64_t key) const;
 
-    bool fork(const UpdateSet::Type updateSetType);
+    void fork(const UpdateSet::Type updateSetType);
 
     /**
      *
@@ -130,27 +130,6 @@ public:
 
 private:
     std::stack<UpdateSet*> m_updateSets;
-};
-
-class UpdateSetForkGuard final
-{
-public:
-    UpdateSetForkGuard(const UpdateSet::Type type, UpdateSetManager* manager) :
-        m_manager(manager)
-    {
-        m_wasForked = manager->fork(type);
-    }
-
-    ~UpdateSetForkGuard()
-    {
-        if (m_wasForked) {
-            m_manager->merge();
-        }
-    }
-
-private:
-    UpdateSetManager* m_manager;
-    bool m_wasForked;
 };
 
 #endif // _LIB_CASMFE_UPDATESET_H_

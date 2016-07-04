@@ -84,8 +84,6 @@ ExecutionContext::ExecutionContext(const SymbolTable& st, RuleNode *init,
   //pp_mem_new(&updateset_data_, UPDATESET_DATA_SIZE, "mem for updateset hashmap"); FIXME?
   //updateset.set =  pp_hashmap_new(&updateset_data_, UPDATESET_SIZE, "main updateset");
 
-  //assert(init->child_ && init->child_->node_type_ == NodeType::PARBLOCK);
-
   function_states = std::vector<std::unordered_map<ArgumentsKey, value_t>>(symbol_table.size());
   function_symbols = std::vector<const Function*>(symbol_table.size());
   Function *program_sym = symbol_table.get_function("program");
@@ -107,7 +105,7 @@ ExecutionContext::ExecutionContext(const ExecutionContext& other) :
   //updateset.set =  pp_hashmap_new(&updateset_data_, UPDATESET_SIZE, "main updateset");
 }
 
-Update* ExecutionContext::add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[]) {
+Update* ExecutionContext::add_update(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[], uint64_t line) {
   auto& function_map = function_states[sym_id];
   auto it = function_map.find(ArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
   if (it == function_map.cend()) {
@@ -120,11 +118,25 @@ Update* ExecutionContext::add_update(const value_t& val, size_t sym_id, uint32_t
   up->func = sym_id;
   up->args = const_cast<value_t*>(it->first.p);
   up->num_args = num_arguments;
-  // TODO: Do we need line here?
-  //up->line = (uint64_t) loc.lines;
+  up->line = line;
 
-  const value_t& ref = it->second;
-  updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
+  try {
+    const value_t& ref = it->second;
+    updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
+  } catch (const UpdateSet::Conflict& e) {
+    const auto conflictingUpdate = e.conflictingUpdate();
+    const auto existingUpdate = e.existingUpdate();
+
+    const auto function = function_symbols[conflictingUpdate->func];
+    const auto location = function->name + arguments_to_string(conflictingUpdate->num_args,
+                                                               conflictingUpdate->args);
+
+    const auto info = "Conflict while adding update " + location + " = " + val.to_str()
+                    + " at line " + std::to_string(line) + ", conflicting with line "
+                    + std::to_string(existingUpdate->line) + " with value '"
+                    + existingUpdate->value.to_str() + "'";
+    throw RuntimeException(info);
+  }
 
   return up;
 }
@@ -265,6 +277,32 @@ void ExecutionContext::apply_updates() {
   // free allocated updateset data
   updateset_data_.freeAll();
   pp_stack.freeAll();
+}
+
+void ExecutionContext::fork(const UpdateSet::Type updateSetType)
+{
+    updateSetManager.fork(updateSetType);
+}
+
+void ExecutionContext::merge()
+{
+    try {
+        updateSetManager.merge();
+    } catch (const UpdateSet::Conflict& e) {
+        const auto conflictingUpdate = e.conflictingUpdate();
+        const auto existingUpdate = e.existingUpdate();
+
+        const auto function = function_symbols[conflictingUpdate->func];
+        const auto location = function->name + arguments_to_string(conflictingUpdate->num_args,
+                                                                   conflictingUpdate->args);
+
+        const auto info = "Conflict while merging updateset " + location
+                        + " at line " + std::to_string(conflictingUpdate->line)
+                        + " with value '" + conflictingUpdate->value.to_str() + "'"
+                        + " and at line " + std::to_string(existingUpdate->line)
+                        + " with value '" + existingUpdate->value.to_str() + "'";
+        throw RuntimeException(info);
+    }
 }
 
 static value_t undef = value_t();
