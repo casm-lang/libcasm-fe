@@ -850,7 +850,7 @@ const value_t NumericExecutionPass::visit_expression_single(Expression *expr,
     case ExpressionOperation::NOT:
         return value_t(not val.value.boolean);
     default:
-        assert(false);
+        FAILURE();
     }
 }
 
@@ -941,7 +941,7 @@ const value_t NumericExecutionPass::visit_builtin_atom(BuiltinAtom *atom,
     case Builtin::Id::SYMBOLIC:
         return builtins::symbolic(arguments[0]);
     default:
-        assert(false);
+        FAILURE();
     }
 }
 
