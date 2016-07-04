@@ -1146,6 +1146,7 @@ void AstWalker<NumericExecutionPass, value_t>::walk_iterate(UnaryNode *node)
         visitor.fork(UpdateSet::Type::Parallel);
         walk_statement(node->child_);
         if (visitor.hasEmptyUpdateSet()) {
+            visitor.merge(); // to remove the update set from the stack
             break;
         }
         visitor.merge();
