@@ -1288,7 +1288,7 @@ bool ExecutionWalker::init_function(const std::string& name,
                                                 + " of `" + func->name + "`");
                 }
             }
-            function_map.emplace(std::pair<ArgumentsKey, value_t>(ArgumentsKey(args, num_arguments, true), v));
+            function_map.emplace(std::make_pair(ArgumentsKey(args, num_arguments, true), v));
 
             initializer_args.push_back(args);
         }
