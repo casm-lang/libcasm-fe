@@ -124,6 +124,8 @@ public:
      */
     void merge();
 
+    void clear();
+
     UpdateSet* currentUpdateSet() const;
 
     size_t size() const;

@@ -30,14 +30,17 @@
 #include <stdexcept>
 #include <string>
 
+#include "various/location.hh"
+
 class RuntimeException : public std::exception {
   private:
     const std::string msg_;
 
   public:
     RuntimeException(const std::string& msg);
-    virtual const char* what() const throw();
+    RuntimeException(const yy::location& location, const std::string& msg);
 
+    virtual const char* what() const throw();
 };
 
 class ImpossibleException : public std::exception {
