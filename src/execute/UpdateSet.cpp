@@ -145,15 +145,12 @@ typename UpdateSet::const_iterator UpdateSet::cend() const noexcept
 UpdateSetManager::UpdateSetManager() :
     m_updateSets()
 {
-    m_updateSets.push(new UpdateSet(UpdateSet::Type::Parallel));
+
 }
 
 UpdateSetManager::~UpdateSetManager()
 {
-    while (!m_updateSets.empty()) {
-        delete m_updateSets.top();
-        m_updateSets.pop();
-    }
+    clear();
 }
 
 void UpdateSetManager::add(const uint64_t key, Update* update)
@@ -170,10 +167,13 @@ Update* UpdateSetManager::lookup(const uint64_t key) const
 
 void UpdateSetManager::fork(const UpdateSet::Type updateSetType)
 {
-    assert(!m_updateSets.empty());
-    auto currentUpdateSet = m_updateSets.top();
-    auto forkedUpdateSet = currentUpdateSet->fork(updateSetType);
-    m_updateSets.push(forkedUpdateSet);
+    if (m_updateSets.empty()) {
+        m_updateSets.push(new UpdateSet(updateSetType));
+    } else {
+        auto currentUpdateSet = m_updateSets.top();
+        auto forkedUpdateSet = currentUpdateSet->fork(updateSetType);
+        m_updateSets.push(forkedUpdateSet);
+    }
 }
 
 void UpdateSetManager::merge()
@@ -183,6 +183,14 @@ void UpdateSetManager::merge()
         currentUpdateSet->merge();
         m_updateSets.pop();
         delete currentUpdateSet;
+    }
+}
+
+void UpdateSetManager::clear()
+{
+    while (!m_updateSets.empty()) {
+        delete m_updateSets.top();
+        m_updateSets.pop();
     }
 }
 

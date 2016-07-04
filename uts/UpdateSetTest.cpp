@@ -159,6 +159,8 @@ TEST(UpdateSetTest, sequentialUpdateSetsShouldOverrideOldUpdatesIfAddingUpdatesW
 TEST(UpdateSetManagerTest, forkAndMerge) {
     auto manager = std::unique_ptr<UpdateSetManager>(new UpdateSetManager());
 
+    manager->fork(UpdateSet::Type::Parallel);
+
     manager->add(1, new Update);
     manager->add(2, new Update);
 

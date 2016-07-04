@@ -190,8 +190,7 @@ void NumericExecutionPass::applyUpdates() {
             updated_functions[u->func].push_back(ArgumentsKey(u->args, u->num_args, true));
         }
     }
-    updateSet->clear();
-    assert(updateSet->empty());
+    updateSetManager.clear();
 
     if (dump_updates) {
         for (uint32_t i = 0; i < function_states.size(); i++) {
@@ -1335,16 +1334,14 @@ void ExecutionWalker::run()
     uint64_t stepCounter = 0;
 
     Function *program_sym = global_driver->function_table.get_function("program");
-    while (true) {
-        const value_t program_val = visitor.get_function_value(program_sym, 0, nullptr);
-        if (program_val.type == TypeType::UNDEF) {
-            break;
-        }
+    const auto& function_map = visitor.function_states[program_sym->id];
+    const value_t& program_val = function_map.at(ArgumentsKey(nullptr, 0, false));
+
+    while (program_val.type != TypeType::UNDEF) {
         walk_rule(program_val.value.rule);
         visitor.applyUpdates();
         ++stepCounter;
     }
-
 
     std::cout << (stepCounter - 2);
     if ((stepCounter - 2) > 1) {
