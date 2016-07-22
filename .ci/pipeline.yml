@@ -1,0 +1,116 @@
+#   
+#   Copyright (c) 2014-2016 CASM Organization
+#   All rights reserved.
+#   
+#   Developed by: Florian Hahn
+#                 Philipp Paulweber
+#                 Emmanuel Pescosta
+#                 https://github.com/ppaulweber/libcasm-fe
+#   
+#   This file is part of libcasm-fe.
+#   
+#   libcasm-fe is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#   
+#   libcasm-fe is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#   GNU General Public License for more details.
+#   
+#   You should have received a copy of the GNU General Public License
+#   along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
+#   
+
+groups: []
+#groups:
+#- name: master
+#  jobs:
+#    - build@master
+#    - test@master
+#- name: ppaulweber/ast
+#  jobs:
+#    - build@ppaulweber_ast
+resources:
+- name: gtest@master
+  type: git
+  source:
+    branch: master
+    disable_ci_skip: true
+    private_key: {{github-auth-ssh-key-private}}
+    uri: git@github.com:google/googletest
+- name: libstdhl@master
+  type: git
+  source:
+    branch: master
+    disable_ci_skip: true
+    private_key: {{github-auth-ssh-key-private}}
+    uri: git@github.com:ppaulweber/libstdhl
+- name: libpass@master
+  type: git
+  source:
+    branch: master
+    disable_ci_skip: true
+    private_key: {{github-auth-ssh-key-private}}
+    uri: git@github.com:ppaulweber/libpass
+- name: libcasm-fe@master
+  type: git
+  source:
+    branch: master
+    disable_ci_skip: true
+    private_key: {{github-auth-ssh-key-private}}
+    uri: git@github.com:ppaulweber/libcasm-fe
+- name: libcasm-fe@ppaulweber_ast
+  type: git
+  source:
+    branch: ppaulweber/ast
+    disable_ci_skip: true
+    private_key: {{github-auth-ssh-key-private}}
+    uri: git@github.com:ppaulweber/libcasm-fe
+resource_types: []
+jobs:
+- name: build@master
+  plan:
+  - get: gtest@master
+  - get: libstdhl@master
+  - get: libpass@master
+  - get: libcasm-fe@master
+    trigger: true
+  - task: build
+    file: libcasm-fe@master/.ci/task/build/master.yml
+- name: test@master
+  plan:
+  - get: gtest@master
+    passed: [build@master]
+  - get: libstdhl@master
+    passed: [build@master]
+  - get: libpass@master
+    passed: [build@master]
+  - get: libcasm-fe@master
+    passed: [build@master]
+    trigger: true
+  - task: test
+    file: libcasm-fe@master/.ci/task/test/master.yml
+- name: build@ppaulweber_ast
+  plan:
+  - get: gtest@master
+  - get: libstdhl@master
+  - get: libpass@master
+  - get: libcasm-fe@ppaulweber_ast
+    trigger: true
+  - task: build
+    file: libcasm-fe@ppaulweber_ast/.ci/task/build/ppaulweber_ast.yml
+- name: test@ppaulweber_ast
+  plan:
+  - get: gtest@master
+    passed: [build@ppaulweber_ast]
+  - get: libstdhl@master
+    passed: [build@ppaulweber_ast]
+  - get: libpass@master
+    passed: [build@ppaulweber_ast]
+  - get: libcasm-fe@ppaulweber_ast
+    passed: [build@ppaulweber_ast]
+    trigger: true
+  - task: test
+    file: libcasm-fe@ppaulweber_ast/.ci/task/test/ppaulweber_ast.yml
