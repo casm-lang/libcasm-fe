@@ -15,6 +15,5 @@ inputs:
     path: stdhl
   - name: libpass@master
     path: pass
-  - name: libcasm-fe@ppaulweber/ast
+  - name: libcasm-fe@ppaulweber_ast
     path: casm-fe
-

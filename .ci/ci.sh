@@ -54,7 +54,7 @@ template=$1
 tempname=`basename $1 .yml`
 
 branch=$2
-branch_replace=`echo $branch | sed -e 's/\//\\\\\//g'`
+#branch_replace=`echo $branch | sed -e 's/\//\\\\\//g'`
 branch_filename=`echo $branch | sed -e 's/\//_/g'`
 
 mkdir -p $tempname
@@ -64,4 +64,4 @@ config=$tempname/$branch_filename.yml
 cp $template $config
 
 echo "ci: created '$config'"
-sed -i -e "s/BRANCH/$branch_replace/g" $config
+sed -i -e "s/BRANCH/$branch_filename/g" $config

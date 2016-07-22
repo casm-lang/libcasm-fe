@@ -17,4 +17,3 @@ inputs:
     path: pass
   - name: libcasm-fe@master
     path: casm-fe
-
