@@ -1,4 +1,3 @@
-#!/bin/bash
 #   
 #   Copyright (c) 2014-2016 CASM Organization
 #   All rights reserved.
@@ -23,45 +22,22 @@
 #   You should have received a copy of the GNU General Public License
 #   along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 #   
-
-function usage
-{
-    echo "ci: usage: ci.sh <template> <branch>"
-}
-
-function error
-{
-    if [ -z "$1" ]; then
-        echo "internal error"
-        exit -1
-    fi
-    echo "ci: error: $1"
-    usage
-}
-
-if [ -z "$1" ]; then
-    error "missing template"
-    exit -1
-fi
-
-if [ -z "$2" ]; then
-    error "missing branch"
-    exit -1
-fi
-
-template=$1
-
-tempname=`basename $1 .yml`
-
-branch=$2
-branch_replace=`echo $branch | sed -e 's/\//\\\\\//g'`
-branch_filename=`echo $branch | sed -e 's/\//_/g'`
-
-mkdir -p $tempname
-
-config=$tempname/$branch_filename.yml
-
-cp $template $config
-
-echo "ci: created '$config'"
-sed -i -e "s/BRANCH/$branch_replace/g" $config
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: rsmmr/clang
+run:
+  path: make
+  args: [test]
+  dir:  casm-fe
+inputs:
+  - name: gtest@master
+    path: gtest
+  - name: libstdhl@master
+    path: stdhl
+  - name: libpass@master
+    path: pass
+  - name: libcasm-fe@{{branch}}
+    path: casm-fe
