@@ -100,7 +100,7 @@ jobs:
   - get: libcasm-fe@ppaulweber_ast
     trigger: true
   - task: build
-    file: libcasm-fe@ppaulweber_ast/.ci/task/build/ppaulweber_ast.yml
+    file: libcasm-fe@master/.ci/task/test/ppaulweber_ast.yml
 - name: test@ppaulweber_ast
   plan:
   - get: gtest@master
@@ -113,4 +113,4 @@ jobs:
     passed: [build@ppaulweber_ast]
     trigger: true
   - task: test
-    file: libcasm-fe@ppaulweber_ast/.ci/task/test/ppaulweber_ast.yml
+    file: libcasm-fe@master/.ci/task/test/ppaulweber_ast.yml
