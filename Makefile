@@ -134,7 +134,7 @@ obj/uts/%.o: uts/%.cpp
 	@echo "CPP " $<
 	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) -c $< -o $@
 
-test: default obj/uts $(TEST_OBJECTS)
+test: default obj $(TEST_OBJECTS)
 	@rm -f $@
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) $(TEST_LIBRARY) -o $@ $(filter %.o,$^) ../gtest/googletest/src/gtest-all.cc ../gtest/googletest/src/gtest_main.cc
