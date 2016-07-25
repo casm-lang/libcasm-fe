@@ -142,7 +142,8 @@ Update* NumericExecutionPass::addUpdate(const value_t& val, size_t sym_id,
     return up;
 }
 
-void NumericExecutionPass::applyUpdates() {
+void NumericExecutionPass::applyUpdates()
+{
     std::unordered_map<uint32_t, std::vector<ArgumentsKey>> updated_functions;
     if (dump_updates) {
         for (uint32_t i = 0; i < function_states.size(); i++) {
@@ -999,7 +1000,7 @@ ExpressionOperation invert(ExpressionOperation op)
 }
 
 template <>
-value_t AstWalker<NumericExecutionPass, value_t>::walk_list_atom(ListAtom *atom)
+value_t NumericExecutionWalker::walk_list_atom(ListAtom *atom)
 {
     std::vector<value_t> expr_results;
     if (atom->expr_list) {
@@ -1011,7 +1012,7 @@ value_t AstWalker<NumericExecutionPass, value_t>::walk_list_atom(ListAtom *atom)
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_ifthenelse(IfThenElseNode* node)
+void NumericExecutionWalker::walk_ifthenelse(IfThenElseNode* node)
 {
     const value_t cond = walk_expression_base(node->condition_);
 
@@ -1026,7 +1027,7 @@ void AstWalker<NumericExecutionPass, value_t>::walk_ifthenelse(IfThenElseNode* n
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_seqblock(UnaryNode* seqblock)
+void NumericExecutionWalker::walk_seqblock(UnaryNode* seqblock)
 {
     visitor.fork(UpdateSet::Type::Sequential);
     visitor.visit_seqblock(seqblock);
@@ -1035,7 +1036,7 @@ void AstWalker<NumericExecutionPass, value_t>::walk_seqblock(UnaryNode* seqblock
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_parblock(UnaryNode* parblock)
+void NumericExecutionWalker::walk_parblock(UnaryNode* parblock)
 {
     visitor.fork(UpdateSet::Type::Parallel);
     visitor.visit_parblock(parblock);
@@ -1044,14 +1045,14 @@ void AstWalker<NumericExecutionPass, value_t>::walk_parblock(UnaryNode* parblock
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_pop(PopNode* node)
+void NumericExecutionWalker::walk_pop(PopNode* node)
 {
     const value_t from = walk_function_atom(node->from);
     visitor.visit_pop(node, from);
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_push(PushNode *node)
+void NumericExecutionWalker::walk_push(PushNode *node)
 {
     const value_t expr = walk_expression_base(node->expr);
     const value_t atom = walk_function_atom(node->to);
@@ -1059,7 +1060,7 @@ void AstWalker<NumericExecutionPass, value_t>::walk_push(PushNode *node)
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_case(CaseNode *node)
+void NumericExecutionWalker::walk_case(CaseNode *node)
 {
     const value_t cond = walk_expression_base(node->expr);
 
@@ -1081,7 +1082,7 @@ void AstWalker<NumericExecutionPass, value_t>::walk_case(CaseNode *node)
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_forall(ForallNode *node)
+void NumericExecutionWalker::walk_forall(ForallNode *node)
 {
     const value_t in_list = walk_expression_base(node->in_expr);
 
@@ -1138,7 +1139,7 @@ void AstWalker<NumericExecutionPass, value_t>::walk_forall(ForallNode *node)
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_iterate(UnaryNode *node)
+void NumericExecutionWalker::walk_iterate(UnaryNode *node)
 {
     visitor.fork(UpdateSet::Type::Sequential);
 
@@ -1155,66 +1156,47 @@ void AstWalker<NumericExecutionPass, value_t>::walk_iterate(UnaryNode *node)
     visitor.merge();
 }
 
-template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_update(UpdateNode *node)
+static void walk_function_arguments(NumericExecutionWalker* walker, std::vector<ExpressionBase*>* arguments)
 {
-    const value_t &expr_t = walk_expression_base(node->expr_);
-
-    if (node->func->arguments) {
-        uint16_t i;
-        for (i=0; i < node->func->arguments->size(); i++) {
-            visitor.arguments[i] = walk_expression_base(node->func->arguments->at(i));
+    if (arguments) {
+        for (uint16_t i = 0; i < arguments->size(); i++) {
+            walker->visitor.arguments[i] = walker->walk_expression_base(arguments->at(i));
         }
-        visitor.num_arguments = i;
+        walker->visitor.num_arguments = arguments->size();
     } else {
-        visitor.num_arguments = 0;
+        walker->visitor.num_arguments = 0;
     }
-
-    visitor.visit_update(node, expr_t);
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_update_subrange(UpdateNode *node)
+void NumericExecutionWalker::walk_update(UpdateNode *node)
 {
-    const value_t &expr_t = walk_expression_base(node->expr_);
+    const value_t expr = walk_expression_base(node->expr_);
+    walk_function_arguments(this, node->func->arguments);
+    visitor.visit_update(node, expr);
+}
 
+template <>
+void NumericExecutionWalker::walk_update_subrange(UpdateNode *node)
+{
+    const value_t expr = walk_expression_base(node->expr_);
     if (node->func->symbol->subrange_arguments.size() > 0) {
         walk_expression_base(node->func);
     }
-
-    if (node->func->arguments) {
-        uint16_t i;
-        for (i=0; i < node->func->arguments->size(); i++) {
-            visitor.arguments[i] = walk_expression_base(node->func->arguments->at(i));
-        }
-        visitor.num_arguments = i;
-    } else {
-        visitor.num_arguments = 0;
-    }
-
-    visitor.visit_update_subrange(node, expr_t);
+    walk_function_arguments(this, node->func->arguments);
+    visitor.visit_update_subrange(node, expr);
 }
 
 template <>
-void AstWalker<NumericExecutionPass, value_t>::walk_update_dumps(UpdateNode *node)
+void NumericExecutionWalker::walk_update_dumps(UpdateNode *node)
 {
-    const value_t expr_t = walk_expression_base(node->expr_);
-
-    if (node->func->arguments) {
-        uint16_t i;
-        for (i=0; i < node->func->arguments->size(); i++) {
-            visitor.arguments[i] = walk_expression_base(node->func->arguments->at(i));
-        }
-        visitor.num_arguments = i;
-    } else {
-        visitor.num_arguments = 0;
-    }
-
-    visitor.visit_update_dumps(node, expr_t);
+    const value_t expr = walk_expression_base(node->expr_);
+    walk_function_arguments(this, node->func->arguments);
+    visitor.visit_update_dumps(node, expr);
 }
 
 ExecutionWalker::ExecutionWalker(NumericExecutionPass& v) :
-    AstWalker<NumericExecutionPass, value_t>(v),
+    NumericExecutionWalker(v),
     initialized()
 {
 

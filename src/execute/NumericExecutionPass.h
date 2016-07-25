@@ -176,44 +176,46 @@ namespace libcasm_fe
     };
 }
 
+using NumericExecutionWalker = AstWalker<libcasm_fe::NumericExecutionPass, value_t>;
+
 template <>
-value_t AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_list_atom(ListAtom *atom);
+value_t NumericExecutionWalker::walk_list_atom(ListAtom *atom);
 
 // Specialize if-then-else for NumericExecutionPass
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_ifthenelse(IfThenElseNode* node);
+void NumericExecutionWalker::walk_ifthenelse(IfThenElseNode* node);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_seqblock(UnaryNode* seqblock);
+void NumericExecutionWalker::walk_seqblock(UnaryNode* seqblock);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_parblock(UnaryNode* parblock);
+void NumericExecutionWalker::walk_parblock(UnaryNode* parblock);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_pop(PopNode* node);
+void NumericExecutionWalker::walk_pop(PopNode* node);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_push(PushNode* node);
+void NumericExecutionWalker::walk_push(PushNode* node);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_case(CaseNode *node);
+void NumericExecutionWalker::walk_case(CaseNode *node);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_forall(ForallNode *node);
+void NumericExecutionWalker::walk_forall(ForallNode *node);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_iterate(UnaryNode *node);
+void NumericExecutionWalker::walk_iterate(UnaryNode *node);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_update(UpdateNode *node);
+void NumericExecutionWalker::walk_update(UpdateNode *node);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_update_subrange(UpdateNode *node);
+void NumericExecutionWalker::walk_update_subrange(UpdateNode *node);
 
 template <>
-void AstWalker<libcasm_fe::NumericExecutionPass, value_t>::walk_update_dumps(UpdateNode *node);
+void NumericExecutionWalker::walk_update_dumps(UpdateNode *node);
 
-class ExecutionWalker : public AstWalker<libcasm_fe::NumericExecutionPass, value_t> {
+class ExecutionWalker : public NumericExecutionWalker {
 private:
     std::set<std::string> initialized;
 
