@@ -23,6 +23,18 @@
 #   along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 #   
 
+resource_types:
+- name: matrix-notification-resource
+  type: docker-image
+  source:
+    repository: freelock/matrix-notification-resource
+
+- name: rsync-resource
+  type: docker-image
+  source:
+    repository: mrsixw/concourse-rsync-resource
+    tag: latest
+
 groups: []
 #groups:
 #- name: master
@@ -31,44 +43,74 @@ groups: []
 #    - test@master
 #- name: ppaulweber/ast
 #  jobs:
-#    - build@ppaulweber_ast
+#    - build@ppaulweber-ast
+
+
 resources:
+- name: notify
+  type: matrix-notification-resource
+  source:
+    matrix_server_url: {{matrix-addr}}
+    token: {{matrix-auth}}
+    room_id: {{matrix-room}}
+
+- name: libcasm-fe
+  type: rsync-resource
+  source:
+    base_dir:    /opt/sync/libcasm-fe
+    server:      {{sync-addr}}
+    port:        {{sync-port}}
+    user:        {{sync-user}}
+    private_key: {{sync-auth}}
+    
 - name: gtest@master
   type: git
   source:
     branch: master
     disable_ci_skip: true
-    private_key: {{github-auth-ssh-key-private}}
+    private_key: {{github-auth}}
     uri: git@github.com:google/googletest
 - name: libstdhl@master
   type: git
   source:
     branch: master
     disable_ci_skip: true
-    private_key: {{github-auth-ssh-key-private}}
+    private_key: {{github-auth}}
     uri: git@github.com:ppaulweber/libstdhl
 - name: libpass@master
   type: git
   source:
     branch: master
     disable_ci_skip: true
-    private_key: {{github-auth-ssh-key-private}}
+    private_key: {{github-auth}}
     uri: git@github.com:ppaulweber/libpass
+
+
 - name: libcasm-fe@master
   type: git
   source:
     branch: master
     disable_ci_skip: true
-    private_key: {{github-auth-ssh-key-private}}
+    private_key: {{github-auth}}
     uri: git@github.com:ppaulweber/libcasm-fe
-- name: libcasm-fe@ppaulweber_ast
+- name: libcasm-fe@ppaulweber-ast
   type: git
   source:
     branch: ppaulweber/ast
     disable_ci_skip: true
-    private_key: {{github-auth-ssh-key-private}}
+    private_key: {{github-auth}}
     uri: git@github.com:ppaulweber/libcasm-fe
-resource_types: []
+- name: libcasm-fe@emmanuel099-numericSymbolicExecSplitting
+  type: git
+  source:
+    branch: emmanuel099/numericSymbolicExecSplitting
+    disable_ci_skip: true
+    private_key: {{github-auth}}
+    uri: git@github.com:ppaulweber/libcasm-fe
+
+
+
+
 jobs:
 - name: build@master
   plan:
@@ -78,39 +120,75 @@ jobs:
   - get: libcasm-fe@master
     trigger: true
   - task: build
-    file: libcasm-fe@master/.ci/task/build/master.yml
+    file: libcasm-fe@master/.ci/task/build.yml
+    input_mapping:
+      gtest    : gtest@master
+      libstdhl : libstdhl@master
+      libpass  : libpass@master
+      libcasm-fe: libcasm-fe@master
+  - put: libcasm-fe
+    params:
+      "sync_dir" : "out"
 - name: test@master
   plan:
-  - get: gtest@master
-    passed: [build@master]
-  - get: libstdhl@master
-    passed: [build@master]
-  - get: libpass@master
-    passed: [build@master]
-  - get: libcasm-fe@master
+  - get: libcasm-fe
     passed: [build@master]
     trigger: true
   - task: test
-    file: libcasm-fe@master/.ci/task/test/master.yml
-- name: build@ppaulweber_ast
+    file: libcasm-fe/casm-fe/.ci/task/test.yml
+    input_mapping:
+      in: libcasm-fe
+
+- name: build@ppaulweber-ast
   plan:
   - get: gtest@master
   - get: libstdhl@master
   - get: libpass@master
-  - get: libcasm-fe@ppaulweber_ast
+  - get: libcasm-fe@ppaulweber-ast
     trigger: true
   - task: build
-    file: libcasm-fe@ppaulweber_ast/.ci/task/build/ppaulweber_ast.yml
-- name: test@ppaulweber_ast
+    file: libcasm-fe@ppaulweber-ast/.ci/task/build.yml
+    input_mapping:
+      gtest    : gtest@master
+      libstdhl : libstdhl@master
+      libpass  : libpass@master
+      libcasm-fe: libcasm-fe@ppaulweber-ast
+  - put: libcasm-fe
+    params:
+      "sync_dir" : "out"
+- name: test@ppaulweber-ast
   plan:
-  - get: gtest@master
-    passed: [build@ppaulweber_ast]
-  - get: libstdhl@master
-    passed: [build@ppaulweber_ast]
-  - get: libpass@master
-    passed: [build@ppaulweber_ast]
-  - get: libcasm-fe@ppaulweber_ast
-    passed: [build@ppaulweber_ast]
+  - get: libcasm-fe
+    passed: [build@ppaulweber-ast]
     trigger: true
   - task: test
-    file: libcasm-fe@ppaulweber_ast/.ci/task/test/ppaulweber_ast.yml
+    file: libcasm-fe/casm-fe/.ci/task/test.yml
+    input_mapping:
+      in: libcasm-fe
+
+- name: build@emmanuel099-numericSymbolicExecSplitting
+  plan:
+  - get: gtest@master
+  - get: libstdhl@master
+  - get: libpass@master
+  - get: libcasm-fe@emmanuel099-numericSymbolicExecSplitting
+    trigger: true
+  - task: build
+    file: libcasm-fe@emmanuel099-numericSymbolicExecSplitting/.ci/task/build.yml
+    input_mapping:
+      gtest    : gtest@master
+      libstdhl : libstdhl@master
+      libpass  : libpass@master
+      libcasm-fe: libcasm-fe@emmanuel099-numericSymbolicExecSplitting
+  - put: libcasm-fe
+    params:
+      "sync_dir" : "out"
+- name: test@emmanuel099-numericSymbolicExecSplitting
+  plan:
+  - get: libcasm-fe
+    passed: [build@emmanuel099-numericSymbolicExecSplitting]
+    trigger: true
+  - task: test
+    file: libcasm-fe/casm-fe/.ci/task/test.yml
+    input_mapping:
+      in: libcasm-fe
