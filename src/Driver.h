@@ -54,7 +54,7 @@ public:
     virtual ~Driver();
 
     std::map<std::string, RuleNode*> rules_map_;
-    AstNode *result;
+    Ast *result;
     std::string spec_name;
     
     std::string init_name;
@@ -69,7 +69,7 @@ public:
     size_t get_next_chars(char buffer[], size_t max_size);
 
     // Run the parser. Return 0 on success.
-    AstNode *parse(const std::string& f);
+    Ast *parse(const std::string& f);
 
     // Error handling.
     void error(const yy::location& l, const std::string& m);

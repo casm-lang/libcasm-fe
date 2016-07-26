@@ -25,8 +25,15 @@
 
 #include "NumericExecutionPass.h"
 
+#include <iostream>
+
+#include "../Driver.h"
+#include "ExecutionContext.h"
+#include "ExecutionVisitor.h"
+
 using namespace libcasm_fe;
 
+extern Driver *global_driver;
 
 char NumericExecutionPass::id = 0;
 
@@ -40,13 +47,23 @@ static libpass::PassRegistration< NumericExecutionPass > PASS
 
 bool NumericExecutionPass::run( libpass::PassResult& pr )
 {
-	AstNode* node = (AstNode*)pr.getResult< TypeCheckPass >();
-    fprintf( stderr, "%s:%i: TODO of %p\n", __FILE__, __LINE__, node );
+	Ast* root = (Ast*)pr.getResult< TypeCheckPass >();
+    RuleNode* node = global_driver->rules_map_[ root->getInitRule()->identifier ];
+    ExecutionContext ctx(global_driver->function_table, node, false, false, false);
+    ExecutionVisitor visitor(ctx, *global_driver);
+    ExecutionWalker walker(visitor);
 	
-	// TODO: FIXME: 
-
-	// return false if something went wrong!!!
-	return true;
+    try {
+        walker.run();
+        return true;
+    } catch (const RuntimeException& ex) {
+        std::cerr << "Abort after runtime exception: " << ex.what() << std::endl;
+    } catch (const ImpossibleException& ex) {
+    } catch (char * e) {
+        std::cerr << "Abort after catching a string: " << e << std::endl;
+    }
+	
+    return false;
 }
 
 

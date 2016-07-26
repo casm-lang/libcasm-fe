@@ -42,11 +42,11 @@ namespace libcasm_fe
 	{
 	public:
 		
-		void visit_init( UnaryNode* node )
+		void visit_init( InitNode* node )
 		{
 		}
 		
-		void visit_specification( AstNode* node )
+		void visit_specification( SpecificationNode* node )
 		{
 		}
 		

@@ -40,7 +40,7 @@ static libpass::PassRegistration< AstDumpPass > PASS
 
 bool AstDumpPass::run( libpass::PassResult& pr )
 {
-	AstNode* node = (AstNode*)pr.getResult< AstDumpPass >();
+	Ast* node = (Ast*)pr.getResult< AstDumpPass >();
 	
 	AstWalker< AstDumpVisitor, bool > dump_walker( *this );
 	

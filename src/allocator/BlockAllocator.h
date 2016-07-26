@@ -90,7 +90,7 @@ class BlockAllocator
 
             m_usage -= n;
             if (m_usage == 0) {
-                m_freePosition = (char*)this + sizeof(Block);
+                free();
             } else if (((char*)addr + n) == m_freePosition) {
                 // only decrease the position if deallocation happens in reversed order
                 m_freePosition -= n;
@@ -100,15 +100,17 @@ class BlockAllocator
         void reset(void* addr) noexcept
         {
             const auto beg = (char*)this + sizeof(Block);
-            const auto end = (char*)this + BlockSize;
 
-            if ((addr >= beg) && (addr < end)) {
-                m_freePosition = addr;
-                m_usage = m_freePosition - beg;
-            } else {
-                m_usage = 0;
-                m_freePosition = beg;
-            }
+            m_freePosition = addr;
+            m_usage = m_freePosition - beg;
+        }
+
+        void free() noexcept
+        {
+            const auto beg = (char*)this + sizeof(Block);
+
+            m_usage = 0;
+            m_freePosition = beg;
         }
 
     private:
@@ -171,9 +173,21 @@ public:
     void reset(void* addr)
     {
         m_currentBlock = blockFor(addr);
-        for (auto block = m_currentBlock; block != nullptr; block = block->next()) {
-            block->reset(addr);
+        m_currentBlock->reset(addr);
+
+        // free subsequent blocks
+        for (auto block = m_currentBlock->next(); block != nullptr; block = block->next()) {
+            block->free();
         }
+    }
+
+    void freeAll()
+    {
+        for (auto block = m_topBlock; block != nullptr; block = block->previous()) {
+            block->free();
+        }
+
+        m_currentBlock = m_topBlock;
     }
 
 private:

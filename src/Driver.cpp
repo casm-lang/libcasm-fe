@@ -82,7 +82,7 @@ size_t Driver::get_next_chars(char buf[], size_t max_size) {
   }
 }
 
-AstNode *Driver::parse (const std::string &f) {
+Ast *Driver::parse (const std::string &f) {
   int res = -1;
 
   if (file_ != nullptr) {
@@ -245,7 +245,7 @@ AstNode *StringDriver::parse (const std::string &str) {
 
   fwrite(str.c_str(), str.length(), sizeof(char), file);
   fclose(file);
-  AstNode *res = Driver::parse(tmpname);
+  Ast *res = Driver::parse(tmpname);
   remove(tmpname);
 
   return res;
