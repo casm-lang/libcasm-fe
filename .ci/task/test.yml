@@ -28,16 +28,15 @@ image_resource:
   type: docker-image
   source:
     repository: rsmmr/clang
-run:
-  path: make
-  args: [test]
-  dir:  casm-fe
 inputs:
-  - name: gtest@master
-    path: gtest
-  - name: libstdhl@master
-    path: stdhl
-  - name: libpass@master
-    path: pass
-  - name: libcasm-fe@{{branch}}
-    path: casm-fe
+  - name: in
+outputs:
+  - name: out
+run:
+  path: sh
+  args:
+    - -exc
+    - |
+      date
+      uname -a
+      make -C in/casm-fe test
