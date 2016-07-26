@@ -54,18 +54,10 @@ resources:
     token: {{matrix-auth}}
     room_id: {{matrix-room}}
 
-- name: libcasm-fe-master
+- name: libcasm-fe
   type: rsync-resource
   source:
-    base_dir:    ~/sync/libcasm-fe/master
-    server:      {{sync-addr}}
-    port:        {{sync-port}}
-    user:        {{sync-user}}
-    private_key: {{sync-auth}}
-- name: libcasm-fe-ppaulweber-ast
-  type: rsync-resource
-  source:
-    base_dir:    ~/sync/libcasm-fe/ppaulweber-ast
+    base_dir:    /opt/sync/libcasm-fe
     server:      {{sync-addr}}
     port:        {{sync-port}}
     user:        {{sync-user}}
@@ -108,6 +100,13 @@ resources:
     disable_ci_skip: true
     private_key: {{github-auth}}
     uri: git@github.com:ppaulweber/libcasm-fe
+- name: libcasm-fe@emmanuel099-numericSymbolicExecSplitting
+  type: git
+  source:
+    branch: emmanuel099/numericSymbolicExecSplitting
+    disable_ci_skip: true
+    private_key: {{github-auth}}
+    uri: git@github.com:ppaulweber/libcasm-fe
 
 
 
@@ -127,18 +126,18 @@ jobs:
       libstdhl : libstdhl@master
       libpass  : libpass@master
       libcasm-fe: libcasm-fe@master
-  - put: libcasm-fe-master
+  - put: libcasm-fe
     params:
       "sync_dir" : "out"
 - name: test@master
   plan:
-  - get: libcasm-fe-master
+  - get: libcasm-fe
     passed: [build@master]
     trigger: true
   - task: test
-    file: libcasm-fe@master/.ci/task/test.yml
+    file: libcasm-fe/casm-fe/.ci/task/test.yml
     input_mapping:
-      in: libcasm-fe-master
+      in: libcasm-fe
 
 - name: build@ppaulweber-ast
   plan:
@@ -154,16 +153,42 @@ jobs:
       libstdhl : libstdhl@master
       libpass  : libpass@master
       libcasm-fe: libcasm-fe@ppaulweber-ast
-  - put: libcasm-fe-ppaulweber-ast
+  - put: libcasm-fe
     params:
       "sync_dir" : "out"
 - name: test@ppaulweber-ast
   plan:
-  - get: libcasm-fe-ppaulweber-ast
+  - get: libcasm-fe
     passed: [build@ppaulweber-ast]
     trigger: true
   - task: test
-    file: libcasm-fe@ppaulweber-ast/.ci/task/test.yml
+    file: libcasm-fe/casm-fe/.ci/task/test.yml
     input_mapping:
-      in: libcasm-fe-ppaulweber-ast
+      in: libcasm-fe
 
+- name: build@emmanuel099-numericSymbolicExecSplitting
+  plan:
+  - get: gtest@master
+  - get: libstdhl@master
+  - get: libpass@master
+  - get: libcasm-fe@emmanuel099-numericSymbolicExecSplitting
+    trigger: true
+  - task: build
+    file: libcasm-fe@emmanuel099-numericSymbolicExecSplitting/.ci/task/build.yml
+    input_mapping:
+      gtest    : gtest@master
+      libstdhl : libstdhl@master
+      libpass  : libpass@master
+      libcasm-fe: libcasm-fe@emmanuel099-numericSymbolicExecSplitting
+  - put: libcasm-fe
+    params:
+      "sync_dir" : "out"
+- name: test@emmanuel099-numericSymbolicExecSplitting
+  plan:
+  - get: libcasm-fe
+    passed: [build@emmanuel099-numericSymbolicExecSplitting]
+    trigger: true
+  - task: test
+    file: libcasm-fe/casm-fe/.ci/task/test.yml
+    input_mapping:
+      in: libcasm-fe
