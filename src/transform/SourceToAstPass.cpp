@@ -44,15 +44,26 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
 	
 	casm_frontend_init();
 	
-	AstNode* node = casm_frontend_pass_1_parse( file_name );
+	Ast* node = casm_frontend_pass_1_parse( file_name );
 	
     if( !node ) 
 	{
-		// TODO: FIXME: PPA: better error messages, can be improved with the new libstdhl Verbose support
-        std::cerr << "Error parsing file" << std::endl;
+		// TODO: FIXME: PPA: better error messages,
+		// can be improved with the new libstdhl Verbose support
+
+		std::cerr << "Error parsing file" << std::endl;
 		
 		return false;
     }
+	
+	assert( node->getElements() );
+	for( auto e : node->getElements()->nodes )
+	{
+		if( e->node_type_ == NodeType::INIT )
+		{
+			node->setInitRule( (InitNode*)e );
+		}
+	}
 	
 	pr.setResult< SourceToAstPass >( node );
     

@@ -64,6 +64,13 @@ CPPOBJECTS += obj/SourceToAstPass.o
 CPPOBJECTS += obj/NumericExecutionPass.o
 CPPOBJECTS += obj/SymbolicExecutionPass.o
 
+CPPOBJECTS += obj/Builtins.o
+CPPOBJECTS += obj/ExecutionContext.o
+CPPOBJECTS += obj/ExecutionVisitor.o
+CPPOBJECTS += obj/Operators.o
+CPPOBJECTS += obj/Symbolic.o
+CPPOBJECTS += obj/UpdateSet.o
+
 INCLUDE += -I ./
 INCLUDE += -I ./src
 INCLUDE += -I ./src/analyze
@@ -127,6 +134,7 @@ TEST_INCLUDE  = -I ../gtest/googletest/include
 TEST_INCLUDE += -I ../gtest/googletest
 
 TEST_LIBRARY  = -lstdc++
+TEST_LIBRARY += -lm
 TEST_LIBRARY += -lpthread
 
 obj/uts/%.o: uts/%.cpp
@@ -137,7 +145,7 @@ obj/uts/%.o: uts/%.cpp
 test: default obj $(TEST_OBJECTS)
 	@rm -f $@
 	@echo "LD  " $@
-	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) $(TEST_LIBRARY) -o $@ $(filter %.o,$^) ../gtest/googletest/src/gtest-all.cc ../gtest/googletest/src/gtest_main.cc
+	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) $(TEST_LIBRARY) -o $@ $(filter %.o,$^) $(TARGET) ../gtest/googletest/src/gtest-all.cc ../gtest/googletest/src/gtest_main.cc
 	@echo "RUN " $@
 	@./$@
 

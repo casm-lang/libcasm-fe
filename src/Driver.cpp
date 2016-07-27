@@ -82,7 +82,7 @@ size_t Driver::get_next_chars(char buf[], size_t max_size) {
   }
 }
 
-AstNode *Driver::parse (const std::string &f) {
+Ast *Driver::parse (const std::string &f) {
   int res = -1;
 
   if (file_ != nullptr) {
@@ -116,7 +116,7 @@ AstNode *Driver::parse (const std::string &f) {
   return result;
 }
 
-void Driver::error( const yy::location& l, const std::string& m )
+void Driver::error( const yy::location& l, const std::string& m, libcasm_fe::Codes code )
 {
     // Set state to error!
     error_++;
@@ -125,6 +125,21 @@ void Driver::error( const yy::location& l, const std::string& m )
               << "error: " << RESET << BOLD_BLACK << m << RESET << std::endl;
     
     underline( l );
+    
+    if( code == libcasm_fe::Codes::Unspecified )
+    {
+        warning( l, "unspecified error code!" );
+    }
+    else
+    {
+        fprintf
+        ( stderr
+        , "%s:%i: " YELLOW "{%04x}" RESET "\n"
+        , filename_.c_str()
+          , l.begin.line
+        , code
+        );
+    }
 }
 
 void Driver::warning( const yy::location& l, const std::string& m )
@@ -151,7 +166,7 @@ void Driver::underline( const yy::location& l )
 {
     if( l.begin.line == l.end.line && l.begin.line <= lines_.size() )
     {
-        const std::string location_info = filename_ + ":" + std::to_string(l.begin.line) + " ";
+        const std::string location_info = filename_ + ":" + std::to_string(l.begin.line) + ": ";
         const std::string& error_line = lines_[l.begin.line - 1];
 
         std::cerr << location_info << error_line
@@ -245,7 +260,7 @@ AstNode *StringDriver::parse (const std::string &str) {
 
   fwrite(str.c_str(), str.length(), sizeof(char), file);
   fclose(file);
-  AstNode *res = Driver::parse(tmpname);
+  Ast *res = Driver::parse(tmpname);
   remove(tmpname);
 
   return res;

@@ -42,12 +42,13 @@ template<class T, class V> class AstWalker {
     {
     }
     
-    void walk_specification(AstNode *spec) {
-      if (spec->node_type_ == NodeType::BODY_ELEMENTS) {
-        visitor.visit_specification(spec);
-        walk_body_elements(reinterpret_cast<AstListNode*>(spec));
-      }
+    void walk_specification( Ast* spec )
+    {
+        assert( spec->node_type_ == NodeType::SPECIFICATION );
+        visitor.visit_specification( spec->getSpecification() );
+        walk_body_elements( spec->getElements() );
     }
+    
     
     void walk_body_elements(AstListNode *body_elements) {
       for (auto e : body_elements->nodes) {
@@ -65,7 +66,7 @@ template<class T, class V> class AstWalker {
             break; 
           } 
           case NodeType::INIT: {
-            visitor.visit_init(reinterpret_cast<UnaryNode*>(e));
+            visitor.visit_init(reinterpret_cast<InitNode*>(e));
             break;
           }
           default: {
@@ -455,8 +456,8 @@ template<class T, class V> class AstWalker {
 
 template<class T> class BaseVisitor {
   public:
-    void visit_specification(AstNode*) {}
-    void visit_init(AstNode*) {}
+    void visit_specification(SpecificationNode*) {}
+    void visit_init(InitNode*) {}
     void visit_body_elements(AstListNode*) {}
     void visit_function_def(FunctionDefNode*, const std::vector<std::pair<T,T>>&) {}
     void visit_derived_def_pre(FunctionDefNode*) {}

@@ -23,43 +23,36 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#ifndef CASMI_EXCEPTIONS_H
-#define CASMI_EXCEPTIONS_H
+#ifndef _LIB_CASMFE_CODES_H_
+#define _LIB_CASMFE_CODES_H_
 
-#include <exception>
-#include <stdexcept>
-#include <string>
 
-#include "various/location.hh"
+namespace libcasm_fe
+{
+    enum class Codes
+    { SyntaxError                                   = 0x0000
+	, SyntaxErrorUnrecognizedCharacter              = 0x0001
+	, SyntaxErrorUnclosedString                     = 0x0002
+	
+	, FunctionAttributeIsInvalid                    = 0xfa00
+	, FunctionAttributeMultipleUseOfStatic          = 0xfa01
+	, FunctionAttributeMultipleUseOfSymbolic        = 0xfa02
+	, FunctionAttributeMultipleUseOfControlled      = 0xfa03
+	, FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
+	
+	, Unspecified                                   = 0xffff
+	};
+}
 
-class RuntimeException : public std::exception {
-  private:
-    const std::string msg_;
+#endif /* _LIB_CASMFE_CODES_H_ */
 
-  public:
-    RuntimeException(const std::string& msg);
-    RuntimeException(const yy::location& location, const std::string& msg);
 
-    virtual const char* what() const throw();
-};
-
-class ImpossibleException : public std::exception {
-    virtual const char* what() const throw();
-};
-
-class IdentifierAlreadyUsed : public std::logic_error {
-public:
-    using logic_error::logic_error;
-};
-
-class SymbolAlreadyExists : public IdentifierAlreadyUsed {
-public:
-    using IdentifierAlreadyUsed::IdentifierAlreadyUsed;
-};
-
-class RuleAlreadyExists : public IdentifierAlreadyUsed {
-public:
-    using IdentifierAlreadyUsed::IdentifierAlreadyUsed;
-};
-
-#endif //CASMI_EXCEPTIONS_H
+//  
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: t
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//  
