@@ -63,12 +63,6 @@ CPPOBJECTS += obj/TypeCheckPass.o
 CPPOBJECTS += obj/SourceToAstPass.o
 CPPOBJECTS += obj/NumericExecutionPass.o
 CPPOBJECTS += obj/SymbolicExecutionPass.o
-
-CPPOBJECTS += obj/Builtins.o
-CPPOBJECTS += obj/ExecutionContext.o
-CPPOBJECTS += obj/ExecutionVisitor.o
-CPPOBJECTS += obj/Operators.o
-CPPOBJECTS += obj/Symbolic.o
 CPPOBJECTS += obj/UpdateSet.o
 
 INCLUDE += -I ./

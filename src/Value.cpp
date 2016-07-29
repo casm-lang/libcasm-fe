@@ -30,7 +30,6 @@
 #include <sstream>
 
 #include "Ast.h"
-#include "execute/ExecutionContext.h"
 
 value_t::value_t() : type(TypeType::UNDEF) {}
 
@@ -221,28 +220,28 @@ bool rational_t::operator==(const rational_t& other) const {
 }
 
 const rational_t& rational_t::operator+(const rational_t& other) const {
-  auto result = reinterpret_cast<rational_t*>(ExecutionContext::value_stack.allocate(sizeof(rational_t)));
+  auto result = new rational_t;
   result->numerator = (numerator * other.denominator) + (other.numerator * denominator);
   result->denominator = denominator * other.denominator;
   return *result;
 }
 
 const rational_t& rational_t::operator-(const rational_t& other) const {
-  auto result = reinterpret_cast<rational_t*>(ExecutionContext::value_stack.allocate(sizeof(rational_t)));
+  auto result = new rational_t;
   result->numerator = (numerator * other.denominator) - (other.numerator * denominator);
   result->denominator = denominator * other.denominator;
   return *result;
 }
 
 const rational_t& rational_t::operator*(const rational_t& other) const {
-  auto result = reinterpret_cast<rational_t*>(ExecutionContext::value_stack.allocate(sizeof(rational_t)));
+  auto result = new rational_t;
   result->numerator = numerator * other.numerator;
   result->denominator = denominator * other.denominator;
   return *result;
 }
 
 const rational_t& rational_t::operator/(const rational_t& other) const {
-  auto result = reinterpret_cast<rational_t*>(ExecutionContext::value_stack.allocate(sizeof(rational_t)));
+  auto result = new rational_t;
   result->numerator = numerator * other.denominator;
   result->denominator = denominator * other.numerator;
   return *result;

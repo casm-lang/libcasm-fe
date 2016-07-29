@@ -339,7 +339,7 @@ class NumberRangeAtom : public AtomNode {
     NumberRangeAtom(yy::location& loc, IntegerAtom *start, IntegerAtom *end);
 };
 
-enum class ExpressionOperation {
+enum class ExpressionOperation : uint8_t {
   ADD = 0,
   SUB,
   MUL,
