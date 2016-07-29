@@ -29,22 +29,200 @@
 #include "libpass.h"
 #include "libcasm-fe.all.h"
 
+#include "UpdateSet.h"
+#include "../allocator/BlockAllocator.h"
+#include "../Visitor.h"
+#include "../Ast.h"
+
+#define TEMP_STACK_SIZE 32768
+
 /**
    @brief    TODO
    
    TODO
 */
 
+struct SymbolicArgumentsKey {
+    const value_t* p;
+    uint32_t size;
+    bool dynamic;
+
+    // size must be equal to the size specified in the function type
+    SymbolicArgumentsKey(const value_t args[], uint32_t size, bool dyn);
+    SymbolicArgumentsKey(const SymbolicArgumentsKey& other);
+    SymbolicArgumentsKey(SymbolicArgumentsKey&& other) noexcept;
+    ~SymbolicArgumentsKey();
+};
+
+namespace std {
+
+    template <> struct hash<SymbolicArgumentsKey> {
+        size_t operator()(const SymbolicArgumentsKey &key) const {
+            size_t h = 0;
+            for (uint32_t i = 0; i < key.size; i++) {
+                assert(not key.p[i].is_symbolic());
+                static std::hash<value_t> value_hasher;
+                h ^= value_hasher(key.p[i]);
+            }
+            return h;
+        }
+    };
+
+    template <> struct equal_to<SymbolicArgumentsKey> {
+        bool operator()(const SymbolicArgumentsKey &lhs, const SymbolicArgumentsKey &rhs) const {
+            for (uint32_t i = 0; i < lhs.size; i++) {
+                if (lhs.p[i] != rhs.p[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    };
+}
+
 namespace libcasm_fe
 {
-	class SymbolicExecutionPass : public libpass::Pass
-	{
-	public:
-		static char id;
-	
-		virtual bool run( libpass::PassResult& pr );
-	};
+    class SymbolicExecutionPass : public libpass::Pass, public BaseVisitor<value_t>
+    {
+    public:
+        static char id;
+
+        virtual bool run( libpass::PassResult& pr );
+
+        bool hasEmptyUpdateSet() const;
+        Update* addUpdate(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[], uint64_t line);
+        void applyUpdates();
+
+        void fork(const UpdateSet::Type updateSetType);
+        void merge();
+
+        const value_t get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]);
+
+        bool filter_enabled(const std::string& filter);
+
+        void visit_assert(UnaryNode* assert, const value_t& val);
+        void visit_assure(UnaryNode* assure, const value_t& val);
+        void visit_update(UpdateNode *update, const value_t& expr_v);
+        void visit_update_subrange(UpdateNode *update, const value_t& expr_v);
+
+        void visit_update_dumps(UpdateNode *update, const value_t& expr_v);
+        void visit_call_pre(CallNode *call);
+        void visit_call_pre(CallNode *call, const value_t& expr);
+        void visit_call(CallNode *call, std::vector<value_t> &arguments);
+        void visit_call_post(CallNode *call);
+        void visit_print(PrintNode *node, const std::vector<value_t> &arguments);
+        void visit_diedie(DiedieNode *node, const value_t& msg);
+        void visit_impossible(AstNode *node);
+
+        void visit_let(LetNode *node, const value_t& v);
+        void visit_let_post(LetNode *node);
+        void visit_push(PushNode *node, const value_t& expr, const value_t& atom);
+        void visit_pop(PopNode *node, const value_t& val);
+
+        const value_t visit_expression(Expression *expr, const value_t& left_val,
+                                       const value_t& right_val);
+        const value_t visit_expression_single(Expression *expr, const value_t& val);
+        const value_t visit_int_atom(IntegerAtom *atom) { return value_t(atom->val_); }
+        const value_t visit_bit_atom(IntegerAtom *atom) { return value_t(atom->val_); }
+        const value_t visit_floating_atom(FloatingAtom *atom) { return value_t(atom->val_); }
+        const value_t visit_rational_atom(RationalAtom *atom) { return value_t(&atom->val_); }
+        const value_t visit_undef_atom(UndefAtom *atom) { UNUSED(atom); return value_t(); }
+        const value_t visit_function_atom(FunctionAtom *atom,
+                                          const value_t arguments[], uint16_t num_arguments);
+        const value_t visit_function_atom_subrange(FunctionAtom *atom,
+                                                   const value_t arguments[],
+                                                   uint16_t num_arguments);
+
+
+        const value_t visit_builtin_atom(BuiltinAtom *atom, const value_t arguments[],
+                                         uint16_t num_arguments);
+        void visit_derived_function_atom_pre(FunctionAtom *atom,
+                                             const value_t arguments[],
+                                             uint16_t num_arguments);
+        const value_t visit_derived_function_atom(FunctionAtom *atom, const value_t& expr);
+        const value_t visit_self_atom(SelfAtom *atom) { UNUSED(atom); return value_t(); }
+        const value_t visit_rule_atom(RuleAtom *atom) { return value_t(atom->rule); }
+        const value_t visit_boolean_atom(BooleanAtom *atom) { return value_t(atom->value); }
+        const value_t visit_string_atom(StringAtom *atom) { return value_t(&atom->string); }
+        const value_t visit_list_atom(ListAtom *atom, const std::vector<value_t> &vals);
+        const value_t visit_number_range_atom(NumberRangeAtom *atom);
+
+    private:
+        bool init_function(const std::string& name, std::set<std::string>& visited);
+        void main_loop();
+        void print_trace() const;
+
+    private:
+        std::vector<value_t> main_bindings;
+        UpdateSetManager updateSetManager;
+
+        const bool dump_updates = false;
+        std::vector<std::string> update_dump;
+        std::vector<std::string> trace_creates;
+
+        BlockAllocator<TEMP_STACK_SIZE> stack;
+        std::map<const std::string, bool> debuginfo_filters;
+
+        std::set<std::string> initialized;
+
+        AstWalker<libcasm_fe::SymbolicExecutionPass, value_t>* walker;
+
+    public:
+        std::vector<value_t> value_list;
+        std::vector<std::vector<value_t> *> rule_bindings;
+
+        value_t arguments[10];
+        uint32_t num_arguments;
+
+        std::vector<std::unordered_map<SymbolicArgumentsKey, value_t>> function_states;
+        std::vector<const Function*> function_symbols;
+
+        std::vector<List*> temp_lists;
+
+        std::string path_name;
+        std::vector<symbolic_condition_t*> path_conditions;
+        std::vector<std::string> trace;
+    };
 }
+
+using SymbolicExecutionWalker = AstWalker<libcasm_fe::SymbolicExecutionPass, value_t>;
+
+template <>
+value_t SymbolicExecutionWalker::walk_list_atom(ListAtom *atom);
+
+// Specialize if-then-else for SymbolicExecutionPass
+template <>
+void SymbolicExecutionWalker::walk_ifthenelse(IfThenElseNode* node);
+
+template <>
+void SymbolicExecutionWalker::walk_seqblock(UnaryNode* seqblock);
+
+template <>
+void SymbolicExecutionWalker::walk_parblock(UnaryNode* parblock);
+
+template <>
+void SymbolicExecutionWalker::walk_pop(PopNode* node);
+
+template <>
+void SymbolicExecutionWalker::walk_push(PushNode* node);
+
+template <>
+void SymbolicExecutionWalker::walk_case(CaseNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_forall(ForallNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_iterate(UnaryNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_update(UpdateNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_update_subrange(UpdateNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_update_dumps(UpdateNode *node);
 
 #endif /* _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_ */
 
