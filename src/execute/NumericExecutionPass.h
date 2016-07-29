@@ -35,7 +35,6 @@
 #include "../Ast.h"
 
 #define TEMP_STACK_SIZE 32768
-#define VALUE_STACK_SIZE 32768
 
 /**
    @brief    TODO
@@ -43,24 +42,22 @@
    TODO
 */
 
-struct ArgumentsKey {
+struct NumericArgumentsKey {
     const value_t* p;
     uint32_t size;
     bool dynamic;
 
     // size must be equal to the size specified in the function type
-    ArgumentsKey(const value_t args[], uint32_t size, bool dyn);
-    ArgumentsKey(const ArgumentsKey& other);
-    ArgumentsKey(ArgumentsKey&& other) noexcept;
-    ~ArgumentsKey();
+    NumericArgumentsKey(const value_t args[], uint32_t size, bool dyn);
+    NumericArgumentsKey(const NumericArgumentsKey& other);
+    NumericArgumentsKey(NumericArgumentsKey&& other) noexcept;
+    ~NumericArgumentsKey();
 };
-
-
 
 namespace std {
 
-    template <> struct hash<ArgumentsKey> {
-        size_t operator()(const ArgumentsKey &key) const {
+    template <> struct hash<NumericArgumentsKey> {
+        size_t operator()(const NumericArgumentsKey &key) const {
             size_t h = 0;
             for (uint32_t i = 0; i < key.size; i++) {
                 assert(not key.p[i].is_symbolic());
@@ -71,8 +68,8 @@ namespace std {
         }
     };
 
-    template <> struct equal_to<ArgumentsKey> {
-        bool operator()(const ArgumentsKey &lhs, const ArgumentsKey &rhs) const {
+    template <> struct equal_to<NumericArgumentsKey> {
+        bool operator()(const NumericArgumentsKey &lhs, const NumericArgumentsKey &rhs) const {
             for (uint32_t i = 0; i < lhs.size; i++) {
                 if (lhs.p[i] != rhs.p[i]) {
                     return false;
@@ -151,6 +148,9 @@ namespace libcasm_fe
         const value_t visit_number_range_atom(NumberRangeAtom *atom);
 
     private:
+        bool init_function(const std::string& name, std::set<std::string>& visited);
+
+    private:
         std::vector<value_t> main_bindings;
         UpdateSetManager updateSetManager;
 
@@ -160,6 +160,10 @@ namespace libcasm_fe
         BlockAllocator<TEMP_STACK_SIZE> stack;
         std::map<const std::string, bool> debuginfo_filters;
 
+        std::set<std::string> initialized;
+
+        AstWalker<libcasm_fe::NumericExecutionPass, value_t>* walker;
+
     public:
         std::vector<value_t> value_list;
         std::vector<std::vector<value_t> *> rule_bindings;
@@ -167,12 +171,10 @@ namespace libcasm_fe
         value_t arguments[10];
         uint32_t num_arguments;
 
-        std::vector<std::unordered_map<ArgumentsKey, value_t>> function_states;
+        std::vector<std::unordered_map<NumericArgumentsKey, value_t>> function_states;
         std::vector<const Function*> function_symbols;
 
         std::vector<List*> temp_lists;
-
-        static BlockAllocator<VALUE_STACK_SIZE> value_stack;
     };
 }
 
@@ -214,17 +216,6 @@ void NumericExecutionWalker::walk_update_subrange(UpdateNode *node);
 
 template <>
 void NumericExecutionWalker::walk_update_dumps(UpdateNode *node);
-
-class ExecutionWalker : public NumericExecutionWalker {
-private:
-    std::set<std::string> initialized;
-
-    bool init_function(const std::string& name, std::set<std::string>& visited);
-
-public:
-    ExecutionWalker(libcasm_fe::NumericExecutionPass& v);
-    void run();
-};
 
 #endif /* _LIB_CASMFE_NUMERICEXECUTIONPASS_H_ */
 

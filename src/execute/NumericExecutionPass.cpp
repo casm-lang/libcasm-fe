@@ -43,8 +43,6 @@ using namespace libcasm_fe;
 
 extern Driver *global_driver;
 
-BlockAllocator<VALUE_STACK_SIZE> NumericExecutionPass::value_stack;
-
 char NumericExecutionPass::id = 0;
 
 static libpass::PassRegistration< NumericExecutionPass > PASS
@@ -54,6 +52,41 @@ static libpass::PassRegistration< NumericExecutionPass > PASS
 , 0
 );
 
+NumericArgumentsKey::NumericArgumentsKey(const value_t args[], uint32_t size, bool dyn) :
+    size(size),
+    dynamic(dyn)
+{
+    if (dynamic) {
+        auto argsDup = new value_t[size];
+        memcpy(argsDup, args, sizeof(value_t) * size);
+        p = argsDup;
+    } else {
+        p = args;
+    }
+}
+
+NumericArgumentsKey::NumericArgumentsKey(const NumericArgumentsKey& other) :
+    p(other.p),
+    size(other.size),
+    dynamic(other.dynamic)
+{
+
+}
+
+NumericArgumentsKey::NumericArgumentsKey(NumericArgumentsKey&& other) noexcept
+{
+    p = other.p;
+    dynamic = other.dynamic;
+    size = other.size;
+    other.dynamic = false;
+}
+
+NumericArgumentsKey::~NumericArgumentsKey()
+{
+    if (dynamic) {
+        delete[] p;
+    }
+}
 
 static std::string arguments_to_string(uint32_t num_arguments, const value_t arguments[])
 {
@@ -75,7 +108,7 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
     RuleNode* node = global_driver->rules_map_[ root->getInitRule()->identifier ];
 
     rule_bindings.push_back(&main_bindings);
-    function_states = std::vector<std::unordered_map<ArgumentsKey, value_t>>(global_driver->function_table.size());
+    function_states = std::vector<std::unordered_map<NumericArgumentsKey, value_t>>(global_driver->function_table.size());
     function_symbols = std::vector<const Function*>(global_driver->function_table.size());
     Function *program_sym = global_driver->function_table.get_function("program");
     // TODO location is wrong here
@@ -85,8 +118,58 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
     program_sym->intitializers_->push_back(std::make_pair(new SelfAtom(node->location), init_atom));
 
     try {
-        ExecutionWalker walker(*this);
-        walker.run();
+        walker = new NumericExecutionWalker(*this);
+
+        for (auto pair : global_driver->init_dependencies) {
+            std::set<std::string> visited;
+            if (initialized.count(pair.first) > 0) {
+                continue;;
+            }
+            if (!init_function(pair.first, visited)) {
+                Function *func = global_driver->function_table.get_function(pair.first);
+                std::string cycle = pair.first;
+                for (const std::string& dep : visited) {
+                    cycle = cycle + " => " + dep;
+                }
+                throw RuntimeException(func->intitializers_->at(0).second->location,
+                                       "initializer dependency cycle detected: " + cycle);
+            }
+        }
+
+
+        for (auto pair: global_driver->function_table.table_) {
+            if (pair.second->type != Symbol::SymbolType::FUNCTION || initialized.count(pair.first) > 0) {
+                continue;
+            }
+
+            std::set<std::string> visited;
+            init_function(pair.first, visited);
+        }
+
+        for (List *l : temp_lists) {
+            l->bump_usage();
+        }
+        temp_lists.clear();
+
+        uint64_t stepCounter = 0;
+
+        Function *program_sym = global_driver->function_table.get_function("program");
+        const auto& function_map = function_states[program_sym->id];
+        const value_t& program_val = function_map.at(NumericArgumentsKey(nullptr, 0, false));
+
+        while (program_val.type != TypeType::UNDEF) {
+            walker->walk_rule(program_val.value.rule);
+            applyUpdates();
+            ++stepCounter;
+        }
+
+        std::cout << (stepCounter - 2);
+        if ((stepCounter - 2) > 1) {
+            std::cout << " steps later..." << std::endl;
+        } else {
+            std::cout << " step later..." << std::endl;
+        }
+
         return true;
     } catch (const RuntimeException& ex) {
         std::cerr << "Abort after runtime exception: " << ex.what() << std::endl;
@@ -96,6 +179,83 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
     }
 	
     return false;
+}
+
+bool NumericExecutionPass::init_function(const std::string& name, std::set<std::string>& visited)
+{
+    if (global_driver->init_dependencies.count(name) != 0) {
+        visited.insert(name);
+        const std::set<std::string>& deps = global_driver->init_dependencies[name];
+        for (const std::string& dep : deps) {
+            if (visited.count(dep) > 0) {
+                return false;
+            } else {
+                if (!init_function(dep, visited)) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    std::vector<value_t> initializer_args;
+
+    Function *func = global_driver->function_table.get_function(name);
+    if (!func) {
+        return true;
+    }
+
+    function_states[func->id] = std::unordered_map<NumericArgumentsKey, value_t>(0);
+    function_symbols[func->id] = func;
+
+    auto& function_map = function_states[func->id];
+
+    if (func->intitializers_ != nullptr) {
+        for (std::pair<ExpressionBase*, ExpressionBase*> init : *func->intitializers_) {
+            uint32_t num_arguments = 0;
+            value_t *args = new value_t[10];
+            if (init.first != nullptr) {
+                const value_t argument_v = walker->walk_expression_base(init.first);
+                if (func->arguments_.size() > 1) {
+                    List *list = argument_v.value.list;
+                    for (auto iter = list->begin(); iter != list->end(); iter++) {
+                        args[num_arguments] = *iter;
+                        num_arguments += 1;
+                    }
+                } else {
+                    args[num_arguments] = argument_v;
+                    num_arguments += 1;
+                }
+            }
+
+            if (function_map.count(NumericArgumentsKey(args, num_arguments, false)) != 0) {
+                yy::location loc = init.first ? init.first->location+init.second->location
+                                              : init.second->location;
+                throw RuntimeException(loc, "function `" + func->name +
+                                       arguments_to_string(num_arguments, args) +
+                                       "` already initialized");
+            }
+
+            value_t v = walker->walk_expression_base(init.second);
+            if (func->subrange_return) {
+                if (v.value.integer < func->return_type_->subrange_start ||
+                    v.value.integer > func->return_type_->subrange_end) {
+                    yy::location loc = init.first ? init.first->location+init.second->location
+                                                  : init.second->location;
+                    throw RuntimeException(loc, std::to_string(v.value.integer) +
+                                           " does violate the subrange "
+                                           + std::to_string(func->return_type_->subrange_start)
+                                           + ".." + std::to_string(func->return_type_->subrange_end)
+                                           + " of `" + func->name + "`");
+                }
+            }
+            function_map.emplace(std::make_pair(NumericArgumentsKey(args, num_arguments, true), v));
+
+            initializer_args.push_back(args);
+        }
+    }
+
+    initialized.insert(name);
+    return true;
 }
 
 bool NumericExecutionPass::hasEmptyUpdateSet() const
@@ -108,9 +268,9 @@ Update* NumericExecutionPass::addUpdate(const value_t& val, size_t sym_id,
                                         uint64_t line)
 {
     auto& function_map = function_states[sym_id];
-    auto it = function_map.find(ArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
+    auto it = function_map.find(NumericArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
     if (it == function_map.cend()) {
-        const auto pair = function_map.emplace(ArgumentsKey(arguments, num_arguments, true), value_t());
+        const auto pair = function_map.emplace(NumericArgumentsKey(arguments, num_arguments, true), value_t());
         it = pair.first;
     }
 
@@ -144,10 +304,10 @@ Update* NumericExecutionPass::addUpdate(const value_t& val, size_t sym_id,
 
 void NumericExecutionPass::applyUpdates()
 {
-    std::unordered_map<uint32_t, std::vector<ArgumentsKey>> updated_functions;
+    std::unordered_map<uint32_t, std::vector<NumericArgumentsKey>> updated_functions;
     if (dump_updates) {
         for (uint32_t i = 0; i < function_states.size(); i++) {
-            updated_functions[i] = std::vector<ArgumentsKey>();
+            updated_functions[i] = std::vector<NumericArgumentsKey>();
         }
     }
 
@@ -163,7 +323,7 @@ void NumericExecutionPass::applyUpdates()
         // TODO handle tuples
         if (u->value.type == TypeType::LIST) {
             auto& function_map = function_states[u->func];
-            value_t& list = function_map[ArgumentsKey(u->args, u->num_args, false)];
+            value_t& list = function_map[NumericArgumentsKey(u->args, u->num_args, false)];
             if (u->value.is_undef()) {
                 // set list to undef
                 if (!list.is_undef()) {
@@ -188,7 +348,7 @@ void NumericExecutionPass::applyUpdates()
         }
 
         if (dump_updates) {
-            updated_functions[u->func].push_back(ArgumentsKey(u->args, u->num_args, true));
+            updated_functions[u->func].push_back(NumericArgumentsKey(u->args, u->num_args, true));
         }
     }
     updateSetManager.clear();
@@ -276,7 +436,7 @@ const value_t NumericExecutionPass::get_function_value(Function *sym,
 {
     auto& function_map = function_states[sym->id];
     try {
-        const value_t &v = function_map.at(ArgumentsKey(arguments, num_arguments, false));
+        const value_t &v = function_map.at(NumericArgumentsKey(arguments, num_arguments, false));
         const auto update = updateSetManager.lookup(reinterpret_cast<uint64_t>(&v));
         if (update) {
             return update->value;
@@ -555,7 +715,7 @@ namespace builtins
 
     static const value_t asrational(const value_t& arg)
     {
-        auto result = reinterpret_cast<rational_t*>(NumericExecutionPass::value_stack.allocate(sizeof(rational_t)));
+        auto result = new rational_t;
         switch (arg.type) {
             case TypeType::INTEGER:
                 result->numerator = arg.value.integer;
@@ -774,9 +934,10 @@ namespace operators
 {
     static const value_t mod(const value_t& lhs, const value_t& rhs)
     {
-        if (lhs.type == TypeType::INTEGER) {
+        switch (lhs.type) {
+        case TypeType::INTEGER:
             return value_t(lhs.value.integer % rhs.value.integer);
-        } else {
+        default:
             return value_t();
         }
     }
@@ -785,7 +946,7 @@ namespace operators
     {
         switch (lhs.type) {
         case TypeType::INTEGER: {
-            auto result = reinterpret_cast<rational_t*>(NumericExecutionPass::value_stack.allocate(sizeof(rational_t)));
+            auto result = new rational_t;
             result->numerator = lhs.value.integer;
             result->denominator = rhs.value.integer;
             return value_t(result);
@@ -977,26 +1138,6 @@ const value_t NumericExecutionPass::visit_list_atom(ListAtom *atom,
 const value_t NumericExecutionPass::visit_number_range_atom(NumberRangeAtom *atom)
 {
     return value_t(atom->type_, atom->list);
-}
-
-ExpressionOperation invert(ExpressionOperation op)
-{
-    switch (op) {
-    case ExpressionOperation::EQ:
-        return ExpressionOperation::NEQ;
-    case ExpressionOperation::NEQ:
-        return ExpressionOperation::EQ;
-    case ExpressionOperation::LESSEREQ:
-        return ExpressionOperation::GREATER;
-    case ExpressionOperation::LESSER:
-        return ExpressionOperation::GREATEREQ;
-    case ExpressionOperation::GREATER:
-        return ExpressionOperation::LESSEREQ;
-    case ExpressionOperation::GREATEREQ:
-        return ExpressionOperation::LESSER;
-    default:
-        throw RuntimeException("Invert not implemented for operation");
-    }
 }
 
 template <>
@@ -1193,145 +1334,6 @@ void NumericExecutionWalker::walk_update_dumps(UpdateNode *node)
     const value_t expr = walk_expression_base(node->expr_);
     walk_function_arguments(this, node->func->arguments);
     visitor.visit_update_dumps(node, expr);
-}
-
-ExecutionWalker::ExecutionWalker(NumericExecutionPass& v) :
-    NumericExecutionWalker(v),
-    initialized()
-{
-
-}
-
-bool ExecutionWalker::init_function(const std::string& name,
-                                    std::set<std::string>& visited)
-{
-    if (global_driver->init_dependencies.count(name) != 0) {
-        visited.insert(name);
-        const std::set<std::string>& deps = global_driver->init_dependencies[name];
-        for (const std::string& dep : deps) {
-            if (visited.count(dep) > 0) {
-                return false;
-            } else {
-                if (!init_function(dep, visited)) {
-                    return false;
-                }
-            }
-        }
-    }
-
-    std::vector<value_t> initializer_args;
-
-    Function *func = global_driver->function_table.get_function(name);
-    if (!func) {
-        return true;
-    }
-
-    visitor.function_states[func->id] = std::unordered_map<ArgumentsKey, value_t>(0);
-    visitor.function_symbols[func->id] = func;
-
-    auto& function_map = visitor.function_states[func->id];
-
-    if (func->intitializers_ != nullptr) {
-        for (std::pair<ExpressionBase*, ExpressionBase*> init : *func->intitializers_) {
-            uint32_t num_arguments = 0;
-            value_t *args = new value_t[10];
-            if (init.first != nullptr) {
-                const value_t argument_v = walk_expression_base(init.first);
-                if (func->arguments_.size() > 1) {
-                    List *list = argument_v.value.list;
-                    for (auto iter = list->begin(); iter != list->end(); iter++) {
-                        args[num_arguments] = *iter;
-                        num_arguments += 1;
-                    }
-                } else {
-                    args[num_arguments] = argument_v;
-                    num_arguments += 1;
-                }
-            }
-
-            if (function_map.count(ArgumentsKey(args, num_arguments, false)) != 0) {
-                yy::location loc = init.first ? init.first->location+init.second->location
-                                              : init.second->location;
-                throw RuntimeException(loc, "function `" + func->name +
-                                            arguments_to_string(num_arguments, args) +
-                                            "` already initialized");
-            }
-
-            value_t v = walk_expression_base(init.second);
-            if (func->subrange_return) {
-                if (v.value.integer < func->return_type_->subrange_start ||
-                    v.value.integer > func->return_type_->subrange_end) {
-                    yy::location loc = init.first ? init.first->location+init.second->location
-                                                    : init.second->location;
-                    throw RuntimeException(loc, std::to_string(v.value.integer) +
-                                                " does violate the subrange "
-                                                + std::to_string(func->return_type_->subrange_start)
-                                                + ".." + std::to_string(func->return_type_->subrange_end)
-                                                + " of `" + func->name + "`");
-                }
-            }
-            function_map.emplace(std::make_pair(ArgumentsKey(args, num_arguments, true), v));
-
-            initializer_args.push_back(args);
-        }
-    }
-
-    initialized.insert(name);
-    return true;
-}
-
-void ExecutionWalker::run()
-{
-    for (auto pair : global_driver->init_dependencies) {
-        std::set<std::string> visited;
-        if (initialized.count(pair.first) > 0) {
-            continue;;
-        }
-        if (!init_function(pair.first, visited)) {
-            Function *func = global_driver->function_table.get_function(pair.first);
-            std::string cycle = pair.first;
-            for (const std::string& dep : visited) {
-                cycle = cycle + " => " + dep;
-            }
-            throw RuntimeException(func->intitializers_->at(0).second->location,
-                                   "initializer dependency cycle detected: " + cycle);
-        }
-    }
-
-
-    for (auto pair: global_driver->function_table.table_) {
-        if (pair.second->type != Symbol::SymbolType::FUNCTION || initialized.count(pair.first) > 0) {
-            continue;
-        }
-
-        std::set<std::string> visited;
-        init_function(pair.first, visited);
-    }
-
-    for (List *l : visitor.temp_lists) {
-        l->bump_usage();
-    }
-
-    visitor.temp_lists.clear();
-
-    uint64_t stepCounter = 0;
-
-    Function *program_sym = global_driver->function_table.get_function("program");
-    const auto& function_map = visitor.function_states[program_sym->id];
-    const value_t& program_val = function_map.at(ArgumentsKey(nullptr, 0, false));
-
-    while (program_val.type != TypeType::UNDEF) {
-        walk_rule(program_val.value.rule);
-        visitor.applyUpdates();
-        ++stepCounter;
-    }
-
-    std::cout << (stepCounter - 2);
-    if ((stepCounter - 2) > 1) {
-        std::cout << " steps later..." << std::endl;
-    } else {
-        std::cout << " step later..." << std::endl;
-    }
 }
 
 //  
