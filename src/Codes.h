@@ -23,52 +23,28 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#include "SourceToAstPass.h"
-
-using namespace libcasm_fe;
-
-
-char SourceToAstPass::id = 0;
-
-static libpass::PassRegistration< SourceToAstPass > PASS
-( "Source To AST Pass"
-, "parse the source code and generate an AST"
-, 0
-, 'P'
-);
+#ifndef _LIB_CASMFE_CODES_H_
+#define _LIB_CASMFE_CODES_H_
 
 
-bool SourceToAstPass::run( libpass::PassResult& pr )
+namespace libcasm_fe
 {
-	const char* file_name = (const char*)pr.getResults()[ 0 ];
+    enum class Codes
+    { SyntaxError                                   = 0x0000
+	, SyntaxErrorUnrecognizedCharacter              = 0x0001
+	, SyntaxErrorUnclosedString                     = 0x0002
 	
-	casm_frontend_init();
+	, FunctionAttributeIsInvalid                    = 0xfa00
+	, FunctionAttributeMultipleUseOfStatic          = 0xfa01
+	, FunctionAttributeMultipleUseOfSymbolic        = 0xfa02
+	, FunctionAttributeMultipleUseOfControlled      = 0xfa03
+	, FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
 	
-	Ast* node = casm_frontend_pass_1_parse( file_name );
-	
-    if( !node ) 
-	{
-		// TODO: FIXME: PPA: better error messages,
-		// can be improved with the new libstdhl Verbose support
-
-		std::cerr << "Error parsing file" << std::endl;
-		
-		return false;
-    }
-	
-	assert( node->getElements() );
-	for( auto e : node->getElements()->nodes )
-	{
-		if( e->node_type_ == NodeType::INIT )
-		{
-			node->setInitRule( (InitNode*)e );
-		}
-	}
-	
-	pr.setResult< SourceToAstPass >( node );
-    
-	return true;
+	, Unspecified                                   = 0xffff
+	};
 }
+
+#endif /* _LIB_CASMFE_CODES_H_ */
 
 
 //  

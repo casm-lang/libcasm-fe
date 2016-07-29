@@ -37,6 +37,9 @@
 
 #include "Symbols.h"
 
+#include "Codes.h"
+
+
 class AstNode;
 class RuleNode;
 
@@ -72,7 +75,8 @@ public:
     Ast *parse(const std::string& f);
 
     // Error handling.
-    void error(const yy::location& l, const std::string& m);
+    void error(const yy::location& l, const std::string& m, libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
+    
     void warning(const yy::location& l, const std::string& m);
     void info(const yy::location& l, const std::string& m);
     bool ok() const;

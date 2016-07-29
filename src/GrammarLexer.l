@@ -210,11 +210,20 @@ objdump { return yy::casmi_parser::make_OBJDUMP(loc); }
 <STRING>\\t { strncat( strbuf, "\t", STRBUF_LENGTH-1 ); }
 <STRING>\\\" { strncat( strbuf, "\"", STRBUF_LENGTH-1 ); }
 <STRING>\\' { strncat( strbuf, "\'", STRBUF_LENGTH-1 ); }
-<STRING><<EOF>> { fprintf( stderr, "unclosed string\n" ); exit( 1 ); }
+<STRING><<EOF>> { global_driver->error( loc, "unclosed string", libcasm_fe::Codes::SyntaxErrorUnclosedString ); exit( 1 ); }
 <STRING>\" { BEGIN(INITIAL); return yy::casmi_parser::make_STRCONST(strbuf, loc); }
 
-. { fprintf( stderr, "Unrecognized character: %s (ASCII-Code: %d) on line %d.\n",
-  yytext, *yytext, yylineno ); exit( 1 );
+. { global_driver->error( loc, "unrecognized character '" + std::string( yytext ) + "'", libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter ); /*yytext, *yytext, yylineno*/ exit( 1 );
 }
 
 %%
+
+//  
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: t
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//  
