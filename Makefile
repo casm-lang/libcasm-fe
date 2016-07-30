@@ -61,6 +61,7 @@ CPPOBJECTS += obj/Value.o
 CPPOBJECTS += obj/AstDumpPass.o
 CPPOBJECTS += obj/TypeCheckPass.o
 CPPOBJECTS += obj/SourceToAstPass.o
+CPPOBJECTS += obj/ExecutionPassBase.o
 CPPOBJECTS += obj/NumericExecutionPass.o
 CPPOBJECTS += obj/SymbolicExecutionPass.o
 CPPOBJECTS += obj/UpdateSet.o
