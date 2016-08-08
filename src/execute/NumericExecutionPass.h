@@ -62,8 +62,12 @@ namespace libcasm_fe
     private:
         bool init_function(const std::string& name, std::set<std::string>& visited);
 
+        void dumpUpdates() const;
+
     private:
         AstWalker<libcasm_fe::NumericExecutionPass, value_t>* walker;
+
+        bool dump_updates = false;
     };
 }
 

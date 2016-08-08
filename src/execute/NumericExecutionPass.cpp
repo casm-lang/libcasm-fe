@@ -123,6 +123,9 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
 
         while (program_val.type != TypeType::UNDEF) {
             walker->walk_rule(program_val.value.rule);
+            if (dump_updates) {
+                dumpUpdates();
+            }
             applyUpdates();
             ++stepCounter;
         }
@@ -144,6 +147,34 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
     }
 
     return true;
+}
+
+void NumericExecutionPass::dumpUpdates() const
+{
+    std::stringstream ss;
+
+    ss << "{";
+
+    bool firstDump = true;
+
+    const auto updateSet = updateSetManager.currentUpdateSet();
+    const auto end = updateSet->cend();
+    for (auto it = updateSet->cbegin(); it != end; ++it) {
+        const Update* update = it->second;
+        const Function* function = function_symbols[update->func];
+
+        if (not firstDump) {
+            ss << ", ";
+        }
+
+        ss << function->name
+           << "(" << arguments_to_string(update->num_args, update->args) << ")"
+           << " = " << update->value.to_str();
+
+        firstDump = false;
+    }
+
+    ss << "}" << std::endl;
 }
 
 bool NumericExecutionPass::init_function(const std::string& name, std::set<std::string>& visited)

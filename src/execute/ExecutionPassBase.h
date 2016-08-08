@@ -140,9 +140,6 @@ namespace libcasm_fe
         std::vector<value_t> main_bindings;
         UpdateSetManager updateSetManager;
 
-        const bool dump_updates = false;
-        std::vector<std::string> update_dump;
-
         BlockAllocator<TEMP_STACK_SIZE> stack;
         std::map<const std::string, bool> debuginfo_filters;
 

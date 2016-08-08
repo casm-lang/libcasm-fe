@@ -166,17 +166,11 @@ void ExecutionPassBase::merge()
 
 void ExecutionPassBase::applyUpdates()
 {
-    std::unordered_map<uint32_t, std::vector<ArgumentsKey>> updated_functions;
-    if (dump_updates) {
-        for (uint32_t i = 0; i < function_states.size(); i++) {
-            updated_functions[i] = std::vector<ArgumentsKey>();
-        }
-    }
-
     assert(updateSetManager.size() == 1);
 
-    auto updateSet = updateSetManager.currentUpdateSet();
     std::vector<value_t*> to_fold;
+
+    auto updateSet = updateSetManager.currentUpdateSet();
     const auto end = updateSet->cend();
     for (auto it = updateSet->cbegin(); it != end; ++it) {
         value_t* location = reinterpret_cast<value_t*>(it->first);
@@ -208,33 +202,8 @@ void ExecutionPassBase::applyUpdates()
             // mode
             *location = u->value;
         }
-
-        if (dump_updates) {
-            updated_functions[u->func].push_back(ArgumentsKey(u->args, u->num_args, true));
-        }
     }
     updateSetManager.clear();
-
-    if (dump_updates) {
-        for (uint32_t i = 0; i < function_states.size(); i++) {
-            auto& function_map = function_states[i];
-            const Function* function_symbol = function_symbols[i];
-            const auto& updated_keys = updated_functions[i];
-
-            for (const auto& k : updated_keys) {
-                update_dump.push_back(function_symbol->name+
-                arguments_to_string(k.size, k.p)+" = "+
-                function_map[k].to_str());
-            }
-        }
-
-        std::stringstream ss;
-        for (auto s : update_dump) {
-            ss << s << ", ";
-        }
-        std::cout << "{ " << ss.str().substr(0, ss.str().size()-2) << " }" << std::endl;
-        update_dump.clear();
-    }
 
     // Handle lists
     // 1. convert chained lists to BottomLists
@@ -245,10 +214,9 @@ void ExecutionPassBase::applyUpdates()
         }
         v->value.list = new_l;
     }
-    to_fold.clear();
-    std::vector<size_t> deleted;
 
     // delete all list objects, except BottomLists that are currently used
+    std::vector<size_t> deleted;
     for (size_t i=0; i < temp_lists.size(); i++) {
         if (!(temp_lists[i]->is_bottom() && reinterpret_cast<BottomList*>(temp_lists[i])->is_used())) {
             delete temp_lists[i];
