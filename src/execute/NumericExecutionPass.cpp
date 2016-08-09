@@ -151,9 +151,7 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
 
 void NumericExecutionPass::dumpUpdates() const
 {
-    std::stringstream ss;
-
-    ss << "{";
+    std::cout << "{";
 
     bool firstDump = true;
 
@@ -164,17 +162,17 @@ void NumericExecutionPass::dumpUpdates() const
         const Function* function = function_symbols[update->func];
 
         if (not firstDump) {
-            ss << ", ";
+          std::cout << ", ";
         }
 
-        ss << function->name
-           << "(" << arguments_to_string(update->num_args, update->args) << ")"
-           << " = " << update->value.to_str();
+        std::cout << function->name
+                  << arguments_to_string(update->num_args, update->args)
+                  << " = " << update->value.to_str();
 
         firstDump = false;
     }
 
-    ss << "}" << std::endl;
+    std::cout << "}" << std::endl;
 }
 
 bool NumericExecutionPass::init_function(const std::string& name, std::set<std::string>& visited)
