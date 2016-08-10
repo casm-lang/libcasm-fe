@@ -175,6 +175,18 @@ void NumericExecutionPass::dumpUpdates() const
     std::cout << "}" << std::endl;
 }
 
+const value_t NumericExecutionPass::get_function_value(Function *sym,
+                                                       uint32_t num_arguments,
+                                                       const value_t arguments[])
+{
+    try {
+        return ExecutionPassBase::get_function_value(sym, num_arguments, arguments);
+    } catch (const std::out_of_range &e) {
+        static value_t undef = value_t();
+        return undef;
+    }
+}
+
 bool NumericExecutionPass::init_function(const std::string& name, std::set<std::string>& visited)
 {
     if (global_driver->init_dependencies.count(name) != 0) {

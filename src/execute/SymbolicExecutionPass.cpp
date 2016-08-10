@@ -160,11 +160,17 @@ namespace symbolic
     }
 }
 
-#define CREATE_NUMERICAL_OPERATION(op, lhs, rhs)  {                             \
-    if (lhs.is_symbolic() or rhs.is_symbolic()) {                               \
+#define HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs) {                                    \
+    if (lhs.is_undef() or rhs.is_undef()) {                                     \
+        return value_t();                                                       \
+    } else if (lhs.is_symbolic() or rhs.is_symbolic()) {                        \
+        /* TODO cleanup symbols */                                              \
         return value_t(new symbol_t(symbolic::next_symbol_id()));               \
     }                                                                           \
-                                                                                \
+}
+
+#define CREATE_NUMERICAL_OPERATION(op, lhs, rhs) {                              \
+    HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)                                          \
     switch (lhs.type) {                                                         \
     case TypeType::INTEGER:                                                     \
         return value_t(lhs.value.integer op rhs.value.integer);                 \
@@ -177,15 +183,15 @@ namespace symbolic
     }                                                                           \
 }
 
-#define CREATE_BOOLEAN_OPERATION(op, lhs, rhs)  {                               \
-    return value_t((bool)(lhs.value.boolean op rhs.value.boolean));             \
-}
-
-#define CREATE_COMPARE_OPERATION(op, lhs, rhs)  {                               \
+#define CREATE_BOOLEAN_OPERATION(op, lhs, rhs) {                                \
     if (lhs.is_undef() or rhs.is_undef()) {                                     \
         return value_t();                                                       \
     }                                                                           \
-                                                                                \
+    return value_t((bool)(lhs.value.boolean op rhs.value.boolean));             \
+}
+
+#define CREATE_COMPARE_OPERATION(op, lhs, rhs) {                                \
+    HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)                                          \
     switch (lhs.type) {                                                         \
     case TypeType::INTEGER:                                                     \
         return value_t(lhs.value.integer op rhs.value.integer);                 \
@@ -193,6 +199,21 @@ namespace symbolic
         return value_t(lhs.value.float_ op rhs.value.float_);                   \
     default:                                                                    \
         FAILURE();                                                              \
+    }                                                                           \
+}
+
+#define CHECK_SYMBOLIC_CMP_OPERATION(op, lhs, rhs) {                            \
+    if (lhs.is_symbolic() and not rhs.is_undef()) {                             \
+        return value_t(new symbol_t(symbolic::next_symbol_id(),                 \
+                                new symbolic_condition_t(new value_t(lhs),      \
+                                                         new value_t(rhs),      \
+                                                         op)));                 \
+    }                                                                           \
+    if (rhs.is_symbolic() and not lhs.is_undef()) {                             \
+        return value_t(new symbol_t(symbolic::next_symbol_id(),                 \
+                                new symbolic_condition_t(new value_t(lhs),      \
+                                                         new value_t(rhs),      \
+                                                         op)));                 \
     }                                                                           \
 }
 
@@ -263,13 +284,12 @@ namespace symbolic
                     uint32_t time, const std::string &type)
     {
         ss << "fof(" << name << ",hypothesis,"
-           << (func->is_static ? "cs" : "st") << func->name << "(" << time << ","
-           << arguments_to_string(num_arguments, arguments) << val.to_str(true)
-           << "))." << type << ": " << func->name;
+           << (func->is_static ? "cs" : "st") << func->name << "(" << time << ",";
         if (num_arguments > 0) {
-            ss << '(' << arguments_to_string(num_arguments, arguments) << ')';
+            ss << arguments_to_string(num_arguments, arguments) << ",";
         }
-        ss << std::endl;
+        ss << val.to_str(true) << "))." << type << ": " << func->name
+           << arguments_to_string(num_arguments, arguments) << std::endl;
     }
 
     static void dump_type(std::stringstream& ss, const value_t& v)
@@ -317,13 +337,12 @@ namespace symbolic
     }
 
     static void dump_update(std::vector<std::string>& trace, const Function *func,
-                            uint32_t num_arguments, const value_t arguments[],
-                            const value_t& v)
+                            const Update *update)
     {
         std::stringstream ss;
-        dump_type(ss, v);
-        fof(ss, "id%u", func, num_arguments, arguments, v, symbolic::get_timestamp(),
-            "%%UPDATE");
+        dump_type(ss, update->value);
+        fof(ss, "id%u", func, update->num_args, update->args, update->value,
+            symbolic::get_timestamp(), "%%UPDATE");
         trace.push_back(ss.str());
     }
 
@@ -353,19 +372,22 @@ namespace symbolic
                            const std::vector<const Function*>& symbols,
                            const std::vector<std::unordered_map<ArgumentsKey, value_t>>& states)
     {
+        assert(symbols.size() == states.size());
+
         std::stringstream ss;
-        uint32_t i = 0;
-        for (uint32_t j = 0; j < symbols.size(); j++) {
-            if (not symbols[j]->is_symbolic) {
+        uint32_t finalId = 0;
+        for (uint32_t i = 0; i < symbols.size(); i++) {
+            if (not symbols[i]->is_symbolic) {
                 continue;
             }
-            for (auto& value_pair : states[j]) {
+            for (auto& value_pair : states[i]) {
                 const auto arguments = value_pair.first;
                 const auto value = value_pair.second;
 
-                fof(ss, "final", symbols[j], arguments.size, arguments.p, value,
-                    FINAL_TIME, "%FINAL");
-                i += 1;
+                fof(ss, "final" + std::to_string(finalId), symbols[i],
+                    arguments.size, arguments.p, value, FINAL_TIME, "%FINAL");
+
+                ++finalId;
             }
         }
         trace.push_back(ss.str());
@@ -578,10 +600,6 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
                                                       const value_t &left_val,
                                                       const value_t &right_val)
 {
-    if (left_val.is_undef() or right_val.is_undef()) {
-        return value_t();
-    }
-
     switch (expr->op) {
     case ExpressionOperation::ADD:
         CREATE_NUMERICAL_OPERATION(+, left_val, right_val);
@@ -596,8 +614,14 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
     case ExpressionOperation::RAT_DIV:
         return operators::rat_div(left_val, right_val);
     case ExpressionOperation::EQ:
+        if (not(left_val.is_symbolic() and right_val.is_symbolic())) {
+            CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
+        }
         CREATE_COMPARE_OPERATION(==, left_val, right_val);
     case ExpressionOperation::NEQ:
+        if (not(left_val.is_symbolic() and right_val.is_symbolic())) {
+            CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
+        }
         CREATE_COMPARE_OPERATION(!=, left_val, right_val);
     case ExpressionOperation::AND:
         CREATE_BOOLEAN_OPERATION(and, left_val, right_val);
@@ -609,45 +633,25 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
         if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
             return value_t(false);
         }
-        if (left_val.is_symbolic() or right_val.is_symbolic()) {
-            auto symCond = new symbolic_condition_t(new value_t(left_val),
-                                                    new value_t(right_val),
-                                                    expr->op);
-            return value_t(new symbol_t(symbolic::next_symbol_id(), symCond));
-        }
+        CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         operators::lesser(left_val, right_val);
     case ExpressionOperation::GREATER:
         if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
             return value_t(false);
         }
-        if (left_val.is_symbolic() or right_val.is_symbolic()) {
-            auto symCond = new symbolic_condition_t(new value_t(left_val),
-                                                    new value_t(right_val),
-                                                    expr->op);
-            return value_t(new symbol_t(symbolic::next_symbol_id(), symCond));
-        }
+        CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         operators::greater(left_val, right_val);
     case ExpressionOperation::LESSEREQ:
         if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
             return value_t(true);
         }
-        if (left_val.is_symbolic() or right_val.is_symbolic()) {
-            auto symCond = new symbolic_condition_t(new value_t(left_val),
-                                                    new value_t(right_val),
-                                                    expr->op);
-            return value_t(new symbol_t(symbolic::next_symbol_id(), symCond));
-        }
+        CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         operators::lessereq(left_val, right_val);
     case ExpressionOperation::GREATEREQ:
         if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
             return value_t(true);
         }
-        if (left_val.is_symbolic() or right_val.is_symbolic()) {
-            auto symCond = new symbolic_condition_t(new value_t(left_val),
-                                                    new value_t(right_val),
-                                                    expr->op);
-            return value_t(new symbol_t(symbolic::next_symbol_id(), symCond));
-        }
+        CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         operators::greatereq(left_val, right_val);
     default:
         FAILURE();
@@ -686,6 +690,28 @@ const value_t SymbolicExecutionPass::visit_list_atom(ListAtom *atom,
         return value_t(sym);
     } else {
         return value_t(atom->type_, list);
+    }
+}
+
+const value_t SymbolicExecutionPass::get_function_value(Function *sym,
+                                                        uint32_t num_arguments,
+                                                        const value_t arguments[])
+{
+    try {
+        return ExecutionPassBase::get_function_value(sym, num_arguments, arguments);
+    } catch (const std::out_of_range &e) {
+        if (sym->is_symbolic) {
+            const value_t v(new symbol_t(symbolic::next_symbol_id())); // TODO cleanup symbol
+
+            auto &function_map = function_states[sym->id];
+            function_map.emplace(ArgumentsKey(arguments, num_arguments, false), v);
+            symbolic::dump_create(trace_creates, sym, num_arguments, arguments, v);
+
+            return v;
+        } else {
+            static value_t undef = value_t();
+            return undef;
+        }
     }
 }
 
@@ -780,6 +806,7 @@ void SymbolicExecutionPass::mainLoop()
 
     while (program_val.type != TypeType::UNDEF) {
         walker->walk_rule(program_val.value.rule);
+        dumpUpdates();
         applyUpdates();
         symbolic::advance_timestamp();
     }
@@ -800,7 +827,7 @@ void SymbolicExecutionPass::printTrace() const
     //}
     fprintf(out, "forklog:%s\n", path_name.c_str());
     uint32_t fof_id = 0;
-    for (const std::string& s :trace_creates) {
+    for (const std::string& s : trace_creates) {
         if (s.find("id%u") != std::string::npos) {
             fprintf(out, s.c_str(), fof_id);
             fof_id += 1;
@@ -817,6 +844,32 @@ void SymbolicExecutionPass::printTrace() const
         }
     }
     fprintf(out, "\n");
+}
+
+void SymbolicExecutionPass::dumpUpdates()
+{
+    assert(updateSetManager.size() == 1);
+
+    const auto updateSet = updateSetManager.currentUpdateSet();
+
+    for (uint32_t i = 0; i < function_symbols.size(); i++) {
+        const Function* function = function_symbols[i];
+        if (not function->is_symbolic or function->is_static) {
+            continue;
+        }
+
+        for (const auto& pair : function_states[i]) {
+            const ArgumentsKey &args = pair.first;
+            const value_t &value = pair.second;
+
+            const auto update = updateSet->get(reinterpret_cast<uint64_t>(&value));
+            if (update) {
+                symbolic::dump_update(trace, function, update);
+            } else {
+                symbolic::dump_symbolic(trace, function, args.size, args.p, value);
+            }
+        }
+    }
 }
 
 static ExpressionOperation invert(ExpressionOperation op)

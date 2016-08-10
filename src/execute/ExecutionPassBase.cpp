@@ -238,18 +238,13 @@ const value_t ExecutionPassBase::get_function_value(Function *sym,
                                                     uint32_t num_arguments,
                                                     const value_t arguments[])
 {
-    auto& function_map = function_states[sym->id];
-    try {
-        const value_t &v = function_map.at(ArgumentsKey(arguments, num_arguments, false));
-        const auto update = updateSetManager.lookup(reinterpret_cast<uint64_t>(&v));
-        if (update) {
-            return update->value;
-        } else {
-            return v;
-        }
-    } catch (const std::out_of_range &e) {
-        static value_t undef = value_t();
-        return undef;
+    const auto &function_map = function_states[sym->id];
+    const value_t &v = function_map.at(ArgumentsKey(arguments, num_arguments, false));
+    const auto update = updateSetManager.lookup(reinterpret_cast<uint64_t>(&v));
+    if (update) {
+        return update->value;
+    } else {
+        return v;
     }
 }
 

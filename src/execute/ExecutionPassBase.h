@@ -93,7 +93,7 @@ namespace libcasm_fe
         void merge();
         void applyUpdates();
 
-        const value_t get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]);
+        virtual const value_t get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]);
 
         bool filter_enabled(const std::string& filter);
 

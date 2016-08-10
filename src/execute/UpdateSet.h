@@ -96,6 +96,8 @@ public:
     const_iterator cbegin() const noexcept;
     const_iterator cend() const noexcept;
 
+    Update* get(const uint64_t key) const noexcept;
+
 private:
     UpdateSet* m_parent;
     const Type m_type;
