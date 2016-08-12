@@ -180,7 +180,7 @@
 %type <Ast*> SPECIFICATION
 %type <SpecificationNode*> HEADER
 %type <InitNode*> INIT_SYNTAX
-%type <AstNode*> BODY_ELEMENT RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX
+%type <AstNode*> BODY_ELEMENT RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX RULE_STMT SIMPLE_STMT
 %type <UnaryNode*> PAR_SYNTAX SEQ_SYNTAX ASSERT_SYNTAX ASSURE_SYNTAX ITERATE_SYNTAX
 %type <AstListNode*> BODY_ELEMENTS STATEMENTS
 %type <AtomNode*> NUMBER VALUE NUMBER_RANGE
@@ -615,23 +615,32 @@ FUNCTION_SYNTAX: IDENTIFIER { $$ = new FunctionAtom(@$, $1); }
                }
                ;
 
-RULE_SYNTAX: RULE IDENTIFIER "=" STATEMENT { $$ = new RuleNode(@$, $4, $2); }
-           | RULE IDENTIFIER "(" ")" "=" STATEMENT {
+RULE_STMT: SEQ_SYNTAX { $$ = $1; }
+         | PAR_SYNTAX { $$ = $1; }
+         | SIMPLE_STMT {
+              auto stmts = new AstListNode(@$, NodeType::STATEMENTS);
+              stmts->add($1);
+              $$ = new UnaryNode(@$, NodeType::PARBLOCK, stmts);
+          }
+         ;
+
+RULE_SYNTAX: RULE IDENTIFIER "=" RULE_STMT { $$ = new RuleNode(@$, $4, $2); }
+           | RULE IDENTIFIER "(" ")" "=" RULE_STMT {
                 $$ = new RuleNode(@$, $6, $2);
            }
-           | RULE IDENTIFIER "(" PARAM_LIST ")" "=" STATEMENT {
+           | RULE IDENTIFIER "(" PARAM_LIST ")" "=" RULE_STMT {
                 $$ = new RuleNode(@$, $7, $2, $4);
            }
 /* again, with dump specification */
-           | RULE IDENTIFIER DUMPS DUMPSPEC_LIST "=" STATEMENT {
+           | RULE IDENTIFIER DUMPS DUMPSPEC_LIST "=" RULE_STMT {
                 std::vector<Type*> tmp;
                 $$ = new RuleNode(@$, $6, $2, tmp, $4);
            }
-           | RULE IDENTIFIER "(" ")" DUMPS DUMPSPEC_LIST "=" STATEMENT {
+           | RULE IDENTIFIER "(" ")" DUMPS DUMPSPEC_LIST "=" RULE_STMT {
                 std::vector<Type*> tmp;
                 $$ = new RuleNode(@$, $8, $2, tmp, $6);
            }
-           | RULE IDENTIFIER "(" PARAM_LIST ")" DUMPS DUMPSPEC_LIST "=" STATEMENT {
+           | RULE IDENTIFIER "(" PARAM_LIST ")" DUMPS DUMPSPEC_LIST "=" RULE_STMT {
                 std::vector<Type*> tmp;
                 $$ = new RuleNode(@$, $9, $2, tmp, $7);
            }
@@ -649,27 +658,30 @@ DUMPSPEC: "(" IDENTIFIER_LIST ")" ARROW IDENTIFIER {
         }
         ;
 
-STATEMENT: ASSERT_SYNTAX { $$ = $1; }
-         | ASSURE_SYNTAX { $$ = $1; }
-         | DIEDIE_SYNTAX { $$ = $1; }
-         | IMPOSSIBLE_SYNTAX { $$ = $1; }
-         | DEBUG_SYNTAX { $$ = $1; }
-         | PRINT_SYNTAX { $$ = $1; }
-         | UPDATE_SYNTAX { $$ = $1; }
-         | CASE_SYNTAX { $$ = $1; }
-         | CALL_SYNTAX { $$ = $1; }
+SIMPLE_STMT: ASSERT_SYNTAX { $$ = $1; }
+           | ASSURE_SYNTAX { $$ = $1; }
+           | DIEDIE_SYNTAX { $$ = $1; }
+           | IMPOSSIBLE_SYNTAX { $$ = $1; }
+           | DEBUG_SYNTAX { $$ = $1; }
+           | PRINT_SYNTAX { $$ = $1; }
+           | UPDATE_SYNTAX { $$ = $1; }
+           | CASE_SYNTAX { $$ = $1; }
+           | CALL_SYNTAX { $$ = $1; }
+           | IFTHENELSE { $$ = $1; }
+           | LET_SYNTAX { $$ = $1; }
+           | PUSH_SYNTAX { $$ = $1; }
+           | POP_SYNTAX { $$ = $1; }
+           | FORALL_SYNTAX { $$ = $1; }
+           | ITERATE_SYNTAX { $$ = $1; }
+           | SKIP  { $$ = new AstNode(NodeType::SKIP); }
+           | IDENTIFIER  { driver.error(@$, "this call syntax is obsolete, use `call "+$1+"`"); }
+           | INTERN EXPRESSION_LIST  { $$ = new AstNode(NodeType::STATEMENT); }
+           | OBJDUMP "(" IDENTIFIER ")"   { $$ = new AstNode(NodeType::STATEMENT);}
+           ;
+
+STATEMENT: SIMPLE_STMT { $$ = $1; }
          | SEQ_SYNTAX { $$ = $1; }
          | PAR_SYNTAX { $$ = $1; }
-         | IFTHENELSE { $$ = $1; }
-         | LET_SYNTAX { $$ = $1; }
-         | PUSH_SYNTAX { $$ = $1; }
-         | POP_SYNTAX { $$ = $1; }
-         | FORALL_SYNTAX { $$ = $1; }
-         | ITERATE_SYNTAX { $$ = $1; }
-         | SKIP  { $$ = new AstNode(NodeType::SKIP); }
-         | IDENTIFIER  { driver.error(@$, "this call syntax is obsolete, use `call "+$1+"`"); }
-         | INTERN EXPRESSION_LIST  { $$ = new AstNode(NodeType::STATEMENT); }
-         | OBJDUMP "(" IDENTIFIER ")"   { $$ = new AstNode(NodeType::STATEMENT);}
          ;
 
 ASSERT_SYNTAX: ASSERT EXPRESSION { $$ = new UnaryNode(@$, NodeType::ASSERT, $2); }
