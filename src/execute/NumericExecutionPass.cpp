@@ -130,8 +130,8 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
             ++stepCounter;
         }
 
-        std::cout << (stepCounter - 2);
-        if ((stepCounter - 2) > 1) {
+        std::cout << stepCounter;
+        if (stepCounter != 1) {
             std::cout << " steps later..." << std::endl;
         } else {
             std::cout << " step later..." << std::endl;
