@@ -32,7 +32,7 @@
 struct enum_value_t;
 
 class RuleNode;
-enum class ExpressionOperation;
+enum class ExpressionOperation : uint8_t;
 
 class HeadList;
 class TailList;

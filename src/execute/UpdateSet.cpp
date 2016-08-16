@@ -142,6 +142,12 @@ typename UpdateSet::const_iterator UpdateSet::cend() const noexcept
     return m_set.cend();
 }
 
+Update* UpdateSet::get(const uint64_t key) const noexcept
+{
+    const auto it = m_set.find(key);
+    return (it != m_set.cend()) ? it->second : nullptr;
+}
+
 UpdateSetManager::UpdateSetManager() :
     m_updateSets()
 {

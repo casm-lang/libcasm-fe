@@ -29,6 +29,8 @@
 #include "libpass.h"
 #include "libcasm-fe.all.h"
 
+#include "ExecutionPassBase.h"
+
 /**
    @brief    TODO
    
@@ -37,14 +39,86 @@
 
 namespace libcasm_fe
 {
-	class SymbolicExecutionPass : public libpass::Pass
-	{
-	public:
-		static char id;
-	
-		virtual bool run( libpass::PassResult& pr );
-	};
+    class SymbolicExecutionPass : public ExecutionPassBase, public libpass::Pass
+    {
+    public:
+        static char id;
+
+        bool run(libpass::PassResult& pr) override;
+
+        void visit_assure(UnaryNode* assure, const value_t& val);
+
+        void visit_print(PrintNode *node, const std::vector<value_t> &arguments);
+
+        void visit_push(PushNode *node, const value_t& expr, const value_t& atom);
+        void visit_pop(PopNode *node, const value_t& val);
+
+        const value_t visit_expression(Expression *expr, const value_t& left_val,
+                                       const value_t& right_val);
+        const value_t visit_expression_single(Expression *expr, const value_t& val);
+
+        const value_t visit_list_atom(ListAtom *atom, const std::vector<value_t> &vals);
+
+        const value_t get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]) override;
+
+    private:
+        bool init_function(const std::string& name, std::set<std::string>& visited);
+
+        void mainLoop();
+        void printTrace() const;
+
+        void dumpUpdates();
+
+    private:
+        std::vector<std::string> trace_creates;
+
+        AstWalker<libcasm_fe::SymbolicExecutionPass, value_t>* walker;
+
+    public:
+        std::string path_name;
+        std::vector<symbolic_condition_t*> path_conditions;
+        std::vector<std::string> trace;
+    };
 }
+
+using SymbolicExecutionWalker = AstWalker<libcasm_fe::SymbolicExecutionPass, value_t>;
+
+template <>
+value_t SymbolicExecutionWalker::walk_list_atom(ListAtom *atom);
+
+// Specialize if-then-else for SymbolicExecutionPass
+template <>
+void SymbolicExecutionWalker::walk_ifthenelse(IfThenElseNode* node);
+
+template <>
+void SymbolicExecutionWalker::walk_seqblock(UnaryNode* seqblock);
+
+template <>
+void SymbolicExecutionWalker::walk_parblock(UnaryNode* parblock);
+
+template <>
+void SymbolicExecutionWalker::walk_pop(PopNode* node);
+
+template <>
+void SymbolicExecutionWalker::walk_push(PushNode* node);
+
+template <>
+void SymbolicExecutionWalker::walk_case(CaseNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_forall(ForallNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_iterate(UnaryNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_update(UpdateNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_update_subrange(UpdateNode *node);
+
+template <>
+void SymbolicExecutionWalker::walk_update_dumps(UpdateNode *node);
 
 #endif /* _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_ */
 
