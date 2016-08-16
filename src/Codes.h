@@ -40,6 +40,9 @@ namespace libcasm_fe
 	, FunctionAttributeMultipleUseOfControlled      = 0xfa03
 	, FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
 	
+	, BitTypeSyntaxError                            = 0xb000
+	, BitTypeSizeIsInvalid                          = 0xb001
+	
 	, Unspecified                                   = 0xffff
 	};
 }
