@@ -120,25 +120,43 @@ void Driver::error( const yy::location& l, const std::string& m, libcasm_fe::Cod
 {
     // Set state to error!
     error_++;
+
+
     
-    std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " << BOLD_RED
-              << "error: " << RESET << BOLD_BLACK << m << RESET << std::endl;
+    std::cerr
+    << BOLD_BLACK
+    << filename_ << ":" << l << ": "
+    << BOLD_RED
+    << "error: "
+    << RESET
+    << BOLD_BLACK
+    << m
+    << RESET;
+
+    if( code != libcasm_fe::Codes::Unspecified )
+    {
+        int line_of_code = l.begin.line;
+        
+        if( code == libcasm_fe::Codes::SyntaxError )
+        {
+            line_of_code--;
+        }
+        
+        fprintf
+        ( stderr
+        , " " YELLOW "@%i{%04x}" RESET
+        , line_of_code
+        , code
+        );
+    }
     
-    underline( l );
+    std::cerr << std::endl;
+    
+    underline( l );    
     
     if( code == libcasm_fe::Codes::Unspecified )
     {
         warning( l, "unspecified error code!" );
-    }
-    else
-    {
-        fprintf
-        ( stderr
-        , "%s:%i: " YELLOW "{%04x}" RESET "\n"
-        , filename_.c_str()
-          , l.begin.line
-        , code
-        );
     }
 }
 
