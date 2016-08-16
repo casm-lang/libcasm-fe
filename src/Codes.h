@@ -30,18 +30,20 @@
 namespace libcasm_fe
 {
     enum class Codes
-    { SyntaxError                                   = 0x0000
+    { SyntaxError                                   = 0x0000  // 0*** ... generic syntax error
 	, SyntaxErrorUnrecognizedCharacter              = 0x0001
 	, SyntaxErrorUnclosedString                     = 0x0002
 	
-	, FunctionAttributeIsInvalid                    = 0xfa00
+	, FunctionAttributeIsInvalid                    = 0xfa00  // fa** ... function attribute error
 	, FunctionAttributeMultipleUseOfStatic          = 0xfa01
 	, FunctionAttributeMultipleUseOfSymbolic        = 0xfa02
 	, FunctionAttributeMultipleUseOfControlled      = 0xfa03
 	, FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
 	
-	, BitTypeSyntaxError                            = 0xb000
-	, BitTypeSizeIsInvalid                          = 0xb001
+	, TypeIntegerRangedInvalidInterval              = 0x1000  // 1*** ... Integer type error
+			
+	, TypeBitSyntaxError                            = 0xb000  // b*** ... Bit type error
+	, TypeBitSizeIsInvalid                          = 0xb001
 	
 	, Unspecified                                   = 0xffff
 	};

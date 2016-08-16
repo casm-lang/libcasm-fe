@@ -452,13 +452,17 @@ TYPE_IDENTIFIER_STARLIST: TYPE_SYNTAX "*" TYPE_IDENTIFIER_STARLIST {
 TYPE_SYNTAX
 : IDENTIFIER
   {
-	  $$ = new Type($1);
+	  $$ = new Type( $1 );
 	  
 	  // TODO: FUTURE: integrate the IR-based type-list here to perform checks!,
 	  //               or maybe we should check everything in the typecheckpass?
 	  if( $1.compare( "Bit" ) == 0 )
 	  {
-		  driver.error( @$, "missing bit-size for Bit type", libcasm_fe::Codes::BitTypeSyntaxError );
+		  driver.error
+		  ( @$
+		  , "missing bit-size for Bit type"
+		  , libcasm_fe::Codes::TypeBitSyntaxError
+		  );
 	  }
   }
 | IDENTIFIER "(" INTEGER_NUMBER ")"
@@ -467,21 +471,29 @@ TYPE_SYNTAX
 	  $$->bitsize = $3->val_;
 	  if( $$->bitsize <= 0 || $$->bitsize > 256 )
 	  {
-		  driver.error(@$, "invalid bit-size for Bit type, must between 1 <= x <= 256", libcasm_fe::Codes::BitTypeSizeIsInvalid );
+		  driver.error
+		  ( @$
+		  , "invalid bit-size for Bit type, must between 1 <= x <= 256"
+		  , libcasm_fe::Codes::TypeBitSizeIsInvalid
+		  );
 	  }
   }
 | IDENTIFIER "(" TYPE_SYNTAX_LIST ")"
   {
-	  $$ = new Type($1, $3);
+	  $$ = new Type( $1, $3 );
   }
 | IDENTIFIER "(" INTEGER_NUMBER DOTDOT INTEGER_NUMBER ")"
   {
-	  $$ = new Type($1);
+	  $$ = new Type( $1 );
 	  $$->subrange_start = $3->val_;
 	  $$->subrange_end = $5->val_;
-	  if ($$->subrange_start >= $$->subrange_end)
+	  if( $$->subrange_start >= $$->subrange_end )
 	  {
-		  driver.error(@$, "start of subrange must be smaller than the end");
+		  driver.error
+		  ( @$
+		  , "start of subrange must be smaller than the end"
+		  , libcasm_fe::Codes::TypeIntegerRangedInvalidInterval
+		  );
 	  }
   }
 ;
