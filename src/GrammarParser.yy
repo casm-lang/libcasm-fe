@@ -460,10 +460,18 @@ TYPE_SYNTAX
 	  {
 		  driver.error
 		  ( @$
-		  , "missing bit-size for Bit type"
+		  , "missing bit-size for Bit type 'Bit(<bitsize>)'"
 		  , libcasm_fe::Codes::TypeBitSyntaxError
 		  );
 	  }
+	  else if( $1.compare( "List" ) == 0 )
+	  {
+		  driver.error
+		  ( @$
+		  , "unsupported type '" + $1 + "'"
+		  , libcasm_fe::Codes::TypeUnsupported
+		  );
+	  }	  
   }
 | IDENTIFIER "(" INTEGER_NUMBER ")"
   {
@@ -481,6 +489,24 @@ TYPE_SYNTAX
 | IDENTIFIER "(" TYPE_SYNTAX_LIST ")"
   {
 	  $$ = new Type( $1, $3 );
+
+	  if( $1.compare( "List" ) == 0 )
+	  {
+		  driver.error
+		  ( @$
+		  , "unsupported type '" + $1 + "'"
+		  , libcasm_fe::Codes::TypeUnsupported
+		  );
+	  }
+	  // TODO: FUTURE: PPA: better and generic type checking in the type check pass
+	  else if( $1.compare( "Tuple" ) != 0 )
+	  {
+		  driver.error
+		  ( @$
+		  , "unknown type '" + $1 + "'"
+		  , libcasm_fe::Codes::TypeUnknown
+		  );
+	  }	  
   }
 | IDENTIFIER "(" INTEGER_NUMBER DOTDOT INTEGER_NUMBER ")"
   {

@@ -25,6 +25,7 @@
 
 #include "FunctionCycleVisitor.h"
 #include "TypeCheckVisitor.h"
+#include "Codes.h"
 
 #include <cmath>
 
@@ -35,7 +36,11 @@ void TypecheckVisitor::check_type_valid(const yy::location& location, const Type
   &&  !driver_.function_table.get_enum(type.enum_name)
   )
   {
-      driver_.error( location, "unknown type " + type.enum_name + "" );
+      driver_.error
+      ( location
+      , "unknown type '" + type.enum_name + "'"
+      , libcasm_fe::Codes::TypeUnknown
+      );
   }
 }
 

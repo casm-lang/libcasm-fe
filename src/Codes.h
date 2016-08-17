@@ -39,11 +39,15 @@ namespace libcasm_fe
 	, FunctionAttributeMultipleUseOfSymbolic        = 0xfa02
 	, FunctionAttributeMultipleUseOfControlled      = 0xfa03
 	, FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
-	
+
+			
 	, TypeIntegerRangedInvalidInterval              = 0x1000  // 1*** ... Integer type error
 			
 	, TypeBitSyntaxError                            = 0xb000  // b*** ... Bit type error
 	, TypeBitSizeIsInvalid                          = 0xb001
+			
+	, TypeUnknown                                   = 0xfffd
+	, TypeUnsupported                               = 0xfffe
 	
 	, Unspecified                                   = 0xffff
 	};
