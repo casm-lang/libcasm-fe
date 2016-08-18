@@ -26,7 +26,6 @@
 #ifndef _LIB_CASMFE_ASTINTERFACE_H_
 #define _LIB_CASMFE_ASTINTERFACE_H_
 
-#include "Frontend.h"
 #include "Driver.h"
 #include "Visitor.h"
 #include "AstDumpVisitor.h"

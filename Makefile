@@ -50,7 +50,6 @@ CPPOBJECTS += obj/Ast.o
 CPPOBJECTS += obj/AstDumpVisitor.o
 CPPOBJECTS += obj/Driver.o
 CPPOBJECTS += obj/Exceptions.o
-CPPOBJECTS += obj/Frontend.o
 CPPOBJECTS += obj/FunctionCycleVisitor.o
 CPPOBJECTS += obj/LexerHelpers.o
 CPPOBJECTS += obj/Symbols.o
