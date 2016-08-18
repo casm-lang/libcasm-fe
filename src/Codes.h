@@ -42,15 +42,16 @@ namespace libcasm_fe
 
 	, AgentInitRuleDoesNotExist                     = 0xa000  // a*** ... Agent errors
 			
+	, LetTypeInferenceFailed                        = 0x1000  // 1*** ... type check errors
 			
-	, TypeIntegerRangedInvalidInterval              = 0x1000  // 1*** ... Integer type error
+	, TypeIntegerRangedInvalidInterval              = 0x2000  // 2*** ... Integer type error
 			
 	, TypeBitSyntaxError                            = 0xb000  // b*** ... Bit type error
 	, TypeBitSizeIsInvalid                          = 0xb001
 			
 	, TypeUnknown                                   = 0xfffd
 	, TypeUnsupported                               = 0xfffe
-	
+			
 	, Unspecified                                   = 0xffff
 	};
 }

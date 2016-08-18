@@ -328,12 +328,18 @@ void TypecheckVisitor::visit_let(LetNode *node, Type*) {
   current_rule_binding_types->push_back(&node->type_);
 }
 
-void TypecheckVisitor::visit_let_post(LetNode *node) {
-  if (!node->type_.is_complete()) {
-    driver_.error(node->location, "type inference for `"+node->identifier+"` failed");
-  }
-  rule_binding_types.back()->pop_back();
-  rule_binding_offsets.back()->erase(node->identifier);
+void TypecheckVisitor::visit_let_post(LetNode *node)
+{
+    if( not node->type_.is_complete() )
+    {
+        driver_.error
+        ( node->location
+        , "unable to infer the type of let identifier '"+node->identifier+"'"
+        , libcasm_fe::Codes::LetTypeInferenceFailed
+        );
+    }
+    rule_binding_types.back()->pop_back();
+    rule_binding_offsets.back()->erase(node->identifier);
 }
 
 void TypecheckVisitor::visit_push(PushNode *node, Type *expr, Type *atom) {
