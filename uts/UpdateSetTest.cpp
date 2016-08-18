@@ -156,6 +156,12 @@ TEST(UpdateSetTest, sequentialUpdateSetsShouldOverrideOldUpdatesIfAddingUpdatesW
     EXPECT_EQ(make_integer_value(2), updateSet->lookup(1)->value);
 }
 
+TEST(UpdateSetManagerTest, lookupShouldReturnNullptrWhenNoUpdateSetExists) {
+  auto manager = std::unique_ptr<UpdateSetManager>(new UpdateSetManager());
+
+  EXPECT_EQ(nullptr, manager->lookup(1));
+}
+
 TEST(UpdateSetManagerTest, forkAndMerge) {
     auto manager = std::unique_ptr<UpdateSetManager>(new UpdateSetManager());
 

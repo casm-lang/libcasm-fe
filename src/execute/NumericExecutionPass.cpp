@@ -386,9 +386,9 @@ const value_t NumericExecutionPass::visit_expression(Expression *expr,
     case ExpressionOperation::RAT_DIV:
         return operators::rat_div(left_val, right_val);
     case ExpressionOperation::EQ:
-        CREATE_COMPARE_OPERATION(==, left_val, right_val);
+        return value_t(left_val == right_val);
     case ExpressionOperation::NEQ:
-        CREATE_COMPARE_OPERATION(!=, left_val, right_val);
+        return value_t(left_val != right_val);
     case ExpressionOperation::AND:
         CREATE_BOOLEAN_OPERATION(and, left_val, right_val);
     case ExpressionOperation::OR:

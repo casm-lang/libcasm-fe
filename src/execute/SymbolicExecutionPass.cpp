@@ -617,12 +617,14 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
         if (not(left_val.is_symbolic() and right_val.is_symbolic())) {
             CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         }
-        CREATE_COMPARE_OPERATION(==, left_val, right_val);
+        HANDLE_SYMBOLIC_OR_UNDEF(left_val, right_val);
+        return value_t(left_val == right_val);
     case ExpressionOperation::NEQ:
         if (not(left_val.is_symbolic() and right_val.is_symbolic())) {
             CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         }
-        CREATE_COMPARE_OPERATION(!=, left_val, right_val);
+        HANDLE_SYMBOLIC_OR_UNDEF(left_val, right_val);
+        return value_t(left_val != right_val);
     case ExpressionOperation::AND:
         CREATE_BOOLEAN_OPERATION(and, left_val, right_val);
     case ExpressionOperation::OR:
