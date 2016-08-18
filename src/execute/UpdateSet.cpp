@@ -167,8 +167,11 @@ void UpdateSetManager::add(const uint64_t key, Update* update)
 
 Update* UpdateSetManager::lookup(const uint64_t key) const
 {
-    assert(!m_updateSets.empty());
-    return m_updateSets.top()->lookup(key);
+    if (m_updateSets.empty()) {
+      return nullptr;
+    } else {
+      return m_updateSets.top()->lookup(key);
+    }
 }
 
 void UpdateSetManager::fork(const UpdateSet::Type updateSetType)

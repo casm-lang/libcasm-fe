@@ -25,8 +25,12 @@
 
 #include "TypeCheckPass.h"
 
+#include "../Driver.h"
+#include "../TypeCheckVisitor.h"
+
 using namespace libcasm_fe;
 
+extern Driver *global_driver;
 
 char TypeCheckPass::id = 0;
 
@@ -40,20 +44,25 @@ static libpass::PassRegistration< TypeCheckPass > PASS
 
 bool TypeCheckPass::run( libpass::PassResult& pr )
 {
-	Ast* node = (Ast*)pr.getResult< SourceToAstPass >();
-	
-	if( !casm_frontend_pass_2_typecheck( node ) )
-	{
-		// TODO: FIXME: PPA: better error message here, can be done with the new libstdhl Verbose class
-		std::cerr << "Error typecheck file" << std::endl;
-		
-		return false;
-	}
-	
-	pr.setResult< TypeCheckPass >( node );
-	pr.setResult< AstDumpPass >( node );
-    
-	return true;
+    Ast* node = (Ast*)pr.getResult< SourceToAstPass >();
+
+    TypecheckVisitor typecheck_visitor(*global_driver);
+    AstWalker<TypecheckVisitor, Type*> typecheck_walker(typecheck_visitor);
+    typecheck_walker.walk_specification(node);
+
+    if( global_driver->rules_map_.count(node->getInitRule()->identifier) == 0 )
+    {
+        global_driver->error
+        ( node->getInitRule()->location
+        , "init rule `" + node->getInitRule()->identifier + "` doesn't exist"
+        , libcasm_fe::Codes::AgentInitRuleDoesNotExist
+        );
+    }
+
+    pr.setResult< TypeCheckPass >( node );
+    pr.setResult< AstDumpPass >( node );
+
+    return global_driver->ok();
 }
 
 

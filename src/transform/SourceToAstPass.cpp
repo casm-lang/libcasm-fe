@@ -25,8 +25,11 @@
 
 #include "SourceToAstPass.h"
 
+#include "../Driver.h"
+
 using namespace libcasm_fe;
 
+extern Driver *global_driver;
 
 char SourceToAstPass::id = 0;
 
@@ -42,9 +45,9 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
 {
 	const char* file_name = (const char*)pr.getResults()[ 0 ];
 	
-	casm_frontend_init();
+        global_driver = new Driver;
 	
-	Ast* node = casm_frontend_pass_1_parse( file_name );
+        Ast* node = global_driver->parse(file_name);
 	
     if( !node ) 
 	{
