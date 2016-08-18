@@ -40,6 +40,8 @@ namespace libcasm_fe
 	, FunctionAttributeMultipleUseOfControlled      = 0xfa03
 	, FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
 
+	, AgentInitRuleDoesNotExist                     = 0xa000  // a*** ... Agent errors
+			
 			
 	, TypeIntegerRangedInvalidInterval              = 0x1000  // 1*** ... Integer type error
 			

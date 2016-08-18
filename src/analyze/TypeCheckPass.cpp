@@ -53,16 +53,19 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 		return false;
 	}
 
-        if (global_driver->rules_map_.count(node->getInitRule()->identifier) == 0) {
-          global_driver->error(node->getInitRule()->location,
-                               "init rule `" +node->getInitRule()->identifier+
-                               "` doesn't exist");
-        }
-
+	if( global_driver->rules_map_.count(node->getInitRule()->identifier) == 0 )
+	{
+		global_driver->error
+		( node->getInitRule()->location
+		, "init rule `" + node->getInitRule()->identifier + "` doesn't exist"
+		, libcasm_fe::Codes::AgentInitRuleDoesNotExist
+		);
+	}
+	
 	pr.setResult< TypeCheckPass >( node );
 	pr.setResult< AstDumpPass >( node );
     
-        return global_driver->ok();
+	return global_driver->ok();
 }
 
 
