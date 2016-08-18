@@ -38,6 +38,7 @@
 #define INTEGER_T int64_t
 #define FLOATING_T double
 
+class AstNode;
 class CompoundType;
 
 enum class TypeType {
@@ -120,7 +121,7 @@ class Type {
     bool unify_nofollow(Type *other);
 
 
-    const Type* get_most_general_type() const;
+    const Type* get_most_general_type(AstNode* node) const;
     bool is_complete() const;
     bool is_unknown() const;
 };

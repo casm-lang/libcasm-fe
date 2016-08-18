@@ -25,6 +25,10 @@
 
 #include "Types.h"
 
+#include "Driver.h"
+#include "Ast.h"
+
+extern Driver *global_driver;
 
 Type::Type(const std::string& type_name, std::vector<Type*>& st) :
     unify_with_left(nullptr), unify_with_right(nullptr), constraints(),
@@ -218,26 +222,21 @@ std::string Type::unify_links_to_str_right() const {
   return res;
 }
 
-const Type* Type::get_most_general_type() const {
-  if (!is_complete()) {
-    return this;
+const Type* Type::get_most_general_type(AstNode* node) const {
+  if (not is_complete()) {
+    global_driver->warning(node->location, "type unification issue");
   }
 
-  const Type *right = nullptr;
-  if (unify_with_right) {
-    right = unify_with_right->get_most_general_type();
-    if (!right->is_complete()) {
-      return right;
-    }
-  }
+//   std::cout << this << " THIS: " << this->to_str() << (is_complete() ? "COMPLETE" : "NOTCOMPLETE") << std::endl;
+//
+//   for (auto right = unify_with_right; right != nullptr; right = right->unify_with_right) {
+//     std::cout << this << " RIGHT: " << right->to_str() << std::endl;
+//   }
+//
+//   for (auto left = unify_with_left; left != nullptr; left = left->unify_with_left) {
+//     std::cout << this << " LEFT: " << left->to_str() << std::endl;
+//   }
 
-  const Type *left = this;
-  if (unify_with_left) {
-    left = unify_with_left->get_most_general_type();
-    if (!left->is_complete()) {
-      return left; 
-    }
-  }
   return this;
 }
 
@@ -401,7 +400,7 @@ bool Type::unify_nofollow(Type *other) {
     return other->unify_enum(this);
   }
 
-  if (t != TypeType::UNKNOWN && other->t != TypeType::UNKNOWN) {
+  if (t != TypeType::UNKNOWN and other->t != TypeType::UNKNOWN) {
     return t == other->t;
   }
 
@@ -463,32 +462,30 @@ bool Type::unify_left(Type *other) {
     return true;
   }
 
-  
-  bool result = unify_nofollow(other);
   if (other->unify_with_left != nullptr) {
-    result = result && unify_nofollow(other) && unify_left(other->unify_with_left);
+    return unify_nofollow(other) and unify_left(other->unify_with_left);
+  } else {
+    return unify_nofollow(other);
   }
-
-  return result;
 }
 
 bool Type::unify_right(Type *other) {
   if (other == nullptr) {
     return true;
   }
-  bool result = unify_nofollow(other);
 
   if (other->unify_with_right != nullptr) {
-    result = result && unify_right(other->unify_with_right);
+    return unify_nofollow(other) and unify_right(other->unify_with_right);
+  } else {
+    return unify_nofollow(other);
   }
-  return result;
 }
 
 bool Type::is_unknown() const {
   if (t == TypeType::UNKNOWN) {
     return true;
   } else if (t == TypeType::TUPLE || t == TypeType::TUPLE_OR_LIST) {
-    if (subtypes.size() == 0 || (subtypes.size() == 1 && subtypes[0]->t == TypeType::UNKNOWN)) {
+    if (subtypes.empty() or (subtypes.size() == 1 && subtypes[0]->t == TypeType::UNKNOWN)) {
       return true;
     }
   }
@@ -497,7 +494,7 @@ bool Type::is_unknown() const {
 
 bool Type::unify(Type *other)
 {
-    if (is_unknown() && other->is_unknown() )
+    if (is_unknown() and other->is_unknown())
     {
         Type* left_link = this;
         while (left_link->unify_with_left != nullptr)
@@ -546,32 +543,35 @@ bool Type::unify(Type *other)
     
     if( unify_nofollow(other) )
     {
-        bool result = true;
-        result = result && unify_left(other->unify_with_left);
-        result = result && unify_left(unify_with_left);
-        result = result && unify_right(other->unify_with_right);
-        result = result && unify_right(unify_with_right);
-    
-        return result;
+        return unify_left(other->unify_with_left) and
+               unify_left(unify_with_left) and
+               unify_right(other->unify_with_right) and
+               unify_right(unify_with_right);
     }
+
     return false;
 }
 
 
 bool Type::is_complete() const {
-  if (t == TypeType::UNKNOWN) {
-    return false;
-  }
-  if (t == TypeType::LIST || t == TypeType::TUPLE || t == TypeType::TUPLE_OR_LIST) {
-    if (subtypes.size() == 0) {
+  switch (t) {
+    case TypeType::UNKNOWN:
       return false;
-    } else {
-      bool res = true;
-      for (Type* typ : subtypes) {
-        res = res && typ->is_complete();
+    case TypeType::LIST:
+    case TypeType::TUPLE:
+    case TypeType::TUPLE_OR_LIST:
+      if (subtypes.empty()) {
+        assert(!"internal error: syntax issue");
+        return false;
+      } else {
+        for (Type* type : subtypes) {
+          if (not type->is_complete()) {
+            return false;
+          }
+        }
+        return true;
       }
-      return res;
-    }
+    default:
+      return true;
   }
-  return true;
 }

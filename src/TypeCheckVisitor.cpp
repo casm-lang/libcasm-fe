@@ -207,13 +207,13 @@ void TypecheckVisitor::visit_update(UpdateNode *update, Type*, Type*) {
   }
 
   if (!update->func->type_.unify(&update->expr_->type_)) {
-    driver_.error(update->location, "type `"+update->func->type_.get_most_general_type()->to_str()+"` of `"+
+    driver_.error(update->location, "type `"+update->func->type_.get_most_general_type(update->func)->to_str()+"` of `"+
                                     update->func->name+"` does not match type `"+
-                                    update->expr_->type_.get_most_general_type()->to_str()+"` of expression");
+                                    update->expr_->type_.get_most_general_type(update->expr_)->to_str()+"` of expression");
   }
 
-  const Type* lhs = update->func->type_.get_most_general_type();
-  const Type* rhs = update->expr_->type_.get_most_general_type();
+  const Type* lhs = update->func->type_.get_most_general_type(update->func);
+  const Type* rhs = update->expr_->type_.get_most_general_type(update->expr_);
   
   if( lhs->t == TypeType::BIT
    && lhs->bitsize != rhs->bitsize )
@@ -314,6 +314,8 @@ void TypecheckVisitor::visit_let(LetNode *node, Type*) {
   }
 
 
+  node->type_.get_most_general_type(node);
+  node->expr->type_.get_most_general_type(node->expr);
   DEBUG(node->type_.unify_links_to_str());
 
   auto current_rule_binding_types = rule_binding_types.back();
@@ -346,7 +348,7 @@ void TypecheckVisitor::visit_push(PushNode *node, Type *expr, Type *atom) {
     }
     if (!expr->unify(atom->subtypes[0])) {
       driver_.error(node->expr->location, 
-                    "cannot push "+expr->get_most_general_type()->to_str()
+                    "cannot push "+expr->get_most_general_type(node)->to_str()
                     +" into "+atom->to_str());
     }
   }
@@ -457,8 +459,8 @@ void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<
         {
             driver_.error
             ( node->case_list[i].first->location
-            , "type of case expression (" + expr->get_most_general_type()->to_str() + ") and label (" +
-              case_labels[i]->get_most_general_type()->to_str() + ") do not match"
+            , "type of case expression (" + expr->get_most_general_type(node)->to_str() + ") and label (" +
+                case_labels[i]->get_most_general_type(node->case_list[i].first)->to_str() + ") do not match"
             );
         }
     }
@@ -505,12 +507,12 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
 Type* TypecheckVisitor::visit_expression(Expression *expr, Type*, Type*) {
   if (expr->left_ && expr->right_ && !expr->left_->type_.unify(&expr->right_->type_)) {
       driver_.error(expr->location, "type of expressions did not match: "+
-                                     expr->left_->type_.get_most_general_type()->to_str()+" != "+
-                                     expr->right_->type_.get_most_general_type()->to_str());
+                                     expr->left_->type_.get_most_general_type(expr->left_)->to_str()+" != "+
+                                     expr->right_->type_.get_most_general_type(expr->right_)->to_str());
   }
 
-  const Type* lhs = expr->left_->type_.get_most_general_type();
-  const Type* rhs = expr->right_->type_.get_most_general_type();
+  const Type* lhs = expr->left_->type_.get_most_general_type(expr->left_);
+  const Type* rhs = expr->right_->type_.get_most_general_type(expr->right_);
 
   if( lhs->t == TypeType::BIT
    && lhs->bitsize != rhs->bitsize )
