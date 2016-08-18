@@ -33,6 +33,7 @@ namespace libcasm_fe
     { SyntaxError                                   = 0x0000  // 0*** ... generic syntax error
 	, SyntaxErrorUnrecognizedCharacter              = 0x0001
 	, SyntaxErrorUnclosedString                     = 0x0002
+	, SyntaxErrorInvalidStatement                   = 0x0003
 	
 	, FunctionAttributeIsInvalid                    = 0xfa00  // fa** ... function attribute error
 	, FunctionAttributeMultipleUseOfStatic          = 0xfa01

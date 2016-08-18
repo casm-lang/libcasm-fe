@@ -711,26 +711,34 @@ DUMPSPEC: "(" IDENTIFIER_LIST ")" ARROW IDENTIFIER {
         }
         ;
 
-SIMPLE_STMT: ASSERT_SYNTAX { $$ = $1; }
-           | ASSURE_SYNTAX { $$ = $1; }
-           | DIEDIE_SYNTAX { $$ = $1; }
-           | IMPOSSIBLE_SYNTAX { $$ = $1; }
-           | DEBUG_SYNTAX { $$ = $1; }
-           | PRINT_SYNTAX { $$ = $1; }
-           | UPDATE_SYNTAX { $$ = $1; }
-           | CASE_SYNTAX { $$ = $1; }
-           | CALL_SYNTAX { $$ = $1; }
-           | IFTHENELSE { $$ = $1; }
-           | LET_SYNTAX { $$ = $1; }
-           | PUSH_SYNTAX { $$ = $1; }
-           | POP_SYNTAX { $$ = $1; }
-           | FORALL_SYNTAX { $$ = $1; }
-           | ITERATE_SYNTAX { $$ = $1; }
-           | SKIP  { $$ = new AstNode(NodeType::SKIP); }
-           | IDENTIFIER  { driver.error(@$, "this call syntax is obsolete, use `call "+$1+"`"); }
-           | INTERN EXPRESSION_LIST  { $$ = new AstNode(NodeType::STATEMENT); }
-           | OBJDUMP "(" IDENTIFIER ")"   { $$ = new AstNode(NodeType::STATEMENT);}
-           ;
+SIMPLE_STMT
+: ASSERT_SYNTAX { $$ = $1; }
+| ASSURE_SYNTAX { $$ = $1; }
+| DIEDIE_SYNTAX { $$ = $1; }
+| IMPOSSIBLE_SYNTAX { $$ = $1; }
+| DEBUG_SYNTAX { $$ = $1; }
+| PRINT_SYNTAX { $$ = $1; }
+| UPDATE_SYNTAX { $$ = $1; }
+| CASE_SYNTAX { $$ = $1; }
+| CALL_SYNTAX { $$ = $1; }
+| IFTHENELSE { $$ = $1; }
+| LET_SYNTAX { $$ = $1; }
+| PUSH_SYNTAX { $$ = $1; }
+| POP_SYNTAX { $$ = $1; }
+| FORALL_SYNTAX { $$ = $1; }
+| ITERATE_SYNTAX { $$ = $1; }
+| SKIP  { $$ = new AstNode(NodeType::SKIP); }
+| IDENTIFIER
+{
+	driver.error
+	( @$
+	, "syntax error: invalid statement '" + $1 + "' found"
+	, libcasm_fe::Codes::SyntaxErrorInvalidStatement
+	);
+}
+| INTERN EXPRESSION_LIST  { $$ = new AstNode(NodeType::STATEMENT); }
+| OBJDUMP "(" IDENTIFIER ")"   { $$ = new AstNode(NodeType::STATEMENT);}
+;
 
 STATEMENT: SIMPLE_STMT { $$ = $1; }
          | SEQ_SYNTAX { $$ = $1; }
