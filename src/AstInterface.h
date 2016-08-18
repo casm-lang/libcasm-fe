@@ -108,10 +108,6 @@ namespace libcasm_fe
 		{
 		}
 	
-		void visit_update_subrange( UpdateNode* node, T func, T expr)
-		{
-		}
-	
 		void visit_call_pre( CallNode* node )
 		{
 		}
@@ -188,11 +184,6 @@ namespace libcasm_fe
     
 		T visit_function_atom( FunctionAtom* node, T args[], uint16_t argc )
 		{ 
-			return 0;
-		}
-    
-		T visit_function_atom_subrange( FunctionAtom* node, T args[], uint16_t argc	)
-		{
 			return 0;
 		}
     

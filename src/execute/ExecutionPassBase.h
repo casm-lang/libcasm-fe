@@ -87,7 +87,7 @@ namespace libcasm_fe
         static char id;
 
         bool hasEmptyUpdateSet() const;
-        Update* addUpdate(const value_t& val, size_t sym_id, uint32_t num_arguments, value_t arguments[], uint64_t line);
+        Update* addUpdate(Function *sym, const value_t& val, uint32_t num_arguments, value_t arguments[], uint64_t line);
 
         void fork(const UpdateSet::Type updateSetType);
         void merge();
@@ -99,7 +99,6 @@ namespace libcasm_fe
 
         void visit_assert(UnaryNode* assert, const value_t& val);
         void visit_update(UpdateNode *update, const value_t& expr_v);
-        void visit_update_subrange(UpdateNode *update, const value_t& expr_v);
 
         void visit_update_dumps(UpdateNode *update, const value_t& expr_v);
         void visit_call_pre(CallNode *call);
@@ -119,10 +118,6 @@ namespace libcasm_fe
         const value_t visit_undef_atom(UndefAtom *atom) { UNUSED(atom); return value_t(); }
         const value_t visit_function_atom(FunctionAtom *atom,
                                           const value_t arguments[], uint16_t num_arguments);
-        const value_t visit_function_atom_subrange(FunctionAtom *atom,
-                                                   const value_t arguments[],
-                                                   uint16_t num_arguments);
-
 
         const value_t visit_builtin_atom(BuiltinAtom *atom, const value_t arguments[],
                                          uint16_t num_arguments);

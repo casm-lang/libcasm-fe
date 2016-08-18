@@ -862,6 +862,33 @@ Function::~Function() {
   }
 }
 
+void Function::validateArguments(uint32_t num_arguments, const value_t arguments[]) const
+{
+    for (const auto i : subrange_arguments) {
+        const Type *type = arguments_[i];
+        const auto integer = arguments[i].value.integer;
+        if ((integer < type->subrange_start) or (integer > type->subrange_end)) {
+            throw std::domain_error(std::to_string(integer) + " does violate the subrange " +
+                                    std::to_string(type->subrange_start) + ".." +
+                                    std::to_string(type->subrange_end) +
+                                    " of " + std::to_string(i + 1) + ". function argument");
+        }
+    }
+}
+
+void Function::validateValue(const value_t &value) const
+{
+    if (subrange_return) {
+        const auto integer = value.value.integer;
+        if ((integer < return_type_->subrange_start) or (integer > return_type_->subrange_end)) {
+            throw std::domain_error(std::to_string(integer) + " does violate the subrange " +
+                                    std::to_string(return_type_->subrange_start) + ".." +
+                                    std::to_string(return_type_->subrange_end) +
+                                    " of `" + name + "`");
+        }
+    }
+}
+
 const std::string Function::to_str() const {
   std::string res = name;
 

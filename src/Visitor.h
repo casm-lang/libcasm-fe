@@ -186,9 +186,6 @@ template<class T, class V> class AstWalker {
         case NodeType::UPDATE_DUMPS:
           walk_update_dumps(reinterpret_cast<UpdateNode*>(stmt));
           break;
-        case NodeType::UPDATE_SUBRANGE:
-          walk_update_subrange(reinterpret_cast<UpdateNode*>(stmt));
-          break;
         case NodeType::DIEDIE: {
             DiedieNode *node = reinterpret_cast<DiedieNode*>(stmt);
             if (node->msg) {
@@ -236,16 +233,6 @@ template<class T, class V> class AstWalker {
       // overwrite the value_list
       V func_t = walk_function_atom(update->func);
       visitor.visit_update(update, func_t, expr_t);
-    }
-
-    void walk_update_subrange(UpdateNode *update) {
-      V expr_t = walk_expression_base(update->expr_);
-
-      // we must walk the expression before walking update->func because it 
-      // sets the list of arguments and we do not want the update->expr_ to
-      // overwrite the value_list
-      V func_t = walk_function_atom(update->func);
-      visitor.visit_update_subrange(update, func_t, expr_t);
     }
 
 
@@ -386,11 +373,7 @@ template<class T, class V> class AstWalker {
           V expr = walk_expression_base(func_a->symbol->derived);
           return visitor.visit_derived_function_atom(func_a, expr);
         } else {
-          if (func->node_type_ == NodeType::FUNCTION_ATOM) {
-            return visitor.visit_function_atom(func_a, arguments, i);
-          } else {
-            return visitor.visit_function_atom_subrange(func_a, arguments, i);
-          }
+          return visitor.visit_function_atom(func_a, arguments, i);
         }
       }
     }
@@ -428,7 +411,6 @@ template<class T, class V> class AstWalker {
           return visitor.visit_undef_atom(reinterpret_cast<UndefAtom*>(atom));
         case NodeType::BUILTIN_ATOM:
         case NodeType::FUNCTION_ATOM:
-        case NodeType::FUNCTION_ATOM_SUBRANGE:
           return walk_function_atom(reinterpret_cast<BaseFunctionAtom*>(atom));
         case NodeType::SELF_ATOM: {
           return visitor.visit_self_atom(reinterpret_cast<SelfAtom*>(atom));
@@ -472,7 +454,6 @@ template<class T> class BaseVisitor {
     void visit_seqblock(UnaryNode*) {}
     void visit_parblock(UnaryNode*) {}
     T visit_update(UpdateNode*, T, T) { return T(); }
-    T visit_update_subrange(UpdateNode*, T, T) { return T(); }
     T visit_update_dumps(UpdateNode *u, T v1, T v2) { return visit_update(u, v1, v2); }
     T visit_call_pre(CallNode*) { return T(); }
     T visit_call_pre(CallNode*, T) { return T(); }
@@ -503,7 +484,6 @@ template<class T> class BaseVisitor {
     T visit_rational_atom(RationalAtom*) { return T(); }
     T visit_undef_atom(UndefAtom*) { return T(); }
     T visit_function_atom(FunctionAtom *, const std::vector<T> &) { return T(); }
-    T visit_function_atom_subrange(FunctionAtom*, T[], uint16_t) { return T(); }
     T visit_builtin_atom(BuiltinAtom*, T[], uint16_t) { return T(); }
     void visit_derived_function_atom_pre(FunctionAtom*, T[], uint16_t) {}
     T visit_derived_function_atom(FunctionAtom*, T) { return T(); }

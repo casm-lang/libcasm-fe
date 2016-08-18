@@ -119,8 +119,8 @@ bool SymbolicExecutionPass::run(libpass::PassResult& pr)
         mainLoop();
         printTrace();
     } catch (const RuntimeException& ex) {
-        return false;
         std::cerr << "Abort after runtime exception: " << ex.what() << std::endl;
+        return false;
     } catch (const ImpossibleException& ex) {
         return false;
     } catch (char * e) {
@@ -564,7 +564,7 @@ void SymbolicExecutionPass::visit_push(PushNode *node, const value_t& expr, cons
                                                 value_t(TypeType::LIST, new BottomList())).value.list;
     }
 
-    addUpdate(to_res, node->to->symbol->id, num_arguments, arguments, node->location.begin.line);
+    addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location.begin.line);
 
     value_t args[] = {atom, expr};
     symbolic::dump_builtin(trace, "push", args, 2, to_res);
@@ -579,7 +579,7 @@ void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
 
     Update *up = nullptr;
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
-        up = addUpdate(to_res, node->to->symbol->id, num_arguments, arguments, node->location.begin.line);
+        up = addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location.begin.line);
     } else {
         rule_bindings.back()->push_back(to_res);
     }
@@ -593,7 +593,7 @@ void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
     value_t args[] = {val, to_res};
     symbolic::dump_builtin(trace, "pop", args, 2, from_res);
 
-    addUpdate(from_res, node->from->symbol->id, num_arguments, arguments, node->location.begin.line);
+    addUpdate(node->to->symbol, from_res, num_arguments, arguments, node->location.begin.line);
 }
 
 const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
@@ -763,6 +763,14 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
                 }
             }
 
+            try {
+                func->validateArguments(num_arguments, args);
+            } catch (const std::domain_error& e) {
+                const auto location = init.first ? (init.first->location + init.second->location)
+                                                 : init.second->location;
+                throw RuntimeException(location, e.what());
+            }
+
             if (function_map.count(ArgumentsKey(args, num_arguments, false)) != 0) {
                 yy::location loc = init.first ? init.first->location+init.second->location
                                               : init.second->location;
@@ -771,26 +779,19 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
                                        "` already initialized");
             }
 
+            const value_t v = walker->walk_expression_base(init.second);
             if (func->is_symbolic) {
-                const value_t v = walker->walk_expression_base(init.second);
                 symbolic::dump_create(trace_creates, func, num_arguments, args, v);
-                function_map.emplace(std::pair<ArgumentsKey, value_t>(ArgumentsKey(args, num_arguments, true), v));
             } else {
-                value_t v = walker->walk_expression_base(init.second);
-                if (func->subrange_return) {
-                    if (v.value.integer < func->return_type_->subrange_start ||
-                        v.value.integer > func->return_type_->subrange_end) {
-                        yy::location loc = init.first ? init.first->location+init.second->location
-                                                    : init.second->location;
-                        throw RuntimeException(loc, std::to_string(v.value.integer) +
-                                               " does violate the subrange "
-                                               + std::to_string(func->return_type_->subrange_start)
-                                               + ".." + std::to_string(func->return_type_->subrange_end)
-                                               + " of `" + func->name + "`");
-                    }
+                try {
+                    func->validateValue(v);
+                } catch (const std::domain_error& e) {
+                    const auto location = init.first ? (init.first->location + init.second->location)
+                                                     : init.second->location;
+                    throw RuntimeException(location, e.what());
                 }
-                function_map.emplace(std::make_pair(ArgumentsKey(args, num_arguments, true), v));
             }
+            function_map.emplace(std::make_pair(ArgumentsKey(args, num_arguments, true), v));
 
             initializer_args.push_back(args);
         }
@@ -1182,18 +1183,6 @@ void SymbolicExecutionWalker::walk_update(UpdateNode *node)
     }
     walk_function_arguments(this, node->func->arguments);
     visitor.visit_update(node, expr);
-}
-
-template <>
-void SymbolicExecutionWalker::walk_update_subrange(UpdateNode *node)
-{
-    const value_t expr = walk_expression_base(node->expr_);
-    if (node->func->symbol->is_symbolic or
-            (node->func->symbol->subrange_arguments.size() > 0)) {
-        walk_expression_base(node->func);
-    }
-    walk_function_arguments(this, node->func->arguments);
-    visitor.visit_update_subrange(node, expr);
 }
 
 template <>

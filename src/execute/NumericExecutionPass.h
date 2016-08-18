@@ -107,9 +107,6 @@ template <>
 void NumericExecutionWalker::walk_update(UpdateNode *node);
 
 template <>
-void NumericExecutionWalker::walk_update_subrange(UpdateNode *node);
-
-template <>
 void NumericExecutionWalker::walk_update_dumps(UpdateNode *node);
 
 #endif /* _LIB_CASMFE_NUMERICEXECUTIONPASS_H_ */

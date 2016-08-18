@@ -99,11 +99,18 @@ bool ExecutionPassBase::hasEmptyUpdateSet() const
     return updateSetManager.currentUpdateSet()->empty();
 }
 
-Update* ExecutionPassBase::addUpdate(const value_t& val, size_t sym_id,
+Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
                                      uint32_t num_arguments, value_t arguments[],
                                      uint64_t line)
 {
-    auto& function_map = function_states[sym_id];
+    try {
+        sym->validateArguments(num_arguments, arguments);
+        sym->validateValue(val);
+    } catch (const std::domain_error& e) {
+        throw RuntimeException(sym->location, e.what());
+    }
+
+    auto& function_map = function_states[sym->id];
     auto it = function_map.find(ArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
     if (it == function_map.cend()) {
         const auto pair = function_map.emplace(ArgumentsKey(arguments, num_arguments, true), value_t());
@@ -112,7 +119,7 @@ Update* ExecutionPassBase::addUpdate(const value_t& val, size_t sym_id,
 
     Update* up = reinterpret_cast<Update*>(stack.allocate(sizeof(Update))); // FIXME make it nicer!!
     up->value = val;
-    up->func = sym_id;
+    up->func = sym->id;
     up->args = const_cast<value_t*>(it->first.p);
     up->num_args = num_arguments;
     up->line = line;
@@ -124,9 +131,8 @@ Update* ExecutionPassBase::addUpdate(const value_t& val, size_t sym_id,
         const auto conflictingUpdate = e.conflictingUpdate();
         const auto existingUpdate = e.existingUpdate();
 
-        const auto function = function_symbols[conflictingUpdate->func];
-        const auto location = function->name + arguments_to_string(conflictingUpdate->num_args,
-                                                                   conflictingUpdate->args);
+        const auto location = sym->name + arguments_to_string(conflictingUpdate->num_args,
+                                                              conflictingUpdate->args);
 
         const auto info = "Conflict while adding update " + location + " = " + val.to_str()
                         + " at line " + std::to_string(line) + ", conflicting with line "
@@ -238,6 +244,12 @@ const value_t ExecutionPassBase::get_function_value(Function *sym,
                                                     uint32_t num_arguments,
                                                     const value_t arguments[])
 {
+    try {
+        sym->validateArguments(num_arguments, arguments);
+    } catch (const std::domain_error& e) {
+        throw RuntimeException(sym->location, e.what());
+    }
+
     const auto &function_map = function_states[sym->id];
     const value_t &v = function_map.at(ArgumentsKey(arguments, num_arguments, false));
     const auto update = updateSetManager.lookup(reinterpret_cast<uint64_t>(&v));
@@ -563,22 +575,7 @@ void ExecutionPassBase::visit_update_dumps(UpdateNode *update, const value_t& ex
 
 void ExecutionPassBase::visit_update(UpdateNode *update, const value_t& expr_v)
 {
-    addUpdate(expr_v, update->func->symbol->id, num_arguments, arguments, update->location.begin.line);
-}
-
-void ExecutionPassBase::visit_update_subrange(UpdateNode *update, const value_t& expr_v)
-{
-    const INTEGER_T v = expr_v.value.integer;
-    const Type *t = update->func->symbol->return_type_;
-    if ((t->subrange_start < t->subrange_end) && (v < t->subrange_start || v > t->subrange_end)) {
-        throw RuntimeException(update->location,
-                               std::to_string(v) + " does violate the subrange " +
-                               std::to_string(t->subrange_start) +
-                               ".." + std::to_string(t->subrange_end) +
-                               " of `" + update->func->name + "`");
-    }
-
-    visit_update(update, expr_v);
+    addUpdate(update->func->symbol, expr_v, num_arguments, arguments, update->location.begin.line);
 }
 
 void ExecutionPassBase::visit_call_pre(CallNode *call)
@@ -674,25 +671,6 @@ const value_t ExecutionPassBase::visit_function_atom(FunctionAtom *atom,
     default:
         FAILURE();
     }
-}
-
-const value_t ExecutionPassBase::visit_function_atom_subrange(FunctionAtom *atom,
-                                                              const value_t arguments[],
-                                                              uint16_t num_arguments)
-{
-    for (uint32_t i = 0; i < atom->symbol->subrange_arguments.size(); i++) {
-        uint32_t j = atom->symbol->subrange_arguments[i];
-        value_t v = arguments[j];
-        Type *t = atom->symbol->arguments_[j];
-        if (v.value.integer < t->subrange_start || v.value.integer > t->subrange_end) {
-            throw RuntimeException(atom->location,
-                                   std::to_string(v.value.integer) + " does violate the subrange " +
-                                   std::to_string(t->subrange_start) + ".." + std::to_string(t->subrange_end) +
-                                   " of " + std::to_string(i + 1) + ". function argument");
-        }
-    }
-
-    return visit_function_atom(atom, arguments, num_arguments);
 }
 
 const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,

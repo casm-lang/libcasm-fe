@@ -115,9 +115,6 @@ template <>
 void SymbolicExecutionWalker::walk_update(UpdateNode *node);
 
 template <>
-void SymbolicExecutionWalker::walk_update_subrange(UpdateNode *node);
-
-template <>
 void SymbolicExecutionWalker::walk_update_dumps(UpdateNode *node);
 
 #endif /* _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_ */

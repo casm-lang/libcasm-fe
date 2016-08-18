@@ -235,10 +235,6 @@ void TypecheckVisitor::visit_update(UpdateNode *update, Type*, Type*) {
   if (update->func->symbol && driver_.function_trace_map.count(update->func->symbol->id) > 0) {
     update->node_type_ = NodeType::UPDATE_DUMPS;
   }
-  if (update->func->symbol && (update->func->symbol->subrange_return 
-                               || update->func->symbol->subrange_arguments.size() > 0)) {
-    update->node_type_ = NodeType::UPDATE_SUBRANGE;
-  }
 }
 
 void TypecheckVisitor::visit_call_pre(CallNode *call) {
@@ -634,9 +630,6 @@ Type* TypecheckVisitor::visit_function_atom(FunctionAtom *atom, Type* arguments[
   atom->symbol = func;
   if (atom->symbol->type == Symbol::SymbolType::FUNCTION) {
     atom->symbol_type = FunctionAtom::SymbolType::FUNCTION;
-    if (func->subrange_arguments.size() > 0) {
-      atom->node_type_ = NodeType::FUNCTION_ATOM_SUBRANGE;
-    }
   } else{
     atom->symbol_type = FunctionAtom::SymbolType::DERIVED;
   }
