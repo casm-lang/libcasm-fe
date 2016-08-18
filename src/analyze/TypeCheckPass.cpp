@@ -25,8 +25,11 @@
 
 #include "TypeCheckPass.h"
 
+#include "../Driver.h"
+
 using namespace libcasm_fe;
 
+extern Driver *global_driver;
 
 char TypeCheckPass::id = 0;
 
@@ -49,11 +52,17 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 		
 		return false;
 	}
-	
+
+        if (global_driver->rules_map_.count(node->getInitRule()->identifier) == 0) {
+          global_driver->error(node->getInitRule()->location,
+                               "init rule `" +node->getInitRule()->identifier+
+                               "` doesn't exist");
+        }
+
 	pr.setResult< TypeCheckPass >( node );
 	pr.setResult< AstDumpPass >( node );
     
-	return true;
+        return global_driver->ok();
 }
 
 
