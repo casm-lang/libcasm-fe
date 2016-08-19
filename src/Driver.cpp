@@ -85,47 +85,57 @@ size_t Driver::get_next_chars(char buf[], size_t max_size) {
 Ast *Driver::parse (const std::string &f) {
   int res = -1;
 
-  if (file_ != nullptr) {
-    fclose(file_);
+  if( file_ != nullptr )
+  {
+      fclose(file_);
   }
-
+  
   filename_ = f;
   file_ = fopen(filename_.c_str(), "rt");
-  if (file_ == NULL) {
-    std::cerr << "error: could not open `" << filename_ << "´" << std::endl;
-    return nullptr;
+  if( file_ == NULL )
+  {
+      std::cerr << "error: could not open `" << filename_ << "´" << std::endl;
+      return nullptr;
   }
-
+  
   yy::casmi_parser parser (*this);
   parser.set_debug_level (trace_parsing);
 
-  try {
-    res = parser.parse ();
+  try
+  {
+      res = parser.parse ();
 
-    // TODO check leak on parser error
-    if( res != 0 || error_ > 0 )
-    {
-      return nullptr;
-    }
-
-  } catch (const std::exception& e) {
-    std::cerr << "error: got exception: " << e.what() << " -- exiting" << std::endl;
-    return nullptr;
+      // TODO check leak on parser error
+      if( res != 0 || error_ > 0 )
+      {
+          return nullptr;
+      }
+      
   }
-
+  catch( const std::exception& e )
+  {
+      std::cerr << "error: got exception: " << e.what() << " -- exiting" << std::endl;
+      return nullptr;
+  }
+  
   return result;
 }
+
+
 
 void Driver::error( const yy::location& l, const std::string& m, libcasm_fe::Codes code )
 {
     // Set state to error!
     error_++;
-
-
     
     std::cerr
     << BOLD_BLACK
-    << filename_ << ":" << l << ": "
+    << filename_
+    << ":"
+    << l.begin.line << "." << l.begin.column
+    << "-"
+    << l.end.line << "." << l.end.column
+    << ": "
     << BOLD_RED
     << "error: "
     << RESET
@@ -165,16 +175,42 @@ void Driver::warning( const yy::location& l, const std::string& m )
     // increment warning counter
     warning_++;
 
-    std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " << BOLD_MAGENTA
-              << "warning: " << RESET << BOLD_BLACK << m << RESET << std::endl;
+    std::cerr
+    << BOLD_BLACK
+    << filename_
+    << ":"
+    << l.begin.line << "." << l.begin.column
+    << "-"
+    << l.end.line << "." << l.end.column
+    << ": "
+    << BOLD_MAGENTA
+    << "warning: "
+    << RESET
+    << BOLD_BLACK
+    << m
+    << RESET
+    << std::endl;
     
     underline( l );
 }
 
 void Driver::info( const yy::location& l, const std::string& m )
 {
-    std::cerr << BOLD_BLACK << filename_ << ":" << l << ": " << BOLD_GREEN
-              << "info: " << RESET << BOLD_BLACK << m << RESET << std::endl;
+    std::cerr
+    << BOLD_BLACK
+    << filename_
+    << ":"
+    << l.begin.line << "." << l.begin.column
+    << "-"
+    << l.end.line << "." << l.end.column
+    << ": "
+    << BOLD_GREEN
+    << "info: "
+    << RESET
+    << BOLD_BLACK
+    << m
+    << RESET
+    << std::endl;
     
     underline( l );
 }
