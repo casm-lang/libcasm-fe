@@ -271,15 +271,15 @@ class Function : public Symbol {
     ~Function();
 
     /**
-     * @throws std::domain_error if any argument is out of range
-     */
+       @throws std::domain_error if any argument is out of range
+    */
     void validateArguments(uint32_t num_arguments, const value_t arguments[]) const;
 
     /**
-     * @throws std::domain_error if value is out of range
-     */
+       @throws std::domain_error if value is out of range
+    */
     void validateValue(const value_t &value) const;
-
+    
     bool equals(Function *other) const;
     const std::string to_str() const;
     inline size_t argument_count() const {

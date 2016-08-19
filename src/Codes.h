@@ -30,17 +30,27 @@
 namespace libcasm_fe
 {
     enum class Codes
-    { SyntaxError                                   = 0x0000  // 0*** ... generic syntax error
+	// --------------------------------------------------------- 0*** ... generic syntax error
+	{ SyntaxError                                   = 0x0000  // 00** ... syntax/grammar
 	, SyntaxErrorUnrecognizedCharacter              = 0x0001
 	, SyntaxErrorUnclosedString                     = 0x0002
 	, SyntaxErrorInvalidStatement                   = 0x0003
 	
-	, FunctionAttributeIsInvalid                    = 0xfa00  // fa** ... function attribute error
+	// --------------------------------------------------------- f*** ... function errors
+	, FunctionAttributeIsInvalid                    = 0xfa00  // fa** ... function attribute
 	, FunctionAttributeMultipleUseOfStatic          = 0xfa01
 	, FunctionAttributeMultipleUseOfSymbolic        = 0xfa02
 	, FunctionAttributeMultipleUseOfControlled      = 0xfa03
 	, FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
-
+	
+	, FunctionArgumentsInvalidRangeAtLookup         = 0xfe00  // fe** ... function argument
+	, FunctionArgumentsInvalidRangeAtUpdate         = 0xfe01
+	, FunctionArgumentsInvalidRangeAtInitially      = 0xfe02
+	
+	, FunctionValueInvalidRangeAtUpdate             = 0xfd00  // fd** ... function argument
+	, FunctionValueInvalidRangeAtInitially          = 0xfd01
+	, FunctionValueAlreadyInitializedAtInitially    = 0xfd02
+	
 	, AgentInitRuleDoesNotExist                     = 0xa000  // a*** ... Agent errors
 			
 	, LetTypeInferenceFailed                        = 0x1000  // 1*** ... type check errors
@@ -52,9 +62,12 @@ namespace libcasm_fe
 			
 	, TypeUnknown                                   = 0xfffd
 	, TypeUnsupported                               = 0xfffe
-			
+
 	, Unspecified                                   = 0xffff
+	
+	, DUMMY                                         = 0xc0de
 	};
+	
 }
 
 #endif /* _LIB_CASMFE_CODES_H_ */

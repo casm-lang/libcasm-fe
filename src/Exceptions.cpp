@@ -26,18 +26,53 @@
 #include "Exceptions.h"
 
 
-RuntimeException::RuntimeException(const std::string& msg): msg_(msg) {}
-
-RuntimeException::RuntimeException(const yy::location& location, const std::string& msg) :
-    RuntimeException(msg + " at line " + std::to_string(location.begin.line))
+RuntimeException::RuntimeException
+( const yy::location& location
+, const std::string& msg
+, const libcasm_fe::Codes error_code
+)
+: location_( location )
+, msg_( msg )
+, error_code_( error_code )
 {
-
 }
 
-const char* RuntimeException::what() const throw() {
-  return msg_.c_str();
+RuntimeException::RuntimeException
+( const std::string& msg
+, const libcasm_fe::Codes error_code
+)
+: RuntimeException
+  ( yy::location( yy::position(0,0,0) ) // unknown
+    // ( (std::string*)"asdf"
+    // , 0
+    // , 0
+    // )
+  , msg
+  , error_code
+  )
+{
+    fprintf( stderr, "RUNTIME_EXCEPTION_WITH_UNKNOWN_LOCATION!!!\n" );
 }
 
-const char* ImpossibleException::what() const throw() {
-  return "ImpossibleException";
+const char* RuntimeException::what() const throw()
+{
+    return msg_.c_str();
+}
+
+const yy::location& RuntimeException::getLocation( void ) const
+{
+    return location_;
+}
+
+const libcasm_fe::Codes RuntimeException::getErrorCode( void ) const
+{
+    return error_code_;
+}
+
+
+
+
+const char* ImpossibleException::what() const throw()
+{
+    return "ImpossibleException";
 }

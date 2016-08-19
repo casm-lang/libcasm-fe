@@ -23,8 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#ifndef CASMI_EXCEPTIONS_H
-#define CASMI_EXCEPTIONS_H
+#ifndef _LIB_CASMFE_EXCEPTIONS_H_
+#define _LIB_CASMFE_EXCEPTIONS_H_
 
 #include <exception>
 #include <stdexcept>
@@ -32,34 +32,58 @@
 
 #include "various/location.hh"
 
-class RuntimeException : public std::exception {
-  private:
+#include "Codes.h"
+
+// TODO: namespace libcasm_fe
+
+class RuntimeException : public std::exception
+{
+private:
+    const yy::location& location_;
     const std::string msg_;
+    const libcasm_fe::Codes error_code_;
+    
+public:
+    RuntimeException
+    ( const std::string& msg
+    , const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified
+    );
+    
+    RuntimeException
+    ( const yy::location& location
+    , const std::string& msg
+    , const libcasm_fe::Codes error_code_ = libcasm_fe::Codes::Unspecified
+    );
+    
+    virtual const char* what() const throw();
+    
+    const yy::location& getLocation( void ) const;
+    
+    const libcasm_fe::Codes getErrorCode( void ) const;
+};
 
-  public:
-    RuntimeException(const std::string& msg);
-    RuntimeException(const yy::location& location, const std::string& msg);
-
+class ImpossibleException : public std::exception
+{
+public:
     virtual const char* what() const throw();
 };
 
-class ImpossibleException : public std::exception {
-    virtual const char* what() const throw();
-};
-
-class IdentifierAlreadyUsed : public std::logic_error {
+class IdentifierAlreadyUsed : public std::logic_error
+{
 public:
     using logic_error::logic_error;
 };
 
-class SymbolAlreadyExists : public IdentifierAlreadyUsed {
+class SymbolAlreadyExists : public IdentifierAlreadyUsed
+{
 public:
     using IdentifierAlreadyUsed::IdentifierAlreadyUsed;
 };
 
-class RuleAlreadyExists : public IdentifierAlreadyUsed {
+class RuleAlreadyExists : public IdentifierAlreadyUsed
+{
 public:
     using IdentifierAlreadyUsed::IdentifierAlreadyUsed;
 };
 
-#endif //CASMI_EXCEPTIONS_H
+#endif // _LIB_CASMFE_EXCEPTIONS_H_

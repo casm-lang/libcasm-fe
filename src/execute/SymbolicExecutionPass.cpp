@@ -48,7 +48,7 @@ char SymbolicExecutionPass::id = 0;
 
 static libpass::PassRegistration< SymbolicExecutionPass > PASS
 ( "Symbolic Execution Pass"
-, "execute symbolically over the AST the input specification"
+, "execute symbolically over the AST input specification"
 , "ast-sym"
 , 0
 );
