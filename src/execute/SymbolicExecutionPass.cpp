@@ -184,9 +184,7 @@ namespace symbolic
 }
 
 #define CREATE_BOOLEAN_OPERATION(op, lhs, rhs) {                                \
-    if (lhs.is_undef() or rhs.is_undef()) {                                     \
-        return value_t();                                                       \
-    }                                                                           \
+    HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)                                          \
     return value_t((bool)(lhs.value.boolean op rhs.value.boolean));             \
 }
 
@@ -221,13 +219,12 @@ namespace operators
 {
     static const value_t mod(const value_t& lhs, const value_t& rhs)
     {
-        if (lhs.is_symbolic() or rhs.is_symbolic()) {
-            return value_t(new symbol_t(symbolic::next_symbol_id()));
-        }
-
+        HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)
         switch (lhs.type) {
         case TypeType::INTEGER:
             return value_t(lhs.value.integer % rhs.value.integer);
+        case TypeType::FLOATING:
+            return value_t(fmod(lhs.value.float_, rhs.value.float_));
         default:
             return value_t();
         }
@@ -235,10 +232,7 @@ namespace operators
 
     static const value_t rat_div(const value_t& lhs, const value_t& rhs)
     {
-        if (lhs.is_symbolic() or rhs.is_symbolic()) {
-            return value_t(new symbol_t(symbolic::next_symbol_id()));
-        }
-
+        HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)
         switch (lhs.type) {
         case TypeType::INTEGER: {
             auto result = new rational_t;
@@ -263,11 +257,17 @@ namespace operators
 
     static const value_t lessereq(const value_t& lhs, const value_t& rhs)
     {
+        if (lhs.is_undef() and rhs.is_undef()) {
+            return value_t(true);
+        }
         CREATE_COMPARE_OPERATION(<=, lhs, rhs);
     }
 
     static const value_t greatereq(const value_t& lhs, const value_t& rhs)
     {
+        if (lhs.is_undef() and rhs.is_undef()) {
+            return value_t(true);
+        }
         CREATE_COMPARE_OPERATION(>=, lhs, rhs);
     }
 }
@@ -617,13 +617,11 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
         if (not(left_val.is_symbolic() and right_val.is_symbolic())) {
             CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         }
-        HANDLE_SYMBOLIC_OR_UNDEF(left_val, right_val);
         return value_t(left_val == right_val);
     case ExpressionOperation::NEQ:
         if (not(left_val.is_symbolic() and right_val.is_symbolic())) {
             CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         }
-        HANDLE_SYMBOLIC_OR_UNDEF(left_val, right_val);
         return value_t(left_val != right_val);
     case ExpressionOperation::AND:
         CREATE_BOOLEAN_OPERATION(and, left_val, right_val);
@@ -636,25 +634,25 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
             return value_t(false);
         }
         CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
-        operators::lesser(left_val, right_val);
+        return operators::lesser(left_val, right_val);
     case ExpressionOperation::GREATER:
         if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
             return value_t(false);
         }
         CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
-        operators::greater(left_val, right_val);
+        return operators::greater(left_val, right_val);
     case ExpressionOperation::LESSEREQ:
         if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
             return value_t(true);
         }
         CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
-        operators::lessereq(left_val, right_val);
+        return operators::lessereq(left_val, right_val);
     case ExpressionOperation::GREATEREQ:
         if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
             return value_t(true);
         }
         CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
-        operators::greatereq(left_val, right_val);
+        return operators::greatereq(left_val, right_val);
     default:
         FAILURE();
     }
