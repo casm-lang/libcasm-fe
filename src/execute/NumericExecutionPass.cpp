@@ -365,6 +365,9 @@ void NumericExecutionPass::visit_pop(PopNode *node, const value_t& val)
 }
 
 #define CREATE_NUMERICAL_OPERATION(op, lhs, rhs)  {                             \
+    if (lhs.is_undef() or rhs.is_undef()) {                                     \
+        return value_t();                                                       \
+    }                                                                           \
     switch (lhs.type) {                                                         \
     case TypeType::INTEGER:                                                     \
         return value_t(lhs.value.integer op rhs.value.integer);                 \
@@ -378,10 +381,16 @@ void NumericExecutionPass::visit_pop(PopNode *node, const value_t& val)
 }
 
 #define CREATE_BOOLEAN_OPERATION(op, lhs, rhs)  {                               \
+    if (lhs.is_undef() or rhs.is_undef()) {                                     \
+        return value_t();                                                       \
+    }                                                                           \
     return value_t((bool)(lhs.value.boolean op rhs.value.boolean));             \
 }
 
 #define CREATE_COMPARE_OPERATION(op, lhs, rhs)  {                               \
+    if (lhs.is_undef() or rhs.is_undef()) {                                     \
+        return value_t();                                                       \
+    }                                                                           \
     switch (lhs.type) {                                                         \
     case TypeType::INTEGER:                                                     \
         return value_t(lhs.value.integer op rhs.value.integer);                 \
@@ -396,6 +405,9 @@ namespace operators
 {
     static const value_t mod(const value_t& lhs, const value_t& rhs)
     {
+        if (lhs.is_undef() or rhs.is_undef()) {
+            return value_t();
+        }
         switch (lhs.type) {
         case TypeType::INTEGER:
             return value_t(lhs.value.integer % rhs.value.integer);
@@ -406,6 +418,9 @@ namespace operators
 
     static const value_t rat_div(const value_t& lhs, const value_t& rhs)
     {
+        if (lhs.is_undef() or rhs.is_undef()) {
+            return value_t();
+        }
         switch (lhs.type) {
         case TypeType::INTEGER: {
             auto result = new rational_t;
@@ -423,10 +438,6 @@ const value_t NumericExecutionPass::visit_expression(Expression *expr,
                                                      const value_t &left_val,
                                                      const value_t &right_val)
 {
-    if (left_val.is_undef() or right_val.is_undef()) {
-        return value_t();
-    }
-
     switch (expr->op) {
     case ExpressionOperation::ADD:
         CREATE_NUMERICAL_OPERATION(+, left_val, right_val);
@@ -455,8 +466,14 @@ const value_t NumericExecutionPass::visit_expression(Expression *expr,
     case ExpressionOperation::GREATER:
         CREATE_COMPARE_OPERATION(>, left_val, right_val);
     case ExpressionOperation::LESSEREQ:
+        if (left_val.is_undef() and right_val.is_undef()) {
+            return value_t(true);
+        }
         CREATE_COMPARE_OPERATION(<=, left_val, right_val);
     case ExpressionOperation::GREATEREQ:
+        if (left_val.is_undef() and right_val.is_undef()) {
+            return value_t(true);
+        }
         CREATE_COMPARE_OPERATION(>=, left_val, right_val);
     default:
         FAILURE();
