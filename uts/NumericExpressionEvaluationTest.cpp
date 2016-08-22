@@ -45,7 +45,7 @@ static value_t make_value(TypeType type)
         case TypeType::LIST:
         case TypeType::TUPLE:
         case TypeType::TUPLE_OR_LIST:
-            static List* list = new List(List::ListType::HEAD);
+            static List* list = new HeadList(nullptr, value_t());
             value.value.list = list;
             break;
         case TypeType::ENUM:
