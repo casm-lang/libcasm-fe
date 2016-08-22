@@ -215,7 +215,6 @@ INSTANTIATE_TEST_CASE_P(CompareOperationsEqNeq, BinaryExpressionTest,
         ValuesIn(generateBinaryExpressionTestCases(
             {
                 TypeType::STRING,
-                TypeType::RULEREF,
                 TypeType::INTEGER,
                 TypeType::FLOATING,
                 TypeType::BOOLEAN,
@@ -237,14 +236,13 @@ INSTANTIATE_TEST_CASE_P(CompareOperationsEqNeq, BinaryExpressionTest,
     )
 );
 
-INSTANTIATE_TEST_CASE_P(ArithmeticOperations, BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(ArithmeticOperationsAddSubMulDiv, BinaryExpressionTest,
     Combine(
         Values(
             ExpressionOperation::ADD,
             ExpressionOperation::SUB,
             ExpressionOperation::MUL,
-            ExpressionOperation::DIV,
-            ExpressionOperation::MOD
+            ExpressionOperation::DIV
         ),
         ValuesIn(generateBinaryExpressionTestCases(
             {
@@ -261,5 +259,42 @@ INSTANTIATE_TEST_CASE_P(ArithmeticOperations, BinaryExpressionTest,
                 };
             }
         ))
+    )
+);
+
+INSTANTIATE_TEST_CASE_P(ArithmeticOperationsMod, BinaryExpressionTest,
+    Combine(
+        Values(
+            ExpressionOperation::MOD
+        ),
+        ValuesIn(generateBinaryExpressionTestCases(
+            {
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+            },
+            [](TypeType number) -> BinaryOpTypes {
+                return {
+                    BinaryOpType{TypeType::UNDEF, TypeType::UNDEF, yields(TypeType::UNDEF)},
+                    BinaryOpType{TypeType::UNDEF, number, yields(TypeType::UNDEF)},
+                    BinaryOpType{number, TypeType::UNDEF, yields(TypeType::UNDEF)},
+                    BinaryOpType{number, number, yields(number)}
+                };
+            }
+        ))
+    )
+);
+
+
+INSTANTIATE_TEST_CASE_P(ArithmeticOperationsRatDiv, BinaryExpressionTest,
+    Combine(
+        Values(
+            ExpressionOperation::RAT_DIV
+        ),
+        Values(
+            BinaryOpType{TypeType::UNDEF, TypeType::UNDEF, yields(TypeType::UNDEF)},
+            BinaryOpType{TypeType::UNDEF, TypeType::INTEGER, yields(TypeType::UNDEF)},
+            BinaryOpType{TypeType::INTEGER, TypeType::UNDEF, yields(TypeType::UNDEF)},
+            BinaryOpType{TypeType::INTEGER, TypeType::INTEGER, yields(TypeType::RATIONAL)}
+        )
     )
 );
