@@ -75,9 +75,9 @@ constexpr TypeType yields(TypeType type)
 }
 
 using UnaryOpType = std::tuple<TypeType, TypeType>;
-class UnaryExpressionTest : public TestWithParam<std::tuple<ExpressionOperation, UnaryOpType>>{};
+class Numeric_UnaryExpressionTest : public TestWithParam<std::tuple<ExpressionOperation, UnaryOpType>>{};
 
-TEST_P(UnaryExpressionTest, testUnaryExpressionResultType)
+TEST_P(Numeric_UnaryExpressionTest, testUnaryExpressionResultType)
 {
     const auto row = GetParam();
 
@@ -96,9 +96,9 @@ TEST_P(UnaryExpressionTest, testUnaryExpressionResultType)
 }
 
 using BinaryOpType = std::tuple<TypeType, TypeType, TypeType>;
-class BinaryExpressionTest : public TestWithParam<std::tuple<ExpressionOperation, BinaryOpType>>{};
+class Numeric_BinaryExpressionTest : public TestWithParam<std::tuple<ExpressionOperation, BinaryOpType>>{};
 
-TEST_P(BinaryExpressionTest, testBinaryExpressionResultType)
+TEST_P(Numeric_BinaryExpressionTest, testBinaryExpressionResultType)
 {
     const auto row = GetParam();
 
@@ -119,8 +119,8 @@ TEST_P(BinaryExpressionTest, testBinaryExpressionResultType)
 }
 
 using BinaryOpTypes = std::vector<BinaryOpType>;
-static BinaryOpTypes generateBinaryExpressionTestCases(const std::vector<TypeType> &types,
-                                                       const std::function<BinaryOpTypes(TypeType)> &testTemplate)
+static BinaryOpTypes generateNumeric_BinaryExpressionTestCases(const std::vector<TypeType> &types,
+                                                               const std::function<BinaryOpTypes(TypeType)> &testTemplate)
 {
     BinaryOpTypes binOpTypes;
     for (auto type : types) {
@@ -130,7 +130,7 @@ static BinaryOpTypes generateBinaryExpressionTestCases(const std::vector<TypeTyp
     return binOpTypes;
 }
 
-INSTANTIATE_TEST_CASE_P(NotOperation, UnaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_UnaryOperations, Numeric_UnaryExpressionTest,
     Combine(
         Values(
             ExpressionOperation::NOT
@@ -142,7 +142,7 @@ INSTANTIATE_TEST_CASE_P(NotOperation, UnaryExpressionTest,
     )
 );
 
-INSTANTIATE_TEST_CASE_P(LogicalOperations, BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_LogicalOperations, Numeric_BinaryExpressionTest,
     Combine(
         Values(
             ExpressionOperation::AND,
@@ -158,13 +158,13 @@ INSTANTIATE_TEST_CASE_P(LogicalOperations, BinaryExpressionTest,
     )
 );
 
-INSTANTIATE_TEST_CASE_P(CompareOperationsLesserGreater, BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_LesserGreater, Numeric_BinaryExpressionTest,
     Combine(
         Values(
             ExpressionOperation::LESSER,
             ExpressionOperation::GREATER
         ),
-        ValuesIn(generateBinaryExpressionTestCases(
+        ValuesIn(generateNumeric_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER,
                 TypeType::FLOATING,
@@ -182,13 +182,13 @@ INSTANTIATE_TEST_CASE_P(CompareOperationsLesserGreater, BinaryExpressionTest,
     )
 );
 
-INSTANTIATE_TEST_CASE_P(CompareOperationsLesserEqGreaterEq, BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_LesserEqGreaterEq, Numeric_BinaryExpressionTest,
     Combine(
         Values(
             ExpressionOperation::LESSEREQ,
             ExpressionOperation::GREATEREQ
         ),
-        ValuesIn(generateBinaryExpressionTestCases(
+        ValuesIn(generateNumeric_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER,
                 TypeType::FLOATING,
@@ -206,13 +206,13 @@ INSTANTIATE_TEST_CASE_P(CompareOperationsLesserEqGreaterEq, BinaryExpressionTest
     )
 );
 
-INSTANTIATE_TEST_CASE_P(CompareOperationsEqNeq, BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_EqNeq, Numeric_BinaryExpressionTest,
     Combine(
         Values(
             ExpressionOperation::EQ,
             ExpressionOperation::NEQ
         ),
-        ValuesIn(generateBinaryExpressionTestCases(
+        ValuesIn(generateNumeric_BinaryExpressionTestCases(
             {
                 TypeType::STRING,
                 TypeType::INTEGER,
@@ -236,7 +236,7 @@ INSTANTIATE_TEST_CASE_P(CompareOperationsEqNeq, BinaryExpressionTest,
     )
 );
 
-INSTANTIATE_TEST_CASE_P(ArithmeticOperationsAddSubMulDiv, BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_ArithmeticOperations_AddSubMulDiv, Numeric_BinaryExpressionTest,
     Combine(
         Values(
             ExpressionOperation::ADD,
@@ -244,7 +244,7 @@ INSTANTIATE_TEST_CASE_P(ArithmeticOperationsAddSubMulDiv, BinaryExpressionTest,
             ExpressionOperation::MUL,
             ExpressionOperation::DIV
         ),
-        ValuesIn(generateBinaryExpressionTestCases(
+        ValuesIn(generateNumeric_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER,
                 TypeType::FLOATING,
@@ -262,12 +262,12 @@ INSTANTIATE_TEST_CASE_P(ArithmeticOperationsAddSubMulDiv, BinaryExpressionTest,
     )
 );
 
-INSTANTIATE_TEST_CASE_P(ArithmeticOperationsMod, BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_ArithmeticOperations_Mod, Numeric_BinaryExpressionTest,
     Combine(
         Values(
             ExpressionOperation::MOD
         ),
-        ValuesIn(generateBinaryExpressionTestCases(
+        ValuesIn(generateNumeric_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER,
                 TypeType::FLOATING,
@@ -285,7 +285,7 @@ INSTANTIATE_TEST_CASE_P(ArithmeticOperationsMod, BinaryExpressionTest,
 );
 
 
-INSTANTIATE_TEST_CASE_P(ArithmeticOperationsRatDiv, BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_ArithmeticOperations_RatDiv, Numeric_BinaryExpressionTest,
     Combine(
         Values(
             ExpressionOperation::RAT_DIV
