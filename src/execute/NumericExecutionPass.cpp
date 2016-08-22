@@ -411,6 +411,8 @@ namespace operators
         switch (lhs.type) {
         case TypeType::INTEGER:
             return value_t(lhs.value.integer % rhs.value.integer);
+        case TypeType::FLOATING:
+            return value_t(fmod(lhs.value.float_, rhs.value.float_));
         default:
             return value_t();
         }
