@@ -37,7 +37,7 @@ template <typename T>
 static value_t make_value(TypeType type, T v)
 {
     value_t value(v);
-    EXPECT_EQ(type, value.type);
+    assert(type == value.type);
     return value;
 }
 
