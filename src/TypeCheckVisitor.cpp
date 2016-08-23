@@ -483,13 +483,23 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
     }
     else
     {
-        if( op == ExpressionOperation::MOD || op == ExpressionOperation::RAT_DIV )
+        if( op == ExpressionOperation::RAT_DIV )
         {
             if( *type != TypeType::INTEGER )
             {
                 driver_.error(loc,
                               "operands of operator `"+operator_to_str(op)+
                               "` must be Integer but were "+type->to_str());
+            }
+        }
+        else if( op == ExpressionOperation::MOD )
+        {
+            if( *type != TypeType::INTEGER
+             && *type != TypeType::FLOATING )
+            {
+                driver_.error(loc,
+                              "operands of operator `"+operator_to_str(op)+
+                              "` must be Integer or Floating but were "+type->to_str());
             }
         }
         else if( *type != TypeType::INTEGER

@@ -577,7 +577,7 @@ namespace builtins
         }
     }
 
-    static const value_t symbolic(const value_t& arg)
+    static const value_t issymbolic(const value_t& arg)
     {
         if (arg.is_symbolic() && !arg.value.sym->list) {
             return value_t(true);
@@ -751,8 +751,8 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
         return builtins::asfloating(arguments[0]);
     case Builtin::Id::AS_RATIONAL:
         return builtins::asrational(arguments[0]);
-    case Builtin::Id::SYMBOLIC:
-        return builtins::symbolic(arguments[0]);
+    case Builtin::Id::IS_SYMBOLIC:
+        return builtins::issymbolic(arguments[0]);
     default:
         FAILURE();
     }
