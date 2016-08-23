@@ -128,8 +128,8 @@ static void built_in_check_bitargs
 //  }
 
 Builtin built_ins[] =
-{ { "symbolic"
-  , Builtin::Id::SYMBOLIC
+{ { "isSymbolic"
+  , Builtin::Id::IS_SYMBOLIC
   , { TypeType::BOOLEAN }
   , { { TypeType::UNKNOWN
       }
