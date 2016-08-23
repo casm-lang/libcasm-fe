@@ -160,110 +160,53 @@ namespace symbolic
     }
 }
 
-#define HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs) {                                    \
-    if (lhs.is_undef() or rhs.is_undef()) {                                     \
-        return value_t();                                                       \
-    } else if (lhs.is_symbolic() or rhs.is_symbolic()) {                        \
-        /* TODO cleanup symbols */                                              \
+#define WRAP_NUMERICAL_OPERATION(op, lhs, rhs)                                  \
+    if ((lhs.is_symbolic() and rhs.is_symbolic()) or                            \
+        (lhs.is_symbolic() and not rhs.is_undef()) or                           \
+        (rhs.is_symbolic() and not lhs.is_undef())) {                           \
         return value_t(new symbol_t(symbolic::next_symbol_id()));               \
-    }                                                                           \
-}
-
-#define CREATE_NUMERICAL_OPERATION(op, lhs, rhs) {                              \
-    HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)                                          \
-    switch (lhs.type) {                                                         \
-    case TypeType::INTEGER:                                                     \
-        return value_t(lhs.value.integer op rhs.value.integer);                 \
-    case TypeType::FLOATING:                                                    \
-        return value_t(lhs.value.float_ op rhs.value.float_);                   \
-    case TypeType::RATIONAL:                                                    \
-        return value_t(&(*lhs.value.rat op *rhs.value.rat));                    \
-    default:                                                                    \
-        FAILURE();                                                              \
-    }                                                                           \
-}
-
-#define CREATE_COMPARE_OPERATION(op, lhs, rhs) {                                \
-    HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)                                          \
-    switch (lhs.type) {                                                         \
-    case TypeType::INTEGER:                                                     \
-        return value_t(lhs.value.integer op rhs.value.integer);                 \
-    case TypeType::FLOATING:                                                    \
-        return value_t(lhs.value.float_ op rhs.value.float_);                   \
-    default:                                                                    \
-        FAILURE();                                                              \
-    }                                                                           \
-}
-
-#define CHECK_SYMBOLIC_CMP_OPERATION(op, lhs, rhs) {                            \
-    if (lhs.is_symbolic() and not rhs.is_undef()) {                             \
-        return value_t(new symbol_t(symbolic::next_symbol_id(),                 \
-                                new symbolic_condition_t(new value_t(lhs),      \
-                                                         new value_t(rhs),      \
-                                                         op)));                 \
-    }                                                                           \
-    if (rhs.is_symbolic() and not lhs.is_undef()) {                             \
-        return value_t(new symbol_t(symbolic::next_symbol_id(),                 \
-                                new symbolic_condition_t(new value_t(lhs),      \
-                                                         new value_t(rhs),      \
-                                                         op)));                 \
-    }                                                                           \
-}
+    } else {                                                                    \
+        return op(lhs, rhs);                                                    \
+    }
 
 namespace operators
 {
-    static const value_t mod(const value_t& lhs, const value_t& rhs)
-    {
-        HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)
-        switch (lhs.type) {
-        case TypeType::INTEGER:
-            return value_t(lhs.value.integer % rhs.value.integer);
-        case TypeType::FLOATING:
-            return value_t(fmod(lhs.value.float_, rhs.value.float_));
-        default:
-            return value_t();
-        }
-    }
-
-    static const value_t rat_div(const value_t& lhs, const value_t& rhs)
-    {
-        HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)
-        switch (lhs.type) {
-        case TypeType::INTEGER: {
-            auto result = new rational_t;
-            result->numerator = lhs.value.integer;
-            result->denominator = rhs.value.integer;
-            return value_t(result);
-        }
-        default:
-            FAILURE();
-        }
-    }
-
     static const value_t lesser(const value_t& lhs, const value_t& rhs)
     {
-        CREATE_COMPARE_OPERATION(<, lhs, rhs);
+        if (lhs.is_symbolic() and rhs.is_symbolic() and lhs == rhs) {
+            return value_t(false);
+        }
+        WRAP_NUMERICAL_OPERATION(operator <, lhs, rhs)
     }
 
     static const value_t greater(const value_t& lhs, const value_t& rhs)
     {
-        CREATE_COMPARE_OPERATION(>, lhs, rhs);
+        if (lhs.is_symbolic() and rhs.is_symbolic() and lhs == rhs) {
+            return value_t(false);
+        }
+        WRAP_NUMERICAL_OPERATION(operator >, lhs, rhs)
     }
 
     static const value_t lessereq(const value_t& lhs, const value_t& rhs)
     {
-        if (lhs.is_undef() and rhs.is_undef()) {
+        if (lhs.is_symbolic() and rhs.is_symbolic() and (lhs == rhs)) {
             return value_t(true);
+        } else if (lhs.is_symbolic() or rhs.is_symbolic()) {
+            return value_t(new symbol_t(symbolic::next_symbol_id()));
+        } else {
+            return lhs <= rhs;
         }
-        CREATE_COMPARE_OPERATION(<=, lhs, rhs);
     }
 
     static const value_t greatereq(const value_t& lhs, const value_t& rhs)
     {
-        if (lhs.is_undef() and rhs.is_undef()) {
+        if (lhs.is_symbolic() and rhs.is_symbolic() and (lhs == rhs)) {
             return value_t(true);
+        } else if (lhs.is_symbolic() or rhs.is_symbolic()) {
+            return value_t(new symbol_t(symbolic::next_symbol_id()));
+        } else {
+            return lhs >= rhs;
         }
-        CREATE_COMPARE_OPERATION(>=, lhs, rhs);
     }
 }
 
@@ -597,192 +540,75 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
 {
     switch (expr->op) {
     case ExpressionOperation::ADD:
-        CREATE_NUMERICAL_OPERATION(+, left_val, right_val);
+        WRAP_NUMERICAL_OPERATION(operator +, left_val, right_val)
     case ExpressionOperation::SUB:
-        CREATE_NUMERICAL_OPERATION(-, left_val, right_val);
+        WRAP_NUMERICAL_OPERATION(operator -, left_val, right_val)
     case ExpressionOperation::MUL:
-        CREATE_NUMERICAL_OPERATION(*, left_val, right_val);
+        WRAP_NUMERICAL_OPERATION(operator *, left_val, right_val)
     case ExpressionOperation::DIV:
-        CREATE_NUMERICAL_OPERATION(/, left_val, right_val);
+        WRAP_NUMERICAL_OPERATION(operator /, left_val, right_val)
     case ExpressionOperation::MOD:
-        return operators::mod(left_val, right_val);
+        WRAP_NUMERICAL_OPERATION(operator %, left_val, right_val)
     case ExpressionOperation::RAT_DIV:
-        return operators::rat_div(left_val, right_val);
+        WRAP_NUMERICAL_OPERATION(rat_div, left_val, right_val);
     case ExpressionOperation::EQ:
-        if (left_val.is_undef()) {
-            if (right_val.is_undef()) {
-                return value_t(true);
-            } else if (right_val.is_symbolic()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t(false);
-            }
-        } else if (left_val.is_symbolic()) {
-            if (right_val.is_symbolic() and (left_val == right_val)) {
-                return value_t(true);
-            } else {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            }
+        if (left_val.is_symbolic() and right_val.is_symbolic() and (left_val == right_val)) {
+            return value_t(true);
+        } else if (left_val.is_symbolic() or right_val.is_symbolic()) {
+            return value_t(new symbol_t(symbolic::next_symbol_id()));
         } else {
-            if (right_val.is_undef()) {
-                return value_t(false);
-            } else if (right_val.is_symbolic()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t(left_val.value.boolean == right_val.value.boolean);
-            }
+            return value_t(left_val == right_val);
         }
     case ExpressionOperation::NEQ:
-        if (left_val.is_undef()) {
-            if (right_val.is_undef()) {
-                return value_t(false);
-            } else if (right_val.is_symbolic()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t(true);
-            }
-        } else if (left_val.is_symbolic()) {
-            if (right_val.is_symbolic() and (left_val == right_val)) {
-                return value_t(false);
-            } else {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            }
+        if (left_val.is_symbolic() and right_val.is_symbolic() and (left_val == right_val)) {
+            return value_t(false);
+        } else if (left_val.is_symbolic() or right_val.is_symbolic()) {
+            return value_t(new symbol_t(symbolic::next_symbol_id()));
         } else {
-            if (right_val.is_undef()) {
-                return value_t(true);
-            } else if (right_val.is_symbolic()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t(left_val.value.boolean != right_val.value.boolean);
-            }
+            return value_t(left_val != right_val);
         }
     case ExpressionOperation::AND:
-        if (left_val.is_undef()) {
-            if (right_val.is_undef()) {
-                return value_t();
-            } else if (right_val.is_symbolic()) {
+        if (left_val.is_symbolic()) {
+            if (right_val.is_undef() or right_val.is_symbolic() or right_val.value.boolean) {
                 return value_t(new symbol_t(symbolic::next_symbol_id()));
             } else {
-                return right_val.value.boolean ? value_t() : value_t(false);
+                return value_t(false);
             }
-        } else if (left_val.is_symbolic()) {
-            if (right_val.is_undef()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else if (right_val.is_symbolic()) {
+        } else if (right_val.is_symbolic()) {
+            if (left_val.is_undef() or left_val.is_symbolic() or left_val.value.boolean) {
                 return value_t(new symbol_t(symbolic::next_symbol_id()));
             } else {
-                return right_val.value.boolean ? value_t(new symbol_t(symbolic::next_symbol_id())) : value_t(false);
+                return value_t(false);
             }
         } else {
-            if (right_val.is_undef()) {
-                return left_val.value.boolean ? value_t() : value_t(false);
-            } else if (right_val.is_symbolic()) {
-                return left_val.value.boolean ? value_t(new symbol_t(symbolic::next_symbol_id())) : value_t(false);
-            } else {
-                return value_t((bool)(left_val.value.boolean and right_val.value.boolean));
-            }
+            return left_val and right_val;
         }
     case ExpressionOperation::OR:
-        if (left_val.is_undef()) {
-            if (right_val.is_undef()) {
-                return value_t();
-            } else if (right_val.is_symbolic()) {
+        if (left_val.is_symbolic()) {
+            if (right_val.is_undef() or right_val.is_symbolic() or !right_val.value.boolean) {
                 return value_t(new symbol_t(symbolic::next_symbol_id()));
             } else {
-                return right_val.value.boolean ? value_t(true) : value_t();
+                return value_t(true);
             }
-        } else if (left_val.is_symbolic()) {
-            if (right_val.is_undef()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else if (right_val.is_symbolic()) {
+        } else if (right_val.is_symbolic()) {
+            if (left_val.is_undef() or left_val.is_symbolic() or !left_val.value.boolean) {
                 return value_t(new symbol_t(symbolic::next_symbol_id()));
             } else {
-                return right_val.value.boolean ? value_t(true) : value_t(new symbol_t(symbolic::next_symbol_id()));
+                return value_t(true);
             }
         } else {
-            if (right_val.is_undef()) {
-                return left_val.value.boolean ? value_t(true) : value_t();
-            } else if (right_val.is_symbolic()) {
-                return left_val.value.boolean ? value_t(true) : value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t((bool)(left_val.value.boolean or right_val.value.boolean));
-            }
+            return left_val or right_val;
         }
     case ExpressionOperation::XOR:
-        HANDLE_SYMBOLIC_OR_UNDEF(left_val, right_val)
-        return value_t((bool)(left_val.value.boolean ^ right_val.value.boolean));
+        WRAP_NUMERICAL_OPERATION(operator ^, left_val, right_val);
     case ExpressionOperation::LESSER:
-        if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
-            return value_t(false);
-        }
-        CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         return operators::lesser(left_val, right_val);
     case ExpressionOperation::GREATER:
-        if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
-            return value_t(false);
-        }
-        CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         return operators::greater(left_val, right_val);
     case ExpressionOperation::LESSEREQ:
-        if (left_val.is_undef()) {
-            if (right_val.is_undef()) {
-                return value_t(true);
-            } else if (right_val.is_symbolic()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t();
-            }
-        } else if (left_val.is_symbolic()) {
-            if (right_val.is_undef()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else if (right_val.is_symbolic()) {
-                if (left_val == right_val) { // same symbol
-                    return value_t(true);
-                } else {
-                    return value_t(new symbol_t(symbolic::next_symbol_id()));
-                }
-            } else {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            }
-        } else {
-            if (right_val.is_undef()) {
-                return value_t();
-            } else if (right_val.is_symbolic()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return operators::lessereq(left_val, right_val);
-            }
-        }
+        return operators::lessereq(left_val, right_val);
     case ExpressionOperation::GREATEREQ:
-        if (left_val.is_undef()) {
-            if (right_val.is_undef()) {
-                return value_t(true);
-            } else if (right_val.is_symbolic()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t();
-            }
-        } else if (left_val.is_symbolic()) {
-            if (right_val.is_undef()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else if (right_val.is_symbolic()) {
-                if (left_val == right_val) { // same symbol
-                    return value_t(true);
-                } else {
-                    return value_t(new symbol_t(symbolic::next_symbol_id()));
-                }
-            } else {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            }
-        } else {
-            if (right_val.is_undef()) {
-                return value_t();
-            } else if (right_val.is_symbolic()) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return operators::greatereq(left_val, right_val);
-            }
-        }
+        return operators::greatereq(left_val, right_val);
     default:
         FAILURE();
     }

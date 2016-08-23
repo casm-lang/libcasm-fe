@@ -81,6 +81,22 @@ class value_t {
     const std::string to_str(bool symbolic=false) const;
 };
 
+value_t operator or(const value_t& lhs, const value_t& rhs);
+value_t operator and(const value_t& lhs, const value_t& rhs);
+value_t operator ^(const value_t& lhs, const value_t& rhs);
+
+value_t operator +(const value_t& lhs, const value_t& rhs);
+value_t operator -(const value_t& lhs, const value_t& rhs);
+value_t operator *(const value_t& lhs, const value_t& rhs);
+value_t operator /(const value_t& lhs, const value_t& rhs);
+value_t operator %(const value_t& lhs, const value_t& rhs);
+value_t rat_div(const value_t& lhs, const value_t& rhs);
+
+value_t operator <(const value_t& lhs, const value_t& rhs);
+value_t operator >(const value_t& lhs, const value_t& rhs);
+value_t operator <=(const value_t& lhs, const value_t& rhs);
+value_t operator >=(const value_t& lhs, const value_t& rhs);
+
 struct symbol_t {
   const uint32_t id;
   symbolic_condition_t *condition;
