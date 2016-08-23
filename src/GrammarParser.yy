@@ -244,210 +244,309 @@
      
 SPECIFICATION
 : HEADER BODY_ELEMENTS
-{
-    driver.result = new Ast( @$, $1, $2 );
-}
+  {
+	  driver.result = new Ast( @$, $1, $2 );
+  }
 ;
 
 
 HEADER
 : CASM IDENTIFIER
-{
-    $$ = new SpecificationNode( @$, $2 );
-}
+  {
+	  $$ = new SpecificationNode( @$, $2 );
+  }
 ;
 
 BODY_ELEMENTS
 : BODY_ELEMENTS BODY_ELEMENT
-{
-    $1->add($2);
-    $$ = $1;
-}
+  {
+	  $1->add($2);
+	  $$ = $1;
+  }
 | BODY_ELEMENT
-{
-    $$ = new AstListNode(@$, NodeType::BODY_ELEMENTS);
-    $$->add($1);
-}
+  {
+	  $$ = new AstListNode(@$, NodeType::BODY_ELEMENTS);
+	  $$->add($1);
+  }
 ;
 
 
-BODY_ELEMENT: PROVIDER_SYNTAX { $$ = new AstNode(NodeType::PROVIDER); }
-           | OPTION_SYNTAX { $$ = new AstNode(NodeType::OPTION); }
-           | ENUM_SYNTAX { $$ = new EnumDefNode(@$, $1); }
-           | FUNCTION_DEFINITION {
-                $$ = new FunctionDefNode(@$, $1);
-                if ($1->is_builtin()) {
-                    driver.error(@$, "cannot use `"+$1->name+"` as function identifier because it is a builtin name");
-                }
-                try {
-                    driver.add($1);
-                } catch (const IdentifierAlreadyUsed& e) {
-                    driver.error(@$, e.what());
-                    // if another symbol with same name exists we need to delete
-                    // the symbol here, because it is not inserted in the symbol table
-                    delete $1;
-                }
-            }
-           | DERIVED_SYNTAX {
-                $1->binding_offsets = std::move(driver.binding_offsets);
-                driver.binding_offsets.clear();
-                $$ = new FunctionDefNode(@$, $1);
-                try {
-                    driver.add($1);
-                } catch (const IdentifierAlreadyUsed& e) {
-                    driver.error(@$, e.what());
-                    // if another symbol with same name exists we need to delete
-                    // the symbol here, because it is not inserted in the symbol table
-                    delete $1;
-                }
-            }
-           | INIT_SYNTAX { $$ = $1; }
-           | RULE_SYNTAX {
-                $$ = $1;
-                // TODO check, we trust bison to pass only RuleNodes up
-                try {
-                    driver.add(reinterpret_cast<RuleNode*>($1));
-                } catch (const IdentifierAlreadyUsed& e) {
-                    driver.error(@$, e.what());
-                    // we do not need to delete $1 here, because it's already in
-                    // the AST, so it will be deleted later
-                }
-           }
-           ;
+BODY_ELEMENT
+: PROVIDER_SYNTAX
+  {
+	  $$ = new AstNode(NodeType::PROVIDER);
+  }
+| OPTION_SYNTAX
+  {
+	  $$ = new AstNode(NodeType::OPTION);
+  }
+| ENUM_SYNTAX
+  {
+	  $$ = new EnumDefNode(@$, $1);
+  }
+| FUNCTION_DEFINITION
+  {
+	  $$ = new FunctionDefNode(@$, $1);
+	  
+	  if( $1->is_builtin() )
+	  {
+		  driver.error(@$, "cannot use `"+$1->name+"` as function identifier because it is a builtin name");
+	  }
+	  try
+	  {
+		  driver.add($1);
+	  }
+	  catch( const IdentifierAlreadyUsed& e )
+	  {
+		  driver.error(@$, e.what());
+		  // if another symbol with same name exists we need to delete
+		  // the symbol here, because it is not inserted in the symbol table
+		  delete $1;
+	  }
+  }
+| DERIVED_SYNTAX
+  {
+	  $1->binding_offsets = std::move(driver.binding_offsets);
+	  driver.binding_offsets.clear();
+	  $$ = new FunctionDefNode(@$, $1);
+	  try
+	  {
+		  driver.add($1);
+	  }
+	  catch( const IdentifierAlreadyUsed& e )
+	  {
+		  driver.error(@$, e.what());
+		  // if another symbol with same name exists we need to delete
+		  // the symbol here, because it is not inserted in the symbol table
+		  delete $1;
+	  }
+  }
+| INIT_SYNTAX
+  {
+	  $$ = $1;
+  }
+| RULE_SYNTAX
+  {
+	  $$ = $1;
+	  // TODO check, we trust bison to pass only RuleNodes up
+	  try
+	  {
+		  driver.add(reinterpret_cast<RuleNode*>($1));
+	  }
+	  catch( const IdentifierAlreadyUsed& e )
+	  {
+		  driver.error( @$, e.what() );
+		  // we do not need to delete $1 here, because it's already in
+		  // the AST, so it will be deleted later
+	  }
+  }
+;
 
 INIT_SYNTAX
 : INIT IDENTIFIER
-{
-    $$ = new InitNode( @$, $2 );
-}
+  {
+	  $$ = new InitNode( @$, $2 );
+  }
 ;
 
 
-PROVIDER_SYNTAX: PROVIDER IDENTIFIER // TODO: PPA: REMOVE THIS, BECAUSE THIS IS AN OLD SYNTAX ELEMENT!!! 
+PROVIDER_SYNTAX
+: PROVIDER IDENTIFIER // TODO: PPA: REMOVE THIS, BECAUSE THIS IS AN OLD SYNTAX ELEMENT!!!
+  {
+	  driver.error( @$, "invalid/obsolete syntax element!" );
+  }
 ;
 
 
-OPTION_SYNTAX: OPTION IDENTIFIER "." IDENTIFIER IDENTIFIER;
+OPTION_SYNTAX
+: OPTION IDENTIFIER "." IDENTIFIER IDENTIFIER
+;
 
 
-ENUM_SYNTAX: ENUM IDENTIFIER "=" "{" IDENTIFIER_LIST "}" {
-                $$ = new Enum($2, @$);
-                try {
-                    driver.function_table.add($$);
-                } catch (const SymbolAlreadyExists& e) {
-                    driver.error(@$, e.what());
-                }
-                for (const std::string& name : $5) {
-                    if ($$->add_enum_element(name)) {
-                        try {
-                            driver.function_table.add_enum_element(name, $$);
-                        } catch (const SymbolAlreadyExists& e) {
-                            driver.error(@$, e.what());
-                        }
-                    } else {
-                        driver.error(@$, "name `"+name+"` already used in enum");
-                    }
-                }
-           }
-           ;
-
-DERIVED_SYNTAX: DERIVED IDENTIFIER "(" PARAM_LIST ")" "=" EXPRESSION {
-                  // TODO: 2nd argument should be a reference
-                  $$ = new Function($2, @$, $4, $7, new Type(TypeType::UNKNOWN));
-                }
-              | DERIVED IDENTIFIER "=" EXPRESSION {
-                  $$ = new Function($2, @$, $4, new Type(TypeType::UNKNOWN));
-                }
-              | DERIVED IDENTIFIER "(" ")" "=" EXPRESSION {
-                  $$ = new Function($2, @$, $6, new Type(TypeType::UNKNOWN));
-                }
-              /* again with type syntax */
-              | DERIVED IDENTIFIER "(" PARAM_LIST ")" ":" TYPE_SYNTAX "=" EXPRESSION {
-                  $$ = new Function($2, @$, $4, $9, $7);
-                }
-              | DERIVED IDENTIFIER ":" TYPE_SYNTAX "=" EXPRESSION {
-                  $$ = new Function($2, @$, $6, $4);
-                }
-              | DERIVED IDENTIFIER "(" ")" ":" TYPE_SYNTAX "=" EXPRESSION {
-                  $$ = new Function($2, @$, $8, $6);
-                }
-              ;
-
-FUNCTION_DEFINITION: FUNCTION "(" IDENTIFIER_LIST ")" IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS {
-                      auto attrs = parse_function_attributes(driver, @$, $3);
-                      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, $7);
-                   }
-                   | FUNCTION "(" IDENTIFIER_LIST ")" IDENTIFIER FUNCTION_SIGNATURE {
-                      auto attrs = parse_function_attributes(driver, @$, $3);
-                      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, nullptr);
-                   }
-                   | FUNCTION IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS {
-                      $$ = new Function($2, @$, $3.first, $3.second, $4);
-                   }
-                   | FUNCTION IDENTIFIER FUNCTION_SIGNATURE
-                   { $$ = new Function($2, @$, $3.first, $3.second, nullptr); }
-                   ;
-
-IDENTIFIER_LIST: IDENTIFIER_LIST_NO_COMMA "," { $$ = std::move($1); }
-               | IDENTIFIER_LIST_NO_COMMA { $$ = std::move($1); }
-               ;
-
-IDENTIFIER_LIST_NO_COMMA: IDENTIFIER_LIST_NO_COMMA "," IDENTIFIER {
-                            $$ = std::move($1);
-                            $$.push_back($3);
-                        }
-                        | IDENTIFIER {
-                            $$ = std::vector<std::string>();
-                            $$.push_back($1);
-                        }
-                        ;
-
-FUNCTION_SIGNATURE: ":" ARROW TYPE_SYNTAX {
-                    /* this constructor is implementation dependant! */
-                    std::vector<Type*> foo;
-                    $$ = std::pair<std::vector<Type*>, Type*>(foo, $3);
-                  }
-                  | ":" TYPE_IDENTIFIER_STARLIST ARROW TYPE_SYNTAX
-                  { $$ = std::pair<std::vector<Type*>, Type*>($2, $4); }
-                  ;
-
-PARAM: IDENTIFIER ":" TYPE_SYNTAX {
-        size_t size = driver.binding_offsets.size();
-        driver.binding_offsets[$1] = size;
-        $$ = $3;
-     }
-     | IDENTIFIER {
-        size_t size = driver.binding_offsets.size();
-        driver.binding_offsets[$1] = size;
-        // TODO: fail for rules without types and print warnings
-        $$ = new Type(TypeType::INTEGER);
-     }
-     ;
+ENUM_SYNTAX
+: ENUM IDENTIFIER "=" "{" IDENTIFIER_LIST "}"
+  {
+	  $$ = new Enum($2, @$);
+	  try
+	  {
+		  driver.function_table.add($$);
+	  }
+	  catch( const SymbolAlreadyExists& e )
+	  {
+		  driver.error( @$, e.what() );
+	  }
+	  for( const std::string& name : $5 )
+	  {
+		  if( $$->add_enum_element(name) )
+		  {
+			  try
+			  {
+				  driver.function_table.add_enum_element( name, $$ );
+			  }
+			  catch( const SymbolAlreadyExists& e )
+			  {
+				  driver.error( @$, e.what() );
+			  }
+		  }
+		  else
+		  {
+			  driver.error( @$, "name `"+name+"` already used in enum" );
+		  }
+	  }
+  }
+;
 
 
-PARAM_LIST: PARAM_LIST_NO_COMMA { $$ = std::move($1); }
-          | PARAM_LIST_NO_COMMA "," { $$ = std::move($1); }
+DERIVED_SYNTAX
+: DERIVED IDENTIFIER "(" PARAM_LIST ")" "=" EXPRESSION
+  {
+	  // TODO: 2nd argument should be a reference
+	  $$ = new Function($2, @$, $4, $7, new Type(TypeType::UNKNOWN));
+  }
+| DERIVED IDENTIFIER "=" EXPRESSION
+  {
+	  $$ = new Function($2, @$, $4, new Type(TypeType::UNKNOWN));
+  }
+| DERIVED IDENTIFIER "(" ")" "=" EXPRESSION
+  {
+	  $$ = new Function($2, @$, $6, new Type(TypeType::UNKNOWN));
+  }
+/* again with type syntax */
+| DERIVED IDENTIFIER "(" PARAM_LIST ")" ":" TYPE_SYNTAX "=" EXPRESSION
+  {
+	  $$ = new Function($2, @$, $4, $9, $7);
+  }
+| DERIVED IDENTIFIER ":" TYPE_SYNTAX "=" EXPRESSION
+  {
+	  $$ = new Function($2, @$, $6, $4);
+  }
+| DERIVED IDENTIFIER "(" ")" ":" TYPE_SYNTAX "=" EXPRESSION
+  {
+	  $$ = new Function($2, @$, $8, $6);
+  }
+;
 
-PARAM_LIST_NO_COMMA: PARAM_LIST_NO_COMMA "," PARAM {
-                        $$ = std::move($1);
-                        $$.push_back($3);
-                   }
-                   | PARAM { $$.push_back($1); }
-                   ;
+
+FUNCTION_DEFINITION
+: FUNCTION "(" IDENTIFIER_LIST ")" IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
+  {
+	  auto attrs = parse_function_attributes(driver, @$, $3);
+	  $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, $7);
+  }
+| FUNCTION "(" IDENTIFIER_LIST ")" IDENTIFIER FUNCTION_SIGNATURE
+  {
+	  auto attrs = parse_function_attributes(driver, @$, $3);
+	  $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, nullptr);
+  }
+| FUNCTION IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
+  {
+	  $$ = new Function($2, @$, $3.first, $3.second, $4);
+  }
+| FUNCTION IDENTIFIER FUNCTION_SIGNATURE
+  {
+	  $$ = new Function($2, @$, $3.first, $3.second, nullptr);
+  }
+;
+
+IDENTIFIER_LIST
+: IDENTIFIER_LIST_NO_COMMA ","
+  {
+	  $$ = std::move($1);
+  }
+| IDENTIFIER_LIST_NO_COMMA
+  {
+	  $$ = std::move($1);
+  }
+;
 
 
-TYPE_IDENTIFIER_STARLIST: TYPE_SYNTAX "*" TYPE_IDENTIFIER_STARLIST {
-                            $3.insert($3.begin(), $1);
-                            $$ = std::move($3);
-                        }
-                        | TYPE_SYNTAX "*" {
-                          // TODO: limit memory size
-                            $$.push_back($1);
-                        }
-                        | TYPE_SYNTAX {
-                            $$.push_back($1);
-                        }
-                        ;
+IDENTIFIER_LIST_NO_COMMA
+: IDENTIFIER_LIST_NO_COMMA "," IDENTIFIER
+  {
+      $$ = std::move($1);
+      $$.push_back($3);
+  }
+| IDENTIFIER
+  {
+	  $$ = std::vector<std::string>();
+	  $$.push_back($1);
+  }
+;
+
+
+FUNCTION_SIGNATURE
+: ":" ARROW TYPE_SYNTAX
+  {
+	  /* this constructor is implementation dependant! */
+	  std::vector<Type*> foo;
+	  $$ = std::pair<std::vector<Type*>, Type*>(foo, $3);
+  }
+| ":" TYPE_IDENTIFIER_STARLIST ARROW TYPE_SYNTAX
+  {
+	  $$ = std::pair<std::vector<Type*>, Type*>($2, $4);
+  }
+;
+
+
+PARAM
+: IDENTIFIER ":" TYPE_SYNTAX
+  {
+	  size_t size = driver.binding_offsets.size();
+	  driver.binding_offsets[$1] = size;
+	  $$ = $3;
+  }
+| IDENTIFIER
+  {
+	  size_t size = driver.binding_offsets.size();
+	  driver.binding_offsets[$1] = size;
+	  // TODO: fail for rules without types and print warnings
+	  $$ = new Type(TypeType::INTEGER);
+  }
+;
+
+
+PARAM_LIST
+: PARAM_LIST_NO_COMMA
+  {
+	  $$ = std::move($1);
+  }
+| PARAM_LIST_NO_COMMA ","
+  {
+	  $$ = std::move($1);
+  }
+;
+
+
+PARAM_LIST_NO_COMMA
+: PARAM_LIST_NO_COMMA "," PARAM
+  {
+	  $$ = std::move($1);
+	  $$.push_back($3);
+  }
+| PARAM
+  {
+	  $$.push_back($1);
+  }
+;
+
+
+TYPE_IDENTIFIER_STARLIST
+: TYPE_SYNTAX "*" TYPE_IDENTIFIER_STARLIST
+  {
+	  $3.insert($3.begin(), $1);
+	  $$ = std::move($3);
+  }
+| TYPE_SYNTAX "*"
+  {
+	  // TODO: limit memory size
+	  $$.push_back($1);
+  }
+| TYPE_SYNTAX
+  {
+	  $$.push_back($1);
+  }
+;
+
 
 TYPE_SYNTAX
 : IDENTIFIER
@@ -525,130 +624,306 @@ TYPE_SYNTAX
 ;
 
 
-TYPE_SYNTAX_LIST: TYPE_SYNTAX "," TYPE_SYNTAX_LIST {
-                      $3.push_back($1);
-                      $$ = std::move($3);
-                    }
-                    | TYPE_SYNTAX "," { $$.push_back($1); }
-                    | TYPE_SYNTAX { $$.push_back($1); }
-                    ;
-
-INITIALIZERS: INITIALLY "{" INITIALIZER_LIST "}" { $$ = $3; }
-            | INITIALLY "{" "}" { $$ = nullptr; }
-            ;
-
-INITIALIZER_LIST: INITIALIZER_LIST "," INITIALIZER { $$ = $1; $1->push_back($3); }
-                | INITIALIZER_LIST "," { $$ = $1; }
-                | INITIALIZER {
-                    $$ = new std::vector<std::pair<ExpressionBase*, ExpressionBase*>>();
-                    $$->push_back($1);
-                }
-                ;
+TYPE_SYNTAX_LIST
+: TYPE_SYNTAX "," TYPE_SYNTAX_LIST
+  {
+	  $3.push_back($1);
+	  $$ = std::move($3);
+  }
+| TYPE_SYNTAX ","
+  {
+	  $$.push_back($1);
+  }
+| TYPE_SYNTAX
+  {
+	  $$.push_back($1);
+  }
+;
 
 
-INITIALIZER: ATOM { $$ = std::pair<ExpressionBase*, ExpressionBase*>(nullptr, $1); }
-           | ATOM ARROW ATOM { $$ = std::pair<ExpressionBase*, ExpressionBase*>($1, $3); }
-           ;
-
-ATOM: FUNCTION_SYNTAX { $$ = $1; }
-    | VALUE { $$ = $1; }
-    | BRACKET_EXPRESSION { $$ = $1; }
-    ;
-
-VALUE: RULEREF { $$ = new RuleAtom(@$, std::move($1)); }
-     | NUMBER { $$ = $1; }
-     | STRCONST { $$ = new StringAtom(@$, std::move($1)); }
-     | LISTCONST { $$ = new ListAtom(@$, $1); }
-     | NUMBER_RANGE { $$ = $1; }
-     | SYMBOL { $$ = new IntegerAtom(@$, 0); }
-     | SELF { $$ = new SelfAtom(@$); }
-     | UNDEF { $$ = new UndefAtom(@$); }
-     | TRUE { $$ = new BooleanAtom(@$, true); }
-     | FALSE { $$ = new BooleanAtom(@$, false); }
-     ;
-
-INTEGER_NUMBER: "+" INTEGERCONST %prec UPLUS { $$ = new IntegerAtom(@$, $2); }
-          | "-" INTEGERCONST %prec UMINUS { $$ = new IntegerAtom(@$, (-1) * $2); }
-          | INTEGERCONST { $$ = new IntegerAtom(@$, $1); }
-NUMBER: INTEGER_NUMBER { $$ = $1; }
-      | "+" FLOATINGCONST %prec UPLUS { $$ = new FloatingAtom(@$, $2); }
-      | "-" FLOATINGCONST %prec UMINUS { $$ = new FloatingAtom(@$, (-1) * $2); }
-      | FLOATINGCONST { $$ = new FloatingAtom(@$, $1); }
-      | "+" RATIONALCONST %prec UPLUS { $$ = new RationalAtom(@$, $2); }
-      | "-" RATIONALCONST %prec UMINUS {
-          $2.numerator *= -1;
-          $$ = new RationalAtom(@$, $2);
-        }
-      | RATIONALCONST { $$ = new RationalAtom(@$, $1); }
-      ;
-
-RULEREF: "@" IDENTIFIER { $$ = $2; }
-       ;
-
-NUMBER_RANGE: "[" NUMBER DOTDOT NUMBER "]" {
-              if ($2->node_type_ == NodeType::INTEGER_ATOM && $4->node_type_ == NodeType::INTEGER_ATOM) {
-                $$ = new NumberRangeAtom(@$, reinterpret_cast<IntegerAtom*>($2), reinterpret_cast<IntegerAtom*>($4));
-              } else {
-                driver.error(@$, "numbers in range expression must be Integer");
-                $$ = nullptr;
-              }
-            }
-            /*| "[" IDENTIFIER DOTDOT IDENTIFIER "]" */
-            ;
-
-LISTCONST: "[" EXPRESSION_LIST "]" { $$ = $2; }
-         | "[" "]" { $$ = new std::vector<ExpressionBase*>(); }
-         ;
+INITIALIZERS
+: INITIALLY "{" INITIALIZER_LIST "}"
+  {
+	  $$ = $3;
+  }
+| INITIALLY "{" "}"
+  {
+	  $$ = nullptr;
+  }
+;
 
 
-EXPRESSION_LIST: EXPRESSION_LIST_NO_COMMA { $$ = $1; }
-               | EXPRESSION_LIST_NO_COMMA "," { $$ = $1; }
+INITIALIZER_LIST
+: INITIALIZER_LIST "," INITIALIZER
+  {
+	  $$ = $1; $1->push_back($3);
+  }
+| INITIALIZER_LIST ","
+  {
+	  $$ = $1;
+  }
+| INITIALIZER
+  {
+	  $$ = new std::vector<std::pair<ExpressionBase*, ExpressionBase*>>();
+	  $$->push_back($1);
+  }
+;
 
-EXPRESSION_LIST_NO_COMMA: EXPRESSION_LIST_NO_COMMA"," EXPRESSION {
-                          $$ = $1;
-                          $$->push_back($3);
-                        }
-                        | EXPRESSION {
-                          $$ = new std::vector<ExpressionBase*>;
-                          $$->push_back($1);
-                        }
-                        ;
+
+INITIALIZER
+: ATOM
+  {
+	  $$ = std::pair<ExpressionBase*, ExpressionBase*>(nullptr, $1);
+  }
+| ATOM ARROW ATOM
+  {
+	  $$ = std::pair<ExpressionBase*, ExpressionBase*>($1, $3);
+  }
+;
 
 
-EXPRESSION: EXPRESSION "+" EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::ADD); }
-          | EXPRESSION "-" EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::SUB); }
-          | EXPRESSION "*" EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::MUL); }
-          | EXPRESSION "/" EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::DIV); }
-          | EXPRESSION "%" EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::MOD); }
-          | EXPRESSION RATIONAL_DIV EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::RAT_DIV); }
-          | EXPRESSION NEQUAL EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::NEQ); }
-          | EXPRESSION "=" EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::EQ); }
-          | EXPRESSION "<" EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::LESSER); }
-          | EXPRESSION ">" EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::GREATER); }
-          | EXPRESSION LESSEQ EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::LESSEREQ); }
-          | EXPRESSION GREATEREQ EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::GREATEREQ); }
-          | EXPRESSION OR EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::OR); }
-          | EXPRESSION XOR EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::XOR); }
-          | EXPRESSION AND EXPRESSION
-            { $$ = new Expression(@$, $1, $3, ExpressionOperation::AND); }
-          | NOT EXPRESSION
-            { $$ = new Expression(@$, $2, nullptr, ExpressionOperation::NOT);}
-          | ATOM  { $$ = $1; }
-          ;
+ATOM
+: FUNCTION_SYNTAX
+  {
+	  $$ = $1;
+  }
+| VALUE
+  {
+	  $$ = $1;
+  }
+| BRACKET_EXPRESSION
+  {
+	  $$ = $1;
+  }
+;
+
+
+VALUE
+: RULEREF
+  {
+	  $$ = new RuleAtom( @$, std::move( $1 ) );
+  }
+| NUMBER
+  {
+	  $$ = $1;
+  }
+| STRCONST
+  {
+	  $$ = new StringAtom(@$, std::move($1));
+  }
+| LISTCONST
+  {
+	  $$ = new ListAtom(@$, $1);
+  }
+| NUMBER_RANGE
+  {
+	  $$ = $1;
+  }
+| SYMBOL
+  {
+	  $$ = new IntegerAtom(@$, 0);
+  }
+| SELF
+  {
+	  $$ = new SelfAtom(@$);
+  }
+| UNDEF
+  {
+	  $$ = new UndefAtom(@$);
+  }
+| TRUE
+  {
+	  $$ = new BooleanAtom(@$, true);
+  }
+| FALSE
+  {
+	  $$ = new BooleanAtom(@$, false);
+  }
+;
+
+
+INTEGER_NUMBER
+: "+" INTEGERCONST %prec UPLUS
+  {
+	  $$ = new IntegerAtom(@$, $2);
+  }
+| "-" INTEGERCONST %prec UMINUS
+  {
+	  $$ = new IntegerAtom(@$, (-1) * $2);
+  }
+| INTEGERCONST
+  {
+	  $$ = new IntegerAtom(@$, $1);
+  }
+;
+
+
+NUMBER
+: INTEGER_NUMBER
+  {
+	  $$ = $1;
+  }
+| "+" FLOATINGCONST %prec UPLUS
+  {
+	  $$ = new FloatingAtom( @$, $2 );
+  }
+| "-" FLOATINGCONST %prec UMINUS
+  {
+	  $$ = new FloatingAtom(@$, (-1) * $2);
+  }
+| FLOATINGCONST
+  {
+	  $$ = new FloatingAtom(@$, $1);
+  }
+| "+" RATIONALCONST %prec UPLUS
+  {
+	  $$ = new RationalAtom(@$, $2);
+  }
+| "-" RATIONALCONST %prec UMINUS
+  {
+	  $2.numerator *= -1;
+	  $$ = new RationalAtom(@$, $2);
+  }
+| RATIONALCONST
+  {
+	  $$ = new RationalAtom(@$, $1);
+  }
+;
+
+
+RULEREF
+: "@" IDENTIFIER
+  {
+	  $$ = $2;
+  }
+;
+
+
+NUMBER_RANGE
+: "[" NUMBER DOTDOT NUMBER "]"
+  {
+	  if( $2->node_type_ == NodeType::INTEGER_ATOM && $4->node_type_ == NodeType::INTEGER_ATOM )
+	  {
+		  $$ = new NumberRangeAtom( @$, reinterpret_cast<IntegerAtom*>( $2 ), reinterpret_cast<IntegerAtom*>( $4 ));
+	  }
+	  else
+	  {
+		  driver.error( @$, "numbers in range expression must be Integer" );
+		  $$ = nullptr;
+	  }
+  }
+/*| "[" IDENTIFIER DOTDOT IDENTIFIER "]" */
+;
+
+
+LISTCONST
+: "[" EXPRESSION_LIST "]"
+{
+	$$ = $2;
+}
+| "[" "]"
+  {
+	  $$ = new std::vector<ExpressionBase*>();
+  }
+;
+
+
+EXPRESSION_LIST
+: EXPRESSION_LIST_NO_COMMA
+  {
+	  $$ = $1;
+  }
+| EXPRESSION_LIST_NO_COMMA ","
+  {
+	  $$ = $1;
+  }
+;
+
+
+EXPRESSION_LIST_NO_COMMA
+: EXPRESSION_LIST_NO_COMMA"," EXPRESSION
+  {
+	  $$ = $1;
+	  $$->push_back($3);
+  }
+| EXPRESSION
+  {
+	  $$ = new std::vector<ExpressionBase*>;
+	  $$->push_back($1);
+  }
+;
+
+
+EXPRESSION
+: EXPRESSION "+" EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::ADD );
+  }
+| EXPRESSION "-" EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::SUB );
+  }
+| EXPRESSION "*" EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::MUL );
+  }
+| EXPRESSION "/" EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::DIV );
+  }
+| EXPRESSION "%" EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::MOD );
+  }
+| EXPRESSION RATIONAL_DIV EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::RAT_DIV );
+  }
+| EXPRESSION NEQUAL EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::NEQ );
+  }
+| EXPRESSION "=" EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::EQ );
+  }
+| EXPRESSION "<" EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::LESSER );
+  }
+| EXPRESSION ">" EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::GREATER );
+  }
+| EXPRESSION LESSEQ EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::LESSEREQ );
+  }
+| EXPRESSION GREATEREQ EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::GREATEREQ );
+  }
+| EXPRESSION OR EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::OR );
+  }
+| EXPRESSION XOR EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::XOR );
+  }
+| EXPRESSION AND EXPRESSION
+  {
+	  $$ = new Expression( @$, $1, $3, ExpressionOperation::AND );
+  }
+| NOT EXPRESSION
+  {
+	  $$ = new Expression( @$, $2, nullptr, ExpressionOperation::NOT );
+  }
+| ATOM
+  {
+	  $$ = $1;
+  }
+;
 
 BRACKET_EXPRESSION: "(" EXPRESSION ")"  { $$ = $2; }
                   ;
@@ -783,10 +1058,12 @@ UPDATE_SYNTAX: FUNCTION_SYNTAX UPDATE EXPRESSION {
                 }
              ;
 
-CASE_SYNTAX: CASE EXPRESSION OF CASE_LABEL_LIST ENDCASE {
-                $$ = new CaseNode(@$, $2, $4);
-           }
-           ;
+CASE_SYNTAX
+: CASE EXPRESSION OF CASE_LABEL_LIST ENDCASE
+  {
+	  $$ = new CaseNode(@$, $2, $4);
+  }
+;
 
 CASE_LABEL_LIST: CASE_LABEL_LIST CASE_LABEL {
                     $$ = std::move($1);
