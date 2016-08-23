@@ -183,11 +183,6 @@ namespace symbolic
     }                                                                           \
 }
 
-#define CREATE_BOOLEAN_OPERATION(op, lhs, rhs) {                                \
-    HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)                                          \
-    return value_t((bool)(lhs.value.boolean op rhs.value.boolean));             \
-}
-
 #define CREATE_COMPARE_OPERATION(op, lhs, rhs) {                                \
     HANDLE_SYMBOLIC_OR_UNDEF(lhs, rhs)                                          \
     switch (lhs.type) {                                                         \
@@ -614,21 +609,108 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
     case ExpressionOperation::RAT_DIV:
         return operators::rat_div(left_val, right_val);
     case ExpressionOperation::EQ:
-        if (not(left_val.is_symbolic() and right_val.is_symbolic())) {
-            CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
+        if (left_val.is_undef()) {
+            if (right_val.is_undef()) {
+                return value_t(true);
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return value_t(false);
+            }
+        } else if (left_val.is_symbolic()) {
+            if (right_val.is_symbolic() and (left_val == right_val)) {
+                return value_t(true);
+            } else {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            }
+        } else {
+            if (right_val.is_undef()) {
+                return value_t(false);
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return value_t(left_val.value.boolean == right_val.value.boolean);
+            }
         }
-        return value_t(left_val == right_val);
     case ExpressionOperation::NEQ:
-        if (not(left_val.is_symbolic() and right_val.is_symbolic())) {
-            CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
+        if (left_val.is_undef()) {
+            if (right_val.is_undef()) {
+                return value_t(false);
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return value_t(true);
+            }
+        } else if (left_val.is_symbolic()) {
+            if (right_val.is_symbolic() and (left_val == right_val)) {
+                return value_t(false);
+            } else {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            }
+        } else {
+            if (right_val.is_undef()) {
+                return value_t(true);
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return value_t(left_val.value.boolean != right_val.value.boolean);
+            }
         }
-        return value_t(left_val != right_val);
     case ExpressionOperation::AND:
-        CREATE_BOOLEAN_OPERATION(and, left_val, right_val);
+        if (left_val.is_undef()) {
+            if (right_val.is_undef()) {
+                return value_t();
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return right_val.value.boolean ? value_t() : value_t(false);
+            }
+        } else if (left_val.is_symbolic()) {
+            if (right_val.is_undef()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return right_val.value.boolean ? value_t(new symbol_t(symbolic::next_symbol_id())) : value_t(false);
+            }
+        } else {
+            if (right_val.is_undef()) {
+                return left_val.value.boolean ? value_t() : value_t(false);
+            } else if (right_val.is_symbolic()) {
+                return left_val.value.boolean ? value_t(new symbol_t(symbolic::next_symbol_id())) : value_t(false);
+            } else {
+                return value_t((bool)(left_val.value.boolean and right_val.value.boolean));
+            }
+        }
     case ExpressionOperation::OR:
-        CREATE_BOOLEAN_OPERATION(or, left_val, right_val);
+        if (left_val.is_undef()) {
+            if (right_val.is_undef()) {
+                return value_t();
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return right_val.value.boolean ? value_t(true) : value_t();
+            }
+        } else if (left_val.is_symbolic()) {
+            if (right_val.is_undef()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return right_val.value.boolean ? value_t(true) : value_t(new symbol_t(symbolic::next_symbol_id()));
+            }
+        } else {
+            if (right_val.is_undef()) {
+                return left_val.value.boolean ? value_t(true) : value_t();
+            } else if (right_val.is_symbolic()) {
+                return left_val.value.boolean ? value_t(true) : value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return value_t((bool)(left_val.value.boolean or right_val.value.boolean));
+            }
+        }
     case ExpressionOperation::XOR:
-        CREATE_BOOLEAN_OPERATION(^, left_val, right_val);
+        HANDLE_SYMBOLIC_OR_UNDEF(left_val, right_val)
+        return value_t((bool)(left_val.value.boolean ^ right_val.value.boolean));
     case ExpressionOperation::LESSER:
         if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
             return value_t(false);
@@ -642,17 +724,65 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
         CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
         return operators::greater(left_val, right_val);
     case ExpressionOperation::LESSEREQ:
-        if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
-            return value_t(true);
+        if (left_val.is_undef()) {
+            if (right_val.is_undef()) {
+                return value_t(true);
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return value_t();
+            }
+        } else if (left_val.is_symbolic()) {
+            if (right_val.is_undef()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else if (right_val.is_symbolic()) {
+                if (left_val == right_val) { // same symbol
+                    return value_t(true);
+                } else {
+                    return value_t(new symbol_t(symbolic::next_symbol_id()));
+                }
+            } else {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            }
+        } else {
+            if (right_val.is_undef()) {
+                return value_t();
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return operators::lessereq(left_val, right_val);
+            }
         }
-        CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
-        return operators::lessereq(left_val, right_val);
     case ExpressionOperation::GREATEREQ:
-        if (left_val.is_symbolic() and right_val.is_symbolic() and left_val == right_val) {
-            return value_t(true);
+        if (left_val.is_undef()) {
+            if (right_val.is_undef()) {
+                return value_t(true);
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return value_t();
+            }
+        } else if (left_val.is_symbolic()) {
+            if (right_val.is_undef()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else if (right_val.is_symbolic()) {
+                if (left_val == right_val) { // same symbol
+                    return value_t(true);
+                } else {
+                    return value_t(new symbol_t(symbolic::next_symbol_id()));
+                }
+            } else {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            }
+        } else {
+            if (right_val.is_undef()) {
+                return value_t();
+            } else if (right_val.is_symbolic()) {
+                return value_t(new symbol_t(symbolic::next_symbol_id()));
+            } else {
+                return operators::greatereq(left_val, right_val);
+            }
         }
-        CHECK_SYMBOLIC_CMP_OPERATION(expr->op, left_val, right_val);
-        return operators::greatereq(left_val, right_val);
     default:
         FAILURE();
     }
