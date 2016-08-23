@@ -52,7 +52,7 @@ public:
     
     enum class Id
     // general built-ins
-    { SYMBOLIC
+    { IS_SYMBOLIC
 
     // tuple and list built-ins
     , NTH
