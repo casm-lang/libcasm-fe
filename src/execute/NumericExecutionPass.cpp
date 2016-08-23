@@ -380,13 +380,6 @@ void NumericExecutionPass::visit_pop(PopNode *node, const value_t& val)
     }                                                                           \
 }
 
-#define CREATE_BOOLEAN_OPERATION(op, lhs, rhs)  {                               \
-    if (lhs.is_undef() or rhs.is_undef()) {                                     \
-        return value_t();                                                       \
-    }                                                                           \
-    return value_t((bool)(lhs.value.boolean op rhs.value.boolean));             \
-}
-
 #define CREATE_COMPARE_OPERATION(op, lhs, rhs)  {                               \
     if (lhs.is_undef() or rhs.is_undef()) {                                     \
         return value_t();                                                       \
@@ -458,11 +451,31 @@ const value_t NumericExecutionPass::visit_expression(Expression *expr,
     case ExpressionOperation::NEQ:
         return value_t(left_val != right_val);
     case ExpressionOperation::AND:
-        CREATE_BOOLEAN_OPERATION(and, left_val, right_val);
+        if (left_val.is_undef() and right_val.is_undef()) {
+            return value_t();
+        } else if (left_val.is_undef()) {
+            return right_val.value.boolean ? value_t() : value_t(false);
+        } else if (right_val.is_undef()) {
+            return left_val.value.boolean ? value_t() : value_t(false);
+        } else {
+            return value_t(left_val.value.boolean and right_val.value.boolean);
+        }
     case ExpressionOperation::OR:
-        CREATE_BOOLEAN_OPERATION(or, left_val, right_val);
+        if (left_val.is_undef() and right_val.is_undef()) {
+            return value_t();
+        } else if (left_val.is_undef()) {
+            return right_val.value.boolean ? value_t(true) : value_t();
+        } else if (right_val.is_undef()) {
+            return left_val.value.boolean ? value_t(true) : value_t();
+        } else {
+            return value_t(left_val.value.boolean or right_val.value.boolean);
+        }
     case ExpressionOperation::XOR:
-        CREATE_BOOLEAN_OPERATION(^, left_val, right_val);
+        if (left_val.is_undef() or right_val.is_undef()) {
+            return value_t();
+        } else {
+            return value_t((bool)(left_val.value.boolean ^ right_val.value.boolean));
+        }
     case ExpressionOperation::LESSER:
         CREATE_COMPARE_OPERATION(<, left_val, right_val);
     case ExpressionOperation::GREATER:

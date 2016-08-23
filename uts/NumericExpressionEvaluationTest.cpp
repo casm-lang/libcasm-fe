@@ -33,6 +33,14 @@
 
 using namespace testing;
 
+template <typename T>
+static value_t make_value(TypeType type, T v)
+{
+    value_t value(v);
+    EXPECT_EQ(type, value.type);
+    return value;
+}
+
 static value_t make_value(TypeType type)
 {
     value_t value;
@@ -69,65 +77,85 @@ static std::unique_ptr<Expression> make_expression(ExpressionOperation op)
     return std::unique_ptr<Expression>(new Expression(location, nullptr, nullptr, op));
 }
 
-constexpr TypeType yields(TypeType type)
+static value_t yields(value_t value)
 {
-    return type;
+    return value;
 }
 
-using UnaryOpType = std::tuple<TypeType, TypeType>;
-class Numeric_UnaryExpressionTest : public TestWithParam<std::tuple<ExpressionOperation, UnaryOpType>>{};
+struct UnaryOpArgs {
+    value_t value;
+    value_t expectedResult;
+    bool checkReturnValue;
+};
 
-TEST_P(Numeric_UnaryExpressionTest, testUnaryExpressionResultType)
+class Numeric_UnaryExpressionTest : public TestWithParam<std::tuple<ExpressionOperation, UnaryOpArgs>>{};
+
+TEST_P(Numeric_UnaryExpressionTest, testUnaryExpressionResultTypeType)
 {
     const auto row = GetParam();
 
     const ExpressionOperation op = std::get<0>(row);
+    const auto expr = make_expression(op);
 
-    const auto types = std::get<1>(row);
-    const TypeType valueType = std::get<0>(types);
-    const TypeType resultType = std::get<1>(types);
+    const auto values = std::get<1>(row);
+    const auto value = values.value;
+    const auto expectedResult = values.expectedResult;
+
+    const bool checkReturnValue = values.checkReturnValue;
 
     libcasm_fe::NumericExecutionPass visitor{};
+    const auto result = visitor.visit_expression_single(expr.get(), value);
 
-    const auto expr = make_expression(op);
-    const auto value = make_value(valueType);
-
-    EXPECT_EQ(resultType, visitor.visit_expression_single(expr.get(), value).type);
-}
-
-using BinaryOpType = std::tuple<TypeType, TypeType, TypeType>;
-class Numeric_BinaryExpressionTest : public TestWithParam<std::tuple<ExpressionOperation, BinaryOpType>>{};
-
-TEST_P(Numeric_BinaryExpressionTest, testBinaryExpressionResultType)
-{
-    const auto row = GetParam();
-
-    const ExpressionOperation op = std::get<0>(row);
-
-    const auto types = std::get<1>(row);
-    const TypeType lhsType = std::get<0>(types);
-    const TypeType rhsType = std::get<1>(types);
-    const TypeType resultType = std::get<2>(types);
-
-    libcasm_fe::NumericExecutionPass visitor{};
-
-    const auto expr = make_expression(op);
-    const auto lhs = make_value(lhsType);
-    const auto rhs = make_value(rhsType);
-
-    EXPECT_EQ(resultType, visitor.visit_expression(expr.get(), lhs, rhs).type);
-}
-
-using BinaryOpTypes = std::vector<BinaryOpType>;
-static BinaryOpTypes generateNumeric_BinaryExpressionTestCases(const std::vector<TypeType> &types,
-                                                               const std::function<BinaryOpTypes(TypeType)> &testTemplate)
-{
-    BinaryOpTypes binOpTypes;
-    for (auto type : types) {
-        const auto instantiatedTypes = testTemplate(type);
-        binOpTypes.insert(binOpTypes.cend(), instantiatedTypes.cbegin(), instantiatedTypes.cend());
+    if (checkReturnValue) {
+        EXPECT_EQ(expectedResult, result);
+    } else {
+        EXPECT_EQ(expectedResult.type, result.type);
     }
-    return binOpTypes;
+}
+
+struct BinaryOpArgs {
+    value_t lhs;
+    value_t rhs;
+    value_t expectedResult;
+    bool checkReturnValue;
+};
+
+class Numeric_BinaryExpressionTest : public TestWithParam<std::tuple<ExpressionOperation, BinaryOpArgs>>{};
+
+TEST_P(Numeric_BinaryExpressionTest, testBinaryExpressionResultTypeType)
+{
+    const auto row = GetParam();
+
+    const ExpressionOperation op = std::get<0>(row);
+    const auto expr = make_expression(op);
+
+    const auto values = std::get<1>(row);
+    const auto lhs = values.lhs;
+    const auto rhs = values.rhs;
+    const auto expectedResult = values.expectedResult;
+
+    const bool checkReturnValue = values.checkReturnValue;
+
+    libcasm_fe::NumericExecutionPass visitor{};
+    const auto result = visitor.visit_expression(expr.get(), lhs, rhs);
+
+    if (checkReturnValue) {
+        EXPECT_EQ(expectedResult, result);
+    } else {
+        EXPECT_EQ(expectedResult.type, result.type);
+    }
+}
+
+using BinaryOpArgss = std::vector<BinaryOpArgs>;
+static BinaryOpArgss generateNumeric_BinaryExpressionTestCases(const std::vector<TypeType> &types,
+                                                               const std::function<BinaryOpArgss(TypeType)> &testTemplate)
+{
+    BinaryOpArgss binOpTypeTypes;
+    for (auto type : types) {
+        const auto instantiatedTypeTypes = testTemplate(type);
+        binOpTypeTypes.insert(binOpTypeTypes.cend(), instantiatedTypeTypes.cbegin(), instantiatedTypeTypes.cend());
+    }
+    return binOpTypeTypes;
 }
 
 INSTANTIATE_TEST_CASE_P(Numeric_UnaryOperations, Numeric_UnaryExpressionTest,
@@ -136,24 +164,54 @@ INSTANTIATE_TEST_CASE_P(Numeric_UnaryOperations, Numeric_UnaryExpressionTest,
             ExpressionOperation::NOT
         ),
         Values(
-            UnaryOpType{TypeType::UNDEF, yields(TypeType::UNDEF)},
-            UnaryOpType{TypeType::BOOLEAN, yields(TypeType::BOOLEAN)}
+            UnaryOpArgs{make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+            UnaryOpArgs{make_value(TypeType::BOOLEAN), yields(make_value(TypeType::BOOLEAN))}
         )
     )
 );
 
-INSTANTIATE_TEST_CASE_P(Numeric_LogicalOperations, Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_LogicalOperations_Xor, Numeric_BinaryExpressionTest,
     Combine(
         Values(
-            ExpressionOperation::AND,
-            ExpressionOperation::OR,
             ExpressionOperation::XOR
         ),
         Values(
-            BinaryOpType{TypeType::UNDEF, TypeType::UNDEF, yields(TypeType::UNDEF)},
-            BinaryOpType{TypeType::UNDEF, TypeType::BOOLEAN, yields(TypeType::UNDEF)},
-            BinaryOpType{TypeType::BOOLEAN, TypeType::UNDEF, yields(TypeType::UNDEF)},
-            BinaryOpType{TypeType::BOOLEAN, TypeType::BOOLEAN, yields(TypeType::BOOLEAN)}
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::BOOLEAN), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::BOOLEAN), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::BOOLEAN), make_value(TypeType::BOOLEAN), yields(make_value(TypeType::BOOLEAN))}
+        )
+    )
+);
+
+INSTANTIATE_TEST_CASE_P(Numeric_LogicalOperations_And, Numeric_BinaryExpressionTest,
+    Combine(
+        Values(
+            ExpressionOperation::AND
+        ),
+        Values(
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::BOOLEAN, false), yields(make_value(TypeType::BOOLEAN, false)), true},
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::BOOLEAN, true), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::BOOLEAN, false), make_value(TypeType::UNDEF), yields(make_value(TypeType::BOOLEAN, false)), true},
+            BinaryOpArgs{make_value(TypeType::BOOLEAN, true), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::BOOLEAN), make_value(TypeType::BOOLEAN), yields(make_value(TypeType::BOOLEAN))}
+        )
+    )
+);
+
+INSTANTIATE_TEST_CASE_P(Numeric_LogicalOperations_Or, Numeric_BinaryExpressionTest,
+    Combine(
+        Values(
+            ExpressionOperation::OR
+        ),
+        Values(
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::BOOLEAN, false), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::BOOLEAN, true), yields(make_value(TypeType::BOOLEAN, true)), true},
+            BinaryOpArgs{make_value(TypeType::BOOLEAN, false), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::BOOLEAN, true), make_value(TypeType::UNDEF), yields(make_value(TypeType::BOOLEAN, true)), true},
+            BinaryOpArgs{make_value(TypeType::BOOLEAN), make_value(TypeType::BOOLEAN), yields(make_value(TypeType::BOOLEAN))}
         )
     )
 );
@@ -170,12 +228,12 @@ INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_LesserGreater, Numeric_BinaryE
                 TypeType::FLOATING,
                 //TypeType::RATIONAL, TODO EP not implemented yet
             },
-            [](TypeType number) -> BinaryOpTypes {
+            [](TypeType number) -> BinaryOpArgss {
                 return {
-                    BinaryOpType{TypeType::UNDEF, TypeType::UNDEF, yields(TypeType::UNDEF)},
-                    BinaryOpType{TypeType::UNDEF, number, yields(TypeType::UNDEF)},
-                    BinaryOpType{number, TypeType::UNDEF, yields(TypeType::UNDEF)},
-                    BinaryOpType{number, number, yields(TypeType::BOOLEAN)}
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(number), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(number), yields(make_value(TypeType::BOOLEAN))}
                 };
             }
         ))
@@ -194,22 +252,50 @@ INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_LesserEqGreaterEq, Numeric_Bin
                 TypeType::FLOATING,
                 //TypeType::RATIONAL, TODO EP not implemented yet
             },
-            [](TypeType number) -> BinaryOpTypes {
+            [](TypeType number) -> BinaryOpArgss {
                 return {
-                    BinaryOpType{TypeType::UNDEF, TypeType::UNDEF, yields(TypeType::BOOLEAN)},
-                    BinaryOpType{TypeType::UNDEF, number, yields(TypeType::UNDEF)},
-                    BinaryOpType{number, TypeType::UNDEF, yields(TypeType::UNDEF)},
-                    BinaryOpType{number, number, yields(TypeType::BOOLEAN)}
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::BOOLEAN))},
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(number), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(number), yields(make_value(TypeType::BOOLEAN))}
                 };
             }
         ))
     )
 );
 
-INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_EqNeq, Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_Eq, Numeric_BinaryExpressionTest,
     Combine(
         Values(
-            ExpressionOperation::EQ,
+            ExpressionOperation::EQ
+        ),
+        ValuesIn(generateNumeric_BinaryExpressionTestCases(
+            {
+                TypeType::STRING,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::BOOLEAN,
+                TypeType::LIST,
+                TypeType::TUPLE,
+                TypeType::TUPLE_OR_LIST,
+                TypeType::ENUM,
+                TypeType::RATIONAL,
+            },
+            [](TypeType literal) -> BinaryOpArgss {
+                return {
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::BOOLEAN, true)), true},
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(literal), yields(make_value(TypeType::BOOLEAN, false)), true},
+                    BinaryOpArgs{make_value(literal), make_value(TypeType::UNDEF), yields(make_value(TypeType::BOOLEAN, false)), true},
+                    BinaryOpArgs{make_value(literal), make_value(literal), yields(make_value(TypeType::BOOLEAN))}
+                };
+            }
+        ))
+    )
+);
+
+INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_Neq, Numeric_BinaryExpressionTest,
+    Combine(
+        Values(
             ExpressionOperation::NEQ
         ),
         ValuesIn(generateNumeric_BinaryExpressionTestCases(
@@ -224,12 +310,12 @@ INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_EqNeq, Numeric_BinaryExpressio
                 TypeType::ENUM,
                 TypeType::RATIONAL,
             },
-            [](TypeType literal) -> BinaryOpTypes {
+            [](TypeType literal) -> BinaryOpArgss {
                 return {
-                    BinaryOpType{TypeType::UNDEF, TypeType::UNDEF, yields(TypeType::BOOLEAN)},
-                    BinaryOpType{TypeType::UNDEF, literal, yields(TypeType::BOOLEAN)},
-                    BinaryOpType{literal, TypeType::UNDEF, yields(TypeType::BOOLEAN)},
-                    BinaryOpType{literal, literal, yields(TypeType::BOOLEAN)}
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::BOOLEAN, false)), true},
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(literal), yields(make_value(TypeType::BOOLEAN, true)), true},
+                    BinaryOpArgs{make_value(literal), make_value(TypeType::UNDEF), yields(make_value(TypeType::BOOLEAN, true)), true},
+                    BinaryOpArgs{make_value(literal), make_value(literal), yields(make_value(TypeType::BOOLEAN))}
                 };
             }
         ))
@@ -250,12 +336,12 @@ INSTANTIATE_TEST_CASE_P(Numeric_ArithmeticOperations_AddSubMulDiv, Numeric_Binar
                 TypeType::FLOATING,
                 TypeType::RATIONAL,
             },
-            [](TypeType number) -> BinaryOpTypes {
+            [](TypeType number) -> BinaryOpArgss {
                 return {
-                    BinaryOpType{TypeType::UNDEF, TypeType::UNDEF, yields(TypeType::UNDEF)},
-                    BinaryOpType{TypeType::UNDEF, number, yields(TypeType::UNDEF)},
-                    BinaryOpType{number, TypeType::UNDEF, yields(TypeType::UNDEF)},
-                    BinaryOpType{number, number, yields(number)}
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(number), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(number), yields(make_value(number))}
                 };
             }
         ))
@@ -272,12 +358,12 @@ INSTANTIATE_TEST_CASE_P(Numeric_ArithmeticOperations_Mod, Numeric_BinaryExpressi
                 TypeType::INTEGER,
                 TypeType::FLOATING,
             },
-            [](TypeType number) -> BinaryOpTypes {
+            [](TypeType number) -> BinaryOpArgss {
                 return {
-                    BinaryOpType{TypeType::UNDEF, TypeType::UNDEF, yields(TypeType::UNDEF)},
-                    BinaryOpType{TypeType::UNDEF, number, yields(TypeType::UNDEF)},
-                    BinaryOpType{number, TypeType::UNDEF, yields(TypeType::UNDEF)},
-                    BinaryOpType{number, number, yields(number)}
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(number), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(number), yields(make_value(number))}
                 };
             }
         ))
@@ -291,10 +377,10 @@ INSTANTIATE_TEST_CASE_P(Numeric_ArithmeticOperations_RatDiv, Numeric_BinaryExpre
             ExpressionOperation::RAT_DIV
         ),
         Values(
-            BinaryOpType{TypeType::UNDEF, TypeType::UNDEF, yields(TypeType::UNDEF)},
-            BinaryOpType{TypeType::UNDEF, TypeType::INTEGER, yields(TypeType::UNDEF)},
-            BinaryOpType{TypeType::INTEGER, TypeType::UNDEF, yields(TypeType::UNDEF)},
-            BinaryOpType{TypeType::INTEGER, TypeType::INTEGER, yields(TypeType::RATIONAL)}
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::INTEGER), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::INTEGER), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+            BinaryOpArgs{make_value(TypeType::INTEGER), make_value(TypeType::INTEGER), yields(make_value(TypeType::RATIONAL))}
         )
     )
 );
