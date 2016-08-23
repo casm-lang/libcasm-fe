@@ -600,7 +600,11 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
             return left_val or right_val;
         }
     case ExpressionOperation::XOR:
-        WRAP_NUMERICAL_OPERATION(operator ^, left_val, right_val);
+        if (left_val.is_symbolic() or right_val.is_symbolic()) {
+            return value_t(new symbol_t(symbolic::next_symbol_id()));
+        } else {
+            return left_val ^ right_val;
+        }
     case ExpressionOperation::LESSER:
         return operators::lesser(left_val, right_val);
     case ExpressionOperation::GREATER:
