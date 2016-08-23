@@ -364,100 +364,41 @@ void NumericExecutionPass::visit_pop(PopNode *node, const value_t& val)
     addUpdate(node->from->symbol, from_res, num_arguments, arguments, node->location.begin.line);
 }
 
-#define CREATE_NUMERICAL_OPERATION(op, lhs, rhs)  {                             \
-    switch (lhs.type) {                                                         \
-    case TypeType::INTEGER:                                                     \
-        return value_t(lhs.value.integer op rhs.value.integer);                 \
-    case TypeType::FLOATING:                                                    \
-        return value_t(lhs.value.float_ op rhs.value.float_);                   \
-    case TypeType::RATIONAL:                                                    \
-        return value_t(&(*lhs.value.rat op *rhs.value.rat));                    \
-    default:                                                                    \
-        FAILURE();                                                              \
-    }                                                                           \
-}
-
-#define CREATE_BOOLEAN_OPERATION(op, lhs, rhs)  {                               \
-    return value_t((bool)(lhs.value.boolean op rhs.value.boolean));             \
-}
-
-#define CREATE_COMPARE_OPERATION(op, lhs, rhs)  {                               \
-    switch (lhs.type) {                                                         \
-    case TypeType::INTEGER:                                                     \
-        return value_t(lhs.value.integer op rhs.value.integer);                 \
-    case TypeType::FLOATING:                                                    \
-        return value_t(lhs.value.float_ op rhs.value.float_);                   \
-    default:                                                                    \
-        FAILURE();                                                              \
-    }                                                                           \
-}
-
-namespace operators
-{
-    static const value_t mod(const value_t& lhs, const value_t& rhs)
-    {
-        switch (lhs.type) {
-        case TypeType::INTEGER:
-            return value_t(lhs.value.integer % rhs.value.integer);
-        default:
-            return value_t();
-        }
-    }
-
-    static const value_t rat_div(const value_t& lhs, const value_t& rhs)
-    {
-        switch (lhs.type) {
-        case TypeType::INTEGER: {
-            auto result = new rational_t;
-            result->numerator = lhs.value.integer;
-            result->denominator = rhs.value.integer;
-            return value_t(result);
-        }
-        default:
-            FAILURE();
-        }
-    }
-}
-
 const value_t NumericExecutionPass::visit_expression(Expression *expr,
                                                      const value_t &left_val,
                                                      const value_t &right_val)
 {
-    if (left_val.is_undef() or right_val.is_undef()) {
-        return value_t();
-    }
-
     switch (expr->op) {
     case ExpressionOperation::ADD:
-        CREATE_NUMERICAL_OPERATION(+, left_val, right_val);
+        return left_val + right_val;
     case ExpressionOperation::SUB:
-        CREATE_NUMERICAL_OPERATION(-, left_val, right_val);
+        return left_val - right_val;
     case ExpressionOperation::MUL:
-        CREATE_NUMERICAL_OPERATION(*, left_val, right_val);
+        return left_val * right_val;
     case ExpressionOperation::DIV:
-        CREATE_NUMERICAL_OPERATION(/, left_val, right_val);
+        return left_val / right_val;
     case ExpressionOperation::MOD:
-        return operators::mod(left_val, right_val);
+        return left_val % right_val;
     case ExpressionOperation::RAT_DIV:
-        return operators::rat_div(left_val, right_val);
+        return rat_div(left_val, right_val);
     case ExpressionOperation::EQ:
         return value_t(left_val == right_val);
     case ExpressionOperation::NEQ:
         return value_t(left_val != right_val);
     case ExpressionOperation::AND:
-        CREATE_BOOLEAN_OPERATION(and, left_val, right_val);
+        return left_val and right_val;
     case ExpressionOperation::OR:
-        CREATE_BOOLEAN_OPERATION(or, left_val, right_val);
+        return left_val or right_val;
     case ExpressionOperation::XOR:
-        CREATE_BOOLEAN_OPERATION(^, left_val, right_val);
+        return left_val ^ right_val;
     case ExpressionOperation::LESSER:
-        CREATE_COMPARE_OPERATION(<, left_val, right_val);
+        return left_val < right_val;
     case ExpressionOperation::GREATER:
-        CREATE_COMPARE_OPERATION(>, left_val, right_val);
+        return left_val > right_val;
     case ExpressionOperation::LESSEREQ:
-        CREATE_COMPARE_OPERATION(<=, left_val, right_val);
+        return left_val <= right_val;
     case ExpressionOperation::GREATEREQ:
-        CREATE_COMPARE_OPERATION(>=, left_val, right_val);
+        return left_val >= right_val;
     default:
         FAILURE();
     }

@@ -26,6 +26,7 @@
 #include "Value.h"
 
 #include <cassert>
+#include <cmath>
 #include <utility>
 #include <sstream>
 
@@ -175,6 +176,149 @@ const std::string value_t::to_str(bool symbolic) const {
       return "sym"+std::to_string(value.sym->id);
     default: throw RuntimeException("Unsupported type in value_t.to_str() ");
   }
+}
+
+value_t operator or(const value_t& lhs, const value_t& rhs)
+{
+    if (lhs.is_undef() and rhs.is_undef()) {
+        return value_t();
+    } else if (lhs.is_undef()) {
+        return rhs.value.boolean ? value_t(true) : value_t();
+    } else if (rhs.is_undef()) {
+        return lhs.value.boolean ? value_t(true) : value_t();
+    } else {
+        return value_t(lhs.value.boolean or rhs.value.boolean);
+    }
+}
+
+value_t operator and(const value_t& lhs, const value_t& rhs)
+{
+    if (lhs.is_undef() and rhs.is_undef()) {
+        return value_t();
+    } else if (lhs.is_undef()) {
+        return rhs.value.boolean ? value_t() : value_t(false);
+    } else if (rhs.is_undef()) {
+        return lhs.value.boolean ? value_t() : value_t(false);
+    } else {
+        return value_t(lhs.value.boolean and rhs.value.boolean);
+    }
+}
+
+value_t operator ^(const value_t& lhs, const value_t& rhs)
+{
+    if (lhs.is_undef() or rhs.is_undef()) {
+        return value_t();
+    } else {
+        return value_t((bool)(lhs.value.boolean ^ rhs.value.boolean));
+    }
+}
+
+#define CREATE_NUMERICAL_OPERATION(op, lhs, rhs)  {                             \
+    if (lhs.is_undef() or rhs.is_undef()) {                                     \
+        return value_t();                                                       \
+    }                                                                           \
+    switch (lhs.type) {                                                         \
+    case TypeType::INTEGER:                                                     \
+        return value_t(lhs.value.integer op rhs.value.integer);                 \
+    case TypeType::FLOATING:                                                    \
+        return value_t(lhs.value.float_ op rhs.value.float_);                   \
+    case TypeType::RATIONAL:                                                    \
+        return value_t(&(*lhs.value.rat op *rhs.value.rat));                    \
+    default:                                                                    \
+        FAILURE();                                                              \
+    }                                                                           \
+}
+
+value_t operator +(const value_t& lhs, const value_t& rhs)
+{
+    CREATE_NUMERICAL_OPERATION(+, lhs, rhs);
+}
+
+value_t operator -(const value_t& lhs, const value_t& rhs)
+{
+    CREATE_NUMERICAL_OPERATION(-, lhs, rhs);
+}
+
+value_t operator *(const value_t& lhs, const value_t& rhs)
+{
+    CREATE_NUMERICAL_OPERATION(*, lhs, rhs);
+}
+
+value_t operator /(const value_t& lhs, const value_t& rhs)
+{
+    CREATE_NUMERICAL_OPERATION(/, lhs, rhs);
+}
+
+value_t operator %(const value_t& lhs, const value_t& rhs)
+{
+    if (lhs.is_undef() or rhs.is_undef()) {
+        return value_t();
+    }
+    switch (lhs.type) {
+        case TypeType::INTEGER:
+            return value_t(lhs.value.integer % rhs.value.integer);
+        case TypeType::FLOATING:
+            return value_t(std::fmod(lhs.value.float_, rhs.value.float_));
+        default:
+            return value_t();
+    }
+}
+
+value_t rat_div(const value_t& lhs, const value_t& rhs)
+{
+    if (lhs.is_undef() or rhs.is_undef()) {
+        return value_t();
+    }
+    switch (lhs.type) {
+        case TypeType::INTEGER: {
+            auto result = new rational_t;
+            result->numerator = lhs.value.integer;
+            result->denominator = rhs.value.integer;
+            return value_t(result);
+        }
+        default:
+            FAILURE();
+    }
+}
+
+#define CREATE_COMPARE_OPERATION(op, lhs, rhs)  {                               \
+    if (lhs.is_undef() or rhs.is_undef()) {                                     \
+        return value_t();                                                       \
+    }                                                                           \
+    switch (lhs.type) {                                                         \
+    case TypeType::INTEGER:                                                     \
+        return value_t(lhs.value.integer op rhs.value.integer);                 \
+    case TypeType::FLOATING:                                                    \
+        return value_t(lhs.value.float_ op rhs.value.float_);                   \
+    default:                                                                    \
+        FAILURE();                                                              \
+    }                                                                           \
+}
+
+value_t operator <(const value_t& lhs, const value_t& rhs)
+{
+    CREATE_COMPARE_OPERATION(<, lhs, rhs);
+}
+
+value_t operator >(const value_t& lhs, const value_t& rhs)
+{
+    CREATE_COMPARE_OPERATION(>, lhs, rhs);
+}
+
+value_t operator <=(const value_t& lhs, const value_t& rhs)
+{
+    if (lhs.is_undef() and rhs.is_undef()) {
+        return value_t(true);
+    }
+    CREATE_COMPARE_OPERATION(<=, lhs, rhs);
+}
+
+value_t operator >=(const value_t& lhs, const value_t& rhs)
+{
+    if (lhs.is_undef() and rhs.is_undef()) {
+        return value_t(true);
+    }
+    CREATE_COMPARE_OPERATION(>=, lhs, rhs);
 }
 
 symbol_t::symbol_t(uint32_t id) : symbol_t(id, nullptr)  {}
