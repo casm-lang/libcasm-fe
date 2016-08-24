@@ -60,7 +60,8 @@
 %define parse.trace
 %define parse.error verbose
 
-%code {
+%code
+{
     #include "src/Driver.h"
     #include "src/Codes.h"
 
@@ -175,6 +176,7 @@
     SLASH   "/"
     PERCENT "%"
     ;
+
 %token FLOATINGCONST INTEGERCONST RATIONALCONST STRCONST
 %token <std::string> IDENTIFIER "identifier"
 
@@ -818,9 +820,9 @@ NUMBER_RANGE
 
 LISTCONST
 : "[" EXPRESSION_LIST "]"
-{
-	$$ = $2;
-}
+  {
+	  $$ = $2;
+  }
 | "[" "]"
   {
 	  $$ = new std::vector<ExpressionBase*>();
@@ -925,84 +927,173 @@ EXPRESSION
   }
 ;
 
-BRACKET_EXPRESSION: "(" EXPRESSION ")"  { $$ = $2; }
-                  ;
 
-FUNCTION_SYNTAX: IDENTIFIER { $$ = new FunctionAtom(@$, $1); }
-               | IDENTIFIER "(" ")" { $$ = new FunctionAtom(@$, $1); }
-               | IDENTIFIER "(" EXPRESSION_LIST ")"
-               {
-                   if( Builtin::isBuiltin( $1 ) )
-                   {
-                       $$ = new BuiltinAtom(@$, $1, $3);
-                   }
-                   else
-                   {
-                       $$ = new FunctionAtom(@$, $1, $3);
-                   }
-               }
-               ;
+BRACKET_EXPRESSION
+: "(" EXPRESSION ")"
+  {
+	  $$ = $2;
+  }
+;
 
-RULE_STMT: SEQ_SYNTAX { $$ = $1; }
-         | PAR_SYNTAX { $$ = $1; }
-         | SIMPLE_STMT {
-              auto stmts = new AstListNode(@$, NodeType::STATEMENTS);
-              stmts->add($1);
-              $$ = new UnaryNode(@$, NodeType::PARBLOCK, stmts);
-          }
-         ;
 
-RULE_SYNTAX: RULE IDENTIFIER "=" RULE_STMT { $$ = new RuleNode(@$, $4, $2); }
-           | RULE IDENTIFIER "(" ")" "=" RULE_STMT {
-                $$ = new RuleNode(@$, $6, $2);
-           }
-           | RULE IDENTIFIER "(" PARAM_LIST ")" "=" RULE_STMT {
-                $$ = new RuleNode(@$, $7, $2, $4);
-           }
+FUNCTION_SYNTAX
+: IDENTIFIER
+  {
+	  $$ = new FunctionAtom( @$, $1 );
+  }
+| IDENTIFIER "(" ")"
+  {
+	  $$ = new FunctionAtom( @$, $1 );
+  }
+| IDENTIFIER "(" EXPRESSION_LIST ")"
+  {
+	  if( Builtin::isBuiltin( $1 ) )
+	  {
+		  $$ = new BuiltinAtom( @$, $1, $3 );
+	  }
+	  else
+	  {
+		  $$ = new FunctionAtom( @$, $1, $3 );
+	  }
+  }
+;
+
+RULE_STMT
+: SEQ_SYNTAX
+  {
+	  $$ = $1;
+  }
+| PAR_SYNTAX
+  {
+	  $$ = $1;
+  }
+| SIMPLE_STMT
+  {
+	  auto stmts = new AstListNode( @$, NodeType::STATEMENTS );
+	  stmts->add( $1 );
+	  $$ = new UnaryNode( @$, NodeType::PARBLOCK, stmts );
+  }
+;
+
+
+RULE_SYNTAX
+: RULE IDENTIFIER "=" RULE_STMT
+  {
+	  $$ = new RuleNode( @$, $4, $2 );
+  }
+| RULE IDENTIFIER "(" ")" "=" RULE_STMT
+  {
+	  $$ = new RuleNode( @$, $6, $2 );
+  }
+| RULE IDENTIFIER "(" PARAM_LIST ")" "=" RULE_STMT
+  {
+	  $$ = new RuleNode( @$, $7, $2, $4 );
+  }
 /* again, with dump specification */
-           | RULE IDENTIFIER DUMPS DUMPSPEC_LIST "=" RULE_STMT {
-                std::vector<Type*> tmp;
-                $$ = new RuleNode(@$, $6, $2, tmp, $4);
-           }
-           | RULE IDENTIFIER "(" ")" DUMPS DUMPSPEC_LIST "=" RULE_STMT {
-                std::vector<Type*> tmp;
-                $$ = new RuleNode(@$, $8, $2, tmp, $6);
-           }
-           | RULE IDENTIFIER "(" PARAM_LIST ")" DUMPS DUMPSPEC_LIST "=" RULE_STMT {
-                std::vector<Type*> tmp;
-                $$ = new RuleNode(@$, $9, $2, tmp, $7);
-           }
-           ;
+| RULE IDENTIFIER DUMPS DUMPSPEC_LIST "=" RULE_STMT
+  {
+	  std::vector<Type*> tmp;
+	  $$ = new RuleNode( @$, $6, $2, tmp, $4 );
+  }
+| RULE IDENTIFIER "(" ")" DUMPS DUMPSPEC_LIST "=" RULE_STMT
+  {
+	  std::vector<Type*> tmp;
+	  $$ = new RuleNode( @$, $8, $2, tmp, $6 );
+  }
+| RULE IDENTIFIER "(" PARAM_LIST ")" DUMPS DUMPSPEC_LIST "=" RULE_STMT
+  {
+	  std::vector<Type*> tmp;
+	  $$ = new RuleNode( @$, $9, $2, tmp, $7 );
+  }
+;
 
-DUMPSPEC_LIST: DUMPSPEC_LIST "," DUMPSPEC { $$ = std::move($1); $$.push_back($3); }
-             | DUMPSPEC {
-                $$ = std::vector<std::pair<std::string,std::vector<std::string>>>();
-                $$.push_back(std::move($1));
-             }
-             ;
 
-DUMPSPEC: "(" IDENTIFIER_LIST ")" ARROW IDENTIFIER {
-            $$ = std::pair<std::string, std::vector<std::string>>($5, $2);
-        }
-        ;
+DUMPSPEC_LIST
+: DUMPSPEC_LIST "," DUMPSPEC
+  {
+	  $$ = std::move( $1 ); $$.push_back( $3 );
+  }
+| DUMPSPEC
+  {
+	  $$ = std::vector< std::pair< std::string, std::vector<std::string> > >();
+	  $$.push_back( std::move( $1 ) );
+  }
+;
+
+
+DUMPSPEC
+: "(" IDENTIFIER_LIST ")" ARROW IDENTIFIER
+  {
+	  $$ = std::pair< std::string, std::vector< std::string > >( $5, $2 );
+  }
+;
+
 
 SIMPLE_STMT
-: ASSERT_SYNTAX { $$ = $1; }
-| ASSURE_SYNTAX { $$ = $1; }
-| DIEDIE_SYNTAX { $$ = $1; }
-| IMPOSSIBLE_SYNTAX { $$ = $1; }
-| DEBUG_SYNTAX { $$ = $1; }
-| PRINT_SYNTAX { $$ = $1; }
-| UPDATE_SYNTAX { $$ = $1; }
-| CASE_SYNTAX { $$ = $1; }
-| CALL_SYNTAX { $$ = $1; }
-| IFTHENELSE { $$ = $1; }
-| LET_SYNTAX { $$ = $1; }
-| PUSH_SYNTAX { $$ = $1; }
-| POP_SYNTAX { $$ = $1; }
-| FORALL_SYNTAX { $$ = $1; }
-| ITERATE_SYNTAX { $$ = $1; }
-| SKIP  { $$ = new AstNode(NodeType::SKIP); }
+: ASSERT_SYNTAX
+  {
+	  $$ = $1;
+  }
+| ASSURE_SYNTAX
+  {
+	  $$ = $1;
+  }
+| DIEDIE_SYNTAX
+  {
+	  $$ = $1;
+  }
+| IMPOSSIBLE_SYNTAX
+  {
+	  $$ = $1;
+  }
+| DEBUG_SYNTAX
+  {
+	  $$ = $1;
+  }
+| PRINT_SYNTAX
+  {
+	  $$ = $1;
+  }
+| UPDATE_SYNTAX
+  {
+	  $$ = $1;
+  }
+| CASE_SYNTAX
+  {
+	  $$ = $1;
+  }
+| CALL_SYNTAX
+  {
+	  $$ = $1;
+  }
+| IFTHENELSE
+  {
+	  $$ = $1;
+  }
+| LET_SYNTAX
+  {
+	  $$ = $1;
+  }
+| PUSH_SYNTAX
+  {
+	  $$ = $1;
+  }
+| POP_SYNTAX
+  {
+	  $$ = $1;
+  }
+| FORALL_SYNTAX
+  {
+	  $$ = $1;
+  }
+| ITERATE_SYNTAX
+  {
+	  $$ = $1;
+  }
+| SKIP
+  {
+	  $$ = new AstNode( NodeType::SKIP );
+  }
 | IDENTIFIER
 {
 	driver.error
@@ -1011,23 +1102,60 @@ SIMPLE_STMT
 	, libcasm_fe::Codes::SyntaxErrorInvalidStatement
 	);
 }
-| INTERN EXPRESSION_LIST  { $$ = new AstNode(NodeType::STATEMENT); }
-| OBJDUMP "(" IDENTIFIER ")"   { $$ = new AstNode(NodeType::STATEMENT);}
+| INTERN EXPRESSION_LIST
+  {
+	  $$ = new AstNode( NodeType::STATEMENT );
+  }
+| OBJDUMP "(" IDENTIFIER ")"
+  {
+	  $$ = new AstNode( NodeType::STATEMENT );
+  }
 ;
 
-STATEMENT: SIMPLE_STMT { $$ = $1; }
-         | SEQ_SYNTAX { $$ = $1; }
-         | PAR_SYNTAX { $$ = $1; }
-         ;
 
-ASSERT_SYNTAX: ASSERT EXPRESSION { $$ = new UnaryNode(@$, NodeType::ASSERT, $2); }
-             ;
-ASSURE_SYNTAX: ASSURE EXPRESSION { $$ = new UnaryNode(@$, NodeType::ASSURE, $2); }
-             ;
+STATEMENT
+: SIMPLE_STMT
+  {
+	  $$ = $1;
+  }
+| SEQ_SYNTAX
+  {
+	  $$ = $1;
+  }
+| PAR_SYNTAX
+  {
+	  $$ = $1;
+  }
+;
 
-DIEDIE_SYNTAX: DIEDIE EXPRESSION { $$ = new DiedieNode(@$, $2); }
-             | DIEDIE { $$ = new DiedieNode(@$, nullptr); }
-             ;
+
+ASSERT_SYNTAX
+: ASSERT EXPRESSION
+  {
+	  $$ = new UnaryNode( @$, NodeType::ASSERT, $2 );
+  }
+;
+
+
+ASSURE_SYNTAX
+: ASSURE EXPRESSION
+  {
+	  $$ = new UnaryNode( @$, NodeType::ASSURE, $2 );
+  }
+;
+
+
+DIEDIE_SYNTAX
+: DIEDIE EXPRESSION
+  {
+	  $$ = new DiedieNode( @$, $2 );
+  }
+| DIEDIE
+  {
+	  $$ = new DiedieNode( @$, nullptr );
+  }
+;
+
 
 /* when symbolic execution:
     * abort trace
@@ -1036,162 +1164,299 @@ DIEDIE_SYNTAX: DIEDIE EXPRESSION { $$ = new DiedieNode(@$, $2); }
   in concrete mode:
     * an error like diedie
 */
-IMPOSSIBLE_SYNTAX: IMPOSSIBLE { $$ = new AstNode(@$, NodeType::IMPOSSIBLE); }
-         ;
+IMPOSSIBLE_SYNTAX
+: IMPOSSIBLE
+  {
+	  $$ = new AstNode( @$, NodeType::IMPOSSIBLE );
+  }
+;
 
-DEBUG_SYNTAX: DEBUG IDENTIFIER DEBUG_ATOM_LIST { $$ = new PrintNode(@$, $2, $3); }
-                ;
 
-DEBUG_ATOM_LIST: DEBUG_ATOM_LIST "+" ATOM { $$ = std::move($1); $$.push_back($3); }
-               | ATOM { $$.push_back($1); }
+DEBUG_SYNTAX
+: DEBUG IDENTIFIER DEBUG_ATOM_LIST
+  {
+	  $$ = new PrintNode( @$, $2, $3 );
+  }
+;
 
-PRINT_SYNTAX: PRINT DEBUG_ATOM_LIST { $$ = new PrintNode(@$, $2); }
-            ;
 
-UPDATE_SYNTAX: FUNCTION_SYNTAX UPDATE EXPRESSION {
-                  if ($1->node_type_ == NodeType::FUNCTION_ATOM) {
-                    $$ = new UpdateNode(@$, reinterpret_cast<FunctionAtom*>($1), $3);
-                  } else {
-                    driver.error(@$, "can only use functions for updates but `"+
-                                     $1->to_str()+"` is a `"+type_to_str($1->node_type_));
-                  }
-                }
-             ;
+DEBUG_ATOM_LIST
+: DEBUG_ATOM_LIST "+" ATOM
+  {
+	  $$ = std::move( $1 );
+	  $$.push_back( $3 );
+  }
+| ATOM
+  {
+	  $$.push_back($1);
+  }
+;
+
+
+PRINT_SYNTAX
+: PRINT DEBUG_ATOM_LIST
+  {
+	  $$ = new PrintNode( @$, $2 );
+  }
+;
+
+
+UPDATE_SYNTAX
+: FUNCTION_SYNTAX UPDATE EXPRESSION
+  {
+	  if( $1->node_type_ == NodeType::FUNCTION_ATOM )
+	  {
+		  $$ = new UpdateNode( @$, reinterpret_cast< FunctionAtom* >( $1 ), $3 );
+	  }
+	  else
+	  {
+		  driver.error
+		  ( @$
+		  , "can only use functions for updates but `"
+			+ $1->to_str()
+			+ "` is a `"
+			+ type_to_str( $1->node_type_ )
+		  );
+	  }
+  }
+;
+
 
 CASE_SYNTAX
 : CASE EXPRESSION OF CASE_LABEL_LIST ENDCASE
   {
-	  $$ = new CaseNode(@$, $2, $4);
+	  $$ = new CaseNode( @$, $2, $4 );
   }
 ;
 
-CASE_LABEL_LIST: CASE_LABEL_LIST CASE_LABEL {
-                    $$ = std::move($1);
-                    $$.push_back($2);
-               }
-               | CASE_LABEL {
-                    $$ = std::move(std::vector<std::pair<AtomNode*, AstNode*>>());
-                    $$.push_back($1);
-               }
-               ;
 
-CASE_LABEL: CASE_LABEL_DEFAULT { $$ =$1; }
-          | CASE_LABEL_NUMBER { $$ = $1; }
-          | CASE_LABEL_IDENT  { $$ = $1; }
-          | CASE_LABEL_STRING { $$ = $1; }
-          ;
+CASE_LABEL_LIST
+: CASE_LABEL_LIST CASE_LABEL
+  {
+	  $$ = std::move( $1 );
+	  $$.push_back( $2 );
+  }
+| CASE_LABEL
+  {
+	  $$ = std::move( std::vector< std::pair< AtomNode*, AstNode* > >() );
+	  $$.push_back( $1 );
+  }
+;
 
-CASE_LABEL_DEFAULT: DEFAULT ":" STATEMENT {
-                    $$ = std::pair<AtomNode*, AstNode*>(nullptr, $3);
-                  }
-                  ;
 
-CASE_LABEL_NUMBER: NUMBER ":" STATEMENT {
-                    $$ = std::pair<AtomNode*, AstNode*>($1, $3);
-                 }
-                 ;
+CASE_LABEL
+: CASE_LABEL_DEFAULT
+  {
+	  $$ =$1;
+  }
+| CASE_LABEL_NUMBER
+  {
+	  $$ = $1;
+  }
+| CASE_LABEL_IDENT
+  {
+	  $$ = $1;
+  }
+| CASE_LABEL_STRING
+  {
+	  $$ = $1;
+  }
+;
 
-CASE_LABEL_IDENT: FUNCTION_SYNTAX ":" STATEMENT {
-                    $$ = std::pair<AtomNode*, AstNode*>($1, $3);
-                }
-                ;
 
-CASE_LABEL_STRING: STRCONST ":" STATEMENT {
-                    $$ = std::pair<AtomNode*, AstNode*>(new StringAtom(@$, std::move($1)), $3);
-                 }
-                 ;
+CASE_LABEL_DEFAULT
+: DEFAULT ":" STATEMENT
+  {
+	  $$ = std::pair< AtomNode*, AstNode* >( nullptr, $3 );
+  }
+;
 
-CALL_SYNTAX: CALL "(" EXPRESSION ")" "(" EXPRESSION_LIST ")" { $$ = new CallNode(@$, "", $3, $6); }
-           | CALL "(" EXPRESSION ")" { $$ = new CallNode(@$, "", $3); }
-           | CALL IDENTIFIER "(" EXPRESSION_LIST ")" { $$ = new CallNode(@$, $2, nullptr, $4); }
-           | CALL IDENTIFIER { $$ = new CallNode(@$, $2, nullptr); }
-           ;
 
-SEQ_SYNTAX: SEQ_BRACKET STATEMENTS ENDSEQ_BRACKET {
-                $$ = new UnaryNode(@$, NodeType::SEQBLOCK, $2);
-          }
-          | SEQ STATEMENTS ENDSEQ {
-                $$ = new UnaryNode(@$, NodeType::SEQBLOCK, $2);
-          }
-          ;
+CASE_LABEL_NUMBER
+: NUMBER ":" STATEMENT
+  {
+	  $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
+  }
+;
 
-PAR_SYNTAX: "{" STATEMENTS "}" {
-                $$ = new UnaryNode(@$, NodeType::PARBLOCK, $2);
-          }
-          | PAR STATEMENTS ENDPAR {
-                $$ = new UnaryNode(@$, NodeType::PARBLOCK, $2);
-          }
-          ;
 
-STATEMENTS: STATEMENTS STATEMENT { $1->add($2); $$ = $1; }
-          | STATEMENT { $$ = new AstListNode(@$, NodeType::STATEMENTS); $$->add($1); }
-          ;
+CASE_LABEL_IDENT
+: FUNCTION_SYNTAX ":" STATEMENT
+  {
+	  $$ = std::pair<AtomNode*, AstNode*>($1, $3);
+  }
+;
 
-IFTHENELSE: IF EXPRESSION THEN STATEMENT %prec XIF {
-                $$ = new IfThenElseNode(@$, $2, $4, nullptr);
-          }
-          | IF EXPRESSION THEN STATEMENT ELSE STATEMENT {
-                $$ = new IfThenElseNode(@$, $2, $4, $6);
-          }
-          ;
 
-LET_SYNTAX: LET IDENTIFIER "=" 
-            {
-                auto var = Symbol($2, @$, Symbol::SymbolType::LET);
-                try {
-                    driver.function_table.add(&var);
-                } catch (const SymbolAlreadyExists& e) {
-                    driver.error(@$, e.what());
-                }
-            }
-            EXPRESSION IN STATEMENT {
-              driver.function_table.remove($2);
-              $$ = new LetNode(@$, Type(TypeType::UNKNOWN), $2, $5, $7);
-          }
-          | LET IDENTIFIER ":" TYPE_SYNTAX "="
-            {
-                auto var = Symbol($2, @$, Symbol::SymbolType::LET);
-                try {
-                    driver.function_table.add(&var);
-                } catch (const SymbolAlreadyExists& e) {
-                    driver.error(@$, e.what());
-                }
-            }
-          EXPRESSION IN STATEMENT {
-              driver.function_table.remove($2);
-              $$ = new LetNode(@$, $4, $2, $7, $9);
-          }
-          ;
+CASE_LABEL_STRING
+: STRCONST ":" STATEMENT
+  {
+	  $$ = std::pair< AtomNode*, AstNode* >( new StringAtom( @$, std::move( $1 ) ), $3 );
+  }
+;
 
-PUSH_SYNTAX: PUSH EXPRESSION INTO FUNCTION_SYNTAX {
-                if ($4->node_type_ == NodeType::BUILTIN_ATOM) {
-                  driver.error(@$, "cannot push to builtin `"+$4->to_str()+"`");
-                } else {
-                    $$ = new PushNode(@$, $2, reinterpret_cast<FunctionAtom*>($4));
-                }
-          }
 
-           ;
+CALL_SYNTAX
+: CALL "(" EXPRESSION ")" "(" EXPRESSION_LIST ")"
+  {
+	  $$ = new CallNode( @$, "", $3, $6 );
+  }
+| CALL "(" EXPRESSION ")"
+  {
+	  $$ = new CallNode( @$, "", $3 );
+  }
+| CALL IDENTIFIER "(" EXPRESSION_LIST ")"
+  {
+	  $$ = new CallNode( @$, $2, nullptr, $4 );
+  }
+| CALL IDENTIFIER
+  {
+	  $$ = new CallNode( @$, $2, nullptr );
+  }
+;
 
-POP_SYNTAX: POP FUNCTION_SYNTAX FROM FUNCTION_SYNTAX {
-                if ($2->node_type_ == NodeType::BUILTIN_ATOM) {
-                  driver.error(@$, "cannot pop to builtin `"+$2->to_str()+"`");
-                } else if ($4->node_type_ == NodeType::BUILTIN_ATOM) {
-                  driver.error(@$, "cannot pop from builtin `"+$4->to_str()+"`");
-                } else {
-                    $$ = new PopNode(@$, reinterpret_cast<FunctionAtom*>($2), reinterpret_cast<FunctionAtom*>($4));
-                }
-          }
-          ;
 
-FORALL_SYNTAX: FORALL IDENTIFIER IN EXPRESSION DO STATEMENT {
-                $$ = new ForallNode(@$, $2, $4, $6);
-             }
-             ;
+SEQ_SYNTAX
+: SEQ_BRACKET STATEMENTS ENDSEQ_BRACKET
+  {
+	  $$ = new UnaryNode( @$, NodeType::SEQBLOCK, $2 );
+  }
+| SEQ STATEMENTS ENDSEQ
+  {
+	  $$ = new UnaryNode( @$, NodeType::SEQBLOCK, $2 );
+  }
+;
 
-ITERATE_SYNTAX: ITERATE STATEMENT { $$ = new UnaryNode(@$, NodeType::ITERATE, $2); }
-              ;
 
+PAR_SYNTAX
+: "{" STATEMENTS "}"
+  {
+	  $$ = new UnaryNode( @$, NodeType::PARBLOCK, $2 );
+  }
+| PAR STATEMENTS ENDPAR
+  {
+	  $$ = new UnaryNode( @$, NodeType::PARBLOCK, $2 );
+  }
+;
+
+
+STATEMENTS
+: STATEMENTS STATEMENT
+  {
+	  $1->add( $2 );
+	  $$ = $1;
+  }
+| STATEMENT
+  {
+	  $$ = new AstListNode( @$, NodeType::STATEMENTS );
+	  $$->add( $1 );
+  }
+;
+
+
+IFTHENELSE
+: IF EXPRESSION THEN STATEMENT
+  %prec XIF
+  {
+	  $$ = new IfThenElseNode( @$, $2, $4, nullptr );
+  }
+| IF EXPRESSION THEN STATEMENT ELSE STATEMENT
+  {
+	  $$ = new IfThenElseNode( @$, $2, $4, $6 );
+  }
+;
+
+
+LET_SYNTAX
+: LET IDENTIFIER "=" 
+  {
+	  auto var = Symbol( $2, @$, Symbol::SymbolType::LET );
+	  try
+	  {
+		  driver.function_table.add( &var );	  
+	  }
+	  catch( const SymbolAlreadyExists& e)
+	  {
+		  driver.error( @$, e.what() );
+	  }
+  }
+  EXPRESSION IN STATEMENT
+  {
+	  driver.function_table.remove( $2 );
+	  $$ = new LetNode( @$, Type( TypeType::UNKNOWN ), $2, $5, $7 );
+  }
+| LET IDENTIFIER ":" TYPE_SYNTAX "="
+  {
+	  auto var = Symbol( $2, @$, Symbol::SymbolType::LET );
+	  try
+	  {
+		  driver.function_table.add( &var );
+	  }
+	  catch( const SymbolAlreadyExists& e)
+	  {
+		  driver.error( @$, e.what() );
+	  }
+  }
+  EXPRESSION IN STATEMENT
+  {
+	  driver.function_table.remove( $2 );
+	  $$ = new LetNode( @$, $4, $2, $7, $9 );
+  }
+;
+
+
+PUSH_SYNTAX
+: PUSH EXPRESSION INTO FUNCTION_SYNTAX
+  {
+	  if( $4->node_type_ == NodeType::BUILTIN_ATOM )
+	  {
+		  driver.error( @$, "cannot push to builtin `"+$4->to_str()+"`" );
+	  }
+	  else
+	  {
+		  $$ = new PushNode( @$, $2, reinterpret_cast<FunctionAtom*>( $4 ) );
+	  }
+  }
+;
+
+
+POP_SYNTAX
+: POP FUNCTION_SYNTAX FROM FUNCTION_SYNTAX
+  {
+	  if( $2->node_type_ == NodeType::BUILTIN_ATOM )
+	  {
+		  driver.error( @$, "cannot pop to builtin `"+$2->to_str()+"`" );
+	  }
+	  else if( $4->node_type_ == NodeType::BUILTIN_ATOM )
+	  {
+		  driver.error( @$, "cannot pop from builtin `"+$4->to_str()+"`" );
+	  }
+	  else
+	  {
+		  $$ = new PopNode
+		  ( @$
+		  , reinterpret_cast< FunctionAtom* >( $2 )
+		  , reinterpret_cast< FunctionAtom* >( $4 )
+		  );
+	  }
+  }
+;
+
+
+FORALL_SYNTAX
+: FORALL IDENTIFIER IN EXPRESSION DO STATEMENT
+  {
+	  $$ = new ForallNode( @$, $2, $4, $6 );
+  }
+;
+
+
+ITERATE_SYNTAX
+: ITERATE STATEMENT
+  {
+	  $$ = new UnaryNode( @$, NodeType::ITERATE, $2 );
+  }
+;
 
 %%
 
@@ -1200,7 +1465,7 @@ void yy::casmi_parser::error
 , const std::string& m
 )
 {
-    driver.error (l, m, libcasm_fe::Codes::SyntaxError );
+    driver.error( l, m, libcasm_fe::Codes::SyntaxError );
 }
 
 
