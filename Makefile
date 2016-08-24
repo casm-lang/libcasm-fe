@@ -38,11 +38,13 @@ CPPFLAG += -Wall
 
 LEX=flex
 YAC=bison
+YAC_FLAG = -Wall
 
 TARGET = libcasm-fe.a
 
 CPPOBJECTS += src/various/GrammarParser.cpp
 CPPOBJECTS += src/various/GrammarLexer.cpp
+CPPOBJECTS += src/various/Grammar.org
 CPPOBJECTS += obj/GrammarParser.o
 CPPOBJECTS += obj/GrammarLexer.o
 
@@ -82,7 +84,17 @@ obj:
 
 src/various/GrammarParser.cpp: src/GrammarParser.yy
 	@echo "YAC " $<
-	@cd src/various && $(YAC) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../$^
+	@cd src/various && $(YAC) $(YAC_FLAG) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../$^
+
+
+src/various/Grammar.org: src/GrammarParser.yy
+	@echo "GEN " $@
+	@grep -e "^[:|] [alpha]*" $< -B 2 -A 1 |\
+		sed "/^  {/d" |\
+		sed "/^  }/d" |\
+		sed "/^--/d"  |\
+		sed "/^\t/d"  > $@
+
 
 src/various/GrammarLexer.cpp: src/GrammarLexer.l
 	@echo "LEX " $<
