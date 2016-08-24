@@ -147,38 +147,18 @@
     }
 }
 
-%token AND OR XOR NOT ASSERT ASSURE DIEDIE IMPOSSIBLE SKIP SEQ ENDSEQ
-%token PAR ENDPAR LET IN IF THEN ELSE PRINT DEBUG DUMPS PUSH INTO
-%token POP FROM FORALL ITERATE DO CALL CASE DEFAULT OF ENDCASE INITIALLY FUNCTION
-%token DERIVED ENUM RULE PROVIDER INIT OPTION SELF UNDEF TRUE FALSE CASM SYMBOL
-%token INTERN RATIONAL_DIV OBJDUMP
-
-%token DOTDOT ARROW UPDATE NEQUAL LESSEQ GREATEREQ SEQ_BRACKET ENDSEQ_BRACKET
 
 %token
-    END  0  "end of file"
-    PLUS    "+"
-    MINUS   "-"
-    EQ      "="
-    LPAREN  "("
-    RPAREN  ")"
-    LSQPAREN  "["
-    RSQPAREN  "]"
-    LCURPAREN  "{"
-    RCURPAREN  "}"
-    DOT "."
-    COLON ":"
-    AT "@"
-    COMMA ","
-    LESSER "<"
-    GREATER ">"
-    STAR    "*"
-    SLASH   "/"
-    PERCENT "%"
-    ;
+END       0 "end of file"
+{{grammartoken}}
+;
 
-%token FLOATINGCONST INTEGERCONST RATIONALCONST STRCONST
+%token FLOATINGCONST "floating"
+%token INTEGERCONST  "integer"
+%token RATIONALCONST "rational"
+%token STRCONST      "string"
 %token <std::string> IDENTIFIER "identifier"
+
 
 %type <Ast*> SPECIFICATION
 %type <SpecificationNode*> HEADER
@@ -188,6 +168,8 @@
 %type <AstListNode*> BODY_ELEMENTS STATEMENTS
 %type <AtomNode*> NUMBER VALUE NUMBER_RANGE
 %type <IntegerAtom*> INTEGER_NUMBER 
+%type <FloatingAtom*> FLOATING_NUMBER 
+%type <RationalAtom*> RATIONAL_NUMBER 
 %type <std::pair<ExpressionBase*, ExpressionBase*>> INITIALIZER
 %type <std::vector<std::pair<ExpressionBase*, ExpressionBase*>>*> INITIALIZER_LIST INITIALIZERS
 %type <ExpressionBase*> EXPRESSION BRACKET_EXPRESSION ATOM
@@ -225,21 +207,35 @@
 
 
 %start SPECIFICATION
-
-%right UMINUS
-%right UPLUS
-
+	 
 %precedence THEN
 %precedence ELSE
-	 
-%precedence UPDATE PRINT ASSURE ASSERT DIEDIE NOT
 
-// %nonassoc ","
-// %nonassoc FLOATINGCONST INTEGERCONST STRCONST RATIONALCONST IDENTIFIER
-%nonassoc AND OR
-%nonassoc "=" "<" ">"  NEQUAL LESSEQ GREATEREQ
-%left "-" "+" XOR
-%left RATIONAL_DIV "*" "/" "%"
+%precedence UPDATE ASSERT ASSURE DIEDIE
+%precedence IDENTIFIER
+%precedence INTEGERCONST STRCONST FLOATINGCONST RATIONALCONST 
+
+%left AND
+%left XOR
+%left OR
+	 
+%left EQUAL	 
+%left NEQUAL 
+	 
+%left GREATEREQ
+%left LESSEQ
+	 
+%left GREATER
+%left LESSER
+	 
+%left PLUS
+%left MINUS
+%left PERCENT
+%left RATIONAL_DIV
+%left SLASH
+%left STAR
+
+%precedence NOT
 
 %%
 
@@ -274,11 +270,7 @@ BODY_ELEMENTS
 
 
 BODY_ELEMENT
-: PROVIDER_SYNTAX
-  {
-	  $$ = new AstNode(NodeType::PROVIDER);
-  }
-| OPTION_SYNTAX
+: OPTION_SYNTAX
   {
 	  $$ = new AstNode(NodeType::OPTION);
   }
@@ -353,22 +345,13 @@ INIT_SYNTAX
 ;
 
 
-PROVIDER_SYNTAX
-: PROVIDER IDENTIFIER
-  {
-	  // TODO: PPA: REMOVE THIS, BECAUSE THIS IS AN OLD SYNTAX ELEMENT!!!
-	  driver.error( @$, "invalid/obsolete syntax element!" );
-  }
-;
-
-
 OPTION_SYNTAX
-: OPTION IDENTIFIER "." IDENTIFIER IDENTIFIER
+: OPTION IDENTIFIER DOT IDENTIFIER IDENTIFIER
 ;
 
 
 ENUM_SYNTAX
-: ENUM IDENTIFIER "=" "{" IDENTIFIER_LIST "}"
+: ENUM IDENTIFIER EQUAL LCURPAREN IDENTIFIER_LIST RCURPAREN
   {
 	  $$ = new Enum($2, @$);
 	  try
@@ -402,28 +385,28 @@ ENUM_SYNTAX
 
 
 DERIVED_SYNTAX
-: DERIVED IDENTIFIER "(" PARAM_LIST ")" "=" EXPRESSION
+: DERIVED IDENTIFIER LPAREN PARAM_LIST RPAREN EQUAL EXPRESSION
   {
 	  // TODO: 2nd argument should be a reference
 	  $$ = new Function($2, @$, $4, $7, new Type(TypeType::UNKNOWN));
   }
-| DERIVED IDENTIFIER "=" EXPRESSION
+| DERIVED IDENTIFIER EQUAL EXPRESSION
   {
 	  $$ = new Function($2, @$, $4, new Type(TypeType::UNKNOWN));
   }
-| DERIVED IDENTIFIER "(" ")" "=" EXPRESSION
+| DERIVED IDENTIFIER LPAREN RPAREN EQUAL EXPRESSION
   {
 	  $$ = new Function($2, @$, $6, new Type(TypeType::UNKNOWN));
   }
-| DERIVED IDENTIFIER "(" PARAM_LIST ")" ":" TYPE_SYNTAX "=" EXPRESSION
+| DERIVED IDENTIFIER LPAREN PARAM_LIST RPAREN COLON TYPE_SYNTAX EQUAL EXPRESSION
   {
 	  $$ = new Function($2, @$, $4, $9, $7);
   }
-| DERIVED IDENTIFIER ":" TYPE_SYNTAX "=" EXPRESSION
+| DERIVED IDENTIFIER COLON TYPE_SYNTAX EQUAL EXPRESSION
   {
 	  $$ = new Function($2, @$, $6, $4);
   }
-| DERIVED IDENTIFIER "(" ")" ":" TYPE_SYNTAX "=" EXPRESSION
+| DERIVED IDENTIFIER LPAREN RPAREN COLON TYPE_SYNTAX EQUAL EXPRESSION
   {
 	  $$ = new Function($2, @$, $8, $6);
   }
@@ -431,12 +414,12 @@ DERIVED_SYNTAX
 
 
 FUNCTION_DEFINITION
-: FUNCTION "(" IDENTIFIER_LIST ")" IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
+: FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
   {
 	  auto attrs = parse_function_attributes(driver, @$, $3);
 	  $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, $7);
   }
-| FUNCTION "(" IDENTIFIER_LIST ")" IDENTIFIER FUNCTION_SIGNATURE
+| FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE
   {
 	  auto attrs = parse_function_attributes(driver, @$, $3);
 	  $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, nullptr);
@@ -452,7 +435,7 @@ FUNCTION_DEFINITION
 ;
 
 IDENTIFIER_LIST
-: IDENTIFIER_LIST_NO_COMMA ","
+: IDENTIFIER_LIST_NO_COMMA COMMA
   {
 	  $$ = std::move($1);
   }
@@ -464,10 +447,10 @@ IDENTIFIER_LIST
 
 
 IDENTIFIER_LIST_NO_COMMA
-: IDENTIFIER_LIST_NO_COMMA "," IDENTIFIER
+: IDENTIFIER_LIST_NO_COMMA COMMA IDENTIFIER
   {
-      $$ = std::move($1);
-      $$.push_back($3);
+      $$ = std::move( $1 );
+      $$.push_back( $3 );
   }
 | IDENTIFIER
   {
@@ -478,13 +461,13 @@ IDENTIFIER_LIST_NO_COMMA
 
 
 FUNCTION_SIGNATURE
-: ":" ARROW TYPE_SYNTAX
+: COLON ARROW TYPE_SYNTAX
   {
 	  /* this constructor is implementation dependant! */
 	  std::vector<Type*> foo;
 	  $$ = std::pair<std::vector<Type*>, Type*>(foo, $3);
   }
-| ":" TYPE_IDENTIFIER_STARLIST ARROW TYPE_SYNTAX
+| COLON TYPE_IDENTIFIER_STARLIST ARROW TYPE_SYNTAX
   {
 	  $$ = std::pair<std::vector<Type*>, Type*>($2, $4);
   }
@@ -492,7 +475,7 @@ FUNCTION_SIGNATURE
 
 
 PARAM
-: IDENTIFIER ":" TYPE_SYNTAX
+: IDENTIFIER COLON TYPE_SYNTAX
   {
 	  size_t size = driver.binding_offsets.size();
 	  driver.binding_offsets[$1] = size;
@@ -513,7 +496,7 @@ PARAM_LIST
   {
 	  $$ = std::move($1);
   }
-| PARAM_LIST_NO_COMMA ","
+| PARAM_LIST_NO_COMMA COMMA
   {
 	  $$ = std::move($1);
   }
@@ -521,7 +504,7 @@ PARAM_LIST
 
 
 PARAM_LIST_NO_COMMA
-: PARAM_LIST_NO_COMMA "," PARAM
+: PARAM_LIST_NO_COMMA COMMA PARAM
   {
 	  $$ = std::move($1);
 	  $$.push_back($3);
@@ -534,12 +517,12 @@ PARAM_LIST_NO_COMMA
 
 
 TYPE_IDENTIFIER_STARLIST
-: TYPE_SYNTAX "*" TYPE_IDENTIFIER_STARLIST
+: TYPE_SYNTAX STAR TYPE_IDENTIFIER_STARLIST
   {
 	  $3.insert($3.begin(), $1);
 	  $$ = std::move($3);
   }
-| TYPE_SYNTAX "*"
+| TYPE_SYNTAX STAR
   {
 	  // TODO: limit memory size
 	  $$.push_back($1);
@@ -575,7 +558,7 @@ TYPE_SYNTAX
 		  );
 	  }	  
   }
-| IDENTIFIER "(" INTEGER_NUMBER ")"
+| IDENTIFIER LPAREN INTEGER_NUMBER RPAREN
   {
 	  $$ = new Type( $1 );
 	  $$->bitsize = $3->val_;
@@ -588,7 +571,7 @@ TYPE_SYNTAX
 		  );
 	  }
   }
-| IDENTIFIER "(" TYPE_SYNTAX_LIST ")"
+| IDENTIFIER LPAREN TYPE_SYNTAX_LIST RPAREN
   {
 	  $$ = new Type( $1, $3 );
 
@@ -610,7 +593,7 @@ TYPE_SYNTAX
 		  );
 	  }	  
   }
-| IDENTIFIER "(" INTEGER_NUMBER DOTDOT INTEGER_NUMBER ")"
+| IDENTIFIER LPAREN INTEGER_NUMBER DOTDOT INTEGER_NUMBER RPAREN
   {
 	  $$ = new Type( $1 );
 	  $$->subrange_start = $3->val_;
@@ -628,28 +611,28 @@ TYPE_SYNTAX
 
 
 TYPE_SYNTAX_LIST
-: TYPE_SYNTAX "," TYPE_SYNTAX_LIST
+: TYPE_SYNTAX COMMA TYPE_SYNTAX_LIST
   {
-	  $3.push_back($1);
-	  $$ = std::move($3);
+	  $3.push_back( $1 );
+	  $$ = std::move( $3 );
   }
-| TYPE_SYNTAX ","
+| TYPE_SYNTAX COMMA
   {
-	  $$.push_back($1);
+	  $$.push_back( $1 );
   }
 | TYPE_SYNTAX
   {
-	  $$.push_back($1);
+	  $$.push_back( $1 );
   }
 ;
 
 
 INITIALIZERS
-: INITIALLY "{" INITIALIZER_LIST "}"
+: INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
   {
 	  $$ = $3;
   }
-| INITIALLY "{" "}"
+| INITIALLY LCURPAREN RCURPAREN
   {
 	  $$ = nullptr;
   }
@@ -657,18 +640,18 @@ INITIALIZERS
 
 
 INITIALIZER_LIST
-: INITIALIZER_LIST "," INITIALIZER
+: INITIALIZER_LIST COMMA INITIALIZER
   {
-	  $$ = $1; $1->push_back($3);
+	  $$ = $1; $1->push_back( $3 );
   }
-| INITIALIZER_LIST ","
+| INITIALIZER_LIST COMMA
   {
 	  $$ = $1;
   }
 | INITIALIZER
   {
-	  $$ = new std::vector<std::pair<ExpressionBase*, ExpressionBase*>>();
-	  $$->push_back($1);
+	  $$ = new std::vector< std::pair<ExpressionBase*, ExpressionBase* > >();
+	  $$->push_back( $1 );
   }
 ;
 
@@ -712,51 +695,31 @@ VALUE
   }
 | STRCONST
   {
-	  $$ = new StringAtom(@$, std::move($1));
+	  $$ = new StringAtom( @$, std::move( $1 ) );
   }
 | LISTCONST
   {
-	  $$ = new ListAtom(@$, $1);
+	  $$ = new ListAtom( @$, $1 );
   }
 | NUMBER_RANGE
   {
 	  $$ = $1;
   }
-| SYMBOL
-  {
-	  $$ = new IntegerAtom(@$, 0);
-  }
 | SELF
   {
-	  $$ = new SelfAtom(@$);
+	  $$ = new SelfAtom( @$ );
   }
 | UNDEF
   {
-	  $$ = new UndefAtom(@$);
+	  $$ = new UndefAtom( @$ );
   }
 | TRUE
   {
-	  $$ = new BooleanAtom(@$, true);
+	  $$ = new BooleanAtom( @$, true );
   }
 | FALSE
   {
-	  $$ = new BooleanAtom(@$, false);
-  }
-;
-
-
-INTEGER_NUMBER
-: "+" INTEGERCONST %prec UPLUS
-  {
-	  $$ = new IntegerAtom(@$, $2);
-  }
-| "-" INTEGERCONST %prec UMINUS
-  {
-	  $$ = new IntegerAtom(@$, (-1) * $2);
-  }
-| INTEGERCONST
-  {
-	  $$ = new IntegerAtom(@$, $1);
+	  $$ = new BooleanAtom( @$, false );
   }
 ;
 
@@ -766,36 +729,68 @@ NUMBER
   {
 	  $$ = $1;
   }
-| "+" FLOATINGCONST %prec UPLUS
+| FLOATING_NUMBER
+  {
+	  $$ = $1;
+  }
+| RATIONAL_NUMBER
+  {
+	  $$ = $1;
+  }
+;
+
+
+INTEGER_NUMBER
+: PLUS INTEGERCONST
+  {
+	  $$ = new IntegerAtom( @$, $2 );
+  }
+| MINUS INTEGERCONST
+  {
+	  $$ = new IntegerAtom( @$, (-1) * $2 );
+  }
+| INTEGERCONST
+  {
+	  $$ = new IntegerAtom( @$, $1 );
+  }
+;
+
+
+FLOATING_NUMBER
+: PLUS FLOATINGCONST
   {
 	  $$ = new FloatingAtom( @$, $2 );
   }
-| "-" FLOATINGCONST %prec UMINUS
+| MINUS FLOATINGCONST
   {
-	  $$ = new FloatingAtom(@$, (-1) * $2);
+	  $$ = new FloatingAtom( @$, (-1) * $2 );
   }
 | FLOATINGCONST
   {
-	  $$ = new FloatingAtom(@$, $1);
+	  $$ = new FloatingAtom( @$, $1 );
   }
-| "+" RATIONALCONST %prec UPLUS
+;
+
+
+RATIONAL_NUMBER
+: PLUS RATIONALCONST
   {
-	  $$ = new RationalAtom(@$, $2);
+	  $$ = new RationalAtom( @$, $2 );
   }
-| "-" RATIONALCONST %prec UMINUS
+| MINUS RATIONALCONST
   {
 	  $2.numerator *= -1;
-	  $$ = new RationalAtom(@$, $2);
+	  $$ = new RationalAtom( @$, $2 );
   }
 | RATIONALCONST
   {
-	  $$ = new RationalAtom(@$, $1);
+	  $$ = new RationalAtom( @$, $1 );
   }
 ;
 
 
 RULEREF
-: "@" IDENTIFIER
+: AT IDENTIFIER
   {
 	  $$ = $2;
   }
@@ -803,7 +798,7 @@ RULEREF
 
 
 NUMBER_RANGE
-: "[" NUMBER DOTDOT NUMBER "]"
+: LSQPAREN NUMBER DOTDOT NUMBER RSQPAREN
   {
 	  if( $2->node_type_ == NodeType::INTEGER_ATOM && $4->node_type_ == NodeType::INTEGER_ATOM )
 	  {
@@ -815,18 +810,17 @@ NUMBER_RANGE
 		  $$ = nullptr;
 	  }
   }
-/*| "[" IDENTIFIER DOTDOT IDENTIFIER "]" */
 ;
 
 
 LISTCONST
-: "[" EXPRESSION_LIST "]"
+: LSQPAREN EXPRESSION_LIST RSQPAREN
   {
 	  $$ = $2;
   }
-| "[" "]"
+| LSQPAREN RSQPAREN
   {
-	  $$ = new std::vector<ExpressionBase*>();
+	  $$ = new std::vector< ExpressionBase* >();
   }
 ;
 
@@ -836,7 +830,7 @@ EXPRESSION_LIST
   {
 	  $$ = $1;
   }
-| EXPRESSION_LIST_NO_COMMA ","
+| EXPRESSION_LIST_NO_COMMA COMMA
   {
 	  $$ = $1;
   }
@@ -844,37 +838,37 @@ EXPRESSION_LIST
 
 
 EXPRESSION_LIST_NO_COMMA
-: EXPRESSION_LIST_NO_COMMA"," EXPRESSION
+: EXPRESSION_LIST_NO_COMMA COMMA EXPRESSION
   {
 	  $$ = $1;
-	  $$->push_back($3);
+	  $$->push_back( $3 );
   }
 | EXPRESSION
   {
-	  $$ = new std::vector<ExpressionBase*>;
-	  $$->push_back($1);
+	  $$ = new std::vector< ExpressionBase* >;
+	  $$->push_back( $1 );
   }
 ;
 
 
 EXPRESSION
-: EXPRESSION "+" EXPRESSION
+: EXPRESSION PLUS EXPRESSION
   {
 	  $$ = new Expression( @$, $1, $3, ExpressionOperation::ADD );
   }
-| EXPRESSION "-" EXPRESSION
+| EXPRESSION MINUS EXPRESSION
   {
 	  $$ = new Expression( @$, $1, $3, ExpressionOperation::SUB );
   }
-| EXPRESSION "*" EXPRESSION
+| EXPRESSION STAR EXPRESSION
   {
 	  $$ = new Expression( @$, $1, $3, ExpressionOperation::MUL );
   }
-| EXPRESSION "/" EXPRESSION
+| EXPRESSION SLASH EXPRESSION
   {
 	  $$ = new Expression( @$, $1, $3, ExpressionOperation::DIV );
   }
-| EXPRESSION "%" EXPRESSION
+| EXPRESSION PERCENT EXPRESSION
   {
 	  $$ = new Expression( @$, $1, $3, ExpressionOperation::MOD );
   }
@@ -886,15 +880,15 @@ EXPRESSION
   {
 	  $$ = new Expression( @$, $1, $3, ExpressionOperation::NEQ );
   }
-| EXPRESSION "=" EXPRESSION
+| EXPRESSION EQUAL EXPRESSION
   {
 	  $$ = new Expression( @$, $1, $3, ExpressionOperation::EQ );
   }
-| EXPRESSION "<" EXPRESSION
+| EXPRESSION LESSER EXPRESSION
   {
 	  $$ = new Expression( @$, $1, $3, ExpressionOperation::LESSER );
   }
-| EXPRESSION ">" EXPRESSION
+| EXPRESSION GREATER EXPRESSION
   {
 	  $$ = new Expression( @$, $1, $3, ExpressionOperation::GREATER );
   }
@@ -930,7 +924,7 @@ EXPRESSION
 
 
 BRACKET_EXPRESSION
-: "(" EXPRESSION ")"
+: LPAREN EXPRESSION RPAREN
   {
 	  $$ = $2;
   }
@@ -942,11 +936,11 @@ FUNCTION_SYNTAX
   {
 	  $$ = new FunctionAtom( @$, $1 );
   }
-| IDENTIFIER "(" ")"
+| IDENTIFIER LPAREN RPAREN
   {
 	  $$ = new FunctionAtom( @$, $1 );
   }
-| IDENTIFIER "(" EXPRESSION_LIST ")"
+| IDENTIFIER LPAREN EXPRESSION_LIST RPAREN
   {
 	  if( Builtin::isBuiltin( $1 ) )
 	  {
@@ -978,41 +972,41 @@ RULE_STMT
 
 
 RULE_SYNTAX
-: RULE IDENTIFIER "=" RULE_STMT
+: RULE IDENTIFIER EQUAL RULE_STMT
   {
 	  $$ = new RuleNode( @$, $4, $2 );
   }
-| RULE IDENTIFIER "(" ")" "=" RULE_STMT
+| RULE IDENTIFIER LPAREN RPAREN EQUAL RULE_STMT
   {
 	  $$ = new RuleNode( @$, $6, $2 );
   }
-| RULE IDENTIFIER "(" PARAM_LIST ")" "=" RULE_STMT
+| RULE IDENTIFIER LPAREN PARAM_LIST RPAREN EQUAL RULE_STMT
   {
 	  $$ = new RuleNode( @$, $7, $2, $4 );
   }
-/* again, with dump specification */
-| RULE IDENTIFIER DUMPS DUMPSPEC_LIST "=" RULE_STMT
+| RULE IDENTIFIER DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
   {
-	  std::vector<Type*> tmp;
+	  std::vector< Type* > tmp;
 	  $$ = new RuleNode( @$, $6, $2, tmp, $4 );
   }
-| RULE IDENTIFIER "(" ")" DUMPS DUMPSPEC_LIST "=" RULE_STMT
+| RULE IDENTIFIER LPAREN RPAREN DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
   {
-	  std::vector<Type*> tmp;
+	  std::vector< Type* > tmp;
 	  $$ = new RuleNode( @$, $8, $2, tmp, $6 );
   }
-| RULE IDENTIFIER "(" PARAM_LIST ")" DUMPS DUMPSPEC_LIST "=" RULE_STMT
+| RULE IDENTIFIER LPAREN PARAM_LIST RPAREN DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
   {
-	  std::vector<Type*> tmp;
+	  std::vector< Type* > tmp;
 	  $$ = new RuleNode( @$, $9, $2, tmp, $7 );
   }
 ;
 
 
 DUMPSPEC_LIST
-: DUMPSPEC_LIST "," DUMPSPEC
+: DUMPSPEC_LIST COMMA DUMPSPEC
   {
-	  $$ = std::move( $1 ); $$.push_back( $3 );
+	  $$ = std::move( $1 );
+	  $$.push_back( $3 );
   }
 | DUMPSPEC
   {
@@ -1023,7 +1017,7 @@ DUMPSPEC_LIST
 
 
 DUMPSPEC
-: "(" IDENTIFIER_LIST ")" ARROW IDENTIFIER
+: LPAREN IDENTIFIER_LIST RPAREN ARROW IDENTIFIER
   {
 	  $$ = std::pair< std::string, std::vector< std::string > >( $5, $2 );
   }
@@ -1096,21 +1090,21 @@ SIMPLE_STMT
 	  $$ = new AstNode( NodeType::SKIP );
   }
 | IDENTIFIER
-{
-	driver.error
-	( @$
-	, "syntax error: invalid statement '" + $1 + "' found"
-	, libcasm_fe::Codes::SyntaxErrorInvalidStatement
-	);
-}
-| INTERN EXPRESSION_LIST
   {
-	  $$ = new AstNode( NodeType::STATEMENT );
+	  driver.error
+	  ( @$
+	  , "syntax error: invalid statement '" + $1 + "' found"
+	  , libcasm_fe::Codes::SyntaxErrorInvalidStatement
+	  );
   }
-| OBJDUMP "(" IDENTIFIER ")"
-  {
-	  $$ = new AstNode( NodeType::STATEMENT );
-  }
+//   INTERN EXPRESSION_LIST
+//   {
+// 	  $$ = new AstNode( NodeType::STATEMENT );
+//   }
+//   OBJDUMP "(" IDENTIFIER ")"
+//   {
+// 	  $$ = new AstNode( NodeType::STATEMENT );
+//   }
 ;
 
 
@@ -1165,6 +1159,7 @@ DIEDIE_SYNTAX
   in concrete mode:
     * an error like diedie
 */
+
 IMPOSSIBLE_SYNTAX
 : IMPOSSIBLE
   {
@@ -1182,14 +1177,14 @@ DEBUG_SYNTAX
 
 
 DEBUG_ATOM_LIST
-: DEBUG_ATOM_LIST "+" ATOM
+: DEBUG_ATOM_LIST PLUS ATOM
   {
 	  $$ = std::move( $1 );
 	  $$.push_back( $3 );
   }
 | ATOM
   {
-	  $$.push_back($1);
+	  $$.push_back( $1 );
   }
 ;
 
@@ -1213,9 +1208,9 @@ UPDATE_SYNTAX
 	  {
 		  driver.error
 		  ( @$
-		  , "can only use functions for updates but `"
+		  , "can only use functions for updates but '"
 			+ $1->to_str()
-			+ "` is a `"
+			+ "` is a '"
 			+ type_to_str( $1->node_type_ )
 		  );
 	  }
@@ -1266,7 +1261,7 @@ CASE_LABEL
 
 
 CASE_LABEL_DEFAULT
-: DEFAULT ":" STATEMENT
+: DEFAULT COLON STATEMENT
   {
 	  $$ = std::pair< AtomNode*, AstNode* >( nullptr, $3 );
   }
@@ -1274,7 +1269,7 @@ CASE_LABEL_DEFAULT
 
 
 CASE_LABEL_NUMBER
-: NUMBER ":" STATEMENT
+: NUMBER COLON STATEMENT
   {
 	  $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
   }
@@ -1282,15 +1277,15 @@ CASE_LABEL_NUMBER
 
 
 CASE_LABEL_IDENT
-: FUNCTION_SYNTAX ":" STATEMENT
+: FUNCTION_SYNTAX COLON STATEMENT
   {
-	  $$ = std::pair<AtomNode*, AstNode*>($1, $3);
+	  $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
   }
 ;
 
 
 CASE_LABEL_STRING
-: STRCONST ":" STATEMENT
+: STRCONST COLON STATEMENT
   {
 	  $$ = std::pair< AtomNode*, AstNode* >( new StringAtom( @$, std::move( $1 ) ), $3 );
   }
@@ -1298,15 +1293,15 @@ CASE_LABEL_STRING
 
 
 CALL_SYNTAX
-: CALL "(" EXPRESSION ")" "(" EXPRESSION_LIST ")"
+: CALL LPAREN EXPRESSION RPAREN LPAREN EXPRESSION_LIST RPAREN
   {
 	  $$ = new CallNode( @$, "", $3, $6 );
   }
-| CALL "(" EXPRESSION ")"
+| CALL LPAREN EXPRESSION RPAREN
   {
 	  $$ = new CallNode( @$, "", $3 );
   }
-| CALL IDENTIFIER "(" EXPRESSION_LIST ")"
+| CALL IDENTIFIER LPAREN EXPRESSION_LIST RPAREN
   {
 	  $$ = new CallNode( @$, $2, nullptr, $4 );
   }
@@ -1330,7 +1325,7 @@ SEQ_SYNTAX
 
 
 PAR_SYNTAX
-: "{" STATEMENTS "}"
+: LCURPAREN STATEMENTS RCURPAREN
   {
 	  $$ = new UnaryNode( @$, NodeType::PARBLOCK, $2 );
   }
@@ -1369,7 +1364,7 @@ IFTHENELSE
 
 
 LET_SYNTAX
-: LET IDENTIFIER "=" 
+: LET IDENTIFIER EQUAL
   {
 	  auto var = Symbol( $2, @$, Symbol::SymbolType::LET );
 	  try
@@ -1386,7 +1381,7 @@ LET_SYNTAX
 	  driver.function_table.remove( $2 );
 	  $$ = new LetNode( @$, Type( TypeType::UNKNOWN ), $2, $5, $7 );
   }
-| LET IDENTIFIER ":" TYPE_SYNTAX "="
+| LET IDENTIFIER COLON TYPE_SYNTAX EQUAL
   {
 	  auto var = Symbol( $2, @$, Symbol::SymbolType::LET );
 	  try
@@ -1411,11 +1406,11 @@ PUSH_SYNTAX
   {
 	  if( $4->node_type_ == NodeType::BUILTIN_ATOM )
 	  {
-		  driver.error( @$, "cannot push to builtin `"+$4->to_str()+"`" );
+		  driver.error( @$, "cannot push to builtin '" + $4->to_str() + "'" );
 	  }
 	  else
 	  {
-		  $$ = new PushNode( @$, $2, reinterpret_cast<FunctionAtom*>( $4 ) );
+		  $$ = new PushNode( @$, $2, reinterpret_cast< FunctionAtom* >( $4 ) );
 	  }
   }
 ;
@@ -1426,11 +1421,11 @@ POP_SYNTAX
   {
 	  if( $2->node_type_ == NodeType::BUILTIN_ATOM )
 	  {
-		  driver.error( @$, "cannot pop to builtin `"+$2->to_str()+"`" );
+		  driver.error( @$, "cannot pop to builtin '" + $2->to_str() + "'" );
 	  }
 	  else if( $4->node_type_ == NodeType::BUILTIN_ATOM )
 	  {
-		  driver.error( @$, "cannot pop from builtin `"+$4->to_str()+"`" );
+		  driver.error( @$, "cannot pop from builtin '" + $4->to_str() + "'" );
 	  }
 	  else
 	  {
