@@ -543,8 +543,7 @@ namespace yy {
         STRCONST = 337,
         IDENTIFIER = 338,
         UMINUS = 339,
-        UPLUS = 340,
-        XIF = 341
+        UPLUS = 340
       };
     };
 
@@ -1061,10 +1060,6 @@ namespace yy {
     symbol_type
     make_UPLUS (const location_type& l);
 
-    static inline
-    symbol_type
-    make_XIF (const location_type& l);
-
 
     /// Build a parser object.
     casmi_parser (Driver& driver_yyarg);
@@ -1275,7 +1270,7 @@ namespace yy {
       yyfinal_ = 5, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 87  ///< Number of tokens.
+      yyntokens_ = 86  ///< Number of tokens.
     };
 
 
@@ -1326,9 +1321,9 @@ namespace yy {
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
       75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86
+      85
     };
-    const unsigned int user_token_number_max_ = 341;
+    const unsigned int user_token_number_max_ = 340;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -1361,53 +1356,53 @@ namespace yy {
   {
       switch (other.type_get ())
     {
-      case 88: // SPECIFICATION
+      case 87: // SPECIFICATION
         value.copy< Ast* > (other.value);
         break;
 
-      case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 89: // BODY_ELEMENTS
+      case 145: // STATEMENTS
         value.copy< AstListNode* > (other.value);
         break;
 
-      case 91: // BODY_ELEMENT
-      case 122: // RULE_STMT
-      case 123: // RULE_SYNTAX
-      case 126: // SIMPLE_STMT
-      case 127: // STATEMENT
-      case 131: // IMPOSSIBLE_SYNTAX
+      case 90: // BODY_ELEMENT
+      case 121: // RULE_STMT
+      case 122: // RULE_SYNTAX
+      case 125: // SIMPLE_STMT
+      case 126: // STATEMENT
+      case 130: // IMPOSSIBLE_SYNTAX
         value.copy< AstNode* > (other.value);
         break;
 
-      case 111: // VALUE
-      case 113: // NUMBER
-      case 115: // NUMBER_RANGE
+      case 110: // VALUE
+      case 112: // NUMBER
+      case 114: // NUMBER_RANGE
         value.copy< AtomNode* > (other.value);
         break;
 
-      case 121: // FUNCTION_SYNTAX
+      case 120: // FUNCTION_SYNTAX
         value.copy< BaseFunctionAtom* > (other.value);
         break;
 
-      case 143: // CALL_SYNTAX
+      case 142: // CALL_SYNTAX
         value.copy< CallNode* > (other.value);
         break;
 
-      case 136: // CASE_SYNTAX
+      case 135: // CASE_SYNTAX
         value.copy< CaseNode* > (other.value);
         break;
 
-      case 130: // DIEDIE_SYNTAX
+      case 129: // DIEDIE_SYNTAX
         value.copy< DiedieNode* > (other.value);
         break;
 
-      case 95: // ENUM_SYNTAX
+      case 94: // ENUM_SYNTAX
         value.copy< Enum* > (other.value);
         break;
 
-      case 110: // ATOM
-      case 119: // EXPRESSION
-      case 120: // BRACKET_EXPRESSION
+      case 109: // ATOM
+      case 118: // EXPRESSION
+      case 119: // BRACKET_EXPRESSION
         value.copy< ExpressionBase* > (other.value);
         break;
 
@@ -1415,12 +1410,12 @@ namespace yy {
         value.copy< FLOATING_T > (other.value);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 152: // FORALL_SYNTAX
         value.copy< ForallNode* > (other.value);
         break;
 
-      case 96: // DERIVED_SYNTAX
-      case 97: // FUNCTION_DEFINITION
+      case 95: // DERIVED_SYNTAX
+      case 96: // FUNCTION_DEFINITION
         value.copy< Function* > (other.value);
         break;
 
@@ -1428,53 +1423,53 @@ namespace yy {
         value.copy< INTEGER_T > (other.value);
         break;
 
-      case 147: // IFTHENELSE
+      case 146: // IFTHENELSE
         value.copy< IfThenElseNode* > (other.value);
         break;
 
-      case 92: // INIT_SYNTAX
+      case 91: // INIT_SYNTAX
         value.copy< InitNode* > (other.value);
         break;
 
-      case 112: // INTEGER_NUMBER
+      case 111: // INTEGER_NUMBER
         value.copy< IntegerAtom* > (other.value);
         break;
 
-      case 148: // LET_SYNTAX
+      case 147: // LET_SYNTAX
         value.copy< LetNode* > (other.value);
         break;
 
-      case 152: // POP_SYNTAX
+      case 151: // POP_SYNTAX
         value.copy< PopNode* > (other.value);
         break;
 
-      case 132: // DEBUG_SYNTAX
-      case 134: // PRINT_SYNTAX
+      case 131: // DEBUG_SYNTAX
+      case 133: // PRINT_SYNTAX
         value.copy< PrintNode* > (other.value);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 150: // PUSH_SYNTAX
         value.copy< PushNode* > (other.value);
         break;
 
-      case 89: // HEADER
+      case 88: // HEADER
         value.copy< SpecificationNode* > (other.value);
         break;
 
-      case 101: // PARAM
-      case 105: // TYPE_SYNTAX
+      case 100: // PARAM
+      case 104: // TYPE_SYNTAX
         value.copy< Type* > (other.value);
         break;
 
-      case 128: // ASSERT_SYNTAX
-      case 129: // ASSURE_SYNTAX
-      case 144: // SEQ_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 127: // ASSERT_SYNTAX
+      case 128: // ASSURE_SYNTAX
+      case 143: // SEQ_SYNTAX
+      case 144: // PAR_SYNTAX
+      case 153: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (other.value);
         break;
 
-      case 135: // UPDATE_SYNTAX
+      case 134: // UPDATE_SYNTAX
         value.copy< UpdateNode* > (other.value);
         break;
 
@@ -1482,64 +1477,64 @@ namespace yy {
         value.copy< rational_t > (other.value);
         break;
 
-      case 138: // CASE_LABEL
-      case 139: // CASE_LABEL_DEFAULT
-      case 140: // CASE_LABEL_NUMBER
-      case 141: // CASE_LABEL_IDENT
-      case 142: // CASE_LABEL_STRING
+      case 137: // CASE_LABEL
+      case 138: // CASE_LABEL_DEFAULT
+      case 139: // CASE_LABEL_NUMBER
+      case 140: // CASE_LABEL_IDENT
+      case 141: // CASE_LABEL_STRING
         value.copy< std::pair<AtomNode*, AstNode*> > (other.value);
         break;
 
-      case 109: // INITIALIZER
+      case 108: // INITIALIZER
         value.copy< std::pair<ExpressionBase*, ExpressionBase*> > (other.value);
         break;
 
-      case 125: // DUMPSPEC
+      case 124: // DUMPSPEC
         value.copy< std::pair<std::string, std::vector<std::string>> > (other.value);
         break;
 
-      case 100: // FUNCTION_SIGNATURE
+      case 99: // FUNCTION_SIGNATURE
         value.copy< std::pair<std::vector<Type*>, Type*> > (other.value);
         break;
 
       case 82: // STRCONST
       case 83: // "identifier"
-      case 114: // RULEREF
+      case 113: // RULEREF
         value.copy< std::string > (other.value);
         break;
 
-      case 133: // DEBUG_ATOM_LIST
+      case 132: // DEBUG_ATOM_LIST
         value.copy< std::vector<ExpressionBase*> > (other.value);
         break;
 
-      case 116: // LISTCONST
-      case 117: // EXPRESSION_LIST
-      case 118: // EXPRESSION_LIST_NO_COMMA
+      case 115: // LISTCONST
+      case 116: // EXPRESSION_LIST
+      case 117: // EXPRESSION_LIST_NO_COMMA
         value.copy< std::vector<ExpressionBase*>* > (other.value);
         break;
 
-      case 102: // PARAM_LIST
-      case 103: // PARAM_LIST_NO_COMMA
-      case 104: // TYPE_IDENTIFIER_STARLIST
-      case 106: // TYPE_SYNTAX_LIST
+      case 101: // PARAM_LIST
+      case 102: // PARAM_LIST_NO_COMMA
+      case 103: // TYPE_IDENTIFIER_STARLIST
+      case 105: // TYPE_SYNTAX_LIST
         value.copy< std::vector<Type*> > (other.value);
         break;
 
-      case 137: // CASE_LABEL_LIST
+      case 136: // CASE_LABEL_LIST
         value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (other.value);
         break;
 
-      case 107: // INITIALIZERS
-      case 108: // INITIALIZER_LIST
+      case 106: // INITIALIZERS
+      case 107: // INITIALIZER_LIST
         value.copy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (other.value);
         break;
 
-      case 124: // DUMPSPEC_LIST
+      case 123: // DUMPSPEC_LIST
         value.copy< std::vector<std::pair<std::string, std::vector<std::string>>> > (other.value);
         break;
 
-      case 98: // IDENTIFIER_LIST
-      case 99: // IDENTIFIER_LIST_NO_COMMA
+      case 97: // IDENTIFIER_LIST
+      case 98: // IDENTIFIER_LIST_NO_COMMA
         value.copy< std::vector<std::string> > (other.value);
         break;
 
@@ -1560,53 +1555,53 @@ namespace yy {
     (void) v;
       switch (this->type_get ())
     {
-      case 88: // SPECIFICATION
+      case 87: // SPECIFICATION
         value.copy< Ast* > (v);
         break;
 
-      case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 89: // BODY_ELEMENTS
+      case 145: // STATEMENTS
         value.copy< AstListNode* > (v);
         break;
 
-      case 91: // BODY_ELEMENT
-      case 122: // RULE_STMT
-      case 123: // RULE_SYNTAX
-      case 126: // SIMPLE_STMT
-      case 127: // STATEMENT
-      case 131: // IMPOSSIBLE_SYNTAX
+      case 90: // BODY_ELEMENT
+      case 121: // RULE_STMT
+      case 122: // RULE_SYNTAX
+      case 125: // SIMPLE_STMT
+      case 126: // STATEMENT
+      case 130: // IMPOSSIBLE_SYNTAX
         value.copy< AstNode* > (v);
         break;
 
-      case 111: // VALUE
-      case 113: // NUMBER
-      case 115: // NUMBER_RANGE
+      case 110: // VALUE
+      case 112: // NUMBER
+      case 114: // NUMBER_RANGE
         value.copy< AtomNode* > (v);
         break;
 
-      case 121: // FUNCTION_SYNTAX
+      case 120: // FUNCTION_SYNTAX
         value.copy< BaseFunctionAtom* > (v);
         break;
 
-      case 143: // CALL_SYNTAX
+      case 142: // CALL_SYNTAX
         value.copy< CallNode* > (v);
         break;
 
-      case 136: // CASE_SYNTAX
+      case 135: // CASE_SYNTAX
         value.copy< CaseNode* > (v);
         break;
 
-      case 130: // DIEDIE_SYNTAX
+      case 129: // DIEDIE_SYNTAX
         value.copy< DiedieNode* > (v);
         break;
 
-      case 95: // ENUM_SYNTAX
+      case 94: // ENUM_SYNTAX
         value.copy< Enum* > (v);
         break;
 
-      case 110: // ATOM
-      case 119: // EXPRESSION
-      case 120: // BRACKET_EXPRESSION
+      case 109: // ATOM
+      case 118: // EXPRESSION
+      case 119: // BRACKET_EXPRESSION
         value.copy< ExpressionBase* > (v);
         break;
 
@@ -1614,12 +1609,12 @@ namespace yy {
         value.copy< FLOATING_T > (v);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 152: // FORALL_SYNTAX
         value.copy< ForallNode* > (v);
         break;
 
-      case 96: // DERIVED_SYNTAX
-      case 97: // FUNCTION_DEFINITION
+      case 95: // DERIVED_SYNTAX
+      case 96: // FUNCTION_DEFINITION
         value.copy< Function* > (v);
         break;
 
@@ -1627,53 +1622,53 @@ namespace yy {
         value.copy< INTEGER_T > (v);
         break;
 
-      case 147: // IFTHENELSE
+      case 146: // IFTHENELSE
         value.copy< IfThenElseNode* > (v);
         break;
 
-      case 92: // INIT_SYNTAX
+      case 91: // INIT_SYNTAX
         value.copy< InitNode* > (v);
         break;
 
-      case 112: // INTEGER_NUMBER
+      case 111: // INTEGER_NUMBER
         value.copy< IntegerAtom* > (v);
         break;
 
-      case 148: // LET_SYNTAX
+      case 147: // LET_SYNTAX
         value.copy< LetNode* > (v);
         break;
 
-      case 152: // POP_SYNTAX
+      case 151: // POP_SYNTAX
         value.copy< PopNode* > (v);
         break;
 
-      case 132: // DEBUG_SYNTAX
-      case 134: // PRINT_SYNTAX
+      case 131: // DEBUG_SYNTAX
+      case 133: // PRINT_SYNTAX
         value.copy< PrintNode* > (v);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 150: // PUSH_SYNTAX
         value.copy< PushNode* > (v);
         break;
 
-      case 89: // HEADER
+      case 88: // HEADER
         value.copy< SpecificationNode* > (v);
         break;
 
-      case 101: // PARAM
-      case 105: // TYPE_SYNTAX
+      case 100: // PARAM
+      case 104: // TYPE_SYNTAX
         value.copy< Type* > (v);
         break;
 
-      case 128: // ASSERT_SYNTAX
-      case 129: // ASSURE_SYNTAX
-      case 144: // SEQ_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 127: // ASSERT_SYNTAX
+      case 128: // ASSURE_SYNTAX
+      case 143: // SEQ_SYNTAX
+      case 144: // PAR_SYNTAX
+      case 153: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (v);
         break;
 
-      case 135: // UPDATE_SYNTAX
+      case 134: // UPDATE_SYNTAX
         value.copy< UpdateNode* > (v);
         break;
 
@@ -1681,64 +1676,64 @@ namespace yy {
         value.copy< rational_t > (v);
         break;
 
-      case 138: // CASE_LABEL
-      case 139: // CASE_LABEL_DEFAULT
-      case 140: // CASE_LABEL_NUMBER
-      case 141: // CASE_LABEL_IDENT
-      case 142: // CASE_LABEL_STRING
+      case 137: // CASE_LABEL
+      case 138: // CASE_LABEL_DEFAULT
+      case 139: // CASE_LABEL_NUMBER
+      case 140: // CASE_LABEL_IDENT
+      case 141: // CASE_LABEL_STRING
         value.copy< std::pair<AtomNode*, AstNode*> > (v);
         break;
 
-      case 109: // INITIALIZER
+      case 108: // INITIALIZER
         value.copy< std::pair<ExpressionBase*, ExpressionBase*> > (v);
         break;
 
-      case 125: // DUMPSPEC
+      case 124: // DUMPSPEC
         value.copy< std::pair<std::string, std::vector<std::string>> > (v);
         break;
 
-      case 100: // FUNCTION_SIGNATURE
+      case 99: // FUNCTION_SIGNATURE
         value.copy< std::pair<std::vector<Type*>, Type*> > (v);
         break;
 
       case 82: // STRCONST
       case 83: // "identifier"
-      case 114: // RULEREF
+      case 113: // RULEREF
         value.copy< std::string > (v);
         break;
 
-      case 133: // DEBUG_ATOM_LIST
+      case 132: // DEBUG_ATOM_LIST
         value.copy< std::vector<ExpressionBase*> > (v);
         break;
 
-      case 116: // LISTCONST
-      case 117: // EXPRESSION_LIST
-      case 118: // EXPRESSION_LIST_NO_COMMA
+      case 115: // LISTCONST
+      case 116: // EXPRESSION_LIST
+      case 117: // EXPRESSION_LIST_NO_COMMA
         value.copy< std::vector<ExpressionBase*>* > (v);
         break;
 
-      case 102: // PARAM_LIST
-      case 103: // PARAM_LIST_NO_COMMA
-      case 104: // TYPE_IDENTIFIER_STARLIST
-      case 106: // TYPE_SYNTAX_LIST
+      case 101: // PARAM_LIST
+      case 102: // PARAM_LIST_NO_COMMA
+      case 103: // TYPE_IDENTIFIER_STARLIST
+      case 105: // TYPE_SYNTAX_LIST
         value.copy< std::vector<Type*> > (v);
         break;
 
-      case 137: // CASE_LABEL_LIST
+      case 136: // CASE_LABEL_LIST
         value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (v);
         break;
 
-      case 107: // INITIALIZERS
-      case 108: // INITIALIZER_LIST
+      case 106: // INITIALIZERS
+      case 107: // INITIALIZER_LIST
         value.copy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (v);
         break;
 
-      case 124: // DUMPSPEC_LIST
+      case 123: // DUMPSPEC_LIST
         value.copy< std::vector<std::pair<std::string, std::vector<std::string>>> > (v);
         break;
 
-      case 98: // IDENTIFIER_LIST
-      case 99: // IDENTIFIER_LIST_NO_COMMA
+      case 97: // IDENTIFIER_LIST
+      case 98: // IDENTIFIER_LIST_NO_COMMA
         value.copy< std::vector<std::string> > (v);
         break;
 
@@ -2049,53 +2044,53 @@ namespace yy {
     // Type destructor.
     switch (yytype)
     {
-      case 88: // SPECIFICATION
+      case 87: // SPECIFICATION
         value.template destroy< Ast* > ();
         break;
 
-      case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 89: // BODY_ELEMENTS
+      case 145: // STATEMENTS
         value.template destroy< AstListNode* > ();
         break;
 
-      case 91: // BODY_ELEMENT
-      case 122: // RULE_STMT
-      case 123: // RULE_SYNTAX
-      case 126: // SIMPLE_STMT
-      case 127: // STATEMENT
-      case 131: // IMPOSSIBLE_SYNTAX
+      case 90: // BODY_ELEMENT
+      case 121: // RULE_STMT
+      case 122: // RULE_SYNTAX
+      case 125: // SIMPLE_STMT
+      case 126: // STATEMENT
+      case 130: // IMPOSSIBLE_SYNTAX
         value.template destroy< AstNode* > ();
         break;
 
-      case 111: // VALUE
-      case 113: // NUMBER
-      case 115: // NUMBER_RANGE
+      case 110: // VALUE
+      case 112: // NUMBER
+      case 114: // NUMBER_RANGE
         value.template destroy< AtomNode* > ();
         break;
 
-      case 121: // FUNCTION_SYNTAX
+      case 120: // FUNCTION_SYNTAX
         value.template destroy< BaseFunctionAtom* > ();
         break;
 
-      case 143: // CALL_SYNTAX
+      case 142: // CALL_SYNTAX
         value.template destroy< CallNode* > ();
         break;
 
-      case 136: // CASE_SYNTAX
+      case 135: // CASE_SYNTAX
         value.template destroy< CaseNode* > ();
         break;
 
-      case 130: // DIEDIE_SYNTAX
+      case 129: // DIEDIE_SYNTAX
         value.template destroy< DiedieNode* > ();
         break;
 
-      case 95: // ENUM_SYNTAX
+      case 94: // ENUM_SYNTAX
         value.template destroy< Enum* > ();
         break;
 
-      case 110: // ATOM
-      case 119: // EXPRESSION
-      case 120: // BRACKET_EXPRESSION
+      case 109: // ATOM
+      case 118: // EXPRESSION
+      case 119: // BRACKET_EXPRESSION
         value.template destroy< ExpressionBase* > ();
         break;
 
@@ -2103,12 +2098,12 @@ namespace yy {
         value.template destroy< FLOATING_T > ();
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 152: // FORALL_SYNTAX
         value.template destroy< ForallNode* > ();
         break;
 
-      case 96: // DERIVED_SYNTAX
-      case 97: // FUNCTION_DEFINITION
+      case 95: // DERIVED_SYNTAX
+      case 96: // FUNCTION_DEFINITION
         value.template destroy< Function* > ();
         break;
 
@@ -2116,53 +2111,53 @@ namespace yy {
         value.template destroy< INTEGER_T > ();
         break;
 
-      case 147: // IFTHENELSE
+      case 146: // IFTHENELSE
         value.template destroy< IfThenElseNode* > ();
         break;
 
-      case 92: // INIT_SYNTAX
+      case 91: // INIT_SYNTAX
         value.template destroy< InitNode* > ();
         break;
 
-      case 112: // INTEGER_NUMBER
+      case 111: // INTEGER_NUMBER
         value.template destroy< IntegerAtom* > ();
         break;
 
-      case 148: // LET_SYNTAX
+      case 147: // LET_SYNTAX
         value.template destroy< LetNode* > ();
         break;
 
-      case 152: // POP_SYNTAX
+      case 151: // POP_SYNTAX
         value.template destroy< PopNode* > ();
         break;
 
-      case 132: // DEBUG_SYNTAX
-      case 134: // PRINT_SYNTAX
+      case 131: // DEBUG_SYNTAX
+      case 133: // PRINT_SYNTAX
         value.template destroy< PrintNode* > ();
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 150: // PUSH_SYNTAX
         value.template destroy< PushNode* > ();
         break;
 
-      case 89: // HEADER
+      case 88: // HEADER
         value.template destroy< SpecificationNode* > ();
         break;
 
-      case 101: // PARAM
-      case 105: // TYPE_SYNTAX
+      case 100: // PARAM
+      case 104: // TYPE_SYNTAX
         value.template destroy< Type* > ();
         break;
 
-      case 128: // ASSERT_SYNTAX
-      case 129: // ASSURE_SYNTAX
-      case 144: // SEQ_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 127: // ASSERT_SYNTAX
+      case 128: // ASSURE_SYNTAX
+      case 143: // SEQ_SYNTAX
+      case 144: // PAR_SYNTAX
+      case 153: // ITERATE_SYNTAX
         value.template destroy< UnaryNode* > ();
         break;
 
-      case 135: // UPDATE_SYNTAX
+      case 134: // UPDATE_SYNTAX
         value.template destroy< UpdateNode* > ();
         break;
 
@@ -2170,64 +2165,64 @@ namespace yy {
         value.template destroy< rational_t > ();
         break;
 
-      case 138: // CASE_LABEL
-      case 139: // CASE_LABEL_DEFAULT
-      case 140: // CASE_LABEL_NUMBER
-      case 141: // CASE_LABEL_IDENT
-      case 142: // CASE_LABEL_STRING
+      case 137: // CASE_LABEL
+      case 138: // CASE_LABEL_DEFAULT
+      case 139: // CASE_LABEL_NUMBER
+      case 140: // CASE_LABEL_IDENT
+      case 141: // CASE_LABEL_STRING
         value.template destroy< std::pair<AtomNode*, AstNode*> > ();
         break;
 
-      case 109: // INITIALIZER
+      case 108: // INITIALIZER
         value.template destroy< std::pair<ExpressionBase*, ExpressionBase*> > ();
         break;
 
-      case 125: // DUMPSPEC
+      case 124: // DUMPSPEC
         value.template destroy< std::pair<std::string, std::vector<std::string>> > ();
         break;
 
-      case 100: // FUNCTION_SIGNATURE
+      case 99: // FUNCTION_SIGNATURE
         value.template destroy< std::pair<std::vector<Type*>, Type*> > ();
         break;
 
       case 82: // STRCONST
       case 83: // "identifier"
-      case 114: // RULEREF
+      case 113: // RULEREF
         value.template destroy< std::string > ();
         break;
 
-      case 133: // DEBUG_ATOM_LIST
+      case 132: // DEBUG_ATOM_LIST
         value.template destroy< std::vector<ExpressionBase*> > ();
         break;
 
-      case 116: // LISTCONST
-      case 117: // EXPRESSION_LIST
-      case 118: // EXPRESSION_LIST_NO_COMMA
+      case 115: // LISTCONST
+      case 116: // EXPRESSION_LIST
+      case 117: // EXPRESSION_LIST_NO_COMMA
         value.template destroy< std::vector<ExpressionBase*>* > ();
         break;
 
-      case 102: // PARAM_LIST
-      case 103: // PARAM_LIST_NO_COMMA
-      case 104: // TYPE_IDENTIFIER_STARLIST
-      case 106: // TYPE_SYNTAX_LIST
+      case 101: // PARAM_LIST
+      case 102: // PARAM_LIST_NO_COMMA
+      case 103: // TYPE_IDENTIFIER_STARLIST
+      case 105: // TYPE_SYNTAX_LIST
         value.template destroy< std::vector<Type*> > ();
         break;
 
-      case 137: // CASE_LABEL_LIST
+      case 136: // CASE_LABEL_LIST
         value.template destroy< std::vector<std::pair<AtomNode*, AstNode*>> > ();
         break;
 
-      case 107: // INITIALIZERS
-      case 108: // INITIALIZER_LIST
+      case 106: // INITIALIZERS
+      case 107: // INITIALIZER_LIST
         value.template destroy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > ();
         break;
 
-      case 124: // DUMPSPEC_LIST
+      case 123: // DUMPSPEC_LIST
         value.template destroy< std::vector<std::pair<std::string, std::vector<std::string>>> > ();
         break;
 
-      case 98: // IDENTIFIER_LIST
-      case 99: // IDENTIFIER_LIST_NO_COMMA
+      case 97: // IDENTIFIER_LIST
+      case 98: // IDENTIFIER_LIST_NO_COMMA
         value.template destroy< std::vector<std::string> > ();
         break;
 
@@ -2254,53 +2249,53 @@ namespace yy {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 88: // SPECIFICATION
+      case 87: // SPECIFICATION
         value.move< Ast* > (s.value);
         break;
 
-      case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 89: // BODY_ELEMENTS
+      case 145: // STATEMENTS
         value.move< AstListNode* > (s.value);
         break;
 
-      case 91: // BODY_ELEMENT
-      case 122: // RULE_STMT
-      case 123: // RULE_SYNTAX
-      case 126: // SIMPLE_STMT
-      case 127: // STATEMENT
-      case 131: // IMPOSSIBLE_SYNTAX
+      case 90: // BODY_ELEMENT
+      case 121: // RULE_STMT
+      case 122: // RULE_SYNTAX
+      case 125: // SIMPLE_STMT
+      case 126: // STATEMENT
+      case 130: // IMPOSSIBLE_SYNTAX
         value.move< AstNode* > (s.value);
         break;
 
-      case 111: // VALUE
-      case 113: // NUMBER
-      case 115: // NUMBER_RANGE
+      case 110: // VALUE
+      case 112: // NUMBER
+      case 114: // NUMBER_RANGE
         value.move< AtomNode* > (s.value);
         break;
 
-      case 121: // FUNCTION_SYNTAX
+      case 120: // FUNCTION_SYNTAX
         value.move< BaseFunctionAtom* > (s.value);
         break;
 
-      case 143: // CALL_SYNTAX
+      case 142: // CALL_SYNTAX
         value.move< CallNode* > (s.value);
         break;
 
-      case 136: // CASE_SYNTAX
+      case 135: // CASE_SYNTAX
         value.move< CaseNode* > (s.value);
         break;
 
-      case 130: // DIEDIE_SYNTAX
+      case 129: // DIEDIE_SYNTAX
         value.move< DiedieNode* > (s.value);
         break;
 
-      case 95: // ENUM_SYNTAX
+      case 94: // ENUM_SYNTAX
         value.move< Enum* > (s.value);
         break;
 
-      case 110: // ATOM
-      case 119: // EXPRESSION
-      case 120: // BRACKET_EXPRESSION
+      case 109: // ATOM
+      case 118: // EXPRESSION
+      case 119: // BRACKET_EXPRESSION
         value.move< ExpressionBase* > (s.value);
         break;
 
@@ -2308,12 +2303,12 @@ namespace yy {
         value.move< FLOATING_T > (s.value);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 152: // FORALL_SYNTAX
         value.move< ForallNode* > (s.value);
         break;
 
-      case 96: // DERIVED_SYNTAX
-      case 97: // FUNCTION_DEFINITION
+      case 95: // DERIVED_SYNTAX
+      case 96: // FUNCTION_DEFINITION
         value.move< Function* > (s.value);
         break;
 
@@ -2321,53 +2316,53 @@ namespace yy {
         value.move< INTEGER_T > (s.value);
         break;
 
-      case 147: // IFTHENELSE
+      case 146: // IFTHENELSE
         value.move< IfThenElseNode* > (s.value);
         break;
 
-      case 92: // INIT_SYNTAX
+      case 91: // INIT_SYNTAX
         value.move< InitNode* > (s.value);
         break;
 
-      case 112: // INTEGER_NUMBER
+      case 111: // INTEGER_NUMBER
         value.move< IntegerAtom* > (s.value);
         break;
 
-      case 148: // LET_SYNTAX
+      case 147: // LET_SYNTAX
         value.move< LetNode* > (s.value);
         break;
 
-      case 152: // POP_SYNTAX
+      case 151: // POP_SYNTAX
         value.move< PopNode* > (s.value);
         break;
 
-      case 132: // DEBUG_SYNTAX
-      case 134: // PRINT_SYNTAX
+      case 131: // DEBUG_SYNTAX
+      case 133: // PRINT_SYNTAX
         value.move< PrintNode* > (s.value);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 150: // PUSH_SYNTAX
         value.move< PushNode* > (s.value);
         break;
 
-      case 89: // HEADER
+      case 88: // HEADER
         value.move< SpecificationNode* > (s.value);
         break;
 
-      case 101: // PARAM
-      case 105: // TYPE_SYNTAX
+      case 100: // PARAM
+      case 104: // TYPE_SYNTAX
         value.move< Type* > (s.value);
         break;
 
-      case 128: // ASSERT_SYNTAX
-      case 129: // ASSURE_SYNTAX
-      case 144: // SEQ_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 127: // ASSERT_SYNTAX
+      case 128: // ASSURE_SYNTAX
+      case 143: // SEQ_SYNTAX
+      case 144: // PAR_SYNTAX
+      case 153: // ITERATE_SYNTAX
         value.move< UnaryNode* > (s.value);
         break;
 
-      case 135: // UPDATE_SYNTAX
+      case 134: // UPDATE_SYNTAX
         value.move< UpdateNode* > (s.value);
         break;
 
@@ -2375,64 +2370,64 @@ namespace yy {
         value.move< rational_t > (s.value);
         break;
 
-      case 138: // CASE_LABEL
-      case 139: // CASE_LABEL_DEFAULT
-      case 140: // CASE_LABEL_NUMBER
-      case 141: // CASE_LABEL_IDENT
-      case 142: // CASE_LABEL_STRING
+      case 137: // CASE_LABEL
+      case 138: // CASE_LABEL_DEFAULT
+      case 139: // CASE_LABEL_NUMBER
+      case 140: // CASE_LABEL_IDENT
+      case 141: // CASE_LABEL_STRING
         value.move< std::pair<AtomNode*, AstNode*> > (s.value);
         break;
 
-      case 109: // INITIALIZER
+      case 108: // INITIALIZER
         value.move< std::pair<ExpressionBase*, ExpressionBase*> > (s.value);
         break;
 
-      case 125: // DUMPSPEC
+      case 124: // DUMPSPEC
         value.move< std::pair<std::string, std::vector<std::string>> > (s.value);
         break;
 
-      case 100: // FUNCTION_SIGNATURE
+      case 99: // FUNCTION_SIGNATURE
         value.move< std::pair<std::vector<Type*>, Type*> > (s.value);
         break;
 
       case 82: // STRCONST
       case 83: // "identifier"
-      case 114: // RULEREF
+      case 113: // RULEREF
         value.move< std::string > (s.value);
         break;
 
-      case 133: // DEBUG_ATOM_LIST
+      case 132: // DEBUG_ATOM_LIST
         value.move< std::vector<ExpressionBase*> > (s.value);
         break;
 
-      case 116: // LISTCONST
-      case 117: // EXPRESSION_LIST
-      case 118: // EXPRESSION_LIST_NO_COMMA
+      case 115: // LISTCONST
+      case 116: // EXPRESSION_LIST
+      case 117: // EXPRESSION_LIST_NO_COMMA
         value.move< std::vector<ExpressionBase*>* > (s.value);
         break;
 
-      case 102: // PARAM_LIST
-      case 103: // PARAM_LIST_NO_COMMA
-      case 104: // TYPE_IDENTIFIER_STARLIST
-      case 106: // TYPE_SYNTAX_LIST
+      case 101: // PARAM_LIST
+      case 102: // PARAM_LIST_NO_COMMA
+      case 103: // TYPE_IDENTIFIER_STARLIST
+      case 105: // TYPE_SYNTAX_LIST
         value.move< std::vector<Type*> > (s.value);
         break;
 
-      case 137: // CASE_LABEL_LIST
+      case 136: // CASE_LABEL_LIST
         value.move< std::vector<std::pair<AtomNode*, AstNode*>> > (s.value);
         break;
 
-      case 107: // INITIALIZERS
-      case 108: // INITIALIZER_LIST
+      case 106: // INITIALIZERS
+      case 107: // INITIALIZER_LIST
         value.move< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (s.value);
         break;
 
-      case 124: // DUMPSPEC_LIST
+      case 123: // DUMPSPEC_LIST
         value.move< std::vector<std::pair<std::string, std::vector<std::string>>> > (s.value);
         break;
 
-      case 98: // IDENTIFIER_LIST
-      case 99: // IDENTIFIER_LIST_NO_COMMA
+      case 97: // IDENTIFIER_LIST
+      case 98: // IDENTIFIER_LIST_NO_COMMA
         value.move< std::vector<std::string> > (s.value);
         break;
 
@@ -2499,7 +2494,7 @@ namespace yy {
      305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
      315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
      325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-     335,   336,   337,   338,   339,   340,   341
+     335,   336,   337,   338,   339,   340
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -3008,16 +3003,10 @@ namespace yy {
     return symbol_type (token::UPLUS, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_XIF (const location_type& l)
-  {
-    return symbol_type (token::XIF, l);
-  }
-
 
 
 } // yy
-#line 3021 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3010 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
