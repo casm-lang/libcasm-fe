@@ -228,14 +228,14 @@
 
 %right UMINUS
 %right UPLUS
-%left XIF
 
-%precedence THEN ELSE
-
+%precedence THEN
+%precedence ELSE
+	 
 %precedence UPDATE PRINT ASSURE ASSERT DIEDIE NOT
 
-%nonassoc ","
-%nonassoc FLOATINGCONST INTEGERCONST STRCONST RATIONALCONST IDENTIFIER
+// %nonassoc ","
+// %nonassoc FLOATINGCONST INTEGERCONST STRCONST RATIONALCONST IDENTIFIER
 %nonassoc AND OR
 %nonassoc "=" "<" ">"  NEQUAL LESSEQ GREATEREQ
 %left "-" "+" XOR
@@ -344,6 +344,7 @@ BODY_ELEMENT
   }
 ;
 
+
 INIT_SYNTAX
 : INIT IDENTIFIER
   {
@@ -353,8 +354,9 @@ INIT_SYNTAX
 
 
 PROVIDER_SYNTAX
-: PROVIDER IDENTIFIER // TODO: PPA: REMOVE THIS, BECAUSE THIS IS AN OLD SYNTAX ELEMENT!!!
+: PROVIDER IDENTIFIER
   {
+	  // TODO: PPA: REMOVE THIS, BECAUSE THIS IS AN OLD SYNTAX ELEMENT!!!
 	  driver.error( @$, "invalid/obsolete syntax element!" );
   }
 ;
@@ -413,7 +415,6 @@ DERIVED_SYNTAX
   {
 	  $$ = new Function($2, @$, $6, new Type(TypeType::UNKNOWN));
   }
-/* again with type syntax */
 | DERIVED IDENTIFIER "(" PARAM_LIST ")" ":" TYPE_SYNTAX "=" EXPRESSION
   {
 	  $$ = new Function($2, @$, $4, $9, $7);
@@ -1356,7 +1357,6 @@ STATEMENTS
 
 IFTHENELSE
 : IF EXPRESSION THEN STATEMENT
-  %prec XIF
   {
 	  $$ = new IfThenElseNode( @$, $2, $4, nullptr );
   }
@@ -1365,6 +1365,7 @@ IFTHENELSE
 	  $$ = new IfThenElseNode( @$, $2, $4, $6 );
   }
 ;
+
 
 
 LET_SYNTAX
