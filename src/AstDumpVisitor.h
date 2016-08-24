@@ -79,6 +79,7 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     
     bool visit_expression(Expression *expr, bool, bool);
     bool visit_expression_single(Expression *expr, bool);
+    bool visit_zero_atom( ZeroAtom *atom );
     bool visit_int_atom(IntegerAtom *atom);
     bool visit_bit_atom(IntegerAtom *atom);
     bool visit_floating_atom(FloatingAtom *atom);

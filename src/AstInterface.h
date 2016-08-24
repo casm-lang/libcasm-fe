@@ -192,6 +192,11 @@ namespace libcasm_fe
 			return 0;
 		}
     
+		T visit_zero_atom( ZeroAtom* node )
+		{
+			return 0;
+		}
+
 		T visit_int_atom( IntegerAtom* node )
 		{
 			return 0;

@@ -43,6 +43,7 @@ class value_t;
 enum NodeType {
   ASSERT,
   UNDEF_ATOM,
+  ZERO_ATOM,
   INTEGER_ATOM,
   FLOATING_ATOM,
   RATIONAL_ATOM,
@@ -196,6 +197,17 @@ class AtomNode: public ExpressionBase {
   public:
     AtomNode(yy::location& loc, NodeType node_type, Type type) : ExpressionBase(loc, node_type, type) {}
 };
+
+
+class ZeroAtom : public AtomNode
+{
+private:
+    AstNode* ref;
+public:
+    ZeroAtom( yy::location& loc, AstNode* reference );
+    const AstNode* getRef( void ) const;
+};
+
 
 class IntegerAtom : public AtomNode {
   public:

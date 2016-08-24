@@ -172,7 +172,7 @@ END       0 "end of file"
 %type <RationalAtom*> RATIONAL_NUMBER 
 %type <std::pair<ExpressionBase*, ExpressionBase*>> INITIALIZER
 %type <std::vector<std::pair<ExpressionBase*, ExpressionBase*>>*> INITIALIZER_LIST INITIALIZERS
-%type <ExpressionBase*> EXPRESSION BRACKET_EXPRESSION ATOM
+%type <ExpressionBase*> EXPRESSION ATOM
 %type <std::vector<ExpressionBase*>*> EXPRESSION_LIST EXPRESSION_LIST_NO_COMMA LISTCONST
 %type <UpdateNode*> UPDATE_SYNTAX
 %type <INTEGER_T> INTEGERCONST
@@ -677,10 +677,55 @@ ATOM
   {
 	  $$ = $1;
   }
-| BRACKET_EXPRESSION
+| LPAREN EXPRESSION RPAREN
   {
-	  $$ = $1;
+	  $$ = $2;
   }
+| PLUS LPAREN EXPRESSION RPAREN
+  {
+	  $$ = $3;
+  }
+| MINUS LPAREN EXPRESSION RPAREN
+  {
+	  $$ = new Expression( @$, new ZeroAtom( @$, $3 ), $3, ExpressionOperation::SUB );
+  }
+// | PLUS LPAREN EXPRESSION RPAREN
+//   {
+// 	  $$ = $3;
+//   }
+// | MINUS LPAREN EXPRESSION RPAREN
+//   {	  
+// 	  AstNode* zero = 0;
+	  
+// 	  if( $3->type_.t == TypeType::INTEGER )
+// 	  {
+// 		  zero = new IntegerAtom( @$, 0 );
+// 	  }
+// 	  else if( $3->type_.t == TypeType::FLOATING )
+// 	  {
+// 		  zero = new FloatingAtom( @$, 0 );
+// 	  }
+// 	  else if( $3->type_.t == TypeType::RATIONAL )
+// 	  {
+// 		  zero = new RationalAtom( @$, rational_t( 0, 1 ) );
+// 	  }
+// 	  else
+// 	  {
+// 		  zero = $3;
+		  
+// 		  driver.error
+// 		  ( @$
+// 		  , "type '"
+// 			+ type_to_str( $3->node_type_ )
+// 			+ "' cannot be used for the expression '"
+// 			+ $3->to_str()
+// 			+ "'"			
+// 		  );
+// 		  assert(0);
+// 	  }
+	  
+// 	  $$ = new Expression( @$, new IntegerAtom( @$, 0 ), $3, ExpressionOperation::SUB );
+//   }
 ;
 
 
@@ -741,7 +786,11 @@ NUMBER
 
 
 INTEGER_NUMBER
-: PLUS INTEGERCONST
+: INTEGERCONST
+  {
+	  $$ = new IntegerAtom( @$, $1 );
+  }
+| PLUS INTEGERCONST
   {
 	  $$ = new IntegerAtom( @$, $2 );
   }
@@ -749,15 +798,15 @@ INTEGER_NUMBER
   {
 	  $$ = new IntegerAtom( @$, (-1) * $2 );
   }
-| INTEGERCONST
-  {
-	  $$ = new IntegerAtom( @$, $1 );
-  }
 ;
 
 
 FLOATING_NUMBER
-: PLUS FLOATINGCONST
+: FLOATINGCONST
+  {
+	  $$ = new FloatingAtom( @$, $1 );
+  }
+| PLUS FLOATINGCONST
   {
 	  $$ = new FloatingAtom( @$, $2 );
   }
@@ -765,15 +814,15 @@ FLOATING_NUMBER
   {
 	  $$ = new FloatingAtom( @$, (-1) * $2 );
   }
-| FLOATINGCONST
-  {
-	  $$ = new FloatingAtom( @$, $1 );
-  }
 ;
 
 
 RATIONAL_NUMBER
-: PLUS RATIONALCONST
+: RATIONALCONST
+  {
+	  $$ = new RationalAtom( @$, $1 );
+  }
+| PLUS RATIONALCONST
   {
 	  $$ = new RationalAtom( @$, $2 );
   }
@@ -781,10 +830,6 @@ RATIONAL_NUMBER
   {
 	  $2.numerator *= -1;
 	  $$ = new RationalAtom( @$, $2 );
-  }
-| RATIONALCONST
-  {
-	  $$ = new RationalAtom( @$, $1 );
   }
 ;
 
@@ -919,14 +964,6 @@ EXPRESSION
 | ATOM
   {
 	  $$ = $1;
-  }
-;
-
-
-BRACKET_EXPRESSION
-: LPAREN EXPRESSION RPAREN
-  {
-	  $$ = $2;
   }
 ;
 

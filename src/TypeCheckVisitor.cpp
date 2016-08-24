@@ -532,6 +532,39 @@ Type* TypecheckVisitor::visit_expression(Expression *expr, Type*, Type*) {
       driver_.error( expr->location, "size of 'Bit' types in expression did not match: " + lhs->to_str() + " != " + rhs->to_str() );   
   }
   
+  if( expr->left_->node_type_ == NodeType::ZERO_ATOM )
+  {
+      ZeroAtom* tmp = reinterpret_cast< ZeroAtom* >( expr->left_ );
+      
+      switch( tmp->getRef()->type_.t )
+      {
+          case TypeType::INTEGER:
+          {
+              tmp = (ZeroAtom*)new IntegerAtom( tmp->location, 0 );
+              break;
+          }
+          case TypeType::FLOATING:
+          {
+              tmp = (ZeroAtom*)new FloatingAtom( tmp->location, 0 );
+              break;
+          }
+          case TypeType::RATIONAL:
+          {
+              tmp = (ZeroAtom*)new RationalAtom( tmp->location, rational_t( 0, 1 ) );
+              break;
+          }
+          default:
+          {
+              driver_.error
+              ( tmp->getRef()->location
+              , "invalid unary operator type '" + tmp->getRef()->type_.to_str() + "'"
+              );
+          }
+      }
+      delete expr->left_;
+      expr->left_ = tmp;
+  }
+  
   switch (expr->op) {
     case ExpressionOperation::ADD:
     case ExpressionOperation::SUB:
@@ -601,6 +634,7 @@ Type* TypecheckVisitor::visit_expression_single(Expression *expr, Type*) {
   }
 
 }
+
 
 Type* TypecheckVisitor::visit_function_atom(FunctionAtom *atom, Type* arguments[],
                                             uint16_t num_arguments) {
