@@ -78,84 +78,9 @@ char strbuf[STRBUF_LENGTH];
     loc.step ();
 %}
 
-and { return yy::casmi_parser::make_AND(loc); }
-or { return yy::casmi_parser::make_OR(loc); }
-xor { return yy::casmi_parser::make_XOR(loc); }
-not { return yy::casmi_parser::make_NOT(loc); }
-assert { return yy::casmi_parser::make_ASSERT(loc); }
-assure { return yy::casmi_parser::make_ASSURE(loc); }
-diedie { return yy::casmi_parser::make_DIEDIE(loc); }
-impossible { return yy::casmi_parser::make_IMPOSSIBLE(loc); }
-skip { return yy::casmi_parser::make_SKIP(loc); }
-seq { return yy::casmi_parser::make_SEQ(loc); }
-endseq { return yy::casmi_parser::make_ENDSEQ(loc); }
-par { return yy::casmi_parser::make_PAR(loc); }
-endpar { return yy::casmi_parser::make_ENDPAR(loc); }
-let { return yy::casmi_parser::make_LET(loc); }
-in { return yy::casmi_parser::make_IN(loc); }
-if { return yy::casmi_parser::make_IF(loc); }
-then { return yy::casmi_parser::make_THEN(loc); }
-else { return yy::casmi_parser::make_ELSE(loc); }
-print { return yy::casmi_parser::make_PRINT(loc); }
-debug { return yy::casmi_parser::make_DEBUG(loc); }
-dumps { return yy::casmi_parser::make_DUMPS(loc); }
-push { return yy::casmi_parser::make_PUSH(loc); }
-into { return yy::casmi_parser::make_INTO(loc); }
-pop { return yy::casmi_parser::make_POP(loc); }
-from { return yy::casmi_parser::make_FROM(loc); }
-forall { return yy::casmi_parser::make_FORALL(loc); }
-iterate { return yy::casmi_parser::make_ITERATE(loc); }
-do { return yy::casmi_parser::make_DO(loc); }
-call { return yy::casmi_parser::make_CALL(loc); }
-case { return yy::casmi_parser::make_CASE(loc); }
-default { return yy::casmi_parser::make_DEFAULT(loc); }
-of { return yy::casmi_parser::make_OF(loc); }
-endcase { return yy::casmi_parser::make_ENDCASE(loc); }
-initially { return yy::casmi_parser::make_INITIALLY(loc); }
-function { return yy::casmi_parser::make_FUNCTION(loc); }
-derived { return yy::casmi_parser::make_DERIVED(loc); }
-enum { return yy::casmi_parser::make_ENUM(loc); }
-rule { return yy::casmi_parser::make_RULE(loc); }
-provider { return yy::casmi_parser::make_PROVIDER(loc); }
-init { return yy::casmi_parser::make_INIT(loc); }
-option { return yy::casmi_parser::make_OPTION(loc); }
-self { return yy::casmi_parser::make_SELF(loc); }
-undef { return yy::casmi_parser::make_UNDEF(loc); }
-true { return yy::casmi_parser::make_TRUE(loc); }
-false { return yy::casmi_parser::make_FALSE(loc); }
-CASM { return yy::casmi_parser::make_CASM(loc); }
-symbol { return yy::casmi_parser::make_SYMBOL(loc); }
-intern_debug { return yy::casmi_parser::make_INTERN(loc); }
-div { return yy::casmi_parser::make_RATIONAL_DIV(loc); }
-objdump { return yy::casmi_parser::make_OBJDUMP(loc); }
 
-"+" { return  yy::casmi_parser::make_PLUS(loc); }
-"-" { return yy::casmi_parser::make_MINUS(loc); }
-"=" { return yy::casmi_parser::make_EQ(loc); }
-"(" { return yy::casmi_parser::make_LPAREN(loc); }
-")" { return yy::casmi_parser::make_RPAREN(loc); }
-"[" { return yy::casmi_parser::make_LSQPAREN(loc); }
-"]" { return yy::casmi_parser::make_RSQPAREN(loc); }
-"{" { return yy::casmi_parser::make_LCURPAREN(loc); }
-"}" { return yy::casmi_parser::make_RCURPAREN(loc); }
-"\." { return yy::casmi_parser::make_DOT(loc); }
-":" { return yy::casmi_parser::make_COLON(loc); }
-"@" { return yy::casmi_parser::make_AT(loc); }
-"," { return yy::casmi_parser::make_COMMA(loc); }
-"<" { return yy::casmi_parser::make_LESSER(loc); }
-">" { return yy::casmi_parser::make_GREATER(loc); }
-"*" { return yy::casmi_parser::make_STAR(loc); }
-"/" { return yy::casmi_parser::make_SLASH(loc); }
-"%" { return yy::casmi_parser::make_PERCENT(loc); }
+{{grammartoken}}
 
-".." { return yy::casmi_parser::make_DOTDOT(loc); }
-"->" { return yy::casmi_parser::make_ARROW(loc); }
-":=" { return yy::casmi_parser::make_UPDATE(loc); }
-"!=" { return yy::casmi_parser::make_NEQUAL(loc); }
-"<=" { return yy::casmi_parser::make_LESSEQ(loc); }
-">=" { return yy::casmi_parser::make_GREATEREQ(loc); }
-"{|" { return yy::casmi_parser::make_SEQ_BRACKET(loc); }
-"|}" { return yy::casmi_parser::make_ENDSEQ_BRACKET(loc); }
 
 [a-zA-Z_][a-zA-Z0-9\_]* { return yy::casmi_parser::make_IDENTIFIER(yytext, loc); }
 

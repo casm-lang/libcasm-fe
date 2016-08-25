@@ -40,7 +40,7 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 36 "../../src/GrammarParser.yy" // lalr1.cc:377
+#line 36 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 
     #include <cstdint>
     #include <string>
@@ -332,112 +332,117 @@ namespace yy {
 
       // ATOM
       // EXPRESSION
-      // BRACKET_EXPRESSION
       char dummy10[sizeof(ExpressionBase*)];
 
-      // FLOATINGCONST
+      // "floating"
       char dummy11[sizeof(FLOATING_T)];
 
+      // FLOATING_NUMBER
+      char dummy12[sizeof(FloatingAtom*)];
+
       // FORALL_SYNTAX
-      char dummy12[sizeof(ForallNode*)];
+      char dummy13[sizeof(ForallNode*)];
 
       // DERIVED_SYNTAX
       // FUNCTION_DEFINITION
-      char dummy13[sizeof(Function*)];
+      char dummy14[sizeof(Function*)];
 
-      // INTEGERCONST
-      char dummy14[sizeof(INTEGER_T)];
+      // "integer"
+      char dummy15[sizeof(INTEGER_T)];
 
       // IFTHENELSE
-      char dummy15[sizeof(IfThenElseNode*)];
+      char dummy16[sizeof(IfThenElseNode*)];
 
       // INIT_SYNTAX
-      char dummy16[sizeof(InitNode*)];
+      char dummy17[sizeof(InitNode*)];
 
       // INTEGER_NUMBER
-      char dummy17[sizeof(IntegerAtom*)];
+      char dummy18[sizeof(IntegerAtom*)];
 
       // LET_SYNTAX
-      char dummy18[sizeof(LetNode*)];
+      char dummy19[sizeof(LetNode*)];
 
       // POP_SYNTAX
-      char dummy19[sizeof(PopNode*)];
+      char dummy20[sizeof(PopNode*)];
 
       // DEBUG_SYNTAX
       // PRINT_SYNTAX
-      char dummy20[sizeof(PrintNode*)];
+      char dummy21[sizeof(PrintNode*)];
 
       // PUSH_SYNTAX
-      char dummy21[sizeof(PushNode*)];
+      char dummy22[sizeof(PushNode*)];
+
+      // RATIONAL_NUMBER
+      char dummy23[sizeof(RationalAtom*)];
 
       // HEADER
-      char dummy22[sizeof(SpecificationNode*)];
+      char dummy24[sizeof(SpecificationNode*)];
 
       // PARAM
       // TYPE_SYNTAX
-      char dummy23[sizeof(Type*)];
+      char dummy25[sizeof(Type*)];
 
       // ASSERT_SYNTAX
       // ASSURE_SYNTAX
       // SEQ_SYNTAX
       // PAR_SYNTAX
       // ITERATE_SYNTAX
-      char dummy24[sizeof(UnaryNode*)];
+      char dummy26[sizeof(UnaryNode*)];
 
       // UPDATE_SYNTAX
-      char dummy25[sizeof(UpdateNode*)];
+      char dummy27[sizeof(UpdateNode*)];
 
-      // RATIONALCONST
-      char dummy26[sizeof(rational_t)];
+      // "rational"
+      char dummy28[sizeof(rational_t)];
 
       // CASE_LABEL
       // CASE_LABEL_DEFAULT
       // CASE_LABEL_NUMBER
       // CASE_LABEL_IDENT
       // CASE_LABEL_STRING
-      char dummy27[sizeof(std::pair<AtomNode*, AstNode*>)];
+      char dummy29[sizeof(std::pair<AtomNode*, AstNode*>)];
 
       // INITIALIZER
-      char dummy28[sizeof(std::pair<ExpressionBase*, ExpressionBase*>)];
+      char dummy30[sizeof(std::pair<ExpressionBase*, ExpressionBase*>)];
 
       // DUMPSPEC
-      char dummy29[sizeof(std::pair<std::string, std::vector<std::string>>)];
+      char dummy31[sizeof(std::pair<std::string, std::vector<std::string>>)];
 
       // FUNCTION_SIGNATURE
-      char dummy30[sizeof(std::pair<std::vector<Type*>, Type*>)];
+      char dummy32[sizeof(std::pair<std::vector<Type*>, Type*>)];
 
-      // STRCONST
+      // "string"
       // "identifier"
       // RULEREF
-      char dummy31[sizeof(std::string)];
+      char dummy33[sizeof(std::string)];
 
       // DEBUG_ATOM_LIST
-      char dummy32[sizeof(std::vector<ExpressionBase*>)];
+      char dummy34[sizeof(std::vector<ExpressionBase*>)];
 
       // LISTCONST
       // EXPRESSION_LIST
       // EXPRESSION_LIST_NO_COMMA
-      char dummy33[sizeof(std::vector<ExpressionBase*>*)];
+      char dummy35[sizeof(std::vector<ExpressionBase*>*)];
 
       // PARAM_LIST
       // PARAM_LIST_NO_COMMA
       // TYPE_IDENTIFIER_STARLIST
       // TYPE_SYNTAX_LIST
-      char dummy34[sizeof(std::vector<Type*>)];
+      char dummy36[sizeof(std::vector<Type*>)];
 
       // CASE_LABEL_LIST
-      char dummy35[sizeof(std::vector<std::pair<AtomNode*, AstNode*>>)];
+      char dummy37[sizeof(std::vector<std::pair<AtomNode*, AstNode*>>)];
 
       // INITIALIZERS
       // INITIALIZER_LIST
-      char dummy36[sizeof(std::vector<std::pair<ExpressionBase*, ExpressionBase*>>*)];
+      char dummy38[sizeof(std::vector<std::pair<ExpressionBase*, ExpressionBase*>>*)];
 
       // DUMPSPEC_LIST
-      char dummy37[sizeof(std::vector<std::pair<std::string, std::vector<std::string>>>)];
+      char dummy39[sizeof(std::vector<std::pair<std::string, std::vector<std::string>>>)];
 
       // IDENTIFIER_LIST
       // IDENTIFIER_LIST_NO_COMMA
-      char dummy38[sizeof(std::vector<std::string>)];
+      char dummy40[sizeof(std::vector<std::string>)];
 };
 
     /// Symbol semantic values.
@@ -461,90 +466,83 @@ namespace yy {
       enum yytokentype
       {
         END = 0,
-        AND = 258,
-        OR = 259,
-        XOR = 260,
-        NOT = 261,
-        ASSERT = 262,
-        ASSURE = 263,
-        DIEDIE = 264,
-        IMPOSSIBLE = 265,
-        SKIP = 266,
+        CASM = 258,
+        INIT = 259,
+        OPTION = 260,
+        DERIVED = 261,
+        ENUM = 262,
+        RULE = 263,
+        DUMPS = 264,
+        FUNCTION = 265,
+        INITIALLY = 266,
         SEQ = 267,
         ENDSEQ = 268,
         PAR = 269,
         ENDPAR = 270,
-        LET = 271,
-        IN = 272,
-        IF = 273,
-        THEN = 274,
-        ELSE = 275,
-        PRINT = 276,
-        DEBUG = 277,
-        DUMPS = 278,
-        PUSH = 279,
-        INTO = 280,
-        POP = 281,
-        FROM = 282,
-        FORALL = 283,
-        ITERATE = 284,
-        DO = 285,
-        CALL = 286,
-        CASE = 287,
-        DEFAULT = 288,
-        OF = 289,
-        ENDCASE = 290,
-        INITIALLY = 291,
-        FUNCTION = 292,
-        DERIVED = 293,
-        ENUM = 294,
-        RULE = 295,
-        PROVIDER = 296,
-        INIT = 297,
-        OPTION = 298,
-        SELF = 299,
-        UNDEF = 300,
-        TRUE = 301,
-        FALSE = 302,
-        CASM = 303,
-        SYMBOL = 304,
-        INTERN = 305,
-        RATIONAL_DIV = 306,
-        OBJDUMP = 307,
-        DOTDOT = 308,
-        ARROW = 309,
-        UPDATE = 310,
-        NEQUAL = 311,
-        LESSEQ = 312,
-        GREATEREQ = 313,
-        SEQ_BRACKET = 314,
-        ENDSEQ_BRACKET = 315,
-        PLUS = 316,
-        MINUS = 317,
-        EQ = 318,
-        LPAREN = 319,
-        RPAREN = 320,
-        LSQPAREN = 321,
-        RSQPAREN = 322,
-        LCURPAREN = 323,
-        RCURPAREN = 324,
-        DOT = 325,
-        COLON = 326,
-        AT = 327,
-        COMMA = 328,
-        LESSER = 329,
-        GREATER = 330,
-        STAR = 331,
-        SLASH = 332,
-        PERCENT = 333,
-        FLOATINGCONST = 334,
-        INTEGERCONST = 335,
-        RATIONALCONST = 336,
-        STRCONST = 337,
-        IDENTIFIER = 338,
-        UMINUS = 339,
-        UPLUS = 340,
-        XIF = 341
+        ASSERT = 271,
+        ASSURE = 272,
+        DIEDIE = 273,
+        IMPOSSIBLE = 274,
+        SKIP = 275,
+        LET = 276,
+        IN = 277,
+        FORALL = 278,
+        ITERATE = 279,
+        DO = 280,
+        CALL = 281,
+        IF = 282,
+        THEN = 283,
+        ELSE = 284,
+        CASE = 285,
+        OF = 286,
+        DEFAULT = 287,
+        ENDCASE = 288,
+        PRINT = 289,
+        DEBUG = 290,
+        PUSH = 291,
+        INTO = 292,
+        POP = 293,
+        FROM = 294,
+        SELF = 295,
+        UNDEF = 296,
+        FALSE = 297,
+        TRUE = 298,
+        AND = 299,
+        OR = 300,
+        XOR = 301,
+        NOT = 302,
+        RATIONAL_DIV = 303,
+        PLUS = 304,
+        MINUS = 305,
+        EQUAL = 306,
+        LPAREN = 307,
+        RPAREN = 308,
+        LSQPAREN = 309,
+        RSQPAREN = 310,
+        LCURPAREN = 311,
+        RCURPAREN = 312,
+        DOT = 313,
+        COLON = 314,
+        AT = 315,
+        COMMA = 316,
+        LESSER = 317,
+        GREATER = 318,
+        STAR = 319,
+        SLASH = 320,
+        PERCENT = 321,
+        DOTDOT = 322,
+        ARROW = 323,
+        UPDATE = 324,
+        NEQUAL = 325,
+        LESSEQ = 326,
+        GREATEREQ = 327,
+        SEQ_BRACKET = 328,
+        ENDSEQ_BRACKET = 329,
+        FLOATINGCONST = 330,
+        INTEGERCONST = 331,
+        RATIONALCONST = 332,
+        STRCONST = 333,
+        IDENTIFIER = 334
       };
     };
 
@@ -604,6 +602,8 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const FLOATING_T v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const FloatingAtom* v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const ForallNode* v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Function* v, const location_type& l);
@@ -623,6 +623,8 @@ namespace yy {
   basic_symbol (typename Base::kind_type t, const PrintNode* v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const PushNode* v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const RationalAtom* v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const SpecificationNode* v, const location_type& l);
 
@@ -731,19 +733,55 @@ namespace yy {
 
     static inline
     symbol_type
-    make_AND (const location_type& l);
+    make_CASM (const location_type& l);
 
     static inline
     symbol_type
-    make_OR (const location_type& l);
+    make_INIT (const location_type& l);
 
     static inline
     symbol_type
-    make_XOR (const location_type& l);
+    make_OPTION (const location_type& l);
 
     static inline
     symbol_type
-    make_NOT (const location_type& l);
+    make_DERIVED (const location_type& l);
+
+    static inline
+    symbol_type
+    make_ENUM (const location_type& l);
+
+    static inline
+    symbol_type
+    make_RULE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_DUMPS (const location_type& l);
+
+    static inline
+    symbol_type
+    make_FUNCTION (const location_type& l);
+
+    static inline
+    symbol_type
+    make_INITIALLY (const location_type& l);
+
+    static inline
+    symbol_type
+    make_SEQ (const location_type& l);
+
+    static inline
+    symbol_type
+    make_ENDSEQ (const location_type& l);
+
+    static inline
+    symbol_type
+    make_PAR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_ENDPAR (const location_type& l);
 
     static inline
     symbol_type
@@ -767,67 +805,11 @@ namespace yy {
 
     static inline
     symbol_type
-    make_SEQ (const location_type& l);
-
-    static inline
-    symbol_type
-    make_ENDSEQ (const location_type& l);
-
-    static inline
-    symbol_type
-    make_PAR (const location_type& l);
-
-    static inline
-    symbol_type
-    make_ENDPAR (const location_type& l);
-
-    static inline
-    symbol_type
     make_LET (const location_type& l);
 
     static inline
     symbol_type
     make_IN (const location_type& l);
-
-    static inline
-    symbol_type
-    make_IF (const location_type& l);
-
-    static inline
-    symbol_type
-    make_THEN (const location_type& l);
-
-    static inline
-    symbol_type
-    make_ELSE (const location_type& l);
-
-    static inline
-    symbol_type
-    make_PRINT (const location_type& l);
-
-    static inline
-    symbol_type
-    make_DEBUG (const location_type& l);
-
-    static inline
-    symbol_type
-    make_DUMPS (const location_type& l);
-
-    static inline
-    symbol_type
-    make_PUSH (const location_type& l);
-
-    static inline
-    symbol_type
-    make_INTO (const location_type& l);
-
-    static inline
-    symbol_type
-    make_POP (const location_type& l);
-
-    static inline
-    symbol_type
-    make_FROM (const location_type& l);
 
     static inline
     symbol_type
@@ -847,11 +829,19 @@ namespace yy {
 
     static inline
     symbol_type
-    make_CASE (const location_type& l);
+    make_IF (const location_type& l);
 
     static inline
     symbol_type
-    make_DEFAULT (const location_type& l);
+    make_THEN (const location_type& l);
+
+    static inline
+    symbol_type
+    make_ELSE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_CASE (const location_type& l);
 
     static inline
     symbol_type
@@ -859,39 +849,35 @@ namespace yy {
 
     static inline
     symbol_type
+    make_DEFAULT (const location_type& l);
+
+    static inline
+    symbol_type
     make_ENDCASE (const location_type& l);
 
     static inline
     symbol_type
-    make_INITIALLY (const location_type& l);
+    make_PRINT (const location_type& l);
 
     static inline
     symbol_type
-    make_FUNCTION (const location_type& l);
+    make_DEBUG (const location_type& l);
 
     static inline
     symbol_type
-    make_DERIVED (const location_type& l);
+    make_PUSH (const location_type& l);
 
     static inline
     symbol_type
-    make_ENUM (const location_type& l);
+    make_INTO (const location_type& l);
 
     static inline
     symbol_type
-    make_RULE (const location_type& l);
+    make_POP (const location_type& l);
 
     static inline
     symbol_type
-    make_PROVIDER (const location_type& l);
-
-    static inline
-    symbol_type
-    make_INIT (const location_type& l);
-
-    static inline
-    symbol_type
-    make_OPTION (const location_type& l);
+    make_FROM (const location_type& l);
 
     static inline
     symbol_type
@@ -903,63 +889,31 @@ namespace yy {
 
     static inline
     symbol_type
-    make_TRUE (const location_type& l);
-
-    static inline
-    symbol_type
     make_FALSE (const location_type& l);
 
     static inline
     symbol_type
-    make_CASM (const location_type& l);
+    make_TRUE (const location_type& l);
 
     static inline
     symbol_type
-    make_SYMBOL (const location_type& l);
+    make_AND (const location_type& l);
 
     static inline
     symbol_type
-    make_INTERN (const location_type& l);
+    make_OR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_XOR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_NOT (const location_type& l);
 
     static inline
     symbol_type
     make_RATIONAL_DIV (const location_type& l);
-
-    static inline
-    symbol_type
-    make_OBJDUMP (const location_type& l);
-
-    static inline
-    symbol_type
-    make_DOTDOT (const location_type& l);
-
-    static inline
-    symbol_type
-    make_ARROW (const location_type& l);
-
-    static inline
-    symbol_type
-    make_UPDATE (const location_type& l);
-
-    static inline
-    symbol_type
-    make_NEQUAL (const location_type& l);
-
-    static inline
-    symbol_type
-    make_LESSEQ (const location_type& l);
-
-    static inline
-    symbol_type
-    make_GREATEREQ (const location_type& l);
-
-    static inline
-    symbol_type
-    make_SEQ_BRACKET (const location_type& l);
-
-    static inline
-    symbol_type
-    make_ENDSEQ_BRACKET (const location_type& l);
 
     static inline
     symbol_type
@@ -971,7 +925,7 @@ namespace yy {
 
     static inline
     symbol_type
-    make_EQ (const location_type& l);
+    make_EQUAL (const location_type& l);
 
     static inline
     symbol_type
@@ -1035,6 +989,38 @@ namespace yy {
 
     static inline
     symbol_type
+    make_DOTDOT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_ARROW (const location_type& l);
+
+    static inline
+    symbol_type
+    make_UPDATE (const location_type& l);
+
+    static inline
+    symbol_type
+    make_NEQUAL (const location_type& l);
+
+    static inline
+    symbol_type
+    make_LESSEQ (const location_type& l);
+
+    static inline
+    symbol_type
+    make_GREATEREQ (const location_type& l);
+
+    static inline
+    symbol_type
+    make_SEQ_BRACKET (const location_type& l);
+
+    static inline
+    symbol_type
+    make_ENDSEQ_BRACKET (const location_type& l);
+
+    static inline
+    symbol_type
     make_FLOATINGCONST (const FLOATING_T& v, const location_type& l);
 
     static inline
@@ -1052,18 +1038,6 @@ namespace yy {
     static inline
     symbol_type
     make_IDENTIFIER (const std::string& v, const location_type& l);
-
-    static inline
-    symbol_type
-    make_UMINUS (const location_type& l);
-
-    static inline
-    symbol_type
-    make_UPLUS (const location_type& l);
-
-    static inline
-    symbol_type
-    make_XIF (const location_type& l);
 
 
     /// Build a parser object.
@@ -1270,12 +1244,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1013,     ///< Last index in yytable_.
+      yylast_ = 1059,     ///< Last index in yytable_.
       yynnts_ = 68,  ///< Number of nonterminal symbols.
       yyfinal_ = 5, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 87  ///< Number of tokens.
+      yyntokens_ = 80  ///< Number of tokens.
     };
 
 
@@ -1325,10 +1299,9 @@ namespace yy {
       45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
-      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86
+      75,    76,    77,    78,    79
     };
-    const unsigned int user_token_number_max_ = 341;
+    const unsigned int user_token_number_max_ = 334;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -1361,185 +1334,192 @@ namespace yy {
   {
       switch (other.type_get ())
     {
-      case 88: // SPECIFICATION
+      case 81: // SPECIFICATION
         value.copy< Ast* > (other.value);
         break;
 
-      case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 83: // BODY_ELEMENTS
+      case 139: // STATEMENTS
         value.copy< AstListNode* > (other.value);
         break;
 
-      case 91: // BODY_ELEMENT
-      case 122: // RULE_STMT
-      case 123: // RULE_SYNTAX
-      case 126: // SIMPLE_STMT
-      case 127: // STATEMENT
-      case 131: // IMPOSSIBLE_SYNTAX
+      case 84: // BODY_ELEMENT
+      case 115: // RULE_STMT
+      case 116: // RULE_SYNTAX
+      case 119: // SIMPLE_STMT
+      case 120: // STATEMENT
+      case 124: // IMPOSSIBLE_SYNTAX
         value.copy< AstNode* > (other.value);
         break;
 
-      case 111: // VALUE
-      case 113: // NUMBER
-      case 115: // NUMBER_RANGE
+      case 103: // VALUE
+      case 104: // NUMBER
+      case 109: // NUMBER_RANGE
         value.copy< AtomNode* > (other.value);
         break;
 
-      case 121: // FUNCTION_SYNTAX
+      case 114: // FUNCTION_SYNTAX
         value.copy< BaseFunctionAtom* > (other.value);
         break;
 
-      case 143: // CALL_SYNTAX
+      case 136: // CALL_SYNTAX
         value.copy< CallNode* > (other.value);
         break;
 
-      case 136: // CASE_SYNTAX
+      case 129: // CASE_SYNTAX
         value.copy< CaseNode* > (other.value);
         break;
 
-      case 130: // DIEDIE_SYNTAX
+      case 123: // DIEDIE_SYNTAX
         value.copy< DiedieNode* > (other.value);
         break;
 
-      case 95: // ENUM_SYNTAX
+      case 87: // ENUM_SYNTAX
         value.copy< Enum* > (other.value);
         break;
 
-      case 110: // ATOM
-      case 119: // EXPRESSION
-      case 120: // BRACKET_EXPRESSION
+      case 102: // ATOM
+      case 113: // EXPRESSION
         value.copy< ExpressionBase* > (other.value);
         break;
 
-      case 79: // FLOATINGCONST
+      case 75: // "floating"
         value.copy< FLOATING_T > (other.value);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 106: // FLOATING_NUMBER
+        value.copy< FloatingAtom* > (other.value);
+        break;
+
+      case 146: // FORALL_SYNTAX
         value.copy< ForallNode* > (other.value);
         break;
 
-      case 96: // DERIVED_SYNTAX
-      case 97: // FUNCTION_DEFINITION
+      case 88: // DERIVED_SYNTAX
+      case 89: // FUNCTION_DEFINITION
         value.copy< Function* > (other.value);
         break;
 
-      case 80: // INTEGERCONST
+      case 76: // "integer"
         value.copy< INTEGER_T > (other.value);
         break;
 
-      case 147: // IFTHENELSE
+      case 140: // IFTHENELSE
         value.copy< IfThenElseNode* > (other.value);
         break;
 
-      case 92: // INIT_SYNTAX
+      case 85: // INIT_SYNTAX
         value.copy< InitNode* > (other.value);
         break;
 
-      case 112: // INTEGER_NUMBER
+      case 105: // INTEGER_NUMBER
         value.copy< IntegerAtom* > (other.value);
         break;
 
-      case 148: // LET_SYNTAX
+      case 141: // LET_SYNTAX
         value.copy< LetNode* > (other.value);
         break;
 
-      case 152: // POP_SYNTAX
+      case 145: // POP_SYNTAX
         value.copy< PopNode* > (other.value);
         break;
 
-      case 132: // DEBUG_SYNTAX
-      case 134: // PRINT_SYNTAX
+      case 125: // DEBUG_SYNTAX
+      case 127: // PRINT_SYNTAX
         value.copy< PrintNode* > (other.value);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 144: // PUSH_SYNTAX
         value.copy< PushNode* > (other.value);
         break;
 
-      case 89: // HEADER
+      case 107: // RATIONAL_NUMBER
+        value.copy< RationalAtom* > (other.value);
+        break;
+
+      case 82: // HEADER
         value.copy< SpecificationNode* > (other.value);
         break;
 
-      case 101: // PARAM
-      case 105: // TYPE_SYNTAX
+      case 93: // PARAM
+      case 97: // TYPE_SYNTAX
         value.copy< Type* > (other.value);
         break;
 
-      case 128: // ASSERT_SYNTAX
-      case 129: // ASSURE_SYNTAX
-      case 144: // SEQ_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 121: // ASSERT_SYNTAX
+      case 122: // ASSURE_SYNTAX
+      case 137: // SEQ_SYNTAX
+      case 138: // PAR_SYNTAX
+      case 147: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (other.value);
         break;
 
-      case 135: // UPDATE_SYNTAX
+      case 128: // UPDATE_SYNTAX
         value.copy< UpdateNode* > (other.value);
         break;
 
-      case 81: // RATIONALCONST
+      case 77: // "rational"
         value.copy< rational_t > (other.value);
         break;
 
-      case 138: // CASE_LABEL
-      case 139: // CASE_LABEL_DEFAULT
-      case 140: // CASE_LABEL_NUMBER
-      case 141: // CASE_LABEL_IDENT
-      case 142: // CASE_LABEL_STRING
+      case 131: // CASE_LABEL
+      case 132: // CASE_LABEL_DEFAULT
+      case 133: // CASE_LABEL_NUMBER
+      case 134: // CASE_LABEL_IDENT
+      case 135: // CASE_LABEL_STRING
         value.copy< std::pair<AtomNode*, AstNode*> > (other.value);
         break;
 
-      case 109: // INITIALIZER
+      case 101: // INITIALIZER
         value.copy< std::pair<ExpressionBase*, ExpressionBase*> > (other.value);
         break;
 
-      case 125: // DUMPSPEC
+      case 118: // DUMPSPEC
         value.copy< std::pair<std::string, std::vector<std::string>> > (other.value);
         break;
 
-      case 100: // FUNCTION_SIGNATURE
+      case 92: // FUNCTION_SIGNATURE
         value.copy< std::pair<std::vector<Type*>, Type*> > (other.value);
         break;
 
-      case 82: // STRCONST
-      case 83: // "identifier"
-      case 114: // RULEREF
+      case 78: // "string"
+      case 79: // "identifier"
+      case 108: // RULEREF
         value.copy< std::string > (other.value);
         break;
 
-      case 133: // DEBUG_ATOM_LIST
+      case 126: // DEBUG_ATOM_LIST
         value.copy< std::vector<ExpressionBase*> > (other.value);
         break;
 
-      case 116: // LISTCONST
-      case 117: // EXPRESSION_LIST
-      case 118: // EXPRESSION_LIST_NO_COMMA
+      case 110: // LISTCONST
+      case 111: // EXPRESSION_LIST
+      case 112: // EXPRESSION_LIST_NO_COMMA
         value.copy< std::vector<ExpressionBase*>* > (other.value);
         break;
 
-      case 102: // PARAM_LIST
-      case 103: // PARAM_LIST_NO_COMMA
-      case 104: // TYPE_IDENTIFIER_STARLIST
-      case 106: // TYPE_SYNTAX_LIST
+      case 94: // PARAM_LIST
+      case 95: // PARAM_LIST_NO_COMMA
+      case 96: // TYPE_IDENTIFIER_STARLIST
+      case 98: // TYPE_SYNTAX_LIST
         value.copy< std::vector<Type*> > (other.value);
         break;
 
-      case 137: // CASE_LABEL_LIST
+      case 130: // CASE_LABEL_LIST
         value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (other.value);
         break;
 
-      case 107: // INITIALIZERS
-      case 108: // INITIALIZER_LIST
+      case 99: // INITIALIZERS
+      case 100: // INITIALIZER_LIST
         value.copy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (other.value);
         break;
 
-      case 124: // DUMPSPEC_LIST
+      case 117: // DUMPSPEC_LIST
         value.copy< std::vector<std::pair<std::string, std::vector<std::string>>> > (other.value);
         break;
 
-      case 98: // IDENTIFIER_LIST
-      case 99: // IDENTIFIER_LIST_NO_COMMA
+      case 90: // IDENTIFIER_LIST
+      case 91: // IDENTIFIER_LIST_NO_COMMA
         value.copy< std::vector<std::string> > (other.value);
         break;
 
@@ -1560,185 +1540,192 @@ namespace yy {
     (void) v;
       switch (this->type_get ())
     {
-      case 88: // SPECIFICATION
+      case 81: // SPECIFICATION
         value.copy< Ast* > (v);
         break;
 
-      case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 83: // BODY_ELEMENTS
+      case 139: // STATEMENTS
         value.copy< AstListNode* > (v);
         break;
 
-      case 91: // BODY_ELEMENT
-      case 122: // RULE_STMT
-      case 123: // RULE_SYNTAX
-      case 126: // SIMPLE_STMT
-      case 127: // STATEMENT
-      case 131: // IMPOSSIBLE_SYNTAX
+      case 84: // BODY_ELEMENT
+      case 115: // RULE_STMT
+      case 116: // RULE_SYNTAX
+      case 119: // SIMPLE_STMT
+      case 120: // STATEMENT
+      case 124: // IMPOSSIBLE_SYNTAX
         value.copy< AstNode* > (v);
         break;
 
-      case 111: // VALUE
-      case 113: // NUMBER
-      case 115: // NUMBER_RANGE
+      case 103: // VALUE
+      case 104: // NUMBER
+      case 109: // NUMBER_RANGE
         value.copy< AtomNode* > (v);
         break;
 
-      case 121: // FUNCTION_SYNTAX
+      case 114: // FUNCTION_SYNTAX
         value.copy< BaseFunctionAtom* > (v);
         break;
 
-      case 143: // CALL_SYNTAX
+      case 136: // CALL_SYNTAX
         value.copy< CallNode* > (v);
         break;
 
-      case 136: // CASE_SYNTAX
+      case 129: // CASE_SYNTAX
         value.copy< CaseNode* > (v);
         break;
 
-      case 130: // DIEDIE_SYNTAX
+      case 123: // DIEDIE_SYNTAX
         value.copy< DiedieNode* > (v);
         break;
 
-      case 95: // ENUM_SYNTAX
+      case 87: // ENUM_SYNTAX
         value.copy< Enum* > (v);
         break;
 
-      case 110: // ATOM
-      case 119: // EXPRESSION
-      case 120: // BRACKET_EXPRESSION
+      case 102: // ATOM
+      case 113: // EXPRESSION
         value.copy< ExpressionBase* > (v);
         break;
 
-      case 79: // FLOATINGCONST
+      case 75: // "floating"
         value.copy< FLOATING_T > (v);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 106: // FLOATING_NUMBER
+        value.copy< FloatingAtom* > (v);
+        break;
+
+      case 146: // FORALL_SYNTAX
         value.copy< ForallNode* > (v);
         break;
 
-      case 96: // DERIVED_SYNTAX
-      case 97: // FUNCTION_DEFINITION
+      case 88: // DERIVED_SYNTAX
+      case 89: // FUNCTION_DEFINITION
         value.copy< Function* > (v);
         break;
 
-      case 80: // INTEGERCONST
+      case 76: // "integer"
         value.copy< INTEGER_T > (v);
         break;
 
-      case 147: // IFTHENELSE
+      case 140: // IFTHENELSE
         value.copy< IfThenElseNode* > (v);
         break;
 
-      case 92: // INIT_SYNTAX
+      case 85: // INIT_SYNTAX
         value.copy< InitNode* > (v);
         break;
 
-      case 112: // INTEGER_NUMBER
+      case 105: // INTEGER_NUMBER
         value.copy< IntegerAtom* > (v);
         break;
 
-      case 148: // LET_SYNTAX
+      case 141: // LET_SYNTAX
         value.copy< LetNode* > (v);
         break;
 
-      case 152: // POP_SYNTAX
+      case 145: // POP_SYNTAX
         value.copy< PopNode* > (v);
         break;
 
-      case 132: // DEBUG_SYNTAX
-      case 134: // PRINT_SYNTAX
+      case 125: // DEBUG_SYNTAX
+      case 127: // PRINT_SYNTAX
         value.copy< PrintNode* > (v);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 144: // PUSH_SYNTAX
         value.copy< PushNode* > (v);
         break;
 
-      case 89: // HEADER
+      case 107: // RATIONAL_NUMBER
+        value.copy< RationalAtom* > (v);
+        break;
+
+      case 82: // HEADER
         value.copy< SpecificationNode* > (v);
         break;
 
-      case 101: // PARAM
-      case 105: // TYPE_SYNTAX
+      case 93: // PARAM
+      case 97: // TYPE_SYNTAX
         value.copy< Type* > (v);
         break;
 
-      case 128: // ASSERT_SYNTAX
-      case 129: // ASSURE_SYNTAX
-      case 144: // SEQ_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 121: // ASSERT_SYNTAX
+      case 122: // ASSURE_SYNTAX
+      case 137: // SEQ_SYNTAX
+      case 138: // PAR_SYNTAX
+      case 147: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (v);
         break;
 
-      case 135: // UPDATE_SYNTAX
+      case 128: // UPDATE_SYNTAX
         value.copy< UpdateNode* > (v);
         break;
 
-      case 81: // RATIONALCONST
+      case 77: // "rational"
         value.copy< rational_t > (v);
         break;
 
-      case 138: // CASE_LABEL
-      case 139: // CASE_LABEL_DEFAULT
-      case 140: // CASE_LABEL_NUMBER
-      case 141: // CASE_LABEL_IDENT
-      case 142: // CASE_LABEL_STRING
+      case 131: // CASE_LABEL
+      case 132: // CASE_LABEL_DEFAULT
+      case 133: // CASE_LABEL_NUMBER
+      case 134: // CASE_LABEL_IDENT
+      case 135: // CASE_LABEL_STRING
         value.copy< std::pair<AtomNode*, AstNode*> > (v);
         break;
 
-      case 109: // INITIALIZER
+      case 101: // INITIALIZER
         value.copy< std::pair<ExpressionBase*, ExpressionBase*> > (v);
         break;
 
-      case 125: // DUMPSPEC
+      case 118: // DUMPSPEC
         value.copy< std::pair<std::string, std::vector<std::string>> > (v);
         break;
 
-      case 100: // FUNCTION_SIGNATURE
+      case 92: // FUNCTION_SIGNATURE
         value.copy< std::pair<std::vector<Type*>, Type*> > (v);
         break;
 
-      case 82: // STRCONST
-      case 83: // "identifier"
-      case 114: // RULEREF
+      case 78: // "string"
+      case 79: // "identifier"
+      case 108: // RULEREF
         value.copy< std::string > (v);
         break;
 
-      case 133: // DEBUG_ATOM_LIST
+      case 126: // DEBUG_ATOM_LIST
         value.copy< std::vector<ExpressionBase*> > (v);
         break;
 
-      case 116: // LISTCONST
-      case 117: // EXPRESSION_LIST
-      case 118: // EXPRESSION_LIST_NO_COMMA
+      case 110: // LISTCONST
+      case 111: // EXPRESSION_LIST
+      case 112: // EXPRESSION_LIST_NO_COMMA
         value.copy< std::vector<ExpressionBase*>* > (v);
         break;
 
-      case 102: // PARAM_LIST
-      case 103: // PARAM_LIST_NO_COMMA
-      case 104: // TYPE_IDENTIFIER_STARLIST
-      case 106: // TYPE_SYNTAX_LIST
+      case 94: // PARAM_LIST
+      case 95: // PARAM_LIST_NO_COMMA
+      case 96: // TYPE_IDENTIFIER_STARLIST
+      case 98: // TYPE_SYNTAX_LIST
         value.copy< std::vector<Type*> > (v);
         break;
 
-      case 137: // CASE_LABEL_LIST
+      case 130: // CASE_LABEL_LIST
         value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (v);
         break;
 
-      case 107: // INITIALIZERS
-      case 108: // INITIALIZER_LIST
+      case 99: // INITIALIZERS
+      case 100: // INITIALIZER_LIST
         value.copy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (v);
         break;
 
-      case 124: // DUMPSPEC_LIST
+      case 117: // DUMPSPEC_LIST
         value.copy< std::vector<std::pair<std::string, std::vector<std::string>>> > (v);
         break;
 
-      case 98: // IDENTIFIER_LIST
-      case 99: // IDENTIFIER_LIST_NO_COMMA
+      case 90: // IDENTIFIER_LIST
+      case 91: // IDENTIFIER_LIST_NO_COMMA
         value.copy< std::vector<std::string> > (v);
         break;
 
@@ -1835,6 +1822,13 @@ namespace yy {
   {}
 
   template <typename Base>
+  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FloatingAtom* v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ForallNode* v, const location_type& l)
     : Base (t)
     , value (v)
@@ -1899,6 +1893,13 @@ namespace yy {
 
   template <typename Base>
   casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PushNode* v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RationalAtom* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2049,185 +2050,192 @@ namespace yy {
     // Type destructor.
     switch (yytype)
     {
-      case 88: // SPECIFICATION
+      case 81: // SPECIFICATION
         value.template destroy< Ast* > ();
         break;
 
-      case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 83: // BODY_ELEMENTS
+      case 139: // STATEMENTS
         value.template destroy< AstListNode* > ();
         break;
 
-      case 91: // BODY_ELEMENT
-      case 122: // RULE_STMT
-      case 123: // RULE_SYNTAX
-      case 126: // SIMPLE_STMT
-      case 127: // STATEMENT
-      case 131: // IMPOSSIBLE_SYNTAX
+      case 84: // BODY_ELEMENT
+      case 115: // RULE_STMT
+      case 116: // RULE_SYNTAX
+      case 119: // SIMPLE_STMT
+      case 120: // STATEMENT
+      case 124: // IMPOSSIBLE_SYNTAX
         value.template destroy< AstNode* > ();
         break;
 
-      case 111: // VALUE
-      case 113: // NUMBER
-      case 115: // NUMBER_RANGE
+      case 103: // VALUE
+      case 104: // NUMBER
+      case 109: // NUMBER_RANGE
         value.template destroy< AtomNode* > ();
         break;
 
-      case 121: // FUNCTION_SYNTAX
+      case 114: // FUNCTION_SYNTAX
         value.template destroy< BaseFunctionAtom* > ();
         break;
 
-      case 143: // CALL_SYNTAX
+      case 136: // CALL_SYNTAX
         value.template destroy< CallNode* > ();
         break;
 
-      case 136: // CASE_SYNTAX
+      case 129: // CASE_SYNTAX
         value.template destroy< CaseNode* > ();
         break;
 
-      case 130: // DIEDIE_SYNTAX
+      case 123: // DIEDIE_SYNTAX
         value.template destroy< DiedieNode* > ();
         break;
 
-      case 95: // ENUM_SYNTAX
+      case 87: // ENUM_SYNTAX
         value.template destroy< Enum* > ();
         break;
 
-      case 110: // ATOM
-      case 119: // EXPRESSION
-      case 120: // BRACKET_EXPRESSION
+      case 102: // ATOM
+      case 113: // EXPRESSION
         value.template destroy< ExpressionBase* > ();
         break;
 
-      case 79: // FLOATINGCONST
+      case 75: // "floating"
         value.template destroy< FLOATING_T > ();
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 106: // FLOATING_NUMBER
+        value.template destroy< FloatingAtom* > ();
+        break;
+
+      case 146: // FORALL_SYNTAX
         value.template destroy< ForallNode* > ();
         break;
 
-      case 96: // DERIVED_SYNTAX
-      case 97: // FUNCTION_DEFINITION
+      case 88: // DERIVED_SYNTAX
+      case 89: // FUNCTION_DEFINITION
         value.template destroy< Function* > ();
         break;
 
-      case 80: // INTEGERCONST
+      case 76: // "integer"
         value.template destroy< INTEGER_T > ();
         break;
 
-      case 147: // IFTHENELSE
+      case 140: // IFTHENELSE
         value.template destroy< IfThenElseNode* > ();
         break;
 
-      case 92: // INIT_SYNTAX
+      case 85: // INIT_SYNTAX
         value.template destroy< InitNode* > ();
         break;
 
-      case 112: // INTEGER_NUMBER
+      case 105: // INTEGER_NUMBER
         value.template destroy< IntegerAtom* > ();
         break;
 
-      case 148: // LET_SYNTAX
+      case 141: // LET_SYNTAX
         value.template destroy< LetNode* > ();
         break;
 
-      case 152: // POP_SYNTAX
+      case 145: // POP_SYNTAX
         value.template destroy< PopNode* > ();
         break;
 
-      case 132: // DEBUG_SYNTAX
-      case 134: // PRINT_SYNTAX
+      case 125: // DEBUG_SYNTAX
+      case 127: // PRINT_SYNTAX
         value.template destroy< PrintNode* > ();
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 144: // PUSH_SYNTAX
         value.template destroy< PushNode* > ();
         break;
 
-      case 89: // HEADER
+      case 107: // RATIONAL_NUMBER
+        value.template destroy< RationalAtom* > ();
+        break;
+
+      case 82: // HEADER
         value.template destroy< SpecificationNode* > ();
         break;
 
-      case 101: // PARAM
-      case 105: // TYPE_SYNTAX
+      case 93: // PARAM
+      case 97: // TYPE_SYNTAX
         value.template destroy< Type* > ();
         break;
 
-      case 128: // ASSERT_SYNTAX
-      case 129: // ASSURE_SYNTAX
-      case 144: // SEQ_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 121: // ASSERT_SYNTAX
+      case 122: // ASSURE_SYNTAX
+      case 137: // SEQ_SYNTAX
+      case 138: // PAR_SYNTAX
+      case 147: // ITERATE_SYNTAX
         value.template destroy< UnaryNode* > ();
         break;
 
-      case 135: // UPDATE_SYNTAX
+      case 128: // UPDATE_SYNTAX
         value.template destroy< UpdateNode* > ();
         break;
 
-      case 81: // RATIONALCONST
+      case 77: // "rational"
         value.template destroy< rational_t > ();
         break;
 
-      case 138: // CASE_LABEL
-      case 139: // CASE_LABEL_DEFAULT
-      case 140: // CASE_LABEL_NUMBER
-      case 141: // CASE_LABEL_IDENT
-      case 142: // CASE_LABEL_STRING
+      case 131: // CASE_LABEL
+      case 132: // CASE_LABEL_DEFAULT
+      case 133: // CASE_LABEL_NUMBER
+      case 134: // CASE_LABEL_IDENT
+      case 135: // CASE_LABEL_STRING
         value.template destroy< std::pair<AtomNode*, AstNode*> > ();
         break;
 
-      case 109: // INITIALIZER
+      case 101: // INITIALIZER
         value.template destroy< std::pair<ExpressionBase*, ExpressionBase*> > ();
         break;
 
-      case 125: // DUMPSPEC
+      case 118: // DUMPSPEC
         value.template destroy< std::pair<std::string, std::vector<std::string>> > ();
         break;
 
-      case 100: // FUNCTION_SIGNATURE
+      case 92: // FUNCTION_SIGNATURE
         value.template destroy< std::pair<std::vector<Type*>, Type*> > ();
         break;
 
-      case 82: // STRCONST
-      case 83: // "identifier"
-      case 114: // RULEREF
+      case 78: // "string"
+      case 79: // "identifier"
+      case 108: // RULEREF
         value.template destroy< std::string > ();
         break;
 
-      case 133: // DEBUG_ATOM_LIST
+      case 126: // DEBUG_ATOM_LIST
         value.template destroy< std::vector<ExpressionBase*> > ();
         break;
 
-      case 116: // LISTCONST
-      case 117: // EXPRESSION_LIST
-      case 118: // EXPRESSION_LIST_NO_COMMA
+      case 110: // LISTCONST
+      case 111: // EXPRESSION_LIST
+      case 112: // EXPRESSION_LIST_NO_COMMA
         value.template destroy< std::vector<ExpressionBase*>* > ();
         break;
 
-      case 102: // PARAM_LIST
-      case 103: // PARAM_LIST_NO_COMMA
-      case 104: // TYPE_IDENTIFIER_STARLIST
-      case 106: // TYPE_SYNTAX_LIST
+      case 94: // PARAM_LIST
+      case 95: // PARAM_LIST_NO_COMMA
+      case 96: // TYPE_IDENTIFIER_STARLIST
+      case 98: // TYPE_SYNTAX_LIST
         value.template destroy< std::vector<Type*> > ();
         break;
 
-      case 137: // CASE_LABEL_LIST
+      case 130: // CASE_LABEL_LIST
         value.template destroy< std::vector<std::pair<AtomNode*, AstNode*>> > ();
         break;
 
-      case 107: // INITIALIZERS
-      case 108: // INITIALIZER_LIST
+      case 99: // INITIALIZERS
+      case 100: // INITIALIZER_LIST
         value.template destroy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > ();
         break;
 
-      case 124: // DUMPSPEC_LIST
+      case 117: // DUMPSPEC_LIST
         value.template destroy< std::vector<std::pair<std::string, std::vector<std::string>>> > ();
         break;
 
-      case 98: // IDENTIFIER_LIST
-      case 99: // IDENTIFIER_LIST_NO_COMMA
+      case 90: // IDENTIFIER_LIST
+      case 91: // IDENTIFIER_LIST_NO_COMMA
         value.template destroy< std::vector<std::string> > ();
         break;
 
@@ -2254,185 +2262,192 @@ namespace yy {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 88: // SPECIFICATION
+      case 81: // SPECIFICATION
         value.move< Ast* > (s.value);
         break;
 
-      case 90: // BODY_ELEMENTS
-      case 146: // STATEMENTS
+      case 83: // BODY_ELEMENTS
+      case 139: // STATEMENTS
         value.move< AstListNode* > (s.value);
         break;
 
-      case 91: // BODY_ELEMENT
-      case 122: // RULE_STMT
-      case 123: // RULE_SYNTAX
-      case 126: // SIMPLE_STMT
-      case 127: // STATEMENT
-      case 131: // IMPOSSIBLE_SYNTAX
+      case 84: // BODY_ELEMENT
+      case 115: // RULE_STMT
+      case 116: // RULE_SYNTAX
+      case 119: // SIMPLE_STMT
+      case 120: // STATEMENT
+      case 124: // IMPOSSIBLE_SYNTAX
         value.move< AstNode* > (s.value);
         break;
 
-      case 111: // VALUE
-      case 113: // NUMBER
-      case 115: // NUMBER_RANGE
+      case 103: // VALUE
+      case 104: // NUMBER
+      case 109: // NUMBER_RANGE
         value.move< AtomNode* > (s.value);
         break;
 
-      case 121: // FUNCTION_SYNTAX
+      case 114: // FUNCTION_SYNTAX
         value.move< BaseFunctionAtom* > (s.value);
         break;
 
-      case 143: // CALL_SYNTAX
+      case 136: // CALL_SYNTAX
         value.move< CallNode* > (s.value);
         break;
 
-      case 136: // CASE_SYNTAX
+      case 129: // CASE_SYNTAX
         value.move< CaseNode* > (s.value);
         break;
 
-      case 130: // DIEDIE_SYNTAX
+      case 123: // DIEDIE_SYNTAX
         value.move< DiedieNode* > (s.value);
         break;
 
-      case 95: // ENUM_SYNTAX
+      case 87: // ENUM_SYNTAX
         value.move< Enum* > (s.value);
         break;
 
-      case 110: // ATOM
-      case 119: // EXPRESSION
-      case 120: // BRACKET_EXPRESSION
+      case 102: // ATOM
+      case 113: // EXPRESSION
         value.move< ExpressionBase* > (s.value);
         break;
 
-      case 79: // FLOATINGCONST
+      case 75: // "floating"
         value.move< FLOATING_T > (s.value);
         break;
 
-      case 153: // FORALL_SYNTAX
+      case 106: // FLOATING_NUMBER
+        value.move< FloatingAtom* > (s.value);
+        break;
+
+      case 146: // FORALL_SYNTAX
         value.move< ForallNode* > (s.value);
         break;
 
-      case 96: // DERIVED_SYNTAX
-      case 97: // FUNCTION_DEFINITION
+      case 88: // DERIVED_SYNTAX
+      case 89: // FUNCTION_DEFINITION
         value.move< Function* > (s.value);
         break;
 
-      case 80: // INTEGERCONST
+      case 76: // "integer"
         value.move< INTEGER_T > (s.value);
         break;
 
-      case 147: // IFTHENELSE
+      case 140: // IFTHENELSE
         value.move< IfThenElseNode* > (s.value);
         break;
 
-      case 92: // INIT_SYNTAX
+      case 85: // INIT_SYNTAX
         value.move< InitNode* > (s.value);
         break;
 
-      case 112: // INTEGER_NUMBER
+      case 105: // INTEGER_NUMBER
         value.move< IntegerAtom* > (s.value);
         break;
 
-      case 148: // LET_SYNTAX
+      case 141: // LET_SYNTAX
         value.move< LetNode* > (s.value);
         break;
 
-      case 152: // POP_SYNTAX
+      case 145: // POP_SYNTAX
         value.move< PopNode* > (s.value);
         break;
 
-      case 132: // DEBUG_SYNTAX
-      case 134: // PRINT_SYNTAX
+      case 125: // DEBUG_SYNTAX
+      case 127: // PRINT_SYNTAX
         value.move< PrintNode* > (s.value);
         break;
 
-      case 151: // PUSH_SYNTAX
+      case 144: // PUSH_SYNTAX
         value.move< PushNode* > (s.value);
         break;
 
-      case 89: // HEADER
+      case 107: // RATIONAL_NUMBER
+        value.move< RationalAtom* > (s.value);
+        break;
+
+      case 82: // HEADER
         value.move< SpecificationNode* > (s.value);
         break;
 
-      case 101: // PARAM
-      case 105: // TYPE_SYNTAX
+      case 93: // PARAM
+      case 97: // TYPE_SYNTAX
         value.move< Type* > (s.value);
         break;
 
-      case 128: // ASSERT_SYNTAX
-      case 129: // ASSURE_SYNTAX
-      case 144: // SEQ_SYNTAX
-      case 145: // PAR_SYNTAX
-      case 154: // ITERATE_SYNTAX
+      case 121: // ASSERT_SYNTAX
+      case 122: // ASSURE_SYNTAX
+      case 137: // SEQ_SYNTAX
+      case 138: // PAR_SYNTAX
+      case 147: // ITERATE_SYNTAX
         value.move< UnaryNode* > (s.value);
         break;
 
-      case 135: // UPDATE_SYNTAX
+      case 128: // UPDATE_SYNTAX
         value.move< UpdateNode* > (s.value);
         break;
 
-      case 81: // RATIONALCONST
+      case 77: // "rational"
         value.move< rational_t > (s.value);
         break;
 
-      case 138: // CASE_LABEL
-      case 139: // CASE_LABEL_DEFAULT
-      case 140: // CASE_LABEL_NUMBER
-      case 141: // CASE_LABEL_IDENT
-      case 142: // CASE_LABEL_STRING
+      case 131: // CASE_LABEL
+      case 132: // CASE_LABEL_DEFAULT
+      case 133: // CASE_LABEL_NUMBER
+      case 134: // CASE_LABEL_IDENT
+      case 135: // CASE_LABEL_STRING
         value.move< std::pair<AtomNode*, AstNode*> > (s.value);
         break;
 
-      case 109: // INITIALIZER
+      case 101: // INITIALIZER
         value.move< std::pair<ExpressionBase*, ExpressionBase*> > (s.value);
         break;
 
-      case 125: // DUMPSPEC
+      case 118: // DUMPSPEC
         value.move< std::pair<std::string, std::vector<std::string>> > (s.value);
         break;
 
-      case 100: // FUNCTION_SIGNATURE
+      case 92: // FUNCTION_SIGNATURE
         value.move< std::pair<std::vector<Type*>, Type*> > (s.value);
         break;
 
-      case 82: // STRCONST
-      case 83: // "identifier"
-      case 114: // RULEREF
+      case 78: // "string"
+      case 79: // "identifier"
+      case 108: // RULEREF
         value.move< std::string > (s.value);
         break;
 
-      case 133: // DEBUG_ATOM_LIST
+      case 126: // DEBUG_ATOM_LIST
         value.move< std::vector<ExpressionBase*> > (s.value);
         break;
 
-      case 116: // LISTCONST
-      case 117: // EXPRESSION_LIST
-      case 118: // EXPRESSION_LIST_NO_COMMA
+      case 110: // LISTCONST
+      case 111: // EXPRESSION_LIST
+      case 112: // EXPRESSION_LIST_NO_COMMA
         value.move< std::vector<ExpressionBase*>* > (s.value);
         break;
 
-      case 102: // PARAM_LIST
-      case 103: // PARAM_LIST_NO_COMMA
-      case 104: // TYPE_IDENTIFIER_STARLIST
-      case 106: // TYPE_SYNTAX_LIST
+      case 94: // PARAM_LIST
+      case 95: // PARAM_LIST_NO_COMMA
+      case 96: // TYPE_IDENTIFIER_STARLIST
+      case 98: // TYPE_SYNTAX_LIST
         value.move< std::vector<Type*> > (s.value);
         break;
 
-      case 137: // CASE_LABEL_LIST
+      case 130: // CASE_LABEL_LIST
         value.move< std::vector<std::pair<AtomNode*, AstNode*>> > (s.value);
         break;
 
-      case 107: // INITIALIZERS
-      case 108: // INITIALIZER_LIST
+      case 99: // INITIALIZERS
+      case 100: // INITIALIZER_LIST
         value.move< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (s.value);
         break;
 
-      case 124: // DUMPSPEC_LIST
+      case 117: // DUMPSPEC_LIST
         value.move< std::vector<std::pair<std::string, std::vector<std::string>>> > (s.value);
         break;
 
-      case 98: // IDENTIFIER_LIST
-      case 99: // IDENTIFIER_LIST_NO_COMMA
+      case 90: // IDENTIFIER_LIST
+      case 91: // IDENTIFIER_LIST_NO_COMMA
         value.move< std::vector<std::string> > (s.value);
         break;
 
@@ -2498,8 +2513,7 @@ namespace yy {
      295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
      305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
      315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
-     325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-     335,   336,   337,   338,   339,   340,   341
+     325,   326,   327,   328,   329,   330,   331,   332,   333,   334
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -2511,27 +2525,81 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_AND (const location_type& l)
+  casmi_parser::make_CASM (const location_type& l)
   {
-    return symbol_type (token::AND, l);
+    return symbol_type (token::CASM, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_OR (const location_type& l)
+  casmi_parser::make_INIT (const location_type& l)
   {
-    return symbol_type (token::OR, l);
+    return symbol_type (token::INIT, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_XOR (const location_type& l)
+  casmi_parser::make_OPTION (const location_type& l)
   {
-    return symbol_type (token::XOR, l);
+    return symbol_type (token::OPTION, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_NOT (const location_type& l)
+  casmi_parser::make_DERIVED (const location_type& l)
   {
-    return symbol_type (token::NOT, l);
+    return symbol_type (token::DERIVED, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_ENUM (const location_type& l)
+  {
+    return symbol_type (token::ENUM, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_RULE (const location_type& l)
+  {
+    return symbol_type (token::RULE, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_DUMPS (const location_type& l)
+  {
+    return symbol_type (token::DUMPS, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_FUNCTION (const location_type& l)
+  {
+    return symbol_type (token::FUNCTION, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_INITIALLY (const location_type& l)
+  {
+    return symbol_type (token::INITIALLY, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_SEQ (const location_type& l)
+  {
+    return symbol_type (token::SEQ, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_ENDSEQ (const location_type& l)
+  {
+    return symbol_type (token::ENDSEQ, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_PAR (const location_type& l)
+  {
+    return symbol_type (token::PAR, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_ENDPAR (const location_type& l)
+  {
+    return symbol_type (token::ENDPAR, l);
   }
 
   casmi_parser::symbol_type
@@ -2565,30 +2633,6 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_SEQ (const location_type& l)
-  {
-    return symbol_type (token::SEQ, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_ENDSEQ (const location_type& l)
-  {
-    return symbol_type (token::ENDSEQ, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_PAR (const location_type& l)
-  {
-    return symbol_type (token::PAR, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_ENDPAR (const location_type& l)
-  {
-    return symbol_type (token::ENDPAR, l);
-  }
-
-  casmi_parser::symbol_type
   casmi_parser::make_LET (const location_type& l)
   {
     return symbol_type (token::LET, l);
@@ -2598,66 +2642,6 @@ namespace yy {
   casmi_parser::make_IN (const location_type& l)
   {
     return symbol_type (token::IN, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_IF (const location_type& l)
-  {
-    return symbol_type (token::IF, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_THEN (const location_type& l)
-  {
-    return symbol_type (token::THEN, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_ELSE (const location_type& l)
-  {
-    return symbol_type (token::ELSE, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_PRINT (const location_type& l)
-  {
-    return symbol_type (token::PRINT, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_DEBUG (const location_type& l)
-  {
-    return symbol_type (token::DEBUG, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_DUMPS (const location_type& l)
-  {
-    return symbol_type (token::DUMPS, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_PUSH (const location_type& l)
-  {
-    return symbol_type (token::PUSH, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_INTO (const location_type& l)
-  {
-    return symbol_type (token::INTO, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_POP (const location_type& l)
-  {
-    return symbol_type (token::POP, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_FROM (const location_type& l)
-  {
-    return symbol_type (token::FROM, l);
   }
 
   casmi_parser::symbol_type
@@ -2685,15 +2669,27 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_CASE (const location_type& l)
+  casmi_parser::make_IF (const location_type& l)
   {
-    return symbol_type (token::CASE, l);
+    return symbol_type (token::IF, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_DEFAULT (const location_type& l)
+  casmi_parser::make_THEN (const location_type& l)
   {
-    return symbol_type (token::DEFAULT, l);
+    return symbol_type (token::THEN, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_ELSE (const location_type& l)
+  {
+    return symbol_type (token::ELSE, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_CASE (const location_type& l)
+  {
+    return symbol_type (token::CASE, l);
   }
 
   casmi_parser::symbol_type
@@ -2703,57 +2699,51 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
+  casmi_parser::make_DEFAULT (const location_type& l)
+  {
+    return symbol_type (token::DEFAULT, l);
+  }
+
+  casmi_parser::symbol_type
   casmi_parser::make_ENDCASE (const location_type& l)
   {
     return symbol_type (token::ENDCASE, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_INITIALLY (const location_type& l)
+  casmi_parser::make_PRINT (const location_type& l)
   {
-    return symbol_type (token::INITIALLY, l);
+    return symbol_type (token::PRINT, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_FUNCTION (const location_type& l)
+  casmi_parser::make_DEBUG (const location_type& l)
   {
-    return symbol_type (token::FUNCTION, l);
+    return symbol_type (token::DEBUG, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_DERIVED (const location_type& l)
+  casmi_parser::make_PUSH (const location_type& l)
   {
-    return symbol_type (token::DERIVED, l);
+    return symbol_type (token::PUSH, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_ENUM (const location_type& l)
+  casmi_parser::make_INTO (const location_type& l)
   {
-    return symbol_type (token::ENUM, l);
+    return symbol_type (token::INTO, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_RULE (const location_type& l)
+  casmi_parser::make_POP (const location_type& l)
   {
-    return symbol_type (token::RULE, l);
+    return symbol_type (token::POP, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_PROVIDER (const location_type& l)
+  casmi_parser::make_FROM (const location_type& l)
   {
-    return symbol_type (token::PROVIDER, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_INIT (const location_type& l)
-  {
-    return symbol_type (token::INIT, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_OPTION (const location_type& l)
-  {
-    return symbol_type (token::OPTION, l);
+    return symbol_type (token::FROM, l);
   }
 
   casmi_parser::symbol_type
@@ -2769,93 +2759,45 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_TRUE (const location_type& l)
-  {
-    return symbol_type (token::TRUE, l);
-  }
-
-  casmi_parser::symbol_type
   casmi_parser::make_FALSE (const location_type& l)
   {
     return symbol_type (token::FALSE, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_CASM (const location_type& l)
+  casmi_parser::make_TRUE (const location_type& l)
   {
-    return symbol_type (token::CASM, l);
+    return symbol_type (token::TRUE, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_SYMBOL (const location_type& l)
+  casmi_parser::make_AND (const location_type& l)
   {
-    return symbol_type (token::SYMBOL, l);
+    return symbol_type (token::AND, l);
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_INTERN (const location_type& l)
+  casmi_parser::make_OR (const location_type& l)
   {
-    return symbol_type (token::INTERN, l);
+    return symbol_type (token::OR, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_XOR (const location_type& l)
+  {
+    return symbol_type (token::XOR, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_NOT (const location_type& l)
+  {
+    return symbol_type (token::NOT, l);
   }
 
   casmi_parser::symbol_type
   casmi_parser::make_RATIONAL_DIV (const location_type& l)
   {
     return symbol_type (token::RATIONAL_DIV, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_OBJDUMP (const location_type& l)
-  {
-    return symbol_type (token::OBJDUMP, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_DOTDOT (const location_type& l)
-  {
-    return symbol_type (token::DOTDOT, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_ARROW (const location_type& l)
-  {
-    return symbol_type (token::ARROW, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_UPDATE (const location_type& l)
-  {
-    return symbol_type (token::UPDATE, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_NEQUAL (const location_type& l)
-  {
-    return symbol_type (token::NEQUAL, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_LESSEQ (const location_type& l)
-  {
-    return symbol_type (token::LESSEQ, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_GREATEREQ (const location_type& l)
-  {
-    return symbol_type (token::GREATEREQ, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_SEQ_BRACKET (const location_type& l)
-  {
-    return symbol_type (token::SEQ_BRACKET, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_ENDSEQ_BRACKET (const location_type& l)
-  {
-    return symbol_type (token::ENDSEQ_BRACKET, l);
   }
 
   casmi_parser::symbol_type
@@ -2871,9 +2813,9 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
-  casmi_parser::make_EQ (const location_type& l)
+  casmi_parser::make_EQUAL (const location_type& l)
   {
-    return symbol_type (token::EQ, l);
+    return symbol_type (token::EQUAL, l);
   }
 
   casmi_parser::symbol_type
@@ -2967,6 +2909,54 @@ namespace yy {
   }
 
   casmi_parser::symbol_type
+  casmi_parser::make_DOTDOT (const location_type& l)
+  {
+    return symbol_type (token::DOTDOT, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_ARROW (const location_type& l)
+  {
+    return symbol_type (token::ARROW, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_UPDATE (const location_type& l)
+  {
+    return symbol_type (token::UPDATE, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_NEQUAL (const location_type& l)
+  {
+    return symbol_type (token::NEQUAL, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_LESSEQ (const location_type& l)
+  {
+    return symbol_type (token::LESSEQ, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_GREATEREQ (const location_type& l)
+  {
+    return symbol_type (token::GREATEREQ, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_SEQ_BRACKET (const location_type& l)
+  {
+    return symbol_type (token::SEQ_BRACKET, l);
+  }
+
+  casmi_parser::symbol_type
+  casmi_parser::make_ENDSEQ_BRACKET (const location_type& l)
+  {
+    return symbol_type (token::ENDSEQ_BRACKET, l);
+  }
+
+  casmi_parser::symbol_type
   casmi_parser::make_FLOATINGCONST (const FLOATING_T& v, const location_type& l)
   {
     return symbol_type (token::FLOATINGCONST, v, l);
@@ -2996,28 +2986,10 @@ namespace yy {
     return symbol_type (token::IDENTIFIER, v, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_UMINUS (const location_type& l)
-  {
-    return symbol_type (token::UMINUS, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_UPLUS (const location_type& l)
-  {
-    return symbol_type (token::UPLUS, l);
-  }
-
-  casmi_parser::symbol_type
-  casmi_parser::make_XIF (const location_type& l)
-  {
-    return symbol_type (token::XIF, l);
-  }
-
 
 
 } // yy
-#line 3021 "GrammarParser.tab.h" // lalr1.cc:377
+#line 2993 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

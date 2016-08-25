@@ -329,21 +329,43 @@ template<class T, class V> class AstWalker {
         visitor.visit_case(node, web, case_labels);
     }
     
-    V walk_expression_base(ExpressionBase *expr) {
-      if (expr->node_type_ == NodeType::EXPRESSION) {
-        Expression *e = reinterpret_cast<Expression*>(expr);
-        V v1 = walk_expression_base(e->left_);
-        if (e->right_) {
-          V v2 = walk_expression_base(e->right_);
-          return visitor.visit_expression(e, v1, v2);
-        } else {
-          return visitor.visit_expression_single(e, v1);
-        }
-      } else {
-        return walk_atom(reinterpret_cast<AtomNode*>(expr));
-      }
+    V walk_expression_base( ExpressionBase *expr )
+    {
+        if( expr->node_type_ == NodeType::EXPRESSION )
+        {
+            Expression *e = reinterpret_cast< Expression* >( expr );
 
-      throw RuntimeException("Invalid expression structure");
+            V lhs{};
+            V rhs{};
+            
+            if( e->left_ and e->right_ )
+            {
+                if( e->left_->node_type_ == NodeType::ZERO_ATOM )
+                {
+                    // IMPORTANT: right hand side has to be evaluated first to assign the
+                    // correct typed zero value to the left hand side
+                    rhs = walk_expression_base( e->right_ );
+                    lhs = walk_expression_base( e->left_ );                     
+                }
+                else
+                {
+                    lhs = walk_expression_base( e->left_ );
+                    rhs = walk_expression_base( e->right_ );
+                }
+                return visitor.visit_expression( e, lhs, rhs );
+            }
+            else
+            {
+                lhs = walk_expression_base( e->left_ );
+                return visitor.visit_expression_single( e, lhs );
+            }
+        }
+        else
+        {
+            return walk_atom( reinterpret_cast< AtomNode* >( expr ) );
+        }
+        
+        throw RuntimeException("Invalid expression structure");
     }
 
     void walk_ifthenelse(IfThenElseNode *n) {
@@ -388,53 +410,78 @@ template<class T, class V> class AstWalker {
       return visitor.visit_list_atom(atom, expr_results);
     }
 
-    V walk_atom(AtomNode *atom) {
-      switch(atom->node_type_) {
-        case NodeType::INTEGER_ATOM:
+    V walk_atom( AtomNode* atom )
+    {
+        switch( atom->node_type_ )
         {
-            IntegerAtom* ia = reinterpret_cast<IntegerAtom*>(atom);
-            
-            if( ia->type_.t == TypeType::BIT )
+            case NodeType::ZERO_ATOM:
             {
-                return visitor.visit_bit_atom(ia);
+                return visitor.visit_zero_atom( reinterpret_cast< ZeroAtom* >( atom ) );
             }
-            
-            return visitor.visit_int_atom(ia);
+            case NodeType::INTEGER_ATOM:
+            {
+                IntegerAtom* ia = reinterpret_cast< IntegerAtom* >( atom );
+                
+                if( ia->type_.t == TypeType::BIT )
+                {
+                    return visitor.visit_bit_atom( ia );
+                }
+                
+                return visitor.visit_int_atom( ia );
+            }
+            case NodeType::FLOATING_ATOM:
+            {
+                return visitor.visit_floating_atom( reinterpret_cast< FloatingAtom* >( atom ) );
+            }
+            case NodeType::RATIONAL_ATOM:
+            {
+                return visitor.visit_rational_atom( reinterpret_cast< RationalAtom* >( atom ) );
+            }
+            case NodeType::UNDEF_ATOM:
+            {
+                return visitor.visit_undef_atom( reinterpret_cast< UndefAtom* >( atom ) );
+            }
+            case NodeType::BUILTIN_ATOM: // fall-through
+            case NodeType::FUNCTION_ATOM:
+            {
+                return walk_function_atom( reinterpret_cast< BaseFunctionAtom* >( atom ) );
+            }
+            case NodeType::SELF_ATOM:
+            {
+                return visitor.visit_self_atom( reinterpret_cast< SelfAtom* >( atom ) );
+            }
+            case NodeType::RULE_ATOM:
+            {
+                return visitor.visit_rule_atom( reinterpret_cast< RuleAtom* >( atom ) );
+            }
+            case NodeType::BOOLEAN_ATOM:
+            {
+                return visitor.visit_boolean_atom( reinterpret_cast< BooleanAtom* >( atom ) );
+            }
+            case NodeType::STRING_ATOM:
+            {
+                return visitor.visit_string_atom( reinterpret_cast< StringAtom* >( atom ) );
+            }
+            case NodeType::LIST_ATOM:
+            {
+                return walk_list_atom(reinterpret_cast< ListAtom* >( atom ) );
+            }
+            case NodeType::NUMBER_RANGE_ATOM:
+            {
+                return visitor.visit_number_range_atom( reinterpret_cast< NumberRangeAtom* >( atom ) );
+            }
+            default:
+            {
+                throw RuntimeException
+                ( "Invalid atom type:"
+                  + type_to_str( atom->node_type_ )
+                  + std::to_string( atom->node_type_ )
+                );
+            }
         }
-        case NodeType::FLOATING_ATOM: {
-          return visitor.visit_floating_atom(reinterpret_cast<FloatingAtom*>(atom));
-        }
-        case NodeType::RATIONAL_ATOM: {
-          return visitor.visit_rational_atom(reinterpret_cast<RationalAtom*>(atom));
-        }
-         case NodeType::UNDEF_ATOM:
-          return visitor.visit_undef_atom(reinterpret_cast<UndefAtom*>(atom));
-        case NodeType::BUILTIN_ATOM:
-        case NodeType::FUNCTION_ATOM:
-          return walk_function_atom(reinterpret_cast<BaseFunctionAtom*>(atom));
-        case NodeType::SELF_ATOM: {
-          return visitor.visit_self_atom(reinterpret_cast<SelfAtom*>(atom));
-        }
-        case NodeType::RULE_ATOM: {
-          return visitor.visit_rule_atom(reinterpret_cast<RuleAtom*>(atom));
-        }
-        case NodeType::BOOLEAN_ATOM: {
-          return visitor.visit_boolean_atom(reinterpret_cast<BooleanAtom*>(atom));
-        }
-        case NodeType::STRING_ATOM: {
-          return visitor.visit_string_atom(reinterpret_cast<StringAtom*>(atom));
-        }
-        case NodeType::LIST_ATOM: {
-          return walk_list_atom(reinterpret_cast<ListAtom*>(atom));
-        }
-        case NodeType::NUMBER_RANGE_ATOM:
-          return visitor.visit_number_range_atom(reinterpret_cast<NumberRangeAtom*>(atom));
-        default: {
-          throw RuntimeException("Invalid atom type:"+type_to_str(atom->node_type_)+std::to_string(atom->node_type_));
-        }
-      }
     }
 };
+
 
 template<class T> class BaseVisitor {
   public:
@@ -478,6 +525,7 @@ template<class T> class BaseVisitor {
 
     T visit_expression(Expression*, T, T) { return T(); }
     T visit_expression_single(Expression*, T) { return T(); }
+    T visit_zero_atom( ZeroAtom* ) { return T(); }
     T visit_int_atom(IntegerAtom*) { return T(); }
     T visit_bit_atom(IntegerAtom*) { return T(); }
     T visit_floating_atom(FloatingAtom*) { return T(); }

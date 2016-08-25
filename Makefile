@@ -38,11 +38,13 @@ CPPFLAG += -Wall
 
 LEX=flex
 YAC=bison
+YAC_FLAG = -Wall
 
 TARGET = libcasm-fe.a
 
 CPPOBJECTS += src/various/GrammarParser.cpp
 CPPOBJECTS += src/various/GrammarLexer.cpp
+CPPOBJECTS += src/various/Grammar.org
 CPPOBJECTS += obj/GrammarParser.o
 CPPOBJECTS += obj/GrammarLexer.o
 
@@ -80,13 +82,34 @@ default: $(LIBRARY) obj $(TARGET)
 obj:
 	mkdir -p obj
 
-src/various/GrammarParser.cpp: src/GrammarParser.yy
-	@echo "YAC " $<
-	@cd src/various && $(YAC) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../$^
 
-src/various/GrammarLexer.cpp: src/GrammarLexer.l
+src/various/Grammar.org: src/GrammarParser.yy
+	@echo "GEN " $@
+	@grep -e "^[:|] [alpha]*" $< -B 2 -A 1 |\
+		sed "/^  {/d" |\
+		sed "/^  }/d" |\
+		sed "/^--/d"  |\
+		sed "/^\t/d"  > $@
+
+src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.h
+	@echo "YAC " $<
+	@mkdir -p `dirname obj/$<`
+	@head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
+	@cat $(filter %.h,$^) | sed "/^\/\/ /d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
+	@tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
+	@sed -i "/^{{grammartoken}}/d" obj/$<
+	@cd src/various && $(YAC) $(YAC_FLAG) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
+
+
+src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.h
 	@echo "LEX " $<
-	@$(LEX) $(LFLAGS) -o $@ $^
+	@mkdir -p `dirname obj/$<`
+	@head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
+	@cat $(filter %.h,$^) | sed "/^\/\/ /d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$< 
+	@tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
+	@sed -i "/^{{grammartoken}}/d" obj/$<
+	@$(LEX) $(LFLAGS) -o $@ obj/$<
+
 
 obj/%.o: src/%.cpp
 	@echo "CPP " $<

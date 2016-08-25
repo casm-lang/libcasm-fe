@@ -60,7 +60,6 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
     }
 
     pr.setResult< TypeCheckPass >( node );
-    pr.setResult< AstDumpPass >( node );
 
     return global_driver->ok();
 }

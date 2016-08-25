@@ -161,6 +161,19 @@ IfThenElseNode::IfThenElseNode(yy::location& loc, ExpressionBase *condition, Ast
     : AstNode(loc, NodeType::IFTHENELSE), condition_(condition), then_(then), else_(els) {}
 
 
+ZeroAtom::ZeroAtom( yy::location& loc, AstNode* reference )
+: AtomNode( loc, NodeType::ZERO_ATOM, Type( TypeType::UNKNOWN ) )
+, ref( reference )
+{
+}
+
+const AstNode* ZeroAtom::getRef( void ) const
+{
+	assert( ref );
+	return ref;
+}
+
+
 IntegerAtom::IntegerAtom(yy::location& loc, INTEGER_T val) :
         AtomNode(loc, NodeType::INTEGER_ATOM, Type(TypeType::INTEGER)) {
   val_ = val;

@@ -231,6 +231,12 @@ bool AstDumpVisitor::visit_expression_single(Expression *expr, bool) {
   return true;
 }
 
+bool AstDumpVisitor::visit_zero_atom( ZeroAtom *atom )
+{
+    dump_node( atom, std::string( "ZeroAtom: 0") );
+    return true;
+}
+
 bool AstDumpVisitor::visit_int_atom(IntegerAtom *atom) {
   dump_node(atom, std::string("IntegerAtom: ")+std::to_string(atom->val_));
   return true;

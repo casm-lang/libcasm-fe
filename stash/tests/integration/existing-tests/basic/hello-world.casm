@@ -1,7 +1,0 @@
-CASM helloWorld
-
-rule main = {
-  intern_debug stacktrace
-  program( self ) := undef
-}
-init main
