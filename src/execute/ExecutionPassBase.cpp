@@ -692,7 +692,11 @@ const value_t ExecutionPassBase::visit_function_atom(FunctionAtom *atom,
     case FunctionAtom::SymbolType::PARAMETER:
         return value_t(rule_bindings.back()->at(atom->offset));
     case FunctionAtom::SymbolType::FUNCTION:
-        return get_function_value(atom->symbol, num_arguments, arguments);
+        try {
+            return get_function_value(atom->symbol, num_arguments, arguments);
+        } catch (const RuntimeException& e) {
+            throw RuntimeException(atom->location, e.what(), e.getErrorCode());
+        }
     case FunctionAtom::SymbolType::ENUM: {
         enum_value_t *val = atom->enum_->mapping[atom->name];
         value_t v = value_t(val);
