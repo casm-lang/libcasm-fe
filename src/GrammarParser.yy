@@ -689,43 +689,6 @@ ATOM
   {
 	  $$ = new Expression( @$, new ZeroAtom( @$, $3 ), $3, ExpressionOperation::SUB );
   }
-// | PLUS LPAREN EXPRESSION RPAREN
-//   {
-// 	  $$ = $3;
-//   }
-// | MINUS LPAREN EXPRESSION RPAREN
-//   {	  
-// 	  AstNode* zero = 0;
-	  
-// 	  if( $3->type_.t == TypeType::INTEGER )
-// 	  {
-// 		  zero = new IntegerAtom( @$, 0 );
-// 	  }
-// 	  else if( $3->type_.t == TypeType::FLOATING )
-// 	  {
-// 		  zero = new FloatingAtom( @$, 0 );
-// 	  }
-// 	  else if( $3->type_.t == TypeType::RATIONAL )
-// 	  {
-// 		  zero = new RationalAtom( @$, rational_t( 0, 1 ) );
-// 	  }
-// 	  else
-// 	  {
-// 		  zero = $3;
-		  
-// 		  driver.error
-// 		  ( @$
-// 		  , "type '"
-// 			+ type_to_str( $3->node_type_ )
-// 			+ "' cannot be used for the expression '"
-// 			+ $3->to_str()
-// 			+ "'"			
-// 		  );
-// 		  assert(0);
-// 	  }
-	  
-// 	  $$ = new Expression( @$, new IntegerAtom( @$, 0 ), $3, ExpressionOperation::SUB );
-//   }
 ;
 
 
