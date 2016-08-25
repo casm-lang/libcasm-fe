@@ -106,7 +106,7 @@ class ExpressionBase;
 class AtomNode;
 
 class AstNode {
-    public:
+public:
         yy::location location;
         NodeType node_type_;
 
@@ -454,14 +454,21 @@ class CallNode: public AstNode {
              std::vector<ExpressionBase*> *args);
 };
 
-class PrintNode: public AstNode {
-  public:
-    std::vector<ExpressionBase*> atoms;
-    std::string filter;
 
-    PrintNode(yy::location& loc, const std::vector<ExpressionBase*> &atoms);
-    PrintNode(yy::location& loc, const std::string& filter, const std::vector<ExpressionBase*> &atoms);
+class PrintNode: public AstNode
+{
+private:
+    ExpressionBase* atom;
+    std::string filter;
+    
+public:
+    PrintNode(yy::location& loc, ExpressionBase* atom );
+    PrintNode(yy::location& loc, ExpressionBase* atom, const std::string& filter );
+
+    ExpressionBase* getAtom( void ) const;
+    const std::string& getFilter( void ) const;
 };
+
 
 class LetNode: public AstNode {
   public:
@@ -519,3 +526,13 @@ public:
 
 
 #endif
+
+//  
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: t
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

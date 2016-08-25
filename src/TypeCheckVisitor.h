@@ -66,7 +66,7 @@ class TypecheckVisitor : public BaseVisitor<Type*> {
     void visit_call_pre(CallNode *call, Type* expr);
     void visit_call(CallNode *call, std::vector<Type*>& argument_results);
     void visit_call_post(CallNode *call);
-    void visit_print(PrintNode* node, std::vector<Type*>& types);
+    void visit_print( PrintNode* node, Type* type );
     void visit_diedie(DiedieNode *node, Type* msg);
 
     void visit_let(LetNode *node, Type* v);

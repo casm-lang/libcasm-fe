@@ -185,16 +185,15 @@ void AstDumpVisitor::visit_case(CaseNode* node, const bool flag, const std::vect
     }
 }
 
-bool AstDumpVisitor::visit_print(PrintNode *node, std::vector<bool>& argument_results) {
-  UNUSED(argument_results);
 
-  dump_node(node, "Print");
-
-  for (ExpressionBase* a : node->atoms) {
-    dump_link(node, a);
-  }
-  return true;
+bool AstDumpVisitor::visit_print( PrintNode *node, bool argument )
+{
+    UNUSED( argument );
+    dump_node(node, "Print");
+    dump_link(node, node->getAtom() );
+    return true;
 }
+
 
 void AstDumpVisitor::visit_let(LetNode *node, bool) {
   dump_node(node, "Let "+node->identifier);

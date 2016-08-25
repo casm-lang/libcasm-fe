@@ -276,12 +276,12 @@ template<class T, class V> class AstWalker {
       }
     }
 
-    void walk_print(PrintNode *node) {
-      std::vector<V> argument_results;
-      for (ExpressionBase *e: node->atoms) {          
-          argument_results.push_back(walk_expression_base(e));
-        }
-      visitor.visit_print(node, argument_results);
+    void walk_print( PrintNode* node )
+    {
+        visitor.visit_print
+        ( node
+        , walk_expression_base( node->getAtom() )
+        );
     }
     
     void walk_let(LetNode *node) {
@@ -506,7 +506,7 @@ template<class T> class BaseVisitor {
     T visit_call_pre(CallNode*, T) { return T(); }
     T visit_call(CallNode*, std::vector<T>&) { return T(); }
     void visit_call_post(CallNode*) {}
-    T visit_print(PrintNode*, std::vector<T>&) { return T(); }
+    T visit_print(PrintNode*, T) { return T(); }
     void visit_diedie(DiedieNode*, const T&) {}
     void visit_impossible(AstNode*) {}
 
@@ -544,3 +544,13 @@ template<class T> class BaseVisitor {
 };
 
 #endif
+
+//  
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: t
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

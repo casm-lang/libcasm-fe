@@ -612,13 +612,40 @@ CallNode::CallNode(yy::location& loc, const std::string& rule_name, ExpressionBa
       rule(nullptr), arguments(args), ruleref(ruleref) {}
 
 
-PrintNode::PrintNode(yy::location& loc, const std::vector<ExpressionBase*> &atoms)
-    : AstNode(loc, NodeType::PRINT, Type(TypeType::NO_TYPE)), atoms(std::move(atoms)), filter() {
+PrintNode::PrintNode
+( yy::location& loc
+, ExpressionBase* atom
+, const std::string& filter
+)
+: AstNode
+  ( loc
+  , NodeType::PRINT
+  , Type( TypeType::NO_TYPE )
+  )
+, atom( atom )
+, filter( filter )
+{
+	assert( atom and " invalid PrintNode created! " );
 }
 
-PrintNode::PrintNode(yy::location& loc, const std::string& filter, const std::vector<ExpressionBase*> &atoms)
-    : AstNode(loc, NodeType::PRINT, Type(TypeType::NO_TYPE)), atoms(std::move(atoms)), filter(std::move(filter)) {
+PrintNode::PrintNode
+( yy::location& loc
+, ExpressionBase* atom
+)
+: PrintNode( loc, atom, "" )
+{
 }
+
+ExpressionBase* PrintNode::getAtom( void ) const
+{
+	return atom;
+}
+
+const std::string& PrintNode::getFilter( void ) const
+{
+	return filter;
+}
+
 
 
 LetNode::LetNode(yy::location& loc, Type type, const std::string& identifier,

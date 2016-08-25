@@ -43,13 +43,13 @@ namespace libcasm_fe
     {
     public:
         static char id;
-
+        
         bool run(libpass::PassResult& pr) override;
-
+        
         void visit_assure(UnaryNode* assure, const value_t& val);
-
-        void visit_print(PrintNode *node, const std::vector<value_t> &arguments);
-
+        
+        void visit_print( PrintNode *node, const value_t& argument );
+        
         void visit_push(PushNode *node, const value_t& expr, const value_t& atom);
         void visit_pop(PopNode *node, const value_t& val);
 
