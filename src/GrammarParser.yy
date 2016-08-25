@@ -449,8 +449,8 @@ IDENTIFIER_LIST
 IDENTIFIER_LIST_NO_COMMA
 : IDENTIFIER_LIST_NO_COMMA COMMA IDENTIFIER
   {
-      $$ = std::move( $1 );
-      $$.push_back( $3 );
+	  $$ = std::move( $1 );
+	  $$.push_back( $3 );
   }
 | IDENTIFIER
   {
@@ -1271,7 +1271,7 @@ CASE_LABEL_LIST
   }
 | CASE_LABEL
   {
-	  $$ = std::move( std::vector< std::pair< AtomNode*, AstNode* > >() );
+	  $$ = std::vector< std::pair< AtomNode*, AstNode* > >();
 	  $$.push_back( $1 );
   }
 ;

@@ -98,7 +98,7 @@ src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.h
 	@cat $(filter %.h,$^) | sed "/^\/\/ /d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
 	@tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
 	@sed -i "/^{{grammartoken}}/d" obj/$<
-	cd src/various && $(YAC) $(YAC_FLAG) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
+	@cd src/various && $(YAC) $(YAC_FLAG) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
 
 
 src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.h

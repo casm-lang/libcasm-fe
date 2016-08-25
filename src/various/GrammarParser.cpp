@@ -1437,8 +1437,8 @@ namespace yy {
   case 27:
 #line 540 "../../obj/src/GrammarParser.yy" // lalr1.cc:859
     {
-      yylhs.value.as< std::vector<std::string> > () = std::move( yystack_[2].value.as< std::vector<std::string> > () );
-      yylhs.value.as< std::vector<std::string> > ().push_back( yystack_[0].value.as< std::string > () );
+	  yylhs.value.as< std::vector<std::string> > () = std::move( yystack_[2].value.as< std::vector<std::string> > () );
+	  yylhs.value.as< std::vector<std::string> > ().push_back( yystack_[0].value.as< std::string > () );
   }
 #line 1444 "GrammarParser.cpp" // lalr1.cc:859
     break;
@@ -2551,7 +2551,7 @@ namespace yy {
   case 152:
 #line 1362 "../../obj/src/GrammarParser.yy" // lalr1.cc:859
     {
-	  yylhs.value.as< std::vector<std::pair<AtomNode*, AstNode*>> > () = std::move( std::vector< std::pair< AtomNode*, AstNode* > >() );
+	  yylhs.value.as< std::vector<std::pair<AtomNode*, AstNode*>> > () = std::vector< std::pair< AtomNode*, AstNode* > >();
 	  yylhs.value.as< std::vector<std::pair<AtomNode*, AstNode*>> > ().push_back( yystack_[0].value.as< std::pair<AtomNode*, AstNode*> > () );
   }
 #line 2558 "GrammarParser.cpp" // lalr1.cc:859
