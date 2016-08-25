@@ -324,20 +324,20 @@ void NumericExecutionPass::visit_assure(UnaryNode* assure, const value_t& val)
     visit_assert(assure, val);
 }
 
-void NumericExecutionPass::visit_print(PrintNode *node, const std::vector<value_t> &arguments)
+void NumericExecutionPass::visit_print( PrintNode *node, const value_t& argument )
 {
-    if (node->filter.size() > 0 ) {
-        if (filter_enabled(node->filter)) {
-            std::cout << node->filter << ": ";
-        } else {
+    if( node->getFilter().size() > 0 )
+	{
+        if( filter_enabled( node->getFilter() ) )
+		{
+            std::cout << node->getFilter() << ": ";
+        } else
+		{
             return;
         }
     }
-
-    for (const value_t& v: arguments) {
-        std::cout << v.to_str();
-    }
-    std::cout << std::endl;
+	
+    std::cout << argument.to_str() << std::endl;
 }
 
 void NumericExecutionPass::visit_push(PushNode *node, const value_t& expr, const value_t& atom)

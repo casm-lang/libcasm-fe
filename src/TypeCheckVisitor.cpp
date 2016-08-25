@@ -280,16 +280,19 @@ void TypecheckVisitor::visit_call_post(CallNode *call) {
   UNUSED(call);
 }
 
-void TypecheckVisitor::visit_print( PrintNode* node, std::vector<Type*>& types )
+
+void TypecheckVisitor::visit_print( PrintNode* node, Type* type )
 {
-    for( auto a : node->atoms )
+    if( node->getAtom()->type_.t == TypeType::UNKNOWN )
     {
-        if( a->type_.t == TypeType::UNKNOWN )
-        {
-            a->type_.t = TypeType::STRING;
-        }
+        driver_.error
+        ( node->getAtom()->location
+        , "unable to annotate type of print statement"
+	, libcasm_fe::Codes::TypeInferenceInvalidPrint
+        );
     }
 }
+
 
 void TypecheckVisitor::visit_diedie(DiedieNode *node, Type* msg) {
   if (node->msg && !node->msg->type_.unify(TypeType::STRING)) {
@@ -331,7 +334,7 @@ void TypecheckVisitor::visit_let_post(LetNode *node)
         driver_.error
         ( node->location
         , "unable to infer the type of let identifier '"+node->identifier+"'"
-        , libcasm_fe::Codes::LetTypeInferenceFailed
+        , libcasm_fe::Codes::TypeInferenceInvalidLet
         );
     }
     rule_binding_types.back()->pop_back();
@@ -502,6 +505,25 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
                               "` must be Integer or Floating but were "+type->to_str());
             }
         }
+        else if( op == ExpressionOperation::ADD )
+        {
+	    if( *type != TypeType::INTEGER
+	    and *type != TypeType::FLOATING
+	    and *type != TypeType::BIT
+	    and *type != TypeType::RATIONAL
+	    and *type != TypeType::STRING
+	    )
+	    {
+		driver_.error
+		( loc
+		, "operands of operator `"
+		  + operator_to_str( op )
+		  + "` must be Integer, Bit, String, Floating or Rational but were "
+		  + type->to_str()
+		, libcasm_fe::Codes::OperatorAddInvalidOperandType
+		);
+	    }
+	}
         else if( *type != TypeType::INTEGER
               && *type != TypeType::FLOATING
               && *type != TypeType::BIT
@@ -511,25 +533,37 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
                           "operands of operator `"+operator_to_str(op)+
                           "` must be Integer, Bit, Floating or Rational but were "+
                           type->to_str());
-        }
-    }
+        }    }
 }
 
 
-Type* TypecheckVisitor::visit_expression(Expression *expr, Type*, Type*) {
-  if (expr->left_ && expr->right_ && !expr->left_->type_.unify(&expr->right_->type_)) {
-      driver_.error(expr->location, "type of expressions did not match: "+
-                                     expr->left_->type_.get_most_general_type(expr->left_)->to_str()+" != "+
-                                     expr->right_->type_.get_most_general_type(expr->right_)->to_str());
-  }
-
-  const Type* lhs = expr->left_->type_.get_most_general_type(expr->left_);
-  const Type* rhs = expr->right_->type_.get_most_general_type(expr->right_);
-
-  if( lhs->t == TypeType::BIT
-   && lhs->bitsize != rhs->bitsize )
+Type* TypecheckVisitor::visit_expression( Expression *expr, Type*, Type* )
+{
+    if( expr->left_ and expr->right_ and not expr->left_->type_.unify( &expr->right_->type_ ) )
+    {
+	driver_.error
+	( expr->location
+	, "type of expressions did not match: "
+	  + expr->left_->type_.get_most_general_type( expr->left_ )->to_str()
+	  + " != "
+	  + expr->right_->type_.get_most_general_type( expr->right_ )->to_str()
+	  , libcasm_fe::Codes::TypeInferenceInvalidExpression
+	);
+    }
+    
+    const Type* lhs = expr->left_->type_.get_most_general_type(expr->left_);
+    const Type* rhs = expr->right_->type_.get_most_general_type(expr->right_);
+    
+  if( lhs->t == TypeType::BIT and rhs->t == TypeType::BIT and lhs->bitsize != rhs->bitsize )
   {      
-      driver_.error( expr->location, "size of 'Bit' types in expression did not match: " + lhs->to_str() + " != " + rhs->to_str() );   
+      driver_.error
+      ( expr->location
+      , "size of 'Bit' types in expression did not match: "
+	+ lhs->to_str()
+	+ " != "
+	+ rhs->to_str()
+	, libcasm_fe::Codes::TypeBitSizeInvalidExpression
+      );   
   }
   
   if( expr->left_->node_type_ == NodeType::ZERO_ATOM )

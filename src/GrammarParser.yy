@@ -189,7 +189,6 @@ END       0 "end of file"
 %type <std::string> RULEREF
 %type <IfThenElseNode*> IFTHENELSE
 %type <CallNode*> CALL_SYNTAX
-%type <std::vector<ExpressionBase*>> DEBUG_ATOM_LIST
 %type <PrintNode*> PRINT_SYNTAX DEBUG_SYNTAX
 %type <LetNode*> LET_SYNTAX
 %type<std::vector<Type*>> TYPE_SYNTAX_LIST
@@ -1093,7 +1092,7 @@ SIMPLE_STMT
   {
 	  driver.error
 	  ( @$
-	  , "syntax error: invalid statement '" + $1 + "' found"
+	  , "invalid statement '" + $1 + "' found"
 	  , libcasm_fe::Codes::SyntaxErrorInvalidStatement
 	  );
   }
@@ -1168,31 +1167,18 @@ IMPOSSIBLE_SYNTAX
 ;
 
 
-DEBUG_SYNTAX
-: DEBUG IDENTIFIER DEBUG_ATOM_LIST
-  {
-	  $$ = new PrintNode( @$, $2, $3 );
-  }
-;
-
-
-DEBUG_ATOM_LIST
-: DEBUG_ATOM_LIST PLUS ATOM
-  {
-	  $$ = std::move( $1 );
-	  $$.push_back( $3 );
-  }
-| ATOM
-  {
-	  $$.push_back( $1 );
-  }
-;
-
-
 PRINT_SYNTAX
-: PRINT DEBUG_ATOM_LIST
+: PRINT EXPRESSION
   {
 	  $$ = new PrintNode( @$, $2 );
+  }
+;
+
+
+DEBUG_SYNTAX
+: DEBUG IDENTIFIER EXPRESSION
+  {
+	  $$ = new PrintNode( @$, $3, $2 );
   }
 ;
 

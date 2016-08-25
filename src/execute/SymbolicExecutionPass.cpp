@@ -470,22 +470,23 @@ void SymbolicExecutionPass::visit_assure(UnaryNode* assure, const value_t& val)
     }
 }
 
-void SymbolicExecutionPass::visit_print(PrintNode *node, const std::vector<value_t> &arguments)
+void SymbolicExecutionPass::visit_print( PrintNode *node, const value_t& argument )
 {
     std::stringstream ss;
-    if (node->filter.size() > 0 ) {
-        if (filter_enabled(node->filter)) {
-            ss << node->filter << ": ";
-        } else {
+    if( node->getFilter().size() > 0 )
+	{
+        if( filter_enabled( node->getFilter() ) )
+		{
+            ss << node->getFilter() << ": ";
+        }
+		else
+		{
             return;
         }
     }
-
-    for (const value_t& v: arguments) {
-        ss << v.to_str();
-    }
-    ss << std::endl;
-
+	
+    ss << argument.to_str() << std::endl;
+	
     trace.push_back(ss.str());
 }
 
