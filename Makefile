@@ -27,12 +27,14 @@ AR=ar
 
 CC=clang
 CCFLAG += -std=c11
-CCFLAG += -g -O0
+debug: CCFLAG += -g -O0
+release: CCFLAG += -O3 -DNDEBUG
 CCFLAG += -Wall
 
 CPP=clang
 CPPFLAG += -std=c++11
-CPPFLAG += -g -O0
+debug: CPPFLAG += -g -O0
+release: CPPFLAG += -O3 -DNDEBUG
 CPPFLAG += -Wall
 #CPPFLAG += -Wextra
 
@@ -77,7 +79,10 @@ INCLUDE += -I ./src/various
 INCLUDE += -I ../
 INCLUDE += -I ../pass
 
-default: $(LIBRARY) obj $(TARGET)
+default: debug
+
+debug: $(LIBRARY) obj $(TARGET)
+release: $(LIBRARY) obj $(TARGET)
 
 obj:
 	mkdir -p obj
@@ -159,7 +164,7 @@ obj/uts/%.o: uts/%.cpp
 	@echo "CPP " $<
 	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) -c $< -o $@
 
-test: default obj $(TEST_OBJECTS)
+test: debug obj $(TEST_OBJECTS)
 	@rm -f $@
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) $(TEST_LIBRARY) -o $@ $(filter %.o,$^) $(TARGET) ../gtest/googletest/src/gtest-all.cc ../gtest/googletest/src/gtest_main.cc
