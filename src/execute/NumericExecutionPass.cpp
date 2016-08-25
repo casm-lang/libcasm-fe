@@ -345,7 +345,7 @@ void NumericExecutionPass::visit_push(PushNode *node, const value_t& expr, const
     num_arguments = 0; // TODO at the moment, functions with arguments are not supported
 
     const value_t to_res = builtins::cons(temp_lists, expr, atom);
-    addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location.begin.line);
+    addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location);
 }
 
 void NumericExecutionPass::visit_pop(PopNode *node, const value_t& val)
@@ -355,13 +355,13 @@ void NumericExecutionPass::visit_pop(PopNode *node, const value_t& val)
     const value_t to_res = builtins::peek(val);
 
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
-        addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location.begin.line);
+        addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location);
     } else {
         rule_bindings.back()->push_back(to_res);
     }
 
     const value_t from_res = builtins::tail(temp_lists, val);
-    addUpdate(node->from->symbol, from_res, num_arguments, arguments, node->location.begin.line);
+    addUpdate(node->from->symbol, from_res, num_arguments, arguments, node->location);
 }
 
 const value_t NumericExecutionPass::visit_expression(Expression *expr,

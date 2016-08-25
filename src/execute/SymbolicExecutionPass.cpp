@@ -502,7 +502,7 @@ void SymbolicExecutionPass::visit_push(PushNode *node, const value_t& expr, cons
                                                 value_t(TypeType::LIST, new BottomList())).value.list;
     }
 
-    addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location.begin.line);
+    addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location);
 
     value_t args[] = {atom, expr};
     symbolic::dump_builtin(trace, "push", args, 2, to_res);
@@ -517,7 +517,7 @@ void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
 
     Update *up = nullptr;
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
-        up = addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location.begin.line);
+        up = addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location);
     } else {
         rule_bindings.back()->push_back(to_res);
     }
@@ -531,7 +531,7 @@ void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
     value_t args[] = {val, to_res};
     symbolic::dump_builtin(trace, "pop", args, 2, from_res);
 
-    addUpdate(node->to->symbol, from_res, num_arguments, arguments, node->location.begin.line);
+    addUpdate(node->to->symbol, from_res, num_arguments, arguments, node->location);
 }
 
 const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
