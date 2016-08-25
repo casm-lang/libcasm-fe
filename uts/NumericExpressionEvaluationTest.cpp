@@ -106,10 +106,9 @@ TEST_P(Numeric_UnaryExpressionTest, testUnaryExpressionResultTypeType)
     libcasm_fe::NumericExecutionPass visitor{};
     const auto result = visitor.visit_expression_single(expr.get(), value);
 
+    EXPECT_EQ(expectedResult.type, result.type);
     if (checkReturnValue) {
         EXPECT_EQ(expectedResult, result);
-    } else {
-        EXPECT_EQ(expectedResult.type, result.type);
     }
 }
 
@@ -139,10 +138,9 @@ TEST_P(Numeric_BinaryExpressionTest, testBinaryExpressionResultTypeType)
     libcasm_fe::NumericExecutionPass visitor{};
     const auto result = visitor.visit_expression(expr.get(), lhs, rhs);
 
+    EXPECT_EQ(expectedResult.type, result.type);
     if (checkReturnValue) {
         EXPECT_EQ(expectedResult, result);
-    } else {
-        EXPECT_EQ(expectedResult.type, result.type);
     }
 }
 

@@ -87,7 +87,8 @@ namespace libcasm_fe
         static char id;
 
         bool hasEmptyUpdateSet() const;
-        Update* addUpdate(Function *sym, const value_t& val, uint32_t num_arguments, value_t arguments[], uint64_t line);
+        Update* addUpdate(Function *sym, const value_t& val, uint32_t num_arguments,
+                          value_t arguments[], const yy::location& location);
 
         void fork(const UpdateSet::Type updateSetType);
         void merge();

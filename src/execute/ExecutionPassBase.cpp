@@ -101,7 +101,7 @@ bool ExecutionPassBase::hasEmptyUpdateSet() const
 
 Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
                                      uint32_t num_arguments, value_t arguments[],
-                                     uint64_t line)
+                                     const yy::location& location)
 {
 	try
 	{
@@ -110,7 +110,7 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
 	catch( const std::domain_error& e )
 	{
         throw RuntimeException
-		( sym->location
+        ( location
 		, e.what()
 		, libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtUpdate
 		);
@@ -123,7 +123,7 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
 	catch( const std::domain_error& e )
 	{
         throw RuntimeException
-		( sym->location
+        ( location
 		, e.what()
 		, libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate
 		);
@@ -142,7 +142,7 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
     up->func = sym->id;
     up->args = const_cast<value_t*>(it->first.p);
     up->num_args = num_arguments;
-    up->line = line;
+    up->line = location.begin.line;
 
     try {
         const value_t& ref = it->second;
@@ -151,14 +151,12 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
         const auto conflictingUpdate = e.conflictingUpdate();
         const auto existingUpdate = e.existingUpdate();
 
-        const auto location = sym->name + arguments_to_string(conflictingUpdate->num_args,
-                                                              conflictingUpdate->args);
-
-        const auto info = "Conflict while adding update " + location + " = " + val.to_str()
-                        + " at line " + std::to_string(line) + ", conflicting with line "
-                        + std::to_string(existingUpdate->line) + " with value '"
-                        + existingUpdate->value.to_str() + "'";
-        throw RuntimeException(info);
+        const auto info = "Conflict while adding update " + sym->name
+                        + arguments_to_string(conflictingUpdate->num_args, conflictingUpdate->args)
+                        + " = " + val.to_str() + " at line " + std::to_string(up->line)
+                        + ", conflicting with line " + std::to_string(existingUpdate->line)
+                        + " with value '" + existingUpdate->value.to_str() + "'";
+        throw RuntimeException(location, info);
     }
 
     return up;
@@ -608,7 +606,7 @@ void ExecutionPassBase::visit_update_dumps(UpdateNode *update, const value_t& ex
 
 void ExecutionPassBase::visit_update(UpdateNode *update, const value_t& expr_v)
 {
-    addUpdate(update->func->symbol, expr_v, num_arguments, arguments, update->location.begin.line);
+    addUpdate(update->func->symbol, expr_v, num_arguments, arguments, update->location);
 }
 
 void ExecutionPassBase::visit_call_pre(CallNode *call)
@@ -694,7 +692,11 @@ const value_t ExecutionPassBase::visit_function_atom(FunctionAtom *atom,
     case FunctionAtom::SymbolType::PARAMETER:
         return value_t(rule_bindings.back()->at(atom->offset));
     case FunctionAtom::SymbolType::FUNCTION:
-        return get_function_value(atom->symbol, num_arguments, arguments);
+        try {
+            return get_function_value(atom->symbol, num_arguments, arguments);
+        } catch (const RuntimeException& e) {
+            throw RuntimeException(atom->location, e.what(), e.getErrorCode());
+        }
     case FunctionAtom::SymbolType::ENUM: {
         enum_value_t *val = atom->enum_->mapping[atom->name];
         value_t v = value_t(val);
