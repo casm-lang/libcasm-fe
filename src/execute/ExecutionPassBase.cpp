@@ -767,10 +767,16 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
     }
 }
 
-void ExecutionPassBase::visit_derived_function_atom_pre(FunctionAtom*,
+void ExecutionPassBase::visit_derived_function_atom_pre(FunctionAtom *function,
                                                         const value_t arguments[],
                                                         uint16_t num_arguments)
 {
+    try {
+        function->symbol->validateArguments(num_arguments, arguments);
+    } catch (const std::domain_error& e) {
+        throw RuntimeException(function->location, e.what());
+    }
+
     // TODO change, cleanup!
     std::vector<value_t> *tmp = new std::vector<value_t>();
     for (uint32_t i = 0; i < num_arguments; i++) {

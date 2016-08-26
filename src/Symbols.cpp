@@ -808,7 +808,7 @@ static std::string to_string(Symbol::SymbolType type)
 
 uint64_t Function::counter = 0;
 
-Function::Function(const std::string name, const yy::location& location, std::vector<Type*>& args,
+Function::Function(const std::string name, const yy::location& location, const std::vector<Type*>& args,
                   Type* return_type,
                   std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *init) :
     Function(false, false, name, location, args, return_type, init) {
@@ -816,7 +816,7 @@ Function::Function(const std::string name, const yy::location& location, std::ve
 }
 
 Function::Function(bool is_static, bool is_symbolic, const std::string name, const yy::location& location,
-             std::vector<Type*>& args, Type* return_type,
+             const std::vector<Type*>& args, Type* return_type,
              std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *init) :
                 Symbol(name, location, SymbolType::FUNCTION), arguments_(std::move(args)), intitializers_(init),
                 return_type_(return_type), id(counter),
@@ -824,32 +824,37 @@ Function::Function(bool is_static, bool is_symbolic, const std::string name, con
                 subrange_arguments(), subrange_return(false) {
 
   counter += 1;
-  if (return_type->subrange_start < return_type->subrange_end) {
-    subrange_return = true;
-  }
-  for (uint32_t i=0; i < arguments_.size(); i++) {
-    Type* t = arguments_[i];
-    if (t->subrange_start < t->subrange_end) {
-      subrange_arguments.push_back(i);
-    }
-  }
+  initRangeCheck();
+
 }
 
-Function::Function(const std::string name, const yy::location& location, std::vector<Type*>& args,
+Function::Function(const std::string name, const yy::location& location, const std::vector<Type*>& args,
                    ExpressionBase *expr, Type* return_type) :
                 Symbol(name, location, SymbolType::DERIVED), arguments_(std::move(args)), derived(expr),
                 return_type_(return_type), id(counter),
                 is_static(false), is_symbolic(false) {
   counter += 1;
+  initRangeCheck();
 }
 
 Function::Function(const std::string name, const yy::location& location,
                    ExpressionBase *expr, Type* return_type) :
-                Symbol(name, location, SymbolType::DERIVED), arguments_(), derived(expr),
-                return_type_(return_type), id(counter), is_static(false), is_symbolic(false) {
-  counter += 1;
+    Function(name, location, {}, expr, return_type) {
+
 }
 
+void Function::initRangeCheck()
+{
+    if (return_type_->subrange_start < return_type_->subrange_end) {
+        subrange_return = true;
+    }
+    for (uint32_t i=0; i < arguments_.size(); i++) {
+        Type* t = arguments_[i];
+        if (t->subrange_start < t->subrange_end) {
+            subrange_arguments.push_back(i);
+        }
+    }
+}
 
 Function::~Function() {
   arguments_.clear();
