@@ -507,6 +507,11 @@ namespace builtins
         }
     }
 
+    static const value_t asbit(const value_t& arg)
+    {
+        return asinteger(arg); // TODO EP: fix this once we have a proper bit implementation
+    }
+
     static void get_numerator_denominator(double x, int64_t *num, int64_t *denom)
     {
         // thanks to
@@ -753,6 +758,8 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
         return builtins::asfloating(arguments[0]);
     case Builtin::Id::AS_RATIONAL:
         return builtins::asrational(arguments[0]);
+    case Builtin::Id::AS_BIT:
+        return builtins::asbit(arguments[0]);
     case Builtin::Id::IS_SYMBOLIC:
         return builtins::issymbolic(arguments[0]);
     default:
