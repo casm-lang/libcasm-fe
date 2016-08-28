@@ -507,7 +507,7 @@ namespace builtins
         }
     }
 
-    static const value_t asbit(const value_t& arg)
+    static const value_t asbit(const value_t& arg, const value_t& bitsize)
     {
         return asinteger(arg); // TODO EP: fix this once we have a proper bit implementation
     }
@@ -759,7 +759,7 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
     case Builtin::Id::AS_RATIONAL:
         return builtins::asrational(arguments[0]);
     case Builtin::Id::AS_BIT:
-        return builtins::asbit(arguments[0]);
+        return builtins::asbit(arguments[0], arguments[1]);
     case Builtin::Id::IS_SYMBOLIC:
         return builtins::issymbolic(arguments[0]);
     default:
