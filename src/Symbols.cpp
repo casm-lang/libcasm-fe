@@ -845,12 +845,11 @@ Function::Function(const std::string name, const yy::location& location,
 
 void Function::initRangeCheck()
 {
-    if (return_type_->subrange_start < return_type_->subrange_end) {
-        subrange_return = true;
-    }
+    subrange_return = return_type_->has_range_restriction();
+
     for (uint32_t i=0; i < arguments_.size(); i++) {
         Type* t = arguments_[i];
-        if (t->subrange_start < t->subrange_end) {
+        if (t->has_range_restriction()) {
             subrange_arguments.push_back(i);
         }
     }

@@ -151,7 +151,13 @@ bool Type::operator!=(const Type& other) const {
 
 const std::string Type::to_str() const {
   switch (t) {
-    case TypeType::INTEGER: return "Integer";
+    case TypeType::INTEGER:
+        if (has_range_restriction()) {
+            return "Integer(" + std::to_string(subrange_start) +
+                   ".." + std::to_string(subrange_end) + ")";
+        } else {
+            return "Integer";
+        }
     case TypeType::BIT:
     {
         if( bitsize > 0 )
@@ -410,6 +416,9 @@ bool Type::unify_nofollow(Type *other) {
     if( t == TypeType::BIT )
     {
         bitsize = other->bitsize;
+    } else if (t == TypeType::INTEGER) {
+        subrange_start = other->subrange_start;
+        subrange_end = other->subrange_end;
     }
     
     bool matched_constraint = true;
@@ -435,6 +444,9 @@ bool Type::unify_nofollow(Type *other) {
     if( t == TypeType::BIT )
     {
         other->bitsize = bitsize;
+    } else if (t == TypeType::INTEGER) {
+        other->subrange_start = subrange_start;
+        other->subrange_end = subrange_end;
     }
     
     bool matched_constraint = true;
@@ -574,4 +586,9 @@ bool Type::is_complete() const {
     default:
       return true;
   }
+}
+
+bool Type::has_range_restriction() const
+{
+    return subrange_start < subrange_end;
 }

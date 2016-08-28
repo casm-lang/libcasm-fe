@@ -124,6 +124,8 @@ class Type {
     const Type* get_most_general_type(AstNode* node) const;
     bool is_complete() const;
     bool is_unknown() const;
+
+    bool has_range_restriction() const;
 };
 
 
