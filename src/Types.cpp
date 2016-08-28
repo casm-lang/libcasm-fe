@@ -82,7 +82,8 @@ Type::Type(TypeType t) : t(t), unify_with_left(nullptr), unify_with_right(nullpt
 }
 
 Type::Type(Type *other) : t(other->t), unify_with_left(nullptr),
-    unify_with_right(nullptr), constraints(), subtypes(), enum_name(other->enum_name)  {
+    unify_with_right(nullptr), constraints(), subtypes(), enum_name(other->enum_name),
+    subrange_start(other->subrange_start), subrange_end(other->subrange_end), bitsize(other->bitsize) {
   for (Type* t : other->subtypes) {
     subtypes.push_back(new Type(t));
   }
@@ -90,7 +91,8 @@ Type::Type(Type *other) : t(other->t), unify_with_left(nullptr),
 
 
 Type::Type(const Type& other) : t(other.t), unify_with_left(nullptr),
-    unify_with_right(nullptr), constraints(), subtypes(other.subtypes), enum_name(other.enum_name)  {
+    unify_with_right(nullptr), constraints(), subtypes(other.subtypes), enum_name(other.enum_name),
+    subrange_start(other.subrange_start), subrange_end(other.subrange_end), bitsize(other.bitsize) {
 }
 
 Type::Type(TypeType enum_type, const std::string& name) : unify_with_left(nullptr), unify_with_right(nullptr), constraints(), subtypes(), enum_name(std::move(name))  {

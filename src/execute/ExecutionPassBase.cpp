@@ -630,27 +630,46 @@ void ExecutionPassBase::visit_call_pre(CallNode *call, const value_t& expr)
 
 void ExecutionPassBase::visit_call(CallNode *call, std::vector<value_t> &argument_results)
 {
-    UNUSED(call);
-
     if (call->ruleref) {
-        size_t args_defined = call->rule->arguments.size();
-        size_t args_provided = argument_results.size();
+        const size_t args_defined = call->rule->arguments.size();
+        const size_t args_provided = argument_results.size();
         if (args_defined != args_provided) {
             throw RuntimeException(call->location, "indirectly called rule `" + call->rule->name +
                                    "` expects " + std::to_string(args_defined) + " arguments but " +
                                    std::to_string(args_provided) + " where provided");
         } else {
-            for (size_t i=0; i < args_defined; i++) {
-                Type arg_t(argument_results[i].type);
-                if (call->rule->arguments[i]->t == TypeType::LIST) {
-                    // TODO
-                    assert(0);
-                } else if (!call->rule->arguments[i]->unify(&arg_t) && !(argument_results[i].is_undef() && argument_results[i].type == TypeType::UNDEF)) {
+            for (size_t i = 0; i < args_defined; i++) {
+                const auto arg = argument_results.at(i);
+                Type argType(arg.type);
+
+                Type ruleArgType = call->rule->arguments.at(i);
+                if (not (ruleArgType.unify(&argType) or arg.is_undef())) {
                     throw RuntimeException(call->arguments->at(i)->location,
-                                           "argument "+std::to_string(i+1)+" of indirectly called rule `"+
-                                           call->rule->name+"` must be `"+
-                                           call->rule->arguments[i]->to_str()+"` but was `"+
-                                           Type(argument_results[i].type).to_str()+"`");
+                                           "argument " + std::to_string(i + 1) +
+                                           " of indirectly called rule `" +
+                                           call->rule->name + "` must be `" +
+                                           ruleArgType.to_str() + "` but was `" +
+                                           argType.to_str() + "`");
+                }
+
+                switch (ruleArgType.t) {
+                    case TypeType::LIST:
+                        assert(0); // TODO
+                        break;
+                    case TypeType::INTEGER: {
+                        const INTEGER_T integer = arg.value.integer;
+                        if (ruleArgType.has_range_restriction() and
+                            (integer < ruleArgType.subrange_start or integer > ruleArgType.subrange_end)) {
+                            throw RuntimeException(call->arguments->at(i)->location,
+                                                   std::to_string(integer) +
+                                                   " does violate the subrange " +
+                                                   std::to_string(ruleArgType.subrange_start) + ".." +
+                                                   std::to_string(ruleArgType.subrange_end) +
+                                                   " of " + std::to_string(i + 1) + ". rule argument");
+                        }
+                    }   break;
+                    default:
+                        break;
                 }
             }
         }
