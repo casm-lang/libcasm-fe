@@ -311,6 +311,7 @@ namespace yy {
       char dummy3[sizeof(AstNode*)];
 
       // VALUE
+      // BOOLEAN
       // NUMBER
       // NUMBER_RANGE
       char dummy4[sizeof(AtomNode*)];
@@ -396,10 +397,6 @@ namespace yy {
       char dummy28[sizeof(rational_t)];
 
       // CASE_LABEL
-      // CASE_LABEL_DEFAULT
-      // CASE_LABEL_NUMBER
-      // CASE_LABEL_IDENT
-      // CASE_LABEL_STRING
       char dummy29[sizeof(std::pair<AtomNode*, AstNode*>)];
 
       // INITIALIZER
@@ -1239,8 +1236,8 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1048,     ///< Last index in yytable_.
-      yynnts_ = 67,  ///< Number of nonterminal symbols.
+      yylast_ = 1059,     ///< Last index in yytable_.
+      yynnts_ = 64,  ///< Number of nonterminal symbols.
       yyfinal_ = 5, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -1334,38 +1331,39 @@ namespace yy {
         break;
 
       case 83: // BODY_ELEMENTS
-      case 138: // STATEMENTS
+      case 135: // STATEMENTS
         value.copy< AstListNode* > (other.value);
         break;
 
       case 84: // BODY_ELEMENT
-      case 115: // RULE_STMT
-      case 116: // RULE_SYNTAX
-      case 119: // SIMPLE_STMT
-      case 120: // STATEMENT
-      case 124: // IMPOSSIBLE_SYNTAX
+      case 116: // RULE_STMT
+      case 117: // RULE_SYNTAX
+      case 120: // SIMPLE_STMT
+      case 121: // STATEMENT
+      case 125: // IMPOSSIBLE_SYNTAX
         value.copy< AstNode* > (other.value);
         break;
 
       case 103: // VALUE
-      case 104: // NUMBER
-      case 109: // NUMBER_RANGE
+      case 104: // BOOLEAN
+      case 105: // NUMBER
+      case 110: // NUMBER_RANGE
         value.copy< AtomNode* > (other.value);
         break;
 
-      case 114: // FUNCTION_SYNTAX
+      case 115: // FUNCTION_SYNTAX
         value.copy< BaseFunctionAtom* > (other.value);
         break;
 
-      case 135: // CALL_SYNTAX
+      case 132: // CALL_SYNTAX
         value.copy< CallNode* > (other.value);
         break;
 
-      case 128: // CASE_SYNTAX
+      case 129: // CASE_SYNTAX
         value.copy< CaseNode* > (other.value);
         break;
 
-      case 123: // DIEDIE_SYNTAX
+      case 124: // DIEDIE_SYNTAX
         value.copy< DiedieNode* > (other.value);
         break;
 
@@ -1374,7 +1372,7 @@ namespace yy {
         break;
 
       case 102: // ATOM
-      case 113: // EXPRESSION
+      case 114: // EXPRESSION
         value.copy< ExpressionBase* > (other.value);
         break;
 
@@ -1382,11 +1380,11 @@ namespace yy {
         value.copy< FLOATING_T > (other.value);
         break;
 
-      case 106: // FLOATING_NUMBER
+      case 107: // FLOATING_NUMBER
         value.copy< FloatingAtom* > (other.value);
         break;
 
-      case 145: // FORALL_SYNTAX
+      case 142: // FORALL_SYNTAX
         value.copy< ForallNode* > (other.value);
         break;
 
@@ -1399,7 +1397,7 @@ namespace yy {
         value.copy< INTEGER_T > (other.value);
         break;
 
-      case 139: // IFTHENELSE
+      case 136: // IFTHENELSE
         value.copy< IfThenElseNode* > (other.value);
         break;
 
@@ -1407,28 +1405,28 @@ namespace yy {
         value.copy< InitNode* > (other.value);
         break;
 
-      case 105: // INTEGER_NUMBER
+      case 106: // INTEGER_NUMBER
         value.copy< IntegerAtom* > (other.value);
         break;
 
-      case 140: // LET_SYNTAX
+      case 137: // LET_SYNTAX
         value.copy< LetNode* > (other.value);
         break;
 
-      case 144: // POP_SYNTAX
+      case 141: // POP_SYNTAX
         value.copy< PopNode* > (other.value);
         break;
 
-      case 125: // PRINT_SYNTAX
-      case 126: // DEBUG_SYNTAX
+      case 126: // PRINT_SYNTAX
+      case 127: // DEBUG_SYNTAX
         value.copy< PrintNode* > (other.value);
         break;
 
-      case 143: // PUSH_SYNTAX
+      case 140: // PUSH_SYNTAX
         value.copy< PushNode* > (other.value);
         break;
 
-      case 107: // RATIONAL_NUMBER
+      case 108: // RATIONAL_NUMBER
         value.copy< RationalAtom* > (other.value);
         break;
 
@@ -1441,15 +1439,15 @@ namespace yy {
         value.copy< Type* > (other.value);
         break;
 
-      case 121: // ASSERT_SYNTAX
-      case 122: // ASSURE_SYNTAX
-      case 136: // SEQ_SYNTAX
-      case 137: // PAR_SYNTAX
-      case 146: // ITERATE_SYNTAX
+      case 122: // ASSERT_SYNTAX
+      case 123: // ASSURE_SYNTAX
+      case 133: // SEQ_SYNTAX
+      case 134: // PAR_SYNTAX
+      case 143: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (other.value);
         break;
 
-      case 127: // UPDATE_SYNTAX
+      case 128: // UPDATE_SYNTAX
         value.copy< UpdateNode* > (other.value);
         break;
 
@@ -1457,11 +1455,7 @@ namespace yy {
         value.copy< rational_t > (other.value);
         break;
 
-      case 130: // CASE_LABEL
-      case 131: // CASE_LABEL_DEFAULT
-      case 132: // CASE_LABEL_NUMBER
-      case 133: // CASE_LABEL_IDENT
-      case 134: // CASE_LABEL_STRING
+      case 131: // CASE_LABEL
         value.copy< std::pair<AtomNode*, AstNode*> > (other.value);
         break;
 
@@ -1469,7 +1463,7 @@ namespace yy {
         value.copy< std::pair<ExpressionBase*, ExpressionBase*> > (other.value);
         break;
 
-      case 118: // DUMPSPEC
+      case 119: // DUMPSPEC
         value.copy< std::pair<std::string, std::vector<std::string>> > (other.value);
         break;
 
@@ -1479,13 +1473,13 @@ namespace yy {
 
       case 78: // "string"
       case 79: // "identifier"
-      case 108: // RULEREF
+      case 109: // RULEREF
         value.copy< std::string > (other.value);
         break;
 
-      case 110: // LISTCONST
-      case 111: // EXPRESSION_LIST
-      case 112: // EXPRESSION_LIST_NO_COMMA
+      case 111: // LISTCONST
+      case 112: // EXPRESSION_LIST
+      case 113: // EXPRESSION_LIST_NO_COMMA
         value.copy< std::vector<ExpressionBase*>* > (other.value);
         break;
 
@@ -1496,7 +1490,7 @@ namespace yy {
         value.copy< std::vector<Type*> > (other.value);
         break;
 
-      case 129: // CASE_LABEL_LIST
+      case 130: // CASE_LABEL_LIST
         value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (other.value);
         break;
 
@@ -1505,7 +1499,7 @@ namespace yy {
         value.copy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (other.value);
         break;
 
-      case 117: // DUMPSPEC_LIST
+      case 118: // DUMPSPEC_LIST
         value.copy< std::vector<std::pair<std::string, std::vector<std::string>>> > (other.value);
         break;
 
@@ -1536,38 +1530,39 @@ namespace yy {
         break;
 
       case 83: // BODY_ELEMENTS
-      case 138: // STATEMENTS
+      case 135: // STATEMENTS
         value.copy< AstListNode* > (v);
         break;
 
       case 84: // BODY_ELEMENT
-      case 115: // RULE_STMT
-      case 116: // RULE_SYNTAX
-      case 119: // SIMPLE_STMT
-      case 120: // STATEMENT
-      case 124: // IMPOSSIBLE_SYNTAX
+      case 116: // RULE_STMT
+      case 117: // RULE_SYNTAX
+      case 120: // SIMPLE_STMT
+      case 121: // STATEMENT
+      case 125: // IMPOSSIBLE_SYNTAX
         value.copy< AstNode* > (v);
         break;
 
       case 103: // VALUE
-      case 104: // NUMBER
-      case 109: // NUMBER_RANGE
+      case 104: // BOOLEAN
+      case 105: // NUMBER
+      case 110: // NUMBER_RANGE
         value.copy< AtomNode* > (v);
         break;
 
-      case 114: // FUNCTION_SYNTAX
+      case 115: // FUNCTION_SYNTAX
         value.copy< BaseFunctionAtom* > (v);
         break;
 
-      case 135: // CALL_SYNTAX
+      case 132: // CALL_SYNTAX
         value.copy< CallNode* > (v);
         break;
 
-      case 128: // CASE_SYNTAX
+      case 129: // CASE_SYNTAX
         value.copy< CaseNode* > (v);
         break;
 
-      case 123: // DIEDIE_SYNTAX
+      case 124: // DIEDIE_SYNTAX
         value.copy< DiedieNode* > (v);
         break;
 
@@ -1576,7 +1571,7 @@ namespace yy {
         break;
 
       case 102: // ATOM
-      case 113: // EXPRESSION
+      case 114: // EXPRESSION
         value.copy< ExpressionBase* > (v);
         break;
 
@@ -1584,11 +1579,11 @@ namespace yy {
         value.copy< FLOATING_T > (v);
         break;
 
-      case 106: // FLOATING_NUMBER
+      case 107: // FLOATING_NUMBER
         value.copy< FloatingAtom* > (v);
         break;
 
-      case 145: // FORALL_SYNTAX
+      case 142: // FORALL_SYNTAX
         value.copy< ForallNode* > (v);
         break;
 
@@ -1601,7 +1596,7 @@ namespace yy {
         value.copy< INTEGER_T > (v);
         break;
 
-      case 139: // IFTHENELSE
+      case 136: // IFTHENELSE
         value.copy< IfThenElseNode* > (v);
         break;
 
@@ -1609,28 +1604,28 @@ namespace yy {
         value.copy< InitNode* > (v);
         break;
 
-      case 105: // INTEGER_NUMBER
+      case 106: // INTEGER_NUMBER
         value.copy< IntegerAtom* > (v);
         break;
 
-      case 140: // LET_SYNTAX
+      case 137: // LET_SYNTAX
         value.copy< LetNode* > (v);
         break;
 
-      case 144: // POP_SYNTAX
+      case 141: // POP_SYNTAX
         value.copy< PopNode* > (v);
         break;
 
-      case 125: // PRINT_SYNTAX
-      case 126: // DEBUG_SYNTAX
+      case 126: // PRINT_SYNTAX
+      case 127: // DEBUG_SYNTAX
         value.copy< PrintNode* > (v);
         break;
 
-      case 143: // PUSH_SYNTAX
+      case 140: // PUSH_SYNTAX
         value.copy< PushNode* > (v);
         break;
 
-      case 107: // RATIONAL_NUMBER
+      case 108: // RATIONAL_NUMBER
         value.copy< RationalAtom* > (v);
         break;
 
@@ -1643,15 +1638,15 @@ namespace yy {
         value.copy< Type* > (v);
         break;
 
-      case 121: // ASSERT_SYNTAX
-      case 122: // ASSURE_SYNTAX
-      case 136: // SEQ_SYNTAX
-      case 137: // PAR_SYNTAX
-      case 146: // ITERATE_SYNTAX
+      case 122: // ASSERT_SYNTAX
+      case 123: // ASSURE_SYNTAX
+      case 133: // SEQ_SYNTAX
+      case 134: // PAR_SYNTAX
+      case 143: // ITERATE_SYNTAX
         value.copy< UnaryNode* > (v);
         break;
 
-      case 127: // UPDATE_SYNTAX
+      case 128: // UPDATE_SYNTAX
         value.copy< UpdateNode* > (v);
         break;
 
@@ -1659,11 +1654,7 @@ namespace yy {
         value.copy< rational_t > (v);
         break;
 
-      case 130: // CASE_LABEL
-      case 131: // CASE_LABEL_DEFAULT
-      case 132: // CASE_LABEL_NUMBER
-      case 133: // CASE_LABEL_IDENT
-      case 134: // CASE_LABEL_STRING
+      case 131: // CASE_LABEL
         value.copy< std::pair<AtomNode*, AstNode*> > (v);
         break;
 
@@ -1671,7 +1662,7 @@ namespace yy {
         value.copy< std::pair<ExpressionBase*, ExpressionBase*> > (v);
         break;
 
-      case 118: // DUMPSPEC
+      case 119: // DUMPSPEC
         value.copy< std::pair<std::string, std::vector<std::string>> > (v);
         break;
 
@@ -1681,13 +1672,13 @@ namespace yy {
 
       case 78: // "string"
       case 79: // "identifier"
-      case 108: // RULEREF
+      case 109: // RULEREF
         value.copy< std::string > (v);
         break;
 
-      case 110: // LISTCONST
-      case 111: // EXPRESSION_LIST
-      case 112: // EXPRESSION_LIST_NO_COMMA
+      case 111: // LISTCONST
+      case 112: // EXPRESSION_LIST
+      case 113: // EXPRESSION_LIST_NO_COMMA
         value.copy< std::vector<ExpressionBase*>* > (v);
         break;
 
@@ -1698,7 +1689,7 @@ namespace yy {
         value.copy< std::vector<Type*> > (v);
         break;
 
-      case 129: // CASE_LABEL_LIST
+      case 130: // CASE_LABEL_LIST
         value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (v);
         break;
 
@@ -1707,7 +1698,7 @@ namespace yy {
         value.copy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (v);
         break;
 
-      case 117: // DUMPSPEC_LIST
+      case 118: // DUMPSPEC_LIST
         value.copy< std::vector<std::pair<std::string, std::vector<std::string>>> > (v);
         break;
 
@@ -2035,38 +2026,39 @@ namespace yy {
         break;
 
       case 83: // BODY_ELEMENTS
-      case 138: // STATEMENTS
+      case 135: // STATEMENTS
         value.template destroy< AstListNode* > ();
         break;
 
       case 84: // BODY_ELEMENT
-      case 115: // RULE_STMT
-      case 116: // RULE_SYNTAX
-      case 119: // SIMPLE_STMT
-      case 120: // STATEMENT
-      case 124: // IMPOSSIBLE_SYNTAX
+      case 116: // RULE_STMT
+      case 117: // RULE_SYNTAX
+      case 120: // SIMPLE_STMT
+      case 121: // STATEMENT
+      case 125: // IMPOSSIBLE_SYNTAX
         value.template destroy< AstNode* > ();
         break;
 
       case 103: // VALUE
-      case 104: // NUMBER
-      case 109: // NUMBER_RANGE
+      case 104: // BOOLEAN
+      case 105: // NUMBER
+      case 110: // NUMBER_RANGE
         value.template destroy< AtomNode* > ();
         break;
 
-      case 114: // FUNCTION_SYNTAX
+      case 115: // FUNCTION_SYNTAX
         value.template destroy< BaseFunctionAtom* > ();
         break;
 
-      case 135: // CALL_SYNTAX
+      case 132: // CALL_SYNTAX
         value.template destroy< CallNode* > ();
         break;
 
-      case 128: // CASE_SYNTAX
+      case 129: // CASE_SYNTAX
         value.template destroy< CaseNode* > ();
         break;
 
-      case 123: // DIEDIE_SYNTAX
+      case 124: // DIEDIE_SYNTAX
         value.template destroy< DiedieNode* > ();
         break;
 
@@ -2075,7 +2067,7 @@ namespace yy {
         break;
 
       case 102: // ATOM
-      case 113: // EXPRESSION
+      case 114: // EXPRESSION
         value.template destroy< ExpressionBase* > ();
         break;
 
@@ -2083,11 +2075,11 @@ namespace yy {
         value.template destroy< FLOATING_T > ();
         break;
 
-      case 106: // FLOATING_NUMBER
+      case 107: // FLOATING_NUMBER
         value.template destroy< FloatingAtom* > ();
         break;
 
-      case 145: // FORALL_SYNTAX
+      case 142: // FORALL_SYNTAX
         value.template destroy< ForallNode* > ();
         break;
 
@@ -2100,7 +2092,7 @@ namespace yy {
         value.template destroy< INTEGER_T > ();
         break;
 
-      case 139: // IFTHENELSE
+      case 136: // IFTHENELSE
         value.template destroy< IfThenElseNode* > ();
         break;
 
@@ -2108,28 +2100,28 @@ namespace yy {
         value.template destroy< InitNode* > ();
         break;
 
-      case 105: // INTEGER_NUMBER
+      case 106: // INTEGER_NUMBER
         value.template destroy< IntegerAtom* > ();
         break;
 
-      case 140: // LET_SYNTAX
+      case 137: // LET_SYNTAX
         value.template destroy< LetNode* > ();
         break;
 
-      case 144: // POP_SYNTAX
+      case 141: // POP_SYNTAX
         value.template destroy< PopNode* > ();
         break;
 
-      case 125: // PRINT_SYNTAX
-      case 126: // DEBUG_SYNTAX
+      case 126: // PRINT_SYNTAX
+      case 127: // DEBUG_SYNTAX
         value.template destroy< PrintNode* > ();
         break;
 
-      case 143: // PUSH_SYNTAX
+      case 140: // PUSH_SYNTAX
         value.template destroy< PushNode* > ();
         break;
 
-      case 107: // RATIONAL_NUMBER
+      case 108: // RATIONAL_NUMBER
         value.template destroy< RationalAtom* > ();
         break;
 
@@ -2142,15 +2134,15 @@ namespace yy {
         value.template destroy< Type* > ();
         break;
 
-      case 121: // ASSERT_SYNTAX
-      case 122: // ASSURE_SYNTAX
-      case 136: // SEQ_SYNTAX
-      case 137: // PAR_SYNTAX
-      case 146: // ITERATE_SYNTAX
+      case 122: // ASSERT_SYNTAX
+      case 123: // ASSURE_SYNTAX
+      case 133: // SEQ_SYNTAX
+      case 134: // PAR_SYNTAX
+      case 143: // ITERATE_SYNTAX
         value.template destroy< UnaryNode* > ();
         break;
 
-      case 127: // UPDATE_SYNTAX
+      case 128: // UPDATE_SYNTAX
         value.template destroy< UpdateNode* > ();
         break;
 
@@ -2158,11 +2150,7 @@ namespace yy {
         value.template destroy< rational_t > ();
         break;
 
-      case 130: // CASE_LABEL
-      case 131: // CASE_LABEL_DEFAULT
-      case 132: // CASE_LABEL_NUMBER
-      case 133: // CASE_LABEL_IDENT
-      case 134: // CASE_LABEL_STRING
+      case 131: // CASE_LABEL
         value.template destroy< std::pair<AtomNode*, AstNode*> > ();
         break;
 
@@ -2170,7 +2158,7 @@ namespace yy {
         value.template destroy< std::pair<ExpressionBase*, ExpressionBase*> > ();
         break;
 
-      case 118: // DUMPSPEC
+      case 119: // DUMPSPEC
         value.template destroy< std::pair<std::string, std::vector<std::string>> > ();
         break;
 
@@ -2180,13 +2168,13 @@ namespace yy {
 
       case 78: // "string"
       case 79: // "identifier"
-      case 108: // RULEREF
+      case 109: // RULEREF
         value.template destroy< std::string > ();
         break;
 
-      case 110: // LISTCONST
-      case 111: // EXPRESSION_LIST
-      case 112: // EXPRESSION_LIST_NO_COMMA
+      case 111: // LISTCONST
+      case 112: // EXPRESSION_LIST
+      case 113: // EXPRESSION_LIST_NO_COMMA
         value.template destroy< std::vector<ExpressionBase*>* > ();
         break;
 
@@ -2197,7 +2185,7 @@ namespace yy {
         value.template destroy< std::vector<Type*> > ();
         break;
 
-      case 129: // CASE_LABEL_LIST
+      case 130: // CASE_LABEL_LIST
         value.template destroy< std::vector<std::pair<AtomNode*, AstNode*>> > ();
         break;
 
@@ -2206,7 +2194,7 @@ namespace yy {
         value.template destroy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > ();
         break;
 
-      case 117: // DUMPSPEC_LIST
+      case 118: // DUMPSPEC_LIST
         value.template destroy< std::vector<std::pair<std::string, std::vector<std::string>>> > ();
         break;
 
@@ -2243,38 +2231,39 @@ namespace yy {
         break;
 
       case 83: // BODY_ELEMENTS
-      case 138: // STATEMENTS
+      case 135: // STATEMENTS
         value.move< AstListNode* > (s.value);
         break;
 
       case 84: // BODY_ELEMENT
-      case 115: // RULE_STMT
-      case 116: // RULE_SYNTAX
-      case 119: // SIMPLE_STMT
-      case 120: // STATEMENT
-      case 124: // IMPOSSIBLE_SYNTAX
+      case 116: // RULE_STMT
+      case 117: // RULE_SYNTAX
+      case 120: // SIMPLE_STMT
+      case 121: // STATEMENT
+      case 125: // IMPOSSIBLE_SYNTAX
         value.move< AstNode* > (s.value);
         break;
 
       case 103: // VALUE
-      case 104: // NUMBER
-      case 109: // NUMBER_RANGE
+      case 104: // BOOLEAN
+      case 105: // NUMBER
+      case 110: // NUMBER_RANGE
         value.move< AtomNode* > (s.value);
         break;
 
-      case 114: // FUNCTION_SYNTAX
+      case 115: // FUNCTION_SYNTAX
         value.move< BaseFunctionAtom* > (s.value);
         break;
 
-      case 135: // CALL_SYNTAX
+      case 132: // CALL_SYNTAX
         value.move< CallNode* > (s.value);
         break;
 
-      case 128: // CASE_SYNTAX
+      case 129: // CASE_SYNTAX
         value.move< CaseNode* > (s.value);
         break;
 
-      case 123: // DIEDIE_SYNTAX
+      case 124: // DIEDIE_SYNTAX
         value.move< DiedieNode* > (s.value);
         break;
 
@@ -2283,7 +2272,7 @@ namespace yy {
         break;
 
       case 102: // ATOM
-      case 113: // EXPRESSION
+      case 114: // EXPRESSION
         value.move< ExpressionBase* > (s.value);
         break;
 
@@ -2291,11 +2280,11 @@ namespace yy {
         value.move< FLOATING_T > (s.value);
         break;
 
-      case 106: // FLOATING_NUMBER
+      case 107: // FLOATING_NUMBER
         value.move< FloatingAtom* > (s.value);
         break;
 
-      case 145: // FORALL_SYNTAX
+      case 142: // FORALL_SYNTAX
         value.move< ForallNode* > (s.value);
         break;
 
@@ -2308,7 +2297,7 @@ namespace yy {
         value.move< INTEGER_T > (s.value);
         break;
 
-      case 139: // IFTHENELSE
+      case 136: // IFTHENELSE
         value.move< IfThenElseNode* > (s.value);
         break;
 
@@ -2316,28 +2305,28 @@ namespace yy {
         value.move< InitNode* > (s.value);
         break;
 
-      case 105: // INTEGER_NUMBER
+      case 106: // INTEGER_NUMBER
         value.move< IntegerAtom* > (s.value);
         break;
 
-      case 140: // LET_SYNTAX
+      case 137: // LET_SYNTAX
         value.move< LetNode* > (s.value);
         break;
 
-      case 144: // POP_SYNTAX
+      case 141: // POP_SYNTAX
         value.move< PopNode* > (s.value);
         break;
 
-      case 125: // PRINT_SYNTAX
-      case 126: // DEBUG_SYNTAX
+      case 126: // PRINT_SYNTAX
+      case 127: // DEBUG_SYNTAX
         value.move< PrintNode* > (s.value);
         break;
 
-      case 143: // PUSH_SYNTAX
+      case 140: // PUSH_SYNTAX
         value.move< PushNode* > (s.value);
         break;
 
-      case 107: // RATIONAL_NUMBER
+      case 108: // RATIONAL_NUMBER
         value.move< RationalAtom* > (s.value);
         break;
 
@@ -2350,15 +2339,15 @@ namespace yy {
         value.move< Type* > (s.value);
         break;
 
-      case 121: // ASSERT_SYNTAX
-      case 122: // ASSURE_SYNTAX
-      case 136: // SEQ_SYNTAX
-      case 137: // PAR_SYNTAX
-      case 146: // ITERATE_SYNTAX
+      case 122: // ASSERT_SYNTAX
+      case 123: // ASSURE_SYNTAX
+      case 133: // SEQ_SYNTAX
+      case 134: // PAR_SYNTAX
+      case 143: // ITERATE_SYNTAX
         value.move< UnaryNode* > (s.value);
         break;
 
-      case 127: // UPDATE_SYNTAX
+      case 128: // UPDATE_SYNTAX
         value.move< UpdateNode* > (s.value);
         break;
 
@@ -2366,11 +2355,7 @@ namespace yy {
         value.move< rational_t > (s.value);
         break;
 
-      case 130: // CASE_LABEL
-      case 131: // CASE_LABEL_DEFAULT
-      case 132: // CASE_LABEL_NUMBER
-      case 133: // CASE_LABEL_IDENT
-      case 134: // CASE_LABEL_STRING
+      case 131: // CASE_LABEL
         value.move< std::pair<AtomNode*, AstNode*> > (s.value);
         break;
 
@@ -2378,7 +2363,7 @@ namespace yy {
         value.move< std::pair<ExpressionBase*, ExpressionBase*> > (s.value);
         break;
 
-      case 118: // DUMPSPEC
+      case 119: // DUMPSPEC
         value.move< std::pair<std::string, std::vector<std::string>> > (s.value);
         break;
 
@@ -2388,13 +2373,13 @@ namespace yy {
 
       case 78: // "string"
       case 79: // "identifier"
-      case 108: // RULEREF
+      case 109: // RULEREF
         value.move< std::string > (s.value);
         break;
 
-      case 110: // LISTCONST
-      case 111: // EXPRESSION_LIST
-      case 112: // EXPRESSION_LIST_NO_COMMA
+      case 111: // LISTCONST
+      case 112: // EXPRESSION_LIST
+      case 113: // EXPRESSION_LIST_NO_COMMA
         value.move< std::vector<ExpressionBase*>* > (s.value);
         break;
 
@@ -2405,7 +2390,7 @@ namespace yy {
         value.move< std::vector<Type*> > (s.value);
         break;
 
-      case 129: // CASE_LABEL_LIST
+      case 130: // CASE_LABEL_LIST
         value.move< std::vector<std::pair<AtomNode*, AstNode*>> > (s.value);
         break;
 
@@ -2414,7 +2399,7 @@ namespace yy {
         value.move< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (s.value);
         break;
 
-      case 117: // DUMPSPEC_LIST
+      case 118: // DUMPSPEC_LIST
         value.move< std::vector<std::pair<std::string, std::vector<std::string>>> > (s.value);
         break;
 
@@ -2961,7 +2946,7 @@ namespace yy {
 
 
 } // yy
-#line 2965 "GrammarParser.tab.h" // lalr1.cc:377
+#line 2950 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

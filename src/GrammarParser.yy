@@ -166,7 +166,7 @@ END       0 "end of file"
 %type <AstNode*> BODY_ELEMENT RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX RULE_STMT SIMPLE_STMT
 %type <UnaryNode*> PAR_SYNTAX SEQ_SYNTAX ASSERT_SYNTAX ASSURE_SYNTAX ITERATE_SYNTAX
 %type <AstListNode*> BODY_ELEMENTS STATEMENTS
-%type <AtomNode*> NUMBER VALUE NUMBER_RANGE
+%type <AtomNode*> BOOLEAN NUMBER VALUE NUMBER_RANGE
 %type <IntegerAtom*> INTEGER_NUMBER 
 %type <FloatingAtom*> FLOATING_NUMBER 
 %type <RationalAtom*> RATIONAL_NUMBER 
@@ -194,7 +194,7 @@ END       0 "end of file"
 %type<std::vector<Type*>> TYPE_SYNTAX_LIST
 %type <PushNode*> PUSH_SYNTAX
 %type <PopNode*> POP_SYNTAX
-%type <std::pair<AtomNode*, AstNode*>> CASE_LABEL_STRING CASE_LABEL_NUMBER CASE_LABEL_DEFAULT CASE_LABEL_IDENT CASE_LABEL
+%type <std::pair<AtomNode*, AstNode*>> CASE_LABEL
 %type <std::vector<std::pair<AtomNode*, AstNode*>>> CASE_LABEL_LIST
 %type <CaseNode*> CASE_SYNTAX
 %type <ForallNode*> FORALL_SYNTAX
@@ -214,6 +214,9 @@ END       0 "end of file"
 %precedence IDENTIFIER
 %precedence INTEGERCONST STRCONST FLOATINGCONST RATIONALCONST 
 
+%precedence TRUE
+%precedence FALSE
+	 	 
 %left AND
 %left XOR
 %left OR
@@ -720,7 +723,15 @@ VALUE
   {
 	  $$ = new UndefAtom( @$ );
   }
-| TRUE
+| BOOLEAN
+  {
+	  $$ = $1;
+  }
+;
+
+
+BOOLEAN
+: TRUE
   {
 	  $$ = new BooleanAtom( @$, true );
   }
@@ -728,8 +739,7 @@ VALUE
   {
 	  $$ = new BooleanAtom( @$, false );
   }
-;
-
+; 
 
 NUMBER
 : INTEGER_NUMBER
@@ -1227,53 +1237,25 @@ CASE_LABEL_LIST
 
 
 CASE_LABEL
-: CASE_LABEL_DEFAULT
-  {
-	  $$ =$1;
-  }
-| CASE_LABEL_NUMBER
-  {
-	  $$ = $1;
-  }
-| CASE_LABEL_IDENT
-  {
-	  $$ = $1;
-  }
-| CASE_LABEL_STRING
-  {
-	  $$ = $1;
-  }
-;
-
-
-CASE_LABEL_DEFAULT
 : DEFAULT COLON STATEMENT
   {
 	  $$ = std::pair< AtomNode*, AstNode* >( nullptr, $3 );
   }
-;
-
-
-CASE_LABEL_NUMBER
-: NUMBER COLON STATEMENT
+| BOOLEAN COLON STATEMENT
   {
 	  $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
   }
-;
-
-
-CASE_LABEL_IDENT
-: FUNCTION_SYNTAX COLON STATEMENT
+| NUMBER COLON STATEMENT
   {
 	  $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
   }
-;
-
-
-CASE_LABEL_STRING
-: STRCONST COLON STATEMENT
+| STRCONST COLON STATEMENT
   {
 	  $$ = std::pair< AtomNode*, AstNode* >( new StringAtom( @$, std::move( $1 ) ), $3 );
+  }
+| FUNCTION_SYNTAX COLON STATEMENT
+  {
+	  $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
   }
 ;
 
