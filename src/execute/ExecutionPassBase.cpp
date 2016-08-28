@@ -630,13 +630,13 @@ void ExecutionPassBase::visit_call_pre(CallNode *call, const value_t& expr)
 
 void ExecutionPassBase::visit_call(CallNode *call, std::vector<value_t> &argument_results)
 {
-    if (call->ruleref) {
+    if (call->ruleref) { // only relevant for indirect calls
         const size_t args_defined = call->rule->arguments.size();
         const size_t args_provided = argument_results.size();
         if (args_defined != args_provided) {
             throw RuntimeException(call->location, "indirectly called rule `" + call->rule->name +
                                    "` expects " + std::to_string(args_defined) + " arguments but " +
-                                   std::to_string(args_provided) + " where provided");
+                                   std::to_string(args_provided) + " were provided");
         } else {
             for (size_t i = 0; i < args_defined; i++) {
                 const auto arg = argument_results.at(i);
@@ -651,27 +651,29 @@ void ExecutionPassBase::visit_call(CallNode *call, std::vector<value_t> &argumen
                                            ruleArgType.to_str() + "` but was `" +
                                            argType.to_str() + "`");
                 }
-
-                switch (ruleArgType.t) {
-                    case TypeType::LIST:
-                        assert(0); // TODO
-                        break;
-                    case TypeType::INTEGER: {
-                        const INTEGER_T integer = arg.value.integer;
-                        if (ruleArgType.has_range_restriction() and
-                            (integer < ruleArgType.subrange_start or integer > ruleArgType.subrange_end)) {
-                            throw RuntimeException(call->arguments->at(i)->location,
-                                                   std::to_string(integer) +
-                                                   " does violate the subrange " +
-                                                   std::to_string(ruleArgType.subrange_start) + ".." +
-                                                   std::to_string(ruleArgType.subrange_end) +
-                                                   " of " + std::to_string(i + 1) + ". rule argument");
-                        }
-                    }   break;
-                    default:
-                        break;
-                }
             }
+        }
+    }
+
+    // arguments validation
+    for (size_t i = 0; i < argument_results.size(); i++) {
+        const auto arg = argument_results.at(i);
+
+        Type ruleArgType = call->rule->arguments.at(i);
+        switch (ruleArgType.t) {
+            case TypeType::INTEGER: {
+                const INTEGER_T integer = arg.value.integer;
+                if (ruleArgType.has_range_restriction() and
+                    (integer < ruleArgType.subrange_start or integer > ruleArgType.subrange_end)) {
+                    throw RuntimeException(call->arguments->at(i)->location,
+                                           std::to_string(integer) + " does violate the subrange " +
+                                           std::to_string(ruleArgType.subrange_start) + ".." +
+                                           std::to_string(ruleArgType.subrange_end) +
+                                           " of " + std::to_string(i + 1) + ". rule argument");
+                }
+            }   break;
+            default:
+                break;
         }
     }
 
