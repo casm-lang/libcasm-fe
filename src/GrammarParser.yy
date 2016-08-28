@@ -163,10 +163,10 @@ END       0 "end of file"
 %type <Ast*> SPECIFICATION
 %type <SpecificationNode*> HEADER
 %type <InitNode*> INIT_SYNTAX
-%type <AstNode*> BODY_ELEMENT RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX RULE_STMT SIMPLE_STMT
+%type <AstNode*> BODY_ELEMENT RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX RULE_STMT SIMPLE_STMT SCOPE
 %type <UnaryNode*> PAR_SYNTAX SEQ_SYNTAX ASSERT_SYNTAX ASSURE_SYNTAX ITERATE_SYNTAX
 %type <AstListNode*> BODY_ELEMENTS STATEMENTS
-%type <AtomNode*> BOOLEAN NUMBER VALUE NUMBER_RANGE
+%type <AtomNode*> UNDEFINED BOOLEAN NUMBER VALUE NUMBER_RANGE
 %type <IntegerAtom*> INTEGER_NUMBER 
 %type <FloatingAtom*> FLOATING_NUMBER 
 %type <RationalAtom*> RATIONAL_NUMBER 
@@ -194,6 +194,7 @@ END       0 "end of file"
 %type<std::vector<Type*>> TYPE_SYNTAX_LIST
 %type <PushNode*> PUSH_SYNTAX
 %type <PopNode*> POP_SYNTAX
+%type <AtomNode*> CASE_VALUE
 %type <std::pair<AtomNode*, AstNode*>> CASE_LABEL
 %type <std::vector<std::pair<AtomNode*, AstNode*>>> CASE_LABEL_LIST
 %type <CaseNode*> CASE_SYNTAX
@@ -210,13 +211,13 @@ END       0 "end of file"
 %precedence THEN
 %precedence ELSE
 
-%precedence UPDATE ASSERT ASSURE DIEDIE
-%precedence IDENTIFIER
-%precedence INTEGERCONST STRCONST FLOATINGCONST RATIONALCONST 
+//%precedence UPDATE ASSERT ASSURE DIEDIE
+// %precedence IDENTIFIER
+//%precedence INTEGERCONST STRCONST FLOATINGCONST RATIONALCONST 
+// %precedence UNDEF
+// %precedence TRUE
+// %precedence FALSE
 
-%precedence TRUE
-%precedence FALSE
-	 	 
 %left AND
 %left XOR
 %left OR
@@ -239,6 +240,9 @@ END       0 "end of file"
 
 %precedence NOT
 
+%nonassoc UPLUS
+%nonassoc UMINUS
+     
 %%
 
      
@@ -683,11 +687,11 @@ ATOM
   {
 	  $$ = $2;
   }
-| PLUS LPAREN EXPRESSION RPAREN
+| PLUS LPAREN EXPRESSION RPAREN %prec UPLUS
   {
 	  $$ = $3;
   }
-| MINUS LPAREN EXPRESSION RPAREN
+| MINUS LPAREN EXPRESSION RPAREN %prec UMINUS
   {
 	  $$ = new Expression( @$, new ZeroAtom( @$, $3 ), $3, ExpressionOperation::SUB );
   }
@@ -709,7 +713,7 @@ VALUE
   }
 | LISTCONST
   {
-	  $$ = new ListAtom( @$, $1 );
+      $$ = new ListAtom( @$, $1 );
   }
 | NUMBER_RANGE
   {
@@ -719,9 +723,9 @@ VALUE
   {
 	  $$ = new SelfAtom( @$ );
   }
-| UNDEF
+| UNDEFINED
   {
-	  $$ = new UndefAtom( @$ );
+	  $$ = $1; 
   }
 | BOOLEAN
   {
@@ -730,21 +734,30 @@ VALUE
 ;
 
 
+UNDEFINED
+: UNDEF
+  {
+      $$ = new UndefAtom( @$ );
+  }
+;
+
+
 BOOLEAN
 : TRUE
   {
-	  $$ = new BooleanAtom( @$, true );
+      $$ = new BooleanAtom( @$, true );
   }
 | FALSE
   {
-	  $$ = new BooleanAtom( @$, false );
+      $$ = new BooleanAtom( @$, false );
   }
 ; 
+
 
 NUMBER
 : INTEGER_NUMBER
   {
-	  $$ = $1;
+      $$ = $1;
   }
 | FLOATING_NUMBER
   {
@@ -762,13 +775,14 @@ INTEGER_NUMBER
   {
 	  $$ = new IntegerAtom( @$, $1 );
   }
-| PLUS INTEGERCONST
+| PLUS INTEGER_NUMBER %prec UPLUS
   {
-	  $$ = new IntegerAtom( @$, $2 );
+	  $$ = $2;
   }
-| MINUS INTEGERCONST
+| MINUS INTEGER_NUMBER %prec UMINUS
   {
-	  $$ = new IntegerAtom( @$, (-1) * $2 );
+	  $$ = $2;
+      $2->val_ *= (-1);
   }
 ;
 
@@ -778,13 +792,14 @@ FLOATING_NUMBER
   {
 	  $$ = new FloatingAtom( @$, $1 );
   }
-| PLUS FLOATINGCONST
+| PLUS FLOATING_NUMBER %prec UPLUS
   {
-	  $$ = new FloatingAtom( @$, $2 );
+      $$ = $2;
   }
-| MINUS FLOATINGCONST
+| MINUS FLOATING_NUMBER %prec UMINUS
   {
-	  $$ = new FloatingAtom( @$, (-1) * $2 );
+      $$ = $2;
+      $2->val_ *= (-1);
   }
 ;
 
@@ -794,11 +809,11 @@ RATIONAL_NUMBER
   {
 	  $$ = new RationalAtom( @$, $1 );
   }
-| PLUS RATIONALCONST
+| PLUS RATIONAL_NUMBER %prec UPLUS
   {
-	  $$ = new RationalAtom( @$, $2 );
+      $$ = $2;
   }
-| MINUS RATIONALCONST
+| MINUS RATIONALCONST %prec UMINUS
   {
 	  $2.numerator *= -1;
 	  $$ = new RationalAtom( @$, $2 );
@@ -962,12 +977,21 @@ FUNCTION_SYNTAX
   }
 ;
 
-RULE_STMT
+
+SCOPE
 : SEQ_SYNTAX
   {
 	  $$ = $1;
   }
 | PAR_SYNTAX
+  {
+	  $$ = $1;
+  }
+; 
+
+
+RULE_STMT
+: SCOPE
   {
 	  $$ = $1;
   }
@@ -1118,15 +1142,11 @@ SIMPLE_STMT
 
 
 STATEMENT
-: SIMPLE_STMT
+: SCOPE
   {
 	  $$ = $1;
   }
-| SEQ_SYNTAX
-  {
-	  $$ = $1;
-  }
-| PAR_SYNTAX
+| SIMPLE_STMT
   {
 	  $$ = $1;
   }
@@ -1223,10 +1243,10 @@ CASE_SYNTAX
 
 
 CASE_LABEL_LIST
-: CASE_LABEL_LIST CASE_LABEL
+: CASE_LABEL CASE_LABEL_LIST
   {
-	  $$ = std::move( $1 );
-	  $$.push_back( $2 );
+	  $$ = std::move( $2 );
+	  $$.push_back( $1 );
   }
 | CASE_LABEL
   {
@@ -1237,25 +1257,37 @@ CASE_LABEL_LIST
 
 
 CASE_LABEL
-: DEFAULT COLON STATEMENT
+: CASE_VALUE COLON SCOPE
   {
-	  $$ = std::pair< AtomNode*, AstNode* >( nullptr, $3 );
+      $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
   }
-| BOOLEAN COLON STATEMENT
+;
+
+
+CASE_VALUE
+: DEFAULT
   {
-	  $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
+      $$ = nullptr;
   }
-| NUMBER COLON STATEMENT
+| UNDEFINED
   {
-	  $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
+      $$ = $1;
   }
-| STRCONST COLON STATEMENT
+| BOOLEAN
   {
-	  $$ = std::pair< AtomNode*, AstNode* >( new StringAtom( @$, std::move( $1 ) ), $3 );
+      $$ = $1;
   }
-| FUNCTION_SYNTAX COLON STATEMENT
+| NUMBER
   {
-	  $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
+      $$ = $1;
+  }
+| STRCONST
+  {
+      $$ = new StringAtom( @$, std::move( $1 ) );
+  }
+| FUNCTION_SYNTAX
+  {
+      $$ = $1;
   }
 ;
 
@@ -1436,7 +1468,7 @@ void yy::casmi_parser::error
 //  
 //  Local variables:
 //  mode: c++
-//  indent-tabs-mode: t
+//  indent-tabs-mode: nil
 //  c-basic-offset: 4
 //  tab-width: 4
 //  End:
