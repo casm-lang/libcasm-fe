@@ -1269,6 +1269,11 @@ CASE_VALUE
   {
       $$ = nullptr;
   }
+| UNDERLINE
+  {
+      // equivalent to 'default' 
+      $$ = nullptr;
+  }
 | UNDEFINED
   {
       $$ = $1;

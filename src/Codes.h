@@ -55,7 +55,7 @@ namespace libcasm_fe
     , DerivedArgumentsInvalidRangeAtLookup          = 0xde00  // de** ... derived argment
 
 
-    // --------------------------------------------------------- 5*** ... statement errors
+    // --------------------------------------------------------- 5*** ... statement errors       
     , RuleArgumentsInvalidRangeAtCall               = 0x5e00  // 5e** ... rule argument
     , RuleArgumentsSizeInvalidAtCall                = 0x5e01 
     , RuleArgumentsTypeInvalidAtCall                = 0x5e02
@@ -63,7 +63,9 @@ namespace libcasm_fe
     , RuleArgumentsInvalidRangeAtIndirectCall       = 0x5e03
     , RuleArgumentsSizeInvalidAtIndirectCall        = 0x5e04
     , RuleArgumentsTypeInvalidAtIndirectCall        = 0x5e05
-            
+
+    , CaseLabelMultipleUseOfDefault                 = 0x5c00  // 5c** ... case errors
+         
     // --------------------------------------------------------- a*** ... agent errors
     , AgentInitRuleDoesNotExist                     = 0xa000 
 

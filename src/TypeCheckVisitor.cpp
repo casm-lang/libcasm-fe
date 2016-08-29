@@ -438,9 +438,21 @@ void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<
 {
     if( node->case_list.size() - case_labels.size() > 1 )
     {
-        driver_.error(node->location,"more than one default label in case");
+	for( auto c = node->case_list.rbegin(); c != node->case_list.rend(); c++ )
+	{
+	    if( c->first )
+	    {
+		continue;
+	    }
+	    
+	    driver_.error
+	    ( c->second->location
+	    , "found multiple 'default' labels for case, but only one is allowed"
+	    , libcasm_fe::Codes::CaseLabelMultipleUseOfDefault
+	    );
+	}
     }
-
+    
     for( size_t i=0; i < case_labels.size(); i++ )
     {
         if( expr->t == TypeType::BIT && case_labels[i]->t == TypeType::INTEGER )
