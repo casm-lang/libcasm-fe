@@ -1235,9 +1235,9 @@ UPDATE_SYNTAX
 
 
 CASE_SYNTAX
-: CASE EXPRESSION OF CASE_LABEL_LIST ENDCASE
+: CASE EXPRESSION OF LCURPAREN CASE_LABEL_LIST RCURPAREN
   {
-	  $$ = new CaseNode( @$, $2, $4 );
+	  $$ = new CaseNode( @$, $2, $5 );
   }
 ;
 
