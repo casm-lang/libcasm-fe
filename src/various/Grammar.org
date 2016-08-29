@@ -360,6 +360,8 @@ CASE_LABEL
 CASE_VALUE
 : DEFAULT
       $$ = nullptr;
+| UNDERLINE
+      $$ = nullptr;
 | UNDEFINED
       $$ = $1;
 | BOOLEAN

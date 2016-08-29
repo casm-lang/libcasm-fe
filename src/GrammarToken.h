@@ -98,6 +98,7 @@ LCURPAREN       "{"             { return yy::casmi_parser::make_LCURPAREN(loc); 
 RCURPAREN       "}"             { return yy::casmi_parser::make_RCURPAREN(loc); }
 DOT             "."             { return yy::casmi_parser::make_DOT(loc); }
 COLON           ":"             { return yy::casmi_parser::make_COLON(loc); }
+UNDERLINE       "_"             { return yy::casmi_parser::make_UNDERLINE(loc); }
 AT              "@"             { return yy::casmi_parser::make_AT(loc); }
 COMMA           ","             { return yy::casmi_parser::make_COMMA(loc); }
 LESSER          "<"             { return yy::casmi_parser::make_LESSER(loc); }
