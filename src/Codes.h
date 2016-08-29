@@ -47,30 +47,46 @@ namespace libcasm_fe
     , FunctionArgumentsInvalidRangeAtUpdate         = 0xfe01
     , FunctionArgumentsInvalidRangeAtInitially      = 0xfe02
     
-    , FunctionValueInvalidRangeAtUpdate             = 0xfd00  // fd** ... function argument
+    , FunctionValueInvalidRangeAtUpdate             = 0xfd00  // fd** ... function value
     , FunctionValueInvalidRangeAtInitially          = 0xfd01
     , FunctionValueAlreadyInitializedAtInitially    = 0xfd02
-    
-    , AgentInitRuleDoesNotExist                     = 0xa000  // a*** ... Agent errors
+
+    // --------------------------------------------------------- d*** ... derived errors
+    , DerivedArgumentsInvalidRangeAtLookup          = 0xde00  // de** ... derived argment
+
+
+    // --------------------------------------------------------- 5*** ... statement errors
+    , RuleArgumentsInvalidRangeAtCall               = 0x5e00  // 5e** ... rule argument
+    , RuleArgumentsSizeInvalidAtCall                = 0x5e01 
+    , RuleArgumentsTypeInvalidAtCall                = 0x5e02
+
+    , RuleArgumentsInvalidRangeAtIndirectCall       = 0x5e03
+    , RuleArgumentsSizeInvalidAtIndirectCall        = 0x5e04
+    , RuleArgumentsTypeInvalidAtIndirectCall        = 0x5e05
             
-    , TypeInferenceInvalidLet                       = 0x1000  // 1*** ... type check errors
+    // --------------------------------------------------------- a*** ... agent errors
+    , AgentInitRuleDoesNotExist                     = 0xa000 
+
+    // --------------------------------------------------------- 1*** ... type check errors
+    , TypeInferenceInvalidLet                       = 0x1000
     , TypeInferenceInvalidExpression                = 0x1001
     , TypeInferenceInvalidPrint                     = 0x1002
     
     , TypeIntegerRangedInvalidInterval              = 0x2000  // 2*** ... Integer type error
 
-    , OperatorAddInvalidOperandType                 = 0x8000  // 8*** ... Operator errors
+    // --------------------------------------------------------- 8*** ... operator errors
+    , OperatorAddInvalidOperandType                 = 0x8000
             
-    , TypeBitSyntaxError                            = 0xb000  // b*** ... Bit type error
+    // --------------------------------------------------------- b*** ... bit type errors
+    , TypeBitSyntaxError                            = 0xb000
     , TypeBitSizeIsInvalid                          = 0xb001
     , TypeBitSizeInvalidExpression                  = 0xb002
     
+    // --------------------------------------------------------- fff* ... not categorized errors
     , TypeUnknown                                   = 0xfffd
     , TypeUnsupported                               = 0xfffe
 
     , Unspecified                                   = 0xffff
-    
-    , DUMMY                                         = 0xc0de
     };
     
 }

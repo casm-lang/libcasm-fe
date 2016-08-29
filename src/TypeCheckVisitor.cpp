@@ -252,32 +252,58 @@ void TypecheckVisitor::visit_call_pre(CallNode *call, Type* expr) {
   }
 }
 
-void TypecheckVisitor::visit_call(CallNode *call, std::vector<Type*>& argument_results) {
-  // typecheck for indirect calls happens during execution
-  if (call->ruleref) {
-    return;
-  }
-
-  size_t args_defined = call->rule->arguments.size();
-  size_t args_provided = argument_results.size();
-  if (args_defined != args_provided) {
-    driver_.error(call->location, "rule `"+call->rule_name+"` expects "
-                                  +std::to_string(args_defined)+" arguments but "+
-                                  std::to_string(args_provided)+" where provided");
-  } else {
-    for (size_t i=0; i < args_defined; i++) {
-      if (!call->rule->arguments[i]->unify(argument_results[i])) {
-        driver_.error(call->arguments->at(i)->location,
-                      "argument "+std::to_string(i+1)+" of rule `"+ call->rule_name+
-                      "` must be `"+call->rule->arguments[i]->to_str()+"` but was `"+
-                      argument_results[i]->to_str()+"`");
-      }
+void TypecheckVisitor::visit_call( CallNode *call, std::vector< Type* >& argument_results )
+{
+    // typecheck for indirect calls happens during execution
+    if( call->ruleref )
+    {
+	return;
     }
-  }
+    
+    size_t args_defined = call->rule->arguments.size();
+    size_t args_provided = argument_results.size();
+    
+    if( args_defined != args_provided )
+    {
+	driver_.error
+	( call->location
+	, "rule '"
+	  + call->rule_name
+	  + "' expects "
+	  + std::to_string( args_defined )
+	  + " arguments but "
+	  + std::to_string( args_provided )
+	  + " where provided"
+	, libcasm_fe::Codes::RuleArgumentsSizeInvalidAtCall
+	);
+    }
+    else
+    {
+	for( size_t i = 0; i < args_defined; i++ )
+	{
+	    if( not call->rule->arguments[ i ]->unify( argument_results[ i ] ) )
+	    {
+		driver_.error
+		( call->arguments->at( i )->location
+		, "argument "
+		  + std::to_string( i + 1 )
+		  + " of rule '"
+		  + call->rule_name
+		  + "' must be '"
+		  + call->rule->arguments[ i ]->to_str()
+		  + "' but was '"
+		  + argument_results[i]->to_str()
+		  + "'"
+		, libcasm_fe::Codes::RuleArgumentsTypeInvalidAtCall
+		);
+	    }
+	}
+    }
 }
 
-void TypecheckVisitor::visit_call_post(CallNode *call) {
-  UNUSED(call);
+void TypecheckVisitor::visit_call_post( CallNode *call )
+{
+    UNUSED(call);
 }
 
 
