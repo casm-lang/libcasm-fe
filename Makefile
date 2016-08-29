@@ -5,7 +5,7 @@
 #   Developed by: Florian Hahn
 #                 Philipp Paulweber
 #                 Emmanuel Pescosta
-#                 https://github.com/ppaulweber/libcasm-fe
+#                 https://github.com/casm-lang/libcasm-fe
 #   
 #   This file is part of libcasm-fe.
 #   
