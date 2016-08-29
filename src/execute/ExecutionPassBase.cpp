@@ -631,98 +631,98 @@ void ExecutionPassBase::visit_call_pre(CallNode *call, const value_t& expr)
 void ExecutionPassBase::visit_call( CallNode *call, std::vector< value_t > &argument_results )
 {
     if( call->ruleref )
-	{
+    {
         // only relevant for indirect calls
         const size_t args_defined = call->rule->arguments.size();
         const size_t args_provided = argument_results.size();
 
-		if( args_defined != args_provided )
-		{
+        if( args_defined != args_provided )
+        {
             throw RuntimeException
-			( call->location
-			, "indirectly called rule '"
-			  + call->rule->name
-			  + "' expects "
-			  + std::to_string( args_defined )
-			  + " arguments but "
-			  + std::to_string( args_provided )
-			  + " were provided"
-			, libcasm_fe::Codes::RuleArgumentsSizeInvalidAtIndirectCall
-			);
+            ( call->location
+            , "indirectly called rule '"
+              + call->rule->name
+              + "' expects "
+              + std::to_string( args_defined )
+              + " arguments but "
+              + std::to_string( args_provided )
+              + " were provided"
+            , libcasm_fe::Codes::RuleArgumentsSizeInvalidAtIndirectCall
+            );
         }
-		else
-		{
+        else
+        {
             for( size_t i = 0; i < args_defined; i++ )
-			{
+            {
                 const auto arg = argument_results.at( i );
-				
+                
                 Type argType( arg.type );
-				
+                
                 Type ruleArgType = call->rule->arguments.at( i );
-				
+                
                 if( not (ruleArgType.unify( &argType ) or arg.is_undef()) )
-				{
+                {
                     throw RuntimeException
-					( call->arguments->at( i )->location
-					, "argument "
-					  + std::to_string( i + 1 )
-					  + " of indirectly called rule `"
-					  + call->rule->name
-					  + "` must be `"
-					  + ruleArgType.to_str()
-					  + "` but was `"
-					  + argType.to_str()
-					  + "`"
-					, libcasm_fe::Codes::RuleArgumentsTypeInvalidAtIndirectCall
-					);
+                    ( call->arguments->at( i )->location
+                    , "argument "
+                      + std::to_string( i + 1 )
+                      + " of indirectly called rule `"
+                      + call->rule->name
+                      + "` must be `"
+                      + ruleArgType.to_str()
+                      + "` but was `"
+                      + argType.to_str()
+                      + "`"
+                    , libcasm_fe::Codes::RuleArgumentsTypeInvalidAtIndirectCall
+                    );
                 }
             }
         }
     }
-	
+    
     // arguments validation
     for( size_t i = 0; i < argument_results.size(); i++ )
-	{
+    {
         const auto arg = argument_results.at( i );
 
         Type ruleArgType = call->rule->arguments.at( i );
 
-		switch( ruleArgType.t )
-		{
-		    case TypeType::INTEGER:
-			{
+        switch( ruleArgType.t )
+        {
+            case TypeType::INTEGER:
+            {
                 const INTEGER_T integer = arg.value.integer;
-				
+                
                 if( ruleArgType.has_range_restriction()
-				and (  integer < ruleArgType.subrange_start
-					or integer > ruleArgType.subrange_end
-					)
-				)
-				{
+                and (  integer < ruleArgType.subrange_start
+                    or integer > ruleArgType.subrange_end
+                    )
+                )
+                {
                     throw RuntimeException
-					( call->arguments->at( i )->location
-					, std::to_string( integer )
-					  + " does violate the subrange "
-					  + std::to_string( ruleArgType.subrange_start )
-					  + ".."
-					  + std::to_string( ruleArgType.subrange_end )
-					  + " at argument #"
-					  + std::to_string( i + 1 )
-					  + " of rule '"
-					  + ( call->ruleref ? call->rule->name : call->rule_name )
-					  + "'"
-					, libcasm_fe::Codes::RuleArgumentsInvalidRangeAtCall
-					);
+                    ( call->arguments->at( i )->location
+                    , std::to_string( integer )
+                      + " does violate the subrange "
+                      + std::to_string( ruleArgType.subrange_start )
+                      + ".."
+                      + std::to_string( ruleArgType.subrange_end )
+                      + " at argument #"
+                      + std::to_string( i + 1 )
+                      + " of rule '"
+                      + ( call->ruleref ? call->rule->name : call->rule_name )
+                      + "'"
+                    , libcasm_fe::Codes::RuleArgumentsInvalidRangeAtCall
+                    );
                 }
-				break;
+                break;
             }
             default:
-			{
+            {
                 break;
-			}
+            }
         }
     }
-	
+    
     rule_bindings.push_back( &argument_results );
 }
 
@@ -839,27 +839,27 @@ void ExecutionPassBase::visit_derived_function_atom_pre(FunctionAtom *function,
                                                         uint16_t num_arguments)
 {
     try
-	{
+    {
         function->symbol->validateArguments( num_arguments, arguments );
     }
-	catch( const std::domain_error& e )
-	{
-		std::string msg = std::string( e.what() ) + " of derived '" + function->symbol->name + "'";
-		
+    catch( const std::domain_error& e )
+    {
+        std::string msg = std::string( e.what() ) + " of derived '" + function->symbol->name + "'";
+        
         throw RuntimeException
-		( function->location
-		, msg.c_str()
-		, libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup
-		);
+        ( function->location
+        , msg.c_str()
+        , libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup
+        );
     }
-	
+    
     // TODO change, cleanup!
     std::vector<value_t> *tmp = new std::vector<value_t>();
     for( uint32_t i = 0; i < num_arguments; i++ )
-	{
+    {
         tmp->push_back( arguments[ i ] );
     }
-	
+    
     rule_bindings.push_back( tmp );
 }
 
@@ -878,7 +878,7 @@ const value_t ExecutionPassBase::visit_number_range_atom(NumberRangeAtom *atom)
 //  
 //  Local variables:
 //  mode: c++
-//  indent-tabs-mode: t
+//  indent-tabs-mode: nil
 //  c-basic-offset: 4
 //  tab-width: 4
 //  End:

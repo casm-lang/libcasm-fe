@@ -257,7 +257,7 @@ void TypecheckVisitor::visit_call( CallNode *call, std::vector< Type* >& argumen
     // typecheck for indirect calls happens during execution
     if( call->ruleref )
     {
-	return;
+    return;
     }
     
     size_t args_defined = call->rule->arguments.size();
@@ -265,39 +265,39 @@ void TypecheckVisitor::visit_call( CallNode *call, std::vector< Type* >& argumen
     
     if( args_defined != args_provided )
     {
-	driver_.error
-	( call->location
-	, "rule '"
-	  + call->rule_name
-	  + "' expects "
-	  + std::to_string( args_defined )
-	  + " arguments but "
-	  + std::to_string( args_provided )
-	  + " where provided"
-	, libcasm_fe::Codes::RuleArgumentsSizeInvalidAtCall
-	);
+    driver_.error
+    ( call->location
+    , "rule '"
+      + call->rule_name
+      + "' expects "
+      + std::to_string( args_defined )
+      + " arguments but "
+      + std::to_string( args_provided )
+      + " where provided"
+    , libcasm_fe::Codes::RuleArgumentsSizeInvalidAtCall
+    );
     }
     else
     {
-	for( size_t i = 0; i < args_defined; i++ )
-	{
-	    if( not call->rule->arguments[ i ]->unify( argument_results[ i ] ) )
-	    {
-		driver_.error
-		( call->arguments->at( i )->location
-		, "argument "
-		  + std::to_string( i + 1 )
-		  + " of rule '"
-		  + call->rule_name
-		  + "' must be '"
-		  + call->rule->arguments[ i ]->to_str()
-		  + "' but was '"
-		  + argument_results[i]->to_str()
-		  + "'"
-		, libcasm_fe::Codes::RuleArgumentsTypeInvalidAtCall
-		);
-	    }
-	}
+    for( size_t i = 0; i < args_defined; i++ )
+    {
+        if( not call->rule->arguments[ i ]->unify( argument_results[ i ] ) )
+        {
+        driver_.error
+        ( call->arguments->at( i )->location
+        , "argument "
+          + std::to_string( i + 1 )
+          + " of rule '"
+          + call->rule_name
+          + "' must be '"
+          + call->rule->arguments[ i ]->to_str()
+          + "' but was '"
+          + argument_results[i]->to_str()
+          + "'"
+        , libcasm_fe::Codes::RuleArgumentsTypeInvalidAtCall
+        );
+        }
+    }
     }
 }
 
@@ -438,19 +438,19 @@ void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<
 {
     if( node->case_list.size() - case_labels.size() > 1 )
     {
-	for( auto c = node->case_list.rbegin(); c != node->case_list.rend(); c++ )
-	{
-	    if( c->first )
-	    {
-		continue;
-	    }
-	    
-	    driver_.error
-	    ( c->second->location
-	    , "found multiple 'default' labels for case, but only one is allowed"
-	    , libcasm_fe::Codes::CaseLabelMultipleUseOfDefault
-	    );
-	}
+    for( auto c = node->case_list.rbegin(); c != node->case_list.rend(); c++ )
+    {
+        if( c->first )
+        {
+        continue;
+        }
+        
+        driver_.error
+        ( c->second->location
+        , "found multiple 'default' labels for case, but only one is allowed"
+        , libcasm_fe::Codes::CaseLabelMultipleUseOfDefault
+        );
+    }
     }
     
     for( size_t i=0; i < case_labels.size(); i++ )

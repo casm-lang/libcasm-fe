@@ -872,20 +872,20 @@ void Function::validateArguments( uint32_t num_arguments, const value_t argument
     {
         const Type *type = arguments_[ i ];
         const auto integer = arguments[ i ].value.integer;
-	
+    
         if( (integer < type->subrange_start)
-	or  (integer > type->subrange_end)
-	)
-	{
+    or  (integer > type->subrange_end)
+    )
+    {
             throw std::domain_error
-	    ( std::to_string( integer )
-	      + " does violate the subrange "
-	      + std::to_string( type->subrange_start )
-	      + ".."
-	      + std::to_string( type->subrange_end )
-	      + " at argument #"
-	      + std::to_string( i + 1 )
-	    );
+        ( std::to_string( integer )
+          + " does violate the subrange "
+          + std::to_string( type->subrange_start )
+          + ".."
+          + std::to_string( type->subrange_end )
+          + " at argument #"
+          + std::to_string( i + 1 )
+        );
         }
     }
 }
