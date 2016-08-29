@@ -37,13 +37,13 @@
 
 namespace libcasm_fe
 {
-	class TypeCheckPass : public libpass::Pass
-	{
-	public:
-		static char id;
-	
-	virtual bool run( libpass::PassResult& pr );
-	};
+    class TypeCheckPass : public libpass::Pass
+    {
+    public:
+        static char id;
+    
+    virtual bool run( libpass::PassResult& pr );
+    };
 }
 
 #endif /* _LIB_CASMFE_TYPECHECKPASS_H_ */

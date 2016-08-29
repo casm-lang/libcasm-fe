@@ -37,15 +37,15 @@
 
 namespace libcasm_fe
 {
-	class AstDumpPass : public libpass::Pass, AstDumpVisitor
-	{
-	public:
-		static char id;
-		
-		virtual bool run( libpass::PassResult& pr );
-	};
+    class AstDumpPass : public libpass::Pass, AstDumpVisitor
+    {
+    public:
+        static char id;
+        
+        virtual bool run( libpass::PassResult& pr );
+    };
 }
-	
+    
 #endif /* _LIB_CASMFE_ASTDUMPPASS_H_ */
 
 

@@ -41,19 +41,19 @@ static libpass::PassRegistration< AstDumpPass > PASS
 bool AstDumpPass::run( libpass::PassResult& pr )
 {
     Ast* node = (Ast*)pr.getResult< TypeCheckPass >();
-	
-	AstWalker< AstDumpVisitor, bool > dump_walker( *this );
-	
-	dump_walker.suppress_calls = true;
-	dump_walker.walk_specification( node );
-	
-	// std::cout << this->get_dump() << std::endl;
-	
-	std::ofstream dotfile( "./obj/out.dot" );
-	dotfile << this->get_dump() << "\n";
-	dotfile.close();
-	
-	return true;
+    
+    AstWalker< AstDumpVisitor, bool > dump_walker( *this );
+    
+    dump_walker.suppress_calls = true;
+    dump_walker.walk_specification( node );
+    
+    // std::cout << this->get_dump() << std::endl;
+    
+    std::ofstream dotfile( "./obj/out.dot" );
+    dotfile << this->get_dump() << "\n";
+    dotfile.close();
+    
+    return true;
 }
 
 

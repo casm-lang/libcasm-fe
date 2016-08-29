@@ -103,33 +103,33 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
                                      uint32_t num_arguments, value_t arguments[],
                                      const yy::location& location)
 {
-	try
-	{
+    try
+    {
         sym->validateArguments(num_arguments, arguments);
     }
-	catch( const std::domain_error& e )
-	{
+    catch( const std::domain_error& e )
+    {
         throw RuntimeException
         ( location
-		, e.what()
-		, libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtUpdate
-		);
+        , e.what()
+        , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtUpdate
+        );
     }
-	
-	try
-	{
+    
+    try
+    {
         sym->validateValue(val);
     }
-	catch( const std::domain_error& e )
-	{
+    catch( const std::domain_error& e )
+    {
         throw RuntimeException
         ( location
-		, e.what()
-		, libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate
-		);
+        , e.what()
+        , libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate
+        );
     }
-	
-	
+    
+    
     auto& function_map = function_states[sym->id];
     auto it = function_map.find(ArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
     if (it == function_map.cend()) {
@@ -265,28 +265,28 @@ const value_t ExecutionPassBase::get_function_value
 )
 {
     try
-	{
+    {
         sym->validateArguments(num_arguments, arguments);
     }
-	catch( const std::domain_error& e )
-	{
+    catch( const std::domain_error& e )
+    {
         throw RuntimeException
-		( sym->location
-		, e.what()
-		, libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtLookup
-		);
+        ( sym->location
+        , e.what()
+        , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtLookup
+        );
     }
-	
+    
     const auto &function_map = function_states[sym->id];
     const value_t &v = function_map.at(ArgumentsKey(arguments, num_arguments, false));
     const auto update = updateSetManager.lookup( reinterpret_cast< uint64_t >( &v ) );
-	
-	if( update )
-	{
+    
+    if( update )
+    {
         return update->value;
     }
-	else
-	{
+    else
+    {
         return v;
     }
 }

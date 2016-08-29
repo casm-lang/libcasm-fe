@@ -169,8 +169,8 @@ ZeroAtom::ZeroAtom( yy::location& loc, AstNode* reference )
 
 const AstNode* ZeroAtom::getRef( void ) const
 {
-	assert( ref );
-	return ref;
+    assert( ref );
+    return ref;
 }
 
 
@@ -625,7 +625,7 @@ PrintNode::PrintNode
 , atom( atom )
 , filter( filter )
 {
-	assert( atom and " invalid PrintNode created! " );
+    assert( atom and " invalid PrintNode created! " );
 }
 
 PrintNode::PrintNode
@@ -638,12 +638,12 @@ PrintNode::PrintNode
 
 ExpressionBase* PrintNode::getAtom( void ) const
 {
-	return atom;
+    return atom;
 }
 
 const std::string& PrintNode::getFilter( void ) const
 {
-	return filter;
+    return filter;
 }
 
 
@@ -673,26 +673,26 @@ Ast::Ast( yy::location& loc, SpecificationNode* spec, AstListNode* elements )
 
 void Ast::setInitRule( InitNode* init_rule )
 {
-	assert( init_rule and "invalid init rule pointer!" );
+    assert( init_rule and "invalid init rule pointer!" );
     this->init_rule = init_rule;
 }
 
 SpecificationNode* Ast::getSpecification( void )
 {
-	assert( spec and "invalid specification node pointer!" );
-	return spec;
+    assert( spec and "invalid specification node pointer!" );
+    return spec;
 }
 
 InitNode* Ast::getInitRule( void )
 {
-	assert( init_rule and "invalid specification node pointer!" );
-	return init_rule;
+    assert( init_rule and "invalid specification node pointer!" );
+    return init_rule;
 }
 
 AstListNode* Ast::getElements( void )
 {
-	assert( elements and "invalid specification node pointer!" );
-	return elements;	
+    assert( elements and "invalid specification node pointer!" );
+    return elements;    
 }
 
 

@@ -43,34 +43,34 @@ static libpass::PassRegistration< SourceToAstPass > PASS
 
 bool SourceToAstPass::run( libpass::PassResult& pr )
 {
-	const char* file_name = (const char*)pr.getResults()[ 0 ];
-	
-        global_driver = new Driver;
-	
-        Ast* node = global_driver->parse(file_name);
-	
-    if( !node ) 
-	{
-		// TODO: FIXME: PPA: better error messages,
-		// can be improved with the new libstdhl Verbose support
-
-		std::cerr << "Error parsing file" << std::endl;
-		
-		return false;
-    }
-	
-	assert( node->getElements() );
-	for( auto e : node->getElements()->nodes )
-	{
-		if( e->node_type_ == NodeType::INIT )
-		{
-			node->setInitRule( (InitNode*)e );
-		}
-	}
-	
-	pr.setResult< SourceToAstPass >( node );
+    const char* file_name = (const char*)pr.getResults()[ 0 ];
     
-	return true;
+        global_driver = new Driver;
+    
+        Ast* node = global_driver->parse(file_name);
+    
+    if( !node ) 
+    {
+        // TODO: FIXME: PPA: better error messages,
+        // can be improved with the new libstdhl Verbose support
+
+        std::cerr << "Error parsing file" << std::endl;
+        
+        return false;
+    }
+    
+    assert( node->getElements() );
+    for( auto e : node->getElements()->nodes )
+    {
+        if( e->node_type_ == NodeType::INIT )
+        {
+            node->setInitRule( (InitNode*)e );
+        }
+    }
+    
+    pr.setResult< SourceToAstPass >( node );
+    
+    return true;
 }
 
 

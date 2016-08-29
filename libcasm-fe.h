@@ -33,9 +33,9 @@
 
 namespace libcasm_fe
 {
-	class CasmFE
-	{
-	};
+    class CasmFE
+    {
+    };
 }
 
 #endif /* _LIB_CASMFE_H_ */

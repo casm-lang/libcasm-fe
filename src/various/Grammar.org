@@ -7,14 +7,20 @@ HEADER
 
 BODY_ELEMENTS
 : BODY_ELEMENTS BODY_ELEMENT
+      $$ = $1;
 | BODY_ELEMENT
 
 BODY_ELEMENT
 : OPTION_SYNTAX
+      $$ = new AstNode(NodeType::OPTION);
 | ENUM_SYNTAX
+      $$ = new EnumDefNode(@$, $1);
 | FUNCTION_DEFINITION
+      }
 | DERIVED_SYNTAX
+      }
 | INIT_SYNTAX
+      $$ = $1;
 | RULE_SYNTAX
 
 INIT_SYNTAX
@@ -29,87 +35,122 @@ ENUM_SYNTAX
 
 DERIVED_SYNTAX
 : DERIVED IDENTIFIER LPAREN PARAM_LIST RPAREN EQUAL EXPRESSION
+      $$ = new Function($2, @$, $4, $7, new Type(TypeType::UNKNOWN));
 | DERIVED IDENTIFIER EQUAL EXPRESSION
+      $$ = new Function($2, @$, $4, new Type(TypeType::UNKNOWN));
 | DERIVED IDENTIFIER LPAREN RPAREN EQUAL EXPRESSION
+      $$ = new Function($2, @$, $6, new Type(TypeType::UNKNOWN));
 | DERIVED IDENTIFIER LPAREN PARAM_LIST RPAREN COLON TYPE_SYNTAX EQUAL EXPRESSION
+      $$ = new Function($2, @$, $4, $9, $7);
 | DERIVED IDENTIFIER COLON TYPE_SYNTAX EQUAL EXPRESSION
+      $$ = new Function($2, @$, $6, $4);
 | DERIVED IDENTIFIER LPAREN RPAREN COLON TYPE_SYNTAX EQUAL EXPRESSION
 
 FUNCTION_DEFINITION
 : FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
+      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, $7);
 | FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE
+      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, nullptr);
 | FUNCTION IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
+      $$ = new Function($2, @$, $3.first, $3.second, $4);
 | FUNCTION IDENTIFIER FUNCTION_SIGNATURE
 
 IDENTIFIER_LIST
 : IDENTIFIER_LIST_NO_COMMA COMMA
+      $$ = std::move($1);
 | IDENTIFIER_LIST_NO_COMMA
 
 IDENTIFIER_LIST_NO_COMMA
 : IDENTIFIER_LIST_NO_COMMA COMMA IDENTIFIER
+      $$.push_back( $3 );
 | IDENTIFIER
 
 FUNCTION_SIGNATURE
 : COLON ARROW TYPE_SYNTAX
+      $$ = std::pair<std::vector<Type*>, Type*>(foo, $3);
 | COLON TYPE_IDENTIFIER_STARLIST ARROW TYPE_SYNTAX
 
 PARAM
 : IDENTIFIER COLON TYPE_SYNTAX
+      $$ = $3;
 | IDENTIFIER
 
 PARAM_LIST
 : PARAM_LIST_NO_COMMA
+      $$ = std::move($1);
 | PARAM_LIST_NO_COMMA COMMA
 
 PARAM_LIST_NO_COMMA
 : PARAM_LIST_NO_COMMA COMMA PARAM
+      $$.push_back($3);
 | PARAM
 
 TYPE_IDENTIFIER_STARLIST
 : TYPE_SYNTAX STAR TYPE_IDENTIFIER_STARLIST
+      $$ = std::move($3);
 | TYPE_SYNTAX STAR
+      $$.push_back($1);
 | TYPE_SYNTAX
 
 TYPE_SYNTAX
 : IDENTIFIER
+      }      
 | IDENTIFIER LPAREN INTEGER_NUMBER RPAREN
+      }
 | IDENTIFIER LPAREN TYPE_SYNTAX_LIST RPAREN
+      }      
 | IDENTIFIER LPAREN INTEGER_NUMBER DOTDOT INTEGER_NUMBER RPAREN
 
 TYPE_SYNTAX_LIST
 : TYPE_SYNTAX COMMA TYPE_SYNTAX_LIST
+      $$ = std::move( $3 );
 | TYPE_SYNTAX COMMA
+      $$.push_back( $1 );
 | TYPE_SYNTAX
 
 INITIALIZERS
 : INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
+      $$ = $3;
 | INITIALLY LCURPAREN RCURPAREN
 
 INITIALIZER_LIST
 : INITIALIZER_LIST COMMA INITIALIZER
+      $$ = $1; $1->push_back( $3 );
 | INITIALIZER_LIST COMMA
+      $$ = $1;
 | INITIALIZER
 
 INITIALIZER
 : ATOM
+      $$ = std::pair<ExpressionBase*, ExpressionBase*>(nullptr, $1);
 | ATOM ARROW ATOM
 
 ATOM
 : FUNCTION_SYNTAX
+      $$ = $1;
 | VALUE
+      $$ = $1;
 | LPAREN EXPRESSION RPAREN
+      $$ = $2;
 | PLUS LPAREN EXPRESSION RPAREN %prec UPLUS
+      $$ = $3;
 | MINUS LPAREN EXPRESSION RPAREN %prec UMINUS
 
 VALUE
 : RULEREF
+      $$ = new RuleAtom( @$, std::move( $1 ) );
 | NUMBER
+      $$ = $1;
 | STRCONST
+      $$ = new StringAtom( @$, std::move( $1 ) );
 | LISTCONST
       $$ = new ListAtom( @$, $1 );
 | NUMBER_RANGE
+      $$ = $1;
 | SELF
+      $$ = new SelfAtom( @$ );
 | UNDEFINED
+      $$ = $1; 
 | BOOLEAN
 
 UNDEFINED
@@ -124,21 +165,26 @@ NUMBER
 : INTEGER_NUMBER
       $$ = $1;
 | FLOATING_NUMBER
+      $$ = $1;
 | RATIONAL_NUMBER
 
 INTEGER_NUMBER
 : INTEGERCONST
+      $$ = new IntegerAtom( @$, $1 );
 | PLUS INTEGER_NUMBER %prec UPLUS
+      $$ = $2;
 | MINUS INTEGER_NUMBER %prec UMINUS
 
 FLOATING_NUMBER
 : FLOATINGCONST
+      $$ = new FloatingAtom( @$, $1 );
 | PLUS FLOATING_NUMBER %prec UPLUS
       $$ = $2;
 | MINUS FLOATING_NUMBER %prec UMINUS
 
 RATIONAL_NUMBER
 : RATIONALCONST
+      $$ = new RationalAtom( @$, $1 );
 | PLUS RATIONAL_NUMBER %prec UPLUS
       $$ = $2;
 | MINUS RATIONALCONST %prec UMINUS
@@ -151,58 +197,87 @@ NUMBER_RANGE
 
 LISTCONST
 : LSQPAREN EXPRESSION_LIST RSQPAREN
+      $$ = $2;
 | LSQPAREN RSQPAREN
 
 EXPRESSION_LIST
 : EXPRESSION_LIST_NO_COMMA
+      $$ = $1;
 | EXPRESSION_LIST_NO_COMMA COMMA
 
 EXPRESSION_LIST_NO_COMMA
 : EXPRESSION_LIST_NO_COMMA COMMA EXPRESSION
+      $$->push_back( $3 );
 | EXPRESSION
 
 EXPRESSION
 : EXPRESSION PLUS EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::ADD );
 | EXPRESSION MINUS EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::SUB );
 | EXPRESSION STAR EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::MUL );
 | EXPRESSION SLASH EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::DIV );
 | EXPRESSION PERCENT EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::MOD );
 | EXPRESSION RATIONAL_DIV EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::RAT_DIV );
 | EXPRESSION NEQUAL EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::NEQ );
 | EXPRESSION EQUAL EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::EQ );
 | EXPRESSION LESSER EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::LESSER );
 | EXPRESSION GREATER EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::GREATER );
 | EXPRESSION LESSEQ EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::LESSEREQ );
 | EXPRESSION GREATEREQ EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::GREATEREQ );
 | EXPRESSION OR EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::OR );
 | EXPRESSION XOR EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::XOR );
 | EXPRESSION AND EXPRESSION
+      $$ = new Expression( @$, $1, $3, ExpressionOperation::AND );
 | NOT EXPRESSION
+      $$ = new Expression( @$, $2, nullptr, ExpressionOperation::NOT );
 | ATOM
 
 FUNCTION_SYNTAX
 : IDENTIFIER
+      $$ = new FunctionAtom( @$, $1 );
 | IDENTIFIER LPAREN RPAREN
+      $$ = new FunctionAtom( @$, $1 );
 | IDENTIFIER LPAREN EXPRESSION_LIST RPAREN
 
 SCOPE
 : SEQ_SYNTAX
+      $$ = $1;
 | PAR_SYNTAX
 
 RULE_STMT
 : SCOPE
+      $$ = $1;
 | SIMPLE_STMT
 
 RULE_SYNTAX
 : RULE IDENTIFIER EQUAL RULE_STMT
+      $$ = new RuleNode( @$, $4, $2 );
 | RULE IDENTIFIER LPAREN RPAREN EQUAL RULE_STMT
+      $$ = new RuleNode( @$, $6, $2 );
 | RULE IDENTIFIER LPAREN PARAM_LIST RPAREN EQUAL RULE_STMT
+      $$ = new RuleNode( @$, $7, $2, $4 );
 | RULE IDENTIFIER DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
+      $$ = new RuleNode( @$, $6, $2, tmp, $4 );
 | RULE IDENTIFIER LPAREN RPAREN DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
+      $$ = new RuleNode( @$, $8, $2, tmp, $6 );
 | RULE IDENTIFIER LPAREN PARAM_LIST RPAREN DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
 
 DUMPSPEC_LIST
 : DUMPSPEC_LIST COMMA DUMPSPEC
+      $$.push_back( $3 );
 | DUMPSPEC
 
 DUMPSPEC
@@ -210,25 +285,42 @@ DUMPSPEC
 
 SIMPLE_STMT
 : ASSERT_SYNTAX
+      $$ = $1;
 | ASSURE_SYNTAX
+      $$ = $1;
 | DIEDIE_SYNTAX
+      $$ = $1;
 | IMPOSSIBLE_SYNTAX
+      $$ = $1;
 | DEBUG_SYNTAX
+      $$ = $1;
 | PRINT_SYNTAX
+      $$ = $1;
 | UPDATE_SYNTAX
+      $$ = $1;
 | CASE_SYNTAX
+      $$ = $1;
 | CALL_SYNTAX
+      $$ = $1;
 | IFTHENELSE
+      $$ = $1;
 | LET_SYNTAX
+      $$ = $1;
 | PUSH_SYNTAX
+      $$ = $1;
 | POP_SYNTAX
+      $$ = $1;
 | FORALL_SYNTAX
+      $$ = $1;
 | ITERATE_SYNTAX
+      $$ = $1;
 | SKIP
+      $$ = new AstNode( NodeType::SKIP );
 | IDENTIFIER
 
 STATEMENT
 : SCOPE
+      $$ = $1;
 | SIMPLE_STMT
 
 ASSERT_SYNTAX
@@ -239,6 +331,7 @@ ASSURE_SYNTAX
 
 DIEDIE_SYNTAX
 : DIEDIE EXPRESSION
+      $$ = new DiedieNode( @$, $2 );
 | DIEDIE
 
 IMPOSSIBLE_SYNTAX
@@ -258,6 +351,7 @@ CASE_SYNTAX
 
 CASE_LABEL_LIST
 : CASE_LABEL CASE_LABEL_LIST
+      $$.push_back( $1 );
 | CASE_LABEL
 
 CASE_LABEL
@@ -278,28 +372,36 @@ CASE_VALUE
 
 CALL_SYNTAX
 : CALL LPAREN EXPRESSION RPAREN LPAREN EXPRESSION_LIST RPAREN
+      $$ = new CallNode( @$, "", $3, $6 );
 | CALL LPAREN EXPRESSION RPAREN
+      $$ = new CallNode( @$, "", $3 );
 | CALL IDENTIFIER LPAREN EXPRESSION_LIST RPAREN
+      $$ = new CallNode( @$, $2, nullptr, $4 );
 | CALL IDENTIFIER
 
 SEQ_SYNTAX
 : SEQ_BRACKET STATEMENTS ENDSEQ_BRACKET
+      $$ = new UnaryNode( @$, NodeType::SEQBLOCK, $2 );
 | SEQ STATEMENTS ENDSEQ
 
 PAR_SYNTAX
 : LCURPAREN STATEMENTS RCURPAREN
+      $$ = new UnaryNode( @$, NodeType::PARBLOCK, $2 );
 | PAR STATEMENTS ENDPAR
 
 STATEMENTS
 : STATEMENTS STATEMENT
+      $$ = $1;
 | STATEMENT
 
 IFTHENELSE
 : IF EXPRESSION THEN STATEMENT
+      $$ = new IfThenElseNode( @$, $2, $4, nullptr );
 | IF EXPRESSION THEN STATEMENT ELSE STATEMENT
 
 LET_SYNTAX
 : LET IDENTIFIER EQUAL
+      $$ = new LetNode( @$, Type( TypeType::UNKNOWN ), $2, $5, $7 );
 | LET IDENTIFIER COLON TYPE_SYNTAX EQUAL
 
 PUSH_SYNTAX

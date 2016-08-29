@@ -37,13 +37,13 @@
 
 namespace libcasm_fe
 {
-	class SourceToAstPass : public libpass::Pass
-	{
-	public:
-		static char id;
-		
-		virtual bool run( libpass::PassResult& pr );
-	};
+    class SourceToAstPass : public libpass::Pass
+    {
+    public:
+        static char id;
+        
+        virtual bool run( libpass::PassResult& pr );
+    };
 }
 
 #endif /* _LIB_CASMFE_SOURCETOASTPASS_H_ */

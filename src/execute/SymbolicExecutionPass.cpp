@@ -474,19 +474,19 @@ void SymbolicExecutionPass::visit_print( PrintNode *node, const value_t& argumen
 {
     std::stringstream ss;
     if( node->getFilter().size() > 0 )
-	{
+    {
         if( filter_enabled( node->getFilter() ) )
-		{
+        {
             ss << node->getFilter() << ": ";
         }
-		else
-		{
+        else
+        {
             return;
         }
     }
-	
+    
     ss << argument.to_str() << std::endl;
-	
+    
     trace.push_back(ss.str());
 }
 
