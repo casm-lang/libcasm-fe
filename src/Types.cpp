@@ -179,11 +179,11 @@ const std::string Type::to_str() const {
     case TypeType::STRING: return "String";
     case TypeType::LIST: 
       if (subtypes.size() == 0) {
-        return "List(Unknown)";
+        return "List(Undefined)";
       } else {
         return "List("+subtypes[0]->to_str()+")";
       }
-    case TypeType::UNKNOWN: return "Unknown";
+    case TypeType::UNKNOWN: return "Undefined";
     case TypeType::SELF: return "Self";
     case TypeType::TUPLE_OR_LIST: /*{
       std::string res = "TupleOrList (";

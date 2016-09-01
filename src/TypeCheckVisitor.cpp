@@ -187,12 +187,21 @@ void TypecheckVisitor::visit_rule(RuleNode *rule) {
   }
 }
 
-void TypecheckVisitor::visit_ifthenelse(IfThenElseNode *node, Type* cond) {
-  if (*cond != TypeType::BOOLEAN) {
-    driver_.error(node->condition_->location,
-                  "type of expression should be `Bool` but was `" +cond->to_str()+"`");
-  }
+
+void TypecheckVisitor::visit_ifthenelse( IfThenElseNode *node, Type* cond )
+{
+    if( *cond != TypeType::BOOLEAN )
+    {
+	driver_.error
+	( node->condition_->location
+	, "type of 'if' expression should be 'Boolean', found '"
+	  + cond->to_str()
+	  + "'"
+	  , libcasm_fe::Codes::TypeInferenceInvalidIfExpression
+	);
+    }
 }
+
 
 void TypecheckVisitor::visit_assert(UnaryNode *assert, Type* val) {
   if (*val != TypeType::BOOLEAN) {
