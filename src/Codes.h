@@ -75,6 +75,7 @@ namespace libcasm_fe
     , TypeInferenceInvalidPrint                     = 0x1002
 
     , TypeInferenceInvalidIfExpression              = 0x1003
+    , TypeInferenceInvalidForallExpression          = 0x1004
     
             
     , TypeIntegerRangedInvalidInterval              = 0x2000  // 2*** ... Integer type error

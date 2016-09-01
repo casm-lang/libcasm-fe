@@ -936,42 +936,63 @@ Type* TypecheckVisitor::visit_list_atom(ListAtom *atom, std::vector<Type*> &vals
   return &atom->type_;
 }
 
+
 template <>
-void AstWalker<TypecheckVisitor, Type*>::walk_forall(ForallNode *node) {
+void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode *node )
+{
+    visitor.forall_head = true;
+    walk_expression_base( node->in_expr );
+    visitor.forall_head = false;
+    
+    Type list_t = new Type( TypeType::LIST, new Type( TypeType::UNKNOWN ) );
+    
+    if( node->in_expr->type_ == TypeType::INTEGER || node->in_expr->type_ == TypeType::ENUM )
+    {
+	node->type_.unify(&node->in_expr->type_);
+    }
+    else if( node->in_expr->type_.unify(&list_t) )
+    {
+	node->type_.unify(node->in_expr->type_.subtypes[0]);
+    }
+    else
+    {
+	visitor.driver_.error
+	( node->location
+	, "expression must be a List, an Integer or enum, but is '"
+	  + node->in_expr->type_.to_str()
+	  + "'"
+	);
+    }
+    
+    auto current_rule_binding_types = visitor.rule_binding_types.back();
+    auto current_rule_binding_offsets = visitor.rule_binding_offsets.back();
 
-  visitor.forall_head = true;
-  walk_expression_base(node->in_expr);
-  visitor.forall_head = false;
+    current_rule_binding_offsets->insert
+    ( std::pair<std::string, size_t>
+      ( node->identifier
+      , current_rule_binding_types->size()
+      )
+    );
+    
+    current_rule_binding_types->push_back( &node->type_ );
 
-  Type list_t = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+    walk_statement( node->statement );
 
-  if (node->in_expr->type_ == TypeType::INTEGER || node->in_expr->type_ == TypeType::ENUM) {
-    node->type_.unify(&node->in_expr->type_);
-  } else if (node->in_expr->type_.unify(&list_t)) {
-    node->type_.unify(node->in_expr->type_.subtypes[0]);
-  } else {
-    visitor.driver_.error(node->location, "expression must be a List, an Integer or enum, but is "
-                                  +node->in_expr->type_.to_str());
-  }
-
-  auto current_rule_binding_types = visitor.rule_binding_types.back();
-  auto current_rule_binding_offsets = visitor.rule_binding_offsets.back();
-
-  current_rule_binding_offsets->insert(
-      std::pair<std::string, size_t>(node->identifier,
-                                     current_rule_binding_types->size())
-  );
-  current_rule_binding_types->push_back(&node->type_);
-
-  walk_statement(node->statement);
-
-  if (!node->type_.is_complete()) {
-    visitor.driver_.error(node->location, "type inference for `"+node->identifier+"` failed");
-  }
-
-  visitor.rule_binding_types.back()->pop_back();
-  visitor.rule_binding_offsets.back()->erase(node->identifier);
+    if( not node->type_.is_complete() )
+    {
+	visitor.driver_.error
+	( node->location
+	, "type inference for '"
+	  + node->identifier
+	  + "' failed"
+	, libcasm_fe::Codes::TypeInferenceInvalidForallExpression
+	);
+    }
+    
+    visitor.rule_binding_types.back()->pop_back();
+    visitor.rule_binding_offsets.back()->erase( node->identifier );
 }
+
 
 template <>
 void AstWalker<TypecheckVisitor, Type*>::walk_call(CallNode *call) {
