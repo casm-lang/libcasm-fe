@@ -1257,7 +1257,7 @@ CASE_LABEL_LIST
 
 
 CASE_LABEL
-: CASE_VALUE COLON SCOPE
+: CASE_VALUE COLON STATEMENT
   {
       $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
   }
