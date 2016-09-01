@@ -225,7 +225,7 @@ void Driver::underline( const yy::location& l )
 
         std::cerr << location_info << error_line
                   << std::string(location_info.size() + l.begin.column - 1, ' ')
-                  << GREEN << "^" << std::string(l.end.column - l.begin.column + 1, '~') << RESET
+                  << GREEN << "^" << std::string(l.end.column - l.begin.column + 1, '-') << RESET
                   << std::endl;
     }
     else
