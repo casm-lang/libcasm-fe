@@ -368,10 +368,38 @@ INSTANTIATE_TEST_CASE_P(Symbolic_CompareOperations_Neq, Symbolic_BinaryExpressio
     )
 );
 
-INSTANTIATE_TEST_CASE_P(Symbolic_ArithmeticOperations_AddSubMulDiv, Symbolic_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Symbolic_ArithmeticOperations_Add, Symbolic_BinaryExpressionTest,
     Combine(
         Values(
-            ExpressionOperation::ADD,
+            ExpressionOperation::ADD
+        ),
+        ValuesIn(generateSymbolic_BinaryExpressionTestCases(
+            {
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::RATIONAL,
+                TypeType::STRING,
+            },
+            [](TypeType number) -> BinaryOpArgss {
+                return {
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(number), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(TypeType::SYMBOL), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::SYMBOL), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(TypeType::SYMBOL), make_value(TypeType::SYMBOL), yields(make_value(TypeType::SYMBOL))},
+                    BinaryOpArgs{make_value(TypeType::SYMBOL), make_value(number), yields(make_value(TypeType::SYMBOL))},
+                    BinaryOpArgs{make_value(number), make_value(TypeType::SYMBOL), yields(make_value(TypeType::SYMBOL))},
+                    BinaryOpArgs{make_value(number), make_value(number), yields(make_value(number))}
+                };
+            }
+        ))
+    )
+);
+
+INSTANTIATE_TEST_CASE_P(Symbolic_ArithmeticOperations_SubMulDiv, Symbolic_BinaryExpressionTest,
+    Combine(
+        Values(
             ExpressionOperation::SUB,
             ExpressionOperation::MUL,
             ExpressionOperation::DIV
