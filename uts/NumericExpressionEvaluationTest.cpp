@@ -320,10 +320,33 @@ INSTANTIATE_TEST_CASE_P(Numeric_CompareOperations_Neq, Numeric_BinaryExpressionT
     )
 );
 
-INSTANTIATE_TEST_CASE_P(Numeric_ArithmeticOperations_AddSubMulDiv, Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P(Numeric_ArithmeticOperations_Add, Numeric_BinaryExpressionTest,
     Combine(
         Values(
-            ExpressionOperation::ADD,
+            ExpressionOperation::ADD
+        ),
+        ValuesIn(generateNumeric_BinaryExpressionTestCases(
+            {
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::RATIONAL,
+                TypeType::STRING,
+            },
+            [](TypeType number) -> BinaryOpArgss {
+                return {
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(TypeType::UNDEF), make_value(number), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(TypeType::UNDEF), yields(make_value(TypeType::UNDEF))},
+                    BinaryOpArgs{make_value(number), make_value(number), yields(make_value(number))}
+                };
+            }
+        ))
+    )
+);
+
+INSTANTIATE_TEST_CASE_P(Numeric_ArithmeticOperations_SubMulDiv, Numeric_BinaryExpressionTest,
+    Combine(
+        Values(
             ExpressionOperation::SUB,
             ExpressionOperation::MUL,
             ExpressionOperation::DIV
