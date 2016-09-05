@@ -855,7 +855,8 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
     case Builtin::Id::IS_SYMBOLIC:
         return builtins::issymbolic(arguments[0]);
     default:
-        FAILURE();
+        global_driver->error(atom->location, "unknown builtin `" + atom->to_str() + "`");
+        return value_t();
     }
 }
 
