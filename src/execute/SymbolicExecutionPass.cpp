@@ -1072,22 +1072,31 @@ void SymbolicExecutionWalker::walk_forall(ForallNode *node)
             visitor.rule_bindings.back()->pop_back();
         }
     }   break;
-    case TypeType::INTEGER: {
+
+    case TypeType::INTEGER:
+    {
         INTEGER_T end =  in_list.value.integer;
-        if (end > 0) {
-            for (INTEGER_T i = 0; i < end; i++) {
-                visitor.rule_bindings.back()->push_back(value_t(i));
-                walk_statement(node->statement);
-                visitor.rule_bindings.back()->pop_back();
-            }
-        } else {
-            for (INTEGER_T i = 0; end < i; i--) {
-                visitor.rule_bindings.back()->push_back(value_t(i));
-                walk_statement(node->statement);
+        if( end > 0 )
+        {
+            for( INTEGER_T i = 1; i <= end; i++ )
+            {
+                visitor.rule_bindings.back()->push_back( value_t( i ) );
+                walk_statement( node->statement );
                 visitor.rule_bindings.back()->pop_back();
             }
         }
-    }   break;
+        else
+        {
+            for( INTEGER_T i = end; i <= -1; i++ )
+            {
+                visitor.rule_bindings.back()->push_back( value_t( i ) );
+                walk_statement( node->statement );
+                visitor.rule_bindings.back()->pop_back();
+            }
+        }
+        break;
+    }
+    
     case TypeType::ENUM: {
         FunctionAtom *func = reinterpret_cast<FunctionAtom*>(node->in_expr);
         if (func->name == func->enum_->name) {
