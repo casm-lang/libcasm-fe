@@ -134,6 +134,9 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
         while( program_val.type != TypeType::UNDEF )
         {
             walker->walk_rule(program_val.value.rule);
+            if (hasEmptyUpdateSet()) {
+                break;
+            }
             if( dump_updates )
             {
                 dumpUpdates();
