@@ -936,6 +936,19 @@ Type* TypecheckVisitor::visit_list_atom(ListAtom *atom, std::vector<Type*> &vals
   return &atom->type_;
 }
 
+Type* TypecheckVisitor::visit_number_range_atom(NumberRangeAtom* atom, Type* left, Type* right)
+{
+    if (not left->unify(TypeType::INTEGER)) {
+        driver_.error(atom->left->location, "left value of number range must be an Integer "
+                                            "but was `" + left->to_str() + "`");
+    }
+    if (not right->unify(TypeType::INTEGER)) {
+        driver_.error(atom->right->location, "right value of number range must be an Integer "
+                                             "but was `" + right->to_str() + "`");
+    }
+    return &atom->type_;
+}
+
 
 template <>
 void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode *node )

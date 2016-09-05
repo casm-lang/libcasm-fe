@@ -396,10 +396,10 @@ ListAtom::ListAtom(yy::location& loc, std::vector<ExpressionBase*> *exprs)
   type_ = Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
 }
 
-NumberRangeAtom::NumberRangeAtom(yy::location& loc, IntegerAtom *start, IntegerAtom *end) :
+NumberRangeAtom::NumberRangeAtom(yy::location& loc, ExpressionBase *left, ExpressionBase *right) :
     AtomNode(loc, NodeType::NUMBER_RANGE_ATOM, TypeType::NUMBER_RANGE),
-    start(start),
-    end(end)
+    left(left),
+    right(right)
 {
 
 }

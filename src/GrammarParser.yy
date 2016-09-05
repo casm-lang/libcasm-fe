@@ -830,17 +830,9 @@ RULEREF
 
 
 NUMBER_RANGE
-: LSQPAREN NUMBER DOTDOT NUMBER RSQPAREN
+: LSQPAREN EXPRESSION DOTDOT EXPRESSION RSQPAREN
   {
-      if( $2->node_type_ == NodeType::INTEGER_ATOM && $4->node_type_ == NodeType::INTEGER_ATOM )
-      {
-          $$ = new NumberRangeAtom( @$, reinterpret_cast<IntegerAtom*>( $2 ), reinterpret_cast<IntegerAtom*>( $4 ));
-      }
-      else
-      {
-          driver.error( @$, "numbers in range expression must be Integer" );
-          $$ = nullptr;
-      }
+      $$ = new NumberRangeAtom( @$, $2, $4 );
   }
 ;
 

@@ -130,7 +130,9 @@ namespace libcasm_fe
         const value_t visit_rule_atom(RuleAtom *atom) { return value_t(atom->rule); }
         const value_t visit_boolean_atom(BooleanAtom *atom) { return value_t(atom->value); }
         const value_t visit_string_atom(StringAtom *atom) { return value_t(&atom->string); }
-        const value_t visit_number_range_atom(NumberRangeAtom *atom);
+        const value_t visit_number_range_atom(NumberRangeAtom *atom,
+                                              const value_t& left,
+                                              const value_t& right);
 
     protected:
         std::vector<value_t> main_bindings;
