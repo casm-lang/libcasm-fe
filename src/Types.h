@@ -59,6 +59,7 @@ enum class TypeType {
   RATIONAL,
   UNDEF,    // only possible during execution in value_t.type
   SYMBOL,   // only possible during execution in value_t.type
+  NUMBER_RANGE,
 };
 
 class Type;

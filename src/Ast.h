@@ -344,7 +344,8 @@ class ListAtom : public AtomNode {
 
 class NumberRangeAtom : public AtomNode {
   public:
-    BottomList *list;
+    IntegerAtom *start;
+    IntegerAtom *end;
 
     NumberRangeAtom(yy::location& loc, IntegerAtom *start, IntegerAtom *end);
 };

@@ -39,6 +39,8 @@ class TailList;
 class BottomList;
 class List;
 
+class NumberRange;
+
 struct symbolic_condition_t;
 struct symbol_t;
 struct rational_t;
@@ -56,6 +58,7 @@ class value_t {
       const enum_value_t *enum_val;
       const rational_t *rat;
       symbol_t *sym;
+      NumberRange *numberRange;
     } value;
 
     value_t();
@@ -68,6 +71,7 @@ class value_t {
     value_t(const enum_value_t *enum_val);
     value_t(const rational_t *val);
     value_t(symbol_t *sym);
+    value_t(NumberRange *numberRange);
     value_t(const value_t& other);
     value_t(value_t&& other) noexcept;
 
@@ -136,6 +140,54 @@ struct rational_t {
   const rational_t& operator%(const rational_t& other) const;
 
   const std::string to_str() const;
+};
+
+class NumberRange
+{
+private:
+    INTEGER_T m_bottom;
+    INTEGER_T m_top;
+
+public:
+    NumberRange();
+    NumberRange(INTEGER_T bottom, INTEGER_T top);
+    NumberRange(const NumberRange& other);
+
+    class const_iterator {
+    public:
+        using difference_type = INTEGER_T;
+        using value_type = INTEGER_T;
+        using const_reference = const value_type&;
+        using const_pointer = const value_type*;
+        using iterator_category = std::forward_iterator_tag;
+
+        const_iterator(INTEGER_T number);
+        const_iterator(const const_iterator& rhs);
+
+        const_iterator& operator=(const const_iterator& rhs) noexcept;
+
+        bool operator==(const const_iterator& rhs) const noexcept;
+        bool operator!=(const const_iterator& rhs) const noexcept;
+
+        const_iterator& operator++() noexcept;
+        const_iterator operator++(int) noexcept;
+
+        const_reference operator*() const noexcept;
+
+    private:
+        INTEGER_T m_number;
+    };
+
+    INTEGER_T bottom() const noexcept;
+    INTEGER_T top() const noexcept;
+
+    bool operator==(const NumberRange& other) const;
+    bool operator!=(const NumberRange& other) const;
+
+    const_iterator begin() const;
+    const_iterator end() const;
+
+    const std::string to_str() const;
 };
 
 class List {

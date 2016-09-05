@@ -872,7 +872,14 @@ const value_t ExecutionPassBase::visit_derived_function_atom(FunctionAtom*,
 
 const value_t ExecutionPassBase::visit_number_range_atom(NumberRangeAtom *atom)
 {
-    return value_t(atom->type_, atom->list);
+    const auto start = atom->start->val_;
+    const auto end = atom->end->val_;
+
+    if (start > end) {
+        return value_t(new NumberRange(end, start));
+    } else {
+        return value_t(new NumberRange(start, end));
+    }
 }
 
 //  

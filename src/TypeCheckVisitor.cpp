@@ -954,11 +954,15 @@ void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode *node )
     {
 	node->type_.unify(node->in_expr->type_.subtypes[0]);
     }
+    else if ( node->in_expr->type_ == TypeType::NUMBER_RANGE )
+    {
+        node->type_.unify(TypeType::INTEGER);
+    }
     else
     {
 	visitor.driver_.error
 	( node->location
-	, "expression must be a List, an Integer or enum, but is '"
+	, "expression must be a List, an Integer, a NumberRange or enum, but is '"
 	  + node->in_expr->type_.to_str()
 	  + "'"
 	);
