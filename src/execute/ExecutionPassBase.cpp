@@ -310,6 +310,22 @@ namespace builtins
         }
     }
 
+    static const value_t dec(const value_t& arg)
+    {
+        // TODO LEAK!
+        if (arg.is_undef()) {
+            return value_t(new std::string("undef"));
+        }
+
+        std::stringstream ss;
+        if (arg.value.integer < 0) {
+            ss << "-" << std::dec << (-1) * arg.value.integer;
+        } else {
+            ss << std::dec << arg.value.integer;
+        }
+        return value_t(new std::string(ss.str()));
+    }
+
     static const value_t hex(const value_t& arg)
     {
         // TODO LEAK!
@@ -816,6 +832,8 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
         return builtins::app(temp_lists, arguments[0], arguments[1]);
     case Builtin::Id::CONS:
         return builtins::cons(temp_lists, arguments[0], arguments[1]);
+    case Builtin::Id::DEC:
+        return builtins::dec(arguments[0]);
     case Builtin::Id::HEX:
         return builtins::hex(arguments[0]);
     case Builtin::Id::TAIL:
@@ -837,7 +855,8 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
     case Builtin::Id::IS_SYMBOLIC:
         return builtins::issymbolic(arguments[0]);
     default:
-        FAILURE();
+        global_driver->error(atom->location, "unknown builtin `" + atom->to_str() + "`");
+        return value_t();
     }
 }
 
