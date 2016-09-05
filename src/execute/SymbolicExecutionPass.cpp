@@ -768,6 +768,9 @@ void SymbolicExecutionPass::mainLoop()
 
     while (program_val.type != TypeType::UNDEF) {
         walker->walk_rule(program_val.value.rule);
+        if (hasEmptyUpdateSet()) {
+            break;
+        }
         dumpUpdates();
         applyUpdates();
         symbolic::advance_timestamp();
