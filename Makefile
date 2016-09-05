@@ -81,11 +81,11 @@ INCLUDE += -I ../pass
 
 default: debug
 
-debug: $(LIBRARY) obj $(TARGET)
+debug:   $(LIBRARY) obj $(TARGET)
 release: $(LIBRARY) obj $(TARGET)
 
 obj:
-	mkdir -p obj
+	@mkdir -p obj
 
 
 src/various/Grammar.org: src/GrammarParser.yy
@@ -147,7 +147,10 @@ clean:
 	@echo "RM  " $(TARGET)
 	@rm -f $(TARGET)
 	@rm -f test
+	@rm -f $(TEST_TARGET)
 
+
+TEST_TARGET = libcasm-fe-test.a
 
 TEST_FILES   = $(shell find uts -name '*.cpp' | cut -d'.' -f1)
 TEST_OBJECTS = $(TEST_FILES:%=obj/%.o)
@@ -164,91 +167,18 @@ obj/uts/%.o: uts/%.cpp
 	@echo "CPP " $<
 	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) -c $< -o $@
 
-test: debug obj $(TEST_OBJECTS)
+test: tests
 	@rm -f $@
 	@echo "LD  " $@
-	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) $(TEST_LIBRARY) -o $@ $(filter %.o,$^) $(TARGET) ../gtest/googletest/src/gtest-all.cc ../gtest/googletest/src/gtest_main.cc
+	@$(CPP) $(CPPFLAG) $(TEST_INCLUDE) $(INCLUDE) $(TEST_LIBRARY) -o $@ \
+		-Wl,--whole-archive $(TEST_TARGET) $(TARGET) -Wl,--no-whole-archive \
+		 ../gtest/googletest/src/gtest-all.cc ../gtest/googletest/src/gtest_main.cc 
 	@echo "RUN " $@
 	@./$@
 
+tests: obj $(TARGET) $(TEST_TARGET) default
 
-# LEX = flex
-# CXX = clang
-# CFLAGS = -Isrc -Iobj/src -std=c++11 -O0 -g
-# # -stdlib=libstdc++
-# OBJ_DIR = obj
-# AR = /usr/bin/ar
-
-# SRC = $(shell find src -name '*.cpp' | cut -d'.' -f1)
-
-# OBJS = $(SRC:%=obj/%.o)
-
-# .PHONY: all clean
-# # test
-
-# all: lib
-
-# clean:
-# 	rm -rf obj
-
-# # test: obj/test_parse obj/test_typecheck
-# #	python tests/integration/test_runner.py
-
-# $(OBJ_DIR):
-# 	mkdir -p $@/src/libsyntax
-# 	mkdir -p $@/src/libutil
-# 	mkdir -p $@/src/libmiddle
-# 	mkdir -p $@/src/execute
-
-# obj/libfrontend.a: obj/src/libsyntax/parser.o obj/src/libsyntax/lexer.o $(OBJS)
-# 	@echo "AR  " $@
-# 	@$(AR) rsc obj/libfrontend.a $(OBJS) obj/src/libsyntax/lexer.o obj/src/libsyntax/parser.o
-# 	@ranlib obj/libfrontend.a
-
-# lib: $(OBJ_DIR) obj/libfrontend.a
-
-# obj/src/libsyntax/parser.cpp: src/libsyntax/grammer.yy
-# 	@echo "YAC " $<
-# 	@cd obj/src/libsyntax && bison --output parser.cpp --defines=parser.tab.h ../../../src/libsyntax/grammer.yy
-
-# $(OBJ_DIR)/src/libsyntax/lexer.cpp: src/libsyntax/lexer.l
-# 	@echo "LEX " $<
-# 	@$(LEX) $(LFLAGS) -o $(OBJ_DIR)/src/libsyntax/lexer.cpp src/libsyntax/lexer.l
-
-# $(OBJ_DIR)/src/libsyntax/%.o: obj/src/libsyntax/%.cpp
-# 	@echo "CPP " $<
-# 	@$(CXX) $(CFLAGS) -c $< -o $@
-
-# $(OBJ_DIR)/src/libutil/%.o: src/libutil/%.cpp
-# 	@echo "CPP " $<
-# 	@$(CXX) $(CFLAGS) -c $< -o $@
-
-# $(OBJ_DIR)/src/libsyntax/%.o: src/libsyntax/%.cpp
-# 	@echo "CPP " $<
-# 	@$(CXX) $(CFLAGS) -c $< -o $@
-
-# $(obj_dir)/src/libmiddle/%.o: src/libmiddle/%.cpp
-# 	@echo "CPP " $<
-# 	@$(cxx) $(cflags) -c $< -o $@
-
-# $(OBJ_DIR)/src/%.o: src/%.cpp
-# 	@echo "CPP " $<
-# 	@$(CXX) $(CFLAGS) -c $< -o $@
-
-# $(obj_dir)/src/execute/%.o: src/execute/%.cpp
-# 	@echo "CPP " $<
-# 	@$(cxx) $(cflags) -c $< -o $@
-
-
-# # obj/test_parse: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_parse.cpp
-# # 	@echo "CPP " $<
-# # 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_parse.cpp obj/libfrontend.a -lstdc++ -lm
-# # 
-# # obj/test_typecheck: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_typecheck.cpp
-# # 	@echo "CPP " $<
-# # 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_typecheck.cpp obj/libfrontend.a -lstdc++ -lm
-# # 
-# # obj/test_dump: $(OBJ_DIR) obj/libfrontend.a tests/integration/test_dump.cpp
-# # 	@echo "CPP " $<
-# # 	@$(CXX) $(CFLAGS) -o $@ tests/integration/test_dump.cpp obj/libfrontend.a -lstdc++ -lm
-
+$(TEST_TARGET): $(TEST_OBJECTS)
+	@echo "AR  " $@
+	@$(AR) rsc $@ $(filter %.o,$^)
+	@ranlib $@

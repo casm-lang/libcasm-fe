@@ -65,10 +65,13 @@ namespace libcasm_fe
     , RuleArgumentsTypeInvalidAtIndirectCall        = 0x5e05
 
     , CaseLabelMultipleUseOfDefault                 = 0x5c00  // 5c** ... case errors
-         
+            
+    , AssertInvalidExpression                       = 0x5a00  // 5a** ... assert errors
+    
     // --------------------------------------------------------- a*** ... agent errors
     , AgentInitRuleDoesNotExist                     = 0xa000 
-
+    , AgentInitRuleMultipleDefinitions              = 0xa001 
+    
     // --------------------------------------------------------- 1*** ... type check errors
     , TypeInferenceInvalidLet                       = 0x1000
     , TypeInferenceInvalidExpression                = 0x1001

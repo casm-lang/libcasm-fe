@@ -45,13 +45,15 @@
     #include <cstdint>
     #include <string>
     #include <utility>
+    
+    #include "stdhl/cpp/Type.h"
 
     #include "src/Ast.h"
     #include "src/Types.h"
     #include "src/Codes.h"
     class Driver;
 
-#line 55 "GrammarParser.tab.h" // lalr1.cc:377
+#line 57 "GrammarParser.tab.h" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -128,7 +130,7 @@
 
 
 namespace yy {
-#line 132 "GrammarParser.tab.h" // lalr1.cc:377
+#line 134 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
@@ -1256,7 +1258,7 @@ namespace yy {
       yyeof_ = 0,
       yylast_ = 1048,     ///< Last index in yytable_.
       yynnts_ = 67,  ///< Number of nonterminal symbols.
-      yyfinal_ = 5, ///< Termination state number.
+      yyfinal_ = 4, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
       yyntokens_ = 83  ///< Number of tokens.
@@ -2995,7 +2997,7 @@ namespace yy {
 
 
 } // yy
-#line 2999 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3001 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

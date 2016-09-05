@@ -590,12 +590,19 @@ namespace builtins
     }
 }
 
-void ExecutionPassBase::visit_assert(UnaryNode* assert, const value_t& val)
+
+void ExecutionPassBase::visit_assert( UnaryNode* assert, const value_t& val )
 {
-    if (!val.value.boolean) {
-        throw RuntimeException(assert->location, "Assertion failed");
+    if( not val.value.boolean )
+    {
+        throw RuntimeException
+        ( assert->location
+        , "assertion failed"
+        , libcasm_fe::Codes::AssertInvalidExpression
+        );
     }
 }
+
 
 void ExecutionPassBase::visit_update_dumps(UpdateNode *update, const value_t& expr_v)
 {
