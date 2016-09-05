@@ -255,9 +255,9 @@ SPECIFICATION
 
 
 HEADER
-: CASM IDENTIFIER
+: CASM 
   {
-      $$ = new SpecificationNode( @$, $2 );
+      $$ = new SpecificationNode( @$, driver.get_filename() );
   }
 ;
 

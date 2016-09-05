@@ -1256,7 +1256,7 @@ namespace yy {
       yyeof_ = 0,
       yylast_ = 1027,     ///< Last index in yytable_.
       yynnts_ = 67,  ///< Number of nonterminal symbols.
-      yyfinal_ = 5, ///< Termination state number.
+      yyfinal_ = 4, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
       yyntokens_ = 83  ///< Number of tokens.
