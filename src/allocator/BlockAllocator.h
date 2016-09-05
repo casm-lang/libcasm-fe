@@ -129,8 +129,11 @@ public:
 
     virtual ~BlockAllocator()
     {
-        for (auto block = m_topBlock; block != nullptr; block = block->previous()) {
-            free(block);
+        auto block = m_topBlock;
+        while (block != nullptr) {
+            const auto b = block;
+            block = block->previous();
+            free(b);
         }
     }
 
