@@ -37,6 +37,8 @@
     #include <cstdint>
     #include <string>
     #include <utility>
+    
+    #include "stdhl/cpp/Type.h"
 
     #include "src/Ast.h"
     #include "src/Types.h"
@@ -346,7 +348,35 @@ BODY_ELEMENT
 INIT_SYNTAX
 : INIT IDENTIFIER
   {
-      $$ = new InitNode( @$, $2 );
+      static InitNode* init_node = 0;
+
+      if( not init_node )
+      {
+          init_node = new InitNode( @$, $2 );
+      }
+      else
+      {
+          static u1 flag = true;
+          
+          if( flag )
+          {
+              flag = false;
+              
+              driver.error
+              ( init_node->location
+              , "multiple definition of 'init' node"
+              , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
+              );
+          }
+          
+          driver.error
+          ( @$
+          , "multiple definition of 'init' node"
+          , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
+          );
+      }
+      
+      $$ = init_node;
   }
 ;
 

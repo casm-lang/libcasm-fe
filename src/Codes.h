@@ -70,7 +70,8 @@ namespace libcasm_fe
     
     // --------------------------------------------------------- a*** ... agent errors
     , AgentInitRuleDoesNotExist                     = 0xa000 
-
+    , AgentInitRuleMultipleDefinitions              = 0xa001 
+    
     // --------------------------------------------------------- 1*** ... type check errors
     , TypeInferenceInvalidLet                       = 0x1000
     , TypeInferenceInvalidExpression                = 0x1001
