@@ -344,9 +344,10 @@ class ListAtom : public AtomNode {
 
 class NumberRangeAtom : public AtomNode {
   public:
-    BottomList *list;
+    ExpressionBase *left;
+    ExpressionBase *right;
 
-    NumberRangeAtom(yy::location& loc, IntegerAtom *start, IntegerAtom *end);
+    NumberRangeAtom(yy::location& loc, ExpressionBase *left, ExpressionBase *right);
 };
 
 enum class ExpressionOperation : uint8_t {

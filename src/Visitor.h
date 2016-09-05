@@ -410,6 +410,13 @@ template<class T, class V> class AstWalker {
       return visitor.visit_list_atom(atom, expr_results);
     }
 
+    V walk_number_range(NumberRangeAtom* atom)
+    {
+        V left = walk_expression_base(atom->left);
+        V right = walk_expression_base(atom->right);
+        return visitor.visit_number_range_atom(atom, left, right);
+    }
+
     V walk_atom( AtomNode* atom )
     {
         switch( atom->node_type_ )
@@ -468,7 +475,7 @@ template<class T, class V> class AstWalker {
             }
             case NodeType::NUMBER_RANGE_ATOM:
             {
-                return visitor.visit_number_range_atom( reinterpret_cast< NumberRangeAtom* >( atom ) );
+                return walk_number_range( reinterpret_cast< NumberRangeAtom* >( atom ) );
             }
             default:
             {
@@ -540,7 +547,7 @@ template<class T> class BaseVisitor {
     T visit_boolean_atom(BooleanAtom*) { return T(); }
     T visit_string_atom(StringAtom*) { return T(); }
     T visit_list_atom(ListAtom*, std::vector<T> &) { return T(); }
-    T visit_number_range_atom(NumberRangeAtom*) { return T(); }
+    T visit_number_range_atom(NumberRangeAtom*, T, T) { return T(); }
 };
 
 #endif

@@ -70,6 +70,12 @@ value_t::value_t(symbol_t *sym) : type(TypeType::SYMBOL) {
   value.sym = sym;
 }
 
+value_t::value_t(NumberRange *numberRange) :
+    type(TypeType::NUMBER_RANGE)
+{
+    value.numberRange = numberRange;
+}
+
 value_t::value_t(const value_t& other) : type(other.type), value(other.value) {}
 
 value_t::value_t(value_t&& other) noexcept : type(other.type), value(other.value) {}
@@ -119,6 +125,7 @@ bool value_t::operator==(const value_t &other) const {
     case TypeType::TUPLE:
     case TypeType::TUPLE_OR_LIST:
     case TypeType::LIST: return *value.list == *other.value.list;
+    case TypeType::NUMBER_RANGE: return *value.numberRange == *other.value.numberRange;
     default: FAILURE();
   }
 }
@@ -174,6 +181,8 @@ const std::string value_t::to_str(bool symbolic) const {
       }
     case TypeType::SYMBOL:
       return "sym"+std::to_string(value.sym->id);
+    case TypeType::NUMBER_RANGE:
+      return value.numberRange->to_str();
     default: throw RuntimeException("Unsupported type in value_t.to_str() ");
   }
 }
@@ -436,8 +445,107 @@ const std::string rational_t::to_str() const {
   return "";
 }
 
-List::List(ListType t) : list_type(t) {}
+NumberRange::NumberRange() :
+    NumberRange(0, 0)
+{
 
+}
+
+NumberRange::NumberRange(INTEGER_T bottom, INTEGER_T top) :
+    m_bottom(bottom),
+    m_top(top)
+{
+    assert(m_bottom <= m_top);
+}
+
+NumberRange::NumberRange(const NumberRange& other) :
+    NumberRange(other.m_bottom, other.m_top)
+{
+}
+
+NumberRange::const_iterator NumberRange::begin() const
+{
+    return const_iterator(m_bottom);
+}
+
+NumberRange::const_iterator NumberRange::end() const
+{
+    return const_iterator(m_top + 1);
+}
+
+INTEGER_T NumberRange::bottom() const noexcept
+{
+    return m_bottom;
+}
+
+INTEGER_T NumberRange::top() const noexcept
+{
+    return m_top;
+}
+
+bool NumberRange::operator==(const NumberRange& other) const
+{
+    return (m_bottom == other.m_bottom) and (m_top == other.m_top);
+}
+
+bool NumberRange::operator!=(const NumberRange& other) const
+{
+    return not operator==(other);
+}
+
+const std::string NumberRange::to_str() const
+{
+    return std::to_string(m_bottom) + ".." + std::to_string(m_top);
+}
+
+NumberRange::const_iterator::const_iterator(INTEGER_T number) :
+    m_number(number)
+{
+
+}
+
+NumberRange::const_iterator::const_iterator(const const_iterator& rhs) :
+    m_number(rhs.m_number)
+{
+
+}
+
+NumberRange::const_iterator& NumberRange::const_iterator::operator=(const const_iterator& rhs) noexcept
+{
+    this->m_number = rhs.m_number;
+    return *this;
+}
+
+bool NumberRange::const_iterator::operator==(const const_iterator& rhs) const noexcept
+{
+    return this->m_number == rhs.m_number;
+}
+
+bool NumberRange::const_iterator::operator!=(const const_iterator& rhs) const noexcept
+{
+    return this->m_number != rhs.m_number;
+}
+
+NumberRange::const_iterator& NumberRange::const_iterator::operator++() noexcept
+{
+    ++m_number;
+    return *this;
+}
+
+NumberRange::const_iterator NumberRange::const_iterator::operator++(int) noexcept
+{
+    auto i = *this;
+    ++m_number;
+    return i;
+}
+
+NumberRange::const_iterator::const_reference NumberRange::const_iterator::operator*() const noexcept
+{
+    return m_number;
+}
+
+
+List::List(ListType t) : list_type(t) {}
 
 void List::const_iterator::do_init(const List *ptr) {
   pos = 0;
@@ -761,6 +869,8 @@ namespace std {
         return (size_t) key.value.rat->numerator + key.value.rat->denominator;
       case TypeType::SYMBOL:
         return reinterpret_cast<size_t>(key.value.sym);
+      case TypeType::NUMBER_RANGE:
+        return ~key.value.numberRange->bottom() ^ key.value.numberRange->top();
       default: throw RuntimeException("Unsupported type in std::hash<value_t>()");
     }
   }

@@ -896,9 +896,15 @@ const value_t ExecutionPassBase::visit_derived_function_atom(FunctionAtom*,
     return expr;
 }
 
-const value_t ExecutionPassBase::visit_number_range_atom(NumberRangeAtom *atom)
+const value_t ExecutionPassBase::visit_number_range_atom(NumberRangeAtom *atom,
+                                                         const value_t& left,
+                                                         const value_t& right)
 {
-    return value_t(atom->type_, atom->list);
+    if (left.value.integer > right.value.integer) {
+        return value_t(new NumberRange(right.value.integer, left.value.integer));
+    } else {
+        return value_t(new NumberRange(left.value.integer, right.value.integer));
+    }
 }
 
 //  

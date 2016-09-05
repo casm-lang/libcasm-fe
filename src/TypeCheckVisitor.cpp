@@ -937,6 +937,32 @@ Type* TypecheckVisitor::visit_list_atom(ListAtom *atom, std::vector<Type*> &vals
 }
 
 
+Type* TypecheckVisitor::visit_number_range_atom( NumberRangeAtom* atom, Type* left, Type* right )
+{
+    if( not left->unify( TypeType::INTEGER ) )
+    {
+        driver_.error
+        ( atom->left->location
+        , "left value of number range must be an Integer but was '"
+          + left->to_str()
+          + "'"
+        , libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtLeftHandSide
+        );
+    }
+    if( not right->unify( TypeType::INTEGER ) )
+    {
+        driver_.error
+        ( atom->right->location
+        , "right value of number range must be an Integer but was '"
+          + right->to_str()
+          + "'"
+        , libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtRightHandSide
+        );
+    }
+    return &atom->type_;
+}
+
+
 template <>
 void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode *node )
 {
@@ -954,11 +980,15 @@ void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode *node )
     {
 	node->type_.unify(node->in_expr->type_.subtypes[0]);
     }
+    else if ( node->in_expr->type_ == TypeType::NUMBER_RANGE )
+    {
+        node->type_.unify(TypeType::INTEGER);
+    }
     else
     {
 	visitor.driver_.error
 	( node->location
-	, "expression must be a List, an Integer or enum, but is '"
+	, "expression must be a List, an Integer, a NumberRange or enum, but is '"
 	  + node->in_expr->type_.to_str()
 	  + "'"
 	);

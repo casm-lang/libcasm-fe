@@ -201,6 +201,7 @@ const std::string Type::to_str() const {
     }
     case TypeType::ENUM: return enum_name;
     case TypeType::INVALID: return "Invalid";
+    case TypeType::NUMBER_RANGE: return "NumberRange";
     default: FAILURE();
   }
 }

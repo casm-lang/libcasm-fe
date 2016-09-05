@@ -92,7 +92,7 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     bool visit_boolean_atom(BooleanAtom *atom);
     bool visit_string_atom(StringAtom *atom);
     bool visit_list_atom(ListAtom*, std::vector<bool>&);
-    bool visit_number_range_atom(NumberRangeAtom*) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); return 0; }
+    bool visit_number_range_atom(NumberRangeAtom*, bool, bool) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); return 0; }
 };
 
 #endif //CASMI_LIBINTERPRETER_EXEC_VISITOR

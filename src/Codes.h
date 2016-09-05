@@ -83,6 +83,9 @@ namespace libcasm_fe
             
     , TypeIntegerRangedInvalidInterval              = 0x2000  // 2*** ... Integer type error
 
+    , TypeNumberRangeInvalidTypeAtLeftHandSide      = 0x3000  // 3*** ... Number range type error
+    , TypeNumberRangeInvalidTypeAtRightHandSide     = 0x3001  // 3*** ... Number range type error
+    
     // --------------------------------------------------------- 8*** ... operator errors
     , OperatorAddInvalidOperandType                 = 0x8000
             
