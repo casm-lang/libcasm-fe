@@ -70,6 +70,8 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
 {
     walker = new NumericExecutionWalker(*this);
 
+    const bool dump_updates = (bool)pr.getResults()[(void*)2];
+
     Ast* root = (Ast*)pr.getResult< TypeCheckPass >();
     RuleNode* node = global_driver->rules_map_[ root->getInitRule()->identifier ];
 

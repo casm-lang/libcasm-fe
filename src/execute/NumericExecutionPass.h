@@ -68,8 +68,6 @@ namespace libcasm_fe
 
     private:
         AstWalker<libcasm_fe::NumericExecutionPass, value_t>* walker;
-
-        bool dump_updates = false;
     };
 }
 
