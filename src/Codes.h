@@ -50,10 +50,13 @@ namespace libcasm_fe
     , FunctionValueInvalidRangeAtUpdate             = 0xfd00  // fd** ... function value
     , FunctionValueInvalidRangeAtInitially          = 0xfd01
     , FunctionValueAlreadyInitializedAtInitially    = 0xfd02
+            
+    , FunctionIdentifierIsBuiltinName               = 0xf100  // f1** ... function identifer
+    
 
     // --------------------------------------------------------- d*** ... derived errors
     , DerivedArgumentsInvalidRangeAtLookup          = 0xde00  // de** ... derived argment
-
+    
 
     // --------------------------------------------------------- 5*** ... statement errors       
     , RuleArgumentsInvalidRangeAtCall               = 0x5e00  // 5e** ... rule argument

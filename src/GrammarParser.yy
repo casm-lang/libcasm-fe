@@ -292,8 +292,15 @@ BODY_ELEMENT
       
       if( $1->is_builtin() )
       {
-          driver.error(@$, "cannot use `"+$1->name+"` as function identifier because it is a builtin name");
+          driver.error
+          ( @$
+          , "cannot use builtin name '"
+            + $1->name
+            + "' as function identifier"
+          , libcasm_fe::Codes::FunctionIdentifierIsBuiltinName
+          );
       }
+      
       try
       {
           driver.add($1);
