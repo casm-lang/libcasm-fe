@@ -494,6 +494,8 @@ namespace builtins
         switch (arg.type) {
             case TypeType::INTEGER:
                 return value_t(arg.value.integer);
+            case TypeType::BOOLEAN:
+                return value_t((INTEGER_T)arg.value.boolean);
             case TypeType::FLOATING:
                 return value_t((INTEGER_T)arg.value.float_);
             case TypeType::RATIONAL:
