@@ -118,40 +118,58 @@ void TypecheckVisitor::visit_derived_def_pre(FunctionDefNode *def) {
   rule_binding_offsets.push_back(&def->sym->binding_offsets);
 }
 
-void TypecheckVisitor::visit_derived_def(FunctionDefNode *def, Type* expr) {
-  rule_binding_types.pop_back();
-  rule_binding_offsets.pop_back();
 
-  if (!def->sym->return_type_->unify(expr)) {
-    driver_.error(def->location, "type of derived expression is `"+
-                                 expr->to_str()+"`, but specified as `"+
-                                 def->sym->return_type_->to_str()+"`");
-  } else if (!def->sym->return_type_->is_complete()) {
-    driver_.error(def->location, std::string("type of derived expression is ")+
-                                 "unknown because type of expression is "+expr->to_str());
-  }
+void TypecheckVisitor::visit_derived_def( FunctionDefNode *def, Type* expr )
+{
+    rule_binding_types.pop_back();
+    rule_binding_offsets.pop_back();
 
-  if( def->sym->return_type_->t  == TypeType::BIT
-   && def->sym->derived->type_.t == TypeType::BIT
-   && def->sym->return_type_->bitsize  != def->sym->derived->type_.bitsize
+    if( not def->sym->return_type_->unify( expr ) )
+    {
+	driver_.error
+	( def->location
+	, "type of derived expression is '"
+	  + expr->to_str()
+	  + "', but specified as '"
+	  + def->sym->return_type_->to_str()
+	  + "'"
+	);
+    }
+    else if( not def->sym->return_type_->is_complete() )
+    {
+	driver_.error
+	( def->location
+	, "type of derived expression is unknown because type of expression is "
+	  + expr->to_str()
+	, libcasm_fe::Codes::DerivedExpressionInvalidType
+	);
+    }
+    
+    if( def->sym->return_type_->t  == TypeType::BIT
+    and def->sym->derived->type_.t == TypeType::BIT
+    and def->sym->return_type_->bitsize  != def->sym->derived->type_.bitsize
     )
-  {
-      driver_.error( def->location, "expression bit size does not match the return type bit size" );
-  }
-  
-  for( auto arg : def->sym->binding_offsets )
-  {
-      def->sym->parameter.push_back( 0 );
-  }
+    {
+	driver_.error
+	( def->location
+	, "expression bit size does not match the return type bit size"
+	);
+    }
+    
+    for( auto arg : def->sym->binding_offsets )
+    {
+	def->sym->parameter.push_back( 0 );
+    }
 
-  for( auto arg : def->sym->binding_offsets )
-  {
-      uint32_t i = arg.second;
-      assert( i < def->sym->parameter.size() and "invalid parameter index found!" );
+    for( auto arg : def->sym->binding_offsets )
+    {
+	uint32_t i = arg.second;
+	assert( i < def->sym->parameter.size() and "invalid parameter index found!" );
       
-      def->sym->parameter[i] = arg.first.c_str();
-  }
+	def->sym->parameter[i] = arg.first.c_str();
+    }
 }
+
 
 void TypecheckVisitor::visit_rule(RuleNode *rule) {
   auto foo = new std::vector<Type*>();

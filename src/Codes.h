@@ -57,7 +57,8 @@ namespace libcasm_fe
     
 
     // --------------------------------------------------------- d*** ... derived errors
-    , DerivedArgumentsInvalidRangeAtLookup          = 0xde00  // de** ... derived argment
+    , DerivedArgumentsInvalidRangeAtLookup          = 0xda00  // da** ... derived argment
+    , DerivedExpressionInvalidType                  = 0xde00  // de** ... derived expression
     
 
     // --------------------------------------------------------- 5*** ... statement errors       
