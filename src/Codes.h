@@ -35,7 +35,9 @@ namespace libcasm_fe
     , SyntaxErrorUnrecognizedCharacter              = 0x0001
     , SyntaxErrorUnclosedString                     = 0x0002
     , SyntaxErrorInvalidStatement                   = 0x0003
-    
+
+    , IdentifierAlreadyUsed                         = 0x0010
+            
     // --------------------------------------------------------- f*** ... function errors
     , FunctionAttributeIsInvalid                    = 0xfa00  // fa** ... function attribute
     , FunctionAttributeMultipleUseOfStatic          = 0xfa01

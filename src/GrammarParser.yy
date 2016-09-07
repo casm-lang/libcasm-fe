@@ -305,9 +305,14 @@ BODY_ELEMENT
       {
           driver.add($1);
       }
-      catch( const IdentifierAlreadyUsed& e )
+      catch( const Exception& e )
       {
-          driver.error(@$, e.what());
+          driver.error
+          ( e.getLocations()
+          , e.what()
+          , e.getErrorCode()
+          );
+          
           // if another symbol with same name exists we need to delete
           // the symbol here, because it is not inserted in the symbol table
           delete $1;
@@ -322,7 +327,7 @@ BODY_ELEMENT
       {
           driver.add($1);
       }
-      catch( const IdentifierAlreadyUsed& e )
+      catch( const Exception& e )
       {
           driver.error(@$, e.what());
           // if another symbol with same name exists we need to delete
@@ -342,7 +347,7 @@ BODY_ELEMENT
       {
           driver.add(reinterpret_cast<RuleNode*>($1));
       }
-      catch( const IdentifierAlreadyUsed& e )
+      catch( const Exception& e )
       {
           driver.error( @$, e.what() );
           // we do not need to delete $1 here, because it's already in
@@ -401,7 +406,7 @@ ENUM_SYNTAX
       {
           driver.function_table.add($$);
       }
-      catch( const SymbolAlreadyExists& e )
+      catch( const Exception& e )
       {
           driver.error( @$, e.what() );
       }
@@ -413,7 +418,7 @@ ENUM_SYNTAX
               {
                   driver.function_table.add_enum_element( name, $$ );
               }
-              catch( const SymbolAlreadyExists& e )
+              catch( const Exception& e )
               {
                   driver.error( @$, e.what() );
               }
@@ -1405,7 +1410,7 @@ LET_SYNTAX
       {
           driver.function_table.add( &var );      
       }
-      catch( const SymbolAlreadyExists& e)
+      catch( const Exception& e)
       {
           driver.error( @$, e.what() );
       }
@@ -1422,7 +1427,7 @@ LET_SYNTAX
       {
           driver.function_table.add( &var );
       }
-      catch( const SymbolAlreadyExists& e)
+      catch( const Exception& e)
       {
           driver.error( @$, e.what() );
       }

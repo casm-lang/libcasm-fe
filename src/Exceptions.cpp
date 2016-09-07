@@ -26,53 +26,69 @@
 #include "Exceptions.h"
 
 
-RuntimeException::RuntimeException
+Exception::Exception
+( const std::string& msg
+, const libcasm_fe::Codes error_code
+)
+: msg_( msg )
+, error_code_( error_code )
+{
+    addLocation( yy::location( yy::position(0,0,0) ) );
+    fprintf( stderr, "RUNTIME_EXCEPTION_WITH_UNKNOWN_LOCATION!!!\n" );
+}
+
+
+Exception::Exception
 ( const yy::location& location
 , const std::string& msg
 , const libcasm_fe::Codes error_code
 )
-: location_( location )
-, msg_( msg )
+: msg_( msg )
 , error_code_( error_code )
 {
+    addLocation( location );
 }
 
-RuntimeException::RuntimeException
-( const std::string& msg
+
+Exception::Exception
+( const std::vector< const yy::location* >& location
+, const std::string& msg
 , const libcasm_fe::Codes error_code
 )
-: RuntimeException
-  ( yy::location( yy::position(0,0,0) ) // unknown
-    // ( (std::string*)"asdf"
-    // , 0
-    // , 0
-    // )
-  , msg
-  , error_code
-  )
+: msg_( msg )
+, error_code_( error_code )
 {
-    fprintf( stderr, "RUNTIME_EXCEPTION_WITH_UNKNOWN_LOCATION!!!\n" );
+    for( auto loc : location )
+    {
+	addLocation( *loc );
+    }
 }
 
-const char* RuntimeException::what() const throw()
+
+
+const char* Exception::what() const throw()
 {
     return msg_.c_str();
 }
 
-const yy::location& RuntimeException::getLocation( void ) const
+void Exception::addLocation( const yy::location& location )
+{
+    location_.push_back( &location );
+}
+
+const yy::location& Exception::getLocation( void ) const
+{
+    assert( location_.size() > 0 and location_[0] );
+    return *location_[0];
+}
+
+const std::vector< const yy::location* >& Exception::getLocations( void ) const
 {
     return location_;
 }
 
-const libcasm_fe::Codes RuntimeException::getErrorCode( void ) const
+const libcasm_fe::Codes Exception::getErrorCode( void ) const
 {
     return error_code_;
 }
 
-
-
-
-const char* ImpossibleException::what() const throw()
-{
-    return "ImpossibleException";
-}

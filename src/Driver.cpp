@@ -123,8 +123,26 @@ Ast *Driver::parse (const std::string &f) {
 
 
 
-void Driver::error( const yy::location& l, const std::string& m, libcasm_fe::Codes code )
+void Driver::error
+( const yy::location& l
+, const std::string& m
+, libcasm_fe::Codes code
+)
 {
+    error( { &l }, m, code );
+}
+
+
+void Driver::error
+( const std::vector< const yy::location* >& locations
+, const std::string& m
+, libcasm_fe::Codes code
+)
+{
+    assert( locations.size() > 0 and locations[0] );
+    
+    const yy::location& l = *locations[0];
+    
     // Set state to error!
     error_++;
     
@@ -145,30 +163,37 @@ void Driver::error( const yy::location& l, const std::string& m, libcasm_fe::Cod
 
     if( code != libcasm_fe::Codes::Unspecified )
     {
-        int line_of_code = l.begin.line;
+	for( auto loc : locations )
+	{
+	    int line_of_code = loc->begin.line;
         
-        if( code == libcasm_fe::Codes::SyntaxError )
-        {
-            line_of_code--;
-        }
+	    if( code == libcasm_fe::Codes::SyntaxError )
+	    {
+		line_of_code--;
+	    }
         
-        fprintf
-        ( stderr
-        , " " YELLOW "@%i{%04x}" RESET
-        , line_of_code
-        , code
-        );
+            fprintf
+            ( stderr
+            , " " YELLOW "@%i{%04x}" RESET
+            , line_of_code
+            , code
+            );
+	}
     }
     
     std::cerr << std::endl;
     
-    underline( l );    
+    for( auto loc : locations )
+    {
+	underline( *loc );
+    }
     
     if( code == libcasm_fe::Codes::Unspecified )
     {
         warning( l, "unspecified error code!" );
     }
 }
+
 
 void Driver::warning( const yy::location& l, const std::string& m )
 {
@@ -254,70 +279,77 @@ uint64_t Driver::get_warning_count() const
     return warning_;
 }
 
-void Driver::add(RuleNode *rule_root) {
-  Function *function = function_table.get_function(rule_root->name);
-  if (function != nullptr) { // rules and functions can't have the same name
-    throw IdentifierAlreadyUsed("identifier `" + rule_root->name +
-                                "` already used as name for a function in line " +
-                                std::to_string(function->location.begin.line));
-  }
-
-  const auto result = rules_map_.emplace(rule_root->name, rule_root);
-  if (result.second) {
-    DEBUG("Add symbol "+rule_root->name);
-    rule_root->binding_offsets = std::move(binding_offsets);
-    binding_offsets.clear(); // is this necessary? move should empty map
-  } else {
-    const auto it = result.first;
-    RuleNode *existingRule = it->second;
-    throw RuleAlreadyExists("redefinition of rule `" + rule_root->name +
-                            "` which is defined in line " +
-                            std::to_string(existingRule->location.begin.line));
-  }
-}
-
-RuleNode *Driver::get_init_rule() const {
-  return rules_map_.at(init_name);
-}
-
-void Driver::add(Function *function)
+void Driver::add( RuleNode *rule_root )
 {
-  const auto it = rules_map_.find(function->name);
-  if (it != rules_map_.cend()) { // rules and functions can't have the same name
-    RuleNode *existingRule = it->second;
-    throw IdentifierAlreadyUsed("identifier `" + function->name +
-                                "` already used as name for a rule in line " +
-                                std::to_string(existingRule->location.begin.line));
-  }
-
-  function_table.add(function);
+    Function *function = function_table.get_function( rule_root->name );
+    
+    if( function )
+    {
+        // rules and functions can't have the same name
+	throw CompiletimeException
+	( { &rule_root->location, &function->location }
+	, "redefinition of '"
+	  + rule_root->name
+	  + "'"
+	, libcasm_fe::Codes::IdentifierAlreadyUsed
+	);
+    }
+    
+    const auto result = rules_map_.emplace( rule_root->name, rule_root );
+    
+    if( result.second )
+    {
+	DEBUG("Add symbol "+rule_root->name);
+	rule_root->binding_offsets = std::move( binding_offsets );
+	binding_offsets.clear(); // TODO: is this necessary? move should empty map
+    }
+    else
+    {
+	const auto it = result.first;
+	RuleNode *existingRule = it->second;
+	
+	throw CompiletimeException
+	( { &rule_root->location, &existingRule->location }
+	, "redefinition of '"
+	  + rule_root->name
+	  + "'"
+	, libcasm_fe::Codes::IdentifierAlreadyUsed
+	);
+    }
 }
+
+
+RuleNode *Driver::get_init_rule() const
+{
+    return rules_map_.at( init_name );
+}
+
+
+void Driver::add( Function *function )
+{
+    const auto it = rules_map_.find( function->name );
+  
+    if( it != rules_map_.cend() )
+    {
+        // rules and functions can't have the same name
+	RuleNode *existingRule = it->second;
+
+	throw CompiletimeException
+	( { &function->location, &existingRule->location }
+	, "redefinition of '"
+	  + function->name
+	  + "'"
+	, libcasm_fe::Codes::IdentifierAlreadyUsed
+	);
+    }
+    
+    function_table.add( function );
+}
+
 
 const std::string& Driver::get_filename() {
   return filename_;
 }
 
-AstNode *StringDriver::parse (const std::string &str) {
-  char tmpname[] = "/tmp/casmi_test_XXXXXX";
-  int fd = mkstemp(&tmpname[0]);
-
-  if (fd == -1) {
-    std::cerr << "Could not create tmpfile" << std::endl;
-    return nullptr;
-  }
-
-  FILE *file = fdopen(fd, "w");
-  if (file == NULL) {
-    std::cerr << "Could not open file stream for tmpfile" << std::endl;
-    return nullptr;
-  } 
-
-  fwrite(str.c_str(), str.length(), sizeof(char), file);
-  fclose(file);
-  Ast *res = Driver::parse(tmpname);
-  remove(tmpname);
-
-  return res;
-}
 
 

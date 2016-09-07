@@ -76,6 +76,8 @@ public:
 
     // Error handling.
     void error(const yy::location& l, const std::string& m, libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
+
+    void error(const std::vector< const yy::location* >& locations, const std::string& m, libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
     
     void warning(const yy::location& l, const std::string& m);
     void info(const yy::location& l, const std::string& m);
@@ -116,15 +118,6 @@ private:
     void underline( const yy::location& l );
 };
 
-class StringDriver: public Driver {
-  private:
-    std::string str_;
-    std::string::iterator iter_;
-    std::string::iterator end_;
-
-  public:
-    AstNode *parse (const std::string& str);
-};
 
 // Tell Flex the lexer's prototype ...
 #define YY_DECL \

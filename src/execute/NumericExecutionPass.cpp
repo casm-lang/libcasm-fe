@@ -159,12 +159,7 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
     }
     catch( const RuntimeException& ex )
     {
-        global_driver->error( ex.getLocation(), std::string( ex.what() ), ex.getErrorCode() );
-        return false;
-    }
-    catch( const ImpossibleException& ex )
-    {
-        std::cerr << ex.what() << std::endl;
+        global_driver->error( ex.getLocation(), ex.what(), ex.getErrorCode() );
         return false;
     }
     catch( char * e )

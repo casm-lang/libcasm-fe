@@ -118,16 +118,18 @@ bool SymbolicExecutionPass::run(libpass::PassResult& pr)
 
         mainLoop();
         printTrace();
-    } catch (const RuntimeException& ex) {
-        std::cerr << "Abort after runtime exception: " << ex.what() << std::endl;
+    }
+    catch( const RuntimeException& ex )
+    {
+        global_driver->error( ex.getLocation(), ex.what(), ex.getErrorCode() );
         return false;
-    } catch (const ImpossibleException& ex) {
-        return false;
-    } catch (char * e) {
+    }
+    catch( char* e )
+    {
         std::cerr << "Abort after catching a string: " << e << std::endl;
         return false;
     }
-
+    
     return true;
 }
 

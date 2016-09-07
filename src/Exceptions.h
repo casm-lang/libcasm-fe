@@ -30,60 +30,59 @@
 #include <stdexcept>
 #include <string>
 
+#include "stdhl/cpp/Type.h"
+
 #include "various/location.hh"
 
 #include "Codes.h"
 
 // TODO: namespace libcasm_fe
 
-class RuntimeException : public std::exception
+class Exception : public std::exception
 {
 private:
-    const yy::location& location_;
+    std::vector< const yy::location* > location_;
     const std::string msg_;
     const libcasm_fe::Codes error_code_;
     
 public:
-    RuntimeException
+    explicit Exception
     ( const std::string& msg
     , const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified
     );
     
-    RuntimeException
+    explicit Exception
     ( const yy::location& location
     , const std::string& msg
-    , const libcasm_fe::Codes error_code_ = libcasm_fe::Codes::Unspecified
+    , const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified
+    );
+
+    explicit Exception
+    ( const std::vector< const yy::location* >& location
+    , const std::string& msg
+    , const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified
     );
     
     virtual const char* what() const throw();
     
+    void addLocation( const yy::location& location );
+
     const yy::location& getLocation( void ) const;
+    
+    const std::vector< const yy::location* >& getLocations( void ) const;
     
     const libcasm_fe::Codes getErrorCode( void ) const;
 };
 
-class ImpossibleException : public std::exception
+class RuntimeException : public Exception
 {
-public:
-    virtual const char* what() const throw();
+    using Exception::Exception;
 };
 
-class IdentifierAlreadyUsed : public std::logic_error
+class CompiletimeException : public Exception
 {
-public:
-    using logic_error::logic_error;
+    using Exception::Exception;
 };
 
-class SymbolAlreadyExists : public IdentifierAlreadyUsed
-{
-public:
-    using IdentifierAlreadyUsed::IdentifierAlreadyUsed;
-};
-
-class RuleAlreadyExists : public IdentifierAlreadyUsed
-{
-public:
-    using IdentifierAlreadyUsed::IdentifierAlreadyUsed;
-};
 
 #endif // _LIB_CASMFE_EXCEPTIONS_H_
