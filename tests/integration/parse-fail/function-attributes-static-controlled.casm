@@ -1,5 +1,0 @@
-function(static, controlled) a: -> List(Integer)
-//~^  attributes `controlled` and `static` are mutually exclusive
-
-rule main = skip
-init main
