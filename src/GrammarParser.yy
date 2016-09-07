@@ -280,15 +280,15 @@ BODY_ELEMENTS
 BODY_ELEMENT
 : OPTION_SYNTAX
   {
-      $$ = new AstNode(NodeType::OPTION);
+      $$ = new AstNode( NodeType::OPTION );
   }
 | ENUM_SYNTAX
   {
-      $$ = new EnumDefNode(@$, $1);
+      $$ = new EnumDefNode( @$, $1 );
   }
 | FUNCTION_DEFINITION
   {
-      $$ = new FunctionDefNode(@$, $1);
+      $$ = new FunctionDefNode( @$, $1 );
       
       if( $1->is_builtin() )
       {
@@ -303,7 +303,7 @@ BODY_ELEMENT
       
       try
       {
-          driver.add($1);
+          driver.add( $1 );
       }
       catch( const Exception& e )
       {
@@ -320,16 +320,22 @@ BODY_ELEMENT
   }
 | DERIVED_SYNTAX
   {
-      $1->binding_offsets = std::move(driver.binding_offsets);
+      $1->binding_offsets = std::move( driver.binding_offsets );
       driver.binding_offsets.clear();
-      $$ = new FunctionDefNode(@$, $1);
+      
+      $$ = new FunctionDefNode( @$, $1 );
       try
       {
-          driver.add($1);
+          driver.add( $1 );
       }
       catch( const Exception& e )
       {
-          driver.error(@$, e.what());
+          driver.error
+          ( e.getLocations()
+          , e.what()
+          , e.getErrorCode()
+          );
+          
           // if another symbol with same name exists we need to delete
           // the symbol here, because it is not inserted in the symbol table
           delete $1;
@@ -342,14 +348,20 @@ BODY_ELEMENT
 | RULE_SYNTAX
   {
       $$ = $1;
-      // TODO check, we trust bison to pass only RuleNodes up
+      // TODO: check, we trust bison to pass only RuleNodes up
+      
       try
       {
-          driver.add(reinterpret_cast<RuleNode*>($1));
+          driver.add( reinterpret_cast< RuleNode* >( $1 ) );
       }
       catch( const Exception& e )
       {
-          driver.error( @$, e.what() );
+          driver.error
+          ( e.getLocations()
+          , e.what()
+          , e.getErrorCode()
+          );
+          
           // we do not need to delete $1 here, because it's already in
           // the AST, so it will be deleted later
       }
@@ -408,7 +420,11 @@ ENUM_SYNTAX
       }
       catch( const Exception& e )
       {
-          driver.error( @$, e.what() );
+          driver.error
+          ( e.getLocations()
+          , e.what()
+          , e.getErrorCode()
+          );
       }
       for( const std::string& name : $5 )
       {
@@ -420,12 +436,21 @@ ENUM_SYNTAX
               }
               catch( const Exception& e )
               {
-                  driver.error( @$, e.what() );
+                  driver.error
+                  ( e.getLocations()
+                  , e.what()
+                  , e.getErrorCode()
+                  );
               }
           }
           else
           {
-              driver.error( @$, "name `"+name+"` already used in enum" );
+              driver.error
+              ( @$
+              , "name '"
+                + name
+                + "' already used in enum"
+              );
           }
       }
   }
@@ -1502,7 +1527,21 @@ void yy::casmi_parser::error
 , const std::string& m
 )
 {
-    driver.error( l, m, libcasm_fe::Codes::SyntaxError );
+    if( m.compare( "syntax error, unexpected end of file, expecting CASM" ) == 0 )
+    {
+        i32 pos = (l.begin.line - 1);
+        pos = ( pos > 0 ? pos : 1 );
+        
+        driver.error
+        ( yy::location( yy::position( 0, pos, 1 ) )
+        , m
+        , libcasm_fe::Codes::SyntaxError
+        );
+    }
+    else
+    {
+        driver.error( l, m, libcasm_fe::Codes::SyntaxError );
+    }
 }
 
 

@@ -165,17 +165,10 @@ void Driver::error
     {
 	for( auto loc : locations )
 	{
-	    int line_of_code = loc->begin.line;
-        
-	    if( code == libcasm_fe::Codes::SyntaxError )
-	    {
-		line_of_code--;
-	    }
-        
             fprintf
             ( stderr
             , " " YELLOW "@%i{%04x}" RESET
-            , line_of_code
+            , loc->begin.line
             , code
             );
 	}

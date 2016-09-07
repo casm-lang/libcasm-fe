@@ -12,9 +12,9 @@ BODY_ELEMENTS
 
 BODY_ELEMENT
 : OPTION_SYNTAX
-      $$ = new AstNode(NodeType::OPTION);
+      $$ = new AstNode( NodeType::OPTION );
 | ENUM_SYNTAX
-      $$ = new EnumDefNode(@$, $1);
+      $$ = new EnumDefNode( @$, $1 );
 | FUNCTION_DEFINITION
       }
 | DERIVED_SYNTAX

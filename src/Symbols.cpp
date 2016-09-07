@@ -780,28 +780,8 @@ Builtin built_ins[] =
 };
 
 
-
-
 Symbol::Symbol(const std::string& name, const yy::location& location, SymbolType type) :
     name(std::move(name)), location(std::move(location)), type(type) {}
-
-
-// static std::string to_string(Symbol::SymbolType type) // TODO: PPA: this can be removed in my opinion!
-// {
-//     using Type = Symbol::SymbolType;
-//     switch (type) {
-//         case Type::FUNCTION:
-//             return "function";
-//         case Type::DERIVED:
-//             return "derived";
-//         case Type::BUILTIN:
-//             return "builtin";
-//         case Type::ENUM:
-//             return "enum";
-//         case Type::LET:
-//             return "let";
-//     };
-// }
 
 
 // -------------------------------------------------------------------------
