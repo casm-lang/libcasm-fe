@@ -186,11 +186,12 @@ public:
 
     void freeAll()
     {
-        for (auto block = m_topBlock; block != nullptr; block = block->previous()) {
+        auto currentBlock = m_currentBlock;
+        for (auto block = currentBlock; block != nullptr; block = block->previous()) {
+            currentBlock = block;
             block->free();
         }
-
-        m_currentBlock = m_topBlock;
+        m_currentBlock = currentBlock;
     }
 
 private:
