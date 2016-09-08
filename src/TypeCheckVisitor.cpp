@@ -913,11 +913,6 @@ Type* TypecheckVisitor::visit_function_atom(FunctionAtom *atom, Type* arguments[
     }
   }
 
-  // check for function definitions without arguments
-  if (atom->symbol->arguments_.size() == 0 && num_arguments > 0 ) {
-    driver_.error(atom->location, "number of provided arguments does not match definition of `"+atom->name+"`");
-  }
-
   atom->type_.unify(func->return_type_);
   return &atom->type_;
 }
