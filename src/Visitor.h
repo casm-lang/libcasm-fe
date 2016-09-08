@@ -31,290 +31,313 @@
 
 class AstNode;
 
-template<class T, class V> class AstWalker {
-  public:
+template<class T, class V> class AstWalker
+{
+public:
     T& visitor;
     bool suppress_calls;
-    
+
     AstWalker(T& v)
-    : visitor(v)
-    , suppress_calls(false)
+        : visitor(v)
+        , suppress_calls(false)
     {
+
     }
-    
+
     void walk_specification( Ast* spec )
     {
         assert( spec->node_type_ == NodeType::SPECIFICATION );
         visitor.visit_specification( spec->getSpecification() );
         walk_body_elements( spec->getElements() );
     }
-    
-    
-    void walk_body_elements(AstListNode *body_elements) {
-      for (auto e : body_elements->nodes) {
-        switch(e->node_type_) {
-          case NodeType::PROVIDER: {break;} // TODO implement
-          case NodeType::OPTION: {break;} // TODO implement
-          case NodeType::ENUM: {break;} // TODO implement
-          case NodeType::FUNCTION: {
-            walk_function_def(reinterpret_cast<FunctionDefNode*>(e));
-            break;
-          }
-          case NodeType::DERIVED: {break;} // TODO implement
-          case NodeType::RULE: {
-            walk_rule(reinterpret_cast<RuleNode*>(e));
-            break; 
-          } 
-          case NodeType::INIT: {
-            visitor.visit_init(reinterpret_cast<InitNode*>(e));
-            break;
-          }
-          default: {
-            throw RuntimeException(
-              std::string("Invalid node type: ")+
-              type_to_str(e->node_type_)+
-              std::string(" at ")+
-              e->location_str());
-          }
-        }
-      }
-      visitor.visit_body_elements(body_elements);
-    }
 
-    void walk_function_def(FunctionDefNode *def) {
-      if (def->sym->type == Symbol::SymbolType::FUNCTION) {
-        std::vector<std::pair<V, V>> initializer_results;
-        if (def->sym->intitializers_) {
-          for (std::pair<ExpressionBase*, ExpressionBase*> p : *def->sym->intitializers_) {
-            V first;
-            if (p.first) {
-              first = walk_expression_base(p.first);
-            } else {
-              UndefAtom foo = {p.second->location};
-              first = walk_atom(&foo);
+
+    void walk_body_elements(AstListNode *body_elements)
+    {
+        for (auto e : body_elements->nodes) {
+            switch(e->node_type_) {
+            case NodeType::PROVIDER: {
+                break;   // TODO implement
             }
-            initializer_results.push_back(
-                std::pair<V, V>(first, walk_expression_base(p.second))
-            );
-          }
+            case NodeType::OPTION: {
+                break;   // TODO implement
+            }
+            case NodeType::ENUM: {
+                break;   // TODO implement
+            }
+            case NodeType::FUNCTION: {
+                walk_function_def(reinterpret_cast<FunctionDefNode*>(e));
+                break;
+            }
+            case NodeType::DERIVED: {
+                break;   // TODO implement
+            }
+            case NodeType::RULE: {
+                walk_rule(reinterpret_cast<RuleNode*>(e));
+                break;
+            }
+            case NodeType::INIT: {
+                visitor.visit_init(reinterpret_cast<InitNode*>(e));
+                break;
+            }
+            default:
+                throw RuntimeException(
+                    std::string("Invalid node type: ")+
+                    type_to_str(e->node_type_)+
+                    std::string(" at ")+
+                    e->location_str());
+            }
         }
-
-        visitor.visit_function_def(def, initializer_results);
-      } else {
-        visitor.visit_derived_def_pre(def);
-        V v = walk_expression_base(def->sym->derived);
-        visitor.visit_derived_def(def, v);
-      }
+        visitor.visit_body_elements(body_elements);
     }
 
-    void walk_rule(RuleNode *rule) {
-      visitor.visit_rule(rule);
-      walk_statement(rule->child_);
-      visitor.visit_rule_post(rule);
+    void walk_function_def(FunctionDefNode *def)
+    {
+        if (def->sym->type == Symbol::SymbolType::FUNCTION) {
+            std::vector<std::pair<V, V>> initializer_results;
+            if (def->sym->intitializers_) {
+                for (std::pair<ExpressionBase*, ExpressionBase*> p : *def->sym->intitializers_) {
+                    V first;
+                    if (p.first) {
+                        first = walk_expression_base(p.first);
+                    } else {
+                        UndefAtom foo = {p.second->location};
+                        first = walk_atom(&foo);
+                    }
+                    initializer_results.push_back(
+                        std::pair<V, V>(first, walk_expression_base(p.second))
+                    );
+                }
+            }
+
+            visitor.visit_function_def(def, initializer_results);
+        } else {
+            visitor.visit_derived_def_pre(def);
+            V v = walk_expression_base(def->sym->derived);
+            visitor.visit_derived_def(def, v);
+        }
+    }
+
+    void walk_rule(RuleNode *rule)
+    {
+        visitor.visit_rule(rule);
+        walk_statement(rule->child_);
+        visitor.visit_rule_post(rule);
     }
 
     void walk_skip(AstNode* node)
     {
         visitor.visit_skip(node);
     }
-    
-    void walk_statement(AstNode *stmt) {
-      switch(stmt->node_type_) {
+
+    void walk_statement(AstNode *stmt)
+    {
+        switch(stmt->node_type_) {
         case NodeType::SEQBLOCK:
-          walk_seqblock(reinterpret_cast<UnaryNode*>(stmt));
-          break;
+            walk_seqblock(reinterpret_cast<UnaryNode*>(stmt));
+            break;
         case NodeType::PARBLOCK:
-          walk_parblock(reinterpret_cast<UnaryNode*>(stmt));
-          break;
+            walk_parblock(reinterpret_cast<UnaryNode*>(stmt));
+            break;
         case NodeType::UPDATE:
-          walk_update(reinterpret_cast<UpdateNode*>(stmt));
-          break;
+            walk_update(reinterpret_cast<UpdateNode*>(stmt));
+            break;
         case NodeType::ASSERT: {
-          UnaryNode *assert = reinterpret_cast<UnaryNode*>(stmt);
-          V v = walk_expression_base(reinterpret_cast<ExpressionBase*>(assert->child_));
-          visitor.visit_assert(assert, v);
-          break;
+            UnaryNode *assert = reinterpret_cast<UnaryNode*>(stmt);
+            V v = walk_expression_base(reinterpret_cast<ExpressionBase*>(assert->child_));
+            visitor.visit_assert(assert, v);
+            break;
         }
         case NodeType::ASSURE: {
-          UnaryNode *assure = reinterpret_cast<UnaryNode*>(stmt);
-          V v = walk_expression_base(reinterpret_cast<ExpressionBase*>(assure->child_));
-          visitor.visit_assure(assure, v);
-          break;
+            UnaryNode *assure = reinterpret_cast<UnaryNode*>(stmt);
+            V v = walk_expression_base(reinterpret_cast<ExpressionBase*>(assure->child_));
+            visitor.visit_assure(assure, v);
+            break;
         }
-        case NodeType::SKIP:
-        {
+        case NodeType::SKIP: {
             // skip does nothing, but in the IR we need this "trivial" information for processing!
             walk_skip(stmt);
-            break; 
+            break;
         }
         case NodeType::IFTHENELSE: {
-          walk_ifthenelse(reinterpret_cast<IfThenElseNode*>(stmt));
-          break;
+            walk_ifthenelse(reinterpret_cast<IfThenElseNode*>(stmt));
+            break;
         }
         case NodeType::CALL: {
-          walk_call(reinterpret_cast<CallNode*>(stmt));
-          break;
+            walk_call(reinterpret_cast<CallNode*>(stmt));
+            break;
         }
         case NodeType::PRINT: {
-          walk_print(reinterpret_cast<PrintNode*>(stmt));
-          break;
+            walk_print(reinterpret_cast<PrintNode*>(stmt));
+            break;
         }
         case NodeType::LET: {
-          walk_let(reinterpret_cast<LetNode*>(stmt));
-          break;
+            walk_let(reinterpret_cast<LetNode*>(stmt));
+            break;
         }
         case NodeType::POP: {
-          walk_pop(reinterpret_cast<PopNode*>(stmt));
-          break;
+            walk_pop(reinterpret_cast<PopNode*>(stmt));
+            break;
         }
         case NodeType::PUSH: {
-          walk_push(reinterpret_cast<PushNode*>(stmt));
-          break;
+            walk_push(reinterpret_cast<PushNode*>(stmt));
+            break;
         }
         case NodeType::FORALL: {
-          walk_forall(reinterpret_cast<ForallNode*>(stmt));
-          break;
+            walk_forall(reinterpret_cast<ForallNode*>(stmt));
+            break;
         }
         case NodeType::ITERATE: {
-          walk_iterate(reinterpret_cast<UnaryNode*>(stmt));
-          break;
+            walk_iterate(reinterpret_cast<UnaryNode*>(stmt));
+            break;
         }
         case NodeType::CASE: {
-          walk_case(reinterpret_cast<CaseNode*>(stmt));
-          break;
+            walk_case(reinterpret_cast<CaseNode*>(stmt));
+            break;
         }
         case NodeType::UPDATE_DUMPS:
-          walk_update_dumps(reinterpret_cast<UpdateNode*>(stmt));
-          break;
+            walk_update_dumps(reinterpret_cast<UpdateNode*>(stmt));
+            break;
         case NodeType::DIEDIE: {
             DiedieNode *node = reinterpret_cast<DiedieNode*>(stmt);
             if (node->msg) {
-              visitor.visit_diedie(node, walk_expression_base(node->msg));
+                visitor.visit_diedie(node, walk_expression_base(node->msg));
             } else {
-              visitor.visit_diedie(node, V());
+                visitor.visit_diedie(node, V());
             }
-          }
-          break;
+            break;
+        }
         case NodeType::IMPOSSIBLE:
             visitor.visit_impossible(stmt);
-          break;
-
+            break;
         default:
             throw RuntimeException(
-              std::string("Invalid node type: ")+
-              type_to_str(stmt->node_type_)+
-              std::string(" at ")+
-              stmt->location_str());
-      }
-    }
-
-    void walk_seqblock(UnaryNode *parblock) {
-      visitor.visit_seqblock(parblock);
-      walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
-    }
-
-    void walk_parblock(UnaryNode *parblock) {
-      visitor.visit_parblock(parblock);
-      walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
-    }
-
-    void walk_statements(AstListNode *stmts) {
-      visitor.visit_statements(stmts);
-      for (auto stmt: stmts->nodes) {
-        walk_statement(stmt);
-      }
-    }
-
-    void walk_update(UpdateNode *update) {
-      V expr_t = walk_expression_base(update->expr_);
-
-      // we must walk the expression before walking update->func because it 
-      // sets the list of arguments and we do not want the update->expr_ to
-      // overwrite the value_list
-      V func_t = walk_function_atom(update->func);
-      visitor.visit_update(update, func_t, expr_t);
-    }
-
-
-    void walk_update_dumps(UpdateNode *update) {
-      V expr_t = walk_expression_base(update->expr_);
-
-      // we must walk the expression before walking update->func because it 
-      // sets the list of arguments and we do not want the update->expr_ to
-      // overwrite the value_list
-      V func_t = walk_function_atom(update->func);
-      visitor.visit_update_dumps(update, func_t, expr_t);
-    }
-
-
-    void walk_call(CallNode *call) {
-      if (call->ruleref == nullptr) {
-        visitor.visit_call_pre(call);
-      } else {
-        V v = walk_expression_base(call->ruleref);
-        visitor.visit_call_pre(call, v);
-      }
-      
-      // we must evaluate all arguments, to set correct offset for bindings
-      std::vector<V> argument_results;
-      if (call->arguments != nullptr) {
-        for (ExpressionBase *e: *call->arguments) {
-          argument_results.push_back(walk_expression_base(e));
+                std::string("Invalid node type: ")+
+                type_to_str(stmt->node_type_)+
+                std::string(" at ")+
+                stmt->location_str());
         }
-      }
-      if (call->rule != nullptr) {
-        visitor.visit_call(call, argument_results);
+    }
 
-        if( !suppress_calls )
-        {
-            walk_rule(call->rule);
+    void walk_seqblock(UnaryNode *parblock)
+    {
+        visitor.visit_seqblock(parblock);
+        walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
+    }
+
+    void walk_parblock(UnaryNode *parblock)
+    {
+        visitor.visit_parblock(parblock);
+        walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
+    }
+
+    void walk_statements(AstListNode *stmts)
+    {
+        visitor.visit_statements(stmts);
+        for (auto stmt: stmts->nodes) {
+            walk_statement(stmt);
         }
-        
-        visitor.visit_call_post(call);
-      } else {
-        DEBUG("rule not set!");
-      }
+    }
+
+    void walk_update(UpdateNode *update)
+    {
+        V expr_t = walk_expression_base(update->expr_);
+
+        // we must walk the expression before walking update->func because it
+        // sets the list of arguments and we do not want the update->expr_ to
+        // overwrite the value_list
+        V func_t = walk_function_atom(update->func);
+        visitor.visit_update(update, func_t, expr_t);
+    }
+
+
+    void walk_update_dumps(UpdateNode *update)
+    {
+        V expr_t = walk_expression_base(update->expr_);
+
+        // we must walk the expression before walking update->func because it
+        // sets the list of arguments and we do not want the update->expr_ to
+        // overwrite the value_list
+        V func_t = walk_function_atom(update->func);
+        visitor.visit_update_dumps(update, func_t, expr_t);
+    }
+
+
+    void walk_call(CallNode *call)
+    {
+        if (call->ruleref == nullptr) {
+            visitor.visit_call_pre(call);
+        } else {
+            V v = walk_expression_base(call->ruleref);
+            visitor.visit_call_pre(call, v);
+        }
+
+        // we must evaluate all arguments, to set correct offset for bindings
+        std::vector<V> argument_results;
+        if (call->arguments != nullptr) {
+            for (ExpressionBase *e: *call->arguments) {
+                argument_results.push_back(walk_expression_base(e));
+            }
+        }
+        if (call->rule != nullptr) {
+            visitor.visit_call(call, argument_results);
+
+            if( !suppress_calls )
+            {
+                walk_rule(call->rule);
+            }
+
+            visitor.visit_call_post(call);
+        } else {
+            DEBUG("rule not set!");
+        }
     }
 
     void walk_print( PrintNode* node )
     {
         visitor.visit_print
         ( node
-        , walk_expression_base( node->getAtom() )
+          , walk_expression_base( node->getAtom() )
         );
     }
-    
-    void walk_let(LetNode *node) {
-      V v = walk_expression_base(node->expr);
-      visitor.visit_let(node, v);
-      walk_statement(node->stmt);
-      visitor.visit_let_post(node);
+
+    void walk_let(LetNode *node)
+    {
+        V v = walk_expression_base(node->expr);
+        visitor.visit_let(node, v);
+        walk_statement(node->stmt);
+        visitor.visit_let_post(node);
     }
 
-    void walk_pop(PopNode *node) {
-      walk_function_atom(node->from);
-      visitor.visit_pop(node);
+    void walk_pop(PopNode *node)
+    {
+        walk_function_atom(node->from);
+        visitor.visit_pop(node);
     }
 
-    void walk_push(PushNode *node) {
-      V expr = walk_expression_base(node->expr);
-      V atom = walk_function_atom(node->to);
-      visitor.visit_push(node, expr, atom);
+    void walk_push(PushNode *node)
+    {
+        V expr = walk_expression_base(node->expr);
+        V atom = walk_function_atom(node->to);
+        visitor.visit_push(node, expr, atom);
     }
 
-    void walk_forall(ForallNode *node) {
-      walk_expression_base(node->in_expr);
-      visitor.visit_forall_pre(node);
-      walk_statement(node->statement);
-      visitor.visit_forall_post(node);
+    void walk_forall(ForallNode *node)
+    {
+        walk_expression_base(node->in_expr);
+        visitor.visit_forall_pre(node);
+        walk_statement(node->statement);
+        visitor.visit_forall_post(node);
     }
 
-    void walk_iterate(UnaryNode* node) {
-      visitor.visit_iterate(node);
-      walk_statement(node->child_);
+    void walk_iterate(UnaryNode* node)
+    {
+        visitor.visit_iterate(node);
+        walk_statement(node->child_);
     }
 
-    void walk_case(CaseNode *node) {
+    void walk_case(CaseNode *node)
+    {
         V web = walk_expression_base(node->expr);
         visitor.visit_case_pre(node, web );
         std::vector<V> case_labels;
@@ -328,16 +351,16 @@ template<class T, class V> class AstWalker {
         }
         visitor.visit_case(node, web, case_labels);
     }
-    
+
     V walk_expression_base( ExpressionBase *expr )
     {
         if( expr->node_type_ == NodeType::EXPRESSION )
         {
             Expression *e = reinterpret_cast< Expression* >( expr );
 
-            V lhs{};
-            V rhs{};
-            
+            V lhs {};
+            V rhs {};
+
             if( e->left_ and e->right_ )
             {
                 if( e->left_->node_type_ == NodeType::ZERO_ATOM )
@@ -345,7 +368,7 @@ template<class T, class V> class AstWalker {
                     // IMPORTANT: right hand side has to be evaluated first to assign the
                     // correct typed zero value to the left hand side
                     rhs = walk_expression_base( e->right_ );
-                    lhs = walk_expression_base( e->left_ );                     
+                    lhs = walk_expression_base( e->left_ );
                 }
                 else
                 {
@@ -364,50 +387,53 @@ template<class T, class V> class AstWalker {
         {
             return walk_atom( reinterpret_cast< AtomNode* >( expr ) );
         }
-        
+
         throw RuntimeException("Invalid expression structure");
     }
 
-    void walk_ifthenelse(IfThenElseNode *n) {
-      V cond = walk_expression_base(n->condition_);
-      visitor.visit_ifthenelse(n, cond);
-      walk_statement(n->then_);
-      if (n->else_) {
-        walk_statement(n->else_);
-      }
+    void walk_ifthenelse(IfThenElseNode *n)
+    {
+        V cond = walk_expression_base(n->condition_);
+        visitor.visit_ifthenelse(n, cond);
+        walk_statement(n->then_);
+        if (n->else_) {
+            walk_statement(n->else_);
+        }
     }
 
-    V walk_function_atom(BaseFunctionAtom *func) {
-      V arguments[10];
+    V walk_function_atom(BaseFunctionAtom *func)
+    {
+        V arguments[10];
 
-      uint16_t i = 0;
-      if (func->arguments) {
-        for (; i < func->arguments->size(); i++) {
-          arguments[i] = walk_expression_base(func->arguments->at(i));
+        uint16_t i = 0;
+        if (func->arguments) {
+            for (; i < func->arguments->size(); i++) {
+                arguments[i] = walk_expression_base(func->arguments->at(i));
+            }
         }
-      } 
-      if (func->node_type_ == NodeType::BUILTIN_ATOM) {
-         return visitor.visit_builtin_atom(reinterpret_cast<BuiltinAtom*>(func), arguments, i);
-      } else {
-        FunctionAtom *func_a = reinterpret_cast<FunctionAtom*>(func);
-        if (func_a->symbol_type == FunctionAtom::SymbolType::DERIVED) {
-          visitor.visit_derived_function_atom_pre(func_a, arguments, i);
-          V expr = walk_expression_base(func_a->symbol->derived);
-          return visitor.visit_derived_function_atom(func_a, expr);
+        if (func->node_type_ == NodeType::BUILTIN_ATOM) {
+            return visitor.visit_builtin_atom(reinterpret_cast<BuiltinAtom*>(func), arguments, i);
         } else {
-          return visitor.visit_function_atom(func_a, arguments, i);
+            FunctionAtom *func_a = reinterpret_cast<FunctionAtom*>(func);
+            if (func_a->symbol_type == FunctionAtom::SymbolType::DERIVED) {
+                visitor.visit_derived_function_atom_pre(func_a, arguments, i);
+                V expr = walk_expression_base(func_a->symbol->derived);
+                return visitor.visit_derived_function_atom(func_a, expr);
+            } else {
+                return visitor.visit_function_atom(func_a, arguments, i);
+            }
         }
-      }
     }
 
-    V walk_list_atom(ListAtom *atom) {
-      std::vector<V> expr_results;
-      if (atom->expr_list) {
-        for (ExpressionBase* e : *atom->expr_list) {
-          expr_results.push_back(walk_expression_base(e));
+    V walk_list_atom(ListAtom *atom)
+    {
+        std::vector<V> expr_results;
+        if (atom->expr_list) {
+            for (ExpressionBase* e : *atom->expr_list) {
+                expr_results.push_back(walk_expression_base(e));
+            }
         }
-      }
-      return visitor.visit_list_atom(atom, expr_results);
+        return visitor.visit_list_atom(atom, expr_results);
     }
 
     V walk_number_range(NumberRangeAtom* atom)
@@ -428,12 +454,12 @@ template<class T, class V> class AstWalker {
             case NodeType::INTEGER_ATOM:
             {
                 IntegerAtom* ia = reinterpret_cast< IntegerAtom* >( atom );
-                
+
                 if( ia->type_.t == TypeType::BIT )
                 {
                     return visitor.visit_bit_atom( ia );
                 }
-                
+
                 return visitor.visit_int_atom( ia );
             }
             case NodeType::FLOATING_ATOM:
@@ -490,8 +516,9 @@ template<class T, class V> class AstWalker {
 };
 
 
-template<class T> class BaseVisitor {
-  public:
+template<class T> class BaseVisitor
+{
+public:
     void visit_specification(SpecificationNode*) {}
     void visit_init(InitNode*) {}
     void visit_body_elements(AstListNode*) {}
@@ -524,7 +551,7 @@ template<class T> class BaseVisitor {
     void visit_case_pre(CaseNode*, const T ) { }
     void visit_case(CaseNode*, const T, const std::vector<T>&) { }
     void visit_skip( AstNode* node ) {}
-    
+
     void visit_forall_pre(ForallNode*) { }
     void visit_forall_post(ForallNode*) { }
 
