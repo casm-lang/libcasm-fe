@@ -56,9 +56,28 @@ void TypecheckVisitor::visit_function_def(FunctionDefNode *def,
   }
 
   // check if initializer types match argument types
+  
   for (size_t i = 0; i < initializers.size(); i++) {
     const std::pair<Type*, Type*>& p = initializers[i];
 
+    Type* t     = p.second;
+    Type* other = def->sym->return_type_;
+    if( ( t->t == TypeType::BIT and other->t == TypeType::INTEGER )
+    or  ( t->t == TypeType::INTEGER and other->t == TypeType::BIT )
+    )
+    {
+    	Type* b = t;
+    	Type* i = other;
+	
+    	if( t->t == TypeType::INTEGER )
+    	{
+    	    b = other;
+    	    i = t;
+    	}
+	
+    	i->t = b->t;
+    }
+    
     // check type of initializer and type of function type
     if (!p.second->unify(def->sym->return_type_)) {
       driver_.error(def->sym->intitializers_->at(i).second->location,
@@ -66,7 +85,39 @@ void TypecheckVisitor::visit_function_def(FunctionDefNode *def,
                     "` is "+p.second->to_str()+" but should be "+
                     def->sym->return_type_->to_str()+"");
     }
+    
+    if( def->sym->return_type_->t == TypeType::BIT
+    and p.second->t == TypeType::BIT
+    )
+    {
+    	INTEGER_T bitsize = def->sym->return_type_->bitsize;
+        INTEGER_T value = -1;
+        INTEGER_T value_bitsize = -1;
+        
+    	assert( def->sym->intitializers_->at(i).second->node_type_ == NodeType::INTEGER_ATOM );
+    	{
+    	    value = static_cast< IntegerAtom* >( def->sym->intitializers_->at(i).second )->val_;
+    	    double v = (double)value;
+    	    v = floor(log2( v )) + 1;
+            value_bitsize = (INTEGER_T)v;
+    	}
+        
+    	if( value_bitsize > bitsize )
+    	{
+    	    driver_.error
+            ( def->sym->intitializers_->at(i).second->location
+    	    , "initially value bitsize '"
+    	      + std::to_string( value_bitsize )
+    	      + "' does not fit into the bitsize of '"
+    	      + std::to_string( bitsize )
+    	      + "'"
+    	    , libcasm_fe::Codes::TypeBitSizeInvalidInIninitallyExpression
+            );
+    	}
 
+	def->sym->intitializers_->at(i).second->type_.bitsize = bitsize;
+    }
+    
     // check arument types
     if (def->sym->arguments_.size() == 0) {
       if (def->sym->intitializers_->at(i).first) {
@@ -354,31 +405,97 @@ void TypecheckVisitor::visit_diedie(DiedieNode *node, Type* msg) {
   }
 }
 
-void TypecheckVisitor::visit_let(LetNode *node, Type*) {
-  if (node->type_ == TypeType::ENUM &&
-      !driver_.function_table.get_enum(node->type_.enum_name)) {
-    driver_.error(node->location,
-                  "unknown type "+node->type_.enum_name+"");
-  }
 
-  if (!node->type_.unify(&node->expr->type_)) {
-    driver_.error(node->location, "type of let conflicts with type of expression");
-  }
+void TypecheckVisitor::visit_let( LetNode *node, Type* )
+{
+    if( node->type_ == TypeType::ENUM
+    and not driver_.function_table.get_enum( node->type_.enum_name )
+    )
+    {
+	driver_.error
+	( node->location
+	, "unknown type '"
+	  + node->type_.enum_name
+	  + "'"
+	);
+    }
 
+    
+    Type* t     = &node->type_;
+    Type* other = &node->expr->type_;
+    if( ( t->t == TypeType::BIT and other->t == TypeType::INTEGER )
+    or  ( t->t == TypeType::INTEGER and other->t == TypeType::BIT )
+    )
+    {
+    	Type* b = t;
+    	Type* i = other;
+	
+    	if( t->t == TypeType::INTEGER )
+    	{
+    	    b = other;
+    	    i = t;
+    	}
+	
+    	i->t = b->t;
+    }
+    
+    if( not node->type_.unify( &node->expr->type_ ) )
+    {
+	driver_.error
+	( node->location
+	, "type of let conflicts with type of expression"
+	);
+    }
+    
+    node->type_.get_most_general_type( node );
+    node->expr->type_.get_most_general_type( node->expr );
+    DEBUG( node->type_.unify_links_to_str() );
+        
+    if( node->type_.t       == TypeType::BIT
+    and node->expr->type_.t == TypeType::BIT
+    )
+    {
+    	INTEGER_T bitsize = node->type_.bitsize;
+        INTEGER_T value = -1;
+        INTEGER_T value_bitsize = -1;
+        
+    	assert( node->expr->node_type_ == NodeType::INTEGER_ATOM );
+    	{
+    	    value = static_cast< IntegerAtom* >( node->expr )->val_;
+    	    double v = (double)value;
+    	    v = floor(log2( v )) + 1;
+    	    value_bitsize = (INTEGER_T)v;
+    	}
+	
+    	if( value_bitsize > bitsize )
+    	{
+    	    driver_.error
+            ( node->expr->location
+    	    , "let expression bitsize '"
+    	      + std::to_string( value_bitsize )
+    	      + "' does not fit into the bitsize of '"
+    	      + std::to_string( bitsize )
+    	      + "'"
+    	    , libcasm_fe::Codes::TypeBitSizeInvalidInLetExpression
+            );            
+    	}
 
-  node->type_.get_most_general_type(node);
-  node->expr->type_.get_most_general_type(node->expr);
-  DEBUG(node->type_.unify_links_to_str());
+	node->expr->type_.bitsize = bitsize;
+    }
+    
+    auto current_rule_binding_types = rule_binding_types.back();
+    auto current_rule_binding_offsets = rule_binding_offsets.back();
 
-  auto current_rule_binding_types = rule_binding_types.back();
-  auto current_rule_binding_offsets = rule_binding_offsets.back();
-
-  current_rule_binding_offsets->insert(
-      std::pair<std::string, size_t>(node->identifier,
-                                     current_rule_binding_types->size())
-  );
-  current_rule_binding_types->push_back(&node->type_);
+    current_rule_binding_offsets->insert
+    ( std::pair< std::string, size_t >
+      ( node->identifier
+      , current_rule_binding_types->size()
+      )
+    );
+    
+    current_rule_binding_types->push_back( &node->type_ );
 }
+
 
 void TypecheckVisitor::visit_let_post(LetNode *node)
 {
@@ -618,7 +735,7 @@ Type* TypecheckVisitor::visit_expression( Expression *expr, Type*, Type* )
     
     const Type* lhs = expr->left_->type_.get_most_general_type(expr->left_);
     const Type* rhs = expr->right_->type_.get_most_general_type(expr->right_);
-    
+        
   if( lhs->t == TypeType::BIT and rhs->t == TypeType::BIT and lhs->bitsize != rhs->bitsize )
   {      
       driver_.error

@@ -31,33 +31,47 @@
 #include "LexerHelpers.h"
 
 
-INTEGER_T convert_to_long(const char* val, int base, Driver &driver, yy::location loc) {
-  char* endptr;
-  errno = 0;
+INTEGER_T convert_to_long( const char* val, int base, Driver &driver, yy::location loc )
+{
+    char* endptr;
+    errno = 0;
   
-  std::string tmp( val );
-  tmp.erase( remove_if( tmp.begin(), tmp.end(), ptr_fun( ::ispunct ) ), tmp.end() );
-  printf( ">>> %s\n", tmp.c_str() );
+    std::string tmp( val );
+    tmp.erase( remove_if( tmp.begin(), tmp.end(), ptr_fun( ::ispunct ) ), tmp.end() );
   
-  INTEGER_T res = strtol( tmp.c_str(), &endptr, base );
+    INTEGER_T res = strtol( tmp.c_str(), &endptr, base );
   
-  switch (errno) {
-      case EINVAL:
-        driver.error(loc, "invalid value");
-        errno = 0;
-        throw std::out_of_range("invalid value");
-      case ERANGE:
-        driver.error(loc, "value out of range");
-        errno = 0;
-        throw std::out_of_range("value out of range");
-  }
-
-  if (*endptr != '\0') {
-      driver.error(loc, "invalid value");
-      throw std::out_of_range("invalid value");
-  }
-  return res;
+    switch( errno )
+    {
+        case EINVAL:
+        {
+	    driver.error( loc, "invalid value" );
+	    errno = 0;
+	    throw std::out_of_range( "invalid value" );
+	    break;
+	}
+        case ERANGE:
+        {
+	    driver.error( loc, "value out of range" );
+	    errno = 0;
+	    throw std::out_of_range( "value out of range" );
+	    break;
+	}
+        default:
+        {
+	    break;
+	}
+    }
+    
+    if( *endptr != '\0' )
+    {
+	driver.error( loc, "invalid value" );
+	throw std::out_of_range( "invalid value" );
+    }
+    
+    return res;
 }
+
 
 FLOATING_T convert_to_float(const char* val, Driver &driver, yy::location loc) {
   char* endptr;

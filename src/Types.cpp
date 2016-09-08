@@ -390,7 +390,8 @@ bool Type::unify_enum(Type *other) {
   return false;
 }
 
-bool Type::unify_nofollow(Type *other) {
+bool Type::unify_nofollow( Type* other )
+{    
   if( t == TypeType::LIST) {
     return unify_list(other);
   } else if (other->t == TypeType::LIST) {
@@ -508,7 +509,7 @@ bool Type::is_unknown() const {
 }
 
 bool Type::unify(Type *other)
-{
+{    
     if (is_unknown() and other->is_unknown())
     {
         Type* left_link = this;
