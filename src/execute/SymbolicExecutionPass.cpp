@@ -656,19 +656,17 @@ const value_t SymbolicExecutionPass::visit_list_atom(ListAtom *atom,
     }
 }
 
-const value_t SymbolicExecutionPass::get_function_value(Function *sym,
-                                                        uint32_t num_arguments,
-                                                        const value_t arguments[])
+const value_t SymbolicExecutionPass::get_function_value(Function *sym, const std::vector<value_t>& arguments)
 {
     try {
-        return ExecutionPassBase::get_function_value(sym, num_arguments, arguments);
+        return ExecutionPassBase::get_function_value(sym, arguments);
     } catch (const std::out_of_range &e) {
         if (sym->is_symbolic) {
             const value_t v(new symbol_t(symbolic::next_symbol_id())); // TODO cleanup symbol
 
             auto &function_map = function_states[sym->id];
-            function_map.emplace(ArgumentsKey(arguments, num_arguments, false), v);
-            symbolic::dump_create(trace_creates, sym, num_arguments, arguments, v);
+            function_map.emplace(ArgumentsKey(arguments.data(), arguments.size(), false), v);
+            symbolic::dump_create(trace_creates, sym, arguments.size(), arguments.data(), v);
 
             return v;
         } else {

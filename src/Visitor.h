@@ -273,14 +273,10 @@ public:
         }
 
         // we must evaluate all arguments, to set correct offset for bindings
-        std::vector<V> argument_results;
-        if (call->arguments != nullptr) {
-            for (ExpressionBase *e: *call->arguments) {
-                argument_results.push_back(walk_expression_base(e));
-            }
-        }
+        std::vector<V> arguments = evaluateExpressions(call->arguments);
+
         if (call->rule != nullptr) {
-            visitor.visit_call(call, argument_results);
+            visitor.visit_call(call, arguments);
 
             if( !suppress_calls )
             {
@@ -403,36 +399,25 @@ public:
 
     V walk_function_atom(BaseFunctionAtom *func)
     {
-        V arguments[10];
+        std::vector<V> argumentValues = evaluateExpressions(func->arguments);
 
-        uint16_t i = 0;
-        if (func->arguments) {
-            for (; i < func->arguments->size(); i++) {
-                arguments[i] = walk_expression_base(func->arguments->at(i));
-            }
-        }
         if (func->node_type_ == NodeType::BUILTIN_ATOM) {
-            return visitor.visit_builtin_atom(reinterpret_cast<BuiltinAtom*>(func), arguments, i);
+            return visitor.visit_builtin_atom(reinterpret_cast<BuiltinAtom*>(func), argumentValues);
         } else {
             FunctionAtom *func_a = reinterpret_cast<FunctionAtom*>(func);
             if (func_a->symbol_type == FunctionAtom::SymbolType::DERIVED) {
-                visitor.visit_derived_function_atom_pre(func_a, arguments, i);
+                visitor.visit_derived_function_atom_pre(func_a, argumentValues);
                 V expr = walk_expression_base(func_a->symbol->derived);
                 return visitor.visit_derived_function_atom(func_a, expr);
             } else {
-                return visitor.visit_function_atom(func_a, arguments, i);
+                return visitor.visit_function_atom(func_a, argumentValues);
             }
         }
     }
 
     V walk_list_atom(ListAtom *atom)
     {
-        std::vector<V> expr_results;
-        if (atom->expr_list) {
-            for (ExpressionBase* e : *atom->expr_list) {
-                expr_results.push_back(walk_expression_base(e));
-            }
-        }
+        std::vector<V> expr_results = evaluateExpressions(atom->expr_list);
         return visitor.visit_list_atom(atom, expr_results);
     }
 
@@ -513,6 +498,19 @@ public:
             }
         }
     }
+
+protected:
+    std::vector<V> evaluateExpressions(std::vector<ExpressionBase*> *expressions)
+    {
+        std::vector<V> values;
+        if (expressions != nullptr) {
+            values.reserve(expressions->size());
+            for (ExpressionBase *expression : *expressions) {
+                values.emplace_back(walk_expression_base(expression));
+            }
+        }
+        return values;
+    }
 };
 
 
@@ -565,15 +563,15 @@ public:
     T visit_floating_atom(FloatingAtom*) { return T(); }
     T visit_rational_atom(RationalAtom*) { return T(); }
     T visit_undef_atom(UndefAtom*) { return T(); }
-    T visit_function_atom(FunctionAtom *, const std::vector<T> &) { return T(); }
-    T visit_builtin_atom(BuiltinAtom*, T[], uint16_t) { return T(); }
-    void visit_derived_function_atom_pre(FunctionAtom*, T[], uint16_t) {}
+    T visit_function_atom(FunctionAtom *, const std::vector<T>&) { return T(); }
+    T visit_builtin_atom(BuiltinAtom*, std::vector<T>&) { return T(); }
+    void visit_derived_function_atom_pre(FunctionAtom*, std::vector<T>&) {}
     T visit_derived_function_atom(FunctionAtom*, T) { return T(); }
     T visit_self_atom(SelfAtom*) { return T(); }
     T visit_rule_atom(RuleAtom*) { return T(); }
     T visit_boolean_atom(BooleanAtom*) { return T(); }
     T visit_string_atom(StringAtom*) { return T(); }
-    T visit_list_atom(ListAtom*, std::vector<T> &) { return T(); }
+    T visit_list_atom(ListAtom*, std::vector<T>&) { return T(); }
     T visit_number_range_atom(NumberRangeAtom*, T, T) { return T(); }
 };
 

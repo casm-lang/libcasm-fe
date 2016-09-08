@@ -59,7 +59,7 @@ namespace libcasm_fe
 
         const value_t visit_list_atom(ListAtom *atom, const std::vector<value_t> &vals);
 
-        const value_t get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]) override;
+        const value_t get_function_value(Function *sym, const std::vector<value_t>& arguments) override;
 
     private:
         bool init_function(const std::string& name, std::set<std::string>& visited);
