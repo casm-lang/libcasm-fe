@@ -34,8 +34,13 @@
 INTEGER_T convert_to_long(const char* val, int base, Driver &driver, yy::location loc) {
   char* endptr;
   errno = 0;
-  INTEGER_T res = strtol(val, &endptr, base);
-
+  
+  std::string tmp( val );
+  tmp.erase( remove_if( tmp.begin(), tmp.end(), ptr_fun( ::ispunct ) ), tmp.end() );
+  printf( ">>> %s\n", tmp.c_str() );
+  
+  INTEGER_T res = strtol( tmp.c_str(), &endptr, base );
+  
   switch (errno) {
       case EINVAL:
         driver.error(loc, "invalid value");
