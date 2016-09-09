@@ -106,7 +106,7 @@ release-check-linux64-clang: linux64-check
 release: clean release-build-linux64-clang
 
 test:           debug-check-linux64-clang
-release-test: release-check-linux64-clang
+test-release: release-check-linux64-clang
 
 
 config: CFG=CC="$(CC)" CF="$(CF)"
