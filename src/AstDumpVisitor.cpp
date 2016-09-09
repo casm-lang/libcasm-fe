@@ -166,10 +166,9 @@ bool AstDumpVisitor::visit_call_pre(CallNode *call, bool)
 }
 
 
-bool AstDumpVisitor::visit_call(CallNode *call, std::vector<bool>& argument_results)
+bool AstDumpVisitor::visit_call(CallNode *call, std::vector<bool>&)
 {
     UNUSED(call);
-    UNUSED(argument_results);
     return true;
 }
 
@@ -265,7 +264,7 @@ bool AstDumpVisitor::visit_undef_atom(UndefAtom *atom) {
 }
 
 
-bool AstDumpVisitor::visit_function_atom(FunctionAtom *atom, bool[], uint16_t) {
+bool AstDumpVisitor::visit_function_atom(FunctionAtom *atom, std::vector<bool>&) {
   dump_node(atom, std::string("FunctionAtom:"+atom->name));
 
   if( atom->arguments )
@@ -279,7 +278,7 @@ bool AstDumpVisitor::visit_function_atom(FunctionAtom *atom, bool[], uint16_t) {
   return true;
 }
 
-bool AstDumpVisitor::visit_builtin_atom(BuiltinAtom *atom, bool[], uint16_t) {
+bool AstDumpVisitor::visit_builtin_atom(BuiltinAtom *atom, std::vector<bool>&) {
   dump_node(atom, std::string("BuiltinAtom:"+atom->to_str()));
 
   if( atom->arguments )

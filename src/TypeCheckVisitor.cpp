@@ -330,7 +330,7 @@ void TypecheckVisitor::visit_call_pre(CallNode *call, Type* expr) {
   }
 }
 
-void TypecheckVisitor::visit_call( CallNode *call, std::vector< Type* >& argument_results )
+void TypecheckVisitor::visit_call( CallNode *call, std::vector<Type*> &arguments )
 {
     // typecheck for indirect calls happens during execution
     if( call->ruleref )
@@ -339,7 +339,7 @@ void TypecheckVisitor::visit_call( CallNode *call, std::vector< Type* >& argumen
     }
     
     size_t args_defined = call->rule->arguments.size();
-    size_t args_provided = argument_results.size();
+    size_t args_provided = arguments.size();
     
     if( args_defined != args_provided )
     {
@@ -359,7 +359,7 @@ void TypecheckVisitor::visit_call( CallNode *call, std::vector< Type* >& argumen
     {
     for( size_t i = 0; i < args_defined; i++ )
     {
-        if( not call->rule->arguments[ i ]->unify( argument_results[ i ] ) )
+        if( not call->rule->arguments.at(i)->unify( arguments.at(i) ) )
         {
         driver_.error
         ( call->arguments->at( i )->location
@@ -368,9 +368,9 @@ void TypecheckVisitor::visit_call( CallNode *call, std::vector< Type* >& argumen
           + " of rule '"
           + call->rule_name
           + "' must be '"
-          + call->rule->arguments[ i ]->to_str()
+          + call->rule->arguments.at(i)->to_str()
           + "' but was '"
-          + argument_results[i]->to_str()
+          + arguments.at(i)->to_str()
           + "'"
         , libcasm_fe::Codes::RuleArgumentsTypeInvalidAtCall
         );
@@ -554,7 +554,8 @@ void TypecheckVisitor::visit_pop(PopNode *node) {
       // TODO this should be doable!
       driver_.error(node->to->location, "cannot pop into function with arguments");
     }
-    visit_function_atom(node->to, arguments, 0);
+    std::vector<Type*> arguments{};
+    visit_function_atom(node->to, arguments);
     if (!node->type_.unify(&node->to->type_)) {
       driver_.error(node->from->location,
                     "cannot pop from "+node->from->type_.to_str()+" into "+node->to->type_.to_str());
@@ -852,8 +853,7 @@ Type* TypecheckVisitor::visit_expression_single(Expression *expr, Type*) {
 }
 
 
-Type* TypecheckVisitor::visit_function_atom(FunctionAtom *atom, Type* arguments[],
-                                            uint16_t num_arguments) {
+Type* TypecheckVisitor::visit_function_atom(FunctionAtom *atom, std::vector<Type*> &arguments) {
   Symbol *sym = driver_.function_table.get(atom->name);
   if (sym && sym->type == Symbol::SymbolType::ENUM) {
     atom->symbol_type = FunctionAtom::SymbolType::ENUM;
@@ -895,19 +895,19 @@ Type* TypecheckVisitor::visit_function_atom(FunctionAtom *atom, Type* arguments[
   }
 
   // check for function definitions with arguments
-  if(atom->symbol->arguments_.size() != num_arguments) {
+  if(atom->symbol->arguments_.size() != arguments.size()) {
     driver_.error(atom->location,
                   "number of provided arguments does not match definition of `"+
                   atom->name+"`");
   } else {
     for (size_t i=0; i < atom->symbol->arguments_.size(); i++) {
 
-      Type *argument_t = atom->symbol->arguments_[i];
+      Type *argument_t = atom->symbol->arguments_.at(i);
  
-      if (!arguments[i]->unify(argument_t)) {
+      if (!arguments.at(i)->unify(argument_t)) {
         driver_.error(atom->arguments->at(i)->location,
                       "type of "+std::to_string(i+1)+" argument of `"+atom->name+
-                      "` is "+arguments[i]->to_str()+" but should be "+
+                      "` is "+arguments.at(i)->to_str()+" but should be "+
                       argument_t->to_str());
       }
     }
@@ -917,28 +917,26 @@ Type* TypecheckVisitor::visit_function_atom(FunctionAtom *atom, Type* arguments[
   return &atom->type_;
 }
 
-Type* TypecheckVisitor::visit_builtin_atom(BuiltinAtom *atom,
-                                           Type* arguments[],
-                                           uint16_t num_arguments)
+Type* TypecheckVisitor::visit_builtin_atom(BuiltinAtom *atom, std::vector<Type*> &arguments)
 {
     Builtin* built_in = Builtin::get( atom->name );
     assert( built_in );
     
-    built_in->typecheck( driver_, atom, arguments, num_arguments );
+    built_in->typecheck( driver_, atom, arguments );
     
-    if(atom->types.size() != num_arguments) {
+    if(atom->types.size() != arguments.size()) {
         driver_.error(atom->location,
                       "number of provided arguments does not match definition of `"+
                       atom->name+"`");
     } else {
         for (size_t i=0; i < atom->types.size(); i++) {
 
-            Type *argument_t = atom->types[i];
+            Type *argument_t = atom->types.at(i);
             
-            if (!arguments[i]->unify(argument_t)) {
+            if (!arguments.at(i)->unify(argument_t)) {
                 driver_.error(atom->arguments->at(i)->location,
                               "type of "+std::to_string(i+1)+" argument of `"+atom->name+
-                              "` is "+arguments[i]->to_str()+" but should be "+
+                              "` is "+arguments.at(i)->to_str()+" but should be "+
                               argument_t->to_str());
             }
         }
@@ -1004,21 +1002,19 @@ Type* TypecheckVisitor::visit_builtin_atom(BuiltinAtom *atom,
     return &atom->type_;
 }
 
-void TypecheckVisitor::visit_derived_function_atom_pre(FunctionAtom *atom,
-                                                       Type* arguments[],
-                                                       uint16_t num_arguments) {
+void TypecheckVisitor::visit_derived_function_atom_pre(FunctionAtom *atom, std::vector<Type*> &arguments) {
   size_t args_defined = atom->symbol->arguments_.size();
-  size_t args_provided = num_arguments;
+  size_t args_provided = arguments.size();
   if (args_defined != args_provided) {
     driver_.error(atom->location, " expects "
                                   +std::to_string(args_defined)+" arguments but "+
                                   std::to_string(args_provided)+" where provided");
   } else {
     for (size_t i=0; i < args_defined; i++) {
-      if (!arguments[i]->unify(atom->symbol->arguments_.at(i))) {
+      if (!arguments.at(i)->unify(atom->symbol->arguments_.at(i))) {
         driver_.error(atom->arguments->at(i)->location,
                       "argument "+std::to_string(i+1)+" of must be `"+atom->symbol->arguments_.at(i)->to_str()+"` but was `"+
-                      arguments[i]->to_str()+"`");
+                      arguments.at(i)->to_str()+"`");
       }
     }
   }
@@ -1166,14 +1162,10 @@ void AstWalker<TypecheckVisitor, Type*>::walk_call(CallNode *call) {
   }
 
   // we must evaluate all arguments, to set correct offset for bindings
-  std::vector<Type*> argument_results;
-  if (call->arguments != nullptr) {
-    for (ExpressionBase *e: *call->arguments) {
-      argument_results.push_back(walk_expression_base(e));
-    }
-  }
+  std::vector<Type*> arguments = evaluateExpressions(call->arguments);
+
   if (call->rule != nullptr) {
-    visitor.visit_call(call, argument_results);
+    visitor.visit_call(call, arguments);
     //walk_rule(call->rule);
     visitor.visit_call_post(call);
   } else {

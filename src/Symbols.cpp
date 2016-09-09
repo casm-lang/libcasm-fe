@@ -34,9 +34,9 @@ std::map< std::string, Builtin* > Builtin::str2obj;
 
 
 static bool built_in_intconstarg_to_retbittype
-( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length, uint8_t len2check, uint8_t argpos )
+( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments, uint8_t len2check, uint8_t argpos )
 {
-    if( length != len2check && "invalid argument length for builtin" )
+    if( arguments.size() != len2check && "invalid argument length for builtin" )
     {
         return false;
     }
@@ -66,19 +66,19 @@ static bool built_in_intconstarg_to_retbittype
 }
 
 static void built_in_funcarg_to_retbittype
-( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length, uint8_t argpos )
+( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments, uint8_t argpos )
 {
     ExpressionBase *expr_bitsize = atom->arguments->at( argpos );
     atom->types[argpos]->bitsize = expr_bitsize->type_.bitsize;    
 }
 
 static void built_in_check_bitargs
-( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
 {
     bool flag = false;
     for( int i = 0; i < 2; i++ )
     {
-        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, i );
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, i );
         
         if( atom->types[i]->bitsize <= 0 )
         {
@@ -306,9 +306,9 @@ Builtin built_ins[] =
     {
         ret->unify( arg[1] );
     }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, length, 2, 1 ) )
+        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, 2, 1 ) )
         {
             return;
         }
@@ -512,9 +512,9 @@ Builtin built_ins[] =
     , { TypeType::INTEGER }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, length, 2, 1 ) )
+        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, 2, 1 ) )
         {
             return;
         }
@@ -537,9 +537,9 @@ Builtin built_ins[] =
     , { TypeType::INTEGER }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, length, 2, 1 ) )
+        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, 2, 1 ) )
         {
             return;
         }
@@ -562,14 +562,14 @@ Builtin built_ins[] =
     , { TypeType::INTEGER }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, length, 2, 1 ) )
+        if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, 2, 1 ) )
         {
             return;
         }
 
-        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, 0 );
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, 0 );
         
         if( atom->return_type->bitsize > atom->types[0]->bitsize )
         {
@@ -593,9 +593,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, 0 );
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, 0 );
 
         atom->return_type->bitsize = atom->types[0]->bitsize;
     }
@@ -613,9 +613,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, 0 );
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, 0 );
 
         atom->return_type->bitsize = atom->types[0]->bitsize;
     }
@@ -633,9 +633,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_funcarg_to_retbittype( self, driver, atom, arguments, length, 0 );
+        built_in_funcarg_to_retbittype( self, driver, atom, arguments, 0 );
 
         atom->return_type->bitsize = atom->types[0]->bitsize;
     }
@@ -660,9 +660,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_check_bitargs( self, driver, atom, arguments, length );
+        built_in_check_bitargs( self, driver, atom, arguments );
     }
   }
 
@@ -676,9 +676,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_check_bitargs( self, driver, atom, arguments, length );
+        built_in_check_bitargs( self, driver, atom, arguments );
     }
   }
 
@@ -691,9 +691,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_check_bitargs( self, driver, atom, arguments, length );
+        built_in_check_bitargs( self, driver, atom, arguments );
     }
   }
 
@@ -707,9 +707,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_check_bitargs( self, driver, atom, arguments, length );
+        built_in_check_bitargs( self, driver, atom, arguments );
     }
   }
 
@@ -723,9 +723,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_check_bitargs( self, driver, atom, arguments, length );
+        built_in_check_bitargs( self, driver, atom, arguments );
     }
   }
 
@@ -739,9 +739,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_check_bitargs( self, driver, atom, arguments, length );
+        built_in_check_bitargs( self, driver, atom, arguments );
     }
   }
 
@@ -754,9 +754,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_check_bitargs( self, driver, atom, arguments, length );
+        built_in_check_bitargs( self, driver, atom, arguments );
     }
   }
 
@@ -770,9 +770,9 @@ Builtin built_ins[] =
       }
     }
   , [] ( Type* ret, std::vector< Type* >& arg ) { }
-  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, Type* arguments[], uint16_t length )
+  , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
-        built_in_check_bitargs( self, driver, atom, arguments, length );
+        built_in_check_bitargs( self, driver, atom, arguments );
     }
   }
 

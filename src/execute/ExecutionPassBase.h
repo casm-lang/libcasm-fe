@@ -94,7 +94,7 @@ namespace libcasm_fe
         void merge();
         void applyUpdates();
 
-        virtual const value_t get_function_value(Function *sym, uint32_t num_arguments, const value_t arguments[]);
+        virtual const value_t get_function_value(Function *sym, const std::vector<value_t>& arguments);
 
         bool filter_enabled(const std::string& filter);
 
@@ -117,14 +117,10 @@ namespace libcasm_fe
         const value_t visit_floating_atom(FloatingAtom *atom) { return value_t(atom->val_); }
         const value_t visit_rational_atom(RationalAtom *atom) { return value_t(&atom->val_); }
         const value_t visit_undef_atom(UndefAtom *atom) { UNUSED(atom); return value_t(); }
-        const value_t visit_function_atom(FunctionAtom *atom,
-                                          const value_t arguments[], uint16_t num_arguments);
+        const value_t visit_function_atom(FunctionAtom *atom, std::vector<value_t> &arguments);
 
-        const value_t visit_builtin_atom(BuiltinAtom *atom, const value_t arguments[],
-                                         uint16_t num_arguments);
-        void visit_derived_function_atom_pre(FunctionAtom *atom,
-                                             const value_t arguments[],
-                                             uint16_t num_arguments);
+        const value_t visit_builtin_atom(BuiltinAtom *atom, std::vector<value_t> &arguments);
+        void visit_derived_function_atom_pre(FunctionAtom *atom, std::vector<value_t> &arguments);
         const value_t visit_derived_function_atom(FunctionAtom *atom, const value_t& expr);
         const value_t visit_self_atom(SelfAtom *atom) { UNUSED(atom); return value_t(); }
         const value_t visit_rule_atom(RuleAtom *atom) { return value_t(atom->rule); }
@@ -133,6 +129,13 @@ namespace libcasm_fe
         const value_t visit_number_range_atom(NumberRangeAtom *atom,
                                               const value_t& left,
                                               const value_t& right);
+
+    private:
+        /**
+         * @ throws std::domain_error if any argument is out of range                    *
+         */
+        void validateArguments(const std::vector<Type*>& argumentTypes,
+                               const std::vector<value_t>& argumentValues) const;
 
     protected:
         std::vector<value_t> main_bindings;

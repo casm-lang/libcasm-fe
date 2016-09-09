@@ -44,9 +44,6 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     
     
   public:
-    bool arguments[10];
-    uint32_t num_arguments;
-    
     AstDumpVisitor();
     std::string get_dump();
     
@@ -65,7 +62,7 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     bool visit_update_dumps(UpdateNode *update, bool v1, bool v2);
     bool visit_call_pre(CallNode *call);
     bool visit_call_pre(CallNode *call, bool);
-    bool visit_call(CallNode *call, std::vector<bool>& argument_results);
+    bool visit_call(CallNode *call, std::vector<bool>&);
     void visit_call_post(CallNode *call) {UNUSED(call);}
     bool visit_print( PrintNode *node, bool argument );
 
@@ -84,8 +81,8 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     bool visit_bit_atom(IntegerAtom *atom);
     bool visit_floating_atom(FloatingAtom *atom);
     bool visit_undef_atom(UndefAtom*);
-    bool visit_function_atom(FunctionAtom *atom, bool[], uint16_t);
-    bool visit_builtin_atom(BuiltinAtom *, bool[], uint16_t);
+    bool visit_function_atom(FunctionAtom *atom, std::vector<bool>&);
+    bool visit_builtin_atom(BuiltinAtom *, std::vector<bool>&);
     bool visit_derived_function_atom(FunctionAtom*, bool); // { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); return 0; }
     bool visit_self_atom(SelfAtom *atom);
     bool visit_rule_atom(RuleAtom *atom);

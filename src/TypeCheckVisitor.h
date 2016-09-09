@@ -47,9 +47,6 @@ class TypecheckVisitor : public BaseVisitor<Type*> {
 
     bool forall_head;
 
-    Type *arguments[10];
-    uint32_t num_arguments;
-
     TypecheckVisitor(Driver& driver);
 
     void visit_init(AstNode *init) { UNUSED(init); }
@@ -64,7 +61,7 @@ class TypecheckVisitor : public BaseVisitor<Type*> {
     void visit_update(UpdateNode *update, Type* func, Type* expr);
     void visit_call_pre(CallNode *call);
     void visit_call_pre(CallNode *call, Type* expr);
-    void visit_call(CallNode *call, std::vector<Type*>& argument_results);
+    void visit_call(CallNode *call, std::vector<Type*> &arguments);
     void visit_call_post(CallNode *call);
     void visit_print( PrintNode* node, Type* type );
     void visit_diedie(DiedieNode *node, Type* msg);
@@ -82,10 +79,10 @@ class TypecheckVisitor : public BaseVisitor<Type*> {
     Type* visit_floating_atom(FloatingAtom *atom) {  return &atom->type_; }
     Type* visit_rational_atom(RationalAtom *atom) { return &atom->type_; }
     Type* visit_undef_atom(UndefAtom *atom) { return &atom->type_; }
-    Type* visit_function_atom(FunctionAtom *atom, Type* arguments[], uint16_t num_arguments);
-    Type* visit_builtin_atom(BuiltinAtom *atom, Type *arguments[], uint16_t num_arguments);
+    Type* visit_function_atom(FunctionAtom *atom, std::vector<Type*> &arguments);
+    Type* visit_builtin_atom(BuiltinAtom *atom, std::vector<Type*> &arguments);
 
-    void visit_derived_function_atom_pre(FunctionAtom *atom, Type* arguments[], uint16_t num_arguments);
+    void visit_derived_function_atom_pre(FunctionAtom *atom, std::vector<Type*> &arguments);
     Type* visit_derived_function_atom(FunctionAtom *atom, Type *expr);
     Type* visit_self_atom(SelfAtom *atom) { return &atom->type_;  }
     Type* visit_rule_atom(RuleAtom *atom);

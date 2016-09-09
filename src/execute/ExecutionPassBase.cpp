@@ -260,13 +260,12 @@ void ExecutionPassBase::applyUpdates()
 
 const value_t ExecutionPassBase::get_function_value
 ( Function *sym
-, uint32_t num_arguments
-, const value_t arguments[]
+, const std::vector<value_t>& arguments
 )
 {
     try
     {
-        sym->validateArguments(num_arguments, arguments);
+        sym->validateArguments(arguments.size(), arguments.data());
     }
     catch( const std::domain_error& e )
     {
@@ -278,7 +277,7 @@ const value_t ExecutionPassBase::get_function_value
     }
     
     const auto &function_map = function_states[sym->id];
-    const value_t &v = function_map.at(ArgumentsKey(arguments, num_arguments, false));
+    const value_t &v = function_map.at(ArgumentsKey(arguments.data(), arguments.size(), false));
     const auto update = updateSetManager.lookup( reinterpret_cast< uint64_t >( &v ) );
     
     if( update )
@@ -653,13 +652,13 @@ void ExecutionPassBase::visit_call_pre(CallNode *call, const value_t& expr)
     }
 }
 
-void ExecutionPassBase::visit_call( CallNode *call, std::vector< value_t > &argument_results )
+void ExecutionPassBase::visit_call( CallNode *call, std::vector<value_t> &arguments )
 {
     if( call->ruleref )
     {
         // only relevant for indirect calls
         const size_t args_defined = call->rule->arguments.size();
-        const size_t args_provided = argument_results.size();
+        const size_t args_provided = arguments.size();
 
         if( args_defined != args_provided )
         {
@@ -679,7 +678,7 @@ void ExecutionPassBase::visit_call( CallNode *call, std::vector< value_t > &argu
         {
             for( size_t i = 0; i < args_defined; i++ )
             {
-                const auto arg = argument_results.at( i );
+                const auto arg = arguments.at( i );
                 
                 Type argType( arg.type );
                 
@@ -705,50 +704,20 @@ void ExecutionPassBase::visit_call( CallNode *call, std::vector< value_t > &argu
         }
     }
     
-    // arguments validation
-    for( size_t i = 0; i < argument_results.size(); i++ )
-    {
-        const auto arg = argument_results.at( i );
-
-        Type ruleArgType = call->rule->arguments.at( i );
-
-        switch( ruleArgType.t )
-        {
-            case TypeType::INTEGER:
-            {
-                const INTEGER_T integer = arg.value.integer;
-                
-                if( ruleArgType.has_range_restriction()
-                and (  integer < ruleArgType.subrange_start
-                    or integer > ruleArgType.subrange_end
-                    )
-                )
-                {
-                    throw RuntimeException
-                    ( call->arguments->at( i )->location
-                    , std::to_string( integer )
-                      + " does violate the subrange "
-                      + std::to_string( ruleArgType.subrange_start )
-                      + ".."
-                      + std::to_string( ruleArgType.subrange_end )
-                      + " at argument #"
-                      + std::to_string( i + 1 )
-                      + " of rule '"
-                      + ( call->ruleref ? call->rule->name : call->rule_name )
-                      + "'"
-                    , libcasm_fe::Codes::RuleArgumentsInvalidRangeAtCall
-                    );
-                }
-                break;
-            }
-            default:
-            {
-                break;
-            }
-        }
+    try {
+        validateArguments(call->rule->arguments, arguments);
+    } catch (const std::domain_error& e) {
+        throw RuntimeException
+        ( call->location // TODO create a new exception type to pass on the argument index to get the proper arg location
+        , std::string(e.what())
+        + " of rule '"
+        + ( call->ruleref ? call->rule->name : call->rule_name )
+        + "'"
+        , libcasm_fe::Codes::RuleArgumentsInvalidRangeAtCall
+        );
     }
     
-    rule_bindings.push_back( &argument_results );
+    rule_bindings.push_back( &arguments );
 }
 
 void ExecutionPassBase::visit_call_post(CallNode *call)
@@ -781,16 +750,14 @@ void ExecutionPassBase::visit_let_post(LetNode*)
     rule_bindings.back()->pop_back();
 }
 
-const value_t ExecutionPassBase::visit_function_atom(FunctionAtom *atom,
-                                                     const value_t arguments[],
-                                                     uint16_t num_arguments)
+const value_t ExecutionPassBase::visit_function_atom(FunctionAtom *atom, std::vector<value_t> &arguments)
 {
     switch (atom->symbol_type) {
     case FunctionAtom::SymbolType::PARAMETER:
         return value_t(rule_bindings.back()->at(atom->offset));
     case FunctionAtom::SymbolType::FUNCTION:
         try {
-            return get_function_value(atom->symbol, num_arguments, arguments);
+            return get_function_value(atom->symbol, arguments);
         } catch (const RuntimeException& e) {
             throw RuntimeException(atom->location, e.what(), e.getErrorCode());
         }
@@ -805,9 +772,7 @@ const value_t ExecutionPassBase::visit_function_atom(FunctionAtom *atom,
     }
 }
 
-const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
-                                                    const value_t arguments[],
-                                                    uint16_t num_arguments)
+const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom, std::vector<value_t> &arguments)
 {
     // TODO Int2Enum is a special builtin, it needs the complete type information
     // for the enum, values only store TypeType and passing the type to all
@@ -818,7 +783,7 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
         for (auto pair : enum_->mapping) {
             // TODO check why the enum mapping contains an extra entry with the name
             // of the enum
-            if (pair.first != enum_->name && pair.second->id == arguments[0].value.integer) {
+            if (pair.first != enum_->name && pair.second->id == arguments.at(0).value.integer) {
                 return value_t(pair.second);
             }
         }
@@ -827,68 +792,57 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom,
 
     switch (atom->id) {
     case Builtin::Id::POW:
-        return builtins::pow(arguments[0], arguments[1]);
+        return builtins::pow(arguments.at(0), arguments.at(1));
     case Builtin::Id::NTH:
-        return builtins::nth(arguments[0], arguments[1]);
+        return builtins::nth(arguments.at(0), arguments.at(1));
     case Builtin::Id::APP:
-        return builtins::app(temp_lists, arguments[0], arguments[1]);
+        return builtins::app(temp_lists, arguments.at(0), arguments.at(1));
     case Builtin::Id::CONS:
-        return builtins::cons(temp_lists, arguments[0], arguments[1]);
+        return builtins::cons(temp_lists, arguments.at(0), arguments.at(1));
     case Builtin::Id::DEC:
-        return builtins::dec(arguments[0]);
+        return builtins::dec(arguments.at(0));
     case Builtin::Id::HEX:
-        return builtins::hex(arguments[0]);
+        return builtins::hex(arguments.at(0));
     case Builtin::Id::TAIL:
-        return builtins::tail(temp_lists, arguments[0]);
+        return builtins::tail(temp_lists, arguments.at(0));
     case Builtin::Id::LEN:
-        return builtins::len(arguments[0]);
+        return builtins::len(arguments.at(0));
     case Builtin::Id::PEEK:
-        return builtins::peek(arguments[0]);
+        return builtins::peek(arguments.at(0));
     case Builtin::Id::AS_BOOLEAN:
-        return builtins::asboolean(arguments[0]);
+        return builtins::asboolean(arguments.at(0));
     case Builtin::Id::AS_INTEGER:
-        return builtins::asinteger(arguments[0]);
+        return builtins::asinteger(arguments.at(0));
     case Builtin::Id::AS_FLOATING:
-        return builtins::asfloating(arguments[0]);
+        return builtins::asfloating(arguments.at(0));
     case Builtin::Id::AS_RATIONAL:
-        return builtins::asrational(arguments[0]);
+        return builtins::asrational(arguments.at(0));
     case Builtin::Id::AS_BIT:
-        return builtins::asbit(arguments[0], arguments[1]);
+        return builtins::asbit(arguments.at(0), arguments.at(1));
     case Builtin::Id::IS_SYMBOLIC:
-        return builtins::issymbolic(arguments[0]);
+        return builtins::issymbolic(arguments.at(0));
     default:
         global_driver->error(atom->location, "unknown builtin `" + atom->to_str() + "`");
         return value_t();
     }
 }
 
-void ExecutionPassBase::visit_derived_function_atom_pre(FunctionAtom *function,
-                                                        const value_t arguments[],
-                                                        uint16_t num_arguments)
+void ExecutionPassBase::visit_derived_function_atom_pre(FunctionAtom *function, std::vector<value_t> &arguments)
 {
-    try
-    {
-        function->symbol->validateArguments( num_arguments, arguments );
-    }
-    catch( const std::domain_error& e )
-    {
-        std::string msg = std::string( e.what() ) + " of derived '" + function->symbol->name + "'";
-        
+    try {
+        validateArguments(function->symbol->arguments_, arguments);
+    } catch (const std::domain_error& e) {
         throw RuntimeException
-        ( function->location
-        , msg.c_str()
+        ( function->location // TODO create a new exception type to pass on the argument index to get the proper arg location
+        , std::string(e.what())
+        + " of derived '"
+        + function->symbol->name
+        + "'"
         , libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup
         );
     }
-    
-    // TODO change, cleanup!
-    std::vector<value_t> *tmp = new std::vector<value_t>();
-    for( uint32_t i = 0; i < num_arguments; i++ )
-    {
-        tmp->push_back( arguments[ i ] );
-    }
-    
-    rule_bindings.push_back( tmp );
+
+    rule_bindings.push_back( &arguments );
 }
 
 const value_t ExecutionPassBase::visit_derived_function_atom(FunctionAtom*,
@@ -908,6 +862,47 @@ const value_t ExecutionPassBase::visit_number_range_atom(NumberRangeAtom *atom,
         return value_t(new NumberRange(left.value.integer, right.value.integer));
     }
 }
+
+void libcasm_fe::ExecutionPassBase::validateArguments(const std::vector<Type*>& argumentTypes,
+                                                      const std::vector<value_t>& argumentValues) const
+{
+    for( size_t i = 0; i < argumentValues.size(); i++ )
+    {
+        const auto argumentValue = argumentValues.at( i );
+        const Type argumentType = argumentTypes.at( i );
+
+        switch( argumentType.t )
+        {
+            case TypeType::INTEGER:
+            {
+                const INTEGER_T integer = argumentValue.value.integer;
+
+                if( argumentType.has_range_restriction()
+                and (  integer < argumentType.subrange_start
+                    or integer > argumentType.subrange_end
+                    )
+                )
+                {
+                    throw std::domain_error
+                    ( std::to_string( integer )
+                      + " does violate the subrange "
+                      + std::to_string( argumentType.subrange_start )
+                      + ".."
+                      + std::to_string( argumentType.subrange_end )
+                      + " at argument #"
+                      + std::to_string( i + 1 )
+                    );
+                }
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+}
+
 
 //  
 //  Local variables:
