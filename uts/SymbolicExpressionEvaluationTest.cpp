@@ -69,6 +69,12 @@ static value_t make_value(TypeType type)
             static symbol_t* sym = new symbol_t(1);
             value.value.sym = sym;
             break;
+        case TypeType::FLOATING:
+            value.value.float_ = 1.0f;
+            break;
+        case TypeType::INTEGER:
+            value.value.integer = 1;
+            break;
         default:
             break;
     }

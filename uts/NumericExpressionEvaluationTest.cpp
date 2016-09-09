@@ -65,6 +65,12 @@ static value_t make_value(TypeType type)
             static rational_t* rat = new rational_t(1, 1);
             value.value.rat = rat;
             break;
+        case TypeType::FLOATING:
+            value.value.float_ = 1.0f;
+            break;
+        case TypeType::INTEGER:
+            value.value.integer = 1;
+            break;
         default:
             break;
     }
