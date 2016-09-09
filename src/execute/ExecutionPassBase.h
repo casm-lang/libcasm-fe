@@ -148,7 +148,6 @@ namespace libcasm_fe
         std::set<std::string> initialized;
 
     public:
-        std::vector<value_t> value_list;
         std::vector<std::vector<value_t> *> rule_bindings;
 
         std::vector<std::unordered_map<ArgumentsKey, value_t>> function_states;
