@@ -867,27 +867,27 @@ void libcasm_fe::ExecutionPassBase::validateArguments(const std::vector<Type*>& 
 {
     for( size_t i = 0; i < argumentValues.size(); i++ )
     {
-        const auto argumentValue = argumentValues.at( i );
-        const Type argumentType = argumentTypes.at( i );
+        const auto& argumentValue = argumentValues.at( i );
+        const Type* argumentType = argumentTypes.at( i );
 
-        switch( argumentType.t )
+        switch( argumentType->t )
         {
             case TypeType::INTEGER:
             {
                 const INTEGER_T integer = argumentValue.value.integer;
 
-                if( argumentType.has_range_restriction()
-                and (  integer < argumentType.subrange_start
-                    or integer > argumentType.subrange_end
+                if( argumentType->has_range_restriction()
+                and (  integer < argumentType->subrange_start
+                    or integer > argumentType->subrange_end
                     )
                 )
                 {
                     throw std::domain_error
                     ( std::to_string( integer )
                       + " does violate the subrange "
-                      + std::to_string( argumentType.subrange_start )
+                      + std::to_string( argumentType->subrange_start )
                       + ".."
-                      + std::to_string( argumentType.subrange_end )
+                      + std::to_string( argumentType->subrange_end )
                       + " at argument #"
                       + std::to_string( i + 1 )
                     );
