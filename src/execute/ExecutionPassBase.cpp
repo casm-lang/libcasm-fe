@@ -264,7 +264,7 @@ const value_t ExecutionPassBase::get_function_value
 {
     try
     {
-        sym->validateArguments(arguments.size(), arguments.data());
+        validateArguments(sym->arguments_, arguments);
     }
     catch( const std::domain_error& e )
     {

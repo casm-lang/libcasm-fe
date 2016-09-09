@@ -230,8 +230,6 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
         }
     }
 
-    std::vector<value_t> initializer_args;
-
     Function *func = global_driver->function_table.get_function( name );
 
     if( not func )
@@ -248,8 +246,8 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
     {
         for( std::pair<ExpressionBase*, ExpressionBase*> init : *func->intitializers_ )
         {
-            uint32_t num_arguments = 0;
-            value_t *args = new value_t[10];
+            std::vector<value_t> arguments{};
+            arguments.reserve(func->arguments_.size());
             
             if( init.first != nullptr )
             {
@@ -259,20 +257,18 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
                     List *list = argument_v.value.list;
                     for( auto iter = list->begin(); iter != list->end(); iter++ )
                     {
-                        args[ num_arguments ] = *iter;
-                        num_arguments += 1;
+                        arguments.emplace_back(*iter);
                     }
                 }
                 else
                 {
-                    args[ num_arguments ] = argument_v;
-                    num_arguments += 1;
+                    arguments.emplace_back(argument_v);
                 }
             }
             
             try
             {
-                func->validateArguments( num_arguments, args );
+                validateArguments( func->arguments_, arguments );
             }
             catch( const std::domain_error& e )
             {
@@ -283,11 +279,13 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
                 );
             }
             
-            if( function_map.count( ArgumentsKey( args, num_arguments, false ) ) != 0 )
+            if( function_map.count( ArgumentsKey( arguments.data(), arguments.size(), false ) ) != 0 )
             {
                 throw RuntimeException
                 ( init.first->location
-                , "function '" + func->name + arguments_to_string(num_arguments, args) + "' already initialized"
+                , "function '" + func->name
+                + arguments_to_string(arguments.size(), arguments.data())
+                + "' already initialized"
                 , libcasm_fe::Codes::FunctionValueAlreadyInitializedAtInitially
                 );
             }
@@ -306,9 +304,7 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
                 );
             }
             
-            function_map.emplace( std::make_pair( ArgumentsKey( args, num_arguments, true ), v ) );
-
-            initializer_args.push_back( args );
+            function_map.emplace( std::make_pair( ArgumentsKey( arguments.data(), arguments.size(), true ), v ) );
         }
     }
 

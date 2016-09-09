@@ -131,7 +131,7 @@ namespace libcasm_fe
                                               const value_t& left,
                                               const value_t& right);
 
-    private:
+    protected:
         /**
          * @ throws std::domain_error if any argument is out of range
          */

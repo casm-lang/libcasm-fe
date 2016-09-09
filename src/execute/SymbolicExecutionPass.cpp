@@ -692,8 +692,6 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
         }
     }
 
-    std::vector<value_t> initializer_args;
-
     Function *func = global_driver->function_table.get_function(name);
     if (!func) {
         return true;
@@ -706,41 +704,40 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
 
     if (func->intitializers_ != nullptr) {
         for (std::pair<ExpressionBase*, ExpressionBase*> init : *func->intitializers_) {
-            uint32_t num_arguments = 0;
-            value_t *args = new value_t[10];
+            std::vector<value_t> arguments{};
+            arguments.reserve(func->arguments_.size());
+
             if (init.first != nullptr) {
                 const value_t argument_v = walker->walk_expression_base(init.first);
                 if (func->arguments_.size() > 1) {
                     List *list = argument_v.value.list;
                     for (auto iter = list->begin(); iter != list->end(); iter++) {
-                        args[num_arguments] = *iter;
-                        num_arguments += 1;
+                        arguments.emplace_back(*iter);
                     }
                 } else {
-                    args[num_arguments] = argument_v;
-                    num_arguments += 1;
+                    arguments.emplace_back(argument_v);
                 }
             }
 
             try {
-                func->validateArguments(num_arguments, args);
+                validateArguments(func->arguments_, arguments);
             } catch (const std::domain_error& e) {
                 const auto location = init.first ? (init.first->location + init.second->location)
                                                  : init.second->location;
                 throw RuntimeException(location, e.what());
             }
 
-            if (function_map.count(ArgumentsKey(args, num_arguments, false)) != 0) {
+            if (function_map.count(ArgumentsKey(arguments.data(), arguments.size(), false)) != 0) {
                 yy::location loc = init.first ? init.first->location+init.second->location
                                               : init.second->location;
                 throw RuntimeException(loc, "function `" + func->name +
-                                       arguments_to_string(num_arguments, args) +
+                                       arguments_to_string(arguments.size(), arguments.data()) +
                                        "` already initialized");
             }
 
             const value_t v = walker->walk_expression_base(init.second);
             if (func->is_symbolic) {
-                symbolic::dump_create(trace_creates, func, num_arguments, args, v);
+                symbolic::dump_create(trace_creates, func, arguments.size(), arguments.data(), v);
             } else {
                 try {
                     func->validateValue(v);
@@ -750,9 +747,7 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
                     throw RuntimeException(location, e.what());
                 }
             }
-            function_map.emplace(std::make_pair(ArgumentsKey(args, num_arguments, true), v));
-
-            initializer_args.push_back(args);
+            function_map.emplace(std::make_pair(ArgumentsKey(arguments.data(), arguments.size(), true), v));
         }
     }
 
