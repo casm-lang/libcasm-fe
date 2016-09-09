@@ -1,7 +1,0 @@
-function x : -> Integer initially { }
-
-init main
-
-rule main = { 
-    assert x = 1 //~ Assertion failed
-}

@@ -1,2 +1,0 @@
-
-- all source code inside (recursive) this folder is licensed from now on as GPLv3 
