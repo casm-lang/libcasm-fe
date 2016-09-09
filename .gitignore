@@ -1,4 +1,4 @@
 /obj
 /libcasm-fe.a
 /libcasm-fe-test.a
-/test
+/test*
