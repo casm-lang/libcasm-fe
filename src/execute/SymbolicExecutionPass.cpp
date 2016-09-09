@@ -494,7 +494,7 @@ void SymbolicExecutionPass::visit_print( PrintNode *node, const value_t& argumen
 
 void SymbolicExecutionPass::visit_push(PushNode *node, const value_t& expr, const value_t& atom)
 {
-    num_arguments = 0; // TODO at the moment, functions with arguments are not supported
+    std::vector<value_t> arguments{}; // TODO at the moment, functions with arguments are not supported
 
     const value_t to_res(new symbol_t(symbolic::next_symbol_id()));
     if (atom.value.sym->list) {
@@ -505,7 +505,7 @@ void SymbolicExecutionPass::visit_push(PushNode *node, const value_t& expr, cons
                                                 value_t(TypeType::LIST, new BottomList())).value.list;
     }
 
-    addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location);
+    addUpdate(node->to->symbol, arguments, to_res, node->location);
 
     value_t args[] = {atom, expr};
     symbolic::dump_builtin(trace, "push", args, 2, to_res);
@@ -513,14 +513,14 @@ void SymbolicExecutionPass::visit_push(PushNode *node, const value_t& expr, cons
 
 void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
 {
-    num_arguments = 0; // TODO at the moment, functions with arguments are not supported
+    std::vector<value_t> arguments{}; // TODO at the moment, functions with arguments are not supported
 
     const value_t to_res = (val.value.sym->list) ? builtins::peek(value_t(TypeType::LIST, val.value.sym->list))
                                                  : value_t(new symbol_t(symbolic::next_symbol_id()));
 
     Update *up = nullptr;
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
-        up = addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location);
+        up = addUpdate(node->to->symbol, arguments, to_res, node->location);
     } else {
         rule_bindings.back()->push_back(to_res);
     }
@@ -534,7 +534,7 @@ void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
     value_t args[] = {val, to_res};
     symbolic::dump_builtin(trace, "pop", args, 2, from_res);
 
-    addUpdate(node->to->symbol, from_res, num_arguments, arguments, node->location);
+    addUpdate(node->to->symbol, arguments, from_res, node->location);
 }
 
 const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
@@ -1140,18 +1140,6 @@ void SymbolicExecutionWalker::walk_iterate(UnaryNode *node)
     visitor.merge();
 }
 
-static void walk_function_arguments(SymbolicExecutionWalker* walker, std::vector<ExpressionBase*>* arguments)
-{
-    if (arguments) {
-        for (uint16_t i = 0; i < arguments->size(); i++) {
-            walker->visitor.arguments[i] = walker->walk_expression_base(arguments->at(i));
-        }
-        walker->visitor.num_arguments = arguments->size();
-    } else {
-        walker->visitor.num_arguments = 0;
-    }
-}
-
 template <>
 void SymbolicExecutionWalker::walk_update(UpdateNode *node)
 {
@@ -1159,16 +1147,16 @@ void SymbolicExecutionWalker::walk_update(UpdateNode *node)
     if (node->func->symbol->is_symbolic) {
         walk_expression_base(node->func);
     }
-    walk_function_arguments(this, node->func->arguments);
-    visitor.visit_update(node, expr);
+    std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
+    visitor.visit_update(node, arguments, expr);
 }
 
 template <>
 void SymbolicExecutionWalker::walk_update_dumps(UpdateNode *node)
 {
     const value_t expr = walk_expression_base(node->expr_);
-    walk_function_arguments(this, node->func->arguments);
-    visitor.visit_update_dumps(node, expr);
+    std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
+    visitor.visit_update_dumps(node, arguments, expr);
 }
 
 //

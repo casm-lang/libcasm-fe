@@ -87,8 +87,8 @@ namespace libcasm_fe
         static char id;
 
         bool hasEmptyUpdateSet() const;
-        Update* addUpdate(Function *sym, const value_t& val, uint32_t num_arguments,
-                          value_t arguments[], const yy::location& location);
+        Update* addUpdate(Function *sym, const std::vector<value_t> &arguments,
+                          const value_t& val, const yy::location& location);
 
         void fork(const UpdateSet::Type updateSetType);
         void merge();
@@ -99,9 +99,10 @@ namespace libcasm_fe
         bool filter_enabled(const std::string& filter);
 
         void visit_assert(UnaryNode* assert, const value_t& val);
-        void visit_update(UpdateNode *update, const value_t& expr_v);
 
-        void visit_update_dumps(UpdateNode *update, const value_t& expr_v);
+        void visit_update(UpdateNode *update, const std::vector<value_t>& arguments, const value_t& expr_v);
+        void visit_update_dumps(UpdateNode *update, const std::vector<value_t>& arguments, const value_t& expr_v);
+
         void visit_call_pre(CallNode *call);
         void visit_call_pre(CallNode *call, const value_t& expr);
         void visit_call(CallNode *call, std::vector<value_t> &arguments);
@@ -132,7 +133,7 @@ namespace libcasm_fe
 
     private:
         /**
-         * @ throws std::domain_error if any argument is out of range                    *
+         * @ throws std::domain_error if any argument is out of range
          */
         void validateArguments(const std::vector<Type*>& argumentTypes,
                                const std::vector<value_t>& argumentValues) const;
@@ -149,9 +150,6 @@ namespace libcasm_fe
     public:
         std::vector<value_t> value_list;
         std::vector<std::vector<value_t> *> rule_bindings;
-
-        value_t arguments[10];
-        uint32_t num_arguments;
 
         std::vector<std::unordered_map<ArgumentsKey, value_t>> function_states;
         std::vector<const Function*> function_symbols;

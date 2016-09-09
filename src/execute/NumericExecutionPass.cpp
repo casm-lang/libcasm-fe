@@ -340,26 +340,26 @@ void NumericExecutionPass::visit_print( PrintNode *node, const value_t& argument
 
 void NumericExecutionPass::visit_push(PushNode *node, const value_t& expr, const value_t& atom)
 {
-    num_arguments = 0; // TODO at the moment, functions with arguments are not supported
+    std::vector<value_t> arguments{}; // TODO at the moment, functions with arguments are not supported
 
     const value_t to_res = builtins::cons(temp_lists, expr, atom);
-    addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location);
+    addUpdate(node->to->symbol, arguments, to_res, node->location);
 }
 
 void NumericExecutionPass::visit_pop(PopNode *node, const value_t& val)
 {
-    num_arguments = 0; // TODO at the moment, functions with arguments are not supported
+    std::vector<value_t> arguments{}; // TODO at the moment, functions with arguments are not supported
 
     const value_t to_res = builtins::peek(val);
 
     if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
-        addUpdate(node->to->symbol, to_res, num_arguments, arguments, node->location);
+        addUpdate(node->to->symbol, arguments, to_res, node->location);
     } else {
         rule_bindings.back()->push_back(to_res);
     }
 
     const value_t from_res = builtins::tail(temp_lists, val);
-    addUpdate(node->from->symbol, from_res, num_arguments, arguments, node->location);
+    addUpdate(node->from->symbol, arguments, from_res, node->location);
 }
 
 const value_t NumericExecutionPass::visit_expression(Expression *expr,
@@ -599,32 +599,20 @@ void NumericExecutionWalker::walk_iterate(UnaryNode *node)
     visitor.merge();
 }
 
-static void walk_function_arguments(NumericExecutionWalker* walker, std::vector<ExpressionBase*>* arguments)
-{
-    if (arguments) {
-        for (uint16_t i = 0; i < arguments->size(); i++) {
-            walker->visitor.arguments[i] = walker->walk_expression_base(arguments->at(i));
-        }
-        walker->visitor.num_arguments = arguments->size();
-    } else {
-        walker->visitor.num_arguments = 0;
-    }
-}
-
 template <>
 void NumericExecutionWalker::walk_update(UpdateNode *node)
 {
     const value_t expr = walk_expression_base(node->expr_);
-    walk_function_arguments(this, node->func->arguments);
-    visitor.visit_update(node, expr);
+    std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
+    visitor.visit_update(node, arguments, expr);
 }
 
 template <>
 void NumericExecutionWalker::walk_update_dumps(UpdateNode *node)
 {
     const value_t expr = walk_expression_base(node->expr_);
-    walk_function_arguments(this, node->func->arguments);
-    visitor.visit_update_dumps(node, expr);
+    std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
+    visitor.visit_update_dumps(node, arguments, expr);
 }
 
 //  

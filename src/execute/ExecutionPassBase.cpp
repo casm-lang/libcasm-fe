@@ -99,13 +99,12 @@ bool ExecutionPassBase::hasEmptyUpdateSet() const
     return updateSetManager.currentUpdateSet()->empty();
 }
 
-Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
-                                     uint32_t num_arguments, value_t arguments[],
-                                     const yy::location& location)
+Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &arguments,
+                                     const value_t& val, const yy::location& location)
 {
     try
     {
-        sym->validateArguments(num_arguments, arguments);
+        validateArguments(sym->arguments_, arguments);
     }
     catch( const std::domain_error& e )
     {
@@ -131,9 +130,9 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
     
     
     auto& function_map = function_states[sym->id];
-    auto it = function_map.find(ArgumentsKey(arguments, num_arguments, false)); // TODO EP: use emplace only
+    auto it = function_map.find(ArgumentsKey(arguments.data(), arguments.size(), false)); // TODO EP: use emplace only
     if (it == function_map.cend()) {
-        const auto pair = function_map.emplace(ArgumentsKey(arguments, num_arguments, true), value_t());
+        const auto pair = function_map.emplace(ArgumentsKey(arguments.data(), arguments.size(), true), value_t());
         it = pair.first;
     }
 
@@ -141,7 +140,7 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const value_t& val,
     up->value = val;
     up->func = sym->id;
     up->args = const_cast<value_t*>(it->first.p);
-    up->num_args = num_arguments;
+    up->num_args = arguments.size();
     up->line = location.begin.line;
 
     try {
@@ -621,21 +620,21 @@ void ExecutionPassBase::visit_assert( UnaryNode* assert, const value_t& val )
 }
 
 
-void ExecutionPassBase::visit_update_dumps(UpdateNode *update, const value_t& expr_v)
+void ExecutionPassBase::visit_update_dumps(UpdateNode *update, const std::vector<value_t>& arguments, const value_t& expr_v)
 {
     const std::string& filter = global_driver->function_trace_map[update->func->symbol->id];
     if (filter_enabled(filter)) {
         std::cout << filter << ": "
-                  << update->func->symbol->name << arguments_to_string(num_arguments, arguments)
+                  << update->func->symbol->name << arguments_to_string(arguments.size(), arguments.data())
                   << " = " << expr_v.to_str() << std::endl;
     }
 
-    visit_update(update, expr_v);
+    visit_update(update, arguments, expr_v);
 }
 
-void ExecutionPassBase::visit_update(UpdateNode *update, const value_t& expr_v)
+void ExecutionPassBase::visit_update(UpdateNode *update, const std::vector<value_t>& arguments, const value_t& expr_v)
 {
-    addUpdate(update->func->symbol, expr_v, num_arguments, arguments, update->location);
+    addUpdate(update->func->symbol, arguments, expr_v, update->location);
 }
 
 void ExecutionPassBase::visit_call_pre(CallNode *call)
