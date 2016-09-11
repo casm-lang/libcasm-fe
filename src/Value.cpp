@@ -885,16 +885,6 @@ namespace std {
     return h;
   }
 
-    bool equal_to<std::vector<value_t>>::operator()(const std::vector<value_t>& lhs,
-                                                    const std::vector<value_t>& rhs) const
-    {
-        if (lhs.size() != rhs.size()) {
-            return false;
-        } else {
-            return std::equal(lhs.cbegin(), lhs.cend(), rhs.cbegin());
-        }
-    }
-
   std::hash<value_t> hash<HeadList>::hasher;
   size_t hash<HeadList>::operator()(const HeadList &key) const {
     return hasher(key.current_head);
