@@ -27,7 +27,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <sstream>
 #include <cmath>
 #include <cassert>
 #include <utility>
@@ -52,20 +51,6 @@ static libpass::PassRegistration< NumericExecutionPass > PASS
 , 0
 );
 
-static std::string arguments_to_string(uint32_t num_arguments, const value_t arguments[])
-{
-    std::stringstream ss;
-    if (num_arguments == 0) {
-        return "";
-    }
-    for (uint32_t i = 0; i < num_arguments; i++) {
-        ss << arguments[i].to_str();
-        ss << ", ";
-    }
-    // Strip trailing comma
-    return "(" + ss.str().substr(0, ss.str().size() - 2) + ")";
-}
-
 bool NumericExecutionPass::run(libpass::PassResult& pr)
 {
     walker = new NumericExecutionWalker(*this);
@@ -76,7 +61,7 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
     RuleNode* node = global_driver->rules_map_[ root->getInitRule()->identifier ];
 
     rule_bindings.push_back(&main_bindings);
-    function_states = std::vector<std::unordered_map<ArgumentsKey, value_t>>(global_driver->function_table.size());
+    function_states = std::vector<std::unordered_map<std::vector<value_t>, value_t>>(global_driver->function_table.size());
     function_symbols = std::vector<const Function*>(global_driver->function_table.size());
     Function *program_sym = global_driver->function_table.get_function("program");
     // TODO location is wrong here
@@ -131,7 +116,7 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
 
         Function *program_sym = global_driver->function_table.get_function( "program" );
         const auto& function_map = function_states[program_sym->id];
-        const value_t& program_val = function_map.at(ArgumentsKey(nullptr, 0, false));
+        const value_t& program_val = function_map.at({value_t()});
         
         while( program_val.type != TypeType::UNDEF )
         {
@@ -187,8 +172,7 @@ void NumericExecutionPass::dumpUpdates() const
           std::cout << ", ";
         }
 
-        std::cout << function->name
-                  << arguments_to_string(update->num_args, update->args)
+        std::cout << function->name << to_string(*update->args)
                   << " = " << update->value.to_str();
 
         firstDump = false;
@@ -237,7 +221,7 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
         return true;
     }
     
-    function_states[  func->id ] = std::unordered_map<ArgumentsKey, value_t>( 0 );
+    function_states[  func->id ] = std::unordered_map<std::vector<value_t>, value_t>( 0 );
     function_symbols[ func->id ] = func;
     
     auto& function_map = function_states[ func->id ];
@@ -279,13 +263,11 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
                 );
             }
             
-            if( function_map.count( ArgumentsKey( arguments.data(), arguments.size(), false ) ) != 0 )
+            if( function_map.count( arguments ) != 0 )
             {
                 throw RuntimeException
                 ( init.first->location
-                , "function '" + func->name
-                + arguments_to_string(arguments.size(), arguments.data())
-                + "' already initialized"
+                , "function '" + func->name + to_string(arguments) + "' already initialized"
                 , libcasm_fe::Codes::FunctionValueAlreadyInitializedAtInitially
                 );
             }
@@ -304,7 +286,7 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
                 );
             }
             
-            function_map.emplace( std::make_pair( ArgumentsKey( arguments.data(), arguments.size(), true ), v ) );
+            function_map.emplace( std::make_pair( arguments, v ) );
         }
     }
 

@@ -314,6 +314,11 @@ namespace std {
     size_t operator()(const std::vector<value_t> &key) const;
   };
 
+    template <> struct equal_to<std::vector<value_t>> {
+        bool operator()(const std::vector<value_t>& lhs,
+                        const std::vector<value_t>& rhs) const;
+    };
+
   template <> struct hash<HeadList> {
     static std::hash<value_t> hasher;
 
@@ -326,5 +331,7 @@ namespace std {
     size_t operator()(const BottomList &key) const;
   };
 }
+
+std::string to_string(const std::vector<value_t>& values);
 
 #endif

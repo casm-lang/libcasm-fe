@@ -27,7 +27,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <sstream>
 #include <cmath>
 #include <cassert>
 #include <utility>
@@ -53,20 +52,6 @@ static libpass::PassRegistration< SymbolicExecutionPass > PASS
 , 0
 );
 
-static std::string arguments_to_string(uint32_t num_arguments, const value_t arguments[])
-{
-    std::stringstream ss;
-    if (num_arguments == 0) {
-        return "";
-    }
-    for (uint32_t i = 0; i < num_arguments; i++) {
-        ss << arguments[i].to_str();
-        ss << ", ";
-    }
-    // Strip trailing comma
-    return "(" + ss.str().substr(0, ss.str().size() - 2) + ")";
-}
-
 bool SymbolicExecutionPass::run(libpass::PassResult& pr)
 {
     walker = new SymbolicExecutionWalker(*this);
@@ -75,7 +60,7 @@ bool SymbolicExecutionPass::run(libpass::PassResult& pr)
     RuleNode* node = global_driver->rules_map_[ root->getInitRule()->identifier ];
 
     rule_bindings.push_back(&main_bindings);
-    function_states = std::vector<std::unordered_map<ArgumentsKey, value_t>>(global_driver->function_table.size());
+    function_states = std::vector<std::unordered_map<std::vector<value_t>, value_t>>(global_driver->function_table.size());
     function_symbols = std::vector<const Function*>(global_driver->function_table.size());
     Function *program_sym = global_driver->function_table.get_function("program");
     // TODO location is wrong here
@@ -220,16 +205,16 @@ namespace symbolic
     }
 
     static void fof(std::stringstream& ss, const std::string& name, const Function *func,
-                    uint32_t num_arguments, const value_t arguments[], const value_t& val,
+                    const std::vector<value_t>& arguments, const value_t& val,
                     uint32_t time, const std::string &type)
     {
         ss << "fof(" << name << ",hypothesis,"
            << (func->is_static ? "cs" : "st") << func->name << "(" << time << ",";
-        if (num_arguments > 0) {
-            ss << arguments_to_string(num_arguments, arguments) << ",";
+        if (not arguments.empty()) {
+            ss << to_string(arguments) << ",";
         }
         ss << val.to_str(true) << "))." << type << ": " << func->name
-           << arguments_to_string(num_arguments, arguments) << std::endl;
+           << to_string(arguments) << std::endl;
     }
 
     static void dump_type(std::stringstream& ss, const value_t& v)
@@ -241,37 +226,34 @@ namespace symbolic
     }
 
     static void dump_catchup(std::vector<std::string>& trace, const Function *func,
-                             uint32_t num_arguments, const value_t arguments[],
-                             const value_t& v)
+                             const std::vector<value_t>& arguments, const value_t& v)
     {
         for (uint32_t i = 1; i < symbolic::get_timestamp() - 1; i++) {
             std::stringstream ss;
-            fof(ss, "id%u", func, num_arguments, arguments, v, i, "%%CATCHUP");
+            fof(ss, "id%u", func, arguments, v, i, "%%CATCHUP");
             trace.push_back(ss.str());
         }
     }
 
     static void dump_create(std::vector<std::string>& trace, const Function *func,
-                            uint32_t num_arguments, const value_t arguments[],
-                            const value_t& v)
+                            const std::vector<value_t>& arguments, const value_t& v)
     {
         std::stringstream ss;
         dump_type(ss, v);
-        fof(ss, "id%u", func, num_arguments, arguments, v, symbolic::get_timestamp() - 1,
+        fof(ss, "id%u", func, arguments, v, symbolic::get_timestamp() - 1,
             "%%CREATE");
         trace.push_back(ss.str());
 
         if (symbolic::get_timestamp() > 2) {
-            dump_catchup(trace, func, num_arguments, arguments, v);
+            dump_catchup(trace, func, arguments, v);
         }
     }
 
     static void dump_symbolic(std::vector<std::string>& trace, const Function *func,
-                              uint32_t num_arguments, const value_t arguments[],
-                              const value_t& v)
+                              const std::vector<value_t>& arguments, const value_t& v)
     {
         std::stringstream ss;
-        fof(ss, "id%u", func, num_arguments, arguments, v, symbolic::get_timestamp(),
+        fof(ss, "id%u", func, arguments, v, symbolic::get_timestamp(),
             "%%SYMBOLIC");
         trace.push_back(ss.str());
     }
@@ -281,8 +263,7 @@ namespace symbolic
     {
         std::stringstream ss;
         dump_type(ss, update->value);
-        fof(ss, "id%u", func, update->num_args, update->args, update->value,
-            symbolic::get_timestamp(), "%%UPDATE");
+        fof(ss, "id%u", func, *update->args, update->value, symbolic::get_timestamp(), "%%UPDATE");
         trace.push_back(ss.str());
     }
 
@@ -310,7 +291,7 @@ namespace symbolic
 
     static void dump_final(std::vector<std::string>& trace,
                            const std::vector<const Function*>& symbols,
-                           const std::vector<std::unordered_map<ArgumentsKey, value_t>>& states)
+                           const std::vector<std::unordered_map<std::vector<value_t>, value_t>>& states)
     {
         assert(symbols.size() == states.size());
 
@@ -324,8 +305,8 @@ namespace symbolic
                 const auto arguments = value_pair.first;
                 const auto value = value_pair.second;
 
-                fof(ss, "final" + std::to_string(finalId), symbols[i],
-                    arguments.size, arguments.p, value, FINAL_TIME, "%FINAL");
+                fof(ss, "final" + std::to_string(finalId), symbols[i], arguments,
+                    value, FINAL_TIME, "%FINAL");
 
                 ++finalId;
             }
@@ -445,19 +426,16 @@ namespace symbolic
     }
 
     static void dump_builtin(std::vector<std::string>& trace, const std::string& name,
-                             const value_t arguments[], uint16_t num_arguments,
-                             const value_t& ret)
+                             const std::vector<value_t>& arguments, const value_t& ret)
     {
         std::stringstream ss;
 
-        for (uint16_t i = 0; i < num_arguments; i++) {
-            dump_type(ss, arguments[i]);
+        for (const auto& arg : arguments) {
+            dump_type(ss, arg);
         }
         dump_type(ss, ret);
 
-        ss << "fof(id%u,hypothesis,f" << name << '('
-           << arguments_to_string(num_arguments, arguments) << "))."
-           << std::endl;
+        ss << "fof(id%u,hypothesis,f" << name << '(' << to_string(arguments) << "))." << std::endl;
 
         trace.push_back(ss.str());
     }
@@ -507,8 +485,7 @@ void SymbolicExecutionPass::visit_push(PushNode *node, const value_t& expr, cons
 
     addUpdate(node->to->symbol, arguments, to_res, node->location);
 
-    value_t args[] = {atom, expr};
-    symbolic::dump_builtin(trace, "push", args, 2, to_res);
+    symbolic::dump_builtin(trace, "push", {atom, expr}, to_res);
 }
 
 void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
@@ -531,8 +508,7 @@ void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
                                                   value_t(TypeType::LIST, val.value.sym->list)).value.list;
     }
 
-    value_t args[] = {val, to_res};
-    symbolic::dump_builtin(trace, "pop", args, 2, from_res);
+    symbolic::dump_builtin(trace, "pop", {val, to_res}, from_res);
 
     addUpdate(node->to->symbol, arguments, from_res, node->location);
 }
@@ -665,8 +641,8 @@ const value_t SymbolicExecutionPass::get_function_value(Function *sym, const std
             const value_t v(new symbol_t(symbolic::next_symbol_id())); // TODO cleanup symbol
 
             auto &function_map = function_states[sym->id];
-            function_map.emplace(ArgumentsKey(arguments.data(), arguments.size(), false), v);
-            symbolic::dump_create(trace_creates, sym, arguments.size(), arguments.data(), v);
+            function_map.emplace(arguments, v);
+            symbolic::dump_create(trace_creates, sym, arguments, v);
 
             return v;
         } else {
@@ -697,7 +673,7 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
         return true;
     }
 
-    function_states[func->id] = std::unordered_map<ArgumentsKey, value_t>(0);
+    function_states[func->id] = std::unordered_map<std::vector<value_t>, value_t>(0);
     function_symbols[func->id] = func;
 
     auto& function_map = function_states[func->id];
@@ -727,17 +703,16 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
                 throw RuntimeException(location, e.what());
             }
 
-            if (function_map.count(ArgumentsKey(arguments.data(), arguments.size(), false)) != 0) {
+            if (function_map.count(arguments) != 0) {
                 yy::location loc = init.first ? init.first->location+init.second->location
                                               : init.second->location;
-                throw RuntimeException(loc, "function `" + func->name +
-                                       arguments_to_string(arguments.size(), arguments.data()) +
-                                       "` already initialized");
+                throw RuntimeException(loc, "function `" + func->name + to_string(arguments) +
+                                            "` already initialized");
             }
 
             const value_t v = walker->walk_expression_base(init.second);
             if (func->is_symbolic) {
-                symbolic::dump_create(trace_creates, func, arguments.size(), arguments.data(), v);
+                symbolic::dump_create(trace_creates, func, arguments, v);
             } else {
                 try {
                     func->validateValue(v);
@@ -747,7 +722,7 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
                     throw RuntimeException(location, e.what());
                 }
             }
-            function_map.emplace(std::make_pair(ArgumentsKey(arguments.data(), arguments.size(), true), v));
+            function_map.emplace(std::make_pair(arguments, v));
         }
     }
 
@@ -759,7 +734,7 @@ void SymbolicExecutionPass::mainLoop()
 {
     Function *program_sym = global_driver->function_table.get_function("program");
     const auto& function_map = function_states[program_sym->id];
-    const value_t& program_val = function_map.at(ArgumentsKey(nullptr, 0, false));
+    const value_t& program_val = function_map.at({value_t()});
 
     while (program_val.type != TypeType::UNDEF) {
         walker->walk_rule(program_val.value.rule);
@@ -819,14 +794,14 @@ void SymbolicExecutionPass::dumpUpdates()
         }
 
         for (const auto& pair : function_states[i]) {
-            const ArgumentsKey &args = pair.first;
+            const std::vector<value_t> &arguments = pair.first;
             const value_t &value = pair.second;
 
             const auto update = updateSet->get(reinterpret_cast<uint64_t>(&value));
             if (update) {
                 symbolic::dump_update(trace, function, update);
             } else {
-                symbolic::dump_symbolic(trace, function, args.size, args.p, value);
+                symbolic::dump_symbolic(trace, function, arguments, value);
             }
         }
     }

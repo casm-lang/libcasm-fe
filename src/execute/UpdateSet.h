@@ -36,10 +36,9 @@
 struct Update
 {
     value_t value;
-    value_t* args;
+    const std::vector<value_t>* args;
     uint64_t line;
     uint32_t func; // function uid
-    uint16_t num_args;
 };
 
 class UpdateSet

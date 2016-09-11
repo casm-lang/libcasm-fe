@@ -885,6 +885,16 @@ namespace std {
     return h;
   }
 
+    bool equal_to<std::vector<value_t>>::operator()(const std::vector<value_t>& lhs,
+                                                    const std::vector<value_t>& rhs) const
+    {
+        if (lhs.size() != rhs.size()) {
+            return false;
+        } else {
+            return std::equal(lhs.cbegin(), lhs.cend(), rhs.cbegin());
+        }
+    }
+
   std::hash<value_t> hash<HeadList>::hasher;
   size_t hash<HeadList>::operator()(const HeadList &key) const {
     return hasher(key.current_head);
@@ -894,4 +904,30 @@ namespace std {
   size_t hash<BottomList>::operator()(const BottomList &key) const {
     return list_hasher(key.values);
   }
+}
+
+std::string to_string(const std::vector<value_t>& values)
+{
+    if (values.empty()) {
+        return "";
+    }
+
+    std::stringstream ss;
+
+    ss << "(";
+
+    bool firstValue = true;
+    for (const auto& value : values) {
+        if (not firstValue) {
+            ss << ",";
+        }
+
+        ss << value.to_str();
+
+        firstValue = false;
+    }
+
+    ss << ")";
+
+    return ss.str();
 }

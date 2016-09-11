@@ -25,7 +25,6 @@
 
 #include "ExecutionPassBase.h"
 
-#include <cstring>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -34,7 +33,6 @@
 #include <utility>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <cstdio>
 
 #include "../Driver.h"
 #include "../Symbols.h"
@@ -43,56 +41,6 @@
 using namespace libcasm_fe;
 
 extern Driver *global_driver;
-
-ArgumentsKey::ArgumentsKey(const value_t args[], uint32_t size, bool dyn) :
-    size(size),
-    dynamic(dyn)
-{
-    if (dynamic) {
-        auto argsDup = new value_t[size];
-        memcpy(argsDup, args, sizeof(value_t) * size);
-        p = argsDup;
-    } else {
-        p = args;
-    }
-}
-
-ArgumentsKey::ArgumentsKey(const ArgumentsKey& other) :
-    p(other.p),
-    size(other.size),
-    dynamic(other.dynamic)
-{
-
-}
-
-ArgumentsKey::ArgumentsKey(ArgumentsKey&& other) noexcept
-{
-    p = other.p;
-    dynamic = other.dynamic;
-    size = other.size;
-    other.dynamic = false;
-}
-
-ArgumentsKey::~ArgumentsKey()
-{
-    if (dynamic) {
-        delete[] p;
-    }
-}
-
-static std::string arguments_to_string(uint32_t num_arguments, const value_t arguments[])
-{
-    std::stringstream ss;
-    if (num_arguments == 0) {
-        return "";
-    }
-    for (uint32_t i = 0; i < num_arguments; i++) {
-        ss << arguments[i].to_str();
-        ss << ", ";
-    }
-    // Strip trailing comma
-    return "(" + ss.str().substr(0, ss.str().size() - 2) + ")";
-}
 
 bool ExecutionPassBase::hasEmptyUpdateSet() const
 {
@@ -130,17 +78,16 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &
     
     
     auto& function_map = function_states[sym->id];
-    auto it = function_map.find(ArgumentsKey(arguments.data(), arguments.size(), false)); // TODO EP: use emplace only
+    auto it = function_map.find(arguments); // TODO EP: use emplace only
     if (it == function_map.cend()) {
-        const auto pair = function_map.emplace(ArgumentsKey(arguments.data(), arguments.size(), true), value_t());
+        const auto pair = function_map.emplace(arguments, value_t());
         it = pair.first;
     }
 
     Update* up = reinterpret_cast<Update*>(stack.allocate(sizeof(Update))); // FIXME make it nicer!!
     up->value = val;
     up->func = sym->id;
-    up->args = const_cast<value_t*>(it->first.p);
-    up->num_args = arguments.size();
+    up->args = &it->first;
     up->line = location.begin.line;
 
     try {
@@ -151,7 +98,7 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &
         const auto existingUpdate = e.existingUpdate();
 
         const auto info = "Conflict while adding update " + sym->name
-                        + arguments_to_string(conflictingUpdate->num_args, conflictingUpdate->args)
+                        + to_string(*conflictingUpdate->args)
                         + " = " + val.to_str() + " at line " + std::to_string(up->line)
                         + ", conflicting with line " + std::to_string(existingUpdate->line)
                         + " with value '" + existingUpdate->value.to_str() + "'";
@@ -175,8 +122,7 @@ void ExecutionPassBase::merge()
         const auto existingUpdate = e.existingUpdate();
 
         const auto function = function_symbols[conflictingUpdate->func];
-        const auto location = function->name + arguments_to_string(conflictingUpdate->num_args,
-                                                                   conflictingUpdate->args);
+        const auto location = function->name + to_string(*conflictingUpdate->args);
 
         const auto info = "Conflict while merging updateset " + location
                         + " at line " + std::to_string(conflictingUpdate->line)
@@ -201,23 +147,21 @@ void ExecutionPassBase::applyUpdates()
 
         // TODO handle tuples
         if (u->value.type == TypeType::LIST) {
-            auto& function_map = function_states[u->func];
-            value_t& list = function_map[ArgumentsKey(u->args, u->num_args, false)];
             if (u->value.is_undef()) {
                 // set list to undef
-                if (!list.is_undef()) {
-                    list.value.list->decrease_usage();
-                    list.type = TypeType::UNDEF;
+                if (not location->is_undef()) {
+                    location->value.list->decrease_usage();
+                    location->type = TypeType::UNDEF;
                 }
             } else {
-                if (!list.is_undef() && !list.is_symbolic()) {
-                    list.value.list->decrease_usage();
+                if (not location->is_undef() and not location->is_symbolic()) {
+                    location->value.list->decrease_usage();
                 } else {
-                    list.type = u->value.type;
+                    location->type = u->value.type;
                 }
-                list.value.list = u->value.value.list;
-                list.value.list->bump_usage();
-                to_fold.push_back(&list);
+                location->value.list = u->value.value.list;
+                location->value.list->bump_usage();
+                to_fold.push_back(location);
             }
         } else {
             // we could erase keys that store an undef value in concrete mode,
@@ -276,7 +220,7 @@ const value_t ExecutionPassBase::get_function_value
     }
     
     const auto &function_map = function_states[sym->id];
-    const value_t &v = function_map.at(ArgumentsKey(arguments.data(), arguments.size(), false));
+    const value_t &v = function_map.at(arguments);
     const auto update = updateSetManager.lookup( reinterpret_cast< uint64_t >( &v ) );
     
     if( update )
@@ -625,7 +569,7 @@ void ExecutionPassBase::visit_update_dumps(UpdateNode *update, const std::vector
     const std::string& filter = global_driver->function_trace_map[update->func->symbol->id];
     if (filter_enabled(filter)) {
         std::cout << filter << ": "
-                  << update->func->symbol->name << arguments_to_string(arguments.size(), arguments.data())
+                  << update->func->symbol->name << to_string(arguments)
                   << " = " << expr_v.to_str() << std::endl;
     }
 
@@ -865,6 +809,8 @@ const value_t ExecutionPassBase::visit_number_range_atom(NumberRangeAtom *atom,
 void libcasm_fe::ExecutionPassBase::validateArguments(const std::vector<Type*>& argumentTypes,
                                                       const std::vector<value_t>& argumentValues) const
 {
+    assert(argumentTypes.size() == argumentValues.size());
+
     for( size_t i = 0; i < argumentValues.size(); i++ )
     {
         const auto& argumentValue = argumentValues.at( i );

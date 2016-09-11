@@ -41,44 +41,6 @@
    TODO
 */
 
-struct ArgumentsKey {
-    const value_t* p;
-    uint32_t size;
-    bool dynamic;
-
-    // size must be equal to the size specified in the function type
-    ArgumentsKey(const value_t args[], uint32_t size, bool dyn);
-    ArgumentsKey(const ArgumentsKey& other);
-    ArgumentsKey(ArgumentsKey&& other) noexcept;
-    ~ArgumentsKey();
-};
-
-namespace std {
-
-    template <> struct hash<ArgumentsKey> {
-        size_t operator()(const ArgumentsKey &key) const {
-            size_t h = 0;
-            for (uint32_t i = 0; i < key.size; i++) {
-                assert(not key.p[i].is_symbolic());
-                static std::hash<value_t> value_hasher;
-                h ^= value_hasher(key.p[i]);
-            }
-            return h;
-        }
-    };
-
-    template <> struct equal_to<ArgumentsKey> {
-        bool operator()(const ArgumentsKey &lhs, const ArgumentsKey &rhs) const {
-            for (uint32_t i = 0; i < lhs.size; i++) {
-                if (lhs.p[i] != rhs.p[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    };
-}
-
 namespace libcasm_fe
 {
     class ExecutionPassBase : public BaseVisitor<value_t>
@@ -150,7 +112,7 @@ namespace libcasm_fe
     public:
         std::vector<std::vector<value_t> *> rule_bindings;
 
-        std::vector<std::unordered_map<ArgumentsKey, value_t>> function_states;
+        std::vector<std::unordered_map<std::vector<value_t>, value_t>> function_states;
         std::vector<const Function*> function_symbols;
 
         std::vector<List*> temp_lists;
