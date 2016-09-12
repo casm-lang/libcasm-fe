@@ -632,23 +632,18 @@ const value_t SymbolicExecutionPass::visit_list_atom(ListAtom *atom,
     }
 }
 
-const value_t SymbolicExecutionPass::get_function_value(Function *sym, const std::vector<value_t>& arguments)
+value_t SymbolicExecutionPass::defaultFunctionValue(Function* function, const std::vector<value_t>& arguments)
 {
-    try {
-        return ExecutionPassBase::get_function_value(sym, arguments);
-    } catch (const std::out_of_range &e) {
-        if (sym->is_symbolic) {
-            const value_t v(new symbol_t(symbolic::next_symbol_id())); // TODO cleanup symbol
+    if (function->is_symbolic) {
+        const value_t value(new symbol_t(symbolic::next_symbol_id())); // TODO cleanup symbol
 
-            auto &function_map = function_states[sym->id];
-            function_map.emplace(arguments, v);
-            symbolic::dump_create(trace_creates, sym, arguments, v);
+        auto& function_map = function_states[function->id];
+        function_map.emplace(arguments, value);
+        symbolic::dump_create(trace_creates, function, arguments, value);
 
-            return v;
-        } else {
-            static value_t undef = value_t();
-            return undef;
-        }
+        return value;
+    } else {
+        return ExecutionPassBase::defaultFunctionValue(function, arguments);
     }
 }
 

@@ -201,36 +201,51 @@ void ExecutionPassBase::applyUpdates()
     stack.freeAll();
 }
 
-const value_t ExecutionPassBase::get_function_value
-( Function *sym
+value_t ExecutionPassBase::functionValue
+( Function* function
 , const std::vector<value_t>& arguments
 )
 {
     try
     {
-        validateArguments(sym->arguments_, arguments);
+        validateArguments(function->arguments_, arguments);
     }
     catch( const std::domain_error& e )
     {
         throw RuntimeException
-        ( sym->location
+        ( function->location
         , e.what()
         , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtLookup
         );
     }
     
-    const auto &function_map = function_states[sym->id];
-    const value_t &v = function_map.at(arguments);
-    const auto update = updateSetManager.lookup( reinterpret_cast< uint64_t >( &v ) );
-    
-    if( update )
-    {
-        return update->value;
+    const auto& function_map = function_states[function->id];
+
+    const auto it = function_map.find(arguments);
+    if (it != function_map.cend()) {
+        const auto& value = it->second;
+        const auto update = updateSetManager.lookup( reinterpret_cast< uint64_t >( &value ) );
+
+        if( update )
+        {
+            return update->value;
+        }
+        else
+        {
+            return value;
+        }
+    } else {
+        return defaultFunctionValue(function, arguments);
     }
-    else
-    {
-        return v;
-    }
+}
+
+value_t ExecutionPassBase::defaultFunctionValue(Function* function, const std::vector<value_t>& arguments)
+{
+    UNUSED(function);
+    UNUSED(arguments);
+
+    static value_t undef = value_t();
+    return undef;
 }
 
 bool ExecutionPassBase::filter_enabled(const std::string& filter)
@@ -700,7 +715,7 @@ const value_t ExecutionPassBase::visit_function_atom(FunctionAtom *atom, std::ve
         return value_t(rule_bindings.back()->at(atom->offset));
     case FunctionAtom::SymbolType::FUNCTION:
         try {
-            return get_function_value(atom->symbol, arguments);
+            return functionValue(atom->symbol, arguments);
         } catch (const RuntimeException& e) {
             throw RuntimeException(atom->location, e.what(), e.getErrorCode());
         }

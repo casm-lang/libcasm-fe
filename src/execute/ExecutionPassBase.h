@@ -56,7 +56,7 @@ namespace libcasm_fe
         void merge();
         void applyUpdates();
 
-        virtual const value_t get_function_value(Function *sym, const std::vector<value_t>& arguments);
+        value_t functionValue(Function* function, const std::vector<value_t>& arguments);
 
         bool filter_enabled(const std::string& filter);
 
@@ -99,6 +99,8 @@ namespace libcasm_fe
          */
         void validateArguments(const std::vector<Type*>& argumentTypes,
                                const std::vector<value_t>& argumentValues) const;
+
+        virtual value_t defaultFunctionValue(Function* function, const std::vector<value_t>& arguments);
 
     protected:
         std::vector<value_t> main_bindings;

@@ -39,7 +39,7 @@
 
 namespace libcasm_fe
 {
-    class SymbolicExecutionPass : public ExecutionPassBase, public libpass::Pass
+    class SymbolicExecutionPass final : public ExecutionPassBase, public libpass::Pass
     {
     public:
         static char id;
@@ -59,7 +59,8 @@ namespace libcasm_fe
 
         const value_t visit_list_atom(ListAtom *atom, const std::vector<value_t> &vals);
 
-        const value_t get_function_value(Function *sym, const std::vector<value_t>& arguments) override;
+    protected:
+        value_t defaultFunctionValue(Function* function, const std::vector<value_t>& arguments) override;
 
     private:
         bool init_function(const std::string& name, std::set<std::string>& visited);

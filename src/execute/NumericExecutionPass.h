@@ -39,7 +39,7 @@
 
 namespace libcasm_fe
 {
-    class NumericExecutionPass : public ExecutionPassBase, public libpass::Pass
+    class NumericExecutionPass final : public ExecutionPassBase, public libpass::Pass
     {
     public:
         static char id;
@@ -58,8 +58,6 @@ namespace libcasm_fe
         const value_t visit_expression_single(Expression *expr, const value_t& val);
 
         const value_t visit_list_atom(ListAtom *atom, const std::vector<value_t> &vals);
-
-        const value_t get_function_value(Function *sym, const std::vector<value_t>& arguments) override;
 
     private:
         bool init_function(const std::string& name, std::set<std::string>& visited);
