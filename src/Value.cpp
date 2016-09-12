@@ -859,28 +859,27 @@ namespace std {
       case TypeType::LIST: {
         size_t h = 0;
         for (const value_t& v : *key.value.list) {
-          h += operator()(v);
+          h = h * 31 + operator()(v);
         }
         return h;
       }
       case TypeType::ENUM:
-        return (size_t) key.value.enum_val->id;
+        return key.value.enum_val->id;
       case TypeType::RATIONAL:
-        return (size_t) key.value.rat->numerator + key.value.rat->denominator;
+        return key.value.rat->numerator * 31 + key.value.rat->denominator;
       case TypeType::SYMBOL:
         return reinterpret_cast<size_t>(key.value.sym);
       case TypeType::NUMBER_RANGE:
-        return ~key.value.numberRange->bottom() ^ key.value.numberRange->top();
+        return key.value.numberRange->bottom() * 31 + key.value.numberRange->top();
       default: throw RuntimeException("Unsupported type in std::hash<value_t>()");
     }
   }
-
 
   std::hash<value_t> hash<std::vector<value_t>>::hasher;
   size_t hash<std::vector<value_t>>::operator()(const std::vector<value_t> &key) const {
     size_t h = 0;
     for (const value_t& v : key) {
-      h += hasher(v);
+      h = h * 31 + hasher(v);
     }
     return h;
   }
