@@ -77,10 +77,16 @@ static value_t make_value(TypeType type)
     return value;
 }
 
-static std::unique_ptr<Expression> make_expression(ExpressionOperation op)
+static std::unique_ptr<UnaryExpression> make_unary_expression(ExpressionOperation op)
 {
     auto location = yy::location(nullptr);
-    return std::unique_ptr<Expression>(new Expression(location, nullptr, nullptr, op));
+    return std::unique_ptr<UnaryExpression>(new UnaryExpression(location, nullptr, op));
+}
+
+static std::unique_ptr<BinaryExpression> make_binary_expression(ExpressionOperation op)
+{
+    auto location = yy::location(nullptr);
+    return std::unique_ptr<BinaryExpression>(new BinaryExpression(location, nullptr, nullptr, op));
 }
 
 static value_t yields(value_t value)
@@ -101,7 +107,7 @@ TEST_P(Numeric_UnaryExpressionTest, testUnaryExpressionResultTypeType)
     const auto row = GetParam();
 
     const ExpressionOperation op = std::get<0>(row);
-    const auto expr = make_expression(op);
+    const auto expr = make_unary_expression(op);
 
     const auto values = std::get<1>(row);
     const auto value = values.value;
@@ -132,7 +138,7 @@ TEST_P(Numeric_BinaryExpressionTest, testBinaryExpressionResultTypeType)
     const auto row = GetParam();
 
     const ExpressionOperation op = std::get<0>(row);
-    const auto expr = make_expression(op);
+    const auto expr = make_binary_expression(op);
 
     const auto values = std::get<1>(row);
     const auto lhs = values.lhs;
