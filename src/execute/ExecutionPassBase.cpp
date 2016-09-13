@@ -446,6 +446,19 @@ namespace builtins
         return value_t((bool)arg.value.integer);
     }
 
+    static const value_t asenum(BuiltinAtom *atom, const value_t& arg)
+    {
+        Enum *enum_ = global_driver->function_table.get_enum(atom->type_.enum_name);
+        for (auto pair : enum_->mapping) {
+            // TODO check why the enum mapping contains an extra entry with the name
+            // of the enum
+            if (pair.first != enum_->name && pair.second->id == arg.value.integer) {
+                return value_t(pair.second);
+            }
+        }
+        return value_t();
+    }
+
     static const value_t asinteger(const value_t& arg)
     {
         switch (arg.type) {
@@ -732,22 +745,6 @@ const value_t ExecutionPassBase::visit_function_atom(FunctionAtom *atom, std::ve
 
 const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom, std::vector<value_t> &arguments)
 {
-    // TODO Int2Enum is a special builtin, it needs the complete type information
-    // for the enum, values only store TypeType and passing the type to all
-    // builtins seems ugly.
-    // Maybe store Type* in value_t?
-    if (atom->id == Builtin::Id::AS_ENUM) {
-        Enum *enum_ = global_driver->function_table.get_enum(atom->type_.enum_name);
-        for (auto pair : enum_->mapping) {
-            // TODO check why the enum mapping contains an extra entry with the name
-            // of the enum
-            if (pair.first != enum_->name && pair.second->id == arguments.at(0).value.integer) {
-                return value_t(pair.second);
-            }
-        }
-        return value_t();
-    }
-
     switch (atom->id) {
     case Builtin::Id::POW:
         return builtins::pow(arguments.at(0), arguments.at(1));
@@ -769,6 +766,12 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom, std::vect
         return builtins::peek(arguments.at(0));
     case Builtin::Id::AS_BOOLEAN:
         return builtins::asboolean(arguments.at(0));
+    case Builtin::Id::AS_ENUM:
+        // TODO Int2Enum is a special builtin, it needs the complete type information
+        // for the enum, values only store TypeType and passing the type to all
+        // builtins seems ugly.
+        // Maybe store Type* in value_t?
+        return builtins::asenum(atom, arguments.at(0));
     case Builtin::Id::AS_INTEGER:
         return builtins::asinteger(arguments.at(0));
     case Builtin::Id::AS_FLOATING:
