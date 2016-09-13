@@ -760,7 +760,7 @@ ATOM
   }
 | MINUS LPAREN EXPRESSION RPAREN %prec UMINUS
   {
-      $$ = new Expression( @$, new ZeroAtom( @$, $3 ), $3, ExpressionOperation::SUB );
+      $$ = new BinaryExpression( @$, new ZeroAtom( @$, $3 ), $3, ExpressionOperation::SUB );
   }
 ;
 
@@ -945,67 +945,67 @@ EXPRESSION_LIST_NO_COMMA
 EXPRESSION
 : EXPRESSION PLUS EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::ADD );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::ADD );
   }
 | EXPRESSION MINUS EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::SUB );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::SUB );
   }
 | EXPRESSION STAR EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::MUL );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::MUL );
   }
 | EXPRESSION SLASH EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::DIV );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::DIV );
   }
 | EXPRESSION PERCENT EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::MOD );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::MOD );
   }
 | EXPRESSION RATIONAL_DIV EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::RAT_DIV );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::RAT_DIV );
   }
 | EXPRESSION NEQUAL EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::NEQ );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::NEQ );
   }
 | EXPRESSION EQUAL EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::EQ );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::EQ );
   }
 | EXPRESSION LESSER EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::LESSER );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::LESSER );
   }
 | EXPRESSION GREATER EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::GREATER );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::GREATER );
   }
 | EXPRESSION LESSEQ EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::LESSEREQ );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::LESSEREQ );
   }
 | EXPRESSION GREATEREQ EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::GREATEREQ );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::GREATEREQ );
   }
 | EXPRESSION OR EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::OR );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::OR );
   }
 | EXPRESSION XOR EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::XOR );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::XOR );
   }
 | EXPRESSION AND EXPRESSION
   {
-      $$ = new Expression( @$, $1, $3, ExpressionOperation::AND );
+      $$ = new BinaryExpression( @$, $1, $3, ExpressionOperation::AND );
   }
 | NOT EXPRESSION
   {
-      $$ = new Expression( @$, $2, nullptr, ExpressionOperation::NOT );
+      $$ = new UnaryExpression( @$, $2, ExpressionOperation::NOT );
   }
 | ATOM
   {

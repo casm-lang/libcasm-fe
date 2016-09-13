@@ -225,7 +225,7 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
             
             if( init.first != nullptr )
             {
-                const value_t argument_v = walker->walk_expression_base( init.first );
+                const value_t argument_v = walker->walk_atom( init.first );
                 if( func->arguments_.size() > 1 )
                 {
                     List *list = argument_v.value.list;
@@ -262,7 +262,7 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
                 );
             }
             
-            const value_t v = walker->walk_expression_base(init.second);
+            const value_t v = walker->walk_atom(init.second);
             try
             {
                 func->validateValue(v);
@@ -330,7 +330,7 @@ void NumericExecutionPass::visit_pop(PopNode *node, const value_t& val)
     addUpdate(node->from->symbol, arguments, from_res, node->location);
 }
 
-const value_t NumericExecutionPass::visit_expression(Expression *expr,
+const value_t NumericExecutionPass::visit_expression(BinaryExpression *expr,
                                                      const value_t &left_val,
                                                      const value_t &right_val)
 {
@@ -370,7 +370,7 @@ const value_t NumericExecutionPass::visit_expression(Expression *expr,
     }
 }
 
-const value_t NumericExecutionPass::visit_expression_single(Expression *expr,
+const value_t NumericExecutionPass::visit_expression_single(UnaryExpression *expr,
                                                             const value_t &val)
 {
     if (val.is_undef()) {
@@ -399,7 +399,7 @@ value_t NumericExecutionWalker::walk_list_atom(ListAtom *atom)
     std::vector<value_t> expr_results;
     if (atom->expr_list) {
         for (auto iter = atom->expr_list->rbegin(); iter != atom->expr_list->rend(); iter++) {
-            expr_results.push_back(walk_expression_base(*iter));
+            expr_results.push_back(walk_atom(*iter));
         }
     }
     return visitor.visit_list_atom(atom, expr_results);
@@ -408,7 +408,7 @@ value_t NumericExecutionWalker::walk_list_atom(ListAtom *atom)
 template <>
 void NumericExecutionWalker::walk_ifthenelse(IfThenElseNode* node)
 {
-    const value_t cond = walk_expression_base(node->condition_);
+    const value_t cond = walk_atom(node->condition_);
 
     if (cond.is_undef()) {
         throw RuntimeException(node->condition_->location,
@@ -448,7 +448,7 @@ void NumericExecutionWalker::walk_pop(PopNode* node)
 template <>
 void NumericExecutionWalker::walk_push(PushNode *node)
 {
-    const value_t expr = walk_expression_base(node->expr);
+    const value_t expr = walk_atom(node->expr);
     const value_t atom = walk_function_atom(node->to);
     visitor.visit_push(node, expr, atom);
 }
@@ -456,7 +456,7 @@ void NumericExecutionWalker::walk_push(PushNode *node)
 template <>
 void NumericExecutionWalker::walk_case(CaseNode *node)
 {
-    const value_t cond = walk_expression_base(node->expr);
+    const value_t cond = walk_atom(node->expr);
 
     std::pair<AtomNode*, AstNode*> *default_pair = nullptr;
     for (auto& pair : node->case_list) {
@@ -478,7 +478,7 @@ void NumericExecutionWalker::walk_case(CaseNode *node)
 template <>
 void NumericExecutionWalker::walk_forall(ForallNode *node)
 {
-    const value_t in_list = walk_expression_base(node->in_expr);
+    const value_t in_list = walk_atom(node->in_expr);
 
     visitor.fork(UpdateSet::Type::Parallel);
 
@@ -570,7 +570,7 @@ void NumericExecutionWalker::walk_iterate(UnaryNode *node)
 template <>
 void NumericExecutionWalker::walk_update(UpdateNode *node)
 {
-    const value_t expr = walk_expression_base(node->expr_);
+    const value_t expr = walk_atom(node->expr_);
     std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
     visitor.visit_update(node, arguments, expr);
 }
@@ -578,7 +578,7 @@ void NumericExecutionWalker::walk_update(UpdateNode *node)
 template <>
 void NumericExecutionWalker::walk_update_dumps(UpdateNode *node)
 {
-    const value_t expr = walk_expression_base(node->expr_);
+    const value_t expr = walk_atom(node->expr_);
     std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
     visitor.visit_update_dumps(node, arguments, expr);
 }

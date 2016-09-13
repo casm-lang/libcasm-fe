@@ -513,7 +513,7 @@ void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
     addUpdate(node->to->symbol, arguments, from_res, node->location);
 }
 
-const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
+const value_t SymbolicExecutionPass::visit_expression(BinaryExpression *expr,
                                                       const value_t &left_val,
                                                       const value_t &right_val)
 {
@@ -597,7 +597,7 @@ const value_t SymbolicExecutionPass::visit_expression(Expression *expr,
     }
 }
 
-const value_t SymbolicExecutionPass::visit_expression_single(Expression *expr,
+const value_t SymbolicExecutionPass::visit_expression_single(UnaryExpression *expr,
                                                              const value_t &val)
 {
     if (val.is_undef()) {
@@ -679,7 +679,7 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
             arguments.reserve(func->arguments_.size());
 
             if (init.first != nullptr) {
-                const value_t argument_v = walker->walk_expression_base(init.first);
+                const value_t argument_v = walker->walk_atom(init.first);
                 if (func->arguments_.size() > 1) {
                     List *list = argument_v.value.list;
                     for (auto iter = list->begin(); iter != list->end(); iter++) {
@@ -705,7 +705,7 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
                                             "` already initialized");
             }
 
-            const value_t v = walker->walk_expression_base(init.second);
+            const value_t v = walker->walk_atom(init.second);
             if (func->is_symbolic) {
                 symbolic::dump_create(trace_creates, func, arguments, v);
             } else {
@@ -828,7 +828,7 @@ value_t SymbolicExecutionWalker::walk_list_atom(ListAtom *atom)
     std::vector<value_t> expr_results;
     if (atom->expr_list) {
         for (auto iter = atom->expr_list->rbegin(); iter != atom->expr_list->rend(); iter++) {
-            expr_results.push_back(walk_expression_base(*iter));
+            expr_results.push_back(walk_atom(*iter));
         }
     }
     return visitor.visit_list_atom(atom, expr_results);
@@ -837,7 +837,7 @@ value_t SymbolicExecutionWalker::walk_list_atom(ListAtom *atom)
 template <>
 void SymbolicExecutionWalker::walk_ifthenelse(IfThenElseNode* node)
 {
-    const value_t cond = walk_expression_base(node->condition_);
+    const value_t cond = walk_atom(node->condition_);
 
     if (cond.is_symbolic()) {
         symbolic_condition_t *sym_cond;
@@ -950,7 +950,7 @@ void SymbolicExecutionWalker::walk_pop(PopNode* node)
 template <>
 void SymbolicExecutionWalker::walk_push(PushNode *node)
 {
-    const value_t expr = walk_expression_base(node->expr);
+    const value_t expr = walk_atom(node->expr);
     const value_t atom = walk_function_atom(node->to);
     visitor.visit_push(node, expr, atom);
 }
@@ -958,7 +958,7 @@ void SymbolicExecutionWalker::walk_push(PushNode *node)
 template <>
 void SymbolicExecutionWalker::walk_case(CaseNode *node)
 {
-    const value_t cond = walk_expression_base(node->expr);
+    const value_t cond = walk_atom(node->expr);
 
     for (uint32_t i = 0; i < node->case_list.size(); i++) {
         auto pair = node->case_list[i];
@@ -1017,7 +1017,7 @@ void SymbolicExecutionWalker::walk_case(CaseNode *node)
 template <>
 void SymbolicExecutionWalker::walk_forall(ForallNode *node)
 {
-    const value_t in_list = walk_expression_base(node->in_expr);
+    const value_t in_list = walk_atom(node->in_expr);
 
     visitor.fork(UpdateSet::Type::Parallel);
 
@@ -1108,9 +1108,9 @@ void SymbolicExecutionWalker::walk_iterate(UnaryNode *node)
 template <>
 void SymbolicExecutionWalker::walk_update(UpdateNode *node)
 {
-    const value_t expr = walk_expression_base(node->expr_);
+    const value_t expr = walk_atom(node->expr_);
     if (node->func->symbol->is_symbolic) {
-        walk_expression_base(node->func);
+        walk_atom(node->func);
     }
     std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
     visitor.visit_update(node, arguments, expr);
@@ -1119,7 +1119,7 @@ void SymbolicExecutionWalker::walk_update(UpdateNode *node)
 template <>
 void SymbolicExecutionWalker::walk_update_dumps(UpdateNode *node)
 {
-    const value_t expr = walk_expression_base(node->expr_);
+    const value_t expr = walk_atom(node->expr_);
     std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
     visitor.visit_update_dumps(node, arguments, expr);
 }

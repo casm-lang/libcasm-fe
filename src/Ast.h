@@ -62,7 +62,8 @@ enum NodeType {
   DERIVED,
   RULE,
   SPECIFICATION,
-  EXPRESSION,
+  BINARY_EXPRESSION,
+  UNARY_EXPRESSION,
   UPDATE,
   UPDATE_DUMPS,
   STATEMENT,
@@ -369,7 +370,7 @@ enum class ExpressionOperation : uint8_t {
   NOT
 };
 
-class Expression : public ExpressionBase {
+class BinaryExpression : public ExpressionBase {
   public:
 
     ExpressionBase *left_;
@@ -377,8 +378,20 @@ class Expression : public ExpressionBase {
 
     ExpressionOperation op;
 
-    Expression(yy::location& loc, ExpressionBase *left, ExpressionBase *right, ExpressionOperation op);
-    ~Expression() override;
+    BinaryExpression(yy::location& loc, ExpressionBase *left, ExpressionBase *right, ExpressionOperation op);
+    ~BinaryExpression() override;
+    bool equals(AstNode *other) const override;
+};
+
+class UnaryExpression : public ExpressionBase {
+public:
+
+    ExpressionBase *expr_;
+
+    ExpressionOperation op;
+
+    UnaryExpression(yy::location& loc, ExpressionBase *expr, ExpressionOperation op);
+    ~UnaryExpression() override;
     bool equals(AstNode *other) const override;
 };
 

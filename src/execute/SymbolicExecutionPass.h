@@ -53,9 +53,9 @@ namespace libcasm_fe
         void visit_push(PushNode *node, const value_t& expr, const value_t& atom);
         void visit_pop(PopNode *node, const value_t& val);
 
-        const value_t visit_expression(Expression *expr, const value_t& left_val,
+        const value_t visit_expression(BinaryExpression *expr, const value_t& left_val,
                                        const value_t& right_val);
-        const value_t visit_expression_single(Expression *expr, const value_t& val);
+        const value_t visit_expression_single(UnaryExpression *expr, const value_t& val);
 
         const value_t visit_list_atom(ListAtom *atom, const std::vector<value_t> &vals);
 

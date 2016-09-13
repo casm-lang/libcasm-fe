@@ -74,8 +74,8 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     void visit_forall_post(ForallNode*) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); }
     void visit_iterate(UnaryNode*) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); }
     
-    bool visit_expression(Expression *expr, bool, bool);
-    bool visit_expression_single(Expression *expr, bool);
+    bool visit_expression(BinaryExpression *expr, bool, bool);
+    bool visit_expression_single(UnaryExpression *expr, bool);
     bool visit_zero_atom( ZeroAtom *atom );
     bool visit_int_atom(IntegerAtom *atom);
     bool visit_bit_atom(IntegerAtom *atom);

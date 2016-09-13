@@ -212,20 +212,16 @@ void AstDumpVisitor::visit_push(PushNode *node, bool, bool) {
   dump_link(node, node->to);
 }
 
-bool AstDumpVisitor::visit_expression(Expression *expr, bool, bool) {
+bool AstDumpVisitor::visit_expression(BinaryExpression *expr, bool, bool) {
   dump_node(expr, "Expression:"+operator_to_str(expr->op));
-  if (expr->left_ != nullptr) {
-    dump_link(expr, expr->left_);
-  }
-  if (expr->right_ != nullptr) {
-    dump_link(expr, expr->right_);
-  }
-
+  dump_link(expr, expr->left_);
+  dump_link(expr, expr->right_);
   return true;
 }
 
-bool AstDumpVisitor::visit_expression_single(Expression *expr, bool) {
-  visit_expression(expr, true, true);
+bool AstDumpVisitor::visit_expression_single(UnaryExpression *expr, bool) {
+  dump_node(expr, "Expression:"+operator_to_str(expr->op));
+  dump_link(expr, expr->expr_);
   return true;
 }
 

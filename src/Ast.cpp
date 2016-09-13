@@ -48,7 +48,8 @@ static std::map<NodeType, const std::string> node_type_names_ = {
     {NodeType::FUNCTION, std::string("FUNCTION")},
     {NodeType::DERIVED, std::string("DERIVED")},
     {NodeType::RULE, std::string("RULE")},
-    {NodeType::EXPRESSION, std::string("EXPRESSION")},
+    {NodeType::BINARY_EXPRESSION, std::string("BINARY EXPRESSION")},
+    {NodeType::UNARY_EXPRESSION, std::string("UNARY EXPRESSION")},
     {NodeType::UPDATE, std::string("UPDATE")},
     {NodeType::SPECIFICATION, std::string("SPECIFICATION")},
     {NodeType::STATEMENT, std::string("STATEMENT")},
@@ -404,49 +405,70 @@ NumberRangeAtom::NumberRangeAtom(yy::location& loc, ExpressionBase *left, Expres
 
 }
 
-Expression::Expression(yy::location& loc, ExpressionBase *left, ExpressionBase *right,
-                       ExpressionOperation op)
-                       : ExpressionBase(loc, NodeType::EXPRESSION, Type(TypeType::UNKNOWN)),
-                         left_(left), right_(right), op(op) {
-  // Propagate known types
-  /*
-  if (left_ == nullptr) {
-    if(right_->type_ != Type::UNKNOWN) {
-      type_ = right_->type_;
-    }
-  } else if (right_ == nullptr) {
-    if (left_->type_ != Type::UNKNOWN) {
-      type_ = left_->type_;
-    }
-  } else {
-    if (left_->type_ == right_->type_) {
-      type_ = right_->type_;
-    }
-  }
-  */
+BinaryExpression::BinaryExpression(yy::location& loc, ExpressionBase *left, ExpressionBase *right,
+                                   ExpressionOperation op) :
+    ExpressionBase(loc, NodeType::BINARY_EXPRESSION, Type(TypeType::UNKNOWN)),
+    left_(left),
+    right_(right),
+    op(op)
+{
+
 }
 
-Expression::~Expression() {
-  delete left_;
-  delete right_;
+BinaryExpression::~BinaryExpression()
+{
+    delete left_;
+    delete right_;
 }
 
-bool Expression::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
+bool BinaryExpression::equals(AstNode *other) const
+{
+    if (not AstNode::equals(other)) {
+        return false;
+    }
 
-  Expression *other_cast = static_cast<Expression*>(other);
-  if (left_ == nullptr || other_cast->left_ == nullptr) {
-    return left_ == nullptr && 
-           other_cast->left_ == nullptr &&
-           right_->equals(other_cast->right_) &&
-           op == other_cast->op;
-  } else {
-    return left_->equals(other_cast->left_) &&
-           right_->equals(other_cast->right_) &&
-           op == other_cast->op;
-  }
+    BinaryExpression *other_cast = static_cast<BinaryExpression*>(other);
+    if (left_ == nullptr || other_cast->left_ == nullptr) {
+        return left_ == nullptr &&
+            other_cast->left_ == nullptr &&
+            right_->equals(other_cast->right_) &&
+            op == other_cast->op;
+    } else {
+        return left_->equals(other_cast->left_) &&
+            right_->equals(other_cast->right_) &&
+            op == other_cast->op;
+    }
+}
+
+UnaryExpression::UnaryExpression(yy::location& loc, ExpressionBase *expr,
+                                 ExpressionOperation op) :
+    ExpressionBase(loc, NodeType::UNARY_EXPRESSION, Type(TypeType::UNKNOWN)),
+    expr_(expr),
+    op(op)
+{
+
+}
+
+UnaryExpression::~UnaryExpression()
+{
+    delete expr_;
+}
+
+bool UnaryExpression::equals(AstNode *other) const
+{
+    if (not AstNode::equals(other)) {
+        return false;
+    }
+
+    UnaryExpression *other_cast = static_cast<UnaryExpression*>(other);
+    if (expr_ == nullptr || other_cast->expr_ == nullptr) {
+        return expr_ == nullptr &&
+            other_cast->expr_ == nullptr &&
+            op == other_cast->op;
+    } else {
+        return expr_->equals(other_cast->expr_) &&
+            op == other_cast->op;
+    }
 }
 
 std::string operator_to_str(const ExpressionOperation op) {

@@ -72,8 +72,8 @@ class TypecheckVisitor : public BaseVisitor<Type*> {
     void visit_pop(PopNode *node);
     void visit_case(CaseNode *node, Type *val, const std::vector<Type*>& case_labels);
 
-    Type* visit_expression(Expression *expr, Type* left_val, Type* right_val);
-    Type* visit_expression_single(Expression *expr, Type* val);
+    Type* visit_expression(BinaryExpression *expr, Type* left_val, Type* right_val);
+    Type* visit_expression_single(UnaryExpression *expr, Type* val);
     Type* visit_zero_atom(ZeroAtom *atom)   { return &atom->type_; }
     Type* visit_int_atom(IntegerAtom *atom) { return &atom->type_; }
     Type* visit_floating_atom(FloatingAtom *atom) {  return &atom->type_; }

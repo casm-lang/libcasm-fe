@@ -99,13 +99,13 @@ public:
                 for (std::pair<ExpressionBase*, ExpressionBase*> p : *def->sym->intitializers_) {
                     V first;
                     if (p.first) {
-                        first = walk_expression_base(p.first);
+                        first = walk_atom(p.first);
                     } else {
                         UndefAtom foo = {p.second->location};
                         first = walk_atom(&foo);
                     }
                     initializer_results.push_back(
-                        std::pair<V, V>(first, walk_expression_base(p.second))
+                        std::pair<V, V>(first, walk_atom(p.second))
                     );
                 }
             }
@@ -113,7 +113,7 @@ public:
             visitor.visit_function_def(def, initializer_results);
         } else {
             visitor.visit_derived_def_pre(def);
-            V v = walk_expression_base(def->sym->derived);
+            V v = walk_atom(def->sym->derived);
             visitor.visit_derived_def(def, v);
         }
     }
@@ -144,13 +144,13 @@ public:
             break;
         case NodeType::ASSERT: {
             UnaryNode *assert = reinterpret_cast<UnaryNode*>(stmt);
-            V v = walk_expression_base(reinterpret_cast<ExpressionBase*>(assert->child_));
+            V v = walk_atom(reinterpret_cast<ExpressionBase*>(assert->child_));
             visitor.visit_assert(assert, v);
             break;
         }
         case NodeType::ASSURE: {
             UnaryNode *assure = reinterpret_cast<UnaryNode*>(stmt);
-            V v = walk_expression_base(reinterpret_cast<ExpressionBase*>(assure->child_));
+            V v = walk_atom(reinterpret_cast<ExpressionBase*>(assure->child_));
             visitor.visit_assure(assure, v);
             break;
         }
@@ -201,7 +201,7 @@ public:
         case NodeType::DIEDIE: {
             DiedieNode *node = reinterpret_cast<DiedieNode*>(stmt);
             if (node->msg) {
-                visitor.visit_diedie(node, walk_expression_base(node->msg));
+                visitor.visit_diedie(node, walk_atom(node->msg));
             } else {
                 visitor.visit_diedie(node, V());
             }
@@ -241,7 +241,7 @@ public:
 
     void walk_update(UpdateNode *update)
     {
-        V expr_t = walk_expression_base(update->expr_);
+        V expr_t = walk_atom(update->expr_);
 
         // we must walk the expression before walking update->func because it
         // sets the list of arguments and we do not want the update->expr_ to
@@ -253,7 +253,7 @@ public:
 
     void walk_update_dumps(UpdateNode *update)
     {
-        V expr_t = walk_expression_base(update->expr_);
+        V expr_t = walk_atom(update->expr_);
 
         // we must walk the expression before walking update->func because it
         // sets the list of arguments and we do not want the update->expr_ to
@@ -268,7 +268,7 @@ public:
         if (call->ruleref == nullptr) {
             visitor.visit_call_pre(call);
         } else {
-            V v = walk_expression_base(call->ruleref);
+            V v = walk_atom(call->ruleref);
             visitor.visit_call_pre(call, v);
         }
 
@@ -293,13 +293,13 @@ public:
     {
         visitor.visit_print
         ( node
-          , walk_expression_base( node->getAtom() )
+          , walk_atom( node->getAtom() )
         );
     }
 
     void walk_let(LetNode *node)
     {
-        V v = walk_expression_base(node->expr);
+        V v = walk_atom(node->expr);
         visitor.visit_let(node, v);
         walk_statement(node->stmt);
         visitor.visit_let_post(node);
@@ -313,14 +313,14 @@ public:
 
     void walk_push(PushNode *node)
     {
-        V expr = walk_expression_base(node->expr);
+        V expr = walk_atom(node->expr);
         V atom = walk_function_atom(node->to);
         visitor.visit_push(node, expr, atom);
     }
 
     void walk_forall(ForallNode *node)
     {
-        walk_expression_base(node->in_expr);
+        walk_atom(node->in_expr);
         visitor.visit_forall_pre(node);
         walk_statement(node->statement);
         visitor.visit_forall_post(node);
@@ -334,7 +334,7 @@ public:
 
     void walk_case(CaseNode *node)
     {
-        V web = walk_expression_base(node->expr);
+        V web = walk_atom(node->expr);
         visitor.visit_case_pre(node, web );
         std::vector<V> case_labels;
         for (auto& pair : node->case_list) {
@@ -348,48 +348,9 @@ public:
         visitor.visit_case(node, web, case_labels);
     }
 
-    V walk_expression_base( ExpressionBase *expr )
-    {
-        if( expr->node_type_ == NodeType::EXPRESSION )
-        {
-            Expression *e = reinterpret_cast< Expression* >( expr );
-
-            V lhs {};
-            V rhs {};
-
-            if( e->left_ and e->right_ )
-            {
-                if( e->left_->node_type_ == NodeType::ZERO_ATOM )
-                {
-                    // IMPORTANT: right hand side has to be evaluated first to assign the
-                    // correct typed zero value to the left hand side
-                    rhs = walk_expression_base( e->right_ );
-                    lhs = walk_expression_base( e->left_ );
-                }
-                else
-                {
-                    lhs = walk_expression_base( e->left_ );
-                    rhs = walk_expression_base( e->right_ );
-                }
-                return visitor.visit_expression( e, lhs, rhs );
-            }
-            else
-            {
-                lhs = walk_expression_base( e->left_ );
-                return visitor.visit_expression_single( e, lhs );
-            }
-        }
-        else
-        {
-            return walk_atom( reinterpret_cast< AtomNode* >( expr ) );
-        }
-
-        throw RuntimeException("Invalid expression structure");
-    }
-
     void walk_ifthenelse(IfThenElseNode *n)
     {
-        V cond = walk_expression_base(n->condition_);
+        V cond = walk_atom(n->condition_);
         visitor.visit_ifthenelse(n, cond);
         walk_statement(n->then_);
         if (n->else_) {
@@ -407,7 +368,7 @@ public:
             FunctionAtom *func_a = reinterpret_cast<FunctionAtom*>(func);
             if (func_a->symbol_type == FunctionAtom::SymbolType::DERIVED) {
                 visitor.visit_derived_function_atom_pre(func_a, argumentValues);
-                V expr = walk_expression_base(func_a->symbol->derived);
+                V expr = walk_atom(func_a->symbol->derived);
                 return visitor.visit_derived_function_atom(func_a, expr);
             } else {
                 return visitor.visit_function_atom(func_a, argumentValues);
@@ -423,12 +384,27 @@ public:
 
     V walk_number_range(NumberRangeAtom* atom)
     {
-        V left = walk_expression_base(atom->left);
-        V right = walk_expression_base(atom->right);
+        const V left = walk_atom(atom->left);
+        const V right = walk_atom(atom->right);
         return visitor.visit_number_range_atom(atom, left, right);
     }
 
-    V walk_atom( AtomNode* atom )
+    V walk_binary_expression(BinaryExpression* e)
+    {
+        // IMPORTANT: right hand side has to be evaluated first to assign the
+        // correct typed zero value to the left hand side
+        const V rhs = walk_atom( e->right_ );
+        const V lhs = walk_atom( e->left_ );
+        return visitor.visit_expression( e, lhs, rhs );
+    }
+
+    V walk_unary_expression(UnaryExpression* e)
+    {
+        const V v = walk_atom( e->expr_ );
+        return visitor.visit_expression_single( e, v );
+    }
+
+    V walk_atom( ExpressionBase* atom )
     {
         switch( atom->node_type_ )
         {
@@ -488,6 +464,14 @@ public:
             {
                 return walk_number_range( reinterpret_cast< NumberRangeAtom* >( atom ) );
             }
+            case NodeType::BINARY_EXPRESSION:
+            {
+                return walk_binary_expression( reinterpret_cast< BinaryExpression* >( atom ) );
+            }
+            case NodeType::UNARY_EXPRESSION:
+            {
+                return walk_unary_expression( reinterpret_cast< UnaryExpression* >( atom ) );
+            }
             default:
             {
                 throw RuntimeException
@@ -506,7 +490,7 @@ protected:
         if (expressions != nullptr) {
             values.reserve(expressions->size());
             for (ExpressionBase *expression : *expressions) {
-                values.emplace_back(walk_expression_base(expression));
+                values.emplace_back(walk_atom(expression));
             }
         }
         return values;
@@ -555,8 +539,8 @@ public:
 
     void visit_iterate(UnaryNode*) { }
 
-    T visit_expression(Expression*, T, T) { return T(); }
-    T visit_expression_single(Expression*, T) { return T(); }
+    T visit_expression(BinaryExpression*, T, T) { return T(); }
+    T visit_expression_single(UnaryExpression*, T) { return T(); }
     T visit_zero_atom( ZeroAtom* ) { return T(); }
     T visit_int_atom(IntegerAtom*) { return T(); }
     T visit_bit_atom(IntegerAtom*) { return T(); }

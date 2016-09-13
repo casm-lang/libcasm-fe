@@ -720,9 +720,9 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
 }
 
 
-Type* TypecheckVisitor::visit_expression( Expression *expr, Type*, Type* )
+Type* TypecheckVisitor::visit_expression( BinaryExpression *expr, Type*, Type* )
 {
-    if( expr->left_ and expr->right_ and not expr->left_->type_.unify( &expr->right_->type_ ) )
+    if( not expr->left_->type_.unify( &expr->right_->type_ ) )
     {
     driver_.error
     ( expr->location
@@ -837,12 +837,12 @@ Type* TypecheckVisitor::visit_expression( Expression *expr, Type*, Type* )
   return &expr->type_;
 }
 
-Type* TypecheckVisitor::visit_expression_single(Expression *expr, Type*) {
+Type* TypecheckVisitor::visit_expression_single(UnaryExpression *expr, Type*) {
   switch (expr->op) {
     case ExpressionOperation::NOT:
-      if (!expr->left_->type_.unify(new Type(TypeType::BOOLEAN))) {
+      if (!expr->expr_->type_.unify(new Type(TypeType::BOOLEAN))) {
         driver_.error(expr->location,
-                  "operand of `not` must be Boolean but is "+expr->left_->type_.to_str());
+                      "operand of `not` must be Boolean but is "+expr->expr_->type_.to_str());
       }
       expr->type_.unify(Type(TypeType::BOOLEAN));
       return &expr->type_;
@@ -1093,7 +1093,7 @@ template <>
 void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode *node )
 {
     visitor.forall_head = true;
-    walk_expression_base( node->in_expr );
+    walk_atom( node->in_expr );
     visitor.forall_head = false;
     
     Type list_t = new Type( TypeType::LIST, new Type( TypeType::UNKNOWN ) );
@@ -1157,7 +1157,7 @@ void AstWalker<TypecheckVisitor, Type*>::walk_call(CallNode *call) {
   if (call->ruleref == nullptr) {
     visitor.visit_call_pre(call);
   } else {
-    Type *v = walk_expression_base(call->ruleref);
+    Type *v = walk_atom(call->ruleref);
     visitor.visit_call_pre(call, v);
   }
 
