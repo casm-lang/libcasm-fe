@@ -32,12 +32,13 @@
 
 #include "LinkedHashMap.h"
 #include "../Value.h"
+#include "../various/location.hh"
 
 struct Update
 {
     value_t value;
     const std::vector<value_t>* args;
-    uint64_t line;
+    const yy::location* location;
     uint32_t func; // function uid
 };
 

@@ -88,7 +88,7 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &
     up->value = val;
     up->func = sym->id;
     up->args = &it->first;
-    up->line = location.begin.line;
+    up->location = &location;
 
     try {
         const value_t& ref = it->second;
@@ -99,10 +99,10 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &
 
         const auto info = "Conflict while adding update " + sym->name
                         + to_string(*conflictingUpdate->args)
-                        + " = " + val.to_str() + " at line " + std::to_string(up->line)
-                        + ", conflicting with line " + std::to_string(existingUpdate->line)
+                        + " = " + val.to_str() + " at line " + std::to_string(up->location->begin.line)
+                        + ", conflicting with line " + std::to_string(existingUpdate->location->begin.line)
                         + " with value '" + existingUpdate->value.to_str() + "'";
-        throw RuntimeException(location, info);
+        throw RuntimeException({existingUpdate->location, conflictingUpdate->location}, info);
     }
 
     return up;
@@ -122,14 +122,14 @@ void ExecutionPassBase::merge()
         const auto existingUpdate = e.existingUpdate();
 
         const auto function = function_symbols[conflictingUpdate->func];
-        const auto location = function->name + to_string(*conflictingUpdate->args);
+        const auto functionLocation = function->name + to_string(*conflictingUpdate->args);
 
-        const auto info = "Conflict while merging updateset " + location
-                        + " at line " + std::to_string(conflictingUpdate->line)
+        const auto info = "Conflict while merging updateset " + functionLocation
+                        + " at line " + std::to_string(conflictingUpdate->location->begin.line)
                         + " with value '" + conflictingUpdate->value.to_str() + "'"
-                        + " and at line " + std::to_string(existingUpdate->line)
+                        + " and at line " + std::to_string(existingUpdate->location->begin.line)
                         + " with value '" + existingUpdate->value.to_str() + "'";
-        throw RuntimeException(info);
+        throw RuntimeException({existingUpdate->location, conflictingUpdate->location}, info);
     }
 }
 
