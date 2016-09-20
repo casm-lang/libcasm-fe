@@ -101,7 +101,7 @@ class BlockAllocator
         {
             const auto beg = (char*)this + sizeof(Block);
 
-            m_freePosition = addr;
+            m_freePosition = (char*)addr;
             m_usage = m_freePosition - beg;
         }
 
