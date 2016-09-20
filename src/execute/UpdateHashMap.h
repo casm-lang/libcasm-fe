@@ -232,11 +232,9 @@ private:
         const size_type hash = hasher(key);
         Bucket* bucket = bucketAt(hash);
 
-        if (bucket->entry) {
-            for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
-                if ((entry->hash == hash) and equals(entry->key, key)) {
-                    return std::make_pair(entry, false);
-                }
+        for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
+            if ((entry->hash == hash) and equals(entry->key, key)) {
+                return std::make_pair(entry, false);
             }
         }
 
