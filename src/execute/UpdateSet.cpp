@@ -58,7 +58,7 @@ UpdateSet::UpdateSet(Type type, UpdateSet* parent) :
 
 UpdateSet::~UpdateSet()
 {
-    clear();
+
 }
 
 UpdateSet::Type UpdateSet::type() const noexcept
@@ -81,15 +81,15 @@ void UpdateSet::add(const value_t* location, Update* update)
     if (m_type == Type::Parallel) {
         const auto result = m_set.insert(location, update);
         if (!result.second) {
-            const auto existingPair = *(result.first);
-            const auto existingUpdate = existingPair.second;
+            const auto it = result.first;
+            const auto existingUpdate = it.value();
 
             if (update->value != existingUpdate->value) {
                 throw Conflict("Conflict in updateset", update, existingUpdate);
             }
         }
     } else {
-        m_set[location] = update;
+        m_set.insertOrAssign(location, update);
     }
 }
 
@@ -97,8 +97,8 @@ Update* UpdateSet::lookup(const value_t* location) const
 {
     if (m_type == Type::Sequential) {
         const auto it = m_set.find(location);
-        if (it != m_set.cend()) {
-            return it->second;
+        if (it != m_set.end()) {
+            return it.value();
         }
     }
 
@@ -120,32 +120,27 @@ void UpdateSet::merge()
         std::swap(m_parent->m_set, m_set);
     } else {
         m_parent->m_set.reserve(m_parent->m_set.size() + m_set.size());
-        for(const auto& pair : m_set) {
-            m_parent->add(pair.first, pair.second);
+        const auto end = m_set.end();
+        for (auto it = m_set.begin(); it != end; ++it) {
+            m_parent->add(it.key(), it.value());
         }
-        clear();
     }
 }
 
-void UpdateSet::clear()
+typename UpdateSet::const_iterator UpdateSet::begin() const noexcept
 {
-    m_set.clear();
+    return m_set.begin();
 }
 
-typename UpdateSet::const_iterator UpdateSet::cbegin() const noexcept
+typename UpdateSet::const_iterator UpdateSet::end() const noexcept
 {
-    return m_set.cbegin();
-}
-
-typename UpdateSet::const_iterator UpdateSet::cend() const noexcept
-{
-    return m_set.cend();
+    return m_set.end();
 }
 
 Update* UpdateSet::get(const value_t* location) const noexcept
 {
     const auto it = m_set.find(location);
-    return (it != m_set.cend()) ? it->second : nullptr;
+    return (it != m_set.end()) ? it.value() : nullptr;
 }
 
 UpdateSetManager::UpdateSetManager() :

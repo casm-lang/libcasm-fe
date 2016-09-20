@@ -142,10 +142,10 @@ void ExecutionPassBase::applyUpdates()
     std::vector<value_t*> to_fold;
 
     auto updateSet = updateSetManager.currentUpdateSet();
-    const auto end = updateSet->cend();
-    for (auto it = updateSet->cbegin(); it != end; ++it) {
-        value_t* location = const_cast<value_t*>(it->first);
-        const Update* u = it->second;
+    const auto end = updateSet->end();
+    for (auto it = updateSet->begin(); it != end; ++it) {
+        value_t* location = const_cast<value_t*>(it.key());
+        Update* u = it.value();
 
         // TODO handle tuples
         if (u->value.type == TypeType::LIST) {

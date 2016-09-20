@@ -1,4 +1,4 @@
-//  
+//
 //  Copyright (c) 2014-2016 CASM Organization
 //  All rights reserved.
 //  
@@ -163,9 +163,9 @@ void NumericExecutionPass::dumpUpdates() const
     bool firstDump = true;
 
     const auto updateSet = updateSetManager.currentUpdateSet();
-    const auto end = updateSet->cend();
-    for (auto it = updateSet->cbegin(); it != end; ++it) {
-        const Update* update = it->second;
+    const auto end = updateSet->end();
+    for (auto it = updateSet->begin(); it != end; ++it) {
+        const Update* update = it.value();
         const Function* function = function_symbols[update->func];
 
         if (not firstDump) {

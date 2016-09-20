@@ -30,17 +30,7 @@
 #include <stdexcept>
 #include <stack>
 
-#include "LinkedHashMap.h"
-#include "../Value.h"
-#include "../various/location.hh"
-
-struct Update
-{
-    value_t value;
-    const std::vector<value_t>* args;
-    const yy::location* location;
-    uint32_t func; // function uid
-};
+#include "UpdateHashMap.h"
 
 class UpdateSet
 {
@@ -65,7 +55,7 @@ public:
     };
 
 public:
-    using const_iterator = typename LinkedHashMap<const value_t*, Update*>::const_iterator;
+    using const_iterator = typename UpdateHashMap<const value_t*, Update*>::const_iterator;
 
     explicit UpdateSet(Type type, UpdateSet* parent = nullptr);
     virtual ~UpdateSet();
@@ -91,17 +81,15 @@ public:
      */
     void merge();
 
-    void clear();
-
-    const_iterator cbegin() const noexcept;
-    const_iterator cend() const noexcept;
+    const_iterator begin() const noexcept;
+    const_iterator end() const noexcept;
 
     Update* get(const value_t* location) const noexcept;
 
 private:
     UpdateSet* m_parent;
     const Type m_type;
-    LinkedHashMap<const value_t*, Update*> m_set;
+    UpdateHashMap<const value_t*, Update*> m_set;
 };
 
 class UpdateSetManager
