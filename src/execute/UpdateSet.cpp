@@ -51,7 +51,7 @@ Update* UpdateSet::Conflict::existingUpdate() const noexcept
 UpdateSet::UpdateSet(Type type, UpdateSet* parent) :
     m_parent(parent),
     m_type(type),
-    m_set(100)
+    m_set(10)
 {
 
 }
