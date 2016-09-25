@@ -114,9 +114,9 @@ public:
         m_buckets(nullptr),
         m_lastEntry(nullptr),
         m_size(0),
-        m_capacity(0)
+        m_capacity(initialCapacity)
     {
-        resize(nextPowerOfTwo(initialCapacity));
+
     }
 
     UpdateHashMap(UpdateHashMap&& other) :
@@ -141,7 +141,9 @@ public:
 
     ~UpdateHashMap()
     {
-        delete[] m_buckets;
+        if (m_buckets) {
+            delete[] m_buckets;
+        }
     }
 
     constexpr bool empty() const
@@ -217,7 +219,11 @@ public:
     void reserve(size_type n)
     {
         if (needsResizing(n)) {
-            resize(nextPowerOfTwo(std::max(n, m_capacity + 1)));
+            if (m_buckets) {
+                resize(nextPowerOfTwo(std::max(n, m_capacity + 1)));
+            } else {
+                m_capacity = std::max(n, m_capacity);
+            }
         }
     }
 
@@ -229,6 +235,8 @@ private:
 
     inline std::pair<Entry*, bool> searchOrInsertEntry(const Key& key, const Value& value)
     {
+        assert(m_buckets != nullptr);
+
         const size_type hash = hasher(key);
         Bucket* bucket = bucketAt(hash);
 
@@ -250,12 +258,14 @@ private:
 
     inline Entry* searchEntry(const Key& key) const
     {
-        const size_type hash = hasher(key);
-        const Bucket* bucket = bucketAt(hash);
+        if (m_buckets) {
+            const size_type hash = hasher(key);
+            const Bucket* bucket = bucketAt(hash);
 
-        for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
-            if ((entry->hash == hash) and equals(entry->key, key)) {
-                return entry;
+            for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
+                if ((entry->hash == hash) and equals(entry->key, key)) {
+                    return entry;
+                }
             }
         }
 
@@ -264,6 +274,8 @@ private:
 
     inline void insertEntry(Entry* entry) noexcept
     {
+        assert(m_buckets != nullptr);
+
         Bucket* bucket = bucketAt(entry->hash);
         entry->next = bucket->entry;
         bucket->entry = entry;
@@ -271,7 +283,7 @@ private:
 
     constexpr bool needsResizing(size_type size) const noexcept
     {
-        return size > m_capacity;
+        return (size > m_capacity) or (m_buckets == nullptr);
     }
 
     void resize(size_type newCapacity)
