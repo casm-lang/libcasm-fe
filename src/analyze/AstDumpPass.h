@@ -29,6 +29,8 @@
 #include "libpass.h"
 #include "libcasm-fe.all.h"
 
+#include "../AstDumpVisitor.h"
+
 /**
    @brief    TODO
    

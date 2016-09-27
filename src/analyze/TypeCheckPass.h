@@ -29,6 +29,8 @@
 #include "libpass.h"
 #include "libcasm-fe.all.h"
 
+#include "../TypeCheckVisitor.h"
+
 /**
    @brief    TODO
    

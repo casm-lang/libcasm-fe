@@ -26,7 +26,7 @@
 #ifndef _LIB_CASMFE_H_
 #define _LIB_CASMFE_H_
 
-#include "src/AstInterface.h"
+#include "src/Visitor.h"
 
 // TODO: FIXME: PPA: list here all internal header files etc.
 // use the class below to create a nice inheritance tree!
