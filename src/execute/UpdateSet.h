@@ -67,7 +67,7 @@ public:
 public:
     using const_iterator = typename LinkedHashMap<uint64_t, Update*>::const_iterator;
 
-    explicit UpdateSet(Type type, UpdateSet* parent = nullptr);
+    explicit UpdateSet(Type type, std::size_t initialSize, UpdateSet* parent = nullptr);
     virtual ~UpdateSet();
 
     Type type() const noexcept;
@@ -83,7 +83,7 @@ public:
 
     Update* lookup(const uint64_t key) const;
 
-    UpdateSet* fork(const UpdateSet::Type updateSetType);
+    UpdateSet* fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
 
     /**
      *
@@ -118,7 +118,7 @@ public:
 
     Update* lookup(const uint64_t key) const;
 
-    void fork(const UpdateSet::Type updateSetType);
+    void fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
 
     /**
      *

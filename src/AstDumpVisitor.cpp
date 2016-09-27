@@ -78,7 +78,7 @@ void AstDumpVisitor::visit_init(AstNode *init) {
 }
 
 void AstDumpVisitor::visit_rule(RuleNode *rule) {
-  dump_node(rule, "Rule "+rule->name);
+  dump_node(rule, "Rule " + rule->name + " - " + std::to_string(rule->updates) + " updates");
   dump_link(rule, rule->child_);
 }
 
@@ -96,7 +96,7 @@ void AstDumpVisitor::visit_statement(AstNode *stmt) {
 }
 
 void AstDumpVisitor::visit_ifthenelse(IfThenElseNode *node, bool) {
-  dump_node(node, "IfThenElse");
+  dump_node(node, "IfThenElse - " + std::to_string(node->updates) + " updates");
   dump_link(node, node->condition_);
   dump_link(node, node->then_);
   if (node->else_) {
@@ -112,12 +112,12 @@ bool AstDumpVisitor::visit_assert(UnaryNode *assert, bool) {
 }
 
 void AstDumpVisitor::visit_seqblock(UnaryNode *seqblock) {
-  dump_node(seqblock, "Seqblock");
+  dump_node(seqblock, "Seqblock - " + std::to_string(seqblock->updates) + " updates");
   dump_link(seqblock, seqblock->child_);
 }
 
 void AstDumpVisitor::visit_parblock(UnaryNode *parblock) {
-  dump_node(parblock, "Parblock");
+  dump_node(parblock, "Parblock - " + std::to_string(parblock->updates) + " updates");
   dump_link(parblock, parblock->child_);
 }
 
@@ -186,14 +186,14 @@ void AstDumpVisitor::visit_case(CaseNode* node, const bool flag, const std::vect
 
 void AstDumpVisitor::visit_forall_post(ForallNode* node)
 {
-    dump_node(node, "Forall");
+    dump_node(node, "Forall - " + std::to_string(node->updates) + " updates");
     dump_link(node, node->in_expr);
     dump_link(node, node->statement);
 }
 
 void AstDumpVisitor::visit_iterate(UnaryNode* node)
 {
-    dump_node(node, "Iterate");
+    dump_node(node, "Iterate - " + std::to_string(node->updates) + " updates");
     dump_link(node, node->child_);
 }
 

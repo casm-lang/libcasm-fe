@@ -108,9 +108,9 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &
     return up;
 }
 
-void ExecutionPassBase::fork(const UpdateSet::Type updateSetType)
+void ExecutionPassBase::fork(const UpdateSet::Type updateSetType, std::size_t initialSize)
 {
-    updateSetManager.fork(updateSetType);
+    updateSetManager.fork(updateSetType, initialSize);
 }
 
 void ExecutionPassBase::merge()

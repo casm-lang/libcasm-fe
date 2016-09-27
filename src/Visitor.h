@@ -223,12 +223,14 @@ public:
     {
         visitor.visit_seqblock(parblock);
         walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
+        visitor.visit_seqblock_post(parblock);
     }
 
     void walk_parblock(UnaryNode *parblock)
     {
         visitor.visit_parblock(parblock);
         walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
+        visitor.visit_parblock_post(parblock);
     }
 
     void walk_statements(AstListNode *stmts)
@@ -237,6 +239,7 @@ public:
         for (auto stmt: stmts->nodes) {
             walk_statement(stmt);
         }
+        visitor.visit_statements_post(stmts);
     }
 
     void walk_update(UpdateNode *update)
@@ -330,6 +333,7 @@ public:
     {
         visitor.visit_iterate(node);
         walk_statement(node->child_);
+        visitor.visit_iterate_post(node);
     }
 
     void walk_case(CaseNode *node)
@@ -356,6 +360,7 @@ public:
         if (n->else_) {
             walk_statement(n->else_);
         }
+        visitor.visit_ifthenelse_post(n, cond);
     }
 
     V walk_function_atom(BaseFunctionAtom *func)
@@ -510,12 +515,16 @@ public:
     void visit_rule(RuleNode*) {}
     void visit_rule_post(RuleNode*) {}
     void visit_statements(AstListNode*) {}
+    void visit_statements_post(AstListNode*) {}
     void visit_statement(AstNode*) {}
     void visit_ifthenelse(IfThenElseNode*, T) {}
+    void visit_ifthenelse_post(IfThenElseNode*, T) {}
     void visit_assert(UnaryNode*, T) {}
     void visit_assure(UnaryNode*, T) {}
     void visit_seqblock(UnaryNode*) {}
+    void visit_seqblock_post(UnaryNode*) {}
     void visit_parblock(UnaryNode*) {}
+    void visit_parblock_post(UnaryNode*) {}
     T visit_update(UpdateNode*, T, T) { return T(); }
     T visit_update_dumps(UpdateNode *u, T v1, T v2) { return visit_update(u, v1, v2); }
     T visit_call_pre(CallNode*) { return T(); }
@@ -538,6 +547,7 @@ public:
     void visit_forall_post(ForallNode*) { }
 
     void visit_iterate(UnaryNode*) { }
+    void visit_iterate_post(UnaryNode*) { }
 
     T visit_expression(BinaryExpression*, T, T) { return T(); }
     T visit_expression_single(UnaryExpression*, T) { return T(); }

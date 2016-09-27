@@ -48,10 +48,10 @@ Update* UpdateSet::Conflict::existingUpdate() const noexcept
     return m_existingUpdate;
 }
 
-UpdateSet::UpdateSet(Type type, UpdateSet* parent) :
+UpdateSet::UpdateSet(Type type, std::size_t initialSize, UpdateSet* parent) :
     m_parent(parent),
     m_type(type),
-    m_set(100)
+    m_set(initialSize)
 {
 
 }
@@ -109,9 +109,9 @@ Update* UpdateSet::lookup(const uint64_t key) const
     return nullptr;
 }
 
-UpdateSet *UpdateSet::fork(const UpdateSet::Type updateSetType)
+UpdateSet *UpdateSet::fork(const UpdateSet::Type updateSetType, std::size_t initialSize)
 {
-    return new UpdateSet(updateSetType, this);
+    return new UpdateSet(updateSetType, initialSize, this);
 }
 
 void UpdateSet::merge()
@@ -174,13 +174,13 @@ Update* UpdateSetManager::lookup(const uint64_t key) const
     }
 }
 
-void UpdateSetManager::fork(const UpdateSet::Type updateSetType)
+void UpdateSetManager::fork(const UpdateSet::Type updateSetType, std::size_t initialSize)
 {
     if (m_updateSets.empty()) {
-        m_updateSets.push(new UpdateSet(updateSetType));
+        m_updateSets.push(new UpdateSet(updateSetType, initialSize));
     } else {
         auto currentUpdateSet = m_updateSets.top();
-        auto forkedUpdateSet = currentUpdateSet->fork(updateSetType);
+        auto forkedUpdateSet = currentUpdateSet->fork(updateSetType, initialSize);
         m_updateSets.push(forkedUpdateSet);
     }
 }

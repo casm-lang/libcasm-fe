@@ -423,7 +423,7 @@ void NumericExecutionWalker::walk_ifthenelse(IfThenElseNode* node)
 template <>
 void NumericExecutionWalker::walk_seqblock(UnaryNode* seqblock)
 {
-    visitor.fork(UpdateSet::Type::Sequential);
+    visitor.fork(UpdateSet::Type::Sequential, seqblock->updates);
     visitor.visit_seqblock(seqblock);
     walk_statements(reinterpret_cast<AstListNode*>(seqblock->child_));
     visitor.merge();
@@ -432,7 +432,7 @@ void NumericExecutionWalker::walk_seqblock(UnaryNode* seqblock)
 template <>
 void NumericExecutionWalker::walk_parblock(UnaryNode* parblock)
 {
-    visitor.fork(UpdateSet::Type::Parallel);
+    visitor.fork(UpdateSet::Type::Parallel, parblock->updates);
     visitor.visit_parblock(parblock);
     walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
     visitor.merge();
@@ -480,7 +480,7 @@ void NumericExecutionWalker::walk_forall(ForallNode *node)
 {
     const value_t in_list = walk_atom(node->in_expr);
 
-    visitor.fork(UpdateSet::Type::Parallel);
+    visitor.fork(UpdateSet::Type::Parallel, node->updates);
 
     switch (node->in_expr->type_.t)
     {
@@ -552,10 +552,10 @@ void NumericExecutionWalker::walk_forall(ForallNode *node)
 template <>
 void NumericExecutionWalker::walk_iterate(UnaryNode *node)
 {
-    visitor.fork(UpdateSet::Type::Sequential);
+    visitor.fork(UpdateSet::Type::Sequential, node->updates);
 
     while (true) {
-        visitor.fork(UpdateSet::Type::Parallel);
+        visitor.fork(UpdateSet::Type::Parallel, node->child_->updates);
         walk_statement(node->child_);
         if (visitor.hasEmptyUpdateSet()) {
             visitor.merge(); // to remove the update set from the stack
