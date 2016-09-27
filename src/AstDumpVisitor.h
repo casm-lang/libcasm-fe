@@ -71,8 +71,8 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     void visit_push(PushNode*, bool, bool);
     void visit_case(CaseNode* node, const bool flag, const std::vector<bool>& result);
             
-    void visit_forall_post(ForallNode*) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); }
-    void visit_iterate(UnaryNode*) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); }
+    void visit_forall_post(ForallNode* node);
+    void visit_iterate(UnaryNode* node);
     
     bool visit_expression(BinaryExpression *expr, bool, bool);
     bool visit_expression_single(UnaryExpression *expr, bool);
@@ -83,13 +83,13 @@ class AstDumpVisitor : public BaseVisitor<bool> {
     bool visit_undef_atom(UndefAtom*);
     bool visit_function_atom(FunctionAtom *atom, std::vector<bool>&);
     bool visit_builtin_atom(BuiltinAtom *, std::vector<bool>&);
-    bool visit_derived_function_atom(FunctionAtom*, bool); // { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); return 0; }
+    bool visit_derived_function_atom(FunctionAtom*, bool);
     bool visit_self_atom(SelfAtom *atom);
     bool visit_rule_atom(RuleAtom *atom);
     bool visit_boolean_atom(BooleanAtom *atom);
     bool visit_string_atom(StringAtom *atom);
     bool visit_list_atom(ListAtom*, std::vector<bool>&);
-    bool visit_number_range_atom(NumberRangeAtom*, bool, bool) { fprintf( stderr, "%s: %s: not implemented\n", __FILE__, __FUNCTION__ ); return 0; }
+    bool visit_number_range_atom(NumberRangeAtom*, bool, bool);
 };
 
 #endif //CASMI_LIBINTERPRETER_EXEC_VISITOR

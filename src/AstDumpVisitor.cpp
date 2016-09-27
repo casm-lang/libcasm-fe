@@ -184,6 +184,18 @@ void AstDumpVisitor::visit_case(CaseNode* node, const bool flag, const std::vect
     }
 }
 
+void AstDumpVisitor::visit_forall_post(ForallNode* node)
+{
+    dump_node(node, "Forall");
+    dump_link(node, node->in_expr);
+    dump_link(node, node->statement);
+}
+
+void AstDumpVisitor::visit_iterate(UnaryNode* node)
+{
+    dump_node(node, "Iterate");
+    dump_link(node, node->child_);
+}
 
 bool AstDumpVisitor::visit_print( PrintNode *node, bool argument )
 {
@@ -316,4 +328,12 @@ bool AstDumpVisitor::visit_list_atom(ListAtom* atom, std::vector<bool>&) {
   }
 
   return true;
+}
+
+bool AstDumpVisitor::visit_number_range_atom(NumberRangeAtom* atom, bool, bool)
+{
+    dump_node(atom, std::string("NumberRange"));
+    dump_link(atom, atom->left);
+    dump_link(atom, atom->right);
+    return true;
 }
