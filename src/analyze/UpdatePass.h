@@ -63,6 +63,8 @@ namespace libcasm_fe
 
         bool visit_update(UpdateNode* update, bool, bool);
         bool visit_update_dumps(UpdateNode* update, bool, bool);
+        void visit_push(PushNode* node, bool, bool);
+        void visit_pop(PopNode* node);
 
     private:
         void evaluateRule(RuleNode* rule);

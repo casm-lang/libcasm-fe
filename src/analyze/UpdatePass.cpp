@@ -151,7 +151,7 @@ static std::pair<bool, std::size_t> expressionBound(ExpressionBase* expr) // TOD
 void UpdatePass::visit_forall_post(ForallNode* node)
 {
     const auto bound = expressionBound(node->in_expr);
-    if (bound.first) {
+    if (bound.first) { // is bounded
         node->updates = node->statement->updates * bound.second;
     } else {
         node->updates = node->statement->updates; // in theorie this should be infinity
@@ -178,6 +178,20 @@ bool UpdatePass::visit_update_dumps(UpdateNode* update, bool, bool)
 {
     update->updates = 1;
     return true;
+}
+
+void UpdatePass::visit_push(PushNode* node, bool, bool)
+{
+    node->updates = 1;
+}
+
+void UpdatePass::visit_pop(PopNode* node)
+{
+    if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) { // pop into
+        node->updates = 2;
+    } else {
+        node->updates = 1;
+    }
 }
 
 void UpdatePass::evaluateRule(RuleNode* rule)
