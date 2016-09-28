@@ -120,6 +120,44 @@ class BlockAllocator
         Block* m_previous;
     };
 
+    class MemoryPool
+    {
+    public:
+        void* get()
+        {
+            if (m_freeMemory) {
+                auto memory = m_freeMemory;
+                m_freeMemory = reinterpret_cast<void**>(*memory);
+                return reinterpret_cast<void*>(memory);
+            } else {
+                return aligned_alloc(BlockSize, BlockSize);
+            }
+        }
+
+        void release(void* memory)
+        {
+            auto p = reinterpret_cast<void**>(memory);
+            *p = m_freeMemory; // build a linked-list
+            m_freeMemory = p;
+        }
+
+        static MemoryPool& instance()
+        {
+            static MemoryPool instance;
+            return instance;
+        }
+
+    private:
+        MemoryPool() = default;
+        MemoryPool(const MemoryPool&) = delete;
+        MemoryPool& operator=(const MemoryPool&) = delete;
+        MemoryPool(MemoryPool&&) = delete;
+        MemoryPool& operator=(MemoryPool&&) = delete;
+
+    private:
+        void** m_freeMemory = nullptr; // linked list of free memory blocks
+    };
+
 public:
     BlockAllocator()
     {
@@ -133,7 +171,7 @@ public:
         while (block != nullptr) {
             const auto b = block;
             block = block->previous();
-            free(b);
+            MemoryPool::instance().release(b);
         }
     }
 
@@ -197,7 +235,7 @@ public:
 private:
     Block* allocateNewBlock()
     {
-        const auto memory = aligned_alloc(BlockSize, BlockSize);
+        const auto memory = MemoryPool::instance().get();
         const auto block = new(memory) Block(m_topBlock);
         m_topBlock = block;
         return block;
