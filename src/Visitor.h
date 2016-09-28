@@ -130,6 +130,27 @@ public:
         visitor.visit_skip(node);
     }
 
+    void walk_assert(UnaryNode* assert)
+    {
+        const V v = walk_atom(reinterpret_cast<ExpressionBase*>(assert->child_));
+        visitor.visit_assert(assert, v);
+    }
+
+    void walk_assure(UnaryNode* assure)
+    {
+        const V v = walk_atom(reinterpret_cast<ExpressionBase*>(assure->child_));
+        visitor.visit_assure(assure, v);
+    }
+
+    void walk_diedie(DiedieNode* node)
+    {
+        if (node->msg) {
+            visitor.visit_diedie(node, walk_atom(node->msg));
+        } else {
+            visitor.visit_diedie(node, V());
+        }
+    }
+
     void walk_statement(AstNode *stmt)
     {
         switch(stmt->node_type_) {
@@ -142,18 +163,12 @@ public:
         case NodeType::UPDATE:
             walk_update(reinterpret_cast<UpdateNode*>(stmt));
             break;
-        case NodeType::ASSERT: {
-            UnaryNode *assert = reinterpret_cast<UnaryNode*>(stmt);
-            V v = walk_atom(reinterpret_cast<ExpressionBase*>(assert->child_));
-            visitor.visit_assert(assert, v);
+        case NodeType::ASSERT:
+            walk_assert(reinterpret_cast<UnaryNode*>(stmt));
             break;
-        }
-        case NodeType::ASSURE: {
-            UnaryNode *assure = reinterpret_cast<UnaryNode*>(stmt);
-            V v = walk_atom(reinterpret_cast<ExpressionBase*>(assure->child_));
-            visitor.visit_assure(assure, v);
+        case NodeType::ASSURE:
+            walk_assure(reinterpret_cast<UnaryNode*>(stmt));
             break;
-        }
         case NodeType::SKIP: {
             // skip does nothing, but in the IR we need this "trivial" information for processing!
             walk_skip(stmt);
@@ -198,15 +213,9 @@ public:
         case NodeType::UPDATE_DUMPS:
             walk_update_dumps(reinterpret_cast<UpdateNode*>(stmt));
             break;
-        case NodeType::DIEDIE: {
-            DiedieNode *node = reinterpret_cast<DiedieNode*>(stmt);
-            if (node->msg) {
-                visitor.visit_diedie(node, walk_atom(node->msg));
-            } else {
-                visitor.visit_diedie(node, V());
-            }
+        case NodeType::DIEDIE:
+            walk_diedie(reinterpret_cast<DiedieNode*>(stmt));
             break;
-        }
         case NodeType::IMPOSSIBLE:
             visitor.visit_impossible(stmt);
             break;
@@ -244,25 +253,25 @@ public:
 
     void walk_update(UpdateNode *update)
     {
-        V expr_t = walk_atom(update->expr_);
+        const V expr = walk_atom(update->expr_);
 
         // we must walk the expression before walking update->func because it
         // sets the list of arguments and we do not want the update->expr_ to
         // overwrite the value_list
-        V func_t = walk_function_atom(update->func);
-        visitor.visit_update(update, func_t, expr_t);
+        const V func = walk_function_atom(update->func);
+        visitor.visit_update(update, func, expr);
     }
 
 
     void walk_update_dumps(UpdateNode *update)
     {
-        V expr_t = walk_atom(update->expr_);
+        const V expr = walk_atom(update->expr_);
 
         // we must walk the expression before walking update->func because it
         // sets the list of arguments and we do not want the update->expr_ to
         // overwrite the value_list
-        V func_t = walk_function_atom(update->func);
-        visitor.visit_update_dumps(update, func_t, expr_t);
+        const V func = walk_function_atom(update->func);
+        visitor.visit_update_dumps(update, func, expr);
     }
 
 
@@ -271,7 +280,7 @@ public:
         if (call->ruleref == nullptr) {
             visitor.visit_call_pre(call);
         } else {
-            V v = walk_atom(call->ruleref);
+            const V v = walk_atom(call->ruleref);
             visitor.visit_call_pre(call, v);
         }
 
@@ -302,7 +311,7 @@ public:
 
     void walk_let(LetNode *node)
     {
-        V v = walk_atom(node->expr);
+        const V v = walk_atom(node->expr);
         visitor.visit_let(node, v);
         walk_statement(node->stmt);
         visitor.visit_let_post(node);
@@ -316,8 +325,8 @@ public:
 
     void walk_push(PushNode *node)
     {
-        V expr = walk_atom(node->expr);
-        V atom = walk_function_atom(node->to);
+        const V expr = walk_atom(node->expr);
+        const V atom = walk_function_atom(node->to);
         visitor.visit_push(node, expr, atom);
     }
 
@@ -338,8 +347,8 @@ public:
 
     void walk_case(CaseNode *node)
     {
-        V web = walk_atom(node->expr);
-        visitor.visit_case_pre(node, web );
+        const V web = walk_atom(node->expr);
+        visitor.visit_case_pre(node, web);
         std::vector<V> case_labels;
         for (auto& pair : node->case_list) {
             // pair.first == nullptr for default:
@@ -354,7 +363,7 @@ public:
 
     void walk_ifthenelse(IfThenElseNode *n)
     {
-        V cond = walk_atom(n->condition_);
+        const V cond = walk_atom(n->condition_);
         visitor.visit_ifthenelse(n, cond);
         walk_statement(n->then_);
         if (n->else_) {
@@ -363,22 +372,23 @@ public:
         visitor.visit_ifthenelse_post(n, cond);
     }
 
-    V walk_function_atom(BaseFunctionAtom *func)
+    V walk_function_atom(FunctionAtom* func)
     {
         std::vector<V> argumentValues = evaluateExpressions(func->arguments);
 
-        if (func->node_type_ == NodeType::BUILTIN_ATOM) {
-            return visitor.visit_builtin_atom(reinterpret_cast<BuiltinAtom*>(func), argumentValues);
+        if (func->symbol_type == FunctionAtom::SymbolType::DERIVED) {
+            visitor.visit_derived_function_atom_pre(func, argumentValues);
+            const V expr = walk_atom(func->symbol->derived);
+            return visitor.visit_derived_function_atom(func, expr);
         } else {
-            FunctionAtom *func_a = reinterpret_cast<FunctionAtom*>(func);
-            if (func_a->symbol_type == FunctionAtom::SymbolType::DERIVED) {
-                visitor.visit_derived_function_atom_pre(func_a, argumentValues);
-                V expr = walk_atom(func_a->symbol->derived);
-                return visitor.visit_derived_function_atom(func_a, expr);
-            } else {
-                return visitor.visit_function_atom(func_a, argumentValues);
-            }
+            return visitor.visit_function_atom(func, argumentValues);
         }
+    }
+
+    V walk_builtin_atom(BuiltinAtom* builtin)
+    {
+        std::vector<V> argumentValues = evaluateExpressions(builtin->arguments);
+        return visitor.visit_builtin_atom(builtin, argumentValues);
     }
 
     V walk_list_atom(ListAtom *atom)
@@ -440,10 +450,13 @@ public:
             {
                 return visitor.visit_undef_atom( reinterpret_cast< UndefAtom* >( atom ) );
             }
-            case NodeType::BUILTIN_ATOM: // fall-through
+            case NodeType::BUILTIN_ATOM:
+            {
+                return walk_builtin_atom( reinterpret_cast< BuiltinAtom* >( atom ) );
+            }
             case NodeType::FUNCTION_ATOM:
             {
-                return walk_function_atom( reinterpret_cast< BaseFunctionAtom* >( atom ) );
+                return walk_function_atom( reinterpret_cast< FunctionAtom* >( atom ) );
             }
             case NodeType::SELF_ATOM:
             {
