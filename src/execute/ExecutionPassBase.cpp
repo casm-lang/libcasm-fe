@@ -209,17 +209,19 @@ value_t ExecutionPassBase::functionValue
 , const std::vector<value_t>& arguments
 )
 {
-    try
-    {
-        validateArguments(function->arguments_, arguments);
-    }
-    catch( const std::domain_error& e )
-    {
-        throw RuntimeException
-        ( function->location
-        , e.what()
-        , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtLookup
-        );
+    if (function->checkArguments) {
+        try
+        {
+            validateArguments(function->arguments_, arguments);
+        }
+        catch( const std::domain_error& e )
+        {
+            throw RuntimeException
+            ( function->location
+            , e.what()
+            , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtLookup
+            );
+        }
     }
     
     const auto& function_map = function_states[function->id];
@@ -793,17 +795,19 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom, std::vect
 
 void ExecutionPassBase::visit_derived_function_atom_pre(FunctionAtom *function, std::vector<value_t> &arguments)
 {
-    try {
-        validateArguments(function->symbol->arguments_, arguments);
-    } catch (const std::domain_error& e) {
-        throw RuntimeException
-        ( function->location // TODO create a new exception type to pass on the argument index to get the proper arg location
-        , std::string(e.what())
-        + " of derived '"
-        + function->symbol->name
-        + "'"
-        , libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup
-        );
+    if (function->symbol->checkArguments) {
+        try {
+            validateArguments(function->symbol->arguments_, arguments);
+        } catch (const std::domain_error& e) {
+            throw RuntimeException
+            ( function->location // TODO create a new exception type to pass on the argument index to get the proper arg location
+            , std::string(e.what())
+            + " of derived '"
+            + function->symbol->name
+            + "'"
+            , libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup
+            );
+        }
     }
 
     rule_bindings.push_back( &arguments );
