@@ -803,7 +803,7 @@ Function::Function(bool is_static, bool is_symbolic, const std::string name, con
                 Symbol(name, location, SymbolType::FUNCTION), arguments_(std::move(args)), intitializers_(init),
                 return_type_(return_type), id(counter),
                 is_static(is_static), is_symbolic(is_symbolic),
-                subrange_arguments(), subrange_return(false) {
+                checkArguments(false), checkReturnValue(false) {
 
   counter += 1;
   initRangeCheck();
@@ -827,12 +827,12 @@ Function::Function(const std::string name, const yy::location& location,
 
 void Function::initRangeCheck()
 {
-    subrange_return = return_type_->has_range_restriction();
+    checkReturnValue = return_type_->has_range_restriction() and not is_symbolic;
 
-    for (uint32_t i=0; i < arguments_.size(); i++) {
-        Type* t = arguments_[i];
+    for (auto t : arguments_) {
         if (t->has_range_restriction()) {
-            subrange_arguments.push_back(i);
+            checkArguments = true;
+            break;
         }
     }
 }
@@ -846,19 +846,6 @@ Function::~Function() {
     }
     delete intitializers_;
   }
-}
-
-void Function::validateValue(const value_t &value) const
-{
-    if (subrange_return) {
-        const auto integer = value.value.integer;
-        if ((integer < return_type_->subrange_start) or (integer > return_type_->subrange_end)) {
-            throw std::domain_error(std::to_string(integer) + " does violate the subrange " +
-                                    std::to_string(return_type_->subrange_start) + ".." +
-                                    std::to_string(return_type_->subrange_end) +
-                                    " of `" + name + "`");
-        }
-    }
 }
 
 const std::string Function::to_str() const {

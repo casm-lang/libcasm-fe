@@ -50,32 +50,35 @@ bool ExecutionPassBase::hasEmptyUpdateSet() const
 Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &arguments,
                                      const value_t& val, const yy::location& location)
 {
-    try
-    {
-        validateArguments(sym->arguments_, arguments);
-    }
-    catch( const std::domain_error& e )
-    {
-        throw RuntimeException
-        ( location
-        , e.what()
-        , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtUpdate
-        );
-    }
-    
-    try
-    {
-        sym->validateValue(val);
-    }
-    catch( const std::domain_error& e )
-    {
-        throw RuntimeException
-        ( location
-        , e.what()
-        , libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate
-        );
+    if (sym->checkArguments) {
+        try
+        {
+            validateArguments(sym->arguments_, arguments);
+        }
+        catch( const std::domain_error& e )
+        {
+            throw RuntimeException
+            ( location
+            , e.what()
+            , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtUpdate
+            );
+        }
     }
     
+    if (sym->checkReturnValue) {
+        try
+        {
+            validateValue(sym->return_type_, val);
+        }
+        catch( const std::domain_error& e )
+        {
+            throw RuntimeException
+            ( location
+            , std::string(e.what()) + " of `" + sym->name + "`"
+            , libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate
+            );
+        }
+    }
     
     auto& function_map = function_states[sym->id];
     auto it = function_map.find(arguments); // TODO EP: use emplace only
@@ -834,38 +837,50 @@ void libcasm_fe::ExecutionPassBase::validateArguments(const std::vector<Type*>& 
         const auto& argumentValue = argumentValues.at( i );
         const Type* argumentType = argumentTypes.at( i );
 
-        switch( argumentType->t )
-        {
-            case TypeType::INTEGER:
-            {
-                const INTEGER_T integer = argumentValue.value.integer;
-
-                if( argumentType->has_range_restriction()
-                and (  integer < argumentType->subrange_start
-                    or integer > argumentType->subrange_end
-                    )
-                )
-                {
-                    throw std::domain_error
-                    ( std::to_string( integer )
-                      + " does violate the subrange "
-                      + std::to_string( argumentType->subrange_start )
-                      + ".."
-                      + std::to_string( argumentType->subrange_end )
-                      + " at argument #"
-                      + std::to_string( i + 1 )
-                    );
-                }
-                break;
-            }
-            default:
-            {
-                break;
-            }
+        try {
+            validateValue(argumentType, argumentValue);
+        } catch (const std::domain_error& e) {
+            throw std::domain_error
+            ( std::string(e.what())
+            + " at argument #"
+            + std::to_string( i + 1 )
+            );
         }
     }
 }
 
+void libcasm_fe::ExecutionPassBase::validateValue(const Type* type, const value_t& value) const
+{
+    assert(type != nullptr);
+
+    switch( type->t )
+    {
+        case TypeType::INTEGER:
+        {
+            const INTEGER_T integer = value.value.integer;
+
+            if( type->has_range_restriction()
+            and (  integer < type->subrange_start
+                or integer > type->subrange_end
+                )
+            )
+            {
+                throw std::domain_error
+                ( std::to_string( integer )
+                + " does violate the subrange "
+                + std::to_string( type->subrange_start )
+                + ".."
+                + std::to_string( type->subrange_end )
+                );
+            }
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+}
 
 //  
 //  Local variables:

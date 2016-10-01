@@ -257,8 +257,9 @@ class Function : public Symbol {
     const bool is_static;
     const bool is_symbolic;
 
-    std::vector<uint32_t> subrange_arguments;
-    bool subrange_return;
+    // for execution
+    bool checkArguments;
+    bool checkReturnValue;
 
     Function(const std::string name, const yy::location& location, const std::vector<Type*>& args, Type* return_type,
            std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *init);
@@ -268,11 +269,6 @@ class Function : public Symbol {
     Function(const std::string name, const yy::location& location, const std::vector<Type*>& args, ExpressionBase *expr, Type* return_type);
     Function(const std::string name, const yy::location& location, ExpressionBase *expr, Type *return_type);
     ~Function();
-
-    /**
-       @throws std::domain_error if value is out of range
-    */
-    void validateValue(const value_t &value) const;
     
     bool equals(Function *other) const;
     const std::string to_str() const;
