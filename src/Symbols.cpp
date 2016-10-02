@@ -827,14 +827,9 @@ Function::Function(const std::string name, const yy::location& location,
 
 void Function::initRangeCheck()
 {
-    checkReturnValue = return_type_->has_range_restriction() and not is_symbolic;
-
-    for (auto t : arguments_) {
-        if (t->has_range_restriction()) {
-            checkArguments = true;
-            break;
-        }
-    }
+    checkReturnValue = not is_symbolic and return_type_->has_range_restriction();
+    checkArguments = std::any_of(arguments_.cbegin(), arguments_.cend(),
+                                 [](Type* arg) { return arg->has_range_restriction(); });
 }
 
 Function::~Function() {
