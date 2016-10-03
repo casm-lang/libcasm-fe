@@ -59,24 +59,28 @@ TEST(UpdateSetTest, forkedSequentialUpdateSetShouldBeSequentialWhenRequestingSeq
 }
 
 TEST(UpdateSetTest, mergingParallelUpdateSetsIntoSequentialOnesShouldOverrideLocationValues) {
+    const value_t location;
+
     const auto seqUpdateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
-    seqUpdateSet->add(1, new Update{.value = make_integer_value(10)});
+    seqUpdateSet->add(&location, new Update{.value = make_integer_value(10)});
 
     const auto parUpdateSet = std::unique_ptr<UpdateSet>(seqUpdateSet->fork(UpdateSet::Type::Parallel));
-    parUpdateSet->add(1, new Update{.value = make_integer_value(1000)});
+    parUpdateSet->add(&location, new Update{.value = make_integer_value(1000)});
 
     parUpdateSet->merge();
 
-    EXPECT_EQ(make_integer_value(1000), seqUpdateSet->lookup(1)->value);
+    EXPECT_EQ(make_integer_value(1000), seqUpdateSet->lookup(&location)->value);
 }
 
 TEST(UpdateSetTest, mergingUpdateSetsIntoEmptyUpdateSetsShouldSwapValues) {
+    const value_t location1, location2, location3;
+
     const auto seqUpdateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
 
     const auto parUpdateSet = std::unique_ptr<UpdateSet>(seqUpdateSet->fork(UpdateSet::Type::Parallel));
-    parUpdateSet->add(1, new Update{.value = make_integer_value(1000)});
-    parUpdateSet->add(2, new Update{.value = make_integer_value(2000)});
-    parUpdateSet->add(3, new Update{.value = make_integer_value(3000)});
+    parUpdateSet->add(&location1, new Update{.value = make_integer_value(1000)});
+    parUpdateSet->add(&location2, new Update{.value = make_integer_value(2000)});
+    parUpdateSet->add(&location3, new Update{.value = make_integer_value(3000)});
 
     ASSERT_TRUE(seqUpdateSet->empty());
     ASSERT_EQ(3, parUpdateSet->size());
@@ -88,87 +92,106 @@ TEST(UpdateSetTest, mergingUpdateSetsIntoEmptyUpdateSetsShouldSwapValues) {
 }
 
 TEST(UpdateSetTest, mergingSequentialUpdateSetsIntoParallelOnesShouldNotThrowWhenOverridingLocationValuesWithSameValues) {
+    const value_t location;
+
     const auto parUpdateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Parallel));
-    parUpdateSet->add(1, new Update{.value = make_integer_value(10)});
+    parUpdateSet->add(&location, new Update{.value = make_integer_value(10)});
 
     const auto seqUpdateSet = std::unique_ptr<UpdateSet>(parUpdateSet->fork(UpdateSet::Type::Sequential));
-    seqUpdateSet->add(1, new Update{.value = make_integer_value(10)});
+    seqUpdateSet->add(&location, new Update{.value = make_integer_value(10)});
 
     EXPECT_NO_THROW(seqUpdateSet->merge());
 }
 
 TEST(UpdateSetTest, mergingSequentialUpdateSetsIntoParallelOnesShouldThrowWhenOverridingLocationValuesWithDifferentValues) {
+    const value_t location;
+
     const auto parUpdateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Parallel));
-    parUpdateSet->add(1, new Update{.value = make_integer_value(10)});
+    parUpdateSet->add(&location, new Update{.value = make_integer_value(10)});
 
     const auto seqUpdateSet = std::unique_ptr<UpdateSet>(parUpdateSet->fork(UpdateSet::Type::Sequential));
-    seqUpdateSet->add(1, new Update{.value = make_integer_value(1000)});
+    seqUpdateSet->add(&location, new Update{.value = make_integer_value(1000)});
 
     EXPECT_THROW(seqUpdateSet->merge(), UpdateSet::Conflict);
 }
 
 TEST(UpdateSetTest, lookupShouldPreferUpdatesOfCurrentUpdateSet) {
+    const value_t location;
+
     const auto seqUpdateSet1 = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
-    seqUpdateSet1->add(1, new Update{.value = make_integer_value(1)});
+    seqUpdateSet1->add(&location, new Update{.value = make_integer_value(1)});
 
     const auto parUpdateSet = std::unique_ptr<UpdateSet>(seqUpdateSet1->fork(UpdateSet::Type::Parallel));
 
     const auto seqUpdateSet2 = std::unique_ptr<UpdateSet>(parUpdateSet->fork(UpdateSet::Type::Sequential));
-    seqUpdateSet2->add(1, new Update{.value = make_integer_value(2)}); // winner
+    seqUpdateSet2->add(&location, new Update{.value = make_integer_value(2)}); // winner
 
-    EXPECT_EQ(make_integer_value(2), seqUpdateSet2->lookup(1)->value);
+    EXPECT_EQ(make_integer_value(2), seqUpdateSet2->lookup(&location)->value);
 }
 
 TEST(UpdateSetTest, lookupShouldConsiderAllSequentialParentUpdateSets) {
+    const value_t location;
+
     const auto seqUpdateSet1 = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
-    seqUpdateSet1->add(1, new Update{.value = make_integer_value(1)});
+    seqUpdateSet1->add(&location, new Update{.value = make_integer_value(1)});
 
     const auto parUpdateSet1 = std::unique_ptr<UpdateSet>(seqUpdateSet1->fork(UpdateSet::Type::Parallel));
 
     const auto seqUpdateSet2 = std::unique_ptr<UpdateSet>(parUpdateSet1->fork(UpdateSet::Type::Sequential));
-    seqUpdateSet2->add(1, new Update{.value = make_integer_value(2)}); // winner
+    seqUpdateSet2->add(&location, new Update{.value = make_integer_value(2)}); // winner
 
     const auto parUpdateSet2 = std::unique_ptr<UpdateSet>(seqUpdateSet2->fork(UpdateSet::Type::Parallel));
-    parUpdateSet2->add(1, new Update{.value = make_integer_value(0)});
+    parUpdateSet2->add(&location, new Update{.value = make_integer_value(0)});
 
     const auto seqUpdateSet3 = std::unique_ptr<UpdateSet>(parUpdateSet2->fork(UpdateSet::Type::Sequential));
 
-    EXPECT_EQ(make_integer_value(2), seqUpdateSet3->lookup(1)->value);
+    EXPECT_EQ(make_integer_value(2), seqUpdateSet3->lookup(&location)->value);
 }
 
 TEST(UpdateSetTest, lookupShouldReturnNullptrWhenUpdateDoesNotExist) {
+    const value_t location;
+
     const auto seqUpdateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
 
-    EXPECT_EQ(nullptr, seqUpdateSet->lookup(1));
+    EXPECT_EQ(nullptr, seqUpdateSet->lookup(&location));
 }
 
 TEST(UpdateSetTest, parallelUpdateSetsShouldThrowIfAddingUpdatesWithSameKeyButDifferentValues) {
+    const value_t location;
+
     const auto updateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Parallel));
-    updateSet->add(1, new Update{.value = make_integer_value(1)});
-    EXPECT_THROW(updateSet->add(1, new Update{.value = make_integer_value(2)}), UpdateSet::Conflict);
+    updateSet->add(&location, new Update{.value = make_integer_value(1)});
+
+    EXPECT_THROW(updateSet->add(&location, new Update{.value = make_integer_value(2)}), UpdateSet::Conflict);
 }
 
 TEST(UpdateSetTest, sequentialUpdateSetsShouldOverrideOldUpdatesIfAddingUpdatesWithSameKeyButDifferentValues) {
-    const auto updateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
-    updateSet->add(1, new Update{.value = make_integer_value(1)});
-    EXPECT_NO_THROW(updateSet->add(1, new Update{.value = make_integer_value(2)}));
+    const value_t location;
 
-    EXPECT_EQ(make_integer_value(2), updateSet->lookup(1)->value);
+    const auto updateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Sequential));
+    updateSet->add(&location, new Update{.value = make_integer_value(1)});
+    EXPECT_NO_THROW(updateSet->add(&location, new Update{.value = make_integer_value(2)}));
+
+    EXPECT_EQ(make_integer_value(2), updateSet->lookup(&location)->value);
 }
 
 TEST(UpdateSetManagerTest, lookupShouldReturnNullptrWhenNoUpdateSetExists) {
-  auto manager = std::unique_ptr<UpdateSetManager>(new UpdateSetManager());
+    const value_t location;
 
-  EXPECT_EQ(nullptr, manager->lookup(1));
+    auto manager = std::unique_ptr<UpdateSetManager>(new UpdateSetManager());
+
+    EXPECT_EQ(nullptr, manager->lookup(&location));
 }
 
 TEST(UpdateSetManagerTest, forkAndMerge) {
+    const value_t location1, location2, location3, location4;
+
     auto manager = std::unique_ptr<UpdateSetManager>(new UpdateSetManager());
 
     manager->fork(UpdateSet::Type::Parallel);
 
-    manager->add(1, new Update);
-    manager->add(2, new Update);
+    manager->add(&location1, new Update);
+    manager->add(&location2, new Update);
 
     EXPECT_EQ(manager->currentUpdateSet()->size(), 2);
     EXPECT_EQ(manager->size(), 1);
@@ -176,8 +199,8 @@ TEST(UpdateSetManagerTest, forkAndMerge) {
     {
         manager->fork(UpdateSet::Type::Sequential);
 
-        manager->add(3, new Update);
-        manager->add(4, new Update);
+        manager->add(&location3, new Update);
+        manager->add(&location4, new Update);
 
         EXPECT_EQ(manager->currentUpdateSet()->size(), 2);
         EXPECT_EQ(manager->size(), 2);
