@@ -797,7 +797,7 @@ void SymbolicExecutionPass::dumpUpdates()
             const std::vector<value_t> &arguments = pair.first;
             const value_t &value = pair.second;
 
-            const auto update = updateSet->get(reinterpret_cast<uint64_t>(&value));
+            const auto update = updateSet->get(&value);
             if (update) {
                 symbolic::dump_update(trace, function, update);
             } else {

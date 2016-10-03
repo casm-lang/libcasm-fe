@@ -94,8 +94,7 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &
     up->location = &location;
 
     try {
-        const value_t& ref = it->second;
-        updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
+        updateSetManager.add(&it->second, up);
     } catch (const UpdateSet::Conflict& e) {
         const auto conflictingUpdate = e.conflictingUpdate();
         const auto existingUpdate = e.existingUpdate();
@@ -145,8 +144,8 @@ void ExecutionPassBase::applyUpdates()
     auto updateSet = updateSetManager.currentUpdateSet();
     const auto end = updateSet->cend();
     for (auto it = updateSet->cbegin(); it != end; ++it) {
-        value_t* location = reinterpret_cast<value_t*>(it->first);
-        Update* u = it->second;
+        value_t* location = const_cast<value_t*>(it->first);
+        const Update* u = it->second;
 
         // TODO handle tuples
         if (u->value.type == TypeType::LIST) {
@@ -229,7 +228,7 @@ value_t ExecutionPassBase::functionValue
     const auto it = function_map.find(arguments);
     if (it != function_map.cend()) {
         const auto& value = it->second;
-        const auto update = updateSetManager.lookup( reinterpret_cast< uint64_t >( &value ) );
+        const auto update = updateSetManager.lookup( &value );
 
         if( update )
         {
