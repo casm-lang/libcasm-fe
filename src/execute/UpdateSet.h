@@ -32,6 +32,22 @@
 
 #include "UpdateHashMap.h"
 
+struct LocationHash
+{
+    /**
+     * Directly using a value_t pointer as hash value has the problem that the first
+     * 4 bits of the hash value are always 0, because the size of value_t is 16 bytes.
+     * Some bit shifting avoids this problem.
+     *
+     * Forumla is from LLVM's DenseMapInfo<T*>
+     */
+    std::size_t operator()(const value_t* location) const
+    {
+        return (reinterpret_cast<std::uintptr_t>(location) >> 4) ^
+               (reinterpret_cast<std::uintptr_t>(location) >> 9);
+    }
+};
+
 class UpdateSet
 {
 public:
@@ -55,7 +71,7 @@ public:
     };
 
 public:
-    using const_iterator = typename UpdateHashMap<const value_t*, Update*>::const_iterator;
+    using const_iterator = typename UpdateHashMap<const value_t*, Update*, LocationHash>::const_iterator;
 
     explicit UpdateSet(Type type, UpdateSet* parent = nullptr);
     virtual ~UpdateSet();
@@ -89,7 +105,7 @@ public:
 private:
     UpdateSet* m_parent;
     const Type m_type;
-    UpdateHashMap<const value_t*, Update*> m_set;
+    UpdateHashMap<const value_t*, Update*, LocationHash> m_set;
 };
 
 class UpdateSetManager
