@@ -114,7 +114,7 @@ public:
         m_buckets(nullptr),
         m_lastEntry(nullptr),
         m_size(0),
-        m_capacity(initialCapacity)
+        m_capacity(nextPowerOfTwo(std::max(initialCapacity, 1UL)))
     {
 
     }
@@ -173,31 +173,23 @@ public:
 
     std::pair<const_iterator, bool> insert(const Key& key, const Value& value)
     {
-        if (needsResizing(m_size)) {
-            resize(nextPowerOfTwo(m_capacity + 1));
+        auto entry = searchEntry(key);
+        if (entry) {
+            return std::make_pair(const_iterator(entry), false);
+        } else {
+            entry = createAndInsertEntry(key, value);
+            return std::make_pair(const_iterator(entry), true);
         }
-        assert(m_size < m_capacity);
-
-        const auto result = searchOrInsertEntry(key, value);
-        const Entry* entry = std::get<0>(result);
-        const bool inserted = std::get<1>(result);
-        assert(entry != nullptr);
-
-        return std::make_pair(const_iterator(entry), inserted);
     }
 
     void insertOrAssign(const Key& key, const Value& value)
     {
-        if (needsResizing(m_size)) {
-            resize(nextPowerOfTwo(m_capacity + 1));
+        auto entry = searchEntry(key);
+        if (entry) {
+            entry->value = value;
+        } else {
+            createAndInsertEntry(key, value);
         }
-        assert(m_size < m_capacity);
-
-        const auto result = searchOrInsertEntry(key, value);
-        Entry* entry = std::get<0>(result);
-        assert(entry != nullptr);
-
-        entry->value = value;
     }
 
     const Value& get(const Key& key) const
@@ -220,9 +212,9 @@ public:
     {
         if (needsResizing(n)) {
             if (m_buckets) {
-                resize(nextPowerOfTwo(std::max(n, m_capacity + 1)));
+                resize(std::max(nextPowerOfTwo(n), m_capacity));
             } else {
-                m_capacity = std::max(n, m_capacity);
+                m_capacity = std::max(nextPowerOfTwo(n), m_capacity);
             }
         }
     }
@@ -233,30 +225,7 @@ private:
         return m_buckets + (hash & (m_capacity - 1));
     }
 
-    inline std::pair<Entry*, bool> searchOrInsertEntry(const Key& key, const Value& value)
-    {
-        assert(m_buckets != nullptr);
-
-        const size_type hash = hasher(key);
-        Bucket* bucket = bucketAt(hash);
-
-        for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
-            if ((entry->hash == hash) and equals(entry->key, key)) {
-                return std::make_pair(entry, false);
-            }
-        }
-
-        // entry not found, create a new one
-        Entry* entry = createEntry(key, value);
-        entry->hash = hash;
-
-        entry->next = bucket->entry;
-        bucket->entry = entry;
-
-        return std::make_pair(entry, true);
-    }
-
-    inline Entry* searchEntry(const Key& key) const
+    Entry* searchEntry(const Key& key) const
     {
         if (m_buckets) {
             const size_type hash = hasher(key);
@@ -272,13 +241,40 @@ private:
         return nullptr;
     }
 
-    inline void insertEntry(Entry* entry) noexcept
+    void insertEntry(Entry* entry) noexcept
     {
         assert(m_buckets != nullptr);
 
         Bucket* bucket = bucketAt(entry->hash);
         entry->next = bucket->entry;
         bucket->entry = entry;
+    }
+
+    Entry* createEntry(const Key& key, const Value& value)
+    {
+        Entry* entry = (Entry *)m_entryAllocator.allocate(sizeof(Entry));
+        entry->key = key;
+        entry->value = value;
+        entry->next = nullptr;
+
+        entry->prev = m_lastEntry;
+        m_lastEntry = entry;
+
+        ++m_size;
+
+        return entry;
+    }
+
+    Entry* createAndInsertEntry(const Key& key, const Value& value)
+    {
+        growIfNecessary();
+
+        auto entry = createEntry(key, value);
+        entry->hash = hasher(key);
+
+        insertEntry(entry);
+
+        return entry;
     }
 
     constexpr bool needsResizing(size_type size) const noexcept
@@ -301,7 +297,15 @@ private:
         }
     }
 
-    inline size_type nextPowerOfTwo(size_type n) const noexcept
+    inline void growIfNecessary()
+    {
+        if (needsResizing(m_size)) {
+            resize(m_capacity * 2);
+        }
+        assert(m_size < m_capacity);
+    }
+
+    size_type nextPowerOfTwo(size_type n) const noexcept
     {
         n -= 1;
         n |= (n >> 1);
@@ -311,21 +315,6 @@ private:
         n |= (n >> 16);
         n |= (n >> 32);
         return n + 1;
-    }
-
-    Entry* createEntry(const Key& key, const Value& value)
-    {
-        Entry* entry = (Entry *)m_entryAllocator.allocate(sizeof(Entry));
-        entry->key = key;
-        entry->value = value;
-        entry->next = nullptr;
-
-        entry->prev = m_lastEntry;
-        m_lastEntry = entry;
-
-        ++m_size;
-
-        return entry;
     }
 
 private:
