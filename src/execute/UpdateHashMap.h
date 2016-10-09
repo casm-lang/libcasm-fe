@@ -114,7 +114,7 @@ public:
         m_buckets(nullptr),
         m_lastEntry(nullptr),
         m_size(0),
-        m_capacity(nextPowerOfTwo(std::max(initialCapacity, 1UL)))
+        m_capacity(std::max(initialCapacity, 1UL))
     {
 
     }
@@ -212,9 +212,9 @@ public:
     {
         if (needsResizing(n)) {
             if (m_buckets) {
-                resize(std::max(nextPowerOfTwo(n), m_capacity));
+                resize(n);
             } else {
-                m_capacity = std::max(nextPowerOfTwo(n), m_capacity);
+                m_capacity = n;
             }
         }
     }
@@ -279,11 +279,12 @@ private:
 
     constexpr bool needsResizing(size_type size) const noexcept
     {
-        return (size > m_capacity) or (m_buckets == nullptr);
+        return size > m_capacity;
     }
 
     void resize(size_type newCapacity)
     {
+        newCapacity = nextPowerOfTwo(newCapacity);
         m_capacity = newCapacity;
 
         if (m_buckets) {
@@ -299,7 +300,9 @@ private:
 
     inline void growIfNecessary()
     {
-        if (needsResizing(m_size)) {
+        if (m_buckets == nullptr) {
+            resize(m_capacity);
+        } else if (needsResizing(m_size)) {
             resize(m_capacity * 2);
         }
         assert(m_size < m_capacity);
