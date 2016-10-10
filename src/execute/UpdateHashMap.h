@@ -50,6 +50,12 @@ private:
     struct Bucket
     {
         Entry* entry;
+
+        inline void insert(Entry* newEntry)
+        {
+            newEntry->next = entry;
+            entry = newEntry;
+        }
     };
 
 public:
@@ -173,22 +179,37 @@ public:
 
     std::pair<const_iterator, bool> insert(const Key& key, const Value& value)
     {
-        auto entry = searchEntry(key);
+        static Hash hasher;
+        const size_type hash = hasher(key);
+
+        const auto entry = searchEntryWithHash(key, hash);
         if (entry) {
             return std::make_pair(const_iterator(entry), false);
         } else {
-            entry = createAndInsertEntry(key, value);
-            return std::make_pair(const_iterator(entry), true);
+            growIfNecessary();
+
+            const auto newEntry = createEntry(key, value, hash);
+            auto bucket = bucketAt(hash);
+            bucket->insert(newEntry);
+
+            return std::make_pair(const_iterator(newEntry), true);
         }
     }
 
     void insertOrAssign(const Key& key, const Value& value)
     {
-        auto entry = searchEntry(key);
+        static Hash hasher;
+        const size_type hash = hasher(key);
+
+        const auto entry = searchEntryWithHash(key, hash);
         if (entry) {
             entry->value = value;
         } else {
-            createAndInsertEntry(key, value);
+            growIfNecessary();
+
+            const auto newEntry = createEntry(key, value, hash);
+            auto bucket = bucketAt(hash);
+            bucket->insert(newEntry);
         }
     }
 
@@ -205,12 +226,12 @@ public:
     const_iterator find(const Key& key) const noexcept
     {
         const auto entry = searchEntry(key);
-        return const_iterator(entry ? entry : nullptr);
+        return const_iterator(entry);
     }
 
     void reserve(size_type n)
     {
-        if (needsResizing(n)) {
+        if (n > m_capacity) {
             if (m_buckets) {
                 resize(n);
             } else {
@@ -227,8 +248,20 @@ private:
 
     Entry* searchEntry(const Key& key) const
     {
+        static Hash hasher;
+
         if (m_buckets) {
-            const size_type hash = hasher(key);
+            return searchEntryWithHash(key, hasher(key));
+        }
+
+        return nullptr;
+    }
+
+    Entry* searchEntryWithHash(const Key& key, const size_type hash) const
+    {
+        static Pred equals;
+
+        if (m_buckets) {
             const Bucket* bucket = bucketAt(hash);
 
             for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
@@ -241,21 +274,12 @@ private:
         return nullptr;
     }
 
-    void insertEntry(Entry* entry) noexcept
-    {
-        assert(m_buckets != nullptr);
-
-        Bucket* bucket = bucketAt(entry->hash);
-        entry->next = bucket->entry;
-        bucket->entry = entry;
-    }
-
-    Entry* createEntry(const Key& key, const Value& value)
+    Entry* createEntry(const Key& key, const Value& value, size_type hash)
     {
         Entry* entry = (Entry *)m_entryAllocator.allocate(sizeof(Entry));
         entry->key = key;
         entry->value = value;
-        entry->next = nullptr;
+        entry->hash = hash;
 
         entry->prev = m_lastEntry;
         m_lastEntry = entry;
@@ -263,23 +287,6 @@ private:
         ++m_size;
 
         return entry;
-    }
-
-    Entry* createAndInsertEntry(const Key& key, const Value& value)
-    {
-        growIfNecessary();
-
-        auto entry = createEntry(key, value);
-        entry->hash = hasher(key);
-
-        insertEntry(entry);
-
-        return entry;
-    }
-
-    constexpr bool needsResizing(size_type size) const noexcept
-    {
-        return size > m_capacity;
     }
 
     void resize(size_type newCapacity)
@@ -290,19 +297,20 @@ private:
         if (m_buckets) {
             delete[] m_buckets;
         }
-        m_buckets = new Bucket[newCapacity]; // TODO EP: reallocate?
+        m_buckets = new Bucket[newCapacity];
         std::memset(m_buckets, 0, sizeof(Bucket) * newCapacity);
 
         for (auto entry = m_lastEntry; entry != nullptr; entry = entry->prev) {
-            insertEntry(entry);
+            auto bucket = bucketAt(entry->hash);
+            bucket->insert(entry);
         }
     }
 
-    inline void growIfNecessary()
+    void growIfNecessary()
     {
         if (m_buckets == nullptr) {
             resize(m_capacity);
-        } else if (needsResizing(m_size)) {
+        } else if (m_size == m_capacity) {
             resize(m_capacity * 2);
         }
         assert(m_size < m_capacity);
@@ -321,9 +329,6 @@ private:
     }
 
 private:
-    static const Hash hasher;
-    static const Pred equals;
-
     Bucket* m_buckets;
     Entry* m_lastEntry;
 
