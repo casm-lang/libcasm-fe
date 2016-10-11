@@ -50,32 +50,35 @@ bool ExecutionPassBase::hasEmptyUpdateSet() const
 Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &arguments,
                                      const value_t& val, const yy::location& location)
 {
-    try
-    {
-        validateArguments(sym->arguments_, arguments);
-    }
-    catch( const std::domain_error& e )
-    {
-        throw RuntimeException
-        ( location
-        , e.what()
-        , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtUpdate
-        );
-    }
-    
-    try
-    {
-        sym->validateValue(val);
-    }
-    catch( const std::domain_error& e )
-    {
-        throw RuntimeException
-        ( location
-        , e.what()
-        , libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate
-        );
+    if (sym->checkArguments) {
+        try
+        {
+            validateArguments(sym->arguments_, arguments);
+        }
+        catch( const std::domain_error& e )
+        {
+            throw RuntimeException
+            ( location
+            , e.what()
+            , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtUpdate
+            );
+        }
     }
     
+    if (sym->checkReturnValue) {
+        try
+        {
+            validateValue(sym->return_type_, val);
+        }
+        catch( const std::domain_error& e )
+        {
+            throw RuntimeException
+            ( location
+            , std::string(e.what()) + " of `" + sym->name + "`"
+            , libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate
+            );
+        }
+    }
     
     auto& function_map = function_states[sym->id];
     auto it = function_map.find(arguments); // TODO EP: use emplace only
@@ -91,8 +94,7 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &
     up->location = &location;
 
     try {
-        const value_t& ref = it->second;
-        updateSetManager.add(reinterpret_cast<uint64_t>(&ref), up);
+        updateSetManager.add(&it->second, up);
     } catch (const UpdateSet::Conflict& e) {
         const auto conflictingUpdate = e.conflictingUpdate();
         const auto existingUpdate = e.existingUpdate();
@@ -142,8 +144,8 @@ void ExecutionPassBase::applyUpdates()
     auto updateSet = updateSetManager.currentUpdateSet();
     const auto end = updateSet->cend();
     for (auto it = updateSet->cbegin(); it != end; ++it) {
-        value_t* location = reinterpret_cast<value_t*>(it->first);
-        Update* u = it->second;
+        value_t* location = const_cast<value_t*>(it->first);
+        const Update* u = it->second;
 
         // TODO handle tuples
         if (u->value.type == TypeType::LIST) {
@@ -206,17 +208,19 @@ value_t ExecutionPassBase::functionValue
 , const std::vector<value_t>& arguments
 )
 {
-    try
-    {
-        validateArguments(function->arguments_, arguments);
-    }
-    catch( const std::domain_error& e )
-    {
-        throw RuntimeException
-        ( function->location
-        , e.what()
-        , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtLookup
-        );
+    if (function->checkArguments) {
+        try
+        {
+            validateArguments(function->arguments_, arguments);
+        }
+        catch( const std::domain_error& e )
+        {
+            throw RuntimeException
+            ( function->location
+            , e.what()
+            , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtLookup
+            );
+        }
     }
     
     const auto& function_map = function_states[function->id];
@@ -224,7 +228,7 @@ value_t ExecutionPassBase::functionValue
     const auto it = function_map.find(arguments);
     if (it != function_map.cend()) {
         const auto& value = it->second;
-        const auto update = updateSetManager.lookup( reinterpret_cast< uint64_t >( &value ) );
+        const auto update = updateSetManager.lookup( &value );
 
         if( update )
         {
@@ -790,17 +794,19 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom, std::vect
 
 void ExecutionPassBase::visit_derived_function_atom_pre(FunctionAtom *function, std::vector<value_t> &arguments)
 {
-    try {
-        validateArguments(function->symbol->arguments_, arguments);
-    } catch (const std::domain_error& e) {
-        throw RuntimeException
-        ( function->location // TODO create a new exception type to pass on the argument index to get the proper arg location
-        , std::string(e.what())
-        + " of derived '"
-        + function->symbol->name
-        + "'"
-        , libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup
-        );
+    if (function->symbol->checkArguments) {
+        try {
+            validateArguments(function->symbol->arguments_, arguments);
+        } catch (const std::domain_error& e) {
+            throw RuntimeException
+            ( function->location // TODO create a new exception type to pass on the argument index to get the proper arg location
+            , std::string(e.what())
+            + " of derived '"
+            + function->symbol->name
+            + "'"
+            , libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup
+            );
+        }
     }
 
     rule_bindings.push_back( &arguments );
@@ -834,38 +840,50 @@ void libcasm_fe::ExecutionPassBase::validateArguments(const std::vector<Type*>& 
         const auto& argumentValue = argumentValues.at( i );
         const Type* argumentType = argumentTypes.at( i );
 
-        switch( argumentType->t )
-        {
-            case TypeType::INTEGER:
-            {
-                const INTEGER_T integer = argumentValue.value.integer;
-
-                if( argumentType->has_range_restriction()
-                and (  integer < argumentType->subrange_start
-                    or integer > argumentType->subrange_end
-                    )
-                )
-                {
-                    throw std::domain_error
-                    ( std::to_string( integer )
-                      + " does violate the subrange "
-                      + std::to_string( argumentType->subrange_start )
-                      + ".."
-                      + std::to_string( argumentType->subrange_end )
-                      + " at argument #"
-                      + std::to_string( i + 1 )
-                    );
-                }
-                break;
-            }
-            default:
-            {
-                break;
-            }
+        try {
+            validateValue(argumentType, argumentValue);
+        } catch (const std::domain_error& e) {
+            throw std::domain_error
+            ( std::string(e.what())
+            + " at argument #"
+            + std::to_string( i + 1 )
+            );
         }
     }
 }
 
+void libcasm_fe::ExecutionPassBase::validateValue(const Type* type, const value_t& value) const
+{
+    assert(type != nullptr);
+
+    switch( type->t )
+    {
+        case TypeType::INTEGER:
+        {
+            const INTEGER_T integer = value.value.integer;
+
+            if( type->has_range_restriction()
+            and (  integer < type->subrange_start
+                or integer > type->subrange_end
+                )
+            )
+            {
+                throw std::domain_error
+                ( std::to_string( integer )
+                + " does violate the subrange "
+                + std::to_string( type->subrange_start )
+                + ".."
+                + std::to_string( type->subrange_end )
+                );
+            }
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+}
 
 //  
 //  Local variables:

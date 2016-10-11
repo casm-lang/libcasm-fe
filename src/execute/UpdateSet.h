@@ -65,7 +65,7 @@ public:
     };
 
 public:
-    using const_iterator = typename LinkedHashMap<uint64_t, Update*>::const_iterator;
+    using const_iterator = typename LinkedHashMap<const value_t*, Update*>::const_iterator;
 
     explicit UpdateSet(Type type, std::size_t initialSize, UpdateSet* parent = nullptr);
     virtual ~UpdateSet();
@@ -79,9 +79,9 @@ public:
      *
      * @throws Conflict
      */
-    void add(const uint64_t key, Update* update);
+    void add(const value_t* location, Update* update);
 
-    Update* lookup(const uint64_t key) const;
+    Update* lookup(const value_t* location) const;
 
     UpdateSet* fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
 
@@ -96,12 +96,12 @@ public:
     const_iterator cbegin() const noexcept;
     const_iterator cend() const noexcept;
 
-    Update* get(const uint64_t key) const noexcept;
+    Update* get(const value_t* location) const noexcept;
 
 private:
     UpdateSet* m_parent;
     const Type m_type;
-    LinkedHashMap<uint64_t, Update*> m_set;
+    LinkedHashMap<const value_t*, Update*> m_set;
 };
 
 class UpdateSetManager
@@ -114,9 +114,9 @@ public:
      *
      * @throws Conflict
      */
-    void add(const uint64_t key, Update* update);
+    void add(const value_t* location, Update* update);
 
-    Update* lookup(const uint64_t key) const;
+    Update* lookup(const value_t* location) const;
 
     void fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
 

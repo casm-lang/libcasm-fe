@@ -95,10 +95,15 @@ namespace libcasm_fe
 
     protected:
         /**
-         * @ throws std::domain_error if any argument is out of range
+         * @throws std::domain_error if any argument is out of range
          */
         void validateArguments(const std::vector<Type*>& argumentTypes,
                                const std::vector<value_t>& argumentValues) const;
+
+        /**
+         * @throws std::domain_error if value is out of range
+         */
+        void validateValue(const Type* type, const value_t& value) const;
 
         virtual value_t defaultFunctionValue(Function* function, const std::vector<value_t>& arguments);
 

@@ -240,17 +240,19 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
                 }
             }
             
-            try
-            {
-                validateArguments( func->arguments_, arguments );
-            }
-            catch( const std::domain_error& e )
-            {
-                throw RuntimeException
-                ( init.first->location
-                , e.what()
-                , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtInitially
-                );
+            if (func->checkArguments) {
+                try
+                {
+                    validateArguments( func->arguments_, arguments );
+                }
+                catch( const std::domain_error& e )
+                {
+                    throw RuntimeException
+                    ( init.first->location
+                    , e.what()
+                    , libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtInitially
+                    );
+                }
             }
             
             if( function_map.count( arguments ) != 0 )
@@ -263,17 +265,19 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
             }
             
             const value_t v = walker->walk_atom(init.second);
-            try
-            {
-                func->validateValue(v);
-            }
-            catch( const std::domain_error& e )
-            {
-                throw RuntimeException
-                ( init.second->location
-                , e.what()
-                , libcasm_fe::Codes::FunctionValueInvalidRangeAtInitially
-                );
+            if (func->checkReturnValue) {
+                try
+                {
+                    validateValue(func->return_type_, v);
+                }
+                catch( const std::domain_error& e )
+                {
+                    throw RuntimeException
+                    ( init.second->location
+                    , std::string(e.what()) + " of `" + func->name + "`"
+                    , libcasm_fe::Codes::FunctionValueInvalidRangeAtInitially
+                    );
+                }
             }
             
             function_map.emplace( std::make_pair( arguments, v ) );

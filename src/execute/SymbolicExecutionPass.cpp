@@ -690,12 +690,14 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
                 }
             }
 
-            try {
-                validateArguments(func->arguments_, arguments);
-            } catch (const std::domain_error& e) {
-                const auto location = init.first ? (init.first->location + init.second->location)
-                                                 : init.second->location;
-                throw RuntimeException(location, e.what());
+            if (func->checkArguments) {
+                try {
+                    validateArguments(func->arguments_, arguments);
+                } catch (const std::domain_error& e) {
+                    const auto location = init.first ? (init.first->location + init.second->location)
+                                                     : init.second->location;
+                    throw RuntimeException(location, e.what());
+                }
             }
 
             if (function_map.count(arguments) != 0) {
@@ -706,17 +708,20 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
             }
 
             const value_t v = walker->walk_atom(init.second);
-            if (func->is_symbolic) {
-                symbolic::dump_create(trace_creates, func, arguments, v);
-            } else {
+            if (func->checkReturnValue) {
                 try {
-                    func->validateValue(v);
+                    validateValue(func->return_type_, v);
                 } catch (const std::domain_error& e) {
                     const auto location = init.first ? (init.first->location + init.second->location)
                                                      : init.second->location;
-                    throw RuntimeException(location, e.what());
+                    throw RuntimeException(location, std::string(e.what()) + " of `" + func->name + "`");
                 }
             }
+
+            if (func->is_symbolic) {
+                symbolic::dump_create(trace_creates, func, arguments, v);
+            }
+
             function_map.emplace(std::make_pair(arguments, v));
         }
     }
@@ -792,7 +797,7 @@ void SymbolicExecutionPass::dumpUpdates()
             const std::vector<value_t> &arguments = pair.first;
             const value_t &value = pair.second;
 
-            const auto update = updateSet->get(reinterpret_cast<uint64_t>(&value));
+            const auto update = updateSet->get(&value);
             if (update) {
                 symbolic::dump_update(trace, function, update);
             } else {

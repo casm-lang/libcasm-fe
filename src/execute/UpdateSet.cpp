@@ -76,10 +76,10 @@ size_t UpdateSet::size() const noexcept
     return m_set.size();
 }
 
-void UpdateSet::add(const uint64_t key, Update* update)
+void UpdateSet::add(const value_t* location, Update* update)
 {
     if (m_type == Type::Parallel) {
-        const auto result = m_set.insert(key, update);
+        const auto result = m_set.insert(location, update);
         if (!result.second) {
             const auto existingPair = *(result.first);
             const auto existingUpdate = existingPair.second;
@@ -89,21 +89,21 @@ void UpdateSet::add(const uint64_t key, Update* update)
             }
         }
     } else {
-        m_set[key] = update;
+        m_set[location] = update;
     }
 }
 
-Update* UpdateSet::lookup(const uint64_t key) const
+Update* UpdateSet::lookup(const value_t* location) const
 {
     if (m_type == Type::Sequential) {
-        const auto it = m_set.find(key);
+        const auto it = m_set.find(location);
         if (it != m_set.cend()) {
             return it->second;
         }
     }
 
     if (m_parent) {
-        return m_parent->lookup(key);
+        return m_parent->lookup(location);
     }
 
     return nullptr;
@@ -142,9 +142,9 @@ typename UpdateSet::const_iterator UpdateSet::cend() const noexcept
     return m_set.cend();
 }
 
-Update* UpdateSet::get(const uint64_t key) const noexcept
+Update* UpdateSet::get(const value_t* location) const noexcept
 {
-    const auto it = m_set.find(key);
+    const auto it = m_set.find(location);
     return (it != m_set.cend()) ? it->second : nullptr;
 }
 
@@ -159,18 +159,18 @@ UpdateSetManager::~UpdateSetManager()
     clear();
 }
 
-void UpdateSetManager::add(const uint64_t key, Update* update)
+void UpdateSetManager::add(const value_t* location, Update* update)
 {
     assert(!m_updateSets.empty());
-    m_updateSets.top()->add(key, update);
+    m_updateSets.top()->add(location, update);
 }
 
-Update* UpdateSetManager::lookup(const uint64_t key) const
+Update* UpdateSetManager::lookup(const value_t* location) const
 {
     if (m_updateSets.empty()) {
       return nullptr;
     } else {
-      return m_updateSets.top()->lookup(key);
+      return m_updateSets.top()->lookup(location);
     }
 }
 
