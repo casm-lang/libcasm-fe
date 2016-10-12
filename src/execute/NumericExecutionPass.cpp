@@ -61,7 +61,7 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
     RuleNode* node = global_driver->rules_map_[ root->getInitRule()->identifier ];
 
     rule_bindings.push_back(&main_bindings);
-    function_states = std::vector<std::unordered_map<std::vector<value_t>, value_t>>(global_driver->function_table.size());
+    function_states = std::vector<FunctionState>(global_driver->function_table.size());
     function_symbols = std::vector<const Function*>(global_driver->function_table.size());
     Function *program_sym = global_driver->function_table.get_function("program");
     // TODO location is wrong here
@@ -116,7 +116,7 @@ bool NumericExecutionPass::run(libpass::PassResult& pr)
 
         Function *program_sym = global_driver->function_table.get_function( "program" );
         const auto& function_map = function_states[program_sym->id];
-        const value_t& program_val = function_map.at({value_t()});
+        const value_t& program_val = function_map.get({value_t()});
         
         while( program_val.type != TypeType::UNDEF )
         {
@@ -211,7 +211,7 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
         return true;
     }
     
-    function_states[  func->id ] = std::unordered_map<std::vector<value_t>, value_t>( 0 );
+    function_states[  func->id ] = FunctionState( 0 );
     function_symbols[ func->id ] = func;
     
     auto& function_map = function_states[ func->id ];
@@ -280,7 +280,7 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
                 }
             }
             
-            function_map.emplace( std::make_pair( arguments, v ) );
+            function_map.insert( arguments, v );
         }
     }
 

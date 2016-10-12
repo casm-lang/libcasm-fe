@@ -60,7 +60,7 @@ bool SymbolicExecutionPass::run(libpass::PassResult& pr)
     RuleNode* node = global_driver->rules_map_[ root->getInitRule()->identifier ];
 
     rule_bindings.push_back(&main_bindings);
-    function_states = std::vector<std::unordered_map<std::vector<value_t>, value_t>>(global_driver->function_table.size());
+    function_states = std::vector<FunctionState>(global_driver->function_table.size());
     function_symbols = std::vector<const Function*>(global_driver->function_table.size());
     Function *program_sym = global_driver->function_table.get_function("program");
     // TODO location is wrong here
@@ -291,7 +291,7 @@ namespace symbolic
 
     static void dump_final(std::vector<std::string>& trace,
                            const std::vector<const Function*>& symbols,
-                           const std::vector<std::unordered_map<std::vector<value_t>, value_t>>& states)
+                           const std::vector<FunctionState>& states)
     {
         assert(symbols.size() == states.size());
 
@@ -301,9 +301,10 @@ namespace symbolic
             if (not symbols[i]->is_symbolic) {
                 continue;
             }
-            for (auto& value_pair : states[i]) {
-                const auto arguments = value_pair.first;
-                const auto value = value_pair.second;
+            const auto end = states[i].end();
+            for (auto it = states[i].begin(); it != end; ++it) {
+                const auto& arguments = it.key();
+                const auto& value = it.value();
 
                 fof(ss, "final" + std::to_string(finalId), symbols[i], arguments,
                     value, FINAL_TIME, "%FINAL");
@@ -638,7 +639,7 @@ value_t SymbolicExecutionPass::defaultFunctionValue(Function* function, const st
         const value_t value(new symbol_t(symbolic::next_symbol_id())); // TODO cleanup symbol
 
         auto& function_map = function_states[function->id];
-        function_map.emplace(arguments, value);
+        function_map.insert(arguments, value);
         symbolic::dump_create(trace_creates, function, arguments, value);
 
         return value;
@@ -668,7 +669,7 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
         return true;
     }
 
-    function_states[func->id] = std::unordered_map<std::vector<value_t>, value_t>(0);
+    function_states[func->id] = FunctionState(0);
     function_symbols[func->id] = func;
 
     auto& function_map = function_states[func->id];
@@ -722,7 +723,7 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
                 symbolic::dump_create(trace_creates, func, arguments, v);
             }
 
-            function_map.emplace(std::make_pair(arguments, v));
+            function_map.insert(arguments, v);
         }
     }
 
@@ -734,7 +735,7 @@ void SymbolicExecutionPass::mainLoop()
 {
     Function *program_sym = global_driver->function_table.get_function("program");
     const auto& function_map = function_states[program_sym->id];
-    const value_t& program_val = function_map.at({value_t()});
+    const value_t& program_val = function_map.get({value_t()});
 
     while (program_val.type != TypeType::UNDEF) {
         walker->walk_rule(program_val.value.rule);
@@ -793,9 +794,10 @@ void SymbolicExecutionPass::dumpUpdates()
             continue;
         }
 
-        for (const auto& pair : function_states[i]) {
-            const std::vector<value_t> &arguments = pair.first;
-            const value_t &value = pair.second;
+        const auto end = function_states[i].end();
+        for (auto it = function_states[i].begin(); it != end; ++it) {
+            const auto& arguments = it.key();
+            const auto& value = it.value();
 
             const auto update = updateSet->get(&value);
             if (update) {

@@ -82,19 +82,19 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &
     
     auto& function_map = function_states[sym->id];
     auto it = function_map.find(arguments); // TODO EP: use emplace only
-    if (it == function_map.cend()) {
-        const auto pair = function_map.emplace(arguments, value_t());
+    if (it == function_map.end()) {
+        const auto pair = function_map.insert(arguments, value_t());
         it = pair.first;
     }
 
     Update* up = reinterpret_cast<Update*>(stack.allocate(sizeof(Update))); // FIXME make it nicer!!
     up->value = val;
     up->func = sym->id;
-    up->args = &it->first;
+    up->args = &it.key();
     up->location = &location;
 
     try {
-        updateSetManager.add(&it->second, up);
+        updateSetManager.add(&it.value(), up);
     } catch (const UpdateSet::Conflict& e) {
         const auto conflictingUpdate = e.conflictingUpdate();
         const auto existingUpdate = e.existingUpdate();
@@ -226,8 +226,8 @@ value_t ExecutionPassBase::functionValue
     const auto& function_map = function_states[function->id];
 
     const auto it = function_map.find(arguments);
-    if (it != function_map.cend()) {
-        const auto& value = it->second;
+    if (it != function_map.end()) {
+        const auto& value = it.value();
         const auto update = updateSetManager.lookup( &value );
 
         if( update )

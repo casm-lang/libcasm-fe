@@ -31,7 +31,9 @@
 #include <stack>
 
 #include "Update.h"
-#include "HashMap.h"
+#include "ChainedHashMap.h"
+#include "OpenHashMap.h"
+#include "RobinHoodHashMap.h"
 
 struct LocationHash
 {
@@ -71,8 +73,10 @@ public:
         Parallel
     };
 
+    using UpdateHashMap = ChainedHashMap<const value_t*, Update*, LocationHash>;
+
 public:
-    using const_iterator = typename UpdateHashMap<const value_t*, Update*, LocationHash>::const_iterator;
+    using const_iterator = typename UpdateHashMap::const_iterator;
 
     explicit UpdateSet(Type type, UpdateSet* parent = nullptr);
     virtual ~UpdateSet();
@@ -106,7 +110,7 @@ public:
 private:
     UpdateSet* m_parent;
     const Type m_type;
-    UpdateHashMap<const value_t*, Update*, LocationHash> m_set;
+    UpdateHashMap m_set;
 };
 
 class UpdateSetManager
