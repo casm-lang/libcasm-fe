@@ -23,8 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_UPDATEHASHMAP_H_
-#define _LIB_CASMFE_UPDATEHASHMAP_H_
+#ifndef _LIB_CASMFE_CHAINEDHASHMAP_H_
+#define _LIB_CASMFE_CHAINEDHASHMAP_H_
 
 #include <functional>
 #include <cstring>
@@ -34,7 +34,7 @@
 template <typename Key, typename Value,
           typename Hash = std::hash<Key>,
           typename Pred = std::equal_to<Key>>
-class UpdateHashMap
+class ChainedHashMap
 {
 private:
     struct Entry
@@ -125,13 +125,13 @@ public:
 public:
     using size_type = size_t;
 
-    explicit UpdateHashMap() :
-        UpdateHashMap(1UL)
+    explicit ChainedHashMap() :
+        ChainedHashMap(1UL)
     {
 
     }
 
-    explicit UpdateHashMap(size_type initialCapacity) :
+    explicit ChainedHashMap(size_type initialCapacity) :
         m_buckets(nullptr),
         m_lastEntry(nullptr),
         m_size(0UL),
@@ -140,7 +140,7 @@ public:
 
     }
 
-    UpdateHashMap(UpdateHashMap&& other) :
+    ChainedHashMap(ChainedHashMap&& other) :
         m_buckets(nullptr),
         m_lastEntry(other.m_lastEntry),
         m_size(other.m_size),
@@ -150,7 +150,7 @@ public:
         std::swap(m_entryAllocator, other.m_entryAllocator);
     }
 
-    UpdateHashMap& operator=(UpdateHashMap&& other) noexcept
+    ChainedHashMap& operator=(ChainedHashMap&& other) noexcept
     {
         std::swap(m_buckets, other.m_buckets);
         m_lastEntry = other.m_lastEntry;
@@ -160,7 +160,7 @@ public:
         return *this;
     }
 
-    ~UpdateHashMap()
+    ~ChainedHashMap()
     {
         if (m_buckets) {
             delete[] m_buckets;
@@ -360,7 +360,7 @@ private:
     BlockAllocator<4096> m_entryAllocator;
 };
 
-#endif // _LIB_CASMFE_UPDATEHASHMAP_H_
+#endif // _LIB_CASMFE_CHAINEDHASHMAP_H_
 
 //
 //  Local variables:

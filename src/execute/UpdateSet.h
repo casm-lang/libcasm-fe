@@ -31,7 +31,7 @@
 #include <stack>
 
 #include "Update.h"
-#include "UpdateHashMap.h"
+#include "HashMap.h"
 
 struct LocationHash
 {
