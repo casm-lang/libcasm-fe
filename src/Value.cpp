@@ -126,6 +126,7 @@ bool value_t::operator==(const value_t &other) const {
     case TypeType::TUPLE_OR_LIST:
     case TypeType::LIST: return *value.list == *other.value.list;
     case TypeType::NUMBER_RANGE: return *value.numberRange == *other.value.numberRange;
+    case TypeType::RULEREF: return value.rule == other.value.rule;
     default: FAILURE();
   }
 }
