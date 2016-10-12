@@ -45,6 +45,16 @@ private:
         std::size_t hash;
         Entry* next; // conflict chain
         Entry* prev; // linked-list for iterating
+
+        Entry(const Key& key, const Value& value, std::size_t hash, Entry* prev) :
+            key(key),
+            value(value),
+            hash(hash),
+            next(nullptr),
+            prev(prev)
+        {
+
+        }
     };
 
     struct Bucket
@@ -116,10 +126,16 @@ public:
 public:
     using size_type = size_t;
 
+    explicit UpdateHashMap() :
+        UpdateHashMap(1UL)
+    {
+
+    }
+
     explicit UpdateHashMap(size_type initialCapacity) :
         m_buckets(nullptr),
         m_lastEntry(nullptr),
-        m_size(0),
+        m_size(0UL),
         m_capacity(std::max(nextPowerOfTwo(initialCapacity), 1UL))
     {
 
@@ -154,7 +170,7 @@ public:
 
     constexpr bool empty() const
     {
-        return m_size == 0;
+        return m_size == 0UL;
     }
 
     constexpr size_type size() const
@@ -229,6 +245,12 @@ public:
         return const_iterator(entry);
     }
 
+    size_type count(const Key& key) const noexcept
+    {
+        const auto entry = searchEntry(key);
+        return entry ? 1UL : 0UL;
+    }
+
     void reserve(size_type n)
     {
         if (n > m_capacity) {
@@ -276,14 +298,10 @@ private:
 
     Entry* createEntry(const Key& key, const Value& value, size_type hash)
     {
-        Entry* entry = (Entry *)m_entryAllocator.allocate(sizeof(Entry));
-        entry->key = key;
-        entry->value = value;
-        entry->hash = hash;
+        const auto memory = m_entryAllocator.allocate(sizeof(Entry));
+        const auto entry = new(memory) Entry(key, value, hash, m_lastEntry);
 
-        entry->prev = m_lastEntry;
         m_lastEntry = entry;
-
         ++m_size;
 
         return entry;
