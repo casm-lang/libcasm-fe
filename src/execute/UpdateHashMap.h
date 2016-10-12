@@ -29,7 +29,6 @@
 #include <functional>
 #include <cstring>
 
-#include "Update.h"
 #include "../allocator/BlockAllocator.h"
 
 template <typename Key, typename Value,

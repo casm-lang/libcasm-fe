@@ -30,6 +30,7 @@
 #include <stdexcept>
 #include <stack>
 
+#include "Update.h"
 #include "UpdateHashMap.h"
 
 struct LocationHash
