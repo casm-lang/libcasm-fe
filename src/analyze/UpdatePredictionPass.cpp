@@ -133,7 +133,7 @@ static std::pair<bool, std::size_t> expressionBound(ExpressionBase* expr) // TOD
                 (numberRange->right->node_type_ == NodeType::INTEGER_ATOM)) {
                 const auto left = reinterpret_cast<IntegerAtom*>(numberRange->left);
                 const auto right = reinterpret_cast<IntegerAtom*>(numberRange->right);
-                return std::make_pair(true, std::abs(left->val_ - right->val_));
+                return std::make_pair(true, std::abs(left->val_ - right->val_) + 1);
             } else {
                 return std::make_pair(false, 0);
             }
