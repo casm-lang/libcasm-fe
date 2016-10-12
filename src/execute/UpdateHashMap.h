@@ -120,7 +120,7 @@ public:
         m_buckets(nullptr),
         m_lastEntry(nullptr),
         m_size(0),
-        m_capacity(std::max(initialCapacity, 1UL))
+        m_capacity(std::max(nextPowerOfTwo(initialCapacity), 1UL))
     {
 
     }
@@ -233,9 +233,9 @@ public:
     {
         if (n > m_capacity) {
             if (m_buckets) {
-                resize(n);
+                resize(nextPowerOfTwo(n));
             } else {
-                m_capacity = n;
+                m_capacity = nextPowerOfTwo(n);
             }
         }
     }
@@ -291,7 +291,7 @@ private:
 
     void resize(size_type newCapacity)
     {
-        newCapacity = nextPowerOfTwo(newCapacity);
+        assert(isPowerOfTwo(newCapacity));
         m_capacity = newCapacity;
 
         if (m_buckets) {
@@ -326,6 +326,11 @@ private:
         n |= (n >> 16);
         n |= (n >> 32);
         return n + 1;
+    }
+
+    constexpr bool isPowerOfTwo(size_type n) const noexcept
+    {
+        return ((n != 0) && !(n & (n - 1)));
     }
 
 private:
