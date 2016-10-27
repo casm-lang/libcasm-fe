@@ -48,10 +48,9 @@ Update* UpdateSet::Conflict::existingUpdate() const noexcept
     return m_existingUpdate;
 }
 
-UpdateSet::UpdateSet(Type type, std::size_t initialSize, UpdateSet* parent) :
-    m_parent(parent),
-    m_type(type),
-    m_set(initialSize)
+UpdateSet::UpdateSet(std::size_t initialSize, UpdateSet* parent) :
+    m_set(initialSize),
+    m_parent(parent)
 {
 
 }
@@ -59,11 +58,6 @@ UpdateSet::UpdateSet(Type type, std::size_t initialSize, UpdateSet* parent) :
 UpdateSet::~UpdateSet()
 {
     clear();
-}
-
-UpdateSet::Type UpdateSet::type() const noexcept
-{
-    return m_type;
 }
 
 bool UpdateSet::empty() const noexcept
@@ -76,32 +70,13 @@ size_t UpdateSet::size() const noexcept
     return m_set.size();
 }
 
-void UpdateSet::add(const value_t* location, Update* update)
+void UpdateSet::clear()
 {
-    if (m_type == Type::Parallel) {
-        const auto result = m_set.insert(location, update);
-        if (!result.second) {
-            const auto existingPair = *(result.first);
-            const auto existingUpdate = existingPair.second;
-
-            if (update->value != existingUpdate->value) {
-                throw Conflict("Conflict in updateset", update, existingUpdate);
-            }
-        }
-    } else {
-        m_set[location] = update;
-    }
+    m_set.clear();
 }
 
 Update* UpdateSet::lookup(const value_t* location) const
 {
-    if (m_type == Type::Sequential) {
-        const auto it = m_set.find(location);
-        if (it != m_set.cend()) {
-            return it->second;
-        }
-    }
-
     if (m_parent) {
         return m_parent->lookup(location);
     }
@@ -111,7 +86,12 @@ Update* UpdateSet::lookup(const value_t* location) const
 
 UpdateSet *UpdateSet::fork(const UpdateSet::Type updateSetType, std::size_t initialSize)
 {
-    return new UpdateSet(updateSetType, initialSize, this);
+    switch (updateSetType) {
+    case Type::Sequential:
+        return new SequentialUpdateSet(initialSize, this);
+    case Type::Parallel:
+        return new ParallelUpdateSet(initialSize, this);
+    }
 }
 
 void UpdateSet::merge()
@@ -125,11 +105,6 @@ void UpdateSet::merge()
         }
         clear();
     }
-}
-
-void UpdateSet::clear()
-{
-    m_set.clear();
 }
 
 typename UpdateSet::const_iterator UpdateSet::cbegin() const noexcept
@@ -146,6 +121,44 @@ Update* UpdateSet::get(const value_t* location) const noexcept
 {
     const auto it = m_set.find(location);
     return (it != m_set.cend()) ? it->second : nullptr;
+}
+
+UpdateSet::Type SequentialUpdateSet::type() const noexcept
+{
+    return Type::Sequential;
+}
+
+void SequentialUpdateSet::add(const value_t* location, Update* update)
+{
+    m_set[location] = update;
+}
+
+Update* SequentialUpdateSet::lookup(const value_t* location) const
+{
+    const auto it = m_set.find(location);
+    if (it != m_set.cend()) {
+        return it->second;
+    }
+
+    return UpdateSet::lookup(location);
+}
+
+UpdateSet::Type ParallelUpdateSet::type() const noexcept
+{
+    return Type::Parallel;
+}
+
+void ParallelUpdateSet::add(const value_t* location, Update* update)
+{
+    const auto result = m_set.insert(location, update);
+    if (!result.second) {
+        const auto existingPair = *(result.first);
+        const auto existingUpdate = existingPair.second;
+
+        if (update->value != existingUpdate->value) {
+            throw Conflict("Conflict in updateset", update, existingUpdate);
+        }
+    }
 }
 
 UpdateSetManager::UpdateSetManager() :
@@ -177,7 +190,14 @@ Update* UpdateSetManager::lookup(const value_t* location) const
 void UpdateSetManager::fork(const UpdateSet::Type updateSetType, std::size_t initialSize)
 {
     if (m_updateSets.empty()) {
-        m_updateSets.push(new UpdateSet(updateSetType, initialSize));
+        switch (updateSetType) {
+        case UpdateSet::Type::Sequential:
+            m_updateSets.push(new SequentialUpdateSet(initialSize));
+            break;
+        case UpdateSet::Type::Parallel:
+            m_updateSets.push(new ParallelUpdateSet(initialSize));
+            break;
+        }
     } else {
         auto currentUpdateSet = m_updateSets.top();
         auto forkedUpdateSet = currentUpdateSet->fork(updateSetType, initialSize);
