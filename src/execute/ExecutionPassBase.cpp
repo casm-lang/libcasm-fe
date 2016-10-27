@@ -303,6 +303,20 @@ namespace builtins
         return value_t(new std::string(ss.str()));
     }
 
+    static const value_t bin(const value_t& arg)
+    {
+        // TODO LEAK!
+        if (arg.is_undef()) {
+            return value_t(new std::string("undef"));
+        }
+        
+        std::bitset< 256 > bits( (uint64_t)arg.value.integer );
+        std::string str = bits.to_string();        
+        str.erase(0, min(str.find_first_not_of('0'), str.size()-1));
+        
+        return value_t( new std::string( str ));
+    }
+    
     static const value_t nth(const value_t& list_arg, const value_t& index)
     {
         if (list_arg.is_undef() || index.is_undef()) {
@@ -466,6 +480,7 @@ namespace builtins
     static const value_t asinteger(const value_t& arg)
     {
         switch (arg.type) {
+            case TypeType::BIT:
             case TypeType::INTEGER:
                 return value_t(arg.value.integer);
             case TypeType::BOOLEAN:
@@ -499,11 +514,48 @@ namespace builtins
         }
     }
 
-    static const value_t asbit(const value_t& arg, const value_t& bitsize)
+    static const value_t asbit( const value_t& arg, const value_t& bitsize)
     {
-        return asinteger(arg); // TODO EP: fix this once we have a proper bit implementation
+        // TODO PPA: redo after proper bit implementation and new built-ins implementation from IR etc.
+        value_t ret = asinteger(arg);
+        if( ret.type == TypeType::UNDEF )
+        {
+            return ret;
+        }
+        else
+        {
+            return value_t( (uint64_t)ret.value.integer );    
+        }
+    }
+    
+    static const value_t zext( const value_t& arg, const value_t& bitsize )
+    {
+        // TODO PPA: redo after proper bit implementation and new built-ins implementation from IR etc.
+        return value_t( (uint64_t)arg.value.integer );
     }
 
+    static const value_t shl( const value_t& arg, const value_t& bitsize )
+    {
+        // TODO PPA: redo after proper bit implementation and new built-ins implementation from IR etc.
+        return value_t( ((uint64_t)arg.value.integer) << bitsize.value.integer );
+    }
+    
+    static const value_t shr( const value_t& arg, const value_t& bitsize )
+    {
+        // TODO PPA: redo after proper bit implementation and new built-ins implementation from IR etc.
+        return value_t( ((uint64_t)arg.value.integer) >> bitsize.value.integer );
+    }
+
+    static const value_t trunc( const value_t& arg, const value_t& bitsize )
+    {
+        // TODO PPA: redo after proper bit implementation and new built-ins implementation from IR etc.
+
+        uint64_t mask = (1 << bitsize.value.integer) - 1;
+        
+        return value_t( ((uint64_t)arg.value.integer) & mask );
+    }
+    
+    
     static void get_numerator_denominator(double x, int64_t *num, int64_t *denom)
     {
         // thanks to
@@ -762,6 +814,9 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom, std::vect
         return builtins::dec(arguments.at(0));
     case Builtin::Id::HEX:
         return builtins::hex(arguments.at(0));
+    case Builtin::Id::BIN:
+        return builtins::bin(arguments.at(0));
+        
     case Builtin::Id::TAIL:
         return builtins::tail(temp_lists, arguments.at(0));
     case Builtin::Id::LEN:
@@ -786,6 +841,16 @@ const value_t ExecutionPassBase::visit_builtin_atom(BuiltinAtom *atom, std::vect
         return builtins::asbit(arguments.at(0), arguments.at(1));
     case Builtin::Id::IS_SYMBOLIC:
         return builtins::issymbolic(arguments.at(0));
+        
+    case Builtin::Id::ZEXT:
+        return builtins::zext(arguments.at(0), arguments.at(1));
+    case Builtin::Id::SHL:
+        return builtins::shl(arguments.at(0), arguments.at(1));
+    case Builtin::Id::SHR:
+        return builtins::shr(arguments.at(0), arguments.at(1));
+    case Builtin::Id::TRUNC:
+        return builtins::trunc(arguments.at(0), arguments.at(1));
+        
     default:
         global_driver->error(atom->location, "unimplemented builtin `" + atom->to_str() + "`");
         return value_t();

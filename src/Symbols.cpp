@@ -561,7 +561,9 @@ Builtin built_ins[] =
   , { { TypeType::BIT }
     , { TypeType::INTEGER }
     }
-  , [] ( Type* ret, std::vector< Type* >& arg ) { }
+  , [] ( Type* ret, std::vector< Type* >& arg )
+    {
+    }
   , [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
     {
         if( !built_in_intconstarg_to_retbittype( self, driver, atom, arguments, 2, 1 ) )

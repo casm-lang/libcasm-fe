@@ -38,6 +38,10 @@ value_t::value_t(INTEGER_T integer) : type(TypeType::INTEGER) {
   value.integer = integer;
 }
 
+value_t::value_t(uint64_t bitvalue) : type(TypeType::BIT) {
+    value.integer = (INTEGER_T)bitvalue;
+}
+
 value_t::value_t(FLOATING_T float_) : type(TypeType::FLOATING) {
   value.float_ = float_;
 }
@@ -102,7 +106,7 @@ bool value_t::operator==(const value_t &other) const {
       return false;
     }
   }
-
+  
   if (other.is_symbolic()) {
     if (is_symbolic()) {
       if (value.sym->list && other.value.sym->list) {
@@ -117,6 +121,7 @@ bool value_t::operator==(const value_t &other) const {
 
   switch (type) {
     case TypeType::INTEGER: return value.integer == other.value.integer;
+    case TypeType::BIT: return value.integer == other.value.integer;
     case TypeType::FLOATING: return value.float_ == other.value.float_;
     case TypeType::BOOLEAN: return value.boolean == other.value.boolean;
     case TypeType::ENUM: return value.enum_val == other.value.enum_val;
@@ -190,14 +195,49 @@ const std::string value_t::to_str(bool symbolic) const {
 
 value_t operator or(const value_t& lhs, const value_t& rhs)
 {
-    if (lhs.is_undef() and rhs.is_undef()) {
-        return value_t();
-    } else if (lhs.is_undef()) {
-        return rhs.value.boolean ? value_t(true) : value_t();
-    } else if (rhs.is_undef()) {
-        return lhs.value.boolean ? value_t(true) : value_t();
-    } else {
-        return value_t(lhs.value.boolean or rhs.value.boolean);
+    assert( lhs.type == TypeType::UNDEF or lhs.type == TypeType::BOOLEAN
+	 or lhs.type == TypeType::BIT   or lhs.type == TypeType::INTEGER );
+    
+    assert( rhs.type == TypeType::UNDEF or rhs.type == TypeType::BOOLEAN
+	 or rhs.type == TypeType::BIT   or rhs.type == TypeType::INTEGER );
+    
+    if( lhs.is_undef() and rhs.is_undef() )
+    {
+	return value_t();
+    }
+    else if( lhs.type == TypeType::BOOLEAN or rhs.type == TypeType::BOOLEAN )
+    {
+	if( lhs.is_undef() )
+	{
+	    return rhs.value.boolean ? value_t(true) : value_t();
+	}
+	else if( rhs.is_undef() )
+	{
+	    return lhs.value.boolean ? value_t(true) : value_t();
+	}
+	else
+	{
+	    return value_t(lhs.value.boolean or rhs.value.boolean);
+	}
+    }
+    else if( lhs.type == TypeType::BIT
+	  or rhs.type == TypeType::BIT
+	  or lhs.type == TypeType::INTEGER
+	  or rhs.type == TypeType::INTEGER )
+    {
+	if( lhs.is_undef() or rhs.is_undef() )
+	{
+	    return value_t();
+	}
+	else
+	{
+	    return value_t( ((uint64_t)lhs.value.integer) | ((uint64_t)rhs.value.integer) );
+	}
+    }
+    else
+    {
+	assert(0);
+	return value_t();
     }
 }
 
@@ -244,17 +284,32 @@ value_t operator +(const value_t& lhs, const value_t& rhs)
     if (lhs.is_undef() or rhs.is_undef()) {
         return value_t();
     }
-    switch (lhs.type) {
-    case TypeType::INTEGER:
-        return value_t(lhs.value.integer + rhs.value.integer);
-    case TypeType::FLOATING:
-        return value_t(lhs.value.float_ + rhs.value.float_);
-    case TypeType::RATIONAL:
-        return value_t(&(*lhs.value.rat + *rhs.value.rat));
-    case TypeType::STRING:
-        return value_t(new std::string(*lhs.value.string + *rhs.value.string));
-    default:
-        FAILURE();
+    switch (lhs.type)
+    {
+        case TypeType::INTEGER:
+	{
+	    return value_t(lhs.value.integer + rhs.value.integer);
+	}
+        case TypeType::BIT:
+	{
+	    uint64_t tmp = (uint64_t)lhs.value.integer + (uint64_t)rhs.value.integer;
+	    // TODO: PPA: cut of to correct bit size!
+	    return value_t( tmp );
+	}
+        case TypeType::FLOATING:
+	{
+	    return value_t(lhs.value.float_ + rhs.value.float_);
+	}
+        case TypeType::RATIONAL:
+        {
+	    return value_t(&(*lhs.value.rat + *rhs.value.rat));
+	}
+        case TypeType::STRING:
+        {
+	    return value_t(new std::string(*lhs.value.string + *rhs.value.string));
+	}
+        default:
+	    FAILURE();
     }
 }
 
@@ -841,6 +896,7 @@ namespace std {
   size_t hash<value_t>::operator()(const value_t &key) const {
     switch (key.type) {
       case TypeType::INTEGER:
+      case TypeType::BIT:
         return key.value.integer;
       case TypeType::FLOATING:
         static std::hash<FLOATING_T> floating_hasher;

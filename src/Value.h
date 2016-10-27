@@ -63,6 +63,7 @@ class value_t {
 
     value_t();
     value_t(INTEGER_T integer);
+    value_t(uint64_t integer);
     value_t(FLOATING_T float_);
     value_t(bool boolean);
     value_t(RuleNode *rule);

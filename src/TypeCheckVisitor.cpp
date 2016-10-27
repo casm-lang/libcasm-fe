@@ -419,24 +419,13 @@ void TypecheckVisitor::visit_let( LetNode *node, Type* )
 	  + "'"
 	);
     }
-
     
-    Type* t     = &node->type_;
-    Type* other = &node->expr->type_;
-    if( ( t->t == TypeType::BIT and other->t == TypeType::INTEGER )
-    or  ( t->t == TypeType::INTEGER and other->t == TypeType::BIT )
-    )
+    if( node->type_.t == TypeType::BIT )
     {
-    	Type* b = t;
-    	Type* i = other;
-	
-    	if( t->t == TypeType::INTEGER )
-    	{
-    	    b = other;
-    	    i = t;
-    	}
-	
-    	i->t = b->t;
+	if( node->expr->type_.t == TypeType::INTEGER or node->expr->type_.t == TypeType::UNKNOWN )
+	{
+	    node->expr->type_ = node->type_;
+	}
     }
     
     if( not node->type_.unify( &node->expr->type_ ) )
@@ -450,7 +439,7 @@ void TypecheckVisitor::visit_let( LetNode *node, Type* )
     node->type_.get_most_general_type( node );
     node->expr->type_.get_most_general_type( node->expr );
     DEBUG( node->type_.unify_links_to_str() );
-        
+    
     if( node->type_.t       == TypeType::BIT
     and node->expr->type_.t == TypeType::BIT
     )
@@ -459,13 +448,17 @@ void TypecheckVisitor::visit_let( LetNode *node, Type* )
         INTEGER_T value = -1;
         INTEGER_T value_bitsize = -1;
         
-    	assert( node->expr->node_type_ == NodeType::INTEGER_ATOM );
+    	if( node->expr->node_type_ == NodeType::INTEGER_ATOM )
     	{
     	    value = static_cast< IntegerAtom* >( node->expr )->val_;
     	    double v = (double)value;
     	    v = floor(log2( v )) + 1;
     	    value_bitsize = (INTEGER_T)v;
     	}
+	else
+	{
+	    value_bitsize = node->expr->type_.bitsize;
+	}
 	
     	if( value_bitsize > bitsize )
     	{
@@ -602,6 +595,12 @@ void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<
     {
         if( expr->t == TypeType::BIT && case_labels[i]->t == TypeType::INTEGER )
         {
+	    if( not node->case_list[i].first )
+	    {
+		// default case, omit!
+		continue;
+	    }
+	    
             ExpressionBase *expr_value = node->case_list[i].first;
             if( expr_value->node_type_ != NodeType::INTEGER_ATOM )
             {
@@ -611,7 +610,7 @@ void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<
                 );
                 continue;
             }
-
+	    
             IntegerAtom* expr_atom = static_cast< IntegerAtom* >( expr_value );
             INTEGER_T value = expr_atom->val_;
             INTEGER_T value_bitsize = -1;
@@ -738,7 +737,7 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression *expr, Type*, Type* )
     const Type* rhs = expr->right_->type_.get_most_general_type(expr->right_);
         
   if( lhs->t == TypeType::BIT and rhs->t == TypeType::BIT and lhs->bitsize != rhs->bitsize )
-  {      
+  {
       driver_.error
       ( expr->location
       , "size of 'Bit' types in expression did not match: "
@@ -813,9 +812,13 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression *expr, Type*, Type* )
     case ExpressionOperation::XOR:
     case ExpressionOperation::AND:
     {
-        if( expr->left_->type_.t == TypeType::BIT )
+        if( expr->left_->type_.t == TypeType::BIT or expr->right_->type_.t == TypeType::BIT )
         {
-            expr->type_.unify_nofollow( &expr->left_->type_ );
+	    assert( expr->right_->type_.t == TypeType::BIT );
+	    assert( expr->right_->type_.bitsize == expr->left_->type_.bitsize );
+	    
+            expr->type_.unify(Type( TypeType::BIT ));
+	    expr->type_.bitsize = expr->left_->type_.bitsize;
         }
         else
         {
