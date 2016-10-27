@@ -30,6 +30,7 @@
 
 #include "src/analyze/AstDumpPass.h"
 #include "src/analyze/TypeCheckPass.h"
+#include "src/analyze/UpdatePredictionPass.h"
 
 #include "src/transform/SourceToAstPass.h"
 

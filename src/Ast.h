@@ -113,6 +113,8 @@ public:
 
         Type type_;
 
+        std::size_t updates = 0;
+
         AstNode(NodeType node_type);
         AstNode(yy::location& loc, NodeType node_type);
         AstNode(yy::location& loc, NodeType node_type, Type type);

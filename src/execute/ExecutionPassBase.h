@@ -52,7 +52,7 @@ namespace libcasm_fe
         Update* addUpdate(Function *sym, const std::vector<value_t> &arguments,
                           const value_t& val, const yy::location& location);
 
-        void fork(const UpdateSet::Type updateSetType);
+        void fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
         void merge();
         void applyUpdates();
 
