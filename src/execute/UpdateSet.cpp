@@ -48,10 +48,9 @@ Update* UpdateSet::Conflict::existingUpdate() const noexcept
     return m_existingUpdate;
 }
 
-UpdateSet::UpdateSet(Type type, UpdateSet* parent) :
-    m_parent(parent),
-    m_type(type),
-    m_set(10)
+UpdateSet::UpdateSet(std::size_t initialSize, UpdateSet* parent) :
+    m_set(initialSize),
+    m_parent(parent)
 {
 
 }
@@ -59,11 +58,6 @@ UpdateSet::UpdateSet(Type type, UpdateSet* parent) :
 UpdateSet::~UpdateSet()
 {
 
-}
-
-UpdateSet::Type UpdateSet::type() const noexcept
-{
-    return m_type;
 }
 
 bool UpdateSet::empty() const noexcept
@@ -76,32 +70,8 @@ size_t UpdateSet::size() const noexcept
     return m_set.size();
 }
 
-void UpdateSet::add(const value_t* location, Update* update)
-{
-    if (m_type == Type::Parallel) {
-        const auto result = m_set.insert(location, update);
-        if (!result.second) {
-            const auto it = result.first;
-            const auto existingUpdate = it.value();
-
-            if (update->value != existingUpdate->value) {
-                throw Conflict("Conflict in updateset", update, existingUpdate);
-            }
-        }
-    } else {
-        m_set.insertOrAssign(location, update);
-    }
-}
-
 Update* UpdateSet::lookup(const value_t* location) const
 {
-    if (m_type == Type::Sequential) {
-        const auto it = m_set.find(location);
-        if (it != m_set.end()) {
-            return it.value();
-        }
-    }
-
     if (m_parent) {
         return m_parent->lookup(location);
     }
@@ -109,9 +79,14 @@ Update* UpdateSet::lookup(const value_t* location) const
     return nullptr;
 }
 
-UpdateSet *UpdateSet::fork(const UpdateSet::Type updateSetType)
+UpdateSet *UpdateSet::fork(const UpdateSet::Type updateSetType, std::size_t initialSize)
 {
-    return new UpdateSet(updateSetType, this);
+    switch (updateSetType) {
+    case Type::Sequential:
+        return new SequentialUpdateSet(initialSize, this);
+    case Type::Parallel:
+        return new ParallelUpdateSet(initialSize, this);
+    }
 }
 
 void UpdateSet::merge()
@@ -143,6 +118,44 @@ Update* UpdateSet::get(const value_t* location) const noexcept
     return (it != m_set.end()) ? it.value() : nullptr;
 }
 
+UpdateSet::Type SequentialUpdateSet::type() const noexcept
+{
+    return Type::Sequential;
+}
+
+void SequentialUpdateSet::add(const value_t* location, Update* update)
+{
+    m_set.insertOrAssign(location, update);
+}
+
+Update* SequentialUpdateSet::lookup(const value_t* location) const
+{
+    const auto it = m_set.find(location);
+    if (it != m_set.end()) {
+        return it.value();
+    }
+
+    return UpdateSet::lookup(location);
+}
+
+UpdateSet::Type ParallelUpdateSet::type() const noexcept
+{
+    return Type::Parallel;
+}
+
+void ParallelUpdateSet::add(const value_t* location, Update* update)
+{
+    const auto result = m_set.insert(location, update);
+    if (!result.second) {
+        const auto it = result.first;
+        const auto existingUpdate = it.value();
+
+        if (update->value != existingUpdate->value) {
+            throw Conflict("Conflict in updateset", update, existingUpdate);
+        }
+    }
+}
+
 UpdateSetManager::UpdateSetManager() :
     m_updateSets()
 {
@@ -169,13 +182,20 @@ Update* UpdateSetManager::lookup(const value_t* location) const
     }
 }
 
-void UpdateSetManager::fork(const UpdateSet::Type updateSetType)
+void UpdateSetManager::fork(const UpdateSet::Type updateSetType, std::size_t initialSize)
 {
     if (m_updateSets.empty()) {
-        m_updateSets.push(new UpdateSet(updateSetType));
+        switch (updateSetType) {
+        case UpdateSet::Type::Sequential:
+            m_updateSets.push(new SequentialUpdateSet(initialSize));
+            break;
+        case UpdateSet::Type::Parallel:
+            m_updateSets.push(new ParallelUpdateSet(initialSize));
+            break;
+        }
     } else {
         auto currentUpdateSet = m_updateSets.top();
-        auto forkedUpdateSet = currentUpdateSet->fork(updateSetType);
+        auto forkedUpdateSet = currentUpdateSet->fork(updateSetType, initialSize);
         m_updateSets.push(forkedUpdateSet);
     }
 }

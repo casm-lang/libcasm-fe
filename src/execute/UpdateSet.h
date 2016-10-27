@@ -78,10 +78,10 @@ public:
 public:
     using const_iterator = typename UpdateHashMap::const_iterator;
 
-    explicit UpdateSet(Type type, UpdateSet* parent = nullptr);
+    explicit UpdateSet(std::size_t initialSize, UpdateSet* parent = nullptr);
     virtual ~UpdateSet();
 
-    Type type() const noexcept;
+    virtual Type type() const noexcept = 0;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -90,11 +90,11 @@ public:
      *
      * @throws Conflict
      */
-    void add(const value_t* location, Update* update);
+    virtual void add(const value_t* location, Update* update) = 0;
 
-    Update* lookup(const value_t* location) const;
+    virtual Update* lookup(const value_t* location) const;
 
-    UpdateSet* fork(const UpdateSet::Type updateSetType);
+    UpdateSet* fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
 
     /**
      *
@@ -107,10 +107,48 @@ public:
 
     Update* get(const value_t* location) const noexcept;
 
+protected:
+    UpdateHashMap m_set;
+
 private:
     UpdateSet* m_parent;
-    const Type m_type;
-    UpdateHashMap m_set;
+};
+
+/**
+ * @brief Update-set with sequential execution semantics
+ */
+class SequentialUpdateSet final : public UpdateSet
+{
+public:
+    using UpdateSet::UpdateSet;
+
+    Type type() const noexcept override;
+
+    /**
+     * Adds the \a udpate for \a location to this update-set
+     */
+    void add(const value_t* location, Update* update) override;
+
+    Update* lookup(const value_t* location) const override;
+};
+
+/**
+ * @brief Update-set with parallel execution semantics
+ */
+class ParallelUpdateSet final : public UpdateSet
+{
+public:
+    using UpdateSet::UpdateSet;
+
+    Type type() const noexcept override;
+
+    /**
+     * Adds the \a udpate for \a location to this update-set
+     *
+     * @throws Conflict when an update for \a location exists already and the
+     *         values of both updates are different
+     */
+    void add(const value_t* location, Update* update) override;
 };
 
 class UpdateSetManager
@@ -127,7 +165,7 @@ public:
 
     Update* lookup(const value_t* location) const;
 
-    void fork(const UpdateSet::Type updateSetType);
+    void fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
 
     /**
      *
