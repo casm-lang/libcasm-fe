@@ -81,9 +81,9 @@ public:
      */
     virtual void add(const value_t* location, Update* update) = 0;
 
-    virtual Update* lookup(const value_t* location) const;
+    virtual Update* lookup(const value_t* location) const noexcept;
 
-    UpdateSet* fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
+    UpdateSet* fork(UpdateSet::Type updateSetType, std::size_t initialSize);
 
     /**
      *
@@ -120,7 +120,7 @@ public:
      */
     void add(const value_t* location, Update* update) override;
 
-    Update* lookup(const value_t* location) const override;
+    Update* lookup(const value_t* location) const noexcept override;
 };
 
 /**
@@ -154,9 +154,9 @@ public:
      */
     void add(const value_t* location, Update* update);
 
-    Update* lookup(const value_t* location) const;
+    Update* lookup(const value_t* location) const noexcept;
 
-    void fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
+    void fork(UpdateSet::Type updateSetType, std::size_t initialSize);
 
     /**
      *
@@ -168,7 +168,7 @@ public:
 
     UpdateSet* currentUpdateSet() const;
 
-    size_t size() const;
+    size_t size() const noexcept;
 
 private:
     std::stack<UpdateSet*> m_updateSets;
