@@ -55,17 +55,12 @@ UpdateSet::UpdateSet(std::size_t initialSize, UpdateSet* parent) :
 
 }
 
-UpdateSet::~UpdateSet()
-{
-
-}
-
 bool UpdateSet::empty() const noexcept
 {
     return m_set.empty();
 }
 
-size_t UpdateSet::size() const noexcept
+std::size_t UpdateSet::size() const noexcept
 {
     return m_set.size();
 }
@@ -105,7 +100,6 @@ void UpdateSet::merge()
         for(const auto& pair : m_set) {
             m_parent->add(pair.first, pair.second);
         }
-        clear();
     }
 }
 
@@ -208,7 +202,7 @@ void UpdateSetManager::fork(UpdateSet::Type updateSetType, std::size_t initialSi
 
 void UpdateSetManager::merge()
 {
-    if (m_updateSets.size() > 1) {
+    if (size() > 1) {
         const auto updateSet = currentUpdateSet();
         updateSet->merge();
         m_updateSets.pop();
@@ -230,7 +224,7 @@ UpdateSet* UpdateSetManager::currentUpdateSet() const
     return m_updateSets.top();
 }
 
-size_t UpdateSetManager::size() const noexcept
+std::size_t UpdateSetManager::size() const noexcept
 {
     return m_updateSets.size();
 }
