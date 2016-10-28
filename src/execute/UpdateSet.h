@@ -106,7 +106,7 @@ public:
     /**
      * Destroys the update-set
      */
-    virtual ~UpdateSet() = default;
+    virtual ~UpdateSet();
 
     /**
      * @see UpdateSet::Type
@@ -172,8 +172,7 @@ public:
      * Merges all updates of the current update-set into its parent update-set
      *
      * @pre The update-set must have a parent update-set
-     * @post The state of the current update-set is undefined, make sure that
-     *       you call clear() before reusing it
+     * @post The current update-set is empty
      *
      * @throws Conflict when the parent update-set is a parallel update-set, an
      *         update for the \a location exists already in the parent update-set

@@ -179,11 +179,6 @@ public:
 
     }
 
-    virtual ~LinkedHashMap()
-    {
-        clear();
-    }
-
     bool empty() const noexcept
     {
         return m_map.empty();

@@ -55,6 +55,11 @@ UpdateSet::UpdateSet(std::size_t initialSize, UpdateSet* parent) :
 
 }
 
+UpdateSet::~UpdateSet()
+{
+    clear();
+}
+
 bool UpdateSet::empty() const noexcept
 {
     return m_set.empty();
@@ -100,6 +105,7 @@ void UpdateSet::merge()
         for(const auto& pair : m_set) {
             m_parent->add(pair.first, pair.second);
         }
+        clear();
     }
 }
 
