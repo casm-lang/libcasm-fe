@@ -179,6 +179,11 @@ public:
 
     }
 
+    virtual ~LinkedHashMap()
+    {
+        clear();
+    }
+
     bool empty() const noexcept
     {
         return m_map.empty();
@@ -275,9 +280,10 @@ public:
 
     void clear()
     {
-        const auto end = m_map.end();
-        for (auto it = m_map.begin(); it != end; ++it) {
-            delete it->second;
+        for (auto node = m_lastNode; node != nullptr;) {
+            const auto n = node;
+            node = node->prev;
+            delete n;
         }
 
         m_map.clear();
