@@ -29,12 +29,15 @@
 #include "../Value.h"
 #include "../various/location.hh"
 
+/**
+ * @brief Represents an update
+ */
 struct Update
 {
-    value_t value;
-    const std::vector<value_t>* args;
-    const yy::location* location;
-    uint32_t func; // function uid
+    value_t value; /**< The value of the update */
+    const std::vector<value_t>* args; /**< The function arguments of the update */
+    const yy::location* location; /**< The source-code location of the update producer */
+    uint32_t func; /**< The function uid of the update */
 };
 
 #endif // _LIB_CASMFE_UPDATE_H_

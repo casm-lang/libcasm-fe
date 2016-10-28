@@ -47,7 +47,7 @@
 
 namespace libcasm_fe
 {
-    using FunctionState = OpenHashMap<std::vector<value_t>, value_t>;
+    using FunctionState = ChainedHashMap<std::vector<value_t>, value_t>;
 
     class ExecutionPassBase : public BaseVisitor<value_t>
     {

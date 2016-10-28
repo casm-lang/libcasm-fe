@@ -26,7 +26,6 @@
 #ifndef _LIB_CASMFE_UPDATESET_H_
 #define _LIB_CASMFE_UPDATESET_H_
 
-#include <cstdint>
 #include <stdexcept>
 #include <stack>
 
@@ -51,15 +50,37 @@ struct LocationHash
     }
 };
 
+/**
+ * @brief Base class for all types of update-sets
+ */
 class UpdateSet
 {
 public:
+    /**
+     * @brief An exception which will be thrown when updates are in conflict
+     */
     class Conflict : public std::logic_error
     {
     public:
+        /**
+         * Constructs a conflict exception
+         *
+         * @param msg A problem-description for the user
+         * @param conflictingUpdate Update which caused the conflict
+         * @param existingUpdate Existing update for the same location as the
+         *                       \a conflictingUpdate
+         */
         Conflict(const std::string& msg, Update* conflictingUpdate, Update* existingUpdate);
 
+        /**
+         * @return The update which caused the conflict
+         */
         Update* conflictingUpdate() const noexcept;
+
+        /**
+         * @return The existing update for the same location as the conflicting
+         *         update
+         */
         Update* existingUpdate() const noexcept;
 
     private:
@@ -67,10 +88,13 @@ public:
         Update* m_existingUpdate;
     };
 
+    /**
+     * @brief The type of the update-set
+     */
     enum class Type
     {
-        Sequential,
-        Parallel
+        Sequential, /**< Update-set with sequential execution semantics */
+        Parallel /**< Update-set with parallel execution semantics */
     };
 
     using UpdateHashMap = ChainedHashMap<const value_t*, Update*, LocationHash>;
@@ -78,40 +102,116 @@ public:
 public:
     using const_iterator = typename UpdateHashMap::const_iterator;
 
+    /**
+     * Constructs an empty update-set
+     *
+     * @param initialSize The number of updates the update-set should be able to
+     *                    handle without resizing
+     * @param parent The parent update-set (if there is any)
+     */
     explicit UpdateSet(std::size_t initialSize, UpdateSet* parent = nullptr);
-    virtual ~UpdateSet();
-
-    virtual Type type() const noexcept = 0;
-
-    bool empty() const noexcept;
-    size_t size() const noexcept;
 
     /**
+     * @see UpdateSet::Type
      *
-     * @throws Conflict
+     * @return The type of the update-set
+     */
+    virtual Type type() const noexcept = 0;
+
+    /**
+     * @return A boolean value indicating wheter the update-set is empty, i.e.
+     *         wheter it doesn't contain updates
+     */
+    bool empty() const noexcept;
+
+    /**
+     * @return The number of updates in the update-set
+     */
+    std::size_t size() const noexcept;
+
+    /**
+     * Adds the \a update for the \a location to the update-set
+     *
+     * The handling of multiple updates for the same location depends on the
+     * actual type of the update-set.
+     *
+     * @note The udpate-set will not take over the ownership of \a update.
+     *
+     * @param location The location of the update
+     * @param update The update which should be added
+     *
+     * @throws Conflict when the update-set is a parallel update-set, an update
+     *         for the \a location exists already and the values of both updates
+     *         are different
      */
     virtual void add(const value_t* location, Update* update) = 0;
 
-    virtual Update* lookup(const value_t* location) const;
-
-    UpdateSet* fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
+    /**
+     * Searches for an update for the \a location in the update-set
+     *
+     * If the current update-set doesn't contain an update for the \a location,
+     * the parent update-set will be searched.
+     *
+     * @param location The location of the update of interest
+     *
+     * @return The update for the \a location or nullptr if no update for the
+     *         \a location could be found.
+     */
+    virtual Update* lookup(const value_t* location) const noexcept;
 
     /**
+     * Forks the current update-set
      *
-     * @throws Conflict
+     * @param updateSetType The type of the forked update-set @see UpdateSet::Type
+     * @param initialSize The number of updates the update-set should be able to
+     *                    handle without resizing
+     *
+     * @return A new update-set of type \a updateSetType with the current
+     *         update-set as parent
+     */
+    UpdateSet* fork(UpdateSet::Type updateSetType, std::size_t initialSize);
+
+    /**
+     * Merges all updates of the current update-set into its parent update-set
+     *
+     * @pre The update-set must have a parent update-set
+     *
+     * @throws Conflict when the parent update-set is a parallel update-set, an
+     *         update for the \a location exists already in the parent update-set
+     *         and the values of both updates are different
      */
     void merge();
 
+    /**
+     * @return Iterator to the beginning of the update-set
+     */
     const_iterator begin() const noexcept;
+
+    /**
+     * @return Iterator to the end of the update-set
+     */
     const_iterator end() const noexcept;
 
+    /**
+     * Searches for an update for the \a location in the current update-set
+     *
+     * An existing update will always be returned regardless of the type of
+     * the update-set.
+     *
+     * @note In contrast to lookup() no recursive search will be performed.
+     *
+     * @param location The location of the update of interest
+     *
+     * @return The update for the \a location or nullptr if no update for the
+     *         \a location could be found.
+     */
     Update* get(const value_t* location) const noexcept;
 
 protected:
     UpdateHashMap m_set;
 
 private:
-    UpdateSet* m_parent;
+    UpdateSet* const m_parent;
 };
 
 /**
@@ -122,14 +222,38 @@ class SequentialUpdateSet final : public UpdateSet
 public:
     using UpdateSet::UpdateSet;
 
+    /**
+     * @see UpdateSet::Type::Sequential
+     *
+     * @return The type of the update-set
+     */
     Type type() const noexcept override;
 
     /**
-     * Adds the \a udpate for \a location to this update-set
+     * Adds the \a update for the \a location to the update-set.
+     *
+     * If an update for the same location exists already then it will be
+     * overwritten.
+     *
+     * @note The udpate-set will not take over the ownership of \a update.
+     *
+     * @param location The location of the update
+     * @param update The update which should be added
      */
     void add(const value_t* location, Update* update) override;
 
-    Update* lookup(const value_t* location) const override;
+    /**
+     * Searches for an update for the \a location in the update-set
+     *
+     * If the current update-set doesn't contain an update for the \a location,
+     * the parent update-set will be searched.
+     *
+     * @param location The location of the update of interest
+     *
+     * @return The update for the \a location or nullptr if no update for the
+     *         \a location could be found.
+     */
+    Update* lookup(const value_t* location) const noexcept override;
 };
 
 /**
@@ -140,44 +264,120 @@ class ParallelUpdateSet final : public UpdateSet
 public:
     using UpdateSet::UpdateSet;
 
+    /**
+     * @see UpdateSet::Type::Parallel
+     *
+     * @return The type of the update-set
+     */
     Type type() const noexcept override;
 
     /**
-     * Adds the \a udpate for \a location to this update-set
+     * Adds the \a update for the \a location to the update-set
      *
-     * @throws Conflict when an update for \a location exists already and the
-     *         values of both updates are different
+     * @note The udpate-set will not take over the ownership of \a update.
+     *
+     * @param location The location of the update
+     * @param update The update which should be added
+     *
+     * @throws Conflict when an update for the \a location exists already and
+     *         the values of both updates are different
      */
     void add(const value_t* location, Update* update) override;
 };
 
+/**
+ * @brief An helper for convenient forking and merging of update-sets
+ */
 class UpdateSetManager
 {
 public:
+    /**
+     * Constructs an empty update-set manager
+     */
     UpdateSetManager();
+
+    /**
+     * Destroys the update-set manager and frees all update-sets
+     */
     virtual ~UpdateSetManager();
 
     /**
+     * Adds the \a update for the \a location to the current update-set
      *
-     * @throws Conflict
+     * The handling of multiple updates for the same location depends on the
+     * actual type of the update-set.
+     *
+     * @note The udpate-set will not take over the ownership of \a update.
+     *
+     * @pre The update-set manager must not be empty
+     *
+     * @param location The location of the update
+     * @param update The update which should be added
+     *
+     * @throws Conflict when the update-set is a parallel update-set, an update
+     *         for the \a location exists already and the values of both updates
+     *         are different
      */
     void add(const value_t* location, Update* update);
 
-    Update* lookup(const value_t* location) const;
-
-    void fork(const UpdateSet::Type updateSetType, std::size_t initialSize);
+    /**
+     * Searches for an update for the \a location in the current update-set
+     *
+     * If the current update-set doesn't contain an update for the \a location,
+     * the parent update-set will be searched.
+     *
+     * @param location The location of the update of interest
+     *
+     * @return The update for the \a location or nullptr if no update for the
+     *         \a location could be found.
+     */
+    Update* lookup(const value_t* location) const noexcept;
 
     /**
+     * Forks the current update-set or creates a new update-set if the
+     * update-set manager is empty
      *
-     * @throws Conflict
+     * @post The forked update-set is the new "current update-set" and the size
+     *       of the update-set manager is increased by one
+     *
+     * @param updateSetType The type of the forked update-set @see UpdateSet::Type
+     * @param initialSize The number of updates the update-set should be able to
+     *                    handle without resizing
+     */
+    void fork(UpdateSet::Type updateSetType, std::size_t initialSize);
+
+    /**
+     * Merges all updates of the current update-set into its parent update-set
+     *
+     * The merge will only be performed if there is more than one update-set in
+     * the update-set manager.
+     *
+     * @post If an merge has been performed the size of the update-set manager
+     *       is decreased by one
+     *
+     * @throws Conflict when the parent update-set is a parallel update-set, an
+     *         update for the \a location exists already in the parent update-set
+     *         and the values of both updates are different
      */
     void merge();
 
+    /**
+     * Removes all update-sets from the update-set manager
+     */
     void clear();
 
+    /**
+     * @pre The update-set manager must not be empty
+     *
+     * @return The current update-set of the update-set manager, i.e. the
+     *         update-set on top of the update-set stack.
+     */
     UpdateSet* currentUpdateSet() const;
 
-    size_t size() const;
+    /**
+     * @return The number of update-sets in the update-set manager
+     */
+    std::size_t size() const noexcept;
 
 private:
     std::stack<UpdateSet*> m_updateSets;

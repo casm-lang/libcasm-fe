@@ -55,22 +55,17 @@ UpdateSet::UpdateSet(std::size_t initialSize, UpdateSet* parent) :
 
 }
 
-UpdateSet::~UpdateSet()
-{
-
-}
-
 bool UpdateSet::empty() const noexcept
 {
     return m_set.empty();
 }
 
-size_t UpdateSet::size() const noexcept
+std::size_t UpdateSet::size() const noexcept
 {
     return m_set.size();
 }
 
-Update* UpdateSet::lookup(const value_t* location) const
+Update* UpdateSet::lookup(const value_t* location) const noexcept
 {
     if (m_parent) {
         return m_parent->lookup(location);
@@ -79,7 +74,7 @@ Update* UpdateSet::lookup(const value_t* location) const
     return nullptr;
 }
 
-UpdateSet *UpdateSet::fork(const UpdateSet::Type updateSetType, std::size_t initialSize)
+UpdateSet *UpdateSet::fork(UpdateSet::Type updateSetType, std::size_t initialSize)
 {
     switch (updateSetType) {
     case Type::Sequential:
@@ -91,6 +86,8 @@ UpdateSet *UpdateSet::fork(const UpdateSet::Type updateSetType, std::size_t init
 
 void UpdateSet::merge()
 {
+    assert(m_parent != nullptr);
+
     if (m_parent->m_set.empty()) {
         std::swap(m_parent->m_set, m_set);
     } else {
@@ -128,7 +125,7 @@ void SequentialUpdateSet::add(const value_t* location, Update* update)
     m_set.insertOrAssign(location, update);
 }
 
-Update* SequentialUpdateSet::lookup(const value_t* location) const
+Update* SequentialUpdateSet::lookup(const value_t* location) const noexcept
 {
     const auto it = m_set.find(location);
     if (it != m_set.end()) {
@@ -169,20 +166,19 @@ UpdateSetManager::~UpdateSetManager()
 
 void UpdateSetManager::add(const value_t* location, Update* update)
 {
-    assert(!m_updateSets.empty());
-    m_updateSets.top()->add(location, update);
+    currentUpdateSet()->add(location, update);
 }
 
-Update* UpdateSetManager::lookup(const value_t* location) const
+Update* UpdateSetManager::lookup(const value_t* location) const noexcept
 {
     if (m_updateSets.empty()) {
-      return nullptr;
+        return nullptr;
     } else {
-      return m_updateSets.top()->lookup(location);
+        return currentUpdateSet()->lookup(location);
     }
 }
 
-void UpdateSetManager::fork(const UpdateSet::Type updateSetType, std::size_t initialSize)
+void UpdateSetManager::fork(UpdateSet::Type updateSetType, std::size_t initialSize)
 {
     if (m_updateSets.empty()) {
         switch (updateSetType) {
@@ -194,25 +190,25 @@ void UpdateSetManager::fork(const UpdateSet::Type updateSetType, std::size_t ini
             break;
         }
     } else {
-        auto currentUpdateSet = m_updateSets.top();
-        auto forkedUpdateSet = currentUpdateSet->fork(updateSetType, initialSize);
+        const auto updateSet = currentUpdateSet();
+        const auto forkedUpdateSet = updateSet->fork(updateSetType, initialSize);
         m_updateSets.push(forkedUpdateSet);
     }
 }
 
 void UpdateSetManager::merge()
 {
-    if (m_updateSets.size() > 1) {
-        auto currentUpdateSet = m_updateSets.top();
-        currentUpdateSet->merge();
+    if (size() > 1) {
+        const auto updateSet = currentUpdateSet();
+        updateSet->merge();
         m_updateSets.pop();
-        delete currentUpdateSet;
+        delete updateSet;
     }
 }
 
 void UpdateSetManager::clear()
 {
-    while (!m_updateSets.empty()) {
+    while (not m_updateSets.empty()) {
         delete m_updateSets.top();
         m_updateSets.pop();
     }
@@ -220,10 +216,11 @@ void UpdateSetManager::clear()
 
 UpdateSet* UpdateSetManager::currentUpdateSet() const
 {
+    assert(not m_updateSets.empty());
     return m_updateSets.top();
 }
 
-size_t UpdateSetManager::size() const
+std::size_t UpdateSetManager::size() const noexcept
 {
     return m_updateSets.size();
 }

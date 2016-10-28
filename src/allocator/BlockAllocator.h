@@ -165,10 +165,9 @@ public:
         static_assert((BlockSize & (BlockSize - 1)) == 0, "block size must be a power of two");
     }
 
-    virtual ~BlockAllocator()
+    ~BlockAllocator()
     {
-        auto block = m_topBlock;
-        while (block != nullptr) {
+        for (auto block = m_topBlock; block != nullptr;) {
             const auto b = block;
             block = block->previous();
             MemoryPool::instance().release(b);
