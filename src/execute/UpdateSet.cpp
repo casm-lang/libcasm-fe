@@ -57,7 +57,7 @@ UpdateSet::UpdateSet(std::size_t initialSize, UpdateSet* parent) :
 
 UpdateSet::~UpdateSet()
 {
-    clear();
+
 }
 
 bool UpdateSet::empty() const noexcept
