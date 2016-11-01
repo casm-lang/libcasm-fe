@@ -123,15 +123,13 @@ public:
     };
 
 public:
-    using size_type = size_t;
-
     explicit ChainedHashMap() :
         ChainedHashMap(1UL)
     {
 
     }
 
-    explicit ChainedHashMap(size_type initialCapacity) :
+    explicit ChainedHashMap(std::size_t initialCapacity) :
         m_buckets(nullptr),
         m_lastEntry(nullptr),
         m_size(0UL),
@@ -172,12 +170,12 @@ public:
         return m_size == 0UL;
     }
 
-    constexpr size_type size() const
+    constexpr std::size_t size() const
     {
         return m_size;
     }
 
-    constexpr size_type capacity() const
+    constexpr std::size_t capacity() const
     {
         return m_capacity;
     }
@@ -195,7 +193,7 @@ public:
     std::pair<const_iterator, bool> insert(const Key& key, const Value& value)
     {
         static Hash hasher;
-        const size_type hash = hasher(key);
+        const auto hash = hasher(key);
 
         const auto entry = searchEntryWithHash(key, hash);
         if (entry) {
@@ -214,7 +212,7 @@ public:
     void insertOrAssign(const Key& key, const Value& value)
     {
         static Hash hasher;
-        const size_type hash = hasher(key);
+        const auto hash = hasher(key);
 
         const auto entry = searchEntryWithHash(key, hash);
         if (entry) {
@@ -244,13 +242,13 @@ public:
         return const_iterator(entry);
     }
 
-    size_type count(const Key& key) const noexcept
+    std::size_t count(const Key& key) const noexcept
     {
         const auto entry = searchEntry(key);
         return entry ? 1UL : 0UL;
     }
 
-    void reserve(size_type n)
+    void reserve(std::size_t n)
     {
         if (n > m_capacity) {
             if (m_buckets) {
@@ -262,7 +260,7 @@ public:
     }
 
 private:
-    constexpr Bucket* bucketAt(size_type hash) const noexcept
+    constexpr Bucket* bucketAt(std::size_t hash) const noexcept
     {
         return m_buckets + (hash & (m_capacity - 1));
     }
@@ -278,7 +276,7 @@ private:
         return nullptr;
     }
 
-    Entry* searchEntryWithHash(const Key& key, const size_type hash) const
+    Entry* searchEntryWithHash(const Key& key, const std::size_t hash) const
     {
         static Pred equals;
 
@@ -295,7 +293,7 @@ private:
         return nullptr;
     }
 
-    Entry* createEntry(const Key& key, const Value& value, size_type hash)
+    Entry* createEntry(const Key& key, const Value& value, std::size_t hash)
     {
         const auto memory = m_entryAllocator.allocate(sizeof(Entry));
         const auto entry = new(memory) Entry(key, value, hash, m_lastEntry);
@@ -306,7 +304,7 @@ private:
         return entry;
     }
 
-    void resize(size_type newCapacity)
+    void resize(std::size_t newCapacity)
     {
         assert(isPowerOfTwo(newCapacity));
         m_capacity = newCapacity;
@@ -333,7 +331,7 @@ private:
         assert(m_size < m_capacity);
     }
 
-    size_type nextPowerOfTwo(size_type n) const noexcept
+    std::size_t nextPowerOfTwo(std::size_t n) const noexcept
     {
         n -= 1;
         n |= (n >> 1);
@@ -345,7 +343,7 @@ private:
         return n + 1;
     }
 
-    constexpr bool isPowerOfTwo(size_type n) const noexcept
+    constexpr bool isPowerOfTwo(std::size_t n) const noexcept
     {
         return ((n != 0) && !(n & (n - 1)));
     }
@@ -354,8 +352,8 @@ private:
     Bucket* m_buckets;
     Entry* m_lastEntry;
 
-    size_type m_size;
-    size_type m_capacity;
+    std::size_t m_size;
+    std::size_t m_capacity;
 
     BlockAllocator<4096> m_entryAllocator;
 };
