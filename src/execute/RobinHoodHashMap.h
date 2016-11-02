@@ -201,7 +201,7 @@ public:
     {
         growIfNecessary();
 
-        const auto hashCode = hashFor(key);
+        const auto hashCode = hashCodeOf(key);
         auto entry = searchEntry(key, hashCode);
         if (entry) {
             return std::make_pair(const_iterator(entry), false);
@@ -216,7 +216,7 @@ public:
     {
         growIfNecessary();
 
-        const auto hashCode = hashFor(key);
+        const auto hashCode = hashCodeOf(key);
         auto entry = searchEntry(key, hashCode);
         if (entry) {
             entry->value = value;
@@ -228,7 +228,7 @@ public:
 
     const Value& get(const Key& key) const
     {
-        const auto hashCode = hashFor(key);
+        const auto hashCode = hashCodeOf(key);
         const auto entry = searchEntry(key, hashCode);
         if (entry) {
             return entry->value;
@@ -239,14 +239,14 @@ public:
 
     const_iterator find(const Key& key) const noexcept
     {
-        const auto hashCode = hashFor(key);
+        const auto hashCode = hashCodeOf(key);
         const auto entry = searchEntry(key, hashCode);
         return const_iterator(entry);
     }
 
     bool hasKey(const Key& key) const noexcept
     {
-        const auto hashCode = hashFor(key);
+        const auto hashCode = hashCodeOf(key);
         const auto entry = searchEntry(key, hashCode);
         return entry != nullptr;
     }
@@ -263,7 +263,7 @@ public:
     }
 
 private:
-    std::size_t hashFor(const Key& key) const noexcept
+    std::size_t hashCodeOf(const Key& key) const noexcept
     {
         static Hash hasher;
         return hasher(key);
