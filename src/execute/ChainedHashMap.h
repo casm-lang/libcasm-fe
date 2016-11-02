@@ -41,14 +41,14 @@ private:
     {
         Key key;
         Value value;
-        std::size_t hash;
+        std::size_t hashCode;
         Entry* next; // conflict chain
         Entry* prev; // linked-list for iterating
 
-        Entry(const Key& key, const Value& value, std::size_t hash, Entry* prev) :
+        Entry(const Key& key, const Value& value, std::size_t hashCode, Entry* prev) :
             key(key),
             value(value),
-            hash(hash),
+            hashCode(hashCode),
             next(nullptr),
             prev(prev)
         {
@@ -202,43 +202,40 @@ public:
 
     std::pair<const_iterator, bool> insert(const Key& key, const Value& value)
     {
-        static Hash hasher;
-        const auto hash = hasher(key);
-
-        const auto entry = searchEntryWithHash(key, hash);
+        const auto hashCode = hashCodeOf(key);
+        auto entry = searchEntry(key, hashCode);
         if (entry) {
             return std::make_pair(const_iterator(entry), false);
         } else {
             growIfNecessary();
 
-            const auto newEntry = createEntry(key, value, hash);
-            auto bucket = bucketAt(hash);
-            bucket->insert(newEntry);
+            entry = createEntry(key, value, hashCode);
+            auto bucket = bucketAt(hashCode);
+            bucket->insert(entry);
 
-            return std::make_pair(const_iterator(newEntry), true);
+            return std::make_pair(const_iterator(entry), true);
         }
     }
 
     void insertOrAssign(const Key& key, const Value& value)
     {
-        static Hash hasher;
-        const auto hash = hasher(key);
-
-        const auto entry = searchEntryWithHash(key, hash);
+        const auto hashCode = hashCodeOf(key);
+        auto entry = searchEntry(key, hashCode);
         if (entry) {
             entry->value = value;
         } else {
             growIfNecessary();
 
-            const auto newEntry = createEntry(key, value, hash);
-            auto bucket = bucketAt(hash);
-            bucket->insert(newEntry);
+            entry = createEntry(key, value, hashCode);
+            auto bucket = bucketAt(hashCode);
+            bucket->insert(entry);
         }
     }
 
     const Value& get(const Key& key) const
     {
-        const auto entry = searchEntry(key);
+        const auto hashCode = hashCodeOf(key);
+        const auto entry = searchEntry(key, hashCode);
         if (entry) {
             return entry->value;
         } else {
@@ -248,13 +245,15 @@ public:
 
     const_iterator find(const Key& key) const noexcept
     {
-        const auto entry = searchEntry(key);
+        const auto hashCode = hashCodeOf(key);
+        const auto entry = searchEntry(key, hashCode);
         return const_iterator(entry);
     }
 
     bool hasKey(const Key& key) const noexcept
     {
-        const auto entry = searchEntry(key);
+        const auto hashCode = hashCodeOf(key);
+        const auto entry = searchEntry(key, hashCode);
         return entry != nullptr;
     }
 
@@ -270,31 +269,26 @@ public:
     }
 
 private:
+    std::size_t hashCodeOf(const Key& key) const noexcept
+    {
+        static Hash hasher;
+        return hasher(key);
+    }
+
     constexpr Bucket* bucketAt(std::size_t hash) const noexcept
     {
         return m_buckets + (hash & (m_capacity - 1));
     }
 
-    Entry* searchEntry(const Key& key) const
-    {
-        static Hash hasher;
-
-        if (m_buckets) {
-            return searchEntryWithHash(key, hasher(key));
-        }
-
-        return nullptr;
-    }
-
-    Entry* searchEntryWithHash(const Key& key, const std::size_t hash) const
+    Entry* searchEntry(const Key& key, const std::size_t hashCode) const
     {
         static Pred equals;
 
         if (m_buckets) {
-            const Bucket* bucket = bucketAt(hash);
+            const Bucket* bucket = bucketAt(hashCode);
 
             for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
-                if ((entry->hash == hash) and equals(entry->key, key)) {
+                if ((entry->hashCode == hashCode) and equals(entry->key, key)) {
                     return entry;
                 }
             }
@@ -303,10 +297,10 @@ private:
         return nullptr;
     }
 
-    Entry* createEntry(const Key& key, const Value& value, std::size_t hash)
+    Entry* createEntry(const Key& key, const Value& value, std::size_t hashCode)
     {
         const auto memory = m_entryAllocator.allocate(sizeof(Entry));
-        const auto entry = new(memory) Entry(key, value, hash, m_lastEntry);
+        const auto entry = new(memory) Entry(key, value, hashCode, m_lastEntry);
 
         m_lastEntry = entry;
         ++m_size;
@@ -326,7 +320,7 @@ private:
         std::memset(m_buckets, 0, sizeof(Bucket) * newCapacity);
 
         for (auto entry = m_lastEntry; entry != nullptr; entry = entry->prev) {
-            auto bucket = bucketAt(entry->hash);
+            auto bucket = bucketAt(entry->hashCode);
             bucket->insert(entry);
         }
     }
