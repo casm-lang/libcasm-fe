@@ -255,7 +255,7 @@ bool NumericExecutionPass::init_function(const std::string& name, std::set<std::
                 }
             }
             
-            if( function_map.count( arguments ) != 0 )
+            if( function_map.hasKey( arguments ) )
             {
                 throw RuntimeException
                 ( init.first->location

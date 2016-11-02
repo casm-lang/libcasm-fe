@@ -165,19 +165,29 @@ public:
         }
     }
 
-    constexpr bool empty() const
+    constexpr bool empty() const noexcept
     {
         return m_size == 0UL;
     }
 
-    constexpr std::size_t size() const
+    constexpr std::size_t size() const noexcept
     {
         return m_size;
     }
 
-    constexpr std::size_t capacity() const
+    constexpr std::size_t capacity() const noexcept
     {
         return m_capacity;
+    }
+
+    constexpr float loadFactor() const noexcept
+    {
+        return (float)size() / (float)capacity();
+    }
+
+    constexpr float maximumLoadFactor() const noexcept
+    {
+        return 1.0f;
     }
 
     constexpr const_iterator begin() const noexcept
@@ -242,10 +252,10 @@ public:
         return const_iterator(entry);
     }
 
-    std::size_t count(const Key& key) const noexcept
+    bool hasKey(const Key& key) const noexcept
     {
         const auto entry = searchEntry(key);
-        return entry ? 1UL : 0UL;
+        return entry != nullptr;
     }
 
     void reserve(std::size_t n)

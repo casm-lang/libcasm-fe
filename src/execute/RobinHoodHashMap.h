@@ -244,11 +244,11 @@ public:
         return const_iterator(entry);
     }
 
-    std::size_t count(const Key& key) const noexcept
+    bool hasKey(const Key& key) const noexcept
     {
         const auto hashCode = hashFor(key);
         const auto entry = searchEntry(key, hashCode);
-        return entry ? 1UL : 0UL;
+        return entry != nullptr;
     }
 
     void reserve(std::size_t n)

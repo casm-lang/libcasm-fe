@@ -701,7 +701,7 @@ bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std:
                 }
             }
 
-            if (function_map.count(arguments) != 0) {
+            if (function_map.hasKey(arguments)) {
                 yy::location loc = init.first ? init.first->location+init.second->location
                                               : init.second->location;
                 throw RuntimeException(loc, "function `" + func->name + to_string(arguments) +

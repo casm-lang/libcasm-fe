@@ -161,19 +161,29 @@ public:
         }
     }
 
-    constexpr bool empty() const
+    constexpr bool empty() const noexcept
     {
         return m_size == 0UL;
     }
 
-    constexpr std::size_t size() const
+    constexpr std::size_t size() const noexcept
     {
         return m_size;
     }
 
-    constexpr std::size_t capacity() const
+    constexpr std::size_t capacity() const noexcept
     {
         return m_capacity;
+    }
+
+    constexpr float loadFactor() const noexcept
+    {
+        return (float)size() / (float)capacity();
+    }
+
+    constexpr float maximumLoadFactor() const noexcept
+    {
+        return 0.5f;
     }
 
     constexpr const_iterator begin() const noexcept
@@ -233,19 +243,18 @@ public:
         return const_iterator(entry);
     }
 
-    std::size_t count(const Key& key) const noexcept
+    bool hasKey(const Key& key) const noexcept
     {
         const auto hashCode = hashFor(key);
         const auto entry = searchEntry(key, hashCode);
-        return entry ? 1UL : 0UL;
+        return entry != nullptr;
     }
 
     void reserve(std::size_t n)
     {
         if (m_buckets) {
             if (needsResizing(n)) {
-                const auto newMinCapacity = nextPowerOfTwo(n * 2 + 1UL);
-                resize(std::max(newMinCapacity, m_capacity * 2));
+                resize(nextPowerOfTwo(n / maximumLoadFactor() + 1UL));
             }
         } else {
             m_capacity = std::max(n, m_capacity);
@@ -313,7 +322,7 @@ private:
 
     constexpr bool needsResizing(std::size_t size) const noexcept
     {
-        return size > (m_capacity / 2);
+        return size > (m_capacity * maximumLoadFactor());
     }
 
     void resize(std::size_t newCapacity)
@@ -344,7 +353,7 @@ private:
     void growIfNecessary()
     {
         if (m_buckets == nullptr) {
-            resize(nextPowerOfTwo(m_capacity * 2)); // initial resize
+            resize(nextPowerOfTwo(m_capacity)); // initial resize
         } else if (needsResizing(m_size)) {
             resize(m_capacity * 2);
         }
