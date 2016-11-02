@@ -932,14 +932,37 @@ namespace std {
     }
   }
 
-  std::hash<value_t> hash<std::vector<value_t>>::hasher;
-  size_t hash<std::vector<value_t>>::operator()(const std::vector<value_t> &key) const {
-    size_t h = 0;
-    for (const value_t& v : key) {
-      h = h * 31 + hasher(v);
+    std::hash<value_t> hash<std::vector<value_t>>::hasher;
+
+    /**
+     * FNV-1a hash
+     * @see http://www.isthe.com/chongo/tech/comp/fnv/
+     */
+    std::size_t hash<std::vector<value_t>>::operator()(const std::vector<value_t>& key) const
+    {
+#if __SIZEOF_SIZE_T__ == 4
+        constexpr std::size_t OFFSET_BASIS = 2166136261UL;
+        constexpr std::size_t FNV_PRIME = 16777619UL;
+#elif __SIZEOF_SIZE_T__ == 8
+        constexpr std::size_t OFFSET_BASIS = 14695981039346656037ULL;
+        constexpr std::size_t FNV_PRIME = 1099511628211ULL;
+#else
+        static_assert(false, "define an offset basis and a fnv prime");
+#endif
+
+        std::size_t h = OFFSET_BASIS;
+
+        for (const auto& v : key) {
+            auto h1 = hasher(v);
+            for (int i = 0; i < sizeof(std::size_t); i++) {
+                h ^= h1 & 0xFF;
+                h *= FNV_PRIME;
+                h1 >>= 8;
+            }
+        }
+
+        return h;
     }
-    return h;
-  }
 
   std::hash<value_t> hash<HeadList>::hasher;
   size_t hash<HeadList>::operator()(const HeadList &key) const {
