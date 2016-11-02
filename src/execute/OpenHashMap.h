@@ -119,15 +119,13 @@ public:
     };
 
 public:
-    using size_type = size_t;
-
     explicit OpenHashMap() :
         OpenHashMap(1UL)
     {
 
     }
 
-    explicit OpenHashMap(size_type initialCapacity) :
+    explicit OpenHashMap(std::size_t initialCapacity) :
         m_buckets(nullptr),
         m_lastEntry(nullptr),
         m_size(0UL),
@@ -168,12 +166,12 @@ public:
         return m_size == 0UL;
     }
 
-    constexpr size_type size() const
+    constexpr std::size_t size() const
     {
         return m_size;
     }
 
-    constexpr size_type capacity() const
+    constexpr std::size_t capacity() const
     {
         return m_capacity;
     }
@@ -192,18 +190,14 @@ public:
     {
         growIfNecessary();
 
-        static Hash hasher;
-        const auto hashCode = hasher(key);
-        const auto bucket = searchBucketWithHashOrEmptyBucket(key, hashCode);
-        assert(bucket != nullptr);
-
-        if (bucket->empty()) {
-            const auto entry = createEntry(key, value);
-            bucket->entry = entry;
-            bucket->hashCode = hashCode;
-            return std::make_pair(const_iterator(entry), true);
+        const auto hashCode = hashFor(key);
+        auto entry = searchEntry(key, hashCode);
+        if (entry) {
+            return std::make_pair(const_iterator(entry), false);
         } else {
-            return std::make_pair(const_iterator(bucket->entry), false);
+            entry = createEntry(key, value);
+            insertEntry(entry, hashCode);
+            return std::make_pair(const_iterator(entry), true);
         }
     }
 
@@ -211,24 +205,22 @@ public:
     {
         growIfNecessary();
 
-        static Hash hasher;
-        const auto hashCode = hasher(key);
-        const auto bucket = searchBucketWithHashOrEmptyBucket(key, hashCode);
-        assert(bucket != nullptr);
-
-        if (bucket->empty()) {
-            bucket->entry = createEntry(key, value);
-            bucket->hashCode = hashCode;
+        const auto hashCode = hashFor(key);
+        auto entry = searchEntry(key, hashCode);
+        if (entry) {
+            entry->value = value;
         } else {
-            bucket->entry->value = value;
+            entry = createEntry(key, value);
+            insertEntry(entry, hashCode);
         }
     }
 
     const Value& get(const Key& key) const
     {
-        const auto bucket = searchBucket(key);
-        if (bucket) {
-            return bucket->entry->value;
+        const auto hashCode = hashFor(key);
+        const auto entry = searchEntry(key, hashCode);
+        if (entry) {
+            return entry->value;
         } else {
             throw std::out_of_range("key not found");
         }
@@ -236,21 +228,23 @@ public:
 
     const_iterator find(const Key& key) const noexcept
     {
-        const auto bucket = searchBucket(key);
-        return const_iterator(bucket ? bucket->entry : nullptr);
+        const auto hashCode = hashFor(key);
+        const auto entry = searchEntry(key, hashCode);
+        return const_iterator(entry);
     }
 
-    size_type count(const Key& key) const noexcept
+    std::size_t count(const Key& key) const noexcept
     {
-        const auto bucket = searchBucket(key);
-        return bucket ? 1UL : 0UL;
+        const auto hashCode = hashFor(key);
+        const auto entry = searchEntry(key, hashCode);
+        return entry ? 1UL : 0UL;
     }
 
-    void reserve(size_type n)
+    void reserve(std::size_t n)
     {
         if (m_buckets) {
             if (needsResizing(n)) {
-                const auto newMinCapacity = nextPowerOfTwo(n * 4UL / 3UL + 1UL);
+                const auto newMinCapacity = nextPowerOfTwo(n * 2 + 1UL);
                 resize(std::max(newMinCapacity, m_capacity * 2));
             }
         } else {
@@ -259,54 +253,51 @@ public:
     }
 
 private:
-    constexpr inline Bucket* bucketAt(size_type hashCode, size_type probe) const noexcept
-    {
-        return m_buckets + ((hashCode + probe) & (m_capacity - 1));
-    }
-
-    Bucket* searchBucket(const Key& key) const noexcept
+    std::size_t hashFor(const Key& key) const noexcept
     {
         static Hash hasher;
-
-        if (m_buckets) {
-            const auto bucket = searchBucketWithHashOrEmptyBucket(key, hasher(key));
-            return (bucket and not bucket->empty()) ? bucket : nullptr;
-        }
-
-        return nullptr;
+        return hasher(key);
     }
 
-    Bucket* searchBucketWithHashOrEmptyBucket(const Key& key, const size_type hashCode) const noexcept
+    Entry* searchEntry(const Key& key, const std::size_t hashCode) const noexcept
     {
-        assert(m_buckets != nullptr);
-
         static Pred equals;
 
-        for (size_type round = 0; round < m_capacity; round++) {
-            auto bucket = bucketAt(hashCode, round);
-            if (bucket->empty()) {
-                return bucket;
-            }
-            if ((bucket->hashCode == hashCode) and equals(bucket->entry->key, key)) {
-                return bucket;
+        const auto buckets = m_buckets;
+        const auto capacity = m_capacity;
+
+        if (buckets) {
+            for (std::size_t round = 0; round < capacity; round++) {
+                const auto index = (hashCode + round) & (capacity - 1);
+                auto bucket = buckets + index;
+                if (bucket->empty()) {
+                    return nullptr;
+                }
+                if ((bucket->hashCode == hashCode) and equals(bucket->entry->key, key)) {
+                    return bucket->entry;
+                }
             }
         }
 
         return nullptr;
     }
 
-    Bucket* searchEmptyBucket(const size_type hashCode) const noexcept
+    void insertEntry(Entry* entry, std::size_t hashCode) const noexcept
     {
         assert(m_buckets != nullptr);
 
-        for (size_type round = 0; round < m_capacity; round++) {
-            auto bucket = bucketAt(hashCode, round);
+        const auto buckets = m_buckets;
+        const auto capacity = m_capacity;
+
+        for (std::size_t round = 0; round < capacity; round++) {
+            const auto index = (hashCode + round) & (capacity - 1);
+            auto bucket = buckets + index;
             if (bucket->empty()) {
-                return bucket;
+                bucket->hashCode = hashCode;
+                bucket->entry = entry;
+                break;
             }
         }
-
-        return nullptr;
     }
 
     Entry* createEntry(const Key& key, const Value& value)
@@ -320,16 +311,17 @@ private:
         return entry;
     }
 
-    constexpr bool needsResizing(size_type size) const noexcept
+    constexpr bool needsResizing(std::size_t size) const noexcept
     {
-        return size > (m_capacity * 3UL / 4UL);
+        return size > (m_capacity / 2);
     }
 
-    void resize(size_type newCapacity)
+    void resize(std::size_t newCapacity)
     {
         const auto oldCapacity = m_capacity;
         const auto oldBuckets = m_buckets;
 
+        assert(isPowerOfTwo(newCapacity));
         m_capacity = newCapacity;
 
         m_buckets = new Bucket[newCapacity];
@@ -340,22 +332,16 @@ private:
             const auto lastOldBucket = oldBuckets + oldCapacity;
 
             for (auto oldBucket = firstOldBucket; oldBucket != lastOldBucket; ++oldBucket) {
-                if (oldBucket->empty()) {
-                    continue;
+                if (not oldBucket->empty()) {
+                    insertEntry(oldBucket->entry, oldBucket->hashCode);
                 }
-
-                const auto newBucket = searchEmptyBucket(oldBucket->hashCode);
-                assert(newBucket != nullptr);
-                assert(newBucket->empty());
-                newBucket->entry = oldBucket->entry;
-                newBucket->hashCode = oldBucket->hashCode;
             }
 
             delete oldBuckets;
         }
     }
 
-    inline void growIfNecessary()
+    void growIfNecessary()
     {
         if (m_buckets == nullptr) {
             resize(nextPowerOfTwo(m_capacity * 2)); // initial resize
@@ -365,7 +351,7 @@ private:
         assert(m_size < m_capacity);
     }
 
-    size_type nextPowerOfTwo(size_type n) const noexcept
+    std::size_t nextPowerOfTwo(std::size_t n) const noexcept
     {
         n -= 1;
         n |= (n >> 1);
@@ -377,12 +363,17 @@ private:
         return n + 1;
     }
 
+    constexpr bool isPowerOfTwo(std::size_t n) const noexcept
+    {
+        return ((n != 0) && !(n & (n - 1)));
+    }
+
 private:
     Bucket* m_buckets;
     Entry* m_lastEntry;
 
-    size_type m_size;
-    size_type m_capacity;
+    std::size_t m_size;
+    std::size_t m_capacity;
 
     BlockAllocator<4096> m_entryAllocator;
 };
