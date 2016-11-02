@@ -184,7 +184,7 @@ public:
 
     constexpr float maximumLoadFactor() const noexcept
     {
-        return 0.9f;
+        return 0.75f;
     }
 
     constexpr const_iterator begin() const noexcept
