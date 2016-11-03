@@ -343,7 +343,9 @@ private:
         n |= (n >> 4);
         n |= (n >> 8);
         n |= (n >> 16);
+#if __SIZEOF_SIZE_T__ > 4
         n |= (n >> 32);
+#endif
         return n + 1;
     }
 
