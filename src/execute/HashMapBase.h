@@ -23,45 +23,23 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_OPENHASHMAP_H_
-#define _LIB_CASMFE_OPENHASHMAP_H_
+#ifndef _LIB_CASMFE_HASHMAPBASE_H_
+#define _LIB_CASMFE_HASHMAPBASE_H_
 
 #include <functional>
 #include <cstring>
 
 #include "../allocator/BlockAllocator.h"
 
-template <typename Key, typename Value,
-          typename Hash = std::hash<Key>,
-          typename Pred = std::equal_to<Key>>
-class OpenHashMap
+template <typename Details>
+class HashMapBase
 {
-private:
-    struct Entry
-    {
-        Key key;
-        Value value;
-        Entry* prev; // linked-list
-
-        Entry(const Key& key, const Value& value, Entry* prev) :
-            key(key),
-            value(value),
-            prev(prev)
-        {
-
-        }
-    };
-
-    struct Bucket
-    {
-        std::size_t hashCode;
-        Entry* entry;
-
-        constexpr bool empty() const
-        {
-            return entry == nullptr;
-        }
-    };
+    using Key = typename Details::Key;
+    using Value = typename Details::Value;
+    using Hash = typename Details::Hash;
+    using Pred = typename Details::Pred;
+    using Entry = typename Details::Entry;
+    using Bucket = typename Details::Bucket;
 
 public:
     class const_iterator
@@ -119,42 +97,42 @@ public:
     };
 
 public:
-    explicit OpenHashMap() :
-        OpenHashMap(1UL)
+    explicit HashMapBase() :
+        HashMapBase(1UL)
     {
 
     }
 
-    explicit OpenHashMap(std::size_t initialCapacity) :
+    explicit HashMapBase(std::size_t initialCapacity) :
         m_buckets(nullptr),
-        m_lastEntry(nullptr),
         m_size(0UL),
-        m_capacity(std::max(initialCapacity, 1UL))
+        m_capacity(std::max(initialCapacity, 1UL)),
+        m_lastEntry(nullptr)
     {
 
     }
 
-    OpenHashMap(OpenHashMap&& other) :
+    HashMapBase(HashMapBase&& other) :
         m_buckets(nullptr),
-        m_lastEntry(other.m_lastEntry),
         m_size(other.m_size),
-        m_capacity(other.m_capacity)
+        m_capacity(other.m_capacity),
+        m_lastEntry(other.m_lastEntry)
     {
         std::swap(m_buckets, other.m_buckets);
         std::swap(m_entryAllocator, other.m_entryAllocator);
     }
 
-    OpenHashMap& operator=(OpenHashMap&& other) noexcept
+    HashMapBase& operator=(HashMapBase&& other) noexcept
     {
         std::swap(m_buckets, other.m_buckets);
-        m_lastEntry = other.m_lastEntry;
         m_size = other.m_size;
         m_capacity = other.m_capacity;
+        m_lastEntry = other.m_lastEntry;
         std::swap(m_entryAllocator, other.m_entryAllocator);
         return *this;
     }
 
-    ~OpenHashMap()
+    virtual ~HashMapBase()
     {
         if (m_buckets) {
             delete[] m_buckets;
@@ -183,7 +161,7 @@ public:
 
     constexpr float maximumLoadFactor() const noexcept
     {
-        return 0.5f;
+        return Details::maximumLoadFactor();
     }
 
     constexpr const_iterator begin() const noexcept
@@ -261,52 +239,27 @@ public:
         }
     }
 
+protected:
+    virtual Entry* searchEntry(const Key& key, const std::size_t hashCode) const noexcept = 0;
+
+    virtual void insertEntry(Entry* entry, std::size_t hashCode) const noexcept = 0;
+
+    virtual void resize(std::size_t newCapacity) = 0;
+
+    /**
+     * From Bit Twiddling Hacks
+     * @see https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
+     */
+    constexpr bool isPowerOfTwo(std::size_t n) const noexcept
+    {
+        return ((n != 0) && !(n & (n - 1)));
+    }
+
 private:
     std::size_t hashCodeOf(const Key& key) const noexcept
     {
         static Hash hasher;
         return hasher(key);
-    }
-
-    Entry* searchEntry(const Key& key, const std::size_t hashCode) const noexcept
-    {
-        static Pred equals;
-
-        const auto buckets = m_buckets;
-        const auto capacity = m_capacity;
-
-        if (buckets) {
-            for (std::size_t round = 0; round < capacity; round++) {
-                const auto index = (hashCode + round) & (capacity - 1);
-                auto bucket = buckets + index;
-                if (bucket->empty()) {
-                    return nullptr;
-                }
-                if ((bucket->hashCode == hashCode) and equals(bucket->entry->key, key)) {
-                    return bucket->entry;
-                }
-            }
-        }
-
-        return nullptr;
-    }
-
-    void insertEntry(Entry* entry, std::size_t hashCode) const noexcept
-    {
-        assert(m_buckets != nullptr);
-
-        const auto buckets = m_buckets;
-        const auto capacity = m_capacity;
-
-        for (std::size_t round = 0; round < capacity; round++) {
-            const auto index = (hashCode + round) & (capacity - 1);
-            auto bucket = buckets + index;
-            if (bucket->empty()) {
-                bucket->hashCode = hashCode;
-                bucket->entry = entry;
-                break;
-            }
-        }
     }
 
     Entry* createEntry(const Key& key, const Value& value)
@@ -323,31 +276,6 @@ private:
     constexpr bool needsResizing(std::size_t size) const noexcept
     {
         return size > (m_capacity * maximumLoadFactor());
-    }
-
-    void resize(std::size_t newCapacity)
-    {
-        const auto oldCapacity = m_capacity;
-        const auto oldBuckets = m_buckets;
-
-        assert(isPowerOfTwo(newCapacity));
-        m_capacity = newCapacity;
-
-        m_buckets = new Bucket[newCapacity];
-        std::memset(m_buckets, 0, sizeof(Bucket) * newCapacity);
-
-        if (oldBuckets) {
-            const auto firstOldBucket = oldBuckets;
-            const auto lastOldBucket = oldBuckets + oldCapacity;
-
-            for (auto oldBucket = firstOldBucket; oldBucket != lastOldBucket; ++oldBucket) {
-                if (not oldBucket->empty()) {
-                    insertEntry(oldBucket->entry, oldBucket->hashCode);
-                }
-            }
-
-            delete oldBuckets;
-        }
     }
 
     void growIfNecessary()
@@ -378,26 +306,19 @@ private:
         return n + 1;
     }
 
-    /**
-     * From Bit Twiddling Hacks
-     * @see https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
-     */
-    constexpr bool isPowerOfTwo(std::size_t n) const noexcept
-    {
-        return ((n != 0) && !(n & (n - 1)));
-    }
-
-private:
+protected:
     Bucket* m_buckets;
-    Entry* m_lastEntry;
 
     std::size_t m_size;
     std::size_t m_capacity;
 
+    Entry* m_lastEntry;
+
+private:
     BlockAllocator<4096> m_entryAllocator;
 };
 
-#endif // _LIB_CASMFE_OPENHASHMAP_H_
+#endif // _LIB_CASMFE_HASHMAPBASE_H_
 
 //
 //  Local variables:

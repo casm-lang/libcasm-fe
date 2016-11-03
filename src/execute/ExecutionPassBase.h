@@ -34,7 +34,7 @@
 #include "../Ast.h"
 
 #include "ChainedHashMap.h"
-#include "OpenHashMap.h"
+#include "ProbingHashMap.h"
 #include "RobinHoodHashMap.h"
 
 #define TEMP_STACK_SIZE 32768

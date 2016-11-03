@@ -26,350 +26,121 @@
 #ifndef _LIB_CASMFE_CHAINEDHASHMAP_H_
 #define _LIB_CASMFE_CHAINEDHASHMAP_H_
 
-#include <functional>
-#include <cstring>
+#include "HashMapBase.h"
 
-#include "../allocator/BlockAllocator.h"
+namespace details
+{
+    template <typename _Key, typename _Value, typename _Hash, typename _Pred>
+    struct ChainedHashMap
+    {
+        using Key = _Key;
+        using Value = _Value;
+        using Hash = _Hash;
+        using Pred = _Pred;
+
+        struct Entry
+        {
+            Key key;
+            Value value;
+            std::size_t hashCode;
+            Entry* next; // conflict chain
+            Entry* prev; // linked-list
+
+            Entry(const Key& key, const Value& value, Entry* prev) :
+                key(key),
+                value(value),
+                prev(prev)
+            {
+
+            }
+        };
+
+        struct Bucket
+        {
+            Entry* entry;
+
+            constexpr bool empty() const
+            {
+                return entry == nullptr;
+            }
+
+            inline void insert(Entry* newEntry)
+            {
+                newEntry->next = entry;
+                entry = newEntry;
+            }
+        };
+
+        static constexpr float maximumLoadFactor() noexcept
+        {
+            return 1.0f;
+        }
+    };
+}
 
 template <typename Key, typename Value,
           typename Hash = std::hash<Key>,
-          typename Pred = std::equal_to<Key>>
-class ChainedHashMap
+          typename Pred = std::equal_to<Key>,
+          typename Details = details::ChainedHashMap<Key, Value, Hash, Pred>>
+class ChainedHashMap final : public HashMapBase<Details>
 {
-private:
-    struct Entry
-    {
-        Key key;
-        Value value;
-        std::size_t hashCode;
-        Entry* next; // conflict chain
-        Entry* prev; // linked-list for iterating
-
-        Entry(const Key& key, const Value& value, std::size_t hashCode, Entry* prev) :
-            key(key),
-            value(value),
-            hashCode(hashCode),
-            next(nullptr),
-            prev(prev)
-        {
-
-        }
-    };
-
-    struct Bucket
-    {
-        Entry* entry;
-
-        inline void insert(Entry* newEntry)
-        {
-            newEntry->next = entry;
-            entry = newEntry;
-        }
-    };
+    using HashMap = HashMapBase<Details>;
+    using Entry = typename Details::Entry;
+    using Bucket = typename Details::Bucket;
 
 public:
-    class const_iterator
-    {
-    public:
-        using difference_type = std::ptrdiff_t;
-        using iterator_category = std::forward_iterator_tag;
+    using HashMapBase<Details>::HashMapBase;
 
-        explicit const_iterator(const Entry* entry) :
-            m_entry(entry)
-        {
-
-        }
-
-        const_iterator(const const_iterator& rhs) :
-            m_entry(rhs.m_entry)
-        {
-
-        }
-
-        const_iterator& operator=(const const_iterator& rhs) noexcept
-        {
-            m_entry = rhs.m_entry;
-            return *this;
-        }
-
-        bool operator==(const const_iterator& rhs) const noexcept
-        {
-            return m_entry == rhs.m_entry;
-        }
-
-        bool operator!=(const const_iterator& rhs) const noexcept
-        {
-            return m_entry != rhs.m_entry;
-        }
-
-        const_iterator& operator++() noexcept
-        {
-            m_entry = m_entry->prev;
-            return *this;
-        }
-
-        const Key& key() const noexcept
-        {
-            return m_entry->key;
-        }
-
-        const Value& value() const noexcept
-        {
-            return m_entry->value;
-        }
-
-    private:
-        const Entry* m_entry;
-    };
-
-public:
-    explicit ChainedHashMap() :
-        ChainedHashMap(1UL)
-    {
-
-    }
-
-    explicit ChainedHashMap(std::size_t initialCapacity) :
-        m_buckets(nullptr),
-        m_lastEntry(nullptr),
-        m_size(0UL),
-        m_capacity(std::max(nextPowerOfTwo(initialCapacity), 1UL))
-    {
-
-    }
-
-    ChainedHashMap(ChainedHashMap&& other) :
-        m_buckets(nullptr),
-        m_lastEntry(other.m_lastEntry),
-        m_size(other.m_size),
-        m_capacity(other.m_capacity)
-    {
-        std::swap(m_buckets, other.m_buckets);
-        std::swap(m_entryAllocator, other.m_entryAllocator);
-    }
-
-    ChainedHashMap& operator=(ChainedHashMap&& other) noexcept
-    {
-        std::swap(m_buckets, other.m_buckets);
-        m_lastEntry = other.m_lastEntry;
-        m_size = other.m_size;
-        m_capacity = other.m_capacity;
-        std::swap(m_entryAllocator, other.m_entryAllocator);
-        return *this;
-    }
-
-    ~ChainedHashMap()
-    {
-        if (m_buckets) {
-            delete[] m_buckets;
-        }
-    }
-
-    constexpr bool empty() const noexcept
-    {
-        return m_size == 0UL;
-    }
-
-    constexpr std::size_t size() const noexcept
-    {
-        return m_size;
-    }
-
-    constexpr std::size_t capacity() const noexcept
-    {
-        return m_capacity;
-    }
-
-    constexpr float loadFactor() const noexcept
-    {
-        return (float)size() / (float)capacity();
-    }
-
-    constexpr float maximumLoadFactor() const noexcept
-    {
-        return 1.0f;
-    }
-
-    constexpr const_iterator begin() const noexcept
-    {
-        return const_iterator(m_lastEntry);
-    }
-
-    constexpr const_iterator end() const noexcept
-    {
-        return const_iterator(nullptr);
-    }
-
-    std::pair<const_iterator, bool> insert(const Key& key, const Value& value)
-    {
-        const auto hashCode = hashCodeOf(key);
-        auto entry = searchEntry(key, hashCode);
-        if (entry) {
-            return std::make_pair(const_iterator(entry), false);
-        } else {
-            growIfNecessary();
-
-            entry = createEntry(key, value, hashCode);
-            auto bucket = bucketAt(hashCode);
-            bucket->insert(entry);
-
-            return std::make_pair(const_iterator(entry), true);
-        }
-    }
-
-    void insertOrAssign(const Key& key, const Value& value)
-    {
-        const auto hashCode = hashCodeOf(key);
-        auto entry = searchEntry(key, hashCode);
-        if (entry) {
-            entry->value = value;
-        } else {
-            growIfNecessary();
-
-            entry = createEntry(key, value, hashCode);
-            auto bucket = bucketAt(hashCode);
-            bucket->insert(entry);
-        }
-    }
-
-    const Value& get(const Key& key) const
-    {
-        const auto hashCode = hashCodeOf(key);
-        const auto entry = searchEntry(key, hashCode);
-        if (entry) {
-            return entry->value;
-        } else {
-            throw std::out_of_range("key not found");
-        }
-    }
-
-    const_iterator find(const Key& key) const noexcept
-    {
-        const auto hashCode = hashCodeOf(key);
-        const auto entry = searchEntry(key, hashCode);
-        return const_iterator(entry);
-    }
-
-    bool hasKey(const Key& key) const noexcept
-    {
-        const auto hashCode = hashCodeOf(key);
-        const auto entry = searchEntry(key, hashCode);
-        return entry != nullptr;
-    }
-
-    void reserve(std::size_t n)
-    {
-        if (n > m_capacity) {
-            if (m_buckets) {
-                resize(nextPowerOfTwo(n));
-            } else {
-                m_capacity = nextPowerOfTwo(n);
-            }
-        }
-    }
-
-private:
-    std::size_t hashCodeOf(const Key& key) const noexcept
-    {
-        static Hash hasher;
-        return hasher(key);
-    }
-
-    constexpr Bucket* bucketAt(std::size_t hash) const noexcept
-    {
-        return m_buckets + (hash & (m_capacity - 1));
-    }
-
-    Entry* searchEntry(const Key& key, const std::size_t hashCode) const
+protected:
+    Entry* searchEntry(const Key& key, const std::size_t hashCode) const noexcept override
     {
         static Pred equals;
 
-        if (m_buckets) {
-            const Bucket* bucket = bucketAt(hashCode);
+        if (HashMap::m_buckets == nullptr) {
+            return nullptr;
+        }
 
-            for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
-                if ((entry->hashCode == hashCode) and equals(entry->key, key)) {
-                    return entry;
-                }
+        const Bucket* bucket = bucketAt(hashCode);
+        for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
+            if ((entry->hashCode == hashCode) and equals(entry->key, key)) {
+                return entry;
             }
         }
 
         return nullptr;
     }
 
-    Entry* createEntry(const Key& key, const Value& value, std::size_t hashCode)
+    void insertEntry(Entry* entry, std::size_t hashCode) const noexcept override
     {
-        const auto memory = m_entryAllocator.allocate(sizeof(Entry));
-        const auto entry = new(memory) Entry(key, value, hashCode, m_lastEntry);
+        assert(HashMap::m_buckets != nullptr);
 
-        m_lastEntry = entry;
-        ++m_size;
+        entry->hashCode = hashCode;
 
-        return entry;
+        auto bucket = bucketAt(hashCode);
+        bucket->insert(entry);
     }
 
-    void resize(std::size_t newCapacity)
+    void resize(std::size_t newCapacity) override
     {
-        assert(isPowerOfTwo(newCapacity));
-        m_capacity = newCapacity;
+        assert(HashMap::isPowerOfTwo(newCapacity));
+        HashMap::m_capacity = newCapacity;
 
-        if (m_buckets) {
-            delete[] m_buckets;
+        if (HashMap::m_buckets) {
+            delete[] HashMap::m_buckets;
         }
-        m_buckets = new Bucket[newCapacity];
-        std::memset(m_buckets, 0, sizeof(Bucket) * newCapacity);
+        HashMap::m_buckets = new Bucket[newCapacity];
+        std::memset(HashMap::m_buckets, 0, sizeof(Bucket) * newCapacity);
 
-        for (auto entry = m_lastEntry; entry != nullptr; entry = entry->prev) {
-            auto bucket = bucketAt(entry->hashCode);
-            bucket->insert(entry);
+        for (auto entry = HashMap::m_lastEntry; entry != nullptr; entry = entry->prev) {
+            insertEntry(entry, entry->hashCode);
         }
-    }
-
-    void growIfNecessary()
-    {
-        if (m_buckets == nullptr) {
-            resize(m_capacity);
-        } else if (m_size == m_capacity) {
-            resize(m_capacity * 2);
-        }
-        assert(m_size < m_capacity);
-    }
-
-    /**
-     * From Bit Twiddling Hacks
-     * @see https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
-     */
-    std::size_t nextPowerOfTwo(std::size_t n) const noexcept
-    {
-        n -= 1;
-        n |= (n >> 1);
-        n |= (n >> 2);
-        n |= (n >> 4);
-        n |= (n >> 8);
-        n |= (n >> 16);
-#if __SIZEOF_SIZE_T__ > 4
-        n |= (n >> 32);
-#endif
-        return n + 1;
-    }
-
-    /**
-     * From Bit Twiddling Hacks
-     * @see https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
-     */
-    constexpr bool isPowerOfTwo(std::size_t n) const noexcept
-    {
-        return ((n != 0) && !(n & (n - 1)));
     }
 
 private:
-    Bucket* m_buckets;
-    Entry* m_lastEntry;
-
-    std::size_t m_size;
-    std::size_t m_capacity;
-
-    BlockAllocator<4096> m_entryAllocator;
+    constexpr Bucket* bucketAt(std::size_t hashCode) const noexcept
+    {
+        return HashMap::m_buckets + (hashCode & (HashMap::m_capacity - 1));
+    }
 };
 
 #endif // _LIB_CASMFE_CHAINEDHASHMAP_H_

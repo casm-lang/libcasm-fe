@@ -31,7 +31,7 @@
 
 #include "Update.h"
 #include "ChainedHashMap.h"
-#include "OpenHashMap.h"
+#include "ProbingHashMap.h"
 #include "RobinHoodHashMap.h"
 
 struct LocationHash

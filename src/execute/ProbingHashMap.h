@@ -23,15 +23,15 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_ROBINHOODHASHMAP_H_
-#define _LIB_CASMFE_ROBINHOODHASHMAP_H_
+#ifndef _LIB_CASMFE_PROBINGHASHMAP_H_
+#define _LIB_CASMFE_PROBINGHASHMAP_H_
 
 #include "HashMapBase.h"
 
 namespace details
 {
     template <typename _Key, typename _Value, typename _Hash, typename _Pred>
-    struct RobinHoodHashMap
+    struct ProbingHashMap
     {
         using Key = _Key;
         using Value = _Value;
@@ -56,7 +56,6 @@ namespace details
         struct Bucket
         {
             Entry* entry;
-            std::size_t distance;
             std::size_t hashCode;
 
             constexpr bool empty() const
@@ -67,7 +66,7 @@ namespace details
 
         static constexpr float maximumLoadFactor() noexcept
         {
-            return 0.75f;
+            return 0.5f;
         }
     };
 }
@@ -75,8 +74,8 @@ namespace details
 template <typename Key, typename Value,
           typename Hash = std::hash<Key>,
           typename Pred = std::equal_to<Key>,
-          typename Details = details::RobinHoodHashMap<Key, Value, Hash, Pred>>
-class RobinHoodHashMap final : public HashMapBase<Details>
+          typename Details = details::ProbingHashMap<Key, Value, Hash, Pred>>
+class ProbingHashMap final : public HashMapBase<Details>
 {
     using HashMap = HashMapBase<Details>;
     using Entry = typename Details::Entry;
@@ -101,7 +100,7 @@ protected:
         for (std::size_t round = 0; round < capacity; round++) {
             const auto index = (initialIndex + round) & (capacity - 1);
             auto bucket = buckets + index;
-            if (bucket->empty() or (round > bucket->distance)) {
+            if (bucket->empty()) {
                 return nullptr;
             }
             if ((bucket->hashCode == hashCode) and equals(bucket->entry->key, key)) {
@@ -120,23 +119,14 @@ protected:
         const auto capacity = HashMap::m_capacity;
         const auto initialIndex = hashCode & (capacity - 1);
 
-        std::size_t distance = 0;
-
         for (std::size_t round = 0; round < capacity; round++) {
             const auto index = (initialIndex + round) & (capacity - 1);
             auto bucket = buckets + index;
             if (bucket->empty()) {
                 bucket->hashCode = hashCode;
-                bucket->distance = distance;
                 bucket->entry = entry;
                 break;
             }
-            if (distance > bucket->distance) {
-                std::swap(hashCode, bucket->hashCode);
-                std::swap(distance, bucket->distance);
-                std::swap(entry, bucket->entry);
-            }
-            ++distance;
         }
     }
 
@@ -166,7 +156,7 @@ protected:
     }
 };
 
-#endif // _LIB_CASMFE_ROBINHOODHASHMAP_H_
+#endif // _LIB_CASMFE_PROBINGHASHMAP_H_
 
 //
 //  Local variables:
