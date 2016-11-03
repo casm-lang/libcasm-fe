@@ -335,6 +335,10 @@ private:
         assert(m_size < m_capacity);
     }
 
+    /**
+     * From Bit Twiddling Hacks
+     * @see https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+     */
     std::size_t nextPowerOfTwo(std::size_t n) const noexcept
     {
         n -= 1;
@@ -349,6 +353,10 @@ private:
         return n + 1;
     }
 
+    /**
+     * From Bit Twiddling Hacks
+     * @see https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
+     */
     constexpr bool isPowerOfTwo(std::size_t n) const noexcept
     {
         return ((n != 0) && !(n & (n - 1)));
