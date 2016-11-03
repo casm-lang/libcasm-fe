@@ -112,6 +112,11 @@ public:
     explicit UpdateSet(std::size_t initialSize, UpdateSet* parent = nullptr);
 
     /**
+     * Destroys the update-set
+     */
+    virtual ~UpdateSet() = default;
+
+    /**
      * @see UpdateSet::Type
      *
      * @return The type of the update-set
