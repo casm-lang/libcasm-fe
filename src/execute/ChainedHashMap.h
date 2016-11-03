@@ -37,6 +37,7 @@ namespace details
         using Value = _Value;
         using Hash = _Hash;
         using Pred = _Pred;
+        using HashingStrategy = HashingStrategy::PowerOfTwoHashing;
 
         struct Entry
         {
@@ -87,6 +88,7 @@ class ChainedHashMap final : public HashMapBase<Details>
     using HashMap = HashMapBase<Details>;
     using Entry = typename Details::Entry;
     using Bucket = typename Details::Bucket;
+    using HashingStrategy = typename Details::HashingStrategy;
 
 public:
     using HashMapBase<Details>::HashMapBase;
@@ -122,7 +124,6 @@ protected:
 
     void resize(std::size_t newCapacity) override
     {
-        assert(HashMap::isPowerOfTwo(newCapacity));
         HashMap::m_capacity = newCapacity;
 
         if (HashMap::m_buckets) {
@@ -139,7 +140,7 @@ protected:
 private:
     constexpr Bucket* bucketAt(std::size_t hashCode) const noexcept
     {
-        return HashMap::m_buckets + (hashCode & (HashMap::m_capacity - 1));
+        return HashMap::m_buckets + HashingStrategy::hash(hashCode, HashMap::m_capacity);
     }
 };
 

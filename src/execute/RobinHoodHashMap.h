@@ -37,6 +37,7 @@ namespace details
         using Value = _Value;
         using Hash = _Hash;
         using Pred = _Pred;
+        using HashingStrategy = HashingStrategy::PowerOfTwoHashing;
 
         struct Entry
         {
@@ -81,6 +82,7 @@ class RobinHoodHashMap final : public HashMapBase<Details>
     using HashMap = HashMapBase<Details>;
     using Entry = typename Details::Entry;
     using Bucket = typename Details::Bucket;
+    using HashingStrategy = typename Details::HashingStrategy;
 
 public:
     using HashMapBase<Details>::HashMapBase;
@@ -96,10 +98,10 @@ protected:
         }
 
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = hashCode & (capacity - 1);
+        const auto initialIndex = HashingStrategy::hash(hashCode, capacity);
 
         for (std::size_t round = 0; round < capacity; round++) {
-            const auto index = (initialIndex + round) & (capacity - 1);
+            const auto index = HashingStrategy::hash(initialIndex + round, capacity);
             auto bucket = buckets + index;
             if (bucket->empty() or (round > bucket->distance)) {
                 return nullptr;
@@ -118,12 +120,12 @@ protected:
 
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = hashCode & (capacity - 1);
+        const auto initialIndex = HashingStrategy::hash(hashCode, capacity);
 
         std::size_t distance = 0;
 
         for (std::size_t round = 0; round < capacity; round++) {
-            const auto index = (initialIndex + round) & (capacity - 1);
+            const auto index = HashingStrategy::hash(initialIndex + round, capacity);
             auto bucket = buckets + index;
             if (bucket->empty()) {
                 bucket->hashCode = hashCode;
@@ -145,9 +147,7 @@ protected:
         const auto oldCapacity = HashMap::m_capacity;
         const auto oldBuckets = HashMap::m_buckets;
 
-        assert(HashMap::isPowerOfTwo(newCapacity));
         HashMap::m_capacity = newCapacity;
-
         HashMap::m_buckets = new Bucket[newCapacity];
         std::memset(HashMap::m_buckets, 0, sizeof(Bucket) * newCapacity);
 

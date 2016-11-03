@@ -30,6 +30,29 @@
 
 namespace details
 {
+    namespace ProbingStrategy
+    {
+        // h(i, k) = h1(k) + i
+        struct LinearProbing
+        {
+            constexpr std::size_t operator()(const std::size_t index,
+                                             const std::size_t round) const
+            {
+                return index + round;
+            }
+        };
+
+        // h(i, k) = h1(k) + i^2
+        struct QuadraticProbing
+        {
+            constexpr std::size_t operator()(const std::size_t index,
+                                             const std::size_t round) const
+            {
+                return index + round * round;
+            }
+        };
+    }
+
     template <typename _Key, typename _Value, typename _Hash, typename _Pred>
     struct ProbingHashMap
     {
@@ -37,6 +60,8 @@ namespace details
         using Value = _Value;
         using Hash = _Hash;
         using Pred = _Pred;
+        using HashingStrategy = HashingStrategy::PowerOfTwoHashing;
+        using ProbingStrategy = ProbingStrategy::LinearProbing;
 
         struct Entry
         {
@@ -80,6 +105,8 @@ class ProbingHashMap final : public HashMapBase<Details>
     using HashMap = HashMapBase<Details>;
     using Entry = typename Details::Entry;
     using Bucket = typename Details::Bucket;
+    using HashingStrategy = typename Details::HashingStrategy;
+    using ProbingStrategy = typename Details::ProbingStrategy;
 
 public:
     using HashMapBase<Details>::HashMapBase;
@@ -88,6 +115,7 @@ protected:
     Entry* searchEntry(const Key& key, const std::size_t hashCode) const noexcept override
     {
         static Pred equals;
+        static ProbingStrategy probe;
 
         const auto buckets = HashMap::m_buckets;
         if (buckets == nullptr) {
@@ -95,10 +123,10 @@ protected:
         }
 
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = hashCode & (capacity - 1);
+        const auto initialIndex = HashingStrategy::hash(hashCode, capacity);
 
         for (std::size_t round = 0; round < capacity; round++) {
-            const auto index = (initialIndex + round) & (capacity - 1);
+            const auto index = HashingStrategy::hash(probe(initialIndex, round), capacity);
             auto bucket = buckets + index;
             if (bucket->empty()) {
                 return nullptr;
@@ -115,12 +143,14 @@ protected:
     {
         assert(HashMap::m_buckets != nullptr);
 
+        static ProbingStrategy probe;
+
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = hashCode & (capacity - 1);
+        const auto initialIndex = HashingStrategy::hash(hashCode, capacity);
 
         for (std::size_t round = 0; round < capacity; round++) {
-            const auto index = (initialIndex + round) & (capacity - 1);
+            const auto index = HashingStrategy::hash(probe(initialIndex, round), capacity);
             auto bucket = buckets + index;
             if (bucket->empty()) {
                 bucket->hashCode = hashCode;
@@ -135,9 +165,7 @@ protected:
         const auto oldCapacity = HashMap::m_capacity;
         const auto oldBuckets = HashMap::m_buckets;
 
-        assert(HashMap::isPowerOfTwo(newCapacity));
         HashMap::m_capacity = newCapacity;
-
         HashMap::m_buckets = new Bucket[newCapacity];
         std::memset(HashMap::m_buckets, 0, sizeof(Bucket) * newCapacity);
 
