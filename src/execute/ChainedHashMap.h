@@ -102,8 +102,8 @@ protected:
             return nullptr;
         }
 
-        const Bucket* bucket = bucketAt(hashCode);
-        for (Entry* entry = bucket->entry; entry != nullptr; entry = entry->next) {
+        const auto bucket = bucketAt(hashCode);
+        for (auto entry = bucket->entry; entry != nullptr; entry = entry->next) {
             if ((entry->hashCode == hashCode) and equals(entry->key, key)) {
                 return entry;
             }

@@ -127,7 +127,7 @@ protected:
 
         for (std::size_t round = 0; round < capacity; round++) {
             const auto index = HashingStrategy::hash(probe(initialIndex, round), capacity);
-            auto bucket = buckets + index;
+            const auto bucket = buckets + index;
             if (bucket->empty()) {
                 return nullptr;
             }
@@ -151,7 +151,7 @@ protected:
 
         for (std::size_t round = 0; round < capacity; round++) {
             const auto index = HashingStrategy::hash(probe(initialIndex, round), capacity);
-            auto bucket = buckets + index;
+            const auto bucket = buckets + index;
             if (bucket->empty()) {
                 bucket->hashCode = hashCode;
                 bucket->entry = entry;
