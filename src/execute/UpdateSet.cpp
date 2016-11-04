@@ -55,11 +55,6 @@ UpdateSet::UpdateSet(std::size_t initialSize, UpdateSet* parent) :
 
 }
 
-UpdateSet::~UpdateSet()
-{
-    clear();
-}
-
 bool UpdateSet::empty() const noexcept
 {
     return m_set.empty();
@@ -68,11 +63,6 @@ bool UpdateSet::empty() const noexcept
 std::size_t UpdateSet::size() const noexcept
 {
     return m_set.size();
-}
-
-void UpdateSet::clear()
-{
-    m_set.clear();
 }
 
 Update* UpdateSet::lookup(const value_t* location) const noexcept
@@ -102,27 +92,27 @@ void UpdateSet::merge()
         std::swap(m_parent->m_set, m_set);
     } else {
         m_parent->m_set.reserve(m_parent->m_set.size() + m_set.size());
-        for(const auto& pair : m_set) {
-            m_parent->add(pair.first, pair.second);
+        const auto end = m_set.end();
+        for (auto it = m_set.begin(); it != end; ++it) {
+            m_parent->add(it.key(), it.value());
         }
-        clear();
     }
 }
 
-typename UpdateSet::const_iterator UpdateSet::cbegin() const noexcept
+typename UpdateSet::const_iterator UpdateSet::begin() const noexcept
 {
-    return m_set.cbegin();
+    return m_set.begin();
 }
 
-typename UpdateSet::const_iterator UpdateSet::cend() const noexcept
+typename UpdateSet::const_iterator UpdateSet::end() const noexcept
 {
-    return m_set.cend();
+    return m_set.end();
 }
 
 Update* UpdateSet::get(const value_t* location) const noexcept
 {
     const auto it = m_set.find(location);
-    return (it != m_set.cend()) ? it->second : nullptr;
+    return (it != m_set.end()) ? it.value() : nullptr;
 }
 
 UpdateSet::Type SequentialUpdateSet::type() const noexcept
@@ -132,14 +122,14 @@ UpdateSet::Type SequentialUpdateSet::type() const noexcept
 
 void SequentialUpdateSet::add(const value_t* location, Update* update)
 {
-    m_set[location] = update;
+    m_set.insertOrAssign(location, update);
 }
 
 Update* SequentialUpdateSet::lookup(const value_t* location) const noexcept
 {
     const auto it = m_set.find(location);
-    if (it != m_set.cend()) {
-        return it->second;
+    if (it != m_set.end()) {
+        return it.value();
     }
 
     return UpdateSet::lookup(location);
@@ -154,8 +144,8 @@ void ParallelUpdateSet::add(const value_t* location, Update* update)
 {
     const auto result = m_set.insert(location, update);
     if (!result.second) {
-        const auto existingPair = *(result.first);
-        const auto existingUpdate = existingPair.second;
+        const auto it = result.first;
+        const auto existingUpdate = it.value();
 
         if (update->value != existingUpdate->value) {
             throw Conflict("Conflict in updateset", update, existingUpdate);

@@ -29,9 +29,28 @@
 #include <stdexcept>
 #include <stack>
 
-#include "LinkedHashMap.h"
 #include "../Value.h"
 #include "../various/location.hh"
+
+#include "ChainedHashMap.h"
+#include "ProbingHashMap.h"
+#include "RobinHoodHashMap.h"
+
+struct LocationHash
+{
+    /**
+     * Directly using a value_t pointer as hash value has the problem that the first
+     * 4 bits of the hash value are always 0, because the size of value_t is 16 bytes.
+     * Some bit shifting avoids this problem.
+     *
+     * Forumla is from LLVM's DenseMapInfo<T*>
+     */
+    std::size_t operator()(const value_t* location) const
+    {
+        return (reinterpret_cast<std::uintptr_t>(location) >> 4) ^
+               (reinterpret_cast<std::uintptr_t>(location) >> 9);
+    }
+};
 
 /**
  * @brief Represents an update
@@ -91,8 +110,10 @@ public:
         Parallel /**< Update-set with parallel execution semantics */
     };
 
+    using UpdateHashMap = ChainedHashMap<const value_t*, Update*, LocationHash>;
+
 public:
-    using const_iterator = typename LinkedHashMap<const value_t*, Update*>::const_iterator;
+    using const_iterator = typename UpdateHashMap::const_iterator;
 
     /**
      * Constructs an empty update-set
@@ -106,7 +127,7 @@ public:
     /**
      * Destroys the update-set
      */
-    virtual ~UpdateSet();
+    virtual ~UpdateSet() = default;
 
     /**
      * @see UpdateSet::Type
@@ -172,7 +193,6 @@ public:
      * Merges all updates of the current update-set into its parent update-set
      *
      * @pre The update-set must have a parent update-set
-     * @post The current update-set is empty
      *
      * @throws Conflict when the parent update-set is a parallel update-set, an
      *         update for the \a location exists already in the parent update-set
@@ -181,19 +201,14 @@ public:
     void merge();
 
     /**
-     * Removes all updates from the update-set
-     */
-    void clear();
-
-    /**
      * @return Iterator to the beginning of the update-set
      */
-    const_iterator cbegin() const noexcept;
+    const_iterator begin() const noexcept;
 
     /**
      * @return Iterator to the end of the update-set
      */
-    const_iterator cend() const noexcept;
+    const_iterator end() const noexcept;
 
     /**
      * Searches for an update for the \a location in the current update-set
@@ -211,7 +226,7 @@ public:
     Update* get(const value_t* location) const noexcept;
 
 protected:
-    LinkedHashMap<const value_t*, Update*> m_set;
+    UpdateHashMap m_set;
 
 private:
     UpdateSet* const m_parent;

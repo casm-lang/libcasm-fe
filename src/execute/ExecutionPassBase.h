@@ -33,6 +33,10 @@
 #include "../Visitor.h"
 #include "../Ast.h"
 
+#include "ChainedHashMap.h"
+#include "ProbingHashMap.h"
+#include "RobinHoodHashMap.h"
+
 #define TEMP_STACK_SIZE 32768
 
 /**
@@ -43,6 +47,8 @@
 
 namespace libcasm_fe
 {
+    using FunctionState = ChainedHashMap<std::vector<value_t>, value_t>;
+
     class ExecutionPassBase : public BaseVisitor<value_t>
     {
     public:
@@ -119,7 +125,7 @@ namespace libcasm_fe
     public:
         std::vector<std::vector<value_t> *> rule_bindings;
 
-        std::vector<std::unordered_map<std::vector<value_t>, value_t>> function_states;
+        std::vector<FunctionState> function_states;
         std::vector<const Function*> function_symbols;
 
         std::vector<List*> temp_lists;
