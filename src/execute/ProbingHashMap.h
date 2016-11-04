@@ -35,8 +35,8 @@ namespace details
         // h(i, k) = h1(k) + i
         struct LinearProbing
         {
-            constexpr std::size_t operator()(const std::size_t index,
-                                             const std::size_t round) const
+            static constexpr std::size_t probe(const std::size_t index,
+                                               const std::size_t round)
             {
                 return index + round;
             }
@@ -45,8 +45,8 @@ namespace details
         // h(i, k) = h1(k) + i^2
         struct QuadraticProbing
         {
-            constexpr std::size_t operator()(const std::size_t index,
-                                             const std::size_t round) const
+            static constexpr std::size_t probe(const std::size_t index,
+                                               const std::size_t round)
             {
                 return index + round * round;
             }
@@ -115,7 +115,6 @@ protected:
     Entry* searchEntry(const Key& key, const std::size_t hashCode) const noexcept override
     {
         static Pred equals;
-        static ProbingStrategy probe;
 
         const auto buckets = HashMap::m_buckets;
         if (buckets == nullptr) {
@@ -126,7 +125,8 @@ protected:
         const auto initialIndex = HashingStrategy::hash(hashCode, capacity);
 
         for (std::size_t round = 0; round < capacity; round++) {
-            const auto index = HashingStrategy::hash(probe(initialIndex, round), capacity);
+            const auto probedIndex = ProbingStrategy::probe(initialIndex, round);
+            const auto index = HashingStrategy::hash(probedIndex, capacity);
             const auto bucket = buckets + index;
             if (bucket->empty()) {
                 return nullptr;
@@ -143,14 +143,13 @@ protected:
     {
         assert(HashMap::m_buckets != nullptr);
 
-        static ProbingStrategy probe;
-
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
         const auto initialIndex = HashingStrategy::hash(hashCode, capacity);
 
         for (std::size_t round = 0; round < capacity; round++) {
-            const auto index = HashingStrategy::hash(probe(initialIndex, round), capacity);
+            const auto probedIndex = ProbingStrategy::probe(initialIndex, round);
+            const auto index = HashingStrategy::hash(probedIndex, capacity);
             const auto bucket = buckets + index;
             if (bucket->empty()) {
                 bucket->hashCode = hashCode;
