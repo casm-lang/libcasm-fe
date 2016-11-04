@@ -29,7 +29,9 @@
 #include <stdexcept>
 #include <stack>
 
-#include "Update.h"
+#include "../Value.h"
+#include "../various/location.hh"
+
 #include "ChainedHashMap.h"
 #include "ProbingHashMap.h"
 #include "RobinHoodHashMap.h"
@@ -48,6 +50,17 @@ struct LocationHash
         return (reinterpret_cast<std::uintptr_t>(location) >> 4) ^
                (reinterpret_cast<std::uintptr_t>(location) >> 9);
     }
+};
+
+/**
+ * @brief Represents an update
+ */
+struct Update
+{
+    value_t value; /**< The value of the update */
+    const std::vector<value_t>* args; /**< The function arguments of the update */
+    const yy::location* location; /**< The source-code location of the update producer */
+    uint32_t func; /**< The function uid of the update */
 };
 
 /**
