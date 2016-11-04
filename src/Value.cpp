@@ -151,6 +151,7 @@ bool value_t::is_symbolic() const {
 const std::string value_t::to_str(bool symbolic) const {
   switch (type) {
     case TypeType::INTEGER:
+    case TypeType::BIT:
       return std::to_string(value.integer);
     case TypeType::FLOATING:
       return std::to_string(value.float_);
