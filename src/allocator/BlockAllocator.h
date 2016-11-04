@@ -114,6 +114,12 @@ class BlockAllocator
         }
 
     private:
+        Block(const Block&) = delete;
+        Block& operator=(const Block&) = delete;
+        Block(Block&&) = delete;
+        Block& operator=(Block&&) = delete;
+
+    private:
         size_t m_usage = 0;
         char* m_freePosition;
         Block* m_next = nullptr;
@@ -165,6 +171,12 @@ public:
         static_assert((BlockSize & (BlockSize - 1)) == 0, "block size must be a power of two");
     }
 
+    BlockAllocator(BlockAllocator&& other)
+    {
+        std::swap(m_topBlock, other.m_topBlock);
+        std::swap(m_currentBlock, other.m_currentBlock);
+    }
+
     ~BlockAllocator()
     {
         for (auto block = m_topBlock; block != nullptr;) {
@@ -172,6 +184,13 @@ public:
             block = block->previous();
             MemoryPool::instance().release(b);
         }
+    }
+
+    BlockAllocator& operator=(BlockAllocator&& other) noexcept
+    {
+        std::swap(m_topBlock, other.m_topBlock);
+        std::swap(m_currentBlock, other.m_currentBlock);
+        return *this;
     }
 
     void* allocate(const size_t n)
@@ -232,6 +251,9 @@ public:
     }
 
 private:
+    BlockAllocator(const BlockAllocator&) = delete;
+    BlockAllocator& operator=(const BlockAllocator&) = delete;
+
     Block* allocateNewBlock()
     {
         const auto memory = MemoryPool::instance().get();
