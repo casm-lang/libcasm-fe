@@ -106,17 +106,10 @@ TEST(UpdateSetTest, mergingSequentialUpdateSetsIntoParallelOnesShouldNotThrowWhe
 TEST(UpdateSetTest, mergingSequentialUpdateSetsIntoParallelOnesShouldThrowWhenOverridingLocationValuesWithDifferentValues) {
     const value_t location;
 
-<<<<<<< HEAD
-    const auto parUpdateSet = std::unique_ptr<UpdateSet>(new UpdateSet(UpdateSet::Type::Parallel, 0));
-    parUpdateSet->add(&location, new Update{.value = make_integer_value(10)});
-
-    const auto seqUpdateSet = std::unique_ptr<UpdateSet>(parUpdateSet->fork(UpdateSet::Type::Sequential, 0));
-=======
     const auto parUpdateSet = std::unique_ptr<UpdateSet>(new ParallelUpdateSet(10UL));
     parUpdateSet->add(&location, new Update{.value = make_integer_value(10)});
 
     const auto seqUpdateSet = std::unique_ptr<UpdateSet>(parUpdateSet->fork(UpdateSet::Type::Sequential, 10UL));
->>>>>>> master
     seqUpdateSet->add(&location, new Update{.value = make_integer_value(1000)});
 
     EXPECT_THROW(seqUpdateSet->merge(), UpdateSet::Conflict);
