@@ -429,7 +429,7 @@ private:
 
     constexpr bool needsResizing(std::size_t size) const noexcept
     {
-        return size > (m_capacity * maximumLoadFactor());
+        return size >= (m_capacity * maximumLoadFactor());
     }
 
     void growIfNecessary()
