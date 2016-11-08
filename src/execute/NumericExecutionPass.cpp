@@ -47,7 +47,7 @@ char NumericExecutionPass::id = 0;
 static libpass::PassRegistration< NumericExecutionPass > PASS
 ( "Numeric Execution Pass"
 , "execute numerically over the AST input specification"
-, "ast-num"
+, "ast-exec-num"
 , 0
 );
 

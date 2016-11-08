@@ -36,10 +36,12 @@ char SourceToAstPass::id = 0;
 static libpass::PassRegistration< SourceToAstPass > PASS
 ( "Source To AST Pass"
 , "parse the source code and generate an AST"
+, "ast-parse"
 , 0
-, 'P'
 );
 
+
+// PPA: TODO: dependency INPUT FILE
 
 bool SourceToAstPass::run( libpass::PassResult& pr )
 {

@@ -37,10 +37,11 @@ char TypeCheckPass::id = 0;
 static libpass::PassRegistration< TypeCheckPass > PASS
 ( "Type Check Pass"
 , "type check the AST and translate it to a typed AST"
+, "ast-check"
 , 0
-, 'T'
 );
 
+// PPA: TODO: dependency SourceToAstPass
 
 bool TypeCheckPass::run( libpass::PassResult& pr )
 {
