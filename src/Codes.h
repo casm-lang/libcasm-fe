@@ -102,6 +102,10 @@ namespace libcasm_fe
 
     , TypeBitSizeInvalidInLetExpression             = 0xb003
     , TypeBitSizeInvalidInIninitallyExpression      = 0xb004
+
+    // --------------------------------------------------------- 7*** ... update set errors
+    , UpdateSetClash                                = 0x7000
+    , UpdateSetMergeConflict                        = 0x7001
     
     // --------------------------------------------------------- fff* ... not categorized errors
     , TypeUnknown                                   = 0xfffd

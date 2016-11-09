@@ -76,12 +76,6 @@ void Exception::addLocation( const yy::location& location )
     location_.push_back( &location );
 }
 
-const yy::location& Exception::getLocation( void ) const
-{
-    assert( location_.size() > 0 and location_[0] );
-    return *location_[0];
-}
-
 const std::vector< const yy::location* >& Exception::getLocations( void ) const
 {
     return location_;

@@ -66,8 +66,6 @@ public:
     virtual const char* what() const throw();
     
     void addLocation( const yy::location& location );
-
-    const yy::location& getLocation( void ) const;
     
     const std::vector< const yy::location* >& getLocations( void ) const;
     

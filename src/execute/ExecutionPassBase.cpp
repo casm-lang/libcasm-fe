@@ -104,7 +104,8 @@ Update* ExecutionPassBase::addUpdate(Function *sym, const std::vector<value_t> &
                         + " = " + val.to_str() + " at line " + std::to_string(up->location->begin.line)
                         + ", conflicting with line " + std::to_string(existingUpdate->location->begin.line)
                         + " with value '" + existingUpdate->value.to_str() + "'";
-        throw RuntimeException({existingUpdate->location, conflictingUpdate->location}, info);
+        throw RuntimeException({existingUpdate->location, conflictingUpdate->location}, info,
+                               libcasm_fe::Codes::UpdateSetClash);
     }
 
     return up;
@@ -131,7 +132,8 @@ void ExecutionPassBase::merge()
                         + " with value '" + conflictingUpdate->value.to_str() + "'"
                         + " and at line " + std::to_string(existingUpdate->location->begin.line)
                         + " with value '" + existingUpdate->value.to_str() + "'";
-        throw RuntimeException({existingUpdate->location, conflictingUpdate->location}, info);
+        throw RuntimeException({existingUpdate->location, conflictingUpdate->location}, info,
+                               libcasm_fe::Codes::UpdateSetMergeConflict);
     }
 }
 

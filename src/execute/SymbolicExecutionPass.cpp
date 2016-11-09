@@ -106,7 +106,7 @@ bool SymbolicExecutionPass::run(libpass::PassResult& pr)
     }
     catch( const RuntimeException& ex )
     {
-        global_driver->error( ex.getLocation(), ex.what(), ex.getErrorCode() );
+        global_driver->error( ex.getLocations(), ex.what(), ex.getErrorCode() );
         return false;
     }
     catch( char* e )
