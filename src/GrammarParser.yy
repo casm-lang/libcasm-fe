@@ -38,8 +38,8 @@
     #include <string>
     #include <utility>
     
-    #include "stdhl/cpp/Type.h"
-
+    #include "cpp/Type.h"
+    
     #include "src/Ast.h"
     #include "src/Types.h"
     #include "src/Codes.h"
@@ -61,6 +61,7 @@
 
 %define parse.trace
 %define parse.error verbose
+
 
 %code
 {

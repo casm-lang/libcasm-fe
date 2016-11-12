@@ -47,7 +47,7 @@ CI += -I ./src/transform
 CI += -I ./src/execute
 CI += -I ./src/various
 
-CI += -I ../
+CI += -I ../stdhl
 CI += -I ../pass
 
 CL  =

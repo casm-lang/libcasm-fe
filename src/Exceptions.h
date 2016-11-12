@@ -30,7 +30,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "stdhl/cpp/Type.h"
+#include "cpp/Type.h"
 
 #include "various/location.hh"
 
