@@ -28,139 +28,183 @@
 #include "Ast.h"
 #include "Driver.h"
 
-
-static std::map<NodeType, const std::string> node_type_names_ = {
-    {NodeType::ASSERT, std::string("ASSERT")},
-    {NodeType::UNDEF_ATOM, std::string("UNDEF ATOM")},
-    {NodeType::INTEGER_ATOM, std::string("INTEGER ATOM")},
-    {NodeType::FLOATING_ATOM, std::string("FLOATING ATOM")},
-    {NodeType::SELF_ATOM, std::string("SELF ATOM")},
-    {NodeType::STRING_ATOM, std::string("STRING ATOM")},
-    {NodeType::RULE_ATOM, std::string("RULE ATOM")},
-    {NodeType::BOOLEAN_ATOM, std::string("BOOLEAN ATOM")},
-    {NodeType::DUMMY_ATOM, std::string("DUMMY ATOM")},
-    {NodeType::INIT, std::string("INIT")},
-    {NodeType::IFTHENELSE, std::string("IFTHENELSE")},
-    {NodeType::BODY_ELEMENTS, std::string("BODY ELEMENTS")},
-    {NodeType::PROVIDER, std::string("PROVIDER")},
-    {NodeType::OPTION, std::string("OPTION")},
-    {NodeType::ENUM, std::string("ENUM")},
-    {NodeType::FUNCTION, std::string("FUNCTION")},
-    {NodeType::DERIVED, std::string("DERIVED")},
-    {NodeType::RULE, std::string("RULE")},
-    {NodeType::BINARY_EXPRESSION, std::string("BINARY EXPRESSION")},
-    {NodeType::UNARY_EXPRESSION, std::string("UNARY EXPRESSION")},
-    {NodeType::UPDATE, std::string("UPDATE")},
-    {NodeType::SPECIFICATION, std::string("SPECIFICATION")},
-    {NodeType::STATEMENT, std::string("STATEMENT")},
-    {NodeType::STATEMENTS, std::string("STATEMENTS")},
-    {NodeType::SKIP, std::string("SKIP")},
-    {NodeType::PARBLOCK, std::string("PARBLOCK")},
-    {NodeType::SEQBLOCK, std::string("SEQBLOCK")},
-    {NodeType::FUNCTION_ATOM, std::string("FUNCTION ATOM")},
-    {NodeType::CALL, std::string("CALL NODE")},
-    {NodeType::PRINT, std::string("PRINT NODE")},
-    {NodeType::POP, std::string("POP NODE")},
+static std::map< NodeType, const std::string > node_type_names_ = {
+    { NodeType::ASSERT, std::string( "ASSERT" ) },
+    { NodeType::UNDEF_ATOM, std::string( "UNDEF ATOM" ) },
+    { NodeType::INTEGER_ATOM, std::string( "INTEGER ATOM" ) },
+    { NodeType::FLOATING_ATOM, std::string( "FLOATING ATOM" ) },
+    { NodeType::SELF_ATOM, std::string( "SELF ATOM" ) },
+    { NodeType::STRING_ATOM, std::string( "STRING ATOM" ) },
+    { NodeType::RULE_ATOM, std::string( "RULE ATOM" ) },
+    { NodeType::BOOLEAN_ATOM, std::string( "BOOLEAN ATOM" ) },
+    { NodeType::DUMMY_ATOM, std::string( "DUMMY ATOM" ) },
+    { NodeType::INIT, std::string( "INIT" ) },
+    { NodeType::IFTHENELSE, std::string( "IFTHENELSE" ) },
+    { NodeType::BODY_ELEMENTS, std::string( "BODY ELEMENTS" ) },
+    { NodeType::PROVIDER, std::string( "PROVIDER" ) },
+    { NodeType::OPTION, std::string( "OPTION" ) },
+    { NodeType::ENUM, std::string( "ENUM" ) },
+    { NodeType::FUNCTION, std::string( "FUNCTION" ) },
+    { NodeType::DERIVED, std::string( "DERIVED" ) },
+    { NodeType::RULE, std::string( "RULE" ) },
+    { NodeType::BINARY_EXPRESSION, std::string( "BINARY EXPRESSION" ) },
+    { NodeType::UNARY_EXPRESSION, std::string( "UNARY EXPRESSION" ) },
+    { NodeType::UPDATE, std::string( "UPDATE" ) },
+    { NodeType::SPECIFICATION, std::string( "SPECIFICATION" ) },
+    { NodeType::STATEMENT, std::string( "STATEMENT" ) },
+    { NodeType::STATEMENTS, std::string( "STATEMENTS" ) },
+    { NodeType::SKIP, std::string( "SKIP" ) },
+    { NodeType::PARBLOCK, std::string( "PARBLOCK" ) },
+    { NodeType::SEQBLOCK, std::string( "SEQBLOCK" ) },
+    { NodeType::FUNCTION_ATOM, std::string( "FUNCTION ATOM" ) },
+    { NodeType::CALL, std::string( "CALL NODE" ) },
+    { NodeType::PRINT, std::string( "PRINT NODE" ) },
+    { NodeType::POP, std::string( "POP NODE" ) },
 };
 
 std::string unknown_type = "unknown node type";
 
-const std::string& type_to_str(NodeType t) {
-  try {
-    return node_type_names_.at(t);
-  } catch (const std::out_of_range& e) {
-    return unknown_type;
-  }
-}
-
-AstNode::AstNode(NodeType node_type) : type_(TypeType::UNKNOWN){
-    node_type_ = node_type;
-   // DEBUG(this->to_str());
-}
-
-AstNode::AstNode(yy::location& loc, NodeType nt) :
-        location(loc), node_type_(nt), type_(TypeType::UNKNOWN) {}
-
-AstNode::AstNode(yy::location& loc, NodeType nt, Type t) :
-        location(loc), node_type_(nt), type_(t) {}
-
-AstNode::~AstNode() {
-  // no dynamically alloceted stuff here
-}
-
-std::string AstNode::to_str() const {
-    return std::string("AStNode: ") + type_to_str(node_type_);
-}
-
-bool AstNode::equals(AstNode *other) const {
-  return node_type_ == other->node_type_;
-}
-
-std::string AstNode::location_str() const {
-  if (location.begin.filename != nullptr) {
-    return *location.begin.filename;
-  } else {
-    return "NO FILE";
-  }
-}
-
-AstListNode::AstListNode(yy::location& loc, NodeType node_type) :
-        AstNode(loc, node_type) {}
-
-AstListNode::~AstListNode() {
-  for (auto n : nodes) {
-    delete n;
-  }
-  nodes.clear();
-}
-
-void AstListNode::add(AstNode* n) {
-    this->nodes.push_back(n);
-}
-
-bool AstListNode::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
-
-  AstListNode *other_cast = static_cast<AstListNode*>(other);
-
-  auto ast1_iter = nodes.begin();
-  auto ast2_iter = other_cast->nodes.begin();
-  
-  while (ast1_iter < nodes.end() && ast2_iter < other_cast->nodes.end()) {
-    if (!((*ast1_iter)->equals(*ast2_iter))) {
-      return false;
+const std::string& type_to_str( NodeType t )
+{
+    try
+    {
+        return node_type_names_.at( t );
     }
-    ast1_iter += 1;
-    ast2_iter += 1;
-  }
-
-  if (ast1_iter == nodes.cend() && ast2_iter == other_cast->nodes.cend()) {
-    return true;
-  } else {
-    return false;
-  }
+    catch( const std::out_of_range& e )
+    {
+        return unknown_type;
+    }
 }
 
-FunctionDefNode::FunctionDefNode(yy::location& loc, Function* sym) 
-    : AstNode(loc, NodeType::FUNCTION), sym(sym) {
+AstNode::AstNode( NodeType node_type )
+: type_( TypeType::UNKNOWN )
+{
+    node_type_ = node_type;
+    // DEBUG(this->to_str());
 }
 
-FunctionDefNode::~FunctionDefNode() {
-  // sym is deleted in the symbol table
+AstNode::AstNode( yy::location& loc, NodeType nt )
+: location( loc )
+, node_type_( nt )
+, type_( TypeType::UNKNOWN )
+{
 }
 
-EnumDefNode::EnumDefNode(yy::location& loc, Enum *enum_)
-    : AstNode(loc, NodeType::ENUM), enum_(enum_) {}
-
-EnumDefNode::~EnumDefNode() {
-  // enum_ is deleted in the symbol table
+AstNode::AstNode( yy::location& loc, NodeType nt, Type t )
+: location( loc )
+, node_type_( nt )
+, type_( t )
+{
 }
 
-IfThenElseNode::IfThenElseNode(yy::location& loc, ExpressionBase *condition, AstNode *then, AstNode *els)
-    : AstNode(loc, NodeType::IFTHENELSE), condition_(condition), then_(then), else_(els) {}
+AstNode::~AstNode()
+{
+    // no dynamically alloceted stuff here
+}
 
+std::string AstNode::to_str() const
+{
+    return std::string( "AStNode: " ) + type_to_str( node_type_ );
+}
+
+bool AstNode::equals( AstNode* other ) const
+{
+    return node_type_ == other->node_type_;
+}
+
+std::string AstNode::location_str() const
+{
+    if( location.begin.filename != nullptr )
+    {
+        return *location.begin.filename;
+    }
+    else
+    {
+        return "NO FILE";
+    }
+}
+
+AstListNode::AstListNode( yy::location& loc, NodeType node_type )
+: AstNode( loc, node_type )
+{
+}
+
+AstListNode::~AstListNode()
+{
+    for( auto n : nodes )
+    {
+        delete n;
+    }
+    nodes.clear();
+}
+
+void AstListNode::add( AstNode* n )
+{
+    this->nodes.push_back( n );
+}
+
+bool AstListNode::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
+
+    AstListNode* other_cast = static_cast< AstListNode* >( other );
+
+    auto ast1_iter = nodes.begin();
+    auto ast2_iter = other_cast->nodes.begin();
+
+    while( ast1_iter < nodes.end() && ast2_iter < other_cast->nodes.end() )
+    {
+        if( !( ( *ast1_iter )->equals( *ast2_iter ) ) )
+        {
+            return false;
+        }
+        ast1_iter += 1;
+        ast2_iter += 1;
+    }
+
+    if( ast1_iter == nodes.cend() && ast2_iter == other_cast->nodes.cend() )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+FunctionDefNode::FunctionDefNode( yy::location& loc, Function* sym )
+: AstNode( loc, NodeType::FUNCTION )
+, sym( sym )
+{
+}
+
+FunctionDefNode::~FunctionDefNode()
+{
+    // sym is deleted in the symbol table
+}
+
+EnumDefNode::EnumDefNode( yy::location& loc, Enum* enum_ )
+: AstNode( loc, NodeType::ENUM )
+, enum_( enum_ )
+{
+}
+
+EnumDefNode::~EnumDefNode()
+{
+    // enum_ is deleted in the symbol table
+}
+
+IfThenElseNode::IfThenElseNode(
+    yy::location& loc, ExpressionBase* condition, AstNode* then, AstNode* els )
+: AstNode( loc, NodeType::IFTHENELSE )
+, condition_( condition )
+, then_( then )
+, else_( els )
+{
+}
 
 ZeroAtom::ZeroAtom( yy::location& loc, AstNode* reference )
 : AtomNode( loc, NodeType::ZERO_ATOM, Type( TypeType::UNKNOWN ) )
@@ -174,107 +218,143 @@ const AstNode* ZeroAtom::getRef( void ) const
     return ref;
 }
 
-
-IntegerAtom::IntegerAtom(yy::location& loc, INTEGER_T val) :
-        AtomNode(loc, NodeType::INTEGER_ATOM, Type(TypeType::INTEGER)) {
-  val_ = val;
+IntegerAtom::IntegerAtom( yy::location& loc, INTEGER_T val )
+: AtomNode( loc, NodeType::INTEGER_ATOM, Type( TypeType::INTEGER ) )
+{
+    val_ = val;
 }
 
-IntegerAtom::~IntegerAtom() {}
-
-bool IntegerAtom::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
-
-  IntegerAtom *other_cast = static_cast<IntegerAtom*>(other);
-  return val_ == other_cast->val_;
+IntegerAtom::~IntegerAtom()
+{
 }
 
-FloatingAtom::FloatingAtom(yy::location& loc, FLOATING_T val) :
-        AtomNode(loc, NodeType::FLOATING_ATOM, Type(TypeType::FLOATING)) {
-  val_ = val;
+bool IntegerAtom::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
+
+    IntegerAtom* other_cast = static_cast< IntegerAtom* >( other );
+    return val_ == other_cast->val_;
 }
 
-FloatingAtom::~FloatingAtom() {}
-
-bool FloatingAtom::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
-
-  FloatingAtom *other_cast = static_cast<FloatingAtom*>(other);
-  return val_ == other_cast->val_;
+FloatingAtom::FloatingAtom( yy::location& loc, FLOATING_T val )
+: AtomNode( loc, NodeType::FLOATING_ATOM, Type( TypeType::FLOATING ) )
+{
+    val_ = val;
 }
 
-RationalAtom::RationalAtom(yy::location& loc, const rational_t& val) :
-        AtomNode(loc, NodeType::RATIONAL_ATOM, Type(TypeType::RATIONAL)), val_(val) {
+FloatingAtom::~FloatingAtom()
+{
 }
 
+bool FloatingAtom::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
 
-UndefAtom::UndefAtom(yy::location& loc) :
-        AtomNode(loc, NodeType::UNDEF_ATOM, Type(TypeType::UNKNOWN)) {}
-
-bool UndefAtom::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  } else {
-    return true;
-  }
+    FloatingAtom* other_cast = static_cast< FloatingAtom* >( other );
+    return val_ == other_cast->val_;
 }
 
-
-SelfAtom::SelfAtom(yy::location& loc) :
-        AtomNode(loc, NodeType::SELF_ATOM, Type(TypeType::SELF)) { DEBUG("TRUE");}
-
-bool SelfAtom::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  } else {
-    return true;
-  }
+RationalAtom::RationalAtom( yy::location& loc, const rational_t& val )
+: AtomNode( loc, NodeType::RATIONAL_ATOM, Type( TypeType::RATIONAL ) )
+, val_( val )
+{
 }
 
-
-BooleanAtom::BooleanAtom(yy::location& loc, bool value) :
-        AtomNode(loc, NodeType::BOOLEAN_ATOM, Type(TypeType::BOOLEAN)), value(value) {}
-
-bool BooleanAtom::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
-
-  BooleanAtom *other_b = reinterpret_cast<BooleanAtom*>(other);
-  return value == other_b->value;
+UndefAtom::UndefAtom( yy::location& loc )
+: AtomNode( loc, NodeType::UNDEF_ATOM, Type( TypeType::UNKNOWN ) )
+{
 }
 
-
-
-RuleAtom::RuleAtom(yy::location& loc, const std::string&& name) :
-        AtomNode(loc, NodeType::RULE_ATOM, Type(TypeType::RULEREF)), name(name) {}
-
-RuleAtom::~RuleAtom() {}
-
-bool RuleAtom::equals(AstNode*) const {
-  throw "NOT IMPLEMENTED";
+bool UndefAtom::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
-
-StringAtom::StringAtom(yy::location& loc, std::string&& string) :
-        AtomNode(loc, NodeType::STRING_ATOM, Type(TypeType::STRING)), string(string) {
-  DEBUG("StringAtom "<<string);
+SelfAtom::SelfAtom( yy::location& loc )
+: AtomNode( loc, NodeType::SELF_ATOM, Type( TypeType::SELF ) )
+{
+    DEBUG( "TRUE" );
 }
 
-StringAtom::~StringAtom() {}
-
-bool StringAtom::equals(AstNode*) const {
-  throw "NOT IMPLEMENTED";
+bool SelfAtom::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
-BaseFunctionAtom::BaseFunctionAtom(yy::location& loc, NodeType t, const std::string name,
-                           std::vector<ExpressionBase*> *args) 
-    : AtomNode(loc, t, Type(TypeType::UNKNOWN)),
-       name(name), arguments(args) {
+BooleanAtom::BooleanAtom( yy::location& loc, bool value )
+: AtomNode( loc, NodeType::BOOLEAN_ATOM, Type( TypeType::BOOLEAN ) )
+, value( value )
+{
+}
+
+bool BooleanAtom::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
+
+    BooleanAtom* other_b = reinterpret_cast< BooleanAtom* >( other );
+    return value == other_b->value;
+}
+
+RuleAtom::RuleAtom( yy::location& loc, const std::string&& name )
+: AtomNode( loc, NodeType::RULE_ATOM, Type( TypeType::RULEREF ) )
+, name( name )
+{
+}
+
+RuleAtom::~RuleAtom()
+{
+}
+
+bool RuleAtom::equals( AstNode* ) const
+{
+    throw "NOT IMPLEMENTED";
+}
+
+StringAtom::StringAtom( yy::location& loc, std::string&& string )
+: AtomNode( loc, NodeType::STRING_ATOM, Type( TypeType::STRING ) )
+, string( string )
+{
+    DEBUG( "StringAtom " << string );
+}
+
+StringAtom::~StringAtom()
+{
+}
+
+bool StringAtom::equals( AstNode* ) const
+{
+    throw "NOT IMPLEMENTED";
+}
+
+BaseFunctionAtom::BaseFunctionAtom( yy::location& loc, NodeType t,
+    const std::string name, std::vector< ExpressionBase* >* args )
+: AtomNode( loc, t, Type( TypeType::UNKNOWN ) )
+, name( name )
+, arguments( args )
+{
 }
 
 std::string BaseFunctionAtom::to_str() const
@@ -282,56 +362,75 @@ std::string BaseFunctionAtom::to_str() const
     return name;
 }
 
-FunctionAtom::FunctionAtom(yy::location& loc, const std::string name)
-    : FunctionAtom(loc, name, nullptr)  {
+FunctionAtom::FunctionAtom( yy::location& loc, const std::string name )
+: FunctionAtom( loc, name, nullptr )
+{
 }
 
-FunctionAtom::FunctionAtom(yy::location& loc, const std::string name,
-                           std::vector<ExpressionBase*> *args) 
-    : BaseFunctionAtom(loc, NodeType::FUNCTION_ATOM, name, args), symbol_type(SymbolType::UNSET), initialized(false) {
+FunctionAtom::FunctionAtom( yy::location& loc, const std::string name,
+    std::vector< ExpressionBase* >* args )
+: BaseFunctionAtom( loc, NodeType::FUNCTION_ATOM, name, args )
+, symbol_type( SymbolType::UNSET )
+, initialized( false )
+{
 }
 
-FunctionAtom::~FunctionAtom() {
+FunctionAtom::~FunctionAtom()
+{
 }
 
-bool FunctionAtom::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
-
-  FunctionAtom *other_func = reinterpret_cast<FunctionAtom*>(other);
-
-  if (symbol_type == SymbolType::UNSET) {
-    return name == other_func->name;
-  }
-
-  if (arguments && other_func->arguments &&
-      arguments->size() == other_func->arguments->size()) {
-    for (size_t i=0; i < arguments->size(); i++) {
-      if (!arguments->at(i)->equals(other_func->arguments->at(i))) {
+bool FunctionAtom::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
         return false;
-      }
     }
-  }
 
-  if (! (!arguments && !other_func->arguments)) {
+    FunctionAtom* other_func = reinterpret_cast< FunctionAtom* >( other );
+
+    if( symbol_type == SymbolType::UNSET )
+    {
+        return name == other_func->name;
+    }
+
+    if( arguments && other_func->arguments
+        && arguments->size() == other_func->arguments->size() )
+    {
+        for( size_t i = 0; i < arguments->size(); i++ )
+        {
+            if( !arguments->at( i )->equals( other_func->arguments->at( i ) ) )
+            {
+                return false;
+            }
+        }
+    }
+
+    if( !( !arguments && !other_func->arguments ) )
+    {
+        return false;
+    }
+
+    if( symbol_type == FunctionAtom::SymbolType::FUNCTION
+        && symbol_type == other_func->symbol_type )
+    {
+        if( symbol && other_func->symbol
+            && symbol->name != other_func->symbol->name )
+        {
+            return false;
+        }
+
+        if( !( !symbol && !other_func->symbol ) )
+        {
+            return false;
+        }
+        return name == other_func->name;
+    }
+    else if( symbol_type == FunctionAtom::SymbolType::PARAMETER
+             && symbol_type == other_func->symbol_type )
+    {
+        return name == other_func->name && offset == other_func->offset;
+    }
     return false;
-  }
-
-  if (symbol_type == FunctionAtom::SymbolType::FUNCTION && symbol_type == other_func->symbol_type) {
-    if (symbol && other_func->symbol &&
-        symbol->name != other_func->symbol->name) {
-      return false;
-    }
-
-    if (! (!symbol && !other_func->symbol)) {
-      return false;
-    }
-    return name == other_func->name;
-  } else if (symbol_type == FunctionAtom::SymbolType::PARAMETER && symbol_type == other_func->symbol_type) {
-    return name == other_func->name && offset == other_func->offset;
-  }
-  return false;
 }
 
 static Type* builtin_atom_new_type( TypeType t )
@@ -342,45 +441,47 @@ static Type* builtin_atom_new_type( TypeType t )
     }
     else
     {
-        return new Type( t, new Type(TypeType::UNKNOWN) );
+        return new Type( t, new Type( TypeType::UNKNOWN ) );
     }
 }
 
-BuiltinAtom::BuiltinAtom
-( yy::location& loc
-, const std::string name
-, std::vector<ExpressionBase*> *args) 
-: BaseFunctionAtom(loc, NodeType::BUILTIN_ATOM, name, args), return_type(nullptr)
+BuiltinAtom::BuiltinAtom( yy::location& loc, const std::string name,
+    std::vector< ExpressionBase* >* args )
+: BaseFunctionAtom( loc, NodeType::BUILTIN_ATOM, name, args )
+, return_type( nullptr )
 {
     Builtin* built_in = Builtin::get( name );
-    
+
     assert( built_in && "built-in cannot be null" );
-    
+
     assert( built_in->ret_type.size() == 1 );
     return_type = builtin_atom_new_type( built_in->ret_type[ 0 ] );
-    
+
     for( std::vector< TypeType > v : built_in->arg_type )
     {
         assert( v.size() >= 1 );
-        Type* t = builtin_atom_new_type( v[0] );
-        
-        for( int i = 1; i < v.size(); i++)
+        Type* t = builtin_atom_new_type( v[ 0 ] );
+
+        for( int i = 1; i < v.size(); i++ )
         {
-            t->constraints.push_back( builtin_atom_new_type( v[i] ) );
+            t->constraints.push_back( builtin_atom_new_type( v[ i ] ) );
         }
-        
+
         types.push_back( t );
     }
-    
+
     id = built_in->id;
 
     built_in->unify( return_type, types );
 }
 
-BuiltinAtom::~BuiltinAtom() {}
+BuiltinAtom::~BuiltinAtom()
+{
+}
 
-bool BuiltinAtom::equals(AstNode*) const {
-  throw "BuiltinAtom::equals() not implemented";
+bool BuiltinAtom::equals( AstNode* ) const
+{
+    throw "BuiltinAtom::equals() not implemented";
 }
 
 std::string BuiltinAtom::to_str() const
@@ -390,29 +491,29 @@ std::string BuiltinAtom::to_str() const
     return built_in->name;
 }
 
-ListAtom::ListAtom(yy::location& loc, std::vector<ExpressionBase*> *exprs)
-    : AtomNode(loc, NodeType::LIST_ATOM, TypeType::UNKNOWN), expr_list(exprs)
+ListAtom::ListAtom( yy::location& loc, std::vector< ExpressionBase* >* exprs )
+: AtomNode( loc, NodeType::LIST_ATOM, TypeType::UNKNOWN )
+, expr_list( exprs )
 {
-  // TODO LEAK! @fhahn
-  type_ = Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+    // TODO LEAK! @fhahn
+    type_ = Type( TypeType::LIST, new Type( TypeType::UNKNOWN ) );
 }
 
-NumberRangeAtom::NumberRangeAtom(yy::location& loc, ExpressionBase *left, ExpressionBase *right) :
-    AtomNode(loc, NodeType::NUMBER_RANGE_ATOM, TypeType::NUMBER_RANGE),
-    left(left),
-    right(right)
+NumberRangeAtom::NumberRangeAtom(
+    yy::location& loc, ExpressionBase* left, ExpressionBase* right )
+: AtomNode( loc, NodeType::NUMBER_RANGE_ATOM, TypeType::NUMBER_RANGE )
+, left( left )
+, right( right )
 {
-
 }
 
-BinaryExpression::BinaryExpression(yy::location& loc, ExpressionBase *left, ExpressionBase *right,
-                                   ExpressionOperation op) :
-    ExpressionBase(loc, NodeType::BINARY_EXPRESSION, Type(TypeType::UNKNOWN)),
-    left_(left),
-    right_(right),
-    op(op)
+BinaryExpression::BinaryExpression( yy::location& loc, ExpressionBase* left,
+    ExpressionBase* right, ExpressionOperation op )
+: ExpressionBase( loc, NodeType::BINARY_EXPRESSION, Type( TypeType::UNKNOWN ) )
+, left_( left )
+, right_( right )
+, op( op )
 {
-
 }
 
 BinaryExpression::~BinaryExpression()
@@ -421,32 +522,32 @@ BinaryExpression::~BinaryExpression()
     delete right_;
 }
 
-bool BinaryExpression::equals(AstNode *other) const
+bool BinaryExpression::equals( AstNode* other ) const
 {
-    if (not AstNode::equals(other)) {
+    if( not AstNode::equals( other ) )
+    {
         return false;
     }
 
-    BinaryExpression *other_cast = static_cast<BinaryExpression*>(other);
-    if (left_ == nullptr || other_cast->left_ == nullptr) {
-        return left_ == nullptr &&
-            other_cast->left_ == nullptr &&
-            right_->equals(other_cast->right_) &&
-            op == other_cast->op;
-    } else {
-        return left_->equals(other_cast->left_) &&
-            right_->equals(other_cast->right_) &&
-            op == other_cast->op;
+    BinaryExpression* other_cast = static_cast< BinaryExpression* >( other );
+    if( left_ == nullptr || other_cast->left_ == nullptr )
+    {
+        return left_ == nullptr && other_cast->left_ == nullptr
+               && right_->equals( other_cast->right_ ) && op == other_cast->op;
+    }
+    else
+    {
+        return left_->equals( other_cast->left_ )
+               && right_->equals( other_cast->right_ ) && op == other_cast->op;
     }
 }
 
-UnaryExpression::UnaryExpression(yy::location& loc, ExpressionBase *expr,
-                                 ExpressionOperation op) :
-    ExpressionBase(loc, NodeType::UNARY_EXPRESSION, Type(TypeType::UNKNOWN)),
-    expr_(expr),
-    op(op)
+UnaryExpression::UnaryExpression(
+    yy::location& loc, ExpressionBase* expr, ExpressionOperation op )
+: ExpressionBase( loc, NodeType::UNARY_EXPRESSION, Type( TypeType::UNKNOWN ) )
+, expr_( expr )
+, op( op )
 {
-
 }
 
 UnaryExpression::~UnaryExpression()
@@ -454,192 +555,261 @@ UnaryExpression::~UnaryExpression()
     delete expr_;
 }
 
-bool UnaryExpression::equals(AstNode *other) const
+bool UnaryExpression::equals( AstNode* other ) const
 {
-    if (not AstNode::equals(other)) {
+    if( not AstNode::equals( other ) )
+    {
         return false;
     }
 
-    UnaryExpression *other_cast = static_cast<UnaryExpression*>(other);
-    if (expr_ == nullptr || other_cast->expr_ == nullptr) {
-        return expr_ == nullptr &&
-            other_cast->expr_ == nullptr &&
-            op == other_cast->op;
-    } else {
-        return expr_->equals(other_cast->expr_) &&
-            op == other_cast->op;
+    UnaryExpression* other_cast = static_cast< UnaryExpression* >( other );
+    if( expr_ == nullptr || other_cast->expr_ == nullptr )
+    {
+        return expr_ == nullptr && other_cast->expr_ == nullptr
+               && op == other_cast->op;
+    }
+    else
+    {
+        return expr_->equals( other_cast->expr_ ) && op == other_cast->op;
     }
 }
 
-std::string operator_to_str(const ExpressionOperation op) {
-  switch(op) {
-    case ExpressionOperation::ADD: return "+";
-    case ExpressionOperation::SUB: return "-";
-    case ExpressionOperation::MUL: return "*";
-    case ExpressionOperation::DIV: return "/";
-    case ExpressionOperation::MOD: return "%";
-    case ExpressionOperation::RAT_DIV: return "div";
+std::string operator_to_str( const ExpressionOperation op )
+{
+    switch( op )
+    {
+        case ExpressionOperation::ADD:
+            return "+";
+        case ExpressionOperation::SUB:
+            return "-";
+        case ExpressionOperation::MUL:
+            return "*";
+        case ExpressionOperation::DIV:
+            return "/";
+        case ExpressionOperation::MOD:
+            return "%";
+        case ExpressionOperation::RAT_DIV:
+            return "div";
 
-    case ExpressionOperation::EQ: return "=";
-    case ExpressionOperation::NEQ: return "!=";
+        case ExpressionOperation::EQ:
+            return "=";
+        case ExpressionOperation::NEQ:
+            return "!=";
 
-    case ExpressionOperation::AND: return "and";
-    case ExpressionOperation::OR: return "or";
-    case ExpressionOperation::XOR: return "xor";
-    case ExpressionOperation::NOT: return "not";
+        case ExpressionOperation::AND:
+            return "and";
+        case ExpressionOperation::OR:
+            return "or";
+        case ExpressionOperation::XOR:
+            return "xor";
+        case ExpressionOperation::NOT:
+            return "not";
 
-    case ExpressionOperation::LESSER: return "<";
-    case ExpressionOperation::GREATER: return ">";
-    case ExpressionOperation::LESSEREQ: return "<=";
-    case ExpressionOperation::GREATEREQ: return ">=";
-    default: return "unknown";
-  }
+        case ExpressionOperation::LESSER:
+            return "<";
+        case ExpressionOperation::GREATER:
+            return ">";
+        case ExpressionOperation::LESSEREQ:
+            return "<=";
+        case ExpressionOperation::GREATEREQ:
+            return ">=";
+        default:
+            return "unknown";
+    }
 }
 
-UpdateNode::UpdateNode(yy::location& loc, FunctionAtom *func, ExpressionBase *expr)
-    : AstNode(loc, NodeType::UPDATE), func(func), expr_(expr) {
+UpdateNode::UpdateNode(
+    yy::location& loc, FunctionAtom* func, ExpressionBase* expr )
+: AstNode( loc, NodeType::UPDATE )
+, func( func )
+, expr_( expr )
+{
 }
 
-UpdateNode::~UpdateNode() {
-  delete func;
-  delete expr_;
+UpdateNode::~UpdateNode()
+{
+    delete func;
+    delete expr_;
 }
 
-bool UpdateNode::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
+bool UpdateNode::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
 
-  UpdateNode *other_cast = static_cast<UpdateNode*>(other);
-  return expr_->equals(other_cast->expr_) && func->equals(other_cast->func);
+    UpdateNode* other_cast = static_cast< UpdateNode* >( other );
+    return expr_->equals( other_cast->expr_ )
+           && func->equals( other_cast->func );
 }
 
-PushNode::PushNode(yy::location& loc, ExpressionBase *expr, FunctionAtom *to)
-    : AstNode(loc, NodeType::PUSH), expr(expr), to(to) {
-  // TODO LEAK, use constructor of AstNode to set type_
-  type_ = new Type(TypeType::LIST, new Type(TypeType::UNKNOWN));
+PushNode::PushNode( yy::location& loc, ExpressionBase* expr, FunctionAtom* to )
+: AstNode( loc, NodeType::PUSH )
+, expr( expr )
+, to( to )
+{
+    // TODO LEAK, use constructor of AstNode to set type_
+    type_ = new Type( TypeType::LIST, new Type( TypeType::UNKNOWN ) );
 }
 
-PushNode::~PushNode() {
-  delete expr;
-  delete to;
+PushNode::~PushNode()
+{
+    delete expr;
+    delete to;
 }
 
-bool PushNode::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
-  FAILURE();
+bool PushNode::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
+    FAILURE();
 }
 
-
-PopNode::PopNode(yy::location& loc, FunctionAtom *to, FunctionAtom *from)
-    : AstNode(loc, NodeType::POP), to(std::move(to)), from(from), from_type(TypeType::LIST, new Type(TypeType::UNKNOWN)) {
-  type_.unify(from_type.subtypes[0]);
+PopNode::PopNode( yy::location& loc, FunctionAtom* to, FunctionAtom* from )
+: AstNode( loc, NodeType::POP )
+, to( std::move( to ) )
+, from( from )
+, from_type( TypeType::LIST, new Type( TypeType::UNKNOWN ) )
+{
+    type_.unify( from_type.subtypes[ 0 ] );
 }
 
-PopNode::~PopNode() {
-  delete to;
-  delete from;
+PopNode::~PopNode()
+{
+    delete to;
+    delete from;
 }
 
-bool PopNode::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
-  FAILURE();
+bool PopNode::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
+    FAILURE();
 }
 
-ForallNode::ForallNode(yy::location& loc, const std::string& ident,
-                       ExpressionBase *expr, AstNode *stmt) 
-    : AstNode(loc, NodeType::FORALL), identifier(std::move(ident)), in_expr(expr), statement(stmt) {}
-ForallNode::~ForallNode() {
-  delete in_expr;
-  delete statement;
+ForallNode::ForallNode( yy::location& loc, const std::string& ident,
+    ExpressionBase* expr, AstNode* stmt )
+: AstNode( loc, NodeType::FORALL )
+, identifier( std::move( ident ) )
+, in_expr( expr )
+, statement( stmt )
+{
+}
+ForallNode::~ForallNode()
+{
+    delete in_expr;
+    delete statement;
 }
 
-CaseNode::CaseNode(yy::location& loc, ExpressionBase *expr,
-             std::vector<std::pair<AtomNode*, AstNode*>>& case_list)
-    : AstNode(loc, NodeType::CASE), expr(expr), case_list(std::move(case_list)), /* TODO label_map(),*/ map_fixed(false) {}
-
-CaseNode::~CaseNode() {
-  delete expr;
+CaseNode::CaseNode( yy::location& loc, ExpressionBase* expr,
+    std::vector< std::pair< AtomNode*, AstNode* > >& case_list )
+: AstNode( loc, NodeType::CASE )
+, expr( expr )
+, case_list( std::move( case_list ) )
+, /* TODO label_map(),*/ map_fixed( false )
+{
 }
 
-bool CaseNode::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
-  FAILURE();
+CaseNode::~CaseNode()
+{
+    delete expr;
 }
 
-UnaryNode::UnaryNode(yy::location& loc, NodeType node_type, AstNode *child) : AstNode(loc, node_type) {
-  child_ = child;
+bool CaseNode::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
+    FAILURE();
 }
 
-UnaryNode::~UnaryNode() {
-  delete child_;
+UnaryNode::UnaryNode( yy::location& loc, NodeType node_type, AstNode* child )
+: AstNode( loc, node_type )
+{
+    child_ = child;
 }
 
-bool UnaryNode::equals(AstNode *other) const {
-  if (!AstNode::equals(other)) {
-    return false;
-  }
-
-  UnaryNode *other_cast = static_cast<UnaryNode*>(other);
-  return child_->equals(other_cast->child_);
+UnaryNode::~UnaryNode()
+{
+    delete child_;
 }
 
+bool UnaryNode::equals( AstNode* other ) const
+{
+    if( !AstNode::equals( other ) )
+    {
+        return false;
+    }
 
-RuleNode::RuleNode(yy::location& loc, AstNode *child, const std::string& name)
-  :  UnaryNode(loc, NodeType::RULE, child), name(std::move(name)), arguments(),
-     binding_offsets(), dump_list() {}
+    UnaryNode* other_cast = static_cast< UnaryNode* >( other );
+    return child_->equals( other_cast->child_ );
+}
 
-RuleNode::RuleNode(yy::location& loc,
-                   AstNode *child,
-                   const std::string &name,
-                   std::vector<Type*>& args)
-  : UnaryNode(loc, NodeType::RULE, child), name(std::move(name)),
-    arguments(std::move(args)), binding_offsets(std::move(binding_offsets)),
-    dump_list() {}
+RuleNode::RuleNode( yy::location& loc, AstNode* child, const std::string& name )
+: UnaryNode( loc, NodeType::RULE, child )
+, name( std::move( name ) )
+, arguments()
+, binding_offsets()
+, dump_list()
+{
+}
 
-RuleNode::RuleNode(yy::location& loc, AstNode *child, const std::string &name,
-        std::vector<Type*>& args,
-        const std::vector<std::pair<std::string, std::vector<std::string>>>& dump_list)
-    : UnaryNode(loc, NodeType::RULE, child), name(std::move(name)),
-      arguments(std::move(args)), binding_offsets(std::move(binding_offsets)),
-      dump_list(std::move(dump_list)) {}
+RuleNode::RuleNode( yy::location& loc,
+    AstNode* child,
+    const std::string& name,
+    std::vector< Type* >& args )
+: UnaryNode( loc, NodeType::RULE, child )
+, name( std::move( name ) )
+, arguments( std::move( args ) )
+, binding_offsets( std::move( binding_offsets ) )
+, dump_list()
+{
+}
 
+RuleNode::RuleNode( yy::location& loc, AstNode* child, const std::string& name,
+    std::vector< Type* >& args,
+    const std::vector< std::pair< std::string, std::vector< std::string > > >&
+        dump_list )
+: UnaryNode( loc, NodeType::RULE, child )
+, name( std::move( name ) )
+, arguments( std::move( args ) )
+, binding_offsets( std::move( binding_offsets ) )
+, dump_list( std::move( dump_list ) )
+{
+}
 
-CallNode::CallNode(yy::location& loc, const std::string& rule_name, ExpressionBase *ruleref)
-    : CallNode(loc, rule_name, ruleref, nullptr) {}
+CallNode::CallNode(
+    yy::location& loc, const std::string& rule_name, ExpressionBase* ruleref )
+: CallNode( loc, rule_name, ruleref, nullptr )
+{
+}
 
-CallNode::CallNode(yy::location& loc, const std::string& rule_name, ExpressionBase *ruleref,
-                   std::vector<ExpressionBase*> *args)
-    : AstNode(loc, NodeType::CALL, Type(TypeType::NO_TYPE)), rule_name(rule_name),
-      rule(nullptr), arguments(args), ruleref(ruleref) {}
+CallNode::CallNode( yy::location& loc, const std::string& rule_name,
+    ExpressionBase* ruleref, std::vector< ExpressionBase* >* args )
+: AstNode( loc, NodeType::CALL, Type( TypeType::NO_TYPE ) )
+, rule_name( rule_name )
+, rule( nullptr )
+, arguments( args )
+, ruleref( ruleref )
+{
+}
 
-
-PrintNode::PrintNode
-( yy::location& loc
-, ExpressionBase* atom
-, const std::string& filter
-)
-: AstNode
-  ( loc
-  , NodeType::PRINT
-  , Type( TypeType::NO_TYPE )
-  )
+PrintNode::PrintNode(
+    yy::location& loc, ExpressionBase* atom, const std::string& filter )
+: AstNode( loc, NodeType::PRINT, Type( TypeType::NO_TYPE ) )
 , atom( atom )
 , filter( filter )
 {
     assert( atom and " invalid PrintNode created! " );
 }
 
-PrintNode::PrintNode
-( yy::location& loc
-, ExpressionBase* atom
-)
+PrintNode::PrintNode( yy::location& loc, ExpressionBase* atom )
 : PrintNode( loc, atom, "" )
 {
 }
@@ -654,29 +824,40 @@ const std::string& PrintNode::getFilter( void ) const
     return filter;
 }
 
+LetNode::LetNode( yy::location& loc, Type type, const std::string& identifier,
+    ExpressionBase* expr, AstNode* stmt )
+: AstNode( loc, NodeType::LET, type )
+, identifier( identifier )
+, expr( expr )
+, stmt( stmt )
+{
+}
 
+DiedieNode::DiedieNode( yy::location& loc, ExpressionBase* msg )
+: AstNode( loc, NodeType::DIEDIE )
+, msg( msg )
+{
+}
 
-LetNode::LetNode(yy::location& loc, Type type, const std::string& identifier,
-            ExpressionBase *expr, AstNode *stmt) 
-    : AstNode(loc, NodeType::LET, type), identifier(identifier), expr(expr), stmt(stmt) {}
+InitNode::InitNode( yy::location& loc, const std::string& identifier )
+: AstNode( loc, NodeType::INIT )
+, identifier( identifier )
+{
+}
 
-DiedieNode::DiedieNode(yy::location& loc, ExpressionBase *msg)
-    : AstNode(loc, NodeType::DIEDIE), msg(msg) {}
+SpecificationNode::SpecificationNode(
+    yy::location& loc, const std::string& identifier )
+: AstNode( loc, NodeType::SPECIFICATION )
+, identifier( identifier )
+{
+}
 
-InitNode::InitNode(yy::location& loc, const std::string& identifier) 
-    : AstNode(loc, NodeType::INIT), identifier(identifier) {}
-
-SpecificationNode::SpecificationNode(yy::location& loc, const std::string& identifier) 
-    : AstNode(loc, NodeType::SPECIFICATION), identifier(identifier) {}
-
-
-
-Ast::Ast( yy::location& loc, SpecificationNode* spec, AstListNode* elements ) 
+Ast::Ast( yy::location& loc, SpecificationNode* spec, AstListNode* elements )
 : AstNode( loc, NodeType::SPECIFICATION )
 , spec( spec )
 , init_rule( 0 )
 , elements( elements )
-{    
+{
 }
 
 void Ast::setInitRule( InitNode* init_rule )
@@ -700,12 +881,10 @@ InitNode* Ast::getInitRule( void )
 AstListNode* Ast::getElements( void )
 {
     assert( elements and "invalid specification node pointer!" );
-    return elements;    
+    return elements;
 }
 
-
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -713,4 +892,4 @@ AstListNode* Ast::getElements( void )
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//

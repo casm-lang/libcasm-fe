@@ -30,7 +30,7 @@
 
 namespace details
 {
-    template <typename _Key, typename _Value, typename _Hash, typename _Pred>
+    template < typename _Key, typename _Value, typename _Hash, typename _Pred >
     struct RobinHoodHashMap
     {
         using Key = _Key;
@@ -45,12 +45,11 @@ namespace details
             Value value;
             Entry* prev; // linked-list
 
-            Entry(const Key& key, const Value& value, Entry* prev) :
-                key(key),
-                value(value),
-                prev(prev)
+            Entry( const Key& key, const Value& value, Entry* prev )
+            : key( key )
+            , value( value )
+            , prev( prev )
             {
-
             }
         };
 
@@ -73,40 +72,46 @@ namespace details
     };
 }
 
-template <typename Key, typename Value,
-          typename Hash = std::hash<Key>,
-          typename Pred = std::equal_to<Key>,
-          typename Details = details::RobinHoodHashMap<Key, Value, Hash, Pred>>
-class RobinHoodHashMap final : public HashMapBase<Details>
+template < typename Key, typename Value, typename Hash = std::hash< Key >,
+    typename Pred = std::equal_to< Key >,
+    typename Details = details::RobinHoodHashMap< Key, Value, Hash, Pred > >
+class RobinHoodHashMap final : public HashMapBase< Details >
 {
-    using HashMap = HashMapBase<Details>;
+    using HashMap = HashMapBase< Details >;
     using Entry = typename Details::Entry;
     using Bucket = typename Details::Bucket;
     using HashingStrategy = typename Details::HashingStrategy;
 
-public:
-    using HashMapBase<Details>::HashMapBase;
+  public:
+    using HashMapBase< Details >::HashMapBase;
 
-protected:
-    Entry* searchEntry(const Key& key, const std::size_t hashCode) const noexcept override
+  protected:
+    Entry* searchEntry( const Key& key, const std::size_t hashCode ) const
+        noexcept override
     {
         static Pred equals;
 
         const auto buckets = HashMap::m_buckets;
-        if (buckets == nullptr) {
+        if( buckets == nullptr )
+        {
             return nullptr;
         }
 
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = HashingStrategy::hash(hashCode, capacity);
+        const auto initialIndex = HashingStrategy::hash( hashCode, capacity );
 
-        for (std::size_t round = 0; round < capacity; round++) {
-            const auto index = HashingStrategy::hash(initialIndex + round, capacity);
+        for( std::size_t round = 0; round < capacity; round++ )
+        {
+            const auto index
+                = HashingStrategy::hash( initialIndex + round, capacity );
             const auto bucket = buckets + index;
-            if (bucket->empty() or (round > bucket->distance)) {
+            if( bucket->empty() or ( round > bucket->distance ) )
+            {
                 return nullptr;
             }
-            if ((bucket->hashCode == hashCode) and equals(bucket->entry->key, key)) {
+            if( ( bucket->hashCode == hashCode )
+                and equals( bucket->entry->key, key ) )
+            {
                 return bucket->entry;
             }
         }
@@ -114,50 +119,59 @@ protected:
         return nullptr;
     }
 
-    void insertEntry(Entry* entry, std::size_t hashCode) const noexcept override
+    void insertEntry( Entry* entry, std::size_t hashCode ) const
+        noexcept override
     {
-        assert(HashMap::m_buckets != nullptr);
+        assert( HashMap::m_buckets != nullptr );
 
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = HashingStrategy::hash(hashCode, capacity);
+        const auto initialIndex = HashingStrategy::hash( hashCode, capacity );
 
         std::size_t distance = 0;
 
-        for (std::size_t round = 0; round < capacity; round++) {
-            const auto index = HashingStrategy::hash(initialIndex + round, capacity);
+        for( std::size_t round = 0; round < capacity; round++ )
+        {
+            const auto index
+                = HashingStrategy::hash( initialIndex + round, capacity );
             const auto bucket = buckets + index;
-            if (bucket->empty()) {
+            if( bucket->empty() )
+            {
                 bucket->hashCode = hashCode;
                 bucket->distance = distance;
                 bucket->entry = entry;
                 break;
             }
-            if (distance > bucket->distance) {
-                std::swap(hashCode, bucket->hashCode);
-                std::swap(distance, bucket->distance);
-                std::swap(entry, bucket->entry);
+            if( distance > bucket->distance )
+            {
+                std::swap( hashCode, bucket->hashCode );
+                std::swap( distance, bucket->distance );
+                std::swap( entry, bucket->entry );
             }
             ++distance;
         }
     }
 
-    void resize(std::size_t newCapacity) override
+    void resize( std::size_t newCapacity ) override
     {
         const auto oldCapacity = HashMap::m_capacity;
         const auto oldBuckets = HashMap::m_buckets;
 
         HashMap::m_capacity = newCapacity;
-        HashMap::m_buckets = new Bucket[newCapacity];
-        std::memset(HashMap::m_buckets, 0, sizeof(Bucket) * newCapacity);
+        HashMap::m_buckets = new Bucket[ newCapacity ];
+        std::memset( HashMap::m_buckets, 0, sizeof( Bucket ) * newCapacity );
 
-        if (oldBuckets) {
+        if( oldBuckets )
+        {
             const auto firstOldBucket = oldBuckets;
             const auto lastOldBucket = oldBuckets + oldCapacity;
 
-            for (auto oldBucket = firstOldBucket; oldBucket != lastOldBucket; ++oldBucket) {
-                if (not oldBucket->empty()) {
-                    insertEntry(oldBucket->entry, oldBucket->hashCode);
+            for( auto oldBucket = firstOldBucket; oldBucket != lastOldBucket;
+                 ++oldBucket )
+            {
+                if( not oldBucket->empty() )
+                {
+                    insertEntry( oldBucket->entry, oldBucket->hashCode );
                 }
             }
 

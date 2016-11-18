@@ -30,16 +30,12 @@
 
 using namespace libcasm_fe;
 
-extern Driver *global_driver;
+extern Driver* global_driver;
 
 char TypeCheckPass::id = 0;
 
-static libpass::PassRegistration< TypeCheckPass > PASS
-( "Type Check Pass"
-, "type check the AST and translate it to a typed AST"
-, "ast-check"
-, 0
-);
+static libpass::PassRegistration< TypeCheckPass > PASS( "Type Check Pass",
+    "type check the AST and translate it to a typed AST", "ast-check", 0 );
 
 // PPA: TODO: dependency SourceToAstPass
 
@@ -47,17 +43,16 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 {
     Ast* node = (Ast*)pr.getResult< SourceToAstPass >();
 
-    TypecheckVisitor typecheck_visitor(*global_driver);
-    AstWalker<TypecheckVisitor, Type*> typecheck_walker(typecheck_visitor);
-    typecheck_walker.walk_specification(node);
+    TypecheckVisitor typecheck_visitor( *global_driver );
+    AstWalker< TypecheckVisitor, Type* > typecheck_walker( typecheck_visitor );
+    typecheck_walker.walk_specification( node );
 
-    if( global_driver->rules_map_.count(node->getInitRule()->identifier) == 0 )
+    if( global_driver->rules_map_.count( node->getInitRule()->identifier )
+        == 0 )
     {
-        global_driver->error
-        ( node->getInitRule()->location
-        , "init rule `" + node->getInitRule()->identifier + "` doesn't exist"
-        , libcasm_fe::Codes::AgentInitRuleDoesNotExist
-        );
+        global_driver->error( node->getInitRule()->location,
+            "init rule `" + node->getInitRule()->identifier + "` doesn't exist",
+            libcasm_fe::Codes::AgentInitRuleDoesNotExist );
     }
 
     pr.setResult< TypeCheckPass >( node );
@@ -65,8 +60,7 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
     return global_driver->ok();
 }
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -74,4 +68,4 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//

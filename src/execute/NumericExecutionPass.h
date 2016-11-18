@@ -26,89 +26,93 @@
 #ifndef _LIB_CASMFE_NUMERICEXECUTIONPASS_H_
 #define _LIB_CASMFE_NUMERICEXECUTIONPASS_H_
 
-#include "libpass.h"
 #include "libcasm-fe.all.h"
+#include "libpass.h"
 
 #include "ExecutionPassBase.h"
 
 /**
    @brief    TODO
-   
+
    TODO
 */
 
 namespace libcasm_fe
 {
-    class NumericExecutionPass final : public ExecutionPassBase, public libpass::Pass
+    class NumericExecutionPass final : public ExecutionPassBase,
+                                       public libpass::Pass
     {
-    public:
+      public:
         static char id;
-        
-        bool run(libpass::PassResult& pr) override;
-        
-        void visit_assure(UnaryNode* assure, const value_t& val);
-        
-        void visit_print( PrintNode *node, const value_t& argument );
-        
-        void visit_push(PushNode *node, const value_t& expr, const value_t& atom);
-        void visit_pop(PopNode *node, const value_t& val);
 
-        const value_t visit_expression(BinaryExpression *expr, const value_t& left_val,
-                                       const value_t& right_val);
-        const value_t visit_expression_single(UnaryExpression *expr, const value_t& val);
+        bool run( libpass::PassResult& pr ) override;
 
-        const value_t visit_list_atom(ListAtom *atom, const std::vector<value_t> &vals);
+        void visit_assure( UnaryNode* assure, const value_t& val );
 
-    private:
-        bool init_function(const std::string& name, std::set<std::string>& visited);
+        void visit_print( PrintNode* node, const value_t& argument );
+
+        void visit_push(
+            PushNode* node, const value_t& expr, const value_t& atom );
+        void visit_pop( PopNode* node, const value_t& val );
+
+        const value_t visit_expression( BinaryExpression* expr,
+            const value_t& left_val, const value_t& right_val );
+        const value_t visit_expression_single(
+            UnaryExpression* expr, const value_t& val );
+
+        const value_t visit_list_atom(
+            ListAtom* atom, const std::vector< value_t >& vals );
+
+      private:
+        bool init_function(
+            const std::string& name, std::set< std::string >& visited );
 
         void dumpUpdates() const;
 
-    private:
-        AstWalker<libcasm_fe::NumericExecutionPass, value_t>* walker;
+      private:
+        AstWalker< libcasm_fe::NumericExecutionPass, value_t >* walker;
     };
 }
 
-
-using NumericExecutionWalker = AstWalker<libcasm_fe::NumericExecutionPass, value_t>;
-
-template <>
-value_t NumericExecutionWalker::walk_list_atom(ListAtom *atom);
+using NumericExecutionWalker
+    = AstWalker< libcasm_fe::NumericExecutionPass, value_t >;
 
 template <>
-void NumericExecutionWalker::walk_ifthenelse(IfThenElseNode* node);
+value_t NumericExecutionWalker::walk_list_atom( ListAtom* atom );
 
 template <>
-void NumericExecutionWalker::walk_seqblock(UnaryNode* seqblock);
+void NumericExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
 
 template <>
-void NumericExecutionWalker::walk_parblock(UnaryNode* parblock);
+void NumericExecutionWalker::walk_seqblock( UnaryNode* seqblock );
 
 template <>
-void NumericExecutionWalker::walk_pop(PopNode* node);
+void NumericExecutionWalker::walk_parblock( UnaryNode* parblock );
 
 template <>
-void NumericExecutionWalker::walk_push(PushNode* node);
+void NumericExecutionWalker::walk_pop( PopNode* node );
 
 template <>
-void NumericExecutionWalker::walk_case(CaseNode *node);
+void NumericExecutionWalker::walk_push( PushNode* node );
 
 template <>
-void NumericExecutionWalker::walk_forall(ForallNode *node);
+void NumericExecutionWalker::walk_case( CaseNode* node );
 
 template <>
-void NumericExecutionWalker::walk_iterate(UnaryNode *node);
+void NumericExecutionWalker::walk_forall( ForallNode* node );
 
 template <>
-void NumericExecutionWalker::walk_update(UpdateNode *node);
+void NumericExecutionWalker::walk_iterate( UnaryNode* node );
 
 template <>
-void NumericExecutionWalker::walk_update_dumps(UpdateNode *node);
+void NumericExecutionWalker::walk_update( UpdateNode* node );
+
+template <>
+void NumericExecutionWalker::walk_update_dumps( UpdateNode* node );
 
 #endif /* _LIB_CASMFE_NUMERICEXECUTIONPASS_H_ */
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil

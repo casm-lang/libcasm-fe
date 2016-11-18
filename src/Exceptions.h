@@ -40,35 +40,28 @@
 
 class Exception : public std::exception
 {
-private:
+  private:
     std::vector< const yy::location* > location_;
     const std::string msg_;
     const libcasm_fe::Codes error_code_;
-    
-public:
-    explicit Exception
-    ( const std::string& msg
-    , const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified
-    );
-    
-    explicit Exception
-    ( const yy::location& location
-    , const std::string& msg
-    , const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified
-    );
 
-    explicit Exception
-    ( const std::vector< const yy::location* >& location
-    , const std::string& msg
-    , const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified
-    );
-    
+  public:
+    explicit Exception( const std::string& msg,
+        const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
+
+    explicit Exception( const yy::location& location, const std::string& msg,
+        const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
+
+    explicit Exception( const std::vector< const yy::location* >& location,
+        const std::string& msg,
+        const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
+
     virtual const char* what() const throw();
-    
+
     void addLocation( const yy::location& location );
-    
+
     const std::vector< const yy::location* >& getLocations( void ) const;
-    
+
     const libcasm_fe::Codes getErrorCode( void ) const;
 };
 
@@ -81,6 +74,5 @@ class CompiletimeException : public Exception
 {
     using Exception::Exception;
 };
-
 
 #endif // _LIB_CASMFE_EXCEPTIONS_H_

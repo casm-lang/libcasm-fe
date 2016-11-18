@@ -30,7 +30,7 @@
 
 namespace details
 {
-    template <typename _Key, typename _Value, typename _Hash, typename _Pred>
+    template < typename _Key, typename _Value, typename _Hash, typename _Pred >
     struct ChainedHashMap
     {
         using Key = _Key;
@@ -47,12 +47,11 @@ namespace details
             Entry* next; // conflict chain
             Entry* prev; // linked-list
 
-            Entry(const Key& key, const Value& value, Entry* prev) :
-                key(key),
-                value(value),
-                prev(prev)
+            Entry( const Key& key, const Value& value, Entry* prev )
+            : key( key )
+            , value( value )
+            , prev( prev )
             {
-
             }
         };
 
@@ -65,7 +64,7 @@ namespace details
                 return entry == nullptr;
             }
 
-            inline void insert(Entry* newEntry)
+            inline void insert( Entry* newEntry )
             {
                 newEntry->next = entry;
                 entry = newEntry;
@@ -79,32 +78,35 @@ namespace details
     };
 }
 
-template <typename Key, typename Value,
-          typename Hash = std::hash<Key>,
-          typename Pred = std::equal_to<Key>,
-          typename Details = details::ChainedHashMap<Key, Value, Hash, Pred>>
-class ChainedHashMap final : public HashMapBase<Details>
+template < typename Key, typename Value, typename Hash = std::hash< Key >,
+    typename Pred = std::equal_to< Key >,
+    typename Details = details::ChainedHashMap< Key, Value, Hash, Pred > >
+class ChainedHashMap final : public HashMapBase< Details >
 {
-    using HashMap = HashMapBase<Details>;
+    using HashMap = HashMapBase< Details >;
     using Entry = typename Details::Entry;
     using Bucket = typename Details::Bucket;
     using HashingStrategy = typename Details::HashingStrategy;
 
-public:
-    using HashMapBase<Details>::HashMapBase;
+  public:
+    using HashMapBase< Details >::HashMapBase;
 
-protected:
-    Entry* searchEntry(const Key& key, const std::size_t hashCode) const noexcept override
+  protected:
+    Entry* searchEntry( const Key& key, const std::size_t hashCode ) const
+        noexcept override
     {
         static Pred equals;
 
-        if (HashMap::m_buckets == nullptr) {
+        if( HashMap::m_buckets == nullptr )
+        {
             return nullptr;
         }
 
-        const auto bucket = bucketAt(hashCode);
-        for (auto entry = bucket->entry; entry != nullptr; entry = entry->next) {
-            if ((entry->hashCode == hashCode) and equals(entry->key, key)) {
+        const auto bucket = bucketAt( hashCode );
+        for( auto entry = bucket->entry; entry != nullptr; entry = entry->next )
+        {
+            if( ( entry->hashCode == hashCode ) and equals( entry->key, key ) )
+            {
                 return entry;
             }
         }
@@ -112,35 +114,40 @@ protected:
         return nullptr;
     }
 
-    void insertEntry(Entry* entry, std::size_t hashCode) const noexcept override
+    void insertEntry( Entry* entry, std::size_t hashCode ) const
+        noexcept override
     {
-        assert(HashMap::m_buckets != nullptr);
+        assert( HashMap::m_buckets != nullptr );
 
         entry->hashCode = hashCode;
 
-        auto bucket = bucketAt(hashCode);
-        bucket->insert(entry);
+        auto bucket = bucketAt( hashCode );
+        bucket->insert( entry );
     }
 
-    void resize(std::size_t newCapacity) override
+    void resize( std::size_t newCapacity ) override
     {
         HashMap::m_capacity = newCapacity;
 
-        if (HashMap::m_buckets) {
+        if( HashMap::m_buckets )
+        {
             delete[] HashMap::m_buckets;
         }
-        HashMap::m_buckets = new Bucket[newCapacity];
-        std::memset(HashMap::m_buckets, 0, sizeof(Bucket) * newCapacity);
+        HashMap::m_buckets = new Bucket[ newCapacity ];
+        std::memset( HashMap::m_buckets, 0, sizeof( Bucket ) * newCapacity );
 
-        for (auto entry = HashMap::m_lastEntry; entry != nullptr; entry = entry->prev) {
-            insertEntry(entry, entry->hashCode);
+        for( auto entry = HashMap::m_lastEntry; entry != nullptr;
+             entry = entry->prev )
+        {
+            insertEntry( entry, entry->hashCode );
         }
     }
 
-private:
-    constexpr Bucket* bucketAt(std::size_t hashCode) const noexcept
+  private:
+    constexpr Bucket* bucketAt( std::size_t hashCode ) const noexcept
     {
-        return HashMap::m_buckets + HashingStrategy::hash(hashCode, HashMap::m_capacity);
+        return HashMap::m_buckets
+               + HashingStrategy::hash( hashCode, HashMap::m_capacity );
     }
 };
 

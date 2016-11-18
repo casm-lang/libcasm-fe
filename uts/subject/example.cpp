@@ -26,5 +26,5 @@
 #include "gtest/gtest.h"
 
 TEST( libcasm_fe__subject, example )
-{    
+{
 }

@@ -28,16 +28,16 @@
 
 #include <assert.h>
 
-#include <string>
-#include <map>
-#include <vector>
 #include <functional>
+#include <map>
+#include <string>
+#include <vector>
 
-#include <iostream>
+#include "Exceptions.h"
 #include "Types.h"
 #include "Value.h"
-#include "Exceptions.h"
 #include "various/location.hh" // reuse bison's location class
+#include <iostream>
 
 class ExpressionBase;
 class Expression;
@@ -46,101 +46,106 @@ class BuiltinAtom;
 class Driver;
 
 struct Builtin
-{    
-public:
+{
+  public:
     std::string name;
-    
+
     enum class Id
     // general built-ins
-    { IS_SYMBOLIC
+    {
+        IS_SYMBOLIC
 
-    // tuple and list built-ins
-    , NTH
-    , CONS
-    , APP
-    , LEN
-    , TAIL
-    , PEEK
+        // tuple and list built-ins
+        ,
+        NTH,
+        CONS,
+        APP,
+        LEN,
+        TAIL,
+        PEEK
 
-    // casting built-ins
-    , AS_INTEGER
-    , AS_BOOLEAN
-    , AS_FLOATING
-    , AS_BIT
-    , AS_ENUM
-    , AS_STRING
-    , AS_RATIONAL
-    
-    // stringify built-ins
-    , DEC
-    , HEX
-    , BIN
-    
-    // math built-ins
-    , POW
-    , RAND
+        // casting built-ins
+        ,
+        AS_INTEGER,
+        AS_BOOLEAN,
+        AS_FLOATING,
+        AS_BIT,
+        AS_ENUM,
+        AS_STRING,
+        AS_RATIONAL
 
-    // bit-vector built-ins
-    // TODO: PPA: CONTINUE HERE!!!
-    , ZEXT
-    , SEXT
-    , TRUNC
-    , SHL
-    , SHR
-    , ASHR
+        // stringify built-ins
+        ,
+        DEC,
+        HEX,
+        BIN
 
-    , ADDU
-    , SUBU
-    , MULU
-    , DIVU
-    , MODU
-    , GREU
-    , GEQU
-    , LESU
-    , LEQU
-    , EQUU
-    , NEQU
-    
-    , ADDS
-    , SUBS
-    , MULS
-    , DIVS
-    , MODS
-    , GRES
-    , GEQS
-    , LESS
-    , LEQS
-    , EQUS
-    , NEQS
-   
+        // math built-ins
+        ,
+        POW,
+        RAND
+
+        // bit-vector built-ins
+        // TODO: PPA: CONTINUE HERE!!!
+        ,
+        ZEXT,
+        SEXT,
+        TRUNC,
+        SHL,
+        SHR,
+        ASHR
+
+        ,
+        ADDU,
+        SUBU,
+        MULU,
+        DIVU,
+        MODU,
+        GREU,
+        GEQU,
+        LESU,
+        LEQU,
+        EQUU,
+        NEQU
+
+        ,
+        ADDS,
+        SUBS,
+        MULS,
+        DIVS,
+        MODS,
+        GRES,
+        GEQS,
+        LESS,
+        LEQS,
+        EQUS,
+        NEQS
+
     } id;
-    
-    
+
     std::vector< TypeType > ret_type;
     std::vector< std::vector< TypeType > > arg_type;
-    
-    std::function< void( Type*, std::vector< Type* >& )> unify_lambda;
-    std::function< void( Builtin&, Driver&, BuiltinAtom*, std::vector< Type* >& )> typecheck_lambda;
-    
-private:
+
+    std::function< void( Type*, std::vector< Type* >& ) > unify_lambda;
+    std::function< void(
+        Builtin&, Driver&, BuiltinAtom*, std::vector< Type* >& ) >
+        typecheck_lambda;
+
+  private:
     static std::map< Id, Builtin* > id2obj;
     static std::map< std::string, Builtin* > str2obj;
     static std::vector< Builtin > list;
-    
-public:
-    Builtin( const std::string name
-           , Id id
-           , std::vector< TypeType > ret_type
-           , std::vector< std::vector< TypeType >> arg_type
-           , std::function< void( Type*, std::vector< Type* >& )> unify
-             = [] ( Type* ret, std::vector< Type* >& arg )
-             {
-             }
-           , std::function< void( Builtin&, Driver&, BuiltinAtom*, std::vector< Type* >& )> typecheck
-             = [] ( Builtin& self, Driver& driver, BuiltinAtom* atom, std::vector< Type* >& arguments )
-             {
-             }
-           )
+
+  public:
+    Builtin( const std::string name, Id id, std::vector< TypeType > ret_type,
+        std::vector< std::vector< TypeType > > arg_type,
+        std::function< void( Type*, std::vector< Type* >& ) > unify
+        = []( Type* ret, std::vector< Type* >& arg ) {},
+        std::function< void(
+            Builtin&, Driver&, BuiltinAtom*, std::vector< Type* >& ) >
+            typecheck
+        = []( Builtin& self, Driver& driver, BuiltinAtom* atom,
+            std::vector< Type* >& arguments ) {} )
     : name( name )
     , id( id )
     , ret_type( ret_type )
@@ -150,25 +155,27 @@ public:
     {
         assert( !isBuiltin( id ) && "multiple IDs for built-ins symbol table" );
         id2obj[ id ] = this;
-        
-        assert( ! isBuiltin( name ) && "multiple names for built-ins symbol table" );
+
+        assert(
+            !isBuiltin( name ) && "multiple names for built-ins symbol table" );
         str2obj[ name ] = this;
     }
-    
+
     void unify( Type* ret, std::vector< Type* >& arg )
     {
         assert( ret && "invalid return Type pointer" );
 
         unify_lambda( ret, arg );
     }
-    
-    void typecheck( Driver& driver, BuiltinAtom* atom, std::vector<Type*>& arguments )
+
+    void typecheck(
+        Driver& driver, BuiltinAtom* atom, std::vector< Type* >& arguments )
     {
         assert( atom && "invalid BUILTIN AST atom pointer" );
-        
+
         typecheck_lambda( *this, driver, atom, arguments );
     }
-    
+
     static bool isBuiltin( const std::string& name )
     {
         if( str2obj.count( name ) != 0 )
@@ -177,7 +184,7 @@ public:
         }
         return false;
     }
-    
+
     static bool isBuiltin( Id id )
     {
         if( id2obj.count( id ) != 0 )
@@ -186,14 +193,16 @@ public:
         }
         return false;
     }
-    
+
     static Builtin* get( const std::string& name )
     {
-        //std::cout << std::string(__FUNCTION__) << ": lookup of '" << name << "'\n";
+        // std::cout << std::string(__FUNCTION__) << ": lookup of '" << name <<
+        // "'\n";
         auto result = str2obj.find( name );
         if( result != str2obj.end() )
         {
-            //std::cout << std::string(__FUNCTION__) << ": lookup of '" << name << "' @ '" << result->second << "'\n";
+            // std::cout << std::string(__FUNCTION__) << ": lookup of '" << name
+            // << "' @ '" << result->second << "'\n";
             return result->second;
         }
         else
@@ -216,44 +225,47 @@ public:
     }
 };
 
-
-
-class Symbol {
+class Symbol
+{
   public:
     const std::string name;
     const yy::location location;
 
-    enum class SymbolType {
-      FUNCTION,
-      DERIVED,
-      BUILTIN,
-      ENUM,
-      LET,
+    enum class SymbolType
+    {
+        FUNCTION,
+        DERIVED,
+        BUILTIN,
+        ENUM,
+        LET,
     };
-    
+
     SymbolType type;
 
-    Symbol(const std::string& name, const yy::location& location, SymbolType type);
+    Symbol( const std::string& name, const yy::location& location,
+        SymbolType type );
 };
 
-class Function : public Symbol {
+class Function : public Symbol
+{
   private:
     static uint64_t counter;
 
   public:
-    std::vector<Type*> arguments_;
+    std::vector< Type* > arguments_;
 
     union {
-      std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *intitializers_;
-      ExpressionBase *derived;
+        std::vector< std::pair< ExpressionBase*, ExpressionBase* > >*
+            intitializers_;
+        ExpressionBase* derived;
     };
 
-    Type *return_type_;
+    Type* return_type_;
     const uint64_t id;
 
-    std::map<std::string, size_t> binding_offsets;
+    std::map< std::string, size_t > binding_offsets;
     std::vector< const char* > parameter;
-    
+
     const bool is_static;
     const bool is_symbolic;
 
@@ -261,19 +273,25 @@ class Function : public Symbol {
     bool checkArguments;
     bool checkReturnValue;
 
-    Function(const std::string name, const yy::location& location, const std::vector<Type*>& args, Type* return_type,
-           std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *init);
-    Function(bool is_static, bool is_symbolic, const std::string name, const yy::location& location,
-             const std::vector<Type*>& args, Type* return_type,
-             std::vector<std::pair<ExpressionBase*, ExpressionBase*>> *init);
-    Function(const std::string name, const yy::location& location, const std::vector<Type*>& args, ExpressionBase *expr, Type* return_type);
-    Function(const std::string name, const yy::location& location, ExpressionBase *expr, Type *return_type);
+    Function( const std::string name, const yy::location& location,
+        const std::vector< Type* >& args, Type* return_type,
+        std::vector< std::pair< ExpressionBase*, ExpressionBase* > >* init );
+    Function( bool is_static, bool is_symbolic, const std::string name,
+        const yy::location& location, const std::vector< Type* >& args,
+        Type* return_type,
+        std::vector< std::pair< ExpressionBase*, ExpressionBase* > >* init );
+    Function( const std::string name, const yy::location& location,
+        const std::vector< Type* >& args, ExpressionBase* expr,
+        Type* return_type );
+    Function( const std::string name, const yy::location& location,
+        ExpressionBase* expr, Type* return_type );
     ~Function();
-    
-    bool equals(Function *other) const;
+
+    bool equals( Function* other ) const;
     const std::string to_str() const;
-    inline size_t argument_count() const {
-      return arguments_.size();
+    inline size_t argument_count() const
+    {
+        return arguments_.size();
     }
 
     bool is_builtin();
@@ -282,24 +300,27 @@ class Function : public Symbol {
     void initRangeCheck();
 };
 
-struct enum_value_t {
-  const std::string *name;
-  const uint16_t id;
+struct enum_value_t
+{
+    const std::string* name;
+    const uint16_t id;
 
-  enum_value_t(const std::string *name, const uint16_t id);
+    enum_value_t( const std::string* name, const uint16_t id );
 };
 
-class Enum : public Symbol {
+class Enum : public Symbol
+{
   public:
-    // TODO use unordered_map here, but ordering cannot be garantueed in 
+    // TODO use unordered_map here, but ordering cannot be garantueed in
     // forall
-    std::map<std::string, enum_value_t*> mapping;
+    std::map< std::string, enum_value_t* > mapping;
 
-    Enum(const std::string& name, const yy::location& location);
-    bool add_enum_element(const std::string& name);
+    Enum( const std::string& name, const yy::location& location );
+    bool add_enum_element( const std::string& name );
 };
 
-class Binding {
+class Binding
+{
   private:
     static uint64_t counter;
 
@@ -308,13 +329,14 @@ class Binding {
     const std::string name;
     Type type;
 
-    Binding(const std::string& name);
-    Binding(const std::string& name, Type t);
+    Binding( const std::string& name );
+    Binding( const std::string& name, Type t );
 };
 
-class SymbolTable {
+class SymbolTable
+{
   public:
-    std::map<std::string, Symbol*> table_;
+    std::map< std::string, Symbol* > table_;
 
     SymbolTable();
 
@@ -326,24 +348,24 @@ class SymbolTable {
      * @throws SymbolAlreadyExists when the symbol table contains a symbol with
      *         the same name as the name of \a sym.
      */
-    void add(Symbol *sym);
+    void add( Symbol* sym );
 
-    bool remove(const std::string &name);
+    bool remove( const std::string& name );
 
     /**
      * @throws SymbolAlreadyExists when the symbol table contains a symbol with
      *         the same name as \a name.
      */
-    void add_enum_element(const std::string& name, Enum *enum_);
+    void add_enum_element( const std::string& name, Enum* enum_ );
 
-    Symbol* get(const std::string& name) const;
+    Symbol* get( const std::string& name ) const;
 
-    Function* get_function(const std::string& name) const;
+    Function* get_function( const std::string& name ) const;
 
-    Enum* get_enum(const std::string& name) const;
+    Enum* get_enum( const std::string& name ) const;
 
   private:
-    void add_or_throw(const std::string& name, Symbol *sym);
+    void add_or_throw( const std::string& name, Symbol* sym );
 };
 
 #endif

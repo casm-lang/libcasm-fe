@@ -26,12 +26,12 @@
 #ifndef _BLOCK_ALLOCATOR_H
 #define _BLOCK_ALLOCATOR_H
 
-#include <cassert>
-#include <memory>
 #include <algorithm>
+#include <cassert>
 #include <cstdlib>
+#include <memory>
 
-template<size_t BlockSize>
+template < size_t BlockSize >
 class BlockAllocator
 {
     /**
@@ -41,12 +41,13 @@ class BlockAllocator
      */
     class Block
     {
-    public:
-        explicit Block(Block* previous = nullptr) :
-            m_freePosition((char*)this + sizeof(Block)),
-            m_previous(previous)
+      public:
+        explicit Block( Block* previous = nullptr )
+        : m_freePosition( (char*)this + sizeof( Block ) )
+        , m_previous( previous )
         {
-            if (previous) {
+            if( previous )
+            {
                 previous->m_next = this;
             }
         }
@@ -71,9 +72,9 @@ class BlockAllocator
             return m_next;
         }
 
-        void *allocate(const size_t n) noexcept
+        void* allocate( const size_t n ) noexcept
         {
-            assert(n <= (BlockSize - sizeof(Block)));
+            assert( n <= ( BlockSize - sizeof( Block ) ) );
 
             const auto addr = m_freePosition;
             m_freePosition += n;
@@ -84,22 +85,26 @@ class BlockAllocator
         /**
          * Optimized for stack-like allocation/deallocation
          */
-        void deallocate(void* addr, const size_t n) noexcept
+        void deallocate( void* addr, const size_t n ) noexcept
         {
-            assert(n <= m_usage);
+            assert( n <= m_usage );
 
             m_usage -= n;
-            if (m_usage == 0) {
+            if( m_usage == 0 )
+            {
                 free();
-            } else if (((char*)addr + n) == m_freePosition) {
-                // only decrease the position if deallocation happens in reversed order
+            }
+            else if( ( (char*)addr + n ) == m_freePosition )
+            {
+                // only decrease the position if deallocation happens in
+                // reversed order
                 m_freePosition -= n;
             }
         }
 
-        void reset(void* addr) noexcept
+        void reset( void* addr ) noexcept
         {
-            const auto beg = (char*)this + sizeof(Block);
+            const auto beg = (char*)this + sizeof( Block );
 
             m_freePosition = (char*)addr;
             m_usage = m_freePosition - beg;
@@ -107,19 +112,19 @@ class BlockAllocator
 
         void free() noexcept
         {
-            const auto beg = (char*)this + sizeof(Block);
+            const auto beg = (char*)this + sizeof( Block );
 
             m_usage = 0;
             m_freePosition = beg;
         }
 
-    private:
-        Block(const Block&) = delete;
-        Block& operator=(const Block&) = delete;
-        Block(Block&&) = delete;
-        Block& operator=(Block&&) = delete;
+      private:
+        Block( const Block& ) = delete;
+        Block& operator=( const Block& ) = delete;
+        Block( Block&& ) = delete;
+        Block& operator=( Block&& ) = delete;
 
-    private:
+      private:
         size_t m_usage = 0;
         char* m_freePosition;
         Block* m_next = nullptr;
@@ -128,21 +133,24 @@ class BlockAllocator
 
     class MemoryPool
     {
-    public:
+      public:
         void* get()
         {
-            if (m_freeMemory) {
+            if( m_freeMemory )
+            {
                 auto memory = m_freeMemory;
-                m_freeMemory = reinterpret_cast<void**>(*memory);
-                return reinterpret_cast<void*>(memory);
-            } else {
-                return aligned_alloc(BlockSize, BlockSize);
+                m_freeMemory = reinterpret_cast< void** >( *memory );
+                return reinterpret_cast< void* >( memory );
+            }
+            else
+            {
+                return aligned_alloc( BlockSize, BlockSize );
             }
         }
 
-        void release(void* memory)
+        void release( void* memory )
         {
-            auto p = reinterpret_cast<void**>(memory);
+            auto p = reinterpret_cast< void** >( memory );
             *p = m_freeMemory; // build a linked-list
             m_freeMemory = p;
         }
@@ -153,72 +161,86 @@ class BlockAllocator
             return instance;
         }
 
-    private:
+      private:
         MemoryPool() = default;
-        MemoryPool(const MemoryPool&) = delete;
-        MemoryPool& operator=(const MemoryPool&) = delete;
-        MemoryPool(MemoryPool&&) = delete;
-        MemoryPool& operator=(MemoryPool&&) = delete;
+        MemoryPool( const MemoryPool& ) = delete;
+        MemoryPool& operator=( const MemoryPool& ) = delete;
+        MemoryPool( MemoryPool&& ) = delete;
+        MemoryPool& operator=( MemoryPool&& ) = delete;
 
-    private:
+      private:
         void** m_freeMemory = nullptr; // linked list of free memory blocks
     };
 
-public:
+  public:
     BlockAllocator()
     {
-        static_assert(BlockSize > sizeof(Block), "block size must be larger than the management information of the block");
-        static_assert((BlockSize & (BlockSize - 1)) == 0, "block size must be a power of two");
+        static_assert( BlockSize > sizeof( Block ),
+            "block size must be larger than the management information of the "
+            "block" );
+        static_assert( ( BlockSize & ( BlockSize - 1 ) ) == 0,
+            "block size must be a power of two" );
     }
 
-    BlockAllocator(BlockAllocator&& other)
+    BlockAllocator( BlockAllocator&& other )
     {
-        std::swap(m_topBlock, other.m_topBlock);
-        std::swap(m_currentBlock, other.m_currentBlock);
+        std::swap( m_topBlock, other.m_topBlock );
+        std::swap( m_currentBlock, other.m_currentBlock );
     }
 
     ~BlockAllocator()
     {
-        for (auto block = m_topBlock; block != nullptr;) {
+        for( auto block = m_topBlock; block != nullptr; )
+        {
             const auto b = block;
             block = block->previous();
-            MemoryPool::instance().release(b);
+            MemoryPool::instance().release( b );
         }
     }
 
-    BlockAllocator& operator=(BlockAllocator&& other) noexcept
+    BlockAllocator& operator=( BlockAllocator&& other ) noexcept
     {
-        std::swap(m_topBlock, other.m_topBlock);
-        std::swap(m_currentBlock, other.m_currentBlock);
+        std::swap( m_topBlock, other.m_topBlock );
+        std::swap( m_currentBlock, other.m_currentBlock );
         return *this;
     }
 
-    void* allocate(const size_t n)
+    void* allocate( const size_t n )
     {
-        if (n > (BlockSize - sizeof(Block))) {
-            throw std::length_error("requested size was larger than the block size");
+        if( n > ( BlockSize - sizeof( Block ) ) )
+        {
+            throw std::length_error(
+                "requested size was larger than the block size" );
         }
 
-        if (m_currentBlock == nullptr) {
+        if( m_currentBlock == nullptr )
+        {
             m_currentBlock = allocateNewBlock();
-        } else if (m_currentBlock->remaining() < n) {
-            if (m_currentBlock->next()) {
+        }
+        else if( m_currentBlock->remaining() < n )
+        {
+            if( m_currentBlock->next() )
+            {
                 m_currentBlock = m_currentBlock->next();
-            } else {
+            }
+            else
+            {
                 m_currentBlock = allocateNewBlock();
             }
         }
 
-        return m_currentBlock->allocate(n);
+        return m_currentBlock->allocate( n );
     }
 
-    void deallocate(void* addr, const size_t n)
+    void deallocate( void* addr, const size_t n )
     {
-        const auto block = blockFor(addr);
-        block->deallocate(addr, n);
+        const auto block = blockFor( addr );
+        block->deallocate( addr, n );
 
-        if (block == m_currentBlock) {
-            while (m_currentBlock->isEmpty() && m_currentBlock->previous()) {
+        if( block == m_currentBlock )
+        {
+            while( m_currentBlock->isEmpty() && m_currentBlock->previous() )
+            {
                 m_currentBlock = m_currentBlock->previous();
             }
         }
@@ -227,15 +249,18 @@ public:
     /**
      * Resets the stack top position to the given address \a addr.
      *
-     * @note Use this method only if you use this allocator as a stack allocator!
+     * @note Use this method only if you use this allocator as a stack
+     * allocator!
      */
-    void reset(void* addr)
+    void reset( void* addr )
     {
-        m_currentBlock = blockFor(addr);
-        m_currentBlock->reset(addr);
+        m_currentBlock = blockFor( addr );
+        m_currentBlock->reset( addr );
 
         // free subsequent blocks
-        for (auto block = m_currentBlock->next(); block != nullptr; block = block->next()) {
+        for( auto block = m_currentBlock->next(); block != nullptr;
+             block = block->next() )
+        {
             block->free();
         }
     }
@@ -243,35 +268,41 @@ public:
     void freeAll()
     {
         auto currentBlock = m_currentBlock;
-        for (auto block = currentBlock; block != nullptr; block = block->previous()) {
+        for( auto block = currentBlock; block != nullptr;
+             block = block->previous() )
+        {
             currentBlock = block;
             block->free();
         }
         m_currentBlock = currentBlock;
     }
 
-private:
-    BlockAllocator(const BlockAllocator&) = delete;
-    BlockAllocator& operator=(const BlockAllocator&) = delete;
+  private:
+    BlockAllocator( const BlockAllocator& ) = delete;
+    BlockAllocator& operator=( const BlockAllocator& ) = delete;
 
     Block* allocateNewBlock()
     {
         const auto memory = MemoryPool::instance().get();
-        const auto block = new(memory) Block(m_topBlock);
+        const auto block = new( memory ) Block( m_topBlock );
         m_topBlock = block;
         return block;
     }
 
     /**
-     * Uses the fact that all blocks are BlockSize-aligned and the BlockSize is 2^n
+     * Uses the fact that all blocks are BlockSize-aligned and the BlockSize is
+     * 2^n
      */
-    static Block* blockFor(void* addr)
+    static Block* blockFor( void* addr )
     {
-        return reinterpret_cast<Block*>(reinterpret_cast<uintptr_t>(addr) & ~reinterpret_cast<uintptr_t>(BlockSize - 1));
+        return reinterpret_cast< Block* >(
+            reinterpret_cast< uintptr_t >( addr )
+            & ~reinterpret_cast< uintptr_t >( BlockSize - 1 ) );
     }
 
-private:
-    Block* m_topBlock = nullptr; // used in allocateNewBlock to build a linked list
+  private:
+    Block* m_topBlock
+        = nullptr; // used in allocateNewBlock to build a linked list
     Block* m_currentBlock = nullptr;
 };
 

@@ -29,38 +29,33 @@
 
 using namespace libcasm_fe;
 
-extern Driver *global_driver;
+extern Driver* global_driver;
 
 char SourceToAstPass::id = 0;
 
-static libpass::PassRegistration< SourceToAstPass > PASS
-( "Source To AST Pass"
-, "parse the source code and generate an AST"
-, "ast-parse"
-, 0
-);
-
+static libpass::PassRegistration< SourceToAstPass > PASS( "Source To AST Pass",
+    "parse the source code and generate an AST", "ast-parse", 0 );
 
 // PPA: TODO: dependency INPUT FILE
 
 bool SourceToAstPass::run( libpass::PassResult& pr )
 {
     const char* file_name = (const char*)pr.getResults()[ 0 ];
-    
-        global_driver = new Driver;
-    
-        Ast* node = global_driver->parse(file_name);
-    
-    if( !node ) 
+
+    global_driver = new Driver;
+
+    Ast* node = global_driver->parse( file_name );
+
+    if( !node )
     {
         // TODO: FIXME: PPA: better error messages,
         // can be improved with the new libstdhl Verbose support
 
         std::cerr << "Error parsing file" << std::endl;
-        
+
         return false;
     }
-    
+
     assert( node->getElements() );
     for( auto e : node->getElements()->nodes )
     {
@@ -69,14 +64,13 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
             node->setInitRule( (InitNode*)e );
         }
     }
-    
+
     pr.setResult< SourceToAstPass >( node );
-    
+
     return true;
 }
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -84,4 +78,4 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//

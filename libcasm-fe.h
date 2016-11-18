@@ -40,7 +40,7 @@ namespace libcasm_fe
 
 #endif /* _LIB_CASMFE_H_ */
 
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -48,4 +48,4 @@ namespace libcasm_fe
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//

@@ -26,100 +26,137 @@
 #ifndef _LIB_CASMFE_CODES_H_
 #define _LIB_CASMFE_CODES_H_
 
-
 namespace libcasm_fe
 {
     enum class Codes
-    // --------------------------------------------------------- 0*** ... generic syntax error
-    { SyntaxError                                   = 0x0000  // 00** ... syntax/grammar
-    , SyntaxErrorUnrecognizedCharacter              = 0x0001
-    , SyntaxErrorUnclosedString                     = 0x0002
-    , SyntaxErrorInvalidStatement                   = 0x0003
+    // --------------------------------------------------------- 0*** ...
+    // generic syntax error
+    {
+        SyntaxError = 0x0000 // 00** ... syntax/grammar
+        ,
+        SyntaxErrorUnrecognizedCharacter = 0x0001,
+        SyntaxErrorUnclosedString = 0x0002,
+        SyntaxErrorInvalidStatement = 0x0003
 
-    , IdentifierAlreadyUsed                         = 0x0010
-            
-    // --------------------------------------------------------- f*** ... function errors
-    , FunctionAttributeIsInvalid                    = 0xfa00  // fa** ... function attribute
-    , FunctionAttributeMultipleUseOfStatic          = 0xfa01
-    , FunctionAttributeMultipleUseOfSymbolic        = 0xfa02
-    , FunctionAttributeMultipleUseOfControlled      = 0xfa03
-    , FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
-    
-    , FunctionArgumentsInvalidRangeAtLookup         = 0xfe00  // fe** ... function argument
-    , FunctionArgumentsInvalidRangeAtUpdate         = 0xfe01
-    , FunctionArgumentsInvalidRangeAtInitially      = 0xfe02
-    
-    , FunctionValueInvalidRangeAtUpdate             = 0xfd00  // fd** ... function value
-    , FunctionValueInvalidRangeAtInitially          = 0xfd01
-    , FunctionValueAlreadyInitializedAtInitially    = 0xfd02
-            
-    , FunctionIdentifierIsBuiltinName               = 0xf100  // f1** ... function identifer
-    
+        ,
+        IdentifierAlreadyUsed = 0x0010
 
-    // --------------------------------------------------------- d*** ... derived errors
-    , DerivedArgumentsInvalidRangeAtLookup          = 0xda00  // da** ... derived argment
-    , DerivedExpressionInvalidType                  = 0xde00  // de** ... derived expression
-    
+        // --------------------------------------------------------- f*** ...
+        // function errors
+        ,
+        FunctionAttributeIsInvalid = 0xfa00 // fa** ... function attribute
+        ,
+        FunctionAttributeMultipleUseOfStatic = 0xfa01,
+        FunctionAttributeMultipleUseOfSymbolic = 0xfa02,
+        FunctionAttributeMultipleUseOfControlled = 0xfa03,
+        FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
 
-    // --------------------------------------------------------- 5*** ... statement errors       
-    , RuleArgumentsInvalidRangeAtCall               = 0x5e00  // 5e** ... rule argument
-    , RuleArgumentsSizeInvalidAtCall                = 0x5e01 
-    , RuleArgumentsTypeInvalidAtCall                = 0x5e02
+        ,
+        FunctionArgumentsInvalidRangeAtLookup
+        = 0xfe00 // fe** ... function argument
+        ,
+        FunctionArgumentsInvalidRangeAtUpdate = 0xfe01,
+        FunctionArgumentsInvalidRangeAtInitially = 0xfe02
 
-    , RuleArgumentsInvalidRangeAtIndirectCall       = 0x5e03
-    , RuleArgumentsSizeInvalidAtIndirectCall        = 0x5e04
-    , RuleArgumentsTypeInvalidAtIndirectCall        = 0x5e05
+        ,
+        FunctionValueInvalidRangeAtUpdate = 0xfd00 // fd** ... function value
+        ,
+        FunctionValueInvalidRangeAtInitially = 0xfd01,
+        FunctionValueAlreadyInitializedAtInitially = 0xfd02
 
-    , CaseLabelMultipleUseOfDefault                 = 0x5c00  // 5c** ... case errors
-            
-    , AssertInvalidExpression                       = 0x5a00  // 5a** ... assert errors
-    
-    // --------------------------------------------------------- a*** ... agent errors
-    , AgentInitRuleDoesNotExist                     = 0xa000 
-    , AgentInitRuleMultipleDefinitions              = 0xa001 
-    
-    // --------------------------------------------------------- 1*** ... type check errors
-    , TypeInferenceInvalidLet                       = 0x1000
-    , TypeInferenceInvalidExpression                = 0x1001
-    , TypeInferenceInvalidPrint                     = 0x1002
+        ,
+        FunctionIdentifierIsBuiltinName = 0xf100 // f1** ... function identifer
 
-    , TypeInferenceInvalidIfExpression              = 0x1003
-    , TypeInferenceInvalidForallExpression          = 0x1004
-    
-            
-    , TypeIntegerRangedInvalidInterval              = 0x2000  // 2*** ... Integer type error
+        // --------------------------------------------------------- d*** ...
+        // derived errors
+        ,
+        DerivedArgumentsInvalidRangeAtLookup
+        = 0xda00 // da** ... derived argment
+        ,
+        DerivedExpressionInvalidType = 0xde00 // de** ... derived expression
 
-    , TypeNumberRangeInvalidTypeAtLeftHandSide      = 0x3000  // 3*** ... Number range type error
-    , TypeNumberRangeInvalidTypeAtRightHandSide     = 0x3001  // 3*** ... Number range type error
-    
-    // --------------------------------------------------------- 8*** ... operator errors
-    , OperatorAddInvalidOperandType                 = 0x8000
-            
-    // --------------------------------------------------------- b*** ... bit type errors
-    , TypeBitSyntaxError                            = 0xb000
-    , TypeBitSizeIsInvalid                          = 0xb001
-    , TypeBitSizeInvalidExpression                  = 0xb002
+        // --------------------------------------------------------- 5*** ...
+        // statement errors
+        ,
+        RuleArgumentsInvalidRangeAtCall = 0x5e00 // 5e** ... rule argument
+        ,
+        RuleArgumentsSizeInvalidAtCall = 0x5e01,
+        RuleArgumentsTypeInvalidAtCall = 0x5e02
 
-    , TypeBitSizeInvalidInLetExpression             = 0xb003
-    , TypeBitSizeInvalidInIninitallyExpression      = 0xb004
+        ,
+        RuleArgumentsInvalidRangeAtIndirectCall = 0x5e03,
+        RuleArgumentsSizeInvalidAtIndirectCall = 0x5e04,
+        RuleArgumentsTypeInvalidAtIndirectCall = 0x5e05
 
-    // --------------------------------------------------------- 7*** ... update set errors
-    , UpdateSetClash                                = 0x7000
-    , UpdateSetMergeConflict                        = 0x7001
-    
-    // --------------------------------------------------------- fff* ... not categorized errors
-    , TypeUnknown                                   = 0xfffd
-    , TypeUnsupported                               = 0xfffe
+        ,
+        CaseLabelMultipleUseOfDefault = 0x5c00 // 5c** ... case errors
 
-    , Unspecified                                   = 0xffff
+        ,
+        AssertInvalidExpression = 0x5a00 // 5a** ... assert errors
+
+        // --------------------------------------------------------- a*** ...
+        // agent errors
+        ,
+        AgentInitRuleDoesNotExist = 0xa000,
+        AgentInitRuleMultipleDefinitions = 0xa001
+
+        // --------------------------------------------------------- 1*** ...
+        // type check errors
+        ,
+        TypeInferenceInvalidLet = 0x1000,
+        TypeInferenceInvalidExpression = 0x1001,
+        TypeInferenceInvalidPrint = 0x1002
+
+        ,
+        TypeInferenceInvalidIfExpression = 0x1003,
+        TypeInferenceInvalidForallExpression = 0x1004
+
+        ,
+        TypeIntegerRangedInvalidInterval = 0x2000 // 2*** ... Integer type error
+
+        ,
+        TypeNumberRangeInvalidTypeAtLeftHandSide
+        = 0x3000 // 3*** ... Number range type error
+        ,
+        TypeNumberRangeInvalidTypeAtRightHandSide
+        = 0x3001 // 3*** ... Number range type error
+
+        // --------------------------------------------------------- 8*** ...
+        // operator errors
+        ,
+        OperatorAddInvalidOperandType = 0x8000
+
+        // --------------------------------------------------------- b*** ...
+        // bit type errors
+        ,
+        TypeBitSyntaxError = 0xb000,
+        TypeBitSizeIsInvalid = 0xb001,
+        TypeBitSizeInvalidExpression = 0xb002
+
+        ,
+        TypeBitSizeInvalidInLetExpression = 0xb003,
+        TypeBitSizeInvalidInIninitallyExpression = 0xb004
+
+        // --------------------------------------------------------- 7*** ...
+        // update set errors
+        ,
+        UpdateSetClash = 0x7000,
+        UpdateSetMergeConflict = 0x7001
+
+        // --------------------------------------------------------- fff* ...
+        // not categorized errors
+        ,
+        TypeUnknown = 0xfffd,
+        TypeUnsupported = 0xfffe
+
+        ,
+        Unspecified = 0xffff
     };
-    
 }
 
 #endif /* _LIB_CASMFE_CODES_H_ */
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -127,4 +164,4 @@ namespace libcasm_fe
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//

@@ -36,10 +36,9 @@
 #include "src/execute/NumericExecutionPass.h"
 #include "src/execute/SymbolicExecutionPass.h"
 
-
 #endif /* _LIB_CASMFE_ALL_H_ */
 
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -47,4 +46,4 @@
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//

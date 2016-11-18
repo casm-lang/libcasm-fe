@@ -29,14 +29,15 @@
 #include <cstdint>
 #include <iostream>
 
-#include "Types.h"
 #include "Driver.h"
+#include "Types.h"
 
 #include "various/GrammarParser.tab.h"
 
-
-INTEGER_T convert_to_long(const char* val, int base, Driver &driver, yy::location loc);
-FLOATING_T convert_to_float(const char* val, Driver &driver, yy::location loc);
-rational_t convert_to_rational(char* val, Driver &driver, yy::location loc);
+INTEGER_T convert_to_long(
+    const char* val, int base, Driver& driver, yy::location loc );
+FLOATING_T convert_to_float(
+    const char* val, Driver& driver, yy::location loc );
+rational_t convert_to_rational( char* val, Driver& driver, yy::location loc );
 
 #endif

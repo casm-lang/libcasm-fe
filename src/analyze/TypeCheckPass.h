@@ -26,14 +26,14 @@
 #ifndef _LIB_CASMFE_TYPECHECKPASS_H_
 #define _LIB_CASMFE_TYPECHECKPASS_H_
 
-#include "libpass.h"
 #include "libcasm-fe.all.h"
+#include "libpass.h"
 
 #include "../TypeCheckVisitor.h"
 
 /**
    @brief    TODO
-   
+
    TODO
 */
 
@@ -41,17 +41,16 @@ namespace libcasm_fe
 {
     class TypeCheckPass : public libpass::Pass
     {
-    public:
+      public:
         static char id;
-    
-    virtual bool run( libpass::PassResult& pr );
+
+        virtual bool run( libpass::PassResult& pr );
     };
 }
 
 #endif /* _LIB_CASMFE_TYPECHECKPASS_H_ */
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil

@@ -26,14 +26,14 @@
 #ifndef _LIB_CASMFE_ASTDUMPPASS_H_
 #define _LIB_CASMFE_ASTDUMPPASS_H_
 
-#include "libpass.h"
 #include "libcasm-fe.all.h"
+#include "libpass.h"
 
 #include "../AstDumpVisitor.h"
 
 /**
    @brief    TODO
-   
+
    TODO
 */
 
@@ -41,17 +41,16 @@ namespace libcasm_fe
 {
     class AstDumpPass : public libpass::Pass, AstDumpVisitor
     {
-    public:
+      public:
         static char id;
-        
+
         virtual bool run( libpass::PassResult& pr );
     };
 }
-    
+
 #endif /* _LIB_CASMFE_ASTDUMPPASS_H_ */
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -59,4 +58,4 @@ namespace libcasm_fe
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//

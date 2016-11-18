@@ -28,14 +28,12 @@
 #include <algorithm>
 #include <cassert>
 
-UpdateSet::Conflict::Conflict(const std::string& msg,
-                              Update* conflictingUpdate,
-                              Update* existingUpdate) :
-    std::logic_error(msg),
-    m_conflictingUpdate(conflictingUpdate),
-    m_existingUpdate(existingUpdate)
+UpdateSet::Conflict::Conflict(
+    const std::string& msg, Update* conflictingUpdate, Update* existingUpdate )
+: std::logic_error( msg )
+, m_conflictingUpdate( conflictingUpdate )
+, m_existingUpdate( existingUpdate )
 {
-
 }
 
 Update* UpdateSet::Conflict::conflictingUpdate() const noexcept
@@ -48,11 +46,10 @@ Update* UpdateSet::Conflict::existingUpdate() const noexcept
     return m_existingUpdate;
 }
 
-UpdateSet::UpdateSet(std::size_t initialSize, UpdateSet* parent) :
-    m_set(initialSize),
-    m_parent(parent)
+UpdateSet::UpdateSet( std::size_t initialSize, UpdateSet* parent )
+: m_set( initialSize )
+, m_parent( parent )
 {
-
 }
 
 bool UpdateSet::empty() const noexcept
@@ -65,36 +62,43 @@ std::size_t UpdateSet::size() const noexcept
     return m_set.size();
 }
 
-Update* UpdateSet::lookup(const value_t* location) const noexcept
+Update* UpdateSet::lookup( const value_t* location ) const noexcept
 {
-    if (m_parent) {
-        return m_parent->lookup(location);
+    if( m_parent )
+    {
+        return m_parent->lookup( location );
     }
 
     return nullptr;
 }
 
-UpdateSet *UpdateSet::fork(UpdateSet::Type updateSetType, std::size_t initialSize)
+UpdateSet* UpdateSet::fork(
+    UpdateSet::Type updateSetType, std::size_t initialSize )
 {
-    switch (updateSetType) {
-    case Type::Sequential:
-        return new SequentialUpdateSet(initialSize, this);
-    case Type::Parallel:
-        return new ParallelUpdateSet(initialSize, this);
+    switch( updateSetType )
+    {
+        case Type::Sequential:
+            return new SequentialUpdateSet( initialSize, this );
+        case Type::Parallel:
+            return new ParallelUpdateSet( initialSize, this );
     }
 }
 
 void UpdateSet::merge()
 {
-    assert(m_parent != nullptr);
+    assert( m_parent != nullptr );
 
-    if (m_parent->m_set.empty()) {
-        std::swap(m_parent->m_set, m_set);
-    } else {
-        m_parent->m_set.reserve(m_parent->m_set.size() + m_set.size());
+    if( m_parent->m_set.empty() )
+    {
+        std::swap( m_parent->m_set, m_set );
+    }
+    else
+    {
+        m_parent->m_set.reserve( m_parent->m_set.size() + m_set.size() );
         const auto end = m_set.end();
-        for (auto it = m_set.begin(); it != end; ++it) {
-            m_parent->add(it.key(), it.value());
+        for( auto it = m_set.begin(); it != end; ++it )
+        {
+            m_parent->add( it.key(), it.value() );
         }
     }
 }
@@ -109,10 +113,10 @@ typename UpdateSet::const_iterator UpdateSet::end() const noexcept
     return m_set.end();
 }
 
-Update* UpdateSet::get(const value_t* location) const noexcept
+Update* UpdateSet::get( const value_t* location ) const noexcept
 {
-    const auto it = m_set.find(location);
-    return (it != m_set.end()) ? it.value() : nullptr;
+    const auto it = m_set.find( location );
+    return ( it != m_set.end() ) ? it.value() : nullptr;
 }
 
 UpdateSet::Type SequentialUpdateSet::type() const noexcept
@@ -120,19 +124,20 @@ UpdateSet::Type SequentialUpdateSet::type() const noexcept
     return Type::Sequential;
 }
 
-void SequentialUpdateSet::add(const value_t* location, Update* update)
+void SequentialUpdateSet::add( const value_t* location, Update* update )
 {
-    m_set.insertOrAssign(location, update);
+    m_set.insertOrAssign( location, update );
 }
 
-Update* SequentialUpdateSet::lookup(const value_t* location) const noexcept
+Update* SequentialUpdateSet::lookup( const value_t* location ) const noexcept
 {
-    const auto it = m_set.find(location);
-    if (it != m_set.end()) {
+    const auto it = m_set.find( location );
+    if( it != m_set.end() )
+    {
         return it.value();
     }
 
-    return UpdateSet::lookup(location);
+    return UpdateSet::lookup( location );
 }
 
 UpdateSet::Type ParallelUpdateSet::type() const noexcept
@@ -140,23 +145,24 @@ UpdateSet::Type ParallelUpdateSet::type() const noexcept
     return Type::Parallel;
 }
 
-void ParallelUpdateSet::add(const value_t* location, Update* update)
+void ParallelUpdateSet::add( const value_t* location, Update* update )
 {
-    const auto result = m_set.insert(location, update);
-    if (!result.second) {
+    const auto result = m_set.insert( location, update );
+    if( !result.second )
+    {
         const auto it = result.first;
         const auto existingUpdate = it.value();
 
-        if (update->value != existingUpdate->value) {
-            throw Conflict("Conflict in updateset", update, existingUpdate);
+        if( update->value != existingUpdate->value )
+        {
+            throw Conflict( "Conflict in updateset", update, existingUpdate );
         }
     }
 }
 
-UpdateSetManager::UpdateSetManager() :
-    m_updateSets()
+UpdateSetManager::UpdateSetManager()
+: m_updateSets()
 {
-
 }
 
 UpdateSetManager::~UpdateSetManager()
@@ -164,41 +170,51 @@ UpdateSetManager::~UpdateSetManager()
     clear();
 }
 
-void UpdateSetManager::add(const value_t* location, Update* update)
+void UpdateSetManager::add( const value_t* location, Update* update )
 {
-    currentUpdateSet()->add(location, update);
+    currentUpdateSet()->add( location, update );
 }
 
-Update* UpdateSetManager::lookup(const value_t* location) const noexcept
+Update* UpdateSetManager::lookup( const value_t* location ) const noexcept
 {
-    if (m_updateSets.empty()) {
+    if( m_updateSets.empty() )
+    {
         return nullptr;
-    } else {
-        return currentUpdateSet()->lookup(location);
+    }
+    else
+    {
+        return currentUpdateSet()->lookup( location );
     }
 }
 
-void UpdateSetManager::fork(UpdateSet::Type updateSetType, std::size_t initialSize)
+void UpdateSetManager::fork(
+    UpdateSet::Type updateSetType, std::size_t initialSize )
 {
-    if (m_updateSets.empty()) {
-        switch (updateSetType) {
-        case UpdateSet::Type::Sequential:
-            m_updateSets.push(new SequentialUpdateSet(initialSize));
-            break;
-        case UpdateSet::Type::Parallel:
-            m_updateSets.push(new ParallelUpdateSet(initialSize));
-            break;
+    if( m_updateSets.empty() )
+    {
+        switch( updateSetType )
+        {
+            case UpdateSet::Type::Sequential:
+                m_updateSets.push( new SequentialUpdateSet( initialSize ) );
+                break;
+            case UpdateSet::Type::Parallel:
+                m_updateSets.push( new ParallelUpdateSet( initialSize ) );
+                break;
         }
-    } else {
+    }
+    else
+    {
         const auto updateSet = currentUpdateSet();
-        const auto forkedUpdateSet = updateSet->fork(updateSetType, initialSize);
-        m_updateSets.push(forkedUpdateSet);
+        const auto forkedUpdateSet
+            = updateSet->fork( updateSetType, initialSize );
+        m_updateSets.push( forkedUpdateSet );
     }
 }
 
 void UpdateSetManager::merge()
 {
-    if (size() > 1) {
+    if( size() > 1 )
+    {
         const auto updateSet = currentUpdateSet();
         updateSet->merge();
         m_updateSets.pop();
@@ -208,7 +224,8 @@ void UpdateSetManager::merge()
 
 void UpdateSetManager::clear()
 {
-    while (not m_updateSets.empty()) {
+    while( not m_updateSets.empty() )
+    {
         delete m_updateSets.top();
         m_updateSets.pop();
     }
@@ -216,7 +233,7 @@ void UpdateSetManager::clear()
 
 UpdateSet* UpdateSetManager::currentUpdateSet() const
 {
-    assert(not m_updateSets.empty());
+    assert( not m_updateSets.empty() );
     return m_updateSets.top();
 }
 

@@ -25,8 +25,9 @@
 
 #include "FunctionCycleVisitor.h"
 
-bool InitCycleVisitor::visit_function_atom( FunctionAtom *atom, std::vector<bool>& )
+bool InitCycleVisitor::visit_function_atom(
+    FunctionAtom* atom, std::vector< bool >& )
 {
-    dependency_names.insert(atom->name);
+    dependency_names.insert( atom->name );
     return true;
 }

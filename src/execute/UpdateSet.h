@@ -26,8 +26,8 @@
 #ifndef _LIB_CASMFE_UPDATESET_H_
 #define _LIB_CASMFE_UPDATESET_H_
 
-#include <stdexcept>
 #include <stack>
+#include <stdexcept>
 
 #include "../Value.h"
 #include "../various/location.hh"
@@ -39,16 +39,18 @@
 struct LocationHash
 {
     /**
-     * Directly using a value_t pointer as hash value has the problem that the first
-     * 4 bits of the hash value are always 0, because the size of value_t is 16 bytes.
+     * Directly using a value_t pointer as hash value has the problem that the
+     * first
+     * 4 bits of the hash value are always 0, because the size of value_t is 16
+     * bytes.
      * Some bit shifting avoids this problem.
      *
      * Forumla is from LLVM's DenseMapInfo<T*>
      */
-    std::size_t operator()(const value_t* location) const
+    std::size_t operator()( const value_t* location ) const
     {
-        return (reinterpret_cast<std::uintptr_t>(location) >> 4) ^
-               (reinterpret_cast<std::uintptr_t>(location) >> 9);
+        return ( reinterpret_cast< std::uintptr_t >( location ) >> 4 )
+               ^ ( reinterpret_cast< std::uintptr_t >( location ) >> 9 );
     }
 };
 
@@ -58,8 +60,10 @@ struct LocationHash
 struct Update
 {
     value_t value; /**< The value of the update */
-    const std::vector<value_t>* args; /**< The function arguments of the update */
-    const yy::location* location; /**< The source-code location of the update producer */
+    const std::vector< value_t >*
+        args; /**< The function arguments of the update */
+    const yy::location*
+        location;  /**< The source-code location of the update producer */
     uint32_t func; /**< The function uid of the update */
 };
 
@@ -68,13 +72,13 @@ struct Update
  */
 class UpdateSet
 {
-public:
+  public:
     /**
      * @brief An exception which will be thrown when updates are in conflict
      */
     class Conflict : public std::logic_error
     {
-    public:
+      public:
         /**
          * Constructs a conflict exception
          *
@@ -83,7 +87,8 @@ public:
          * @param existingUpdate Existing update for the same location as the
          *                       \a conflictingUpdate
          */
-        Conflict(const std::string& msg, Update* conflictingUpdate, Update* existingUpdate);
+        Conflict( const std::string& msg, Update* conflictingUpdate,
+            Update* existingUpdate );
 
         /**
          * @return The update which caused the conflict
@@ -96,7 +101,7 @@ public:
          */
         Update* existingUpdate() const noexcept;
 
-    private:
+      private:
         Update* m_conflictingUpdate;
         Update* m_existingUpdate;
     };
@@ -107,12 +112,13 @@ public:
     enum class Type
     {
         Sequential, /**< Update-set with sequential execution semantics */
-        Parallel /**< Update-set with parallel execution semantics */
+        Parallel    /**< Update-set with parallel execution semantics */
     };
 
-    using UpdateHashMap = ChainedHashMap<const value_t*, Update*, LocationHash>;
+    using UpdateHashMap
+        = ChainedHashMap< const value_t*, Update*, LocationHash >;
 
-public:
+  public:
     using const_iterator = typename UpdateHashMap::const_iterator;
 
     /**
@@ -122,7 +128,7 @@ public:
      *                    handle without resizing
      * @param parent The parent update-set (if there is any)
      */
-    explicit UpdateSet(std::size_t initialSize, UpdateSet* parent = nullptr);
+    explicit UpdateSet( std::size_t initialSize, UpdateSet* parent = nullptr );
 
     /**
      * Destroys the update-set
@@ -162,7 +168,7 @@ public:
      *         for the \a location exists already and the values of both updates
      *         are different
      */
-    virtual void add(const value_t* location, Update* update) = 0;
+    virtual void add( const value_t* location, Update* update ) = 0;
 
     /**
      * Searches for an update for the \a location in the update-set
@@ -175,19 +181,20 @@ public:
      * @return The update for the \a location or nullptr if no update for the
      *         \a location could be found.
      */
-    virtual Update* lookup(const value_t* location) const noexcept;
+    virtual Update* lookup( const value_t* location ) const noexcept;
 
     /**
      * Forks the current update-set
      *
-     * @param updateSetType The type of the forked update-set @see UpdateSet::Type
+     * @param updateSetType The type of the forked update-set @see
+     * UpdateSet::Type
      * @param initialSize The number of updates the update-set should be able to
      *                    handle without resizing
      *
      * @return A new update-set of type \a updateSetType with the current
      *         update-set as parent
      */
-    UpdateSet* fork(UpdateSet::Type updateSetType, std::size_t initialSize);
+    UpdateSet* fork( UpdateSet::Type updateSetType, std::size_t initialSize );
 
     /**
      * Merges all updates of the current update-set into its parent update-set
@@ -195,7 +202,8 @@ public:
      * @pre The update-set must have a parent update-set
      *
      * @throws Conflict when the parent update-set is a parallel update-set, an
-     *         update for the \a location exists already in the parent update-set
+     *         update for the \a location exists already in the parent
+     * update-set
      *         and the values of both updates are different
      */
     void merge();
@@ -223,12 +231,12 @@ public:
      * @return The update for the \a location or nullptr if no update for the
      *         \a location could be found.
      */
-    Update* get(const value_t* location) const noexcept;
+    Update* get( const value_t* location ) const noexcept;
 
-protected:
+  protected:
     UpdateHashMap m_set;
 
-private:
+  private:
     UpdateSet* const m_parent;
 };
 
@@ -237,7 +245,7 @@ private:
  */
 class SequentialUpdateSet final : public UpdateSet
 {
-public:
+  public:
     using UpdateSet::UpdateSet;
 
     /**
@@ -258,7 +266,7 @@ public:
      * @param location The location of the update
      * @param update The update which should be added
      */
-    void add(const value_t* location, Update* update) override;
+    void add( const value_t* location, Update* update ) override;
 
     /**
      * Searches for an update for the \a location in the update-set
@@ -271,7 +279,7 @@ public:
      * @return The update for the \a location or nullptr if no update for the
      *         \a location could be found.
      */
-    Update* lookup(const value_t* location) const noexcept override;
+    Update* lookup( const value_t* location ) const noexcept override;
 };
 
 /**
@@ -279,7 +287,7 @@ public:
  */
 class ParallelUpdateSet final : public UpdateSet
 {
-public:
+  public:
     using UpdateSet::UpdateSet;
 
     /**
@@ -300,7 +308,7 @@ public:
      * @throws Conflict when an update for the \a location exists already and
      *         the values of both updates are different
      */
-    void add(const value_t* location, Update* update) override;
+    void add( const value_t* location, Update* update ) override;
 };
 
 /**
@@ -308,7 +316,7 @@ public:
  */
 class UpdateSetManager
 {
-public:
+  public:
     /**
      * Constructs an empty update-set manager
      */
@@ -336,7 +344,7 @@ public:
      *         for the \a location exists already and the values of both updates
      *         are different
      */
-    void add(const value_t* location, Update* update);
+    void add( const value_t* location, Update* update );
 
     /**
      * Searches for an update for the \a location in the current update-set
@@ -349,7 +357,7 @@ public:
      * @return The update for the \a location or nullptr if no update for the
      *         \a location could be found.
      */
-    Update* lookup(const value_t* location) const noexcept;
+    Update* lookup( const value_t* location ) const noexcept;
 
     /**
      * Forks the current update-set or creates a new update-set if the
@@ -358,11 +366,12 @@ public:
      * @post The forked update-set is the new "current update-set" and the size
      *       of the update-set manager is increased by one
      *
-     * @param updateSetType The type of the forked update-set @see UpdateSet::Type
+     * @param updateSetType The type of the forked update-set @see
+     * UpdateSet::Type
      * @param initialSize The number of updates the update-set should be able to
      *                    handle without resizing
      */
-    void fork(UpdateSet::Type updateSetType, std::size_t initialSize);
+    void fork( UpdateSet::Type updateSetType, std::size_t initialSize );
 
     /**
      * Merges all updates of the current update-set into its parent update-set
@@ -374,7 +383,8 @@ public:
      *       is decreased by one
      *
      * @throws Conflict when the parent update-set is a parallel update-set, an
-     *         update for the \a location exists already in the parent update-set
+     *         update for the \a location exists already in the parent
+     * update-set
      *         and the values of both updates are different
      */
     void merge();
@@ -397,8 +407,8 @@ public:
      */
     std::size_t size() const noexcept;
 
-private:
-    std::stack<UpdateSet*> m_updateSets;
+  private:
+    std::stack< UpdateSet* > m_updateSets;
 };
 
 #endif // _LIB_CASMFE_UPDATESET_H_

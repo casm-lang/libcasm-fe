@@ -25,78 +25,94 @@
 
 #include "SymbolicExecutionPass.h"
 
-#include <iostream>
 #include <algorithm>
-#include <cmath>
 #include <cassert>
-#include <utility>
-#include <unistd.h>
-#include <sys/wait.h>
+#include <cmath>
 #include <cstdio>
+#include <iostream>
+#include <sys/wait.h>
 #include <type_traits>
+#include <unistd.h>
+#include <utility>
 
 #include "../Driver.h"
-#include "../Symbols.h"
 #include "../Exceptions.h"
+#include "../Symbols.h"
 
 using namespace libcasm_fe;
 
-extern Driver *global_driver;
+extern Driver* global_driver;
 
 char SymbolicExecutionPass::id = 0;
 
-static libpass::PassRegistration< SymbolicExecutionPass > PASS
-( "Symbolic Execution Pass"
-, "execute symbolically over the AST input specification"
-, "ast-exec-sym"
-, 0
-);
+static libpass::PassRegistration< SymbolicExecutionPass > PASS(
+    "Symbolic Execution Pass",
+    "execute symbolically over the AST input specification", "ast-exec-sym",
+    0 );
 
-bool SymbolicExecutionPass::run(libpass::PassResult& pr)
+bool SymbolicExecutionPass::run( libpass::PassResult& pr )
 {
-    walker = new SymbolicExecutionWalker(*this);
+    walker = new SymbolicExecutionWalker( *this );
 
     Ast* root = (Ast*)pr.getResult< TypeCheckPass >();
-    RuleNode* node = global_driver->rules_map_[ root->getInitRule()->identifier ];
+    RuleNode* node
+        = global_driver->rules_map_[ root->getInitRule()->identifier ];
 
-    rule_bindings.push_back(&main_bindings);
-    function_states = std::vector<FunctionState>(global_driver->function_table.size());
-    function_symbols = std::vector<const Function*>(global_driver->function_table.size());
-    Function *program_sym = global_driver->function_table.get_function("program");
+    rule_bindings.push_back( &main_bindings );
+    function_states
+        = std::vector< FunctionState >( global_driver->function_table.size() );
+    function_symbols = std::vector< const Function* >(
+        global_driver->function_table.size() );
+    Function* program_sym
+        = global_driver->function_table.get_function( "program" );
     // TODO location is wrong here
-    program_sym->intitializers_ = new std::vector<std::pair<ExpressionBase*, ExpressionBase*>>();
-    RuleAtom *init_atom = new RuleAtom(node->location, std::string(node->name));
+    program_sym->intitializers_
+        = new std::vector< std::pair< ExpressionBase*, ExpressionBase* > >();
+    RuleAtom* init_atom
+        = new RuleAtom( node->location, std::string( node->name ) );
     init_atom->rule = node;
-    program_sym->intitializers_->push_back(std::make_pair(new SelfAtom(node->location), init_atom));
+    program_sym->intitializers_->push_back(
+        std::make_pair( new SelfAtom( node->location ), init_atom ) );
 
-    try {
-        for (auto pair : global_driver->init_dependencies) {
-            std::set<std::string> visited;
-            if (initialized.count(pair.first) > 0) {
-                continue;;
+    try
+    {
+        for( auto pair : global_driver->init_dependencies )
+        {
+            std::set< std::string > visited;
+            if( initialized.count( pair.first ) > 0 )
+            {
+                continue;
+                ;
             }
-            if (!init_function(pair.first, visited)) {
-                Function *func = global_driver->function_table.get_function(pair.first);
+            if( !init_function( pair.first, visited ) )
+            {
+                Function* func
+                    = global_driver->function_table.get_function( pair.first );
                 std::string cycle = pair.first;
-                for (const std::string& dep : visited) {
+                for( const std::string& dep : visited )
+                {
                     cycle = cycle + " => " + dep;
                 }
-                throw RuntimeException(func->intitializers_->at(0).second->location,
-                                       "initializer dependency cycle detected: " + cycle);
+                throw RuntimeException(
+                    func->intitializers_->at( 0 ).second->location,
+                    "initializer dependency cycle detected: " + cycle );
             }
         }
 
-
-        for (auto pair: global_driver->function_table.table_) {
-            if (pair.second->type != Symbol::SymbolType::FUNCTION || initialized.count(pair.first) > 0) {
+        for( auto pair : global_driver->function_table.table_ )
+        {
+            if( pair.second->type != Symbol::SymbolType::FUNCTION
+                || initialized.count( pair.first ) > 0 )
+            {
                 continue;
             }
 
-            std::set<std::string> visited;
-            init_function(pair.first, visited);
+            std::set< std::string > visited;
+            init_function( pair.first, visited );
         }
 
-        for (List *l : temp_lists) {
+        for( List* l : temp_lists )
+        {
             l->bump_usage();
         }
         temp_lists.clear();
@@ -114,19 +130,21 @@ bool SymbolicExecutionPass::run(libpass::PassResult& pr)
         std::cerr << "Abort after catching a string: " << e << std::endl;
         return false;
     }
-    
+
     return true;
 }
 
 namespace symbolic
 {
-    enum class check_status_t {
+    enum class check_status_t
+    {
         NOT_FOUND,
         TRUE,
         FALSE
     };
 
-    static uint32_t last_symbol_id = 1; // symbol id of 0 means 'non existing symbol'
+    static uint32_t last_symbol_id
+        = 1; // symbol id of 0 means 'non existing symbol'
     static uint32_t current_time = 2; // FIXME EP: why?
 
     const static uint32_t FINAL_TIME = 0;
@@ -147,51 +165,66 @@ namespace symbolic
     }
 }
 
-#define WRAP_NUMERICAL_OPERATION(op, lhs, rhs)                                  \
-    if ((lhs.is_symbolic() and rhs.is_symbolic()) or                            \
-        (lhs.is_symbolic() and not rhs.is_undef()) or                           \
-        (rhs.is_symbolic() and not lhs.is_undef())) {                           \
-        return value_t(new symbol_t(symbolic::next_symbol_id()));               \
-    } else {                                                                    \
-        return op(lhs, rhs);                                                    \
+#define WRAP_NUMERICAL_OPERATION( op, lhs, rhs )                               \
+    if( ( lhs.is_symbolic() and rhs.is_symbolic() )                            \
+        or ( lhs.is_symbolic() and not rhs.is_undef() )                        \
+        or ( rhs.is_symbolic() and not lhs.is_undef() ) )                      \
+    {                                                                          \
+        return value_t( new symbol_t( symbolic::next_symbol_id() ) );          \
+    }                                                                          \
+    else                                                                       \
+    {                                                                          \
+        return op( lhs, rhs );                                                 \
     }
 
 namespace operators
 {
-    static const value_t lesser(const value_t& lhs, const value_t& rhs)
+    static const value_t lesser( const value_t& lhs, const value_t& rhs )
     {
-        if (lhs.is_symbolic() and rhs.is_symbolic() and lhs == rhs) {
-            return value_t(false);
+        if( lhs.is_symbolic() and rhs.is_symbolic() and lhs == rhs )
+        {
+            return value_t( false );
         }
-        WRAP_NUMERICAL_OPERATION(operator <, lhs, rhs)
+        WRAP_NUMERICAL_OPERATION( operator<, lhs, rhs)
     }
 
-    static const value_t greater(const value_t& lhs, const value_t& rhs)
+    static const value_t greater( const value_t& lhs, const value_t& rhs )
     {
-        if (lhs.is_symbolic() and rhs.is_symbolic() and lhs == rhs) {
-            return value_t(false);
+        if( lhs.is_symbolic() and rhs.is_symbolic() and lhs == rhs )
+        {
+            return value_t( false );
         }
-        WRAP_NUMERICAL_OPERATION(operator >, lhs, rhs)
+        WRAP_NUMERICAL_OPERATION( operator>, lhs, rhs)
     }
 
-    static const value_t lessereq(const value_t& lhs, const value_t& rhs)
+    static const value_t lessereq( const value_t& lhs, const value_t& rhs )
     {
-        if (lhs.is_symbolic() and rhs.is_symbolic() and (lhs == rhs)) {
-            return value_t(true);
-        } else if (lhs.is_symbolic() or rhs.is_symbolic()) {
-            return value_t(new symbol_t(symbolic::next_symbol_id()));
-        } else {
+        if( lhs.is_symbolic() and rhs.is_symbolic() and ( lhs == rhs ) )
+        {
+            return value_t( true );
+        }
+        else if( lhs.is_symbolic() or rhs.is_symbolic() )
+        {
+            return value_t( new symbol_t( symbolic::next_symbol_id() ) );
+        }
+        else
+        {
             return lhs <= rhs;
         }
     }
 
-    static const value_t greatereq(const value_t& lhs, const value_t& rhs)
+    static const value_t greatereq( const value_t& lhs, const value_t& rhs )
     {
-        if (lhs.is_symbolic() and rhs.is_symbolic() and (lhs == rhs)) {
-            return value_t(true);
-        } else if (lhs.is_symbolic() or rhs.is_symbolic()) {
-            return value_t(new symbol_t(symbolic::next_symbol_id()));
-        } else {
+        if( lhs.is_symbolic() and rhs.is_symbolic() and ( lhs == rhs ) )
+        {
+            return value_t( true );
+        }
+        else if( lhs.is_symbolic() or rhs.is_symbolic() )
+        {
+            return value_t( new symbol_t( symbolic::next_symbol_id() ) );
+        }
+        else
+        {
             return lhs >= rhs;
         }
     }
@@ -199,204 +232,242 @@ namespace operators
 
 namespace symbolic
 {
-    static std::string symbol_to_string(const uint32_t sym_id)
+    static std::string symbol_to_string( const uint32_t sym_id )
     {
-        return "sym" + std::to_string(sym_id);
+        return "sym" + std::to_string( sym_id );
     }
 
-    static void fof(std::stringstream& ss, const std::string& name, const Function *func,
-                    const std::vector<value_t>& arguments, const value_t& val,
-                    uint32_t time, const std::string &type)
+    static void fof( std::stringstream& ss, const std::string& name,
+        const Function* func, const std::vector< value_t >& arguments,
+        const value_t& val, uint32_t time, const std::string& type )
     {
         ss << "fof(" << name << ",hypothesis,"
-           << (func->is_static ? "cs" : "st") << func->name << "(" << time << ",";
-        if (not arguments.empty()) {
-            ss << to_string(arguments) << ",";
+           << ( func->is_static ? "cs" : "st" ) << func->name << "(" << time
+           << ",";
+        if( not arguments.empty() )
+        {
+            ss << to_string( arguments ) << ",";
         }
-        ss << val.to_str(true) << "))." << type << ": " << func->name
-           << to_string(arguments) << std::endl;
+        ss << val.to_str( true ) << "))." << type << ": " << func->name
+           << to_string( arguments ) << std::endl;
     }
 
-    static void dump_type(std::stringstream& ss, const value_t& v)
+    static void dump_type( std::stringstream& ss, const value_t& v )
     {
-        if (v.is_symbolic() and not v.value.sym->type_dumped) {
-            ss << "tff(symbolNext, type, " << v.to_str() << ": $int)." << std::endl;
+        if( v.is_symbolic() and not v.value.sym->type_dumped )
+        {
+            ss << "tff(symbolNext, type, " << v.to_str() << ": $int)."
+               << std::endl;
             v.value.sym->type_dumped = true;
         }
     }
 
-    static void dump_catchup(std::vector<std::string>& trace, const Function *func,
-                             const std::vector<value_t>& arguments, const value_t& v)
+    static void dump_catchup( std::vector< std::string >& trace,
+        const Function* func, const std::vector< value_t >& arguments,
+        const value_t& v )
     {
-        for (uint32_t i = 1; i < symbolic::get_timestamp() - 1; i++) {
+        for( uint32_t i = 1; i < symbolic::get_timestamp() - 1; i++ )
+        {
             std::stringstream ss;
-            fof(ss, "id%u", func, arguments, v, i, "%%CATCHUP");
-            trace.push_back(ss.str());
+            fof( ss, "id%u", func, arguments, v, i, "%%CATCHUP" );
+            trace.push_back( ss.str() );
         }
     }
 
-    static void dump_create(std::vector<std::string>& trace, const Function *func,
-                            const std::vector<value_t>& arguments, const value_t& v)
+    static void dump_create( std::vector< std::string >& trace,
+        const Function* func, const std::vector< value_t >& arguments,
+        const value_t& v )
     {
         std::stringstream ss;
-        dump_type(ss, v);
-        fof(ss, "id%u", func, arguments, v, symbolic::get_timestamp() - 1,
-            "%%CREATE");
-        trace.push_back(ss.str());
+        dump_type( ss, v );
+        fof( ss, "id%u", func, arguments, v, symbolic::get_timestamp() - 1,
+            "%%CREATE" );
+        trace.push_back( ss.str() );
 
-        if (symbolic::get_timestamp() > 2) {
-            dump_catchup(trace, func, arguments, v);
+        if( symbolic::get_timestamp() > 2 )
+        {
+            dump_catchup( trace, func, arguments, v );
         }
     }
 
-    static void dump_symbolic(std::vector<std::string>& trace, const Function *func,
-                              const std::vector<value_t>& arguments, const value_t& v)
+    static void dump_symbolic( std::vector< std::string >& trace,
+        const Function* func, const std::vector< value_t >& arguments,
+        const value_t& v )
     {
         std::stringstream ss;
-        fof(ss, "id%u", func, arguments, v, symbolic::get_timestamp(),
-            "%%SYMBOLIC");
-        trace.push_back(ss.str());
+        fof( ss, "id%u", func, arguments, v, symbolic::get_timestamp(),
+            "%%SYMBOLIC" );
+        trace.push_back( ss.str() );
     }
 
-    static void dump_update(std::vector<std::string>& trace, const Function *func,
-                            const Update *update)
+    static void dump_update( std::vector< std::string >& trace,
+        const Function* func, const Update* update )
     {
         std::stringstream ss;
-        dump_type(ss, update->value);
-        fof(ss, "id%u", func, *update->args, update->value, symbolic::get_timestamp(), "%%UPDATE");
-        trace.push_back(ss.str());
+        dump_type( ss, update->value );
+        fof( ss, "id%u", func, *update->args, update->value,
+            symbolic::get_timestamp(), "%%UPDATE" );
+        trace.push_back( ss.str() );
     }
 
-    static void dump_pathcond_match(std::vector<std::string>& trace,
-                                    const std::string &filename, size_t lineno,
-                                    const symbolic_condition_t *cond, bool status)
+    static void dump_pathcond_match( std::vector< std::string >& trace,
+        const std::string& filename, size_t lineno,
+        const symbolic_condition_t* cond, bool status )
     {
         std::stringstream ss;
-        ss << "% " << filename << ":" << lineno << " PC-LOOKUP (" << cond->to_str()
-           << ") = " << status
-           << std::endl;
-        trace.push_back(ss.str());
+        ss << "% " << filename << ":" << lineno << " PC-LOOKUP ("
+           << cond->to_str() << ") = " << status << std::endl;
+        trace.push_back( ss.str() );
     }
 
-    static void dump_if(std::vector<std::string>& trace,
-                        const std::string &filename, size_t lineno,
-                        const symbolic_condition_t *cond)
+    static void dump_if( std::vector< std::string >& trace,
+        const std::string& filename, size_t lineno,
+        const symbolic_condition_t* cond )
     {
         std::stringstream ss;
-        ss << "fof('id" << filename <<  ":" << lineno << "',hypothesis,"
-           << cond->to_str() << ")."
-           << std::endl;
-        trace.push_back(ss.str());
+        ss << "fof('id" << filename << ":" << lineno << "',hypothesis,"
+           << cond->to_str() << ")." << std::endl;
+        trace.push_back( ss.str() );
     }
 
-    static void dump_final(std::vector<std::string>& trace,
-                           const std::vector<const Function*>& symbols,
-                           const std::vector<FunctionState>& states)
+    static void dump_final( std::vector< std::string >& trace,
+        const std::vector< const Function* >& symbols,
+        const std::vector< FunctionState >& states )
     {
-        assert(symbols.size() == states.size());
+        assert( symbols.size() == states.size() );
 
         std::stringstream ss;
         uint32_t finalId = 0;
-        for (uint32_t i = 0; i < symbols.size(); i++) {
-            if (not symbols[i]->is_symbolic) {
+        for( uint32_t i = 0; i < symbols.size(); i++ )
+        {
+            if( not symbols[ i ]->is_symbolic )
+            {
                 continue;
             }
-            const auto end = states[i].end();
-            for (auto it = states[i].begin(); it != end; ++it) {
+            const auto end = states[ i ].end();
+            for( auto it = states[ i ].begin(); it != end; ++it )
+            {
                 const auto& arguments = it.key();
                 const auto& value = it.value();
 
-                fof(ss, "final" + std::to_string(finalId), symbols[i], arguments,
-                    value, FINAL_TIME, "%FINAL");
+                fof( ss, "final" + std::to_string( finalId ), symbols[ i ],
+                    arguments, value, FINAL_TIME, "%FINAL" );
 
                 ++finalId;
             }
         }
-        trace.push_back(ss.str());
+        trace.push_back( ss.str() );
     }
 
-    constexpr inline uint16_t operator ,(const ExpressionOperation lhs,
-                                         const ExpressionOperation rhs) noexcept
+    constexpr inline uint16_t operator,(
+        const ExpressionOperation lhs, const ExpressionOperation rhs ) noexcept
     {
-        static_assert(sizeof(ExpressionOperation) == 1,
-                      "uint8_t | (uint8_t << 8) == uint16_t");
-        return (static_cast<uint16_t>(lhs) << 8) | static_cast<uint16_t>(rhs);
+        static_assert( sizeof( ExpressionOperation ) == 1,
+            "uint8_t | (uint8_t << 8) == uint16_t" );
+        return ( static_cast< uint16_t >( lhs ) << 8 )
+               | static_cast< uint16_t >( rhs );
     }
 
-    static check_status_t check_inclusion(const symbolic_condition_t& known,
-                                          const symbolic_condition_t& check)
+    static check_status_t check_inclusion(
+        const symbolic_condition_t& known, const symbolic_condition_t& check )
     {
-        switch (check.op, known.op) {
-        case (ExpressionOperation::EQ, ExpressionOperation::EQ):
-            return (*known.rhs == *check.rhs) ? check_status_t::TRUE
-                                              : check_status_t::FALSE;
-        case (ExpressionOperation::EQ, ExpressionOperation::NEQ):
-            return (*known.rhs == *check.rhs) ? check_status_t::FALSE
-                                              : check_status_t::NOT_FOUND;
-        case (ExpressionOperation::NEQ, ExpressionOperation::NEQ):
-            return (*known.rhs == *check.rhs) ? check_status_t::TRUE
-                                              : check_status_t::NOT_FOUND;
-        case (ExpressionOperation::NEQ, ExpressionOperation::EQ):
-            return (*known.rhs == *check.rhs) ? check_status_t::FALSE
-                                              : check_status_t::TRUE;
-        case (ExpressionOperation::LESSEREQ, ExpressionOperation::EQ): {
-            const value_t res = operators::lessereq(*known.rhs, *check.rhs);
-            return res.value.boolean ? check_status_t::TRUE
-                                     : check_status_t::FALSE;
-        }
-        case (ExpressionOperation::LESSEREQ, ExpressionOperation::LESSEREQ): {
-            const value_t res = operators::lessereq(*check.rhs, *known.rhs);
-            return res.value.boolean ? check_status_t::TRUE
-                                     : check_status_t::NOT_FOUND;
-        }
-        case (ExpressionOperation::LESSEREQ, ExpressionOperation::GREATER): {
-            const value_t res = operators::lessereq(*check.rhs, *known.rhs);
-            return res.value.boolean ? check_status_t::FALSE
-                                     : check_status_t::NOT_FOUND;
-        }
-        case (ExpressionOperation::GREATER, ExpressionOperation::EQ): {
-            const value_t res = operators::greater(*known.rhs, *check.rhs);
-            return res.value.boolean ? check_status_t::TRUE
-                                     : check_status_t::FALSE;
-        }
-        case (ExpressionOperation::GREATER, ExpressionOperation::LESSEREQ): {
-            const value_t res = operators::greater(*check.rhs, *known.rhs);
-            return res.value.boolean ? check_status_t::FALSE
-                                     : check_status_t::NOT_FOUND;
-        }
-        case (ExpressionOperation::GREATER, ExpressionOperation::GREATER): {
-            const value_t res = operators::greater(*check.rhs, *known.rhs);
-            return res.value.boolean ? check_status_t::TRUE
-                                     : check_status_t::NOT_FOUND;
-        }
-        default:
-            return check_status_t::NOT_FOUND;
+        switch( check.op, known.op )
+        {
+            case( ExpressionOperation::EQ, ExpressionOperation::EQ ):
+                return ( *known.rhs == *check.rhs ) ? check_status_t::TRUE
+                                                    : check_status_t::FALSE;
+            case( ExpressionOperation::EQ, ExpressionOperation::NEQ ):
+                return ( *known.rhs == *check.rhs ) ? check_status_t::FALSE
+                                                    : check_status_t::NOT_FOUND;
+            case( ExpressionOperation::NEQ, ExpressionOperation::NEQ ):
+                return ( *known.rhs == *check.rhs ) ? check_status_t::TRUE
+                                                    : check_status_t::NOT_FOUND;
+            case( ExpressionOperation::NEQ, ExpressionOperation::EQ ):
+                return ( *known.rhs == *check.rhs ) ? check_status_t::FALSE
+                                                    : check_status_t::TRUE;
+            case( ExpressionOperation::LESSEREQ, ExpressionOperation::EQ ):
+            {
+                const value_t res
+                    = operators::lessereq( *known.rhs, *check.rhs );
+                return res.value.boolean ? check_status_t::TRUE
+                                         : check_status_t::FALSE;
+            }
+            case(
+                ExpressionOperation::LESSEREQ, ExpressionOperation::LESSEREQ ):
+            {
+                const value_t res
+                    = operators::lessereq( *check.rhs, *known.rhs );
+                return res.value.boolean ? check_status_t::TRUE
+                                         : check_status_t::NOT_FOUND;
+            }
+            case( ExpressionOperation::LESSEREQ, ExpressionOperation::GREATER ):
+            {
+                const value_t res
+                    = operators::lessereq( *check.rhs, *known.rhs );
+                return res.value.boolean ? check_status_t::FALSE
+                                         : check_status_t::NOT_FOUND;
+            }
+            case( ExpressionOperation::GREATER, ExpressionOperation::EQ ):
+            {
+                const value_t res
+                    = operators::greater( *known.rhs, *check.rhs );
+                return res.value.boolean ? check_status_t::TRUE
+                                         : check_status_t::FALSE;
+            }
+            case( ExpressionOperation::GREATER, ExpressionOperation::LESSEREQ ):
+            {
+                const value_t res
+                    = operators::greater( *check.rhs, *known.rhs );
+                return res.value.boolean ? check_status_t::FALSE
+                                         : check_status_t::NOT_FOUND;
+            }
+            case( ExpressionOperation::GREATER, ExpressionOperation::GREATER ):
+            {
+                const value_t res
+                    = operators::greater( *check.rhs, *known.rhs );
+                return res.value.boolean ? check_status_t::TRUE
+                                         : check_status_t::NOT_FOUND;
+            }
+            default:
+                return check_status_t::NOT_FOUND;
         }
     }
 
-    static check_status_t check_condition(const std::vector<symbolic_condition_t*>& known_conditions,
-                                          const symbolic_condition_t *check)
+    static check_status_t check_condition(
+        const std::vector< symbolic_condition_t* >& known_conditions,
+        const symbolic_condition_t* check )
     {
-        symbolic_condition_t cond(check->lhs, check->rhs, check->op);
+        symbolic_condition_t cond( check->lhs, check->rhs, check->op );
 
-        if (check->lhs->type != TypeType::SYMBOL) {
-            if (check->rhs->type == TypeType::SYMBOL) {
-                cond = symbolic_condition_t(check->rhs, check->lhs, check->op);
-            } else {
-                throw RuntimeException("Invalid condition passed");
+        if( check->lhs->type != TypeType::SYMBOL )
+        {
+            if( check->rhs->type == TypeType::SYMBOL )
+            {
+                cond
+                    = symbolic_condition_t( check->rhs, check->lhs, check->op );
+            }
+            else
+            {
+                throw RuntimeException( "Invalid condition passed" );
             }
         }
 
-        for (auto known_cond : known_conditions) {
+        for( auto known_cond : known_conditions )
+        {
             check_status_t s = check_status_t::NOT_FOUND;
-            if (*(known_cond->lhs) == *(cond.lhs)) {
-                s = check_inclusion(*known_cond, cond);
-            } else if (*(known_cond->rhs) == *(cond.lhs)) {
-                s = check_inclusion(symbolic_condition_t(known_cond->rhs,
-                                                         known_cond->lhs,
-                                                         known_cond->op), cond);
+            if( *( known_cond->lhs ) == *( cond.lhs ) )
+            {
+                s = check_inclusion( *known_cond, cond );
             }
-            if (s != check_status_t::NOT_FOUND) {
+            else if( *( known_cond->rhs ) == *( cond.lhs ) )
+            {
+                s = check_inclusion(
+                    symbolic_condition_t(
+                        known_cond->rhs, known_cond->lhs, known_cond->op ),
+                    cond );
+            }
+            if( s != check_status_t::NOT_FOUND )
+            {
                 return s;
             }
         }
@@ -404,54 +475,64 @@ namespace symbolic
         return check_status_t::NOT_FOUND;
     }
 
-    static uint32_t dump_listconst(std::vector<std::string>& trace, List *l)
+    static uint32_t dump_listconst( std::vector< std::string >& trace, List* l )
     {
         uint32_t sym_id = 0;
 
         const auto end = l->end();
-        for (auto it = l->begin(); it != end; ++it) {
+        for( auto it = l->begin(); it != end; ++it )
+        {
             const uint32_t prev_sym_id = sym_id;
             sym_id = symbolic::next_symbol_id();
 
             std::stringstream ss;
-            ss << "tff(symbolNext,type," << symbol_to_string(sym_id) << ": $int)."
-               << std::endl
+            ss << "tff(symbolNext,type," << symbol_to_string( sym_id )
+               << ": $int)." << std::endl
                << "fof(id%u,hypothesis,fcons("
-               << ((prev_sym_id > 0) ? symbol_to_string(sym_id) : "eEmptyList")
-               << "," << (*it).to_str(true) << "," << symbol_to_string(sym_id) << "))."
-               << std::endl;
-            trace.push_back(ss.str());
+               << ( ( prev_sym_id > 0 ) ? symbol_to_string( sym_id )
+                                        : "eEmptyList" )
+               << "," << ( *it ).to_str( true ) << ","
+               << symbol_to_string( sym_id ) << "))." << std::endl;
+            trace.push_back( ss.str() );
         }
 
         return sym_id;
     }
 
-    static void dump_builtin(std::vector<std::string>& trace, const std::string& name,
-                             const std::vector<value_t>& arguments, const value_t& ret)
+    static void dump_builtin( std::vector< std::string >& trace,
+        const std::string& name, const std::vector< value_t >& arguments,
+        const value_t& ret )
     {
         std::stringstream ss;
 
-        for (const auto& arg : arguments) {
-            dump_type(ss, arg);
+        for( const auto& arg : arguments )
+        {
+            dump_type( ss, arg );
         }
-        dump_type(ss, ret);
+        dump_type( ss, ret );
 
-        ss << "fof(id%u,hypothesis,f" << name << '(' << to_string(arguments) << "))." << std::endl;
+        ss << "fof(id%u,hypothesis,f" << name << '(' << to_string( arguments )
+           << "))." << std::endl;
 
-        trace.push_back(ss.str());
+        trace.push_back( ss.str() );
     }
 }
 
-void SymbolicExecutionPass::visit_assure(UnaryNode* assure, const value_t& val)
+void SymbolicExecutionPass::visit_assure(
+    UnaryNode* assure, const value_t& val )
 {
-    if (val.is_symbolic() && val.value.sym->condition) {
-        path_conditions.push_back(val.value.sym->condition);
-    } else {
-        visit_assert(assure, val);
+    if( val.is_symbolic() && val.value.sym->condition )
+    {
+        path_conditions.push_back( val.value.sym->condition );
+    }
+    else
+    {
+        visit_assert( assure, val );
     }
 }
 
-void SymbolicExecutionPass::visit_print( PrintNode *node, const value_t& argument )
+void SymbolicExecutionPass::visit_print(
+    PrintNode* node, const value_t& argument )
 {
     std::stringstream ss;
     if( node->getFilter().size() > 0 )
@@ -465,281 +546,391 @@ void SymbolicExecutionPass::visit_print( PrintNode *node, const value_t& argumen
             return;
         }
     }
-    
+
     ss << argument.to_str() << std::endl;
-    
-    trace.push_back(ss.str());
+
+    trace.push_back( ss.str() );
 }
 
-void SymbolicExecutionPass::visit_push(PushNode *node, const value_t& expr, const value_t& atom)
+void SymbolicExecutionPass::visit_push(
+    PushNode* node, const value_t& expr, const value_t& atom )
 {
-    std::vector<value_t> arguments{}; // TODO at the moment, functions with arguments are not supported
+    std::vector< value_t > arguments{}; // TODO at the moment, functions with
+                                        // arguments are not supported
 
-    const value_t to_res(new symbol_t(symbolic::next_symbol_id()));
-    if (atom.value.sym->list) {
-        to_res.value.sym->list = builtins::cons(temp_lists, expr,
-                                                value_t(TypeType::LIST, atom.value.sym->list)).value.list;
-    } else {
-        to_res.value.sym->list = builtins::cons(temp_lists, expr,
-                                                value_t(TypeType::LIST, new BottomList())).value.list;
+    const value_t to_res( new symbol_t( symbolic::next_symbol_id() ) );
+    if( atom.value.sym->list )
+    {
+        to_res.value.sym->list = builtins::cons(
+            temp_lists, expr, value_t( TypeType::LIST, atom.value.sym->list ) )
+                                     .value.list;
+    }
+    else
+    {
+        to_res.value.sym->list = builtins::cons( temp_lists, expr,
+            value_t( TypeType::LIST,
+                new BottomList() ) ).value.list;
     }
 
-    addUpdate(node->to->symbol, arguments, to_res, node->location);
+    addUpdate( node->to->symbol, arguments, to_res, node->location );
 
-    symbolic::dump_builtin(trace, "push", {atom, expr}, to_res);
+    symbolic::dump_builtin( trace, "push", { atom, expr }, to_res );
 }
 
-void SymbolicExecutionPass::visit_pop(PopNode *node, const value_t& val)
+void SymbolicExecutionPass::visit_pop( PopNode* node, const value_t& val )
 {
-    std::vector<value_t> arguments{}; // TODO at the moment, functions with arguments are not supported
+    std::vector< value_t > arguments{}; // TODO at the moment, functions with
+                                        // arguments are not supported
 
-    const value_t to_res = (val.value.sym->list) ? builtins::peek(value_t(TypeType::LIST, val.value.sym->list))
-                                                 : value_t(new symbol_t(symbolic::next_symbol_id()));
+    const value_t to_res
+        = ( val.value.sym->list )
+              ? builtins::peek( value_t( TypeType::LIST, val.value.sym->list ) )
+              : value_t( new symbol_t( symbolic::next_symbol_id() ) );
 
-    Update *up = nullptr;
-    if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION) {
-        up = addUpdate(node->to->symbol, arguments, to_res, node->location);
-    } else {
-        rule_bindings.back()->push_back(to_res);
+    Update* up = nullptr;
+    if( node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION )
+    {
+        up = addUpdate( node->to->symbol, arguments, to_res, node->location );
+    }
+    else
+    {
+        rule_bindings.back()->push_back( to_res );
     }
 
-    const value_t from_res(new symbol_t(symbolic::next_symbol_id()));
-    if (val.value.sym->list) {
-        from_res.value.sym->list = builtins::tail(temp_lists,
-                                                  value_t(TypeType::LIST, val.value.sym->list)).value.list;
+    const value_t from_res( new symbol_t( symbolic::next_symbol_id() ) );
+    if( val.value.sym->list )
+    {
+        from_res.value.sym->list = builtins::tail( temp_lists,
+            value_t( TypeType::LIST,
+                val.value.sym->list ) ).value.list;
     }
 
-    symbolic::dump_builtin(trace, "pop", {val, to_res}, from_res);
+    symbolic::dump_builtin( trace, "pop", { val, to_res }, from_res );
 
-    addUpdate(node->to->symbol, arguments, from_res, node->location);
+    addUpdate( node->to->symbol, arguments, from_res, node->location );
 }
 
-const value_t SymbolicExecutionPass::visit_expression(BinaryExpression *expr,
-                                                      const value_t &left_val,
-                                                      const value_t &right_val)
+const value_t SymbolicExecutionPass::visit_expression(
+    BinaryExpression* expr, const value_t& left_val, const value_t& right_val )
 {
-    switch (expr->op) {
-    case ExpressionOperation::ADD:
-        WRAP_NUMERICAL_OPERATION(operator +, left_val, right_val)
-    case ExpressionOperation::SUB:
-        WRAP_NUMERICAL_OPERATION(operator -, left_val, right_val)
-    case ExpressionOperation::MUL:
-        WRAP_NUMERICAL_OPERATION(operator *, left_val, right_val)
-    case ExpressionOperation::DIV:
-        WRAP_NUMERICAL_OPERATION(operator /, left_val, right_val)
-    case ExpressionOperation::MOD:
-        WRAP_NUMERICAL_OPERATION(operator %, left_val, right_val)
-    case ExpressionOperation::RAT_DIV:
-        WRAP_NUMERICAL_OPERATION(rat_div, left_val, right_val);
-    case ExpressionOperation::EQ:
-        if (left_val.is_symbolic() and right_val.is_symbolic() and (left_val == right_val)) {
-            return value_t(true);
-        } else if (left_val.is_symbolic() or right_val.is_symbolic()) {
-            return value_t(new symbol_t(symbolic::next_symbol_id()));
-        } else {
-            return value_t(left_val == right_val);
-        }
-    case ExpressionOperation::NEQ:
-        if (left_val.is_symbolic() and right_val.is_symbolic() and (left_val == right_val)) {
-            return value_t(false);
-        } else if (left_val.is_symbolic() or right_val.is_symbolic()) {
-            return value_t(new symbol_t(symbolic::next_symbol_id()));
-        } else {
-            return value_t(left_val != right_val);
-        }
-    case ExpressionOperation::AND:
-        if (left_val.is_symbolic()) {
-            if (right_val.is_undef() or right_val.is_symbolic() or right_val.value.boolean) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t(false);
+    switch( expr->op )
+    {
+        case ExpressionOperation::ADD:
+            WRAP_NUMERICAL_OPERATION( operator+, left_val, right_val)
+        case ExpressionOperation::SUB:
+            WRAP_NUMERICAL_OPERATION( operator-, left_val, right_val)
+        case ExpressionOperation::MUL:
+            WRAP_NUMERICAL_OPERATION( operator*, left_val, right_val)
+        case ExpressionOperation::DIV:
+            WRAP_NUMERICAL_OPERATION( operator/, left_val, right_val)
+        case ExpressionOperation::MOD:
+            WRAP_NUMERICAL_OPERATION( operator%, left_val, right_val)
+        case ExpressionOperation::RAT_DIV:
+            WRAP_NUMERICAL_OPERATION( rat_div, left_val, right_val );
+        case ExpressionOperation::EQ:
+            if( left_val.is_symbolic() and right_val.is_symbolic()
+                and ( left_val == right_val ) )
+            {
+                return value_t( true );
             }
-        } else if (right_val.is_symbolic()) {
-            if (left_val.is_undef() or left_val.is_symbolic() or left_val.value.boolean) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t(false);
+            else if( left_val.is_symbolic() or right_val.is_symbolic() )
+            {
+                return value_t( new symbol_t( symbolic::next_symbol_id() ) );
             }
-        } else {
-            return left_val and right_val;
-        }
-    case ExpressionOperation::OR:
-        if (left_val.is_symbolic()) {
-            if (right_val.is_undef() or right_val.is_symbolic() or !right_val.value.boolean) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t(true);
+            else
+            {
+                return value_t( left_val == right_val );
             }
-        } else if (right_val.is_symbolic()) {
-            if (left_val.is_undef() or left_val.is_symbolic() or !left_val.value.boolean) {
-                return value_t(new symbol_t(symbolic::next_symbol_id()));
-            } else {
-                return value_t(true);
+        case ExpressionOperation::NEQ:
+            if( left_val.is_symbolic() and right_val.is_symbolic()
+                and ( left_val == right_val ) )
+            {
+                return value_t( false );
             }
-        } else {
-            return left_val or right_val;
-        }
-    case ExpressionOperation::XOR:
-        if (left_val.is_symbolic() or right_val.is_symbolic()) {
-            return value_t(new symbol_t(symbolic::next_symbol_id()));
-        } else {
-            return left_val ^ right_val;
-        }
-    case ExpressionOperation::LESSER:
-        return operators::lesser(left_val, right_val);
-    case ExpressionOperation::GREATER:
-        return operators::greater(left_val, right_val);
-    case ExpressionOperation::LESSEREQ:
-        return operators::lessereq(left_val, right_val);
-    case ExpressionOperation::GREATEREQ:
-        return operators::greatereq(left_val, right_val);
-    default:
-        FAILURE();
+            else if( left_val.is_symbolic() or right_val.is_symbolic() )
+            {
+                return value_t( new symbol_t( symbolic::next_symbol_id() ) );
+            }
+            else
+            {
+                return value_t( left_val != right_val );
+            }
+        case ExpressionOperation::AND:
+            if( left_val.is_symbolic() )
+            {
+                if( right_val.is_undef() or right_val.is_symbolic()
+                    or right_val.value.boolean )
+                {
+                    return value_t(
+                        new symbol_t( symbolic::next_symbol_id() ) );
+                }
+                else
+                {
+                    return value_t( false );
+                }
+            }
+            else if( right_val.is_symbolic() )
+            {
+                if( left_val.is_undef() or left_val.is_symbolic()
+                    or left_val.value.boolean )
+                {
+                    return value_t(
+                        new symbol_t( symbolic::next_symbol_id() ) );
+                }
+                else
+                {
+                    return value_t( false );
+                }
+            }
+            else
+            {
+                return left_val and right_val;
+            }
+        case ExpressionOperation::OR:
+            if( left_val.is_symbolic() )
+            {
+                if( right_val.is_undef() or right_val.is_symbolic()
+                    or !right_val.value.boolean )
+                {
+                    return value_t(
+                        new symbol_t( symbolic::next_symbol_id() ) );
+                }
+                else
+                {
+                    return value_t( true );
+                }
+            }
+            else if( right_val.is_symbolic() )
+            {
+                if( left_val.is_undef() or left_val.is_symbolic()
+                    or !left_val.value.boolean )
+                {
+                    return value_t(
+                        new symbol_t( symbolic::next_symbol_id() ) );
+                }
+                else
+                {
+                    return value_t( true );
+                }
+            }
+            else
+            {
+                return left_val or right_val;
+            }
+        case ExpressionOperation::XOR:
+            if( left_val.is_symbolic() or right_val.is_symbolic() )
+            {
+                return value_t( new symbol_t( symbolic::next_symbol_id() ) );
+            }
+            else
+            {
+                return left_val ^ right_val;
+            }
+        case ExpressionOperation::LESSER:
+            return operators::lesser( left_val, right_val );
+        case ExpressionOperation::GREATER:
+            return operators::greater( left_val, right_val );
+        case ExpressionOperation::LESSEREQ:
+            return operators::lessereq( left_val, right_val );
+        case ExpressionOperation::GREATEREQ:
+            return operators::greatereq( left_val, right_val );
+        default:
+            FAILURE();
     }
 }
 
-const value_t SymbolicExecutionPass::visit_expression_single(UnaryExpression *expr,
-                                                             const value_t &val)
+const value_t SymbolicExecutionPass::visit_expression_single(
+    UnaryExpression* expr, const value_t& val )
 {
-    if (val.is_undef()) {
+    if( val.is_undef() )
+    {
         return value_t();
-    } else if (val.is_symbolic()) {
-        return value_t(new symbol_t(symbolic::next_symbol_id()));
+    }
+    else if( val.is_symbolic() )
+    {
+        return value_t( new symbol_t( symbolic::next_symbol_id() ) );
     }
 
-    switch (expr->op) {
-    case ExpressionOperation::NOT:
-        return value_t(not val.value.boolean);
-    default:
-        FAILURE();
+    switch( expr->op )
+    {
+        case ExpressionOperation::NOT:
+            return value_t( not val.value.boolean );
+        default:
+            FAILURE();
     }
 }
 
-const value_t SymbolicExecutionPass::visit_list_atom(ListAtom *atom,
-                                                    const std::vector<value_t> &vals)
+const value_t SymbolicExecutionPass::visit_list_atom(
+    ListAtom* atom, const std::vector< value_t >& vals )
 {
-    BottomList *list = new BottomList(vals);
-    //context_.temp_lists.push_back(list);
+    BottomList* list = new BottomList( vals );
+    // context_.temp_lists.push_back(list);
 
-    const uint32_t sym_id = symbolic::dump_listconst(trace_creates, list);
-    if (sym_id > 0) {
+    const uint32_t sym_id = symbolic::dump_listconst( trace_creates, list );
+    if( sym_id > 0 )
+    {
         // TODO cleanup symbols
-        symbol_t *sym = new symbol_t(sym_id);
+        symbol_t* sym = new symbol_t( sym_id );
         sym->type_dumped = true;
         sym->list = list;
-        return value_t(sym);
-    } else {
-        return value_t(atom->type_, list);
+        return value_t( sym );
+    }
+    else
+    {
+        return value_t( atom->type_, list );
     }
 }
 
-value_t SymbolicExecutionPass::defaultFunctionValue(Function* function, const std::vector<value_t>& arguments)
+value_t SymbolicExecutionPass::defaultFunctionValue(
+    Function* function, const std::vector< value_t >& arguments )
 {
-    if (function->is_symbolic) {
-        const value_t value(new symbol_t(symbolic::next_symbol_id())); // TODO cleanup symbol
+    if( function->is_symbolic )
+    {
+        const value_t value(
+            new symbol_t( symbolic::next_symbol_id() ) ); // TODO cleanup symbol
 
-        auto& function_map = function_states[function->id];
-        function_map.insert(arguments, value);
-        symbolic::dump_create(trace_creates, function, arguments, value);
+        auto& function_map = function_states[ function->id ];
+        function_map.insert( arguments, value );
+        symbolic::dump_create( trace_creates, function, arguments, value );
 
         return value;
-    } else {
-        return ExecutionPassBase::defaultFunctionValue(function, arguments);
+    }
+    else
+    {
+        return ExecutionPassBase::defaultFunctionValue( function, arguments );
     }
 }
 
-bool SymbolicExecutionPass::init_function(const std::string& name, std::set<std::string>& visited)
+bool SymbolicExecutionPass::init_function(
+    const std::string& name, std::set< std::string >& visited )
 {
-    if (global_driver->init_dependencies.count(name) != 0) {
-        visited.insert(name);
-        const std::set<std::string>& deps = global_driver->init_dependencies[name];
-        for (const std::string& dep : deps) {
-            if (visited.count(dep) > 0) {
+    if( global_driver->init_dependencies.count( name ) != 0 )
+    {
+        visited.insert( name );
+        const std::set< std::string >& deps
+            = global_driver->init_dependencies[ name ];
+        for( const std::string& dep : deps )
+        {
+            if( visited.count( dep ) > 0 )
+            {
                 return false;
-            } else {
-                if (!init_function(dep, visited)) {
+            }
+            else
+            {
+                if( !init_function( dep, visited ) )
+                {
                     return false;
                 }
             }
         }
     }
 
-    Function *func = global_driver->function_table.get_function(name);
-    if (!func) {
+    Function* func = global_driver->function_table.get_function( name );
+    if( !func )
+    {
         return true;
     }
 
-    function_states[func->id] = FunctionState(0);
-    function_symbols[func->id] = func;
+    function_states[ func->id ] = FunctionState( 0 );
+    function_symbols[ func->id ] = func;
 
-    auto& function_map = function_states[func->id];
+    auto& function_map = function_states[ func->id ];
 
-    if (func->intitializers_ != nullptr) {
-        for (std::pair<ExpressionBase*, ExpressionBase*> init : *func->intitializers_) {
-            std::vector<value_t> arguments{};
-            arguments.reserve(func->arguments_.size());
+    if( func->intitializers_ != nullptr )
+    {
+        for( std::pair< ExpressionBase*, ExpressionBase* > init :
+            *func->intitializers_ )
+        {
+            std::vector< value_t > arguments{};
+            arguments.reserve( func->arguments_.size() );
 
-            if (init.first != nullptr) {
-                const value_t argument_v = walker->walk_atom(init.first);
-                if (func->arguments_.size() > 1) {
-                    List *list = argument_v.value.list;
-                    for (auto iter = list->begin(); iter != list->end(); iter++) {
-                        arguments.emplace_back(*iter);
+            if( init.first != nullptr )
+            {
+                const value_t argument_v = walker->walk_atom( init.first );
+                if( func->arguments_.size() > 1 )
+                {
+                    List* list = argument_v.value.list;
+                    for( auto iter = list->begin(); iter != list->end();
+                         iter++ )
+                    {
+                        arguments.emplace_back( *iter );
                     }
-                } else {
-                    arguments.emplace_back(argument_v);
+                }
+                else
+                {
+                    arguments.emplace_back( argument_v );
                 }
             }
 
-            if (func->checkArguments) {
-                try {
-                    validateArguments(func->arguments_, arguments);
-                } catch (const std::domain_error& e) {
-                    const auto location = init.first ? (init.first->location + init.second->location)
-                                                     : init.second->location;
-                    throw RuntimeException(location, e.what());
+            if( func->checkArguments )
+            {
+                try
+                {
+                    validateArguments( func->arguments_, arguments );
+                }
+                catch( const std::domain_error& e )
+                {
+                    const auto location
+                        = init.first
+                              ? ( init.first->location + init.second->location )
+                              : init.second->location;
+                    throw RuntimeException( location, e.what() );
                 }
             }
 
-            if (function_map.hasKey(arguments)) {
-                yy::location loc = init.first ? init.first->location+init.second->location
-                                              : init.second->location;
-                throw RuntimeException(loc, "function `" + func->name + to_string(arguments) +
-                                            "` already initialized");
+            if( function_map.hasKey( arguments ) )
+            {
+                yy::location loc
+                    = init.first ? init.first->location + init.second->location
+                                 : init.second->location;
+                throw RuntimeException( loc, "function `" + func->name
+                                                 + to_string( arguments )
+                                                 + "` already initialized" );
             }
 
-            const value_t v = walker->walk_atom(init.second);
-            if (func->checkReturnValue) {
-                try {
-                    validateValue(func->return_type_, v);
-                } catch (const std::domain_error& e) {
-                    const auto location = init.first ? (init.first->location + init.second->location)
-                                                     : init.second->location;
-                    throw RuntimeException(location, std::string(e.what()) + " of `" + func->name + "`");
+            const value_t v = walker->walk_atom( init.second );
+            if( func->checkReturnValue )
+            {
+                try
+                {
+                    validateValue( func->return_type_, v );
+                }
+                catch( const std::domain_error& e )
+                {
+                    const auto location
+                        = init.first
+                              ? ( init.first->location + init.second->location )
+                              : init.second->location;
+                    throw RuntimeException( location,
+                        std::string( e.what() ) + " of `" + func->name + "`" );
                 }
             }
 
-            if (func->is_symbolic) {
-                symbolic::dump_create(trace_creates, func, arguments, v);
+            if( func->is_symbolic )
+            {
+                symbolic::dump_create( trace_creates, func, arguments, v );
             }
 
-            function_map.insert(arguments, v);
+            function_map.insert( arguments, v );
         }
     }
 
-    initialized.insert(name);
+    initialized.insert( name );
     return true;
 }
 
 void SymbolicExecutionPass::mainLoop()
 {
-    Function *program_sym = global_driver->function_table.get_function("program");
-    const auto& function_map = function_states[program_sym->id];
-    const value_t& program_val = function_map.get({value_t()});
+    Function* program_sym
+        = global_driver->function_table.get_function( "program" );
+    const auto& function_map = function_states[ program_sym->id ];
+    const value_t& program_val = function_map.get( { value_t() } );
 
-    while (program_val.type != TypeType::UNDEF) {
-        walker->walk_rule(program_val.value.rule);
-        if (hasEmptyUpdateSet()) {
+    while( program_val.type != TypeType::UNDEF )
+    {
+        walker->walk_rule( program_val.value.rule );
+        if( hasEmptyUpdateSet() )
+        {
             break;
         }
         dumpUpdates();
@@ -747,319 +938,359 @@ void SymbolicExecutionPass::mainLoop()
         symbolic::advance_timestamp();
     }
 
-    symbolic::dump_final(trace, function_symbols, function_states);
+    symbolic::dump_final( trace, function_symbols, function_states );
 }
 
 void SymbolicExecutionPass::printTrace() const
 {
-    FILE *out;
+    FILE* out;
     /*if (fileout) { TODO EP
         const std::string& filename = global_driver->get_filename().substr(
             0, global_driver->get_filename().rfind("."));
 
         out = fopen((filename + "_"  + path_name + ".trace").c_str(), "wt");
     } else {*/
-        out = stdout;
+    out = stdout;
     //}
-    fprintf(out, "forklog:%s\n", path_name.c_str());
+    fprintf( out, "forklog:%s\n", path_name.c_str() );
     uint32_t fof_id = 0;
-    for (const std::string& s : trace_creates) {
-        if (s.find("id%u") != std::string::npos) {
-            fprintf(out, s.c_str(), fof_id);
+    for( const std::string& s : trace_creates )
+    {
+        if( s.find( "id%u" ) != std::string::npos )
+        {
+            fprintf( out, s.c_str(), fof_id );
             fof_id += 1;
-        } else {
-            fprintf(out, "%s", s.c_str());
+        }
+        else
+        {
+            fprintf( out, "%s", s.c_str() );
         }
     }
-    for (const std::string& s : trace) {
-        if (s.find("id%u") != std::string::npos) {
-            fprintf(out, s.c_str(), fof_id);
+    for( const std::string& s : trace )
+    {
+        if( s.find( "id%u" ) != std::string::npos )
+        {
+            fprintf( out, s.c_str(), fof_id );
             fof_id += 1;
-        } else {
-            fprintf(out, "%s", s.c_str());
+        }
+        else
+        {
+            fprintf( out, "%s", s.c_str() );
         }
     }
-    fprintf(out, "\n");
+    fprintf( out, "\n" );
 }
 
 void SymbolicExecutionPass::dumpUpdates()
 {
-    assert(updateSetManager.size() == 1);
+    assert( updateSetManager.size() == 1 );
 
     const auto updateSet = updateSetManager.currentUpdateSet();
 
-    for (uint32_t i = 0; i < function_symbols.size(); i++) {
-        const Function* function = function_symbols[i];
-        if (not function->is_symbolic or function->is_static) {
+    for( uint32_t i = 0; i < function_symbols.size(); i++ )
+    {
+        const Function* function = function_symbols[ i ];
+        if( not function->is_symbolic or function->is_static )
+        {
             continue;
         }
 
-        const auto end = function_states[i].end();
-        for (auto it = function_states[i].begin(); it != end; ++it) {
+        const auto end = function_states[ i ].end();
+        for( auto it = function_states[ i ].begin(); it != end; ++it )
+        {
             const auto& arguments = it.key();
             const auto& value = it.value();
 
-            const auto update = updateSet->get(&value);
-            if (update) {
-                symbolic::dump_update(trace, function, update);
-            } else {
-                symbolic::dump_symbolic(trace, function, arguments, value);
+            const auto update = updateSet->get( &value );
+            if( update )
+            {
+                symbolic::dump_update( trace, function, update );
+            }
+            else
+            {
+                symbolic::dump_symbolic( trace, function, arguments, value );
             }
         }
     }
 }
 
-static ExpressionOperation invert(ExpressionOperation op)
+static ExpressionOperation invert( ExpressionOperation op )
 {
-    switch (op) {
-    case ExpressionOperation::EQ:
-        return ExpressionOperation::NEQ;
-    case ExpressionOperation::NEQ:
-        return ExpressionOperation::EQ;
-    case ExpressionOperation::LESSEREQ:
-        return ExpressionOperation::GREATER;
-    case ExpressionOperation::LESSER:
-        return ExpressionOperation::GREATEREQ;
-    case ExpressionOperation::GREATER:
-        return ExpressionOperation::LESSEREQ;
-    case ExpressionOperation::GREATEREQ:
-        return ExpressionOperation::LESSER;
-    default:
-        throw RuntimeException("Invert not implemented for operation");
+    switch( op )
+    {
+        case ExpressionOperation::EQ:
+            return ExpressionOperation::NEQ;
+        case ExpressionOperation::NEQ:
+            return ExpressionOperation::EQ;
+        case ExpressionOperation::LESSEREQ:
+            return ExpressionOperation::GREATER;
+        case ExpressionOperation::LESSER:
+            return ExpressionOperation::GREATEREQ;
+        case ExpressionOperation::GREATER:
+            return ExpressionOperation::LESSEREQ;
+        case ExpressionOperation::GREATEREQ:
+            return ExpressionOperation::LESSER;
+        default:
+            throw RuntimeException( "Invert not implemented for operation" );
     }
 }
 
 template <>
-value_t SymbolicExecutionWalker::walk_list_atom(ListAtom *atom)
+value_t SymbolicExecutionWalker::walk_list_atom( ListAtom* atom )
 {
-    std::vector<value_t> expr_results;
-    if (atom->expr_list) {
-        for (auto iter = atom->expr_list->rbegin(); iter != atom->expr_list->rend(); iter++) {
-            expr_results.push_back(walk_atom(*iter));
+    std::vector< value_t > expr_results;
+    if( atom->expr_list )
+    {
+        for( auto iter = atom->expr_list->rbegin();
+             iter != atom->expr_list->rend(); iter++ )
+        {
+            expr_results.push_back( walk_atom( *iter ) );
         }
     }
-    return visitor.visit_list_atom(atom, expr_results);
+    return visitor.visit_list_atom( atom, expr_results );
 }
 
 template <>
-void SymbolicExecutionWalker::walk_ifthenelse(IfThenElseNode* node)
+void SymbolicExecutionWalker::walk_ifthenelse( IfThenElseNode* node )
 {
-    const value_t cond = walk_atom(node->condition_);
+    const value_t cond = walk_atom( node->condition_ );
 
-    if (cond.is_symbolic()) {
-        symbolic_condition_t *sym_cond;
-        if (cond.value.sym->condition) {
+    if( cond.is_symbolic() )
+    {
+        symbolic_condition_t* sym_cond;
+        if( cond.value.sym->condition )
+        {
             sym_cond = cond.value.sym->condition;
-        } else {
-            sym_cond = new symbolic_condition_t(new value_t(cond),
-                                                new value_t((INTEGER_T)1),
-                                                ExpressionOperation::EQ);
+        }
+        else
+        {
+            sym_cond = new symbolic_condition_t( new value_t( cond ),
+                new value_t( (INTEGER_T)1 ),
+                ExpressionOperation::EQ );
         }
 
-        switch (symbolic::check_condition(visitor.path_conditions, sym_cond)) {
-        case symbolic::check_status_t::NOT_FOUND:
-            break;
-        case symbolic::check_status_t::TRUE:
-            symbolic::dump_pathcond_match(visitor.trace, global_driver->get_filename(),
-                                          node->condition_->location.begin.line,
-                                          sym_cond, true);
-            walk_statement(node->then_);
-            return;
-        case symbolic::check_status_t::FALSE:
-            symbolic::dump_pathcond_match(visitor.trace, global_driver->get_filename(),
-                                          node->condition_->location.begin.line,
-                                          sym_cond, false);
-
-            if (node->else_) {
-                walk_statement(node->else_);
-            }
-            return;
-        }
-
-        pid_t pid = fork();
-        switch (pid) {
-        case -1:
-            throw RuntimeException("Could not fork");
-        case 0:
-            visitor.path_name += "I";
-            symbolic::dump_if(visitor.trace, global_driver->get_filename(),
-                              node->condition_->location.begin.line, sym_cond);
-            visitor.path_conditions.push_back(sym_cond);
-            walk_statement(node->then_);
-            break;
-        default: {
-            // at the moment this limits parallelism, but ensures a deterministic
-            // trace output on stdout
-            int status;
-            if (waitpid(pid, &status, 0) == -1) {
-                throw RuntimeException("error waiting for child process");
-            }
-            if (WEXITSTATUS(status) != 0) {
-                throw RuntimeException("error in child process");
-            }
-
-            if (cond.value.sym->condition) {
-                sym_cond->op = invert(sym_cond->op);
-            } else {
-                // needed to generate correct output for boolean functions as conditions
-                delete sym_cond;
-                sym_cond = new symbolic_condition_t(new value_t(cond),
-                                                    new value_t((INTEGER_T)0), ExpressionOperation::EQ);
-            }
-            visitor.path_name += "E";
-            symbolic::dump_if(visitor.trace, global_driver->get_filename(),
-                              node->condition_->location.begin.line, sym_cond);
-            visitor.path_conditions.push_back(sym_cond);
-            if (node->else_) {
-                walk_statement(node->else_);
-            }
-        }
-        }
-    } else if (cond.is_undef()) {
-        throw RuntimeException(node->condition_->location,
-                               "condition must be true or false but was undef");
-    } else if (cond.value.boolean) {
-        walk_statement(node->then_);
-    } else if (node->else_) {
-        walk_statement(node->else_);
-    }
-}
-
-template <>
-void SymbolicExecutionWalker::walk_seqblock(UnaryNode* seqblock)
-{
-    visitor.fork(UpdateSet::Type::Sequential);
-    visitor.visit_seqblock(seqblock);
-    walk_statements(reinterpret_cast<AstListNode*>(seqblock->child_));
-    visitor.merge();
-}
-
-template <>
-void SymbolicExecutionWalker::walk_parblock(UnaryNode* parblock)
-{
-    visitor.fork(UpdateSet::Type::Parallel);
-    visitor.visit_parblock(parblock);
-    walk_statements(reinterpret_cast<AstListNode*>(parblock->child_));
-    visitor.merge();
-}
-
-template <>
-void SymbolicExecutionWalker::walk_pop(PopNode* node)
-{
-    const value_t from = walk_function_atom(node->from);
-    if (node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION and
-            node->to->symbol->is_symbolic) {
-        walk_function_atom(node->to);
-    }
-    visitor.visit_pop(node, from);
-}
-
-template <>
-void SymbolicExecutionWalker::walk_push(PushNode *node)
-{
-    const value_t expr = walk_atom(node->expr);
-    const value_t atom = walk_function_atom(node->to);
-    visitor.visit_push(node, expr, atom);
-}
-
-template <>
-void SymbolicExecutionWalker::walk_case(CaseNode *node)
-{
-    const value_t cond = walk_atom(node->expr);
-
-    for (uint32_t i = 0; i < node->case_list.size(); i++) {
-        auto pair = node->case_list[i];
-        // pair.first == nullptr for default:
-        symbolic_condition_t *sym_cond;
-        if (pair.first) {
-            const value_t c = walk_atom(pair.first);
-            sym_cond = new symbolic_condition_t(new value_t(cond), new value_t(c),
-                                                ExpressionOperation::EQ);
-
-            switch (symbolic::check_condition(visitor.path_conditions, sym_cond)) {
+        switch( symbolic::check_condition( visitor.path_conditions, sym_cond ) )
+        {
             case symbolic::check_status_t::NOT_FOUND:
                 break;
             case symbolic::check_status_t::TRUE:
-                symbolic::dump_pathcond_match(visitor.trace, global_driver->get_filename(),
-                                              pair.first->location.begin.line,
-                                              sym_cond, true);
-                walk_statement(pair.second);
+                symbolic::dump_pathcond_match( visitor.trace,
+                    global_driver->get_filename(),
+                    node->condition_->location.begin.line, sym_cond, true );
+                walk_statement( node->then_ );
                 return;
-            default:
+            case symbolic::check_status_t::FALSE:
+                symbolic::dump_pathcond_match( visitor.trace,
+                    global_driver->get_filename(),
+                    node->condition_->location.begin.line, sym_cond, false );
+
+                if( node->else_ )
+                {
+                    walk_statement( node->else_ );
+                }
+                return;
+        }
+
+        pid_t pid = fork();
+        switch( pid )
+        {
+            case -1:
+                throw RuntimeException( "Could not fork" );
+            case 0:
+                visitor.path_name += "I";
+                symbolic::dump_if( visitor.trace, global_driver->get_filename(),
+                    node->condition_->location.begin.line, sym_cond );
+                visitor.path_conditions.push_back( sym_cond );
+                walk_statement( node->then_ );
                 break;
+            default:
+            {
+                // at the moment this limits parallelism, but ensures a
+                // deterministic
+                // trace output on stdout
+                int status;
+                if( waitpid( pid, &status, 0 ) == -1 )
+                {
+                    throw RuntimeException( "error waiting for child process" );
+                }
+                if( WEXITSTATUS( status ) != 0 )
+                {
+                    throw RuntimeException( "error in child process" );
+                }
+
+                if( cond.value.sym->condition )
+                {
+                    sym_cond->op = invert( sym_cond->op );
+                }
+                else
+                {
+                    // needed to generate correct output for boolean functions
+                    // as conditions
+                    delete sym_cond;
+                    sym_cond = new symbolic_condition_t( new value_t( cond ),
+                        new value_t( (INTEGER_T)0 ), ExpressionOperation::EQ );
+                }
+                visitor.path_name += "E";
+                symbolic::dump_if( visitor.trace, global_driver->get_filename(),
+                    node->condition_->location.begin.line, sym_cond );
+                visitor.path_conditions.push_back( sym_cond );
+                if( node->else_ )
+                {
+                    walk_statement( node->else_ );
+                }
+            }
+        }
+    }
+    else if( cond.is_undef() )
+    {
+        throw RuntimeException( node->condition_->location,
+            "condition must be true or false but was undef" );
+    }
+    else if( cond.value.boolean )
+    {
+        walk_statement( node->then_ );
+    }
+    else if( node->else_ )
+    {
+        walk_statement( node->else_ );
+    }
+}
+
+template <>
+void SymbolicExecutionWalker::walk_seqblock( UnaryNode* seqblock )
+{
+    visitor.fork( UpdateSet::Type::Sequential );
+    visitor.visit_seqblock( seqblock );
+    walk_statements( reinterpret_cast< AstListNode* >( seqblock->child_ ) );
+    visitor.merge();
+}
+
+template <>
+void SymbolicExecutionWalker::walk_parblock( UnaryNode* parblock )
+{
+    visitor.fork( UpdateSet::Type::Parallel );
+    visitor.visit_parblock( parblock );
+    walk_statements( reinterpret_cast< AstListNode* >( parblock->child_ ) );
+    visitor.merge();
+}
+
+template <>
+void SymbolicExecutionWalker::walk_pop( PopNode* node )
+{
+    const value_t from = walk_function_atom( node->from );
+    if( node->to->symbol_type == FunctionAtom::SymbolType::FUNCTION
+        and node->to->symbol->is_symbolic )
+    {
+        walk_function_atom( node->to );
+    }
+    visitor.visit_pop( node, from );
+}
+
+template <>
+void SymbolicExecutionWalker::walk_push( PushNode* node )
+{
+    const value_t expr = walk_atom( node->expr );
+    const value_t atom = walk_function_atom( node->to );
+    visitor.visit_push( node, expr, atom );
+}
+
+template <>
+void SymbolicExecutionWalker::walk_case( CaseNode* node )
+{
+    const value_t cond = walk_atom( node->expr );
+
+    for( uint32_t i = 0; i < node->case_list.size(); i++ )
+    {
+        auto pair = node->case_list[ i ];
+        // pair.first == nullptr for default:
+        symbolic_condition_t* sym_cond;
+        if( pair.first )
+        {
+            const value_t c = walk_atom( pair.first );
+            sym_cond = new symbolic_condition_t( new value_t( cond ),
+                new value_t( c ), ExpressionOperation::EQ );
+
+            switch(
+                symbolic::check_condition( visitor.path_conditions, sym_cond ) )
+            {
+                case symbolic::check_status_t::NOT_FOUND:
+                    break;
+                case symbolic::check_status_t::TRUE:
+                    symbolic::dump_pathcond_match( visitor.trace,
+                        global_driver->get_filename(),
+                        pair.first->location.begin.line, sym_cond, true );
+                    walk_statement( pair.second );
+                    return;
+                default:
+                    break;
             }
         }
 
         pid_t pid = fork();
-        switch (pid) {
-        case -1:
-            throw RuntimeException("Could not fork");
-        case 0: {
-            if (pair.first) {
-                visitor.path_name += std::to_string(i);
-                visitor.path_conditions.push_back(sym_cond);
-                symbolic::dump_if(visitor.trace, global_driver->get_filename(),
-                                  pair.first->location.begin.line, sym_cond);
-            } else {
-                visitor.path_name += "D";
+        switch( pid )
+        {
+            case -1:
+                throw RuntimeException( "Could not fork" );
+            case 0:
+            {
+                if( pair.first )
+                {
+                    visitor.path_name += std::to_string( i );
+                    visitor.path_conditions.push_back( sym_cond );
+                    symbolic::dump_if( visitor.trace,
+                        global_driver->get_filename(),
+                        pair.first->location.begin.line, sym_cond );
+                }
+                else
+                {
+                    visitor.path_name += "D";
+                }
+                walk_statement( pair.second );
             }
-            walk_statement(pair.second);
-        }   return;
-        default: {
-            // at the moment this limits parallelism, but ensures a deterministic
-            // trace output on stdout
-            int status;
-            if (waitpid(pid, &status, 0) == -1) {
-                throw RuntimeException("error waiting for child process");
+                return;
+            default:
+            {
+                // at the moment this limits parallelism, but ensures a
+                // deterministic
+                // trace output on stdout
+                int status;
+                if( waitpid( pid, &status, 0 ) == -1 )
+                {
+                    throw RuntimeException( "error waiting for child process" );
+                }
+                if( WEXITSTATUS( status ) != 0 )
+                {
+                    throw RuntimeException( "error in child process" );
+                }
             }
-            if (WEXITSTATUS(status) != 0) {
-                throw RuntimeException("error in child process");
-            }
-        }
         }
     }
-    exit(0); // FIXME EP: ask Florian if this is indended
+    exit( 0 ); // FIXME EP: ask Florian if this is indended
 }
 
 template <>
-void SymbolicExecutionWalker::walk_forall(ForallNode *node)
+void SymbolicExecutionWalker::walk_forall( ForallNode* node )
 {
-    const value_t in_list = walk_atom(node->in_expr);
+    const value_t in_list = walk_atom( node->in_expr );
 
-    visitor.fork(UpdateSet::Type::Parallel);
+    visitor.fork( UpdateSet::Type::Parallel );
 
-    switch (node->in_expr->type_.t) {
-    case TypeType::LIST: {
-        List *l =  in_list.value.list;
-        for (auto iter = l->begin(); iter != l->end(); iter++) {
-            visitor.rule_bindings.back()->push_back(*iter);
-            walk_statement(node->statement);
-            visitor.rule_bindings.back()->pop_back();
-        }
-    }   break;
-    case TypeType::NUMBER_RANGE: {
-        for (auto i : *in_list.value.numberRange) {
-            visitor.rule_bindings.back()->push_back(value_t(i));
-            walk_statement(node->statement);
-            visitor.rule_bindings.back()->pop_back();
-        }
-    }   break;
-
-    case TypeType::INTEGER:
+    switch( node->in_expr->type_.t )
     {
-        INTEGER_T end =  in_list.value.integer;
-        if( end > 0 )
+        case TypeType::LIST:
         {
-            for( INTEGER_T i = 1; i <= end; i++ )
+            List* l = in_list.value.list;
+            for( auto iter = l->begin(); iter != l->end(); iter++ )
             {
-                visitor.rule_bindings.back()->push_back( value_t( i ) );
+                visitor.rule_bindings.back()->push_back( *iter );
                 walk_statement( node->statement );
                 visitor.rule_bindings.back()->pop_back();
             }
         }
-        else
+        break;
+        case TypeType::NUMBER_RANGE:
         {
-            for( INTEGER_T i = end; i <= -1; i++ )
+            for( auto i : *in_list.value.numberRange )
             {
                 visitor.rule_bindings.back()->push_back( value_t( i ) );
                 walk_statement( node->statement );
@@ -1067,42 +1298,75 @@ void SymbolicExecutionWalker::walk_forall(ForallNode *node)
             }
         }
         break;
-    }
-    
-    case TypeType::ENUM: {
-        FunctionAtom *func = reinterpret_cast<FunctionAtom*>(node->in_expr);
-        if (func->name == func->enum_->name) {
-            for (auto pair : func->enum_->mapping) {
-                // why is an element with the name of the enum in the map??
-                if (func->name == pair.first) {
-                    continue;
+
+        case TypeType::INTEGER:
+        {
+            INTEGER_T end = in_list.value.integer;
+            if( end > 0 )
+            {
+                for( INTEGER_T i = 1; i <= end; i++ )
+                {
+                    visitor.rule_bindings.back()->push_back( value_t( i ) );
+                    walk_statement( node->statement );
+                    visitor.rule_bindings.back()->pop_back();
                 }
-                value_t v = value_t(pair.second);
-                v.type = TypeType::ENUM;
-                visitor.rule_bindings.back()->push_back(std::move(v));
-                walk_statement(node->statement);
-                visitor.rule_bindings.back()->pop_back();
             }
-        } else {
-            assert(0);
+            else
+            {
+                for( INTEGER_T i = end; i <= -1; i++ )
+                {
+                    visitor.rule_bindings.back()->push_back( value_t( i ) );
+                    walk_statement( node->statement );
+                    visitor.rule_bindings.back()->pop_back();
+                }
+            }
+            break;
         }
-    }   break;
-    default:
-        assert(0);
+
+        case TypeType::ENUM:
+        {
+            FunctionAtom* func
+                = reinterpret_cast< FunctionAtom* >( node->in_expr );
+            if( func->name == func->enum_->name )
+            {
+                for( auto pair : func->enum_->mapping )
+                {
+                    // why is an element with the name of the enum in the map??
+                    if( func->name == pair.first )
+                    {
+                        continue;
+                    }
+                    value_t v = value_t( pair.second );
+                    v.type = TypeType::ENUM;
+                    visitor.rule_bindings.back()->push_back( std::move( v ) );
+                    walk_statement( node->statement );
+                    visitor.rule_bindings.back()->pop_back();
+                }
+            }
+            else
+            {
+                assert( 0 );
+            }
+        }
+        break;
+        default:
+            assert( 0 );
     }
 
     visitor.merge();
 }
 
 template <>
-void SymbolicExecutionWalker::walk_iterate(UnaryNode *node)
+void SymbolicExecutionWalker::walk_iterate( UnaryNode* node )
 {
-    visitor.fork(UpdateSet::Type::Sequential);
+    visitor.fork( UpdateSet::Type::Sequential );
 
-    while (true) {
-        visitor.fork(UpdateSet::Type::Parallel);
-        walk_statement(node->child_);
-        if (visitor.hasEmptyUpdateSet()) {
+    while( true )
+    {
+        visitor.fork( UpdateSet::Type::Parallel );
+        walk_statement( node->child_ );
+        if( visitor.hasEmptyUpdateSet() )
+        {
             visitor.merge(); // to remove the update set from the stack
             break;
         }
@@ -1113,22 +1377,25 @@ void SymbolicExecutionWalker::walk_iterate(UnaryNode *node)
 }
 
 template <>
-void SymbolicExecutionWalker::walk_update(UpdateNode *node)
+void SymbolicExecutionWalker::walk_update( UpdateNode* node )
 {
-    const value_t expr = walk_atom(node->expr_);
-    if (node->func->symbol->is_symbolic) {
-        walk_atom(node->func);
+    const value_t expr = walk_atom( node->expr_ );
+    if( node->func->symbol->is_symbolic )
+    {
+        walk_atom( node->func );
     }
-    std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
-    visitor.visit_update(node, arguments, expr);
+    std::vector< value_t > arguments
+        = evaluateExpressions( node->func->arguments );
+    visitor.visit_update( node, arguments, expr );
 }
 
 template <>
-void SymbolicExecutionWalker::walk_update_dumps(UpdateNode *node)
+void SymbolicExecutionWalker::walk_update_dumps( UpdateNode* node )
 {
-    const value_t expr = walk_atom(node->expr_);
-    std::vector<value_t> arguments = evaluateExpressions(node->func->arguments);
-    visitor.visit_update_dumps(node, arguments, expr);
+    const value_t expr = walk_atom( node->expr_ );
+    std::vector< value_t > arguments
+        = evaluateExpressions( node->func->arguments );
+    visitor.visit_update_dumps( node, arguments, expr );
 }
 
 //

@@ -28,10 +28,10 @@
 
 #include <set>
 
-#include "UpdateSet.h"
-#include "../allocator/BlockAllocator.h"
-#include "../Visitor.h"
 #include "../Ast.h"
+#include "../Visitor.h"
+#include "../allocator/BlockAllocator.h"
+#include "UpdateSet.h"
 
 #include "ChainedHashMap.h"
 #include "ProbingHashMap.h"
@@ -41,108 +41,146 @@
 
 /**
    @brief    TODO
-   
+
    TODO
 */
 
 namespace libcasm_fe
 {
-    using FunctionState = ChainedHashMap<std::vector<value_t>, value_t>;
+    using FunctionState = ChainedHashMap< std::vector< value_t >, value_t >;
 
-    class ExecutionPassBase : public BaseVisitor<value_t>
+    class ExecutionPassBase : public BaseVisitor< value_t >
     {
-    public:
+      public:
         static char id;
 
         bool hasEmptyUpdateSet() const;
-        Update* addUpdate(Function *sym, const std::vector<value_t> &arguments,
-                          const value_t& val, const yy::location& location);
+        Update* addUpdate( Function* sym,
+            const std::vector< value_t >& arguments, const value_t& val,
+            const yy::location& location );
 
-        void fork(const UpdateSet::Type updateSetType);
+        void fork( const UpdateSet::Type updateSetType );
         void merge();
         void applyUpdates();
 
-        value_t functionValue(Function* function, const std::vector<value_t>& arguments);
+        value_t functionValue(
+            Function* function, const std::vector< value_t >& arguments );
 
-        bool filter_enabled(const std::string& filter);
+        bool filter_enabled( const std::string& filter );
 
-        void visit_assert(UnaryNode* assert, const value_t& val);
+        void visit_assert( UnaryNode* assert, const value_t& val );
 
-        void visit_update(UpdateNode *update, const std::vector<value_t>& arguments, const value_t& expr_v);
-        void visit_update_dumps(UpdateNode *update, const std::vector<value_t>& arguments, const value_t& expr_v);
+        void visit_update( UpdateNode* update,
+            const std::vector< value_t >& arguments, const value_t& expr_v );
+        void visit_update_dumps( UpdateNode* update,
+            const std::vector< value_t >& arguments, const value_t& expr_v );
 
-        void visit_call_pre(CallNode *call);
-        void visit_call_pre(CallNode *call, const value_t& expr);
-        void visit_call(CallNode *call, std::vector<value_t> &arguments);
-        void visit_call_post(CallNode *call);
-        void visit_diedie(DiedieNode *node, const value_t& msg);
-        void visit_impossible(AstNode *node);
+        void visit_call_pre( CallNode* call );
+        void visit_call_pre( CallNode* call, const value_t& expr );
+        void visit_call( CallNode* call, std::vector< value_t >& arguments );
+        void visit_call_post( CallNode* call );
+        void visit_diedie( DiedieNode* node, const value_t& msg );
+        void visit_impossible( AstNode* node );
 
-        void visit_let(LetNode *node, const value_t& v);
-        void visit_let_post(LetNode *node);
+        void visit_let( LetNode* node, const value_t& v );
+        void visit_let_post( LetNode* node );
 
-        const value_t visit_int_atom(IntegerAtom *atom) { return value_t(atom->val_); }
-        const value_t visit_bit_atom(IntegerAtom *atom) { return value_t(atom->val_); }
-        const value_t visit_floating_atom(FloatingAtom *atom) { return value_t(atom->val_); }
-        const value_t visit_rational_atom(RationalAtom *atom) { return value_t(&atom->val_); }
-        const value_t visit_undef_atom(UndefAtom *atom) { UNUSED(atom); return value_t(); }
-        const value_t visit_function_atom(FunctionAtom *atom, std::vector<value_t> &arguments);
+        const value_t visit_int_atom( IntegerAtom* atom )
+        {
+            return value_t( atom->val_ );
+        }
+        const value_t visit_bit_atom( IntegerAtom* atom )
+        {
+            return value_t( atom->val_ );
+        }
+        const value_t visit_floating_atom( FloatingAtom* atom )
+        {
+            return value_t( atom->val_ );
+        }
+        const value_t visit_rational_atom( RationalAtom* atom )
+        {
+            return value_t( &atom->val_ );
+        }
+        const value_t visit_undef_atom( UndefAtom* atom )
+        {
+            UNUSED( atom );
+            return value_t();
+        }
+        const value_t visit_function_atom(
+            FunctionAtom* atom, std::vector< value_t >& arguments );
 
-        const value_t visit_builtin_atom(BuiltinAtom *atom, std::vector<value_t> &arguments);
-        void visit_derived_function_atom_pre(FunctionAtom *atom, std::vector<value_t> &arguments);
-        const value_t visit_derived_function_atom(FunctionAtom *atom, const value_t& expr);
-        const value_t visit_self_atom(SelfAtom *atom) { UNUSED(atom); return value_t(); }
-        const value_t visit_rule_atom(RuleAtom *atom) { return value_t(atom->rule); }
-        const value_t visit_boolean_atom(BooleanAtom *atom) { return value_t(atom->value); }
-        const value_t visit_string_atom(StringAtom *atom) { return value_t(&atom->string); }
-        const value_t visit_number_range_atom(NumberRangeAtom *atom,
-                                              const value_t& left,
-                                              const value_t& right);
+        const value_t visit_builtin_atom(
+            BuiltinAtom* atom, std::vector< value_t >& arguments );
+        void visit_derived_function_atom_pre(
+            FunctionAtom* atom, std::vector< value_t >& arguments );
+        const value_t visit_derived_function_atom(
+            FunctionAtom* atom, const value_t& expr );
+        const value_t visit_self_atom( SelfAtom* atom )
+        {
+            UNUSED( atom );
+            return value_t();
+        }
+        const value_t visit_rule_atom( RuleAtom* atom )
+        {
+            return value_t( atom->rule );
+        }
+        const value_t visit_boolean_atom( BooleanAtom* atom )
+        {
+            return value_t( atom->value );
+        }
+        const value_t visit_string_atom( StringAtom* atom )
+        {
+            return value_t( &atom->string );
+        }
+        const value_t visit_number_range_atom(
+            NumberRangeAtom* atom, const value_t& left, const value_t& right );
 
-    protected:
+      protected:
         /**
          * @throws std::domain_error if any argument is out of range
          */
-        void validateArguments(const std::vector<Type*>& argumentTypes,
-                               const std::vector<value_t>& argumentValues) const;
+        void validateArguments( const std::vector< Type* >& argumentTypes,
+            const std::vector< value_t >& argumentValues ) const;
 
         /**
          * @throws std::domain_error if value is out of range
          */
-        void validateValue(const Type* type, const value_t& value) const;
+        void validateValue( const Type* type, const value_t& value ) const;
 
-        virtual value_t defaultFunctionValue(Function* function, const std::vector<value_t>& arguments);
+        virtual value_t defaultFunctionValue(
+            Function* function, const std::vector< value_t >& arguments );
 
-    protected:
-        std::vector<value_t> main_bindings;
+      protected:
+        std::vector< value_t > main_bindings;
         UpdateSetManager updateSetManager;
 
-        BlockAllocator<TEMP_STACK_SIZE> stack;
-        std::map<const std::string, bool> debuginfo_filters;
+        BlockAllocator< TEMP_STACK_SIZE > stack;
+        std::map< const std::string, bool > debuginfo_filters;
 
-        std::set<std::string> initialized;
+        std::set< std::string > initialized;
 
-    public:
-        std::vector<std::vector<value_t> *> rule_bindings;
+      public:
+        std::vector< std::vector< value_t >* > rule_bindings;
 
-        std::vector<FunctionState> function_states;
-        std::vector<const Function*> function_symbols;
+        std::vector< FunctionState > function_states;
+        std::vector< const Function* > function_symbols;
 
-        std::vector<List*> temp_lists;
+        std::vector< List* > temp_lists;
     };
 }
 
 namespace builtins
 {
-    const value_t cons(std::vector<List*>& tempLists, const value_t& val, const value_t& list);
-    const value_t tail(std::vector<List*>& tempLists, const value_t& arg_list);
-    const value_t peek(const value_t& arg_list);
+    const value_t cons( std::vector< List* >& tempLists, const value_t& val,
+        const value_t& list );
+    const value_t tail(
+        std::vector< List* >& tempLists, const value_t& arg_list );
+    const value_t peek( const value_t& arg_list );
 }
 
 #endif /* _LIB_CASMFE_EXECUTIONPASSBASE_H_ */
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil

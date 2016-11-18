@@ -27,37 +27,31 @@
 
 using namespace libcasm_fe;
 
-
 char AstDumpPass::id = 0;
 
-static libpass::PassRegistration< AstDumpPass > PASS
-( "AST Dumping Pass"
-, "generates a DOT graph of the AST and dumps it to './obj/out.dot' for now"
-, "ast-dump"
-, 0
-);
-
+static libpass::PassRegistration< AstDumpPass > PASS( "AST Dumping Pass",
+    "generates a DOT graph of the AST and dumps it to './obj/out.dot' for now",
+    "ast-dump", 0 );
 
 bool AstDumpPass::run( libpass::PassResult& pr )
 {
     Ast* node = (Ast*)pr.getResult< TypeCheckPass >();
-    
+
     AstWalker< AstDumpVisitor, bool > dump_walker( *this );
-    
+
     dump_walker.suppress_calls = true;
     dump_walker.walk_specification( node );
-    
+
     // std::cout << this->get_dump() << std::endl;
-    
+
     std::ofstream dotfile( "./obj/out.dot" );
     dotfile << this->get_dump() << "\n";
     dotfile.close();
-    
+
     return true;
 }
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -65,4 +59,4 @@ bool AstDumpPass::run( libpass::PassResult& pr )
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//

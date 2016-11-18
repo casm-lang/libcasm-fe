@@ -23,647 +23,693 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "FunctionCycleVisitor.h"
 #include "TypeCheckVisitor.h"
 #include "Codes.h"
+#include "FunctionCycleVisitor.h"
 
 #include <cmath>
 
-TypecheckVisitor::TypecheckVisitor(Driver& driver) : driver_(driver), rule_binding_types(), rule_binding_offsets(), forall_head(false) { }
-
-void TypecheckVisitor::check_type_valid(const yy::location& location, const Type& type) {
-  if( type == TypeType::ENUM
-  &&  !driver_.function_table.get_enum(type.enum_name)
-  )
-  {
-      driver_.error
-      ( location
-      , "unknown type '" + type.enum_name + "'"
-      , libcasm_fe::Codes::TypeUnknown
-      );
-  }
+TypecheckVisitor::TypecheckVisitor( Driver& driver )
+: driver_( driver )
+, rule_binding_types()
+, rule_binding_offsets()
+, forall_head( false )
+{
 }
 
-
-void TypecheckVisitor::visit_function_def(FunctionDefNode *def,
-                                          const std::vector<std::pair<Type*, Type*>>& initializers) {
-
-  check_type_valid(def->location, *def->sym->return_type_);
-
-  // Check if argument types are valid
-  for (Type* argument_t : def->sym->arguments_) {
-      check_type_valid(def->location, *argument_t);
-  }
-
-  // check if initializer types match argument types
-  
-  for (size_t i = 0; i < initializers.size(); i++) {
-    const std::pair<Type*, Type*>& p = initializers[i];
-
-    Type* t     = p.second;
-    Type* other = def->sym->return_type_;
-    if( ( t->t == TypeType::BIT and other->t == TypeType::INTEGER )
-    or  ( t->t == TypeType::INTEGER and other->t == TypeType::BIT )
-    )
+void TypecheckVisitor::check_type_valid(
+    const yy::location& location, const Type& type )
+{
+    if( type == TypeType::ENUM
+        && !driver_.function_table.get_enum( type.enum_name ) )
     {
-    	Type* b = t;
-    	Type* i = other;
-	
-    	if( t->t == TypeType::INTEGER )
-    	{
-    	    b = other;
-    	    i = t;
-    	}
-	
-    	i->t = b->t;
+        driver_.error( location, "unknown type '" + type.enum_name + "'",
+            libcasm_fe::Codes::TypeUnknown );
     }
-    
-    // check type of initializer and type of function type
-    if (!p.second->unify(def->sym->return_type_)) {
-      driver_.error(def->sym->intitializers_->at(i).second->location,
-                    "type of initializer of function `" +def->sym->name+
-                    "` is "+p.second->to_str()+" but should be "+
-                    def->sym->return_type_->to_str()+"");
-    }
-    
-    if( def->sym->return_type_->t == TypeType::BIT
-    and p.second->t == TypeType::BIT
-    )
-    {
-    	INTEGER_T bitsize = def->sym->return_type_->bitsize;
-        INTEGER_T value = -1;
-        INTEGER_T value_bitsize = -1;
-        
-    	assert( def->sym->intitializers_->at(i).second->node_type_ == NodeType::INTEGER_ATOM );
-    	{
-    	    value = static_cast< IntegerAtom* >( def->sym->intitializers_->at(i).second )->val_;
-    	    double v = (double)value;
-    	    v = floor(log2( v )) + 1;
-            value_bitsize = (INTEGER_T)v;
-    	}
-        
-    	if( value_bitsize > bitsize )
-    	{
-    	    driver_.error
-            ( def->sym->intitializers_->at(i).second->location
-    	    , "initially value bitsize '"
-    	      + std::to_string( value_bitsize )
-    	      + "' does not fit into the bitsize of '"
-    	      + std::to_string( bitsize )
-    	      + "'"
-    	    , libcasm_fe::Codes::TypeBitSizeInvalidInIninitallyExpression
-            );
-    	}
+}
 
-	def->sym->intitializers_->at(i).second->type_.bitsize = bitsize;
+void TypecheckVisitor::visit_function_def( FunctionDefNode* def,
+    const std::vector< std::pair< Type*, Type* > >& initializers )
+{
+
+    check_type_valid( def->location, *def->sym->return_type_ );
+
+    // Check if argument types are valid
+    for( Type* argument_t : def->sym->arguments_ )
+    {
+        check_type_valid( def->location, *argument_t );
     }
-    
-    // check arument types
-    if (def->sym->arguments_.size() == 0) {
-      if (def->sym->intitializers_->at(i).first) {
-        driver_.error(def->sym->intitializers_->at(i).first->location,
+
+    // check if initializer types match argument types
+
+    for( size_t i = 0; i < initializers.size(); i++ )
+    {
+        const std::pair< Type*, Type* >& p = initializers[ i ];
+
+        Type* t = p.second;
+        Type* other = def->sym->return_type_;
+        if( ( t->t == TypeType::BIT and other->t == TypeType::INTEGER )
+            or ( t->t == TypeType::INTEGER and other->t == TypeType::BIT ) )
+        {
+            Type* b = t;
+            Type* i = other;
+
+            if( t->t == TypeType::INTEGER )
+            {
+                b = other;
+                i = t;
+            }
+
+            i->t = b->t;
+        }
+
+        // check type of initializer and type of function type
+        if( !p.second->unify( def->sym->return_type_ ) )
+        {
+            driver_.error( def->sym->intitializers_->at( i ).second->location,
+                "type of initializer of function `" + def->sym->name + "` is "
+                    + p.second->to_str()
+                    + " but should be "
+                    + def->sym->return_type_->to_str()
+                    + "" );
+        }
+
+        if( def->sym->return_type_->t == TypeType::BIT
+            and p.second->t == TypeType::BIT )
+        {
+            INTEGER_T bitsize = def->sym->return_type_->bitsize;
+            INTEGER_T value = -1;
+            INTEGER_T value_bitsize = -1;
+
+            assert( def->sym->intitializers_->at( i ).second->node_type_
+                    == NodeType::INTEGER_ATOM );
+            {
+                value = static_cast< IntegerAtom* >(
+                    def->sym->intitializers_->at( i ).second )
+                            ->val_;
+                double v = (double)value;
+                v = floor( log2( v ) ) + 1;
+                value_bitsize = (INTEGER_T)v;
+            }
+
+            if( value_bitsize > bitsize )
+            {
+                driver_.error(
+                    def->sym->intitializers_->at( i ).second->location,
+                    "initially value bitsize '"
+                        + std::to_string( value_bitsize )
+                        + "' does not fit into the bitsize of '"
+                        + std::to_string( bitsize ) + "'",
+                    libcasm_fe::Codes::
+                        TypeBitSizeInvalidInIninitallyExpression );
+            }
+
+            def->sym->intitializers_->at( i ).second->type_.bitsize = bitsize;
+        }
+
+        // check arument types
+        if( def->sym->arguments_.size() == 0 )
+        {
+            if( def->sym->intitializers_->at( i ).first )
+            {
+                driver_.error(def->sym->intitializers_->at(i).first->location,
                       "function `" +def->sym->name+
                        "` does not accept arguments but initializer provides some");
-      }
-    } else if (def->sym->arguments_.size() == 1) {
-      if (def->sym->intitializers_->at(i).first && !p.first->unify(def->sym->arguments_[0])) {
-        driver_.error(def->sym->intitializers_->at(i).first->location,
-                      "type of initializer argument of function `" +def->sym->name+
-                       "` is "+p.first->to_str()+" but should be "+
-                       def->sym->arguments_[0]->to_str());
-      } else if (!def->sym->intitializers_->at(i).first) {
-        driver_.error(def->sym->intitializers_->at(i).second->location,
+            }
+        }
+        else if( def->sym->arguments_.size() == 1 )
+        {
+            if( def->sym->intitializers_->at( i ).first
+                && !p.first->unify( def->sym->arguments_[ 0 ] ) )
+            {
+                driver_.error(
+                    def->sym->intitializers_->at( i ).first->location,
+                    "type of initializer argument of function `"
+                        + def->sym->name
+                        + "` is "
+                        + p.first->to_str()
+                        + " but should be "
+                        + def->sym->arguments_[ 0 ]->to_str() );
+            }
+            else if( !def->sym->intitializers_->at( i ).first )
+            {
+                driver_.error(def->sym->intitializers_->at(i).second->location,
                       "function `" +def->sym->name+
                        "` needs one argument but initializer does not provide one");
-      }
-    } else {
-      if (def->sym->intitializers_->at(i).first) {
-        Type arg_tuple = Type(TypeType::TUPLE, def->sym->arguments_);
-        if (!p.first->unify(&arg_tuple)) {
-          driver_.error(def->sym->intitializers_->at(i).first->location,
-                        "type of initializer arguments of function `" +def->sym->name+
-                         "` is "+p.first->to_str()+" but should be "+
-                         arg_tuple.to_str());
+            }
         }
-      } else if (!def->sym->intitializers_->at(i).first) {
-        driver_.error(def->sym->intitializers_->at(i).second->location,
+        else
+        {
+            if( def->sym->intitializers_->at( i ).first )
+            {
+                Type arg_tuple = Type( TypeType::TUPLE, def->sym->arguments_ );
+                if( !p.first->unify( &arg_tuple ) )
+                {
+                    driver_.error(
+                        def->sym->intitializers_->at( i ).first->location,
+                        "type of initializer arguments of function `"
+                            + def->sym->name
+                            + "` is "
+                            + p.first->to_str()
+                            + " but should be "
+                            + arg_tuple.to_str() );
+                }
+            }
+            else if( !def->sym->intitializers_->at( i ).first )
+            {
+                driver_.error(def->sym->intitializers_->at(i).second->location,
                       "function `" +def->sym->name+
                        "` needs multiple arguments but initializer does not provide any");
-      }
-   
+            }
+        }
     }
-  }
 
-  InitCycleVisitor v;
-  AstWalker<InitCycleVisitor, bool> walker(v);
-  walker.walk_function_def(def);
-  driver_.init_dependencies[def->sym->name] = walker.visitor.dependency_names;
+    InitCycleVisitor v;
+    AstWalker< InitCycleVisitor, bool > walker( v );
+    walker.walk_function_def( def );
+    driver_.init_dependencies[ def->sym->name ]
+        = walker.visitor.dependency_names;
 }
 
-void TypecheckVisitor::visit_derived_def_pre(FunctionDefNode *def) {
-  auto foo = new std::vector<Type*>();
-  for (Type *arg : def->sym->arguments_) {
-    foo->push_back(arg);
-  }
-  rule_binding_types.push_back(foo);
-  rule_binding_offsets.push_back(&def->sym->binding_offsets);
+void TypecheckVisitor::visit_derived_def_pre( FunctionDefNode* def )
+{
+    auto foo = new std::vector< Type* >();
+    for( Type* arg : def->sym->arguments_ )
+    {
+        foo->push_back( arg );
+    }
+    rule_binding_types.push_back( foo );
+    rule_binding_offsets.push_back( &def->sym->binding_offsets );
 }
 
-
-void TypecheckVisitor::visit_derived_def( FunctionDefNode *def, Type* expr )
+void TypecheckVisitor::visit_derived_def( FunctionDefNode* def, Type* expr )
 {
     rule_binding_types.pop_back();
     rule_binding_offsets.pop_back();
 
     if( not def->sym->return_type_->unify( expr ) )
     {
-	driver_.error
-	( def->location
-	, "type of derived expression is '"
-	  + expr->to_str()
-	  + "', but specified as '"
-	  + def->sym->return_type_->to_str()
-	  + "'"
-	);
+        driver_.error(
+            def->location, "type of derived expression is '" + expr->to_str()
+                               + "', but specified as '"
+                               + def->sym->return_type_->to_str() + "'" );
     }
     else if( not def->sym->return_type_->is_complete() )
     {
-	driver_.error
-	( def->location
-	, "type of derived expression is unknown because type of expression is "
-	  + expr->to_str()
-	, libcasm_fe::Codes::DerivedExpressionInvalidType
-	);
+        driver_.error( def->location,
+            "type of derived expression is unknown because type of expression "
+            "is "
+                + expr->to_str(),
+            libcasm_fe::Codes::DerivedExpressionInvalidType );
     }
-    
-    if( def->sym->return_type_->t  == TypeType::BIT
-    and def->sym->derived->type_.t == TypeType::BIT
-    and def->sym->return_type_->bitsize  != def->sym->derived->type_.bitsize
-    )
+
+    if( def->sym->return_type_->t == TypeType::BIT
+        and def->sym->derived->type_.t == TypeType::BIT
+        and def->sym->return_type_->bitsize
+                != def->sym->derived->type_.bitsize )
     {
-	driver_.error
-	( def->location
-	, "expression bit size does not match the return type bit size"
-	);
-    }
-    
-    for( auto arg : def->sym->binding_offsets )
-    {
-	def->sym->parameter.push_back( 0 );
+        driver_.error( def->location,
+            "expression bit size does not match the return type bit size" );
     }
 
     for( auto arg : def->sym->binding_offsets )
     {
-	uint32_t i = arg.second;
-	assert( i < def->sym->parameter.size() and "invalid parameter index found!" );
-      
-	def->sym->parameter[i] = arg.first.c_str();
+        def->sym->parameter.push_back( 0 );
+    }
+
+    for( auto arg : def->sym->binding_offsets )
+    {
+        uint32_t i = arg.second;
+        assert( i < def->sym->parameter.size()
+                and "invalid parameter index found!" );
+
+        def->sym->parameter[ i ] = arg.first.c_str();
     }
 }
 
+void TypecheckVisitor::visit_rule( RuleNode* rule )
+{
+    auto foo = new std::vector< Type* >();
+    for( Type* arg : rule->arguments )
+    {
+        foo->push_back( arg );
+    }
+    rule_binding_types.push_back( foo );
+    rule_binding_offsets.push_back( &rule->binding_offsets );
 
-void TypecheckVisitor::visit_rule(RuleNode *rule) {
-  auto foo = new std::vector<Type*>();
-  for (Type *arg : rule->arguments) {
-    foo->push_back(arg);
-  }
-  rule_binding_types.push_back(foo);
-  rule_binding_offsets.push_back(&rule->binding_offsets);
+    for( auto& pair : rule->dump_list )
+    {
+        for( const std::string& identifier : pair.second )
+        {
+            Function* sym = driver_.function_table.get_function( identifier );
+            if( sym )
+            {
+                driver_.function_trace_map.emplace( sym->id, pair.first );
+            }
+            else
+            {
+                driver_.error( rule->location,
+                    std::string(
+                        "names in dumplist must be function identifiers" )
+                        + " but `" + identifier + "` is not a function" );
+            }
+        }
+    }
 
-  for  (auto& pair : rule->dump_list) {
-    for (const std::string& identifier : pair.second) {
-      Function *sym = driver_.function_table.get_function(identifier);
-      if (sym) {
-        driver_.function_trace_map.emplace(sym->id, pair.first);
-      } else {
-        driver_.error(rule->location, std::string("names in dumplist must be function identifiers")+
-                                     " but `"+identifier+"` is not a function");
-      }
-    } 
-  }
-  
-  for( auto arg : rule->binding_offsets )
-  {
-      rule->parameter.push_back( 0 );
-  }
+    for( auto arg : rule->binding_offsets )
+    {
+        rule->parameter.push_back( 0 );
+    }
 
-  for( auto arg : rule->binding_offsets )
-  {
-      uint32_t i = arg.second;
-      assert( i < rule->parameter.size() and "invalid parameter index found!" );
-      
-      rule->parameter[i] = arg.first.c_str();
-  }
+    for( auto arg : rule->binding_offsets )
+    {
+        uint32_t i = arg.second;
+        assert(
+            i < rule->parameter.size() and "invalid parameter index found!" );
+
+        rule->parameter[ i ] = arg.first.c_str();
+    }
 }
 
-
-void TypecheckVisitor::visit_ifthenelse( IfThenElseNode *node, Type* cond )
+void TypecheckVisitor::visit_ifthenelse( IfThenElseNode* node, Type* cond )
 {
     if( *cond != TypeType::BOOLEAN )
     {
-	driver_.error
-	( node->condition_->location
-	, "type of 'if' expression should be 'Boolean', found '"
-	  + cond->to_str()
-	  + "'"
-	  , libcasm_fe::Codes::TypeInferenceInvalidIfExpression
-	);
+        driver_.error( node->condition_->location,
+            "type of 'if' expression should be 'Boolean', found '"
+                + cond->to_str() + "'",
+            libcasm_fe::Codes::TypeInferenceInvalidIfExpression );
     }
 }
 
-
-void TypecheckVisitor::visit_assert(UnaryNode *assert, Type* val) {
-  if (*val != TypeType::BOOLEAN) {
-    driver_.error(assert->child_->location,
-                  "type of expression should be `Bool` but was `" +val->to_str()+"`");
-  }
+void TypecheckVisitor::visit_assert( UnaryNode* assert, Type* val )
+{
+    if( *val != TypeType::BOOLEAN )
+    {
+        driver_.error( assert->child_->location,
+            "type of expression should be `Bool` but was `" + val->to_str()
+                + "`" );
+    }
 }
 
-void TypecheckVisitor::visit_update(UpdateNode *update, Type*, Type*) {
-  if (update->func->symbol && update->func->symbol->is_static) {
-    driver_.error(update->location, "cannot update static function `"+update->func->name+"`");
-  }
+void TypecheckVisitor::visit_update( UpdateNode* update, Type*, Type* )
+{
+    if( update->func->symbol && update->func->symbol->is_static )
+    {
+        driver_.error( update->location,
+            "cannot update static function `" + update->func->name + "`" );
+    }
 
-  if (!update->func->type_.unify(&update->expr_->type_)) {
-    driver_.error(update->location, "type `"+update->func->type_.get_most_general_type(update->func)->to_str()+"` of `"+
-                                    update->func->name+"` does not match type `"+
-                                    update->expr_->type_.get_most_general_type(update->expr_)->to_str()+"` of expression");
-  }
+    if( !update->func->type_.unify( &update->expr_->type_ ) )
+    {
+        driver_.error( update->location,
+            "type `"
+                + update->func->type_.get_most_general_type( update->func )
+                      ->to_str()
+                + "` of `" + update->func->name + "` does not match type `"
+                + update->expr_->type_.get_most_general_type( update->expr_ )
+                      ->to_str()
+                + "` of expression" );
+    }
 
-  const Type* lhs = update->func->type_.get_most_general_type(update->func);
-  const Type* rhs = update->expr_->type_.get_most_general_type(update->expr_);
-  
-  if( lhs->t == TypeType::BIT
-   && lhs->bitsize != rhs->bitsize )
-  {      
-      driver_.error( update->location,
-                     "type of '" + lhs->to_str() +
-                     "' of '" + update->func->name +
-                     "' does not match type '" + rhs->to_str() +
-                     "' of expression" );   
-  }
-  
-  if (update->func->symbol_type == FunctionAtom::SymbolType::PARAMETER) {
-    driver_.error(update->location, "cannot update `"+update->func->name+
-                                    "` because it is a parameter, not a function");
-  }
+    const Type* lhs = update->func->type_.get_most_general_type( update->func );
+    const Type* rhs
+        = update->expr_->type_.get_most_general_type( update->expr_ );
 
-  update->type_ = update->func->type_;
+    if( lhs->t == TypeType::BIT && lhs->bitsize != rhs->bitsize )
+    {
+        driver_.error( update->location,
+            "type of '" + lhs->to_str() + "' of '" + update->func->name
+                + "' does not match type '"
+                + rhs->to_str()
+                + "' of expression" );
+    }
 
-  if (update->func->symbol && driver_.function_trace_map.count(update->func->symbol->id) > 0) {
-    update->node_type_ = NodeType::UPDATE_DUMPS;
-  }
+    if( update->func->symbol_type == FunctionAtom::SymbolType::PARAMETER )
+    {
+        driver_.error( update->location,
+            "cannot update `" + update->func->name
+                + "` because it is a parameter, not a function" );
+    }
+
+    update->type_ = update->func->type_;
+
+    if( update->func->symbol
+        && driver_.function_trace_map.count( update->func->symbol->id ) > 0 )
+    {
+        update->node_type_ = NodeType::UPDATE_DUMPS;
+    }
 }
 
-void TypecheckVisitor::visit_call_pre(CallNode *call) {
-  if (driver_.rules_map_.count(call->rule_name) == 1) {
-   call->rule = driver_.rules_map_[call->rule_name];
-  } else {
-    driver_.error(call->location, "no rule with name `"+call->rule_name+"` found");
-  }
+void TypecheckVisitor::visit_call_pre( CallNode* call )
+{
+    if( driver_.rules_map_.count( call->rule_name ) == 1 )
+    {
+        call->rule = driver_.rules_map_[ call->rule_name ];
+    }
+    else
+    {
+        driver_.error( call->location,
+            "no rule with name `" + call->rule_name + "` found" );
+    }
 }
 
-void TypecheckVisitor::visit_call_pre(CallNode *call, Type* expr) {
-  if (*expr != TypeType::RULEREF) {
-    driver_.error(call->ruleref->location, "Indirect target must be a `Ruleref` but was `"+
-                                            expr->to_str()+"`");
-  }
+void TypecheckVisitor::visit_call_pre( CallNode* call, Type* expr )
+{
+    if( *expr != TypeType::RULEREF )
+    {
+        driver_.error( call->ruleref->location,
+            "Indirect target must be a `Ruleref` but was `" + expr->to_str()
+                + "`" );
+    }
 }
 
-void TypecheckVisitor::visit_call( CallNode *call, std::vector<Type*> &arguments )
+void TypecheckVisitor::visit_call(
+    CallNode* call, std::vector< Type* >& arguments )
 {
     // typecheck for indirect calls happens during execution
     if( call->ruleref )
     {
-    return;
+        return;
     }
-    
+
     size_t args_defined = call->rule->arguments.size();
     size_t args_provided = arguments.size();
-    
+
     if( args_defined != args_provided )
     {
-    driver_.error
-    ( call->location
-    , "rule '"
-      + call->rule_name
-      + "' expects "
-      + std::to_string( args_defined )
-      + " arguments but "
-      + std::to_string( args_provided )
-      + " where provided"
-    , libcasm_fe::Codes::RuleArgumentsSizeInvalidAtCall
-    );
+        driver_.error( call->location,
+            "rule '" + call->rule_name + "' expects "
+                + std::to_string( args_defined ) + " arguments but "
+                + std::to_string( args_provided ) + " where provided",
+            libcasm_fe::Codes::RuleArgumentsSizeInvalidAtCall );
     }
     else
     {
-    for( size_t i = 0; i < args_defined; i++ )
-    {
-        if( not call->rule->arguments.at(i)->unify( arguments.at(i) ) )
+        for( size_t i = 0; i < args_defined; i++ )
         {
-        driver_.error
-        ( call->arguments->at( i )->location
-        , "argument "
-          + std::to_string( i + 1 )
-          + " of rule '"
-          + call->rule_name
-          + "' must be '"
-          + call->rule->arguments.at(i)->to_str()
-          + "' but was '"
-          + arguments.at(i)->to_str()
-          + "'"
-        , libcasm_fe::Codes::RuleArgumentsTypeInvalidAtCall
-        );
+            if( not call->rule->arguments.at( i )->unify( arguments.at( i ) ) )
+            {
+                driver_.error( call->arguments->at( i )->location,
+                    "argument " + std::to_string( i + 1 ) + " of rule '"
+                        + call->rule_name + "' must be '"
+                        + call->rule->arguments.at( i )->to_str()
+                        + "' but was '" + arguments.at( i )->to_str() + "'",
+                    libcasm_fe::Codes::RuleArgumentsTypeInvalidAtCall );
+            }
         }
     }
-    }
 }
 
-void TypecheckVisitor::visit_call_post( CallNode *call )
+void TypecheckVisitor::visit_call_post( CallNode* call )
 {
-    UNUSED(call);
+    UNUSED( call );
 }
-
 
 void TypecheckVisitor::visit_print( PrintNode* node, Type* type )
 {
     if( node->getAtom()->type_.t == TypeType::UNKNOWN )
     {
-        driver_.error
-        ( node->getAtom()->location
-        , "unable to annotate type of print statement"
-    , libcasm_fe::Codes::TypeInferenceInvalidPrint
-        );
+        driver_.error( node->getAtom()->location,
+            "unable to annotate type of print statement",
+            libcasm_fe::Codes::TypeInferenceInvalidPrint );
     }
 }
 
-
-void TypecheckVisitor::visit_diedie(DiedieNode *node, Type* msg) {
-  if (node->msg && !node->msg->type_.unify(TypeType::STRING)) {
-    driver_.error(node->msg->location,
-                  "expression of `diedie` must be a String but was "+msg->to_str());
-  }
+void TypecheckVisitor::visit_diedie( DiedieNode* node, Type* msg )
+{
+    if( node->msg && !node->msg->type_.unify( TypeType::STRING ) )
+    {
+        driver_.error( node->msg->location,
+            "expression of `diedie` must be a String but was "
+                + msg->to_str() );
+    }
 }
 
-
-void TypecheckVisitor::visit_let( LetNode *node, Type* )
+void TypecheckVisitor::visit_let( LetNode* node, Type* )
 {
     if( node->type_ == TypeType::ENUM
-    and not driver_.function_table.get_enum( node->type_.enum_name )
-    )
+        and not driver_.function_table.get_enum( node->type_.enum_name ) )
     {
-	driver_.error
-	( node->location
-	, "unknown type '"
-	  + node->type_.enum_name
-	  + "'"
-	);
+        driver_.error(
+            node->location, "unknown type '" + node->type_.enum_name + "'" );
     }
-    
+
     if( node->type_.t == TypeType::BIT )
     {
-	if( node->expr->type_.t == TypeType::INTEGER or node->expr->type_.t == TypeType::UNKNOWN )
-	{
-	    node->expr->type_ = node->type_;
-	}
+        if( node->expr->type_.t == TypeType::INTEGER
+            or node->expr->type_.t == TypeType::UNKNOWN )
+        {
+            node->expr->type_ = node->type_;
+        }
     }
-    
+
     if( not node->type_.unify( &node->expr->type_ ) )
     {
-	driver_.error
-	( node->location
-	, "type of let conflicts with type of expression"
-	);
+        driver_.error(
+            node->location, "type of let conflicts with type of expression" );
     }
-    
+
     node->type_.get_most_general_type( node );
     node->expr->type_.get_most_general_type( node->expr );
     DEBUG( node->type_.unify_links_to_str() );
-    
-    if( node->type_.t       == TypeType::BIT
-    and node->expr->type_.t == TypeType::BIT
-    )
+
+    if( node->type_.t == TypeType::BIT
+        and node->expr->type_.t == TypeType::BIT )
     {
-    	INTEGER_T bitsize = node->type_.bitsize;
+        INTEGER_T bitsize = node->type_.bitsize;
         INTEGER_T value = -1;
         INTEGER_T value_bitsize = -1;
-        
-    	if( node->expr->node_type_ == NodeType::INTEGER_ATOM )
-    	{
-    	    value = static_cast< IntegerAtom* >( node->expr )->val_;
-    	    double v = (double)value;
-    	    v = floor(log2( v )) + 1;
-    	    value_bitsize = (INTEGER_T)v;
-    	}
-	else
-	{
-	    value_bitsize = node->expr->type_.bitsize;
-	}
-	
-    	if( value_bitsize > bitsize )
-    	{
-    	    driver_.error
-            ( node->expr->location
-    	    , "let expression bitsize '"
-    	      + std::to_string( value_bitsize )
-    	      + "' does not fit into the bitsize of '"
-    	      + std::to_string( bitsize )
-    	      + "'"
-    	    , libcasm_fe::Codes::TypeBitSizeInvalidInLetExpression
-            );            
-    	}
 
-	node->expr->type_.bitsize = bitsize;
+        if( node->expr->node_type_ == NodeType::INTEGER_ATOM )
+        {
+            value = static_cast< IntegerAtom* >( node->expr )->val_;
+            double v = (double)value;
+            v = floor( log2( v ) ) + 1;
+            value_bitsize = (INTEGER_T)v;
+        }
+        else
+        {
+            value_bitsize = node->expr->type_.bitsize;
+        }
+
+        if( value_bitsize > bitsize )
+        {
+            driver_.error( node->expr->location,
+                "let expression bitsize '" + std::to_string( value_bitsize )
+                    + "' does not fit into the bitsize of '"
+                    + std::to_string( bitsize ) + "'",
+                libcasm_fe::Codes::TypeBitSizeInvalidInLetExpression );
+        }
+
+        node->expr->type_.bitsize = bitsize;
     }
-    
+
     auto current_rule_binding_types = rule_binding_types.back();
     auto current_rule_binding_offsets = rule_binding_offsets.back();
 
-    current_rule_binding_offsets->insert
-    ( std::pair< std::string, size_t >
-      ( node->identifier
-      , current_rule_binding_types->size()
-      )
-    );
-    
+    current_rule_binding_offsets->insert( std::pair< std::string, size_t >(
+        node->identifier, current_rule_binding_types->size() ) );
+
     current_rule_binding_types->push_back( &node->type_ );
 }
 
-
-void TypecheckVisitor::visit_let_post(LetNode *node)
+void TypecheckVisitor::visit_let_post( LetNode* node )
 {
     if( not node->type_.is_complete() )
     {
-        driver_.error
-        ( node->location
-        , "unable to infer the type of let identifier '"+node->identifier+"'"
-        , libcasm_fe::Codes::TypeInferenceInvalidLet
-        );
+        driver_.error( node->location,
+            "unable to infer the type of let identifier '" + node->identifier
+                + "'",
+            libcasm_fe::Codes::TypeInferenceInvalidLet );
     }
     rule_binding_types.back()->pop_back();
-    rule_binding_offsets.back()->erase(node->identifier);
+    rule_binding_offsets.back()->erase( node->identifier );
 }
 
-void TypecheckVisitor::visit_push(PushNode *node, Type *expr, Type *atom) {
-  if (node->to->symbol_type != FunctionAtom::SymbolType::FUNCTION) {
-    driver_.error(node->to->location, 
-                  "can only push into functions");
-  
-  } else {
-    if (node->to->symbol->is_static) {
-        driver_.error(node->to->location, "cannot push into static function `"+
-                                            node->to->symbol->name+"`");
+void TypecheckVisitor::visit_push( PushNode* node, Type* expr, Type* atom )
+{
+    if( node->to->symbol_type != FunctionAtom::SymbolType::FUNCTION )
+    {
+        driver_.error( node->to->location, "can only push into functions" );
     }
-    if (!expr->unify(atom->subtypes[0])) {
-      driver_.error(node->expr->location, 
-                    "cannot push "+expr->get_most_general_type(node)->to_str()
-                    +" into "+atom->to_str());
+    else
+    {
+        if( node->to->symbol->is_static )
+        {
+            driver_.error(
+                node->to->location, "cannot push into static function `"
+                                        + node->to->symbol->name + "`" );
+        }
+        if( !expr->unify( atom->subtypes[ 0 ] ) )
+        {
+            driver_.error( node->expr->location,
+                "cannot push " + expr->get_most_general_type( node )->to_str()
+                    + " into "
+                    + atom->to_str() );
+        }
     }
-  }
 }
 
-void TypecheckVisitor::visit_pop(PopNode *node) {
-  if (!node->from_type.unify(&node->from->type_)) {
-    driver_.error(node->from->location,
-                  "`pop from` argument must be List(A) but was "+node->from->type_.to_str());
-  }
-
-  if (node->from->symbol_type != FunctionAtom::SymbolType::FUNCTION) {
-    driver_.error(node->from->location, "can only pop from functions");
-  } else {
-    if (node->from->symbol->is_static) {
-        driver_.error(node->from->location, "cannot pop from static function `"+node->from->symbol->name+"`");
-    }
-  }
-
-
-  Function *sym = driver_.function_table.get_function(node->to->name);
-  if (sym) {
-    if (sym->is_static) {
-      driver_.error(node->to->location, "cannot pop into static function `"+sym->name+"`");
+void TypecheckVisitor::visit_pop( PopNode* node )
+{
+    if( !node->from_type.unify( &node->from->type_ ) )
+    {
+        driver_.error( node->from->location,
+            "`pop from` argument must be List(A) but was "
+                + node->from->type_.to_str() );
     }
 
-    if (node->to->arguments) {
-      // TODO this should be doable!
-      driver_.error(node->to->location, "cannot pop into function with arguments");
+    if( node->from->symbol_type != FunctionAtom::SymbolType::FUNCTION )
+    {
+        driver_.error( node->from->location, "can only pop from functions" );
     }
-    std::vector<Type*> arguments{};
-    visit_function_atom(node->to, arguments);
-    if (!node->type_.unify(&node->to->type_)) {
-      driver_.error(node->from->location,
-                    "cannot pop from "+node->from->type_.to_str()+" into "+node->to->type_.to_str());
+    else
+    {
+        if( node->from->symbol->is_static )
+        {
+            driver_.error(
+                node->from->location, "cannot pop from static function `"
+                                          + node->from->symbol->name + "`" );
+        }
     }
-  } else {
-    auto current_rule_binding_types = rule_binding_types.back();
-    auto current_rule_binding_offsets = rule_binding_offsets.back();
 
-    if (current_rule_binding_offsets->count(node->to->name) != 0) {
-      driver_.error(node->to->location,
-                    "can only pop into functions or new bindings");
+    Function* sym = driver_.function_table.get_function( node->to->name );
+    if( sym )
+    {
+        if( sym->is_static )
+        {
+            driver_.error( node->to->location,
+                "cannot pop into static function `" + sym->name + "`" );
+        }
+
+        if( node->to->arguments )
+        {
+            // TODO this should be doable!
+            driver_.error(
+                node->to->location, "cannot pop into function with arguments" );
+        }
+        std::vector< Type* > arguments{};
+        visit_function_atom( node->to, arguments );
+        if( !node->type_.unify( &node->to->type_ ) )
+        {
+            driver_.error( node->from->location,
+                "cannot pop from " + node->from->type_.to_str() + " into "
+                    + node->to->type_.to_str() );
+        }
     }
-    current_rule_binding_offsets->insert(
-        std::pair<std::string, size_t>(node->to->name,
-                                       current_rule_binding_types->size())
-    );
-    current_rule_binding_types->push_back(&node->type_);
-    node->to->symbol_type = FunctionAtom::SymbolType::PUSH_POP;
-    node->to->offset = current_rule_binding_offsets->at(node->to->name);
-  }
+    else
+    {
+        auto current_rule_binding_types = rule_binding_types.back();
+        auto current_rule_binding_offsets = rule_binding_offsets.back();
+
+        if( current_rule_binding_offsets->count( node->to->name ) != 0 )
+        {
+            driver_.error( node->to->location,
+                "can only pop into functions or new bindings" );
+        }
+        current_rule_binding_offsets->insert( std::pair< std::string, size_t >(
+            node->to->name, current_rule_binding_types->size() ) );
+        current_rule_binding_types->push_back( &node->type_ );
+        node->to->symbol_type = FunctionAtom::SymbolType::PUSH_POP;
+        node->to->offset = current_rule_binding_offsets->at( node->to->name );
+    }
 }
 
-
-void TypecheckVisitor::visit_case(CaseNode *node, Type *expr, const std::vector<Type*>& case_labels)
+void TypecheckVisitor::visit_case(
+    CaseNode* node, Type* expr, const std::vector< Type* >& case_labels )
 {
     if( node->case_list.size() - case_labels.size() > 1 )
     {
-    for( auto c = node->case_list.rbegin(); c != node->case_list.rend(); c++ )
-    {
-        if( c->first )
+        for( auto c = node->case_list.rbegin(); c != node->case_list.rend();
+             c++ )
         {
-        continue;
-        }
-        
-        driver_.error
-        ( c->second->location
-        , "found multiple 'default' labels for case, but only one is allowed"
-        , libcasm_fe::Codes::CaseLabelMultipleUseOfDefault
-        );
-    }
-    }
-    
-    for( size_t i=0; i < case_labels.size(); i++ )
-    {
-        if( expr->t == TypeType::BIT && case_labels[i]->t == TypeType::INTEGER )
-        {
-	    if( not node->case_list[i].first )
-	    {
-		// default case, omit!
-		continue;
-	    }
-	    
-            ExpressionBase *expr_value = node->case_list[i].first;
-            if( expr_value->node_type_ != NodeType::INTEGER_ATOM )
+            if( c->first )
             {
-                driver_.error
-                ( node->case_list[i].first->location
-                , "case item shall be an Integer constant"
-                );
                 continue;
             }
-	    
+
+            driver_.error( c->second->location,
+                "found multiple 'default' labels for case, but only one is "
+                "allowed",
+                libcasm_fe::Codes::CaseLabelMultipleUseOfDefault );
+        }
+    }
+
+    for( size_t i = 0; i < case_labels.size(); i++ )
+    {
+        if( expr->t == TypeType::BIT
+            && case_labels[ i ]->t == TypeType::INTEGER )
+        {
+            if( not node->case_list[ i ].first )
+            {
+                // default case, omit!
+                continue;
+            }
+
+            ExpressionBase* expr_value = node->case_list[ i ].first;
+            if( expr_value->node_type_ != NodeType::INTEGER_ATOM )
+            {
+                driver_.error( node->case_list[ i ].first->location,
+                    "case item shall be an Integer constant" );
+                continue;
+            }
+
             IntegerAtom* expr_atom = static_cast< IntegerAtom* >( expr_value );
             INTEGER_T value = expr_atom->val_;
             INTEGER_T value_bitsize = -1;
             INTEGER_T bitsize = expr->bitsize;
 
             value = ( value <= 0 ) ? 1 : value;
-            
+
             double v = (double)value;
-            v = floor(log2( v )) + 1;
+            v = floor( log2( v ) ) + 1;
             value_bitsize = (INTEGER_T)v;
-            
+
             if( value_bitsize > bitsize )
             {
-                driver_.error
-                ( node->case_list[i].first->location
-                , "bitsize " + std::to_string(value_bitsize) +
-                  " of case list value does not fit into '" + expr->to_str() + "' of case expression"
-                );
+                driver_.error( node->case_list[ i ].first->location,
+                    "bitsize " + std::to_string( value_bitsize )
+                        + " of case list value does not fit into '"
+                        + expr->to_str() + "' of case expression" );
             }
             else
             {
-                case_labels[i]->t        = TypeType::BIT;
-                case_labels[i]->bitsize  = bitsize;
-                
-                node->case_list[i].first->type_.t       = TypeType::BIT;
-                node->case_list[i].first->type_.bitsize = bitsize;
+                case_labels[ i ]->t = TypeType::BIT;
+                case_labels[ i ]->bitsize = bitsize;
+
+                node->case_list[ i ].first->type_.t = TypeType::BIT;
+                node->case_list[ i ].first->type_.bitsize = bitsize;
             }
-            
-            //continue;
+
+            // continue;
         }
-        
-        if( !expr->unify(case_labels[i]) )
+
+        if( !expr->unify( case_labels[ i ] ) )
         {
-            driver_.error
-            ( node->case_list[i].first->location
-            , "type of case expression (" + expr->get_most_general_type(node)->to_str() + ") and label (" +
-                case_labels[i]->get_most_general_type(node->case_list[i].first)->to_str() + ") do not match"
-            );
+            driver_.error( node->case_list[ i ].first->location,
+                "type of case expression ("
+                    + expr->get_most_general_type( node )->to_str()
+                    + ") and label ("
+                    + case_labels[ i ]
+                          ->get_most_general_type( node->case_list[ i ].first )
+                          ->to_str()
+                    + ") do not match" );
         }
     }
 }
 
-void TypecheckVisitor::check_numeric_operator(const yy::location& loc, 
-                                              Type* type,
-                                              const ExpressionOperation op)
+void TypecheckVisitor::check_numeric_operator(
+    const yy::location& loc, Type* type, const ExpressionOperation op )
 {
     if( *type == TypeType::UNKNOWN )
     {
-        type->constraints.push_back(new Type(TypeType::INTEGER));
-        if( op != ExpressionOperation::MOD || op == ExpressionOperation::RAT_DIV )
+        type->constraints.push_back( new Type( TypeType::INTEGER ) );
+        if( op != ExpressionOperation::MOD
+            || op == ExpressionOperation::RAT_DIV )
         {
-            type->constraints.push_back(new Type(TypeType::RATIONAL));
-            type->constraints.push_back(new Type(TypeType::FLOATING));
+            type->constraints.push_back( new Type( TypeType::RATIONAL ) );
+            type->constraints.push_back( new Type( TypeType::FLOATING ) );
         }
     }
     else
@@ -672,31 +718,30 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
         {
             if( *type != TypeType::INTEGER )
             {
-                driver_.error(loc,
-                              "operands of operator `"+operator_to_str(op)+
-                              "` must be Integer but were "+type->to_str());
+                driver_.error( loc,
+                    "operands of operator `" + operator_to_str( op )
+                        + "` must be Integer but were "
+                        + type->to_str() );
             }
         }
         else if( op == ExpressionOperation::MOD )
         {
-            if( *type != TypeType::INTEGER
-             && *type != TypeType::FLOATING )
+            if( *type != TypeType::INTEGER && *type != TypeType::FLOATING )
             {
-                driver_.error(loc,
-                              "operands of operator `"+operator_to_str(op)+
-                              "` must be Integer or Floating but were "+type->to_str());
+                driver_.error( loc,
+                    "operands of operator `" + operator_to_str( op )
+                        + "` must be Integer or Floating but were "
+                        + type->to_str() );
             }
         }
         else if( op == ExpressionOperation::ADD )
         {
-        if( *type != TypeType::INTEGER
-        and *type != TypeType::FLOATING
-        and *type != TypeType::BIT
-        and *type != TypeType::RATIONAL
-        and *type != TypeType::STRING
-        )
-        {
-        driver_.error
+            if( *type != TypeType::INTEGER and *type != TypeType::FLOATING
+                and *type != TypeType::BIT
+                and *type != TypeType::RATIONAL
+                and *type != TypeType::STRING )
+            {
+                driver_.error
         ( loc
         , "operands of operator `"
           + operator_to_str( op )
@@ -704,475 +749,545 @@ void TypecheckVisitor::check_numeric_operator(const yy::location& loc,
           + type->to_str()
         , libcasm_fe::Codes::OperatorAddInvalidOperandType
         );
+            }
+        }
+        else if( *type != TypeType::INTEGER && *type != TypeType::FLOATING
+                 && *type != TypeType::BIT
+                 && *type != TypeType::RATIONAL )
+        {
+            driver_.error( loc,
+                "operands of operator `" + operator_to_str( op )
+                    + "` must be Integer, Bit, Floating or Rational but were "
+                    + type->to_str() );
         }
     }
-        else if( *type != TypeType::INTEGER
-              && *type != TypeType::FLOATING
-              && *type != TypeType::BIT
-              && *type != TypeType::RATIONAL )
-        {
-            driver_.error(loc,
-                          "operands of operator `"+operator_to_str(op)+
-                          "` must be Integer, Bit, Floating or Rational but were "+
-                          type->to_str());
-        }    }
 }
 
-
-Type* TypecheckVisitor::visit_expression( BinaryExpression *expr, Type*, Type* )
+Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
 {
     if( not expr->left_->type_.unify( &expr->right_->type_ ) )
     {
-    driver_.error
-    ( expr->location
-    , "type of expressions did not match: "
-      + expr->left_->type_.get_most_general_type( expr->left_ )->to_str()
-      + " != "
-      + expr->right_->type_.get_most_general_type( expr->right_ )->to_str()
-      , libcasm_fe::Codes::TypeInferenceInvalidExpression
-    );
+        driver_.error( expr->location,
+            "type of expressions did not match: "
+                + expr->left_->type_.get_most_general_type( expr->left_ )
+                      ->to_str()
+                + " != "
+                + expr->right_->type_.get_most_general_type( expr->right_ )
+                      ->to_str(),
+            libcasm_fe::Codes::TypeInferenceInvalidExpression );
     }
-    
-    const Type* lhs = expr->left_->type_.get_most_general_type(expr->left_);
-    const Type* rhs = expr->right_->type_.get_most_general_type(expr->right_);
-        
-  if( lhs->t == TypeType::BIT and rhs->t == TypeType::BIT and lhs->bitsize != rhs->bitsize )
-  {
-      driver_.error
-      ( expr->location
-      , "size of 'Bit' types in expression did not match: "
-    + lhs->to_str()
-    + " != "
-    + rhs->to_str()
-    , libcasm_fe::Codes::TypeBitSizeInvalidExpression
-      );   
-  }
-  
-  if( expr->left_->node_type_ == NodeType::ZERO_ATOM )
-  {
-      ZeroAtom* tmp = reinterpret_cast< ZeroAtom* >( expr->left_ );
-      
-      switch( tmp->getRef()->type_.t )
-      {
-          case TypeType::INTEGER:
-          {
-              tmp = (ZeroAtom*)new IntegerAtom( tmp->location, 0 );
-              break;
-          }
-          case TypeType::FLOATING:
-          {
-              tmp = (ZeroAtom*)new FloatingAtom( tmp->location, 0 );
-              break;
-          }
-          case TypeType::RATIONAL:
-          {
-              tmp = (ZeroAtom*)new RationalAtom( tmp->location, rational_t( 0, 1 ) );
-              break;
-          }
-          default:
-          {
-              driver_.error
-              ( tmp->getRef()->location
-              , "invalid unary operator type '" + tmp->getRef()->type_.to_str() + "'"
-              );
-          }
-      }
-      delete expr->left_;
-      expr->left_ = tmp;
-  }
-  
-  switch (expr->op) {
-    case ExpressionOperation::ADD:
-    case ExpressionOperation::SUB:
-    case ExpressionOperation::MUL:
-    case ExpressionOperation::DIV:
-    case ExpressionOperation::MOD:
-      check_numeric_operator(expr->location, &expr->left_->type_, expr->op);
-      expr->type_.unify(&expr->left_->type_);
-      break;
-    case ExpressionOperation::RAT_DIV:
-      check_numeric_operator(expr->location, &expr->left_->type_, expr->op);
-      expr->type_.unify(Type(TypeType::RATIONAL));
-      break;
 
-    case ExpressionOperation::EQ:
-    case ExpressionOperation::NEQ:
-      expr->type_.unify(Type(TypeType::BOOLEAN));
-      break;
+    const Type* lhs = expr->left_->type_.get_most_general_type( expr->left_ );
+    const Type* rhs = expr->right_->type_.get_most_general_type( expr->right_ );
 
-    case ExpressionOperation::LESSER:
-    case ExpressionOperation::GREATER:
-    case ExpressionOperation::LESSEREQ:
-    case ExpressionOperation::GREATEREQ:
-      check_numeric_operator(expr->location, &expr->left_->type_, expr->op);
-      expr->type_.unify(Type(TypeType::BOOLEAN));
-      break;
-
-    case ExpressionOperation::OR:
-    case ExpressionOperation::XOR:
-    case ExpressionOperation::AND:
+    if( lhs->t == TypeType::BIT and rhs->t == TypeType::BIT
+        and lhs->bitsize != rhs->bitsize )
     {
-        if( expr->left_->type_.t == TypeType::BIT or expr->right_->type_.t == TypeType::BIT )
+        driver_.error( expr->location,
+            "size of 'Bit' types in expression did not match: " + lhs->to_str()
+                + " != " + rhs->to_str(),
+            libcasm_fe::Codes::TypeBitSizeInvalidExpression );
+    }
+
+    if( expr->left_->node_type_ == NodeType::ZERO_ATOM )
+    {
+        ZeroAtom* tmp = reinterpret_cast< ZeroAtom* >( expr->left_ );
+
+        switch( tmp->getRef()->type_.t )
         {
-	    assert( expr->right_->type_.t == TypeType::BIT );
-	    assert( expr->right_->type_.bitsize == expr->left_->type_.bitsize );
-	    
-            expr->type_.unify(Type( TypeType::BIT ));
-	    expr->type_.bitsize = expr->left_->type_.bitsize;
-        }
-        else
-        {
-            if( !expr->left_->type_.unify(new Type(TypeType::BOOLEAN)) )
+            case TypeType::INTEGER:
             {
-                driver_.error
-                ( expr->location
-                , "operands of operator `" + operator_to_str(expr->op) +
-                  "` must be Boolean or Bit but are " + expr->left_->type_.to_str()
-                );
+                tmp = (ZeroAtom*)new IntegerAtom( tmp->location, 0 );
+                break;
             }
-            expr->type_.unify(Type( TypeType::BOOLEAN ));
+            case TypeType::FLOATING:
+            {
+                tmp = (ZeroAtom*)new FloatingAtom( tmp->location, 0 );
+                break;
+            }
+            case TypeType::RATIONAL:
+            {
+                tmp = (ZeroAtom*)new RationalAtom(
+                    tmp->location, rational_t( 0, 1 ) );
+                break;
+            }
+            default:
+            {
+                driver_.error( tmp->getRef()->location,
+                    "invalid unary operator type '"
+                        + tmp->getRef()->type_.to_str() + "'" );
+            }
         }
-        break;
+        delete expr->left_;
+        expr->left_ = tmp;
     }
-    default: FAILURE();
-  }
 
-  return &expr->type_;
+    switch( expr->op )
+    {
+        case ExpressionOperation::ADD:
+        case ExpressionOperation::SUB:
+        case ExpressionOperation::MUL:
+        case ExpressionOperation::DIV:
+        case ExpressionOperation::MOD:
+            check_numeric_operator(
+                expr->location, &expr->left_->type_, expr->op );
+            expr->type_.unify( &expr->left_->type_ );
+            break;
+        case ExpressionOperation::RAT_DIV:
+            check_numeric_operator(
+                expr->location, &expr->left_->type_, expr->op );
+            expr->type_.unify( Type( TypeType::RATIONAL ) );
+            break;
+
+        case ExpressionOperation::EQ:
+        case ExpressionOperation::NEQ:
+            expr->type_.unify( Type( TypeType::BOOLEAN ) );
+            break;
+
+        case ExpressionOperation::LESSER:
+        case ExpressionOperation::GREATER:
+        case ExpressionOperation::LESSEREQ:
+        case ExpressionOperation::GREATEREQ:
+            check_numeric_operator(
+                expr->location, &expr->left_->type_, expr->op );
+            expr->type_.unify( Type( TypeType::BOOLEAN ) );
+            break;
+
+        case ExpressionOperation::OR:
+        case ExpressionOperation::XOR:
+        case ExpressionOperation::AND:
+        {
+            if( expr->left_->type_.t == TypeType::BIT
+                or expr->right_->type_.t == TypeType::BIT )
+            {
+                assert( expr->right_->type_.t == TypeType::BIT );
+                assert(
+                    expr->right_->type_.bitsize == expr->left_->type_.bitsize );
+
+                expr->type_.unify( Type( TypeType::BIT ) );
+                expr->type_.bitsize = expr->left_->type_.bitsize;
+            }
+            else
+            {
+                if( !expr->left_->type_.unify( new Type( TypeType::BOOLEAN ) ) )
+                {
+                    driver_.error( expr->location,
+                        "operands of operator `" + operator_to_str( expr->op )
+                            + "` must be Boolean or Bit but are "
+                            + expr->left_->type_.to_str() );
+                }
+                expr->type_.unify( Type( TypeType::BOOLEAN ) );
+            }
+            break;
+        }
+        default:
+            FAILURE();
+    }
+
+    return &expr->type_;
 }
 
-Type* TypecheckVisitor::visit_expression_single(UnaryExpression *expr, Type*) {
-  switch (expr->op) {
-    case ExpressionOperation::NOT:
-      if (!expr->expr_->type_.unify(new Type(TypeType::BOOLEAN))) {
-        driver_.error(expr->location,
-                      "operand of `not` must be Boolean but is "+expr->expr_->type_.to_str());
-      }
-      expr->type_.unify(Type(TypeType::BOOLEAN));
-      return &expr->type_;
-      break;
-    default: FAILURE();
-  }
-
+Type* TypecheckVisitor::visit_expression_single( UnaryExpression* expr, Type* )
+{
+    switch( expr->op )
+    {
+        case ExpressionOperation::NOT:
+            if( !expr->expr_->type_.unify( new Type( TypeType::BOOLEAN ) ) )
+            {
+                driver_.error( expr->location,
+                    "operand of `not` must be Boolean but is "
+                        + expr->expr_->type_.to_str() );
+            }
+            expr->type_.unify( Type( TypeType::BOOLEAN ) );
+            return &expr->type_;
+            break;
+        default:
+            FAILURE();
+    }
 }
 
-
-Type* TypecheckVisitor::visit_function_atom(FunctionAtom *atom, std::vector<Type*> &arguments) {
-  Symbol *sym = driver_.function_table.get(atom->name);
-  if (sym && sym->type == Symbol::SymbolType::ENUM) {
-    atom->symbol_type = FunctionAtom::SymbolType::ENUM;
-    atom->enum_ = reinterpret_cast<Enum*>(sym);
-    if (!forall_head && atom->enum_->name == atom->name) {
-      driver_.error(atom->location, "`"+atom->name+"` is an enum, not a member of an enum");
-    }
-    atom->type_.unify(new Type(TypeType::ENUM, sym->name));
-    return &atom->type_;
-  }
-
-  if (!sym) {
-    // check if a rule parameter with this name was defined
-    if (rule_binding_offsets.size() > 0){
-      auto current_rule_binding_offsets = rule_binding_offsets.back();
-      auto current_rule_binding_types = rule_binding_types.back();
-
-      if (current_rule_binding_offsets->count(atom->name) &&
-          !atom->arguments) {
-        atom->symbol_type = FunctionAtom::SymbolType::PARAMETER;
-        atom->offset = current_rule_binding_offsets->at(atom->name);
-        Type* binding_type = current_rule_binding_types->at(atom->offset);
-        atom->type_.unify(binding_type);
+Type* TypecheckVisitor::visit_function_atom(
+    FunctionAtom* atom, std::vector< Type* >& arguments )
+{
+    Symbol* sym = driver_.function_table.get( atom->name );
+    if( sym && sym->type == Symbol::SymbolType::ENUM )
+    {
+        atom->symbol_type = FunctionAtom::SymbolType::ENUM;
+        atom->enum_ = reinterpret_cast< Enum* >( sym );
+        if( !forall_head && atom->enum_->name == atom->name )
+        {
+            driver_.error( atom->location,
+                "`" + atom->name + "` is an enum, not a member of an enum" );
+        }
+        atom->type_.unify( new Type( TypeType::ENUM, sym->name ) );
         return &atom->type_;
-      }
     }
 
-    driver_.error(atom->location, "use of undefined function `"+atom->name+"`");
-    atom->type_ = Type(TypeType::INVALID);
+    if( !sym )
+    {
+        // check if a rule parameter with this name was defined
+        if( rule_binding_offsets.size() > 0 )
+        {
+            auto current_rule_binding_offsets = rule_binding_offsets.back();
+            auto current_rule_binding_types = rule_binding_types.back();
+
+            if( current_rule_binding_offsets->count( atom->name )
+                && !atom->arguments )
+            {
+                atom->symbol_type = FunctionAtom::SymbolType::PARAMETER;
+                atom->offset = current_rule_binding_offsets->at( atom->name );
+                Type* binding_type
+                    = current_rule_binding_types->at( atom->offset );
+                atom->type_.unify( binding_type );
+                return &atom->type_;
+            }
+        }
+
+        driver_.error(
+            atom->location, "use of undefined function `" + atom->name + "`" );
+        atom->type_ = Type( TypeType::INVALID );
+        return &atom->type_;
+    }
+
+    Function* func = reinterpret_cast< Function* >( sym );
+    atom->symbol = func;
+    if( atom->symbol->type == Symbol::SymbolType::FUNCTION )
+    {
+        atom->symbol_type = FunctionAtom::SymbolType::FUNCTION;
+    }
+    else
+    {
+        atom->symbol_type = FunctionAtom::SymbolType::DERIVED;
+    }
+
+    // check for function definitions with arguments
+    if( atom->symbol->arguments_.size() != arguments.size() )
+    {
+        driver_.error( atom->location,
+            "number of provided arguments does not match definition of `"
+                + atom->name
+                + "`" );
+    }
+    else
+    {
+        for( size_t i = 0; i < atom->symbol->arguments_.size(); i++ )
+        {
+
+            Type* argument_t = atom->symbol->arguments_.at( i );
+
+            if( !arguments.at( i )->unify( argument_t ) )
+            {
+                driver_.error( atom->arguments->at( i )->location,
+                    "type of " + std::to_string( i + 1 ) + " argument of `"
+                        + atom->name
+                        + "` is "
+                        + arguments.at( i )->to_str()
+                        + " but should be "
+                        + argument_t->to_str() );
+            }
+        }
+    }
+
+    atom->type_.unify( func->return_type_ );
     return &atom->type_;
-  }
-
-  Function *func = reinterpret_cast<Function*>(sym);
-  atom->symbol = func;
-  if (atom->symbol->type == Symbol::SymbolType::FUNCTION) {
-    atom->symbol_type = FunctionAtom::SymbolType::FUNCTION;
-  } else{
-    atom->symbol_type = FunctionAtom::SymbolType::DERIVED;
-  }
-
-  // check for function definitions with arguments
-  if(atom->symbol->arguments_.size() != arguments.size()) {
-    driver_.error(atom->location,
-                  "number of provided arguments does not match definition of `"+
-                  atom->name+"`");
-  } else {
-    for (size_t i=0; i < atom->symbol->arguments_.size(); i++) {
-
-      Type *argument_t = atom->symbol->arguments_.at(i);
- 
-      if (!arguments.at(i)->unify(argument_t)) {
-        driver_.error(atom->arguments->at(i)->location,
-                      "type of "+std::to_string(i+1)+" argument of `"+atom->name+
-                      "` is "+arguments.at(i)->to_str()+" but should be "+
-                      argument_t->to_str());
-      }
-    }
-  }
-
-  atom->type_.unify(func->return_type_);
-  return &atom->type_;
 }
 
-Type* TypecheckVisitor::visit_builtin_atom(BuiltinAtom *atom, std::vector<Type*> &arguments)
+Type* TypecheckVisitor::visit_builtin_atom(
+    BuiltinAtom* atom, std::vector< Type* >& arguments )
 {
     Builtin* built_in = Builtin::get( atom->name );
     assert( built_in );
-    
-    built_in->typecheck( driver_, atom, arguments );
-    
-    if(atom->types.size() != arguments.size()) {
-        driver_.error(atom->location,
-                      "number of provided arguments does not match definition of `"+
-                      atom->name+"`");
-    } else {
-        for (size_t i=0; i < atom->types.size(); i++) {
 
-            Type *argument_t = atom->types.at(i);
-            
-            if (!arguments.at(i)->unify(argument_t)) {
-                driver_.error(atom->arguments->at(i)->location,
-                              "type of "+std::to_string(i+1)+" argument of `"+atom->name+
-                              "` is "+arguments.at(i)->to_str()+" but should be "+
-                              argument_t->to_str());
+    built_in->typecheck( driver_, atom, arguments );
+
+    if( atom->types.size() != arguments.size() )
+    {
+        driver_.error( atom->location,
+            "number of provided arguments does not match definition of `"
+                + atom->name
+                + "`" );
+    }
+    else
+    {
+        for( size_t i = 0; i < atom->types.size(); i++ )
+        {
+
+            Type* argument_t = atom->types.at( i );
+
+            if( !arguments.at( i )->unify( argument_t ) )
+            {
+                driver_.error( atom->arguments->at( i )->location,
+                    "type of " + std::to_string( i + 1 ) + " argument of `"
+                        + atom->name
+                        + "` is "
+                        + arguments.at( i )->to_str()
+                        + " but should be "
+                        + argument_t->to_str() );
             }
         }
     }
-    
-    
-    
-    
-    if (atom->name == "nth") {
-        if (*atom->types[0] == TypeType::TUPLE_OR_LIST && atom->types[0]->subtypes.size() > 0 && atom->types[0]->subtypes[0]->t != TypeType::UNKNOWN) {
-            Type first = *atom->types[0]->subtypes[0];
+
+    if( atom->name == "nth" )
+    {
+        if( *atom->types[ 0 ] == TypeType::TUPLE_OR_LIST
+            && atom->types[ 0 ]->subtypes.size() > 0
+            && atom->types[ 0 ]->subtypes[ 0 ]->t != TypeType::UNKNOWN )
+        {
+            Type first = *atom->types[ 0 ]->subtypes[ 0 ];
             bool all_equal = true;
-            for (size_t i=1; i < atom->types[0]->subtypes.size(); i++) {
-                if (first != *atom->types[0]->subtypes[i]) {
+            for( size_t i = 1; i < atom->types[ 0 ]->subtypes.size(); i++ )
+            {
+                if( first != *atom->types[ 0 ]->subtypes[ i ] )
+                {
                     all_equal = false;
                     break;
                 }
             }
-            if (all_equal) {
-                atom->types[0]->t = TypeType::LIST;
-                atom->types[0]->subtypes = {new Type(first)};
-            } 
+            if( all_equal )
+            {
+                atom->types[ 0 ]->t = TypeType::LIST;
+                atom->types[ 0 ]->subtypes = { new Type( first ) };
+            }
         }
 
-        if (*atom->types[0] == TypeType::TUPLE) {
-            ExpressionBase *ind_expr = atom->arguments->at(1);
-            if (ind_expr->node_type_ == NodeType::INTEGER_ATOM) {
-                INTEGER_T ind = reinterpret_cast<IntegerAtom*>(ind_expr)->val_;
-                if (ind <= 0) {
-                    driver_.error(atom->arguments->at(1)->location,
-                                  "second argument of nth must be a positive (>0) Integer constant for tuples");
+        if( *atom->types[ 0 ] == TypeType::TUPLE )
+        {
+            ExpressionBase* ind_expr = atom->arguments->at( 1 );
+            if( ind_expr->node_type_ == NodeType::INTEGER_ATOM )
+            {
+                INTEGER_T ind
+                    = reinterpret_cast< IntegerAtom* >( ind_expr )->val_;
+                if( ind <= 0 )
+                {
+                    driver_.error( atom->arguments->at( 1 )->location,
+                        "second argument of nth must be a positive (>0) "
+                        "Integer constant for tuples" );
 
                     return &atom->type_;
                 }
 
                 // this is needed to handle stuff like:
                 //          assert nth(undef, 2) = undef
-                if (atom->types[0]->is_unknown() && atom->type_.is_unknown()) {
+                if( atom->types[ 0 ]->is_unknown() && atom->type_.is_unknown() )
+                {
                     return &atom->type_;
                 }
-                if ((size_t) ind < (atom->types[0]->subtypes.size()+1)) {
-                    atom->type_.unify(atom->types[0]->subtypes[ind-1]);
-                } else {
-                    driver_.error(atom->arguments->at(1)->location,
-                                  "index out of bounds for tuple, currently tuple only has "+
-                                  std::to_string(atom->arguments->size())+" types");
-
+                if( (size_t)ind < ( atom->types[ 0 ]->subtypes.size() + 1 ) )
+                {
+                    atom->type_.unify( atom->types[ 0 ]->subtypes[ ind - 1 ] );
                 }
-            } else {
-                driver_.error(atom->arguments->at(1)->location,
-                              "second argument of nth must be an Integer constant for tuples but was `"+
-                              type_to_str(ind_expr->node_type_)+"`");
+                else
+                {
+                    driver_.error( atom->arguments->at( 1 )->location,
+                        "index out of bounds for tuple, currently tuple only "
+                        "has "
+                            + std::to_string( atom->arguments->size() )
+                            + " types" );
+                }
             }
-        } else {
-            atom->type_.unify(atom->types[0]->subtypes[0]);
-            arguments[0]->unify(&atom->type_);
-            atom->type_.unify(atom->return_type);
+            else
+            {
+                driver_.error( atom->arguments->at( 1 )->location,
+                    "second argument of nth must be an Integer constant for "
+                    "tuples but was `"
+                        + type_to_str( ind_expr->node_type_ )
+                        + "`" );
+            }
         }
-    } else {
+        else
+        {
+            atom->type_.unify( atom->types[ 0 ]->subtypes[ 0 ] );
+            arguments[ 0 ]->unify( &atom->type_ );
+            atom->type_.unify( atom->return_type );
+        }
+    }
+    else
+    {
         // TODO use type_ as return_type_ for builtins
-        atom->type_.unify(atom->return_type);
+        atom->type_.unify( atom->return_type );
     }
     return &atom->type_;
 }
 
-void TypecheckVisitor::visit_derived_function_atom_pre(FunctionAtom *atom, std::vector<Type*> &arguments) {
-  size_t args_defined = atom->symbol->arguments_.size();
-  size_t args_provided = arguments.size();
-  if (args_defined != args_provided) {
-    driver_.error(atom->location, " expects "
-                                  +std::to_string(args_defined)+" arguments but "+
-                                  std::to_string(args_provided)+" where provided");
-  } else {
-    for (size_t i=0; i < args_defined; i++) {
-      if (!arguments.at(i)->unify(atom->symbol->arguments_.at(i))) {
-        driver_.error(atom->arguments->at(i)->location,
-                      "argument "+std::to_string(i+1)+" of must be `"+atom->symbol->arguments_.at(i)->to_str()+"` but was `"+
-                      arguments.at(i)->to_str()+"`");
-      }
+void TypecheckVisitor::visit_derived_function_atom_pre(
+    FunctionAtom* atom, std::vector< Type* >& arguments )
+{
+    size_t args_defined = atom->symbol->arguments_.size();
+    size_t args_provided = arguments.size();
+    if( args_defined != args_provided )
+    {
+        driver_.error( atom->location,
+            " expects " + std::to_string( args_defined ) + " arguments but "
+                + std::to_string( args_provided ) + " where provided" );
     }
-  }
-  rule_binding_types.push_back(new std::vector<Type*>(atom->symbol->arguments_));
-  rule_binding_offsets.push_back(&atom->symbol->binding_offsets);
-}
-
-Type* TypecheckVisitor::visit_derived_function_atom(FunctionAtom*,
-                                                    Type* expr) {
-  delete rule_binding_types.back();
-  rule_binding_types.pop_back();
-  rule_binding_offsets.pop_back();
-  return expr;
-}
-
-Type* TypecheckVisitor::visit_rule_atom(RuleAtom *atom) {
-  if (driver_.rules_map_.count(atom->name) == 1) {
-    atom->rule = driver_.rules_map_[atom->name];
-  } else {
-    driver_.error(atom->location, "no rule with name `"+atom->name+"` found");
-  }
-  return &atom->type_;
-}
-
-Type* TypecheckVisitor::visit_list_atom(ListAtom *atom, std::vector<Type*> &vals) {
-  atom->type_.t = TypeType::TUPLE_OR_LIST;
-  atom->type_.subtypes = vals;
-
-  if (vals.size() > 0) {
-    Type first = *(vals[0]);
-    bool all_known = first.is_complete();
-    bool all_equal = true;
-    for (size_t i=1; i < vals.size(); i++) {
-      all_known = all_known && vals[i]->is_complete();
-      if (first != *vals[i]) {
-        all_equal = false;
-        break;
-      }
+    else
+    {
+        for( size_t i = 0; i < args_defined; i++ )
+        {
+            if( !arguments.at( i )->unify( atom->symbol->arguments_.at( i ) ) )
+            {
+                driver_.error( atom->arguments->at( i )->location,
+                    "argument " + std::to_string( i + 1 ) + " of must be `"
+                        + atom->symbol->arguments_.at( i )->to_str()
+                        + "` but was `"
+                        + arguments.at( i )->to_str()
+                        + "`" );
+            }
+        }
     }
-    if (!all_equal && all_known) {
-      atom->type_.t = TypeType::TUPLE;
-    } 
-  }
-
-  return &atom->type_;
+    rule_binding_types.push_back(
+        new std::vector< Type* >( atom->symbol->arguments_ ) );
+    rule_binding_offsets.push_back( &atom->symbol->binding_offsets );
 }
 
+Type* TypecheckVisitor::visit_derived_function_atom( FunctionAtom*, Type* expr )
+{
+    delete rule_binding_types.back();
+    rule_binding_types.pop_back();
+    rule_binding_offsets.pop_back();
+    return expr;
+}
 
-Type* TypecheckVisitor::visit_number_range_atom( NumberRangeAtom* atom, Type* left, Type* right )
+Type* TypecheckVisitor::visit_rule_atom( RuleAtom* atom )
+{
+    if( driver_.rules_map_.count( atom->name ) == 1 )
+    {
+        atom->rule = driver_.rules_map_[ atom->name ];
+    }
+    else
+    {
+        driver_.error(
+            atom->location, "no rule with name `" + atom->name + "` found" );
+    }
+    return &atom->type_;
+}
+
+Type* TypecheckVisitor::visit_list_atom(
+    ListAtom* atom, std::vector< Type* >& vals )
+{
+    atom->type_.t = TypeType::TUPLE_OR_LIST;
+    atom->type_.subtypes = vals;
+
+    if( vals.size() > 0 )
+    {
+        Type first = *( vals[ 0 ] );
+        bool all_known = first.is_complete();
+        bool all_equal = true;
+        for( size_t i = 1; i < vals.size(); i++ )
+        {
+            all_known = all_known && vals[ i ]->is_complete();
+            if( first != *vals[ i ] )
+            {
+                all_equal = false;
+                break;
+            }
+        }
+        if( !all_equal && all_known )
+        {
+            atom->type_.t = TypeType::TUPLE;
+        }
+    }
+
+    return &atom->type_;
+}
+
+Type* TypecheckVisitor::visit_number_range_atom(
+    NumberRangeAtom* atom, Type* left, Type* right )
 {
     if( not left->unify( TypeType::INTEGER ) )
     {
-        driver_.error
-        ( atom->left->location
-        , "left value of number range must be an Integer but was '"
-          + left->to_str()
-          + "'"
-        , libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtLeftHandSide
-        );
+        driver_.error( atom->left->location,
+            "left value of number range must be an Integer but was '"
+                + left->to_str() + "'",
+            libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtLeftHandSide );
     }
     if( not right->unify( TypeType::INTEGER ) )
     {
-        driver_.error
-        ( atom->right->location
-        , "right value of number range must be an Integer but was '"
-          + right->to_str()
-          + "'"
-        , libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtRightHandSide
-        );
+        driver_.error( atom->right->location,
+            "right value of number range must be an Integer but was '"
+                + right->to_str() + "'",
+            libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtRightHandSide );
     }
     return &atom->type_;
 }
 
-
 template <>
-void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode *node )
+void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode* node )
 {
     visitor.forall_head = true;
     walk_atom( node->in_expr );
     visitor.forall_head = false;
-    
+
     Type list_t = new Type( TypeType::LIST, new Type( TypeType::UNKNOWN ) );
-    
-    if( node->in_expr->type_ == TypeType::INTEGER || node->in_expr->type_ == TypeType::ENUM )
+
+    if( node->in_expr->type_ == TypeType::INTEGER
+        || node->in_expr->type_ == TypeType::ENUM )
     {
-	node->type_.unify(&node->in_expr->type_);
+        node->type_.unify( &node->in_expr->type_ );
     }
-    else if( node->in_expr->type_.unify(&list_t) )
+    else if( node->in_expr->type_.unify( &list_t ) )
     {
-	node->type_.unify(node->in_expr->type_.subtypes[0]);
+        node->type_.unify( node->in_expr->type_.subtypes[ 0 ] );
     }
-    else if ( node->in_expr->type_ == TypeType::NUMBER_RANGE )
+    else if( node->in_expr->type_ == TypeType::NUMBER_RANGE )
     {
-        node->type_.unify(TypeType::INTEGER);
+        node->type_.unify( TypeType::INTEGER );
     }
     else
     {
-	visitor.driver_.error
-	( node->location
-	, "expression must be a List, an Integer, a NumberRange or enum, but is '"
-	  + node->in_expr->type_.to_str()
-	  + "'"
-	);
+        visitor.driver_.error( node->location,
+            "expression must be a List, an Integer, a NumberRange or enum, but "
+            "is '"
+                + node->in_expr->type_.to_str() + "'" );
     }
-    
+
     auto current_rule_binding_types = visitor.rule_binding_types.back();
     auto current_rule_binding_offsets = visitor.rule_binding_offsets.back();
 
-    current_rule_binding_offsets->insert
-    ( std::pair<std::string, size_t>
-      ( node->identifier
-      , current_rule_binding_types->size()
-      )
-    );
-    
+    current_rule_binding_offsets->insert( std::pair< std::string, size_t >(
+        node->identifier, current_rule_binding_types->size() ) );
+
     current_rule_binding_types->push_back( &node->type_ );
 
     walk_statement( node->statement );
 
     if( not node->type_.is_complete() )
     {
-	visitor.driver_.error
-	( node->location
-	, "type inference for '"
-	  + node->identifier
-	  + "' failed"
-	, libcasm_fe::Codes::TypeInferenceInvalidForallExpression
-	);
+        visitor.driver_.error( node->location,
+            "type inference for '" + node->identifier + "' failed",
+            libcasm_fe::Codes::TypeInferenceInvalidForallExpression );
     }
-    
+
     visitor.rule_binding_types.back()->pop_back();
     visitor.rule_binding_offsets.back()->erase( node->identifier );
 }
 
-
 template <>
-void AstWalker<TypecheckVisitor, Type*>::walk_call(CallNode *call) {
-  // basically the same as in AstWalker, but we do not walk the rule here as
-  // this could lead to an endless recursion
-  if (call->ruleref == nullptr) {
-    visitor.visit_call_pre(call);
-  } else {
-    Type *v = walk_atom(call->ruleref);
-    visitor.visit_call_pre(call, v);
-  }
+void AstWalker< TypecheckVisitor, Type* >::walk_call( CallNode* call )
+{
+    // basically the same as in AstWalker, but we do not walk the rule here as
+    // this could lead to an endless recursion
+    if( call->ruleref == nullptr )
+    {
+        visitor.visit_call_pre( call );
+    }
+    else
+    {
+        Type* v = walk_atom( call->ruleref );
+        visitor.visit_call_pre( call, v );
+    }
 
-  // we must evaluate all arguments, to set correct offset for bindings
-  std::vector<Type*> arguments = evaluateExpressions(call->arguments);
+    // we must evaluate all arguments, to set correct offset for bindings
+    std::vector< Type* > arguments = evaluateExpressions( call->arguments );
 
-  if (call->rule != nullptr) {
-    visitor.visit_call(call, arguments);
-    //walk_rule(call->rule);
-    visitor.visit_call_post(call);
-  } else {
-    DEBUG("rule not set!");
-  }
+    if( call->rule != nullptr )
+    {
+        visitor.visit_call( call, arguments );
+        // walk_rule(call->rule);
+        visitor.visit_call_post( call );
+    }
+    else
+    {
+        DEBUG( "rule not set!" );
+    }
 }
-
