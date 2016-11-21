@@ -425,7 +425,8 @@ value_t NumericExecutionWalker::walk_list_atom( ListAtom* atom )
     if( atom->expr_list )
     {
         for( auto iter = atom->expr_list->rbegin();
-             iter != atom->expr_list->rend(); iter++ )
+             iter != atom->expr_list->rend();
+             iter++ )
         {
             expr_results.push_back( walk_atom( *iter ) );
         }

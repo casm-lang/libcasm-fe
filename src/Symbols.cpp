@@ -82,7 +82,8 @@ static void built_in_check_bitargs( Builtin& self, Driver& driver,
         {
             driver.error( atom->arguments->at( i )->location,
                 "first argument of '" + self.name + "' has invalid Bit type '"
-                    + atom->types[ i ]->to_str() + "'!" );
+                    + atom->types[ i ]->to_str()
+                    + "'!" );
             flag = true;
         }
     }
@@ -96,8 +97,10 @@ static void built_in_check_bitargs( Builtin& self, Driver& driver,
     {
         driver.error( atom->location,
             "arguments of '" + self.name + "' have different Bit types: '"
-                + atom->types[ 0 ]->to_str() + "' != '"
-                + atom->types[ 1 ]->to_str() + "'" );
+                + atom->types[ 0 ]->to_str()
+                + "' != '"
+                + atom->types[ 1 ]->to_str()
+                + "'" );
     }
 }
 
@@ -270,7 +273,8 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
                 driver.warning( atom->arguments->at( 0 )->location,
                     "first argument of 'asBit' builtin will be truncated to "
                     "bitsize '"
-                        + std::to_string( bitsize ) + "'"
+                        + std::to_string( bitsize )
+                        + "'"
                     // "conversion from 'TYPE' to 'TYPE', possible loss of data"
                     // // PPA: use this message in the future
                     );
@@ -289,7 +293,8 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
                 driver.error( atom->arguments->at( 0 )->location,
                     "first argument of 'asBit' builtin does not fit into the "
                     "bitsize of '"
-                        + std::to_string( bitsize ) + "'" );
+                        + std::to_string( bitsize )
+                        + "'" );
             }
         } }
 
@@ -402,7 +407,7 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
     ////===--- BIT OPERATION BUILT-INS ---====
 
     //// zext  : Bit( n ) * Integer (const, m) -> Bit( m ) // zero extend to new
-    ///size, if m < n then error!
+    /// size, if m < n then error!
     ,
     { "zext", Builtin::Id::ZEXT, { TypeType::BIT },
         { { TypeType::BIT }, { TypeType::INTEGER } },
@@ -419,13 +424,15 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
             {
                 driver.error( atom->arguments->at( 0 )->location,
                     "cannot '" + self.name + "' from type '"
-                        + atom->types[ 0 ]->to_str() + "' to '"
-                        + atom->return_type->to_str() + "'!" );
+                        + atom->types[ 0 ]->to_str()
+                        + "' to '"
+                        + atom->return_type->to_str()
+                        + "'!" );
             }
         } }
 
     //// sext  : Bit( n ) * Integer (const, m) -> Bit( m ) // sign extend to new
-    ///size, if m < n then error!
+    /// size, if m < n then error!
     ,
     { "sext", Builtin::Id::SEXT, { TypeType::BIT },
         { { TypeType::BIT }, { TypeType::INTEGER } },
@@ -442,13 +449,15 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
             {
                 driver.error( atom->arguments->at( 0 )->location,
                     "cannot '" + self.name + "' from type '"
-                        + atom->types[ 0 ]->to_str() + "' to '"
-                        + atom->return_type->to_str() + "'!" );
+                        + atom->types[ 0 ]->to_str()
+                        + "' to '"
+                        + atom->return_type->to_str()
+                        + "'!" );
             }
         } }
 
     //// trunc : Bit( n ) * Integer (const, m) -> Bit( m ) // truncate to new
-    ///size, if m > n then error!
+    /// size, if m > n then error!
     ,
     { "trunc", Builtin::Id::TRUNC, { TypeType::BIT },
         { { TypeType::BIT }, { TypeType::INTEGER } },
@@ -467,15 +476,17 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
             {
                 driver.error( atom->arguments->at( 0 )->location,
                     "cannot '" + self.name + "' from type '"
-                        + atom->types[ 0 ]->to_str() + "' to '"
-                        + atom->return_type->to_str() + "'!" );
+                        + atom->types[ 0 ]->to_str()
+                        + "' to '"
+                        + atom->return_type->to_str()
+                        + "'!" );
             }
         } }
 
     //// shl   : Bit( n ) * Integer  -> Bit( n ) // logic shift left of Integer
-    ///value positions
+    /// value positions
     //// shl   : Bit( n ) * Bit( n ) -> Bit( n ) // logic shift left of Bit(n)
-    ///value positions
+    /// value positions
     ,
     { "shl", Builtin::Id::SHL, { TypeType::BIT },
         { { TypeType::BIT },
@@ -489,9 +500,9 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
         } }
 
     //// shr   : Bit( n ) * Integer  -> Bit( n ) // logic shift right of Integer
-    ///value positions
+    /// value positions
     //// shr   : Bit( n ) * Bit( n ) -> Bit( n ) // logic shift right of Bit(n)
-    ///value positions
+    /// value positions
     ,
     { "shr", Builtin::Id::SHR, { TypeType::BIT },
         { { TypeType::BIT },
@@ -505,9 +516,9 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
         } }
 
     //// ashr  : Bit( n ) * Integer  -> Bit( n ) // arithmetic shift right of
-    ///Integer value positions
+    /// Integer value positions
     //// ashr  : Bit( n ) * Bit( n ) -> Bit( n ) // arithmetic shift right of
-    ///Bit(n) value positions
+    /// Bit(n) value positions
     ,
     { "ashr", Builtin::Id::ASHR, { TypeType::BIT },
         { { TypeType::BIT },

@@ -461,9 +461,8 @@ namespace symbolic
             }
             else if( *( known_cond->rhs ) == *( cond.lhs ) )
             {
-                s = check_inclusion(
-                    symbolic_condition_t(
-                        known_cond->rhs, known_cond->lhs, known_cond->op ),
+                s = check_inclusion( symbolic_condition_t( known_cond->rhs,
+                                         known_cond->lhs, known_cond->op ),
                     cond );
             }
             if( s != check_status_t::NOT_FOUND )
@@ -1042,7 +1041,8 @@ value_t SymbolicExecutionWalker::walk_list_atom( ListAtom* atom )
     if( atom->expr_list )
     {
         for( auto iter = atom->expr_list->rbegin();
-             iter != atom->expr_list->rend(); iter++ )
+             iter != atom->expr_list->rend();
+             iter++ )
         {
             expr_results.push_back( walk_atom( *iter ) );
         }

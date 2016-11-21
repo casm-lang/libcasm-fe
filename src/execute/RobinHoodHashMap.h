@@ -72,7 +72,9 @@ namespace details
     };
 }
 
-template < typename Key, typename Value, typename Hash = std::hash< Key >,
+template < typename Key,
+    typename Value,
+    typename Hash = std::hash< Key >,
     typename Pred = std::equal_to< Key >,
     typename Details = details::RobinHoodHashMap< Key, Value, Hash, Pred > >
 class RobinHoodHashMap final : public HashMapBase< Details >

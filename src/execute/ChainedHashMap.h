@@ -78,7 +78,9 @@ namespace details
     };
 }
 
-template < typename Key, typename Value, typename Hash = std::hash< Key >,
+template < typename Key,
+    typename Value,
+    typename Hash = std::hash< Key >,
     typename Pred = std::equal_to< Key >,
     typename Details = details::ChainedHashMap< Key, Value, Hash, Pred > >
 class ChainedHashMap final : public HashMapBase< Details >

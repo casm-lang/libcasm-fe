@@ -119,7 +119,8 @@ void TypecheckVisitor::visit_function_def( FunctionDefNode* def,
                     "initially value bitsize '"
                         + std::to_string( value_bitsize )
                         + "' does not fit into the bitsize of '"
-                        + std::to_string( bitsize ) + "'",
+                        + std::to_string( bitsize )
+                        + "'",
                     libcasm_fe::Codes::
                         TypeBitSizeInvalidInIninitallyExpression );
             }
@@ -271,7 +272,9 @@ void TypecheckVisitor::visit_rule( RuleNode* rule )
                 driver_.error( rule->location,
                     std::string(
                         "names in dumplist must be function identifiers" )
-                        + " but `" + identifier + "` is not a function" );
+                        + " but `"
+                        + identifier
+                        + "` is not a function" );
             }
         }
     }
@@ -297,7 +300,8 @@ void TypecheckVisitor::visit_ifthenelse( IfThenElseNode* node, Type* cond )
     {
         driver_.error( node->condition_->location,
             "type of 'if' expression should be 'Boolean', found '"
-                + cond->to_str() + "'",
+                + cond->to_str()
+                + "'",
             libcasm_fe::Codes::TypeInferenceInvalidIfExpression );
     }
 }
@@ -326,7 +330,9 @@ void TypecheckVisitor::visit_update( UpdateNode* update, Type*, Type* )
             "type `"
                 + update->func->type_.get_most_general_type( update->func )
                       ->to_str()
-                + "` of `" + update->func->name + "` does not match type `"
+                + "` of `"
+                + update->func->name
+                + "` does not match type `"
                 + update->expr_->type_.get_most_general_type( update->expr_ )
                       ->to_str()
                 + "` of expression" );
@@ -400,8 +406,10 @@ void TypecheckVisitor::visit_call(
     {
         driver_.error( call->location,
             "rule '" + call->rule_name + "' expects "
-                + std::to_string( args_defined ) + " arguments but "
-                + std::to_string( args_provided ) + " where provided",
+                + std::to_string( args_defined )
+                + " arguments but "
+                + std::to_string( args_provided )
+                + " where provided",
             libcasm_fe::Codes::RuleArgumentsSizeInvalidAtCall );
     }
     else
@@ -412,9 +420,12 @@ void TypecheckVisitor::visit_call(
             {
                 driver_.error( call->arguments->at( i )->location,
                     "argument " + std::to_string( i + 1 ) + " of rule '"
-                        + call->rule_name + "' must be '"
+                        + call->rule_name
+                        + "' must be '"
                         + call->rule->arguments.at( i )->to_str()
-                        + "' but was '" + arguments.at( i )->to_str() + "'",
+                        + "' but was '"
+                        + arguments.at( i )->to_str()
+                        + "'",
                     libcasm_fe::Codes::RuleArgumentsTypeInvalidAtCall );
             }
         }
@@ -498,7 +509,8 @@ void TypecheckVisitor::visit_let( LetNode* node, Type* )
             driver_.error( node->expr->location,
                 "let expression bitsize '" + std::to_string( value_bitsize )
                     + "' does not fit into the bitsize of '"
-                    + std::to_string( bitsize ) + "'",
+                    + std::to_string( bitsize )
+                    + "'",
                 libcasm_fe::Codes::TypeBitSizeInvalidInLetExpression );
         }
 
@@ -671,7 +683,8 @@ void TypecheckVisitor::visit_case(
                 driver_.error( node->case_list[ i ].first->location,
                     "bitsize " + std::to_string( value_bitsize )
                         + " of case list value does not fit into '"
-                        + expr->to_str() + "' of case expression" );
+                        + expr->to_str()
+                        + "' of case expression" );
             }
             else
             {
@@ -785,7 +798,8 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
     {
         driver_.error( expr->location,
             "size of 'Bit' types in expression did not match: " + lhs->to_str()
-                + " != " + rhs->to_str(),
+                + " != "
+                + rhs->to_str(),
             libcasm_fe::Codes::TypeBitSizeInvalidExpression );
     }
 
@@ -815,7 +829,8 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
             {
                 driver_.error( tmp->getRef()->location,
                     "invalid unary operator type '"
-                        + tmp->getRef()->type_.to_str() + "'" );
+                        + tmp->getRef()->type_.to_str()
+                        + "'" );
             }
         }
         delete expr->left_;
@@ -1118,7 +1133,8 @@ void TypecheckVisitor::visit_derived_function_atom_pre(
     {
         driver_.error( atom->location,
             " expects " + std::to_string( args_defined ) + " arguments but "
-                + std::to_string( args_provided ) + " where provided" );
+                + std::to_string( args_provided )
+                + " where provided" );
     }
     else
     {
@@ -1198,14 +1214,16 @@ Type* TypecheckVisitor::visit_number_range_atom(
     {
         driver_.error( atom->left->location,
             "left value of number range must be an Integer but was '"
-                + left->to_str() + "'",
+                + left->to_str()
+                + "'",
             libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtLeftHandSide );
     }
     if( not right->unify( TypeType::INTEGER ) )
     {
         driver_.error( atom->right->location,
             "right value of number range must be an Integer but was '"
-                + right->to_str() + "'",
+                + right->to_str()
+                + "'",
             libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtRightHandSide );
     }
     return &atom->type_;
@@ -1238,7 +1256,8 @@ void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode* node )
         visitor.driver_.error( node->location,
             "expression must be a List, an Integer, a NumberRange or enum, but "
             "is '"
-                + node->in_expr->type_.to_str() + "'" );
+                + node->in_expr->type_.to_str()
+                + "'" );
     }
 
     auto current_rule_binding_types = visitor.rule_binding_types.back();

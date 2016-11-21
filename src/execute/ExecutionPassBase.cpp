@@ -807,8 +807,10 @@ void ExecutionPassBase::visit_call(
         {
             throw RuntimeException( call->location,
                 "indirectly called rule '" + call->rule->name + "' expects "
-                    + std::to_string( args_defined ) + " arguments but "
-                    + std::to_string( args_provided ) + " were provided",
+                    + std::to_string( args_defined )
+                    + " arguments but "
+                    + std::to_string( args_provided )
+                    + " were provided",
                 libcasm_fe::Codes::RuleArgumentsSizeInvalidAtIndirectCall );
         }
         else
@@ -825,9 +827,13 @@ void ExecutionPassBase::visit_call(
                 {
                     throw RuntimeException( call->arguments->at( i )->location,
                         "argument " + std::to_string( i + 1 )
-                            + " of indirectly called rule `" + call->rule->name
-                            + "` must be `" + ruleArgType.to_str()
-                            + "` but was `" + argType.to_str() + "`",
+                            + " of indirectly called rule `"
+                            + call->rule->name
+                            + "` must be `"
+                            + ruleArgType.to_str()
+                            + "` but was `"
+                            + argType.to_str()
+                            + "`",
                         libcasm_fe::Codes::
                             RuleArgumentsTypeInvalidAtIndirectCall );
                 }
@@ -846,7 +852,8 @@ void ExecutionPassBase::visit_call(
                            // argument index to get the proper arg location
             ,
             std::string( e.what() ) + " of rule '"
-                + ( call->ruleref ? call->rule->name : call->rule_name ) + "'",
+                + ( call->ruleref ? call->rule->name : call->rule_name )
+                + "'",
             libcasm_fe::Codes::RuleArgumentsInvalidRangeAtCall );
     }
 
@@ -997,7 +1004,8 @@ void ExecutionPassBase::visit_derived_function_atom_pre(
                                    // arg location
                 ,
                 std::string( e.what() ) + " of derived '"
-                    + function->symbol->name + "'",
+                    + function->symbol->name
+                    + "'",
                 libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup );
         }
     }
