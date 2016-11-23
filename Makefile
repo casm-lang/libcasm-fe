@@ -112,6 +112,7 @@ test-release: release-check-linux64-clang
 config: CFG=CC="$(CC)" CF="$(CF)"
 config:
 	@echo "CFG  $(CFG)"
+	@echo $(CP)
 
 
 obj/%.o: %.cpp
@@ -133,21 +134,21 @@ src/various/Grammar.org: src/GrammarParser.yy
 		sed "/^--/d"  |\
 		sed "/^\t/d"  > $@
 
-src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.h
+src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hh
 	@echo "YAC " $<
 	@mkdir -p `dirname obj/$<`
 	@head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	@cat $(filter %.h,$^) | sed "/^\/\/ /d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
+	@cat $(filter %.hh,$^) | sed "/^\/\//d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
 	@tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
 	@sed -i "/^{{grammartoken}}/d" obj/$<
 	@cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
 
 
-src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.h
+src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hh
 	@echo "LEX " $<
 	@mkdir -p `dirname obj/$<`
 	@head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	@cat $(filter %.h,$^) | sed "/^\/\/ /d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$< 
+	@cat $(filter %.hh,$^) | sed "/^\/\//d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$< 
 	@tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
 	@sed -i "/^{{grammartoken}}/d" obj/$<
 	@$(LX) $(LFLAGS) -o $@ obj/$<
