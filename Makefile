@@ -112,7 +112,6 @@ test-release: release-check-linux64-clang
 config: CFG=CC="$(CC)" CF="$(CF)"
 config:
 	@echo "CFG  $(CFG)"
-	@echo $(CP)
 
 
 obj/%.o: %.cpp
