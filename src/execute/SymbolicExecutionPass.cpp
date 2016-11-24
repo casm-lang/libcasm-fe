@@ -1160,7 +1160,7 @@ template <>
 void SymbolicExecutionWalker::walk_seqblock( UnaryNode* seqblock )
 {
     visitor.fork( UpdateSet::Type::Sequential );
-    visitor.visit_seqblock( seqblock );
+    visitor.visit_seqblock_pre( seqblock );
     walk_statements( reinterpret_cast< AstListNode* >( seqblock->child_ ) );
     visitor.merge();
 }
@@ -1169,7 +1169,7 @@ template <>
 void SymbolicExecutionWalker::walk_parblock( UnaryNode* parblock )
 {
     visitor.fork( UpdateSet::Type::Parallel );
-    visitor.visit_parblock( parblock );
+    visitor.visit_parblock_pre( parblock );
     walk_statements( reinterpret_cast< AstListNode* >( parblock->child_ ) );
     visitor.merge();
 }

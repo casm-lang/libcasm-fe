@@ -262,14 +262,16 @@ class AstWalker
 
     void walk_seqblock( UnaryNode* parblock )
     {
-        visitor.visit_seqblock( parblock );
+        visitor.visit_seqblock_pre( parblock );
         walk_statements( reinterpret_cast< AstListNode* >( parblock->child_ ) );
+        visitor.visit_seqblock_post( parblock );
     }
 
     void walk_parblock( UnaryNode* parblock )
     {
-        visitor.visit_parblock( parblock );
+        visitor.visit_parblock_pre( parblock );
         walk_statements( reinterpret_cast< AstListNode* >( parblock->child_ ) );
+        visitor.visit_parblock_post( parblock );
     }
 
     void walk_statements( AstListNode* stmts )
@@ -609,10 +611,16 @@ class BaseVisitor
     void visit_assure( UnaryNode*, T )
     {
     }
-    void visit_seqblock( UnaryNode* )
+    void visit_seqblock_pre( UnaryNode* )
     {
     }
-    void visit_parblock( UnaryNode* )
+    void visit_seqblock_post( UnaryNode* )
+    {
+    }
+    void visit_parblock_pre( UnaryNode* )
+    {
+    }
+    void visit_parblock_post( UnaryNode* )
     {
     }
     T visit_update( UpdateNode*, T, T )

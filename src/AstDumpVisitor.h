@@ -57,8 +57,8 @@ class AstDumpVisitor : public BaseVisitor< bool >
     void visit_statement( AstNode* stmt );
     void visit_ifthenelse( IfThenElseNode* node, bool );
     bool visit_assert( UnaryNode* assert, bool );
-    void visit_seqblock( UnaryNode* seqblock );
-    void visit_parblock( UnaryNode* parblock );
+    void visit_seqblock_pre( UnaryNode* seqblock );
+    void visit_parblock_pre( UnaryNode* parblock );
     bool visit_update( UpdateNode* update, bool, bool );
     bool visit_update_dumps( UpdateNode* update, bool v1, bool v2 );
     bool visit_call_pre( CallNode* call );
