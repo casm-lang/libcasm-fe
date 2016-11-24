@@ -419,22 +419,6 @@ const value_t NumericExecutionPass::visit_list_atom(
 }
 
 template <>
-value_t NumericExecutionWalker::walk_list_atom( ListAtom* atom )
-{
-    std::vector< value_t > expr_results;
-    if( atom->expr_list )
-    {
-        for( auto iter = atom->expr_list->rbegin();
-             iter != atom->expr_list->rend();
-             iter++ )
-        {
-            expr_results.push_back( walk_atom( *iter ) );
-        }
-    }
-    return visitor.visit_list_atom( atom, expr_results );
-}
-
-template <>
 void NumericExecutionWalker::walk_ifthenelse( IfThenElseNode* node )
 {
     const value_t cond = walk_atom( node->condition_ );

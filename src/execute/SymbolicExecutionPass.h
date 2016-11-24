@@ -91,9 +91,6 @@ namespace libcasm_fe
 using SymbolicExecutionWalker
     = AstWalker< libcasm_fe::SymbolicExecutionPass, value_t >;
 
-template <>
-value_t SymbolicExecutionWalker::walk_list_atom( ListAtom* atom );
-
 // Specialize if-then-else for SymbolicExecutionPass
 template <>
 void SymbolicExecutionWalker::walk_ifthenelse( IfThenElseNode* node );

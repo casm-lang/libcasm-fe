@@ -1127,6 +1127,8 @@ BottomList::BottomList( const std::vector< value_t >& vals )
 , values( std::move( vals ) )
 , tail( nullptr )
 {
+    std::reverse( values.begin(), values.end() ); // why is this needed?!
+    // TODO avoid this in the new list implementation!!
 }
 
 BottomList::~BottomList()

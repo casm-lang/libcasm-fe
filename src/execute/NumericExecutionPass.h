@@ -78,9 +78,6 @@ using NumericExecutionWalker
     = AstWalker< libcasm_fe::NumericExecutionPass, value_t >;
 
 template <>
-value_t NumericExecutionWalker::walk_list_atom( ListAtom* atom );
-
-template <>
 void NumericExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
 
 template <>
