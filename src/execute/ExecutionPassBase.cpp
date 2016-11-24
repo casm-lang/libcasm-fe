@@ -776,25 +776,21 @@ void ExecutionPassBase::visit_assert( UnaryNode* assert, const value_t& val )
     }
 }
 
-void ExecutionPassBase::visit_update_dumps( UpdateNode* update,
-    const std::vector< value_t >& arguments, const value_t& expr_v )
-{
-    const std::string& filter
-        = global_driver->function_trace_map[ update->func->symbol->id ];
-    if( filter_enabled( filter ) )
-    {
-        std::cout << filter << ": " << update->func->symbol->name
-                  << to_string( arguments ) << " = " << expr_v.to_str()
-                  << std::endl;
-    }
-
-    visit_update( update, arguments, expr_v );
-}
-
 void ExecutionPassBase::visit_update( UpdateNode* update,
     const std::vector< value_t >& arguments, const value_t& expr_v )
 {
     addUpdate( update->func->symbol, arguments, expr_v, update->location );
+
+    if( update->dump )
+    {
+        const std::string& filter
+            = global_driver->function_trace_map[ update->func->symbol->id ];
+        if( filter_enabled( filter ) ) {
+            std::cout << filter << ": " << update->func->symbol->name
+                      << to_string( arguments ) << " = " << expr_v.to_str()
+                      << std::endl;
+        }
+    }
 }
 
 void ExecutionPassBase::visit_call_pre( CallNode* call )

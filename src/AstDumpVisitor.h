@@ -60,7 +60,6 @@ class AstDumpVisitor : public BaseVisitor< bool >
     void visit_seqblock_pre( UnaryNode* seqblock );
     void visit_parblock_pre( UnaryNode* parblock );
     bool visit_update( UpdateNode* update, bool, bool );
-    bool visit_update_dumps( UpdateNode* update, bool v1, bool v2 );
     bool visit_call_pre( CallNode* call );
     bool visit_call_pre( CallNode* call, bool );
     bool visit_call( CallNode* call, std::vector< bool >& );

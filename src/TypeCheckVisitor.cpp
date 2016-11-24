@@ -363,7 +363,7 @@ void TypecheckVisitor::visit_update( UpdateNode* update, Type*, Type* )
     if( update->func->symbol
         && driver_.function_trace_map.count( update->func->symbol->id ) > 0 )
     {
-        update->node_type_ = NodeType::UPDATE_DUMPS;
+        update->dump = true;
     }
 }
 

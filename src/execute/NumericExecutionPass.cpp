@@ -614,15 +614,6 @@ void NumericExecutionWalker::walk_update( UpdateNode* node )
     visitor.visit_update( node, arguments, expr );
 }
 
-template <>
-void NumericExecutionWalker::walk_update_dumps( UpdateNode* node )
-{
-    const value_t expr = walk_atom( node->expr_ );
-    std::vector< value_t > arguments
-        = evaluateExpressions( node->func->arguments );
-    visitor.visit_update_dumps( node, arguments, expr );
-}
-
 //
 //  Local variables:
 //  mode: c++

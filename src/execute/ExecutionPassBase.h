@@ -77,8 +77,6 @@ namespace libcasm_fe
 
         void visit_update( UpdateNode* update,
             const std::vector< value_t >& arguments, const value_t& expr_v );
-        void visit_update_dumps( UpdateNode* update,
-            const std::vector< value_t >& arguments, const value_t& expr_v );
 
         void visit_call_pre( CallNode* call );
         void visit_call_pre( CallNode* call, const value_t& expr );

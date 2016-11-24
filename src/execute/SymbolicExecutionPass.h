@@ -116,9 +116,6 @@ void SymbolicExecutionWalker::walk_iterate( UnaryNode* node );
 template <>
 void SymbolicExecutionWalker::walk_update( UpdateNode* node );
 
-template <>
-void SymbolicExecutionWalker::walk_update_dumps( UpdateNode* node );
-
 #endif /* _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_ */
 
 //

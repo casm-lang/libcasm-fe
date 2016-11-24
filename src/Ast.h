@@ -66,7 +66,6 @@ enum NodeType
     BINARY_EXPRESSION,
     UNARY_EXPRESSION,
     UPDATE,
-    UPDATE_DUMPS,
     STATEMENT,
     STATEMENTS,
     SKIP,
@@ -423,6 +422,8 @@ class UpdateNode : public AstNode
   public:
     FunctionAtom* func;
     ExpressionBase* expr_;
+
+    bool dump = false;
 
     UpdateNode( yy::location& loc, FunctionAtom* func, ExpressionBase* expr );
     ~UpdateNode() override;

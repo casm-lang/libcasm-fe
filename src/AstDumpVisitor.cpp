@@ -154,11 +154,6 @@ bool AstDumpVisitor::visit_update( UpdateNode* update, bool, bool )
     return true;
 }
 
-bool AstDumpVisitor::visit_update_dumps( UpdateNode* update, bool v1, bool v2 )
-{
-    return visit_update( update, v1, v2 );
-}
-
 bool AstDumpVisitor::visit_call_pre( CallNode* call )
 {
     dump_node( call, "Direct Call: " + call->rule_name );

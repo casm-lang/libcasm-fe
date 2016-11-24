@@ -243,9 +243,6 @@ class AstWalker
                 walk_case( reinterpret_cast< CaseNode* >( stmt ) );
                 break;
             }
-            case NodeType::UPDATE_DUMPS:
-                walk_update_dumps( reinterpret_cast< UpdateNode* >( stmt ) );
-                break;
             case NodeType::DIEDIE:
                 walk_diedie( reinterpret_cast< DiedieNode* >( stmt ) );
                 break;
@@ -292,17 +289,6 @@ class AstWalker
         // overwrite the value_list
         const V func = walk_function_atom( update->func );
         visitor.visit_update( update, func, expr );
-    }
-
-    void walk_update_dumps( UpdateNode* update )
-    {
-        const V expr = walk_atom( update->expr_ );
-
-        // we must walk the expression before walking update->func because it
-        // sets the list of arguments and we do not want the update->expr_ to
-        // overwrite the value_list
-        const V func = walk_function_atom( update->func );
-        visitor.visit_update_dumps( update, func, expr );
     }
 
     void walk_call( CallNode* call )
@@ -626,10 +612,6 @@ class BaseVisitor
     T visit_update( UpdateNode*, T, T )
     {
         return T();
-    }
-    T visit_update_dumps( UpdateNode* u, T v1, T v2 )
-    {
-        return visit_update( u, v1, v2 );
     }
     T visit_call_pre( CallNode* )
     {
