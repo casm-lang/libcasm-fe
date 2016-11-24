@@ -84,12 +84,6 @@ template <>
 void NumericExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
 
 template <>
-void NumericExecutionWalker::walk_seqblock( UnaryNode* seqblock );
-
-template <>
-void NumericExecutionWalker::walk_parblock( UnaryNode* parblock );
-
-template <>
 void NumericExecutionWalker::walk_pop( PopNode* node );
 
 template <>

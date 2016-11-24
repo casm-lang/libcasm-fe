@@ -68,6 +68,11 @@ namespace libcasm_fe
 
         bool filter_enabled( const std::string& filter );
 
+        void visit_seqblock_pre( UnaryNode* seqblock );
+        void visit_seqblock_post( UnaryNode* seqblock );
+        void visit_parblock_pre( UnaryNode* parblock );
+        void visit_parblock_post( UnaryNode* parblock );
+
         void visit_assert( UnaryNode* assert, const value_t& val );
 
         void visit_update( UpdateNode* update,

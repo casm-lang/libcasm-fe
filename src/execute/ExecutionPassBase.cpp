@@ -293,6 +293,26 @@ bool ExecutionPassBase::filter_enabled( const std::string& filter )
            || debuginfo_filters.count( filter ) > 0;
 }
 
+void ExecutionPassBase::visit_seqblock_pre( UnaryNode* seqblock )
+{
+    fork( UpdateSet::Type::Sequential );
+}
+
+void ExecutionPassBase::visit_seqblock_post( UnaryNode* seqblock )
+{
+    merge();
+}
+
+void ExecutionPassBase::visit_parblock_pre( UnaryNode* parblock )
+{
+    fork( UpdateSet::Type::Parallel );
+}
+
+void ExecutionPassBase::visit_parblock_post( UnaryNode* parblock )
+{
+    merge();
+}
+
 namespace builtins
 {
     static const value_t pow( const value_t& base, const value_t& power )

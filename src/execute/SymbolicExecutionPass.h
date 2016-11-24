@@ -99,12 +99,6 @@ template <>
 void SymbolicExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
 
 template <>
-void SymbolicExecutionWalker::walk_seqblock( UnaryNode* seqblock );
-
-template <>
-void SymbolicExecutionWalker::walk_parblock( UnaryNode* parblock );
-
-template <>
 void SymbolicExecutionWalker::walk_pop( PopNode* node );
 
 template <>
