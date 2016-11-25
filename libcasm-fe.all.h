@@ -31,6 +31,7 @@
 #include "src/analyze/AstDumpPass.h"
 #include "src/analyze/TypeCheckPass.h"
 
+#include "src/transform/AstToCasmIRPass.h"
 #include "src/transform/SourceToAstPass.h"
 
 #include "src/execute/NumericExecutionPass.h"

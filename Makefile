@@ -49,8 +49,9 @@ CI += -I ./src/various
 
 CI += -I ../stdhl
 CI += -I ../pass
+CI += -I ../casm-ir
 
-CL  =
+CL  = ../casm-ir/libcasm-ir.a
 
 LX  = flex
 YC  = bison
@@ -112,6 +113,10 @@ test-release: release-check-linux64-clang
 config: CFG=CC="$(CC)" CF="$(CF)"
 config:
 	@echo "CFG  $(CFG)"
+
+
+../casm-ir/libcasm-ir.a: ../casm-ir
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
 
 obj/%.o: %.cpp
@@ -184,7 +189,7 @@ obj/uts/%.o: uts/%.cpp
 	@echo "C++ " $<
 	@$(CC) $(CF) $(TI) $(CI) -c $< -o $@
 
-$(TEST_TARGET): $(TO) $(CO) $(TARGET)
+$(TEST_TARGET): $(TO) $(CO) $(CL) $(TARGET)
 	@echo "LD " $@
 	@$(CC) \
 	  $(CF) \
@@ -193,6 +198,7 @@ $(TEST_TARGET): $(TO) $(CO) $(TARGET)
 	  $(TL) \
 	  -o $@ \
 	  $(TO) \
+	  $(CL) \
 	  $(TARGET) \
 	  ../gtest/googletest/src/gtest-all.cc \
 	  ../gtest/googletest/src/gtest_main.cc 
