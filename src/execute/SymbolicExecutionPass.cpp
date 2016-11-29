@@ -606,7 +606,7 @@ void SymbolicExecutionPass::visit_pop( PopNode* node, const value_t& val )
 
     symbolic::dump_builtin( trace, "pop", { val, to_res }, from_res );
 
-    addUpdate( node->to->symbol, arguments, from_res, node->location );
+    addUpdate( node->from->symbol, arguments, from_res, node->location );
 }
 
 value_t SymbolicExecutionPass::visit_expression(
