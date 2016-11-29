@@ -60,7 +60,7 @@ void AstDumpVisitor::visit_body_elements( AstListNode* body_elements )
 {
     dump_node( body_elements, "Body Elements" );
 
-    for( AstNode* s : body_elements->nodes )
+    for( auto s : body_elements->nodes )
     {
         dump_link( body_elements, s );
     }
@@ -87,7 +87,7 @@ bool AstDumpVisitor::visit_derived_function_atom( FunctionAtom* node, bool )
     return 0;
 }
 
-void AstDumpVisitor::visit_init( AstNode* init )
+void AstDumpVisitor::visit_init( InitNode* init )
 {
     dump_node( init, "Init" );
 }
@@ -102,7 +102,7 @@ void AstDumpVisitor::visit_statements( AstListNode* stmts )
 {
     dump_node( stmts, "Statements" );
 
-    for( AstNode* s : stmts->nodes )
+    for( auto s : stmts->nodes )
     {
         dump_link( stmts, s );
     }
@@ -125,12 +125,10 @@ void AstDumpVisitor::visit_ifthenelse( IfThenElseNode* node, bool )
     }
 }
 
-bool AstDumpVisitor::visit_assert( UnaryNode* assert, bool )
+void AstDumpVisitor::visit_assert( UnaryNode* assert, bool )
 {
     dump_node( assert, "Assert" );
-
     dump_link( (uint64_t)assert, (uint64_t)assert->child_ );
-    return true;
 }
 
 void AstDumpVisitor::visit_seqblock_pre( UnaryNode* seqblock )
@@ -145,60 +143,48 @@ void AstDumpVisitor::visit_parblock_pre( UnaryNode* parblock )
     dump_link( parblock, parblock->child_ );
 }
 
-bool AstDumpVisitor::visit_update( UpdateNode* update, bool, bool )
+void AstDumpVisitor::visit_update(
+    UpdateNode* update, const std::vector< bool >&, bool )
 {
     dump_node( update, "Update" );
-
     dump_link( (uint64_t)update, (uint64_t)update->func );
     dump_link( update, update->expr_ );
-    return true;
 }
 
-bool AstDumpVisitor::visit_call_pre( CallNode* call )
+void AstDumpVisitor::visit_call_pre( CallNode* call )
 {
     dump_node( call, "Direct Call: " + call->rule_name );
 
     if( call->arguments )
     {
-        for( ExpressionBase* a : *( call->arguments ) )
+        for( auto a : *( call->arguments ) )
         {
             dump_link( call, a );
         }
     }
-
-    return 0;
 }
 
-bool AstDumpVisitor::visit_call_pre( CallNode* call, bool )
+void AstDumpVisitor::visit_call_pre( CallNode* call, bool )
 {
     dump_node( call, "Indirect Call" );
-
     dump_link( call, call->ruleref );
 
     if( call->arguments )
     {
-        for( ExpressionBase* a : *( call->arguments ) )
+        for( auto a : *( call->arguments ) )
         {
             dump_link( call, a );
         }
     }
-
-    return 0;
-}
-
-bool AstDumpVisitor::visit_call( CallNode* call, std::vector< bool >& )
-{
-    UNUSED( call );
-    return true;
 }
 
 void AstDumpVisitor::visit_case(
-    CaseNode* node, const bool flag, const std::vector< bool >& result )
+    CaseNode* node, bool, const std::vector< bool >& )
 {
     dump_node( node, "Case" );
     dump_link( node, node->expr );
 
-    for( auto& a : node->case_list )
+    for( const auto& a : node->case_list )
     {
         dump_link( node, a.first );
         dump_link( a.first, a.second );
@@ -218,12 +204,10 @@ void AstDumpVisitor::visit_iterate( UnaryNode* node )
     dump_link( node, node->child_ );
 }
 
-bool AstDumpVisitor::visit_print( PrintNode* node, bool argument )
+void AstDumpVisitor::visit_print( PrintNode* node, bool )
 {
-    UNUSED( argument );
     dump_node( node, "Print" );
     dump_link( node, node->getAtom() );
-    return true;
 }
 
 void AstDumpVisitor::visit_let( LetNode* node, bool )
@@ -233,7 +217,7 @@ void AstDumpVisitor::visit_let( LetNode* node, bool )
     dump_link( node, node->stmt );
 }
 
-void AstDumpVisitor::visit_pop( PopNode* node )
+void AstDumpVisitor::visit_pop( PopNode* node, bool )
 {
     dump_node( node, "Pop" );
     dump_link( node, node->to );
@@ -354,11 +338,12 @@ bool AstDumpVisitor::visit_string_atom( StringAtom* atom )
     return true;
 }
 
-bool AstDumpVisitor::visit_list_atom( ListAtom* atom, std::vector< bool >& )
+bool AstDumpVisitor::visit_list_atom(
+    ListAtom* atom, const std::vector< bool >& )
 {
     dump_node( atom, std::string( "ListAtom" ) );
 
-    for( ExpressionBase* a : *( atom->expr_list ) )
+    for( auto a : *( atom->expr_list ) )
     {
         dump_link( atom, a );
     }

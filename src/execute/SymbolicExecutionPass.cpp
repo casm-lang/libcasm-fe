@@ -609,7 +609,7 @@ void SymbolicExecutionPass::visit_pop( PopNode* node, const value_t& val )
     addUpdate( node->to->symbol, arguments, from_res, node->location );
 }
 
-const value_t SymbolicExecutionPass::visit_expression(
+value_t SymbolicExecutionPass::visit_expression(
     BinaryExpression* expr, const value_t& left_val, const value_t& right_val )
 {
     switch( expr->op )
@@ -738,7 +738,7 @@ const value_t SymbolicExecutionPass::visit_expression(
     }
 }
 
-const value_t SymbolicExecutionPass::visit_expression_single(
+value_t SymbolicExecutionPass::visit_expression_single(
     UnaryExpression* expr, const value_t& val )
 {
     if( val.is_undef() )
@@ -759,7 +759,7 @@ const value_t SymbolicExecutionPass::visit_expression_single(
     }
 }
 
-const value_t SymbolicExecutionPass::visit_list_atom(
+value_t SymbolicExecutionPass::visit_list_atom(
     ListAtom* atom, const std::vector< value_t >& vals )
 {
     BottomList* list = new BottomList( vals );
@@ -1345,14 +1345,13 @@ void SymbolicExecutionWalker::walk_iterate( UnaryNode* node )
 template <>
 void SymbolicExecutionWalker::walk_update( UpdateNode* node )
 {
-    const value_t expr = walk_atom( node->expr_ );
+    const auto value = walk_atom( node->expr_ );
     if( node->func->symbol->is_symbolic )
     {
         walk_atom( node->func );
     }
-    std::vector< value_t > arguments
-        = evaluateExpressions( node->func->arguments );
-    visitor.visit_update( node, arguments, expr );
+    const auto argumentValues = evaluateExpressions( node->func->arguments );
+    visitor.visit_update( node, argumentValues, value );
 }
 
 //

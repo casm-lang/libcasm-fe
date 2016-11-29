@@ -33,7 +33,7 @@
 #include "Types.h"
 #include "Visitor.h"
 
-class TypecheckVisitor : public BaseVisitor< Type* >
+class TypecheckVisitor : public BaseVisitor< Type*, Type* >
 {
   private:
     void check_type_valid( const yy::location& location, const Type& type );
@@ -50,80 +50,90 @@ class TypecheckVisitor : public BaseVisitor< Type* >
 
     TypecheckVisitor( Driver& driver );
 
-    void visit_init( AstNode* init )
-    {
-        UNUSED( init );
-    }
     void visit_function_def( FunctionDefNode* def,
-        const std::vector< std::pair< Type*, Type* > >& initializers );
-    void visit_derived_def_pre( FunctionDefNode* def );
-    void visit_derived_def( FunctionDefNode* def, Type* expr );
+        const std::vector< std::pair< Type*, Type* > >& initializers ) override;
+    void visit_derived_def_pre( FunctionDefNode* def ) override;
+    void visit_derived_def( FunctionDefNode* def, Type* expr ) override;
 
-    void visit_rule( RuleNode* rule );
-    void visit_ifthenelse( IfThenElseNode* node, Type* cond );
-    void visit_assert( UnaryNode* assert, Type* t );
-    void visit_update( UpdateNode* update, Type* func, Type* expr );
-    void visit_call_pre( CallNode* call );
-    void visit_call_pre( CallNode* call, Type* expr );
-    void visit_call( CallNode* call, std::vector< Type* >& arguments );
-    void visit_call_post( CallNode* call );
-    void visit_print( PrintNode* node, Type* type );
-    void visit_diedie( DiedieNode* node, Type* msg );
+    void visit_rule( RuleNode* rule ) override;
+    void visit_ifthenelse( IfThenElseNode* node, Type* cond ) override;
+    void visit_assert( UnaryNode* assert, Type* t ) override;
+    void visit_update( UpdateNode* update,
+        const std::vector< Type* >& args,
+        Type* expr ) override;
+    void visit_call_pre( CallNode* call ) override;
+    void visit_call_pre( CallNode* call, Type* expr ) override;
+    void visit_call( CallNode* call, std::vector< Type* >& arguments ) override;
+    void visit_call_post( CallNode* call ) override;
+    void visit_print( PrintNode* node, Type* type ) override;
+    void visit_diedie( DiedieNode* node, Type* msg ) override;
 
-    void visit_let( LetNode* node, Type* v );
-    void visit_let_post( LetNode* node );
-    void visit_push( PushNode* node, Type* expr, Type* atom );
-    void visit_pop( PopNode* node );
-    void visit_case(
-        CaseNode* node, Type* val, const std::vector< Type* >& case_labels );
+    void visit_let( LetNode* node, Type* v ) override;
+    void visit_let_post( LetNode* node ) override;
+    void visit_push( PushNode* node, Type* expr, Type* atom ) override;
+    void visit_pop( PopNode* node, Type* atom ) override;
+    void visit_case( CaseNode* node,
+        Type* val,
+        const std::vector< Type* >& case_labels ) override;
 
     Type* visit_expression(
-        BinaryExpression* expr, Type* left_val, Type* right_val );
-    Type* visit_expression_single( UnaryExpression* expr, Type* val );
-    Type* visit_zero_atom( ZeroAtom* atom )
+        BinaryExpression* expr, Type* left_val, Type* right_val ) override;
+    Type* visit_expression_single( UnaryExpression* expr, Type* val ) override;
+
+    Type* visit_zero_atom( ZeroAtom* atom ) override
     {
         return &atom->type_;
     }
-    Type* visit_int_atom( IntegerAtom* atom )
+
+    Type* visit_int_atom( IntegerAtom* atom ) override
     {
         return &atom->type_;
     }
-    Type* visit_floating_atom( FloatingAtom* atom )
+
+    Type* visit_floating_atom( FloatingAtom* atom ) override
     {
         return &atom->type_;
     }
-    Type* visit_rational_atom( RationalAtom* atom )
+
+    Type* visit_rational_atom( RationalAtom* atom ) override
     {
         return &atom->type_;
     }
-    Type* visit_undef_atom( UndefAtom* atom )
+
+    Type* visit_undef_atom( UndefAtom* atom ) override
     {
         return &atom->type_;
     }
+
+    Type* visit_self_atom( SelfAtom* atom ) override
+    {
+        return &atom->type_;
+    }
+
+    Type* visit_boolean_atom( BooleanAtom* atom ) override
+    {
+        return &atom->type_;
+    }
+
+    Type* visit_string_atom( StringAtom* atom ) override
+    {
+        return &atom->type_;
+    }
+
     Type* visit_function_atom(
-        FunctionAtom* atom, std::vector< Type* >& arguments );
+        FunctionAtom* atom, std::vector< Type* >& arguments ) override;
     Type* visit_builtin_atom(
-        BuiltinAtom* atom, std::vector< Type* >& arguments );
+        BuiltinAtom* atom, std::vector< Type* >& arguments ) override;
 
     void visit_derived_function_atom_pre(
-        FunctionAtom* atom, std::vector< Type* >& arguments );
-    Type* visit_derived_function_atom( FunctionAtom* atom, Type* expr );
-    Type* visit_self_atom( SelfAtom* atom )
-    {
-        return &atom->type_;
-    }
-    Type* visit_rule_atom( RuleAtom* atom );
-    Type* visit_boolean_atom( BooleanAtom* atom )
-    {
-        return &atom->type_;
-    }
-    Type* visit_string_atom( StringAtom* atom )
-    {
-        return &atom->type_;
-    }
-    Type* visit_list_atom( ListAtom* atom, std::vector< Type* >& vals );
+        FunctionAtom* atom, std::vector< Type* >& arguments ) override;
+    Type* visit_derived_function_atom(
+        FunctionAtom* atom, Type* expr ) override;
+    Type* visit_rule_atom( RuleAtom* atom ) override;
+    Type* visit_list_atom(
+        ListAtom* atom, const std::vector< Type* >& vals ) override;
     Type* visit_number_range_atom(
-        NumberRangeAtom* atom, Type* left, Type* right );
+        NumberRangeAtom* atom, Type* left, Type* right ) override;
 };
 
 template <>

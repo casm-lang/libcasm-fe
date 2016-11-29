@@ -316,7 +316,8 @@ void TypecheckVisitor::visit_assert( UnaryNode* assert, Type* val )
     }
 }
 
-void TypecheckVisitor::visit_update( UpdateNode* update, Type*, Type* )
+void TypecheckVisitor::visit_update(
+    UpdateNode* update, const std::vector< Type* >&, Type* )
 {
     if( update->func->symbol && update->func->symbol->is_static )
     {
@@ -563,7 +564,7 @@ void TypecheckVisitor::visit_push( PushNode* node, Type* expr, Type* atom )
     }
 }
 
-void TypecheckVisitor::visit_pop( PopNode* node )
+void TypecheckVisitor::visit_pop( PopNode* node, Type* atom )
 {
     if( !node->from_type.unify( &node->from->type_ ) )
     {
@@ -1179,7 +1180,7 @@ Type* TypecheckVisitor::visit_rule_atom( RuleAtom* atom )
 }
 
 Type* TypecheckVisitor::visit_list_atom(
-    ListAtom* atom, std::vector< Type* >& vals )
+    ListAtom* atom, const std::vector< Type* >& vals )
 {
     atom->type_.t = TypeType::TUPLE_OR_LIST;
     atom->type_.subtypes = vals;

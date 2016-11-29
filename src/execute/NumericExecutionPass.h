@@ -47,21 +47,21 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        void visit_assure( UnaryNode* assure, const value_t& val );
+        void visit_assure( UnaryNode* assure, const value_t& val ) override;
 
-        void visit_print( PrintNode* node, const value_t& argument );
+        void visit_print( PrintNode* node, const value_t& argument ) override;
 
         void visit_push(
-            PushNode* node, const value_t& expr, const value_t& atom );
-        void visit_pop( PopNode* node, const value_t& val );
+            PushNode* node, const value_t& expr, const value_t& atom ) override;
+        void visit_pop( PopNode* node, const value_t& val ) override;
 
-        const value_t visit_expression( BinaryExpression* expr,
-            const value_t& left_val, const value_t& right_val );
-        const value_t visit_expression_single(
-            UnaryExpression* expr, const value_t& val );
+        value_t visit_expression( BinaryExpression* expr,
+            const value_t& left_val, const value_t& right_val ) override;
+        value_t visit_expression_single(
+            UnaryExpression* expr, const value_t& val ) override;
 
-        const value_t visit_list_atom(
-            ListAtom* atom, const std::vector< value_t >& vals );
+        value_t visit_list_atom(
+            ListAtom* atom, const std::vector< value_t >& vals ) override;
 
       private:
         bool init_function(

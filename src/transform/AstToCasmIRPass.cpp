@@ -166,7 +166,7 @@ void libcasm_fe::AstToCasmIRPass::visit_init( InitNode* node )
     getSpecification()->add( ir_function );
 }
 
-void libcasm_fe::AstToCasmIRPass::visit_body_elements( AstNode* node )
+void libcasm_fe::AstToCasmIRPass::visit_body_elements( AstListNode* node )
 {
     VISIT;
     // FIXME;TODO ASAP!!!
@@ -450,26 +450,26 @@ void libcasm_fe::AstToCasmIRPass::visit_statements( AstListNode* node )
     }
 }
 
-void libcasm_fe::AstToCasmIRPass::visit_forall_pre( AstNode* node )
+void libcasm_fe::AstToCasmIRPass::visit_forall_pre( ForallNode* node )
 {
     VISIT;
     FIXME;
 }
 
-void libcasm_fe::AstToCasmIRPass::visit_forall_post( AstNode* node )
+void libcasm_fe::AstToCasmIRPass::visit_forall_post( ForallNode* node )
 {
     VISIT;
     FIXME;
 }
 
-void libcasm_fe::AstToCasmIRPass::visit_iterate( AstNode* node )
+void libcasm_fe::AstToCasmIRPass::visit_iterate( UnaryNode* node )
 {
     VISIT;
     FIXME;
 }
 
 void libcasm_fe::AstToCasmIRPass::visit_update(
-    UpdateNode* node, bool func, bool expr )
+    UpdateNode* node, const std::vector< bool >& args, bool expr )
 {
     VISIT;
     // printf( "%p -> %p\n", node, node->func );
@@ -496,20 +496,6 @@ void libcasm_fe::AstToCasmIRPass::visit_update(
 
     ir_stmt->add( new libcasm_ir::UpdateInstruction(
         ( (libcasm_ir::Instruction*)ir_lhs )->getValue( 0 ), ir_rhs ) );
-}
-
-void libcasm_fe::AstToCasmIRPass::visit_update_dumps(
-    UpdateNode* node, bool func, bool expr )
-{
-    VISIT;
-    FIXME;
-}
-
-void libcasm_fe::AstToCasmIRPass::visit_update_subrange(
-    UpdateNode* node, bool func, bool expr )
-{
-    VISIT;
-    FIXME;
 }
 
 void libcasm_fe::AstToCasmIRPass::visit_call_pre( CallNode* node )
@@ -718,7 +704,7 @@ void libcasm_fe::AstToCasmIRPass::visit_push(
     FIXME;
 }
 
-void libcasm_fe::AstToCasmIRPass::visit_pop( PopNode* node )
+void libcasm_fe::AstToCasmIRPass::visit_pop( PopNode* node, bool atom )
 {
     VISIT;
     FIXME;
@@ -1014,14 +1000,6 @@ bool libcasm_fe::AstToCasmIRPass::visit_function_atom(
     return 0;
 }
 
-bool libcasm_fe::AstToCasmIRPass::visit_function_atom_subrange(
-    FunctionAtom* node, bool args[], uint16_t argc )
-{
-    VISIT;
-    FIXME;
-    return 0;
-}
-
 void libcasm_fe::AstToCasmIRPass::visit_derived_function_atom_pre(
     FunctionAtom* node, std::vector< bool >& args )
 {
@@ -1204,7 +1182,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
 }
 
 bool libcasm_fe::AstToCasmIRPass::visit_list_atom(
-    ListAtom* node, std::vector< bool >& args )
+    ListAtom* node, const std::vector< bool >& args )
 {
     VISIT;
     FIXME;

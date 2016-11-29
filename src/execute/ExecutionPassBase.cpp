@@ -785,7 +785,8 @@ void ExecutionPassBase::visit_update( UpdateNode* update,
     {
         const std::string& filter
             = global_driver->function_trace_map[ update->func->symbol->id ];
-        if( filter_enabled( filter ) ) {
+        if( filter_enabled( filter ) )
+        {
             std::cout << filter << ": " << update->func->symbol->name
                       << to_string( arguments ) << " = " << expr_v.to_str()
                       << std::endl;
@@ -909,7 +910,7 @@ void ExecutionPassBase::visit_let_post( LetNode* )
     rule_bindings.back()->pop_back();
 }
 
-const value_t ExecutionPassBase::visit_function_atom(
+value_t ExecutionPassBase::visit_function_atom(
     FunctionAtom* atom, std::vector< value_t >& arguments )
 {
     switch( atom->symbol_type )
@@ -938,7 +939,7 @@ const value_t ExecutionPassBase::visit_function_atom(
     }
 }
 
-const value_t ExecutionPassBase::visit_builtin_atom(
+value_t ExecutionPassBase::visit_builtin_atom(
     BuiltinAtom* atom, std::vector< value_t >& arguments )
 {
     switch( atom->id )
@@ -1029,14 +1030,14 @@ void ExecutionPassBase::visit_derived_function_atom_pre(
     rule_bindings.push_back( &arguments );
 }
 
-const value_t ExecutionPassBase::visit_derived_function_atom(
+value_t ExecutionPassBase::visit_derived_function_atom(
     FunctionAtom*, const value_t& expr )
 {
     rule_bindings.pop_back();
     return expr;
 }
 
-const value_t ExecutionPassBase::visit_number_range_atom(
+value_t ExecutionPassBase::visit_number_range_atom(
     NumberRangeAtom* atom, const value_t& left, const value_t& right )
 {
     if( left.value.integer > right.value.integer )

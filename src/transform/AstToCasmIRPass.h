@@ -36,7 +36,8 @@
 
 namespace libcasm_fe
 {
-    class AstToCasmIRPass : public libpass::Pass, public BaseVisitor< bool >
+    class AstToCasmIRPass : public libpass::Pass,
+                            public BaseVisitor< bool, bool >
     {
       public:
         static char id;
@@ -54,68 +55,73 @@ namespace libcasm_fe
       public:
         libcasm_ir::Specification* getSpecification( void ) const;
 
-        void visit_init( InitNode* node );
-        void visit_specification( SpecificationNode* node );
-        void visit_body_elements( AstNode* node );
+        void visit_init( InitNode* node ) override;
+        void visit_specification( SpecificationNode* node ) override;
+        void visit_body_elements( AstListNode* node ) override;
         void visit_function_def( FunctionDefNode* node,
-            const std::vector< std::pair< bool, bool > >& inits );
+            const std::vector< std::pair< bool, bool > >& inits ) override;
         void visit_derived_function_atom_pre(
-            FunctionAtom* node, std::vector< bool >& args );
-        void visit_derived_def_pre( FunctionDefNode* node );
-        void visit_derived_def( FunctionDefNode* node, bool expr );
-        void visit_rule( RuleNode* node );
-        void visit_rule_post( RuleNode* node );
-        void visit_skip( AstNode* node );
-        void visit_statements( AstListNode* node );
-        void visit_parblock_pre( UnaryNode* node );
-        void visit_seqblock_pre( UnaryNode* node );
-        void visit_forall_pre( AstNode* node );
-        void visit_forall_post( AstNode* node );
-        void visit_iterate( AstNode* node );
-        void visit_update( UpdateNode* node, bool func, bool expr );
-        void visit_update_dumps( UpdateNode* node, bool func, bool expr );
-        void visit_update_subrange( UpdateNode* node, bool func, bool expr );
-        void visit_call_pre( CallNode* node );
-        void visit_call_pre( CallNode* node, bool expr );
-        void visit_call( CallNode* node, std::vector< bool >& args );
-        void visit_call_post( CallNode* node );
-        void visit_print( PrintNode* node, bool expr );
-        void visit_diedie( DiedieNode* node, bool msg );
-        void visit_impossible( AstNode* node );
-        void visit_assert( UnaryNode* node, bool expr );
-        void visit_assure( UnaryNode* node, bool expr );
-        void visit_let( LetNode* node, bool var );
-        void visit_let_post( LetNode* node );
-        void visit_push( PushNode* node, bool expr, bool atom );
-        void visit_pop( PopNode* node );
-        void visit_ifthenelse( IfThenElseNode* node, bool cond );
-        void visit_case_pre( CaseNode* node, bool val );
-        void visit_case(
-            CaseNode* node, bool val, const std::vector< bool >& case_labels );
-        bool visit_expression( BinaryExpression* node, bool lhs, bool rhs );
-        bool visit_expression_single( UnaryExpression* node, bool val );
+            FunctionAtom* node, std::vector< bool >& args ) override;
+        void visit_derived_def_pre( FunctionDefNode* node ) override;
+        void visit_derived_def( FunctionDefNode* node, bool expr ) override;
+        void visit_rule( RuleNode* node ) override;
+        void visit_rule_post( RuleNode* node ) override;
+        void visit_skip( AstNode* node ) override;
+        void visit_statements( AstListNode* node ) override;
+        void visit_parblock_pre( UnaryNode* node ) override;
+        void visit_seqblock_pre( UnaryNode* node ) override;
+        void visit_forall_pre( ForallNode* node ) override;
+        void visit_forall_post( ForallNode* node ) override;
+        void visit_iterate( UnaryNode* node ) override;
+        void visit_update( UpdateNode* node,
+            const std::vector< bool >& args,
+            bool expr ) override;
+        void visit_call_pre( CallNode* node ) override;
+        void visit_call_pre( CallNode* node, bool expr ) override;
+        void visit_call( CallNode* node, std::vector< bool >& args ) override;
+        void visit_call_post( CallNode* node ) override;
+        void visit_print( PrintNode* node, bool expr ) override;
+        void visit_diedie( DiedieNode* node, bool msg ) override;
+        void visit_impossible( AstNode* node ) override;
+        void visit_assert( UnaryNode* node, bool expr ) override;
+        void visit_assure( UnaryNode* node, bool expr ) override;
+        void visit_let( LetNode* node, bool var ) override;
+        void visit_let_post( LetNode* node ) override;
+        void visit_push( PushNode* node, bool expr, bool atom ) override;
+        void visit_pop( PopNode* node, bool atom ) override;
+        void visit_ifthenelse( IfThenElseNode* node, bool cond ) override;
+        void visit_case_pre( CaseNode* node, bool val ) override;
+        void visit_case( CaseNode* node,
+            bool val,
+            const std::vector< bool >& case_labels ) override;
+        bool visit_expression(
+            BinaryExpression* node, bool lhs, bool rhs ) override;
+        bool visit_expression_single(
+            UnaryExpression* node, bool val ) override;
         bool visit_function_atom(
-            FunctionAtom* node, std::vector< bool >& args );
-        bool visit_function_atom_subrange(
-            FunctionAtom* node, bool args[], uint16_t argc );
-        bool visit_derived_function_atom( FunctionAtom* node, bool expr );
-        bool visit_zero_atom( ZeroAtom* node )
+            FunctionAtom* node, std::vector< bool >& args ) override;
+        bool visit_derived_function_atom(
+            FunctionAtom* node, bool expr ) override;
+        bool visit_zero_atom( ZeroAtom* node ) override
         {
             assert( !"internal error!" );
+            return false;
         };
-        bool visit_int_atom( IntegerAtom* node );
-        bool visit_bit_atom( IntegerAtom* node );
-        bool visit_floating_atom( FloatingAtom* node );
-        bool visit_rational_atom( RationalAtom* node );
-        bool visit_undef_atom( UndefAtom* node );
-        bool visit_self_atom( SelfAtom* node );
-        bool visit_rule_atom( RuleAtom* node );
-        bool visit_boolean_atom( BooleanAtom* node );
-        bool visit_string_atom( StringAtom* node );
-        bool visit_list_atom( ListAtom* node, std::vector< bool >& args );
+        bool visit_int_atom( IntegerAtom* node ) override;
+        bool visit_bit_atom( IntegerAtom* node ) override;
+        bool visit_floating_atom( FloatingAtom* node ) override;
+        bool visit_rational_atom( RationalAtom* node ) override;
+        bool visit_undef_atom( UndefAtom* node ) override;
+        bool visit_self_atom( SelfAtom* node ) override;
+        bool visit_rule_atom( RuleAtom* node ) override;
+        bool visit_boolean_atom( BooleanAtom* node ) override;
+        bool visit_string_atom( StringAtom* node ) override;
+        bool visit_list_atom(
+            ListAtom* node, const std::vector< bool >& args ) override;
         bool visit_number_range_atom(
-            NumberRangeAtom* node, bool start, bool end );
-        bool visit_builtin_atom( BuiltinAtom* node, std::vector< bool >& args );
+            NumberRangeAtom* node, bool start, bool end ) override;
+        bool visit_builtin_atom(
+            BuiltinAtom* node, std::vector< bool >& args ) override;
 
       private:
         template < class C >

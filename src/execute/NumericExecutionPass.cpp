@@ -353,7 +353,7 @@ void NumericExecutionPass::visit_pop( PopNode* node, const value_t& val )
     addUpdate( node->from->symbol, arguments, from_res, node->location );
 }
 
-const value_t NumericExecutionPass::visit_expression(
+value_t NumericExecutionPass::visit_expression(
     BinaryExpression* expr, const value_t& left_val, const value_t& right_val )
 {
     switch( expr->op )
@@ -393,7 +393,7 @@ const value_t NumericExecutionPass::visit_expression(
     }
 }
 
-const value_t NumericExecutionPass::visit_expression_single(
+value_t NumericExecutionPass::visit_expression_single(
     UnaryExpression* expr, const value_t& val )
 {
     if( val.is_undef() )
@@ -410,7 +410,7 @@ const value_t NumericExecutionPass::visit_expression_single(
     }
 }
 
-const value_t NumericExecutionPass::visit_list_atom(
+value_t NumericExecutionPass::visit_list_atom(
     ListAtom* atom, const std::vector< value_t >& vals )
 {
     BottomList* list = new BottomList( vals );
@@ -592,10 +592,9 @@ void NumericExecutionWalker::walk_iterate( UnaryNode* node )
 template <>
 void NumericExecutionWalker::walk_update( UpdateNode* node )
 {
-    const value_t expr = walk_atom( node->expr_ );
-    std::vector< value_t > arguments
-        = evaluateExpressions( node->func->arguments );
-    visitor.visit_update( node, arguments, expr );
+    const auto value = walk_atom( node->expr_ );
+    const auto argumentValues = evaluateExpressions( node->func->arguments );
+    visitor.visit_update( node, argumentValues, value );
 }
 
 //

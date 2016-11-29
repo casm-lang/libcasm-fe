@@ -280,15 +280,18 @@ class AstWalker
         }
     }
 
-    void walk_update( UpdateNode* update )
+    void walk_update( UpdateNode* node )
     {
-        const V expr = walk_atom( update->expr_ );
+        const V expr = walk_atom( node->expr_ );
 
         // we must walk the expression before walking update->func because it
         // sets the list of arguments and we do not want the update->expr_ to
         // overwrite the value_list
-        const V func = walk_function_atom( update->func );
-        visitor.visit_update( update, func, expr );
+        walk_function_atom( node->func );
+
+        const auto argumentValues
+            = evaluateExpressions( node->func->arguments );
+        visitor.visit_update( node, argumentValues, expr );
     }
 
     void walk_call( CallNode* call )
@@ -338,8 +341,8 @@ class AstWalker
 
     void walk_pop( PopNode* node )
     {
-        walk_function_atom( node->from );
-        visitor.visit_pop( node );
+        const V atom = walk_function_atom( node->from );
+        visitor.visit_pop( node, atom );
     }
 
     void walk_push( PushNode* node )
@@ -553,193 +556,237 @@ class AstWalker
     }
 };
 
-template < class T >
+template < class T, class U = const T& >
 class BaseVisitor
 {
   public:
-    void visit_specification( SpecificationNode* )
+    virtual void visit_specification( SpecificationNode* )
     {
     }
-    void visit_init( InitNode* )
+
+    virtual void visit_init( InitNode* )
     {
     }
-    void visit_body_elements( AstListNode* )
+
+    virtual void visit_body_elements( AstListNode* )
     {
     }
-    void visit_function_def(
+
+    virtual void visit_function_def(
         FunctionDefNode*, const std::vector< std::pair< T, T > >& )
     {
     }
-    void visit_derived_def_pre( FunctionDefNode* )
-    {
-    }
-    void visit_derived_def( FunctionDefNode*, T )
-    {
-    }
-    void visit_rule( RuleNode* )
-    {
-    }
-    void visit_rule_post( RuleNode* )
-    {
-    }
-    void visit_statements( AstListNode* )
-    {
-    }
-    void visit_statement( AstNode* )
-    {
-    }
-    void visit_ifthenelse( IfThenElseNode*, T )
-    {
-    }
-    void visit_assert( UnaryNode*, T )
-    {
-    }
-    void visit_assure( UnaryNode*, T )
-    {
-    }
-    void visit_seqblock_pre( UnaryNode* )
-    {
-    }
-    void visit_seqblock_post( UnaryNode* )
-    {
-    }
-    void visit_parblock_pre( UnaryNode* )
-    {
-    }
-    void visit_parblock_post( UnaryNode* )
-    {
-    }
-    T visit_update( UpdateNode*, T, T )
-    {
-        return T();
-    }
-    T visit_call_pre( CallNode* )
-    {
-        return T();
-    }
-    T visit_call_pre( CallNode*, T )
-    {
-        return T();
-    }
-    T visit_call( CallNode*, std::vector< T >& )
-    {
-        return T();
-    }
-    void visit_call_post( CallNode* )
-    {
-    }
-    T visit_print( PrintNode*, T )
-    {
-        return T();
-    }
-    void visit_diedie( DiedieNode*, const T& )
-    {
-    }
-    void visit_impossible( AstNode* )
+
+    virtual void visit_derived_def_pre( FunctionDefNode* )
     {
     }
 
-    void visit_let( LetNode*, T )
-    {
-    }
-    void visit_let_post( LetNode* )
-    {
-    }
-    void visit_pop( PopNode* )
-    {
-    }
-    void visit_push( PushNode*, T, T )
-    {
-    }
-    void visit_case_pre( CaseNode*, const T )
-    {
-    }
-    void visit_case( CaseNode*, const T, const std::vector< T >& )
-    {
-    }
-    void visit_skip( AstNode* node )
+    virtual void visit_derived_def( FunctionDefNode*, U )
     {
     }
 
-    void visit_forall_pre( ForallNode* )
-    {
-    }
-    void visit_forall_post( ForallNode* )
+    virtual void visit_rule( RuleNode* )
     {
     }
 
-    void visit_iterate( UnaryNode* )
+    virtual void visit_rule_post( RuleNode* )
     {
     }
 
-    T visit_expression( BinaryExpression*, T, T )
+    virtual void visit_statements( AstListNode* )
+    {
+    }
+
+    virtual void visit_statement( AstNode* )
+    {
+    }
+
+    virtual void visit_ifthenelse( IfThenElseNode*, U )
+    {
+    }
+
+    virtual void visit_assert( UnaryNode*, U )
+    {
+    }
+
+    virtual void visit_assure( UnaryNode*, U )
+    {
+    }
+
+    virtual void visit_seqblock_pre( UnaryNode* )
+    {
+    }
+
+    virtual void visit_seqblock_post( UnaryNode* )
+    {
+    }
+
+    virtual void visit_parblock_pre( UnaryNode* )
+    {
+    }
+
+    virtual void visit_parblock_post( UnaryNode* )
+    {
+    }
+
+    virtual void visit_update( UpdateNode*, const std::vector< T >&, U )
+    {
+    }
+
+    virtual void visit_call_pre( CallNode* )
+    {
+    }
+
+    virtual void visit_call_pre( CallNode*, U )
+    {
+    }
+
+    virtual void visit_call( CallNode*, std::vector< T >& )
+    {
+    }
+
+    virtual void visit_call_post( CallNode* )
+    {
+    }
+
+    virtual void visit_print( PrintNode*, U )
+    {
+    }
+
+    virtual void visit_diedie( DiedieNode*, U )
+    {
+    }
+
+    virtual void visit_impossible( AstNode* )
+    {
+    }
+
+    virtual void visit_let( LetNode*, U )
+    {
+    }
+
+    virtual void visit_let_post( LetNode* )
+    {
+    }
+
+    virtual void visit_pop( PopNode*, U )
+    {
+    }
+
+    virtual void visit_push( PushNode*, U, U )
+    {
+    }
+
+    virtual void visit_case_pre( CaseNode*, U )
+    {
+    }
+
+    virtual void visit_case( CaseNode*, U, const std::vector< T >& )
+    {
+    }
+
+    virtual void visit_skip( AstNode* )
+    {
+    }
+
+    virtual void visit_forall_pre( ForallNode* )
+    {
+    }
+
+    virtual void visit_forall_post( ForallNode* )
+    {
+    }
+
+    virtual void visit_iterate( UnaryNode* )
+    {
+    }
+
+    virtual T visit_expression( BinaryExpression*, U, U )
     {
         return T();
     }
-    T visit_expression_single( UnaryExpression*, T )
+
+    virtual T visit_expression_single( UnaryExpression*, U )
     {
         return T();
     }
-    T visit_zero_atom( ZeroAtom* )
+
+    virtual T visit_zero_atom( ZeroAtom* )
     {
         return T();
     }
-    T visit_int_atom( IntegerAtom* )
+
+    virtual T visit_int_atom( IntegerAtom* )
     {
         return T();
     }
-    T visit_bit_atom( IntegerAtom* )
+
+    virtual T visit_bit_atom( IntegerAtom* )
     {
         return T();
     }
-    T visit_floating_atom( FloatingAtom* )
+
+    virtual T visit_floating_atom( FloatingAtom* )
     {
         return T();
     }
-    T visit_rational_atom( RationalAtom* )
+
+    virtual T visit_rational_atom( RationalAtom* )
     {
         return T();
     }
-    T visit_undef_atom( UndefAtom* )
+
+    virtual T visit_undef_atom( UndefAtom* )
     {
         return T();
     }
-    T visit_function_atom( FunctionAtom*, const std::vector< T >& )
+
+    virtual T visit_function_atom( FunctionAtom*, std::vector< T >& )
     {
         return T();
     }
-    T visit_builtin_atom( BuiltinAtom*, std::vector< T >& )
+
+    virtual T visit_builtin_atom( BuiltinAtom*, std::vector< T >& )
     {
         return T();
     }
-    void visit_derived_function_atom_pre( FunctionAtom*, std::vector< T >& )
+
+    virtual void visit_derived_function_atom_pre(
+        FunctionAtom*, std::vector< T >& )
     {
     }
-    T visit_derived_function_atom( FunctionAtom*, T )
-    {
-        return T();
-    }
-    T visit_self_atom( SelfAtom* )
-    {
-        return T();
-    }
-    T visit_rule_atom( RuleAtom* )
+
+    virtual T visit_derived_function_atom( FunctionAtom*, U )
     {
         return T();
     }
-    T visit_boolean_atom( BooleanAtom* )
+
+    virtual T visit_self_atom( SelfAtom* )
     {
         return T();
     }
-    T visit_string_atom( StringAtom* )
+
+    virtual T visit_rule_atom( RuleAtom* )
     {
         return T();
     }
-    T visit_list_atom( ListAtom*, std::vector< T >& )
+
+    virtual T visit_boolean_atom( BooleanAtom* )
     {
         return T();
     }
-    T visit_number_range_atom( NumberRangeAtom*, T, T )
+
+    virtual T visit_string_atom( StringAtom* )
+    {
+        return T();
+    }
+
+    virtual T visit_list_atom( ListAtom*, const std::vector< T >& )
+    {
+        return T();
+    }
+
+    virtual T visit_number_range_atom( NumberRangeAtom*, U, U )
     {
         return T();
     }
