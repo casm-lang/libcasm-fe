@@ -767,7 +767,7 @@ RuleNode::RuleNode( yy::location& loc,
 : UnaryNode( loc, NodeType::RULE, child )
 , name( std::move( name ) )
 , arguments( std::move( args ) )
-, binding_offsets( std::move( binding_offsets ) )
+, binding_offsets()
 , dump_list()
 {
 }
@@ -779,7 +779,7 @@ RuleNode::RuleNode( yy::location& loc, AstNode* child, const std::string& name,
 : UnaryNode( loc, NodeType::RULE, child )
 , name( std::move( name ) )
 , arguments( std::move( args ) )
-, binding_offsets( std::move( binding_offsets ) )
+, binding_offsets()
 , dump_list( std::move( dump_list ) )
 {
 }
