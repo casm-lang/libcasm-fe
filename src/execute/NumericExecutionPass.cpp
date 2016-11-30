@@ -439,21 +439,6 @@ void NumericExecutionWalker::walk_ifthenelse( IfThenElseNode* node )
 }
 
 template <>
-void NumericExecutionWalker::walk_pop( PopNode* node )
-{
-    const value_t from = walk_function_atom( node->from );
-    visitor.visit_pop( node, from );
-}
-
-template <>
-void NumericExecutionWalker::walk_push( PushNode* node )
-{
-    const value_t expr = walk_atom( node->expr );
-    const value_t atom = walk_function_atom( node->to );
-    visitor.visit_push( node, expr, atom );
-}
-
-template <>
 void NumericExecutionWalker::walk_case( CaseNode* node )
 {
     const value_t cond = walk_atom( node->expr );

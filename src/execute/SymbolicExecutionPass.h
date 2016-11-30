@@ -99,9 +99,6 @@ template <>
 void SymbolicExecutionWalker::walk_pop( PopNode* node );
 
 template <>
-void SymbolicExecutionWalker::walk_push( PushNode* node );
-
-template <>
 void SymbolicExecutionWalker::walk_case( CaseNode* node );
 
 template <>

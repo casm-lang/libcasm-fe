@@ -1153,14 +1153,6 @@ void SymbolicExecutionWalker::walk_pop( PopNode* node )
 }
 
 template <>
-void SymbolicExecutionWalker::walk_push( PushNode* node )
-{
-    const value_t expr = walk_atom( node->expr );
-    const value_t atom = walk_function_atom( node->to );
-    visitor.visit_push( node, expr, atom );
-}
-
-template <>
 void SymbolicExecutionWalker::walk_case( CaseNode* node )
 {
     const value_t cond = walk_atom( node->expr );

@@ -81,12 +81,6 @@ template <>
 void NumericExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
 
 template <>
-void NumericExecutionWalker::walk_pop( PopNode* node );
-
-template <>
-void NumericExecutionWalker::walk_push( PushNode* node );
-
-template <>
 void NumericExecutionWalker::walk_case( CaseNode* node );
 
 template <>
