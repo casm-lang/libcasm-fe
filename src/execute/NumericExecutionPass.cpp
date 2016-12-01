@@ -356,46 +356,48 @@ void NumericExecutionPass::visit_pop( PopNode* node, const value_t& val )
 value_t NumericExecutionPass::visit_expression(
     BinaryExpression* expr, const value_t& left_val, const value_t& right_val )
 {
+    using Operation = BinaryExpression::Operation;
+
     switch( expr->op )
     {
-        case ExpressionOperation::ADD:
+        case Operation::ADD:
             return left_val + right_val;
-        case ExpressionOperation::SUB:
+        case Operation::SUB:
             return left_val - right_val;
-        case ExpressionOperation::MUL:
+        case Operation::MUL:
             return left_val * right_val;
-        case ExpressionOperation::DIV:
+        case Operation::DIV:
             return left_val / right_val;
-        case ExpressionOperation::MOD:
+        case Operation::MOD:
             return left_val % right_val;
-        case ExpressionOperation::RAT_DIV:
+        case Operation::RAT_DIV:
             return rat_div( left_val, right_val );
-        case ExpressionOperation::EQ:
+        case Operation::EQ:
             return value_t( left_val == right_val );
-        case ExpressionOperation::NEQ:
+        case Operation::NEQ:
             return value_t( left_val != right_val );
-        case ExpressionOperation::AND:
+        case Operation::AND:
             return left_val and right_val;
-        case ExpressionOperation::OR:
+        case Operation::OR:
             return left_val or right_val;
-        case ExpressionOperation::XOR:
+        case Operation::XOR:
             return left_val ^ right_val;
-        case ExpressionOperation::LESSER:
+        case Operation::LESSER:
             return left_val < right_val;
-        case ExpressionOperation::GREATER:
+        case Operation::GREATER:
             return left_val > right_val;
-        case ExpressionOperation::LESSEREQ:
+        case Operation::LESSEREQ:
             return left_val <= right_val;
-        case ExpressionOperation::GREATEREQ:
+        case Operation::GREATEREQ:
             return left_val >= right_val;
-        default:
-            FAILURE();
     }
 }
 
 value_t NumericExecutionPass::visit_expression_single(
     UnaryExpression* expr, const value_t& val )
 {
+    using Operation = UnaryExpression::Operation;
+
     if( val.is_undef() )
     {
         return value_t();
@@ -403,10 +405,8 @@ value_t NumericExecutionPass::visit_expression_single(
 
     switch( expr->op )
     {
-        case ExpressionOperation::NOT:
+        case Operation::NOT:
             return value_t( not val.value.boolean );
-        default:
-            FAILURE();
     }
 }
 

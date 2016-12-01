@@ -37,6 +37,7 @@
 
 #include "../Driver.h"
 #include "../Exceptions.h"
+#include "../Symbolic.h"
 #include "../Symbols.h"
 
 using namespace libcasm_fe;
@@ -359,10 +360,10 @@ namespace symbolic
         trace.push_back( ss.str() );
     }
 
-    constexpr inline uint16_t operator,(
-        const ExpressionOperation lhs, const ExpressionOperation rhs ) noexcept
+    constexpr inline uint16_t operator,( const BinaryExpression::Operation lhs,
+        const BinaryExpression::Operation rhs ) noexcept
     {
-        static_assert( sizeof( ExpressionOperation ) == 1,
+        static_assert( sizeof( BinaryExpression::Operation ) == 1,
             "uint8_t | (uint8_t << 8) == uint16_t" );
         return ( static_cast< uint16_t >( lhs ) << 8 )
                | static_cast< uint16_t >( rhs );
@@ -371,57 +372,58 @@ namespace symbolic
     static check_status_t check_inclusion(
         const symbolic_condition_t& known, const symbolic_condition_t& check )
     {
+        using Operation = BinaryExpression::Operation;
+
         switch( check.op, known.op )
         {
-            case( ExpressionOperation::EQ, ExpressionOperation::EQ ):
+            case( Operation::EQ, Operation::EQ ):
                 return ( *known.rhs == *check.rhs ) ? check_status_t::TRUE
                                                     : check_status_t::FALSE;
-            case( ExpressionOperation::EQ, ExpressionOperation::NEQ ):
+            case( Operation::EQ, Operation::NEQ ):
                 return ( *known.rhs == *check.rhs ) ? check_status_t::FALSE
                                                     : check_status_t::NOT_FOUND;
-            case( ExpressionOperation::NEQ, ExpressionOperation::NEQ ):
+            case( Operation::NEQ, Operation::NEQ ):
                 return ( *known.rhs == *check.rhs ) ? check_status_t::TRUE
                                                     : check_status_t::NOT_FOUND;
-            case( ExpressionOperation::NEQ, ExpressionOperation::EQ ):
+            case( Operation::NEQ, Operation::EQ ):
                 return ( *known.rhs == *check.rhs ) ? check_status_t::FALSE
                                                     : check_status_t::TRUE;
-            case( ExpressionOperation::LESSEREQ, ExpressionOperation::EQ ):
+            case( Operation::LESSEREQ, Operation::EQ ):
             {
                 const value_t res
                     = operators::lessereq( *known.rhs, *check.rhs );
                 return res.value.boolean ? check_status_t::TRUE
                                          : check_status_t::FALSE;
             }
-            case(
-                ExpressionOperation::LESSEREQ, ExpressionOperation::LESSEREQ ):
+            case( Operation::LESSEREQ, Operation::LESSEREQ ):
             {
                 const value_t res
                     = operators::lessereq( *check.rhs, *known.rhs );
                 return res.value.boolean ? check_status_t::TRUE
                                          : check_status_t::NOT_FOUND;
             }
-            case( ExpressionOperation::LESSEREQ, ExpressionOperation::GREATER ):
+            case( Operation::LESSEREQ, Operation::GREATER ):
             {
                 const value_t res
                     = operators::lessereq( *check.rhs, *known.rhs );
                 return res.value.boolean ? check_status_t::FALSE
                                          : check_status_t::NOT_FOUND;
             }
-            case( ExpressionOperation::GREATER, ExpressionOperation::EQ ):
+            case( Operation::GREATER, Operation::EQ ):
             {
                 const value_t res
                     = operators::greater( *known.rhs, *check.rhs );
                 return res.value.boolean ? check_status_t::TRUE
                                          : check_status_t::FALSE;
             }
-            case( ExpressionOperation::GREATER, ExpressionOperation::LESSEREQ ):
+            case( Operation::GREATER, Operation::LESSEREQ ):
             {
                 const value_t res
                     = operators::greater( *check.rhs, *known.rhs );
                 return res.value.boolean ? check_status_t::FALSE
                                          : check_status_t::NOT_FOUND;
             }
-            case( ExpressionOperation::GREATER, ExpressionOperation::GREATER ):
+            case( Operation::GREATER, Operation::GREATER ):
             {
                 const value_t res
                     = operators::greater( *check.rhs, *known.rhs );
@@ -612,21 +614,23 @@ void SymbolicExecutionPass::visit_pop( PopNode* node, const value_t& val )
 value_t SymbolicExecutionPass::visit_expression(
     BinaryExpression* expr, const value_t& left_val, const value_t& right_val )
 {
+    using Operation = BinaryExpression::Operation;
+
     switch( expr->op )
     {
-        case ExpressionOperation::ADD:
+        case Operation::ADD:
             WRAP_NUMERICAL_OPERATION( operator+, left_val, right_val)
-        case ExpressionOperation::SUB:
+        case Operation::SUB:
             WRAP_NUMERICAL_OPERATION( operator-, left_val, right_val)
-        case ExpressionOperation::MUL:
+        case Operation::MUL:
             WRAP_NUMERICAL_OPERATION( operator*, left_val, right_val)
-        case ExpressionOperation::DIV:
+        case Operation::DIV:
             WRAP_NUMERICAL_OPERATION( operator/, left_val, right_val)
-        case ExpressionOperation::MOD:
+        case Operation::MOD:
             WRAP_NUMERICAL_OPERATION( operator%, left_val, right_val)
-        case ExpressionOperation::RAT_DIV:
+        case Operation::RAT_DIV:
             WRAP_NUMERICAL_OPERATION( rat_div, left_val, right_val );
-        case ExpressionOperation::EQ:
+        case Operation::EQ:
             if( left_val.is_symbolic() and right_val.is_symbolic()
                 and ( left_val == right_val ) )
             {
@@ -640,7 +644,7 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return value_t( left_val == right_val );
             }
-        case ExpressionOperation::NEQ:
+        case Operation::NEQ:
             if( left_val.is_symbolic() and right_val.is_symbolic()
                 and ( left_val == right_val ) )
             {
@@ -654,7 +658,7 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return value_t( left_val != right_val );
             }
-        case ExpressionOperation::AND:
+        case Operation::AND:
             if( left_val.is_symbolic() )
             {
                 if( right_val.is_undef() or right_val.is_symbolic()
@@ -685,7 +689,7 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return left_val and right_val;
             }
-        case ExpressionOperation::OR:
+        case Operation::OR:
             if( left_val.is_symbolic() )
             {
                 if( right_val.is_undef() or right_val.is_symbolic()
@@ -716,7 +720,7 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return left_val or right_val;
             }
-        case ExpressionOperation::XOR:
+        case Operation::XOR:
             if( left_val.is_symbolic() or right_val.is_symbolic() )
             {
                 return value_t( new symbol_t( symbolic::next_symbol_id() ) );
@@ -725,22 +729,22 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return left_val ^ right_val;
             }
-        case ExpressionOperation::LESSER:
+        case Operation::LESSER:
             return operators::lesser( left_val, right_val );
-        case ExpressionOperation::GREATER:
+        case Operation::GREATER:
             return operators::greater( left_val, right_val );
-        case ExpressionOperation::LESSEREQ:
+        case Operation::LESSEREQ:
             return operators::lessereq( left_val, right_val );
-        case ExpressionOperation::GREATEREQ:
+        case Operation::GREATEREQ:
             return operators::greatereq( left_val, right_val );
-        default:
-            FAILURE();
     }
 }
 
 value_t SymbolicExecutionPass::visit_expression_single(
     UnaryExpression* expr, const value_t& val )
 {
+    using Operation = UnaryExpression::Operation;
+
     if( val.is_undef() )
     {
         return value_t();
@@ -752,10 +756,8 @@ value_t SymbolicExecutionPass::visit_expression_single(
 
     switch( expr->op )
     {
-        case ExpressionOperation::NOT:
+        case Operation::NOT:
             return value_t( not val.value.boolean );
-        default:
-            FAILURE();
     }
 }
 
@@ -1013,22 +1015,24 @@ void SymbolicExecutionPass::dumpUpdates()
     }
 }
 
-static ExpressionOperation invert( ExpressionOperation op )
+static BinaryExpression::Operation invert( BinaryExpression::Operation op )
 {
+    using Operation = BinaryExpression::Operation;
+
     switch( op )
     {
-        case ExpressionOperation::EQ:
-            return ExpressionOperation::NEQ;
-        case ExpressionOperation::NEQ:
-            return ExpressionOperation::EQ;
-        case ExpressionOperation::LESSEREQ:
-            return ExpressionOperation::GREATER;
-        case ExpressionOperation::LESSER:
-            return ExpressionOperation::GREATEREQ;
-        case ExpressionOperation::GREATER:
-            return ExpressionOperation::LESSEREQ;
-        case ExpressionOperation::GREATEREQ:
-            return ExpressionOperation::LESSER;
+        case Operation::EQ:
+            return Operation::NEQ;
+        case Operation::NEQ:
+            return Operation::EQ;
+        case Operation::LESSEREQ:
+            return Operation::GREATER;
+        case Operation::LESSER:
+            return Operation::GREATEREQ;
+        case Operation::GREATER:
+            return Operation::LESSEREQ;
+        case Operation::GREATEREQ:
+            return Operation::LESSER;
         default:
             throw RuntimeException( "Invert not implemented for operation" );
     }
@@ -1050,7 +1054,7 @@ void SymbolicExecutionWalker::walk_ifthenelse( IfThenElseNode* node )
         {
             sym_cond = new symbolic_condition_t( new value_t( cond ),
                 new value_t( (INTEGER_T)1 ),
-                ExpressionOperation::EQ );
+                BinaryExpression::Operation::EQ );
         }
 
         switch( symbolic::check_condition( visitor.path_conditions, sym_cond ) )
@@ -1112,7 +1116,8 @@ void SymbolicExecutionWalker::walk_ifthenelse( IfThenElseNode* node )
                     // as conditions
                     delete sym_cond;
                     sym_cond = new symbolic_condition_t( new value_t( cond ),
-                        new value_t( (INTEGER_T)0 ), ExpressionOperation::EQ );
+                        new value_t( (INTEGER_T)0 ),
+                        BinaryExpression::Operation::EQ );
                 }
                 visitor.path_name += "E";
                 symbolic::dump_if( visitor.trace, global_driver->get_filename(),
@@ -1166,7 +1171,7 @@ void SymbolicExecutionWalker::walk_case( CaseNode* node )
         {
             const value_t c = walk_atom( pair.first );
             sym_cond = new symbolic_condition_t( new value_t( cond ),
-                new value_t( c ), ExpressionOperation::EQ );
+                new value_t( c ), BinaryExpression::Operation::EQ );
 
             switch(
                 symbolic::check_condition( visitor.path_conditions, sym_cond ) )

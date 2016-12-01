@@ -36,6 +36,7 @@
 
 #include "../Driver.h"
 #include "../Exceptions.h"
+#include "../Symbolic.h"
 #include "../Symbols.h"
 
 using namespace libcasm_fe;

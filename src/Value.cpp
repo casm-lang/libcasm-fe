@@ -31,6 +31,7 @@
 #include <utility>
 
 #include "Ast.h"
+#include "Symbolic.h"
 
 value_t::value_t()
 : type( TypeType::UNDEF )
@@ -501,49 +502,6 @@ value_t operator>=( const value_t& lhs, const value_t& rhs )
         return value_t( true );
     }
     CREATE_COMPARE_OPERATION( >=, lhs, rhs );
-}
-
-symbol_t::symbol_t( uint32_t id )
-: symbol_t( id, nullptr )
-{
-}
-
-symbol_t::symbol_t( uint32_t id, symbolic_condition_t* cond )
-: id( id )
-, condition( cond )
-, type_dumped( false )
-, update_dumped( false )
-, list( nullptr )
-{
-}
-
-symbolic_condition_t::symbolic_condition_t(
-    value_t* lhs, value_t* rhs, ExpressionOperation op )
-: lhs( lhs )
-, rhs( rhs )
-, op( op )
-{
-}
-
-std::string symbolic_condition_t::to_str() const
-{
-    switch( op )
-    {
-        case ExpressionOperation::EQ:
-            return lhs->to_str() + "=" + rhs->to_str();
-        case ExpressionOperation::NEQ:
-            return lhs->to_str() + "!=" + rhs->to_str();
-        case ExpressionOperation::LESSEREQ:
-            return "$lesseq(" + lhs->to_str() + ", " + rhs->to_str() + ")";
-        case ExpressionOperation::LESSER:
-            return "$less(" + lhs->to_str() + ", " + rhs->to_str() + ")";
-        case ExpressionOperation::GREATER:
-            return "$greater(" + lhs->to_str() + ", " + rhs->to_str() + ")";
-        case ExpressionOperation::GREATEREQ:
-            return "$greatereq(" + lhs->to_str() + ", " + rhs->to_str() + ")";
-        default:
-            FAILURE();
-    }
 }
 
 rational_t::rational_t()

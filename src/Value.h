@@ -32,7 +32,7 @@
 struct enum_value_t;
 
 class RuleNode;
-enum class ExpressionOperation : uint8_t;
+class BinaryExpression;
 
 class HeadList;
 class TailList;
@@ -102,31 +102,6 @@ value_t operator<( const value_t& lhs, const value_t& rhs );
 value_t operator>( const value_t& lhs, const value_t& rhs );
 value_t operator<=( const value_t& lhs, const value_t& rhs );
 value_t operator>=( const value_t& lhs, const value_t& rhs );
-
-struct symbol_t
-{
-    const uint32_t id;
-    symbolic_condition_t* condition;
-    bool type_dumped;
-    bool update_dumped;
-    List* list; // used for symbolic lists
-    // The distinction between concrete lists and symbolic lists can be fuzzy,
-    // because fcons formulas are generated for all list constants by the legacy
-    // interpreter
-
-    symbol_t( uint32_t id );
-    symbol_t( uint32_t id, symbolic_condition_t* cond );
-};
-
-struct symbolic_condition_t
-{
-    value_t* lhs;
-    value_t* rhs;
-    ExpressionOperation op;
-
-    symbolic_condition_t( value_t* lhs, value_t* rhs, ExpressionOperation op );
-    std::string to_str() const;
-};
 
 struct rational_t
 {

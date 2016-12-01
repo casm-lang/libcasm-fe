@@ -508,7 +508,7 @@ NumberRangeAtom::NumberRangeAtom(
 }
 
 BinaryExpression::BinaryExpression( yy::location& loc, ExpressionBase* left,
-    ExpressionBase* right, ExpressionOperation op )
+    ExpressionBase* right, Operation op )
 : ExpressionBase( loc, NodeType::BINARY_EXPRESSION, Type( TypeType::UNKNOWN ) )
 , left_( left )
 , right_( right )
@@ -543,7 +543,7 @@ bool BinaryExpression::equals( AstNode* other ) const
 }
 
 UnaryExpression::UnaryExpression(
-    yy::location& loc, ExpressionBase* expr, ExpressionOperation op )
+    yy::location& loc, ExpressionBase* expr, Operation op )
 : ExpressionBase( loc, NodeType::UNARY_EXPRESSION, Type( TypeType::UNKNOWN ) )
 , expr_( expr )
 , op( op )
@@ -574,47 +574,53 @@ bool UnaryExpression::equals( AstNode* other ) const
     }
 }
 
-std::string operator_to_str( const ExpressionOperation op )
+std::string operator_to_str( BinaryExpression::Operation op )
 {
+    using Operation = BinaryExpression::Operation;
+
     switch( op )
     {
-        case ExpressionOperation::ADD:
+        case Operation::ADD:
             return "+";
-        case ExpressionOperation::SUB:
+        case Operation::SUB:
             return "-";
-        case ExpressionOperation::MUL:
+        case Operation::MUL:
             return "*";
-        case ExpressionOperation::DIV:
+        case Operation::DIV:
             return "/";
-        case ExpressionOperation::MOD:
+        case Operation::MOD:
             return "%";
-        case ExpressionOperation::RAT_DIV:
+        case Operation::RAT_DIV:
             return "div";
-
-        case ExpressionOperation::EQ:
+        case Operation::EQ:
             return "=";
-        case ExpressionOperation::NEQ:
+        case Operation::NEQ:
             return "!=";
-
-        case ExpressionOperation::AND:
+        case Operation::AND:
             return "and";
-        case ExpressionOperation::OR:
+        case Operation::OR:
             return "or";
-        case ExpressionOperation::XOR:
+        case Operation::XOR:
             return "xor";
-        case ExpressionOperation::NOT:
-            return "not";
-
-        case ExpressionOperation::LESSER:
+        case Operation::LESSER:
             return "<";
-        case ExpressionOperation::GREATER:
+        case Operation::GREATER:
             return ">";
-        case ExpressionOperation::LESSEREQ:
+        case Operation::LESSEREQ:
             return "<=";
-        case ExpressionOperation::GREATEREQ:
+        case Operation::GREATEREQ:
             return ">=";
-        default:
-            return "unknown";
+    }
+}
+
+std::string operator_to_str( UnaryExpression::Operation op )
+{
+    using Operation = UnaryExpression::Operation;
+
+    switch( op )
+    {
+        case Operation::NOT:
+            return "not";
     }
 }
 

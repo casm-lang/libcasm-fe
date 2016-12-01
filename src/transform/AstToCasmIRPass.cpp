@@ -843,57 +843,56 @@ bool libcasm_fe::AstToCasmIRPass::visit_expression(
     assert( ir_lhs );
     assert( ir_rhs );
 
+    using Operation = BinaryExpression::Operation;
+
     libcasm_ir::Value* ir_expr = 0;
     switch( node->op )
     {
-        case ExpressionOperation::ADD:
+        case Operation::ADD:
             ir_expr = new libcasm_ir::AddInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::SUB:
+        case Operation::SUB:
             ir_expr = new libcasm_ir::SubInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::MUL:
+        case Operation::MUL:
             ir_expr = new libcasm_ir::MulInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::DIV:
+        case Operation::DIV:
             ir_expr = new libcasm_ir::DivInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::RAT_DIV:
+        case Operation::RAT_DIV:
             ir_expr = new libcasm_ir::RivInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::MOD:
+        case Operation::MOD:
             ir_expr = new libcasm_ir::ModInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::EQ:
+        case Operation::EQ:
             ir_expr = new libcasm_ir::EquInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::NEQ:
+        case Operation::NEQ:
             ir_expr = new libcasm_ir::NeqInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::LESSER:
+        case Operation::LESSER:
             ir_expr = new libcasm_ir::LthInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::LESSEREQ:
+        case Operation::LESSEREQ:
             ir_expr = new libcasm_ir::LeqInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::GREATER:
+        case Operation::GREATER:
             ir_expr = new libcasm_ir::GthInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::GREATEREQ:
+        case Operation::GREATEREQ:
             ir_expr = new libcasm_ir::GeqInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::OR:
+        case Operation::OR:
             ir_expr = new libcasm_ir::OrInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::XOR:
+        case Operation::XOR:
             ir_expr = new libcasm_ir::XorInstruction( ir_lhs, ir_rhs );
             break;
-        case ExpressionOperation::AND:
+        case Operation::AND:
             ir_expr = new libcasm_ir::AndInstruction( ir_lhs, ir_rhs );
             break;
-        default:
-            assert( 0 && "unsupported expression operation" );
-            FIXME;
     }
 
     assert( ir_expr );
@@ -910,15 +909,14 @@ bool libcasm_fe::AstToCasmIRPass::visit_expression_single(
     libcasm_ir::Value* ir_lhs = lookup< libcasm_ir::Value >( node->expr_ );
     assert( ir_lhs );
 
+    using Operation = UnaryExpression::Operation;
+
     libcasm_ir::Value* ir_expr = 0;
     switch( node->op )
     {
-        case ExpressionOperation::NOT:
+        case Operation::NOT:
             ir_expr = new libcasm_ir::NotInstruction( ir_lhs );
             break;
-        default:
-            assert( 0 && "unsupported expression operation" );
-            FIXME;
     }
 
     assert( ir_expr );

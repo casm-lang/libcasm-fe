@@ -690,13 +690,13 @@ void TypecheckVisitor::visit_case(
 }
 
 void TypecheckVisitor::check_numeric_operator(
-    const yy::location& loc, Type* type, const ExpressionOperation op )
+    const yy::location& loc, Type* type, const BinaryExpression::Operation op )
 {
     if( *type == TypeType::UNKNOWN )
     {
         type->constraints.push_back( new Type( TypeType::INTEGER ) );
-        if( op != ExpressionOperation::MOD
-            || op == ExpressionOperation::RAT_DIV )
+        if( op != BinaryExpression::Operation::MOD
+            || op == BinaryExpression::Operation::RAT_DIV )
         {
             type->constraints.push_back( new Type( TypeType::RATIONAL ) );
             type->constraints.push_back( new Type( TypeType::FLOATING ) );
@@ -704,7 +704,7 @@ void TypecheckVisitor::check_numeric_operator(
     }
     else
     {
-        if( op == ExpressionOperation::RAT_DIV )
+        if( op == BinaryExpression::Operation::RAT_DIV )
         {
             if( *type != TypeType::INTEGER )
             {
@@ -714,7 +714,7 @@ void TypecheckVisitor::check_numeric_operator(
                         + type->to_str() );
             }
         }
-        else if( op == ExpressionOperation::MOD )
+        else if( op == BinaryExpression::Operation::MOD )
         {
             if( *type != TypeType::INTEGER && *type != TypeType::FLOATING )
             {
@@ -724,7 +724,7 @@ void TypecheckVisitor::check_numeric_operator(
                         + type->to_str() );
             }
         }
-        else if( op == ExpressionOperation::ADD )
+        else if( op == BinaryExpression::Operation::ADD )
         {
             if( *type != TypeType::INTEGER and *type != TypeType::FLOATING
                 and *type != TypeType::BIT
@@ -755,6 +755,8 @@ void TypecheckVisitor::check_numeric_operator(
 
 Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
 {
+    using Operation = BinaryExpression::Operation;
+
     if( not expr->left_->type_.unify( &expr->right_->type_ ) )
     {
         driver_.error( expr->location,
@@ -816,38 +818,35 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
 
     switch( expr->op )
     {
-        case ExpressionOperation::ADD:
-        case ExpressionOperation::SUB:
-        case ExpressionOperation::MUL:
-        case ExpressionOperation::DIV:
-        case ExpressionOperation::MOD:
+        case Operation::ADD:
+        case Operation::SUB:
+        case Operation::MUL:
+        case Operation::DIV:
+        case Operation::MOD:
             check_numeric_operator(
                 expr->location, &expr->left_->type_, expr->op );
             expr->type_.unify( &expr->left_->type_ );
             break;
-        case ExpressionOperation::RAT_DIV:
+        case Operation::RAT_DIV:
             check_numeric_operator(
                 expr->location, &expr->left_->type_, expr->op );
             expr->type_.unify( Type( TypeType::RATIONAL ) );
             break;
-
-        case ExpressionOperation::EQ:
-        case ExpressionOperation::NEQ:
+        case Operation::EQ:
+        case Operation::NEQ:
             expr->type_.unify( Type( TypeType::BOOLEAN ) );
             break;
-
-        case ExpressionOperation::LESSER:
-        case ExpressionOperation::GREATER:
-        case ExpressionOperation::LESSEREQ:
-        case ExpressionOperation::GREATEREQ:
+        case Operation::LESSER:
+        case Operation::GREATER:
+        case Operation::LESSEREQ:
+        case Operation::GREATEREQ:
             check_numeric_operator(
                 expr->location, &expr->left_->type_, expr->op );
             expr->type_.unify( Type( TypeType::BOOLEAN ) );
             break;
-
-        case ExpressionOperation::OR:
-        case ExpressionOperation::XOR:
-        case ExpressionOperation::AND:
+        case Operation::OR:
+        case Operation::XOR:
+        case Operation::AND:
         {
             if( expr->left_->type_.t == TypeType::BIT
                 or expr->right_->type_.t == TypeType::BIT )
@@ -873,8 +872,6 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
             }
             break;
         }
-        default:
-            FAILURE();
     }
 
     return &expr->type_;
@@ -882,9 +879,11 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
 
 Type* TypecheckVisitor::visit_expression_single( UnaryExpression* expr, Type* )
 {
+    using Operation = UnaryExpression::Operation;
+
     switch( expr->op )
     {
-        case ExpressionOperation::NOT:
+        case Operation::NOT:
             if( not expr->expr_->type_.unify( new Type( TypeType::BOOLEAN ) ) )
             {
                 driver_.error( expr->location,
@@ -892,11 +891,10 @@ Type* TypecheckVisitor::visit_expression_single( UnaryExpression* expr, Type* )
                         + expr->expr_->type_.to_str() );
             }
             expr->type_.unify( Type( TypeType::BOOLEAN ) );
-            return &expr->type_;
             break;
-        default:
-            FAILURE();
     }
+
+    return &expr->type_;
 }
 
 Type* TypecheckVisitor::visit_function_atom(

@@ -368,36 +368,36 @@ class NumberRangeAtom : public AtomNode
         yy::location& loc, ExpressionBase* left, ExpressionBase* right );
 };
 
-enum class ExpressionOperation : uint8_t
-{
-    ADD = 0,
-    SUB,
-    MUL,
-    DIV,
-    MOD,
-    RAT_DIV,
-    EQ,
-    NEQ,
-    LESSER,
-    GREATER,
-    LESSEREQ,
-    GREATEREQ,
-    OR,
-    XOR,
-    AND,
-    NOT
-};
-
 class BinaryExpression : public ExpressionBase
 {
+  public:
+    enum class Operation : uint8_t
+    {
+        ADD = 0,
+        SUB,
+        MUL,
+        DIV,
+        MOD,
+        RAT_DIV,
+        EQ,
+        NEQ,
+        LESSER,
+        GREATER,
+        LESSEREQ,
+        GREATEREQ,
+        OR,
+        XOR,
+        AND,
+    };
+
   public:
     ExpressionBase* left_;
     ExpressionBase* right_;
 
-    ExpressionOperation op;
+    Operation op;
 
     BinaryExpression( yy::location& loc, ExpressionBase* left,
-        ExpressionBase* right, ExpressionOperation op );
+        ExpressionBase* right, Operation op );
     ~BinaryExpression() override;
     bool equals( AstNode* other ) const override;
 };
@@ -405,17 +405,23 @@ class BinaryExpression : public ExpressionBase
 class UnaryExpression : public ExpressionBase
 {
   public:
+    enum class Operation : uint8_t
+    {
+        NOT = 0,
+    };
+
+  public:
     ExpressionBase* expr_;
 
-    ExpressionOperation op;
+    Operation op;
 
-    UnaryExpression(
-        yy::location& loc, ExpressionBase* expr, ExpressionOperation op );
+    UnaryExpression( yy::location& loc, ExpressionBase* expr, Operation op );
     ~UnaryExpression() override;
     bool equals( AstNode* other ) const override;
 };
 
-std::string operator_to_str( const ExpressionOperation op );
+std::string operator_to_str( BinaryExpression::Operation op );
+std::string operator_to_str( UnaryExpression::Operation op );
 
 class UpdateNode : public AstNode
 {
