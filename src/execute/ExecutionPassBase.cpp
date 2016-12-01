@@ -36,7 +36,6 @@
 
 #include "../Driver.h"
 #include "../Exceptions.h"
-#include "../Symbolic.h"
 #include "../Symbols.h"
 
 using namespace libcasm_fe;
@@ -778,14 +777,7 @@ namespace builtins
 
     static const value_t issymbolic( const value_t& arg )
     {
-        if( arg.is_symbolic() && !arg.value.sym->list )
-        {
-            return value_t( true );
-        }
-        else
-        {
-            return value_t( false );
-        }
+        return value_t( arg.is_symbolic() );
     }
 }
 
