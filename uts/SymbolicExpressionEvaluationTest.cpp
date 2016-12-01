@@ -28,6 +28,7 @@
 #include <memory>
 
 #include "../src/Ast.h"
+#include "../src/Symbolic.h"
 #include "../src/execute/SymbolicExecutionPass.h"
 #include "../src/various/location.hh"
 
@@ -83,7 +84,7 @@ static value_t make_value( TypeType type )
 }
 
 static std::unique_ptr< UnaryExpression > make_unary_expression(
-    ExpressionOperation op )
+    UnaryExpression::Operation op )
 {
     auto location = yy::location( nullptr );
     return std::unique_ptr< UnaryExpression >(
@@ -91,7 +92,7 @@ static std::unique_ptr< UnaryExpression > make_unary_expression(
 }
 
 static std::unique_ptr< BinaryExpression > make_binary_expression(
-    ExpressionOperation op )
+    BinaryExpression::Operation op )
 {
     auto location = yy::location( nullptr );
     return std::unique_ptr< BinaryExpression >(
@@ -111,7 +112,8 @@ struct UnaryOpArgs
 };
 
 class Symbolic_UnaryExpressionTest
-    : public TestWithParam< std::tuple< ExpressionOperation, UnaryOpArgs > >
+    : public TestWithParam< std::tuple< UnaryExpression::Operation,
+          UnaryOpArgs > >
 {
 };
 
@@ -119,7 +121,7 @@ TEST_P( Symbolic_UnaryExpressionTest, testUnaryExpressionResultType )
 {
     const auto row = GetParam();
 
-    const ExpressionOperation op = std::get< 0 >( row );
+    const UnaryExpression::Operation op = std::get< 0 >( row );
     const auto expr = make_unary_expression( op );
 
     const auto values = std::get< 1 >( row );
@@ -147,7 +149,8 @@ struct BinaryOpArgs
 };
 
 class Symbolic_BinaryExpressionTest
-    : public TestWithParam< std::tuple< ExpressionOperation, BinaryOpArgs > >
+    : public TestWithParam< std::tuple< BinaryExpression::Operation,
+          BinaryOpArgs > >
 {
 };
 
@@ -155,7 +158,7 @@ TEST_P( Symbolic_BinaryExpressionTest, testBinaryExpressionResultType )
 {
     const auto row = GetParam();
 
-    const ExpressionOperation op = std::get< 0 >( row );
+    const BinaryExpression::Operation op = std::get< 0 >( row );
     const auto expr = make_binary_expression( op );
 
     const auto values = std::get< 1 >( row );
@@ -191,7 +194,7 @@ static BinaryOpArgss generateSymbolic_BinaryExpressionTestCases(
 }
 
 INSTANTIATE_TEST_CASE_P( Symbolic_UnaryOperations, Symbolic_UnaryExpressionTest,
-    Combine( Values( ExpressionOperation::NOT ),
+    Combine( Values( UnaryExpression::Operation::NOT ),
         Values( UnaryOpArgs{ make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
             UnaryOpArgs{ make_value( TypeType::SYMBOL ),
@@ -201,7 +204,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_UnaryOperations, Symbolic_UnaryExpressionTest,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_Xor,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( ExpressionOperation::XOR ),
+    Combine( Values( BinaryExpression::Operation::XOR ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
@@ -232,7 +235,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_Xor,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_And,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( ExpressionOperation::AND ),
+    Combine( Values( BinaryExpression::Operation::AND ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
@@ -275,7 +278,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_And,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_Or,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( ExpressionOperation::OR ),
+    Combine( Values( BinaryExpression::Operation::OR ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
@@ -318,8 +321,8 @@ INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_Or,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_LesserGreater,
     Symbolic_BinaryExpressionTest,
-    Combine(
-        Values( ExpressionOperation::LESSER, ExpressionOperation::GREATER ),
+    Combine( Values( BinaryExpression::Operation::LESSER,
+                 BinaryExpression::Operation::GREATER ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -365,8 +368,8 @@ INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_LesserGreater,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_LesserEqGreaterEq,
     Symbolic_BinaryExpressionTest,
-    Combine(
-        Values( ExpressionOperation::LESSEREQ, ExpressionOperation::GREATEREQ ),
+    Combine( Values( BinaryExpression::Operation::LESSEREQ,
+                 BinaryExpression::Operation::GREATEREQ ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -413,7 +416,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_LesserEqGreaterEq,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_Eq,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( ExpressionOperation::EQ ),
+    Combine( Values( BinaryExpression::Operation::EQ ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::STRING, TypeType::INTEGER, TypeType::FLOATING,
@@ -463,7 +466,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_Eq,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_Neq,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( ExpressionOperation::NEQ ),
+    Combine( Values( BinaryExpression::Operation::NEQ ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::STRING, TypeType::INTEGER, TypeType::FLOATING,
@@ -511,7 +514,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_Neq,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_Add,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( ExpressionOperation::ADD ),
+    Combine( Values( BinaryExpression::Operation::ADD ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING, TypeType::RATIONAL,
@@ -548,9 +551,9 @@ INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_Add,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_SubMulDiv,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( ExpressionOperation::SUB,
-                 ExpressionOperation::MUL,
-                 ExpressionOperation::DIV ),
+    Combine( Values( BinaryExpression::Operation::SUB,
+                 BinaryExpression::Operation::MUL,
+                 BinaryExpression::Operation::DIV ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING, TypeType::RATIONAL,
@@ -586,7 +589,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_SubMulDiv,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_Mod,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( ExpressionOperation::MOD ),
+    Combine( Values( BinaryExpression::Operation::MOD ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -622,7 +625,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_Mod,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_RatDiv,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( ExpressionOperation::RAT_DIV ),
+    Combine( Values( BinaryExpression::Operation::RAT_DIV ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
