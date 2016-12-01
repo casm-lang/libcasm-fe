@@ -36,11 +36,9 @@ class AstWalker
 {
   public:
     T& visitor;
-    bool suppress_calls;
 
     AstWalker( T& v )
     : visitor( v )
-    , suppress_calls( false )
     {
     }
 
@@ -283,12 +281,7 @@ class AstWalker
         if( node->rule != nullptr )
         {
             visitor.visit_call( node, arguments );
-
-            if( !suppress_calls )
-            {
-                walk_rule( node->rule );
-            }
-
+            call_rule( node->rule );
             visitor.visit_call_post( node );
         }
         else
@@ -578,6 +571,19 @@ class AstWalker
             default:
                 assert( 0 );
         }
+    }
+
+    template < typename V_ = V >
+    typename std::enable_if< not std::is_same< value_t, V_ >::value >::type
+    call_rule( RuleNode* )
+    {
+    }
+
+    template < typename V_ = V >
+    typename std::enable_if< std::is_same< value_t, V_ >::value >::type
+    call_rule( RuleNode* node )
+    {
+        walk_rule( node );
     }
 };
 

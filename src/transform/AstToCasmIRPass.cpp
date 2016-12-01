@@ -73,8 +73,6 @@ bool libcasm_fe::AstToCasmIRPass::run( libpass::PassResult& pr )
     Ast* root = (Ast*)pr.getResult< libcasm_fe::TypeCheckPass >();
 
     AstWalker< AstToCasmIRPass, bool > walker( *this );
-
-    walker.suppress_calls = true;
     walker.walk_specification( root );
 
     // PPA: this could be extracted to a 'update and check consistency' Value
