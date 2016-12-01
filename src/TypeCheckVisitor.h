@@ -64,7 +64,6 @@ class TypecheckVisitor : public BaseVisitor< Type*, Type* >
     void visit_call_pre( CallNode* call ) override;
     void visit_call_pre( CallNode* call, Type* expr ) override;
     void visit_call( CallNode* call, std::vector< Type* >& arguments ) override;
-    void visit_call_post( CallNode* call ) override;
     void visit_print( PrintNode* node, Type* type ) override;
     void visit_diedie( DiedieNode* node, Type* msg ) override;
 
@@ -138,8 +137,5 @@ class TypecheckVisitor : public BaseVisitor< Type*, Type* >
 
 template <>
 void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode* node );
-
-template <>
-void AstWalker< TypecheckVisitor, Type* >::walk_call( CallNode* call );
 
 #endif // CASMI_LIBINTERPRETER_EXEC_VISITOR

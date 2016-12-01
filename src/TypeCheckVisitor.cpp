@@ -194,12 +194,7 @@ void TypecheckVisitor::visit_function_def( FunctionDefNode* def,
 
 void TypecheckVisitor::visit_derived_def_pre( FunctionDefNode* def )
 {
-    auto foo = new std::vector< Type* >();
-    for( Type* arg : def->sym->arguments_ )
-    {
-        foo->push_back( arg );
-    }
-    rule_binding_types.push_back( foo );
+    rule_binding_types.push_back( &def->sym->arguments_ );
     rule_binding_offsets.push_back( &def->sym->binding_offsets );
 }
 
@@ -233,36 +228,26 @@ void TypecheckVisitor::visit_derived_def( FunctionDefNode* def, Type* expr )
             "expression bit size does not match the return type bit size" );
     }
 
-    for( auto arg : def->sym->binding_offsets )
+    def->sym->parameter.resize( def->sym->binding_offsets.size(), nullptr );
+    for( const auto& arg : def->sym->binding_offsets )
     {
-        def->sym->parameter.push_back( 0 );
-    }
-
-    for( auto arg : def->sym->binding_offsets )
-    {
-        uint32_t i = arg.second;
+        const auto i = arg.second;
         assert( i < def->sym->parameter.size()
                 and "invalid parameter index found!" );
-
         def->sym->parameter[ i ] = arg.first.c_str();
     }
 }
 
 void TypecheckVisitor::visit_rule( RuleNode* rule )
 {
-    auto foo = new std::vector< Type* >();
-    for( Type* arg : rule->arguments )
-    {
-        foo->push_back( arg );
-    }
-    rule_binding_types.push_back( foo );
+    rule_binding_types.push_back( &rule->arguments );
     rule_binding_offsets.push_back( &rule->binding_offsets );
 
-    for( auto& pair : rule->dump_list )
+    for( const auto& pair : rule->dump_list )
     {
         for( const std::string& identifier : pair.second )
         {
-            Function* sym = driver_.function_table.get_function( identifier );
+            const auto sym = driver_.function_table.get_function( identifier );
             if( sym )
             {
                 driver_.function_trace_map.emplace( sym->id, pair.first );
@@ -279,17 +264,12 @@ void TypecheckVisitor::visit_rule( RuleNode* rule )
         }
     }
 
-    for( auto arg : rule->binding_offsets )
+    rule->parameter.resize( rule->binding_offsets.size(), nullptr );
+    for( const auto& arg : rule->binding_offsets )
     {
-        rule->parameter.push_back( 0 );
-    }
-
-    for( auto arg : rule->binding_offsets )
-    {
-        uint32_t i = arg.second;
+        const auto i = arg.second;
         assert(
             i < rule->parameter.size() and "invalid parameter index found!" );
-
         rule->parameter[ i ] = arg.first.c_str();
     }
 }
@@ -319,13 +299,13 @@ void TypecheckVisitor::visit_assert( UnaryNode* assert, Type* val )
 void TypecheckVisitor::visit_update(
     UpdateNode* update, const std::vector< Type* >&, Type* )
 {
-    if( update->func->symbol && update->func->symbol->is_static )
+    if( update->func->symbol and update->func->symbol->is_static )
     {
         driver_.error( update->location,
             "cannot update static function `" + update->func->name + "`" );
     }
 
-    if( !update->func->type_.unify( &update->expr_->type_ ) )
+    if( not update->func->type_.unify( &update->expr_->type_ ) )
     {
         driver_.error( update->location,
             "type `"
@@ -343,7 +323,7 @@ void TypecheckVisitor::visit_update(
     const Type* rhs
         = update->expr_->type_.get_most_general_type( update->expr_ );
 
-    if( lhs->t == TypeType::BIT && lhs->bitsize != rhs->bitsize )
+    if( lhs->t == TypeType::BIT and lhs->bitsize != rhs->bitsize )
     {
         driver_.error( update->location,
             "type of '" + lhs->to_str() + "' of '" + update->func->name
@@ -362,7 +342,7 @@ void TypecheckVisitor::visit_update(
     update->type_ = update->func->type_;
 
     if( update->func->symbol
-        && driver_.function_trace_map.count( update->func->symbol->id ) > 0 )
+        and driver_.function_trace_map.count( update->func->symbol->id ) > 0 )
     {
         update->dump = true;
     }
@@ -370,9 +350,10 @@ void TypecheckVisitor::visit_update(
 
 void TypecheckVisitor::visit_call_pre( CallNode* call )
 {
-    if( driver_.rules_map_.count( call->rule_name ) == 1 )
+    const auto it = driver_.rules_map_.find( call->rule_name );
+    if( it != driver_.rules_map_.cend() )
     {
-        call->rule = driver_.rules_map_[ call->rule_name ];
+        call->rule = it->second;
     }
     else
     {
@@ -400,8 +381,8 @@ void TypecheckVisitor::visit_call(
         return;
     }
 
-    size_t args_defined = call->rule->arguments.size();
-    size_t args_provided = arguments.size();
+    const size_t args_defined = call->rule->arguments.size();
+    const size_t args_provided = arguments.size();
 
     if( args_defined != args_provided )
     {
@@ -433,11 +414,6 @@ void TypecheckVisitor::visit_call(
     }
 }
 
-void TypecheckVisitor::visit_call_post( CallNode* call )
-{
-    UNUSED( call );
-}
-
 void TypecheckVisitor::visit_print( PrintNode* node, Type* type )
 {
     if( node->getAtom()->type_.t == TypeType::UNKNOWN )
@@ -450,7 +426,7 @@ void TypecheckVisitor::visit_print( PrintNode* node, Type* type )
 
 void TypecheckVisitor::visit_diedie( DiedieNode* node, Type* msg )
 {
-    if( node->msg && !node->msg->type_.unify( TypeType::STRING ) )
+    if( node->msg and not node->msg->type_.unify( TypeType::STRING ) )
     {
         driver_.error( node->msg->location,
             "expression of `diedie` must be a String but was "
@@ -554,7 +530,7 @@ void TypecheckVisitor::visit_push( PushNode* node, Type* expr, Type* atom )
                 node->to->location, "cannot push into static function `"
                                         + node->to->symbol->name + "`" );
         }
-        if( !expr->unify( atom->subtypes[ 0 ] ) )
+        if( not expr->unify( atom->subtypes.at( 0 ) ) )
         {
             driver_.error( node->expr->location,
                 "cannot push " + expr->get_most_general_type( node )->to_str()
@@ -566,7 +542,7 @@ void TypecheckVisitor::visit_push( PushNode* node, Type* expr, Type* atom )
 
 void TypecheckVisitor::visit_pop( PopNode* node, Type* atom )
 {
-    if( !node->from_type.unify( &node->from->type_ ) )
+    if( not node->from_type.unify( &node->from->type_ ) )
     {
         driver_.error( node->from->location,
             "`pop from` argument must be List(A) but was "
@@ -587,7 +563,7 @@ void TypecheckVisitor::visit_pop( PopNode* node, Type* atom )
         }
     }
 
-    Function* sym = driver_.function_table.get_function( node->to->name );
+    const auto sym = driver_.function_table.get_function( node->to->name );
     if( sym )
     {
         if( sym->is_static )
@@ -885,7 +861,8 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
             }
             else
             {
-                if( !expr->left_->type_.unify( new Type( TypeType::BOOLEAN ) ) )
+                if( not expr->left_->type_.unify(
+                        new Type( TypeType::BOOLEAN ) ) )
                 {
                     driver_.error( expr->location,
                         "operands of operator `" + operator_to_str( expr->op )
@@ -908,7 +885,7 @@ Type* TypecheckVisitor::visit_expression_single( UnaryExpression* expr, Type* )
     switch( expr->op )
     {
         case ExpressionOperation::NOT:
-            if( !expr->expr_->type_.unify( new Type( TypeType::BOOLEAN ) ) )
+            if( not expr->expr_->type_.unify( new Type( TypeType::BOOLEAN ) ) )
             {
                 driver_.error( expr->location,
                     "operand of `not` must be Boolean but is "
@@ -1128,8 +1105,9 @@ Type* TypecheckVisitor::visit_builtin_atom(
 void TypecheckVisitor::visit_derived_function_atom_pre(
     FunctionAtom* atom, std::vector< Type* >& arguments )
 {
-    size_t args_defined = atom->symbol->arguments_.size();
-    size_t args_provided = arguments.size();
+    const size_t args_defined = atom->symbol->arguments_.size();
+    const size_t args_provided = arguments.size();
+
     if( args_defined != args_provided )
     {
         driver_.error( atom->location,
@@ -1152,14 +1130,13 @@ void TypecheckVisitor::visit_derived_function_atom_pre(
             }
         }
     }
-    rule_binding_types.push_back(
-        new std::vector< Type* >( atom->symbol->arguments_ ) );
+
+    rule_binding_types.push_back( &atom->symbol->arguments_ );
     rule_binding_offsets.push_back( &atom->symbol->binding_offsets );
 }
 
 Type* TypecheckVisitor::visit_derived_function_atom( FunctionAtom*, Type* expr )
 {
-    delete rule_binding_types.back();
     rule_binding_types.pop_back();
     rule_binding_offsets.pop_back();
     return expr;
@@ -1237,14 +1214,15 @@ void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode* node )
     walk_atom( node->in_expr );
     visitor.forall_head = false;
 
-    Type list_t = new Type( TypeType::LIST, new Type( TypeType::UNKNOWN ) );
+    // TODO this leaks in some cases
+    Type* list_t = new Type( TypeType::LIST, new Type( TypeType::UNKNOWN ) );
 
     if( node->in_expr->type_ == TypeType::INTEGER
         || node->in_expr->type_ == TypeType::ENUM )
     {
         node->type_.unify( &node->in_expr->type_ );
     }
-    else if( node->in_expr->type_.unify( &list_t ) )
+    else if( node->in_expr->type_.unify( list_t ) )
     {
         node->type_.unify( node->in_expr->type_.subtypes[ 0 ] );
     }
@@ -1280,34 +1258,4 @@ void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode* node )
 
     visitor.rule_binding_types.back()->pop_back();
     visitor.rule_binding_offsets.back()->erase( node->identifier );
-}
-
-template <>
-void AstWalker< TypecheckVisitor, Type* >::walk_call( CallNode* call )
-{
-    // basically the same as in AstWalker, but we do not walk the rule here as
-    // this could lead to an endless recursion
-    if( call->ruleref == nullptr )
-    {
-        visitor.visit_call_pre( call );
-    }
-    else
-    {
-        Type* v = walk_atom( call->ruleref );
-        visitor.visit_call_pre( call, v );
-    }
-
-    // we must evaluate all arguments, to set correct offset for bindings
-    std::vector< Type* > arguments = evaluateExpressions( call->arguments );
-
-    if( call->rule != nullptr )
-    {
-        visitor.visit_call( call, arguments );
-        // walk_rule(call->rule);
-        visitor.visit_call_post( call );
-    }
-    else
-    {
-        DEBUG( "rule not set!" );
-    }
 }
