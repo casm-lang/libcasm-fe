@@ -147,15 +147,15 @@ class AstWalker
 
     void walk_assert( UnaryNode* node )
     {
-        const V v = walk_atom(
-            reinterpret_cast< ExpressionBase* >( node->child_ ) );
+        const V v
+            = walk_atom( reinterpret_cast< ExpressionBase* >( node->child_ ) );
         visitor.visit_assert( node, v );
     }
 
     void walk_assure( UnaryNode* node )
     {
-        const V v = walk_atom(
-            reinterpret_cast< ExpressionBase* >( node->child_ ) );
+        const V v
+            = walk_atom( reinterpret_cast< ExpressionBase* >( node->child_ ) );
         visitor.visit_assure( node, v );
     }
 
@@ -326,9 +326,9 @@ class AstWalker
 
     void walk_forall( ForallNode* node )
     {
-        walk_atom( node->in_expr );
+        const auto expr = walk_atom( node->in_expr );
         visitor.visit_forall_pre( node );
-        walk_statement( node->statement );
+        forall_iterate( node, expr );
         visitor.visit_forall_post( node );
     }
 
@@ -497,6 +497,88 @@ class AstWalker
         }
         return values;
     }
+
+  private:
+    template < typename V_ = V >
+    typename std::enable_if< not std::is_same< value_t, V_ >::value >::type
+    forall_iterate( ForallNode* node, const V_& )
+    {
+        walk_statement( node->statement );
+    }
+
+    template < typename V_ = V >
+    typename std::enable_if< std::is_same< value_t, V_ >::value >::type
+    forall_iterate( ForallNode* node, const V_& expr )
+    {
+        switch( node->in_expr->type_.t )
+        {
+            case TypeType::LIST:
+            {
+                const auto l = expr.value.list;
+                for( auto iter = l->begin(); iter != l->end(); iter++ )
+                {
+                    visitor.visit_forall_iteration_pre( node, *iter );
+                    walk_statement( node->statement );
+                    visitor.visit_forall_iteration_post( node );
+                }
+            }
+            break;
+            case TypeType::NUMBER_RANGE:
+            {
+                for( auto i : *expr.value.numberRange )
+                {
+                    visitor.visit_forall_iteration_pre( node, i );
+                    walk_statement( node->statement );
+                    visitor.visit_forall_iteration_post( node );
+                }
+            }
+            break;
+
+            case TypeType::INTEGER:
+            {
+                const auto end = expr.value.integer;
+                if( end > 0 )
+                {
+                    for( INTEGER_T i = 1; i <= end; i++ )
+                    {
+                        visitor.visit_forall_iteration_pre( node, i );
+                        walk_statement( node->statement );
+                        visitor.visit_forall_iteration_post( node );
+                    }
+                }
+                else
+                {
+                    for( INTEGER_T i = end; i <= -1; i++ )
+                    {
+                        visitor.visit_forall_iteration_pre( node, i );
+                        walk_statement( node->statement );
+                        visitor.visit_forall_iteration_post( node );
+                    }
+                }
+                break;
+            }
+
+            case TypeType::ENUM:
+            {
+                const auto func
+                    = reinterpret_cast< FunctionAtom* >( node->in_expr );
+                assert( func->name == func->enum_->name );
+
+                for( const auto& pair : func->enum_->mapping )
+                {
+                    // why is an element with the name of the enum in the map??
+                    assert( func->name != pair.first );
+
+                    visitor.visit_forall_iteration_pre( node, pair.second );
+                    walk_statement( node->statement );
+                    visitor.visit_forall_iteration_post( node );
+                }
+            }
+            break;
+            default:
+                assert( 0 );
+        }
+    }
 };
 
 template < class T, class U = const T& >
@@ -637,6 +719,14 @@ class BaseVisitor
     }
 
     virtual void visit_forall_post( ForallNode* )
+    {
+    }
+
+    virtual void visit_forall_iteration_pre( ForallNode*, U )
+    {
+    }
+
+    virtual void visit_forall_iteration_post( ForallNode* )
     {
     }
 

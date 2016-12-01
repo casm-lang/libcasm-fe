@@ -313,6 +313,27 @@ void ExecutionPassBase::visit_parblock_post( UnaryNode* parblock )
     merge();
 }
 
+void ExecutionPassBase::visit_forall_pre( ForallNode* )
+{
+    fork( UpdateSet::Type::Parallel );
+}
+
+void ExecutionPassBase::visit_forall_post( ForallNode* )
+{
+    merge();
+}
+
+void ExecutionPassBase::visit_forall_iteration_pre(
+    ForallNode*, const value_t& expr )
+{
+    rule_bindings.back()->push_back( expr );
+}
+
+void ExecutionPassBase::visit_forall_iteration_post( ForallNode* )
+{
+    rule_bindings.back()->pop_back();
+}
+
 namespace builtins
 {
     static const value_t pow( const value_t& base, const value_t& power )

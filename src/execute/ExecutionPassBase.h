@@ -73,6 +73,12 @@ namespace libcasm_fe
         void visit_parblock_pre( UnaryNode* parblock ) override;
         void visit_parblock_post( UnaryNode* parblock ) override;
 
+        void visit_forall_pre( ForallNode* node ) override;
+        void visit_forall_post( ForallNode* node ) override;
+        void visit_forall_iteration_pre(
+            ForallNode* node, const value_t& expr ) override;
+        void visit_forall_iteration_post( ForallNode* node ) override;
+
         void visit_assert( UnaryNode* assert, const value_t& val ) override;
 
         void visit_update( UpdateNode* update,
@@ -154,6 +160,8 @@ namespace libcasm_fe
 
       protected:
         std::vector< value_t > main_bindings;
+        std::vector< std::vector< value_t >* > rule_bindings;
+
         UpdateSetManager updateSetManager;
 
         BlockAllocator< TEMP_STACK_SIZE > stack;
@@ -162,8 +170,6 @@ namespace libcasm_fe
         std::set< std::string > initialized;
 
       public:
-        std::vector< std::vector< value_t >* > rule_bindings;
-
         std::vector< FunctionState > function_states;
         std::vector< const Function* > function_symbols;
 

@@ -102,9 +102,6 @@ template <>
 void SymbolicExecutionWalker::walk_case( CaseNode* node );
 
 template <>
-void SymbolicExecutionWalker::walk_forall( ForallNode* node );
-
-template <>
 void SymbolicExecutionWalker::walk_iterate( UnaryNode* node );
 
 template <>

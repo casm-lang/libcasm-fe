@@ -84,9 +84,6 @@ template <>
 void NumericExecutionWalker::walk_case( CaseNode* node );
 
 template <>
-void NumericExecutionWalker::walk_forall( ForallNode* node );
-
-template <>
 void NumericExecutionWalker::walk_iterate( UnaryNode* node );
 
 template <>
