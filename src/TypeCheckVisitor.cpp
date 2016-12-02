@@ -690,13 +690,13 @@ void TypecheckVisitor::visit_case(
 }
 
 void TypecheckVisitor::check_numeric_operator(
-    const yy::location& loc, Type* type, const BinaryExpression::Operation op )
+    const yy::location& loc, Type* type, const libcasm_ir::Value::ID op )
 {
     if( *type == TypeType::UNKNOWN )
     {
         type->constraints.push_back( new Type( TypeType::INTEGER ) );
-        if( op != BinaryExpression::Operation::MOD
-            || op == BinaryExpression::Operation::RAT_DIV )
+        if( op != libcasm_ir::Value::MOD_INSTRUCTION
+            || op == libcasm_ir::Value::RIV_INSTRUCTION )
         {
             type->constraints.push_back( new Type( TypeType::RATIONAL ) );
             type->constraints.push_back( new Type( TypeType::FLOATING ) );
@@ -704,7 +704,7 @@ void TypecheckVisitor::check_numeric_operator(
     }
     else
     {
-        if( op == BinaryExpression::Operation::RAT_DIV )
+        if( op == libcasm_ir::Value::RIV_INSTRUCTION )
         {
             if( *type != TypeType::INTEGER )
             {
@@ -714,7 +714,7 @@ void TypecheckVisitor::check_numeric_operator(
                         + type->to_str() );
             }
         }
-        else if( op == BinaryExpression::Operation::MOD )
+        else if( op == libcasm_ir::Value::MOD_INSTRUCTION )
         {
             if( *type != TypeType::INTEGER && *type != TypeType::FLOATING )
             {
@@ -724,7 +724,7 @@ void TypecheckVisitor::check_numeric_operator(
                         + type->to_str() );
             }
         }
-        else if( op == BinaryExpression::Operation::ADD )
+        else if( op == libcasm_ir::Value::ADD_INSTRUCTION )
         {
             if( *type != TypeType::INTEGER and *type != TypeType::FLOATING
                 and *type != TypeType::BIT
@@ -755,7 +755,7 @@ void TypecheckVisitor::check_numeric_operator(
 
 Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
 {
-    using Operation = BinaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
     if( not expr->left_->type_.unify( &expr->right_->type_ ) )
     {
@@ -818,35 +818,35 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
 
     switch( expr->op )
     {
-        case Operation::ADD:
-        case Operation::SUB:
-        case Operation::MUL:
-        case Operation::DIV:
-        case Operation::MOD:
+        case Opcode::ADD_INSTRUCTION:
+        case Opcode::SUB_INSTRUCTION:
+        case Opcode::MUL_INSTRUCTION:
+        case Opcode::DIV_INSTRUCTION:
+        case Opcode::MOD_INSTRUCTION:
             check_numeric_operator(
                 expr->location, &expr->left_->type_, expr->op );
             expr->type_.unify( &expr->left_->type_ );
             break;
-        case Operation::RAT_DIV:
+        case Opcode::RIV_INSTRUCTION:
             check_numeric_operator(
                 expr->location, &expr->left_->type_, expr->op );
             expr->type_.unify( Type( TypeType::RATIONAL ) );
             break;
-        case Operation::EQ:
-        case Operation::NEQ:
+        case Opcode::EQU_INSTRUCTION:
+        case Opcode::NEQ_INSTRUCTION:
             expr->type_.unify( Type( TypeType::BOOLEAN ) );
             break;
-        case Operation::LESSER:
-        case Operation::GREATER:
-        case Operation::LESSEREQ:
-        case Operation::GREATEREQ:
+        case Opcode::LTH_INSTRUCTION:
+        case Opcode::GTH_INSTRUCTION:
+        case Opcode::LEQ_INSTRUCTION:
+        case Opcode::GEQ_INSTRUCTION:
             check_numeric_operator(
                 expr->location, &expr->left_->type_, expr->op );
             expr->type_.unify( Type( TypeType::BOOLEAN ) );
             break;
-        case Operation::OR:
-        case Operation::XOR:
-        case Operation::AND:
+        case Opcode::OR_INSTRUCTION:
+        case Opcode::XOR_INSTRUCTION:
+        case Opcode::AND_INSTRUCTION:
         {
             if( expr->left_->type_.t == TypeType::BIT
                 or expr->right_->type_.t == TypeType::BIT )
@@ -872,6 +872,9 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
             }
             break;
         }
+        default:
+            assert( !"internal error" ); // PPA: FIXME: with better verbose info
+                                         // etc.
     }
 
     return &expr->type_;
@@ -879,11 +882,11 @@ Type* TypecheckVisitor::visit_expression( BinaryExpression* expr, Type*, Type* )
 
 Type* TypecheckVisitor::visit_expression_single( UnaryExpression* expr, Type* )
 {
-    using Operation = UnaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
     switch( expr->op )
     {
-        case Operation::NOT:
+        case Opcode::NOT_INSTRUCTION:
             if( not expr->expr_->type_.unify( new Type( TypeType::BOOLEAN ) ) )
             {
                 driver_.error( expr->location,
@@ -892,6 +895,9 @@ Type* TypecheckVisitor::visit_expression_single( UnaryExpression* expr, Type* )
             }
             expr->type_.unify( Type( TypeType::BOOLEAN ) );
             break;
+        default:
+            assert( !"internal error" ); // PPA: FIXME: with better verbose info
+                                         // etc.
     }
 
     return &expr->type_;

@@ -38,6 +38,8 @@
 
 #include "various/location.hh" // reuse bison's location class
 
+#include "libcasm-ir.h"
+
 class value_t;
 
 enum NodeType
@@ -371,33 +373,13 @@ class NumberRangeAtom : public AtomNode
 class BinaryExpression : public ExpressionBase
 {
   public:
-    enum class Operation : uint8_t
-    {
-        ADD = 0,
-        SUB,
-        MUL,
-        DIV,
-        MOD,
-        RAT_DIV,
-        EQ,
-        NEQ,
-        LESSER,
-        GREATER,
-        LESSEREQ,
-        GREATEREQ,
-        OR,
-        XOR,
-        AND,
-    };
-
-  public:
     ExpressionBase* left_;
     ExpressionBase* right_;
 
-    Operation op;
+    libcasm_ir::Value::ID op;
 
     BinaryExpression( yy::location& loc, ExpressionBase* left,
-        ExpressionBase* right, Operation op );
+        ExpressionBase* right, libcasm_ir::Value::ID op );
     ~BinaryExpression() override;
     bool equals( AstNode* other ) const override;
 };
@@ -405,23 +387,17 @@ class BinaryExpression : public ExpressionBase
 class UnaryExpression : public ExpressionBase
 {
   public:
-    enum class Operation : uint8_t
-    {
-        NOT = 0,
-    };
-
-  public:
     ExpressionBase* expr_;
 
-    Operation op;
+    libcasm_ir::Value::ID op;
 
-    UnaryExpression( yy::location& loc, ExpressionBase* expr, Operation op );
+    UnaryExpression(
+        yy::location& loc, ExpressionBase* expr, libcasm_ir::Value::ID op );
     ~UnaryExpression() override;
     bool equals( AstNode* other ) const override;
 };
 
-std::string operator_to_str( BinaryExpression::Operation op );
-std::string operator_to_str( UnaryExpression::Operation op );
+std::string operator_to_str( libcasm_ir::Value::ID op );
 
 class UpdateNode : public AstNode
 {

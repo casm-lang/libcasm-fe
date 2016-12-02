@@ -356,47 +356,50 @@ void NumericExecutionPass::visit_pop( PopNode* node, const value_t& val )
 value_t NumericExecutionPass::visit_expression(
     BinaryExpression* expr, const value_t& left_val, const value_t& right_val )
 {
-    using Operation = BinaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
     switch( expr->op )
     {
-        case Operation::ADD:
+        case Opcode::ADD_INSTRUCTION:
             return left_val + right_val;
-        case Operation::SUB:
+        case Opcode::SUB_INSTRUCTION:
             return left_val - right_val;
-        case Operation::MUL:
+        case Opcode::MUL_INSTRUCTION:
             return left_val * right_val;
-        case Operation::DIV:
+        case Opcode::DIV_INSTRUCTION:
             return left_val / right_val;
-        case Operation::MOD:
+        case Opcode::MOD_INSTRUCTION:
             return left_val % right_val;
-        case Operation::RAT_DIV:
+        case Opcode::RIV_INSTRUCTION:
             return rat_div( left_val, right_val );
-        case Operation::EQ:
+        case Opcode::EQU_INSTRUCTION:
             return value_t( left_val == right_val );
-        case Operation::NEQ:
+        case Opcode::NEQ_INSTRUCTION:
             return value_t( left_val != right_val );
-        case Operation::AND:
+        case Opcode::AND_INSTRUCTION:
             return left_val and right_val;
-        case Operation::OR:
+        case Opcode::OR_INSTRUCTION:
             return left_val or right_val;
-        case Operation::XOR:
+        case Opcode::XOR_INSTRUCTION:
             return left_val ^ right_val;
-        case Operation::LESSER:
+        case Opcode::LTH_INSTRUCTION:
             return left_val < right_val;
-        case Operation::GREATER:
+        case Opcode::GTH_INSTRUCTION:
             return left_val > right_val;
-        case Operation::LESSEREQ:
+        case Opcode::LEQ_INSTRUCTION:
             return left_val <= right_val;
-        case Operation::GREATEREQ:
+        case Opcode::GEQ_INSTRUCTION:
             return left_val >= right_val;
+        default:
+            assert( !"internal error" ); // PPA: FIXME: with better verbose info
+                                         // etc.
     }
 }
 
 value_t NumericExecutionPass::visit_expression_single(
     UnaryExpression* expr, const value_t& val )
 {
-    using Operation = UnaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
     if( val.is_undef() )
     {
@@ -405,8 +408,11 @@ value_t NumericExecutionPass::visit_expression_single(
 
     switch( expr->op )
     {
-        case Operation::NOT:
+        case Opcode::NOT_INSTRUCTION:
             return value_t( not val.value.boolean );
+        default:
+            assert( !"internal error" ); // PPA: FIXME: with better verbose info
+                                         // etc.
     }
 }
 

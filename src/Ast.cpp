@@ -508,7 +508,7 @@ NumberRangeAtom::NumberRangeAtom(
 }
 
 BinaryExpression::BinaryExpression( yy::location& loc, ExpressionBase* left,
-    ExpressionBase* right, Operation op )
+    ExpressionBase* right, libcasm_ir::Value::ID op )
 : ExpressionBase( loc, NodeType::BINARY_EXPRESSION, Type( TypeType::UNKNOWN ) )
 , left_( left )
 , right_( right )
@@ -543,7 +543,7 @@ bool BinaryExpression::equals( AstNode* other ) const
 }
 
 UnaryExpression::UnaryExpression(
-    yy::location& loc, ExpressionBase* expr, Operation op )
+    yy::location& loc, ExpressionBase* expr, libcasm_ir::Value::ID op )
 : ExpressionBase( loc, NodeType::UNARY_EXPRESSION, Type( TypeType::UNKNOWN ) )
 , expr_( expr )
 , op( op )
@@ -574,53 +574,45 @@ bool UnaryExpression::equals( AstNode* other ) const
     }
 }
 
-std::string operator_to_str( BinaryExpression::Operation op )
+std::string operator_to_str( libcasm_ir::Value::ID op )
 {
-    using Operation = BinaryExpression::Operation;
-
     switch( op )
     {
-        case Operation::ADD:
+        case libcasm_ir::Value::ADD_INSTRUCTION:
             return "+";
-        case Operation::SUB:
+        case libcasm_ir::Value::SUB_INSTRUCTION:
             return "-";
-        case Operation::MUL:
+        case libcasm_ir::Value::MUL_INSTRUCTION:
             return "*";
-        case Operation::DIV:
+        case libcasm_ir::Value::DIV_INSTRUCTION:
             return "/";
-        case Operation::MOD:
+        case libcasm_ir::Value::MOD_INSTRUCTION:
             return "%";
-        case Operation::RAT_DIV:
+        case libcasm_ir::Value::RIV_INSTRUCTION:
             return "div";
-        case Operation::EQ:
+        case libcasm_ir::Value::EQU_INSTRUCTION:
             return "=";
-        case Operation::NEQ:
+        case libcasm_ir::Value::NEQ_INSTRUCTION:
             return "!=";
-        case Operation::AND:
+        case libcasm_ir::Value::AND_INSTRUCTION:
             return "and";
-        case Operation::OR:
+        case libcasm_ir::Value::OR_INSTRUCTION:
             return "or";
-        case Operation::XOR:
+        case libcasm_ir::Value::XOR_INSTRUCTION:
             return "xor";
-        case Operation::LESSER:
+        case libcasm_ir::Value::LTH_INSTRUCTION:
             return "<";
-        case Operation::GREATER:
+        case libcasm_ir::Value::GTH_INSTRUCTION:
             return ">";
-        case Operation::LESSEREQ:
+        case libcasm_ir::Value::LEQ_INSTRUCTION:
             return "<=";
-        case Operation::GREATEREQ:
+        case libcasm_ir::Value::GEQ_INSTRUCTION:
             return ">=";
-    }
-}
-
-std::string operator_to_str( UnaryExpression::Operation op )
-{
-    using Operation = UnaryExpression::Operation;
-
-    switch( op )
-    {
-        case Operation::NOT:
+        case libcasm_ir::Value::NOT_INSTRUCTION:
             return "not";
+        default:
+            assert( !"internal error" ); // PPA: FIXME: with better verbose info
+                                         // etc.
     }
 }
 

@@ -84,7 +84,7 @@ static value_t make_value( TypeType type )
 }
 
 static std::unique_ptr< UnaryExpression > make_unary_expression(
-    UnaryExpression::Operation op )
+    libcasm_ir::Value::ID op )
 {
     auto location = yy::location( nullptr );
     return std::unique_ptr< UnaryExpression >(
@@ -92,7 +92,7 @@ static std::unique_ptr< UnaryExpression > make_unary_expression(
 }
 
 static std::unique_ptr< BinaryExpression > make_binary_expression(
-    BinaryExpression::Operation op )
+    libcasm_ir::Value::ID op )
 {
     auto location = yy::location( nullptr );
     return std::unique_ptr< BinaryExpression >(
@@ -112,8 +112,7 @@ struct UnaryOpArgs
 };
 
 class Symbolic_UnaryExpressionTest
-    : public TestWithParam< std::tuple< UnaryExpression::Operation,
-          UnaryOpArgs > >
+    : public TestWithParam< std::tuple< libcasm_ir::Value::ID, UnaryOpArgs > >
 {
 };
 
@@ -121,7 +120,7 @@ TEST_P( Symbolic_UnaryExpressionTest, testUnaryExpressionResultType )
 {
     const auto row = GetParam();
 
-    const UnaryExpression::Operation op = std::get< 0 >( row );
+    const libcasm_ir::Value::ID op = std::get< 0 >( row );
     const auto expr = make_unary_expression( op );
 
     const auto values = std::get< 1 >( row );
@@ -149,8 +148,7 @@ struct BinaryOpArgs
 };
 
 class Symbolic_BinaryExpressionTest
-    : public TestWithParam< std::tuple< BinaryExpression::Operation,
-          BinaryOpArgs > >
+    : public TestWithParam< std::tuple< libcasm_ir::Value::ID, BinaryOpArgs > >
 {
 };
 
@@ -158,7 +156,7 @@ TEST_P( Symbolic_BinaryExpressionTest, testBinaryExpressionResultType )
 {
     const auto row = GetParam();
 
-    const BinaryExpression::Operation op = std::get< 0 >( row );
+    const libcasm_ir::Value::ID op = std::get< 0 >( row );
     const auto expr = make_binary_expression( op );
 
     const auto values = std::get< 1 >( row );
@@ -194,7 +192,7 @@ static BinaryOpArgss generateSymbolic_BinaryExpressionTestCases(
 }
 
 INSTANTIATE_TEST_CASE_P( Symbolic_UnaryOperations, Symbolic_UnaryExpressionTest,
-    Combine( Values( UnaryExpression::Operation::NOT ),
+    Combine( Values( libcasm_ir::Value::NOT_INSTRUCTION ),
         Values( UnaryOpArgs{ make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
             UnaryOpArgs{ make_value( TypeType::SYMBOL ),
@@ -204,7 +202,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_UnaryOperations, Symbolic_UnaryExpressionTest,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_Xor,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::XOR ),
+    Combine( Values( libcasm_ir::Value::XOR_INSTRUCTION ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
@@ -235,7 +233,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_Xor,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_And,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::AND ),
+    Combine( Values( libcasm_ir::Value::AND_INSTRUCTION ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
@@ -278,7 +276,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_And,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_Or,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::OR ),
+    Combine( Values( libcasm_ir::Value::OR_INSTRUCTION ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
@@ -321,8 +319,8 @@ INSTANTIATE_TEST_CASE_P( Symbolic_LogicalOperations_Or,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_LesserGreater,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::LESSER,
-                 BinaryExpression::Operation::GREATER ),
+    Combine( Values( libcasm_ir::Value::LTH_INSTRUCTION,
+                 libcasm_ir::Value::GTH_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -368,8 +366,8 @@ INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_LesserGreater,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_LesserEqGreaterEq,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::LESSEREQ,
-                 BinaryExpression::Operation::GREATEREQ ),
+    Combine( Values( libcasm_ir::Value::LEQ_INSTRUCTION,
+                 libcasm_ir::Value::GEQ_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -416,7 +414,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_LesserEqGreaterEq,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_Eq,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::EQ ),
+    Combine( Values( libcasm_ir::Value::EQU_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::STRING, TypeType::INTEGER, TypeType::FLOATING,
@@ -466,7 +464,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_Eq,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_Neq,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::NEQ ),
+    Combine( Values( libcasm_ir::Value::NEQ_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::STRING, TypeType::INTEGER, TypeType::FLOATING,
@@ -514,7 +512,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_CompareOperations_Neq,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_Add,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::ADD ),
+    Combine( Values( libcasm_ir::Value::ADD_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING, TypeType::RATIONAL,
@@ -551,9 +549,9 @@ INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_Add,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_SubMulDiv,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::SUB,
-                 BinaryExpression::Operation::MUL,
-                 BinaryExpression::Operation::DIV ),
+    Combine( Values( libcasm_ir::Value::SUB_INSTRUCTION,
+                 libcasm_ir::Value::MUL_INSTRUCTION,
+                 libcasm_ir::Value::DIV_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING, TypeType::RATIONAL,
@@ -589,7 +587,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_SubMulDiv,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_Mod,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::MOD ),
+    Combine( Values( libcasm_ir::Value::MOD_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -625,7 +623,7 @@ INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_Mod,
 
 INSTANTIATE_TEST_CASE_P( Symbolic_ArithmeticOperations_RatDiv,
     Symbolic_BinaryExpressionTest,
-    Combine( Values( BinaryExpression::Operation::RAT_DIV ),
+    Combine( Values( libcasm_ir::Value::RIV_INSTRUCTION ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },

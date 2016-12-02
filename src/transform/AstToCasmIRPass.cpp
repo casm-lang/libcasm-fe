@@ -843,56 +843,62 @@ bool libcasm_fe::AstToCasmIRPass::visit_expression(
     assert( ir_lhs );
     assert( ir_rhs );
 
-    using Operation = BinaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
+    // PPA: TODO: this section can be omitted if the IR directly uses the ID
+    // value to
+    // create on the fly the Instruction instance
     libcasm_ir::Value* ir_expr = 0;
     switch( node->op )
     {
-        case Operation::ADD:
+        case Opcode::ADD_INSTRUCTION:
             ir_expr = new libcasm_ir::AddInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::SUB:
+        case Opcode::SUB_INSTRUCTION:
             ir_expr = new libcasm_ir::SubInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::MUL:
+        case Opcode::MUL_INSTRUCTION:
             ir_expr = new libcasm_ir::MulInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::DIV:
+        case Opcode::DIV_INSTRUCTION:
             ir_expr = new libcasm_ir::DivInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::RAT_DIV:
+        case Opcode::RIV_INSTRUCTION:
             ir_expr = new libcasm_ir::RivInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::MOD:
+        case Opcode::MOD_INSTRUCTION:
             ir_expr = new libcasm_ir::ModInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::EQ:
+        case Opcode::EQU_INSTRUCTION:
             ir_expr = new libcasm_ir::EquInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::NEQ:
+        case Opcode::NEQ_INSTRUCTION:
             ir_expr = new libcasm_ir::NeqInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::LESSER:
+        case Opcode::LTH_INSTRUCTION:
             ir_expr = new libcasm_ir::LthInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::LESSEREQ:
+        case Opcode::LEQ_INSTRUCTION:
             ir_expr = new libcasm_ir::LeqInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::GREATER:
+        case Opcode::GTH_INSTRUCTION:
             ir_expr = new libcasm_ir::GthInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::GREATEREQ:
+        case Opcode::GEQ_INSTRUCTION:
             ir_expr = new libcasm_ir::GeqInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::OR:
+        case Opcode::OR_INSTRUCTION:
             ir_expr = new libcasm_ir::OrInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::XOR:
+        case Opcode::XOR_INSTRUCTION:
             ir_expr = new libcasm_ir::XorInstruction( ir_lhs, ir_rhs );
             break;
-        case Operation::AND:
+        case Opcode::AND_INSTRUCTION:
             ir_expr = new libcasm_ir::AndInstruction( ir_lhs, ir_rhs );
             break;
+        default:
+            assert( !"internal error" ); // PPA: FIXME: with better verbose info
+                                         // etc.
     }
 
     assert( ir_expr );
@@ -909,14 +915,17 @@ bool libcasm_fe::AstToCasmIRPass::visit_expression_single(
     libcasm_ir::Value* ir_lhs = lookup< libcasm_ir::Value >( node->expr_ );
     assert( ir_lhs );
 
-    using Operation = UnaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
     libcasm_ir::Value* ir_expr = 0;
     switch( node->op )
     {
-        case Operation::NOT:
+        case Opcode::NOT_INSTRUCTION:
             ir_expr = new libcasm_ir::NotInstruction( ir_lhs );
             break;
+        default:
+            assert( !"internal error" ); // PPA: FIXME: with better verbose info
+                                         // etc.
     }
 
     assert( ir_expr );

@@ -40,7 +40,7 @@ symbol_t::symbol_t( uint32_t id, symbolic_condition_t* cond )
 }
 
 symbolic_condition_t::symbolic_condition_t(
-    value_t* lhs, value_t* rhs, BinaryExpression::Operation op )
+    value_t* lhs, value_t* rhs, libcasm_ir::Value::ID op )
 : lhs( lhs )
 , rhs( rhs )
 , op( op )
@@ -49,21 +49,21 @@ symbolic_condition_t::symbolic_condition_t(
 
 std::string symbolic_condition_t::to_str() const
 {
-    using Operation = BinaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
     switch( op )
     {
-        case Operation::EQ:
+        case Opcode::EQU_INSTRUCTION:
             return lhs->to_str() + "=" + rhs->to_str();
-        case Operation::NEQ:
+        case Opcode::NEQ_INSTRUCTION:
             return lhs->to_str() + "!=" + rhs->to_str();
-        case Operation::LESSEREQ:
+        case Opcode::LEQ_INSTRUCTION:
             return "$lesseq(" + lhs->to_str() + ", " + rhs->to_str() + ")";
-        case Operation::LESSER:
+        case Opcode::LTH_INSTRUCTION:
             return "$less(" + lhs->to_str() + ", " + rhs->to_str() + ")";
-        case Operation::GREATER:
+        case Opcode::GTH_INSTRUCTION:
             return "$greater(" + lhs->to_str() + ", " + rhs->to_str() + ")";
-        case Operation::GREATEREQ:
+        case Opcode::GEQ_INSTRUCTION:
             return "$greatereq(" + lhs->to_str() + ", " + rhs->to_str() + ")";
         default:
             FAILURE();

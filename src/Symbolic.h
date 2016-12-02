@@ -48,10 +48,11 @@ struct symbolic_condition_t
 {
     value_t* lhs;
     value_t* rhs;
-    BinaryExpression::Operation op;
+
+    libcasm_ir::Value::ID op;
 
     symbolic_condition_t(
-        value_t* lhs, value_t* rhs, BinaryExpression::Operation op );
+        value_t* lhs, value_t* rhs, libcasm_ir::Value::ID op );
     std::string to_str() const;
 };
 

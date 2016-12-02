@@ -44,6 +44,8 @@
     #include "src/Types.h"
     #include "src/Codes.h"
     class Driver;
+
+    #include "libcasm-ir.h"
 }
 
 // The parsing context.
@@ -762,7 +764,7 @@ ATOM
 | MINUS LPAREN EXPRESSION RPAREN %prec UMINUS
   {
       $$ = new BinaryExpression( @$, new ZeroAtom( @$, $3 ), $3,
-                                 BinaryExpression::Operation::SUB );
+                                 libcasm_ir::Value::SUB_INSTRUCTION );
   }
 ;
 
@@ -947,67 +949,67 @@ EXPRESSION_LIST_NO_COMMA
 EXPRESSION
 : EXPRESSION PLUS EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::ADD );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
   }
 | EXPRESSION MINUS EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::SUB );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::SUB_INSTRUCTION );
   }
 | EXPRESSION STAR EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::MUL );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::MUL_INSTRUCTION );
   }
 | EXPRESSION SLASH EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::DIV );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
   }
 | EXPRESSION PERCENT EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::MOD );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
   }
 | EXPRESSION RATIONAL_DIV EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::RAT_DIV );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::RIV_INSTRUCTION );
   }
 | EXPRESSION NEQUAL EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::NEQ );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
   }
 | EXPRESSION EQUAL EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::EQ );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::EQU_INSTRUCTION );
   }
 | EXPRESSION LESSER EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::LESSER );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::LTH_INSTRUCTION );
   }
 | EXPRESSION GREATER EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::GREATER );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::GTH_INSTRUCTION );
   }
 | EXPRESSION LESSEQ EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::LESSEREQ );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
   }
 | EXPRESSION GREATEREQ EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::GREATEREQ );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
   }
 | EXPRESSION OR EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::OR );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::OR_INSTRUCTION );
   }
 | EXPRESSION XOR EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::XOR );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::XOR_INSTRUCTION );
   }
 | EXPRESSION AND EXPRESSION
   {
-      $$ = new BinaryExpression( @$, $1, $3, BinaryExpression::Operation::AND );
+      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
   }
 | NOT EXPRESSION
   {
-      $$ = new UnaryExpression( @$, $2, UnaryExpression::Operation::NOT );
+      $$ = new UnaryExpression( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
   }
 | ATOM
   {

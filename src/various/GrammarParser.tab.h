@@ -53,7 +53,9 @@
     #include "src/Codes.h"
     class Driver;
 
-#line 57 "GrammarParser.tab.h" // lalr1.cc:377
+    #include "libcasm-ir.h"
+
+#line 59 "GrammarParser.tab.h" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -130,7 +132,7 @@
 
 
 namespace yy {
-#line 134 "GrammarParser.tab.h" // lalr1.cc:377
+#line 136 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
@@ -2997,7 +2999,7 @@ namespace yy {
 
 
 } // yy
-#line 3001 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3003 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

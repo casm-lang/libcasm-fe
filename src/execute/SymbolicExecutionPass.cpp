@@ -360,10 +360,10 @@ namespace symbolic
         trace.push_back( ss.str() );
     }
 
-    constexpr inline uint16_t operator,( const BinaryExpression::Operation lhs,
-        const BinaryExpression::Operation rhs ) noexcept
+    constexpr inline uint16_t operator,( const libcasm_ir::Value::ID lhs,
+        const libcasm_ir::Value::ID rhs ) noexcept
     {
-        static_assert( sizeof( BinaryExpression::Operation ) == 1,
+        static_assert( sizeof( libcasm_ir::Value::ID ) == 1,
             "uint8_t | (uint8_t << 8) == uint16_t" );
         return ( static_cast< uint16_t >( lhs ) << 8 )
                | static_cast< uint16_t >( rhs );
@@ -372,58 +372,58 @@ namespace symbolic
     static check_status_t check_inclusion(
         const symbolic_condition_t& known, const symbolic_condition_t& check )
     {
-        using Operation = BinaryExpression::Operation;
+        using Opcode = libcasm_ir::Value::ID;
 
         switch( check.op, known.op )
         {
-            case( Operation::EQ, Operation::EQ ):
+            case( Opcode::EQU_INSTRUCTION, Opcode::EQU_INSTRUCTION ):
                 return ( *known.rhs == *check.rhs ) ? check_status_t::TRUE
                                                     : check_status_t::FALSE;
-            case( Operation::EQ, Operation::NEQ ):
+            case( Opcode::EQU_INSTRUCTION, Opcode::NEQ_INSTRUCTION ):
                 return ( *known.rhs == *check.rhs ) ? check_status_t::FALSE
                                                     : check_status_t::NOT_FOUND;
-            case( Operation::NEQ, Operation::NEQ ):
+            case( Opcode::NEQ_INSTRUCTION, Opcode::NEQ_INSTRUCTION ):
                 return ( *known.rhs == *check.rhs ) ? check_status_t::TRUE
                                                     : check_status_t::NOT_FOUND;
-            case( Operation::NEQ, Operation::EQ ):
+            case( Opcode::NEQ_INSTRUCTION, Opcode::EQU_INSTRUCTION ):
                 return ( *known.rhs == *check.rhs ) ? check_status_t::FALSE
                                                     : check_status_t::TRUE;
-            case( Operation::LESSEREQ, Operation::EQ ):
+            case( Opcode::LEQ_INSTRUCTION, Opcode::EQU_INSTRUCTION ):
             {
                 const value_t res
                     = operators::lessereq( *known.rhs, *check.rhs );
                 return res.value.boolean ? check_status_t::TRUE
                                          : check_status_t::FALSE;
             }
-            case( Operation::LESSEREQ, Operation::LESSEREQ ):
+            case( Opcode::LEQ_INSTRUCTION, Opcode::LEQ_INSTRUCTION ):
             {
                 const value_t res
                     = operators::lessereq( *check.rhs, *known.rhs );
                 return res.value.boolean ? check_status_t::TRUE
                                          : check_status_t::NOT_FOUND;
             }
-            case( Operation::LESSEREQ, Operation::GREATER ):
+            case( Opcode::LEQ_INSTRUCTION, Opcode::GTH_INSTRUCTION ):
             {
                 const value_t res
                     = operators::lessereq( *check.rhs, *known.rhs );
                 return res.value.boolean ? check_status_t::FALSE
                                          : check_status_t::NOT_FOUND;
             }
-            case( Operation::GREATER, Operation::EQ ):
+            case( Opcode::GTH_INSTRUCTION, Opcode::EQU_INSTRUCTION ):
             {
                 const value_t res
                     = operators::greater( *known.rhs, *check.rhs );
                 return res.value.boolean ? check_status_t::TRUE
                                          : check_status_t::FALSE;
             }
-            case( Operation::GREATER, Operation::LESSEREQ ):
+            case( Opcode::GTH_INSTRUCTION, Opcode::LEQ_INSTRUCTION ):
             {
                 const value_t res
                     = operators::greater( *check.rhs, *known.rhs );
                 return res.value.boolean ? check_status_t::FALSE
                                          : check_status_t::NOT_FOUND;
             }
-            case( Operation::GREATER, Operation::GREATER ):
+            case( Opcode::GTH_INSTRUCTION, Opcode::GTH_INSTRUCTION ):
             {
                 const value_t res
                     = operators::greater( *check.rhs, *known.rhs );
@@ -614,23 +614,23 @@ void SymbolicExecutionPass::visit_pop( PopNode* node, const value_t& val )
 value_t SymbolicExecutionPass::visit_expression(
     BinaryExpression* expr, const value_t& left_val, const value_t& right_val )
 {
-    using Operation = BinaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
     switch( expr->op )
     {
-        case Operation::ADD:
+        case Opcode::ADD_INSTRUCTION:
             WRAP_NUMERICAL_OPERATION( operator+, left_val, right_val)
-        case Operation::SUB:
+        case Opcode::SUB_INSTRUCTION:
             WRAP_NUMERICAL_OPERATION( operator-, left_val, right_val)
-        case Operation::MUL:
+        case Opcode::MUL_INSTRUCTION:
             WRAP_NUMERICAL_OPERATION( operator*, left_val, right_val)
-        case Operation::DIV:
+        case Opcode::DIV_INSTRUCTION:
             WRAP_NUMERICAL_OPERATION( operator/, left_val, right_val)
-        case Operation::MOD:
+        case Opcode::MOD_INSTRUCTION:
             WRAP_NUMERICAL_OPERATION( operator%, left_val, right_val)
-        case Operation::RAT_DIV:
+        case Opcode::RIV_INSTRUCTION:
             WRAP_NUMERICAL_OPERATION( rat_div, left_val, right_val );
-        case Operation::EQ:
+        case Opcode::EQU_INSTRUCTION:
             if( left_val.is_symbolic() and right_val.is_symbolic()
                 and ( left_val == right_val ) )
             {
@@ -644,7 +644,7 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return value_t( left_val == right_val );
             }
-        case Operation::NEQ:
+        case Opcode::NEQ_INSTRUCTION:
             if( left_val.is_symbolic() and right_val.is_symbolic()
                 and ( left_val == right_val ) )
             {
@@ -658,7 +658,7 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return value_t( left_val != right_val );
             }
-        case Operation::AND:
+        case Opcode::AND_INSTRUCTION:
             if( left_val.is_symbolic() )
             {
                 if( right_val.is_undef() or right_val.is_symbolic()
@@ -689,7 +689,7 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return left_val and right_val;
             }
-        case Operation::OR:
+        case Opcode::OR_INSTRUCTION:
             if( left_val.is_symbolic() )
             {
                 if( right_val.is_undef() or right_val.is_symbolic()
@@ -720,7 +720,7 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return left_val or right_val;
             }
-        case Operation::XOR:
+        case Opcode::XOR_INSTRUCTION:
             if( left_val.is_symbolic() or right_val.is_symbolic() )
             {
                 return value_t( new symbol_t( symbolic::next_symbol_id() ) );
@@ -729,21 +729,24 @@ value_t SymbolicExecutionPass::visit_expression(
             {
                 return left_val ^ right_val;
             }
-        case Operation::LESSER:
+        case Opcode::LTH_INSTRUCTION:
             return operators::lesser( left_val, right_val );
-        case Operation::GREATER:
+        case Opcode::GTH_INSTRUCTION:
             return operators::greater( left_val, right_val );
-        case Operation::LESSEREQ:
+        case Opcode::LEQ_INSTRUCTION:
             return operators::lessereq( left_val, right_val );
-        case Operation::GREATEREQ:
+        case Opcode::GEQ_INSTRUCTION:
             return operators::greatereq( left_val, right_val );
+        default:
+            assert( !"internal error" ); // PPA: FIXME: with better verbose info
+                                         // etc.
     }
 }
 
 value_t SymbolicExecutionPass::visit_expression_single(
     UnaryExpression* expr, const value_t& val )
 {
-    using Operation = UnaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
     if( val.is_undef() )
     {
@@ -756,8 +759,11 @@ value_t SymbolicExecutionPass::visit_expression_single(
 
     switch( expr->op )
     {
-        case Operation::NOT:
+        case Opcode::NOT_INSTRUCTION:
             return value_t( not val.value.boolean );
+        default:
+            assert( !"internal error" ); // PPA: FIXME: with better verbose info
+                                         // etc.
     }
 }
 
@@ -1015,24 +1021,24 @@ void SymbolicExecutionPass::dumpUpdates()
     }
 }
 
-static BinaryExpression::Operation invert( BinaryExpression::Operation op )
+static libcasm_ir::Value::ID invert( libcasm_ir::Value::ID op )
 {
-    using Operation = BinaryExpression::Operation;
+    using Opcode = libcasm_ir::Value::ID;
 
     switch( op )
     {
-        case Operation::EQ:
-            return Operation::NEQ;
-        case Operation::NEQ:
-            return Operation::EQ;
-        case Operation::LESSEREQ:
-            return Operation::GREATER;
-        case Operation::LESSER:
-            return Operation::GREATEREQ;
-        case Operation::GREATER:
-            return Operation::LESSEREQ;
-        case Operation::GREATEREQ:
-            return Operation::LESSER;
+        case Opcode::EQU_INSTRUCTION:
+            return Opcode::NEQ_INSTRUCTION;
+        case Opcode::NEQ_INSTRUCTION:
+            return Opcode::EQU_INSTRUCTION;
+        case Opcode::LEQ_INSTRUCTION:
+            return Opcode::GTH_INSTRUCTION;
+        case Opcode::LTH_INSTRUCTION:
+            return Opcode::GEQ_INSTRUCTION;
+        case Opcode::GTH_INSTRUCTION:
+            return Opcode::LEQ_INSTRUCTION;
+        case Opcode::GEQ_INSTRUCTION:
+            return Opcode::LTH_INSTRUCTION;
         default:
             throw RuntimeException( "Invert not implemented for operation" );
     }
@@ -1054,7 +1060,7 @@ void SymbolicExecutionWalker::walk_ifthenelse( IfThenElseNode* node )
         {
             sym_cond = new symbolic_condition_t( new value_t( cond ),
                 new value_t( (INTEGER_T)1 ),
-                BinaryExpression::Operation::EQ );
+                libcasm_ir::Value::EQU_INSTRUCTION );
         }
 
         switch( symbolic::check_condition( visitor.path_conditions, sym_cond ) )
@@ -1117,7 +1123,7 @@ void SymbolicExecutionWalker::walk_ifthenelse( IfThenElseNode* node )
                     delete sym_cond;
                     sym_cond = new symbolic_condition_t( new value_t( cond ),
                         new value_t( (INTEGER_T)0 ),
-                        BinaryExpression::Operation::EQ );
+                        libcasm_ir::Value::EQU_INSTRUCTION );
                 }
                 visitor.path_name += "E";
                 symbolic::dump_if( visitor.trace, global_driver->get_filename(),
@@ -1171,7 +1177,7 @@ void SymbolicExecutionWalker::walk_case( CaseNode* node )
         {
             const value_t c = walk_atom( pair.first );
             sym_cond = new symbolic_condition_t( new value_t( cond ),
-                new value_t( c ), BinaryExpression::Operation::EQ );
+                new value_t( c ), libcasm_ir::Value::EQU_INSTRUCTION );
 
             switch(
                 symbolic::check_condition( visitor.path_conditions, sym_cond ) )
