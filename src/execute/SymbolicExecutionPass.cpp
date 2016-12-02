@@ -740,6 +740,7 @@ value_t SymbolicExecutionPass::visit_expression(
         default:
             assert( !"internal error" ); // PPA: FIXME: with better verbose info
                                          // etc.
+            return value_t();
     }
 }
 
@@ -764,6 +765,7 @@ value_t SymbolicExecutionPass::visit_expression_single(
         default:
             assert( !"internal error" ); // PPA: FIXME: with better verbose info
                                          // etc.
+            return value_t();
     }
 }
 

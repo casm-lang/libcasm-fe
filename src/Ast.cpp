@@ -613,6 +613,7 @@ std::string operator_to_str( libcasm_ir::Value::ID op )
         default:
             assert( !"internal error" ); // PPA: FIXME: with better verbose info
                                          // etc.
+            return "";
     }
 }
 
