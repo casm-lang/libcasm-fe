@@ -40,12 +40,12 @@ static libpass::PassRegistration< SourceToAstPass > PASS( "Source To AST Pass",
 
 bool SourceToAstPass::run( libpass::PassResult& pr )
 {
-    const char* file_name = (const char*)pr.getResults()[ 0 ];
+    const char* file_name = (const char*)pr.getResult< libpass::LoadFilePass >();
 
     global_driver = new Driver;
-
+    
     Ast* node = global_driver->parse( file_name );
-
+    
     if( !node )
     {
         // TODO: FIXME: PPA: better error messages,
@@ -55,7 +55,7 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
 
         return false;
     }
-
+    
     assert( node->getElements() );
     for( auto e : node->getElements()->nodes )
     {
