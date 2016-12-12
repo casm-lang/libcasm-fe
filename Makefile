@@ -121,7 +121,7 @@ config:
 ../stdhl/libstdhlcpp.a: ../stdhl
 	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
-../pass/libpass.a: ../casm-ir
+../pass/libpass.a: ../pass
 	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
 ../casm-ir/libcasm-ir.a: ../casm-ir
