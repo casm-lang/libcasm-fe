@@ -45,6 +45,8 @@ namespace libcasm_fe
       public:
         static char id;
 
+        ~NumericExecutionPass() override;
+
         bool run( libpass::PassResult& pr ) override;
 
         void visit_assure( UnaryNode* assure, const value_t& val ) override;

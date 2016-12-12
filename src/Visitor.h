@@ -591,6 +591,8 @@ template < class T, class U = const T& >
 class BaseVisitor
 {
   public:
+    virtual ~BaseVisitor() = default;
+
     virtual void visit_specification( SpecificationNode* )
     {
     }

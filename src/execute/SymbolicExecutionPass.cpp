@@ -51,6 +51,11 @@ static libpass::PassRegistration< SymbolicExecutionPass > PASS(
     "execute symbolically over the AST input specification", "ast-exec-sym",
     0 );
 
+SymbolicExecutionPass::~SymbolicExecutionPass()
+{
+    delete walker;
+}
+
 bool SymbolicExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new SymbolicExecutionWalker( *this );

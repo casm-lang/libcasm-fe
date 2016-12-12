@@ -48,6 +48,11 @@ static libpass::PassRegistration< NumericExecutionPass > PASS(
     "Numeric Execution Pass",
     "execute numerically over the AST input specification", "ast-exec-num", 0 );
 
+NumericExecutionPass::~NumericExecutionPass()
+{
+    delete walker;
+}
+
 bool NumericExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new NumericExecutionWalker( *this );
