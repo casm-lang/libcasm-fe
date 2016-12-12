@@ -51,7 +51,9 @@ CI += -I ../stdhl
 CI += -I ../pass
 CI += -I ../casm-ir
 
-CL  = ../casm-ir/libcasm-ir.a
+CL += ../stdhl/libstdhlcpp.a
+CL += ../pass/libpass.a
+CL += ../casm-ir/libcasm-ir.a
 
 LX  = flex
 YC  = bison
@@ -114,6 +116,13 @@ config: CFG=CC="$(CC)" CF="$(CF)"
 config:
 	@echo "CFG  $(CFG)"
 
+
+
+../stdhl/libstdhlcpp.a: ../stdhl
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
+
+../pass/libpass.a: ../casm-ir
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
 ../casm-ir/libcasm-ir.a: ../casm-ir
 	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
@@ -198,8 +207,7 @@ $(TEST_TARGET): $(TO) $(CO) $(CL) $(TARGET)
 	  $(TL) \
 	  -o $@ \
 	  $(TO) \
-	  $(CL) \
-	  $(TARGET) \
+	  -Wl,--whole-archive $(CL) $(TARGET) -Wl,--no-whole-archive \
 	  ../gtest/googletest/src/gtest-all.cc \
 	  ../gtest/googletest/src/gtest_main.cc 
 	@echo "RUN " $@
