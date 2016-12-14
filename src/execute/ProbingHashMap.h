@@ -122,7 +122,6 @@ class ProbingHashMap final : public HashMapBase< Details >
         {
             return nullptr;
         }
-
         const auto capacity = HashMap::m_capacity;
         const auto initialIndex = HashingStrategy::hash( hashCode, capacity );
 
@@ -181,15 +180,14 @@ class ProbingHashMap final : public HashMapBase< Details >
 
         if( oldBuckets )
         {
-            const auto firstOldBucket = oldBuckets;
-            const auto lastOldBucket = oldBuckets + oldCapacity;
+            const auto firstBucket = oldBuckets;
+            const auto lastBucket = oldBuckets + oldCapacity;
 
-            for( auto oldBucket = firstOldBucket; oldBucket != lastOldBucket;
-                 ++oldBucket )
+            for( auto bucket = firstBucket; bucket != lastBucket; ++bucket )
             {
-                if( not oldBucket->empty() )
+                if( not bucket->empty() )
                 {
-                    insertEntry( oldBucket->entry, oldBucket->hashCode );
+                    insertEntry( bucket->entry, bucket->hashCode );
                 }
             }
 

@@ -585,6 +585,15 @@ class HashMapBase
         return const_iterator( nullptr );
     }
 
+    /**
+     * Inserts the \a value with the \a key into the hash map only if the key is
+     * not already part of the hash map.
+     *
+     * @return A pair with an iterator pointing to the newly inserted or
+     * existing
+     *         entry and a boolean value indicating if the insertion was
+     *         successful (true) or not (false)
+     */
     std::pair< const_iterator, bool > insert(
         const Key& key, const Value& value )
     {
@@ -604,6 +613,10 @@ class HashMapBase
         }
     }
 
+    /**
+     * Inserts the \a value with the \a key into the hash map if the key is not
+     * already part of the hash map, otherwise it overwrites the existing value.
+     */
     void insertOrAssign( const Key& key, const Value& value )
     {
         growIfNecessary();
@@ -621,6 +634,11 @@ class HashMapBase
         }
     }
 
+    /**
+     * Retrieves the value for the \a key.
+     *
+     * @throws std::out_of_range if no entry with a \a key could be found
+     */
     const Value& get( const Key& key ) const
     {
         const auto hashCode = hashCodeOf( key );
@@ -666,14 +684,44 @@ class HashMapBase
     }
 
   protected:
+    /**
+     * Searches for an entry with the given \a key.
+     *
+     * @pre m_buckets may be invalid (nullptr) if no entry has been inserted
+     *
+     * @param key The key of the requested entry
+     * @param hashCode The hash code of the \a key
+     *
+     * @return The entry for the given key or nullptr if no entry could be found
+     */
     virtual Entry* searchEntry(
         const Key& key, const std::size_t hashCode ) const noexcept
         = 0;
 
+    /**
+     * Inserts the \a entry into the hash map.
+     *
+     * @pre m_buckets is valid (!= nullptr) and the current size of the hash map
+     *      is smaller than its capacity
+     * @post The \a entry is part of the hash map
+     *
+     * @param entry A valid entry
+     * @param hashCode The hash code of the key of the \a entry
+     */
     virtual void insertEntry( Entry* entry, std::size_t hashCode ) const
         noexcept
         = 0;
 
+    /**
+     * Resizes the hash map to a size of \a newCapacity, all old entries will be
+     * preserved.
+     *
+     * @pre m_buckets may be invalid (nullptr) on initial resize
+     * @post m_buckets is valid (!= nullptr) and has a size of \a newCapacity
+     *       and m_capacity is equal to \a newCapacity
+     *
+     * @param newCapacity The capacity of the hash map after the resize
+     */
     virtual void resize( std::size_t newCapacity ) = 0;
 
   private:
@@ -683,6 +731,14 @@ class HashMapBase
         return hasher( key );
     }
 
+    /**
+     * Creates a new entry with the given \a key and \a value pair.
+     *
+     * All entries are linked together using a single-linked list to optimize
+     * the iterating performance in sparse hash map scenarios.
+     *
+     * @return An entry containing the given key-value pair
+     */
     Entry* createEntry( const Key& key, const Value& value )
     {
         const auto memory = m_entryAllocator.allocate( sizeof( Entry ) );
@@ -699,27 +755,35 @@ class HashMapBase
         return size >= ( m_capacity * maximumLoadFactor() );
     }
 
+    /**
+     * Resizes the hash map if it has not enough capacity to store additional
+     * entries, i.e. if the size exceeds the maximum load.
+     *
+     * @post m_buckets is valid (!= nullptr) and the current size of the hash
+     *       map is smaller than its capacity
+     */
     void growIfNecessary()
     {
-        if( m_buckets == nullptr )
+        if( m_buckets == nullptr ) // initial resize
         {
-            resize(
-                HashingStrategy::initialSize( m_capacity ) ); // initial resize
+            resize( HashingStrategy::initialSize( m_capacity ) );
         }
         else if( needsResizing( m_size ) )
         {
             resize( HashingStrategy::nextSize( m_capacity ) );
         }
         assert( m_size < m_capacity );
+        assert( m_buckets != nullptr );
     }
 
   protected:
-    Bucket* m_buckets;
+    Bucket* m_buckets; /**< Array of buckets */
 
-    std::size_t m_size;
-    std::size_t m_capacity;
+    std::size_t m_size;     /**< The current size of the hash map */
+    std::size_t m_capacity; /**< The capacity of the hash map */
 
-    Entry* m_lastEntry;
+    Entry*
+        m_lastEntry; /**< Used to build a single-linked list in createEntry() */
 
   private:
     BlockAllocator< 4096 > m_entryAllocator;
