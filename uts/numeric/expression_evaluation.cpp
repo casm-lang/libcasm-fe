@@ -106,12 +106,12 @@ struct UnaryOpArgs
     bool checkReturnValue;
 };
 
-class Numeric_UnaryExpressionTest
+class numeric_una_expr_test
     : public TestWithParam< std::tuple< libcasm_ir::Value::ID, UnaryOpArgs > >
 {
 };
 
-TEST_P( Numeric_UnaryExpressionTest, testUnaryExpressionResultTypeType )
+TEST_P( numeric_una_expr_test, result_type )
 {
     const auto row = GetParam();
 
@@ -142,12 +142,12 @@ struct BinaryOpArgs
     bool checkReturnValue;
 };
 
-class Numeric_BinaryExpressionTest
+class numeric_bin_expr_test
     : public TestWithParam< std::tuple< libcasm_ir::Value::ID, BinaryOpArgs > >
 {
 };
 
-TEST_P( Numeric_BinaryExpressionTest, testBinaryExpressionResultTypeType )
+TEST_P( numeric_bin_expr_test, result_type )
 {
     const auto row = GetParam();
 
@@ -186,15 +186,15 @@ static BinaryOpArgss generateNumeric_BinaryExpressionTestCases(
     return binOpTypeTypes;
 }
 
-INSTANTIATE_TEST_CASE_P( Numeric_UnaryOperations, Numeric_UnaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_una_op, numeric_una_expr_test,
     Combine( Values( libcasm_ir::Value::NOT_INSTRUCTION ),
         Values( UnaryOpArgs{ make_value( TypeType::UNDEF ),
                     yields( make_value( TypeType::UNDEF ) ) },
             UnaryOpArgs{ make_value( TypeType::BOOLEAN ),
                 yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_LogicalOperations_Xor,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_log_op_xor,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::XOR_INSTRUCTION ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
@@ -209,8 +209,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_LogicalOperations_Xor,
                 make_value( TypeType::BOOLEAN ),
                 yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_LogicalOperations_And,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_log_op_and,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::AND_INSTRUCTION ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
@@ -231,8 +231,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_LogicalOperations_And,
                 make_value( TypeType::BOOLEAN ),
                 yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_LogicalOperations_Or,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_log_op_or,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::OR_INSTRUCTION ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),
@@ -253,8 +253,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_LogicalOperations_Or,
                 make_value( TypeType::BOOLEAN ),
                 yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_CompareOperations_LesserGreater,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_lth_gth,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::LTH_INSTRUCTION,
                  libcasm_ir::Value::GTH_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
@@ -276,8 +276,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_CompareOperations_LesserGreater,
                         yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_CompareOperations_LesserEqGreaterEq,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_leq_geq,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::LEQ_INSTRUCTION,
                  libcasm_ir::Value::GEQ_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
@@ -299,8 +299,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_CompareOperations_LesserEqGreaterEq,
                         yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_CompareOperations_Eq,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_equ,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::EQU_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
@@ -325,8 +325,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_CompareOperations_Eq,
                         yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_CompareOperations_Neq,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_neq,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::NEQ_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
@@ -349,8 +349,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_CompareOperations_Neq,
                         yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_ArithmeticOperations_Add,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_arith_op_add,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::ADD_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
@@ -371,8 +371,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_ArithmeticOperations_Add,
                         yields( make_value( number ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_ArithmeticOperations_SubMulDiv,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_arith_op_sub_mul_div,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::SUB_INSTRUCTION,
                  libcasm_ir::Value::MUL_INSTRUCTION,
                  libcasm_ir::Value::DIV_INSTRUCTION ),
@@ -394,8 +394,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_ArithmeticOperations_SubMulDiv,
                         yields( make_value( number ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_ArithmeticOperations_Mod,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_arith_op_mod,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::MOD_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
@@ -415,8 +415,8 @@ INSTANTIATE_TEST_CASE_P( Numeric_ArithmeticOperations_Mod,
                         yields( make_value( number ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( Numeric_ArithmeticOperations_RatDiv,
-    Numeric_BinaryExpressionTest,
+INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_arith_op_riv,
+    numeric_bin_expr_test,
     Combine( Values( libcasm_ir::Value::RIV_INSTRUCTION ),
         Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
                     make_value( TypeType::UNDEF ),

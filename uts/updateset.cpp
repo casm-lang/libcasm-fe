@@ -34,8 +34,7 @@ static value_t make_integer_value( INTEGER_T v )
     return value_t( v );
 }
 
-TEST( UpdateSetTest,
-    forkedParallelUpdateSetShouldBeSequentialWhenRequestingSequential )
+TEST( libcasm_fe__updateset, forkedParUSetShouldBeSeqWhenRequestingSeq )
 {
     const auto updateSet
         = std::unique_ptr< UpdateSet >( new ParallelUpdateSet( 10UL ) );
@@ -44,8 +43,7 @@ TEST( UpdateSetTest,
     EXPECT_EQ( UpdateSet::Type::Sequential, forkedUpdateSet->type() );
 }
 
-TEST( UpdateSetTest,
-    forkedParallelUpdateSetShouldBeParallelWhenRequestingParallel )
+TEST( libcasm_fe__updateset, forkedParUSetShouldBeParWhenRequestingPar )
 {
     const auto updateSet
         = std::unique_ptr< UpdateSet >( new ParallelUpdateSet( 10UL ) );
@@ -54,8 +52,7 @@ TEST( UpdateSetTest,
     EXPECT_EQ( UpdateSet::Type::Parallel, forkedUpdateSet->type() );
 }
 
-TEST( UpdateSetTest,
-    forkedSequentialUpdateSetShouldBeParallelWhenRequestingParallel )
+TEST( libcasm_fe__updateset, forkedSeqUSetShouldBeParWhenRequestingPar )
 {
     const auto updateSet
         = std::unique_ptr< UpdateSet >( new SequentialUpdateSet( 10UL ) );
@@ -64,8 +61,7 @@ TEST( UpdateSetTest,
     EXPECT_EQ( UpdateSet::Type::Parallel, forkedUpdateSet->type() );
 }
 
-TEST( UpdateSetTest,
-    forkedSequentialUpdateSetShouldBeSequentialWhenRequestingSequential )
+TEST( libcasm_fe__updateset, forkedSeqUSetShouldBeSeqWhenRequestingSeq )
 {
     const auto updateSet
         = std::unique_ptr< UpdateSet >( new SequentialUpdateSet( 10UL ) );
@@ -74,8 +70,7 @@ TEST( UpdateSetTest,
     EXPECT_EQ( UpdateSet::Type::Sequential, forkedUpdateSet->type() );
 }
 
-TEST( UpdateSetTest,
-    mergingParallelUpdateSetsIntoSequentialOnesShouldOverrideLocationValues )
+TEST( libcasm_fe__updateset, mergeParUSetsIntoSeqShouldOverrideLocationValues )
 {
     const value_t location;
 
@@ -95,7 +90,7 @@ TEST( UpdateSetTest,
         make_integer_value( 1000 ), seqUpdateSet->lookup( &location )->value );
 }
 
-TEST( UpdateSetTest, mergingUpdateSetsIntoEmptyUpdateSetsShouldSwapValues )
+TEST( libcasm_fe__updateset, mergeUSetsIntoEmptyUSetsShouldSwapValues )
 {
     const value_t location1, location2, location3;
 
@@ -120,8 +115,8 @@ TEST( UpdateSetTest, mergingUpdateSetsIntoEmptyUpdateSetsShouldSwapValues )
     EXPECT_EQ( 3, seqUpdateSet->size() );
 }
 
-TEST( UpdateSetTest,
-    mergingSequentialUpdateSetsIntoParallelOnesShouldNotThrowWhenOverridingLocationValuesWithSameValues )
+TEST( libcasm_fe__updateset,
+    mergeSeqUSetsIntoParShouldNotThrowWhenOrideLocValWithSameVal )
 {
     const value_t location;
 
@@ -138,8 +133,8 @@ TEST( UpdateSetTest,
     EXPECT_NO_THROW( seqUpdateSet->merge() );
 }
 
-TEST( UpdateSetTest,
-    mergingSequentialUpdateSetsIntoParallelOnesShouldThrowWhenOverridingLocationValuesWithDifferentValues )
+TEST( libcasm_fe__updateset,
+    mergeSeqUSetsIntoParShouldThrowWhenOrideLocValWithDiffVal )
 {
     const value_t location;
 
@@ -156,7 +151,7 @@ TEST( UpdateSetTest,
     EXPECT_THROW( seqUpdateSet->merge(), UpdateSet::Conflict );
 }
 
-TEST( UpdateSetTest, lookupShouldPreferUpdatesOfCurrentUpdateSet )
+TEST( libcasm_fe__updateset, lookupShouldPreferUpdatesOfCurrentUpdateSet )
 {
     const value_t location;
 
@@ -177,7 +172,7 @@ TEST( UpdateSetTest, lookupShouldPreferUpdatesOfCurrentUpdateSet )
         make_integer_value( 2 ), seqUpdateSet2->lookup( &location )->value );
 }
 
-TEST( UpdateSetTest, lookupShouldConsiderAllSequentialParentUpdateSets )
+TEST( libcasm_fe__updateset, lookupShouldConsiderAllSequentialParentUpdateSets )
 {
     const value_t location;
 
@@ -206,7 +201,7 @@ TEST( UpdateSetTest, lookupShouldConsiderAllSequentialParentUpdateSets )
         make_integer_value( 2 ), seqUpdateSet3->lookup( &location )->value );
 }
 
-TEST( UpdateSetTest, lookupShouldReturnNullptrWhenUpdateDoesNotExist )
+TEST( libcasm_fe__updateset, lookupShouldReturnNullptrWhenUpdateDoesNotExist )
 {
     const value_t location;
 
@@ -216,8 +211,8 @@ TEST( UpdateSetTest, lookupShouldReturnNullptrWhenUpdateDoesNotExist )
     EXPECT_EQ( nullptr, seqUpdateSet->lookup( &location ) );
 }
 
-TEST( UpdateSetTest,
-    parallelUpdateSetsShouldThrowIfAddingUpdatesWithSameKeyButDifferentValues )
+TEST( libcasm_fe__updateset,
+    parUSetsShouldThrowIfAddUpdatesWithSameKeyButDiffVal )
 {
     const value_t location;
 
@@ -230,8 +225,8 @@ TEST( UpdateSetTest,
         UpdateSet::Conflict );
 }
 
-TEST( UpdateSetTest,
-    sequentialUpdateSetsShouldOverrideOldUpdatesIfAddingUpdatesWithSameKeyButDifferentValues )
+TEST( libcasm_fe__updateset,
+    seqUSetsShouldOrideOldUpdatesIfAddUpdatesWithEqKeyButDiffVal )
 {
     const value_t location;
 
@@ -242,45 +237,4 @@ TEST( UpdateSetTest,
         &location, new Update{.value = make_integer_value( 2 ) } ) );
 
     EXPECT_EQ( make_integer_value( 2 ), updateSet->lookup( &location )->value );
-}
-
-TEST( UpdateSetManagerTest, lookupShouldReturnNullptrWhenNoUpdateSetExists )
-{
-    const value_t location;
-
-    auto manager
-        = std::unique_ptr< UpdateSetManager >( new UpdateSetManager() );
-
-    EXPECT_EQ( nullptr, manager->lookup( &location ) );
-}
-
-TEST( UpdateSetManagerTest, forkAndMerge )
-{
-    const value_t location1, location2, location3, location4;
-
-    auto manager
-        = std::unique_ptr< UpdateSetManager >( new UpdateSetManager() );
-
-    manager->fork( UpdateSet::Type::Parallel, 10UL );
-
-    manager->add( &location1, new Update );
-    manager->add( &location2, new Update );
-
-    EXPECT_EQ( manager->currentUpdateSet()->size(), 2 );
-    EXPECT_EQ( manager->size(), 1 );
-
-    {
-        manager->fork( UpdateSet::Type::Sequential, 10UL );
-
-        manager->add( &location3, new Update );
-        manager->add( &location4, new Update );
-
-        EXPECT_EQ( manager->currentUpdateSet()->size(), 2 );
-        EXPECT_EQ( manager->size(), 2 );
-
-        manager->merge();
-    }
-
-    EXPECT_EQ( manager->currentUpdateSet()->size(), 4 );
-    EXPECT_EQ( manager->size(), 1 );
 }
