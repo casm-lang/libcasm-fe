@@ -29,10 +29,6 @@
 
 #include "../src/execute/UpdateSet.h"
 
-static value_t make_integer_value( INTEGER_T v )
-{
-    return value_t( v );
-}
 
 TEST( libcasm_fe__updateset_manager,
     lookupShouldReturnNullptrWhenNoUpdateSetExists )
