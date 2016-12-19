@@ -76,47 +76,19 @@ bool libcasm_fe::AstToCasmIRPass::run( libpass::PassResult& pr )
 
     AstWalker< AstToCasmIRPass, bool > walker( *this );
     walker.walk_specification( root );
-
-    // PPA: this could be extracted to a 'update and check consistency' Value
-    // function?
-    libcasm_ir::Value::SymbolTable& symbols = *libcasm_ir::Value::getSymbols();
-    for( auto value : symbols[ ".rulepointer" ] )
-    {
-        assert( libcasm_ir::Value::isa< libcasm_ir::RulePointerConstant >(
-            value ) );
-        ( (libcasm_ir::RulePointerConstant*)value )->resolve();
-    }
-
+    
+    // PPA: IMPROVEMENT: maybe there is a better solution later for this 'RuleRef to Rule' checking/resolving issue!
+    libcasm_ir::RulePointerConstant::checking();
+    
+    
     // casm_frontend_destroy();
-
+    
     pr.setResult< libcasm_fe::AstToCasmIRPass >( specification );
     pr.setResult< libcasm_ir::CasmIRDumpPass >( specification );
 
     return true;
-
-    // std::string input = "";
-
-    // while( input.compare( "q" ) != 0 )
-    // {
-    //     std::getline( cin, input );
-
-    //     if( input.compare( "#" ) == 0 )
-    //     {
-    //         assert( 0 );
-    //         return false;
-    //     }
-    //     else
-    //     {
-    //         for( auto r : (*Value::getSymbols())[ input.c_str() ] )
-    //         {
-    //             printf( "dumping '%s':\n", input.c_str() );
-    //             r->dump();
-    //         }
-    //     }
-    // }
-
-    // return true;
 }
+
 
 libcasm_ir::Specification* libcasm_fe::AstToCasmIRPass::getSpecification(
     void ) const
