@@ -34,8 +34,8 @@
 
 #include "src/various/GrammarParser.tab.h"
 
-# undef yywrap
-# define yywrap() 1
+#undef yywrap
+#define yywrap() 1
 
 // The location of the current token.
 static yy::location loc;
@@ -70,69 +70,115 @@ char strbuf[STRBUF_LENGTH];
 
 %{
     // Code run each time a pattern is matched.
-    # define YY_USER_ACTION  loc.columns (yyleng);
+    #define YY_USER_ACTION  loc.columns( yyleng );
 %}
 %%
 %{
     // Code run each time yylex is called.
-    loc.step ();
+    loc.step();
 %}
 
-0[bB][01][01\']*[01]* { 
-    INTEGER_T val = convert_to_long(yytext+2, 2, driver, loc);
-    return yy::casmi_parser::make_INTEGERCONST(val, loc);
+0[bB][01][01\']*[01]* {
+    const auto val = convert_to_long( yytext + 2, 2, driver, loc );
+    return yy::casmi_parser::make_INTEGERCONST( val, loc );
 }
 
-0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* { 
-            INTEGER_T val = convert_to_long(yytext+2, 16, driver, loc);
-            return yy::casmi_parser::make_INTEGERCONST(val, loc);
-            }
+0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
+    const auto val = convert_to_long( yytext + 2, 16, driver, loc );
+    return yy::casmi_parser::make_INTEGERCONST( val, loc );
+}
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
-          rational_t val = convert_to_rational(yytext + 2, driver, loc);
-          return yy::casmi_parser::make_RATIONALCONST(val, loc);
-        }
+    const auto val = convert_to_rational( yytext + 2, driver, loc );
+    return yy::casmi_parser::make_RATIONALCONST( val, loc );
+}
 
 [0-9][0-9\']*[0-9]* {
-          INTEGER_T val = convert_to_long(yytext, 10, driver, loc);
-          return yy::casmi_parser::make_INTEGERCONST(val, loc);
-       }
+    const auto val = convert_to_long( yytext, 10, driver, loc );
+    return yy::casmi_parser::make_INTEGERCONST( val, loc );
+}
 
-[0-9]+\.[0-9]+([eE][+-]?[0-9]+)? { 
-            FLOATING_T val = convert_to_float(yytext, driver, loc);
-            return yy::casmi_parser::make_FLOATINGCONST(val, loc);
-          }
+[0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
+    const auto val = convert_to_float( yytext, driver, loc );
+    return yy::casmi_parser::make_FLOATINGCONST( val, loc );
+}
 
 {{grammartoken}}
 
-[a-zA-Z_][a-zA-Z0-9\_]* { return yy::casmi_parser::make_IDENTIFIER(yytext, loc); }
+[a-zA-Z_][a-zA-Z0-9\_]* {
+    return yy::casmi_parser::make_IDENTIFIER( yytext, loc );
+}
 
-[ \t\r]+ loc.step();/* ignore spaces */
+[ \t\r]+ { /* ignore spaces */
+    loc.step();
+}
 
-\n+ {loc.lines(yyleng); loc.step(); } /* ignore newlines too, but reset yycolumn */
+\n+ { /* ignore newlines too, but reset yycolumn */
+    loc.lines( yyleng );
+    loc.step();
+}
 
-"//" { BEGIN(LCOMMENT); loc.lines(1); loc.step(); }
+"//" {
+    BEGIN( LCOMMENT );
+    loc.lines( 1 );
+    loc.step();
+}
 <LCOMMENT>.
-<LCOMMENT>\n { BEGIN( INITIAL ); }
-<LCOMMENT><<EOF>> { BEGIN( INITIAL ); }
+<LCOMMENT>\n {
+    BEGIN( INITIAL );
+}
+<LCOMMENT><<EOF>> {
+    BEGIN( INITIAL );
+}
 
-"/*" { BEGIN(COMMENT); } /* ignore multi line comment */
-<COMMENT>"*/" { BEGIN(INITIAL); }
-<COMMENT>\n { }
+"/*" { /* ignore multi line comments */
+    BEGIN( COMMENT );
+}
+<COMMENT>"*/" {
+    BEGIN( INITIAL );
+}
+<COMMENT>\n
 <COMMENT>([^*]|\n|\r)+|.
-<COMMENT><<EOF>> { printf( "Multiline comment not terminated on line %d", yylineno ); exit( 2 ); }
+<COMMENT><<EOF>> {
+    printf( "Multiline comment not terminated on line %d", yylineno );
+    exit( 2 );
+}
 
-\" { BEGIN(STRING); strbuf[0] = '\0'; }
-<STRING>[^\\\"\n]* { strncat( strbuf, yytext, STRBUF_LENGTH-1 ); } /* alle Zeichen */
-<STRING>\n { }
-<STRING>\\n { strncat( strbuf, "\n", STRBUF_LENGTH-1 ); }
-<STRING>\\t { strncat( strbuf, "\t", STRBUF_LENGTH-1 ); }
-<STRING>\\\" { strncat( strbuf, "\"", STRBUF_LENGTH-1 ); }
-<STRING>\\' { strncat( strbuf, "\'", STRBUF_LENGTH-1 ); }
-<STRING><<EOF>> { global_driver->error( loc, "unclosed string", libcasm_fe::Codes::SyntaxErrorUnclosedString ); exit( 1 ); }
-<STRING>\" { BEGIN(INITIAL); return yy::casmi_parser::make_STRCONST(strbuf, loc); }
+\" {
+    BEGIN( STRING );
+    strbuf[0] = '\0';
+}
+<STRING>[^\\\"\n]* { /* eat all tokens */
+    strncat( strbuf, yytext, STRBUF_LENGTH - 1 );
+}
+<STRING>\n
+<STRING>\\n {
+    strncat( strbuf, "\n", STRBUF_LENGTH - 1 );
+}
+<STRING>\\t {
+    strncat( strbuf, "\t", STRBUF_LENGTH - 1 );
+}
+<STRING>\\\" {
+    strncat( strbuf, "\"", STRBUF_LENGTH - 1 );
+}
+<STRING>\\' {
+    strncat( strbuf, "\'", STRBUF_LENGTH - 1 );
+}
+<STRING><<EOF>> {
+    global_driver->error( loc, "unclosed string",
+            libcasm_fe::Codes::SyntaxErrorUnclosedString );
+    exit( 1 );
+}
+<STRING>\" {
+    BEGIN( INITIAL );
+    return yy::casmi_parser::make_STRCONST( strbuf, loc );
+}
 
-. { global_driver->error( loc, "unrecognized character '" + std::string( yytext ) + "'", libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter ); /*yytext, *yytext, yylineno*/ exit( 1 );
+. {
+    global_driver->error( loc,
+            "unrecognized character '" + std::string( yytext ) + "'",
+            libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter );
+    exit( 1 );
 }
 
 %%

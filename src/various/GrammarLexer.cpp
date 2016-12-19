@@ -673,8 +673,8 @@ char *yytext;
 
 #include "src/various/GrammarParser.tab.h"
 
-# undef yywrap
-# define yywrap() 1
+#undef yywrap
+#define yywrap() 1
 
 // The location of the current token.
 static yy::location loc;
@@ -705,7 +705,7 @@ char strbuf[STRBUF_LENGTH];
 
 #line 72 "obj/src/GrammarLexer.l"
     // Code run each time a pattern is matched.
-    # define YY_USER_ACTION  loc.columns (yyleng);
+    #define YY_USER_ACTION  loc.columns( yyleng );
 #line 710 "src/various/GrammarLexer.cpp"
 
 #define INITIAL 0
@@ -929,7 +929,7 @@ YY_DECL
 
 
     // Code run each time yylex is called.
-    loc.step ();
+    loc.step();
 
 
 #line 936 "src/various/GrammarLexer.cpp"
@@ -988,42 +988,42 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 81 "obj/src/GrammarLexer.l"
-{ 
-    INTEGER_T val = convert_to_long(yytext+2, 2, driver, loc);
-    return yy::casmi_parser::make_INTEGERCONST(val, loc);
+{
+    const auto val = convert_to_long( yytext + 2, 2, driver, loc );
+    return yy::casmi_parser::make_INTEGERCONST( val, loc );
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 86 "obj/src/GrammarLexer.l"
-{ 
-            INTEGER_T val = convert_to_long(yytext+2, 16, driver, loc);
-            return yy::casmi_parser::make_INTEGERCONST(val, loc);
-            }
+{
+    const auto val = convert_to_long( yytext + 2, 16, driver, loc );
+    return yy::casmi_parser::make_INTEGERCONST( val, loc );
+}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 91 "obj/src/GrammarLexer.l"
 {
-          rational_t val = convert_to_rational(yytext + 2, driver, loc);
-          return yy::casmi_parser::make_RATIONALCONST(val, loc);
-        }
+    const auto val = convert_to_rational( yytext + 2, driver, loc );
+    return yy::casmi_parser::make_RATIONALCONST( val, loc );
+}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 96 "obj/src/GrammarLexer.l"
 {
-          INTEGER_T val = convert_to_long(yytext, 10, driver, loc);
-          return yy::casmi_parser::make_INTEGERCONST(val, loc);
-       }
+    const auto val = convert_to_long( yytext, 10, driver, loc );
+    return yy::casmi_parser::make_INTEGERCONST( val, loc );
+}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 101 "obj/src/GrammarLexer.l"
-{ 
-            FLOATING_T val = convert_to_float(yytext, driver, loc);
-            return yy::casmi_parser::make_FLOATINGCONST(val, loc);
-          }
+{
+    const auto val = convert_to_float( yytext, driver, loc );
+    return yy::casmi_parser::make_FLOATINGCONST( val, loc );
+}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
@@ -1393,122 +1393,168 @@ YY_RULE_SETUP
 case 79:
 YY_RULE_SETUP
 #line 198 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_IDENTIFIER(yytext, loc); }
+{
+    return yy::casmi_parser::make_IDENTIFIER( yytext, loc );
+}
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 200 "obj/src/GrammarLexer.l"
-loc.step();/* ignore spaces */
+#line 202 "obj/src/GrammarLexer.l"
+{ /* ignore spaces */
+    loc.step();
+}
 	YY_BREAK
 case 81:
 /* rule 81 can match eol */
 YY_RULE_SETUP
-#line 202 "obj/src/GrammarLexer.l"
-{loc.lines(yyleng); loc.step(); } /* ignore newlines too, but reset yycolumn */
+#line 206 "obj/src/GrammarLexer.l"
+{ /* ignore newlines too, but reset yycolumn */
+    loc.lines( yyleng );
+    loc.step();
+}
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 204 "obj/src/GrammarLexer.l"
-{ BEGIN(LCOMMENT); loc.lines(1); loc.step(); }
+#line 211 "obj/src/GrammarLexer.l"
+{
+    BEGIN( LCOMMENT );
+    loc.lines( 1 );
+    loc.step();
+}
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 205 "obj/src/GrammarLexer.l"
+#line 216 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case 84:
 /* rule 84 can match eol */
 YY_RULE_SETUP
-#line 206 "obj/src/GrammarLexer.l"
-{ BEGIN( INITIAL ); }
+#line 217 "obj/src/GrammarLexer.l"
+{
+    BEGIN( INITIAL );
+}
 	YY_BREAK
 case YY_STATE_EOF(LCOMMENT):
-#line 207 "obj/src/GrammarLexer.l"
-{ BEGIN( INITIAL ); }
+#line 220 "obj/src/GrammarLexer.l"
+{
+    BEGIN( INITIAL );
+}
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 209 "obj/src/GrammarLexer.l"
-{ BEGIN(COMMENT); } /* ignore multi line comment */
+#line 224 "obj/src/GrammarLexer.l"
+{ /* ignore multi line comments */
+    BEGIN( COMMENT );
+}
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 210 "obj/src/GrammarLexer.l"
-{ BEGIN(INITIAL); }
+#line 227 "obj/src/GrammarLexer.l"
+{
+    BEGIN( INITIAL );
+}
 	YY_BREAK
 case 87:
 /* rule 87 can match eol */
 YY_RULE_SETUP
-#line 211 "obj/src/GrammarLexer.l"
-{ }
+#line 230 "obj/src/GrammarLexer.l"
+
 	YY_BREAK
 case 88:
 /* rule 88 can match eol */
 YY_RULE_SETUP
-#line 212 "obj/src/GrammarLexer.l"
+#line 231 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 213 "obj/src/GrammarLexer.l"
-{ printf( "Multiline comment not terminated on line %d", yylineno ); exit( 2 ); }
+#line 232 "obj/src/GrammarLexer.l"
+{
+    printf( "Multiline comment not terminated on line %d", yylineno );
+    exit( 2 );
+}
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 215 "obj/src/GrammarLexer.l"
-{ BEGIN(STRING); strbuf[0] = '\0'; }
+#line 237 "obj/src/GrammarLexer.l"
+{
+    BEGIN( STRING );
+    strbuf[0] = '\0';
+}
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 216 "obj/src/GrammarLexer.l"
-{ strncat( strbuf, yytext, STRBUF_LENGTH-1 ); } /* alle Zeichen */
+#line 241 "obj/src/GrammarLexer.l"
+{ /* eat all tokens */
+    strncat( strbuf, yytext, STRBUF_LENGTH - 1 );
+}
 	YY_BREAK
 case 91:
 /* rule 91 can match eol */
 YY_RULE_SETUP
-#line 217 "obj/src/GrammarLexer.l"
-{ }
+#line 244 "obj/src/GrammarLexer.l"
+
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 218 "obj/src/GrammarLexer.l"
-{ strncat( strbuf, "\n", STRBUF_LENGTH-1 ); }
+#line 245 "obj/src/GrammarLexer.l"
+{
+    strncat( strbuf, "\n", STRBUF_LENGTH - 1 );
+}
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 219 "obj/src/GrammarLexer.l"
-{ strncat( strbuf, "\t", STRBUF_LENGTH-1 ); }
+#line 248 "obj/src/GrammarLexer.l"
+{
+    strncat( strbuf, "\t", STRBUF_LENGTH - 1 );
+}
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 220 "obj/src/GrammarLexer.l"
-{ strncat( strbuf, "\"", STRBUF_LENGTH-1 ); }
+#line 251 "obj/src/GrammarLexer.l"
+{
+    strncat( strbuf, "\"", STRBUF_LENGTH - 1 );
+}
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 221 "obj/src/GrammarLexer.l"
-{ strncat( strbuf, "\'", STRBUF_LENGTH-1 ); }
+#line 254 "obj/src/GrammarLexer.l"
+{
+    strncat( strbuf, "\'", STRBUF_LENGTH - 1 );
+}
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 222 "obj/src/GrammarLexer.l"
-{ global_driver->error( loc, "unclosed string", libcasm_fe::Codes::SyntaxErrorUnclosedString ); exit( 1 ); }
+#line 257 "obj/src/GrammarLexer.l"
+{
+    global_driver->error( loc, "unclosed string",
+            libcasm_fe::Codes::SyntaxErrorUnclosedString );
+    exit( 1 );
+}
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 223 "obj/src/GrammarLexer.l"
-{ BEGIN(INITIAL); return yy::casmi_parser::make_STRCONST(strbuf, loc); }
+#line 262 "obj/src/GrammarLexer.l"
+{
+    BEGIN( INITIAL );
+    return yy::casmi_parser::make_STRCONST( strbuf, loc );
+}
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 225 "obj/src/GrammarLexer.l"
-{ global_driver->error( loc, "unrecognized character '" + std::string( yytext ) + "'", libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter ); /*yytext, *yytext, yylineno*/ exit( 1 );
+#line 267 "obj/src/GrammarLexer.l"
+{
+    global_driver->error( loc,
+            "unrecognized character '" + std::string( yytext ) + "'",
+            libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter );
+    exit( 1 );
 }
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 228 "obj/src/GrammarLexer.l"
+#line 274 "obj/src/GrammarLexer.l"
 ECHO;
 	YY_BREAK
-#line 1512 "src/various/GrammarLexer.cpp"
+#line 1558 "src/various/GrammarLexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2473,7 +2519,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 228 "obj/src/GrammarLexer.l"
+#line 274 "obj/src/GrammarLexer.l"
 
 
 
