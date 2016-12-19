@@ -376,33 +376,33 @@ struct yy_trans_info
 static yyconst flex_int16_t yy_accept[254] =
     {   0,
         0,    0,    0,    0,    0,    0,   91,   91,  100,   98,
-       81,   82,   98,   90,   65,   50,   51,   63,   47,   60,
-       48,   56,   64,   77,   77,   57,   61,   49,   62,   59,
-       74,   74,   52,   53,   58,   74,   74,   74,   74,   74,
-       74,   74,   74,   74,   74,   74,   74,   74,   74,   74,
-       54,   98,   55,   84,   85,   89,   88,   89,   89,   91,
-       92,   97,   99,   81,   82,   69,   67,   66,   86,   83,
-       77,    0,    0,   77,    0,    0,   80,   68,   70,   71,
-       74,   74,   74,   74,   74,   74,   74,   23,   74,   74,
-       74,   74,   74,   74,   74,   25,   74,   20,   74,   74,
+       81,   82,   98,   90,   71,   56,   57,   69,   53,   66,
+       54,   62,   70,    3,    3,   63,   67,   55,   68,   65,
+       80,   80,   58,   59,   64,   80,   80,   80,   80,   80,
+       80,   80,   80,   80,   80,   80,   80,   80,   80,   80,
+       60,   98,   61,   84,   85,   89,   88,   89,   89,   91,
+       92,   97,   99,   81,   82,   75,   73,   72,   86,   83,
+        3,    0,    3,    0,    0,   74,   76,   77,   80,   80,
+       80,   80,   80,   80,   80,   29,   80,   80,   80,   80,
+       80,   80,   80,   31,   80,   26,   80,   80,   80,   35,
 
-       74,   29,   74,   43,   74,   74,   74,   74,   74,   74,
-       74,   74,   74,   74,   74,   72,   73,   89,   89,   87,
-       91,   95,   96,   93,   94,   77,   78,   79,   75,   76,
-       74,   42,   74,   74,   74,   74,   74,   74,   74,   46,
-       74,   74,   74,   74,   74,   74,   74,   74,   74,   74,
-       74,   74,   19,   45,   74,   12,   36,   74,   74,   74,
-       74,   10,   74,   74,   74,   74,   44,    0,   75,   75,
-       76,   76,    1,   74,   74,   24,   28,   74,   74,   74,
-       74,   74,   27,   74,   74,   74,    5,   74,   74,   37,
-       74,   74,    2,   35,   74,   74,   74,   34,    6,   38,
+       80,   49,   80,   80,   80,   80,    6,   80,   80,   80,
+       80,   80,   80,   80,   78,   79,   89,   89,   87,   91,
+       95,   96,   93,   94,    3,    4,    1,    2,   80,   48,
+       80,   80,   80,   80,   80,   80,   80,   52,   80,   80,
+       80,   80,   80,   80,   80,   80,   80,   80,   80,   80,
+       25,   51,   80,   18,   42,   80,   80,    0,   80,   80,
+       16,   80,   80,   80,   80,   50,    0,    1,    1,    2,
+        2,    7,   80,   80,   30,   34,   80,   80,   80,   80,
+       80,   33,   80,   80,   80,   11,   80,   80,   43,   80,
+       80,    8,   41,   80,   80,   80,   40,    5,   12,   44,
 
-       18,   26,   41,   74,    0,   78,   74,   74,   33,   74,
-       74,   74,    7,   74,   74,   74,   40,   74,   74,   74,
-       74,   74,   74,   32,   39,   14,   15,   74,   74,   16,
-       74,   13,   11,   21,   74,   74,   74,   74,    3,   30,
-        4,   31,   74,   74,   74,   22,    8,   74,   74,   74,
-        9,   17,    0
+       24,   32,   47,   80,    0,    4,   80,   80,   39,   80,
+       80,   80,   13,   80,   80,   80,   46,   80,   80,   80,
+       80,   80,   80,   38,   45,   20,   21,   80,   80,   22,
+       80,   19,   17,   27,   80,   80,   80,   80,    9,   36,
+       10,   37,   80,   80,   80,   28,   14,   80,   80,   80,
+       15,   23,    0
     } ;
 
 static yyconst YY_CHAR yy_ec[256] =
@@ -450,34 +450,34 @@ static yyconst YY_CHAR yy_meta[64] =
 
 static yyconst flex_uint16_t yy_base[262] =
     {   0,
-        0,    0,  360,  359,   61,   63,   65,   67,  361,  364,
-       73,  357,  337,  364,  364,  364,  364,  364,  364,  364,
-      335,  342,   65,   95,   70,  334,  333,  364,  332,  364,
-        0,  328,  364,  364,    0,   29,  314,   48,   32,   66,
-       66,  309,  299,   54,   81,  292,   49,   38,  298,  296,
-      284,  282,  364,  364,  364,  122,  126,  133,  328,    0,
-      364,  364,  125,   91,  340,  364,  364,  364,  364,  364,
-      133,  125,  128,  140,  122,    0,  364,  364,  364,  364,
-        0,  310,  300,  285,  105,  122,  120,    0,  290,  283,
-      122,  289,  282,  284,  284,    0,  281,  118,  290,  275,
+        0,    0,  361,  360,   61,   63,   65,   67,  362,  365,
+       73,  358,  338,  365,  365,  365,  365,  365,  365,  365,
+      336,  343,   65,   70,   75,  335,  334,  365,  333,  365,
+        0,  329,  365,  365,    0,   29,  315,   40,   51,   57,
+       63,  310,  300,   64,   66,  107,   63,   76,  300,  298,
+      286,  284,  365,  365,  365,  124,  128,  130,  330,    0,
+      365,  365,  129,  134,  342,  365,  365,  365,  365,  365,
+      131,  123,  136,  128,    0,  365,  365,  365,    0,  312,
+      302,  287,   67,  104,  110,    0,  292,  285,  115,  291,
+      284,  286,  286,    0,  283,  111,  292,  277,  276,    0,
 
-      274,    0,  273,    0,  274,  275,  280,  270,  276,  118,
-      277,  280,  264,  279,  265,  364,  364,  164,  166,  364,
-        0,  364,  364,  364,  364,  165,  168,  171,  183,  310,
-      286,    0,  135,  268,  273,  257,  275,  266,  270,    0,
-      258,  267,  153,  259,  252,  268,  256,  264,  252,  246,
-      250,  246,    0,    0,  253,    0,    0,  248,  252,  254,
-      252,    0,  242,  243,  250,  249,    0,  195,  198,  203,
-      282,  281,    0,  234,  233,    0,    0,  242,  228,  226,
-      237,  227,    0,  243,  242,  237,    0,  236,  229,    0,
-      220,  220,  228,    0,  235,  221,  215,    0,    0,    0,
+      275,    0,  276,  277,  282,  272,  143,  278,  117,  279,
+      282,  266,  281,  267,  365,  365,  170,  172,  365,    0,
+      365,  365,  365,  365,  163,  169,  175,  312,  288,    0,
+      121,  270,  275,  259,  277,  268,  272,    0,  260,  269,
+      144,  261,  254,  270,  258,  266,  254,  248,  252,  248,
+        0,    0,  255,    0,    0,  250,  254,  172,  256,  254,
+        0,  244,  245,  252,  251,    0,  183,  186,  197,  284,
+      283,    0,  236,  235,    0,    0,  244,  230,  228,  239,
+      229,    0,  245,  244,  239,    0,  238,  231,    0,  222,
+      222,  230,    0,  237,  223,  217,    0,  189,    0,    0,
 
-        0,    0,    0,  227,  185,  200,  213,  226,    0,  219,
-      224,  223,    0,  209,  209,  209,    0,  213,  214,  204,
-      220,  201,  205,    0,    0,    0,    0,  193,  204,    0,
-      157,    0,    0,    0,  147,  150,  147,  138,    0,    0,
-        0,    0,  122,   88,   70,    0,    0,   59,   41,   56,
-        0,    0,  364,  221,  227,  233,  235,  241,  247,   64,
+        0,    0,    0,  229,  199,  202,  215,  228,    0,  221,
+      226,  225,    0,  211,  211,  211,    0,  215,  216,  206,
+      222,  203,  208,    0,    0,    0,    0,  201,  214,    0,
+      207,    0,    0,    0,  194,  167,  164,  168,    0,    0,
+        0,    0,  159,  138,  121,    0,    0,  118,   38,   38,
+        0,    0,  365,  221,  227,  233,  235,  241,  247,   64,
       251
     } ;
 
@@ -490,20 +490,20 @@ static yyconst flex_int16_t yy_def[262] =
       257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
       253,  253,  253,  253,  253,  258,  258,  258,  253,  259,
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
-      253,  253,  253,  253,  253,  260,  253,  253,  253,  253,
+      253,  253,  253,  253,  260,  253,  253,  253,  257,  257,
       257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
       257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
 
       257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
-      257,  257,  257,  257,  257,  253,  253,  258,  258,  253,
-      259,  253,  253,  253,  253,  253,  253,  253,  253,  261,
+      257,  257,  257,  257,  253,  253,  258,  258,  253,  259,
+      253,  253,  253,  253,  253,  253,  253,  261,  257,  257,
       257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
       257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
+      257,  257,  257,  257,  257,  257,  257,  253,  257,  257,
+      257,  257,  257,  257,  257,  257,  253,  253,  253,  261,
+      261,  257,  257,  257,  257,  257,  257,  257,  257,  257,
       257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
-      257,  257,  257,  257,  257,  257,  257,  253,  253,  253,
-      261,  261,  257,  257,  257,  257,  257,  257,  257,  257,
-      257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
-      257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
+      257,  257,  257,  257,  257,  257,  257,  253,  257,  257,
 
       257,  257,  257,  257,  253,  253,  257,  257,  257,  257,
       257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
@@ -514,7 +514,7 @@ static yyconst flex_int16_t yy_def[262] =
       253
     } ;
 
-static yyconst flex_uint16_t yy_nxt[428] =
+static yyconst flex_uint16_t yy_nxt[429] =
     {   0,
        10,   11,   12,   11,   13,   14,   15,   10,   16,   17,
        18,   19,   20,   21,   22,   23,   24,   25,   25,   26,
@@ -522,50 +522,50 @@ static yyconst flex_uint16_t yy_nxt[428] =
        31,   31,   31,   33,   10,   34,   35,   36,   31,   37,
        38,   39,   40,   31,   31,   41,   31,   42,   31,   43,
        44,   45,   31,   46,   47,   48,   49,   31,   50,   31,
-       51,   52,   53,   57,   58,   57,   58,   61,  130,   61,
-       62,   59,   62,   59,   64,   69,   64,   71,   83,   90,
-       70,   91,  112,   84,   72,   73,   74,   74,   74,   86,
-      110,  113,   64,   87,   64,  111,  102,  252,   88,   63,
+       51,   52,   53,   57,   58,   57,   58,   61,  128,   61,
+       62,   59,   62,   59,   64,   69,   64,   71,   81,  252,
+       70,   84,   71,   82,   72,   85,   73,   73,   73,   72,
+       86,   73,   73,   73,   90,   74,   87,  251,   88,   63,
 
-      251,   63,   71,   92,   89,  103,  250,  104,   96,   72,
-       73,   74,   74,   74,   97,   98,   93,  249,  105,   94,
-       75,   99,   95,   77,  119,  119,  248,   76,  119,  119,
-      122,  106,  123,   75,  107,  119,  119,  108,  129,  129,
-       71,  127,  127,  127,  128,  128,  128,   71,   77,  126,
-      126,  126,  134,   76,   72,   73,   74,   74,   74,  135,
-      136,  139,  143,  150,  137,  161,  119,  119,  119,  119,
-      162,  247,   71,  151,  124,  138,  174,  140,  144,  246,
-      125,  126,  126,  126,  127,  127,  127,  128,  128,  128,
-      169,  175,  184,   77,  245,  244,  168,  243,  242,  170,
+       89,   63,   75,  103,  109,   94,  100,   91,   74,  110,
+       92,   95,   96,   93,  132,  101,  104,  102,   97,  105,
+      111,  133,  106,  107,  107,  107,  118,  118,   75,  112,
+      118,  118,  118,  118,  121,   64,  122,   64,   71,  126,
+      126,  126,  134,   71,  127,  127,  135,  125,  125,  125,
+       72,  137,   73,   73,   73,  141,  148,  136,  158,  107,
+      107,  107,  173,  108,  160,  250,  149,  138,  249,  161,
+       71,  142,  118,  118,  118,  118,  248,  174,  123,  125,
+      125,  125,  168,  183,  124,  126,  126,  126,  198,  198,
+      198,  169,  169,  168,  205,  184,  205,  167,  185,  206,
 
-      170,  206,  206,  206,  185,  169,  205,  186,  205,  168,
-      169,  206,  206,  206,  170,  170,  206,  206,  206,  170,
-      170,   54,   54,   54,   54,   54,   54,   56,   56,   56,
-       56,   56,   56,   60,   60,   60,   60,   60,   60,   81,
-       81,  118,  118,  118,  241,  118,  118,  121,  240,  121,
-      121,  121,  121,  172,  239,  172,  238,  237,  236,  235,
-      234,  233,  232,  231,  230,  229,  228,  227,  226,  225,
-      224,  223,  222,  221,  220,  219,  218,  217,  216,  215,
-      214,  213,  212,  211,  210,  209,  208,  207,  171,  171,
-      204,  203,  202,  201,  200,  199,  198,  197,  196,  195,
+      206,  206,  169,  169,  168,  198,  198,  198,  247,  246,
+      167,  245,  244,  169,  169,  206,  206,  206,  206,  206,
+      206,   54,   54,   54,   54,   54,   54,   56,   56,   56,
+       56,   56,   56,   60,   60,   60,   60,   60,   60,   79,
+       79,  117,  117,  117,  243,  117,  117,  120,  242,  120,
+      120,  120,  120,  171,  241,  171,  240,  239,  238,  237,
+      236,  235,  234,  233,  232,  231,  230,  229,  228,  227,
+      226,  225,  224,  223,  222,  221,  220,  219,  218,  217,
+      216,  215,  214,  213,  212,  211,  210,  209,  208,  207,
+      170,  170,  204,  203,  202,  201,  200,  199,  197,  196,
 
-      194,  193,  192,  191,  190,  189,  188,  187,  183,  182,
-      181,  180,  179,  178,  177,  176,  173,  171,  167,  166,
-      165,  164,  163,  160,  159,  158,  157,  156,  155,  154,
-      153,  152,  149,  148,  147,  146,  145,  142,  141,  133,
-      132,  131,   65,  120,  117,  116,  115,  114,  109,  101,
-      100,   85,   82,   80,   79,   78,   68,   67,   66,   65,
-      253,   55,   55,    9,  253,  253,  253,  253,  253,  253,
+      195,  194,  193,  192,  191,  190,  189,  188,  187,  186,
+      182,  181,  180,  179,  178,  177,  176,  175,  172,  170,
+      166,  165,  164,  163,  162,  159,  157,  156,  155,  154,
+      153,  152,  151,  150,  147,  146,  145,  144,  143,  140,
+      139,  131,  130,  129,   65,  119,  116,  115,  114,  113,
+       99,   98,   83,   80,   78,   77,   76,   68,   67,   66,
+       65,  253,   55,   55,    9,  253,  253,  253,  253,  253,
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
 
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
-      253,  253,  253,  253,  253,  253,  253
+      253,  253,  253,  253,  253,  253,  253,  253
     } ;
 
-static yyconst flex_int16_t yy_chk[428] =
+static yyconst flex_int16_t yy_chk[429] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -574,46 +574,46 @@ static yyconst flex_int16_t yy_chk[428] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    5,    5,    6,    6,    7,  260,    8,
-        7,    5,    8,    6,   11,   23,   11,   25,   36,   39,
-       23,   39,   48,   36,   25,   25,   25,   25,   25,   38,
-       47,   48,   64,   38,   64,   47,   44,  250,   38,    7,
+        7,    5,    8,    6,   11,   23,   11,   24,   36,  250,
+       23,   38,   25,   36,   24,   38,   24,   24,   24,   25,
+       38,   25,   25,   25,   40,   24,   38,  249,   39,    7,
 
-      249,    8,   24,   40,   38,   44,  248,   44,   41,   24,
-       24,   24,   24,   24,   41,   41,   40,  245,   45,   40,
-       24,   41,   40,   25,   56,   56,  244,   24,   57,   57,
-       63,   45,   63,   24,   45,   58,   58,   45,   75,   75,
-       71,   72,   72,   72,   73,   73,   73,   74,   24,   71,
-       71,   71,   85,   24,   74,   74,   74,   74,   74,   85,
-       86,   87,   91,   98,   86,  110,  118,  118,  119,  119,
-      110,  243,  126,   98,   63,   86,  133,   87,   91,  238,
-       63,  126,  126,  126,  127,  127,  127,  128,  128,  128,
-      129,  133,  143,   74,  237,  236,  127,  235,  231,  129,
+       39,    8,   24,   45,   47,   41,   44,   40,   24,   47,
+       40,   41,   41,   40,   83,   44,   45,   44,   41,   45,
+       48,   83,   45,   46,   46,   46,   56,   56,   24,   48,
+       57,   57,   58,   58,   63,   64,   63,   64,   71,   72,
+       72,   72,   84,   73,   74,   74,   84,   71,   71,   71,
+       73,   85,   73,   73,   73,   89,   96,   84,  107,  107,
+      107,  107,  131,   46,  109,  248,   96,   85,  245,  109,
+      125,   89,  117,  117,  118,  118,  244,  131,   63,  125,
+      125,  125,  127,  141,   63,  126,  126,  126,  158,  158,
+      158,  127,  127,  168,  167,  141,  167,  126,  141,  167,
 
-      129,  205,  205,  205,  143,  169,  168,  143,  168,  127,
-      170,  168,  168,  168,  169,  169,  206,  206,  206,  170,
-      170,  254,  254,  254,  254,  254,  254,  255,  255,  255,
+      167,  167,  168,  168,  169,  198,  198,  198,  243,  238,
+      126,  237,  236,  169,  169,  205,  205,  205,  206,  206,
+      206,  254,  254,  254,  254,  254,  254,  255,  255,  255,
       255,  255,  255,  256,  256,  256,  256,  256,  256,  257,
-      257,  258,  258,  258,  229,  258,  258,  259,  228,  259,
-      259,  259,  259,  261,  223,  261,  222,  221,  220,  219,
-      218,  216,  215,  214,  212,  211,  210,  208,  207,  204,
-      197,  196,  195,  193,  192,  191,  189,  188,  186,  185,
-      184,  182,  181,  180,  179,  178,  175,  174,  172,  171,
-      166,  165,  164,  163,  161,  160,  159,  158,  155,  152,
+      257,  258,  258,  258,  235,  258,  258,  259,  231,  259,
+      259,  259,  259,  261,  229,  261,  228,  223,  222,  221,
+      220,  219,  218,  216,  215,  214,  212,  211,  210,  208,
+      207,  204,  196,  195,  194,  192,  191,  190,  188,  187,
+      185,  184,  183,  181,  180,  179,  178,  177,  174,  173,
+      171,  170,  165,  164,  163,  162,  160,  159,  157,  156,
 
-      151,  150,  149,  148,  147,  146,  145,  144,  142,  141,
-      139,  138,  137,  136,  135,  134,  131,  130,  115,  114,
-      113,  112,  111,  109,  108,  107,  106,  105,  103,  101,
-      100,   99,   97,   95,   94,   93,   92,   90,   89,   84,
-       83,   82,   65,   59,   52,   51,   50,   49,   46,   43,
-       42,   37,   32,   29,   27,   26,   22,   21,   13,   12,
-        9,    4,    3,  253,  253,  253,  253,  253,  253,  253,
+      153,  150,  149,  148,  147,  146,  145,  144,  143,  142,
+      140,  139,  137,  136,  135,  134,  133,  132,  129,  128,
+      114,  113,  112,  111,  110,  108,  106,  105,  104,  103,
+      101,   99,   98,   97,   95,   93,   92,   91,   90,   88,
+       87,   82,   81,   80,   65,   59,   52,   51,   50,   49,
+       43,   42,   37,   32,   29,   27,   26,   22,   21,   13,
+       12,    9,    4,    3,  253,  253,  253,  253,  253,  253,
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
 
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
       253,  253,  253,  253,  253,  253,  253,  253,  253,  253,
-      253,  253,  253,  253,  253,  253,  253
+      253,  253,  253,  253,  253,  253,  253,  253
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -926,10 +926,7 @@ YY_DECL
     loc.step ();
 
 
-
-
-
-#line 933 "src/various/GrammarLexer.cpp"
+#line 930 "src/various/GrammarLexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -984,537 +981,537 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 84 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_CASM(loc); }
-	YY_BREAK
-case 2:
-YY_RULE_SETUP
-#line 85 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_INIT(loc); }
-	YY_BREAK
-case 3:
-YY_RULE_SETUP
-#line 87 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_OPTION(loc); }
-	YY_BREAK
-case 4:
-YY_RULE_SETUP
-#line 89 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DERIVED(loc); }
-	YY_BREAK
-case 5:
-YY_RULE_SETUP
-#line 90 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENUM(loc); }
-	YY_BREAK
-case 6:
-YY_RULE_SETUP
-#line 92 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_RULE(loc); }
-	YY_BREAK
-case 7:
-YY_RULE_SETUP
-#line 93 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DUMPS(loc); }
-	YY_BREAK
-case 8:
-YY_RULE_SETUP
-#line 95 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_FUNCTION(loc); }
-	YY_BREAK
-case 9:
-YY_RULE_SETUP
-#line 96 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_INITIALLY(loc); }
-	YY_BREAK
-case 10:
-YY_RULE_SETUP
-#line 100 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SEQ(loc); }
-	YY_BREAK
-case 11:
-YY_RULE_SETUP
-#line 101 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENDSEQ(loc); }
-	YY_BREAK
-case 12:
-YY_RULE_SETUP
-#line 102 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PAR(loc); }
-	YY_BREAK
-case 13:
-YY_RULE_SETUP
-#line 103 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENDPAR(loc); }
-	YY_BREAK
-case 14:
-YY_RULE_SETUP
-#line 106 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ASSERT(loc); }
-	YY_BREAK
-case 15:
-YY_RULE_SETUP
-#line 107 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ASSURE(loc); }
-	YY_BREAK
-case 16:
-YY_RULE_SETUP
-#line 108 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DIEDIE(loc); }
-	YY_BREAK
-case 17:
-YY_RULE_SETUP
-#line 109 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_IMPOSSIBLE(loc); }
-	YY_BREAK
-case 18:
-YY_RULE_SETUP
-#line 110 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SKIP(loc); }
-	YY_BREAK
-case 19:
-YY_RULE_SETUP
-#line 111 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LET(loc); }
-	YY_BREAK
-case 20:
-YY_RULE_SETUP
-#line 112 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_IN(loc); }
-	YY_BREAK
-case 21:
-YY_RULE_SETUP
-#line 113 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_FORALL(loc); }
-	YY_BREAK
-case 22:
-YY_RULE_SETUP
-#line 114 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ITERATE(loc); }
-	YY_BREAK
-case 23:
-YY_RULE_SETUP
-#line 115 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DO(loc); }
-	YY_BREAK
-case 24:
-YY_RULE_SETUP
-#line 116 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_CALL(loc); }
-	YY_BREAK
-case 25:
-YY_RULE_SETUP
-#line 117 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_IF(loc); }
-	YY_BREAK
-case 26:
-YY_RULE_SETUP
-#line 118 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_THEN(loc); }
-	YY_BREAK
-case 27:
-YY_RULE_SETUP
-#line 119 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ELSE(loc); }
-	YY_BREAK
-case 28:
-YY_RULE_SETUP
-#line 120 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_CASE(loc); }
-	YY_BREAK
-case 29:
-YY_RULE_SETUP
-#line 121 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_OF(loc); }
-	YY_BREAK
-case 30:
-YY_RULE_SETUP
-#line 122 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DEFAULT(loc); }
-	YY_BREAK
-case 31:
-YY_RULE_SETUP
-#line 123 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENDCASE(loc); }
-	YY_BREAK
-case 32:
-YY_RULE_SETUP
-#line 124 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PRINT(loc); }
-	YY_BREAK
-case 33:
-YY_RULE_SETUP
-#line 125 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DEBUG(loc); }
-	YY_BREAK
-case 34:
-YY_RULE_SETUP
-#line 127 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PUSH(loc); }
-	YY_BREAK
-case 35:
-YY_RULE_SETUP
-#line 128 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_INTO(loc); }
-	YY_BREAK
-case 36:
-YY_RULE_SETUP
-#line 129 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_POP(loc); }
-	YY_BREAK
-case 37:
-YY_RULE_SETUP
-#line 130 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_FROM(loc); }
-	YY_BREAK
-case 38:
-YY_RULE_SETUP
-#line 132 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SELF(loc); }
-	YY_BREAK
-case 39:
-YY_RULE_SETUP
-#line 133 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_UNDEF(loc); }
-	YY_BREAK
-case 40:
-YY_RULE_SETUP
-#line 134 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_FALSE(loc); }
-	YY_BREAK
-case 41:
-YY_RULE_SETUP
-#line 135 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_TRUE(loc); }
-	YY_BREAK
-case 42:
-YY_RULE_SETUP
-#line 137 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_AND(loc); }
-	YY_BREAK
-case 43:
-YY_RULE_SETUP
-#line 138 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_OR(loc); }
-	YY_BREAK
-case 44:
-YY_RULE_SETUP
-#line 139 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_XOR(loc); }
-	YY_BREAK
-case 45:
-YY_RULE_SETUP
-#line 140 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_NOT(loc); }
-	YY_BREAK
-case 46:
-YY_RULE_SETUP
-#line 141 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_RATIONAL_DIV(loc); }
-	YY_BREAK
-case 47:
-YY_RULE_SETUP
-#line 143 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PLUS(loc); }
-	YY_BREAK
-case 48:
-YY_RULE_SETUP
-#line 144 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_MINUS(loc); }
-	YY_BREAK
-case 49:
-YY_RULE_SETUP
-#line 145 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_EQUAL(loc); }
-	YY_BREAK
-case 50:
-YY_RULE_SETUP
-#line 146 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LPAREN(loc); }
-	YY_BREAK
-case 51:
-YY_RULE_SETUP
-#line 147 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_RPAREN(loc); }
-	YY_BREAK
-case 52:
-YY_RULE_SETUP
-#line 148 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LSQPAREN(loc); }
-	YY_BREAK
-case 53:
-YY_RULE_SETUP
-#line 149 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_RSQPAREN(loc); }
-	YY_BREAK
-case 54:
-YY_RULE_SETUP
-#line 150 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LCURPAREN(loc); }
-	YY_BREAK
-case 55:
-YY_RULE_SETUP
-#line 151 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_RCURPAREN(loc); }
-	YY_BREAK
-case 56:
-YY_RULE_SETUP
-#line 152 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DOT(loc); }
-	YY_BREAK
-case 57:
-YY_RULE_SETUP
-#line 153 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_COLON(loc); }
-	YY_BREAK
-case 58:
-YY_RULE_SETUP
-#line 154 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_UNDERLINE(loc); }
-	YY_BREAK
-case 59:
-YY_RULE_SETUP
-#line 155 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_AT(loc); }
-	YY_BREAK
-case 60:
-YY_RULE_SETUP
-#line 156 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_COMMA(loc); }
-	YY_BREAK
-case 61:
-YY_RULE_SETUP
-#line 157 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LESSER(loc); }
-	YY_BREAK
-case 62:
-YY_RULE_SETUP
-#line 158 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_GREATER(loc); }
-	YY_BREAK
-case 63:
-YY_RULE_SETUP
-#line 159 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_STAR(loc); }
-	YY_BREAK
-case 64:
-YY_RULE_SETUP
-#line 160 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SLASH(loc); }
-	YY_BREAK
-case 65:
-YY_RULE_SETUP
-#line 161 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PERCENT(loc); }
-	YY_BREAK
-case 66:
-YY_RULE_SETUP
-#line 163 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DOTDOT(loc); }
-	YY_BREAK
-case 67:
-YY_RULE_SETUP
-#line 164 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ARROW(loc); }
-	YY_BREAK
-case 68:
-YY_RULE_SETUP
-#line 165 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_UPDATE(loc); }
-	YY_BREAK
-case 69:
-YY_RULE_SETUP
-#line 166 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_NEQUAL(loc); }
-	YY_BREAK
-case 70:
-YY_RULE_SETUP
-#line 167 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LESSEQ(loc); }
-	YY_BREAK
-case 71:
-YY_RULE_SETUP
-#line 168 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_GREATEREQ(loc); }
-	YY_BREAK
-case 72:
-YY_RULE_SETUP
-#line 169 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SEQ_BRACKET(loc); }
-	YY_BREAK
-case 73:
-YY_RULE_SETUP
-#line 170 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENDSEQ_BRACKET(loc); }
-	YY_BREAK
-case 74:
-YY_RULE_SETUP
-#line 175 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_IDENTIFIER(yytext, loc); }
-	YY_BREAK
-case 75:
-YY_RULE_SETUP
-#line 177 "obj/src/GrammarLexer.l"
+#line 81 "obj/src/GrammarLexer.l"
 { 
     INTEGER_T val = convert_to_long(yytext+2, 2, driver, loc);
     return yy::casmi_parser::make_INTEGERCONST(val, loc);
 }
 	YY_BREAK
-case 76:
+case 2:
 YY_RULE_SETUP
-#line 182 "obj/src/GrammarLexer.l"
+#line 86 "obj/src/GrammarLexer.l"
 { 
             INTEGER_T val = convert_to_long(yytext+2, 16, driver, loc);
             return yy::casmi_parser::make_INTEGERCONST(val, loc);
             }
 	YY_BREAK
-case 77:
+case 3:
 YY_RULE_SETUP
-#line 187 "obj/src/GrammarLexer.l"
+#line 91 "obj/src/GrammarLexer.l"
 {
           INTEGER_T val = convert_to_long(yytext, 10, driver, loc);
           return yy::casmi_parser::make_INTEGERCONST(val, loc);
        }
 	YY_BREAK
-case 78:
+case 4:
 YY_RULE_SETUP
-#line 192 "obj/src/GrammarLexer.l"
+#line 96 "obj/src/GrammarLexer.l"
 { 
             FLOATING_T val = convert_to_float(yytext, driver, loc);
             return yy::casmi_parser::make_FLOATINGCONST(val, loc);
           }
 	YY_BREAK
-case 79:
+case 5:
 YY_RULE_SETUP
-#line 196 "obj/src/GrammarLexer.l"
-{ 
+#line 100 "obj/src/GrammarLexer.l"
+{
             rational_t val = convert_to_rational(yytext, driver, loc);
             return yy::casmi_parser::make_RATIONALCONST(val, loc); 
 }
 	YY_BREAK
-case 80:
+case 6:
 YY_RULE_SETUP
-#line 200 "obj/src/GrammarLexer.l"
+#line 104 "obj/src/GrammarLexer.l"
 {
           yytext[strlen(yytext)-1] = 0;
           rational_t val = convert_to_rational(yytext, driver, loc);
           return yy::casmi_parser::make_RATIONALCONST(val, loc);
         }
 	YY_BREAK
+case 7:
+YY_RULE_SETUP
+#line 112 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_CASM(loc); }
+	YY_BREAK
+case 8:
+YY_RULE_SETUP
+#line 113 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_INIT(loc); }
+	YY_BREAK
+case 9:
+YY_RULE_SETUP
+#line 115 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_OPTION(loc); }
+	YY_BREAK
+case 10:
+YY_RULE_SETUP
+#line 117 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_DERIVED(loc); }
+	YY_BREAK
+case 11:
+YY_RULE_SETUP
+#line 118 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ENUM(loc); }
+	YY_BREAK
+case 12:
+YY_RULE_SETUP
+#line 120 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_RULE(loc); }
+	YY_BREAK
+case 13:
+YY_RULE_SETUP
+#line 121 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_DUMPS(loc); }
+	YY_BREAK
+case 14:
+YY_RULE_SETUP
+#line 123 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_FUNCTION(loc); }
+	YY_BREAK
+case 15:
+YY_RULE_SETUP
+#line 124 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_INITIALLY(loc); }
+	YY_BREAK
+case 16:
+YY_RULE_SETUP
+#line 128 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_SEQ(loc); }
+	YY_BREAK
+case 17:
+YY_RULE_SETUP
+#line 129 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ENDSEQ(loc); }
+	YY_BREAK
+case 18:
+YY_RULE_SETUP
+#line 130 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_PAR(loc); }
+	YY_BREAK
+case 19:
+YY_RULE_SETUP
+#line 131 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ENDPAR(loc); }
+	YY_BREAK
+case 20:
+YY_RULE_SETUP
+#line 134 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ASSERT(loc); }
+	YY_BREAK
+case 21:
+YY_RULE_SETUP
+#line 135 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ASSURE(loc); }
+	YY_BREAK
+case 22:
+YY_RULE_SETUP
+#line 136 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_DIEDIE(loc); }
+	YY_BREAK
+case 23:
+YY_RULE_SETUP
+#line 137 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_IMPOSSIBLE(loc); }
+	YY_BREAK
+case 24:
+YY_RULE_SETUP
+#line 138 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_SKIP(loc); }
+	YY_BREAK
+case 25:
+YY_RULE_SETUP
+#line 139 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_LET(loc); }
+	YY_BREAK
+case 26:
+YY_RULE_SETUP
+#line 140 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_IN(loc); }
+	YY_BREAK
+case 27:
+YY_RULE_SETUP
+#line 141 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_FORALL(loc); }
+	YY_BREAK
+case 28:
+YY_RULE_SETUP
+#line 142 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ITERATE(loc); }
+	YY_BREAK
+case 29:
+YY_RULE_SETUP
+#line 143 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_DO(loc); }
+	YY_BREAK
+case 30:
+YY_RULE_SETUP
+#line 144 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_CALL(loc); }
+	YY_BREAK
+case 31:
+YY_RULE_SETUP
+#line 145 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_IF(loc); }
+	YY_BREAK
+case 32:
+YY_RULE_SETUP
+#line 146 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_THEN(loc); }
+	YY_BREAK
+case 33:
+YY_RULE_SETUP
+#line 147 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ELSE(loc); }
+	YY_BREAK
+case 34:
+YY_RULE_SETUP
+#line 148 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_CASE(loc); }
+	YY_BREAK
+case 35:
+YY_RULE_SETUP
+#line 149 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_OF(loc); }
+	YY_BREAK
+case 36:
+YY_RULE_SETUP
+#line 150 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_DEFAULT(loc); }
+	YY_BREAK
+case 37:
+YY_RULE_SETUP
+#line 151 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ENDCASE(loc); }
+	YY_BREAK
+case 38:
+YY_RULE_SETUP
+#line 152 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_PRINT(loc); }
+	YY_BREAK
+case 39:
+YY_RULE_SETUP
+#line 153 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_DEBUG(loc); }
+	YY_BREAK
+case 40:
+YY_RULE_SETUP
+#line 155 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_PUSH(loc); }
+	YY_BREAK
+case 41:
+YY_RULE_SETUP
+#line 156 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_INTO(loc); }
+	YY_BREAK
+case 42:
+YY_RULE_SETUP
+#line 157 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_POP(loc); }
+	YY_BREAK
+case 43:
+YY_RULE_SETUP
+#line 158 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_FROM(loc); }
+	YY_BREAK
+case 44:
+YY_RULE_SETUP
+#line 160 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_SELF(loc); }
+	YY_BREAK
+case 45:
+YY_RULE_SETUP
+#line 161 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_UNDEF(loc); }
+	YY_BREAK
+case 46:
+YY_RULE_SETUP
+#line 162 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_FALSE(loc); }
+	YY_BREAK
+case 47:
+YY_RULE_SETUP
+#line 163 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_TRUE(loc); }
+	YY_BREAK
+case 48:
+YY_RULE_SETUP
+#line 165 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_AND(loc); }
+	YY_BREAK
+case 49:
+YY_RULE_SETUP
+#line 166 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_OR(loc); }
+	YY_BREAK
+case 50:
+YY_RULE_SETUP
+#line 167 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_XOR(loc); }
+	YY_BREAK
+case 51:
+YY_RULE_SETUP
+#line 168 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_NOT(loc); }
+	YY_BREAK
+case 52:
+YY_RULE_SETUP
+#line 169 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_RATIONAL_DIV(loc); }
+	YY_BREAK
+case 53:
+YY_RULE_SETUP
+#line 171 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_PLUS(loc); }
+	YY_BREAK
+case 54:
+YY_RULE_SETUP
+#line 172 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_MINUS(loc); }
+	YY_BREAK
+case 55:
+YY_RULE_SETUP
+#line 173 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_EQUAL(loc); }
+	YY_BREAK
+case 56:
+YY_RULE_SETUP
+#line 174 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_LPAREN(loc); }
+	YY_BREAK
+case 57:
+YY_RULE_SETUP
+#line 175 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_RPAREN(loc); }
+	YY_BREAK
+case 58:
+YY_RULE_SETUP
+#line 176 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_LSQPAREN(loc); }
+	YY_BREAK
+case 59:
+YY_RULE_SETUP
+#line 177 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_RSQPAREN(loc); }
+	YY_BREAK
+case 60:
+YY_RULE_SETUP
+#line 178 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_LCURPAREN(loc); }
+	YY_BREAK
+case 61:
+YY_RULE_SETUP
+#line 179 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_RCURPAREN(loc); }
+	YY_BREAK
+case 62:
+YY_RULE_SETUP
+#line 180 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_DOT(loc); }
+	YY_BREAK
+case 63:
+YY_RULE_SETUP
+#line 181 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_COLON(loc); }
+	YY_BREAK
+case 64:
+YY_RULE_SETUP
+#line 182 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_UNDERLINE(loc); }
+	YY_BREAK
+case 65:
+YY_RULE_SETUP
+#line 183 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_AT(loc); }
+	YY_BREAK
+case 66:
+YY_RULE_SETUP
+#line 184 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_COMMA(loc); }
+	YY_BREAK
+case 67:
+YY_RULE_SETUP
+#line 185 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_LESSER(loc); }
+	YY_BREAK
+case 68:
+YY_RULE_SETUP
+#line 186 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_GREATER(loc); }
+	YY_BREAK
+case 69:
+YY_RULE_SETUP
+#line 187 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_STAR(loc); }
+	YY_BREAK
+case 70:
+YY_RULE_SETUP
+#line 188 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_SLASH(loc); }
+	YY_BREAK
+case 71:
+YY_RULE_SETUP
+#line 189 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_PERCENT(loc); }
+	YY_BREAK
+case 72:
+YY_RULE_SETUP
+#line 191 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_DOTDOT(loc); }
+	YY_BREAK
+case 73:
+YY_RULE_SETUP
+#line 192 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ARROW(loc); }
+	YY_BREAK
+case 74:
+YY_RULE_SETUP
+#line 193 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_UPDATE(loc); }
+	YY_BREAK
+case 75:
+YY_RULE_SETUP
+#line 194 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_NEQUAL(loc); }
+	YY_BREAK
+case 76:
+YY_RULE_SETUP
+#line 195 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_LESSEQ(loc); }
+	YY_BREAK
+case 77:
+YY_RULE_SETUP
+#line 196 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_GREATEREQ(loc); }
+	YY_BREAK
+case 78:
+YY_RULE_SETUP
+#line 197 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_SEQ_BRACKET(loc); }
+	YY_BREAK
+case 79:
+YY_RULE_SETUP
+#line 198 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_ENDSEQ_BRACKET(loc); }
+	YY_BREAK
+case 80:
+YY_RULE_SETUP
+#line 202 "obj/src/GrammarLexer.l"
+{ return yy::casmi_parser::make_IDENTIFIER(yytext, loc); }
+	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 206 "obj/src/GrammarLexer.l"
+#line 204 "obj/src/GrammarLexer.l"
 loc.step();/* ignore spaces */
 	YY_BREAK
 case 82:
 /* rule 82 can match eol */
 YY_RULE_SETUP
-#line 208 "obj/src/GrammarLexer.l"
+#line 206 "obj/src/GrammarLexer.l"
 {loc.lines(yyleng); loc.step(); } /* ignore newlines too, but reset yycolumn */
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 210 "obj/src/GrammarLexer.l"
+#line 208 "obj/src/GrammarLexer.l"
 { BEGIN(LCOMMENT); loc.lines(1); loc.step(); }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 211 "obj/src/GrammarLexer.l"
+#line 209 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case 85:
 /* rule 85 can match eol */
 YY_RULE_SETUP
-#line 212 "obj/src/GrammarLexer.l"
+#line 210 "obj/src/GrammarLexer.l"
 { BEGIN( INITIAL ); }
 	YY_BREAK
 case YY_STATE_EOF(LCOMMENT):
-#line 213 "obj/src/GrammarLexer.l"
+#line 211 "obj/src/GrammarLexer.l"
 { BEGIN( INITIAL ); }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 215 "obj/src/GrammarLexer.l"
+#line 213 "obj/src/GrammarLexer.l"
 { BEGIN(COMMENT); } /* ignore multi line comment */
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 216 "obj/src/GrammarLexer.l"
+#line 214 "obj/src/GrammarLexer.l"
 { BEGIN(INITIAL); }
 	YY_BREAK
 case 88:
 /* rule 88 can match eol */
 YY_RULE_SETUP
-#line 217 "obj/src/GrammarLexer.l"
+#line 215 "obj/src/GrammarLexer.l"
 { }
 	YY_BREAK
 case 89:
 /* rule 89 can match eol */
 YY_RULE_SETUP
-#line 218 "obj/src/GrammarLexer.l"
+#line 216 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 219 "obj/src/GrammarLexer.l"
+#line 217 "obj/src/GrammarLexer.l"
 { printf( "Multiline comment not terminated on line %d", yylineno ); exit( 2 ); }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 221 "obj/src/GrammarLexer.l"
+#line 219 "obj/src/GrammarLexer.l"
 { BEGIN(STRING); strbuf[0] = '\0'; }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 222 "obj/src/GrammarLexer.l"
+#line 220 "obj/src/GrammarLexer.l"
 { strncat( strbuf, yytext, STRBUF_LENGTH-1 ); } /* alle Zeichen */
 	YY_BREAK
 case 92:
 /* rule 92 can match eol */
 YY_RULE_SETUP
-#line 223 "obj/src/GrammarLexer.l"
+#line 221 "obj/src/GrammarLexer.l"
 { }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 224 "obj/src/GrammarLexer.l"
+#line 222 "obj/src/GrammarLexer.l"
 { strncat( strbuf, "\n", STRBUF_LENGTH-1 ); }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 225 "obj/src/GrammarLexer.l"
+#line 223 "obj/src/GrammarLexer.l"
 { strncat( strbuf, "\t", STRBUF_LENGTH-1 ); }
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 226 "obj/src/GrammarLexer.l"
+#line 224 "obj/src/GrammarLexer.l"
 { strncat( strbuf, "\"", STRBUF_LENGTH-1 ); }
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 227 "obj/src/GrammarLexer.l"
+#line 225 "obj/src/GrammarLexer.l"
 { strncat( strbuf, "\'", STRBUF_LENGTH-1 ); }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 228 "obj/src/GrammarLexer.l"
+#line 226 "obj/src/GrammarLexer.l"
 { global_driver->error( loc, "unclosed string", libcasm_fe::Codes::SyntaxErrorUnclosedString ); exit( 1 ); }
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 229 "obj/src/GrammarLexer.l"
+#line 227 "obj/src/GrammarLexer.l"
 { BEGIN(INITIAL); return yy::casmi_parser::make_STRCONST(strbuf, loc); }
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 231 "obj/src/GrammarLexer.l"
+#line 229 "obj/src/GrammarLexer.l"
 { global_driver->error( loc, "unrecognized character '" + std::string( yytext ) + "'", libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter ); /*yytext, *yytext, yylineno*/ exit( 1 );
 }
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 234 "obj/src/GrammarLexer.l"
+#line 232 "obj/src/GrammarLexer.l"
 ECHO;
 	YY_BREAK
-#line 1518 "src/various/GrammarLexer.cpp"
+#line 1515 "src/various/GrammarLexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2479,7 +2476,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 234 "obj/src/GrammarLexer.l"
+#line 232 "obj/src/GrammarLexer.l"
 
 
 

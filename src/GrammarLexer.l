@@ -78,12 +78,6 @@ char strbuf[STRBUF_LENGTH];
     loc.step ();
 %}
 
-
-{{grammartoken}}
-
-
-[a-zA-Z_][a-zA-Z0-9\_]* { return yy::casmi_parser::make_IDENTIFIER(yytext, loc); }
-
 0[bB][01][01\']*[01]* { 
     INTEGER_T val = convert_to_long(yytext+2, 2, driver, loc);
     return yy::casmi_parser::make_INTEGERCONST(val, loc);
@@ -103,15 +97,19 @@ char strbuf[STRBUF_LENGTH];
             FLOATING_T val = convert_to_float(yytext, driver, loc);
             return yy::casmi_parser::make_FLOATINGCONST(val, loc);
           }
-[0-9]+[/][0-9]+ { 
+r[0-9]+[/][0-9]+ {
             rational_t val = convert_to_rational(yytext, driver, loc);
             return yy::casmi_parser::make_RATIONALCONST(val, loc); 
 }
-[0-9]+r {
+r[0-9]+ {
           yytext[strlen(yytext)-1] = 0;
           rational_t val = convert_to_rational(yytext, driver, loc);
           return yy::casmi_parser::make_RATIONALCONST(val, loc);
         }
+
+{{grammartoken}}
+
+[a-zA-Z_][a-zA-Z0-9\_]* { return yy::casmi_parser::make_IDENTIFIER(yytext, loc); }
 
 [ \t\r]+ loc.step();/* ignore spaces */
 
