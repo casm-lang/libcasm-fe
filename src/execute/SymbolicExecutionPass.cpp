@@ -630,9 +630,25 @@ value_t SymbolicExecutionPass::visit_expression(
         case Opcode::MUL_INSTRUCTION:
             WRAP_NUMERICAL_OPERATION( operator*, left_val, right_val)
         case Opcode::DIV_INSTRUCTION:
-            WRAP_NUMERICAL_OPERATION( operator/, left_val, right_val)
+            try
+            {
+                WRAP_NUMERICAL_OPERATION( operator/, left_val, right_val)
+            }
+            catch( const std::domain_error& e )
+            {
+                throw RuntimeException( expr->right_->location, e.what(),
+                    libcasm_fe::Codes::OperatorInvalidOperands );
+            }
         case Opcode::MOD_INSTRUCTION:
-            WRAP_NUMERICAL_OPERATION( operator%, left_val, right_val)
+            try
+            {
+                WRAP_NUMERICAL_OPERATION( operator%, left_val, right_val)
+            }
+            catch( const std::domain_error& e )
+            {
+                throw RuntimeException( expr->right_->location, e.what(),
+                    libcasm_fe::Codes::OperatorInvalidOperands );
+            }
         case Opcode::RIV_INSTRUCTION:
             WRAP_NUMERICAL_OPERATION( rat_div, left_val, right_val );
         case Opcode::EQU_INSTRUCTION:

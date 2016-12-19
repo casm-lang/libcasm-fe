@@ -419,7 +419,25 @@ value_t operator*( const value_t& lhs, const value_t& rhs )
 
 value_t operator/( const value_t& lhs, const value_t& rhs )
 {
-    CREATE_NUMERICAL_OPERATION( /, lhs, rhs );
+    if( lhs.is_undef() or rhs.is_undef() )
+    {
+        return value_t();
+    }
+    switch( lhs.type )
+    {
+        case TypeType::INTEGER:
+            if( rhs.value.integer == 0 )
+            {
+                throw std::domain_error( "division by zero" );
+            }
+            return value_t( lhs.value.integer / rhs.value.integer );
+        case TypeType::FLOATING:
+            return value_t( lhs.value.float_ / rhs.value.float_ );
+        case TypeType::RATIONAL:
+            return value_t( &( *lhs.value.rat / *rhs.value.rat ) );
+        default:
+            FAILURE();
+    }
 }
 
 value_t operator%( const value_t& lhs, const value_t& rhs )
@@ -431,6 +449,10 @@ value_t operator%( const value_t& lhs, const value_t& rhs )
     switch( lhs.type )
     {
         case TypeType::INTEGER:
+            if( rhs.value.integer == 0 )
+            {
+                throw std::domain_error( "division by zero" );
+            }
             return value_t( lhs.value.integer % rhs.value.integer );
         case TypeType::FLOATING:
             return value_t( std::fmod( lhs.value.float_, rhs.value.float_ ) );

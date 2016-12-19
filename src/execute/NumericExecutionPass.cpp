@@ -372,9 +372,25 @@ value_t NumericExecutionPass::visit_expression(
         case Opcode::MUL_INSTRUCTION:
             return left_val * right_val;
         case Opcode::DIV_INSTRUCTION:
-            return left_val / right_val;
+            try
+            {
+                return left_val / right_val;
+            }
+            catch( const std::domain_error& e )
+            {
+                throw RuntimeException( expr->right_->location, e.what(),
+                    libcasm_fe::Codes::OperatorInvalidOperands );
+            }
         case Opcode::MOD_INSTRUCTION:
-            return left_val % right_val;
+            try
+            {
+                return left_val % right_val;
+            }
+            catch( const std::domain_error& e )
+            {
+                throw RuntimeException( expr->right_->location, e.what(),
+                    libcasm_fe::Codes::OperatorInvalidOperands );
+            }
         case Opcode::RIV_INSTRUCTION:
             return rat_div( left_val, right_val );
         case Opcode::EQU_INSTRUCTION:

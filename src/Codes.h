@@ -124,7 +124,8 @@ namespace libcasm_fe
         // --------------------------------------------------------- 8*** ...
         // operator errors
         ,
-        OperatorAddInvalidOperandType = 0x8000
+        OperatorAddInvalidOperandType = 0x8000,
+        OperatorInvalidOperands = 0x8001
 
         // --------------------------------------------------------- b*** ...
         // bit type errors
