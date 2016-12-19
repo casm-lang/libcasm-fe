@@ -1193,7 +1193,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_builtin_atom(
     }
 
     libcasm_ir::Value* ir_ident = new libcasm_ir::Builtin(
-        node->to_str().c_str(), ty_ident, libcasm_ir::Type::INTEGER, {} );
+        node->to_str().c_str(), ty_ident, {} );
     assert( ir_ident );
 
     libcasm_ir::CallInstruction* ir_call
