@@ -88,6 +88,11 @@ char strbuf[STRBUF_LENGTH];
             return yy::casmi_parser::make_INTEGERCONST(val, loc);
             }
 
+0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
+          rational_t val = convert_to_rational(yytext + 2, driver, loc);
+          return yy::casmi_parser::make_RATIONALCONST(val, loc);
+        }
+
 [0-9][0-9\']*[0-9]* {
           INTEGER_T val = convert_to_long(yytext, 10, driver, loc);
           return yy::casmi_parser::make_INTEGERCONST(val, loc);
@@ -97,15 +102,6 @@ char strbuf[STRBUF_LENGTH];
             FLOATING_T val = convert_to_float(yytext, driver, loc);
             return yy::casmi_parser::make_FLOATINGCONST(val, loc);
           }
-r[0-9]+[/][0-9]+ {
-            rational_t val = convert_to_rational(yytext, driver, loc);
-            return yy::casmi_parser::make_RATIONALCONST(val, loc); 
-}
-r[0-9]+ {
-          yytext[strlen(yytext)-1] = 0;
-          rational_t val = convert_to_rational(yytext, driver, loc);
-          return yy::casmi_parser::make_RATIONALCONST(val, loc);
-        }
 
 {{grammartoken}}
 
