@@ -70,10 +70,11 @@
     #include "src/Driver.h"
     #include "src/Codes.h"
 
-    std::pair<bool, bool> parse_function_attributes
+    void parse_function_attributes
     ( Driver& driver
     , const yy::location& loc
     , const std::vector<std::string>& attribute_names
+    , Function* function
     )
     {
         bool is_static = false;
@@ -148,7 +149,8 @@
             );
         }
         
-        return std::pair<bool, bool>(is_static, is_symbolic);
+        function->is_static = is_static;
+        function->is_symbolic = is_symbolic;
     }
 }
 
@@ -492,13 +494,15 @@ DERIVED_SYNTAX
 FUNCTION_DEFINITION
 : FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
   {
-      auto attrs = parse_function_attributes(driver, @$, $3);
-      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, $7);
+      auto function = new Function($5, @$, $6.first, $6.second, $7);
+      parse_function_attributes(driver, @$, $3, function);
+      $$ = function;
   }
 | FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE
   {
-      auto attrs = parse_function_attributes(driver, @$, $3);
-      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, nullptr);
+      auto function = new Function($5, @$, $6.first, $6.second, nullptr);
+      parse_function_attributes(driver, @$, $3, function);
+      $$ = function;
   }
 | FUNCTION IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
   {

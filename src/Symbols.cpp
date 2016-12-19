@@ -639,21 +639,13 @@ uint64_t Function::counter = 0;
 Function::Function( const std::string name, const yy::location& location,
     const std::vector< Type* >& args, Type* return_type,
     std::vector< std::pair< ExpressionBase*, ExpressionBase* > >* init )
-: Function( false, false, name, location, args, return_type, init )
-{
-}
-
-Function::Function( bool is_static, bool is_symbolic, const std::string name,
-    const yy::location& location, const std::vector< Type* >& args,
-    Type* return_type,
-    std::vector< std::pair< ExpressionBase*, ExpressionBase* > >* init )
 : Symbol( name, location, SymbolType::FUNCTION )
 , arguments_( std::move( args ) )
 , intitializers_( init )
 , return_type_( return_type )
 , id( counter )
-, is_static( is_static )
-, is_symbolic( is_symbolic )
+, is_static( false )
+, is_symbolic( false )
 , checkArguments( false )
 , checkReturnValue( false )
 {

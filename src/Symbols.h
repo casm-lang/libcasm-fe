@@ -266,8 +266,8 @@ class Function : public Symbol
     std::map< std::string, size_t > binding_offsets;
     std::vector< const char* > parameter;
 
-    const bool is_static;
-    const bool is_symbolic;
+    bool is_static;
+    bool is_symbolic;
 
     // for execution
     bool checkArguments;
@@ -275,10 +275,6 @@ class Function : public Symbol
 
     Function( const std::string name, const yy::location& location,
         const std::vector< Type* >& args, Type* return_type,
-        std::vector< std::pair< ExpressionBase*, ExpressionBase* > >* init );
-    Function( bool is_static, bool is_symbolic, const std::string name,
-        const yy::location& location, const std::vector< Type* >& args,
-        Type* return_type,
         std::vector< std::pair< ExpressionBase*, ExpressionBase* > >* init );
     Function( const std::string name, const yy::location& location,
         const std::vector< Type* >& args, ExpressionBase* expr,

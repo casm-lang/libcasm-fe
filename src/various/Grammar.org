@@ -48,9 +48,9 @@ DERIVED_SYNTAX
 
 FUNCTION_DEFINITION
 : FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
-      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, $7);
+      $$ = function;
 | FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE
-      $$ = new Function(attrs.first, attrs.second, $5, @$, $6.first, $6.second, nullptr);
+      $$ = function;
 | FUNCTION IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
       $$ = new Function($2, @$, $3.first, $3.second, $4);
 | FUNCTION IDENTIFIER FUNCTION_SIGNATURE
