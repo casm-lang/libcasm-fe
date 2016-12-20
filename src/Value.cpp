@@ -426,11 +426,9 @@ value_t operator/( const value_t& lhs, const value_t& rhs )
     switch( lhs.type )
     {
         case TypeType::INTEGER:
-            if( rhs.value.integer == 0 )
-            {
-                throw std::domain_error( "division by zero" );
-            }
-            return value_t( lhs.value.integer / rhs.value.integer );
+            return ( rhs.value.integer == 0 )
+                       ? value_t()
+                       : value_t( lhs.value.integer / rhs.value.integer );
         case TypeType::FLOATING:
             return value_t( lhs.value.float_ / rhs.value.float_ );
         case TypeType::RATIONAL:
@@ -449,11 +447,9 @@ value_t operator%( const value_t& lhs, const value_t& rhs )
     switch( lhs.type )
     {
         case TypeType::INTEGER:
-            if( rhs.value.integer == 0 )
-            {
-                throw std::domain_error( "division by zero" );
-            }
-            return value_t( lhs.value.integer % rhs.value.integer );
+            return ( rhs.value.integer == 0 )
+                       ? value_t()
+                       : value_t( lhs.value.integer % rhs.value.integer );
         case TypeType::FLOATING:
             return value_t( std::fmod( lhs.value.float_, rhs.value.float_ ) );
         default:
