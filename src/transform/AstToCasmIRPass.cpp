@@ -836,9 +836,6 @@ bool libcasm_fe::AstToCasmIRPass::visit_expression(
         case Opcode::DIV_INSTRUCTION:
             ir_expr = new libcasm_ir::DivInstruction( ir_lhs, ir_rhs );
             break;
-        case Opcode::RIV_INSTRUCTION:
-            ir_expr = new libcasm_ir::RivInstruction( ir_lhs, ir_rhs );
-            break;
         case Opcode::MOD_INSTRUCTION:
             ir_expr = new libcasm_ir::ModInstruction( ir_lhs, ir_rhs );
             break;
