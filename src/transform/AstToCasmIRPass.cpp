@@ -1189,7 +1189,10 @@ bool libcasm_fe::AstToCasmIRPass::visit_builtin_atom(
     }
 
     libcasm_ir::Value* ir_ident
-        = new libcasm_ir::Builtin( node->to_str().c_str(), ty_ident, {} );
+        = new libcasm_ir::Builtin( node->to_str().c_str(), ty_ident,
+            libcasm_ir::AsBooleanBuiltin::info ); // TODO: PPA: FIXME: this is a
+                                                  // hack for now just to avoid
+                                                  // compilation errors!
     assert( ir_ident );
 
     libcasm_ir::CallInstruction* ir_call
