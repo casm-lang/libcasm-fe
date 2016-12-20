@@ -414,19 +414,3 @@ INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_arith_op_mod,
                     BinaryOpArgs{ make_value( number ), make_value( number ),
                         yields( make_value( number ) ) } };
             } ) ) ) );
-
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_arith_op_riv,
-    numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::RIV_INSTRUCTION ),
-        Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                    make_value( TypeType::UNDEF ),
-                    yields( make_value( TypeType::UNDEF ) ) },
-            BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::INTEGER ),
-                yields( make_value( TypeType::UNDEF ) ) },
-            BinaryOpArgs{ make_value( TypeType::INTEGER ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::UNDEF ) ) },
-            BinaryOpArgs{ make_value( TypeType::INTEGER ),
-                make_value( TypeType::INTEGER ),
-                yields( make_value( TypeType::RATIONAL ) ) } ) ) );
