@@ -457,26 +457,6 @@ value_t operator%( const value_t& lhs, const value_t& rhs )
     }
 }
 
-value_t rat_div( const value_t& lhs, const value_t& rhs )
-{
-    if( lhs.is_undef() or rhs.is_undef() )
-    {
-        return value_t();
-    }
-    switch( lhs.type )
-    {
-        case TypeType::INTEGER:
-        {
-            auto result = new rational_t;
-            result->numerator = lhs.value.integer;
-            result->denominator = rhs.value.integer;
-            return value_t( result );
-        }
-        default:
-            FAILURE();
-    }
-}
-
 #define CREATE_COMPARE_OPERATION( op, lhs, rhs )                               \
     {                                                                          \
         if( lhs.is_undef() or rhs.is_undef() )                                 \

@@ -221,8 +221,6 @@ EXPRESSION
       $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
 | EXPRESSION PERCENT EXPRESSION
       $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
-| EXPRESSION RATIONAL_DIV EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::RIV_INSTRUCTION );
 | EXPRESSION NEQUAL EXPRESSION
       $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
 | EXPRESSION EQUAL EXPRESSION

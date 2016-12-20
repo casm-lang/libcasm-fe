@@ -375,8 +375,6 @@ value_t NumericExecutionPass::visit_expression(
             return left_val / right_val;
         case Opcode::MOD_INSTRUCTION:
             return left_val % right_val;
-        case Opcode::RIV_INSTRUCTION:
-            return rat_div( left_val, right_val );
         case Opcode::EQU_INSTRUCTION:
             return value_t( left_val == right_val );
         case Opcode::NEQ_INSTRUCTION:

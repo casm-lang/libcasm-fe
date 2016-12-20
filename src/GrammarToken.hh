@@ -85,7 +85,6 @@ AND             "and"           { return yy::casmi_parser::make_AND(loc); }
 OR              "or"            { return yy::casmi_parser::make_OR(loc); }
 XOR             "xor"           { return yy::casmi_parser::make_XOR(loc); }
 NOT             "not"           { return yy::casmi_parser::make_NOT(loc); }
-RATIONAL_DIV    "div"           { return yy::casmi_parser::make_RATIONAL_DIV(loc); }
 
 PLUS            "+"             { return yy::casmi_parser::make_PLUS(loc); }
 MINUS           "-"             { return yy::casmi_parser::make_MINUS(loc); }

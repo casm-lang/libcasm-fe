@@ -96,7 +96,6 @@ value_t operator-( const value_t& lhs, const value_t& rhs );
 value_t operator*( const value_t& lhs, const value_t& rhs );
 value_t operator/( const value_t& lhs, const value_t& rhs );
 value_t operator%( const value_t& lhs, const value_t& rhs );
-value_t rat_div( const value_t& lhs, const value_t& rhs );
 
 value_t operator<( const value_t& lhs, const value_t& rhs );
 value_t operator>( const value_t& lhs, const value_t& rhs );

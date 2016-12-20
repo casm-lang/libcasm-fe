@@ -241,7 +241,6 @@ END       0 "end of file"
 %left PLUS
 %left MINUS
 %left PERCENT
-%left RATIONAL_DIV
 %left SLASH
 %left STAR
 
@@ -970,10 +969,6 @@ EXPRESSION
 | EXPRESSION PERCENT EXPRESSION
   {
       $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
-  }
-| EXPRESSION RATIONAL_DIV EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::RIV_INSTRUCTION );
   }
 | EXPRESSION NEQUAL EXPRESSION
   {

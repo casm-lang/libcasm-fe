@@ -633,8 +633,6 @@ value_t SymbolicExecutionPass::visit_expression(
             WRAP_NUMERICAL_OPERATION( operator/, left_val, right_val);
         case Opcode::MOD_INSTRUCTION:
             WRAP_NUMERICAL_OPERATION( operator%, left_val, right_val);
-        case Opcode::RIV_INSTRUCTION:
-            WRAP_NUMERICAL_OPERATION( rat_div, left_val, right_val );
         case Opcode::EQU_INSTRUCTION:
             if( left_val.is_symbolic() and right_val.is_symbolic()
                 and ( left_val == right_val ) )
