@@ -76,19 +76,18 @@ bool libcasm_fe::AstToCasmIRPass::run( libpass::PassResult& pr )
 
     AstWalker< AstToCasmIRPass, bool > walker( *this );
     walker.walk_specification( root );
-    
-    // PPA: IMPROVEMENT: maybe there is a better solution later for this 'RuleRef to Rule' checking/resolving issue!
+
+    // PPA: IMPROVEMENT: maybe there is a better solution later for this
+    // 'RuleRef to Rule' checking/resolving issue!
     libcasm_ir::RulePointerConstant::checking();
-    
-    
+
     // casm_frontend_destroy();
-    
+
     pr.setResult< libcasm_fe::AstToCasmIRPass >( specification );
     pr.setResult< libcasm_ir::CasmIRDumpPass >( specification );
 
     return true;
 }
-
 
 libcasm_ir::Specification* libcasm_fe::AstToCasmIRPass::getSpecification(
     void ) const
@@ -1192,8 +1191,8 @@ bool libcasm_fe::AstToCasmIRPass::visit_builtin_atom(
         }
     }
 
-    libcasm_ir::Value* ir_ident = new libcasm_ir::Builtin(
-        node->to_str().c_str(), ty_ident, {} );
+    libcasm_ir::Value* ir_ident
+        = new libcasm_ir::Builtin( node->to_str().c_str(), ty_ident, {} );
     assert( ir_ident );
 
     libcasm_ir::CallInstruction* ir_call
