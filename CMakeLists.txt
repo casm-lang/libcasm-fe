@@ -69,6 +69,44 @@ set( CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -O3" )
 set( CMAKE_CXX_FLAGS_SANITIZE "${CMAKE_CXX_FLAGS_SANITIZE} -O1 -Wextra -g -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=undefined -fsanitize=address" )
 
 
+string( LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CWD_LENGTH )
+
+
+set( DEF_GRAMMAR ${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy ${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hh )
+set( ORG_GRAMMAR ${CMAKE_CURRENT_SOURCE_DIR}/src/various/Grammar.org )
+string( SUBSTRING ${ORG_GRAMMAR} ${CWD_LENGTH} -1 GRAMMAR )
+
+add_custom_command(
+  OUTPUT  ${ORG_GRAMMAR}
+  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR}
+  DEPENDS ${DEF_GRAMMAR}
+  COMMENT "Generating Grammar Specification ${GRAMMAR}"
+)
+
+set( DEF_GRAMMAR_PARSER ${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy ${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hh )
+set( CXX_GRAMMAR_PARSER ${CMAKE_CURRENT_SOURCE_DIR}/src/various/GrammarParser.cpp )
+string( SUBSTRING ${CXX_GRAMMAR_PARSER} ${CWD_LENGTH} -1 GRAMMAR_PARSER )
+
+add_custom_command(
+  OUTPUT  ${CXX_GRAMMAR_PARSER}
+  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR_PARSER}
+  DEPENDS ${ORG_GRAMMAR} ${DEF_GRAMMAR_PARSER}
+  COMMENT "Generating Grammar Parser ${GRAMMAR_PARSER}"
+)
+
+
+set( DEF_GRAMMAR_LEXER ${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarLexer.l ${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hh )
+set( CXX_GRAMMAR_LEXER ${CMAKE_CURRENT_SOURCE_DIR}/src/various/GrammarLexer.cpp )
+string( SUBSTRING ${CXX_GRAMMAR_LEXER} ${CWD_LENGTH} -1 GRAMMAR_LEXER )
+
+add_custom_command(
+  OUTPUT  ${CXX_GRAMMAR_LEXER}
+  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR_LEXER}
+  DEPENDS ${DEF_GRAMMAR_LEXER}
+  COMMENT "Generating Grammar Lexer ${GRAMMAR_LEXER}"
+)
+
+
 add_library( ${TARGET} STATIC
   ${CXX_SRC_FILES}
 )

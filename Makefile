@@ -28,39 +28,30 @@ TARGET = casm-fe
 include .config.mk
 
 
-GRAMMAR  = src/various/GrammarLexer.cpp
-GRAMMAR += src/various/GrammarParser.cpp
-GRAMMAR += src/various/Grammar.org
-
-grammar: $(GRAMMAR)
-
 LX  = flex
 YC  = bison
 YF  = -Wall
 
 src/various/Grammar.org: src/GrammarParser.yy src/GrammarToken.hh
-	@echo "[GEN ] Generating Grammar Description" $@
-	@grep -e "^[:|] [alpha]*" $< -B 2 -A 1 | \
+	grep -e "^[:|] [alpha]*" $< -B 2 -A 1 | \
 		sed "/^  {/d" | \
 		sed "/^  }/d" | \
 		sed "/^--/d"  | \
 		sed "/^\t/d"  > $@
 
 src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hh
-	@echo "[GEN ] Generating Grammar Description" $@
-	@mkdir -p `dirname obj/$<`
-	@head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	@cat $(filter %.hh,$^) | sed "/^\/\//d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
-	@tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
-	@sed -i "/^{{grammartoken}}/d" obj/$<
-	@cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
+	mkdir -p `dirname obj/$<`
+	head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
+	cat $(filter %.hh,$^) | sed "/^\/\//d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
+	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
+	sed -i "/^{{grammartoken}}/d" obj/$<
+	cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
 
 
 src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hh
-	@echo "[GEN ] Generating Grammar Lexer" $@
-	@mkdir -p `dirname obj/$<`
-	@head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	@cat $(filter %.hh,$^) | sed "/^\/\//d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$< 
-	@tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
-	@sed -i "/^{{grammartoken}}/d" obj/$<
-	@$(LX) $(LFLAGS) -o $@ obj/$<
+	mkdir -p `dirname obj/$<`
+	head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
+	cat $(filter %.hh,$^) | sed "/^\/\//d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$< 
+	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
+	sed -i "/^{{grammartoken}}/d" obj/$<
+	$(LX) $(LFLAGS) -o $@ obj/$<
