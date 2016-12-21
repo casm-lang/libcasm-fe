@@ -32,12 +32,20 @@ LX  = flex
 YC  = bison
 YF  = -Wall
 
+$(OBJ)/src/various/Grammar.org: src/various/Grammar.org
+	mkdir -p `dirname $@`
+	cp -f $< $@
+
 src/various/Grammar.org: src/GrammarParser.yy src/GrammarToken.hh
 	grep -e "^[:|] [alpha]*" $< -B 2 -A 1 | \
 		sed "/^  {/d" | \
 		sed "/^  }/d" | \
 		sed "/^--/d"  | \
 		sed "/^\t/d"  > $@
+
+$(OBJ)/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp
+	mkdir -p `dirname $@`
+	cp -f $< $@
 
 src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hh
 	mkdir -p `dirname obj/$<`
@@ -47,6 +55,9 @@ src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hh
 	sed -i "/^{{grammartoken}}/d" obj/$<
 	cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
 
+$(OBJ)/src/various/GrammarLexer.cpp: src/various/GrammarLexer.cpp
+	mkdir -p `dirname $@`
+	cp -f $< $@
 
 src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hh
 	mkdir -p `dirname obj/$<`
