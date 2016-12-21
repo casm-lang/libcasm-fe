@@ -261,9 +261,17 @@ SPECIFICATION
 
 
 HEADER
-: CASM 
+: CASM
   {
-      $$ = new SpecificationNode( @$, driver.get_filename() );
+      const std::string& filepath = driver.get_filename();
+      
+      const std::string& filename
+          = filepath.substr( filepath.find_last_of( "/\\" ) + 1 );
+      
+      const std::string& filename_without_extension
+          = filename.substr( 0, filename.rfind( "." ) );
+      
+      $$ = new SpecificationNode( @$, filename_without_extension );
   }
 ;
 
