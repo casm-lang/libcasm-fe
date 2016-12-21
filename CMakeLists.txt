@@ -73,8 +73,8 @@ string( LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CWD_LENGTH )
 
 
 set( DEF_GRAMMAR "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hh" )
-set( ORG_GRAMMAR ${CMAKE_CURRENT_BINARY_DIR}/src/various/Grammar.org )
-string( SUBSTRING ${ORG_GRAMMAR} ${CWD_LENGTH} -1 GRAMMAR )
+set( ORG_GRAMMAR "${CMAKE_CURRENT_BINARY_DIR}/src/various/Grammar.or" )
+set( GRAMMAR     "obj/src/various/Grammar.org" )
 
 add_custom_command(
   OUTPUT  ${ORG_GRAMMAR}
@@ -84,8 +84,8 @@ add_custom_command(
 )
 
 set( DEF_GRAMMAR_PARSER "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hh" )
-set( CXX_GRAMMAR_PARSER ${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarParser.cpp )
-string( SUBSTRING ${CXX_GRAMMAR_PARSER} ${CWD_LENGTH} -1 GRAMMAR_PARSER )
+set( CXX_GRAMMAR_PARSER "${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarParser.cpp" )
+set(     GRAMMAR_PARSER "obj/src/various/GrammarParser.cpp" )
 
 add_custom_command(
   OUTPUT  ${CXX_GRAMMAR_PARSER}
@@ -96,8 +96,8 @@ add_custom_command(
 
 
 set( DEF_GRAMMAR_LEXER "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarLexer.l;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hh" )
-set( CXX_GRAMMAR_LEXER ${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarLexer.cpp )
-string( SUBSTRING ${CXX_GRAMMAR_LEXER} ${CWD_LENGTH} -1 GRAMMAR_LEXER )
+set( CXX_GRAMMAR_LEXER "${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarLexer.cpp" )
+set(     GRAMMAR_LEXER "src/various/GrammarLexer.cpp" )
 
 add_custom_command(
   OUTPUT  ${CXX_GRAMMAR_LEXER}
