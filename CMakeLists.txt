@@ -80,7 +80,6 @@ add_custom_command(
   OUTPUT  ${ORG_GRAMMAR}
   COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR}
   DEPENDS ${DEF_GRAMMAR}
-  COMMENT "Generating Grammar Specification ${GRAMMAR}"
 )
 
 set( DEF_GRAMMAR_PARSER "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hh" )
@@ -91,7 +90,6 @@ add_custom_command(
   OUTPUT  ${CXX_GRAMMAR_PARSER}
   COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR_PARSER}
   DEPENDS ${DEF_GRAMMAR_PARSER}
-  COMMENT "Generating Grammar Parser ${GRAMMAR_PARSER}"
 )
 
 
@@ -103,7 +101,6 @@ add_custom_command(
   OUTPUT  ${CXX_GRAMMAR_LEXER}
   COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR_LEXER}
   DEPENDS ${DEF_GRAMMAR_LEXER}
-  COMMENT "Generating Grammar Lexer ${GRAMMAR_LEXER}"
 )
 
 
