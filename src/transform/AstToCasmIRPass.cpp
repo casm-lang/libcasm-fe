@@ -42,13 +42,13 @@ static libcasm_ir::Type* getType( Type* type )
     switch( type->t )
     {
         case TypeType::SELF: // Agent!
-            return new libcasm_ir::Type( libcasm_ir::Type::ID::AGENT );
+            return libcasm_ir::Type::getAgent();
         case TypeType::RULEREF:
-            return new libcasm_ir::Type( libcasm_ir::Type::ID::RULE_POINTER );
+            return libcasm_ir::Type::getRuleReference();
         case TypeType::BOOLEAN:
-            return new libcasm_ir::Type( libcasm_ir::Type::ID::BOOLEAN );
+            return libcasm_ir::Type::getBoolean();
         case TypeType::INTEGER:
-            return new libcasm_ir::Type( libcasm_ir::Type::ID::INTEGER );
+            return libcasm_ir::Type::getInteger();
         case TypeType::BIT:
             if( not( type->bitsize > 0 && type->bitsize <= 256 ) )
             {
@@ -57,10 +57,9 @@ static libcasm_ir::Type* getType( Type* type )
             }
             assert( type->bitsize > 0 && type->bitsize <= 256
                     && "invalid Bit size for Bit type" );
-            return new libcasm_ir::Type(
-                libcasm_ir::Type::ID::BIT, type->bitsize );
+            return libcasm_ir::Type::getBit( type->bitsize );
         case TypeType::STRING:
-            return new libcasm_ir::Type( libcasm_ir::Type::ID::STRING );
+            return libcasm_ir::Type::getString();
         default:
             std::cerr << type->to_str() << "\n";
             assert( 0 && "not implemented function atom identifier type" );
@@ -79,9 +78,10 @@ bool libcasm_fe::AstToCasmIRPass::run( libpass::PassResult& pr )
 
     // PPA: IMPROVEMENT: maybe there is a better solution later for this
     // 'RuleRef to Rule' checking/resolving issue!
-    libcasm_ir::RulePointerConstant::checking();
+    libcasm_ir::RuleReferenceConstant::checking();
 
-    // casm_frontend_destroy();
+    // casm_frontend_destroy(); // PPA: enable this if it is safe to remove the
+    // AST object
 
     pr.setResult< libcasm_fe::AstToCasmIRPass >( specification );
     pr.setResult< libcasm_ir::CasmIRDumpPass >( specification );
@@ -117,20 +117,21 @@ void libcasm_fe::AstToCasmIRPass::visit_specification( SpecificationNode* node )
 void libcasm_fe::AstToCasmIRPass::visit_init( InitNode* node )
 {
     // VISIT;
-    libcasm_ir::RulePointerConstant* ir_init
-        = libcasm_ir::RulePointerConstant::create( node->identifier.c_str() );
+    libcasm_ir::RuleReferenceConstant* ir_init
+        = libcasm_ir::RuleReferenceConstant::create( node->identifier.c_str() );
 
     // single execution agent!
     libcasm_ir::Agent* ir_agent = new libcasm_ir::Agent();
     assert( ir_agent );
-    ir_agent->setInitRulePointer( ir_init );
+    ir_agent->setInitRuleReference( ir_init );
     getSpecification()->add( ir_agent );
 
     // 'program' function!
     libcasm_ir::Type* ftype
-        = new libcasm_ir::Type( libcasm_ir::Type::ID::RULE_POINTER );
+        = libcasm_ir::Type::getRelation( libcasm_ir::Type::getRuleReference(),
+            { libcasm_ir::Type::getAgent() } );
     assert( ftype );
-    ftype->addParameter( &libcasm_ir::AgentType );
+
     libcasm_ir::Function* ir_function = new libcasm_ir::Function(
         libstdhl::Allocator::string( "program" ), ftype );
     assert( ir_function );
@@ -148,24 +149,20 @@ void libcasm_fe::AstToCasmIRPass::visit_function_def(
 {
     VISIT;
 
-    string x;
+    std::string x;
     for( auto& a : node->sym->arguments_ )
     {
         x.append( a->to_str() );
     }
 
-    // printf( "%s, %lu: %s -> %s, \n"
-    //         , node->sym->name.c_str()
-    //         , node->sym->id
-    //         , x.c_str()
-    //         , node->sym->return_type_->to_str().c_str()
-    //     );
-
-    libcasm_ir::Type* ftype = getType( node->sym->return_type_ );
+    std::vector< libcasm_ir::Type* > ftype_args;
     for( auto argument : node->sym->arguments_ )
     {
-        ftype->addParameter( getType( argument ) );
+        ftype_args.push_back( getType( argument ) );
     }
+
+    libcasm_ir::Type* ftype = libcasm_ir::Type::getRelation(
+        getType( node->sym->return_type_ ), ftype_args );
 
     libcasm_ir::Function* ir_function
         = new libcasm_ir::Function( node->sym->name.c_str(), ftype );
@@ -178,15 +175,14 @@ void libcasm_fe::AstToCasmIRPass::visit_derived_def_pre( FunctionDefNode* node )
 {
     VISIT;
 
-    libcasm_ir::Type* ftype = getType( node->sym->return_type_ );
-
-    std::vector< libcasm_ir::Type* > param_types;
-
+    std::vector< libcasm_ir::Type* > ftype_args;
     for( auto argument : node->sym->arguments_ )
     {
-        param_types.push_back( getType( argument ) );
-        ftype->addParameter( param_types.back() );
+        ftype_args.push_back( getType( argument ) );
     }
+
+    libcasm_ir::Type* ftype = libcasm_ir::Type::getRelation(
+        getType( node->sym->return_type_ ), ftype_args );
 
     libcasm_ir::Derived* ir_derived
         = new libcasm_ir::Derived( node->sym->name.c_str(), ftype );
@@ -198,7 +194,7 @@ void libcasm_fe::AstToCasmIRPass::visit_derived_def_pre( FunctionDefNode* node )
         // printf( "param %s\n", param_ident );
 
         ir_derived->addParameter(
-            libcasm_ir::Identifier::create( param_types[ i ], param_ident
+            libcasm_ir::Identifier::create( ftype_args[ i ], param_ident
                 //, ir_derived
                 ) );
     }
@@ -702,7 +698,7 @@ void libcasm_fe::AstToCasmIRPass::visit_ifthenelse(
     assert( ir_cond );
     assert(
         ( libcasm_ir::Value::isa< libcasm_ir::Instruction >( ir_cond )
-            and ir_cond->getType()->getIDKind() == libcasm_ir::Type::BOOLEAN )
+            and ir_cond->getType()->getID() == libcasm_ir::Type::BOOLEAN )
         or libcasm_ir::Value::isa< libcasm_ir::BooleanConstant >( ir_cond ) );
 
     ir_stmt->add( ir_cond );
@@ -939,11 +935,16 @@ bool libcasm_fe::AstToCasmIRPass::visit_function_atom(
         case FunctionAtom::SymbolType::FUNCTION:
         {
             assert( node->symbol );
-            ty_ident = getType( node->symbol->return_type_ );
+
+            std::vector< libcasm_ir::Type* > ty_ident_args;
             for( auto argument : node->symbol->arguments_ )
             {
-                ty_ident->addParameter( getType( argument ) );
+                ty_ident_args.push_back( getType( argument ) );
             }
+
+            ty_ident = libcasm_ir::Type::getRelation(
+                getType( node->symbol->return_type_ ), ty_ident_args );
+            
             break;
         }
         default:
@@ -971,7 +972,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_function_atom(
         = new libcasm_ir::LookupInstruction( ir_loc );
     assert( ir_lup );
     ast2casmir[ node ] = ir_lup;
-
+    
     return 0;
 }
 
@@ -994,11 +995,14 @@ bool libcasm_fe::AstToCasmIRPass::visit_derived_function_atom(
     assert( node->symbol );
     assert( node->symbol_type == FunctionAtom::SymbolType::DERIVED );
 
-    libcasm_ir::Type* ty_ident = getType( node->symbol->return_type_ );
+    std::vector< libcasm_ir::Type* > ty_ident_args;
     for( auto argument : node->symbol->arguments_ )
     {
-        ty_ident->addParameter( getType( argument ) );
+        ty_ident_args.push_back( getType( argument ) );
     }
+
+    libcasm_ir::Type* ty_ident = libcasm_ir::Type::getRelation(
+        getType( node->symbol->return_type_ ), ty_ident_args );
 
     libcasm_ir::Value* ir_ident
         = libcasm_ir::Identifier::create( ty_ident, node->name.c_str() );
@@ -1030,7 +1034,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
     switch( node->type_.t )
     {
         case TypeType::RULEREF:
-            ir_const = libcasm_ir::RulePointerConstant::create();
+            ir_const = libcasm_ir::RuleReferenceConstant::create();
             break;
         case TypeType::BOOLEAN:
             ir_const = libcasm_ir::BooleanConstant::create();
@@ -1146,7 +1150,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
     VISIT;
 
     libcasm_ir::Value* ir_const
-        = libcasm_ir::RulePointerConstant::create( node->name.c_str() );
+        = libcasm_ir::RuleReferenceConstant::create( node->name.c_str() );
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
 
@@ -1179,14 +1183,17 @@ bool libcasm_fe::AstToCasmIRPass::visit_builtin_atom(
 
     // printf( "builtin: %s\n", node->to_str().c_str() );
 
-    libcasm_ir::Type* ty_ident = getType( node->return_type );
+    std::vector< libcasm_ir::Type* > ty_ident_args;
     if( node->arguments )
     {
         for( auto a : *( node->arguments ) )
         {
-            ty_ident->addParameter( getType( &( a->type_ ) ) );
+            ty_ident_args.push_back( getType( &( a->type_ ) ) );
         }
     }
+
+    libcasm_ir::Type* ty_ident = libcasm_ir::Type::getRelation(
+        getType( node->return_type ), ty_ident_args );
 
     libcasm_ir::Value* ir_ident
         = new libcasm_ir::Builtin( node->to_str().c_str(), ty_ident,
