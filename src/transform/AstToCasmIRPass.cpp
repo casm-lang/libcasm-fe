@@ -252,6 +252,8 @@ void libcasm_fe::AstToCasmIRPass::visit_skip( AstNode* node )
     libcasm_ir::TrivialStatement* ir_stmt
         = new libcasm_ir::TrivialStatement( ir_scope );
     assert( ir_stmt );
+    ir_scope->add( ir_stmt );
+    
     ast2casmir[ node ] = ir_stmt;
 
     libcasm_ir::SkipInstruction* ir_skip = new libcasm_ir::SkipInstruction();
@@ -272,11 +274,11 @@ void libcasm_fe::AstToCasmIRPass::visit_rule( RuleNode* node )
     //    printf( "%p -> %p\n", node, node->child_ );
     assert( node );
 
-    libcasm_ir::Rule* ir_rule = new libcasm_ir::Rule( node->name.c_str() );
+    libcasm_ir::Rule* ir_rule = new libcasm_ir::Rule( node->name.c_str(), libcasm_ir::Type::getRuleReference() );
     assert( ir_rule );
     ast2casmir[ node ] = ir_rule;
     ast2parent[ node->child_ ] = node;
-
+    
     if( node->child_->node_type_ != NodeType::PARBLOCK )
     {
         libcasm_ir::ParallelBlock* ir_scope = new libcasm_ir::ParallelBlock();
@@ -449,6 +451,8 @@ void libcasm_fe::AstToCasmIRPass::visit_update(
     libcasm_ir::TrivialStatement* ir_stmt
         = new libcasm_ir::TrivialStatement( ir_scope );
     assert( ir_stmt );
+    ir_scope->add( ir_stmt );
+
     ast2casmir[ node ] = ir_stmt;
     ast2parent[ node->func ] = node;
     ast2parent[ node->expr_ ] = node;
@@ -489,6 +493,8 @@ void libcasm_fe::AstToCasmIRPass::visit_call(
 
     // TrivialStatement* ir_stmt = new TrivialStatement( ir_scope );
     // assert( ir_stmt );
+    // ir_scope->add( ir_stmt );
+    
     // ast2casmir[ node ]         = ir_stmt;
     // // ast2parent[ node->func ]   = node;
     // // ast2parent[ node->expr_ ]  = node;
@@ -526,6 +532,8 @@ void libcasm_fe::AstToCasmIRPass::visit_print( PrintNode* node, bool expr )
     libcasm_ir::TrivialStatement* ir_stmt
         = new libcasm_ir::TrivialStatement( ir_scope );
     assert( ir_stmt );
+    ir_scope->add( ir_stmt );
+    
     ast2casmir[ node ] = ir_stmt;
 
     libcasm_ir::PrintInstruction* ir_print = new libcasm_ir::PrintInstruction();
@@ -569,6 +577,8 @@ void libcasm_fe::AstToCasmIRPass::visit_assert( UnaryNode* node, bool expr )
     libcasm_ir::TrivialStatement* ir_stmt
         = new libcasm_ir::TrivialStatement( ir_scope );
     assert( ir_stmt );
+    ir_scope->add( ir_stmt );
+
     ast2casmir[ node ] = ir_stmt;
 
     libcasm_ir::Value* ir_cond = lookup< libcasm_ir::Value >( node->child_ );
@@ -631,6 +641,8 @@ void libcasm_fe::AstToCasmIRPass::visit_let( LetNode* node, bool var )
     libcasm_ir::TrivialStatement* ir_stmt
         = new libcasm_ir::TrivialStatement( ir_block );
     assert( ir_stmt );
+    ir_block->add( ir_stmt );
+    
     ir_stmt->add( ir_local );
     ir_stmt->setParent( ir_block );
 
@@ -640,7 +652,8 @@ void libcasm_fe::AstToCasmIRPass::visit_let( LetNode* node, bool var )
     // assert( ir_block );
     // TrivialStatement* ir_stmt = new TrivialStatement( ir_block );
     // assert( ir_stmt );
-
+    // ir_block->add( ir_stmt );
+    
     // ir_stmt->add( ir_local );
 
     // ast2casmir[ node ] = ir_stmt;
@@ -691,7 +704,8 @@ void libcasm_fe::AstToCasmIRPass::visit_ifthenelse(
     libcasm_ir::BranchStatement* ir_stmt
         = new libcasm_ir::BranchStatement( ir_scope );
     assert( ir_stmt );
-
+    ir_scope->add( ir_stmt );
+    
     assert( node->condition_ );
     libcasm_ir::Value* ir_cond
         = lookup< libcasm_ir::Value >( node->condition_ );
@@ -757,7 +771,8 @@ void libcasm_fe::AstToCasmIRPass::visit_case(
     libcasm_ir::BranchStatement* ir_stmt
         = new libcasm_ir::BranchStatement( ir_scope );
     assert( ir_stmt );
-
+    ir_scope->add( ir_stmt );
+    
     libcasm_ir::Value* ir_expr = lookup< libcasm_ir::Value >( node->expr );
     assert( ir_expr );
     assert( libcasm_ir::Value::isa< libcasm_ir::Instruction >( ir_expr )
