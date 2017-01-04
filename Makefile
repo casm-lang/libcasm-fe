@@ -36,7 +36,7 @@ $(OBJ)/src/various/Grammar.org: src/various/Grammar.org
 	mkdir -p `dirname $@`
 	cp -f $< $@
 
-src/various/Grammar.org: src/GrammarParser.yy src/GrammarToken.hh
+src/various/Grammar.org: src/GrammarParser.yy src/GrammarToken.hpp
 	grep -e "^[:|] [alpha]*" $< -B 2 -A 1 | \
 		sed "/^  {/d" | \
 		sed "/^  }/d" | \
@@ -47,10 +47,10 @@ $(OBJ)/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp
 	mkdir -p `dirname $@`
 	cp -f $< $@
 
-src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hh
+src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hpp
 	mkdir -p `dirname obj/$<`
 	head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	cat $(filter %.hh,$^) | sed "/^\/\//d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
+	cat $(filter %.hpp,$^) | sed "/^\/\//d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
 	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
 	sed -i "/^{{grammartoken}}/d" obj/$<
 	cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
@@ -59,10 +59,10 @@ $(OBJ)/src/various/GrammarLexer.cpp: src/various/GrammarLexer.cpp
 	mkdir -p `dirname $@`
 	cp -f $< $@
 
-src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hh
+src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
 	mkdir -p `dirname obj/$<`
 	head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	cat $(filter %.hh,$^) | sed "/^\/\//d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$< 
+	cat $(filter %.hpp,$^) | sed "/^\/\//d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$< 
 	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
 	sed -i "/^{{grammartoken}}/d" obj/$<
 	$(LX) $(LFLAGS) -o $@ obj/$<
