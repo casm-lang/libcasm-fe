@@ -711,6 +711,7 @@ void libcasm_fe::AstToCasmIRPass::visit_ifthenelse(
     libcasm_ir::Value* ir_cond
         = lookup< libcasm_ir::Value >( node->condition_ );
     assert( ir_cond );
+
     assert(
         ( libcasm_ir::Value::isa< libcasm_ir::Instruction >( ir_cond )
             and ir_cond->getType()->getID() == libcasm_ir::Type::BOOLEAN )
@@ -728,15 +729,14 @@ void libcasm_fe::AstToCasmIRPass::visit_ifthenelse(
 
     if( node->else_ )
     {
-        assert( 0 );
-        // ExecutionSemanticsBlock* ir_case_false = new ParallelBlock( ir_scope
-        // );
-        // assert( ir_case_false );
-        // ast2casmir[ node->condition_ ] = ir_case_false;
-        // ast2parent[ node->condition_ ] = node;
-        // ast2parent[ node->else_ ]      = node->condition_;
+        libcasm_ir::ExecutionSemanticsBlock* ir_case_false
+            = new libcasm_ir::ParallelBlock( ir_scope );
+        assert( ir_case_false );
+        ast2casmir[ node->condition_ ] = ir_case_false;
+        ast2parent[ node->condition_ ] = node;
+        ast2parent[ node->else_ ] = node->condition_;
 
-        // ir_stmt->addBlock( ir_case_false );
+        ir_stmt->addBlock( ir_case_false );
     }
 }
 
@@ -1054,20 +1054,20 @@ bool libcasm_fe::AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
                 libcasm_ir::Type::getRuleReference() );
             break;
         case TypeType::BOOLEAN:
-            ir_const
-                = libcasm_ir::Constant::getUndef( libcasm_ir::Type::getBoolean() );
+            ir_const = libcasm_ir::Constant::getUndef(
+                libcasm_ir::Type::getBoolean() );
             break;
         case TypeType::BIT:
             ir_const = libcasm_ir::Constant::getUndef(
                 libcasm_ir::Type::getBit( node->type_.bitsize ) );
             break;
         case TypeType::INTEGER:
-            ir_const
-                = libcasm_ir::Constant::getUndef( libcasm_ir::Type::getInteger() );
+            ir_const = libcasm_ir::Constant::getUndef(
+                libcasm_ir::Type::getInteger() );
             break;
         case TypeType::STRING:
-            ir_const
-                = libcasm_ir::Constant::getUndef( libcasm_ir::Type::getString() );
+            ir_const = libcasm_ir::Constant::getUndef(
+                libcasm_ir::Type::getString() );
             break;
         default:
             assert( 0 && "unimplemented undef constant!" );
@@ -1217,9 +1217,9 @@ bool libcasm_fe::AstToCasmIRPass::visit_builtin_atom(
     libcasm_ir::Type* ty_ident = libcasm_ir::Type::getRelation(
         getType( node->return_type ), ty_ident_args );
 
-    libcasm_ir::Value* ir_ident = libcasm_ir::Builtin::get(
-        node->to_str().c_str(), ty_ident );
-    
+    libcasm_ir::Value* ir_ident
+        = libcasm_ir::Builtin::find( node->to_str().c_str(), ty_ident );
+
     assert( ir_ident );
     getSpecification()->add( ir_ident );
 
