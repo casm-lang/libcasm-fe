@@ -719,6 +719,10 @@ void libcasm_fe::AstToCasmIRPass::visit_ifthenelse(
 
     ir_stmt->add( ir_cond );
 
+    libcasm_ir::Instruction* ir_select
+        = new libcasm_ir::SelectInstruction( ir_cond );
+    assert( ir_select );
+
     assert( node->then_ );
     libcasm_ir::ExecutionSemanticsBlock* ir_case_true
         = new libcasm_ir::ParallelBlock( ir_scope );
@@ -726,6 +730,12 @@ void libcasm_fe::AstToCasmIRPass::visit_ifthenelse(
     ast2casmir[ node ] = ir_case_true;
     ast2parent[ node->then_ ] = node;
     ir_stmt->addBlock( ir_case_true );
+
+    libcasm_ir::Value* ir_true = libcasm_ir::Constant::getBoolean( true );
+    getSpecification()->add( ir_true );
+
+    ir_select->add( ir_true );
+    ir_select->add( ir_case_true );
 
     if( node->else_ )
     {
@@ -737,7 +747,15 @@ void libcasm_fe::AstToCasmIRPass::visit_ifthenelse(
         ast2parent[ node->else_ ] = node->condition_;
 
         ir_stmt->addBlock( ir_case_false );
+
+        libcasm_ir::Value* ir_false = libcasm_ir::Constant::getBoolean( false );
+        getSpecification()->add( ir_false );
+
+        ir_select->add( ir_false );
+        ir_select->add( ir_case_false );
     }
+
+    ir_stmt->add( ir_select );
 }
 
 void libcasm_fe::AstToCasmIRPass::visit_case_pre( CaseNode* node, bool val )
@@ -780,11 +798,9 @@ void libcasm_fe::AstToCasmIRPass::visit_case(
             or libcasm_ir::Value::isa< libcasm_ir::Constant >( ir_expr )
             or libcasm_ir::Value::isa< libcasm_ir::Identifier >( ir_expr ) );
 
-    libcasm_ir::Instruction* ir_switch
-        = new libcasm_ir::SwitchInstruction( ir_expr );
-    assert( ir_switch );
-
-    ir_stmt->add( ir_switch );
+    libcasm_ir::Instruction* ir_select
+        = new libcasm_ir::SelectInstruction( ir_expr );
+    assert( ir_select );
 
     libcasm_ir::ExecutionSemanticsBlock* default_case = 0;
 
@@ -806,14 +822,20 @@ void libcasm_fe::AstToCasmIRPass::visit_case(
         libcasm_ir::Value* ir_label = lookup< libcasm_ir::Value >( a.first );
         assert( ir_label );
 
-        ir_switch->add( ir_label );
+        ir_select->add( ir_label );
+        ir_select->add( ir_case );
+
         ir_stmt->addBlock( ir_case );
     }
 
     if( default_case )
     {
+        ir_select->add( default_case );
+
         ir_stmt->addBlock( default_case );
     }
+
+    ir_stmt->add( ir_select );
 }
 
 bool libcasm_fe::AstToCasmIRPass::visit_expression(
