@@ -117,8 +117,8 @@ void libcasm_fe::AstToCasmIRPass::visit_specification( SpecificationNode* node )
 void libcasm_fe::AstToCasmIRPass::visit_init( InitNode* node )
 {
     // VISIT;
-    libcasm_ir::RuleReferenceConstant* ir_init
-        = libcasm_ir::RuleReferenceConstant::create( node->identifier.c_str() );
+    libcasm_ir::Value* ir_init
+        = libcasm_ir::Constant::getRuleReference( node->identifier.c_str() );
 
     // single execution agent!
     libcasm_ir::Agent* ir_agent = new libcasm_ir::Agent();
@@ -777,7 +777,7 @@ void libcasm_fe::AstToCasmIRPass::visit_case(
     libcasm_ir::Value* ir_expr = lookup< libcasm_ir::Value >( node->expr );
     assert( ir_expr );
     assert( libcasm_ir::Value::isa< libcasm_ir::Instruction >( ir_expr )
-            or libcasm_ir::Value::isa< libcasm_ir::ConstantValue >( ir_expr )
+            or libcasm_ir::Value::isa< libcasm_ir::Constant >( ir_expr )
             or libcasm_ir::Value::isa< libcasm_ir::Identifier >( ir_expr ) );
 
     libcasm_ir::Instruction* ir_switch
@@ -1050,19 +1050,24 @@ bool libcasm_fe::AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
     switch( node->type_.t )
     {
         case TypeType::RULEREF:
-            ir_const = libcasm_ir::RuleReferenceConstant::create();
+            ir_const = libcasm_ir::Constant::getUndef(
+                libcasm_ir::Type::getRuleReference() );
             break;
         case TypeType::BOOLEAN:
-            ir_const = libcasm_ir::BooleanConstant::create();
+            ir_const
+                = libcasm_ir::Constant::getUndef( libcasm_ir::Type::getBoolean() );
             break;
         case TypeType::BIT:
-            ir_const = libcasm_ir::BitConstant::create( node->type_.bitsize );
+            ir_const = libcasm_ir::Constant::getUndef(
+                libcasm_ir::Type::getBit( node->type_.bitsize ) );
             break;
         case TypeType::INTEGER:
-            ir_const = libcasm_ir::IntegerConstant::create();
+            ir_const
+                = libcasm_ir::Constant::getUndef( libcasm_ir::Type::getInteger() );
             break;
         case TypeType::STRING:
-            ir_const = libcasm_ir::StringConstant::create();
+            ir_const
+                = libcasm_ir::Constant::getUndef( libcasm_ir::Type::getString() );
             break;
         default:
             assert( 0 && "unimplemented undef constant!" );
@@ -1080,7 +1085,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
     VISIT;
     // printf( "%u\n", node->value );
 
-    libcasm_ir::BooleanConstant* ir_const = libcasm_ir::BooleanConstant::create(
+    libcasm_ir::Value* ir_const = libcasm_ir::Constant::getBoolean(
         (libcasm_ir::Type::Boolean)node->value );
 
     assert( ir_const );
@@ -1095,7 +1100,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
     VISIT;
     // printf( "%lu\n", node->val_    );
 
-    libcasm_ir::IntegerConstant* ir_const = libcasm_ir::IntegerConstant::create(
+    libcasm_ir::Value* ir_const = libcasm_ir::Constant::getInteger(
         (libcasm_ir::Type::Integer)node->val_ );
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1109,10 +1114,11 @@ bool libcasm_fe::AstToCasmIRPass::visit_bit_atom( IntegerAtom* node )
     VISIT;
     // printf( "%lu (0x%lx)\n", node->val_, node->val_    );
 
-    libcasm_ir::BitConstant* ir_const = libcasm_ir::BitConstant::create(
-        (u64)node->val_, node->type_.bitsize ); // LIMITATION: PPA: input
-                                                // parameter can be larger than
-                                                // 64bit!
+    libcasm_ir::Value* ir_const = libcasm_ir::Constant::getBit(
+        libcasm_ir::Type::getBit( node->type_.bitsize ),
+        (u64)node->val_ ); // LIMITATION: PPA: input
+                           // parameter can be larger than
+                           // 64bit!
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
 
@@ -1139,7 +1145,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_string_atom( StringAtom* node )
     VISIT;
 
     libcasm_ir::Value* ir_const
-        = libcasm_ir::StringConstant::create( node->string.c_str() );
+        = libcasm_ir::Constant::getString( node->string.c_str() );
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
 
@@ -1153,7 +1159,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
     VISIT;
 
-    libcasm_ir::Value* ir_const = libcasm_ir::AgentConstant::create( 0 );
+    libcasm_ir::Value* ir_const = libcasm_ir::Constant::getAgent( 0 );
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
 
@@ -1166,7 +1172,7 @@ bool libcasm_fe::AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
     VISIT;
 
     libcasm_ir::Value* ir_const
-        = libcasm_ir::RuleReferenceConstant::create( node->name.c_str() );
+        = libcasm_ir::Constant::getRuleReference( node->name.c_str() );
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
 
@@ -1211,12 +1217,11 @@ bool libcasm_fe::AstToCasmIRPass::visit_builtin_atom(
     libcasm_ir::Type* ty_ident = libcasm_ir::Type::getRelation(
         getType( node->return_type ), ty_ident_args );
 
-    libcasm_ir::Value* ir_ident
-        = new libcasm_ir::Builtin( node->to_str().c_str(), ty_ident,
-            libcasm_ir::AsBooleanBuiltin::info ); // TODO: PPA: FIXME: this is a
-                                                  // hack for now just to avoid
-                                                  // compilation errors!
+    libcasm_ir::Value* ir_ident = libcasm_ir::Builtin::get(
+        node->to_str().c_str(), ty_ident );
+    
     assert( ir_ident );
+    getSpecification()->add( ir_ident );
 
     libcasm_ir::CallInstruction* ir_call
         = new libcasm_ir::CallInstruction( ir_ident );
@@ -1231,7 +1236,6 @@ bool libcasm_fe::AstToCasmIRPass::visit_builtin_atom(
         }
     }
 
-    getSpecification()->add( ir_call );
     return 0;
 }
 
