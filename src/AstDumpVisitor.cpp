@@ -359,3 +359,78 @@ bool AstDumpVisitor::visit_number_range_atom(
     dump_link( atom, atom->right );
     return true;
 }
+
+void AstDumpVisitor::visit_specification( SpecificationNode* )
+{
+}
+
+void AstDumpVisitor::visit_derived_def_pre( FunctionDefNode* )
+{
+}
+
+void AstDumpVisitor::visit_rule_post( RuleNode* )
+{
+}
+
+void AstDumpVisitor::visit_assure( UnaryNode*, bool )
+{
+}
+
+void AstDumpVisitor::visit_seqblock_post( UnaryNode* )
+{
+}
+
+void AstDumpVisitor::visit_parblock_post( UnaryNode* )
+{
+}
+
+void AstDumpVisitor::visit_call(
+    CallNode*, std::vector< bool, std::allocator< bool > >& )
+{
+}
+
+void AstDumpVisitor::visit_call_post( CallNode* )
+{
+}
+
+void AstDumpVisitor::visit_diedie( DiedieNode*, bool )
+{
+}
+
+void AstDumpVisitor::visit_impossible( AstNode* )
+{
+}
+
+void AstDumpVisitor::visit_let_post( LetNode* )
+{
+}
+
+void AstDumpVisitor::visit_case_pre( CaseNode*, bool )
+{
+}
+
+void AstDumpVisitor::visit_skip( AstNode* )
+{
+}
+
+void AstDumpVisitor::visit_forall_pre( ForallNode* )
+{
+}
+
+void AstDumpVisitor::visit_forall_iteration_pre( ForallNode*, bool )
+{
+}
+
+void AstDumpVisitor::visit_forall_iteration_post( ForallNode* )
+{
+}
+
+bool AstDumpVisitor::visit_rational_atom( RationalAtom* )
+{
+    return false;
+}
+
+void AstDumpVisitor::visit_derived_function_atom_pre(
+    FunctionAtom*, std::vector< bool, std::allocator< bool > >& )
+{
+}

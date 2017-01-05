@@ -31,13 +31,15 @@
 
 #include "Visitor.h"
 
-class InitCycleVisitor : public BaseVisitor< bool, bool >
+class InitCycleVisitor : public Visitor< bool, bool >
 {
   public:
     std::set< std::string > dependency_names;
 
-    bool visit_function_atom(
-        FunctionAtom* atom, std::vector< bool >& ) override;
+    /* bool visit_function_atom( */
+    /*     FunctionAtom* atom, std::vector< bool >& ) override; */
+
+    LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
 };
 
 #endif // CASMI_LIBINTERPRETER_EXEC_VISITOR

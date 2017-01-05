@@ -588,249 +588,75 @@ class AstWalker
 };
 
 template < class T, class U = const T& >
-class BaseVisitor
+class Visitor
 {
   public:
-    virtual ~BaseVisitor() = default;
+    virtual ~Visitor() = default;
 
-    virtual void visit_specification( SpecificationNode* )
-    {
-    }
+#define LIB_CASMFE_VISITOR_INTERFACE_( PREFIX, POSTFIX, T, U )                 \
+    PREFIX void visit_specification( SpecificationNode* ) POSTFIX;             \
+    PREFIX void visit_init( InitNode* ) POSTFIX;                               \
+    PREFIX void visit_body_elements( AstListNode* ) POSTFIX;                   \
+    PREFIX void visit_function_def(                                            \
+        FunctionDefNode*, const std::vector< std::pair< T, T > >& ) POSTFIX;   \
+    PREFIX void visit_derived_def_pre( FunctionDefNode* ) POSTFIX;             \
+    PREFIX void visit_derived_def( FunctionDefNode*, U ) POSTFIX;              \
+    PREFIX void visit_rule( RuleNode* ) POSTFIX;                               \
+    PREFIX void visit_rule_post( RuleNode* ) POSTFIX;                          \
+    PREFIX void visit_statements( AstListNode* ) POSTFIX;                      \
+    PREFIX void visit_statement( AstNode* ) POSTFIX;                           \
+    PREFIX void visit_ifthenelse( IfThenElseNode*, U ) POSTFIX;                \
+    PREFIX void visit_assert( UnaryNode*, U ) POSTFIX;                         \
+    PREFIX void visit_assure( UnaryNode*, U ) POSTFIX;                         \
+    PREFIX void visit_seqblock_pre( UnaryNode* ) POSTFIX;                      \
+    PREFIX void visit_seqblock_post( UnaryNode* ) POSTFIX;                     \
+    PREFIX void visit_parblock_pre( UnaryNode* ) POSTFIX;                      \
+    PREFIX void visit_parblock_post( UnaryNode* ) POSTFIX;                     \
+    PREFIX void visit_update( UpdateNode*, const std::vector< T >&, U )        \
+        POSTFIX;                                                               \
+    PREFIX void visit_call_pre( CallNode* ) POSTFIX;                           \
+    PREFIX void visit_call_pre( CallNode*, U ) POSTFIX;                        \
+    PREFIX void visit_call( CallNode*, std::vector< T >& ) POSTFIX;            \
+    PREFIX void visit_call_post( CallNode* ) POSTFIX;                          \
+    PREFIX void visit_print( PrintNode*, U ) POSTFIX;                          \
+    PREFIX void visit_diedie( DiedieNode*, U ) POSTFIX;                        \
+    PREFIX void visit_impossible( AstNode* ) POSTFIX;                          \
+    PREFIX void visit_let( LetNode*, U ) POSTFIX;                              \
+    PREFIX void visit_let_post( LetNode* ) POSTFIX;                            \
+    PREFIX void visit_pop( PopNode*, U ) POSTFIX;                              \
+    PREFIX void visit_push( PushNode*, U, U ) POSTFIX;                         \
+    PREFIX void visit_case_pre( CaseNode*, U ) POSTFIX;                        \
+    PREFIX void visit_case( CaseNode*, U, const std::vector< T >& ) POSTFIX;   \
+    PREFIX void visit_skip( AstNode* ) POSTFIX;                                \
+    PREFIX void visit_forall_pre( ForallNode* ) POSTFIX;                       \
+    PREFIX void visit_forall_post( ForallNode* ) POSTFIX;                      \
+    PREFIX void visit_forall_iteration_pre( ForallNode*, U ) POSTFIX;          \
+    PREFIX void visit_forall_iteration_post( ForallNode* ) POSTFIX;            \
+    PREFIX void visit_iterate( UnaryNode* ) POSTFIX;                           \
+    PREFIX T visit_expression( BinaryExpression*, U, U ) POSTFIX;              \
+    PREFIX T visit_expression_single( UnaryExpression*, U ) POSTFIX;           \
+    PREFIX T visit_zero_atom( ZeroAtom* ) POSTFIX;                             \
+    PREFIX T visit_int_atom( IntegerAtom* ) POSTFIX;                           \
+    PREFIX T visit_bit_atom( IntegerAtom* ) POSTFIX;                           \
+    PREFIX T visit_floating_atom( FloatingAtom* ) POSTFIX;                     \
+    PREFIX T visit_rational_atom( RationalAtom* ) POSTFIX;                     \
+    PREFIX T visit_undef_atom( UndefAtom* ) POSTFIX;                           \
+    PREFIX T visit_function_atom( FunctionAtom*, std::vector< T >& ) POSTFIX;  \
+    PREFIX T visit_builtin_atom( BuiltinAtom*, std::vector< T >& ) POSTFIX;    \
+    PREFIX void visit_derived_function_atom_pre(                               \
+        FunctionAtom*, std::vector< T >& ) POSTFIX;                            \
+    PREFIX T visit_derived_function_atom( FunctionAtom*, U ) POSTFIX;          \
+    PREFIX T visit_self_atom( SelfAtom* ) POSTFIX;                             \
+    PREFIX T visit_rule_atom( RuleAtom* ) POSTFIX;                             \
+    PREFIX T visit_boolean_atom( BooleanAtom* ) POSTFIX;                       \
+    PREFIX T visit_string_atom( StringAtom* ) POSTFIX;                         \
+    PREFIX T visit_list_atom( ListAtom*, const std::vector< T >& ) POSTFIX;    \
+    PREFIX T visit_number_range_atom( NumberRangeAtom*, U, U ) POSTFIX
 
-    virtual void visit_init( InitNode* )
-    {
-    }
+#define LIB_CASMFE_VISITOR_INTERFACE( T, U )                                   \
+    LIB_CASMFE_VISITOR_INTERFACE_(, override final, T, U )
 
-    virtual void visit_body_elements( AstListNode* )
-    {
-    }
-
-    virtual void visit_function_def(
-        FunctionDefNode*, const std::vector< std::pair< T, T > >& )
-    {
-    }
-
-    virtual void visit_derived_def_pre( FunctionDefNode* )
-    {
-    }
-
-    virtual void visit_derived_def( FunctionDefNode*, U )
-    {
-    }
-
-    virtual void visit_rule( RuleNode* )
-    {
-    }
-
-    virtual void visit_rule_post( RuleNode* )
-    {
-    }
-
-    virtual void visit_statements( AstListNode* )
-    {
-    }
-
-    virtual void visit_statement( AstNode* )
-    {
-    }
-
-    virtual void visit_ifthenelse( IfThenElseNode*, U )
-    {
-    }
-
-    virtual void visit_assert( UnaryNode*, U )
-    {
-    }
-
-    virtual void visit_assure( UnaryNode*, U )
-    {
-    }
-
-    virtual void visit_seqblock_pre( UnaryNode* )
-    {
-    }
-
-    virtual void visit_seqblock_post( UnaryNode* )
-    {
-    }
-
-    virtual void visit_parblock_pre( UnaryNode* )
-    {
-    }
-
-    virtual void visit_parblock_post( UnaryNode* )
-    {
-    }
-
-    virtual void visit_update( UpdateNode*, const std::vector< T >&, U )
-    {
-    }
-
-    virtual void visit_call_pre( CallNode* )
-    {
-    }
-
-    virtual void visit_call_pre( CallNode*, U )
-    {
-    }
-
-    virtual void visit_call( CallNode*, std::vector< T >& )
-    {
-    }
-
-    virtual void visit_call_post( CallNode* )
-    {
-    }
-
-    virtual void visit_print( PrintNode*, U )
-    {
-    }
-
-    virtual void visit_diedie( DiedieNode*, U )
-    {
-    }
-
-    virtual void visit_impossible( AstNode* )
-    {
-    }
-
-    virtual void visit_let( LetNode*, U )
-    {
-    }
-
-    virtual void visit_let_post( LetNode* )
-    {
-    }
-
-    virtual void visit_pop( PopNode*, U )
-    {
-    }
-
-    virtual void visit_push( PushNode*, U, U )
-    {
-    }
-
-    virtual void visit_case_pre( CaseNode*, U )
-    {
-    }
-
-    virtual void visit_case( CaseNode*, U, const std::vector< T >& )
-    {
-    }
-
-    virtual void visit_skip( AstNode* )
-    {
-    }
-
-    virtual void visit_forall_pre( ForallNode* )
-    {
-    }
-
-    virtual void visit_forall_post( ForallNode* )
-    {
-    }
-
-    virtual void visit_forall_iteration_pre( ForallNode*, U )
-    {
-    }
-
-    virtual void visit_forall_iteration_post( ForallNode* )
-    {
-    }
-
-    virtual void visit_iterate( UnaryNode* )
-    {
-    }
-
-    virtual T visit_expression( BinaryExpression*, U, U )
-    {
-        return T();
-    }
-
-    virtual T visit_expression_single( UnaryExpression*, U )
-    {
-        return T();
-    }
-
-    virtual T visit_zero_atom( ZeroAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_int_atom( IntegerAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_bit_atom( IntegerAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_floating_atom( FloatingAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_rational_atom( RationalAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_undef_atom( UndefAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_function_atom( FunctionAtom*, std::vector< T >& )
-    {
-        return T();
-    }
-
-    virtual T visit_builtin_atom( BuiltinAtom*, std::vector< T >& )
-    {
-        return T();
-    }
-
-    virtual void visit_derived_function_atom_pre(
-        FunctionAtom*, std::vector< T >& )
-    {
-    }
-
-    virtual T visit_derived_function_atom( FunctionAtom*, U )
-    {
-        return T();
-    }
-
-    virtual T visit_self_atom( SelfAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_rule_atom( RuleAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_boolean_atom( BooleanAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_string_atom( StringAtom* )
-    {
-        return T();
-    }
-
-    virtual T visit_list_atom( ListAtom*, const std::vector< T >& )
-    {
-        return T();
-    }
-
-    virtual T visit_number_range_atom( NumberRangeAtom*, U, U )
-    {
-        return T();
-    }
+    LIB_CASMFE_VISITOR_INTERFACE_( virtual, = 0, T, U );
 };
 
 #endif

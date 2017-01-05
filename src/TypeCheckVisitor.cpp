@@ -1263,3 +1263,128 @@ void AstWalker< TypecheckVisitor, Type* >::walk_forall( ForallNode* node )
     visitor.rule_binding_types.back()->pop_back();
     visitor.rule_binding_offsets.back()->erase( node->identifier );
 }
+
+Type* TypecheckVisitor::visit_zero_atom( ZeroAtom* atom )
+{
+    return &atom->type_;
+}
+
+Type* TypecheckVisitor::visit_int_atom( IntegerAtom* atom )
+{
+    return &atom->type_;
+}
+
+Type* TypecheckVisitor::visit_floating_atom( FloatingAtom* atom )
+{
+    return &atom->type_;
+}
+
+Type* TypecheckVisitor::visit_rational_atom( RationalAtom* atom )
+{
+    return &atom->type_;
+}
+
+Type* TypecheckVisitor::visit_undef_atom( UndefAtom* atom )
+{
+    return &atom->type_;
+}
+
+Type* TypecheckVisitor::visit_self_atom( SelfAtom* atom )
+{
+    return &atom->type_;
+}
+
+Type* TypecheckVisitor::visit_boolean_atom( BooleanAtom* atom )
+{
+    return &atom->type_;
+}
+
+Type* TypecheckVisitor::visit_string_atom( StringAtom* atom )
+{
+    return &atom->type_;
+}
+
+void TypecheckVisitor::visit_body_elements( AstListNode* )
+{
+}
+
+void TypecheckVisitor::visit_rule_post( RuleNode* )
+{
+}
+
+void TypecheckVisitor::visit_seqblock_pre( UnaryNode* )
+{
+}
+
+void TypecheckVisitor::visit_seqblock_post( UnaryNode* )
+{
+}
+
+void TypecheckVisitor::visit_parblock_pre( UnaryNode* )
+{
+}
+
+void TypecheckVisitor::visit_parblock_post( UnaryNode* )
+{
+}
+
+void TypecheckVisitor::visit_assure( UnaryNode*, Type* )
+{
+}
+
+void TypecheckVisitor::visit_skip( AstNode* )
+{
+}
+
+void TypecheckVisitor::visit_call_post( CallNode* )
+{
+}
+
+void TypecheckVisitor::visit_iterate( UnaryNode* )
+{
+}
+
+void TypecheckVisitor::visit_case_pre( CaseNode*, Type* )
+{
+}
+
+void TypecheckVisitor::visit_impossible( AstNode* )
+{
+}
+
+void TypecheckVisitor::visit_statements( AstListNode* )
+{
+}
+
+void TypecheckVisitor::visit_specification( SpecificationNode* )
+{
+}
+
+void TypecheckVisitor::visit_init( InitNode* )
+{
+}
+
+Type* TypecheckVisitor::visit_bit_atom( IntegerAtom* )
+{
+    return 0;
+}
+
+void TypecheckVisitor::visit_statement( AstNode* )
+{
+}
+
+void TypecheckVisitor::visit_forall_pre( ForallNode* )
+{
+}
+
+void TypecheckVisitor::visit_forall_post( ForallNode* )
+{
+}
+
+void TypecheckVisitor::visit_forall_iteration_pre( ForallNode*, Type* )
+{
+}
+
+void TypecheckVisitor::visit_forall_iteration_post( ForallNode* )
+{
+}

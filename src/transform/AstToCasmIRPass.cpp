@@ -362,6 +362,10 @@ void libcasm_fe::AstToCasmIRPass::visit_parblock_pre( UnaryNode* node )
     }
 }
 
+void libcasm_fe::AstToCasmIRPass::visit_parblock_post( UnaryNode* node )
+{
+}
+
 void libcasm_fe::AstToCasmIRPass::visit_seqblock_pre( UnaryNode* node )
 {
     VISIT;
@@ -398,6 +402,10 @@ void libcasm_fe::AstToCasmIRPass::visit_seqblock_pre( UnaryNode* node )
     {
         assert( 0 );
     }
+}
+
+void libcasm_fe::AstToCasmIRPass::visit_seqblock_post( UnaryNode* node )
+{
 }
 
 void libcasm_fe::AstToCasmIRPass::visit_statements( AstListNode* node )
@@ -1259,6 +1267,32 @@ bool libcasm_fe::AstToCasmIRPass::visit_builtin_atom(
     }
 
     return 0;
+}
+
+void libcasm_fe::AstToCasmIRPass::visit_statement( AstNode* )
+{
+}
+
+// void libcasm_fe::AstToCasmIRPass::visit_forall_pre( ForallNode* )
+// {
+// }
+
+// void libcasm_fe::AstToCasmIRPass::visit_forall_post( ForallNode* )
+// {
+// }
+
+void libcasm_fe::AstToCasmIRPass::visit_forall_iteration_pre(
+    ForallNode*, bool )
+{
+}
+
+void libcasm_fe::AstToCasmIRPass::visit_forall_iteration_post( ForallNode* )
+{
+}
+
+bool libcasm_fe::AstToCasmIRPass::visit_zero_atom( ZeroAtom* atom )
+{
+    return false;
 }
 
 template < class C >

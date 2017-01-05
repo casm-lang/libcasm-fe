@@ -39,8 +39,7 @@
 
 namespace libcasm_fe
 {
-    class SymbolicExecutionPass final : public ExecutionPassBase,
-                                        public libpass::Pass
+    class SymbolicExecutionPass : public ExecutionPassBase, public libpass::Pass
     {
       public:
         static char id;
