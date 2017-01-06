@@ -256,10 +256,11 @@ class AstWalker
         // we must walk the expression before walking update->func because it
         // sets the list of arguments and we do not want the update->expr_ to
         // overwrite the value_list
-        walk_function_atom( node->func );
 
-        const auto argumentValues
-            = evaluateExpressions( node->func->arguments );
+        auto argumentValues = evaluateExpressions( node->func->arguments );
+
+        visitor.visit_function_atom( node->func, argumentValues );
+
         visitor.visit_update( node, argumentValues, expr );
     }
 
