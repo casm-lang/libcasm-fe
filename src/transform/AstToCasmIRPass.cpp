@@ -211,9 +211,7 @@ void libcasm_fe::AstToCasmIRPass::visit_derived_def(
     {
         x.append( a->to_str() );
     }
-    // printf( "%s, %lu: %s -> %s, \n", node->sym->name.c_str(), node->sym->id,
-    // x.c_str(), node->sym->return_type_->to_str().c_str() );
-
+    
     assert( node->sym->type == Symbol::SymbolType::DERIVED );
 
     libcasm_ir::Value* ir_expr
@@ -227,6 +225,7 @@ void libcasm_fe::AstToCasmIRPass::visit_derived_def(
     assert(
         libcasm_ir::Value::isa< libcasm_ir::Derived >( current_scope.back() )
         and "invalid scope!" );
+    
     libcasm_ir::Derived* ir_derived
         = (libcasm_ir::Derived*)current_scope.back();
     ir_derived->setContext( ir_stmt );
@@ -239,6 +238,8 @@ void libcasm_fe::AstToCasmIRPass::visit_derived_def(
     current_scope.pop_back();
 
     getSpecification()->add( ir_derived );
+
+    ast2casmir[ (AstNode*)node->sym ] = ir_derived;
 }
 
 void libcasm_fe::AstToCasmIRPass::visit_skip( AstNode* node )
@@ -1033,29 +1034,15 @@ bool libcasm_fe::AstToCasmIRPass::visit_derived_function_atom(
 {
     VISIT;
     string x;
-    // printf( "derived: %s, %s\n"
-    //         , node->name.c_str()
-    //         , x.c_str()
-    //     );
-
+    
     assert( node->symbol );
     assert( node->symbol_type == FunctionAtom::SymbolType::DERIVED );
 
-    std::vector< libcasm_ir::Type* > ty_ident_args;
-    for( auto argument : node->symbol->arguments_ )
-    {
-        ty_ident_args.push_back( getType( argument ) );
-    }
-
-    libcasm_ir::Type* ty_ident = libcasm_ir::Type::getRelation(
-        getType( node->symbol->return_type_ ), ty_ident_args );
-
-    libcasm_ir::Value* ir_ident
-        = libcasm_ir::Identifier::create( ty_ident, node->name.c_str() );
-    assert( ir_ident );
-
+    libcasm_ir::Value* ir_derived = lookup< libcasm_ir::Value >( (AstNode*)node->symbol );
+    assert( ir_derived );
+    
     libcasm_ir::CallInstruction* ir_call
-        = new libcasm_ir::CallInstruction( ir_ident );
+        = new libcasm_ir::CallInstruction( ir_derived );
     assert( ir_call );
     ast2casmir[ node ] = ir_call;
     if( node->arguments )
