@@ -29,8 +29,6 @@
 #include "libcasm-fe.all.h"
 #include "libpass.h"
 
-#include "../TypeCheckVisitor.h"
-
 /**
    @brief    TODO
 
@@ -39,13 +37,28 @@
 
 namespace libcasm_fe
 {
-    class TypeCheckPass : public libpass::Pass
+    class TypeCheckPass : public libpass::Pass, public Visitor< Type*, Type* >
     {
       public:
         static char id;
 
-        virtual bool run( libpass::PassResult& pr );
+        bool run( libpass::PassResult& pr ) override final;
+
+        LIB_CASMFE_VISITOR_INTERFACE( Type*, Type* );
+
+        void check_type_valid( const yy::location& location, const Type& type );
+
+        void check_numeric_operator( const yy::location& loc, Type* type,
+            const libcasm_ir::Value::ID op );
+
+        std::vector< std::vector< Type* >* > rule_binding_types;
+        std::vector< std::map< std::string, size_t >* > rule_binding_offsets;
+
+        bool forall_head;
     };
+
+    template <>
+    void AstWalker< TypeCheckPass, Type* >::walk_forall( ForallNode* node );
 }
 
 #endif /* _LIB_CASMFE_TYPECHECKPASS_H_ */

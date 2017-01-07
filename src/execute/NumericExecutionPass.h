@@ -73,22 +73,22 @@ namespace libcasm_fe
       private:
         AstWalker< libcasm_fe::NumericExecutionPass, value_t >* walker;
     };
+
+    using NumericExecutionWalker
+        = AstWalker< libcasm_fe::NumericExecutionPass, value_t >;
+
+    template <>
+    void NumericExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
+
+    template <>
+    void NumericExecutionWalker::walk_case( CaseNode* node );
+
+    template <>
+    void NumericExecutionWalker::walk_iterate( UnaryNode* node );
+
+    template <>
+    void NumericExecutionWalker::walk_update( UpdateNode* node );
 }
-
-using NumericExecutionWalker
-    = AstWalker< libcasm_fe::NumericExecutionPass, value_t >;
-
-template <>
-void NumericExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
-
-template <>
-void NumericExecutionWalker::walk_case( CaseNode* node );
-
-template <>
-void NumericExecutionWalker::walk_iterate( UnaryNode* node );
-
-template <>
-void NumericExecutionWalker::walk_update( UpdateNode* node );
 
 #endif /* _LIB_CASMFE_NUMERICEXECUTIONPASS_H_ */
 

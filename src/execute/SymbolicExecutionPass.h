@@ -87,26 +87,26 @@ namespace libcasm_fe
         std::vector< symbolic_condition_t* > path_conditions;
         std::vector< std::string > trace;
     };
+
+    using SymbolicExecutionWalker
+        = AstWalker< libcasm_fe::SymbolicExecutionPass, value_t >;
+
+    // Specialize if-then-else for SymbolicExecutionPass
+    template <>
+    void SymbolicExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
+
+    template <>
+    void SymbolicExecutionWalker::walk_pop( PopNode* node );
+
+    template <>
+    void SymbolicExecutionWalker::walk_case( CaseNode* node );
+
+    template <>
+    void SymbolicExecutionWalker::walk_iterate( UnaryNode* node );
+
+    template <>
+    void SymbolicExecutionWalker::walk_update( UpdateNode* node );
 }
-
-using SymbolicExecutionWalker
-    = AstWalker< libcasm_fe::SymbolicExecutionPass, value_t >;
-
-// Specialize if-then-else for SymbolicExecutionPass
-template <>
-void SymbolicExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
-
-template <>
-void SymbolicExecutionWalker::walk_pop( PopNode* node );
-
-template <>
-void SymbolicExecutionWalker::walk_case( CaseNode* node );
-
-template <>
-void SymbolicExecutionWalker::walk_iterate( UnaryNode* node );
-
-template <>
-void SymbolicExecutionWalker::walk_update( UpdateNode* node );
 
 #endif /* _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_ */
 

@@ -29,8 +29,6 @@
 #include "libcasm-fe.all.h"
 #include "libpass.h"
 
-#include "../AstDumpVisitor.h"
-
 /**
    @brief    TODO
 
@@ -39,12 +37,25 @@
 
 namespace libcasm_fe
 {
-    class AstDumpPass : public libpass::Pass, AstDumpVisitor
+    class AstDumpPass : public libpass::Pass,
+                        public libcasm_fe::Visitor< bool, bool >
     {
+      private:
+        std::stringstream dump_stream_;
+
+        void dump_node( uint64_t key, const std::string& name );
+        void dump_node( AstNode* n, const std::string& name );
+        void dump_link( uint64_t from, uint64_t to );
+        void dump_link( AstNode* from, AstNode* to );
+
       public:
         static char id;
 
-        virtual bool run( libpass::PassResult& pr );
+        bool run( libpass::PassResult& pr ) override final;
+
+        std::string get_dump();
+
+        LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
     };
 }
 

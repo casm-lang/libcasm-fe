@@ -38,7 +38,8 @@
 
 namespace libcasm_fe
 {
-    class AstToCasmIRPass : public libpass::Pass, public Visitor< bool, bool >
+    class AstToCasmIRPass : public libpass::Pass,
+                            public libcasm_fe::Visitor< bool, bool >
     {
       public:
         static char id;
