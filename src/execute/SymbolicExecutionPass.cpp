@@ -1266,10 +1266,6 @@ template <>
 void SymbolicExecutionWalker::walk_update( UpdateNode* node )
 {
     const auto value = walk_atom( node->expr_ );
-    if( node->func->symbol->is_symbolic )
-    {
-        walk_atom( node->func );
-    }
     const auto argumentValues = evaluateExpressions( node->func->arguments );
     visitor.visit_update( node, argumentValues, value );
 }
