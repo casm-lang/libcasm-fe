@@ -791,7 +791,7 @@ void ExecutionPassBase::visit_assert( UnaryNode* assert, const value_t& val )
 }
 
 void ExecutionPassBase::visit_update( UpdateNode* update,
-    const std::vector< value_t >& arguments, const value_t& expr_v )
+    std::vector< value_t >& arguments, const value_t& expr_v )
 {
     addUpdate( update->func->symbol, arguments, expr_v, update->location );
 

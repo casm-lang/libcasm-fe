@@ -211,7 +211,7 @@ void libcasm_fe::AstToCasmIRPass::visit_derived_def(
     {
         x.append( a->to_str() );
     }
-    
+
     assert( node->sym->type == Symbol::SymbolType::DERIVED );
 
     libcasm_ir::Value* ir_expr
@@ -225,7 +225,7 @@ void libcasm_fe::AstToCasmIRPass::visit_derived_def(
     assert(
         libcasm_ir::Value::isa< libcasm_ir::Derived >( current_scope.back() )
         and "invalid scope!" );
-    
+
     libcasm_ir::Derived* ir_derived
         = (libcasm_ir::Derived*)current_scope.back();
     ir_derived->setContext( ir_stmt );
@@ -448,7 +448,7 @@ void libcasm_fe::AstToCasmIRPass::visit_iterate( UnaryNode* node )
 }
 
 void libcasm_fe::AstToCasmIRPass::visit_update(
-    UpdateNode* node, const std::vector< bool >& args, bool expr )
+    UpdateNode* node, std::vector< bool >& args, bool expr )
 {
     VISIT;
     // printf( "%p -> %p\n", node, node->func );
@@ -1034,13 +1034,13 @@ bool libcasm_fe::AstToCasmIRPass::visit_derived_function_atom(
 {
     VISIT;
     string x;
-    
+
     assert( node->symbol );
     assert( node->symbol_type == FunctionAtom::SymbolType::DERIVED );
 
     libcasm_ir::Value* ir_derived = lookup< libcasm_ir::Value >( (AstNode*)node->symbol );
     assert( ir_derived );
-    
+
     libcasm_ir::CallInstruction* ir_call
         = new libcasm_ir::CallInstruction( ir_derived );
     assert( ir_call );

@@ -163,8 +163,7 @@ void AstDumpPass::visit_parblock_pre( UnaryNode* parblock )
     dump_link( parblock, parblock->child_ );
 }
 
-void AstDumpPass::visit_update(
-    UpdateNode* update, const std::vector< bool >&, bool )
+void AstDumpPass::visit_update( UpdateNode* update, std::vector< bool >&, bool )
 {
     dump_node( update, "Update" );
     dump_link( (uint64_t)update, (uint64_t)update->func );

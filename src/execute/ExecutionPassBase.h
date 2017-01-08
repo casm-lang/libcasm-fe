@@ -117,7 +117,7 @@ namespace libcasm_fe
             UnaryNode* assert, const value_t& val ) override final;
 
         void visit_update( UpdateNode* update,
-            const std::vector< value_t >& arguments,
+            std::vector< value_t >& arguments,
             const value_t& expr_v ) override final;
 
         void visit_call_pre( CallNode* call ) override final;

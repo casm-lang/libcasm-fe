@@ -324,8 +324,10 @@ void TypeCheckPass::visit_assert( UnaryNode* assert, Type* val )
 }
 
 void TypeCheckPass::visit_update(
-    UpdateNode* update, const std::vector< Type* >&, Type* )
+    UpdateNode* update, std::vector< Type* >& argumentValues, Type* )
 {
+    visit_function_atom( update->func, argumentValues );
+
     if( update->func->symbol and update->func->symbol->is_static )
     {
         global_driver->error( update->location,

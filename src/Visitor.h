@@ -266,8 +266,6 @@ namespace libcasm_fe
 
             auto argumentValues = evaluateExpressions( node->func->arguments );
 
-            visitor.visit_function_atom( node->func, argumentValues );
-
             visitor.visit_update( node, argumentValues, expr );
         }
 
@@ -624,8 +622,7 @@ namespace libcasm_fe
     PREFIX void visit_seqblock_post( UnaryNode* ) POSTFIX;                     \
     PREFIX void visit_parblock_pre( UnaryNode* ) POSTFIX;                      \
     PREFIX void visit_parblock_post( UnaryNode* ) POSTFIX;                     \
-    PREFIX void visit_update( UpdateNode*, const std::vector< T >&, U )        \
-        POSTFIX;                                                               \
+    PREFIX void visit_update( UpdateNode*, std::vector< T >&, U ) POSTFIX;     \
     PREFIX void visit_call_pre( CallNode* ) POSTFIX;                           \
     PREFIX void visit_call_pre( CallNode*, U ) POSTFIX;                        \
     PREFIX void visit_call( CallNode*, std::vector< T >& ) POSTFIX;            \
