@@ -256,19 +256,9 @@ namespace libcasm_fe
 
         void walk_update( UpdateNode* node )
         {
-            const V expr = walk_atom( node->expr_ );
-
-            // we must walk the expression before walking update->func because
-            // it
-            // sets the list of arguments and we do not want the update->expr_
-            // to
-            // overwrite the value_list
-
+            const auto value = walk_atom( node->expr_ );
             auto argumentValues = evaluateExpressions( node->func->arguments );
-
-            visitor.visit_function_atom( node->func, argumentValues );
-
-            visitor.visit_update( node, argumentValues, expr );
+            visitor.visit_update( node, argumentValues, value );
         }
 
         void walk_call( CallNode* node )
@@ -624,8 +614,7 @@ namespace libcasm_fe
     PREFIX void visit_seqblock_post( UnaryNode* ) POSTFIX;                     \
     PREFIX void visit_parblock_pre( UnaryNode* ) POSTFIX;                      \
     PREFIX void visit_parblock_post( UnaryNode* ) POSTFIX;                     \
-    PREFIX void visit_update( UpdateNode*, const std::vector< T >&, U )        \
-        POSTFIX;                                                               \
+    PREFIX void visit_update( UpdateNode*, std::vector< T >&, U ) POSTFIX;     \
     PREFIX void visit_call_pre( CallNode* ) POSTFIX;                           \
     PREFIX void visit_call_pre( CallNode*, U ) POSTFIX;                        \
     PREFIX void visit_call( CallNode*, std::vector< T >& ) POSTFIX;            \

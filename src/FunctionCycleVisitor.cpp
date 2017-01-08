@@ -205,7 +205,7 @@ void InitCycleVisitor::visit_assert( UnaryNode*, bool )
 {
 }
 void InitCycleVisitor::visit_update(
-    UpdateNode*, std::vector< bool, std::allocator< bool > > const&, bool )
+    UpdateNode*, std::vector< bool, std::allocator< bool > >&, bool )
 {
 }
 void InitCycleVisitor::visit_call_pre( CallNode* )

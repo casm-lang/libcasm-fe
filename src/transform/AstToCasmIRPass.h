@@ -78,7 +78,7 @@ namespace libcasm_fe
         // void visit_forall_post( ForallNode* node ) override;
         // void visit_iterate( UnaryNode* node ) override;
         // void visit_update( UpdateNode* node,
-        //     const std::vector< bool >& args,
+        //     std::vector< bool >& args,
         //     bool expr ) override;
         // void visit_call_pre( CallNode* node ) override;
         // void visit_call_pre( CallNode* node, bool expr ) override;

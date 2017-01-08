@@ -1262,14 +1262,6 @@ void SymbolicExecutionWalker::walk_iterate( UnaryNode* node )
     visitor.merge();
 }
 
-template <>
-void SymbolicExecutionWalker::walk_update( UpdateNode* node )
-{
-    const auto value = walk_atom( node->expr_ );
-    const auto argumentValues = evaluateExpressions( node->func->arguments );
-    visitor.visit_update( node, argumentValues, value );
-}
-
 //
 //  Local variables:
 //  mode: c++
