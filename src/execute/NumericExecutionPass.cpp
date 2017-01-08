@@ -497,14 +497,6 @@ void NumericExecutionWalker::walk_iterate( UnaryNode* node )
     visitor.merge();
 }
 
-template <>
-void NumericExecutionWalker::walk_update( UpdateNode* node )
-{
-    const auto value = walk_atom( node->expr_ );
-    auto argumentValues = evaluateExpressions( node->func->arguments );
-    visitor.visit_update( node, argumentValues, value );
-}
-
 //
 //  Local variables:
 //  mode: c++
