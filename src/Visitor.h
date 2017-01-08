@@ -256,17 +256,9 @@ namespace libcasm_fe
 
         void walk_update( UpdateNode* node )
         {
-            const V expr = walk_atom( node->expr_ );
-
-            // we must walk the expression before walking update->func because
-            // it
-            // sets the list of arguments and we do not want the update->expr_
-            // to
-            // overwrite the value_list
-
+            const auto value = walk_atom( node->expr_ );
             auto argumentValues = evaluateExpressions( node->func->arguments );
-
-            visitor.visit_update( node, argumentValues, expr );
+            visitor.visit_update( node, argumentValues, value );
         }
 
         void walk_call( CallNode* node )
