@@ -26,8 +26,9 @@
 #ifndef _LIB_CASMFE_TYPECHECKPASS_H_
 #define _LIB_CASMFE_TYPECHECKPASS_H_
 
-#include "libcasm-fe.all.h"
 #include "libpass.h"
+
+#include "../Visitor.h"
 
 /**
    @brief    TODO

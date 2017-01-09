@@ -25,6 +25,8 @@
 
 #include "AstDumpPass.h"
 
+#include "TypeCheckPass.h"
+
 using namespace libcasm_fe;
 
 char AstDumpPass::id = 0;

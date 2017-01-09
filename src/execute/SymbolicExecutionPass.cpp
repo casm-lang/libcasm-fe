@@ -25,20 +25,17 @@
 
 #include "SymbolicExecutionPass.h"
 
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <cstdio>
-#include <iostream>
-#include <sys/wait.h>
-#include <type_traits>
-#include <unistd.h>
-#include <utility>
+#include "../analyze/TypeCheckPass.h"
 
 #include "../Driver.h"
 #include "../Exceptions.h"
 #include "../Symbolic.h"
 #include "../Symbols.h"
+
+#include "cpp/Default.h"
+#include "cpp/Type.h"
+
+#include <sys/wait.h>
 
 using namespace libcasm_fe;
 

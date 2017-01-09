@@ -25,18 +25,16 @@
 
 #include "NumericExecutionPass.h"
 
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <cstdio>
-#include <iostream>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <utility>
+#include "../analyze/TypeCheckPass.h"
 
 #include "../Driver.h"
 #include "../Exceptions.h"
 #include "../Symbols.h"
+
+#include "cpp/Default.h"
+#include "cpp/Math.h"
+
+#include <sys/wait.h>
 
 using namespace libcasm_fe;
 

@@ -26,7 +26,6 @@
 #ifndef _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_
 #define _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_
 
-#include "libcasm-fe.all.h"
 #include "libpass.h"
 
 #include "ExecutionPassBase.h"

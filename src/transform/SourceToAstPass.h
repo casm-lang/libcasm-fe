@@ -26,7 +26,6 @@
 #ifndef _LIB_CASMFE_SOURCETOASTPASS_H_
 #define _LIB_CASMFE_SOURCETOASTPASS_H_
 
-#include "libcasm-fe.all.h"
 #include "libpass.h"
 
 /**

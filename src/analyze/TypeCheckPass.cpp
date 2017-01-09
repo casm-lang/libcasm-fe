@@ -25,11 +25,13 @@
 
 #include "TypeCheckPass.h"
 
-#include "Driver.h"
-#include "FunctionCycleVisitor.h"
-#include "Value.h"
+#include "../transform/SourceToAstPass.h"
 
-#include <cmath>
+#include "../Driver.h"
+#include "../FunctionCycleVisitor.h"
+#include "../Value.h"
+
+#include "cpp/Math.h"
 
 using namespace libcasm_fe;
 

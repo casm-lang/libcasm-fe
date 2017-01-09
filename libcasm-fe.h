@@ -26,16 +26,45 @@
 #ifndef _LIB_CASMFE_H_
 #define _LIB_CASMFE_H_
 
+#include "src/Ast.h"
+#include "src/CasmFE.h"
+#include "src/Codes.h"
+#include "src/Driver.h"
+#include "src/Exceptions.h"
+#include "src/FunctionCycleVisitor.h"
+#include "src/GrammarToken.hpp"
+#include "src/LexerHelpers.h"
+#include "src/Macros.h"
+#include "src/Symbolic.h"
+#include "src/Symbols.h"
+#include "src/Types.h"
+#include "src/Value.h"
 #include "src/Visitor.h"
 
-// TODO: FIXME: PPA: list here all internal header files etc.
-// use the class below to create a nice inheritance tree!
+#include "src/various/GrammarParser.tab.h"
+#include "src/various/location.hh"
+#include "src/various/position.hh"
+#include "src/various/stack.hh"
+
+#include "src/allocator/BlockAllocator.h"
+
+#include "src/analyze/AstDumpPass.h"
+#include "src/analyze/TypeCheckPass.h"
+
+#include "src/execute/ChainedHashMap.h"
+#include "src/execute/ExecutionPassBase.h"
+#include "src/execute/HashMapBase.h"
+#include "src/execute/NumericExecutionPass.h"
+#include "src/execute/ProbingHashMap.h"
+#include "src/execute/RobinHoodHashMap.h"
+#include "src/execute/SymbolicExecutionPass.h"
+#include "src/execute/UpdateSet.h"
+
+#include "src/transform/AstToCasmIRPass.h"
+#include "src/transform/SourceToAstPass.h"
 
 namespace libcasm_fe
 {
-    class CasmFE
-    {
-    };
 }
 
 #endif /* _LIB_CASMFE_H_ */

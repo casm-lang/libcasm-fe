@@ -26,8 +26,9 @@
 #ifndef _LIB_CASMFE_ASTDUMPPASS_H_
 #define _LIB_CASMFE_ASTDUMPPASS_H_
 
-#include "libcasm-fe.all.h"
 #include "libpass.h"
+
+#include "../Visitor.h"
 
 /**
    @brief    TODO
@@ -37,8 +38,7 @@
 
 namespace libcasm_fe
 {
-    class AstDumpPass : public libpass::Pass,
-                        public libcasm_fe::Visitor< bool, bool >
+    class AstDumpPass : public libpass::Pass, public Visitor< bool, bool >
     {
       private:
         std::stringstream dump_stream_;
