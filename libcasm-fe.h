@@ -32,7 +32,6 @@
 #include "src/Driver.h"
 #include "src/Exceptions.h"
 #include "src/FunctionCycleVisitor.h"
-#include "src/GrammarToken.hpp"
 #include "src/LexerHelpers.h"
 #include "src/Macros.h"
 #include "src/Symbolic.h"
