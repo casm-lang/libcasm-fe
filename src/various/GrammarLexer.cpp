@@ -673,6 +673,8 @@ char *yytext;
 
 #include "src/various/GrammarParser.tab.h"
 
+#define YY_DECL yy::Parser::symbol_type yylex(libcasm_fe::Driver& driver )
+
 #undef yywrap
 #define yywrap() 1
 
@@ -693,7 +695,7 @@ char strbuf[STRBUF_LENGTH];
       result = YY_NULL; \
 }
 
-#define yyterminate() return( yy::casmi_parser::make_END(loc) )
+#define yyterminate() return( yy::Parser::make_END(loc) )
 
 // flex uses `register` keyword, which is deprecated in c++11
 #pragma GCC diagnostic ignored "-Wdeprecated-register"
@@ -703,10 +705,10 @@ char strbuf[STRBUF_LENGTH];
 
 
 
-#line 72 "obj/src/GrammarLexer.l"
+#line 74 "obj/src/GrammarLexer.l"
     // Code run each time a pattern is matched.
     #define YY_USER_ACTION  loc.columns( yyleng );
-#line 710 "src/various/GrammarLexer.cpp"
+#line 712 "src/various/GrammarLexer.cpp"
 
 #define INITIAL 0
 #define LCOMMENT 1
@@ -925,14 +927,14 @@ YY_DECL
 		}
 
 	{
-#line 75 "obj/src/GrammarLexer.l"
+#line 77 "obj/src/GrammarLexer.l"
 
 
     // Code run each time yylex is called.
     loc.step();
 
 
-#line 936 "src/various/GrammarLexer.cpp"
+#line 938 "src/various/GrammarLexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -987,414 +989,414 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 81 "obj/src/GrammarLexer.l"
+#line 83 "obj/src/GrammarLexer.l"
 {
     const auto val = convert_to_long( yytext + 2, 2, driver, loc );
-    return yy::casmi_parser::make_INTEGERCONST( val, loc );
+    return yy::Parser::make_INTEGERCONST( val, loc );
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 86 "obj/src/GrammarLexer.l"
+#line 88 "obj/src/GrammarLexer.l"
 {
     const auto val = convert_to_long( yytext + 2, 16, driver, loc );
-    return yy::casmi_parser::make_INTEGERCONST( val, loc );
+    return yy::Parser::make_INTEGERCONST( val, loc );
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 91 "obj/src/GrammarLexer.l"
+#line 93 "obj/src/GrammarLexer.l"
 {
     const auto val = convert_to_rational( yytext + 2, driver, loc );
-    return yy::casmi_parser::make_RATIONALCONST( val, loc );
+    return yy::Parser::make_RATIONALCONST( val, loc );
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 96 "obj/src/GrammarLexer.l"
+#line 98 "obj/src/GrammarLexer.l"
 {
     const auto val = convert_to_long( yytext, 10, driver, loc );
-    return yy::casmi_parser::make_INTEGERCONST( val, loc );
+    return yy::Parser::make_INTEGERCONST( val, loc );
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 101 "obj/src/GrammarLexer.l"
+#line 103 "obj/src/GrammarLexer.l"
 {
     const auto val = convert_to_float( yytext, driver, loc );
-    return yy::casmi_parser::make_FLOATINGCONST( val, loc );
+    return yy::Parser::make_FLOATINGCONST( val, loc );
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 108 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_CASM(loc); }
+#line 110 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_CASM(loc); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 109 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_INIT(loc); }
+#line 111 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_INIT(loc); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 111 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_OPTION(loc); }
+#line 113 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_OPTION(loc); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 113 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DERIVED(loc); }
+#line 115 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_DERIVED(loc); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 114 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENUM(loc); }
+#line 116 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ENUM(loc); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 116 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_RULE(loc); }
+#line 118 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_RULE(loc); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 117 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DUMPS(loc); }
+#line 119 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_DUMPS(loc); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 119 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_FUNCTION(loc); }
+#line 121 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_FUNCTION(loc); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 120 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_INITIALLY(loc); }
+#line 122 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_INITIALLY(loc); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 124 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SEQ(loc); }
+#line 126 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_SEQ(loc); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 125 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENDSEQ(loc); }
+#line 127 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ENDSEQ(loc); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 126 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PAR(loc); }
+#line 128 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_PAR(loc); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 127 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENDPAR(loc); }
+#line 129 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ENDPAR(loc); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 130 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ASSERT(loc); }
+#line 132 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ASSERT(loc); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 131 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ASSURE(loc); }
+#line 133 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ASSURE(loc); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 132 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DIEDIE(loc); }
+#line 134 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_DIEDIE(loc); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 133 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_IMPOSSIBLE(loc); }
+#line 135 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_IMPOSSIBLE(loc); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 134 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SKIP(loc); }
+#line 136 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_SKIP(loc); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 135 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LET(loc); }
+#line 137 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_LET(loc); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 136 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_IN(loc); }
+#line 138 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_IN(loc); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 137 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_FORALL(loc); }
+#line 139 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_FORALL(loc); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 138 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ITERATE(loc); }
+#line 140 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ITERATE(loc); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 139 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DO(loc); }
+#line 141 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_DO(loc); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 140 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_CALL(loc); }
+#line 142 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_CALL(loc); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 141 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_IF(loc); }
+#line 143 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_IF(loc); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 142 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_THEN(loc); }
+#line 144 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_THEN(loc); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 143 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ELSE(loc); }
+#line 145 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ELSE(loc); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 144 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_CASE(loc); }
+#line 146 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_CASE(loc); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 145 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_OF(loc); }
+#line 147 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_OF(loc); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 146 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DEFAULT(loc); }
+#line 148 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_DEFAULT(loc); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 147 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENDCASE(loc); }
+#line 149 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ENDCASE(loc); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 148 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PRINT(loc); }
+#line 150 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_PRINT(loc); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 149 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DEBUG(loc); }
+#line 151 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_DEBUG(loc); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 151 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PUSH(loc); }
+#line 153 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_PUSH(loc); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 152 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_INTO(loc); }
+#line 154 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_INTO(loc); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 153 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_POP(loc); }
+#line 155 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_POP(loc); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 154 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_FROM(loc); }
+#line 156 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_FROM(loc); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 156 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SELF(loc); }
+#line 158 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_SELF(loc); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 157 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_UNDEF(loc); }
+#line 159 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_UNDEF(loc); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 158 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_FALSE(loc); }
+#line 160 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_FALSE(loc); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 159 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_TRUE(loc); }
+#line 161 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_TRUE(loc); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 161 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_AND(loc); }
+#line 163 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_AND(loc); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 162 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_OR(loc); }
+#line 164 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_OR(loc); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 163 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_XOR(loc); }
+#line 165 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_XOR(loc); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 164 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_NOT(loc); }
+#line 166 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_NOT(loc); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 166 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PLUS(loc); }
+#line 168 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_PLUS(loc); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 167 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_MINUS(loc); }
+#line 169 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_MINUS(loc); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 168 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_EQUAL(loc); }
+#line 170 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_EQUAL(loc); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 169 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LPAREN(loc); }
+#line 171 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_LPAREN(loc); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 170 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_RPAREN(loc); }
+#line 172 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_RPAREN(loc); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 171 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LSQPAREN(loc); }
+#line 173 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_LSQPAREN(loc); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 172 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_RSQPAREN(loc); }
+#line 174 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_RSQPAREN(loc); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 173 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LCURPAREN(loc); }
+#line 175 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_LCURPAREN(loc); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 174 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_RCURPAREN(loc); }
+#line 176 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_RCURPAREN(loc); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 175 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DOT(loc); }
+#line 177 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_DOT(loc); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 176 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_COLON(loc); }
+#line 178 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_COLON(loc); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 177 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_UNDERLINE(loc); }
+#line 179 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_UNDERLINE(loc); }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 178 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_AT(loc); }
+#line 180 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_AT(loc); }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 179 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_COMMA(loc); }
+#line 181 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_COMMA(loc); }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 180 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LESSER(loc); }
+#line 182 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_LESSER(loc); }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 181 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_GREATER(loc); }
+#line 183 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_GREATER(loc); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 182 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_STAR(loc); }
+#line 184 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_STAR(loc); }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 183 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SLASH(loc); }
+#line 185 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_SLASH(loc); }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 184 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_PERCENT(loc); }
+#line 186 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_PERCENT(loc); }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 186 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_DOTDOT(loc); }
+#line 188 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_DOTDOT(loc); }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 187 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ARROW(loc); }
+#line 189 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ARROW(loc); }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 188 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_UPDATE(loc); }
+#line 190 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_UPDATE(loc); }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 189 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_NEQUAL(loc); }
+#line 191 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_NEQUAL(loc); }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 190 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_LESSEQ(loc); }
+#line 192 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_LESSEQ(loc); }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 191 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_GREATEREQ(loc); }
+#line 193 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_GREATEREQ(loc); }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 192 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_SEQ_BRACKET(loc); }
+#line 194 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_SEQ_BRACKET(loc); }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 193 "obj/src/GrammarLexer.l"
-{ return yy::casmi_parser::make_ENDSEQ_BRACKET(loc); }
+#line 195 "obj/src/GrammarLexer.l"
+{ return yy::Parser::make_ENDSEQ_BRACKET(loc); }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 197 "obj/src/GrammarLexer.l"
+#line 199 "obj/src/GrammarLexer.l"
 {
-    return yy::casmi_parser::make_IDENTIFIER( yytext, loc );
+    return yy::Parser::make_IDENTIFIER( yytext, loc );
 }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 201 "obj/src/GrammarLexer.l"
+#line 203 "obj/src/GrammarLexer.l"
 { /* ignore spaces */
     loc.step();
 }
@@ -1402,7 +1404,7 @@ YY_RULE_SETUP
 case 80:
 /* rule 80 can match eol */
 YY_RULE_SETUP
-#line 205 "obj/src/GrammarLexer.l"
+#line 207 "obj/src/GrammarLexer.l"
 { /* ignore newlines too, but reset yycolumn */
     loc.lines( yyleng );
     loc.step();
@@ -1410,7 +1412,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 210 "obj/src/GrammarLexer.l"
+#line 212 "obj/src/GrammarLexer.l"
 {
     BEGIN( LCOMMENT );
     loc.lines( 1 );
@@ -1419,33 +1421,33 @@ YY_RULE_SETUP
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 215 "obj/src/GrammarLexer.l"
+#line 217 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case 83:
 /* rule 83 can match eol */
 YY_RULE_SETUP
-#line 216 "obj/src/GrammarLexer.l"
+#line 218 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
 }
 	YY_BREAK
 case YY_STATE_EOF(LCOMMENT):
-#line 219 "obj/src/GrammarLexer.l"
+#line 221 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
 }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 223 "obj/src/GrammarLexer.l"
+#line 225 "obj/src/GrammarLexer.l"
 { /* ignore multi line comments */
     BEGIN( COMMENT );
 }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 226 "obj/src/GrammarLexer.l"
+#line 228 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
 }
@@ -1453,17 +1455,17 @@ YY_RULE_SETUP
 case 86:
 /* rule 86 can match eol */
 YY_RULE_SETUP
-#line 229 "obj/src/GrammarLexer.l"
+#line 231 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case 87:
 /* rule 87 can match eol */
 YY_RULE_SETUP
-#line 230 "obj/src/GrammarLexer.l"
+#line 232 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 231 "obj/src/GrammarLexer.l"
+#line 233 "obj/src/GrammarLexer.l"
 {
     printf( "Multiline comment not terminated on line %d", yylineno );
     exit( 2 );
@@ -1471,7 +1473,7 @@ case YY_STATE_EOF(COMMENT):
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 236 "obj/src/GrammarLexer.l"
+#line 238 "obj/src/GrammarLexer.l"
 {
     BEGIN( STRING );
     strbuf[0] = '\0';
@@ -1479,7 +1481,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 240 "obj/src/GrammarLexer.l"
+#line 242 "obj/src/GrammarLexer.l"
 { /* eat all tokens */
     strncat( strbuf, yytext, STRBUF_LENGTH - 1 );
 }
@@ -1487,39 +1489,39 @@ YY_RULE_SETUP
 case 90:
 /* rule 90 can match eol */
 YY_RULE_SETUP
-#line 243 "obj/src/GrammarLexer.l"
+#line 245 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 244 "obj/src/GrammarLexer.l"
+#line 246 "obj/src/GrammarLexer.l"
 {
     strncat( strbuf, "\n", STRBUF_LENGTH - 1 );
 }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 247 "obj/src/GrammarLexer.l"
+#line 249 "obj/src/GrammarLexer.l"
 {
     strncat( strbuf, "\t", STRBUF_LENGTH - 1 );
 }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 250 "obj/src/GrammarLexer.l"
+#line 252 "obj/src/GrammarLexer.l"
 {
     strncat( strbuf, "\"", STRBUF_LENGTH - 1 );
 }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 253 "obj/src/GrammarLexer.l"
+#line 255 "obj/src/GrammarLexer.l"
 {
     strncat( strbuf, "\'", STRBUF_LENGTH - 1 );
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 256 "obj/src/GrammarLexer.l"
+#line 258 "obj/src/GrammarLexer.l"
 {
     global_driver->error( loc, "unclosed string",
             libcasm_fe::Codes::SyntaxErrorUnclosedString );
@@ -1528,15 +1530,15 @@ case YY_STATE_EOF(STRING):
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 261 "obj/src/GrammarLexer.l"
+#line 263 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
-    return yy::casmi_parser::make_STRCONST( strbuf, loc );
+    return yy::Parser::make_STRCONST( strbuf, loc );
 }
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 266 "obj/src/GrammarLexer.l"
+#line 268 "obj/src/GrammarLexer.l"
 {
     global_driver->error( loc,
             "unrecognized character '" + std::string( yytext ) + "'",
@@ -1546,10 +1548,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 273 "obj/src/GrammarLexer.l"
+#line 275 "obj/src/GrammarLexer.l"
 ECHO;
 	YY_BREAK
-#line 1553 "src/various/GrammarLexer.cpp"
+#line 1555 "src/various/GrammarLexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2514,7 +2516,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 273 "obj/src/GrammarLexer.l"
+#line 275 "obj/src/GrammarLexer.l"
 
 
 

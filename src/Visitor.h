@@ -28,8 +28,7 @@
 
 #include "Ast.h"
 #include "Exceptions.h"
-
-class AstNode;
+#include "Symbols.h"
 
 namespace libcasm_fe
 {

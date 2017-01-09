@@ -23,11 +23,9 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <cstdio>
-#include <cstring>
-#include <stdexcept>
-
 #include "Driver.h"
+
+using namespace libcasm_fe;
 
 #define BOLD_BLACK "\x1b[1m"
 #define BOLD_RED "\x1b[1;31m"
@@ -117,7 +115,7 @@ Ast* Driver::parse( const std::string& f )
         return nullptr;
     }
 
-    yy::casmi_parser parser( *this );
+    yy::Parser parser( *this );
     parser.set_debug_level( trace_parsing );
 
     try

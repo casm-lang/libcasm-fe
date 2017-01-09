@@ -26,106 +26,106 @@
 #ifndef CASMI_LIBPARSE_TYPES_H
 #define CASMI_LIBPARSE_TYPES_H
 
-#include <assert.h>
-#include <cstdint>
-#include <map>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "cpp/Default.h"
+#include "cpp/Type.h"
 
 #include "Macros.h"
 
 #define INTEGER_T int64_t
 #define FLOATING_T double
 
-class AstNode;
-class CompoundType;
-
-enum class TypeType
+namespace libcasm_fe
 {
-    STRING,
-    RULEREF,
-    INTEGER,
-    BIT,
-    FLOATING,
-    BOOLEAN,
-    SELF,
-    UNKNOWN,
-    INVALID,
-    NO_TYPE,
-    LIST,
-    TUPLE,
-    TUPLE_OR_LIST,
-    ENUM,
-    RATIONAL,
-    UNDEF,  // only possible during execution in value_t.type
-    SYMBOL, // only possible during execution in value_t.type
-    NUMBER_RANGE,
-};
+    class AstNode;
+    class CompoundType;
 
-class Type;
+    enum class TypeType
+    {
+        STRING,
+        RULEREF,
+        INTEGER,
+        BIT,
+        FLOATING,
+        BOOLEAN,
+        SELF,
+        UNKNOWN,
+        INVALID,
+        NO_TYPE,
+        LIST,
+        TUPLE,
+        TUPLE_OR_LIST,
+        ENUM,
+        RATIONAL,
+        UNDEF,  // only possible during execution in value_t.type
+        SYMBOL, // only possible during execution in value_t.type
+        NUMBER_RANGE,
+    };
 
-class Type
-{
-  private:
-    bool eq( const Type& other ) const;
-    bool unify_list( Type* other );
-    bool unify_tuple( Type* other );
-    bool unify_tuple_or_list( Type* other );
-    bool unify_enum( Type* other );
+    class Type;
 
-  public:
-    TypeType t;
-    Type* unify_with_left;
-    Type* unify_with_right;
+    class Type
+    {
+      private:
+        bool eq( const Type& other ) const;
+        bool unify_list( Type* other );
+        bool unify_tuple( Type* other );
+        bool unify_tuple_or_list( Type* other );
+        bool unify_enum( Type* other );
 
-    std::vector< Type* > constraints;
-    std::vector< Type* > subtypes;
+      public:
+        TypeType t;
+        Type* unify_with_left;
+        Type* unify_with_right;
 
-    std::string enum_name;
+        std::vector< Type* > constraints;
+        std::vector< Type* > subtypes;
 
-    INTEGER_T subrange_start = 0;
-    INTEGER_T subrange_end = -1;
+        std::string enum_name;
 
-    INTEGER_T bitsize = -1;
+        INTEGER_T subrange_start = 0;
+        INTEGER_T subrange_end = -1;
 
-    Type();
-    Type( TypeType t );
-    Type( const Type& other );
-    Type( const std::string& type_name, std::vector< Type* >& internal_types );
-    Type( TypeType t, std::vector< Type* >& internal_types );
-    Type( TypeType t, Type* int_typ );
-    Type( const std::string& type_name );
-    Type( TypeType enum_type, const std::string& type_name );
-    Type( Type* other );
+        INTEGER_T bitsize = -1;
 
-    bool operator==( const Type& other ) const;
-    bool operator==( const TypeType other ) const;
+        Type();
+        Type( TypeType t );
+        Type( const Type& other );
+        Type( const std::string& type_name,
+            std::vector< Type* >& internal_types );
+        Type( TypeType t, std::vector< Type* >& internal_types );
+        Type( TypeType t, Type* int_typ );
+        Type( const std::string& type_name );
+        Type( TypeType enum_type, const std::string& type_name );
+        Type( Type* other );
 
-    bool operator!=( const Type& other ) const;
+        bool operator==( const Type& other ) const;
+        bool operator==( const TypeType other ) const;
 
-    virtual const std::string to_str() const;
-    virtual std::string unify_links_to_str() const;
-    virtual std::string unify_links_to_str_left() const;
-    virtual std::string unify_links_to_str_right() const;
+        bool operator!=( const Type& other ) const;
 
-    // unify with temporary type
-    bool unify( Type other );
+        virtual const std::string to_str() const;
+        virtual std::string unify_links_to_str() const;
+        virtual std::string unify_links_to_str_left() const;
+        virtual std::string unify_links_to_str_right() const;
 
-    // unify types of ast nodes
-    bool unify( Type* other );
+        // unify with temporary type
+        bool unify( Type other );
 
-    bool unify_right( Type* other );
+        // unify types of ast nodes
+        bool unify( Type* other );
 
-    bool unify_left( Type* other );
+        bool unify_right( Type* other );
 
-    bool unify_nofollow( Type* other );
+        bool unify_left( Type* other );
 
-    const Type* get_most_general_type( AstNode* node ) const;
-    bool is_complete() const;
-    bool is_unknown() const;
+        bool unify_nofollow( Type* other );
 
-    bool has_range_restriction() const;
-};
+        const Type* get_most_general_type( AstNode* node ) const;
+        bool is_complete() const;
+        bool is_unknown() const;
+
+        bool has_range_restriction() const;
+    };
+}
 
 #endif

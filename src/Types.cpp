@@ -30,6 +30,8 @@
 
 extern Driver* global_driver;
 
+using namespace libcasm_fe;
+
 Type::Type( const std::string& type_name, std::vector< Type* >& st )
 : unify_with_left( nullptr )
 , unify_with_right( nullptr )

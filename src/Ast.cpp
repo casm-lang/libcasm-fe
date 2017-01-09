@@ -23,10 +23,10 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <map>
-
 #include "Ast.h"
 #include "Driver.h"
+
+using namespace libcasm_fe;
 
 static std::map< NodeType, const std::string > node_type_names_ = {
     { NodeType::ASSERT, std::string( "ASSERT" ) },
@@ -64,7 +64,7 @@ static std::map< NodeType, const std::string > node_type_names_ = {
 
 std::string unknown_type = "unknown node type";
 
-const std::string& type_to_str( NodeType t )
+const std::string& libcasm_fe::type_to_str( NodeType t )
 {
     try
     {
@@ -574,7 +574,7 @@ bool UnaryExpression::equals( AstNode* other ) const
     }
 }
 
-std::string operator_to_str( libcasm_ir::Value::ID op )
+std::string libcasm_fe::operator_to_str( libcasm_ir::Value::ID op )
 {
     switch( op )
     {

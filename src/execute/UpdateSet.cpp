@@ -25,8 +25,7 @@
 
 #include "UpdateSet.h"
 
-#include <algorithm>
-#include <cassert>
+#include "cpp/Default.h"
 
 UpdateSet::Conflict::Conflict(
     const std::string& msg, Update* conflictingUpdate, Update* existingUpdate )
@@ -62,7 +61,7 @@ std::size_t UpdateSet::size() const noexcept
     return m_set.size();
 }
 
-Update* UpdateSet::lookup( const value_t* location ) const noexcept
+Update* UpdateSet::lookup( const libcasm_fe::value_t* location ) const noexcept
 {
     if( m_parent )
     {
@@ -113,7 +112,7 @@ typename UpdateSet::const_iterator UpdateSet::end() const noexcept
     return m_set.end();
 }
 
-Update* UpdateSet::get( const value_t* location ) const noexcept
+Update* UpdateSet::get( const libcasm_fe::value_t* location ) const noexcept
 {
     const auto it = m_set.find( location );
     return ( it != m_set.end() ) ? it.value() : nullptr;
@@ -124,12 +123,14 @@ UpdateSet::Type SequentialUpdateSet::type() const noexcept
     return Type::Sequential;
 }
 
-void SequentialUpdateSet::add( const value_t* location, Update* update )
+void SequentialUpdateSet::add(
+    const libcasm_fe::value_t* location, Update* update )
 {
     m_set.insertOrAssign( location, update );
 }
 
-Update* SequentialUpdateSet::lookup( const value_t* location ) const noexcept
+Update* SequentialUpdateSet::lookup( const libcasm_fe::value_t* location ) const
+    noexcept
 {
     const auto it = m_set.find( location );
     if( it != m_set.end() )
@@ -145,7 +146,8 @@ UpdateSet::Type ParallelUpdateSet::type() const noexcept
     return Type::Parallel;
 }
 
-void ParallelUpdateSet::add( const value_t* location, Update* update )
+void ParallelUpdateSet::add(
+    const libcasm_fe::value_t* location, Update* update )
 {
     const auto result = m_set.insert( location, update );
     if( !result.second )
@@ -170,12 +172,14 @@ UpdateSetManager::~UpdateSetManager()
     clear();
 }
 
-void UpdateSetManager::add( const value_t* location, Update* update )
+void UpdateSetManager::add(
+    const libcasm_fe::value_t* location, Update* update )
 {
     currentUpdateSet()->add( location, update );
 }
 
-Update* UpdateSetManager::lookup( const value_t* location ) const noexcept
+Update* UpdateSetManager::lookup( const libcasm_fe::value_t* location ) const
+    noexcept
 {
     if( m_updateSets.empty() )
     {

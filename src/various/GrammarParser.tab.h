@@ -42,20 +42,18 @@
 // //                    "%code requires" blocks.
 #line 36 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 
-    #include <cstdint>
-    #include <string>
-    #include <utility>
-    
     #include "cpp/Type.h"
     
     #include "src/Ast.h"
     #include "src/Types.h"
+    #include "src/Driver.h"
     #include "src/Codes.h"
-    class Driver;
 
-    #include "libcasm-ir.h"
+    #include "../casm-ir/src/Value.h"
 
-#line 59 "GrammarParser.tab.h" // lalr1.cc:377
+    using namespace libcasm_fe;
+
+#line 57 "GrammarParser.tab.h" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -132,7 +130,7 @@
 
 
 namespace yy {
-#line 136 "GrammarParser.tab.h" // lalr1.cc:377
+#line 134 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
@@ -292,7 +290,7 @@ namespace yy {
 
 
   /// A Bison parser.
-  class casmi_parser
+  class Parser
   {
   public:
 #ifndef YYSTYPE
@@ -1050,8 +1048,8 @@ namespace yy {
 
 
     /// Build a parser object.
-    casmi_parser (Driver& driver_yyarg);
-    virtual ~casmi_parser ();
+    Parser (Driver& driver_yyarg);
+    virtual ~Parser ();
 
     /// Parse.
     /// \returns  0 iff parsing succeeded.
@@ -1081,8 +1079,8 @@ namespace yy {
 
   private:
     /// This class is not copyable.
-    casmi_parser (const casmi_parser&);
-    casmi_parser& operator= (const casmi_parser&);
+    Parser (const Parser&);
+    Parser& operator= (const Parser&);
 
     /// State numbers.
     typedef int state_type;
@@ -1268,8 +1266,8 @@ namespace yy {
 
   // Symbol number corresponding to token number t.
   inline
-  casmi_parser::token_number_type
-  casmi_parser::yytranslate_ (token_type t)
+  Parser::token_number_type
+  Parser::yytranslate_ (token_type t)
   {
     static
     const token_number_type
@@ -1322,7 +1320,7 @@ namespace yy {
   }
 
   inline
-  casmi_parser::syntax_error::syntax_error (const location_type& l, const std::string& m)
+  Parser::syntax_error::syntax_error (const location_type& l, const std::string& m)
     : std::runtime_error (m)
     , location (l)
   {}
@@ -1330,13 +1328,13 @@ namespace yy {
   // basic_symbol.
   template <typename Base>
   inline
-  casmi_parser::basic_symbol<Base>::basic_symbol ()
+  Parser::basic_symbol<Base>::basic_symbol ()
     : value ()
   {}
 
   template <typename Base>
   inline
-  casmi_parser::basic_symbol<Base>::basic_symbol (const basic_symbol& other)
+  Parser::basic_symbol<Base>::basic_symbol (const basic_symbol& other)
     : Base (other)
     , value ()
     , location (other.location)
@@ -1537,7 +1535,7 @@ namespace yy {
 
   template <typename Base>
   inline
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const semantic_type& v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const semantic_type& v, const location_type& l)
     : Base (t)
     , value ()
     , location (l)
@@ -1739,280 +1737,280 @@ namespace yy {
   // Implementation of basic_symbol constructor for each type.
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const location_type& l)
     : Base (t)
     , value ()
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Ast* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Ast* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const AstListNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const AstListNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const AstNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const AstNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const AtomNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const AtomNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BaseFunctionAtom* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BaseFunctionAtom* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CallNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CallNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CaseNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CaseNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const DiedieNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const DiedieNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Enum* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Enum* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExpressionBase* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExpressionBase* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FLOATING_T v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FLOATING_T v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FloatingAtom* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FloatingAtom* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ForallNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ForallNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Function* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Function* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const INTEGER_T v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const INTEGER_T v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IfThenElseNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IfThenElseNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IntegerAtom* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IntegerAtom* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LetNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LetNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PopNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PopNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PrintNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PrintNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PushNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PushNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RationalAtom* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RationalAtom* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SpecificationNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SpecificationNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Type* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Type* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UnaryNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UnaryNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UpdateNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UpdateNode* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const rational_t v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const rational_t v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<AtomNode*, AstNode*> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<AtomNode*, AstNode*> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<ExpressionBase*, ExpressionBase*> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<ExpressionBase*, ExpressionBase*> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<std::string, std::vector<std::string>> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<std::string, std::vector<std::string>> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<std::vector<Type*>, Type*> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<std::vector<Type*>, Type*> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<ExpressionBase*>* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<ExpressionBase*>* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<Type*> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<Type*> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<AtomNode*, AstNode*>> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<AtomNode*, AstNode*>> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<std::string, std::vector<std::string>>> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<std::string, std::vector<std::string>>> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  casmi_parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::string> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::string> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2021,7 +2019,7 @@ namespace yy {
 
   template <typename Base>
   inline
-  casmi_parser::basic_symbol<Base>::~basic_symbol ()
+  Parser::basic_symbol<Base>::~basic_symbol ()
   {
     clear ();
   }
@@ -2029,7 +2027,7 @@ namespace yy {
   template <typename Base>
   inline
   void
-  casmi_parser::basic_symbol<Base>::clear ()
+  Parser::basic_symbol<Base>::clear ()
   {
     // User destructor.
     symbol_number_type yytype = this->type_get ();
@@ -2239,7 +2237,7 @@ namespace yy {
   template <typename Base>
   inline
   bool
-  casmi_parser::basic_symbol<Base>::empty () const
+  Parser::basic_symbol<Base>::empty () const
   {
     return Base::type_get () == empty_symbol;
   }
@@ -2247,7 +2245,7 @@ namespace yy {
   template <typename Base>
   inline
   void
-  casmi_parser::basic_symbol<Base>::move (basic_symbol& s)
+  Parser::basic_symbol<Base>::move (basic_symbol& s)
   {
     super_type::move(s);
       switch (this->type_get ())
@@ -2446,30 +2444,30 @@ namespace yy {
 
   // by_type.
   inline
-  casmi_parser::by_type::by_type ()
+  Parser::by_type::by_type ()
     : type (empty_symbol)
   {}
 
   inline
-  casmi_parser::by_type::by_type (const by_type& other)
+  Parser::by_type::by_type (const by_type& other)
     : type (other.type)
   {}
 
   inline
-  casmi_parser::by_type::by_type (token_type t)
+  Parser::by_type::by_type (token_type t)
     : type (yytranslate_ (t))
   {}
 
   inline
   void
-  casmi_parser::by_type::clear ()
+  Parser::by_type::clear ()
   {
     type = empty_symbol;
   }
 
   inline
   void
-  casmi_parser::by_type::move (by_type& that)
+  Parser::by_type::move (by_type& that)
   {
     type = that.type;
     that.clear ();
@@ -2477,14 +2475,14 @@ namespace yy {
 
   inline
   int
-  casmi_parser::by_type::type_get () const
+  Parser::by_type::type_get () const
   {
     return type;
   }
 
   inline
-  casmi_parser::token_type
-  casmi_parser::by_type::token () const
+  Parser::token_type
+  Parser::by_type::token () const
   {
     // YYTOKNUM[NUM] -- (External) token number corresponding to the
     // (internal) symbol number NUM (which must be that of a token).  */
@@ -2505,482 +2503,482 @@ namespace yy {
     return static_cast<token_type> (yytoken_number_[type]);
   }
   // Implementation of make_symbol for each symbol type.
-  casmi_parser::symbol_type
-  casmi_parser::make_END (const location_type& l)
+  Parser::symbol_type
+  Parser::make_END (const location_type& l)
   {
     return symbol_type (token::END, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_CASM (const location_type& l)
+  Parser::symbol_type
+  Parser::make_CASM (const location_type& l)
   {
     return symbol_type (token::CASM, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_INIT (const location_type& l)
+  Parser::symbol_type
+  Parser::make_INIT (const location_type& l)
   {
     return symbol_type (token::INIT, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_OPTION (const location_type& l)
+  Parser::symbol_type
+  Parser::make_OPTION (const location_type& l)
   {
     return symbol_type (token::OPTION, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_DERIVED (const location_type& l)
+  Parser::symbol_type
+  Parser::make_DERIVED (const location_type& l)
   {
     return symbol_type (token::DERIVED, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ENUM (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ENUM (const location_type& l)
   {
     return symbol_type (token::ENUM, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_RULE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_RULE (const location_type& l)
   {
     return symbol_type (token::RULE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_DUMPS (const location_type& l)
+  Parser::symbol_type
+  Parser::make_DUMPS (const location_type& l)
   {
     return symbol_type (token::DUMPS, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_FUNCTION (const location_type& l)
+  Parser::symbol_type
+  Parser::make_FUNCTION (const location_type& l)
   {
     return symbol_type (token::FUNCTION, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_INITIALLY (const location_type& l)
+  Parser::symbol_type
+  Parser::make_INITIALLY (const location_type& l)
   {
     return symbol_type (token::INITIALLY, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_SEQ (const location_type& l)
+  Parser::symbol_type
+  Parser::make_SEQ (const location_type& l)
   {
     return symbol_type (token::SEQ, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ENDSEQ (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ENDSEQ (const location_type& l)
   {
     return symbol_type (token::ENDSEQ, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_PAR (const location_type& l)
+  Parser::symbol_type
+  Parser::make_PAR (const location_type& l)
   {
     return symbol_type (token::PAR, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ENDPAR (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ENDPAR (const location_type& l)
   {
     return symbol_type (token::ENDPAR, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ASSERT (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ASSERT (const location_type& l)
   {
     return symbol_type (token::ASSERT, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ASSURE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ASSURE (const location_type& l)
   {
     return symbol_type (token::ASSURE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_DIEDIE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_DIEDIE (const location_type& l)
   {
     return symbol_type (token::DIEDIE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_IMPOSSIBLE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_IMPOSSIBLE (const location_type& l)
   {
     return symbol_type (token::IMPOSSIBLE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_SKIP (const location_type& l)
+  Parser::symbol_type
+  Parser::make_SKIP (const location_type& l)
   {
     return symbol_type (token::SKIP, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_LET (const location_type& l)
+  Parser::symbol_type
+  Parser::make_LET (const location_type& l)
   {
     return symbol_type (token::LET, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_IN (const location_type& l)
+  Parser::symbol_type
+  Parser::make_IN (const location_type& l)
   {
     return symbol_type (token::IN, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_FORALL (const location_type& l)
+  Parser::symbol_type
+  Parser::make_FORALL (const location_type& l)
   {
     return symbol_type (token::FORALL, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ITERATE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ITERATE (const location_type& l)
   {
     return symbol_type (token::ITERATE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_DO (const location_type& l)
+  Parser::symbol_type
+  Parser::make_DO (const location_type& l)
   {
     return symbol_type (token::DO, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_CALL (const location_type& l)
+  Parser::symbol_type
+  Parser::make_CALL (const location_type& l)
   {
     return symbol_type (token::CALL, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_IF (const location_type& l)
+  Parser::symbol_type
+  Parser::make_IF (const location_type& l)
   {
     return symbol_type (token::IF, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_THEN (const location_type& l)
+  Parser::symbol_type
+  Parser::make_THEN (const location_type& l)
   {
     return symbol_type (token::THEN, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ELSE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ELSE (const location_type& l)
   {
     return symbol_type (token::ELSE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_CASE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_CASE (const location_type& l)
   {
     return symbol_type (token::CASE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_OF (const location_type& l)
+  Parser::symbol_type
+  Parser::make_OF (const location_type& l)
   {
     return symbol_type (token::OF, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_DEFAULT (const location_type& l)
+  Parser::symbol_type
+  Parser::make_DEFAULT (const location_type& l)
   {
     return symbol_type (token::DEFAULT, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ENDCASE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ENDCASE (const location_type& l)
   {
     return symbol_type (token::ENDCASE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_PRINT (const location_type& l)
+  Parser::symbol_type
+  Parser::make_PRINT (const location_type& l)
   {
     return symbol_type (token::PRINT, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_DEBUG (const location_type& l)
+  Parser::symbol_type
+  Parser::make_DEBUG (const location_type& l)
   {
     return symbol_type (token::DEBUG, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_PUSH (const location_type& l)
+  Parser::symbol_type
+  Parser::make_PUSH (const location_type& l)
   {
     return symbol_type (token::PUSH, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_INTO (const location_type& l)
+  Parser::symbol_type
+  Parser::make_INTO (const location_type& l)
   {
     return symbol_type (token::INTO, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_POP (const location_type& l)
+  Parser::symbol_type
+  Parser::make_POP (const location_type& l)
   {
     return symbol_type (token::POP, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_FROM (const location_type& l)
+  Parser::symbol_type
+  Parser::make_FROM (const location_type& l)
   {
     return symbol_type (token::FROM, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_SELF (const location_type& l)
+  Parser::symbol_type
+  Parser::make_SELF (const location_type& l)
   {
     return symbol_type (token::SELF, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_UNDEF (const location_type& l)
+  Parser::symbol_type
+  Parser::make_UNDEF (const location_type& l)
   {
     return symbol_type (token::UNDEF, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_FALSE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_FALSE (const location_type& l)
   {
     return symbol_type (token::FALSE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_TRUE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_TRUE (const location_type& l)
   {
     return symbol_type (token::TRUE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_AND (const location_type& l)
+  Parser::symbol_type
+  Parser::make_AND (const location_type& l)
   {
     return symbol_type (token::AND, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_OR (const location_type& l)
+  Parser::symbol_type
+  Parser::make_OR (const location_type& l)
   {
     return symbol_type (token::OR, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_XOR (const location_type& l)
+  Parser::symbol_type
+  Parser::make_XOR (const location_type& l)
   {
     return symbol_type (token::XOR, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_NOT (const location_type& l)
+  Parser::symbol_type
+  Parser::make_NOT (const location_type& l)
   {
     return symbol_type (token::NOT, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_PLUS (const location_type& l)
+  Parser::symbol_type
+  Parser::make_PLUS (const location_type& l)
   {
     return symbol_type (token::PLUS, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_MINUS (const location_type& l)
+  Parser::symbol_type
+  Parser::make_MINUS (const location_type& l)
   {
     return symbol_type (token::MINUS, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_EQUAL (const location_type& l)
+  Parser::symbol_type
+  Parser::make_EQUAL (const location_type& l)
   {
     return symbol_type (token::EQUAL, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_LPAREN (const location_type& l)
+  Parser::symbol_type
+  Parser::make_LPAREN (const location_type& l)
   {
     return symbol_type (token::LPAREN, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_RPAREN (const location_type& l)
+  Parser::symbol_type
+  Parser::make_RPAREN (const location_type& l)
   {
     return symbol_type (token::RPAREN, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_LSQPAREN (const location_type& l)
+  Parser::symbol_type
+  Parser::make_LSQPAREN (const location_type& l)
   {
     return symbol_type (token::LSQPAREN, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_RSQPAREN (const location_type& l)
+  Parser::symbol_type
+  Parser::make_RSQPAREN (const location_type& l)
   {
     return symbol_type (token::RSQPAREN, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_LCURPAREN (const location_type& l)
+  Parser::symbol_type
+  Parser::make_LCURPAREN (const location_type& l)
   {
     return symbol_type (token::LCURPAREN, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_RCURPAREN (const location_type& l)
+  Parser::symbol_type
+  Parser::make_RCURPAREN (const location_type& l)
   {
     return symbol_type (token::RCURPAREN, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_DOT (const location_type& l)
+  Parser::symbol_type
+  Parser::make_DOT (const location_type& l)
   {
     return symbol_type (token::DOT, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_COLON (const location_type& l)
+  Parser::symbol_type
+  Parser::make_COLON (const location_type& l)
   {
     return symbol_type (token::COLON, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_UNDERLINE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_UNDERLINE (const location_type& l)
   {
     return symbol_type (token::UNDERLINE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_AT (const location_type& l)
+  Parser::symbol_type
+  Parser::make_AT (const location_type& l)
   {
     return symbol_type (token::AT, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_COMMA (const location_type& l)
+  Parser::symbol_type
+  Parser::make_COMMA (const location_type& l)
   {
     return symbol_type (token::COMMA, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_LESSER (const location_type& l)
+  Parser::symbol_type
+  Parser::make_LESSER (const location_type& l)
   {
     return symbol_type (token::LESSER, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_GREATER (const location_type& l)
+  Parser::symbol_type
+  Parser::make_GREATER (const location_type& l)
   {
     return symbol_type (token::GREATER, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_STAR (const location_type& l)
+  Parser::symbol_type
+  Parser::make_STAR (const location_type& l)
   {
     return symbol_type (token::STAR, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_SLASH (const location_type& l)
+  Parser::symbol_type
+  Parser::make_SLASH (const location_type& l)
   {
     return symbol_type (token::SLASH, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_PERCENT (const location_type& l)
+  Parser::symbol_type
+  Parser::make_PERCENT (const location_type& l)
   {
     return symbol_type (token::PERCENT, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_DOTDOT (const location_type& l)
+  Parser::symbol_type
+  Parser::make_DOTDOT (const location_type& l)
   {
     return symbol_type (token::DOTDOT, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ARROW (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ARROW (const location_type& l)
   {
     return symbol_type (token::ARROW, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_UPDATE (const location_type& l)
+  Parser::symbol_type
+  Parser::make_UPDATE (const location_type& l)
   {
     return symbol_type (token::UPDATE, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_NEQUAL (const location_type& l)
+  Parser::symbol_type
+  Parser::make_NEQUAL (const location_type& l)
   {
     return symbol_type (token::NEQUAL, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_LESSEQ (const location_type& l)
+  Parser::symbol_type
+  Parser::make_LESSEQ (const location_type& l)
   {
     return symbol_type (token::LESSEQ, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_GREATEREQ (const location_type& l)
+  Parser::symbol_type
+  Parser::make_GREATEREQ (const location_type& l)
   {
     return symbol_type (token::GREATEREQ, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_SEQ_BRACKET (const location_type& l)
+  Parser::symbol_type
+  Parser::make_SEQ_BRACKET (const location_type& l)
   {
     return symbol_type (token::SEQ_BRACKET, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_ENDSEQ_BRACKET (const location_type& l)
+  Parser::symbol_type
+  Parser::make_ENDSEQ_BRACKET (const location_type& l)
   {
     return symbol_type (token::ENDSEQ_BRACKET, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_FLOATINGCONST (const FLOATING_T& v, const location_type& l)
+  Parser::symbol_type
+  Parser::make_FLOATINGCONST (const FLOATING_T& v, const location_type& l)
   {
     return symbol_type (token::FLOATINGCONST, v, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_INTEGERCONST (const INTEGER_T& v, const location_type& l)
+  Parser::symbol_type
+  Parser::make_INTEGERCONST (const INTEGER_T& v, const location_type& l)
   {
     return symbol_type (token::INTEGERCONST, v, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_RATIONALCONST (const rational_t& v, const location_type& l)
+  Parser::symbol_type
+  Parser::make_RATIONALCONST (const rational_t& v, const location_type& l)
   {
     return symbol_type (token::RATIONALCONST, v, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_STRCONST (const std::string& v, const location_type& l)
+  Parser::symbol_type
+  Parser::make_STRCONST (const std::string& v, const location_type& l)
   {
     return symbol_type (token::STRCONST, v, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_IDENTIFIER (const std::string& v, const location_type& l)
+  Parser::symbol_type
+  Parser::make_IDENTIFIER (const std::string& v, const location_type& l)
   {
     return symbol_type (token::IDENTIFIER, v, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_UPLUS (const location_type& l)
+  Parser::symbol_type
+  Parser::make_UPLUS (const location_type& l)
   {
     return symbol_type (token::UPLUS, l);
   }
 
-  casmi_parser::symbol_type
-  casmi_parser::make_UMINUS (const location_type& l)
+  Parser::symbol_type
+  Parser::make_UMINUS (const location_type& l)
   {
     return symbol_type (token::UMINUS, l);
   }
@@ -2988,7 +2986,7 @@ namespace yy {
 
 
 } // yy
-#line 2992 "GrammarParser.tab.h" // lalr1.cc:377
+#line 2990 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

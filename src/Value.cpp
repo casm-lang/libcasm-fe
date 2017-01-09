@@ -25,13 +25,13 @@
 
 #include "Value.h"
 
-#include <cassert>
-#include <cmath>
-#include <sstream>
-#include <utility>
+#include "cpp/Default.h"
+#include "cpp/Math.h"
 
 #include "Ast.h"
 #include "Symbolic.h"
+
+using namespace libcasm_fe;
 
 value_t::value_t()
 : type( TypeType::UNDEF )
@@ -269,38 +269,80 @@ const std::string value_t::to_str( bool symbolic ) const
     }
 }
 
-value_t operator or( const value_t& lhs, const value_t& rhs )
+namespace libcasm_fe
 {
-    assert( lhs.type == TypeType::UNDEF or lhs.type == TypeType::BOOLEAN
-            or lhs.type == TypeType::BIT
-            or lhs.type == TypeType::INTEGER );
-
-    assert( rhs.type == TypeType::UNDEF or rhs.type == TypeType::BOOLEAN
-            or rhs.type == TypeType::BIT
-            or rhs.type == TypeType::INTEGER );
-
-    if( lhs.is_undef() and rhs.is_undef() )
+    value_t operator or( const value_t& lhs, const value_t& rhs )
     {
-        return value_t();
-    }
-    else if( lhs.type == TypeType::BOOLEAN or rhs.type == TypeType::BOOLEAN )
-    {
-        if( lhs.is_undef() )
+        assert( lhs.type == TypeType::UNDEF or lhs.type == TypeType::BOOLEAN
+                or lhs.type == TypeType::BIT
+                or lhs.type == TypeType::INTEGER );
+
+        assert( rhs.type == TypeType::UNDEF or rhs.type == TypeType::BOOLEAN
+                or rhs.type == TypeType::BIT
+                or rhs.type == TypeType::INTEGER );
+
+        if( lhs.is_undef() and rhs.is_undef() )
         {
-            return rhs.value.boolean ? value_t( true ) : value_t();
+            return value_t();
         }
-        else if( rhs.is_undef() )
+        else if( lhs.type == TypeType::BOOLEAN
+                 or rhs.type == TypeType::BOOLEAN )
         {
-            return lhs.value.boolean ? value_t( true ) : value_t();
+            if( lhs.is_undef() )
+            {
+                return rhs.value.boolean ? value_t( true ) : value_t();
+            }
+            else if( rhs.is_undef() )
+            {
+                return lhs.value.boolean ? value_t( true ) : value_t();
+            }
+            else
+            {
+                return value_t( lhs.value.boolean or rhs.value.boolean );
+            }
+        }
+        else if( lhs.type == TypeType::BIT or rhs.type == TypeType::BIT
+                 or lhs.type == TypeType::INTEGER
+                 or rhs.type == TypeType::INTEGER )
+        {
+            if( lhs.is_undef() or rhs.is_undef() )
+            {
+                return value_t();
+            }
+            else
+            {
+                return value_t( ( (uint64_t)lhs.value.integer )
+                                | ( (uint64_t)rhs.value.integer ) );
+            }
         }
         else
         {
-            return value_t( lhs.value.boolean or rhs.value.boolean );
+            assert( 0 );
+            return value_t();
         }
     }
-    else if( lhs.type == TypeType::BIT or rhs.type == TypeType::BIT
-             or lhs.type == TypeType::INTEGER
-             or rhs.type == TypeType::INTEGER )
+
+    value_t operator and( const value_t& lhs, const value_t& rhs )
+    {
+        if( lhs.is_undef() and rhs.is_undef() )
+        {
+            return value_t();
+        }
+        else if( lhs.is_undef() )
+        {
+            return rhs.value.boolean ? value_t() : value_t( false );
+        }
+        else if( rhs.is_undef() )
+        {
+            return lhs.value.boolean ? value_t() : value_t( false );
+        }
+        else
+        {
+            return value_t( lhs.value.boolean and rhs.value.boolean );
+        }
+    }
+
+    value_t operator^( const value_t& lhs, const value_t& rhs )
     {
         if( lhs.is_undef() or rhs.is_undef() )
         {
@@ -308,48 +350,9 @@ value_t operator or( const value_t& lhs, const value_t& rhs )
         }
         else
         {
-            return value_t( ( (uint64_t)lhs.value.integer )
-                            | ( (uint64_t)rhs.value.integer ) );
+            return value_t( (bool)( lhs.value.boolean ^ rhs.value.boolean ) );
         }
     }
-    else
-    {
-        assert( 0 );
-        return value_t();
-    }
-}
-
-value_t operator and( const value_t& lhs, const value_t& rhs )
-{
-    if( lhs.is_undef() and rhs.is_undef() )
-    {
-        return value_t();
-    }
-    else if( lhs.is_undef() )
-    {
-        return rhs.value.boolean ? value_t() : value_t( false );
-    }
-    else if( rhs.is_undef() )
-    {
-        return lhs.value.boolean ? value_t() : value_t( false );
-    }
-    else
-    {
-        return value_t( lhs.value.boolean and rhs.value.boolean );
-    }
-}
-
-value_t operator^( const value_t& lhs, const value_t& rhs )
-{
-    if( lhs.is_undef() or rhs.is_undef() )
-    {
-        return value_t();
-    }
-    else
-    {
-        return value_t( (bool)( lhs.value.boolean ^ rhs.value.boolean ) );
-    }
-}
 
 #define CREATE_NUMERICAL_OPERATION( op, lhs, rhs )                             \
     {                                                                          \
@@ -370,92 +373,93 @@ value_t operator^( const value_t& lhs, const value_t& rhs )
         }                                                                      \
     }
 
-value_t operator+( const value_t& lhs, const value_t& rhs )
-{
-    if( lhs.is_undef() or rhs.is_undef() )
+    value_t operator+( const value_t& lhs, const value_t& rhs )
     {
-        return value_t();
-    }
-    switch( lhs.type )
-    {
-        case TypeType::INTEGER:
+        if( lhs.is_undef() or rhs.is_undef() )
         {
-            return value_t( lhs.value.integer + rhs.value.integer );
-        }
-        case TypeType::BIT:
-        {
-            uint64_t tmp
-                = (uint64_t)lhs.value.integer + (uint64_t)rhs.value.integer;
-            // TODO: PPA: cut of to correct bit size!
-            return value_t( tmp );
-        }
-        case TypeType::FLOATING:
-        {
-            return value_t( lhs.value.float_ + rhs.value.float_ );
-        }
-        case TypeType::RATIONAL:
-        {
-            return value_t( &( *lhs.value.rat + *rhs.value.rat ) );
-        }
-        case TypeType::STRING:
-        {
-            return value_t(
-                new std::string( *lhs.value.string + *rhs.value.string ) );
-        }
-        default:
-            FAILURE();
-    }
-}
-
-value_t operator-( const value_t& lhs, const value_t& rhs )
-{
-    CREATE_NUMERICAL_OPERATION( -, lhs, rhs );
-}
-
-value_t operator*( const value_t& lhs, const value_t& rhs )
-{
-    CREATE_NUMERICAL_OPERATION( *, lhs, rhs );
-}
-
-value_t operator/( const value_t& lhs, const value_t& rhs )
-{
-    if( lhs.is_undef() or rhs.is_undef() )
-    {
-        return value_t();
-    }
-    switch( lhs.type )
-    {
-        case TypeType::INTEGER:
-            return ( rhs.value.integer == 0 )
-                       ? value_t()
-                       : value_t( lhs.value.integer / rhs.value.integer );
-        case TypeType::FLOATING:
-            return value_t( lhs.value.float_ / rhs.value.float_ );
-        case TypeType::RATIONAL:
-            return value_t( &( *lhs.value.rat / *rhs.value.rat ) );
-        default:
-            FAILURE();
-    }
-}
-
-value_t operator%( const value_t& lhs, const value_t& rhs )
-{
-    if( lhs.is_undef() or rhs.is_undef() )
-    {
-        return value_t();
-    }
-    switch( lhs.type )
-    {
-        case TypeType::INTEGER:
-            return ( rhs.value.integer == 0 )
-                       ? value_t()
-                       : value_t( lhs.value.integer % rhs.value.integer );
-        case TypeType::FLOATING:
-            return value_t( std::fmod( lhs.value.float_, rhs.value.float_ ) );
-        default:
             return value_t();
+        }
+        switch( lhs.type )
+        {
+            case TypeType::INTEGER:
+            {
+                return value_t( lhs.value.integer + rhs.value.integer );
+            }
+            case TypeType::BIT:
+            {
+                uint64_t tmp
+                    = (uint64_t)lhs.value.integer + (uint64_t)rhs.value.integer;
+                // TODO: PPA: cut of to correct bit size!
+                return value_t( tmp );
+            }
+            case TypeType::FLOATING:
+            {
+                return value_t( lhs.value.float_ + rhs.value.float_ );
+            }
+            case TypeType::RATIONAL:
+            {
+                return value_t( &( *lhs.value.rat + *rhs.value.rat ) );
+            }
+            case TypeType::STRING:
+            {
+                return value_t(
+                    new std::string( *lhs.value.string + *rhs.value.string ) );
+            }
+            default:
+                FAILURE();
+        }
     }
-}
+
+    value_t operator-( const value_t& lhs, const value_t& rhs )
+    {
+        CREATE_NUMERICAL_OPERATION( -, lhs, rhs );
+    }
+
+    value_t operator*( const value_t& lhs, const value_t& rhs )
+    {
+        CREATE_NUMERICAL_OPERATION( *, lhs, rhs );
+    }
+
+    value_t operator/( const value_t& lhs, const value_t& rhs )
+    {
+        if( lhs.is_undef() or rhs.is_undef() )
+        {
+            return value_t();
+        }
+        switch( lhs.type )
+        {
+            case TypeType::INTEGER:
+                return ( rhs.value.integer == 0 )
+                           ? value_t()
+                           : value_t( lhs.value.integer / rhs.value.integer );
+            case TypeType::FLOATING:
+                return value_t( lhs.value.float_ / rhs.value.float_ );
+            case TypeType::RATIONAL:
+                return value_t( &( *lhs.value.rat / *rhs.value.rat ) );
+            default:
+                FAILURE();
+        }
+    }
+
+    value_t operator%( const value_t& lhs, const value_t& rhs )
+    {
+        if( lhs.is_undef() or rhs.is_undef() )
+        {
+            return value_t();
+        }
+        switch( lhs.type )
+        {
+            case TypeType::INTEGER:
+                return ( rhs.value.integer == 0 )
+                           ? value_t()
+                           : value_t( lhs.value.integer % rhs.value.integer );
+            case TypeType::FLOATING:
+                return value_t(
+                    std::fmod( lhs.value.float_, rhs.value.float_ ) );
+            default:
+                return value_t();
+        }
+    }
 
 #define CREATE_COMPARE_OPERATION( op, lhs, rhs )                               \
     {                                                                          \
@@ -474,127 +478,128 @@ value_t operator%( const value_t& lhs, const value_t& rhs )
         }                                                                      \
     }
 
-value_t operator<( const value_t& lhs, const value_t& rhs )
-{
-    CREATE_COMPARE_OPERATION( <, lhs, rhs );
-}
-
-value_t operator>( const value_t& lhs, const value_t& rhs )
-{
-    CREATE_COMPARE_OPERATION( >, lhs, rhs );
-}
-
-value_t operator<=( const value_t& lhs, const value_t& rhs )
-{
-    if( lhs.is_undef() and rhs.is_undef() )
+    value_t operator<( const value_t& lhs, const value_t& rhs )
     {
-        return value_t( true );
+        CREATE_COMPARE_OPERATION( <, lhs, rhs );
     }
-    CREATE_COMPARE_OPERATION( <=, lhs, rhs );
-}
 
-value_t operator>=( const value_t& lhs, const value_t& rhs )
-{
-    if( lhs.is_undef() and rhs.is_undef() )
+    value_t operator>( const value_t& lhs, const value_t& rhs )
     {
-        return value_t( true );
+        CREATE_COMPARE_OPERATION( >, lhs, rhs );
     }
-    CREATE_COMPARE_OPERATION( >=, lhs, rhs );
-}
 
-rational_t::rational_t()
-{
-}
-
-rational_t::rational_t( int64_t num, int64_t denom )
-{
-    numerator = num;
-    denominator = denom;
-}
-
-rational_t::rational_t( const rational_t& other )
-: numerator( other.numerator )
-, denominator( other.denominator )
-{
-}
-
-bool rational_t::operator==( const rational_t& other ) const
-{
-    return ( numerator * other.denominator )
-           == ( other.numerator * denominator );
-}
-
-const rational_t& rational_t::operator+( const rational_t& other ) const
-{
-    auto result = new rational_t;
-    result->numerator
-        = ( numerator * other.denominator ) + ( other.numerator * denominator );
-    result->denominator = denominator * other.denominator;
-    return *result;
-}
-
-const rational_t& rational_t::operator-( const rational_t& other ) const
-{
-    auto result = new rational_t;
-    result->numerator
-        = ( numerator * other.denominator ) - ( other.numerator * denominator );
-    result->denominator = denominator * other.denominator;
-    return *result;
-}
-
-const rational_t& rational_t::operator*( const rational_t& other ) const
-{
-    auto result = new rational_t;
-    result->numerator = numerator * other.numerator;
-    result->denominator = denominator * other.denominator;
-    return *result;
-}
-
-const rational_t& rational_t::operator/( const rational_t& other ) const
-{
-    auto result = new rational_t;
-    result->numerator = numerator * other.denominator;
-    result->denominator = denominator * other.numerator;
-    return *result;
-}
-
-const rational_t& rational_t::operator%( const rational_t& ) const
-{
-    // rational modulo is not supported by CASM
-    return *this;
-}
-
-int64_t gcd( int64_t a, int64_t b )
-{
-    int64_t tmp;
-
-    while( b != 0 )
+    value_t operator<=( const value_t& lhs, const value_t& rhs )
     {
-        tmp = b;
-        b = a % b;
-        a = tmp;
+        if( lhs.is_undef() and rhs.is_undef() )
+        {
+            return value_t( true );
+        }
+        CREATE_COMPARE_OPERATION( <=, lhs, rhs );
     }
-    return a;
-}
 
-const std::string rational_t::to_str() const
-{
-    if( numerator == 0 )
+    value_t operator>=( const value_t& lhs, const value_t& rhs )
     {
-        return "0";
+        if( lhs.is_undef() and rhs.is_undef() )
+        {
+            return value_t( true );
+        }
+        CREATE_COMPARE_OPERATION( >=, lhs, rhs );
     }
-    int64_t divisor = gcd( numerator, denominator );
-    int64_t num = numerator / divisor;
-    int64_t denom = denominator / divisor;
-    if( denom == 1 )
+
+    rational_t::rational_t()
     {
-        return std::to_string( num );
     }
-    else
+
+    rational_t::rational_t( int64_t num, int64_t denom )
     {
-        return std::to_string( num ) + "/" + std::to_string( denom );
+        numerator = num;
+        denominator = denom;
     }
-    return "";
+
+    rational_t::rational_t( const rational_t& other )
+    : numerator( other.numerator )
+    , denominator( other.denominator )
+    {
+    }
+
+    bool rational_t::operator==( const rational_t& other ) const
+    {
+        return ( numerator * other.denominator )
+               == ( other.numerator * denominator );
+    }
+
+    const rational_t& rational_t::operator+( const rational_t& other ) const
+    {
+        auto result = new rational_t;
+        result->numerator = ( numerator * other.denominator )
+                            + ( other.numerator * denominator );
+        result->denominator = denominator * other.denominator;
+        return *result;
+    }
+
+    const rational_t& rational_t::operator-( const rational_t& other ) const
+    {
+        auto result = new rational_t;
+        result->numerator = ( numerator * other.denominator )
+                            - ( other.numerator * denominator );
+        result->denominator = denominator * other.denominator;
+        return *result;
+    }
+
+    const rational_t& rational_t::operator*( const rational_t& other ) const
+    {
+        auto result = new rational_t;
+        result->numerator = numerator * other.numerator;
+        result->denominator = denominator * other.denominator;
+        return *result;
+    }
+
+    const rational_t& rational_t::operator/( const rational_t& other ) const
+    {
+        auto result = new rational_t;
+        result->numerator = numerator * other.denominator;
+        result->denominator = denominator * other.numerator;
+        return *result;
+    }
+
+    const rational_t& rational_t::operator%( const rational_t& ) const
+    {
+        // rational modulo is not supported by CASM
+        return *this;
+    }
+
+    int64_t gcd( int64_t a, int64_t b )
+    {
+        int64_t tmp;
+
+        while( b != 0 )
+        {
+            tmp = b;
+            b = a % b;
+            a = tmp;
+        }
+        return a;
+    }
+
+    const std::string rational_t::to_str() const
+    {
+        if( numerator == 0 )
+        {
+            return "0";
+        }
+        int64_t divisor = gcd( numerator, denominator );
+        int64_t num = numerator / divisor;
+        int64_t denom = denominator / divisor;
+        if( denom == 1 )
+        {
+            return std::to_string( num );
+        }
+        else
+        {
+            return std::to_string( num ) + "/" + std::to_string( denom );
+        }
+        return "";
+    }
 }
 
 NumberRange::NumberRange()
@@ -1210,7 +1215,7 @@ namespace std
     }
 }
 
-std::string to_string( const std::vector< value_t >& values )
+std::string std::to_string( const std::vector< value_t >& values )
 {
     if( values.empty() )
     {

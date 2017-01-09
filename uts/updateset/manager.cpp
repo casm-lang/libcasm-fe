@@ -29,6 +29,8 @@
 
 #include "../src/execute/UpdateSet.h"
 
+using namespace libcasm_fe;
+
 TEST( libcasm_fe__updateset_manager,
     lookupShouldReturnNullptrWhenNoUpdateSetExists )
 {

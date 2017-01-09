@@ -25,6 +25,8 @@
 
 #include "FunctionCycleVisitor.h"
 
+using namespace libcasm_fe;
+
 bool InitCycleVisitor::visit_function_atom(
     FunctionAtom* atom, std::vector< bool >& )
 {

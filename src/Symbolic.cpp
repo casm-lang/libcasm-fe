@@ -25,6 +25,8 @@
 
 #include "Symbolic.h"
 
+using namespace libcasm_fe;
+
 symbol_t::symbol_t( uint32_t id )
 : symbol_t( id, nullptr )
 {

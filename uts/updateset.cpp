@@ -29,6 +29,8 @@
 
 #include "../src/execute/UpdateSet.h"
 
+using namespace libcasm_fe;
+
 static value_t make_integer_value( INTEGER_T v )
 {
     return value_t( v );

@@ -23,12 +23,10 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <cerrno>
-#include <cstdlib>
-#include <cstring>
-#include <stdexcept>
-
 #include "LexerHelpers.h"
+
+#include "cpp/Default.h"
+#include "cpp/Type.h"
 
 INTEGER_T convert_to_long(
     const char* val, int base, Driver& driver, yy::location loc )
@@ -37,8 +35,8 @@ INTEGER_T convert_to_long(
     errno = 0;
 
     std::string tmp( val );
-    tmp.erase(
-        remove_if( tmp.begin(), tmp.end(), ptr_fun(::ispunct ) ), tmp.end() );
+    tmp.erase( remove_if( tmp.begin(), tmp.end(), std::ptr_fun(::ispunct ) ),
+        tmp.end() );
 
     INTEGER_T res = strtol( tmp.c_str(), &endptr, base );
 

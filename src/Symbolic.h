@@ -29,31 +29,36 @@
 #include "Ast.h"
 #include "Value.h"
 
-struct symbol_t
+namespace libcasm_fe
 {
-    const uint32_t id;
-    symbolic_condition_t* condition;
-    bool type_dumped;
-    bool update_dumped;
-    List* list; // used for symbolic lists
-    // The distinction between concrete lists and symbolic lists can be fuzzy,
-    // because fcons formulas are generated for all list constants by the legacy
-    // interpreter
+    struct symbol_t
+    {
+        const uint32_t id;
+        symbolic_condition_t* condition;
+        bool type_dumped;
+        bool update_dumped;
+        List* list; // used for symbolic lists
+        // The distinction between concrete lists and symbolic lists can be
+        // fuzzy,
+        // because fcons formulas are generated for all list constants by the
+        // legacy
+        // interpreter
 
-    symbol_t( uint32_t id );
-    symbol_t( uint32_t id, symbolic_condition_t* cond );
-};
+        symbol_t( uint32_t id );
+        symbol_t( uint32_t id, symbolic_condition_t* cond );
+    };
 
-struct symbolic_condition_t
-{
-    value_t* lhs;
-    value_t* rhs;
+    struct symbolic_condition_t
+    {
+        value_t* lhs;
+        value_t* rhs;
 
-    libcasm_ir::Value::ID op;
+        libcasm_ir::Value::ID op;
 
-    symbolic_condition_t(
-        value_t* lhs, value_t* rhs, libcasm_ir::Value::ID op );
-    std::string to_str() const;
-};
+        symbolic_condition_t(
+            value_t* lhs, value_t* rhs, libcasm_ir::Value::ID op );
+        std::string to_str() const;
+    };
+}
 
 #endif

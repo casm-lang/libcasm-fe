@@ -23,23 +23,24 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef CASMI_LIBPARSE_INIT_CYCLE_VISITOR
-#define CASMI_LIBPARSE_INIT_CYCLE_VISITOR
-
-#include <set>
-#include <utility>
-
-#include "Visitor.h"
+#ifndef _LIB_CASMFE_CASMFE_H_
+#define _LIB_CASMFE_CASMFE_H_
 
 namespace libcasm_fe
 {
-    class InitCycleVisitor : public libcasm_fe::Visitor< bool, bool >
+    class CasmFE
     {
-      public:
-        std::set< std::string > dependency_names;
-
-        LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
     };
 }
 
-#endif // CASMI_LIBINTERPRETER_EXEC_VISITOR
+#endif // _LIB_CASMFE_CASMFE_H_
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

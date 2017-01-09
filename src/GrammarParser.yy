@@ -25,7 +25,7 @@
 
 %skeleton "lalr1.cc" /* -*- C++ -*- */
 %defines
-%define parser_class_name {casmi_parser}
+%define parser_class_name {Parser}
 
 %define api.token.constructor
 %define api.value.type variant
@@ -34,18 +34,16 @@
 
 %code requires
 {
-    #include <cstdint>
-    #include <string>
-    #include <utility>
-    
     #include "cpp/Type.h"
     
     #include "src/Ast.h"
     #include "src/Types.h"
+    #include "src/Driver.h"
     #include "src/Codes.h"
-    class Driver;
 
-    #include "libcasm-ir.h"
+    #include "../casm-ir/src/Value.h"
+
+    using namespace libcasm_fe;
 }
 
 // The parsing context.
@@ -67,9 +65,8 @@
 
 %code
 {
-    #include "src/Driver.h"
-    #include "src/Codes.h"
-
+    yy::Parser::symbol_type yylex( libcasm_fe::Driver& driver );
+        
     void parse_function_attributes
     ( Driver& driver
     , const yy::location& loc
@@ -1533,7 +1530,7 @@ ITERATE_SYNTAX
 
 %%
 
-void yy::casmi_parser::error
+void yy::Parser::error
 ( const location_type& l
 , const std::string& m
 )

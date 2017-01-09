@@ -25,104 +25,102 @@
 
 #ifndef CASMI_LIBPARSE_DRIVER_H
 #define CASMI_LIBPARSE_DRIVER_H
-#include <cstdint>
-#include <cstdio>
-#include <fstream>
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
+
+#include "cpp/Default.h"
+#include "cpp/Type.h"
+
+#include "Ast.h"
+#include "Codes.h"
+#include "Symbols.h"
 
 #include "various/GrammarParser.tab.h"
 
-#include "Symbols.h"
-
-#include "Codes.h"
-
-class AstNode;
-class RuleNode;
-
-class Driver
+namespace libcasm_fe
 {
-  private:
-    std::string filename_;
-    FILE* file_;
-    std::vector< std::string > lines_;
-    uint64_t error_;
-    uint64_t warning_;
 
-  public:
-    Driver();
-    virtual ~Driver();
+    class AstNode;
+    class RuleNode;
 
-    std::map< std::string, RuleNode* > rules_map_;
-    Ast* result;
-    std::string spec_name;
+    class Driver
+    {
+      private:
+        std::string filename_;
+        FILE* file_;
+        std::vector< std::string > lines_;
+        uint64_t error_;
+        uint64_t warning_;
 
-    std::string init_name;
+      public:
+        Driver();
+        virtual ~Driver();
 
-    // State information for the lexer
-    bool trace_parsing;
-    bool trace_scanning;
+        std::map< std::string, RuleNode* > rules_map_;
+        Ast* result;
+        std::string spec_name;
 
-    std::map< std::string, std::set< std::string > > init_dependencies;
+        std::string init_name;
 
-    // Handling the scanner.
-    size_t get_next_chars( char buffer[], size_t max_size );
+        // State information for the lexer
+        bool trace_parsing;
+        bool trace_scanning;
 
-    // Run the parser. Return 0 on success.
-    Ast* parse( const std::string& f );
+        std::map< std::string, std::set< std::string > > init_dependencies;
 
-    // Error handling.
-    void error( const yy::location& l, const std::string& m,
-        libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
+        // Handling the scanner.
+        size_t get_next_chars( char buffer[], size_t max_size );
 
-    void error( const std::vector< const yy::location* >& locations,
-        const std::string& m,
-        libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
+        // Run the parser. Return 0 on success.
+        Ast* parse( const std::string& f );
 
-    void warning( const yy::location& l, const std::string& m );
-    void info( const yy::location& l, const std::string& m );
-    bool ok() const;
+        // Error handling.
+        void error( const yy::location& l, const std::string& m,
+            libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
 
-    uint64_t get_error_count() const;
-    uint64_t get_warning_count() const;
+        void error( const std::vector< const yy::location* >& locations,
+            const std::string& m,
+            libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
 
-    // Rule handling
-    /**
-     * @throws RuleAlreadyExists when the rules table contains a rule with
-     *         the same name as the name of the \a rule_root.
-     * @throws IdentifierAlreadyUsed when the name of the \a rule_root is
-     * already
-     *         used somewhere else (e.g. for a function).
-     */
-    void add( RuleNode* rule_root );
-    RuleNode* get_init_rule() const;
+        void warning( const yy::location& l, const std::string& m );
+        void info( const yy::location& l, const std::string& m );
+        bool ok() const;
 
-    // functions
-    /**
-     * @throws SymbolAlreadyExists when the symbol table contains a symbol with
-     *         the same name as the name of the \a function.
-     * @throws IdentifierAlreadyUsed when the name of the \a function is already
-     *         used somewhere else (e.g. for a rule).
-     */
-    void add( Function* function );
-    SymbolTable function_table;
+        uint64_t get_error_count() const;
+        uint64_t get_warning_count() const;
 
-    // Bindings
-    std::map< std::string, size_t > binding_offsets;
+        // Rule handling
+        /**
+         * @throws RuleAlreadyExists when the rules table contains a rule with
+         *         the same name as the name of the \a rule_root.
+         * @throws IdentifierAlreadyUsed when the name of the \a rule_root is
+         * already
+         *         used somewhere else (e.g. for a function).
+         */
+        void add( RuleNode* rule_root );
+        RuleNode* get_init_rule() const;
 
-    // Dumplist map
-    std::unordered_map< size_t, const std::string > function_trace_map;
+        // functions
+        /**
+         * @throws SymbolAlreadyExists when the symbol table contains a symbol
+         * with
+         *         the same name as the name of the \a function.
+         * @throws IdentifierAlreadyUsed when the name of the \a function is
+         * already
+         *         used somewhere else (e.g. for a rule).
+         */
+        void add( Function* function );
+        SymbolTable function_table;
 
-    const std::string& get_filename();
+        // Bindings
+        std::map< std::string, size_t > binding_offsets;
 
-  private:
-    void underline( const yy::location& l );
-};
+        // Dumplist map
+        std::unordered_map< size_t, const std::string > function_trace_map;
 
-// Tell Flex the lexer's prototype ...
-#define YY_DECL yy::casmi_parser::symbol_type yylex( Driver& driver )
-YY_DECL;
+        const std::string& get_filename();
+
+      private:
+        void underline( const yy::location& l );
+    };
+}
 
 #endif

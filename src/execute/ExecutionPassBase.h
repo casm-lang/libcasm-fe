@@ -212,15 +212,15 @@ namespace libcasm_fe
 
         std::vector< List* > temp_lists;
     };
-}
 
-namespace builtins
-{
-    const value_t cons( std::vector< List* >& tempLists, const value_t& val,
-        const value_t& list );
-    const value_t tail(
-        std::vector< List* >& tempLists, const value_t& arg_list );
-    const value_t peek( const value_t& arg_list );
+    namespace builtins
+    {
+        const value_t cons( std::vector< List* >& tempLists, const value_t& val,
+            const value_t& list );
+        const value_t tail(
+            std::vector< List* >& tempLists, const value_t& arg_list );
+        const value_t peek( const value_t& arg_list );
+    }
 }
 
 #endif /* _LIB_CASMFE_EXECUTIONPASSBASE_H_ */

@@ -23,12 +23,10 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef CASMI_AST_H
-#define CASMI_AST_H
+#ifndef _LIB_CASMFE_AST_H_
+#define _LIB_CASMFE_AST_H_
 
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include "cpp/Type.h"
 
 #include "Macros.h"
 
@@ -38,516 +36,522 @@
 
 #include "various/location.hh" // reuse bison's location class
 
-#include "libcasm-ir.h"
+#include "../casm-ir/src/Value.h"
 
-class value_t;
-
-enum NodeType
+namespace libcasm_fe
 {
-    ASSERT,
-    UNDEF_ATOM,
-    ZERO_ATOM,
-    INTEGER_ATOM,
-    FLOATING_ATOM,
-    RATIONAL_ATOM,
-    SELF_ATOM,
-    STRING_ATOM,
-    RULE_ATOM,
-    DUMMY_ATOM,
-    BOOLEAN_ATOM,
-    INIT,
-    IFTHENELSE,
-    BODY_ELEMENTS,
-    PROVIDER,
-    OPTION,
-    ENUM,
-    FUNCTION,
-    DERIVED,
-    RULE,
-    SPECIFICATION,
-    BINARY_EXPRESSION,
-    UNARY_EXPRESSION,
-    UPDATE,
-    STATEMENT,
-    STATEMENTS,
-    SKIP,
-    PARBLOCK,
-    SEQBLOCK,
-    FUNCTION_ATOM,
-    CALL,
-    PRINT,
-    LET,
-    LIST_ATOM,
-    BUILTIN_ATOM,
-    NUMBER_RANGE_ATOM,
-    POP,
-    PUSH,
-    CASE,
-    FORALL,
-    ITERATE,
-    DIEDIE,
-    IMPOSSIBLE,
-    ASSURE,
-};
+    class value_t;
 
-const std::string& type_to_str( NodeType t );
-
-class AstVisitor;
-
-// Forward declarations for libsyntax/symbols.h
-class Function;
-class Enum;
-class Binding;
-
-class List;
-class TempList;
-class BottomList;
-
-// Forward delclarations for this file
-class Expression;
-class ExpressionBase;
-class AtomNode;
-
-class AstNode
-{
-  public:
-    yy::location location;
-    NodeType node_type_;
-
-    Type type_;
-
-    AstNode( NodeType node_type );
-    AstNode( yy::location& loc, NodeType node_type );
-    AstNode( yy::location& loc, NodeType node_type, Type type );
-    virtual ~AstNode();
-    virtual std::string to_str() const;
-    virtual bool equals( AstNode* other ) const;
-    std::string location_str() const;
-};
-
-class AstListNode : public AstNode
-{
-  public:
-    std::vector< AstNode* > nodes;
-
-    AstListNode( yy::location& loc, NodeType node_type );
-    ~AstListNode() override;
-    void add( AstNode* n );
-    bool equals( AstNode* other ) const override;
-};
-
-class UnaryNode : public AstNode
-{
-  public:
-    AstNode* child_;
-
-    UnaryNode( yy::location& loc, NodeType node_type, AstNode* child );
-    ~UnaryNode() override;
-    bool equals( AstNode* other ) const override;
-};
-
-class RuleNode : public UnaryNode
-{
-  public:
-    const std::string name;
-    std::vector< Type* > arguments;
-    std::map< std::string, size_t > binding_offsets;
-    std::vector< const char* > parameter;
-
-    const std::vector< std::pair< std::string, std::vector< std::string > > >
-        dump_list;
-
-    RuleNode( yy::location& loc, AstNode* child, const std::string& name );
-    RuleNode( yy::location& loc, AstNode* child, const std::string& name,
-        std::vector< Type* >& args );
-    RuleNode( yy::location& loc, AstNode* child, const std::string& name,
-        std::vector< Type* >& args,
-        const std::vector< std::pair< std::string,
-            std::vector< std::string > > >& dump_list );
-};
-
-class FunctionDefNode : public AstNode
-{
-  public:
-    Function* sym;
-    FunctionDefNode( yy::location& loc, Function* sym );
-    ~FunctionDefNode() override;
-};
-
-class EnumDefNode : public AstNode
-{
-  public:
-    Enum* enum_;
-    EnumDefNode( yy::location& loc, Enum* enum_ );
-    ~EnumDefNode() override;
-};
-
-class IfThenElseNode : public AstNode
-{
-  public:
-    ExpressionBase* condition_;
-    AstNode* then_; // should always be a statement
-    AstNode* else_; // should always be a statement
-
-    IfThenElseNode( yy::location& loc, ExpressionBase* condition, AstNode* then,
-        AstNode* els );
-};
-
-class ExpressionBase : public AstNode
-{
-  public:
-    ExpressionBase( yy::location& loc, NodeType node_type, Type type )
-    : AstNode( loc, node_type, type )
+    enum NodeType
     {
-    }
-};
-
-class AtomNode : public ExpressionBase
-{
-  public:
-    AtomNode( yy::location& loc, NodeType node_type, Type type )
-    : ExpressionBase( loc, node_type, type )
-    {
-    }
-};
-
-class ZeroAtom : public AtomNode
-{
-  private:
-    AstNode* ref;
-
-  public:
-    ZeroAtom( yy::location& loc, AstNode* reference );
-    const AstNode* getRef( void ) const;
-};
-
-class IntegerAtom : public AtomNode
-{
-  public:
-    INTEGER_T val_;
-
-    IntegerAtom( yy::location& loc, INTEGER_T val );
-    ~IntegerAtom() override;
-    bool equals( AstNode* other ) const override;
-};
-
-class FloatingAtom : public AtomNode
-{
-  public:
-    FLOATING_T val_;
-
-    FloatingAtom( yy::location& loc, FLOATING_T val );
-    ~FloatingAtom() override;
-    bool equals( AstNode* other ) const override;
-};
-
-class RationalAtom : public AtomNode
-{
-  public:
-    const rational_t val_;
-
-    RationalAtom( yy::location& loc, const rational_t& rat );
-};
-
-class UndefAtom : public AtomNode
-{
-  public:
-    UndefAtom( yy::location& loc );
-    bool equals( AstNode* other ) const override;
-};
-
-class SelfAtom : public AtomNode
-{
-  public:
-    SelfAtom( yy::location& loc );
-    bool equals( AstNode* other ) const override;
-};
-
-class BooleanAtom : public AtomNode
-{
-  public:
-    bool value;
-    BooleanAtom( yy::location& loc, bool value );
-    bool equals( AstNode* other ) const override;
-};
-
-class BaseFunctionAtom : public AtomNode
-{
-  public:
-    const std::string name;
-    std::vector< ExpressionBase* >* arguments;
-
-    BaseFunctionAtom( yy::location& loc, NodeType t, const std::string name,
-        std::vector< ExpressionBase* >* args );
-
-    std::string to_str() const override;
-};
-
-class FunctionAtom : public BaseFunctionAtom
-{
-  public:
-    enum class SymbolType
-    {
+        ASSERT,
+        UNDEF_ATOM,
+        ZERO_ATOM,
+        INTEGER_ATOM,
+        FLOATING_ATOM,
+        RATIONAL_ATOM,
+        SELF_ATOM,
+        STRING_ATOM,
+        RULE_ATOM,
+        DUMMY_ATOM,
+        BOOLEAN_ATOM,
+        INIT,
+        IFTHENELSE,
+        BODY_ELEMENTS,
+        PROVIDER,
+        OPTION,
+        ENUM,
         FUNCTION,
         DERIVED,
-        PARAMETER,
-        UNSET,
-        PUSH_POP,
-        ENUM,
+        RULE,
+        SPECIFICATION,
+        BINARY_EXPRESSION,
+        UNARY_EXPRESSION,
+        UPDATE,
+        STATEMENT,
+        STATEMENTS,
+        SKIP,
+        PARBLOCK,
+        SEQBLOCK,
+        FUNCTION_ATOM,
+        CALL,
+        PRINT,
+        LET,
+        LIST_ATOM,
+        BUILTIN_ATOM,
+        NUMBER_RANGE_ATOM,
+        POP,
+        PUSH,
+        CASE,
+        FORALL,
+        ITERATE,
+        DIEDIE,
+        IMPOSSIBLE,
+        ASSURE,
     };
 
-    SymbolType symbol_type;
-    bool initialized;
+    const std::string& type_to_str( NodeType t );
 
-    union {
-        Function* symbol;
-        size_t offset;
+    class AstVisitor;
+
+    // Forward declarations for libsyntax/symbols.h
+    class Function;
+    class Enum;
+    class Binding;
+
+    class List;
+    class TempList;
+    class BottomList;
+
+    // Forward delclarations for this file
+    class Expression;
+    class ExpressionBase;
+    class AtomNode;
+
+    class AstNode
+    {
+      public:
+        yy::location location;
+        NodeType node_type_;
+
+        Type type_;
+
+        AstNode( NodeType node_type );
+        AstNode( yy::location& loc, NodeType node_type );
+        AstNode( yy::location& loc, NodeType node_type, Type type );
+        virtual ~AstNode();
+        virtual std::string to_str() const;
+        virtual bool equals( AstNode* other ) const;
+        std::string location_str() const;
+    };
+
+    class AstListNode : public AstNode
+    {
+      public:
+        std::vector< AstNode* > nodes;
+
+        AstListNode( yy::location& loc, NodeType node_type );
+        ~AstListNode() override;
+        void add( AstNode* n );
+        bool equals( AstNode* other ) const override;
+    };
+
+    class UnaryNode : public AstNode
+    {
+      public:
+        AstNode* child_;
+
+        UnaryNode( yy::location& loc, NodeType node_type, AstNode* child );
+        ~UnaryNode() override;
+        bool equals( AstNode* other ) const override;
+    };
+
+    class RuleNode : public UnaryNode
+    {
+      public:
+        const std::string name;
+        std::vector< Type* > arguments;
+        std::map< std::string, size_t > binding_offsets;
+        std::vector< const char* > parameter;
+
+        const std::vector< std::pair< std::string,
+            std::vector< std::string > > >
+            dump_list;
+
+        RuleNode( yy::location& loc, AstNode* child, const std::string& name );
+        RuleNode( yy::location& loc, AstNode* child, const std::string& name,
+            std::vector< Type* >& args );
+        RuleNode( yy::location& loc, AstNode* child, const std::string& name,
+            std::vector< Type* >& args,
+            const std::vector< std::pair< std::string,
+                std::vector< std::string > > >& dump_list );
+    };
+
+    class FunctionDefNode : public AstNode
+    {
+      public:
+        Function* sym;
+        FunctionDefNode( yy::location& loc, Function* sym );
+        ~FunctionDefNode() override;
+    };
+
+    class EnumDefNode : public AstNode
+    {
+      public:
         Enum* enum_;
+        EnumDefNode( yy::location& loc, Enum* enum_ );
+        ~EnumDefNode() override;
     };
 
-    FunctionAtom( yy::location& loc, const std::string name );
-    FunctionAtom( yy::location& loc, const std::string name,
-        std::vector< ExpressionBase* >* args );
+    class IfThenElseNode : public AstNode
+    {
+      public:
+        ExpressionBase* condition_;
+        AstNode* then_; // should always be a statement
+        AstNode* else_; // should always be a statement
 
-    ~FunctionAtom() override;
-    bool equals( AstNode* other ) const override;
-};
+        IfThenElseNode( yy::location& loc, ExpressionBase* condition,
+            AstNode* then, AstNode* els );
+    };
 
-class BuiltinAtom : public BaseFunctionAtom
-{
-  public:
-    Builtin::Id id;
+    class ExpressionBase : public AstNode
+    {
+      public:
+        ExpressionBase( yy::location& loc, NodeType node_type, Type type )
+        : AstNode( loc, node_type, type )
+        {
+        }
+    };
 
-    std::vector< Type* > types;
-    Type* return_type;
+    class AtomNode : public ExpressionBase
+    {
+      public:
+        AtomNode( yy::location& loc, NodeType node_type, Type type )
+        : ExpressionBase( loc, node_type, type )
+        {
+        }
+    };
 
-    BuiltinAtom( yy::location& loc, const std::string name,
-        std::vector< ExpressionBase* >* args );
+    class ZeroAtom : public AtomNode
+    {
+      private:
+        AstNode* ref;
 
-    ~BuiltinAtom() override;
-    bool equals( AstNode* other ) const override;
-    std::string to_str() const override;
-};
+      public:
+        ZeroAtom( yy::location& loc, AstNode* reference );
+        const AstNode* getRef( void ) const;
+    };
 
-class RuleAtom : public AtomNode
-{
-  public:
-    RuleNode* rule;
-    const std::string name;
+    class IntegerAtom : public AtomNode
+    {
+      public:
+        INTEGER_T val_;
 
-    RuleAtom( yy::location& loc, const std::string&& name );
+        IntegerAtom( yy::location& loc, INTEGER_T val );
+        ~IntegerAtom() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-    ~RuleAtom() override;
-    bool equals( AstNode* other ) const override;
-};
+    class FloatingAtom : public AtomNode
+    {
+      public:
+        FLOATING_T val_;
 
-class StringAtom : public AtomNode
-{
-  public:
-    std::string string;
+        FloatingAtom( yy::location& loc, FLOATING_T val );
+        ~FloatingAtom() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-    StringAtom( yy::location& loc, std::string&& name );
+    class RationalAtom : public AtomNode
+    {
+      public:
+        const rational_t val_;
 
-    ~StringAtom() override;
-    bool equals( AstNode* other ) const override;
-};
+        RationalAtom( yy::location& loc, const rational_t& rat );
+    };
 
-class ListAtom : public AtomNode
-{
-  public:
-    std::vector< ExpressionBase* >* expr_list;
+    class UndefAtom : public AtomNode
+    {
+      public:
+        UndefAtom( yy::location& loc );
+        bool equals( AstNode* other ) const override;
+    };
 
-    ListAtom( yy::location& loc, std::vector< ExpressionBase* >* exprs );
-};
+    class SelfAtom : public AtomNode
+    {
+      public:
+        SelfAtom( yy::location& loc );
+        bool equals( AstNode* other ) const override;
+    };
 
-class NumberRangeAtom : public AtomNode
-{
-  public:
-    ExpressionBase* left;
-    ExpressionBase* right;
+    class BooleanAtom : public AtomNode
+    {
+      public:
+        bool value;
+        BooleanAtom( yy::location& loc, bool value );
+        bool equals( AstNode* other ) const override;
+    };
 
-    NumberRangeAtom(
-        yy::location& loc, ExpressionBase* left, ExpressionBase* right );
-};
+    class BaseFunctionAtom : public AtomNode
+    {
+      public:
+        const std::string name;
+        std::vector< ExpressionBase* >* arguments;
 
-class BinaryExpression : public ExpressionBase
-{
-  public:
-    ExpressionBase* left_;
-    ExpressionBase* right_;
+        BaseFunctionAtom( yy::location& loc, NodeType t, const std::string name,
+            std::vector< ExpressionBase* >* args );
 
-    libcasm_ir::Value::ID op;
+        std::string to_str() const override;
+    };
 
-    BinaryExpression( yy::location& loc, ExpressionBase* left,
-        ExpressionBase* right, libcasm_ir::Value::ID op );
-    ~BinaryExpression() override;
-    bool equals( AstNode* other ) const override;
-};
+    class FunctionAtom : public BaseFunctionAtom
+    {
+      public:
+        enum class SymbolType
+        {
+            FUNCTION,
+            DERIVED,
+            PARAMETER,
+            UNSET,
+            PUSH_POP,
+            ENUM,
+        };
 
-class UnaryExpression : public ExpressionBase
-{
-  public:
-    ExpressionBase* expr_;
+        SymbolType symbol_type;
+        bool initialized;
 
-    libcasm_ir::Value::ID op;
+        union {
+            Function* symbol;
+            size_t offset;
+            Enum* enum_;
+        };
 
-    UnaryExpression(
-        yy::location& loc, ExpressionBase* expr, libcasm_ir::Value::ID op );
-    ~UnaryExpression() override;
-    bool equals( AstNode* other ) const override;
-};
+        FunctionAtom( yy::location& loc, const std::string name );
+        FunctionAtom( yy::location& loc, const std::string name,
+            std::vector< ExpressionBase* >* args );
 
-std::string operator_to_str( libcasm_ir::Value::ID op );
+        ~FunctionAtom() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-class UpdateNode : public AstNode
-{
-  public:
-    FunctionAtom* func;
-    ExpressionBase* expr_;
+    class BuiltinAtom : public BaseFunctionAtom
+    {
+      public:
+        Builtin::Id id;
 
-    bool dump = false;
+        std::vector< Type* > types;
+        Type* return_type;
 
-    UpdateNode( yy::location& loc, FunctionAtom* func, ExpressionBase* expr );
-    ~UpdateNode() override;
-    bool equals( AstNode* other ) const override;
-};
+        BuiltinAtom( yy::location& loc, const std::string name,
+            std::vector< ExpressionBase* >* args );
 
-class PushNode : public AstNode
-{
-  public:
-    ExpressionBase* expr;
-    FunctionAtom* to;
+        ~BuiltinAtom() override;
+        bool equals( AstNode* other ) const override;
+        std::string to_str() const override;
+    };
 
-    PushNode( yy::location& loc, ExpressionBase* expr, FunctionAtom* to );
-    ~PushNode() override;
-    bool equals( AstNode* other ) const override;
-};
+    class RuleAtom : public AtomNode
+    {
+      public:
+        RuleNode* rule;
+        const std::string name;
 
-class PopNode : public AstNode
-{
-  public:
-    FunctionAtom* to;
-    FunctionAtom* from;
+        RuleAtom( yy::location& loc, const std::string&& name );
 
-    Type from_type;
+        ~RuleAtom() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-    PopNode( yy::location& loc, FunctionAtom* to, FunctionAtom* from );
-    ~PopNode() override;
-    bool equals( AstNode* other ) const override;
-};
+    class StringAtom : public AtomNode
+    {
+      public:
+        std::string string;
 
-class ForallNode : public AstNode
-{
-  public:
-    const std::string identifier;
-    ExpressionBase* in_expr;
-    AstNode* statement;
+        StringAtom( yy::location& loc, std::string&& name );
 
-    ForallNode( yy::location& loc, const std::string& ident,
-        ExpressionBase* expr, AstNode* stmt );
-    ~ForallNode() override;
-};
+        ~StringAtom() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-class CaseNode : public AstNode
-{
-  public:
-    ExpressionBase* expr;
+    class ListAtom : public AtomNode
+    {
+      public:
+        std::vector< ExpressionBase* >* expr_list;
 
-    std::vector< std::pair< AtomNode*, AstNode* > > case_list;
-    // std::unordered_map<value_t, AstNode*> label_map;
+        ListAtom( yy::location& loc, std::vector< ExpressionBase* >* exprs );
+    };
 
-    bool map_fixed;
+    class NumberRangeAtom : public AtomNode
+    {
+      public:
+        ExpressionBase* left;
+        ExpressionBase* right;
 
-    CaseNode( yy::location& loc, ExpressionBase* expr,
-        std::vector< std::pair< AtomNode*, AstNode* > >& case_list );
-    ~CaseNode() override;
-    bool equals( AstNode* other ) const override;
-};
+        NumberRangeAtom(
+            yy::location& loc, ExpressionBase* left, ExpressionBase* right );
+    };
 
-class CallNode : public AstNode
-{
-  public:
-    const std::string rule_name;
-    RuleNode* rule;
-    std::vector< ExpressionBase* >* arguments;
-    ExpressionBase* ruleref;
+    class BinaryExpression : public ExpressionBase
+    {
+      public:
+        ExpressionBase* left_;
+        ExpressionBase* right_;
 
-    CallNode( yy::location& loc, const std::string& rule_name,
-        ExpressionBase* ruleref );
-    CallNode( yy::location& loc, const std::string& rule_name,
-        ExpressionBase* ruleref, std::vector< ExpressionBase* >* args );
-};
+        libcasm_ir::Value::ID op;
 
-class PrintNode : public AstNode
-{
-  private:
-    ExpressionBase* atom;
-    std::string filter;
+        BinaryExpression( yy::location& loc, ExpressionBase* left,
+            ExpressionBase* right, libcasm_ir::Value::ID op );
+        ~BinaryExpression() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-  public:
-    PrintNode( yy::location& loc, ExpressionBase* atom );
-    PrintNode(
-        yy::location& loc, ExpressionBase* atom, const std::string& filter );
+    class UnaryExpression : public ExpressionBase
+    {
+      public:
+        ExpressionBase* expr_;
 
-    ExpressionBase* getAtom( void ) const;
-    const std::string& getFilter( void ) const;
-};
+        libcasm_ir::Value::ID op;
 
-class LetNode : public AstNode
-{
-  public:
-    const std::string identifier;
-    ExpressionBase* expr;
-    AstNode* stmt;
+        UnaryExpression(
+            yy::location& loc, ExpressionBase* expr, libcasm_ir::Value::ID op );
+        ~UnaryExpression() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-    LetNode( yy::location& loc, Type type, const std::string& identifier,
-        ExpressionBase* expr, AstNode* stmt );
-};
+    std::string operator_to_str( libcasm_ir::Value::ID op );
 
-class DiedieNode : public AstNode
-{
-  public:
-    ExpressionBase* msg;
+    class UpdateNode : public AstNode
+    {
+      public:
+        FunctionAtom* func;
+        ExpressionBase* expr_;
 
-    DiedieNode( yy::location& loc, ExpressionBase* msg );
-};
+        bool dump = false;
 
-class InitNode : public AstNode
-{
-  public:
-    const std::string identifier;
+        UpdateNode(
+            yy::location& loc, FunctionAtom* func, ExpressionBase* expr );
+        ~UpdateNode() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-    InitNode( yy::location& loc, const std::string& identifier );
-};
+    class PushNode : public AstNode
+    {
+      public:
+        ExpressionBase* expr;
+        FunctionAtom* to;
 
-class SpecificationNode : public AstNode
-{
-  public:
-    const std::string identifier;
+        PushNode( yy::location& loc, ExpressionBase* expr, FunctionAtom* to );
+        ~PushNode() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-    SpecificationNode( yy::location& loc, const std::string& identifier );
-};
+    class PopNode : public AstNode
+    {
+      public:
+        FunctionAtom* to;
+        FunctionAtom* from;
 
-// root level AST node
-class Ast : public AstNode
-{
-    SpecificationNode* spec;
+        Type from_type;
 
-    InitNode* init_rule;
+        PopNode( yy::location& loc, FunctionAtom* to, FunctionAtom* from );
+        ~PopNode() override;
+        bool equals( AstNode* other ) const override;
+    };
 
-    AstListNode* elements;
+    class ForallNode : public AstNode
+    {
+      public:
+        const std::string identifier;
+        ExpressionBase* in_expr;
+        AstNode* statement;
 
-  public:
-    Ast( yy::location& loc, SpecificationNode* spec, AstListNode* elements );
+        ForallNode( yy::location& loc, const std::string& ident,
+            ExpressionBase* expr, AstNode* stmt );
+        ~ForallNode() override;
+    };
 
-    void setInitRule( InitNode* init_rule );
+    class CaseNode : public AstNode
+    {
+      public:
+        ExpressionBase* expr;
 
-    SpecificationNode* getSpecification( void );
-    InitNode* getInitRule( void );
-    AstListNode* getElements( void );
-};
+        std::vector< std::pair< AtomNode*, AstNode* > > case_list;
+        // std::unordered_map<value_t, AstNode*> label_map;
 
-#endif
+        bool map_fixed;
+
+        CaseNode( yy::location& loc, ExpressionBase* expr,
+            std::vector< std::pair< AtomNode*, AstNode* > >& case_list );
+        ~CaseNode() override;
+        bool equals( AstNode* other ) const override;
+    };
+
+    class CallNode : public AstNode
+    {
+      public:
+        const std::string rule_name;
+        RuleNode* rule;
+        std::vector< ExpressionBase* >* arguments;
+        ExpressionBase* ruleref;
+
+        CallNode( yy::location& loc, const std::string& rule_name,
+            ExpressionBase* ruleref );
+        CallNode( yy::location& loc, const std::string& rule_name,
+            ExpressionBase* ruleref, std::vector< ExpressionBase* >* args );
+    };
+
+    class PrintNode : public AstNode
+    {
+      private:
+        ExpressionBase* atom;
+        std::string filter;
+
+      public:
+        PrintNode( yy::location& loc, ExpressionBase* atom );
+        PrintNode( yy::location& loc, ExpressionBase* atom,
+            const std::string& filter );
+
+        ExpressionBase* getAtom( void ) const;
+        const std::string& getFilter( void ) const;
+    };
+
+    class LetNode : public AstNode
+    {
+      public:
+        const std::string identifier;
+        ExpressionBase* expr;
+        AstNode* stmt;
+
+        LetNode( yy::location& loc, Type type, const std::string& identifier,
+            ExpressionBase* expr, AstNode* stmt );
+    };
+
+    class DiedieNode : public AstNode
+    {
+      public:
+        ExpressionBase* msg;
+
+        DiedieNode( yy::location& loc, ExpressionBase* msg );
+    };
+
+    class InitNode : public AstNode
+    {
+      public:
+        const std::string identifier;
+
+        InitNode( yy::location& loc, const std::string& identifier );
+    };
+
+    class SpecificationNode : public AstNode
+    {
+      public:
+        const std::string identifier;
+
+        SpecificationNode( yy::location& loc, const std::string& identifier );
+    };
+
+    // root level AST node
+    class Ast : public AstNode
+    {
+        SpecificationNode* spec;
+
+        InitNode* init_rule;
+
+        AstListNode* elements;
+
+      public:
+        Ast(
+            yy::location& loc, SpecificationNode* spec, AstListNode* elements );
+
+        void setInitRule( InitNode* init_rule );
+
+        SpecificationNode* getSpecification( void );
+        InitNode* getInitRule( void );
+        AstListNode* getElements( void );
+    };
+}
+
+#endif // _LIB_CASMFE_AST_H_
 
 //
 //  Local variables:

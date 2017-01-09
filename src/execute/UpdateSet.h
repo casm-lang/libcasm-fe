@@ -39,15 +39,17 @@
 struct LocationHash
 {
     /**
-     * Directly using a value_t pointer as hash value has the problem that the
+     * Directly using a libcasm_fe::value_t pointer as hash value has the
+     * problem that the
      * first
-     * 4 bits of the hash value are always 0, because the size of value_t is 16
+     * 4 bits of the hash value are always 0, because the size of
+     * libcasm_fe::value_t is 16
      * bytes.
      * Some bit shifting avoids this problem.
      *
      * Forumla is from LLVM's DenseMapInfo<T*>
      */
-    std::size_t operator()( const value_t* location ) const
+    std::size_t operator()( const libcasm_fe::value_t* location ) const
     {
         return ( reinterpret_cast< std::uintptr_t >( location ) >> 4 )
                ^ ( reinterpret_cast< std::uintptr_t >( location ) >> 9 );
@@ -59,8 +61,8 @@ struct LocationHash
  */
 struct Update
 {
-    value_t value; /**< The value of the update */
-    const std::vector< value_t >*
+    libcasm_fe::value_t value; /**< The value of the update */
+    const std::vector< libcasm_fe::value_t >*
         args; /**< The function arguments of the update */
     const yy::location*
         location;  /**< The source-code location of the update producer */
@@ -116,7 +118,7 @@ class UpdateSet
     };
 
     using UpdateHashMap
-        = ChainedHashMap< const value_t*, Update*, LocationHash >;
+        = ChainedHashMap< const libcasm_fe::value_t*, Update*, LocationHash >;
 
   public:
     using const_iterator = typename UpdateHashMap::const_iterator;
@@ -168,7 +170,7 @@ class UpdateSet
      *         for the \a location exists already and the values of both updates
      *         are different
      */
-    virtual void add( const value_t* location, Update* update ) = 0;
+    virtual void add( const libcasm_fe::value_t* location, Update* update ) = 0;
 
     /**
      * Searches for an update for the \a location in the update-set
@@ -181,7 +183,8 @@ class UpdateSet
      * @return The update for the \a location or nullptr if no update for the
      *         \a location could be found.
      */
-    virtual Update* lookup( const value_t* location ) const noexcept;
+    virtual Update* lookup( const libcasm_fe::value_t* location ) const
+        noexcept;
 
     /**
      * Forks the current update-set
@@ -231,7 +234,7 @@ class UpdateSet
      * @return The update for the \a location or nullptr if no update for the
      *         \a location could be found.
      */
-    Update* get( const value_t* location ) const noexcept;
+    Update* get( const libcasm_fe::value_t* location ) const noexcept;
 
   protected:
     UpdateHashMap m_set;
@@ -266,7 +269,7 @@ class SequentialUpdateSet final : public UpdateSet
      * @param location The location of the update
      * @param update The update which should be added
      */
-    void add( const value_t* location, Update* update ) override;
+    void add( const libcasm_fe::value_t* location, Update* update ) override;
 
     /**
      * Searches for an update for the \a location in the update-set
@@ -279,7 +282,8 @@ class SequentialUpdateSet final : public UpdateSet
      * @return The update for the \a location or nullptr if no update for the
      *         \a location could be found.
      */
-    Update* lookup( const value_t* location ) const noexcept override;
+    Update* lookup( const libcasm_fe::value_t* location ) const
+        noexcept override;
 };
 
 /**
@@ -308,7 +312,7 @@ class ParallelUpdateSet final : public UpdateSet
      * @throws Conflict when an update for the \a location exists already and
      *         the values of both updates are different
      */
-    void add( const value_t* location, Update* update ) override;
+    void add( const libcasm_fe::value_t* location, Update* update ) override;
 };
 
 /**
@@ -344,7 +348,7 @@ class UpdateSetManager
      *         for the \a location exists already and the values of both updates
      *         are different
      */
-    void add( const value_t* location, Update* update );
+    void add( const libcasm_fe::value_t* location, Update* update );
 
     /**
      * Searches for an update for the \a location in the current update-set
@@ -357,7 +361,7 @@ class UpdateSetManager
      * @return The update for the \a location or nullptr if no update for the
      *         \a location could be found.
      */
-    Update* lookup( const value_t* location ) const noexcept;
+    Update* lookup( const libcasm_fe::value_t* location ) const noexcept;
 
     /**
      * Forks the current update-set or creates a new update-set if the

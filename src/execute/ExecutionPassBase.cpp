@@ -25,14 +25,11 @@
 
 #include "ExecutionPassBase.h"
 
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <iostream>
-#include <sstream>
+#include "cpp/Default.h"
+#include "cpp/Math.h"
+#include "cpp/Type.h"
+
 #include <sys/wait.h>
-#include <unistd.h>
-#include <utility>
 
 #include "../Driver.h"
 #include "../Exceptions.h"
@@ -334,450 +331,461 @@ void ExecutionPassBase::visit_forall_iteration_post( ForallNode* )
     rule_bindings.back()->pop_back();
 }
 
-namespace builtins
+namespace libcasm_fe
 {
-    static const value_t pow( const value_t& base, const value_t& power )
+    namespace builtins
     {
-        switch( base.type )
+        static const value_t pow( const value_t& base, const value_t& power )
         {
-            case TypeType::INTEGER:
-                return value_t( (INTEGER_T)std::pow(
-                    base.value.integer, power.value.integer ) );
-            case TypeType::FLOATING:
-                return value_t( (FLOATING_T)std::pow(
-                    base.value.float_, power.value.float_ ) );
-            default:
-                FAILURE();
-        }
-    }
-
-    static const value_t dec( const value_t& arg )
-    {
-        // TODO LEAK!
-        if( arg.is_undef() )
-        {
-            return value_t( new std::string( "undef" ) );
-        }
-
-        std::stringstream ss;
-        if( arg.value.integer < 0 )
-        {
-            ss << "-" << std::dec << ( -1 ) * arg.value.integer;
-        }
-        else
-        {
-            ss << std::dec << arg.value.integer;
-        }
-        return value_t( new std::string( ss.str() ) );
-    }
-
-    static const value_t hex( const value_t& arg )
-    {
-        // TODO LEAK!
-        if( arg.is_undef() )
-        {
-            return value_t( new std::string( "undef" ) );
-        }
-
-        std::stringstream ss;
-        if( arg.value.integer < 0 )
-        {
-            ss << "-" << std::hex << ( -1 ) * arg.value.integer;
-        }
-        else
-        {
-            ss << std::hex << arg.value.integer;
-        }
-        return value_t( new std::string( ss.str() ) );
-    }
-
-    static const value_t bin( const value_t& arg )
-    {
-        // TODO LEAK!
-        if( arg.is_undef() )
-        {
-            return value_t( new std::string( "undef" ) );
-        }
-
-        std::bitset< 256 > bits( (uint64_t)arg.value.integer );
-        std::string str = bits.to_string();
-        str.erase( 0, min( str.find_first_not_of( '0' ), str.size() - 1 ) );
-
-        return value_t( new std::string( str ) );
-    }
-
-    static const value_t nth( const value_t& list_arg, const value_t& index )
-    {
-        if( list_arg.is_undef() || index.is_undef() )
-        {
-            return value_t();
-        }
-
-        List* list = list_arg.value.list;
-        List::const_iterator iter = list->begin();
-        INTEGER_T i = 1;
-
-        while( iter != list->end() && i < index.value.integer )
-        {
-            i++;
-            iter++;
-        }
-        if( i == index.value.integer && iter != list->end() )
-        {
-            return value_t( *iter );
-        }
-        else
-        {
-            return value_t();
-        }
-    }
-
-    static const value_t app( std::vector< List* >& tempLists,
-        const value_t& list, const value_t& val )
-    {
-        // TODO LEAK
-        if( list.is_undef() )
-        {
-            return value_t();
-        }
-
-        List* current = list.value.list;
-
-        while( true )
-        {
-            if( current->list_type == List::ListType::HEAD )
+            switch( base.type )
             {
-                current = reinterpret_cast< HeadList* >( current )->right;
+                case TypeType::INTEGER:
+                    return value_t( (INTEGER_T)std::pow(
+                        base.value.integer, power.value.integer ) );
+                case TypeType::FLOATING:
+                    return value_t( (FLOATING_T)std::pow(
+                        base.value.float_, power.value.float_ ) );
+                default:
+                    FAILURE();
             }
-            if( current->list_type == List::ListType::SKIP )
+        }
+
+        static const value_t dec( const value_t& arg )
+        {
+            // TODO LEAK!
+            if( arg.is_undef() )
             {
-                current = reinterpret_cast< SkipList* >( current )->bottom;
+                return value_t( new std::string( "undef" ) );
             }
-            if( current->list_type == List::ListType::BOTTOM )
+
+            std::stringstream ss;
+            if( arg.value.integer < 0 )
             {
-                BottomList* bottom = reinterpret_cast< BottomList* >( current );
-                if( bottom->tail )
+                ss << "-" << std::dec << ( -1 ) * arg.value.integer;
+            }
+            else
+            {
+                ss << std::dec << arg.value.integer;
+            }
+            return value_t( new std::string( ss.str() ) );
+        }
+
+        static const value_t hex( const value_t& arg )
+        {
+            // TODO LEAK!
+            if( arg.is_undef() )
+            {
+                return value_t( new std::string( "undef" ) );
+            }
+
+            std::stringstream ss;
+            if( arg.value.integer < 0 )
+            {
+                ss << "-" << std::hex << ( -1 ) * arg.value.integer;
+            }
+            else
+            {
+                ss << std::hex << arg.value.integer;
+            }
+            return value_t( new std::string( ss.str() ) );
+        }
+
+        static const value_t bin( const value_t& arg )
+        {
+            // TODO LEAK!
+            if( arg.is_undef() )
+            {
+                return value_t( new std::string( "undef" ) );
+            }
+
+            std::bitset< 256 > bits( (uint64_t)arg.value.integer );
+            std::string str = bits.to_string();
+            str.erase(
+                0, std::min( str.find_first_not_of( '0' ), str.size() - 1 ) );
+
+            return value_t( new std::string( str ) );
+        }
+
+        static const value_t nth(
+            const value_t& list_arg, const value_t& index )
+        {
+            if( list_arg.is_undef() || index.is_undef() )
+            {
+                return value_t();
+            }
+
+            List* list = list_arg.value.list;
+            List::const_iterator iter = list->begin();
+            INTEGER_T i = 1;
+
+            while( iter != list->end() && i < index.value.integer )
+            {
+                i++;
+                iter++;
+            }
+            if( i == index.value.integer && iter != list->end() )
+            {
+                return value_t( *iter );
+            }
+            else
+            {
+                return value_t();
+            }
+        }
+
+        static const value_t app( std::vector< List* >& tempLists,
+            const value_t& list, const value_t& val )
+        {
+            // TODO LEAK
+            if( list.is_undef() )
+            {
+                return value_t();
+            }
+
+            List* current = list.value.list;
+
+            while( true )
+            {
+                if( current->list_type == List::ListType::HEAD )
                 {
-                    current = bottom->tail;
+                    current = reinterpret_cast< HeadList* >( current )->right;
                 }
-                else
+                if( current->list_type == List::ListType::SKIP )
                 {
-                    break;
+                    current = reinterpret_cast< SkipList* >( current )->bottom;
+                }
+                if( current->list_type == List::ListType::BOTTOM )
+                {
+                    BottomList* bottom
+                        = reinterpret_cast< BottomList* >( current );
+                    if( bottom->tail )
+                    {
+                        current = bottom->tail;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if( current->list_type == List::ListType::TAIL )
+                {
+                    TailList* tail = reinterpret_cast< TailList* >( current );
+                    if( tail->right )
+                    {
+                        current = tail->right;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
+
+            TailList* tail = new TailList( nullptr, val );
+            tempLists.push_back( tail );
+
             if( current->list_type == List::ListType::TAIL )
             {
-                TailList* tail = reinterpret_cast< TailList* >( current );
-                if( tail->right )
-                {
-                    current = tail->right;
-                }
-                else
-                {
-                    break;
-                }
+                reinterpret_cast< TailList* >( current )->right = tail;
             }
-        }
-
-        TailList* tail = new TailList( nullptr, val );
-        tempLists.push_back( tail );
-
-        if( current->list_type == List::ListType::TAIL )
-        {
-            reinterpret_cast< TailList* >( current )->right = tail;
-        }
-        else if( current->list_type == List::ListType::BOTTOM )
-        {
-            reinterpret_cast< BottomList* >( current )->tail = tail;
-        }
-        else
-        {
-            FAILURE();
-        }
-        return value_t( list.type, list.value.list );
-    }
-
-    const value_t cons( std::vector< List* >& tempLists, const value_t& val,
-        const value_t& list )
-    {
-        // TODO LEAK
-        if( list.is_undef() )
-        {
-            return value_t();
-        }
-
-        HeadList* consed_list = new HeadList( list.value.list, val );
-        tempLists.push_back( consed_list );
-        return value_t( list.type, consed_list );
-    }
-
-    const value_t tail(
-        std::vector< List* >& tempLists, const value_t& arg_list )
-    {
-        if( arg_list.is_undef() )
-        {
-            return value_t();
-        }
-
-        List* list = arg_list.value.list;
-
-        if( list->is_head() )
-        {
-            return value_t(
-                arg_list.type, reinterpret_cast< HeadList* >( list )->right );
-        }
-        else if( list->is_bottom() )
-        {
-            BottomList* btm = reinterpret_cast< BottomList* >( list );
-            SkipList* skip = new SkipList( 1, btm );
-            tempLists.push_back( skip );
-            return value_t( arg_list.type, skip );
-        }
-        else
-        {
-            SkipList* old_skip = reinterpret_cast< SkipList* >( list );
-            SkipList* skip
-                = new SkipList( old_skip->skip + 1, old_skip->bottom );
-            tempLists.push_back( skip );
-            return value_t( arg_list.type, skip );
-        }
-    }
-
-    static const value_t len( const value_t& list_arg )
-    {
-        // TODO len is really slow right now, it itertes over complete list
-        if( list_arg.is_undef() )
-        {
-            return value_t();
-        }
-
-        List* list = list_arg.value.list;
-        List::const_iterator iter = list->begin();
-
-        size_t count = 0;
-
-        while( iter != list->end() )
-        {
-            count++;
-            iter++;
-        }
-        return value_t( (INTEGER_T)count );
-    }
-
-    const value_t peek( const value_t& arg_list )
-    {
-        if( arg_list.is_undef() )
-        {
-            return value_t();
-        }
-
-        List* list = arg_list.value.list;
-
-        if( list->begin() != list->end() )
-        {
-            return value_t( *( list->begin() ) );
-        }
-        else
-        {
-            return value_t();
-        }
-    }
-
-    static const value_t asboolean( const value_t& arg )
-    {
-        if( arg.is_undef() )
-        {
-            return std::move( arg );
-        }
-
-        return value_t( (bool)arg.value.integer );
-    }
-
-    static const value_t asenum( BuiltinAtom* atom, const value_t& arg )
-    {
-        Enum* enum_
-            = global_driver->function_table.get_enum( atom->type_.enum_name );
-        for( auto pair : enum_->mapping )
-        {
-            // TODO check why the enum mapping contains an extra entry with the
-            // name
-            // of the enum
-            if( pair.first != enum_->name
-                && pair.second->id == arg.value.integer )
+            else if( current->list_type == List::ListType::BOTTOM )
             {
-                return value_t( pair.second );
+                reinterpret_cast< BottomList* >( current )->tail = tail;
+            }
+            else
+            {
+                FAILURE();
+            }
+            return value_t( list.type, list.value.list );
+        }
+
+        const value_t cons( std::vector< List* >& tempLists, const value_t& val,
+            const value_t& list )
+        {
+            // TODO LEAK
+            if( list.is_undef() )
+            {
+                return value_t();
+            }
+
+            HeadList* consed_list = new HeadList( list.value.list, val );
+            tempLists.push_back( consed_list );
+            return value_t( list.type, consed_list );
+        }
+
+        const value_t tail(
+            std::vector< List* >& tempLists, const value_t& arg_list )
+        {
+            if( arg_list.is_undef() )
+            {
+                return value_t();
+            }
+
+            List* list = arg_list.value.list;
+
+            if( list->is_head() )
+            {
+                return value_t( arg_list.type,
+                    reinterpret_cast< HeadList* >( list )->right );
+            }
+            else if( list->is_bottom() )
+            {
+                BottomList* btm = reinterpret_cast< BottomList* >( list );
+                SkipList* skip = new SkipList( 1, btm );
+                tempLists.push_back( skip );
+                return value_t( arg_list.type, skip );
+            }
+            else
+            {
+                SkipList* old_skip = reinterpret_cast< SkipList* >( list );
+                SkipList* skip
+                    = new SkipList( old_skip->skip + 1, old_skip->bottom );
+                tempLists.push_back( skip );
+                return value_t( arg_list.type, skip );
             }
         }
-        return value_t();
-    }
 
-    static const value_t asinteger( const value_t& arg )
-    {
-        switch( arg.type )
+        static const value_t len( const value_t& list_arg )
         {
-            case TypeType::BIT:
-            case TypeType::INTEGER:
-                return value_t( arg.value.integer );
-            case TypeType::BOOLEAN:
-                return value_t( (INTEGER_T)arg.value.boolean );
-            case TypeType::FLOATING:
-                return value_t( (INTEGER_T)arg.value.float_ );
-            case TypeType::RATIONAL:
-                return value_t( ( INTEGER_T )(
-                    arg.value.rat->numerator / arg.value.rat->denominator ) );
-            case TypeType::ENUM:
-                return value_t( (INTEGER_T)arg.value.enum_val->id );
-            case TypeType::UNDEF:
-                return arg;
-            default:
-                FAILURE();
-        }
-    }
+            // TODO len is really slow right now, it itertes over complete list
+            if( list_arg.is_undef() )
+            {
+                return value_t();
+            }
 
-    static const value_t asfloating( const value_t& arg )
-    {
-        switch( arg.type )
-        {
-            case TypeType::INTEGER:
-                return value_t( (FLOATING_T)arg.value.integer );
-            case TypeType::FLOATING:
-                return value_t( arg.value.float_ );
-            case TypeType::RATIONAL:
-                return value_t( ( (FLOATING_T)arg.value.rat->numerator )
-                                / arg.value.rat->denominator );
-            case TypeType::UNDEF:
-                return arg;
-            default:
-                FAILURE();
-        }
-    }
+            List* list = list_arg.value.list;
+            List::const_iterator iter = list->begin();
 
-    static const value_t asbit( const value_t& arg, const value_t& bitsize )
-    {
-        // TODO PPA: redo after proper bit implementation and new built-ins
-        // implementation from IR etc.
-        value_t ret = asinteger( arg );
-        if( ret.type == TypeType::UNDEF )
-        {
-            return ret;
-        }
-        else
-        {
-            return value_t( (uint64_t)ret.value.integer );
-        }
-    }
+            size_t count = 0;
 
-    static const value_t zext( const value_t& arg, const value_t& bitsize )
-    {
-        // TODO PPA: redo after proper bit implementation and new built-ins
-        // implementation from IR etc.
-        return value_t( (uint64_t)arg.value.integer );
-    }
-
-    static const value_t shl( const value_t& arg, const value_t& bitsize )
-    {
-        // TODO PPA: redo after proper bit implementation and new built-ins
-        // implementation from IR etc.
-        return value_t(
-            ( (uint64_t)arg.value.integer ) << bitsize.value.integer );
-    }
-
-    static const value_t shr( const value_t& arg, const value_t& bitsize )
-    {
-        // TODO PPA: redo after proper bit implementation and new built-ins
-        // implementation from IR etc.
-        return value_t(
-            ( (uint64_t)arg.value.integer ) >> bitsize.value.integer );
-    }
-
-    static const value_t trunc( const value_t& arg, const value_t& bitsize )
-    {
-        // TODO PPA: redo after proper bit implementation and new built-ins
-        // implementation from IR etc.
-
-        uint64_t mask = ( 1 << bitsize.value.integer ) - 1;
-
-        return value_t( ( (uint64_t)arg.value.integer ) & mask );
-    }
-
-    static void get_numerator_denominator(
-        double x, int64_t* num, int64_t* denom )
-    {
-        // thanks to
-        // http://stackoverflow.com/a/96035/781502
-        uint64_t m[ 2 ][ 2 ];
-        double startx = x;
-        uint64_t maxden = 10000000000;
-        int64_t ai;
-
-        /* initialize matrix */
-        m[ 0 ][ 0 ] = m[ 1 ][ 1 ] = 1;
-        m[ 0 ][ 1 ] = m[ 1 ][ 0 ] = 0;
-
-        /* loop finding terms until denom gets too big */
-        while( m[ 1 ][ 0 ] * ( ai = (int64_t)x ) + m[ 1 ][ 1 ] <= maxden )
-        {
-            long t;
-            t = m[ 0 ][ 0 ] * ai + m[ 0 ][ 1 ];
-            m[ 0 ][ 1 ] = m[ 0 ][ 0 ];
-            m[ 0 ][ 0 ] = t;
-            t = m[ 1 ][ 0 ] * ai + m[ 1 ][ 1 ];
-            m[ 1 ][ 1 ] = m[ 1 ][ 0 ];
-            m[ 1 ][ 0 ] = t;
-            if( x == (double)ai )
-                break; // AF: division by zero
-            x = 1 / ( x - (double)ai );
-            if( x > (double)0x7FFFFFFF )
-                break; // AF: representation failure
+            while( iter != list->end() )
+            {
+                count++;
+                iter++;
+            }
+            return value_t( (INTEGER_T)count );
         }
 
-        /* now remaining x is between 0 and 1/ai */
-        /* approx as either 0 or 1/m where m is max that will fit in maxden */
-        /* first try zero */
-
-        double error1 = startx - ( (double)m[ 0 ][ 0 ] / (double)m[ 1 ][ 0 ] );
-
-        *num = m[ 0 ][ 0 ];
-        *denom = m[ 1 ][ 0 ];
-
-        /* now try other possibility */
-        ai = ( maxden - m[ 1 ][ 1 ] ) / m[ 1 ][ 0 ];
-        m[ 0 ][ 0 ] = m[ 0 ][ 0 ] * ai + m[ 0 ][ 1 ];
-        m[ 1 ][ 0 ] = m[ 1 ][ 0 ] * ai + m[ 1 ][ 1 ];
-        double error2 = startx - ( (double)m[ 0 ][ 0 ] / (double)m[ 1 ][ 0 ] );
-
-        if( fabs( error1 ) > fabs( error2 ) )
+        const value_t peek( const value_t& arg_list )
         {
+            if( arg_list.is_undef() )
+            {
+                return value_t();
+            }
+
+            List* list = arg_list.value.list;
+
+            if( list->begin() != list->end() )
+            {
+                return value_t( *( list->begin() ) );
+            }
+            else
+            {
+                return value_t();
+            }
+        }
+
+        static const value_t asboolean( const value_t& arg )
+        {
+            if( arg.is_undef() )
+            {
+                return std::move( arg );
+            }
+
+            return value_t( (bool)arg.value.integer );
+        }
+
+        static const value_t asenum( BuiltinAtom* atom, const value_t& arg )
+        {
+            Enum* enum_ = global_driver->function_table.get_enum(
+                atom->type_.enum_name );
+            for( auto pair : enum_->mapping )
+            {
+                // TODO check why the enum mapping contains an extra entry with
+                // the
+                // name
+                // of the enum
+                if( pair.first != enum_->name
+                    && pair.second->id == arg.value.integer )
+                {
+                    return value_t( pair.second );
+                }
+            }
+            return value_t();
+        }
+
+        static const value_t asinteger( const value_t& arg )
+        {
+            switch( arg.type )
+            {
+                case TypeType::BIT:
+                case TypeType::INTEGER:
+                    return value_t( arg.value.integer );
+                case TypeType::BOOLEAN:
+                    return value_t( (INTEGER_T)arg.value.boolean );
+                case TypeType::FLOATING:
+                    return value_t( (INTEGER_T)arg.value.float_ );
+                case TypeType::RATIONAL:
+                    return value_t(
+                        ( INTEGER_T )( arg.value.rat->numerator
+                                       / arg.value.rat->denominator ) );
+                case TypeType::ENUM:
+                    return value_t( (INTEGER_T)arg.value.enum_val->id );
+                case TypeType::UNDEF:
+                    return arg;
+                default:
+                    FAILURE();
+            }
+        }
+
+        static const value_t asfloating( const value_t& arg )
+        {
+            switch( arg.type )
+            {
+                case TypeType::INTEGER:
+                    return value_t( (FLOATING_T)arg.value.integer );
+                case TypeType::FLOATING:
+                    return value_t( arg.value.float_ );
+                case TypeType::RATIONAL:
+                    return value_t( ( (FLOATING_T)arg.value.rat->numerator )
+                                    / arg.value.rat->denominator );
+                case TypeType::UNDEF:
+                    return arg;
+                default:
+                    FAILURE();
+            }
+        }
+
+        static const value_t asbit( const value_t& arg, const value_t& bitsize )
+        {
+            // TODO PPA: redo after proper bit implementation and new built-ins
+            // implementation from IR etc.
+            value_t ret = asinteger( arg );
+            if( ret.type == TypeType::UNDEF )
+            {
+                return ret;
+            }
+            else
+            {
+                return value_t( (uint64_t)ret.value.integer );
+            }
+        }
+
+        static const value_t zext( const value_t& arg, const value_t& bitsize )
+        {
+            // TODO PPA: redo after proper bit implementation and new built-ins
+            // implementation from IR etc.
+            return value_t( (uint64_t)arg.value.integer );
+        }
+
+        static const value_t shl( const value_t& arg, const value_t& bitsize )
+        {
+            // TODO PPA: redo after proper bit implementation and new built-ins
+            // implementation from IR etc.
+            return value_t(
+                ( (uint64_t)arg.value.integer ) << bitsize.value.integer );
+        }
+
+        static const value_t shr( const value_t& arg, const value_t& bitsize )
+        {
+            // TODO PPA: redo after proper bit implementation and new built-ins
+            // implementation from IR etc.
+            return value_t(
+                ( (uint64_t)arg.value.integer ) >> bitsize.value.integer );
+        }
+
+        static const value_t trunc( const value_t& arg, const value_t& bitsize )
+        {
+            // TODO PPA: redo after proper bit implementation and new built-ins
+            // implementation from IR etc.
+
+            uint64_t mask = ( 1 << bitsize.value.integer ) - 1;
+
+            return value_t( ( (uint64_t)arg.value.integer ) & mask );
+        }
+
+        static void get_numerator_denominator(
+            double x, int64_t* num, int64_t* denom )
+        {
+            // thanks to
+            // http://stackoverflow.com/a/96035/781502
+            uint64_t m[ 2 ][ 2 ];
+            double startx = x;
+            uint64_t maxden = 10000000000;
+            int64_t ai;
+
+            /* initialize matrix */
+            m[ 0 ][ 0 ] = m[ 1 ][ 1 ] = 1;
+            m[ 0 ][ 1 ] = m[ 1 ][ 0 ] = 0;
+
+            /* loop finding terms until denom gets too big */
+            while( m[ 1 ][ 0 ] * ( ai = (int64_t)x ) + m[ 1 ][ 1 ] <= maxden )
+            {
+                long t;
+                t = m[ 0 ][ 0 ] * ai + m[ 0 ][ 1 ];
+                m[ 0 ][ 1 ] = m[ 0 ][ 0 ];
+                m[ 0 ][ 0 ] = t;
+                t = m[ 1 ][ 0 ] * ai + m[ 1 ][ 1 ];
+                m[ 1 ][ 1 ] = m[ 1 ][ 0 ];
+                m[ 1 ][ 0 ] = t;
+                if( x == (double)ai )
+                    break; // AF: division by zero
+                x = 1 / ( x - (double)ai );
+                if( x > (double)0x7FFFFFFF )
+                    break; // AF: representation failure
+            }
+
+            /* now remaining x is between 0 and 1/ai */
+            /* approx as either 0 or 1/m where m is max that will fit in maxden
+             */
+            /* first try zero */
+
+            double error1
+                = startx - ( (double)m[ 0 ][ 0 ] / (double)m[ 1 ][ 0 ] );
+
             *num = m[ 0 ][ 0 ];
             *denom = m[ 1 ][ 0 ];
-        }
-    }
 
-    static const value_t asrational( const value_t& arg )
-    {
-        auto result = new rational_t;
-        switch( arg.type )
+            /* now try other possibility */
+            ai = ( maxden - m[ 1 ][ 1 ] ) / m[ 1 ][ 0 ];
+            m[ 0 ][ 0 ] = m[ 0 ][ 0 ] * ai + m[ 0 ][ 1 ];
+            m[ 1 ][ 0 ] = m[ 1 ][ 0 ] * ai + m[ 1 ][ 1 ];
+            double error2
+                = startx - ( (double)m[ 0 ][ 0 ] / (double)m[ 1 ][ 0 ] );
+
+            if( fabs( error1 ) > fabs( error2 ) )
+            {
+                *num = m[ 0 ][ 0 ];
+                *denom = m[ 1 ][ 0 ];
+            }
+        }
+
+        static const value_t asrational( const value_t& arg )
         {
-            case TypeType::INTEGER:
-                result->numerator = arg.value.integer;
-                result->denominator = 1;
-                return value_t( result );
-            case TypeType::FLOATING:
-                get_numerator_denominator( arg.value.float_, &result->numerator,
-                    &result->denominator );
-                return value_t( result );
-            case TypeType::RATIONAL:
-                return value_t( arg.value.rat );
-            case TypeType::UNDEF:
-                return arg;
-            default:
-                FAILURE();
+            auto result = new rational_t;
+            switch( arg.type )
+            {
+                case TypeType::INTEGER:
+                    result->numerator = arg.value.integer;
+                    result->denominator = 1;
+                    return value_t( result );
+                case TypeType::FLOATING:
+                    get_numerator_denominator( arg.value.float_,
+                        &result->numerator, &result->denominator );
+                    return value_t( result );
+                case TypeType::RATIONAL:
+                    return value_t( arg.value.rat );
+                case TypeType::UNDEF:
+                    return arg;
+                default:
+                    FAILURE();
+            }
         }
-    }
 
-    static const value_t issymbolic( const value_t& arg )
-    {
-        return value_t( arg.is_symbolic() );
+        static const value_t issymbolic( const value_t& arg )
+        {
+            return value_t( arg.is_symbolic() );
+        }
     }
 }
 
@@ -959,30 +967,30 @@ value_t ExecutionPassBase::visit_builtin_atom(
     switch( atom->id )
     {
         case Builtin::Id::POW:
-            return builtins::pow( arguments.at( 0 ), arguments.at( 1 ) );
+            return ::builtins::pow( arguments.at( 0 ), arguments.at( 1 ) );
         case Builtin::Id::NTH:
-            return builtins::nth( arguments.at( 0 ), arguments.at( 1 ) );
+            return ::builtins::nth( arguments.at( 0 ), arguments.at( 1 ) );
         case Builtin::Id::APP:
-            return builtins::app(
+            return ::builtins::app(
                 temp_lists, arguments.at( 0 ), arguments.at( 1 ) );
         case Builtin::Id::CONS:
-            return builtins::cons(
+            return ::builtins::cons(
                 temp_lists, arguments.at( 0 ), arguments.at( 1 ) );
         case Builtin::Id::DEC:
-            return builtins::dec( arguments.at( 0 ) );
+            return ::builtins::dec( arguments.at( 0 ) );
         case Builtin::Id::HEX:
-            return builtins::hex( arguments.at( 0 ) );
+            return ::builtins::hex( arguments.at( 0 ) );
         case Builtin::Id::BIN:
-            return builtins::bin( arguments.at( 0 ) );
+            return ::builtins::bin( arguments.at( 0 ) );
 
         case Builtin::Id::TAIL:
-            return builtins::tail( temp_lists, arguments.at( 0 ) );
+            return ::builtins::tail( temp_lists, arguments.at( 0 ) );
         case Builtin::Id::LEN:
-            return builtins::len( arguments.at( 0 ) );
+            return ::builtins::len( arguments.at( 0 ) );
         case Builtin::Id::PEEK:
-            return builtins::peek( arguments.at( 0 ) );
+            return ::builtins::peek( arguments.at( 0 ) );
         case Builtin::Id::AS_BOOLEAN:
-            return builtins::asboolean( arguments.at( 0 ) );
+            return ::builtins::asboolean( arguments.at( 0 ) );
         case Builtin::Id::AS_ENUM:
             // TODO Int2Enum is a special builtin, it needs the complete type
             // information
@@ -990,26 +998,26 @@ value_t ExecutionPassBase::visit_builtin_atom(
             // all
             // builtins seems ugly.
             // Maybe store Type* in value_t?
-            return builtins::asenum( atom, arguments.at( 0 ) );
+            return ::builtins::asenum( atom, arguments.at( 0 ) );
         case Builtin::Id::AS_INTEGER:
-            return builtins::asinteger( arguments.at( 0 ) );
+            return ::builtins::asinteger( arguments.at( 0 ) );
         case Builtin::Id::AS_FLOATING:
-            return builtins::asfloating( arguments.at( 0 ) );
+            return ::builtins::asfloating( arguments.at( 0 ) );
         case Builtin::Id::AS_RATIONAL:
-            return builtins::asrational( arguments.at( 0 ) );
+            return ::builtins::asrational( arguments.at( 0 ) );
         case Builtin::Id::AS_BIT:
-            return builtins::asbit( arguments.at( 0 ), arguments.at( 1 ) );
+            return ::builtins::asbit( arguments.at( 0 ), arguments.at( 1 ) );
         case Builtin::Id::IS_SYMBOLIC:
-            return builtins::issymbolic( arguments.at( 0 ) );
+            return ::builtins::issymbolic( arguments.at( 0 ) );
 
         case Builtin::Id::ZEXT:
-            return builtins::zext( arguments.at( 0 ), arguments.at( 1 ) );
+            return ::builtins::zext( arguments.at( 0 ), arguments.at( 1 ) );
         case Builtin::Id::SHL:
-            return builtins::shl( arguments.at( 0 ), arguments.at( 1 ) );
+            return ::builtins::shl( arguments.at( 0 ), arguments.at( 1 ) );
         case Builtin::Id::SHR:
-            return builtins::shr( arguments.at( 0 ), arguments.at( 1 ) );
+            return ::builtins::shr( arguments.at( 0 ), arguments.at( 1 ) );
         case Builtin::Id::TRUNC:
-            return builtins::trunc( arguments.at( 0 ), arguments.at( 1 ) );
+            return ::builtins::trunc( arguments.at( 0 ), arguments.at( 1 ) );
 
         default:
             global_driver->error( atom->location,

@@ -25,8 +25,9 @@
 
 #include "TypeCheckPass.h"
 
-#include "../Driver.h"
-#include "../FunctionCycleVisitor.h"
+#include "Driver.h"
+#include "FunctionCycleVisitor.h"
+#include "Value.h"
 
 #include <cmath>
 

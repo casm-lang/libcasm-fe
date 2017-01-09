@@ -32,6 +32,7 @@
 #include "../src/various/location.hh"
 
 using namespace testing;
+using namespace libcasm_fe;
 
 template < typename T >
 static value_t make_value( TypeType type, T v )
