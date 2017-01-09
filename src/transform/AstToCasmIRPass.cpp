@@ -35,6 +35,8 @@ static libpass::PassRegistration< libcasm_fe::AstToCasmIRPass > PASS(
 
 extern Driver* global_driver;
 
+static libcasm_ir::Value* program_function = 0;
+
 static libcasm_ir::Type* getType( Type* type )
 {
     assert( type && "not initialized type used" );
@@ -112,6 +114,19 @@ void libcasm_fe::AstToCasmIRPass::visit_specification( SpecificationNode* node )
     assert( !specification );
     specification = new libcasm_ir::Specification(
         libstdhl::Allocator::string( node->identifier ) );
+
+    // 'program' function!
+    libcasm_ir::Type* ftype
+        = libcasm_ir::Type::getRelation( libcasm_ir::Type::getRuleReference(),
+            { libcasm_ir::Type::getAgent() } );
+    assert( ftype );
+
+    libcasm_ir::Function* ir_function = new libcasm_ir::Function(
+        libstdhl::Allocator::string( "program" ), ftype );
+    assert( ir_function );
+    getSpecification()->add( ir_function );
+
+    program_function = ir_function;
 }
 
 void libcasm_fe::AstToCasmIRPass::visit_init( InitNode* node )
@@ -125,17 +140,6 @@ void libcasm_fe::AstToCasmIRPass::visit_init( InitNode* node )
     assert( ir_agent );
     ir_agent->setInitRuleReference( ir_init );
     getSpecification()->add( ir_agent );
-
-    // 'program' function!
-    libcasm_ir::Type* ftype
-        = libcasm_ir::Type::getRelation( libcasm_ir::Type::getRuleReference(),
-            { libcasm_ir::Type::getAgent() } );
-    assert( ftype );
-
-    libcasm_ir::Function* ir_function = new libcasm_ir::Function(
-        libstdhl::Allocator::string( "program" ), ftype );
-    assert( ir_function );
-    getSpecification()->add( ir_function );
 }
 
 void libcasm_fe::AstToCasmIRPass::visit_body_elements( AstListNode* node )
@@ -169,6 +173,8 @@ void libcasm_fe::AstToCasmIRPass::visit_function_def(
     assert( ir_function );
 
     getSpecification()->add( ir_function );
+
+    ast2casmir[ (AstNode*)node->sym ] = ir_function;
 }
 
 void libcasm_fe::AstToCasmIRPass::visit_derived_def_pre( FunctionDefNode* node )
@@ -290,19 +296,11 @@ void libcasm_fe::AstToCasmIRPass::visit_rule( RuleNode* node )
         ir_rule->setContext( ir_scope );
     }
 
-    // for( i32 i = 0; i < node->sym->arguments_.size(); i++ )
-    // {
-    //     const char* param_ident = node->sym->parameter[i];
-    //     printf( "param %s\n", param_ident );
-
-    //     ir_derived->addParameter
-    //     ( Identifier::create
-    //       ( param_types[i]
-    //       , param_ident
-    //     //, ir_derived
-    //       )
-    //     );
-    // }
+    for( i32 i = 0; i < node->arguments.size(); i++ )
+    {
+        ir_rule->addParameter( libcasm_ir::Identifier::create(
+            getType( node->arguments[ i ] ), node->parameter[ i ] ) );
+    }
 
     current_scope.push_back( ir_rule );
 }
@@ -317,11 +315,10 @@ void libcasm_fe::AstToCasmIRPass::visit_rule_post( RuleNode* node )
 
     getSpecification()->add( ir_rule );
 
-    // PPA: CONT' HERE !!!
-    // for( auto param : ir_derived->getParameters() )
-    // {
-    //     Identifier::forgetSymbol( param->getName() );
-    // }
+    for( auto param : ir_rule->getParameters() )
+    {
+        libcasm_ir::Identifier::forgetSymbol( param->getName() );
+    }
 
     current_scope.pop_back();
 }
@@ -950,15 +947,6 @@ bool libcasm_fe::AstToCasmIRPass::visit_function_atom(
     FunctionAtom* node, std::vector< bool >& args )
 {
     VISIT;
-    // printf( "%s, %p", node->name.c_str(), node );
-    // if( node->arguments )
-    // {
-    //     for( auto a : *(node->arguments) )
-    //     {
-    //         printf( ", %p", a );
-    //     }
-    // }
-    // printf( "\n" );
 
     if( node->symbol_type == FunctionAtom::SymbolType::PARAMETER )
     {
@@ -976,31 +964,16 @@ bool libcasm_fe::AstToCasmIRPass::visit_function_atom(
         return 0;
     }
 
-    libcasm_ir::Type* ty_ident = 0;
-    switch( node->symbol_type )
+    libcasm_ir::Value* ir_ident = 0;
+
+    if( node->symbol->name.compare( "program" ) == 0 )
     {
-        case FunctionAtom::SymbolType::FUNCTION:
-        {
-            assert( node->symbol );
-
-            std::vector< libcasm_ir::Type* > ty_ident_args;
-            for( auto argument : node->symbol->arguments_ )
-            {
-                ty_ident_args.push_back( getType( argument ) );
-            }
-
-            ty_ident = libcasm_ir::Type::getRelation(
-                getType( node->symbol->return_type_ ), ty_ident_args );
-
-            break;
-        }
-        default:
-            assert(
-                0 && "not implemented function atom identifier symbol type" );
+        ir_ident = program_function;
     }
-
-    libcasm_ir::Value* ir_ident
-        = libcasm_ir::Identifier::create( ty_ident, node->name.c_str() );
+    else
+    {
+        ir_ident = lookup< libcasm_ir::Value >( (AstNode*)node->symbol );
+    }
     assert( ir_ident );
 
     libcasm_ir::LocationInstruction* ir_loc
@@ -1038,7 +1011,8 @@ bool libcasm_fe::AstToCasmIRPass::visit_derived_function_atom(
     assert( node->symbol );
     assert( node->symbol_type == FunctionAtom::SymbolType::DERIVED );
 
-    libcasm_ir::Value* ir_derived = lookup< libcasm_ir::Value >( (AstNode*)node->symbol );
+    libcasm_ir::Value* ir_derived
+        = lookup< libcasm_ir::Value >( (AstNode*)node->symbol );
     assert( ir_derived );
 
     libcasm_ir::CallInstruction* ir_call
