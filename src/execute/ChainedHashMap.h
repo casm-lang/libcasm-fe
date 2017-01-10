@@ -149,7 +149,7 @@ class ChainedHashMap final : public HashMapBase< Details >
     constexpr Bucket* bucketAt( std::size_t hashCode ) const noexcept
     {
         return HashMap::m_buckets
-               + HashingStrategy::hash( hashCode, HashMap::m_capacity );
+               + HashingStrategy::compress( hashCode, HashMap::m_capacity );
     }
 };
 

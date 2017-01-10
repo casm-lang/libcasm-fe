@@ -123,13 +123,15 @@ class ProbingHashMap final : public HashMapBase< Details >
             return nullptr;
         }
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = HashingStrategy::hash( hashCode, capacity );
+        const auto initialIndex
+            = HashingStrategy::compress( hashCode, capacity );
 
         for( std::size_t round = 0; round < capacity; round++ )
         {
             const auto probedIndex
                 = ProbingStrategy::probe( initialIndex, round );
-            const auto index = HashingStrategy::hash( probedIndex, capacity );
+            const auto index
+                = HashingStrategy::compress( probedIndex, capacity );
             const auto bucket = buckets + index;
             if( bucket->empty() )
             {
@@ -152,13 +154,15 @@ class ProbingHashMap final : public HashMapBase< Details >
 
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = HashingStrategy::hash( hashCode, capacity );
+        const auto initialIndex
+            = HashingStrategy::compress( hashCode, capacity );
 
         for( std::size_t round = 0; round < capacity; round++ )
         {
             const auto probedIndex
                 = ProbingStrategy::probe( initialIndex, round );
-            const auto index = HashingStrategy::hash( probedIndex, capacity );
+            const auto index
+                = HashingStrategy::compress( probedIndex, capacity );
             const auto bucket = buckets + index;
             if( bucket->empty() )
             {

@@ -99,12 +99,13 @@ class RobinHoodHashMap final : public HashMapBase< Details >
             return nullptr;
         }
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = HashingStrategy::hash( hashCode, capacity );
+        const auto initialIndex
+            = HashingStrategy::compress( hashCode, capacity );
 
         for( std::size_t round = 0; round < capacity; round++ )
         {
             const auto index
-                = HashingStrategy::hash( initialIndex + round, capacity );
+                = HashingStrategy::compress( initialIndex + round, capacity );
             const auto bucket = buckets + index;
             if( bucket->empty() or ( round > bucket->distance ) )
             {
@@ -127,14 +128,15 @@ class RobinHoodHashMap final : public HashMapBase< Details >
 
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex = HashingStrategy::hash( hashCode, capacity );
+        const auto initialIndex
+            = HashingStrategy::compress( hashCode, capacity );
 
         std::size_t distance = 0;
 
         for( std::size_t round = 0; round < capacity; round++ )
         {
             const auto index
-                = HashingStrategy::hash( initialIndex + round, capacity );
+                = HashingStrategy::compress( initialIndex + round, capacity );
             const auto bucket = buckets + index;
             if( bucket->empty() )
             {
