@@ -231,9 +231,8 @@ void AstToCasmIRPass::visit_derived_def( FunctionDefNode* node, bool expr )
     assert( ir_stmt );
     ir_stmt->add( ir_expr );
 
-    assert(
-        libcasm_ir::Value::isa< libcasm_ir::Derived >( current_scope.back() )
-        and "invalid scope!" );
+    assert( libcasm_ir::isa< libcasm_ir::Derived >( current_scope.back() )
+            and "invalid scope!" );
 
     libcasm_ir::Derived* ir_derived
         = (libcasm_ir::Derived*)current_scope.back();
@@ -312,7 +311,7 @@ void AstToCasmIRPass::visit_rule_post( RuleNode* node )
 {
     VISIT;
 
-    assert( libcasm_ir::Value::isa< libcasm_ir::Rule >( current_scope.back() )
+    assert( libcasm_ir::isa< libcasm_ir::Rule >( current_scope.back() )
             and "invalid scope!" );
     libcasm_ir::Rule* ir_rule = (libcasm_ir::Rule*)current_scope.back();
 
@@ -342,18 +341,17 @@ void AstToCasmIRPass::visit_parblock_pre( UnaryNode* node )
     libcasm_ir::Value* parent = lookupParent< libcasm_ir::Value >( node );
     assert( parent );
 
-    if( libcasm_ir::Value::isa< libcasm_ir::Rule >( parent ) )
+    if( libcasm_ir::isa< libcasm_ir::Rule >( parent ) )
     {
         libcasm_ir::Rule* ir_rule = ( (libcasm_ir::Rule*)parent );
         ir_rule->setContext( ir_scope );
         ir_scope->bind( ir_rule );
     }
-    else if( libcasm_ir::Value::isa< libcasm_ir::ExecutionSemanticsBlock >(
-                 parent ) )
+    else if( libcasm_ir::isa< libcasm_ir::ExecutionSemanticsBlock >( parent ) )
     {
         ( (libcasm_ir::ExecutionSemanticsBlock*)parent )->add( ir_scope );
     }
-    else if( libcasm_ir::Value::isa< libcasm_ir::Statement >( parent ) )
+    else if( libcasm_ir::isa< libcasm_ir::Statement >( parent ) )
     {
         ( (libcasm_ir::Statement*)parent )->getScope()->add( ir_scope );
     }
@@ -383,19 +381,18 @@ void AstToCasmIRPass::visit_seqblock_pre( UnaryNode* node )
     libcasm_ir::Value* parent = lookupParent< libcasm_ir::Value >( node );
     assert( parent );
 
-    // if( Value::isa< Rule >( parent ) )
+    // if( isa< Rule >( parent ) )
     // {
     //     ParallelBlock* ir_par = new ParallelBlock();
     //     ir_par->add( ir_scope );
     //     ((Rule*)parent)->setContext( ir_par );
     // }
     // else
-    if( libcasm_ir::Value::isa< libcasm_ir::ExecutionSemanticsBlock >(
-            parent ) )
+    if( libcasm_ir::isa< libcasm_ir::ExecutionSemanticsBlock >( parent ) )
     {
         ( (libcasm_ir::ExecutionSemanticsBlock*)parent )->add( ir_scope );
     }
-    else if( libcasm_ir::Value::isa< libcasm_ir::Statement >( parent ) )
+    else if( libcasm_ir::isa< libcasm_ir::Statement >( parent ) )
     {
         ( (libcasm_ir::Statement*)parent )->getScope()->add( ir_scope );
     }
@@ -473,7 +470,7 @@ void AstToCasmIRPass::visit_update(
     assert( ir_lhs );
     assert( ir_rhs );
 
-    assert( libcasm_ir::Value::isa< libcasm_ir::LookupInstruction >( ir_lhs ) );
+    assert( libcasm_ir::isa< libcasm_ir::LookupInstruction >( ir_lhs ) );
 
     ir_stmt->add( new libcasm_ir::UpdateInstruction(
         ( (libcasm_ir::Instruction*)ir_lhs )->getValue( 0 ), ir_rhs ) );
@@ -628,12 +625,11 @@ void AstToCasmIRPass::visit_let( LetNode* node, bool var )
     libcasm_ir::Value* parent = lookupParent< libcasm_ir::Value >( node );
     assert( parent );
 
-    if( libcasm_ir::Value::isa< libcasm_ir::ExecutionSemanticsBlock >(
-            parent ) )
+    if( libcasm_ir::isa< libcasm_ir::ExecutionSemanticsBlock >( parent ) )
     {
         ir_scope = (libcasm_ir::ExecutionSemanticsBlock*)parent;
     }
-    else if( libcasm_ir::Value::isa< libcasm_ir::Statement >( parent ) )
+    else if( libcasm_ir::isa< libcasm_ir::Statement >( parent ) )
     {
         ir_scope = ( (libcasm_ir::Statement*)parent )->getScope();
     }
@@ -718,10 +714,9 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
         = lookup< libcasm_ir::Value >( node->condition_ );
     assert( ir_cond );
 
-    assert(
-        ( libcasm_ir::Value::isa< libcasm_ir::Instruction >( ir_cond )
-            and ir_cond->getType()->getID() == libcasm_ir::Type::BOOLEAN )
-        or libcasm_ir::Value::isa< libcasm_ir::BooleanConstant >( ir_cond ) );
+    assert( ( libcasm_ir::isa< libcasm_ir::Instruction >( ir_cond )
+                and ir_cond->getType()->getID() == libcasm_ir::Type::BOOLEAN )
+            or libcasm_ir::isa< libcasm_ir::BooleanConstant >( ir_cond ) );
 
     ir_stmt->add( ir_cond );
 
@@ -800,9 +795,9 @@ void AstToCasmIRPass::visit_case(
 
     libcasm_ir::Value* ir_expr = lookup< libcasm_ir::Value >( node->expr );
     assert( ir_expr );
-    assert( libcasm_ir::Value::isa< libcasm_ir::Instruction >( ir_expr )
-            or libcasm_ir::Value::isa< libcasm_ir::Constant >( ir_expr )
-            or libcasm_ir::Value::isa< libcasm_ir::Identifier >( ir_expr ) );
+    assert( libcasm_ir::isa< libcasm_ir::Instruction >( ir_expr )
+            or libcasm_ir::isa< libcasm_ir::Constant >( ir_expr )
+            or libcasm_ir::isa< libcasm_ir::Identifier >( ir_expr ) );
 
     libcasm_ir::Instruction* ir_select
         = new libcasm_ir::SelectInstruction( ir_expr );
@@ -1279,7 +1274,7 @@ C* AstToCasmIRPass::lookup( AstNode* node )
     if( result != ast2casmir.end() )
     {
         // printf( "%s: %p\n", __FUNCTION__, result->second );
-        if( libcasm_ir::Value::isa< C >( result->second ) )
+        if( libcasm_ir::isa< C >( result->second ) )
         {
             return static_cast< C* >( result->second );
         }
