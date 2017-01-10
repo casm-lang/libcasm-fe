@@ -98,19 +98,22 @@ class RobinHoodHashMap final : public HashMapBase< Details >
         {
             return nullptr;
         }
+
         const auto capacity = HashMap::m_capacity;
         const auto initialIndex
             = HashingStrategy::compress( hashCode, capacity );
 
-        for( std::size_t round = 0; round < capacity; round++ )
+        for( auto distance = 0UL;; ++distance )
         {
-            const auto index
-                = HashingStrategy::compress( initialIndex + round, capacity );
+            const auto index = HashingStrategy::compress(
+                initialIndex + distance, capacity );
             const auto bucket = buckets + index;
-            if( bucket->empty() or ( round > bucket->distance ) )
+
+            if( bucket->empty() or ( distance > bucket->distance ) )
             {
                 return nullptr;
             }
+
             if( ( bucket->hashCode == hashCode )
                 and equals( bucket->entry->key, key ) )
             {
@@ -128,30 +131,31 @@ class RobinHoodHashMap final : public HashMapBase< Details >
 
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex
-            = HashingStrategy::compress( hashCode, capacity );
+        auto initialIndex = HashingStrategy::compress( hashCode, capacity );
 
-        std::size_t distance = 0;
-
-        for( std::size_t round = 0; round < capacity; round++ )
+        for( auto distance = 0UL;; ++distance )
         {
-            const auto index
-                = HashingStrategy::compress( initialIndex + round, capacity );
+            const auto index = HashingStrategy::compress(
+                initialIndex + distance, capacity );
             const auto bucket = buckets + index;
+
             if( bucket->empty() )
             {
                 bucket->hashCode = hashCode;
                 bucket->distance = distance;
                 bucket->entry = entry;
+
                 break;
             }
+
             if( distance > bucket->distance )
             {
                 std::swap( hashCode, bucket->hashCode );
                 std::swap( distance, bucket->distance );
                 std::swap( entry, bucket->entry );
+
+                initialIndex = HashingStrategy::compress( hashCode, capacity );
             }
-            ++distance;
         }
     }
 
