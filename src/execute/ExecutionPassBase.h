@@ -37,8 +37,6 @@
 #include "ProbingHashMap.h"
 #include "RobinHoodHashMap.h"
 
-#define TEMP_STACK_SIZE 32768
-
 /**
    @brief    TODO
 
@@ -201,7 +199,7 @@ namespace libcasm_fe
 
         UpdateSetManager updateSetManager;
 
-        BlockAllocator< TEMP_STACK_SIZE > stack;
+        BlockAllocator< 4096 > stack;
         std::map< const std::string, bool > debuginfo_filters;
 
         std::set< std::string > initialized;
