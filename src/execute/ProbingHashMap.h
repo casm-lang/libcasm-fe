@@ -122,6 +122,7 @@ class ProbingHashMap final : public HashMapBase< Details >
         {
             return nullptr;
         }
+
         const auto capacity = HashMap::m_capacity;
         const auto initialIndex
             = HashingStrategy::compress( hashCode, capacity );
@@ -133,10 +134,12 @@ class ProbingHashMap final : public HashMapBase< Details >
             const auto index
                 = HashingStrategy::compress( probedIndex, capacity );
             const auto bucket = buckets + index;
+
             if( bucket->empty() )
             {
                 return nullptr;
             }
+
             if( ( bucket->hashCode == hashCode )
                 and equals( bucket->entry->key, key ) )
             {
@@ -164,10 +167,12 @@ class ProbingHashMap final : public HashMapBase< Details >
             const auto index
                 = HashingStrategy::compress( probedIndex, capacity );
             const auto bucket = buckets + index;
+
             if( bucket->empty() )
             {
                 bucket->hashCode = hashCode;
                 bucket->entry = entry;
+
                 break;
             }
         }
