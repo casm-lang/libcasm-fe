@@ -52,6 +52,8 @@ namespace libcasm_fe
 
         void walk_body_elements( AstListNode* node )
         {
+            visitor.visit_body_elements_pre( node );
+
             for( auto e : node->nodes )
             {
                 switch( e->node_type_ )
@@ -70,10 +72,11 @@ namespace libcasm_fe
                             reinterpret_cast< FunctionDefNode* >( e ) );
                         break;
                     case NodeType::DERIVED:
-                        // TODO implement
+                        walk_derived_def(
+                            reinterpret_cast< DerivedDefNode* >( e ) );
                         break;
                     case NodeType::RULE:
-                        walk_rule( reinterpret_cast< RuleNode* >( e ) );
+                        walk_rule_def( reinterpret_cast< RuleNode* >( e ) );
                         break;
                     case NodeType::INIT:
                         visitor.visit_init(
@@ -88,45 +91,47 @@ namespace libcasm_fe
                 }
             }
 
-            visitor.visit_body_elements( node );
+            visitor.visit_body_elements_post( node );
         }
 
         void walk_function_def( FunctionDefNode* node )
         {
-            if( node->sym->type == Symbol::SymbolType::FUNCTION )
-            {
-                std::vector< std::pair< V, V > > initializer_results;
-                if( node->sym->intitializers_ )
-                {
-                    initializer_results.reserve(
-                        node->sym->intitializers_->size() );
+            visitor.visit_function_def_pre( node );
 
-                    for( std::pair< ExpressionBase*, ExpressionBase* > p :
-                        *node->sym->intitializers_ )
-                    {
-                        V first;
-                        if( p.first )
-                        {
-                            first = walk_atom( p.first );
-                        }
-                        else
-                        {
-                            UndefAtom foo = { p.second->location };
-                            first = walk_atom( &foo );
-                        }
-                        initializer_results.push_back(
-                            std::pair< V, V >( first, walk_atom( p.second ) ) );
-                    }
-                }
-
-                visitor.visit_function_def( node, initializer_results );
-            }
-            else
+            for( const auto& initializer : node->initializers() )
             {
-                visitor.visit_derived_def_pre( node );
-                const V v = walk_atom( node->sym->derived );
-                visitor.visit_derived_def( node, v );
+                walk_update( initializer );
             }
+
+            visitor.visit_function_def_post( node );
+        }
+
+        template < typename V_ = V >
+        typename std::enable_if< not std::is_same< value_t, V_ >::value >::type
+        walk_derived_def( DerivedDefNode* node )
+        {
+            visitor.visit_derived_def_pre( node );
+            const V v = walk_atom( node->sym->derived );
+            visitor.visit_derived_def( node, v );
+        }
+
+        template < typename V_ = V >
+        typename std::enable_if< std::is_same< value_t, V_ >::value >::type
+        walk_derived_def( DerivedDefNode* )
+        {
+        }
+
+        template < typename V_ = V >
+        typename std::enable_if< not std::is_same< value_t, V_ >::value >::type
+        walk_rule_def( RuleNode* node )
+        {
+            walk_rule( node );
+        }
+
+        template < typename V_ = V >
+        typename std::enable_if< std::is_same< value_t, V_ >::value >::type
+        walk_rule_def( RuleNode* )
+        {
         }
 
         void walk_rule( RuleNode* node )
@@ -597,11 +602,12 @@ namespace libcasm_fe
 #define LIB_CASMFE_VISITOR_INTERFACE_( PREFIX, POSTFIX, T, U )                 \
     PREFIX void visit_specification( SpecificationNode* ) POSTFIX;             \
     PREFIX void visit_init( InitNode* ) POSTFIX;                               \
-    PREFIX void visit_body_elements( AstListNode* ) POSTFIX;                   \
-    PREFIX void visit_function_def(                                            \
-        FunctionDefNode*, const std::vector< std::pair< T, T > >& ) POSTFIX;   \
-    PREFIX void visit_derived_def_pre( FunctionDefNode* ) POSTFIX;             \
-    PREFIX void visit_derived_def( FunctionDefNode*, U ) POSTFIX;              \
+    PREFIX void visit_body_elements_pre( AstListNode* ) POSTFIX;               \
+    PREFIX void visit_body_elements_post( AstListNode* ) POSTFIX;              \
+    PREFIX void visit_function_def_pre( FunctionDefNode* ) POSTFIX;            \
+    PREFIX void visit_function_def_post( FunctionDefNode* ) POSTFIX;           \
+    PREFIX void visit_derived_def_pre( DerivedDefNode* ) POSTFIX;              \
+    PREFIX void visit_derived_def( DerivedDefNode*, U ) POSTFIX;               \
     PREFIX void visit_rule( RuleNode* ) POSTFIX;                               \
     PREFIX void visit_rule_post( RuleNode* ) POSTFIX;                          \
     PREFIX void visit_statements( AstListNode* ) POSTFIX;                      \

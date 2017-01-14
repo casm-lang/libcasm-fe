@@ -395,6 +395,7 @@ namespace yy {
       // ITERATE_SYNTAX
       char dummy26[sizeof(UnaryNode*)];
 
+      // INITIALIZER
       // UPDATE_SYNTAX
       char dummy27[sizeof(UpdateNode*)];
 
@@ -404,44 +405,41 @@ namespace yy {
       // CASE_LABEL
       char dummy29[sizeof(std::pair<AtomNode*, AstNode*>)];
 
-      // INITIALIZER
-      char dummy30[sizeof(std::pair<ExpressionBase*, ExpressionBase*>)];
-
       // DUMPSPEC
-      char dummy31[sizeof(std::pair<std::string, std::vector<std::string>>)];
+      char dummy30[sizeof(std::pair<std::string, std::vector<std::string>>)];
 
       // FUNCTION_SIGNATURE
-      char dummy32[sizeof(std::pair<std::vector<Type*>, Type*>)];
+      char dummy31[sizeof(std::pair<std::vector<Type*>, Type*>)];
 
       // "string"
       // "identifier"
       // RULEREF
-      char dummy33[sizeof(std::string)];
+      char dummy32[sizeof(std::string)];
 
       // LISTCONST
       // EXPRESSION_LIST
       // EXPRESSION_LIST_NO_COMMA
-      char dummy34[sizeof(std::vector<ExpressionBase*>*)];
+      char dummy33[sizeof(std::vector<ExpressionBase*>*)];
 
       // PARAM_LIST
       // PARAM_LIST_NO_COMMA
       // TYPE_IDENTIFIER_STARLIST
       // TYPE_SYNTAX_LIST
-      char dummy35[sizeof(std::vector<Type*>)];
+      char dummy34[sizeof(std::vector<Type*>)];
+
+      // INITIALIZERS
+      // INITIALIZER_LIST
+      char dummy35[sizeof(std::vector<UpdateNode*>)];
 
       // CASE_LABEL_LIST
       char dummy36[sizeof(std::vector<std::pair<AtomNode*, AstNode*>>)];
 
-      // INITIALIZERS
-      // INITIALIZER_LIST
-      char dummy37[sizeof(std::vector<std::pair<ExpressionBase*, ExpressionBase*>>*)];
-
       // DUMPSPEC_LIST
-      char dummy38[sizeof(std::vector<std::pair<std::string, std::vector<std::string>>>)];
+      char dummy37[sizeof(std::vector<std::pair<std::string, std::vector<std::string>>>)];
 
       // IDENTIFIER_LIST
       // IDENTIFIER_LIST_NO_COMMA
-      char dummy39[sizeof(std::vector<std::string>)];
+      char dummy38[sizeof(std::vector<std::string>)];
 };
 
     /// Symbol semantic values.
@@ -639,8 +637,6 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const std::pair<AtomNode*, AstNode*> v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::pair<ExpressionBase*, ExpressionBase*> v, const location_type& l);
-
   basic_symbol (typename Base::kind_type t, const std::pair<std::string, std::vector<std::string>> v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const std::pair<std::vector<Type*>, Type*> v, const location_type& l);
@@ -651,9 +647,9 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const std::vector<Type*> v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::vector<std::pair<AtomNode*, AstNode*>> v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::vector<UpdateNode*> v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::vector<std::pair<AtomNode*, AstNode*>> v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const std::vector<std::pair<std::string, std::vector<std::string>>> v, const location_type& l);
 
@@ -1251,7 +1247,7 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 955,     ///< Last index in yytable_.
+      yylast_ = 1036,     ///< Last index in yytable_.
       yynnts_ = 67,  ///< Number of nonterminal symbols.
       yyfinal_ = 4, ///< Termination state number.
       yyterror_ = 1,
@@ -1465,6 +1461,7 @@ namespace yy {
         value.copy< UnaryNode* > (other.value);
         break;
 
+      case 103: // INITIALIZER
       case 132: // UPDATE_SYNTAX
         value.copy< UpdateNode* > (other.value);
         break;
@@ -1475,10 +1472,6 @@ namespace yy {
 
       case 135: // CASE_LABEL
         value.copy< std::pair<AtomNode*, AstNode*> > (other.value);
-        break;
-
-      case 103: // INITIALIZER
-        value.copy< std::pair<ExpressionBase*, ExpressionBase*> > (other.value);
         break;
 
       case 123: // DUMPSPEC
@@ -1508,13 +1501,13 @@ namespace yy {
         value.copy< std::vector<Type*> > (other.value);
         break;
 
-      case 134: // CASE_LABEL_LIST
-        value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (other.value);
-        break;
-
       case 101: // INITIALIZERS
       case 102: // INITIALIZER_LIST
-        value.copy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (other.value);
+        value.copy< std::vector<UpdateNode*> > (other.value);
+        break;
+
+      case 134: // CASE_LABEL_LIST
+        value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (other.value);
         break;
 
       case 122: // DUMPSPEC_LIST
@@ -1667,6 +1660,7 @@ namespace yy {
         value.copy< UnaryNode* > (v);
         break;
 
+      case 103: // INITIALIZER
       case 132: // UPDATE_SYNTAX
         value.copy< UpdateNode* > (v);
         break;
@@ -1677,10 +1671,6 @@ namespace yy {
 
       case 135: // CASE_LABEL
         value.copy< std::pair<AtomNode*, AstNode*> > (v);
-        break;
-
-      case 103: // INITIALIZER
-        value.copy< std::pair<ExpressionBase*, ExpressionBase*> > (v);
         break;
 
       case 123: // DUMPSPEC
@@ -1710,13 +1700,13 @@ namespace yy {
         value.copy< std::vector<Type*> > (v);
         break;
 
-      case 134: // CASE_LABEL_LIST
-        value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (v);
-        break;
-
       case 101: // INITIALIZERS
       case 102: // INITIALIZER_LIST
-        value.copy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (v);
+        value.copy< std::vector<UpdateNode*> > (v);
+        break;
+
+      case 134: // CASE_LABEL_LIST
+        value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (v);
         break;
 
       case 122: // DUMPSPEC_LIST
@@ -1947,13 +1937,6 @@ namespace yy {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<ExpressionBase*, ExpressionBase*> v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<std::string, std::vector<std::string>> v, const location_type& l)
     : Base (t)
     , value (v)
@@ -1989,14 +1972,14 @@ namespace yy {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<AtomNode*, AstNode*>> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<UpdateNode*> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<AtomNode*, AstNode*>> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2166,6 +2149,7 @@ namespace yy {
         value.template destroy< UnaryNode* > ();
         break;
 
+      case 103: // INITIALIZER
       case 132: // UPDATE_SYNTAX
         value.template destroy< UpdateNode* > ();
         break;
@@ -2176,10 +2160,6 @@ namespace yy {
 
       case 135: // CASE_LABEL
         value.template destroy< std::pair<AtomNode*, AstNode*> > ();
-        break;
-
-      case 103: // INITIALIZER
-        value.template destroy< std::pair<ExpressionBase*, ExpressionBase*> > ();
         break;
 
       case 123: // DUMPSPEC
@@ -2209,13 +2189,13 @@ namespace yy {
         value.template destroy< std::vector<Type*> > ();
         break;
 
-      case 134: // CASE_LABEL_LIST
-        value.template destroy< std::vector<std::pair<AtomNode*, AstNode*>> > ();
-        break;
-
       case 101: // INITIALIZERS
       case 102: // INITIALIZER_LIST
-        value.template destroy< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > ();
+        value.template destroy< std::vector<UpdateNode*> > ();
+        break;
+
+      case 134: // CASE_LABEL_LIST
+        value.template destroy< std::vector<std::pair<AtomNode*, AstNode*>> > ();
         break;
 
       case 122: // DUMPSPEC_LIST
@@ -2374,6 +2354,7 @@ namespace yy {
         value.move< UnaryNode* > (s.value);
         break;
 
+      case 103: // INITIALIZER
       case 132: // UPDATE_SYNTAX
         value.move< UpdateNode* > (s.value);
         break;
@@ -2384,10 +2365,6 @@ namespace yy {
 
       case 135: // CASE_LABEL
         value.move< std::pair<AtomNode*, AstNode*> > (s.value);
-        break;
-
-      case 103: // INITIALIZER
-        value.move< std::pair<ExpressionBase*, ExpressionBase*> > (s.value);
         break;
 
       case 123: // DUMPSPEC
@@ -2417,13 +2394,13 @@ namespace yy {
         value.move< std::vector<Type*> > (s.value);
         break;
 
-      case 134: // CASE_LABEL_LIST
-        value.move< std::vector<std::pair<AtomNode*, AstNode*>> > (s.value);
-        break;
-
       case 101: // INITIALIZERS
       case 102: // INITIALIZER_LIST
-        value.move< std::vector<std::pair<ExpressionBase*, ExpressionBase*>>* > (s.value);
+        value.move< std::vector<UpdateNode*> > (s.value);
+        break;
+
+      case 134: // CASE_LABEL_LIST
+        value.move< std::vector<std::pair<AtomNode*, AstNode*>> > (s.value);
         break;
 
       case 122: // DUMPSPEC_LIST
@@ -2986,7 +2963,7 @@ namespace yy {
 
 
 } // yy
-#line 2990 "GrammarParser.tab.h" // lalr1.cc:377
+#line 2967 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

@@ -64,8 +64,6 @@ namespace libcasm_fe
         bool trace_parsing;
         bool trace_scanning;
 
-        std::map< std::string, std::set< std::string > > init_dependencies;
-
         // Handling the scanner.
         size_t get_next_chars( char buffer[], size_t max_size );
 

@@ -67,14 +67,14 @@ namespace libcasm_fe
         bool filter_enabled( const std::string& filter );
 
         void visit_specification( SpecificationNode* node ) override final{};
-        void visit_init( InitNode* node ) override final{};
-        void visit_body_elements( AstListNode* node ) override final{};
-        void visit_function_def( FunctionDefNode* node,
-            const std::vector< std::pair< value_t, value_t > >& )
-            override final{};
-        void visit_derived_def_pre( FunctionDefNode* node ) override final{};
+        void visit_init( InitNode* node ) override final;
+        void visit_body_elements_pre( AstListNode* node ) override final;
+        void visit_body_elements_post( AstListNode* node ) override final;
+        void visit_function_def_pre( FunctionDefNode* node ) override final;
+        void visit_function_def_post( FunctionDefNode* node ) override final;
+        void visit_derived_def_pre( DerivedDefNode* node ) override final{};
         void visit_derived_def(
-            FunctionDefNode* node, const value_t& value ) override final{};
+            DerivedDefNode* node, const value_t& value ) override final{};
         void visit_rule( RuleNode* node ) override final{};
         void visit_rule_post( RuleNode* node ) override final{};
         void visit_statements( AstListNode* node ) override final{};

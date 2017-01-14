@@ -261,11 +261,7 @@ namespace libcasm_fe
       public:
         std::vector< Type* > arguments_;
 
-        union {
-            std::vector< std::pair< ExpressionBase*, ExpressionBase* > >*
-                intitializers_;
-            ExpressionBase* derived;
-        };
+        ExpressionBase* derived;
 
         Type* return_type_;
         const uint64_t id;
@@ -281,9 +277,7 @@ namespace libcasm_fe
         bool checkReturnValue;
 
         Function( const std::string name, const yy::location& location,
-            const std::vector< Type* >& args, Type* return_type,
-            std::vector< std::pair< ExpressionBase*, ExpressionBase* > >*
-                init );
+            const std::vector< Type* >& args, Type* return_type );
         Function( const std::string name, const yy::location& location,
             const std::vector< Type* >& args, ExpressionBase* expr,
             Type* return_type );

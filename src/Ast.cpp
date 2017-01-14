@@ -178,10 +178,38 @@ bool AstListNode::equals( AstNode* other ) const
 FunctionDefNode::FunctionDefNode( yy::location& loc, Function* sym )
 : AstNode( loc, NodeType::FUNCTION )
 , sym( sym )
+, m_initializers()
 {
 }
 
 FunctionDefNode::~FunctionDefNode()
+{
+    // sym is deleted in the symbol table
+
+    for( auto initializer : m_initializers )
+    {
+        delete initializer;
+    }
+}
+
+void FunctionDefNode::setInitializers(
+    const std::vector< UpdateNode* >& initializers )
+{
+    m_initializers = initializers;
+}
+
+std::vector< UpdateNode* > FunctionDefNode::initializers() const
+{
+    return m_initializers;
+}
+
+DerivedDefNode::DerivedDefNode( yy::location& loc, Function* sym )
+: AstNode( loc, NodeType::DERIVED )
+, sym( sym )
+{
+}
+
+DerivedDefNode::~DerivedDefNode()
 {
     // sym is deleted in the symbol table
 }
@@ -318,7 +346,7 @@ bool BooleanAtom::equals( AstNode* other ) const
     return value == other_b->value;
 }
 
-RuleAtom::RuleAtom( yy::location& loc, const std::string&& name )
+RuleAtom::RuleAtom( yy::location& loc, const std::string& name )
 : AtomNode( loc, NodeType::RULE_ATOM, Type( TypeType::RULEREF ) )
 , name( name )
 {

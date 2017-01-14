@@ -28,7 +28,6 @@
 #include "../transform/SourceToAstPass.h"
 
 #include "../Driver.h"
-#include "../FunctionCycleVisitor.h"
 #include "../Value.h"
 
 #include "cpp/Math.h"
@@ -75,158 +74,41 @@ void TypeCheckPass::check_type_valid(
     }
 }
 
-void TypeCheckPass::visit_function_def( FunctionDefNode* def,
-    const std::vector< std::pair< Type*, Type* > >& initializers )
+void TypeCheckPass::visit_function_def_pre( FunctionDefNode* def )
 {
+    const auto function = def->sym;
 
-    check_type_valid( def->location, *def->sym->return_type_ );
+    if( function->is_builtin() )
+    {
+        global_driver->error( def->location,
+            "cannot use builtin name '" + function->name
+                + "' as function identifier",
+            libcasm_fe::Codes::FunctionIdentifierIsBuiltinName );
+    }
+
+    // TODO check if all functions in initially are decleared
+}
+
+void TypeCheckPass::visit_function_def_post( FunctionDefNode* def )
+{
+    const auto function = def->sym;
+
+    check_type_valid( def->location, *function->return_type_ );
 
     // Check if argument types are valid
-    for( Type* argument_t : def->sym->arguments_ )
+    for( Type* argument_t : function->arguments_ )
     {
         check_type_valid( def->location, *argument_t );
     }
-
-    // check if initializer types match argument types
-
-    for( size_t i = 0; i < initializers.size(); i++ )
-    {
-        const std::pair< Type*, Type* >& p = initializers[ i ];
-
-        Type* t = p.second;
-        Type* other = def->sym->return_type_;
-        if( ( t->t == TypeType::BIT and other->t == TypeType::INTEGER )
-            or ( t->t == TypeType::INTEGER and other->t == TypeType::BIT ) )
-        {
-            Type* b = t;
-            Type* i = other;
-
-            if( t->t == TypeType::INTEGER )
-            {
-                b = other;
-                i = t;
-            }
-
-            i->t = b->t;
-        }
-
-        // check type of initializer and type of function type
-        if( !p.second->unify( def->sym->return_type_ ) )
-        {
-            global_driver->error(
-                def->sym->intitializers_->at( i ).second->location,
-                "type of initializer of function `" + def->sym->name + "` is "
-                    + p.second->to_str()
-                    + " but should be "
-                    + def->sym->return_type_->to_str()
-                    + "" );
-        }
-
-        if( def->sym->return_type_->t == TypeType::BIT
-            and p.second->t == TypeType::BIT )
-        {
-            INTEGER_T bitsize = def->sym->return_type_->bitsize;
-            INTEGER_T value = -1;
-            INTEGER_T value_bitsize = -1;
-
-            assert( def->sym->intitializers_->at( i ).second->node_type_
-                    == NodeType::INTEGER_ATOM );
-            {
-                value = static_cast< IntegerAtom* >(
-                    def->sym->intitializers_->at( i ).second )
-                            ->val_;
-                double v = (double)value;
-                v = floor( log2( v ) ) + 1;
-                value_bitsize = (INTEGER_T)v;
-            }
-
-            if( value_bitsize > bitsize )
-            {
-                global_driver->error(
-                    def->sym->intitializers_->at( i ).second->location,
-                    "initially value bitsize '"
-                        + std::to_string( value_bitsize )
-                        + "' does not fit into the bitsize of '"
-                        + std::to_string( bitsize )
-                        + "'",
-                    libcasm_fe::Codes::
-                        TypeBitSizeInvalidInIninitallyExpression );
-            }
-
-            def->sym->intitializers_->at( i ).second->type_.bitsize = bitsize;
-        }
-
-        // check arument types
-        if( def->sym->arguments_.size() == 0 )
-        {
-            if( def->sym->intitializers_->at( i ).first )
-            {
-                global_driver->error(def->sym->intitializers_->at(i).first->location,
-                      "function `" +def->sym->name+
-                       "` does not accept arguments but initializer provides some");
-            }
-        }
-        else if( def->sym->arguments_.size() == 1 )
-        {
-            if( def->sym->intitializers_->at( i ).first
-                && !p.first->unify( def->sym->arguments_[ 0 ] ) )
-            {
-                global_driver->error(
-                    def->sym->intitializers_->at( i ).first->location,
-                    "type of initializer argument of function `"
-                        + def->sym->name
-                        + "` is "
-                        + p.first->to_str()
-                        + " but should be "
-                        + def->sym->arguments_[ 0 ]->to_str() );
-            }
-            else if( !def->sym->intitializers_->at( i ).first )
-            {
-                global_driver->error(def->sym->intitializers_->at(i).second->location,
-                      "function `" +def->sym->name+
-                       "` needs one argument but initializer does not provide one");
-            }
-        }
-        else
-        {
-            if( def->sym->intitializers_->at( i ).first )
-            {
-                Type arg_tuple = Type( TypeType::TUPLE, def->sym->arguments_ );
-                if( !p.first->unify( &arg_tuple ) )
-                {
-                    global_driver->error(
-                        def->sym->intitializers_->at( i ).first->location,
-                        "type of initializer arguments of function `"
-                            + def->sym->name
-                            + "` is "
-                            + p.first->to_str()
-                            + " but should be "
-                            + arg_tuple.to_str() );
-                }
-            }
-            else if( !def->sym->intitializers_->at( i ).first )
-            {
-                global_driver->error(def->sym->intitializers_->at(i).second->location,
-                      "function `" +def->sym->name+
-                       "` needs multiple arguments but initializer does not provide any");
-            }
-        }
-    }
-
-    InitCycleVisitor v;
-    AstWalker< InitCycleVisitor, bool > walker( v );
-    walker.walk_function_def( def );
-    global_driver->init_dependencies[ def->sym->name ]
-        = walker.visitor.dependency_names;
 }
 
-void TypeCheckPass::visit_derived_def_pre( FunctionDefNode* def )
+void TypeCheckPass::visit_derived_def_pre( DerivedDefNode* def )
 {
     rule_binding_types.push_back( &def->sym->arguments_ );
     rule_binding_offsets.push_back( &def->sym->binding_offsets );
 }
 
-void TypeCheckPass::visit_derived_def( FunctionDefNode* def, Type* expr )
+void TypeCheckPass::visit_derived_def( DerivedDefNode* def, Type* expr )
 {
     rule_binding_types.pop_back();
     rule_binding_offsets.pop_back();
@@ -1341,7 +1223,11 @@ Type* TypeCheckPass::visit_string_atom( StringAtom* atom )
     return &atom->type_;
 }
 
-void TypeCheckPass::visit_body_elements( AstListNode* )
+void TypeCheckPass::visit_body_elements_pre( AstListNode* )
+{
+}
+
+void TypeCheckPass::visit_body_elements_post( AstListNode* )
 {
 }
 

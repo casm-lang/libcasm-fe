@@ -107,6 +107,7 @@ namespace libcasm_fe
     class Expression;
     class ExpressionBase;
     class AtomNode;
+    class UpdateNode;
 
     class AstNode
     {
@@ -173,6 +174,20 @@ namespace libcasm_fe
         Function* sym;
         FunctionDefNode( yy::location& loc, Function* sym );
         ~FunctionDefNode() override;
+
+        void setInitializers( const std::vector< UpdateNode* >& initializers );
+        std::vector< UpdateNode* > initializers() const;
+
+      private:
+        std::vector< UpdateNode* > m_initializers;
+    };
+
+    class DerivedDefNode : public AstNode
+    {
+      public:
+        Function* sym;
+        DerivedDefNode( yy::location& loc, Function* sym );
+        ~DerivedDefNode() override;
     };
 
     class EnumDefNode : public AstNode
@@ -275,7 +290,7 @@ namespace libcasm_fe
     class BaseFunctionAtom : public AtomNode
     {
       public:
-        const std::string name;
+        std::string name;
         std::vector< ExpressionBase* >* arguments;
 
         BaseFunctionAtom( yy::location& loc, NodeType t, const std::string name,
@@ -336,7 +351,7 @@ namespace libcasm_fe
         RuleNode* rule;
         const std::string name;
 
-        RuleAtom( yy::location& loc, const std::string&& name );
+        RuleAtom( yy::location& loc, const std::string& name );
 
         ~RuleAtom() override;
         bool equals( AstNode* other ) const override;
