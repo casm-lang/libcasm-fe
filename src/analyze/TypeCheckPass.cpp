@@ -78,6 +78,8 @@ void TypeCheckPass::visit_init( InitNode* node )
 
 void TypeCheckPass::visit_function_def_pre( FunctionDefNode* def )
 {
+    m_isInFunctionDefinition = true;
+
     const auto function = def->sym;
 
     if( function->is_builtin() )
@@ -88,13 +90,6 @@ void TypeCheckPass::visit_function_def_pre( FunctionDefNode* def )
             libcasm_fe::Codes::FunctionIdentifierIsBuiltinName );
     }
 
-    // TODO check if all functions in initially are decleared
-}
-
-void TypeCheckPass::visit_function_def_post( FunctionDefNode* def )
-{
-    const auto function = def->sym;
-
     check_type_valid( def->location, *function->return_type_ );
 
     // Check if argument types are valid
@@ -102,6 +97,15 @@ void TypeCheckPass::visit_function_def_post( FunctionDefNode* def )
     {
         check_type_valid( def->location, *argument_t );
     }
+
+    m_declaredFunctions.emplace( function->name );
+
+    // function initialization ... (see check in visit_function_atom)
+}
+
+void TypeCheckPass::visit_function_def_post( FunctionDefNode* def )
+{
+    m_isInFunctionDefinition = false;
 }
 
 void TypeCheckPass::visit_derived_def_pre( DerivedDefNode* def )
@@ -862,12 +866,27 @@ Type* TypeCheckPass::visit_function_atom(
         }
 
         global_driver->error(
-            atom->location, "use of undefined function `" + atom->name + "`" );
+            atom->location, "use of undeclared function `" + atom->name + "`" );
         atom->type_ = Type( TypeType::INVALID );
         return &atom->type_;
     }
 
     Function* func = reinterpret_cast< Function* >( sym );
+
+    if( m_isInFunctionDefinition
+        and ( func->type == Symbol::SymbolType::FUNCTION ) )
+    {
+        // only declared functions are allowed in the function initialization
+        if( m_declaredFunctions.count( atom->name ) == 0 )
+        {
+            global_driver->error( atom->location, "use of undeclared function `"
+                                                      + atom->name
+                                                      + "` in initially" );
+            atom->type_ = Type( TypeType::INVALID );
+            return &atom->type_;
+        }
+    }
+
     atom->symbol = func;
     if( atom->symbol->type == Symbol::SymbolType::FUNCTION )
     {
