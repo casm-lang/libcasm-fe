@@ -219,7 +219,8 @@ void TypeCheckPass::visit_update(
 {
     visit_function_atom( update->func, argumentValues );
 
-    if( update->func->symbol and update->func->symbol->is_static )
+    if( update->func->symbol and update->func->symbol->is_static
+        and not m_isInFunctionDefinition )
     {
         global_driver->error( update->location,
             "cannot update static function `" + update->func->name + "`" );
