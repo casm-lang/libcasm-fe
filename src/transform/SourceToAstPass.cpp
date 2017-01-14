@@ -57,15 +57,6 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    assert( node->getElements() );
-    for( auto e : node->getElements()->nodes )
-    {
-        if( e->node_type_ == NodeType::INIT )
-        {
-            node->setInitRule( (InitNode*)e );
-        }
-    }
-
     pr.setResult< SourceToAstPass >( node );
 
     return true;

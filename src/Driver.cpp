@@ -277,11 +277,6 @@ void Driver::add( RuleNode* rule_root )
     }
 }
 
-RuleNode* Driver::get_init_rule() const
-{
-    return rules_map_.at( init_name );
-}
-
 void Driver::add( Function* function )
 {
     const auto it = rules_map_.find( function->name );

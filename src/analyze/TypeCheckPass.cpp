@@ -50,14 +50,6 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
     AstWalker< TypeCheckPass, Type* > typecheck_walker( *this );
     typecheck_walker.walk_specification( node );
 
-    if( global_driver->rules_map_.count( node->getInitRule()->identifier )
-        == 0 )
-    {
-        global_driver->error( node->getInitRule()->location,
-            "init rule `" + node->getInitRule()->identifier + "` doesn't exist",
-            libcasm_fe::Codes::AgentInitRuleDoesNotExist );
-    }
-
     pr.setResult< TypeCheckPass >( node );
 
     return global_driver->ok();
@@ -71,6 +63,16 @@ void TypeCheckPass::check_type_valid(
     {
         global_driver->error( location, "unknown type '" + type.enum_name + "'",
             libcasm_fe::Codes::TypeUnknown );
+    }
+}
+
+void TypeCheckPass::visit_init( InitNode* node )
+{
+    if( global_driver->rules_map_.count( node->identifier ) == 0 )
+    {
+        global_driver->error( node->location,
+            "init rule `" + node->identifier + "` doesn't exist",
+            libcasm_fe::Codes::AgentInitRuleDoesNotExist );
     }
 }
 
@@ -1280,10 +1282,6 @@ void TypeCheckPass::visit_statements( AstListNode* )
 }
 
 void TypeCheckPass::visit_specification( SpecificationNode* )
-{
-}
-
-void TypeCheckPass::visit_init( InitNode* )
 {
 }
 

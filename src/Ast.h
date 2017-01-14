@@ -549,19 +549,13 @@ namespace libcasm_fe
     class Ast : public AstNode
     {
         SpecificationNode* spec;
-
-        InitNode* init_rule;
-
         AstListNode* elements;
 
       public:
         Ast(
             yy::location& loc, SpecificationNode* spec, AstListNode* elements );
 
-        void setInitRule( InitNode* init_rule );
-
         SpecificationNode* getSpecification( void );
-        InitNode* getInitRule( void );
         AstListNode* getElements( void );
     };
 }
