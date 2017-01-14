@@ -114,9 +114,13 @@ void AstDumpPass::visit_init( InitNode* init )
     dump_node( init, "Init" );
 }
 
-void AstDumpPass::visit_rule( RuleNode* rule )
+void AstDumpPass::visit_rule_post( RuleNode* rule )
 {
     dump_node( rule, "Rule " + rule->name );
+}
+
+void AstDumpPass::visit_rule( RuleNode* rule )
+{
     dump_link( rule, rule->child_ );
 }
 
@@ -150,25 +154,40 @@ void AstDumpPass::visit_ifthenelse( IfThenElseNode* node, bool )
 void AstDumpPass::visit_assert( UnaryNode* assert, bool )
 {
     dump_node( assert, "Assert" );
-    dump_link( (uint64_t)assert, (uint64_t)assert->child_ );
+    dump_link( assert, assert->child_ );
+}
+
+void AstDumpPass::visit_assure( UnaryNode* assure, bool )
+{
+    dump_node( assure, "Assure" );
+    dump_link( assure, assure->child_ );
 }
 
 void AstDumpPass::visit_seqblock_pre( UnaryNode* seqblock )
 {
     dump_node( seqblock, "Seqblock" );
+}
+
+void AstDumpPass::visit_seqblock_post( UnaryNode* seqblock )
+{
     dump_link( seqblock, seqblock->child_ );
 }
 
 void AstDumpPass::visit_parblock_pre( UnaryNode* parblock )
 {
     dump_node( parblock, "Parblock" );
+}
+
+void AstDumpPass::visit_parblock_post( UnaryNode* parblock )
+{
     dump_link( parblock, parblock->child_ );
 }
 
-void AstDumpPass::visit_update( UpdateNode* update, std::vector< bool >&, bool )
+void AstDumpPass::visit_update( UpdateNode* update, std::vector< bool >& args, bool )
 {
     dump_node( update, "Update" );
-    dump_link( (uint64_t)update, (uint64_t)update->func );
+    visit_function_atom( update->func, args );
+    dump_link( update, update->func );
     dump_link( update, update->expr_ );
 }
 
@@ -211,9 +230,13 @@ void AstDumpPass::visit_case( CaseNode* node, bool, const std::vector< bool >& )
     }
 }
 
-void AstDumpPass::visit_forall_post( ForallNode* node )
+void AstDumpPass::visit_forall_pre( ForallNode* node )
 {
     dump_node( node, "Forall" );
+}
+
+void AstDumpPass::visit_forall_post( ForallNode* node )
+{
     dump_link( node, node->in_expr );
     dump_link( node, node->statement );
 }
@@ -233,6 +256,10 @@ void AstDumpPass::visit_print( PrintNode* node, bool )
 void AstDumpPass::visit_let( LetNode* node, bool )
 {
     dump_node( node, "Let " + node->identifier );
+}
+
+void AstDumpPass::visit_let_post( LetNode* node )
+{
     dump_link( node, node->expr );
     dump_link( node, node->stmt );
 }
@@ -385,22 +412,6 @@ void AstDumpPass::visit_derived_def_pre( FunctionDefNode* )
 {
 }
 
-void AstDumpPass::visit_rule_post( RuleNode* )
-{
-}
-
-void AstDumpPass::visit_assure( UnaryNode*, bool )
-{
-}
-
-void AstDumpPass::visit_seqblock_post( UnaryNode* )
-{
-}
-
-void AstDumpPass::visit_parblock_post( UnaryNode* )
-{
-}
-
 void AstDumpPass::visit_call(
     CallNode*, std::vector< bool, std::allocator< bool > >& )
 {
@@ -418,19 +429,11 @@ void AstDumpPass::visit_impossible( AstNode* )
 {
 }
 
-void AstDumpPass::visit_let_post( LetNode* )
-{
-}
-
 void AstDumpPass::visit_case_pre( CaseNode*, bool )
 {
 }
 
 void AstDumpPass::visit_skip( AstNode* )
-{
-}
-
-void AstDumpPass::visit_forall_pre( ForallNode* )
 {
 }
 
