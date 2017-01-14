@@ -755,6 +755,14 @@ INITIALIZER
       auto function = new FunctionAtom( @$, "" );
       $$ = new UpdateNode( @$, function, $1 );
   }
+| EXPRESSION ARROW ATOM
+  {
+      auto args = new std::vector< ExpressionBase* >;
+      args->push_back($1);
+
+      auto function = new FunctionAtom( @$, "", args );
+      $$ = new UpdateNode( @$, function, $3 );
+  }
 | LPAREN EXPRESSION_LIST RPAREN ARROW ATOM
   {
       auto function = new FunctionAtom( @$, "", $2 );

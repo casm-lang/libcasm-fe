@@ -121,6 +121,8 @@ INITIALIZER_LIST
 INITIALIZER
 : ATOM
       $$ = new UpdateNode( @$, function, $1 );
+| EXPRESSION ARROW ATOM
+      $$ = new UpdateNode( @$, function, $3 );
 | LPAREN EXPRESSION_LIST RPAREN ARROW ATOM
 
 ATOM
