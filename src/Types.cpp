@@ -628,6 +628,27 @@ bool Type::unify_nofollow( Type* other )
         return other->unify_enum( this );
     }
 
+    if( ( t == TypeType::BIT and other->t == TypeType::INTEGER )
+        or ( t == TypeType::INTEGER and other->t == TypeType::BIT ) )
+    {
+        if( t == TypeType::INTEGER )
+        {
+            t = TypeType::BIT;
+            if( bitsize < 0 )
+            {
+                bitsize = other->bitsize;
+            }
+        }
+        else
+        {
+            other->t = TypeType::BIT;
+            if( other->bitsize < 0 )
+            {
+                other->bitsize = bitsize;
+            }
+        }
+    }
+
     if( t != TypeType::UNKNOWN and other->t != TypeType::UNKNOWN )
     {
         return t == other->t;

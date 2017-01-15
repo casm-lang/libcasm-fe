@@ -47,11 +47,14 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 {
     Ast* node = (Ast*)pr.getResult< SourceToAstPass >();
 
-    try {
+    try
+    {
         AstWalker< TypeCheckPass, Type* > typecheck_walker( *this );
         typecheck_walker.walk_specification( node );
-    } catch (const CompiletimeException& e) {
-        global_driver->error(e.getLocations(), e.what(), e.getErrorCode());
+    }
+    catch( const CompiletimeException& e )
+    {
+        global_driver->error( e.getLocations(), e.what(), e.getErrorCode() );
         return false;
     }
 
@@ -249,13 +252,14 @@ void TypeCheckPass::visit_update(
     const Type* rhs
         = update->expr_->type_.get_most_general_type( update->expr_ );
 
-    if( lhs->t == TypeType::BIT and lhs->bitsize != rhs->bitsize )
+    if( lhs->t == TypeType::BIT and lhs->bitsize < rhs->bitsize )
     {
         global_driver->error( update->location,
             "type of '" + lhs->to_str() + "' of '" + update->func->name
                 + "' does not match type '"
                 + rhs->to_str()
-                + "' of expression" );
+                + "' of expression",
+            libcasm_fe::Codes::TypeBitSizeIsInvalid );
     }
 
     if( update->func->symbol_type == FunctionAtom::SymbolType::PARAMETER )
@@ -871,8 +875,8 @@ Type* TypeCheckPass::visit_function_atom(
             }
         }
 
-        throw CompiletimeException( atom->location,
-            "use of undeclared function `" + atom->name + "`" );
+        throw CompiletimeException(
+            atom->location, "use of undeclared function `" + atom->name + "`" );
     }
 
     Function* func = reinterpret_cast< Function* >( sym );
@@ -884,7 +888,8 @@ Type* TypeCheckPass::visit_function_atom(
         if( m_declaredFunctions.count( atom->name ) == 0 )
         {
             throw CompiletimeException( atom->location,
-                "use of undeclared function `" + atom->name + "` in initially" );
+                "use of undeclared function `" + atom->name
+                    + "` in initially" );
         }
     }
 

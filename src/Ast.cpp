@@ -26,6 +26,8 @@
 #include "Ast.h"
 #include "Driver.h"
 
+#include <cmath>
+
 using namespace libcasm_fe;
 
 static std::map< NodeType, const std::string > node_type_names_ = {
@@ -249,6 +251,19 @@ const AstNode* ZeroAtom::getRef( void ) const
 IntegerAtom::IntegerAtom( yy::location& loc, INTEGER_T val )
 : AtomNode( loc, NodeType::INTEGER_ATOM, Type( TypeType::INTEGER ) )
 {
+    if( val > 0 )
+    {
+        type_.bitsize = std::floor( std::log2( val ) ) + 1;
+    }
+    else if( val == 0 )
+    {
+        type_.bitsize = 0;
+    }
+    else
+    {
+        type_.bitsize = sizeof( INTEGER_T );
+    }
+
     val_ = val;
 }
 
