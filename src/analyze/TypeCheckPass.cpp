@@ -47,8 +47,13 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 {
     Ast* node = (Ast*)pr.getResult< SourceToAstPass >();
 
-    AstWalker< TypeCheckPass, Type* > typecheck_walker( *this );
-    typecheck_walker.walk_specification( node );
+    try {
+        AstWalker< TypeCheckPass, Type* > typecheck_walker( *this );
+        typecheck_walker.walk_specification( node );
+    } catch (const CompiletimeException& e) {
+        global_driver->error(e.getLocations(), e.what(), e.getErrorCode());
+        return false;
+    }
 
     pr.setResult< TypeCheckPass >( node );
 
@@ -866,10 +871,8 @@ Type* TypeCheckPass::visit_function_atom(
             }
         }
 
-        global_driver->error(
-            atom->location, "use of undeclared function `" + atom->name + "`" );
-        atom->type_ = Type( TypeType::INVALID );
-        return &atom->type_;
+        throw CompiletimeException( atom->location,
+            "use of undeclared function `" + atom->name + "`" );
     }
 
     Function* func = reinterpret_cast< Function* >( sym );
@@ -880,11 +883,8 @@ Type* TypeCheckPass::visit_function_atom(
         // only declared functions are allowed in the function initialization
         if( m_declaredFunctions.count( atom->name ) == 0 )
         {
-            global_driver->error( atom->location, "use of undeclared function `"
-                                                      + atom->name
-                                                      + "` in initially" );
-            atom->type_ = Type( TypeType::INVALID );
-            return &atom->type_;
+            throw CompiletimeException( atom->location,
+                "use of undeclared function `" + atom->name + "` in initially" );
         }
     }
 
