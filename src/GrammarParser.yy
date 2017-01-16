@@ -182,7 +182,7 @@ END       0 "end of file"
 %type <FloatingAtom*> FLOATING_NUMBER 
 %type <RationalAtom*> RATIONAL_NUMBER 
 %type <UpdateNode*> INITIALIZER
-%type <std::vector<UpdateNode*>> INITIALIZER_LIST INITIALIZERS
+%type <std::vector<UpdateNode*>> INITIALIZER_LIST INITIALIZER_LIST_NO_COMMA
 %type <ExpressionBase*> EXPRESSION ATOM
 %type <std::vector<ExpressionBase*>*> EXPRESSION_LIST EXPRESSION_LIST_NO_COMMA LISTCONST
 %type <UpdateNode*> UPDATE_SYNTAX
@@ -323,11 +323,11 @@ BODY_ELEMENT
           delete $1;
       }
   }
-| FUNCTION_DEFINITION INITIALIZERS
+| FUNCTION_DEFINITION INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
   {
       auto node = new FunctionDefNode( @$, $1 );
 
-      auto initializers = $2;
+      auto initializers = $4;
       for (auto initializer : initializers) {
           initializer->func->name = $1->name;
       }
@@ -746,28 +746,23 @@ TYPE_SYNTAX_LIST
 ;
 
 
-INITIALIZERS
-: INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
+INITIALIZER_LIST
+: INITIALIZER_LIST_NO_COMMA
   {
-      $$ = $3;
+      $$ = std::move($1);
   }
-| INITIALLY LCURPAREN RCURPAREN
+| INITIALIZER_LIST_NO_COMMA COMMA
   {
-      $$ = {};
+      $$ = std::move($1);
   }
 ;
 
 
-INITIALIZER_LIST
-: INITIALIZER_LIST COMMA INITIALIZER
+INITIALIZER_LIST_NO_COMMA
+: INITIALIZER_LIST_NO_COMMA COMMA INITIALIZER
   {
-      auto initializers = std::move($1);
-      initializers.push_back( $3 );
-      $$ = std::move(initializers);
-  }
-| INITIALIZER_LIST COMMA
-  {
-      $$ = $1;
+      $$ = std::move($1);
+      $$.push_back($3);
   }
 | INITIALIZER
   {

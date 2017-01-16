@@ -427,8 +427,8 @@ namespace yy {
       // TYPE_SYNTAX_LIST
       char dummy34[sizeof(std::vector<Type*>)];
 
-      // INITIALIZERS
       // INITIALIZER_LIST
+      // INITIALIZER_LIST_NO_COMMA
       char dummy35[sizeof(std::vector<UpdateNode*>)];
 
       // CASE_LABEL_LIST
@@ -1247,7 +1247,7 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1035,     ///< Last index in yytable_.
+      yylast_ = 1051,     ///< Last index in yytable_.
       yynnts_ = 67,  ///< Number of nonterminal symbols.
       yyfinal_ = 4, ///< Termination state number.
       yyterror_ = 1,
@@ -1501,8 +1501,8 @@ namespace yy {
         value.copy< std::vector<Type*> > (other.value);
         break;
 
-      case 101: // INITIALIZERS
-      case 102: // INITIALIZER_LIST
+      case 101: // INITIALIZER_LIST
+      case 102: // INITIALIZER_LIST_NO_COMMA
         value.copy< std::vector<UpdateNode*> > (other.value);
         break;
 
@@ -1700,8 +1700,8 @@ namespace yy {
         value.copy< std::vector<Type*> > (v);
         break;
 
-      case 101: // INITIALIZERS
-      case 102: // INITIALIZER_LIST
+      case 101: // INITIALIZER_LIST
+      case 102: // INITIALIZER_LIST_NO_COMMA
         value.copy< std::vector<UpdateNode*> > (v);
         break;
 
@@ -2189,8 +2189,8 @@ namespace yy {
         value.template destroy< std::vector<Type*> > ();
         break;
 
-      case 101: // INITIALIZERS
-      case 102: // INITIALIZER_LIST
+      case 101: // INITIALIZER_LIST
+      case 102: // INITIALIZER_LIST_NO_COMMA
         value.template destroy< std::vector<UpdateNode*> > ();
         break;
 
@@ -2394,8 +2394,8 @@ namespace yy {
         value.move< std::vector<Type*> > (s.value);
         break;
 
-      case 101: // INITIALIZERS
-      case 102: // INITIALIZER_LIST
+      case 101: // INITIALIZER_LIST
+      case 102: // INITIALIZER_LIST_NO_COMMA
         value.move< std::vector<UpdateNode*> > (s.value);
         break;
 
