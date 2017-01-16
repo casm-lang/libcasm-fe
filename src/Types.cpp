@@ -312,8 +312,8 @@ const std::string Type::to_str() const
             }
         case TypeType::UNKNOWN:
             return "Undefined";
-        case TypeType::SELF:
-            return "Self";
+        case TypeType::AGENT:
+            return "Agent";
         case TypeType::TUPLE_OR_LIST: /*{
           std::string res = "TupleOrList (";
           for (Type* t:subtypes) {

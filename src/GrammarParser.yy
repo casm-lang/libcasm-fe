@@ -149,6 +149,13 @@
         function->is_static = is_static;
         function->is_symbolic = is_symbolic;
     }
+
+    static Function* createProgramFunction( yy::location& location )
+    {
+        auto argTypes = { new Type( TypeType::AGENT ) };
+        auto retType = new Type( TypeType::RULEREF );
+        return new Function( "program", location, argTypes, retType );
+    }
 }
 
 
@@ -399,35 +406,55 @@ BODY_ELEMENT
 INIT_SYNTAX
 : INIT IDENTIFIER
   {
-      static InitNode* init_node = 0;
+    auto program = createProgramFunction( @$ );
+    try
+    {
+        driver.add( program );
+    }
+    catch( const Exception& e )
+    {
+        driver.error
+        ( @$
+        , "multiple definition of 'init' node"
+        , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
+        );
+    }
 
-      if( not init_node )
-      {
-          init_node = new InitNode( @$, $2 );
-      }
-      else
-      {
-          static u1 flag = true;
-          
-          if( flag )
-          {
-              flag = false;
-              
-              driver.error
-              ( init_node->location
-              , "multiple definition of 'init' node"
-              , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
-              );
-          }
-          
-          driver.error
-          ( @$
-          , "multiple definition of 'init' node"
-          , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
-          );
-      }
-      
-      $$ = init_node;
+    // create initial update: program(self) := @identifier
+    auto args = new std::vector< ExpressionBase* >;
+    args->push_back( new SelfAtom( @$ ) );
+    auto programAtom = new FunctionAtom( @$, program->name, args );
+    auto update = new UpdateNode( @$, programAtom, new RuleAtom( @$ , $2 ) );
+
+    auto programDef = new FunctionDefNode( @$, program );
+    programDef->setInitializers( { update } );
+    $$ = new InitNode( @$, programDef );
+  }
+| INIT LCURPAREN INITIALIZER_LIST RCURPAREN
+  {
+    auto program = createProgramFunction( @$ );
+    try
+    {
+        driver.add( program );
+    }
+    catch( const Exception& e )
+    {
+        driver.error
+        ( @$
+        , "multiple definition of 'init' node"
+        , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
+        );
+    }
+
+    // initializer updates don't have function names -> apply the correct name
+    auto initializers = $3;
+    for (auto initializer : initializers) {
+        initializer->func->name = program->name;
+    }
+
+    auto programDef = new FunctionDefNode( @$, program );
+    programDef->setInitializers( initializers );
+    $$ = new InitNode( @$, programDef );
   }
 ;
 

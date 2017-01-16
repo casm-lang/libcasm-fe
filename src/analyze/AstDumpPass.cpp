@@ -125,6 +125,7 @@ bool AstDumpPass::visit_derived_function_atom( FunctionAtom* node, bool )
 void AstDumpPass::visit_init( InitNode* init )
 {
     dump_node( init, "Init" );
+    dump_link( init, init->progamDef );
 }
 
 void AstDumpPass::visit_rule_post( RuleNode* rule )

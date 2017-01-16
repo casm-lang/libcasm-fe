@@ -58,6 +58,11 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
         return false;
     }
 
+    if( not m_specificationHasInitNode )
+    {
+        global_driver->error( node->location, "no 'init' node defined" );
+    }
+
     pr.setResult< TypeCheckPass >( node );
 
     return global_driver->ok();
@@ -74,14 +79,9 @@ void TypeCheckPass::check_type_valid(
     }
 }
 
-void TypeCheckPass::visit_init( InitNode* node )
+void TypeCheckPass::visit_init( InitNode* )
 {
-    if( global_driver->rules_map_.count( node->identifier ) == 0 )
-    {
-        global_driver->error( node->location,
-            "init rule `" + node->identifier + "` doesn't exist",
-            libcasm_fe::Codes::AgentInitRuleDoesNotExist );
-    }
+    m_specificationHasInitNode = true;
 }
 
 void TypeCheckPass::visit_function_def_pre( FunctionDefNode* def )
@@ -164,6 +164,8 @@ void TypeCheckPass::visit_derived_def( DerivedDefNode* def, Type* expr )
 
 void TypeCheckPass::visit_rule( RuleNode* rule )
 {
+    m_isInRule = true;
+
     rule_binding_types.push_back( &rule->arguments );
     rule_binding_offsets.push_back( &rule->binding_offsets );
 
@@ -198,6 +200,11 @@ void TypeCheckPass::visit_rule( RuleNode* rule )
             i < rule->parameter.size() and "invalid parameter index found!" );
         rule->parameter[ i ] = arg.first.c_str();
     }
+}
+
+void TypeCheckPass::visit_rule_post( RuleNode* )
+{
+    m_isInRule = false;
 }
 
 void TypeCheckPass::visit_ifthenelse( IfThenElseNode* node, Type* cond )
@@ -1237,6 +1244,12 @@ Type* TypeCheckPass::visit_undef_atom( UndefAtom* atom )
 
 Type* TypeCheckPass::visit_self_atom( SelfAtom* atom )
 {
+    /*if( not m_isInRule ) TODO: enable this check once we can define agents
+    {
+        global_driver->error(
+            atom->location, "agent 'self' reference shall not be used outside of a rule" );
+    }*/
+
     return &atom->type_;
 }
 
@@ -1255,10 +1268,6 @@ void TypeCheckPass::visit_body_elements_pre( AstListNode* )
 }
 
 void TypeCheckPass::visit_body_elements_post( AstListNode* )
-{
-}
-
-void TypeCheckPass::visit_rule_post( RuleNode* )
 {
 }
 

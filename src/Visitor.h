@@ -79,8 +79,7 @@ namespace libcasm_fe
                         walk_rule_def( reinterpret_cast< RuleNode* >( e ) );
                         break;
                     case NodeType::INIT:
-                        visitor.visit_init(
-                            reinterpret_cast< InitNode* >( e ) );
+                        walk_init( reinterpret_cast< InitNode* >( e ) );
                         break;
                     default:
                         throw RuntimeException(
@@ -92,6 +91,12 @@ namespace libcasm_fe
             }
 
             visitor.visit_body_elements_post( node );
+        }
+
+        void walk_init( InitNode* node )
+        {
+            walk_function_def( node->progamDef );
+            visitor.visit_init( node );
         }
 
         void walk_function_def( FunctionDefNode* node )

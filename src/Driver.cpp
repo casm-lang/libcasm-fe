@@ -54,11 +54,6 @@ Driver::Driver()
     file_ = nullptr;
     result = nullptr;
 
-    std::vector< Type* > args;
-    args.push_back( new Type( TypeType::SELF ) );
-    function_table.add( new Function( "program", yy::location( nullptr ), args,
-        new Type( TypeType::RULEREF ) ) );
-
     lines_.push_back( "" );
 }
 
