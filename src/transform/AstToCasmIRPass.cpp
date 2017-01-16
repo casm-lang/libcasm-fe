@@ -451,6 +451,9 @@ void AstToCasmIRPass::visit_update(
     // printf( "%p -> %p\n", node, node->func );
     // printf( "%p -> %p\n", node, node->expr_ );
 
+    assert( node->func );
+    visit_function_atom( node->func, args );
+    
     libcasm_ir::ExecutionSemanticsBlock* ir_scope
         = lookupParent< libcasm_ir::ExecutionSemanticsBlock >( node );
     assert( ir_scope );
