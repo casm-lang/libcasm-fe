@@ -112,6 +112,9 @@ namespace libcasm_fe
         TypeInferenceInvalidForallExpression = 0x1004
 
         ,
+        TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000
+
+        ,
         TypeIntegerRangedInvalidInterval = 0x2000 // 2*** ... Integer type error
 
         ,

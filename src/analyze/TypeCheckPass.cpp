@@ -888,8 +888,9 @@ Type* TypeCheckPass::visit_function_atom(
         if( m_declaredFunctions.count( atom->name ) == 0 )
         {
             throw CompiletimeException( atom->location,
-                "use of undeclared function `" + atom->name
-                    + "` in initially" );
+                "use of undeclared function `" + atom->name + "` in initially",
+                libcasm_fe::Codes::
+                    TypeCheckUseOfUndeclaredFunctionInInitially );
         }
     }
 
