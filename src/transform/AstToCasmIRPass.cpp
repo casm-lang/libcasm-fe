@@ -174,10 +174,14 @@ void AstToCasmIRPass::visit_function_def_pre( FunctionDefNode* node )
     VISIT;
 
     is_initially = true;
-    initially_update_scope = new libcasm_ir::ParallelBlock();
-    assert( initially_update_scope );
-    assert( initially_scope );
-    initially_scope->add( initially_update_scope );
+
+    if( node->initializers().size() > 0 )
+    {
+        initially_update_scope = new libcasm_ir::ParallelBlock();
+        assert( initially_update_scope );
+        assert( initially_scope );
+        initially_scope->add( initially_update_scope );
+    }
 
     std::vector< libcasm_ir::Type* > ftype_args;
     for( auto argument : node->sym->arguments_ )
