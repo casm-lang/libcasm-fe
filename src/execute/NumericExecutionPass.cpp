@@ -58,67 +58,21 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
     const bool dump_updates = (bool)pr.getResults()[ (void*)2 ];
 
     Ast* root = (Ast*)pr.getResult< TypeCheckPass >();
-    RuleNode* node
-        = global_driver->rules_map_[ root->getInitRule()->identifier ];
 
     rule_bindings.push_back( &main_bindings );
     function_states
         = std::vector< FunctionState >( global_driver->function_table.size() );
     function_symbols = std::vector< const Function* >(
         global_driver->function_table.size() );
-    Function* program_sym
-        = global_driver->function_table.get_function( "program" );
-    // TODO location is wrong here
-    program_sym->intitializers_
-        = new std::vector< std::pair< ExpressionBase*, ExpressionBase* > >();
-    RuleAtom* init_atom
-        = new RuleAtom( node->location, std::string( node->name ) );
-    init_atom->rule = node;
-    program_sym->intitializers_->push_back(
-        std::make_pair( new SelfAtom( node->location ), init_atom ) );
 
     try
     {
-        for( auto pair : global_driver->init_dependencies )
+        walker->walk_specification( root );
+        if( dump_updates )
         {
-            std::set< std::string > visited;
-            if( initialized.count( pair.first ) > 0 )
-            {
-                continue;
-            }
-            if( not init_function( pair.first, visited ) )
-            {
-                Function* func
-                    = global_driver->function_table.get_function( pair.first );
-                std::string cycle = pair.first;
-                for( const std::string& dep : visited )
-                {
-                    cycle = cycle + " => " + dep;
-                }
-
-                throw RuntimeException(
-                    func->intitializers_->at( 0 ).second->location,
-                    "initializer dependency cycle detected: " + cycle );
-            }
+            dumpUpdates();
         }
-
-        for( auto pair : global_driver->function_table.table_ )
-        {
-            if( pair.second->type != Symbol::SymbolType::FUNCTION
-                or initialized.count( pair.first ) > 0 )
-            {
-                continue;
-            }
-
-            std::set< std::string > visited;
-            init_function( pair.first, visited );
-        }
-
-        for( List* l : temp_lists )
-        {
-            l->bump_usage();
-        }
-        temp_lists.clear();
+        applyUpdates();
 
         uint64_t stepCounter = 0;
 
@@ -191,116 +145,6 @@ void NumericExecutionPass::dumpUpdates() const
     }
 
     std::cout << "}" << std::endl;
-}
-
-bool NumericExecutionPass::init_function(
-    const std::string& name, std::set< std::string >& visited )
-{
-    if( global_driver->init_dependencies.count( name ) != 0 )
-    {
-        visited.insert( name );
-        const std::set< std::string >& deps
-            = global_driver->init_dependencies[ name ];
-
-        for( const std::string& dep : deps )
-        {
-            if( visited.count( dep ) > 0 )
-            {
-                return false;
-            }
-            else
-            {
-                if( not init_function( dep, visited ) )
-                {
-                    return false;
-                }
-            }
-        }
-    }
-
-    Function* func = global_driver->function_table.get_function( name );
-
-    if( not func )
-    {
-        return true;
-    }
-
-    function_states[ func->id ] = FunctionState( 0 );
-    function_symbols[ func->id ] = func;
-
-    auto& function_map = function_states[ func->id ];
-
-    if( func->intitializers_ != nullptr )
-    {
-        for( std::pair< ExpressionBase*, ExpressionBase* > init :
-            *func->intitializers_ )
-        {
-            std::vector< value_t > arguments{};
-            arguments.reserve( func->arguments_.size() );
-
-            if( init.first != nullptr )
-            {
-                const value_t argument_v = walker->walk_atom( init.first );
-                if( func->arguments_.size() > 1 )
-                {
-                    List* list = argument_v.value.list;
-                    for( auto iter = list->begin(); iter != list->end();
-                         iter++ )
-                    {
-                        arguments.emplace_back( *iter );
-                    }
-                }
-                else
-                {
-                    arguments.emplace_back( argument_v );
-                }
-            }
-
-            if( func->checkArguments )
-            {
-                try
-                {
-                    validateArguments( func->arguments_, arguments );
-                }
-                catch( const std::domain_error& e )
-                {
-                    throw RuntimeException( init.first->location, e.what(),
-                        libcasm_fe::Codes::
-                            FunctionArgumentsInvalidRangeAtInitially );
-                }
-            }
-
-            if( function_map.hasKey( arguments ) )
-            {
-                throw RuntimeException( init.first->location,
-                    "function '" + func->name + to_string( arguments )
-                        + "' already initialized",
-                    libcasm_fe::Codes::
-                        FunctionValueAlreadyInitializedAtInitially );
-            }
-
-            const value_t v = walker->walk_atom( init.second );
-            if( func->checkReturnValue )
-            {
-                try
-                {
-                    validateValue( func->return_type_, v );
-                }
-                catch( const std::domain_error& e )
-                {
-                    throw RuntimeException( init.second->location,
-                        std::string( e.what() ) + " of `" + func->name + "`",
-                        libcasm_fe::Codes::
-                            FunctionValueInvalidRangeAtInitially );
-                }
-            }
-
-            function_map.insert( arguments, v );
-        }
-    }
-
-    initialized.insert( name );
-    return true;
 }
 
 void NumericExecutionPass::visit_assure( UnaryNode* assure, const value_t& val )

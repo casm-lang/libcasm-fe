@@ -48,7 +48,6 @@ Driver::Driver()
 , warning_( 0 )
 , trace_parsing( false )
 , trace_scanning( false )
-, init_dependencies()
 , function_table()
 , function_trace_map()
 {
@@ -58,7 +57,7 @@ Driver::Driver()
     std::vector< Type* > args;
     args.push_back( new Type( TypeType::SELF ) );
     function_table.add( new Function( "program", yy::location( nullptr ), args,
-        new Type( TypeType::RULEREF ), nullptr ) );
+        new Type( TypeType::RULEREF ) ) );
 
     lines_.push_back( "" );
 }
@@ -276,11 +275,6 @@ void Driver::add( RuleNode* rule_root )
             "redefinition of '" + rule_root->name + "'",
             libcasm_fe::Codes::IdentifierAlreadyUsed );
     }
-}
-
-RuleNode* Driver::get_init_rule() const
-{
-    return rules_map_.at( init_name );
 }
 
 void Driver::add( Function* function )

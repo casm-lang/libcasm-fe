@@ -78,28 +78,41 @@ void AstDumpPass::dump_link( AstNode* from, AstNode* to )
     dump_link( (uint64_t)from, (uint64_t)to );
 }
 
-void AstDumpPass::visit_body_elements( AstListNode* body_elements )
+void AstDumpPass::visit_body_elements_pre( AstListNode* body_elements )
 {
     dump_node( body_elements, "Body Elements" );
+}
 
+void AstDumpPass::visit_body_elements_post( AstListNode* body_elements )
+{
     for( auto s : body_elements->nodes )
     {
         dump_link( body_elements, s );
     }
 }
 
-void AstDumpPass::visit_function_def(
-    FunctionDefNode* def, const std::vector< std::pair< bool, bool > >& )
+void AstDumpPass::visit_function_def_pre( FunctionDefNode* def )
 {
     dump_node( def,
         "Function Definition: " + def->sym->name + " " + def->sym->to_str() );
-    DEBUG( "TODO: implement initializers" );
 }
 
-void AstDumpPass::visit_derived_def( FunctionDefNode* def, bool )
+void AstDumpPass::visit_function_def_post( FunctionDefNode* def )
+{
+    for( auto initializer : def->initializers() )
+    {
+        dump_link( def, initializer );
+    }
+}
+
+void AstDumpPass::visit_derived_def_pre( DerivedDefNode* def )
 {
     dump_node( def,
         "Derived Definition: " + def->sym->name + " " + def->sym->to_str() );
+}
+
+void AstDumpPass::visit_derived_def( DerivedDefNode* def, bool )
+{
     dump_link( def, def->sym->derived );
 }
 
@@ -183,7 +196,8 @@ void AstDumpPass::visit_parblock_post( UnaryNode* parblock )
     dump_link( parblock, parblock->child_ );
 }
 
-void AstDumpPass::visit_update( UpdateNode* update, std::vector< bool >& args, bool )
+void AstDumpPass::visit_update(
+    UpdateNode* update, std::vector< bool >& args, bool )
 {
     dump_node( update, "Update" );
     visit_function_atom( update->func, args );
@@ -405,10 +419,6 @@ bool AstDumpPass::visit_number_range_atom( NumberRangeAtom* atom, bool, bool )
 }
 
 void AstDumpPass::visit_specification( SpecificationNode* )
-{
-}
-
-void AstDumpPass::visit_derived_def_pre( FunctionDefNode* )
 {
 }
 

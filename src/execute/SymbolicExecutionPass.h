@@ -68,9 +68,6 @@ namespace libcasm_fe
             const std::vector< value_t >& arguments ) override;
 
       private:
-        bool init_function(
-            const std::string& name, std::set< std::string >& visited );
-
         void mainLoop();
         void printTrace() const;
 

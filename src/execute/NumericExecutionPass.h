@@ -64,9 +64,6 @@ namespace libcasm_fe
             ListAtom* atom, const std::vector< value_t >& vals ) override;
 
       private:
-        bool init_function(
-            const std::string& name, std::set< std::string >& visited );
-
         void dumpUpdates() const;
 
       private:

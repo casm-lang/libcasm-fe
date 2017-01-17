@@ -174,8 +174,8 @@ END       0 "end of file"
 %type <IntegerAtom*> INTEGER_NUMBER 
 %type <FloatingAtom*> FLOATING_NUMBER 
 %type <RationalAtom*> RATIONAL_NUMBER 
-%type <std::pair<ExpressionBase*, ExpressionBase*>> INITIALIZER
-%type <std::vector<std::pair<ExpressionBase*, ExpressionBase*>>*> INITIALIZER_LIST INITIALIZERS
+%type <UpdateNode*> INITIALIZER
+%type <std::vector<UpdateNode*>> INITIALIZER_LIST INITIALIZER_LIST_NO_COMMA
 %type <ExpressionBase*> EXPRESSION ATOM
 %type <std::vector<ExpressionBase*>*> EXPRESSION_LIST EXPRESSION_LIST_NO_COMMA LISTCONST
 %type <UpdateNode*> UPDATE_SYNTAX
@@ -298,18 +298,7 @@ BODY_ELEMENT
 | FUNCTION_DEFINITION
   {
       $$ = new FunctionDefNode( @$, $1 );
-      
-      if( $1->is_builtin() )
-      {
-          driver.error
-          ( @$
-          , "cannot use builtin name '"
-            + $1->name
-            + "' as function identifier"
-          , libcasm_fe::Codes::FunctionIdentifierIsBuiltinName
-          );
-      }
-      
+
       try
       {
           driver.add( $1 );
@@ -321,18 +310,47 @@ BODY_ELEMENT
           , e.what()
           , e.getErrorCode()
           );
-          
+
           // if another symbol with same name exists we need to delete
           // the symbol here, because it is not inserted in the symbol table
           delete $1;
       }
+  }
+| FUNCTION_DEFINITION INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
+  {
+      auto node = new FunctionDefNode( @$, $1 );
+
+      auto initializers = $4;
+      for (auto initializer : initializers) {
+          initializer->func->name = $1->name;
+      }
+      node->setInitializers( initializers );
+
+      try
+      {
+          driver.add( $1 );
+      }
+      catch( const Exception& e )
+      {
+          driver.error
+          ( e.getLocations()
+          , e.what()
+          , e.getErrorCode()
+          );
+
+          // if another symbol with same name exists we need to delete
+          // the symbol here, because it is not inserted in the symbol table
+          delete $1;
+      }
+
+      $$ = node;
   }
 | DERIVED_SYNTAX
   {
       $1->binding_offsets = std::move( driver.binding_offsets );
       driver.binding_offsets.clear();
       
-      $$ = new FunctionDefNode( @$, $1 );
+      $$ = new DerivedDefNode( @$, $1 );
       try
       {
           driver.add( $1 );
@@ -344,7 +362,7 @@ BODY_ELEMENT
           , e.what()
           , e.getErrorCode()
           );
-          
+
           // if another symbol with same name exists we need to delete
           // the symbol here, because it is not inserted in the symbol table
           delete $1;
@@ -496,25 +514,15 @@ DERIVED_SYNTAX
 
 
 FUNCTION_DEFINITION
-: FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
+: FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE
   {
-      auto function = new Function($5, @$, $6.first, $6.second, $7);
+      auto function = new Function($5, @$, $6.first, $6.second);
       parse_function_attributes(driver, @$, $3, function);
       $$ = function;
-  }
-| FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE
-  {
-      auto function = new Function($5, @$, $6.first, $6.second, nullptr);
-      parse_function_attributes(driver, @$, $3, function);
-      $$ = function;
-  }
-| FUNCTION IDENTIFIER FUNCTION_SIGNATURE INITIALIZERS
-  {
-      $$ = new Function($2, @$, $3.first, $3.second, $4);
   }
 | FUNCTION IDENTIFIER FUNCTION_SIGNATURE
   {
-      $$ = new Function($2, @$, $3.first, $3.second, nullptr);
+      $$ = new Function($2, @$, $3.first, $3.second);
   }
 ;
 
@@ -711,31 +719,27 @@ TYPE_SYNTAX_LIST
 ;
 
 
-INITIALIZERS
-: INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
+INITIALIZER_LIST
+: INITIALIZER_LIST_NO_COMMA
   {
-      $$ = $3;
+      $$ = std::move($1);
   }
-| INITIALLY LCURPAREN RCURPAREN
+| INITIALIZER_LIST_NO_COMMA COMMA
   {
-      $$ = nullptr;
+      $$ = std::move($1);
   }
 ;
 
 
-INITIALIZER_LIST
-: INITIALIZER_LIST COMMA INITIALIZER
+INITIALIZER_LIST_NO_COMMA
+: INITIALIZER_LIST_NO_COMMA COMMA INITIALIZER
   {
-      $$ = $1; $1->push_back( $3 );
-  }
-| INITIALIZER_LIST COMMA
-  {
-      $$ = $1;
+      $$ = std::move($1);
+      $$.push_back($3);
   }
 | INITIALIZER
   {
-      $$ = new std::vector< std::pair<ExpressionBase*, ExpressionBase* > >();
-      $$->push_back( $1 );
+      $$ = { $1 };
   }
 ;
 
@@ -743,11 +747,21 @@ INITIALIZER_LIST
 INITIALIZER
 : ATOM
   {
-      $$ = std::pair<ExpressionBase*, ExpressionBase*>(nullptr, $1);
+      auto function = new FunctionAtom( @$, "" );
+      $$ = new UpdateNode( @$, function, $1 );
   }
-| ATOM ARROW ATOM
+| EXPRESSION ARROW ATOM
   {
-      $$ = std::pair<ExpressionBase*, ExpressionBase*>($1, $3);
+      auto args = new std::vector< ExpressionBase* >;
+      args->push_back($1);
+
+      auto function = new FunctionAtom( @$, "", args );
+      $$ = new UpdateNode( @$, function, $3 );
+  }
+| LPAREN EXPRESSION_LIST RPAREN ARROW ATOM
+  {
+      auto function = new FunctionAtom( @$, "", $2 );
+      $$ = new UpdateNode( @$, function, $5 );
   }
 ;
 

@@ -26,6 +26,8 @@
 #include "Ast.h"
 #include "Driver.h"
 
+#include <cmath>
+
 using namespace libcasm_fe;
 
 static std::map< NodeType, const std::string > node_type_names_ = {
@@ -178,10 +180,38 @@ bool AstListNode::equals( AstNode* other ) const
 FunctionDefNode::FunctionDefNode( yy::location& loc, Function* sym )
 : AstNode( loc, NodeType::FUNCTION )
 , sym( sym )
+, m_initializers()
 {
 }
 
 FunctionDefNode::~FunctionDefNode()
+{
+    // sym is deleted in the symbol table
+
+    for( auto initializer : m_initializers )
+    {
+        delete initializer;
+    }
+}
+
+void FunctionDefNode::setInitializers(
+    const std::vector< UpdateNode* >& initializers )
+{
+    m_initializers = initializers;
+}
+
+std::vector< UpdateNode* > FunctionDefNode::initializers() const
+{
+    return m_initializers;
+}
+
+DerivedDefNode::DerivedDefNode( yy::location& loc, Function* sym )
+: AstNode( loc, NodeType::DERIVED )
+, sym( sym )
+{
+}
+
+DerivedDefNode::~DerivedDefNode()
 {
     // sym is deleted in the symbol table
 }
@@ -221,6 +251,19 @@ const AstNode* ZeroAtom::getRef( void ) const
 IntegerAtom::IntegerAtom( yy::location& loc, INTEGER_T val )
 : AtomNode( loc, NodeType::INTEGER_ATOM, Type( TypeType::INTEGER ) )
 {
+    if( val > 0 )
+    {
+        type_.bitsize = std::floor( std::log2( val ) ) + 1;
+    }
+    else if( val == 0 )
+    {
+        type_.bitsize = 0;
+    }
+    else
+    {
+        type_.bitsize = sizeof( INTEGER_T );
+    }
+
     val_ = val;
 }
 
@@ -318,7 +361,7 @@ bool BooleanAtom::equals( AstNode* other ) const
     return value == other_b->value;
 }
 
-RuleAtom::RuleAtom( yy::location& loc, const std::string&& name )
+RuleAtom::RuleAtom( yy::location& loc, const std::string& name )
 : AtomNode( loc, NodeType::RULE_ATOM, Type( TypeType::RULEREF ) )
 , name( name )
 {
@@ -854,27 +897,14 @@ SpecificationNode::SpecificationNode(
 Ast::Ast( yy::location& loc, SpecificationNode* spec, AstListNode* elements )
 : AstNode( loc, NodeType::SPECIFICATION )
 , spec( spec )
-, init_rule( 0 )
 , elements( elements )
 {
-}
-
-void Ast::setInitRule( InitNode* init_rule )
-{
-    assert( init_rule and "invalid init rule pointer!" );
-    this->init_rule = init_rule;
 }
 
 SpecificationNode* Ast::getSpecification( void )
 {
     assert( spec and "invalid specification node pointer!" );
     return spec;
-}
-
-InitNode* Ast::getInitRule( void )
-{
-    assert( init_rule and "invalid specification node pointer!" );
-    return init_rule;
 }
 
 AstListNode* Ast::getElements( void )

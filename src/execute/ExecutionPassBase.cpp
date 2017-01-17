@@ -290,6 +290,42 @@ bool ExecutionPassBase::filter_enabled( const std::string& filter )
            || debuginfo_filters.count( filter ) > 0;
 }
 
+void ExecutionPassBase::visit_init( InitNode* node )
+{
+    auto rule = global_driver->rules_map_[ node->identifier ];
+    auto program = global_driver->function_table.get_function( "program" );
+
+    function_states[ program->id ] = FunctionState( 0 );
+    function_symbols[ program->id ] = program;
+
+    addUpdate( program, { value_t() }, value_t( rule ), node->location );
+}
+
+void ExecutionPassBase::visit_body_elements_pre( AstListNode* node )
+{
+    fork( UpdateSet::Type::Sequential );
+}
+
+void ExecutionPassBase::visit_body_elements_post( AstListNode* node )
+{
+    merge();
+}
+
+void ExecutionPassBase::visit_function_def_pre( FunctionDefNode* node )
+{
+    Function* func = node->sym;
+
+    function_states[ func->id ] = FunctionState( 0 );
+    function_symbols[ func->id ] = func;
+
+    fork( UpdateSet::Type::Parallel );
+}
+
+void ExecutionPassBase::visit_function_def_post( FunctionDefNode* node )
+{
+    merge();
+}
+
 void ExecutionPassBase::visit_seqblock_pre( UnaryNode* seqblock )
 {
     fork( UpdateSet::Type::Sequential );

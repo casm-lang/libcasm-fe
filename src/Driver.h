@@ -58,13 +58,9 @@ namespace libcasm_fe
         Ast* result;
         std::string spec_name;
 
-        std::string init_name;
-
         // State information for the lexer
         bool trace_parsing;
         bool trace_scanning;
-
-        std::map< std::string, std::set< std::string > > init_dependencies;
 
         // Handling the scanner.
         size_t get_next_chars( char buffer[], size_t max_size );
@@ -96,7 +92,6 @@ namespace libcasm_fe
          *         used somewhere else (e.g. for a function).
          */
         void add( RuleNode* rule_root );
-        RuleNode* get_init_rule() const;
 
         // functions
         /**

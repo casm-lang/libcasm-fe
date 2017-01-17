@@ -26,6 +26,8 @@
 #ifndef _LIB_CASMFE_TYPECHECKPASS_H_
 #define _LIB_CASMFE_TYPECHECKPASS_H_
 
+#include <set>
+
 #include "libpass.h"
 
 #include "../Visitor.h"
@@ -56,6 +58,14 @@ namespace libcasm_fe
         std::vector< std::map< std::string, size_t >* > rule_binding_offsets;
 
         bool forall_head;
+
+      private:
+        // type checker is in a function definition
+        bool m_isInFunctionDefinition = false;
+
+        // to simulate top-down function declaration (used during function
+        // initialization)
+        std::set< std::string > m_declaredFunctions;
     };
 
     template <>

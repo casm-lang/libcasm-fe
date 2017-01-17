@@ -146,14 +146,23 @@ void AstToCasmIRPass::visit_init( InitNode* node )
     getSpecification()->add( ir_agent );
 }
 
-void AstToCasmIRPass::visit_body_elements( AstListNode* node )
+void AstToCasmIRPass::visit_body_elements_pre( AstListNode* node )
+{
+    VISIT;
+}
+
+void AstToCasmIRPass::visit_body_elements_post( AstListNode* node )
 {
     VISIT;
     // FIXME;TODO ASAP!!!
 }
 
-void AstToCasmIRPass::visit_function_def(
-    FunctionDefNode* node, const std::vector< std::pair< bool, bool > >& inits )
+void AstToCasmIRPass::visit_function_def_pre( FunctionDefNode* node )
+{
+    VISIT;
+}
+
+void AstToCasmIRPass::visit_function_def_post( FunctionDefNode* node )
 {
     VISIT;
 
@@ -181,7 +190,7 @@ void AstToCasmIRPass::visit_function_def(
     ast2casmir[ (AstNode*)node->sym ] = ir_function;
 }
 
-void AstToCasmIRPass::visit_derived_def_pre( FunctionDefNode* node )
+void AstToCasmIRPass::visit_derived_def_pre( DerivedDefNode* node )
 {
     VISIT;
 
@@ -212,7 +221,7 @@ void AstToCasmIRPass::visit_derived_def_pre( FunctionDefNode* node )
     current_scope.push_back( ir_derived );
 }
 
-void AstToCasmIRPass::visit_derived_def( FunctionDefNode* node, bool expr )
+void AstToCasmIRPass::visit_derived_def( DerivedDefNode* node, bool expr )
 {
     VISIT;
     std::string x;

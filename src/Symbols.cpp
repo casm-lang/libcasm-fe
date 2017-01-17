@@ -637,11 +637,9 @@ Symbol::Symbol(
 uint64_t Function::counter = 0;
 
 Function::Function( const std::string name, const yy::location& location,
-    const std::vector< Type* >& args, Type* return_type,
-    std::vector< std::pair< ExpressionBase*, ExpressionBase* > >* init )
+    const std::vector< Type* >& args, Type* return_type )
 : Symbol( name, location, SymbolType::FUNCTION )
 , arguments_( std::move( args ) )
-, intitializers_( init )
 , return_type_( return_type )
 , id( counter )
 , is_static( false )
@@ -685,15 +683,6 @@ void Function::initRangeCheck()
 Function::~Function()
 {
     arguments_.clear();
-    if( intitializers_ != nullptr )
-    {
-        for( std::pair< ExpressionBase*, ExpressionBase* > e : *intitializers_ )
-        {
-            delete e.first;
-            delete e.second;
-        }
-        delete intitializers_;
-    }
 }
 
 const std::string Function::to_str() const
