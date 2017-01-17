@@ -48,7 +48,7 @@ static libcasm_ir::Type* getType( Type* type )
 
     switch( type->t )
     {
-        case TypeType::SELF: // Agent!
+        case TypeType::AGENT:
             return libcasm_ir::Type::getAgent();
         case TypeType::RULEREF:
             return libcasm_ir::Type::getRuleReference();
@@ -135,15 +135,6 @@ void AstToCasmIRPass::visit_specification( SpecificationNode* node )
 
 void AstToCasmIRPass::visit_init( InitNode* node )
 {
-    // VISIT;
-    libcasm_ir::Value* ir_init
-        = libcasm_ir::Constant::getRuleReference( node->identifier.c_str() );
-
-    // single execution agent!
-    libcasm_ir::Agent* ir_agent = new libcasm_ir::Agent();
-    assert( ir_agent );
-    ir_agent->setInitRuleReference( ir_init );
-    getSpecification()->add( ir_agent );
 }
 
 void AstToCasmIRPass::visit_body_elements_pre( AstListNode* node )

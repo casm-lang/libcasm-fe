@@ -221,8 +221,8 @@ const std::string value_t::to_str( bool symbolic ) const
             return std::to_string( value.integer );
         case TypeType::FLOATING:
             return std::to_string( value.float_ );
-        case TypeType::SELF:
-            return std::move( "self" );
+        case TypeType::AGENT:
+            return std::move( "agent" );
         case TypeType::UNDEF: // are UNDEF and SELF the same here?
             return std::move( "undef" );
         case TypeType::RULEREF:
@@ -1132,7 +1132,7 @@ namespace std
                 return floating_hasher( key.value.float_ );
             case TypeType::BOOLEAN:
                 return key.value.boolean;
-            case TypeType::SELF:
+            case TypeType::AGENT:
             case TypeType::UNDEF: // are UNDEF and SELF the same here?
                 return 0;
             case TypeType::RULEREF:

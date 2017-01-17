@@ -62,10 +62,15 @@ namespace libcasm_fe
       private:
         // type checker is in a function definition
         bool m_isInFunctionDefinition = false;
+        // type checker is in a rule
+        bool m_isInRule = false;
 
         // to simulate top-down function declaration (used during function
         // initialization)
         std::set< std::string > m_declaredFunctions;
+
+        // indicates if the type checker has found an init node
+        bool m_specificationHasInitNode = false;
     };
 
     template <>

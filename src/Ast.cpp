@@ -327,7 +327,7 @@ bool UndefAtom::equals( AstNode* other ) const
 }
 
 SelfAtom::SelfAtom( yy::location& loc )
-: AtomNode( loc, NodeType::SELF_ATOM, Type( TypeType::SELF ) )
+: AtomNode( loc, NodeType::SELF_ATOM, Type( TypeType::AGENT ) )
 {
     DEBUG( "TRUE" );
 }
@@ -881,9 +881,9 @@ DiedieNode::DiedieNode( yy::location& loc, ExpressionBase* msg )
 {
 }
 
-InitNode::InitNode( yy::location& loc, const std::string& identifier )
+InitNode::InitNode( yy::location& loc, FunctionDefNode* progamDef )
 : AstNode( loc, NodeType::INIT )
-, identifier( identifier )
+, progamDef( progamDef )
 {
 }
 

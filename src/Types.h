@@ -47,7 +47,7 @@ namespace libcasm_fe
         BIT,
         FLOATING,
         BOOLEAN,
-        SELF,
+        AGENT,
         UNKNOWN,
         INVALID,
         NO_TYPE,

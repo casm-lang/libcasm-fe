@@ -290,17 +290,6 @@ bool ExecutionPassBase::filter_enabled( const std::string& filter )
            || debuginfo_filters.count( filter ) > 0;
 }
 
-void ExecutionPassBase::visit_init( InitNode* node )
-{
-    auto rule = global_driver->rules_map_[ node->identifier ];
-    auto program = global_driver->function_table.get_function( "program" );
-
-    function_states[ program->id ] = FunctionState( 0 );
-    function_symbols[ program->id ] = program;
-
-    addUpdate( program, { value_t() }, value_t( rule ), node->location );
-}
-
 void ExecutionPassBase::visit_body_elements_pre( AstListNode* node )
 {
     fork( UpdateSet::Type::Sequential );

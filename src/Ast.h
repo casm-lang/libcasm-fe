@@ -532,9 +532,9 @@ namespace libcasm_fe
     class InitNode : public AstNode
     {
       public:
-        const std::string identifier;
+        FunctionDefNode* progamDef;
 
-        InitNode( yy::location& loc, const std::string& identifier );
+        InitNode( yy::location& loc, FunctionDefNode* progamDef );
     };
 
     class SpecificationNode : public AstNode
