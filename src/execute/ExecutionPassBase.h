@@ -66,6 +66,7 @@ namespace libcasm_fe
 
         bool filter_enabled( const std::string& filter );
 
+        void visit_root( Ast* node ) override final{};
         void visit_specification( SpecificationNode* node ) override final{};
         void visit_init( InitNode* node ) override final{};
         void visit_body_elements_pre( AstListNode* node ) override final;

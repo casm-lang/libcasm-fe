@@ -78,9 +78,21 @@ void AstDumpPass::dump_link( AstNode* from, AstNode* to )
     dump_link( (uint64_t)from, (uint64_t)to );
 }
 
+void AstDumpPass::visit_root( Ast* node )
+{
+    dump_node( node, "CASM" );
+    dump_link( node, node->getSpecification() );
+    dump_link( node, node->getElements() );
+}
+
+void AstDumpPass::visit_specification( SpecificationNode* node )
+{
+    dump_node( node, "Specification\\n'" + node->identifier + "'" );
+}
+
 void AstDumpPass::visit_body_elements_pre( AstListNode* body_elements )
 {
-    dump_node( body_elements, "Body Elements" );
+    dump_node( body_elements, "BodyElements" );
 }
 
 void AstDumpPass::visit_body_elements_post( AstListNode* body_elements )
@@ -93,8 +105,8 @@ void AstDumpPass::visit_body_elements_post( AstListNode* body_elements )
 
 void AstDumpPass::visit_function_def_pre( FunctionDefNode* def )
 {
-    dump_node( def,
-        "Function Definition: " + def->sym->name + " " + def->sym->to_str() );
+    dump_node(
+        def, "Function: '" + def->sym->name + "'\\n" + def->sym->to_str() );
 }
 
 void AstDumpPass::visit_function_def_post( FunctionDefNode* def )
@@ -317,7 +329,7 @@ bool AstDumpPass::visit_zero_atom( ZeroAtom* atom )
 bool AstDumpPass::visit_int_atom( IntegerAtom* atom )
 {
     dump_node(
-        atom, std::string( "IntegerAtom: " ) + std::to_string( atom->val_ ) );
+        atom, std::string( "Integer: " ) + std::to_string( atom->val_ ) );
     return true;
 }
 
@@ -333,20 +345,20 @@ bool AstDumpPass::visit_bit_atom( IntegerAtom* atom )
 bool AstDumpPass::visit_floating_atom( FloatingAtom* atom )
 {
     dump_node(
-        atom, std::string( "FloatingAtom: " ) + std::to_string( atom->val_ ) );
+        atom, std::string( "Floating: " ) + std::to_string( atom->val_ ) );
     return true;
 }
 
 bool AstDumpPass::visit_undef_atom( UndefAtom* atom )
 {
-    dump_node( atom, std::string( "UndefAtom" ) );
+    dump_node( atom, std::string( "'undef'" ) );
     return true;
 }
 
 bool AstDumpPass::visit_function_atom(
     FunctionAtom* atom, std::vector< bool >& )
 {
-    dump_node( atom, std::string( "FunctionAtom:" + atom->name ) );
+    dump_node( atom, std::string( "Function: '" + atom->name + "'" ) );
 
     if( atom->arguments )
     {
@@ -361,7 +373,7 @@ bool AstDumpPass::visit_function_atom(
 
 bool AstDumpPass::visit_builtin_atom( BuiltinAtom* atom, std::vector< bool >& )
 {
-    dump_node( atom, std::string( "BuiltinAtom:" + atom->to_str() ) );
+    dump_node( atom, std::string( "Builtin:" + atom->to_str() ) );
 
     if( atom->arguments )
     {
@@ -376,32 +388,33 @@ bool AstDumpPass::visit_builtin_atom( BuiltinAtom* atom, std::vector< bool >& )
 
 bool AstDumpPass::visit_self_atom( SelfAtom* atom )
 {
-    dump_node( atom, std::string( "SelfAtom" ) );
+    dump_node( atom, std::string( "Agent: 'self'" ) );
     return true;
 }
 
 bool AstDumpPass::visit_rule_atom( RuleAtom* atom )
 {
-    dump_node( atom, std::string( "RuleAtom: " + atom->name ) );
+    dump_node( atom, std::string( "RuleRef: '@" + atom->name + "'" ) );
     return true;
 }
 
 bool AstDumpPass::visit_boolean_atom( BooleanAtom* atom )
 {
-    dump_node(
-        atom, std::string( "BooleanAtom: " + std::to_string( atom->value ) ) );
+    dump_node( atom,
+        std::string(
+            "Boolean: " + std::string( atom->value ? "true" : "false" ) ) );
     return true;
 }
 
 bool AstDumpPass::visit_string_atom( StringAtom* atom )
 {
-    dump_node( atom, std::string( "StringAtom: " + atom->string ) );
+    dump_node( atom, std::string( "String: \\\"" + atom->string + "\\\"" ) );
     return true;
 }
 
 bool AstDumpPass::visit_list_atom( ListAtom* atom, const std::vector< bool >& )
 {
-    dump_node( atom, std::string( "ListAtom" ) );
+    dump_node( atom, std::string( "List: " ) );
 
     for( auto a : *( atom->expr_list ) )
     {
@@ -417,10 +430,6 @@ bool AstDumpPass::visit_number_range_atom( NumberRangeAtom* atom, bool, bool )
     dump_link( atom, atom->left );
     dump_link( atom, atom->right );
     return true;
-}
-
-void AstDumpPass::visit_specification( SpecificationNode* )
-{
 }
 
 void AstDumpPass::visit_call(

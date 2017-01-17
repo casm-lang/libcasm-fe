@@ -79,6 +79,14 @@ void TypeCheckPass::check_type_valid(
     }
 }
 
+void TypeCheckPass::visit_root( Ast* )
+{
+}
+
+void TypeCheckPass::visit_specification( SpecificationNode* )
+{
+}
+
 void TypeCheckPass::visit_init( InitNode* )
 {
     m_specificationHasInitNode = true;
@@ -1248,7 +1256,8 @@ Type* TypeCheckPass::visit_self_atom( SelfAtom* atom )
     /*if( not m_isInRule ) TODO: enable this check once we can define agents
     {
         global_driver->error(
-            atom->location, "agent 'self' reference shall not be used outside of a rule" );
+            atom->location, "agent 'self' reference shall not be used outside of
+    a rule" );
     }*/
 
     return &atom->type_;
@@ -1313,10 +1322,6 @@ void TypeCheckPass::visit_impossible( AstNode* )
 }
 
 void TypeCheckPass::visit_statements( AstListNode* )
-{
-}
-
-void TypeCheckPass::visit_specification( SpecificationNode* )
 {
 }
 

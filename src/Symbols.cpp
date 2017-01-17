@@ -688,14 +688,24 @@ Function::~Function()
 const std::string Function::to_str() const
 {
     std::string res = name;
+    u1 first = true;
 
-    res = ": (";
+    res = "(";
     for( Type* t : arguments_ )
     {
-        res += t->to_str() + ", ";
+        res += t->to_str();
+
+        if( first )
+        {
+            first = false;
+        }
+        else
+        {
+            res += ", ";
+        }
     }
-    res += ")";
-    res += "-> " + return_type_->to_str();
+    res += ") -> ";
+    res += return_type_->to_str();
     return res;
 }
 

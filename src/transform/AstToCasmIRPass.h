@@ -36,6 +36,13 @@
    TODO
 */
 
+namespace libcasm_ir
+{
+    class Value;
+    class Specification;
+    class ExecutionSemanticsBlock;
+}
+
 namespace libcasm_fe
 {
     class AstToCasmIRPass : public libpass::Pass, public Visitor< bool, bool >
@@ -52,6 +59,9 @@ namespace libcasm_fe
         std::vector< libcasm_ir::Value* > current_scope;
 
         libcasm_ir::Specification* specification;
+        libcasm_ir::ExecutionSemanticsBlock* initially_scope;
+        libcasm_ir::ExecutionSemanticsBlock* initially_update_scope;
+        u1 is_initially;
 
       public:
         libcasm_ir::Specification* getSpecification( void ) const;

@@ -38,10 +38,6 @@ static libpass::PassRegistration< AstToCasmIRPass > PASS( "AST to CASM IR",
     "ast2ir",
     0 );
 
-extern Driver* global_driver;
-
-static libcasm_ir::Value* program_function = 0;
-
 static libcasm_ir::Type* getType( Type* type )
 {
     assert( type && "not initialized type used" );
@@ -78,6 +74,10 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 {
     specification = 0;
 
+    initially_scope = 0;
+    initially_update_scope = 0;
+    is_initially = false;
+
     Ast* root = (Ast*)pr.getResult< TypeCheckPass >();
 
     AstWalker< AstToCasmIRPass, bool > walker( *this );
@@ -102,9 +102,9 @@ libcasm_ir::Specification* AstToCasmIRPass::getSpecification( void ) const
     return specification;
 }
 
-#define VISIT
-// printf( "===--- %s:%i: %s: %p: %s\n", __FILE__, __LINE__, __FUNCTION__, node,
-// node->to_str().c_str() )
+#define VISIT                                                                  \
+/*printf( "===--- %s:%i: %s: %p: %s\n", __FILE__, __LINE__, __FUNCTION__,      \
+  node, node->to_str().c_str() )*/
 
 #define FIXME                                                                  \
     printf( "+++ FIXME +++: '%s:%i' in '%s'\n", __FILE__, __LINE__,            \
@@ -112,29 +112,51 @@ libcasm_ir::Specification* AstToCasmIRPass::getSpecification( void ) const
     fflush( stdout );                                                          \
     assert( 0 );
 
+void AstToCasmIRPass::visit_root( Ast* node )
+{
+    VISIT;
+    assert( not specification );
+    assert( not is_initially );
+    assert( not initially_scope );
+    assert( not initially_update_scope );
+}
+
 void AstToCasmIRPass::visit_specification( SpecificationNode* node )
 {
-    // VISIT;
-    assert( !specification );
+    VISIT;
     specification = new libcasm_ir::Specification(
         libstdhl::Allocator::string( node->identifier ) );
 
-    // 'program' function!
-    libcasm_ir::Type* ftype
-        = libcasm_ir::Type::getRelation( libcasm_ir::Type::getRuleReference(),
-            { libcasm_ir::Type::getAgent() } );
-    assert( ftype );
+    libcasm_ir::Rule* ir_initially_rule = new libcasm_ir::Rule(
+        ".initially", libcasm_ir::Type::getRuleReference() );
+    assert( ir_initially_rule );
 
-    libcasm_ir::Function* ir_function = new libcasm_ir::Function(
-        libstdhl::Allocator::string( "program" ), ftype );
-    assert( ir_function );
-    getSpecification()->add( ir_function );
+    getSpecification()->add( ir_initially_rule );
 
-    program_function = ir_function;
+    libcasm_ir::ParallelBlock* ir_initially_rule_scope
+        = new libcasm_ir::ParallelBlock();
+    assert( ir_initially_rule_scope );
+    ir_initially_rule->setContext( ir_initially_rule_scope );
+
+    libcasm_ir::SequentialBlock* ir_initially_rule_inner_scope
+        = new libcasm_ir::SequentialBlock();
+    assert( ir_initially_rule_inner_scope );
+    ir_initially_rule_scope->add( ir_initially_rule_inner_scope );
+
+    initially_scope = ir_initially_rule_inner_scope;
+
+    // single execution agent!
+    libcasm_ir::Agent* ir_agent = new libcasm_ir::Agent();
+    assert( ir_agent );
+    libcasm_ir::Value* ir_agent_init_rule
+        = libcasm_ir::Constant::getRuleReference( ir_initially_rule );
+    ir_agent->setInitRuleReference( ir_agent_init_rule );
+    getSpecification()->add( ir_agent );
 }
 
 void AstToCasmIRPass::visit_init( InitNode* node )
 {
+    VISIT;
 }
 
 void AstToCasmIRPass::visit_body_elements_pre( AstListNode* node )
@@ -145,23 +167,17 @@ void AstToCasmIRPass::visit_body_elements_pre( AstListNode* node )
 void AstToCasmIRPass::visit_body_elements_post( AstListNode* node )
 {
     VISIT;
-    // FIXME;TODO ASAP!!!
 }
 
 void AstToCasmIRPass::visit_function_def_pre( FunctionDefNode* node )
 {
     VISIT;
-}
 
-void AstToCasmIRPass::visit_function_def_post( FunctionDefNode* node )
-{
-    VISIT;
-
-    std::string x;
-    for( auto& a : node->sym->arguments_ )
-    {
-        x.append( a->to_str() );
-    }
+    is_initially = true;
+    initially_update_scope = new libcasm_ir::ParallelBlock();
+    assert( initially_update_scope );
+    assert( initially_scope );
+    initially_scope->add( initially_update_scope );
 
     std::vector< libcasm_ir::Type* > ftype_args;
     for( auto argument : node->sym->arguments_ )
@@ -179,6 +195,14 @@ void AstToCasmIRPass::visit_function_def_post( FunctionDefNode* node )
     getSpecification()->add( ir_function );
 
     ast2casmir[ (AstNode*)node->sym ] = ir_function;
+}
+
+void AstToCasmIRPass::visit_function_def_post( FunctionDefNode* node )
+{
+    VISIT;
+
+    is_initially = false;
+    initially_update_scope = 0;
 }
 
 void AstToCasmIRPass::visit_derived_def_pre( DerivedDefNode* node )
@@ -453,9 +477,16 @@ void AstToCasmIRPass::visit_update(
 
     assert( node->func );
     visit_function_atom( node->func, args );
-    
-    libcasm_ir::ExecutionSemanticsBlock* ir_scope
-        = lookupParent< libcasm_ir::ExecutionSemanticsBlock >( node );
+
+    libcasm_ir::ExecutionSemanticsBlock* ir_scope = 0;
+    if( is_initially )
+    {
+        ir_scope = initially_update_scope;
+    }
+    else
+    {
+        ir_scope = lookupParent< libcasm_ir::ExecutionSemanticsBlock >( node );
+    }
     assert( ir_scope );
 
     libcasm_ir::TrivialStatement* ir_stmt
@@ -961,16 +992,8 @@ bool AstToCasmIRPass::visit_function_atom(
         return 0;
     }
 
-    libcasm_ir::Value* ir_ident = 0;
-
-    if( node->symbol->name.compare( "program" ) == 0 )
-    {
-        ir_ident = program_function;
-    }
-    else
-    {
-        ir_ident = lookup< libcasm_ir::Value >( (AstNode*)node->symbol );
-    }
+    libcasm_ir::Value* ir_ident
+        = lookup< libcasm_ir::Value >( (AstNode*)node->symbol );
     assert( ir_ident );
 
     libcasm_ir::LocationInstruction* ir_loc
@@ -1227,28 +1250,24 @@ bool AstToCasmIRPass::visit_builtin_atom(
     return 0;
 }
 
-void AstToCasmIRPass::visit_statement( AstNode* )
+void AstToCasmIRPass::visit_statement( AstNode* node )
 {
+    VISIT;
 }
 
-// void AstToCasmIRPass::visit_forall_pre( ForallNode* )
-// {
-// }
-
-// void AstToCasmIRPass::visit_forall_post( ForallNode* )
-// {
-// }
-
-void AstToCasmIRPass::visit_forall_iteration_pre( ForallNode*, bool )
+void AstToCasmIRPass::visit_forall_iteration_pre( ForallNode* node, bool )
 {
+    VISIT;
 }
 
-void AstToCasmIRPass::visit_forall_iteration_post( ForallNode* )
+void AstToCasmIRPass::visit_forall_iteration_post( ForallNode* node )
 {
+    VISIT;
 }
 
-bool AstToCasmIRPass::visit_zero_atom( ZeroAtom* atom )
+bool AstToCasmIRPass::visit_zero_atom( ZeroAtom* node )
 {
+    VISIT;
     return false;
 }
 

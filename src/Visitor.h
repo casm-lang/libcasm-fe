@@ -46,6 +46,8 @@ namespace libcasm_fe
         void walk_specification( Ast* spec )
         {
             assert( spec->node_type_ == NodeType::SPECIFICATION );
+
+            visitor.visit_root( spec );
             visitor.visit_specification( spec->getSpecification() );
             walk_body_elements( spec->getElements() );
         }
@@ -95,8 +97,8 @@ namespace libcasm_fe
 
         void walk_init( InitNode* node )
         {
-            walk_function_def( node->progamDef );
             visitor.visit_init( node );
+            walk_function_def( node->progamDef );
         }
 
         void walk_function_def( FunctionDefNode* node )
@@ -605,6 +607,7 @@ namespace libcasm_fe
         virtual ~Visitor() = default;
 
 #define LIB_CASMFE_VISITOR_INTERFACE_( PREFIX, POSTFIX, T, U )                 \
+    PREFIX void visit_root( Ast* ) POSTFIX;                                    \
     PREFIX void visit_specification( SpecificationNode* ) POSTFIX;             \
     PREFIX void visit_init( InitNode* ) POSTFIX;                               \
     PREFIX void visit_body_elements_pre( AstListNode* ) POSTFIX;               \
