@@ -379,7 +379,7 @@ namespace libcasm_fe
             if( atom->symbol_type == FunctionAtom::SymbolType::DERIVED )
             {
                 visitor.visit_derived_function_atom_pre( atom, argumentValues );
-                const V expr = walk_atom( atom->symbol->derived );
+                const V expr = call_derived( atom->symbol->derived );
                 return visitor.visit_derived_function_atom( atom, expr );
             }
             else
@@ -597,6 +597,21 @@ namespace libcasm_fe
         call_rule( RuleNode* node )
         {
             walk_rule( node );
+        }
+
+        template < typename V_ = V >
+        typename std::enable_if< not std::is_same< value_t, V_ >::value,
+            V >::type
+        call_derived( ExpressionBase* )
+        {
+            return 0; // FIXME this depends on V
+        }
+
+        template < typename V_ = V >
+        typename std::enable_if< std::is_same< value_t, V_ >::value, V >::type
+        call_derived( ExpressionBase* atom )
+        {
+            return walk_atom( atom );
         }
     };
 
