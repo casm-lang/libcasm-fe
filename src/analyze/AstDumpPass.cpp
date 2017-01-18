@@ -78,6 +78,18 @@ void AstDumpPass::dump_link( AstNode* from, AstNode* to )
     dump_link( (uint64_t)from, (uint64_t)to );
 }
 
+void AstDumpPass::dump_arguments(
+    AstNode* from, std::vector< ExpressionBase* >* arguments )
+{
+    if( arguments )
+    {
+        for( auto arg : *arguments )
+        {
+            dump_link( from, arg );
+        }
+    }
+}
+
 void AstDumpPass::visit_root( Ast* node )
 {
     dump_node( node, "CASM" );
@@ -128,10 +140,11 @@ void AstDumpPass::visit_derived_def( DerivedDefNode* def, bool )
     dump_link( def, def->sym->derived );
 }
 
-bool AstDumpPass::visit_derived_function_atom( FunctionAtom* node, bool )
+bool AstDumpPass::visit_derived_function_atom( FunctionAtom* atom, bool )
 {
-    dump_node( node, node->name );
-    return 0;
+    dump_node( atom, "Derived: '" + atom->name + "'" );
+    dump_arguments( atom, atom->arguments );
+    return true;
 }
 
 void AstDumpPass::visit_init( InitNode* init )
@@ -221,28 +234,14 @@ void AstDumpPass::visit_update(
 void AstDumpPass::visit_call_pre( CallNode* call )
 {
     dump_node( call, "Direct Call: " + call->rule_name );
-
-    if( call->arguments )
-    {
-        for( auto a : *( call->arguments ) )
-        {
-            dump_link( call, a );
-        }
-    }
+    dump_arguments( call, call->arguments );
 }
 
 void AstDumpPass::visit_call_pre( CallNode* call, bool )
 {
     dump_node( call, "Indirect Call" );
     dump_link( call, call->ruleref );
-
-    if( call->arguments )
-    {
-        for( auto a : *( call->arguments ) )
-        {
-            dump_link( call, a );
-        }
-    }
+    dump_arguments( call, call->arguments );
 }
 
 void AstDumpPass::visit_case( CaseNode* node, bool, const std::vector< bool >& )
@@ -359,30 +358,14 @@ bool AstDumpPass::visit_function_atom(
     FunctionAtom* atom, std::vector< bool >& )
 {
     dump_node( atom, std::string( "Function: '" + atom->name + "'" ) );
-
-    if( atom->arguments )
-    {
-        for( auto arg : *( atom->arguments ) )
-        {
-            dump_link( atom, arg );
-        }
-    }
-
+    dump_arguments( atom, atom->arguments );
     return true;
 }
 
 bool AstDumpPass::visit_builtin_atom( BuiltinAtom* atom, std::vector< bool >& )
 {
     dump_node( atom, std::string( "Builtin:" + atom->to_str() ) );
-
-    if( atom->arguments )
-    {
-        for( auto arg : *( atom->arguments ) )
-        {
-            dump_link( atom, arg );
-        }
-    }
-
+    dump_arguments( atom, atom->arguments );
     return true;
 }
 

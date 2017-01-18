@@ -48,6 +48,9 @@ namespace libcasm_fe
         void dump_link( uint64_t from, uint64_t to );
         void dump_link( AstNode* from, AstNode* to );
 
+        void dump_arguments(
+            AstNode* from, std::vector< ExpressionBase* >* arguments );
+
       public:
         static char id;
 
