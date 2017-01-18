@@ -117,8 +117,8 @@ void AstDumpPass::visit_body_elements_post( AstListNode* body_elements )
 
 void AstDumpPass::visit_function_def_pre( FunctionDefNode* def )
 {
-    dump_node(
-        def, "Function: '" + def->sym->name + "'\\n" + def->sym->to_str() );
+    dump_node( def, "Function Definition: '" + def->sym->name + "'\\n"
+                        + def->sym->to_str() );
 }
 
 void AstDumpPass::visit_function_def_post( FunctionDefNode* def )
@@ -155,7 +155,7 @@ void AstDumpPass::visit_init( InitNode* init )
 
 void AstDumpPass::visit_rule_post( RuleNode* rule )
 {
-    dump_node( rule, "Rule " + rule->name );
+    dump_node( rule, "Rule: '" + rule->name + "'" );
 }
 
 void AstDumpPass::visit_rule( RuleNode* rule )
@@ -233,7 +233,7 @@ void AstDumpPass::visit_update(
 
 void AstDumpPass::visit_call_pre( CallNode* call )
 {
-    dump_node( call, "Direct Call: " + call->rule_name );
+    dump_node( call, "Direct Call: '" + call->rule_name + "'" );
     dump_arguments( call, call->arguments );
 }
 
@@ -306,7 +306,7 @@ void AstDumpPass::visit_push( PushNode* node, bool, bool )
 
 bool AstDumpPass::visit_expression( BinaryExpression* expr, bool, bool )
 {
-    dump_node( expr, "Expression:" + operator_to_str( expr->op ) );
+    dump_node( expr, "Expression: " + operator_to_str( expr->op ) );
     dump_link( expr, expr->left_ );
     dump_link( expr, expr->right_ );
     return true;
@@ -314,90 +314,86 @@ bool AstDumpPass::visit_expression( BinaryExpression* expr, bool, bool )
 
 bool AstDumpPass::visit_expression_single( UnaryExpression* expr, bool )
 {
-    dump_node( expr, "Expression:" + operator_to_str( expr->op ) );
+    dump_node( expr, "Expression: " + operator_to_str( expr->op ) );
     dump_link( expr, expr->expr_ );
     return true;
 }
 
 bool AstDumpPass::visit_zero_atom( ZeroAtom* atom )
 {
-    dump_node( atom, std::string( "ZeroAtom: 0" ) );
+    dump_node( atom, "ZeroAtom: 0" );
     return true;
 }
 
 bool AstDumpPass::visit_int_atom( IntegerAtom* atom )
 {
-    dump_node(
-        atom, std::string( "Integer: " ) + std::to_string( atom->val_ ) );
+    dump_node( atom, "Integer: " + std::to_string( atom->val_ ) );
     return true;
 }
 
 bool AstDumpPass::visit_bit_atom( IntegerAtom* atom )
 {
-    dump_node(
-        atom, std::string( "Bit(" ) + std::to_string( atom->type_.bitsize )
-                  + std::string( "): " ) + std::to_string( atom->val_ ) );
+    dump_node( atom, "Bit(" + std::to_string( atom->type_.bitsize ) + "): "
+                         + std::to_string( atom->val_ ) );
 
     return true;
 }
 
 bool AstDumpPass::visit_floating_atom( FloatingAtom* atom )
 {
-    dump_node(
-        atom, std::string( "Floating: " ) + std::to_string( atom->val_ ) );
+    dump_node( atom, "Floating: " + std::to_string( atom->val_ ) );
     return true;
 }
 
 bool AstDumpPass::visit_undef_atom( UndefAtom* atom )
 {
-    dump_node( atom, std::string( "'undef'" ) );
+    dump_node( atom, "'undef'" );
     return true;
 }
 
 bool AstDumpPass::visit_function_atom(
     FunctionAtom* atom, std::vector< bool >& )
 {
-    dump_node( atom, std::string( "Function: '" + atom->name + "'" ) );
+    dump_node( atom, "Function: '" + atom->name + "'" );
     dump_arguments( atom, atom->arguments );
     return true;
 }
 
 bool AstDumpPass::visit_builtin_atom( BuiltinAtom* atom, std::vector< bool >& )
 {
-    dump_node( atom, std::string( "Builtin:" + atom->to_str() ) );
+    dump_node( atom, "Builtin: '" + atom->to_str() + "'" );
     dump_arguments( atom, atom->arguments );
     return true;
 }
 
 bool AstDumpPass::visit_self_atom( SelfAtom* atom )
 {
-    dump_node( atom, std::string( "Agent: 'self'" ) );
+    dump_node( atom, "Agent: 'self'" );
     return true;
 }
 
 bool AstDumpPass::visit_rule_atom( RuleAtom* atom )
 {
-    dump_node( atom, std::string( "RuleRef: '@" + atom->name + "'" ) );
+    dump_node( atom, "RuleRef: '@" + atom->name + "'" );
     return true;
 }
 
 bool AstDumpPass::visit_boolean_atom( BooleanAtom* atom )
 {
-    dump_node( atom,
-        std::string(
-            "Boolean: " + std::string( atom->value ? "true" : "false" ) ) );
+    dump_node(
+        atom, "Boolean: " + std::string( atom->value ? "true" : "false" ) );
     return true;
 }
 
 bool AstDumpPass::visit_string_atom( StringAtom* atom )
 {
-    dump_node( atom, std::string( "String: \\\"" + atom->string + "\\\"" ) );
+    dump_node( atom, "String: \\\"" + atom->string + "\\\"" );
     return true;
 }
 
 bool AstDumpPass::visit_list_atom( ListAtom* atom, const std::vector< bool >& )
 {
-    dump_node( atom, std::string( "List: " ) );
+    dump_node( atom, "List: " );
 
     for( auto a : *( atom->expr_list ) )
     {
@@ -409,7 +405,7 @@ bool AstDumpPass::visit_list_atom( ListAtom* atom, const std::vector< bool >& )
 
 bool AstDumpPass::visit_number_range_atom( NumberRangeAtom* atom, bool, bool )
 {
-    dump_node( atom, std::string( "NumberRange" ) );
+    dump_node( atom, "NumberRange" );
     dump_link( atom, atom->left );
     dump_link( atom, atom->right );
     return true;
