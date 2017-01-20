@@ -66,118 +66,115 @@ namespace libcasm_fe
 
         bool filter_enabled( const std::string& filter );
 
-        void visit_root( Ast* node ) override final{};
-        void visit_specification( SpecificationNode* node ) override final{};
-        void visit_init( InitNode* node ) override final{};
-        void visit_body_elements_pre( AstListNode* node ) override final;
-        void visit_body_elements_post( AstListNode* node ) override final;
-        void visit_function_def_pre( FunctionDefNode* node ) override final;
-        void visit_function_def_post( FunctionDefNode* node ) override final;
-        void visit_derived_def_pre( DerivedDefNode* node ) override final{};
+        void visit_root( Ast* node ) override{};
+        void visit_specification( SpecificationNode* node ) override{};
+        void visit_init( InitNode* node ) override{};
+        void visit_body_elements_pre( AstListNode* node ) override;
+        void visit_body_elements_post( AstListNode* node ) override;
+        void visit_function_def_pre( FunctionDefNode* node ) override;
+        void visit_function_def_post( FunctionDefNode* node ) override;
+        void visit_derived_def_pre( DerivedDefNode* node ) override{};
         void visit_derived_def(
-            DerivedDefNode* node, const value_t& value ) override final{};
-        void visit_rule( RuleNode* node ) override final{};
-        void visit_rule_post( RuleNode* node ) override final{};
-        void visit_statements( AstListNode* node ) override final{};
-        void visit_statement( AstNode* node ) override final{};
+            DerivedDefNode* node, const value_t& value ) override{};
+        void visit_rule( RuleNode* node ) override{};
+        void visit_rule_post( RuleNode* node ) override{};
+        void visit_statements( AstListNode* node ) override{};
+        void visit_statement( AstNode* node ) override{};
         void visit_ifthenelse(
-            IfThenElseNode* node, const value_t& value ) override final{};
+            IfThenElseNode* node, const value_t& value ) override{};
 
-        void visit_case_pre( CaseNode*, const value_t& value ) override final{};
+        void visit_case_pre( CaseNode*, const value_t& value ) override{};
         void visit_case( CaseNode*, const value_t&,
-            const std::vector< value_t >& ) override final{};
-        void visit_skip( AstNode* ) override final{};
-        void visit_iterate( UnaryNode* ) override final{};
-        value_t visit_zero_atom( ZeroAtom* ) override final
+            const std::vector< value_t >& ) override{};
+        void visit_skip( AstNode* ) override{};
+        void visit_iterate( UnaryNode* ) override{};
+        value_t visit_zero_atom( ZeroAtom* ) override
         {
             return value_t();
         };
-        value_t visit_undef_atom( UndefAtom* ) override final
+        value_t visit_undef_atom( UndefAtom* ) override
         {
             return value_t();
         };
-        value_t visit_self_atom( SelfAtom* ) override final
+        value_t visit_self_atom( SelfAtom* ) override
         {
             return value_t();
         };
 
-        void visit_seqblock_pre( UnaryNode* seqblock ) override final;
-        void visit_seqblock_post( UnaryNode* seqblock ) override final;
-        void visit_parblock_pre( UnaryNode* parblock ) override final;
-        void visit_parblock_post( UnaryNode* parblock ) override final;
+        void visit_seqblock_pre( UnaryNode* seqblock ) override;
+        void visit_seqblock_post( UnaryNode* seqblock ) override;
+        void visit_parblock_pre( UnaryNode* parblock ) override;
+        void visit_parblock_post( UnaryNode* parblock ) override;
 
-        void visit_forall_pre( ForallNode* node ) override final;
-        void visit_forall_post( ForallNode* node ) override final;
+        void visit_forall_pre( ForallNode* node ) override;
+        void visit_forall_post( ForallNode* node ) override;
         void visit_forall_iteration_pre(
-            ForallNode* node, const value_t& expr ) override final;
-        void visit_forall_iteration_post( ForallNode* node ) override final;
+            ForallNode* node, const value_t& expr ) override;
+        void visit_forall_iteration_post( ForallNode* node ) override;
 
-        void visit_assert(
-            UnaryNode* assert, const value_t& val ) override final;
+        void visit_assert( UnaryNode* assert, const value_t& val ) override;
 
         void visit_update( UpdateNode* update,
             std::vector< value_t >& arguments,
-            const value_t& expr_v ) override final;
+            const value_t& expr_v ) override;
 
-        void visit_call_pre( CallNode* call ) override final;
-        void visit_call_pre(
-            CallNode* call, const value_t& expr ) override final;
+        void visit_call_pre( CallNode* call ) override;
+        void visit_call_pre( CallNode* call, const value_t& expr ) override;
         void visit_call(
-            CallNode* call, std::vector< value_t >& arguments ) override final;
-        void visit_call_post( CallNode* call ) override final;
-        void visit_diedie(
-            DiedieNode* node, const value_t& msg ) override final;
-        void visit_impossible( AstNode* node ) override final;
+            CallNode* call, std::vector< value_t >& arguments ) override;
+        void visit_call_post( CallNode* call ) override;
+        void visit_diedie( DiedieNode* node, const value_t& msg ) override;
+        void visit_impossible( AstNode* node ) override;
 
-        void visit_let( LetNode* node, const value_t& v ) override final;
-        void visit_let_post( LetNode* node ) override final;
+        void visit_let( LetNode* node, const value_t& v ) override;
+        void visit_let_post( LetNode* node ) override;
 
-        value_t visit_int_atom( IntegerAtom* atom ) override final
+        value_t visit_int_atom( IntegerAtom* atom ) override
         {
             return value_t( atom->val_ );
         }
 
-        value_t visit_bit_atom( IntegerAtom* atom ) override final
+        value_t visit_bit_atom( IntegerAtom* atom ) override
         {
             return value_t( atom->val_ );
         }
 
-        value_t visit_floating_atom( FloatingAtom* atom ) override final
+        value_t visit_floating_atom( FloatingAtom* atom ) override
         {
             return value_t( atom->val_ );
         }
 
-        value_t visit_rational_atom( RationalAtom* atom ) override final
+        value_t visit_rational_atom( RationalAtom* atom ) override
         {
             return value_t( &atom->val_ );
         }
 
-        value_t visit_rule_atom( RuleAtom* atom ) override final
+        value_t visit_rule_atom( RuleAtom* atom ) override
         {
             return value_t( atom->rule );
         }
 
-        value_t visit_boolean_atom( BooleanAtom* atom ) override final
+        value_t visit_boolean_atom( BooleanAtom* atom ) override
         {
             return value_t( atom->value );
         }
 
-        value_t visit_string_atom( StringAtom* atom ) override final
+        value_t visit_string_atom( StringAtom* atom ) override
         {
             return value_t( &atom->string );
         }
 
         value_t visit_number_range_atom( NumberRangeAtom* atom,
-            const value_t& left, const value_t& right ) override final;
+            const value_t& left, const value_t& right ) override;
 
-        value_t visit_function_atom( FunctionAtom* atom,
-            std::vector< value_t >& arguments ) override final;
-        value_t visit_builtin_atom( BuiltinAtom* atom,
-            std::vector< value_t >& arguments ) override final;
-        void visit_derived_function_atom_pre( FunctionAtom* atom,
-            std::vector< value_t >& arguments ) override final;
+        value_t visit_function_atom(
+            FunctionAtom* atom, std::vector< value_t >& arguments ) override;
+        value_t visit_builtin_atom(
+            BuiltinAtom* atom, std::vector< value_t >& arguments ) override;
+        void visit_derived_function_atom_pre(
+            FunctionAtom* atom, std::vector< value_t >& arguments ) override;
         value_t visit_derived_function_atom(
-            FunctionAtom* atom, const value_t& expr ) override final;
+            FunctionAtom* atom, const value_t& expr ) override;
 
       protected:
         /**
