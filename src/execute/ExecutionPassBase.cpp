@@ -44,15 +44,15 @@ bool ExecutionPassBase::hasEmptyUpdateSet() const
     return updateSetManager.currentUpdateSet()->empty();
 }
 
-Update* ExecutionPassBase::addUpdate( Function* sym,
-    const std::vector< value_t >& arguments, const value_t& val,
+Update* ExecutionPassBase::addUpdate( Function* function,
+    const std::vector< value_t >& arguments, const value_t& value,
     const yy::location& location )
 {
-    if( sym->checkArguments )
+    if( function->checkArguments )
     {
         try
         {
-            validateArguments( sym->arguments_, arguments );
+            validateArguments( function->arguments_, arguments );
         }
         catch( const std::domain_error& e )
         {
@@ -61,21 +61,21 @@ Update* ExecutionPassBase::addUpdate( Function* sym,
         }
     }
 
-    if( sym->checkReturnValue )
+    if( function->checkReturnValue )
     {
         try
         {
-            validateValue( sym->return_type_, val );
+            validateValue( function->return_type_, value );
         }
         catch( const std::domain_error& e )
         {
             throw RuntimeException( location,
-                std::string( e.what() ) + " of `" + sym->name + "`",
+                std::string( e.what() ) + " of `" + function->name + "`",
                 libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate );
         }
     }
 
-    auto& function_map = function_states[ sym->id ];
+    auto& function_map = function_states[ function->id ];
     auto it = function_map.find( arguments ); // TODO EP: use emplace only
     if( it == function_map.end() )
     {
@@ -85,8 +85,8 @@ Update* ExecutionPassBase::addUpdate( Function* sym,
 
     Update* up = reinterpret_cast< Update* >(
         stack.allocate( sizeof( Update ) ) ); // FIXME make it nicer!!
-    up->value = val;
-    up->func = sym->id;
+    up->value = value;
+    up->func = function->id;
     up->args = &it.key();
     up->location = &location;
 
@@ -100,8 +100,8 @@ Update* ExecutionPassBase::addUpdate( Function* sym,
         const auto existingUpdate = e.existingUpdate();
 
         const auto info
-            = "Conflict while adding update " + sym->name
-              + to_string( *conflictingUpdate->args ) + " = " + val.to_str()
+            = "Conflict while adding update " + function->name
+              + to_string( *conflictingUpdate->args ) + " = " + value.to_str()
               + " at line " + std::to_string( up->location->begin.line )
               + ", conflicting with line "
               + std::to_string( existingUpdate->location->begin.line )
@@ -290,47 +290,47 @@ bool ExecutionPassBase::filter_enabled( const std::string& filter )
            || debuginfo_filters.count( filter ) > 0;
 }
 
-void ExecutionPassBase::visit_body_elements_pre( AstListNode* node )
+void ExecutionPassBase::visit_body_elements_pre( AstListNode* )
 {
     fork( UpdateSet::Type::Sequential );
 }
 
-void ExecutionPassBase::visit_body_elements_post( AstListNode* node )
+void ExecutionPassBase::visit_body_elements_post( AstListNode* )
 {
     merge();
 }
 
 void ExecutionPassBase::visit_function_def_pre( FunctionDefNode* node )
 {
-    Function* func = node->sym;
+    const auto function = node->sym;
 
-    function_states[ func->id ] = FunctionState( 0 );
-    function_symbols[ func->id ] = func;
+    function_states[ function->id ] = FunctionState( 0 );
+    function_symbols[ function->id ] = function;
 
     fork( UpdateSet::Type::Parallel );
 }
 
-void ExecutionPassBase::visit_function_def_post( FunctionDefNode* node )
+void ExecutionPassBase::visit_function_def_post( FunctionDefNode* )
 {
     merge();
 }
 
-void ExecutionPassBase::visit_seqblock_pre( UnaryNode* seqblock )
+void ExecutionPassBase::visit_seqblock_pre( UnaryNode* )
 {
     fork( UpdateSet::Type::Sequential );
 }
 
-void ExecutionPassBase::visit_seqblock_post( UnaryNode* seqblock )
+void ExecutionPassBase::visit_seqblock_post( UnaryNode* )
 {
     merge();
 }
 
-void ExecutionPassBase::visit_parblock_pre( UnaryNode* parblock )
+void ExecutionPassBase::visit_parblock_pre( UnaryNode* )
 {
     fork( UpdateSet::Type::Parallel );
 }
 
-void ExecutionPassBase::visit_parblock_post( UnaryNode* parblock )
+void ExecutionPassBase::visit_parblock_post( UnaryNode* )
 {
     merge();
 }
@@ -346,9 +346,9 @@ void ExecutionPassBase::visit_forall_post( ForallNode* )
 }
 
 void ExecutionPassBase::visit_forall_iteration_pre(
-    ForallNode*, const value_t& expr )
+    ForallNode*, const value_t& value )
 {
-    rule_bindings.back()->push_back( expr );
+    rule_bindings.back()->push_back( value );
 }
 
 void ExecutionPassBase::visit_forall_iteration_post( ForallNode* )
@@ -814,43 +814,43 @@ namespace libcasm_fe
     }
 }
 
-void ExecutionPassBase::visit_assert( UnaryNode* assert, const value_t& val )
+void ExecutionPassBase::visit_assert( UnaryNode* node, const value_t& value )
 {
-    if( not val.value.boolean )
+    if( not value.value.boolean )
     {
-        throw RuntimeException( assert->location, "assertion failed",
+        throw RuntimeException( node->location, "assertion failed",
             libcasm_fe::Codes::AssertInvalidExpression );
     }
 }
 
-void ExecutionPassBase::visit_update( UpdateNode* update,
-    std::vector< value_t >& arguments, const value_t& expr_v )
+void ExecutionPassBase::visit_update(
+    UpdateNode* node, std::vector< value_t >& arguments, const value_t& value )
 {
-    addUpdate( update->func->symbol, arguments, expr_v, update->location );
+    const auto function = node->func->symbol;
 
-    if( update->dump )
+    addUpdate( function, arguments, value, node->location );
+
+    if( node->dump )
     {
-        const std::string& filter
-            = global_driver->function_trace_map[ update->func->symbol->id ];
+        const auto& filter = global_driver->function_trace_map[ function->id ];
         if( filter_enabled( filter ) )
         {
-            std::cout << filter << ": " << update->func->symbol->name
-                      << to_string( arguments ) << " = " << expr_v.to_str()
+            std::cout << filter << ": " << function->name
+                      << to_string( arguments ) << " = " << value.to_str()
                       << std::endl;
         }
     }
 }
 
-void ExecutionPassBase::visit_call_pre( CallNode* call )
+void ExecutionPassBase::visit_call_pre( CallNode* )
 {
-    UNUSED( call );
 }
 
-void ExecutionPassBase::visit_call_pre( CallNode* call, const value_t& expr )
+void ExecutionPassBase::visit_call_pre( CallNode* call, const value_t& value )
 {
-    if( expr.type != TypeType::UNDEF )
+    if( value.type != TypeType::UNDEF )
     {
-        call->rule = expr.value.rule;
+        call->rule = value.value.rule;
     }
     else
     {
@@ -947,14 +947,64 @@ void ExecutionPassBase::visit_impossible( AstNode* node )
     throw RuntimeException( node->location, "`impossible` executed" );
 }
 
-void ExecutionPassBase::visit_let( LetNode*, const value_t& v )
+void ExecutionPassBase::visit_let( LetNode*, const value_t& value )
 {
-    rule_bindings.back()->push_back( v );
+    rule_bindings.back()->push_back( value );
 }
 
 void ExecutionPassBase::visit_let_post( LetNode* )
 {
     rule_bindings.back()->pop_back();
+}
+
+value_t ExecutionPassBase::visit_zero_atom( ZeroAtom* )
+{
+    return value_t();
+}
+
+value_t ExecutionPassBase::visit_undef_atom( UndefAtom* )
+{
+    return value_t();
+}
+
+value_t ExecutionPassBase::visit_self_atom( SelfAtom* )
+{
+    return value_t();
+}
+
+value_t ExecutionPassBase::visit_int_atom( IntegerAtom* atom )
+{
+    return value_t( atom->val_ );
+}
+
+value_t ExecutionPassBase::visit_bit_atom( IntegerAtom* atom )
+{
+    return value_t( atom->val_ );
+}
+
+value_t ExecutionPassBase::visit_floating_atom( FloatingAtom* atom )
+{
+    return value_t( atom->val_ );
+}
+
+value_t ExecutionPassBase::visit_rational_atom( RationalAtom* atom )
+{
+    return value_t( &atom->val_ );
+}
+
+value_t ExecutionPassBase::visit_rule_atom( RuleAtom* atom )
+{
+    return value_t( atom->rule );
+}
+
+value_t ExecutionPassBase::visit_boolean_atom( BooleanAtom* atom )
+{
+    return value_t( atom->value );
+}
+
+value_t ExecutionPassBase::visit_string_atom( StringAtom* atom )
+{
+    return value_t( &atom->string );
 }
 
 value_t ExecutionPassBase::visit_function_atom(
