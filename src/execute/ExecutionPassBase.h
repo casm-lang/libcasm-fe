@@ -93,6 +93,7 @@ namespace libcasm_fe
         void visit_call_post( CallNode* call ) override;
 
         void visit_assert( UnaryNode* node, const value_t& value ) override;
+        void visit_assure( UnaryNode* node, const value_t& value ) override;
         void visit_diedie( DiedieNode* node, const value_t& msg ) override;
         void visit_impossible( AstNode* node ) override;
 

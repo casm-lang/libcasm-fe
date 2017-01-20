@@ -48,7 +48,7 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        void visit_assure( UnaryNode* assure, const value_t& val ) override;
+        void visit_assure( UnaryNode* node, const value_t& value ) override;
 
         void visit_print( PrintNode* node, const value_t& argument ) override;
 

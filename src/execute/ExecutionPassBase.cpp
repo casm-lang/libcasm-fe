@@ -823,6 +823,11 @@ void ExecutionPassBase::visit_assert( UnaryNode* node, const value_t& value )
     }
 }
 
+void ExecutionPassBase::visit_assure( UnaryNode* node, const value_t& value )
+{
+    visit_assert( node, value );
+}
+
 void ExecutionPassBase::visit_update(
     UpdateNode* node, std::vector< value_t >& arguments, const value_t& value )
 {

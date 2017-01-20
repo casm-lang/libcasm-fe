@@ -147,11 +147,6 @@ void NumericExecutionPass::dumpUpdates() const
     std::cout << "}" << std::endl;
 }
 
-void NumericExecutionPass::visit_assure( UnaryNode* assure, const value_t& val )
-{
-    visit_assert( assure, val );
-}
-
 void NumericExecutionPass::visit_print(
     PrintNode* node, const value_t& argument )
 {

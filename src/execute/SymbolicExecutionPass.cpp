@@ -481,15 +481,15 @@ namespace libcasm_fe
 }
 
 void SymbolicExecutionPass::visit_assure(
-    UnaryNode* assure, const value_t& val )
+    UnaryNode* node, const value_t& value )
 {
-    if( val.is_symbolic() && val.value.sym->condition )
+    if( value.is_symbolic() && value.value.sym->condition )
     {
-        path_conditions.push_back( val.value.sym->condition );
+        path_conditions.push_back( value.value.sym->condition );
     }
     else
     {
-        visit_assert( assure, val );
+        ExecutionPassBase::visit_assure( node, value );
     }
 }
 
