@@ -79,7 +79,9 @@ Update* ExecutionPassBase::addUpdate( Function* function,
     auto it = function_map.find( arguments ); // TODO EP: use emplace only
     if( it == function_map.end() )
     {
-        const auto pair = function_map.insert( arguments, value_t() );
+        const auto defaultValue
+            = ExecutionPassBase::defaultFunctionValue( function, arguments );
+        const auto pair = function_map.insert( arguments, defaultValue );
         it = pair.first;
     }
 
@@ -275,13 +277,9 @@ value_t ExecutionPassBase::functionValue(
 }
 
 value_t ExecutionPassBase::defaultFunctionValue(
-    Function* function, const std::vector< value_t >& arguments )
+    Function* function, const std::vector< value_t >& )
 {
-    UNUSED( function );
-    UNUSED( arguments );
-
-    static value_t undef = value_t();
-    return undef;
+    return functionDefaultValues[ function->id ];
 }
 
 bool ExecutionPassBase::filter_enabled( const std::string& filter )
@@ -300,12 +298,25 @@ void ExecutionPassBase::visit_body_elements_post( AstListNode* )
     merge();
 }
 
-void ExecutionPassBase::visit_function_def_pre( FunctionDefNode* node )
+void ExecutionPassBase::visit_function_def_pre(
+    FunctionDefNode* node, const value_t& defaultValue )
 {
     const auto function = node->sym;
 
+    try
+    {
+        validateValue( function->return_type_, defaultValue );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw RuntimeException( node->defaultValue()->location,
+            std::string( e.what() ) + " of `" + function->name + "`",
+            libcasm_fe::Codes::FunctionDefaultValueInvalidRange );
+    }
+
     function_states[ function->id ] = FunctionState( 0 );
     function_symbols[ function->id ] = function;
+    functionDefaultValues[ function->id ] = defaultValue;
 
     fork( UpdateSet::Type::Parallel );
 }
@@ -1181,6 +1192,11 @@ void libcasm_fe::ExecutionPassBase::validateValue(
     const Type* type, const value_t& value ) const
 {
     assert( type != nullptr );
+
+    if( value.is_undef() )
+    {
+        return;
+    }
 
     switch( type->t )
     {

@@ -52,6 +52,10 @@ namespace libcasm_fe
         FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
 
         ,
+        FunctionDefaultValueInvalidRange = 0xfb01,
+        FunctionDefaultValueTypeMismatch = 0xfb02
+
+        ,
         FunctionArgumentsInvalidRangeAtLookup
         = 0xfe00 // fe** ... function argument
         ,

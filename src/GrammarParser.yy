@@ -352,6 +352,60 @@ BODY_ELEMENT
 
       $$ = node;
   }
+| FUNCTION_DEFINITION DEFINED LCURPAREN VALUE RCURPAREN
+  {
+      auto node = new FunctionDefNode( @$, $1 );
+      node->setDefaultValue( $4 );
+
+      try
+      {
+          driver.add( $1 );
+      }
+      catch( const Exception& e )
+      {
+          driver.error
+          ( e.getLocations()
+          , e.what()
+          , e.getErrorCode()
+          );
+
+          // if another symbol with same name exists we need to delete
+          // the symbol here, because it is not inserted in the symbol table
+          delete $1;
+      }
+
+      $$ = node;
+  }
+| FUNCTION_DEFINITION DEFINED LCURPAREN VALUE RCURPAREN INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
+  {
+      auto node = new FunctionDefNode( @$, $1 );
+      node->setDefaultValue( $4 );
+
+      auto initializers = $8;
+      for (auto initializer : initializers) {
+          initializer->func->name = $1->name;
+      }
+      node->setInitializers( initializers );
+
+      try
+      {
+          driver.add( $1 );
+      }
+      catch( const Exception& e )
+      {
+          driver.error
+          ( e.getLocations()
+          , e.what()
+          , e.getErrorCode()
+          );
+
+          // if another symbol with same name exists we need to delete
+          // the symbol here, because it is not inserted in the symbol table
+          delete $1;
+      }
+
+      $$ = node;
+  }
 | DERIVED_SYNTAX
   {
       $1->binding_offsets = std::move( driver.binding_offsets );

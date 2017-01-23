@@ -38,7 +38,7 @@ DUMPS           "dumps"         { return yy::Parser::make_DUMPS(loc); }
 
 FUNCTION        "function"      { return yy::Parser::make_FUNCTION(loc); }
 INITIALLY       "initially"     { return yy::Parser::make_INITIALLY(loc); }
-
+DEFINED         "defined"       { return yy::Parser::make_DEFINED(loc); }
 
 
 SEQ             "seq"           { return yy::Parser::make_SEQ(loc); }

@@ -181,6 +181,7 @@ FunctionDefNode::FunctionDefNode( yy::location& loc, Function* sym )
 : AstNode( loc, NodeType::FUNCTION )
 , sym( sym )
 , m_initializers()
+, m_defaultValue( new UndefAtom( location ) )
 {
 }
 
@@ -192,6 +193,8 @@ FunctionDefNode::~FunctionDefNode()
     {
         delete initializer;
     }
+
+    delete m_defaultValue;
 }
 
 void FunctionDefNode::setInitializers(
@@ -203,6 +206,20 @@ void FunctionDefNode::setInitializers(
 std::vector< UpdateNode* > FunctionDefNode::initializers() const
 {
     return m_initializers;
+}
+
+void FunctionDefNode::setDefaultValue( ExpressionBase* defaultValue )
+{
+    if( m_defaultValue )
+    {
+        delete m_defaultValue;
+    }
+    m_defaultValue = defaultValue;
+}
+
+ExpressionBase* FunctionDefNode::defaultValue() const
+{
+    return m_defaultValue;
 }
 
 DerivedDefNode::DerivedDefNode( yy::location& loc, Function* sym )
