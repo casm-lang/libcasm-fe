@@ -115,10 +115,11 @@ void AstDumpPass::visit_body_elements_post( AstListNode* body_elements )
     }
 }
 
-void AstDumpPass::visit_function_def_pre( FunctionDefNode* def )
+void AstDumpPass::visit_function_def_pre( FunctionDefNode* def, bool )
 {
     dump_node( def, "Function Definition: '" + def->sym->name + "'\\n"
                         + def->sym->to_str() );
+    dump_link( def, def->defaultValue() );
 }
 
 void AstDumpPass::visit_function_def_post( FunctionDefNode* def )

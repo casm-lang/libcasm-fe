@@ -178,8 +178,12 @@ namespace libcasm_fe
         void setInitializers( const std::vector< UpdateNode* >& initializers );
         std::vector< UpdateNode* > initializers() const;
 
+        void setDefaultValue( ExpressionBase* defaultValue );
+        ExpressionBase* defaultValue() const;
+
       private:
         std::vector< UpdateNode* > m_initializers;
+        ExpressionBase* m_defaultValue;
     };
 
     class DerivedDefNode : public AstNode

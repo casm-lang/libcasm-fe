@@ -169,7 +169,7 @@ void AstToCasmIRPass::visit_body_elements_post( AstListNode* node )
     VISIT;
 }
 
-void AstToCasmIRPass::visit_function_def_pre( FunctionDefNode* node )
+void AstToCasmIRPass::visit_function_def_pre( FunctionDefNode* node, bool )
 {
     VISIT;
 

@@ -64,6 +64,8 @@ bool SymbolicExecutionPass::run( libpass::PassResult& pr )
         = std::vector< FunctionState >( global_driver->function_table.size() );
     function_symbols = std::vector< const Function* >(
         global_driver->function_table.size() );
+    functionDefaultValues
+        = std::vector< value_t >( global_driver->function_table.size() );
 
     try
     {

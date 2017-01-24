@@ -67,7 +67,8 @@ namespace libcasm_fe
         void visit_body_elements_pre( AstListNode* node ) override;
         void visit_body_elements_post( AstListNode* node ) override;
 
-        void visit_function_def_pre( FunctionDefNode* node ) override;
+        void visit_function_def_pre(
+            FunctionDefNode* node, const value_t& defaultValue ) override;
         void visit_function_def_post( FunctionDefNode* node ) override;
 
         void visit_seqblock_pre( UnaryNode* seqblock ) override;
@@ -165,6 +166,7 @@ namespace libcasm_fe
 
         std::vector< FunctionState > function_states;
         std::vector< const Function* > function_symbols;
+        std::vector< value_t > functionDefaultValues;
 
         std::vector< List* > temp_lists;
 

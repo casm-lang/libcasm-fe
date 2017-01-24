@@ -103,7 +103,8 @@ namespace libcasm_fe
 
         void walk_function_def( FunctionDefNode* node )
         {
-            visitor.visit_function_def_pre( node );
+            const auto defaultValue = walk_atom( node->defaultValue() );
+            visitor.visit_function_def_pre( node, defaultValue );
 
             for( const auto& initializer : node->initializers() )
             {
@@ -627,7 +628,7 @@ namespace libcasm_fe
     PREFIX void visit_init( InitNode* ) POSTFIX;                               \
     PREFIX void visit_body_elements_pre( AstListNode* ) POSTFIX;               \
     PREFIX void visit_body_elements_post( AstListNode* ) POSTFIX;              \
-    PREFIX void visit_function_def_pre( FunctionDefNode* ) POSTFIX;            \
+    PREFIX void visit_function_def_pre( FunctionDefNode*, U ) POSTFIX;         \
     PREFIX void visit_function_def_post( FunctionDefNode* ) POSTFIX;           \
     PREFIX void visit_derived_def_pre( DerivedDefNode* ) POSTFIX;              \
     PREFIX void visit_derived_def( DerivedDefNode*, U ) POSTFIX;               \

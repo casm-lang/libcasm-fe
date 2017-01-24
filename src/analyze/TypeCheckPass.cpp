@@ -92,7 +92,8 @@ void TypeCheckPass::visit_init( InitNode* )
     m_specificationHasInitNode = true;
 }
 
-void TypeCheckPass::visit_function_def_pre( FunctionDefNode* def )
+void TypeCheckPass::visit_function_def_pre(
+    FunctionDefNode* def, Type* defaultValueType )
 {
     m_isInFunctionDefinition = true;
 
@@ -112,6 +113,18 @@ void TypeCheckPass::visit_function_def_pre( FunctionDefNode* def )
     for( Type* argument_t : function->arguments_ )
     {
         check_type_valid( def->location, *argument_t );
+    }
+
+    // Check if the type of the default value is correct
+    check_type_valid( def->location, defaultValueType );
+    if( not function->return_type_->unify( defaultValueType ) )
+    {
+        global_driver->error( def->defaultValue()->location,
+            "type of default value is '" + defaultValueType->to_str()
+                + "', but should be '"
+                + function->return_type_->to_str()
+                + "'",
+            libcasm_fe::Codes::FunctionDefaultValueTypeMismatch );
     }
 
     m_declaredFunctions.emplace( function->name );
