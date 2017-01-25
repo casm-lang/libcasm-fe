@@ -123,7 +123,7 @@ namespace libcasm_fe
         void visit_derived_function_atom_pre(
             FunctionAtom* atom, std::vector< value_t >& arguments ) override;
         value_t visit_derived_function_atom(
-            FunctionAtom* atom, const value_t& expr ) override;
+            FunctionAtom* atom, const value_t& value ) override;
 
         void visit_root( Ast* ) override{};
         void visit_specification( SpecificationNode* ) override{};

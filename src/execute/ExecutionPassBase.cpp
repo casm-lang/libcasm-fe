@@ -1144,10 +1144,27 @@ void ExecutionPassBase::visit_derived_function_atom_pre(
 }
 
 value_t ExecutionPassBase::visit_derived_function_atom(
-    FunctionAtom*, const value_t& expr )
+    FunctionAtom* function, const value_t& value )
 {
     rule_bindings.pop_back();
-    return expr;
+
+    if( function->symbol->checkReturnValue )
+    {
+        try
+        {
+            validateValue( function->symbol->return_type_, value );
+        }
+        catch( const std::domain_error& e )
+        {
+            throw RuntimeException( function->location,
+                std::string( e.what() ) + " of the return value of derived `"
+                    + function->symbol->name
+                    + "`",
+                libcasm_fe::Codes::DerivedReturnValueInvalidRange );
+        }
+    }
+
+    return value;
 }
 
 value_t ExecutionPassBase::visit_number_range_atom(
