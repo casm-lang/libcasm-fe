@@ -321,11 +321,8 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
     // {"asString", true},
     ,
     { "asString", Builtin::Id::AS_STRING, { TypeType::STRING },
-        { {
-            TypeType::UNKNOWN, TypeType::INTEGER, TypeType::FLOATING,
-            TypeType::BIT, TypeType::ENUM
-            //    , TypeType::RATIONAL
-        } } }
+        { { TypeType::UNKNOWN, TypeType::STRING, TypeType::BOOLEAN,
+            TypeType::ENUM } } }
 
     // // TODO: PPA: define a clear semantic for this type cast!
     // {"asRational", true},

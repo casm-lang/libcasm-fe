@@ -650,6 +650,26 @@ namespace libcasm_fe
             return value_t();
         }
 
+        static const value_t asstring( const value_t& arg )
+        {
+            switch( arg.type )
+            {
+                case TypeType::STRING:
+                    return arg;
+                case TypeType::BOOLEAN:
+                    return value_t( arg.value.boolean
+                                        ? new std::string( "true" )
+                                        : new std::string( "false" ) );
+                case TypeType::ENUM:
+                    return value_t(
+                        new std::string( *arg.value.enum_val->name ) );
+                case TypeType::UNDEF:
+                    return value_t( new std::string( "undef" ) );
+                default:
+                    FAILURE();
+            }
+        }
+
         static const value_t asinteger( const value_t& arg )
         {
             switch( arg.type )
@@ -1090,6 +1110,8 @@ value_t ExecutionPassBase::visit_builtin_atom(
             // builtins seems ugly.
             // Maybe store Type* in value_t?
             return ::builtins::asenum( atom, arguments.at( 0 ) );
+        case Builtin::Id::AS_STRING:
+            return ::builtins::asstring( arguments.at( 0 ) );
         case Builtin::Id::AS_INTEGER:
             return ::builtins::asinteger( arguments.at( 0 ) );
         case Builtin::Id::AS_FLOATING:
