@@ -59,7 +59,8 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 
     if( not m_specificationHasInitNode )
     {
-        global_driver->error( node->location, "no 'init' node defined" );
+        global_driver->error( node->location, "no 'init' node defined",
+            libcasm_fe::Codes::AgentInitRuleNotDefined );
     }
 
     pr.setResult< TypeCheckPass >( node );

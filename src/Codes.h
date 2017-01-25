@@ -102,7 +102,8 @@ namespace libcasm_fe
         // agent errors
         ,
         AgentInitRuleDoesNotExist = 0xa000,
-        AgentInitRuleMultipleDefinitions = 0xa001
+        AgentInitRuleMultipleDefinitions = 0xa001,
+        AgentInitRuleNotDefined = 0xa002
 
         // --------------------------------------------------------- 1*** ...
         // type check errors
