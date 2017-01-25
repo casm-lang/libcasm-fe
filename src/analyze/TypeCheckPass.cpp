@@ -317,7 +317,8 @@ void TypeCheckPass::visit_call_pre( CallNode* call )
     else
     {
         global_driver->error( call->location,
-            "no rule with name `" + call->rule_name + "` found" );
+            "no rule with name `" + call->rule_name + "` found",
+            libcasm_fe::Codes::RuleDoesNotExist );
     }
 }
 
@@ -1129,8 +1130,9 @@ Type* TypeCheckPass::visit_rule_atom( RuleAtom* atom )
     }
     else
     {
-        global_driver->error(
-            atom->location, "no rule with name `" + atom->name + "` found" );
+        global_driver->error( atom->location,
+            "no rule with name `" + atom->name + "` found",
+            libcasm_fe::Codes::RuleDoesNotExist );
     }
     return &atom->type_;
 }
