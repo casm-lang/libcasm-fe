@@ -581,11 +581,11 @@ bool Type::unify_enum( Type* other )
     }
     else if( other->t == TypeType::UNKNOWN )
     {
-        if( other->constraints.size() > 0 )
+        /*if( other->constraints.size() > 0 )
         {
             // constraints cover only basic types at the moment
             return false;
-        }
+        }*/
         other->t = TypeType::ENUM;
         other->enum_name = enum_name;
         return true;
