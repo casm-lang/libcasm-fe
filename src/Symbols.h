@@ -300,10 +300,10 @@ namespace libcasm_fe
 
     struct enum_value_t
     {
-        const std::string* name;
+        std::string* name;
         const uint16_t id;
 
-        enum_value_t( const std::string* name, const uint16_t id );
+        enum_value_t( std::string* name, const uint16_t id );
     };
 
     class Enum : public Symbol

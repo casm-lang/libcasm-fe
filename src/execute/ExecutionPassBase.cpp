@@ -661,8 +661,7 @@ namespace libcasm_fe
                                         ? new std::string( "true" )
                                         : new std::string( "false" ) );
                 case TypeType::ENUM:
-                    return value_t(
-                        new std::string( *arg.value.enum_val->name ) );
+                    return value_t( arg.value.enum_val->name );
                 case TypeType::UNDEF:
                     return value_t( new std::string( "undef" ) );
                 default:

@@ -737,7 +737,7 @@ bool Function::is_builtin()
     return false;
 }
 
-enum_value_t::enum_value_t( const std::string* name, const uint16_t id )
+enum_value_t::enum_value_t( std::string* name, const uint16_t id )
 : name( name )
 , id( id )
 {
