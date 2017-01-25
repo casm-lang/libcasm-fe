@@ -574,7 +574,10 @@ namespace libcasm_fe
                     {
                         // why is an element with the name of the enum in the
                         // map??
-                        assert( func->name != pair.first );
+                        if( func->name == pair.first )
+                        {
+                            continue;
+                        }
 
                         visitor.visit_forall_iteration_pre( node, pair.second );
                         walk_statement( node->statement );
