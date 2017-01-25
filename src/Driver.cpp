@@ -175,9 +175,10 @@ void Driver::error( const std::vector< const yy::location* >& locations,
     }
 }
 
-void Driver::error(const Exception& exception)
+void Driver::error( const Exception& exception )
 {
-    error( exception.getLocations(), exception.what(), exception.getErrorCode() );
+    error(
+        exception.getLocations(), exception.what(), exception.getErrorCode() );
 }
 
 void Driver::warning( const yy::location& l, const std::string& m )
