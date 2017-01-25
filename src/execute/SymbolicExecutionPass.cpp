@@ -76,18 +76,12 @@ bool SymbolicExecutionPass::run( libpass::PassResult& pr )
         mainLoop();
         printTrace();
     }
-    catch( const RuntimeException& ex )
+    catch( const RuntimeException& e )
     {
-        global_driver->error( ex.getLocations(), ex.what(), ex.getErrorCode() );
-        return false;
-    }
-    catch( char* e )
-    {
-        std::cerr << "Abort after catching a string: " << e << std::endl;
-        return false;
+        global_driver->error( e );
     }
 
-    return true;
+    return global_driver->ok();
 }
 
 #define WRAP_NUMERICAL_OPERATION( op, lhs, rhs )                               \

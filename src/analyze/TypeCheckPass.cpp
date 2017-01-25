@@ -54,8 +54,7 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
     }
     catch( const CompiletimeException& e )
     {
-        global_driver->error( e.getLocations(), e.what(), e.getErrorCode() );
-        return false;
+        global_driver->error( e );
     }
 
     if( not m_specificationHasInitNode )

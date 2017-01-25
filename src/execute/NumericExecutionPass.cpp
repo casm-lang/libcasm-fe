@@ -108,18 +108,12 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
             std::cout << " step later..." << std::endl;
         }
     }
-    catch( const RuntimeException& ex )
+    catch( const RuntimeException& e )
     {
-        global_driver->error( ex.getLocations(), ex.what(), ex.getErrorCode() );
-        return false;
-    }
-    catch( char* e )
-    {
-        std::cerr << "Abort after catching a string: " << e << std::endl;
-        return false;
+        global_driver->error( e );
     }
 
-    return true;
+    return global_driver->ok();
 }
 
 void NumericExecutionPass::dumpUpdates() const

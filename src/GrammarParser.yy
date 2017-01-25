@@ -312,14 +312,7 @@ BODY_ELEMENT
       }
       catch( const Exception& e )
       {
-          driver.error
-          ( e.getLocations()
-          , e.what()
-          , e.getErrorCode()
-          );
-
-          // if another symbol with same name exists we need to delete
-          // the symbol here, because it is not inserted in the symbol table
+          driver.error( e );
           delete $1;
       }
   }
@@ -339,14 +332,7 @@ BODY_ELEMENT
       }
       catch( const Exception& e )
       {
-          driver.error
-          ( e.getLocations()
-          , e.what()
-          , e.getErrorCode()
-          );
-
-          // if another symbol with same name exists we need to delete
-          // the symbol here, because it is not inserted in the symbol table
+          driver.error( e );
           delete $1;
       }
 
@@ -363,14 +349,7 @@ BODY_ELEMENT
       }
       catch( const Exception& e )
       {
-          driver.error
-          ( e.getLocations()
-          , e.what()
-          , e.getErrorCode()
-          );
-
-          // if another symbol with same name exists we need to delete
-          // the symbol here, because it is not inserted in the symbol table
+          driver.error( e );
           delete $1;
       }
 
@@ -393,14 +372,7 @@ BODY_ELEMENT
       }
       catch( const Exception& e )
       {
-          driver.error
-          ( e.getLocations()
-          , e.what()
-          , e.getErrorCode()
-          );
-
-          // if another symbol with same name exists we need to delete
-          // the symbol here, because it is not inserted in the symbol table
+          driver.error( e );
           delete $1;
       }
 
@@ -418,14 +390,7 @@ BODY_ELEMENT
       }
       catch( const Exception& e )
       {
-          driver.error
-          ( e.getLocations()
-          , e.what()
-          , e.getErrorCode()
-          );
-
-          // if another symbol with same name exists we need to delete
-          // the symbol here, because it is not inserted in the symbol table
+          driver.error( e );
           delete $1;
       }
   }
@@ -444,11 +409,7 @@ BODY_ELEMENT
       }
       catch( const Exception& e )
       {
-          driver.error
-          ( e.getLocations()
-          , e.what()
-          , e.getErrorCode()
-          );
+          driver.error( e );
           
           // we do not need to delete $1 here, because it's already in
           // the AST, so it will be deleted later
@@ -468,8 +429,8 @@ INIT_SYNTAX
     catch( const Exception& e )
     {
         driver.error
-        ( @$
-        , "multiple definition of 'init' node"
+        ( e.getLocations()
+        , "multiple definitions of 'init' node"
         , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
         );
     }
@@ -494,8 +455,8 @@ INIT_SYNTAX
     catch( const Exception& e )
     {
         driver.error
-        ( @$
-        , "multiple definition of 'init' node"
+        ( e.getLocations()
+        , "multiple definitions of 'init' node"
         , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
         );
     }
@@ -528,11 +489,7 @@ ENUM_SYNTAX
       }
       catch( const Exception& e )
       {
-          driver.error
-          ( e.getLocations()
-          , e.what()
-          , e.getErrorCode()
-          );
+          driver.error( e );
       }
       for( const std::string& name : $5 )
       {
@@ -544,11 +501,7 @@ ENUM_SYNTAX
               }
               catch( const Exception& e )
               {
-                  driver.error
-                  ( e.getLocations()
-                  , e.what()
-                  , e.getErrorCode()
-                  );
+                  driver.error( e );
               }
           }
           else
@@ -1540,7 +1493,7 @@ LET_SYNTAX
       }
       catch( const Exception& e)
       {
-          driver.error( @$, e.what() );
+          driver.error( e );
       }
   }
   EXPRESSION IN STATEMENT
@@ -1557,7 +1510,7 @@ LET_SYNTAX
       }
       catch( const Exception& e)
       {
-          driver.error( @$, e.what() );
+          driver.error( e );
       }
   }
   EXPRESSION IN STATEMENT

@@ -76,6 +76,8 @@ namespace libcasm_fe
             const std::string& m,
             libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
 
+        void error( const Exception& exception );
+
         void warning( const yy::location& l, const std::string& m );
         void info( const yy::location& l, const std::string& m );
         bool ok() const;
