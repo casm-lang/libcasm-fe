@@ -150,7 +150,7 @@ namespace libcasm_fe
 
             Variable::Ptr variable() const;
             Expression::Ptr expression() const;
-            Rule::Ptr innerRule() const;
+            Rule::Ptr rule() const;
 
           private:
             Variable::Ptr m_variable;
@@ -168,7 +168,7 @@ namespace libcasm_fe
 
             Variable::Ptr variable() const;
             Expression::Ptr expression() const;
-            Rule::Ptr innerRule() const;
+            Rule::Ptr rule() const;
 
           private:
             Variable::Ptr m_variable;
@@ -183,7 +183,7 @@ namespace libcasm_fe
 
             IterateRule( const Rule::Ptr& rule );
 
-            Rule::Ptr innerRule() const;
+            Rule::Ptr rule() const;
 
           private:
             Rule::Ptr m_rule;
@@ -209,7 +209,7 @@ namespace libcasm_fe
 
             SequenceRule( const Rules::Ptr& rules );
 
-            Rules::Ptr innerRules() const;
+            Rules::Ptr rules() const;
 
           private:
             Rules::Ptr m_rules;

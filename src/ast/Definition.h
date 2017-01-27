@@ -128,7 +128,7 @@ namespace libcasm_fe
 
             std::string identifier() const;
             Signature::Ptr signature() const;
-            Rule::Ptr innerRule() const;
+            Rule::Ptr rule() const;
 
           private:
             std::string m_identifier;

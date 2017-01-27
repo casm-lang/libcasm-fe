@@ -146,7 +146,7 @@ Signature::Ptr RuleDefinition::signature() const
     return m_signature;
 }
 
-Rule::Ptr RuleDefinition::innerRule() const
+Rule::Ptr RuleDefinition::rule() const
 {
     return m_rule;
 }
