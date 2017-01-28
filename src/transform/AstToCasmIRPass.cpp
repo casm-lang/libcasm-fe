@@ -1101,7 +1101,7 @@ bool AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
     // printf( "%u\n", node->value );
 
     libcasm_ir::Value* ir_const = libcasm_ir::Constant::getBoolean(
-        (libcasm_ir::Type::Boolean)node->value );
+        (libcasm_ir::Type::BooleanTy)node->value );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1116,7 +1116,7 @@ bool AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
     // printf( "%lu\n", node->val_    );
 
     libcasm_ir::Value* ir_const = libcasm_ir::Constant::getInteger(
-        (libcasm_ir::Type::Integer)node->val_ );
+        (libcasm_ir::Type::IntegerTy)node->val_ );
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
 
