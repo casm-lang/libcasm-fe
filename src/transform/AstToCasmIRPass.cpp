@@ -78,7 +78,7 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
     initially_update_scope = 0;
     is_initially = false;
 
-    Ast* root = (Ast*)pr.getResult< TypeCheckPass >();
+    Ast* root = (Ast*)pr.result< TypeCheckPass >();
 
     AstWalker< AstToCasmIRPass, bool > walker( *this );
     walker.walk_specification( root );
