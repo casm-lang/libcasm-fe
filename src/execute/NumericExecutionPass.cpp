@@ -55,9 +55,9 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new NumericExecutionWalker( *this );
 
-    const bool dump_updates = (bool)pr.getResults()[ (void*)2 ];
+    const bool dump_updates = (bool)pr.results()[ (void*)2 ];
 
-    Ast* root = (Ast*)pr.getResult< TypeCheckPass >();
+    Ast* root = (Ast*)pr.result< TypeCheckPass >();
 
     rule_bindings.push_back( &main_bindings );
     function_states
