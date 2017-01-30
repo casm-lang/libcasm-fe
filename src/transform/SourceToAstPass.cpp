@@ -40,8 +40,7 @@ static libpass::PassRegistration< SourceToAstPass > PASS( "Source To AST Pass",
 
 bool SourceToAstPass::run( libpass::PassResult& pr )
 {
-    const char* file_name
-        = (const char*)pr.getResult< libpass::LoadFilePass >();
+    const char* file_name = (const char*)pr.result< libpass::LoadFilePass >();
 
     global_driver = new Driver;
 

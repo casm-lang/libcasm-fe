@@ -57,7 +57,7 @@ bool SymbolicExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new SymbolicExecutionWalker( *this );
 
-    Ast* root = (Ast*)pr.getResult< TypeCheckPass >();
+    Ast* root = (Ast*)pr.result< TypeCheckPass >();
 
     rule_bindings.push_back( &main_bindings );
     function_states
