@@ -23,7 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#pragma once
+#ifndef _LIB_CASMFE_RULE_H_
+#define _LIB_CASMFE_RULE_H_
 
 #include "Expression.h"
 
@@ -215,11 +216,25 @@ namespace libcasm_fe
             Rules::Ptr m_rules;
         };
 
-        // TODO add PushRule
-        // TODO add PopRule
         // TODO add CallRule
         // TODO add CaseRule
         // TODO add UpdateRule
+
         // TODO add ImpossibleRule
+
+        // TODO add PushRule
+        // TODO add PopRule
     }
 }
+
+#endif // _LIB_CASMFE_RULE_H_
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

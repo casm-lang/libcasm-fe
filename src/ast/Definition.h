@@ -23,7 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#pragma once
+#ifndef _LIB_CASMFE_DEFINITION_H_
+#define _LIB_CASMFE_DEFINITION_H_
 
 #include "Rule.h"
 
@@ -153,3 +154,15 @@ namespace libcasm_fe
         };
     }
 }
+
+#endif // _LIB_CASMFE_DEFINITION_H_
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//
