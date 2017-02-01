@@ -26,9 +26,13 @@
 #ifndef _LIB_CASMFE_DEFINITION_H_
 #define _LIB_CASMFE_DEFINITION_H_
 
+#include "Node.h"
 #include "Rule.h"
 
-#include "../../casm-ir/src/Type.h"
+namespace libcasm_ir
+{
+    class Type;
+}
 
 namespace libcasm_fe
 {

@@ -28,7 +28,7 @@
 
 #include "Node.h"
 
-#include "../../casm-ir/src/Type.h"
+#include "../../casm-ir/src/Value.h"
 
 namespace libcasm_fe
 {

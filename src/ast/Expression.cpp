@@ -25,6 +25,8 @@
 
 #include "Expression.h"
 
+#include "../../casm-ir/src/Type.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -48,7 +50,7 @@ Atom::Atom( const libcasm_ir::Value& value )
 : Expression( Node::Type::ATOM )
 , m_value( value )
 {
-    Expression::setType( value.type() )
+    Expression::setType( &value.type() );
 }
 
 libcasm_ir::Value Atom::value() const

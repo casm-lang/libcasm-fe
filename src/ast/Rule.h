@@ -216,9 +216,17 @@ namespace libcasm_fe
             Rules::Ptr m_rules;
         };
 
+        // TODO: FIXME: CONTINUE: UpdateRule
+        class UpdateRule : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< UpdateRule >;
+
+            UpdateRule( void /* TODO */ );
+        };
+
         // TODO add CallRule
         // TODO add CaseRule
-        // TODO add UpdateRule
 
         // TODO add ImpossibleRule
 
