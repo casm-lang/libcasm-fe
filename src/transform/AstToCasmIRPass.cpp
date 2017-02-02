@@ -480,7 +480,21 @@ void AstToCasmIRPass::visit_update(
     // printf( "%p -> %p\n", node, node->expr_ );
 
     assert( node->func );
-    visit_function_atom( node->func, args );
+    libcasm_ir::Value* ir_ident
+        = lookup< libcasm_ir::Value >( (AstNode*)node->func->symbol );
+    assert( ir_ident );
+
+    libcasm_ir::LocationInstruction* ir_loc
+        = new libcasm_ir::LocationInstruction( ir_ident );
+    assert( ir_loc );
+    if( node->func->arguments )
+    {
+        for( auto a : *( node->func->arguments ) )
+        {
+            libcasm_ir::Value* instr = lookup< libcasm_ir::Value >( a );
+            ir_loc->add( instr );
+        }
+    }
 
     libcasm_ir::ExecutionSemanticsBlock* ir_scope = 0;
     if( is_initially )
@@ -502,16 +516,11 @@ void AstToCasmIRPass::visit_update(
     ast2parent[ node->func ] = node;
     ast2parent[ node->expr_ ] = node;
 
-    libcasm_ir::Value* ir_lhs = lookup< libcasm_ir::Value >( node->func );
     libcasm_ir::Value* ir_rhs = lookup< libcasm_ir::Value >( node->expr_ );
-
-    assert( ir_lhs );
     assert( ir_rhs );
 
-    assert( libcasm_ir::isa< libcasm_ir::LookupInstruction >( ir_lhs ) );
-
-    ir_stmt->add( new libcasm_ir::UpdateInstruction(
-        ( (libcasm_ir::Instruction*)ir_lhs )->value( 0 ), ir_rhs ) );
+    ir_stmt->add( ir_loc );
+    ir_stmt->add( new libcasm_ir::UpdateInstruction( ir_loc, ir_rhs ) );
 }
 
 void AstToCasmIRPass::visit_call_pre( CallNode* node )
@@ -1069,20 +1078,20 @@ bool AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
                 libcasm_ir::Type::RuleReference() );
             break;
         case TypeType::BOOLEAN:
-            ir_const = libcasm_ir::Constant::Undef(
-                libcasm_ir::Type::Boolean() );
+            ir_const
+                = libcasm_ir::Constant::Undef( libcasm_ir::Type::Boolean() );
             break;
         case TypeType::BIT:
             ir_const = libcasm_ir::Constant::Undef(
                 libcasm_ir::Type::Bit( node->type_.bitsize ) );
             break;
         case TypeType::INTEGER:
-            ir_const = libcasm_ir::Constant::Undef(
-                libcasm_ir::Type::Integer() );
+            ir_const
+                = libcasm_ir::Constant::Undef( libcasm_ir::Type::Integer() );
             break;
         case TypeType::STRING:
-            ir_const = libcasm_ir::Constant::Undef(
-                libcasm_ir::Type::String() );
+            ir_const
+                = libcasm_ir::Constant::Undef( libcasm_ir::Type::String() );
             break;
         default:
             assert( 0 && "unimplemented undef constant!" );
