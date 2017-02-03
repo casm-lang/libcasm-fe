@@ -26,16 +26,17 @@
 #ifndef _LIB_CASMFE_NODE_H_
 #define _LIB_CASMFE_NODE_H_
 
-#include <memory>
-#include <vector>
+#include "CasmFE.h"
 
-#include "../various/location.hh"
+#include "various/location.hh"
+
+#include "../stdhl/cpp/Type.h"
 
 namespace libcasm_fe
 {
     namespace Ast
     {
-        class Node
+        class Node : public CasmFE
         {
           public:
             enum class Type
@@ -144,14 +145,7 @@ namespace libcasm_fe
         };
 
         template < typename NodeType, typename... Args >
-        typename NodeType::Ptr make_node( Args&&... args )
-        {
-            return std::make_shared< NodeType >(
-                std::forward< Args >( args )... );
-        }
-
-        template < typename NodeType, typename... Args >
-        typename NodeType::Ptr make_node(
+        typename NodeType::Ptr make(
             const yy::location& location, Args&&... args )
         {
             auto node = std::make_shared< NodeType >(
