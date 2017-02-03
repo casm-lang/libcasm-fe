@@ -30,6 +30,7 @@
 
 #include "various/location.hh"
 
+#include "../stdhl/cpp/List.h"
 #include "../stdhl/cpp/Type.h"
 
 namespace libcasm_fe
@@ -95,61 +96,23 @@ namespace libcasm_fe
             yy::location m_location;
         };
 
-        template < typename NodeType >
-        class NodeList : public Node
+        template < typename T >
+        class NodeList : public Node, public libstdhl::List< T >
         {
           public:
             using Ptr = std::shared_ptr< NodeList >;
-            using iterator =
-                typename std::vector< typename NodeType::Ptr >::iterator;
-            using const_iterator =
-                typename std::vector< typename NodeType::Ptr >::const_iterator;
 
             NodeList()
             : Node( Node::Type::NODE_LIST )
             {
             }
-
-            std::size_t size() const
-            {
-                return m_nodes.size();
-            }
-
-            void add( const typename NodeType::Ptr& node )
-            {
-                m_nodes.push_back( node );
-            }
-
-            iterator begin()
-            {
-                return m_nodes.begin();
-            }
-
-            iterator end()
-            {
-                return m_nodes.end();
-            }
-
-            const_iterator cbegin() const
-            {
-                return m_nodes.cbegin();
-            }
-
-            const_iterator cend() const
-            {
-                return m_nodes.cend();
-            }
-
-          private:
-            std::vector< typename NodeType::Ptr > m_nodes;
         };
 
-        template < typename NodeType, typename... Args >
-        typename NodeType::Ptr make(
-            const yy::location& location, Args&&... args )
+        template < typename T, typename... Args >
+        typename T::Ptr make( const yy::location& location, Args&&... args )
         {
-            auto node = std::make_shared< NodeType >(
-                std::forward< Args >( args )... );
+            auto node
+                = std::make_shared< T >( std::forward< Args >( args )... );
             node->setLocation( location );
             return node;
         }
