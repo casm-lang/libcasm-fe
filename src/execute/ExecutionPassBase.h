@@ -45,7 +45,7 @@
 
 namespace libcasm_fe
 {
-    using FunctionState = ChainedHashMap< std::vector< value_t >, value_t >;
+    using FunctionState = ProbingHashMap< std::vector< value_t >, value_t >;
 
     class ExecutionPassBase : public Visitor< value_t >
     {

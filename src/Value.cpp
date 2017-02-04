@@ -1660,7 +1660,7 @@ namespace std
         // TODO seed should be injected
         constexpr uint64_t seed = UINT64_C( 14695981039346656037 );
 
-        return fnv1a_hash( key, seed );
+        return murmur3_hash( key, seed );
     }
 
     std::hash< value_t > hash< HeadList >::hasher;
