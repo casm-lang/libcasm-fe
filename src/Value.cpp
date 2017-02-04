@@ -108,20 +108,79 @@ value_t::value_t( NumberRange* numberRange )
 
 value_t::value_t( const value_t& other )
 : type( other.type )
-, value( other.value )
 {
+    switch( other.type )
+    {
+        case TypeType::RATIONAL:
+            value.rat = new rational_t( *other.value.rat );
+            break;
+        case TypeType::STRING:
+            value.string = new std::string( *other.value.string );
+            break;
+        case TypeType::NUMBER_RANGE:
+            value.numberRange = new NumberRange( *other.value.numberRange );
+            break;
+        default:
+            value = other.value;
+    }
 }
 
 value_t::value_t( value_t&& other ) noexcept
 : type( other.type )
 , value( other.value )
 {
+    other.type = TypeType::UNKNOWN;
+    other.value.integer = 0; // same effect as memset 0/nullptr :)
+}
+
+value_t::~value_t()
+{
+    switch( type )
+    {
+        case TypeType::RATIONAL:
+            delete value.rat;
+            break;
+        case TypeType::STRING:
+            delete value.string;
+            break;
+        case TypeType::NUMBER_RANGE:
+            delete value.numberRange;
+            break;
+        default:
+            break;
+    }
 }
 
 value_t& value_t::operator=( const value_t& other )
 {
-    value = other.value;
     type = other.type;
+
+    switch( other.type )
+    {
+        case TypeType::RATIONAL:
+            value.rat = new rational_t( *other.value.rat );
+            break;
+        case TypeType::STRING:
+            value.string = new std::string( *other.value.string );
+            break;
+        case TypeType::NUMBER_RANGE:
+            value.numberRange = new NumberRange( *other.value.numberRange );
+            break;
+        default:
+            value = other.value;
+    }
+
+    return *this;
+}
+
+value_t& value_t::operator=( value_t&& other )
+{
+    type = other.type;
+    value = other.value;
+
+    other.type = TypeType::UNKNOWN;
+    other.value.integer = 0; // same effect as memset 0/nullptr :)
+
     return *this;
 }
 
