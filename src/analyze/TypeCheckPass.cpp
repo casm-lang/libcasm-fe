@@ -45,7 +45,7 @@ static libpass::PassRegistration< TypeCheckPass > PASS( "Type Check Pass",
 
 bool TypeCheckPass::run( libpass::PassResult& pr )
 {
-    Ast* node = (Ast*)pr.getResult< SourceToAstPass >();
+    Ast* node = (Ast*)pr.result< SourceToAstPass >();
 
     try
     {
