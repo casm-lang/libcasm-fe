@@ -57,15 +57,16 @@ libcasm_ir::Value Atom::value() const
 }
 
 UnaryExpression::UnaryExpression(
-    const Expression::Ptr& expression, libcasm_ir::Value::ID id )
+    const Expression::Ptr& expression, libcasm_ir::Value::ID op )
 : Expression( Node::Type::UNARY_EXPRESSION )
+, m_op( op )
 , m_expression( expression )
 {
 }
 
-libcasm_ir::Value::ID UnaryExpression::id() const
+libcasm_ir::Value::ID UnaryExpression::op() const
 {
-    return m_id;
+    return m_op;
 }
 
 Expression::Ptr UnaryExpression::expression() const
@@ -74,17 +75,17 @@ Expression::Ptr UnaryExpression::expression() const
 }
 
 BinaryExpression::BinaryExpression( const Expression::Ptr& left,
-    const Expression::Ptr& right, libcasm_ir::Value::ID id )
+    const Expression::Ptr& right, libcasm_ir::Value::ID op )
 : Expression( Node::Type::BINARY_EXPRESSION )
-, m_id( id )
+, m_op( op )
 , m_left( left )
 , m_right( right )
 {
 }
 
-libcasm_ir::Value::ID BinaryExpression::id() const
+libcasm_ir::Value::ID BinaryExpression::op() const
 {
-    return m_id;
+    return m_op;
 }
 
 Expression::Ptr BinaryExpression::left() const
