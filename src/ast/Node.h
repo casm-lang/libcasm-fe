@@ -111,8 +111,7 @@ namespace libcasm_fe
         template < typename T, typename... Args >
         typename T::Ptr make( const yy::location& location, Args&&... args )
         {
-            auto node
-                = std::make_shared< T >( std::forward< Args >( args )... );
+            auto node = libstdhl::make< T >( std::forward< Args >( args )... );
             node->setLocation( location );
             return node;
         }
