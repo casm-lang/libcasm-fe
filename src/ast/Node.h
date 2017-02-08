@@ -62,6 +62,7 @@ namespace libcasm_fe
                 ASSURE_RULE,
                 SKIP_RULE,
                 DIEDIE_RULE,
+                IMPOSSIBLE_RULE,
                 CONDITIONAL_RULE,
                 LET_RULE,
                 FORALL_RULE,
@@ -78,7 +79,6 @@ namespace libcasm_fe
                 POP_RULE,
                 PUSH_RULE,
                 CASE_RULE,
-                IMPOSSIBLE_RULE,
             };
 
           public:

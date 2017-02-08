@@ -83,6 +83,11 @@ DieDieRule::DieDieRule( const Expression::Ptr& expression )
 {
 }
 
+ImpossibleRule::ImpossibleRule()
+: Rule( Node::Type::IMPOSSIBLE_RULE )
+{
+}
+
 Expression::Ptr DieDieRule::expression() const
 {
     return m_expression;
