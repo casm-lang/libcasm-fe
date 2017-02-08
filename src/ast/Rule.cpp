@@ -25,6 +25,8 @@
 
 #include "Rule.h"
 
+#include "Definition.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -123,23 +125,7 @@ Rule::Ptr ConditionalRule::elseRule() const
     return m_elseRule;
 }
 
-Variable::Variable( const std::string& identifier, libcasm_ir::Type* type )
-: m_identifier( identifier )
-, m_type( type )
-{
-}
-
-std::string Variable::identifier() const
-{
-    return m_identifier;
-}
-
-libcasm_ir::Type* Variable::type() const
-{
-    return m_type;
-}
-
-LetRule::LetRule( const Variable::Ptr& variable,
+LetRule::LetRule( const VariableDefinition::Ptr& variable,
     const Expression::Ptr& expression, const Rule::Ptr& rule )
 : Rule( Node::Type::LET_RULE )
 , m_variable( variable )
@@ -148,7 +134,7 @@ LetRule::LetRule( const Variable::Ptr& variable,
 {
 }
 
-Variable::Ptr LetRule::variable() const
+VariableDefinition::Ptr LetRule::variable() const
 {
     return m_variable;
 }
@@ -163,7 +149,7 @@ Rule::Ptr LetRule::rule() const
     return m_rule;
 }
 
-ForallRule::ForallRule( const Variable::Ptr& variable,
+ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
     const Expression::Ptr& expression, const Rule::Ptr& rule )
 : Rule( Node::Type::FORALL_RULE )
 , m_variable( variable )
@@ -172,7 +158,7 @@ ForallRule::ForallRule( const Variable::Ptr& variable,
 {
 }
 
-Variable::Ptr ForallRule::variable() const
+VariableDefinition::Ptr ForallRule::variable() const
 {
     return m_variable;
 }

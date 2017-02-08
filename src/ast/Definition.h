@@ -48,6 +48,22 @@ namespace libcasm_fe
 
         using Definitions = NodeList< Definition >;
 
+        class VariableDefinition : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< VariableDefinition >;
+
+            VariableDefinition(
+                const std::string& identifier, libcasm_ir::Type* type );
+
+            std::string identifier() const;
+            libcasm_ir::Type* type() const;
+
+          private:
+            std::string m_identifier;
+            libcasm_ir::Type* m_type;
+        };
+
         class Signature // TODO move it to the correct place
         {
           public:

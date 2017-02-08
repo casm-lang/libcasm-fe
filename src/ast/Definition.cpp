@@ -28,6 +28,24 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+VariableDefinition::VariableDefinition(
+    const std::string& identifier, libcasm_ir::Type* type )
+: Definition( Node::Type::VARIABLE_DEFINITION )
+, m_identifier( identifier )
+, m_type( type )
+{
+}
+
+std::string VariableDefinition::identifier() const
+{
+    return m_identifier;
+}
+
+libcasm_ir::Type* VariableDefinition::type() const
+{
+    return m_type;
+}
+
 Signature::Signature( const std::vector< libcasm_ir::Type* >& argumentTypes,
     libcasm_ir::Type* returnType )
 : m_argumentTypes( argumentTypes )

@@ -32,6 +32,8 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class VariableDefinition;
+
         class Rule : public Node
         {
           public:
@@ -134,35 +136,20 @@ namespace libcasm_fe
             Rule::Ptr m_elseRule;
         };
 
-        class Variable // TODO move it to the correct place
-        {
-          public:
-            using Ptr = std::shared_ptr< Variable >;
-
-            Variable( const std::string& identifier, libcasm_ir::Type* type );
-
-            std::string identifier() const;
-            libcasm_ir::Type* type() const;
-
-          private:
-            std::string m_identifier;
-            libcasm_ir::Type* m_type;
-        };
-
         class LetRule : public Rule
         {
           public:
             using Ptr = std::shared_ptr< LetRule >;
 
-            LetRule( const Variable::Ptr& variable,
+            LetRule( const std::shared_ptr< VariableDefinition >& variable,
                 const Expression::Ptr& expression, const Rule::Ptr& rule );
 
-            Variable::Ptr variable() const;
+            std::shared_ptr< VariableDefinition > variable() const;
             Expression::Ptr expression() const;
             Rule::Ptr rule() const;
 
           private:
-            Variable::Ptr m_variable;
+            std::shared_ptr< VariableDefinition > m_variable;
             Expression::Ptr m_expression;
             Rule::Ptr m_rule;
         };
@@ -172,15 +159,15 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ForallRule >;
 
-            ForallRule( const Variable::Ptr& variable,
+            ForallRule( const std::shared_ptr< VariableDefinition >& variable,
                 const Expression::Ptr& expression, const Rule::Ptr& rule );
 
-            Variable::Ptr variable() const;
+            std::shared_ptr< VariableDefinition > variable() const;
             Expression::Ptr expression() const;
             Rule::Ptr rule() const;
 
           private:
-            Variable::Ptr m_variable;
+            std::shared_ptr< VariableDefinition > m_variable;
             Expression::Ptr m_expression;
             Rule::Ptr m_rule;
         };

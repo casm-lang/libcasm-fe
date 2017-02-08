@@ -46,6 +46,7 @@ namespace libcasm_fe
                 SPECIFICATION,
 
                 // definitions
+                VARIABLE_DEFINITION,
                 FUNCTION_DEFINITION,
                 DERIVED_DEFINITION,
                 RULE_DEFINITION,
