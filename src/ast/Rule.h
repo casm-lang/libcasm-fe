@@ -228,13 +228,20 @@ namespace libcasm_fe
             Rules::Ptr m_rules;
         };
 
-        // TODO: FIXME: CONTINUE: UpdateRule
         class UpdateRule : public Rule
         {
           public:
             using Ptr = std::shared_ptr< UpdateRule >;
 
-            UpdateRule( void /* TODO */ );
+            UpdateRule( const DirectCallExpression::Ptr& function,
+                const Expression::Ptr& expression );
+
+            DirectCallExpression::Ptr function() const;
+            Expression::Ptr expression() const;
+
+          private:
+            DirectCallExpression::Ptr m_function;
+            Expression::Ptr m_expression;
         };
 
         // TODO add CallRule

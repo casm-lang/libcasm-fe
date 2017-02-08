@@ -73,13 +73,13 @@ namespace libcasm_fe
                 ITERATE_RULE,
                 BLOCK_RULE,
                 SEQUENCE_RULE,
+                UPDATE_RULE,
 
                 // TODO
                 INIT,
                 PROVIDER,
                 OPTION,
                 CALL_RULE,
-                UPDATE_RULE,
                 POP_RULE,
                 PUSH_RULE,
             };

@@ -223,3 +223,21 @@ Rules::Ptr SequenceRule::rules() const
 {
     return m_rules;
 }
+
+UpdateRule::UpdateRule( const DirectCallExpression::Ptr& function,
+    const Expression::Ptr& expression )
+: Rule( Node::Type::UPDATE_RULE )
+, m_function( function )
+, m_expression( expression )
+{
+}
+
+DirectCallExpression::Ptr UpdateRule::function() const
+{
+    return m_function;
+}
+
+Expression::Ptr UpdateRule::expression() const
+{
+    return m_expression;
+}
