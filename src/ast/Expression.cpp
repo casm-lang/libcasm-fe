@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -24,6 +24,8 @@
 //
 
 #include "Expression.h"
+
+#include "../../casm-ir/src/Type.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -48,7 +50,7 @@ Atom::Atom( const libcasm_ir::Value& value )
 : Expression( Node::Type::ATOM )
 , m_value( value )
 {
-    Expression::setType( value.type() )
+    Expression::setType( &value.type() );
 }
 
 libcasm_ir::Value Atom::value() const

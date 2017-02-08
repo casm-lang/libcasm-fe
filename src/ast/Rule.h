@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -224,9 +224,17 @@ namespace libcasm_fe
             Rules::Ptr m_rules;
         };
 
+        // TODO: FIXME: CONTINUE: UpdateRule
+        class UpdateRule : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< UpdateRule >;
+
+            UpdateRule( void /* TODO */ );
+        };
+
         // TODO add CallRule
         // TODO add CaseRule
-        // TODO add UpdateRule
 
         // TODO add PushRule
         // TODO add PopRule

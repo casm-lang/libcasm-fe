@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -26,9 +26,13 @@
 #ifndef _LIB_CASMFE_DEFINITION_H_
 #define _LIB_CASMFE_DEFINITION_H_
 
+#include "Node.h"
 #include "Rule.h"
 
-#include "../../casm-ir/src/Type.h"
+namespace libcasm_ir
+{
+    class Type;
+}
 
 namespace libcasm_fe
 {
