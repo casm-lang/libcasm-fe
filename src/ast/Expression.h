@@ -71,13 +71,13 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< UnaryExpression >;
 
             UnaryExpression(
-                const Expression::Ptr& expression, libcasm_ir::Value::ID id );
+                const Expression::Ptr& expression, libcasm_ir::Value::ID op );
 
-            libcasm_ir::Value::ID id() const;
+            libcasm_ir::Value::ID op() const;
             Expression::Ptr expression() const;
 
           private:
-            libcasm_ir::Value::ID m_id;
+            libcasm_ir::Value::ID m_op;
             Expression::Ptr m_expression;
         };
 
@@ -87,14 +87,14 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< BinaryExpression >;
 
             BinaryExpression( const Expression::Ptr& left,
-                const Expression::Ptr& right, libcasm_ir::Value::ID id );
+                const Expression::Ptr& right, libcasm_ir::Value::ID op );
 
-            libcasm_ir::Value::ID id() const;
+            libcasm_ir::Value::ID op() const;
             Expression::Ptr left() const;
             Expression::Ptr right() const;
 
           private:
-            libcasm_ir::Value::ID m_id;
+            libcasm_ir::Value::ID m_op;
             Expression::Ptr m_left;
             Expression::Ptr m_right;
         };
