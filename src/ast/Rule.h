@@ -106,6 +106,14 @@ namespace libcasm_fe
             Expression::Ptr m_expression;
         };
 
+        class ImpossibleRule : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< ImpossibleRule >;
+
+            ImpossibleRule();
+        };
+
         class ConditionalRule : public Rule
         {
           public:
@@ -219,8 +227,6 @@ namespace libcasm_fe
         // TODO add CallRule
         // TODO add CaseRule
         // TODO add UpdateRule
-
-        // TODO add ImpossibleRule
 
         // TODO add PushRule
         // TODO add PopRule
