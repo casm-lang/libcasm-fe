@@ -136,6 +136,23 @@ namespace libcasm_fe
             Rule::Ptr m_elseRule;
         };
 
+        class CaseRule : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< CaseRule >;
+            using Case = std::pair< Expression::Ptr, Rule::Ptr >;
+
+            CaseRule( const Expression::Ptr& expression,
+                const std::vector< Case >& cases );
+
+            Expression::Ptr expression() const;
+            std::vector< Case > cases() const;
+
+          private:
+            Expression::Ptr m_expression;
+            std::vector< Case > m_cases;
+        };
+
         class LetRule : public Rule
         {
           public:
@@ -221,7 +238,6 @@ namespace libcasm_fe
         };
 
         // TODO add CallRule
-        // TODO add CaseRule
 
         // TODO add PushRule
         // TODO add PopRule

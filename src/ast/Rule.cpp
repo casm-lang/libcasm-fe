@@ -125,6 +125,24 @@ Rule::Ptr ConditionalRule::elseRule() const
     return m_elseRule;
 }
 
+CaseRule::CaseRule(
+    const Expression::Ptr& expression, const std::vector< Case >& cases )
+: Rule( Node::Type::CASE_RULE )
+, m_expression( expression )
+, m_cases( cases )
+{
+}
+
+Expression::Ptr CaseRule::expression() const
+{
+    return m_expression;
+}
+
+std::vector< CaseRule::Case > CaseRule::cases() const
+{
+    return m_cases;
+}
+
 LetRule::LetRule( const VariableDefinition::Ptr& variable,
     const Expression::Ptr& expression, const Rule::Ptr& rule )
 : Rule( Node::Type::LET_RULE )
