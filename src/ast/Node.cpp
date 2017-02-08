@@ -30,6 +30,7 @@ using namespace Ast;
 
 libcasm_fe::Ast::Node::Node( libcasm_fe::Ast::Node::Type type )
 : m_type( type )
+, m_location()
 {
 }
 
