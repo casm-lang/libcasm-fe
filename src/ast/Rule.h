@@ -244,8 +244,6 @@ namespace libcasm_fe
             Expression::Ptr m_expression;
         };
 
-        // TODO add CallRule
-
         // TODO add PushRule
         // TODO add PopRule
     }

@@ -79,7 +79,6 @@ namespace libcasm_fe
                 INIT,
                 PROVIDER,
                 OPTION,
-                CALL_RULE,
                 POP_RULE,
                 PUSH_RULE,
             };
