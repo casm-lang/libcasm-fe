@@ -63,7 +63,63 @@ namespace libcasm_fe
             libcasm_ir::Value m_value;
         };
 
-        // TODO port FunctionAtom, RuleAtom, BuiltinAtom
+        class DirectCallExpression : public Expression
+        {
+          public:
+            enum class TargetType
+            {
+                Function,
+                Derived,
+                Builtin,
+                Rule,
+                Variable,
+                Unknown
+            };
+
+          public:
+            using Ptr = std::shared_ptr< DirectCallExpression >;
+
+            DirectCallExpression( const std::string& identifier,
+                const Expressions::Ptr& arguments );
+
+            std::string identifier() const;
+            Expressions::Ptr arguments() const;
+
+            void setTargetType( TargetType targetType );
+            TargetType targetType() const;
+
+          private:
+            std::string m_identifier;
+            Expressions::Ptr m_arguments;
+            TargetType m_targetType;
+        };
+
+        class IndirectCallExpression : public Expression
+        {
+          public:
+            enum class TargetType
+            {
+                Builtin,
+                Unknown
+            };
+
+          public:
+            using Ptr = std::shared_ptr< IndirectCallExpression >;
+
+            IndirectCallExpression( const Expression::Ptr& expression,
+                const Expressions::Ptr& arguments );
+
+            Expression::Ptr expression() const;
+            Expressions::Ptr arguments() const;
+
+            void setTargetType( TargetType targetType );
+            TargetType targetType() const;
+
+          private:
+            Expression::Ptr m_expression;
+            Expressions::Ptr m_arguments;
+            TargetType m_targetType;
+        };
 
         class UnaryExpression : public Expression
         {
