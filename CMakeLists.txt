@@ -35,6 +35,9 @@ foreach( DEPENDENCY
     stdhl
     pass
     casm-ir
+    casm-rt
+    csel-ir
+    csel-rt
     )
   if( NOT TARGET ${DEPENDENCY} )
     add_subdirectory( ${LIBS}/${DEPENDENCY} lib/${DEPENDENCY} )
@@ -59,6 +62,9 @@ include_directories(
   ${LIBS}/stdhl
   ${LIBS}/pass
   ${LIBS}/casm-ir
+  ${LIBS}/casm-rt
+  ${LIBS}/csel-ir
+  ${LIBS}/csel-rt
 )
 
 
@@ -129,10 +135,13 @@ add_executable( ${TARGET}-check
 
 target_link_libraries( ${TARGET}-check
   ${TARGET}
+  casm-rt
+  casm-ir
   pass
   stdhl
-  casm-ir
   pthread
+  csel-rt
+  csel-ir
 )
 
 

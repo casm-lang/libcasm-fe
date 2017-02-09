@@ -36,6 +36,12 @@
 
 #include <sys/wait.h>
 
+#include "../casm-ir/src/Instruction.h"
+#include "../casm-ir/src/Value.h"
+#include "../casm-ir/src/analyze/CasmIRDumpPass.h"
+#include "../casm-rt/src/Value.h"
+#include "../transform/AstToCasmIRPass.h"
+
 using namespace libcasm_fe;
 
 extern Driver* global_driver;
@@ -238,20 +244,42 @@ value_t NumericExecutionPass::visit_expression_single(
 {
     using Opcode = libcasm_ir::Value::ID;
 
-    if( val.is_undef() )
-    {
-        return value_t();
-    }
+    AstToCasmIRPass pass;
 
-    switch( expr->op )
-    {
-        case Opcode::NOT_INSTRUCTION:
-            return value_t( not val.value.boolean );
-        default:
-            assert( !"internal error" ); // PPA: FIXME: with better verbose info
-                                         // etc.
-            return value_t();
-    }
+    auto arg = pass.constant( val, *libcasm_ir::Type::Boolean() );
+
+    auto i = libcasm_ir::NotInstruction( arg );
+    auto r = libcasm_rt::Value::execute( i );
+
+    assert( r );
+    return pass.value_t_value( *r );
+    
+
+    // // switch( expr->op )
+    // // {
+    // //     case Opcode::NOT_INSTRUCTION:
+    // //         return value_t( not val.value.boolean );
+    // //     default:
+    // //         assert( !"internal error" ); // PPA: FIXME: with better verbose
+    // //         info
+    // //                                      // etc.
+    // //         return value_t();
+    // // }
+
+    // if( val.is_undef() )
+    // {
+    //     return value_t();
+    // }
+
+    // switch( expr->op )
+    // {
+    //     case Opcode::NOT_INSTRUCTION:
+    //         return value_t( not val.value.boolean );
+    //     default:
+    //         assert( !"internal error" ); // PPA: FIXME: with better verbose info
+    //                                      // etc.
+    //         return value_t();
+    // }
 }
 
 value_t NumericExecutionPass::visit_list_atom(

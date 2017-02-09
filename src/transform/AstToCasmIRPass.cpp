@@ -38,7 +38,7 @@ static libpass::PassRegistration< AstToCasmIRPass > PASS( "AST to CASM IR",
     "ast2ir",
     0 );
 
-static libcasm_ir::Type* getType( Type* type )
+libcasm_ir::Type* AstToCasmIRPass::getType( Type* type )
 {
     assert( type && "not initialized type used" );
 
@@ -67,6 +67,48 @@ static libcasm_ir::Type* getType( Type* type )
             std::cerr << type->to_str() << "\n";
             assert( 0 && "not implemented function atom identifier type" );
             return 0;
+    }
+}
+
+libcasm_ir::Value* AstToCasmIRPass::constant(
+    const value_t& value, libcasm_ir::Type& hint )
+{
+    switch( value.type )
+    {
+        case TypeType::UNDEF:
+        {
+            return libcasm_ir::Constant::Undef( &hint );
+        }
+        case TypeType::INTEGER:
+        {
+            return libcasm_ir::Constant::Integer( value.value.integer );
+        }
+        case TypeType::BOOLEAN:
+        {
+            return libcasm_ir::Constant::Boolean( value.value.boolean );
+        }
+        default:
+        {
+            assert( 0 && "unimplemented 'value_t' constant!" );
+            return 0;
+        }
+    }
+}
+
+value_t AstToCasmIRPass::value_t_value( const libcasm_ir::Value& value )
+{
+    switch( value.id() )
+    {
+        case libcasm_ir::Value::BOOLEAN_CONSTANT:
+        {
+            auto c = static_cast< const libcasm_ir::BooleanConstant& >( value );
+            return c.defined() ? value_t( c.value() ) : value_t();
+        }
+        default:
+        {
+            assert( 0 && "unimplemented 'value' to create a 'value_t'!" );
+            return value_t();
+        }
     }
 }
 
