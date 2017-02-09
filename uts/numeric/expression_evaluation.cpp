@@ -49,8 +49,7 @@ static value_t make_value( TypeType type )
     switch( type )
     {
         case TypeType::STRING:
-            static std::string str = "test";
-            value.value.string = &str;
+            value.value.string = new std::string( "test" );
             break;
         case TypeType::LIST:
         case TypeType::TUPLE:
@@ -64,8 +63,7 @@ static value_t make_value( TypeType type )
             value.value.enum_val = enum_val;
             break;
         case TypeType::RATIONAL:
-            static rational_t* rat = new rational_t( 1, 1 );
-            value.value.rat = rat;
+            value.value.rat = new rational_t( 1, 1 );
             break;
         case TypeType::FLOATING:
             value.value.float_ = 1.0f;
