@@ -42,13 +42,13 @@ namespace details
             }
         };
 
-        // h(i, k) = h1(k) + i^2
+        // h(i, k) = h1(k) + i / 2 + i^2 / 2
         struct QuadraticProbing
         {
             static constexpr std::size_t probe(
                 const std::size_t index, const std::size_t round )
             {
-                return index + round * round;
+                return index + (round + round * round) / 2;
             }
         };
     }
@@ -61,7 +61,7 @@ namespace details
         using Hash = _Hash;
         using Pred = _Pred;
         using HashingStrategy = HashingStrategy::PowerOfTwoHashing;
-        using ProbingStrategy = ProbingStrategy::LinearProbing;
+        using ProbingStrategy = ProbingStrategy::QuadraticProbing;
 
         struct Entry
         {
