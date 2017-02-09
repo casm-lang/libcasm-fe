@@ -97,6 +97,10 @@ class ChainedHashMap final : public HashMapBase< Details >
     Entry* searchEntry( const Key& key, const std::size_t hashCode ) const
         noexcept override
     {
+#ifdef HASH_MAP_PERF
+        HashMap::m_performanceStatistics.searched();
+#endif
+
         static Pred equals;
 
         if( HashMap::m_buckets == nullptr )
@@ -104,13 +108,24 @@ class ChainedHashMap final : public HashMapBase< Details >
             return nullptr;
         }
 
+#ifdef HASH_MAP_PERF
+        std::size_t distance = 0UL;
+#endif
+
         const auto bucket = bucketAt( hashCode );
         for( auto entry = bucket->entry; entry != nullptr; entry = entry->next )
         {
             if( ( entry->hashCode == hashCode ) and equals( entry->key, key ) )
             {
+#ifdef HASH_MAP_PERF
+                HashMap::m_performanceStatistics.probedOnSearch( distance );
+#endif
                 return entry;
             }
+
+#ifdef HASH_MAP_PERF
+            ++distance;
+#endif
         }
 
         return nullptr;
@@ -120,6 +135,10 @@ class ChainedHashMap final : public HashMapBase< Details >
         noexcept override
     {
         assert( HashMap::m_buckets != nullptr );
+
+#ifdef HASH_MAP_PERF
+        HashMap::m_performanceStatistics.inserted();
+#endif
 
         entry->hashCode = hashCode;
 
@@ -134,6 +153,10 @@ class ChainedHashMap final : public HashMapBase< Details >
         if( HashMap::m_buckets )
         {
             delete[] HashMap::m_buckets;
+
+#ifdef HASH_MAP_PERF
+            HashMap::m_performanceStatistics.resized();
+#endif
         }
         HashMap::m_buckets = new Bucket[ newCapacity ];
         std::memset( HashMap::m_buckets, 0, sizeof( Bucket ) * newCapacity );

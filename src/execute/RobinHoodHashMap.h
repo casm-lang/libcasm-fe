@@ -91,6 +91,10 @@ class RobinHoodHashMap final : public HashMapBase< Details >
     Entry* searchEntry( const Key& key, const std::size_t hashCode ) const
         noexcept override
     {
+#ifdef HASH_MAP_PERF
+        HashMap::m_performanceStatistics.searched();
+#endif
+
         static Pred equals;
 
         const auto buckets = HashMap::m_buckets;
@@ -111,12 +115,18 @@ class RobinHoodHashMap final : public HashMapBase< Details >
 
             if( bucket->empty() or ( distance > bucket->distance ) )
             {
+#ifdef HASH_MAP_PERF
+                HashMap::m_performanceStatistics.probedOnSearch( distance );
+#endif
                 return nullptr;
             }
 
             if( ( bucket->hashCode == hashCode )
                 and equals( bucket->entry->key, key ) )
             {
+#ifdef HASH_MAP_PERF
+                HashMap::m_performanceStatistics.probedOnSearch( distance );
+#endif
                 return bucket->entry;
             }
         }
@@ -128,6 +138,10 @@ class RobinHoodHashMap final : public HashMapBase< Details >
         noexcept override
     {
         assert( HashMap::m_buckets != nullptr );
+
+#ifdef HASH_MAP_PERF
+        HashMap::m_performanceStatistics.inserted();
+#endif
 
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
@@ -141,6 +155,10 @@ class RobinHoodHashMap final : public HashMapBase< Details >
 
             if( bucket->empty() )
             {
+#ifdef HASH_MAP_PERF
+                HashMap::m_performanceStatistics.probedOnInsert( distance );
+#endif
+
                 bucket->hashCode = hashCode;
                 bucket->distance = distance;
                 bucket->entry = entry;
@@ -182,6 +200,10 @@ class RobinHoodHashMap final : public HashMapBase< Details >
             }
 
             delete oldBuckets;
+
+#ifdef HASH_MAP_PERF
+            HashMap::m_performanceStatistics.resized();
+#endif
         }
     }
 };
