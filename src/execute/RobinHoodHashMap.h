@@ -109,6 +109,8 @@ class RobinHoodHashMap final : public HashMapBase< Details >
 
         for( auto distance = 0UL;; ++distance )
         {
+            assert( distance < capacity );
+
             const auto index = HashingStrategy::compress(
                 initialIndex + distance, capacity );
             const auto bucket = buckets + index;
@@ -149,6 +151,8 @@ class RobinHoodHashMap final : public HashMapBase< Details >
 
         for( auto distance = 0UL;; ++distance )
         {
+            assert( distance < capacity );
+
             const auto index = HashingStrategy::compress(
                 initialIndex + distance, capacity );
             const auto bucket = buckets + index;

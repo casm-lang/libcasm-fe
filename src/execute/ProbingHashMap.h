@@ -131,8 +131,10 @@ class ProbingHashMap final : public HashMapBase< Details >
         const auto initialIndex
             = HashingStrategy::compress( hashCode, capacity );
 
-        for( std::size_t round = 0; round < capacity; round++ )
+        for( std::size_t round = 0;; round++ )
         {
+            assert( round < capacity );
+
             const auto probedIndex
                 = ProbingStrategy::probe( initialIndex, round );
             const auto index
@@ -174,8 +176,10 @@ class ProbingHashMap final : public HashMapBase< Details >
         const auto initialIndex
             = HashingStrategy::compress( hashCode, capacity );
 
-        for( std::size_t round = 0; round < capacity; round++ )
+        for( std::size_t round = 0;; round++ )
         {
+            assert( round < capacity );
+
             const auto probedIndex
                 = ProbingStrategy::probe( initialIndex, round );
             const auto index
