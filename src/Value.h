@@ -70,16 +70,18 @@ namespace libcasm_fe
         value_t( FLOATING_T float_ );
         value_t( bool boolean );
         value_t( RuleNode* rule );
-        value_t( std::string* string );
+        value_t( std::string* string ); // takes over the ownership
         value_t( const Type& t, List* list );
         value_t( const enum_value_t* enum_val );
-        value_t( const rational_t* val );
+        value_t( const rational_t* val ); // takes over the ownership
         value_t( symbol_t* sym );
-        value_t( NumberRange* numberRange );
+        value_t( NumberRange* numberRange ); // takes over the ownership
         value_t( const value_t& other );
         value_t( value_t&& other ) noexcept;
+        ~value_t();
 
         value_t& operator=( const value_t& other );
+        value_t& operator=( value_t&& other );
         bool operator==( const value_t& other ) const;
         bool operator!=( const value_t& other ) const;
 

@@ -87,7 +87,7 @@ Update* ExecutionPassBase::addUpdate( Function* function,
 
     Update* up = reinterpret_cast< Update* >(
         stack.allocate( sizeof( Update ) ) ); // FIXME make it nicer!!
-    up->value = value;
+    up->value = std::move( value );
     up->func = function->id;
     up->args = &it.key();
     up->location = &location;
@@ -196,7 +196,7 @@ void ExecutionPassBase::applyUpdates()
             // but we need to know if a key was set to undef explicitly in
             // symbolic
             // mode
-            *location = u->value;
+            *location = std::move( u->value );
         }
     }
     updateSetManager.clear();
@@ -661,7 +661,8 @@ namespace libcasm_fe
                                         ? new std::string( "true" )
                                         : new std::string( "false" ) );
                 case TypeType::ENUM:
-                    return value_t( arg.value.enum_val->name );
+                    return value_t(
+                        new std::string( *arg.value.enum_val->name ) );
                 case TypeType::UNDEF:
                     return value_t( new std::string( "undef" ) );
                 default:
@@ -1024,7 +1025,7 @@ value_t ExecutionPassBase::visit_floating_atom( FloatingAtom* atom )
 
 value_t ExecutionPassBase::visit_rational_atom( RationalAtom* atom )
 {
-    return value_t( &atom->val_ );
+    return value_t( new rational_t( atom->val_ ) );
 }
 
 value_t ExecutionPassBase::visit_rule_atom( RuleAtom* atom )
@@ -1039,7 +1040,7 @@ value_t ExecutionPassBase::visit_boolean_atom( BooleanAtom* atom )
 
 value_t ExecutionPassBase::visit_string_atom( StringAtom* atom )
 {
-    return value_t( &atom->string );
+    return value_t( new std::string( atom->string ) );
 }
 
 value_t ExecutionPassBase::visit_function_atom(
