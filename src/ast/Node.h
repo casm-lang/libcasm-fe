@@ -65,7 +65,7 @@ namespace libcasm_fe
                 ASSERT_RULE,
                 ASSURE_RULE,
                 SKIP_RULE,
-                DIEDIE_RULE,
+                ABORT_RULE,
                 IMPOSSIBLE_RULE,
                 CONDITIONAL_RULE,
                 CASE_RULE,

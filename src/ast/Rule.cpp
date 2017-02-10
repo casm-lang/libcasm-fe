@@ -79,8 +79,8 @@ SkipRule::SkipRule()
 {
 }
 
-DieDieRule::DieDieRule( const Expression::Ptr& expression )
-: Rule( Node::Type::DIEDIE_RULE )
+AbortRule::AbortRule( const Expression::Ptr& expression )
+: Rule( Node::Type::ABORT_RULE )
 , m_expression( expression )
 {
 }
@@ -90,7 +90,7 @@ ImpossibleRule::ImpossibleRule()
 {
 }
 
-Expression::Ptr DieDieRule::expression() const
+Expression::Ptr AbortRule::expression() const
 {
     return m_expression;
 }

@@ -95,12 +95,12 @@ namespace libcasm_fe
             SkipRule();
         };
 
-        class DieDieRule : public Rule
+        class AbortRule : public Rule
         {
           public:
-            using Ptr = std::shared_ptr< DieDieRule >;
+            using Ptr = std::shared_ptr< AbortRule >;
 
-            DieDieRule( const Expression::Ptr& expression );
+            AbortRule( const Expression::Ptr& expression );
 
             Expression::Ptr expression() const;
 
