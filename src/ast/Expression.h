@@ -29,6 +29,7 @@
 #include "Node.h"
 
 #include "../../casm-ir/src/Value.h"
+#include "../../casm-ir/src/Type.h"
 
 namespace libcasm_fe
 {
@@ -41,11 +42,11 @@ namespace libcasm_fe
 
             Expression( Node::Type type );
 
-            void setType( libcasm_ir::Type* type );
-            libcasm_ir::Type* type() const;
+            void setType( const libcasm_ir::Type::Ptr& type );
+            libcasm_ir::Type::Ptr type() const;
 
           private:
-            libcasm_ir::Type* m_type;
+            libcasm_ir::Type::Ptr m_type;
         };
 
         using Expressions = NodeList< Expression >;

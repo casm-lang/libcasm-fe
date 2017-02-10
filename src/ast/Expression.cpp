@@ -25,8 +25,6 @@
 
 #include "Expression.h"
 
-#include "../../casm-ir/src/Type.h"
-
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -36,12 +34,12 @@ Expression::Expression( Node::Type type )
 {
 }
 
-void Expression::setType( libcasm_ir::Type* type )
+void Expression::setType( const libcasm_ir::Type::Ptr& type )
 {
     m_type = type;
 }
 
-libcasm_ir::Type* Expression::type() const
+libcasm_ir::Type::Ptr Expression::type() const
 {
     return m_type;
 }

@@ -29,11 +29,6 @@
 #include "Node.h"
 #include "Rule.h"
 
-namespace libcasm_ir
-{
-    class Type;
-}
-
 namespace libcasm_fe
 {
     namespace Ast
