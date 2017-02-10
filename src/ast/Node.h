@@ -54,7 +54,7 @@ namespace libcasm_fe
                 ENUMERATION_DEFINITION,
 
                 // expressions
-                ATOM,
+                VALUE_ATOM,
                 DIRECT_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,
                 UNARY_EXPRESSION,

@@ -44,14 +44,14 @@ libcasm_ir::Type::Ptr Expression::type() const
     return m_type;
 }
 
-Atom::Atom( const libcasm_ir::Value& value )
-: Expression( Node::Type::ATOM )
+ValueAtom::ValueAtom( const libcasm_ir::Value& value )
+: Expression( Node::Type::VALUE_ATOM )
 , m_value( value )
 {
     //Expression::setType( value.type() ); FIXME enable this when ir uses Type::Ptr!!
 }
 
-libcasm_ir::Value Atom::value() const
+libcasm_ir::Value ValueAtom::value() const
 {
     return m_value;
 }

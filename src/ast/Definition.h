@@ -94,15 +94,15 @@ namespace libcasm_fe
                 const NodeList< UpdateRule >::Ptr& initializers );
             NodeList< UpdateRule >::Ptr initializers() const;
 
-            void setDefaultValue( const Atom::Ptr& defaultValue );
-            Atom::Ptr defaultValue() const;
+            void setDefaultValue( const ValueAtom::Ptr& defaultValue );
+            ValueAtom::Ptr defaultValue() const;
 
           private:
             Category m_category;
             NodeList< IdentifierNode >::Ptr m_argumentTypeNames;
             IdentifierNode::Ptr m_returnTypeName;
             NodeList< UpdateRule >::Ptr m_initializers;
-            Atom::Ptr m_defaultValue;
+            ValueAtom::Ptr m_defaultValue;
         };
 
         class DerivedDefinition : public Definition

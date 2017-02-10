@@ -99,12 +99,12 @@ NodeList< UpdateRule >::Ptr FunctionDefinition::initializers() const
     return m_initializers;
 }
 
-void FunctionDefinition::setDefaultValue( const Atom::Ptr& defaultValue )
+void FunctionDefinition::setDefaultValue( const ValueAtom::Ptr& defaultValue )
 {
     m_defaultValue = defaultValue;
 }
 
-Atom::Ptr FunctionDefinition::defaultValue() const
+ValueAtom::Ptr FunctionDefinition::defaultValue() const
 {
     return m_defaultValue;
 }

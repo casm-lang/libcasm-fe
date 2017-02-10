@@ -51,12 +51,12 @@ namespace libcasm_fe
 
         using Expressions = NodeList< Expression >;
 
-        class Atom : public Expression
+        class ValueAtom : public Expression
         {
           public:
-            using Ptr = std::shared_ptr< Atom >;
+            using Ptr = std::shared_ptr< ValueAtom >;
 
-            Atom( const libcasm_ir::Value& value );
+            ValueAtom( const libcasm_ir::Value& value );
 
             libcasm_ir::Value value() const;
 
