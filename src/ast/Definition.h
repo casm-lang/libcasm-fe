@@ -48,8 +48,12 @@ namespace libcasm_fe
 
             IdentifierNode::Ptr identifier() const;
 
+            void setRelationType( const libcasm_ir::RelationType::Ptr& relationType );
+            libcasm_ir::RelationType::Ptr relationType() const;
+
           private:
             IdentifierNode::Ptr m_identifier;
+            libcasm_ir::RelationType::Ptr m_relationType;
         };
 
         using Definitions = NodeList< Definition >;

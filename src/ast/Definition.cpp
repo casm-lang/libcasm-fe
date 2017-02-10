@@ -31,12 +31,23 @@ using namespace Ast;
 Definition::Definition( Node::Type type, const IdentifierNode::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
+, m_relationType( nullptr )
 {
 }
 
 IdentifierNode::Ptr Definition::identifier() const
 {
     return m_identifier;
+}
+
+void Definition::setRelationType( const libcasm_ir::RelationType::Ptr& relationType )
+{
+    m_relationType = relationType;
+}
+
+libcasm_ir::RelationType::Ptr Definition::relationType() const
+{
+    return m_relationType;
 }
 
 VariableDefinition::VariableDefinition(
