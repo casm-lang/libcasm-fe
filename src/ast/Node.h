@@ -44,6 +44,7 @@ namespace libcasm_fe
             {
                 NODE_LIST,
                 SPECIFICATION,
+                IDENTIFIER,
 
                 // definitions
                 VARIABLE_DEFINITION,
@@ -108,6 +109,19 @@ namespace libcasm_fe
             : Node( Node::Type::NODE_LIST )
             {
             }
+        };
+
+        class IdentifierNode : public Node
+        {
+          public:
+            using Ptr = std::shared_ptr< IdentifierNode >;
+
+            IdentifierNode( const std::string& identifier );
+
+            std::string identifier() const;
+
+          private:
+            std::string m_identifier;
         };
 
         template < typename T, typename... Args >

@@ -48,3 +48,14 @@ yy::location libcasm_fe::Ast::Node::location() const
 {
     return m_location;
 }
+
+IdentifierNode::IdentifierNode( const std::string& identifier )
+: Node( Node::Type::IDENTIFIER )
+, m_identifier( identifier )
+{
+}
+
+std::string IdentifierNode::identifier() const
+{
+    return m_identifier;
+}
