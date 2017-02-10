@@ -31,6 +31,8 @@
 
 #include "../allocator/BlockAllocator.h"
 
+//#define HASH_MAP_PERF
+
 namespace details
 {
     /**
@@ -101,6 +103,48 @@ namespace details
         };
     }
 }
+
+#ifdef HASH_MAP_PERF
+/**
+ * Collects hash map related information
+ *
+ * @note Not thread safe!
+ */
+class HashMapPerformanceStatistics
+{
+  public:
+    void probedOnSearch( std::size_t probeSequenceLength ) const;
+    void probedOnInsert( std::size_t probeSequenceLength ) const;
+
+    void searched() const;
+    void inserted() const;
+    void resized() const;
+
+    std::size_t longestSearchProbeSequenceLength() const;
+    std::size_t cumulativeSearchProbeSequenceLength() const;
+
+    std::size_t longestInsertProbeSequenceLength() const;
+    std::size_t cumulativeInsertProbeSequenceLength() const;
+
+    std::size_t numberOfSearches() const;
+    std::size_t numberOfInsertions() const;
+    std::size_t numberOfResizes() const;
+
+    static HashMapPerformanceStatistics& overallStatistics();
+
+  private:
+    mutable std::size_t m_longestSearchProbeSequenceLength = 0UL;
+    mutable std::size_t m_cumulativeSearchProbeSequenceLength = 0UL;
+    mutable std::size_t m_longestInsertProbeSequenceLength = 0UL;
+    mutable std::size_t m_cumulativeInsertProbeSequenceLength = 0UL;
+    mutable std::size_t m_numberOfSearches = 0UL;
+    mutable std::size_t m_numberOfInsertions = 0UL;
+    mutable std::size_t m_numberOfResizes = 0UL;
+};
+
+std::ostream& operator<<(
+    std::ostream& stream, const HashMapPerformanceStatistics& statistics );
+#endif
 
 template < typename Details >
 class HashMapBase
@@ -177,6 +221,9 @@ class HashMapBase
     , m_size( 0UL )
     , m_capacity( std::max( initialCapacity, 1UL ) )
     , m_lastEntry( nullptr )
+#ifdef HASH_MAP_PERF
+    , m_performanceStatistics()
+#endif
     {
     }
 
@@ -185,6 +232,9 @@ class HashMapBase
     , m_size( other.m_size )
     , m_capacity( other.m_capacity )
     , m_lastEntry( other.m_lastEntry )
+#ifdef HASH_MAP_PERF
+    , m_performanceStatistics( other.m_performanceStatistics )
+#endif
     {
         std::swap( m_buckets, other.m_buckets );
         std::swap( m_entryAllocator, other.m_entryAllocator );
@@ -196,6 +246,9 @@ class HashMapBase
         m_size = other.m_size;
         m_capacity = other.m_capacity;
         m_lastEntry = other.m_lastEntry;
+#ifdef HASH_MAP_PERF
+        m_performanceStatistics = other.m_performanceStatistics;
+#endif
         std::swap( m_entryAllocator, other.m_entryAllocator );
         return *this;
     }
@@ -341,6 +394,13 @@ class HashMapBase
         }
     }
 
+#ifdef HASH_MAP_PERF
+    HashMapPerformanceStatistics performanceStatistics() const
+    {
+        return m_performanceStatistics;
+    }
+#endif
+
   protected:
     /**
      * Searches for an entry with the given \a key.
@@ -442,6 +502,10 @@ class HashMapBase
 
     Entry*
         m_lastEntry; /**< Used to build a single-linked list in createEntry() */
+
+#ifdef HASH_MAP_PERF
+    HashMapPerformanceStatistics m_performanceStatistics;
+#endif
 
   private:
     BlockAllocator< 4096 > m_entryAllocator;

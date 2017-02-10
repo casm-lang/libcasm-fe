@@ -113,6 +113,10 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
         global_driver->error( e );
     }
 
+#ifdef HASH_MAP_PERF
+    std::cout << HashMapPerformanceStatistics::overallStatistics() << std::endl;
+#endif
+
     return global_driver->ok();
 }
 
