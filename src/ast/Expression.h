@@ -100,7 +100,7 @@ namespace libcasm_fe
           public:
             enum class TargetType
             {
-                Builtin,
+                Rule,
                 Unknown
             };
 
