@@ -25,6 +25,8 @@
 
 #include "Value.h"
 
+#include <type_traits>
+
 #include "cpp/Default.h"
 #include "cpp/Math.h"
 
@@ -1177,6 +1179,491 @@ SkipList::SkipList( size_t skip, BottomList* btm )
 {
 }
 
+template < typename T >
+constexpr int bitsize()
+{
+    return sizeof( T ) * 8;
+}
+
+template < typename T >
+constexpr T rotate_left( T v, unsigned shift )
+{
+    static_assert( std::is_unsigned< T >::value, "must be unsigned" );
+    assert( ( 0 < shift ) and ( shift < bitsize< T >() ) );
+    return ( v << shift ) | ( v >> ( bitsize< T >() - shift ) );
+}
+
+template < typename T >
+constexpr T rotate_right( T v, unsigned shift )
+{
+    static_assert( std::is_unsigned< T >::value, "must be unsigned" );
+    assert( ( 0 < shift ) and ( shift < bitsize< T >() ) );
+    return ( v >> shift ) | ( v << ( bitsize< T >() - shift ) );
+}
+
+/**
+ * From Boost
+ */
+template < typename T >
+constexpr std::size_t hash_combine( std::size_t seed, const T& v )
+{
+    return seed ^ ( std::hash< T >{}( v ) + 0x9e3779b9 + ( seed << 6 )
+                      + ( seed >> 2 ) );
+}
+
+template < typename Head, typename... Tail >
+constexpr std::size_t hash_combine(
+    std::size_t seed, const Head& head, Tail&&... tail )
+{
+    return hash_combine(
+        hash_combine( seed, head ), std::forward< Tail >( tail )... );
+}
+
+static std::hash< value_t > value_hasher{};
+
+/**
+ * FNV-1a hash
+ * @see http://www.isthe.com/chongo/tech/comp/fnv/
+ */
+static std::size_t fnv1a_hash(
+    const std::vector< value_t >& key, std::size_t seed )
+{
+#if __SIZEOF_SIZE_T__ == 4
+    constexpr uint32_t OFFSET_BASIS = UINT32_C( 2166136261 );
+    constexpr uint32_t FNV_PRIME = UINT32_C( 16777619 );
+#elif __SIZEOF_SIZE_T__ == 8
+    constexpr uint64_t OFFSET_BASIS = UINT64_C( 14695981039346656037 );
+    constexpr uint64_t FNV_PRIME = UINT64_C( 1099511628211 );
+#else
+    static_assert( false, "define an offset basis and a fnv prime" );
+#endif
+
+    std::size_t h = OFFSET_BASIS;
+
+    for( const auto& v : key )
+    {
+        auto k = value_hasher( v );
+        for( int i = 0; i < sizeof( std::size_t ); i++ )
+        {
+            h ^= ( uint8_t )( k );
+            h *= FNV_PRIME;
+            k >>= 8;
+        }
+    }
+
+    return h;
+}
+
+template < typename T >
+T murmur_hashmix( T h )
+{
+    assert( !"hash mix not implemented for this type" );
+    return h;
+}
+
+template <>
+uint32_t murmur_hashmix( uint32_t h )
+{
+    h ^= h >> 16;
+    h *= UINT32_C( 0x85ebca6b );
+    h ^= h >> 13;
+    h *= UINT32_C( 0xc2b2ae35 );
+    h ^= h >> 16;
+    return h;
+}
+
+template <>
+uint64_t murmur_hashmix( uint64_t h )
+{
+    h ^= h >> 33;
+    h *= UINT64_C( 0xff51afd7ed558ccd );
+    h ^= h >> 33;
+    h *= UINT64_C( 0xc4ceb9fe1a85ec53 );
+    h ^= h >> 33;
+    return h;
+}
+
+/**
+ * Based on MurmurHash3 by Austin Appleby
+ * @see https://github.com/aappleby/smhasher
+ */
+static uint32_t murmur3_x86_32_hash(
+    const std::vector< value_t >& key, uint32_t seed )
+{
+    constexpr uint32_t c1 = UINT32_C( 0xcc9e2d51 );
+    constexpr uint32_t c2 = UINT32_C( 0x1b873593 );
+    constexpr uint32_t n = UINT32_C( 0xe6546b64 );
+
+    uint32_t h = seed;
+
+    for( const auto& v : key )
+    {
+        uint32_t k = value_hasher( v );
+        k *= c1;
+        k = rotate_left( k, 15 );
+        k *= c2;
+
+        h ^= k;
+        h = rotate_left( h, 13 );
+        h = h * 5 + n;
+    }
+
+    h ^= key.size() * sizeof( std::size_t );
+
+    return murmur_hashmix( h );
+}
+
+/**
+ * Based on MurmurHash3 by Austin Appleby
+ * @see https://github.com/aappleby/smhasher
+ */
+static std::pair< uint64_t, uint64_t > murmur3_x64_128_hash(
+    const std::vector< value_t >& key, uint64_t seed )
+{
+    constexpr uint64_t c1 = UINT64_C( 0x87c37b91114253d5 );
+    constexpr uint64_t c2 = UINT64_C( 0x4cf5ad432745937f );
+    constexpr uint64_t n1 = UINT64_C( 0x52dce729 );
+    constexpr uint64_t n2 = UINT64_C( 0x38495ab5 );
+
+    const auto offset = ( key.size() % 2 );
+
+    const auto begin = key.cbegin();
+    const auto end = key.cend();
+
+    // initialization
+    uint64_t h1 = seed;
+    uint64_t h2 = seed;
+
+    // 2 at a time
+    for( auto it = begin + offset; it != end; )
+    {
+        uint64_t k1 = value_hasher( *( it++ ) );
+        k1 *= c1;
+        k1 = rotate_left( k1, 31 );
+        k1 *= c2;
+
+        h1 ^= k1;
+        h1 = rotate_left( h1, 27 );
+        h1 += h2;
+        h1 = h1 * 5 + n1;
+
+        uint64_t k2 = value_hasher( *( it++ ) );
+        k2 *= c2;
+        k2 = rotate_left( k2, 33 );
+        k2 *= c1;
+
+        h2 ^= k2;
+        h2 = rotate_left( h2, 31 );
+        h2 += h1;
+        h2 = h2 * 5 + n2;
+    }
+
+    // remaining value
+    if( offset != 0 )
+    {
+        uint64_t k = value_hasher( *begin );
+        k *= c1;
+        k = rotate_left( k, 31 );
+        k *= c2;
+
+        h1 ^= k;
+    }
+
+    // finalization
+    h1 ^= key.size() * sizeof( std::size_t );
+    h2 ^= key.size() * sizeof( std::size_t );
+
+    h1 += h2;
+    h2 += h1;
+
+    h1 = murmur_hashmix( h1 );
+    h2 = murmur_hashmix( h2 );
+
+    h1 += h2;
+    h2 += h1;
+
+    return std::make_pair( h1, h2 );
+}
+
+static uint64_t murmur3_x64_64_hash(
+    const std::vector< value_t >& key, uint64_t seed )
+{
+    return murmur3_x64_128_hash( key, seed ).first;
+}
+
+static std::size_t murmur3_hash(
+    const std::vector< value_t >& key, std::size_t seed )
+{
+#if __SIZEOF_SIZE_T__ == 4
+    return murmur3_x32_32_hash( key, seed );
+#elif __SIZEOF_SIZE_T__ == 8
+    return murmur3_x64_64_hash( key, seed );
+#else
+    static_assert( false, "murmur3_hash not implemented for your platform" );
+#endif
+}
+
+constexpr uint32_t XXH32_PRIME_1 = UINT64_C( 2654435761 );
+constexpr uint32_t XXH32_PRIME_2 = UINT64_C( 2246822519 );
+constexpr uint32_t XXH32_PRIME_3 = UINT64_C( 3266489917 );
+constexpr uint32_t XXH32_PRIME_4 = UINT64_C( 668265263 );
+constexpr uint32_t XXH32_PRIME_5 = UINT64_C( 374761393 );
+
+static uint32_t xxh32_round( uint32_t h, uint32_t v )
+{
+    h += v * XXH32_PRIME_2;
+    h = rotate_left( h, 31 );
+    h *= XXH32_PRIME_1;
+    return h;
+}
+
+static uint32_t xxh32_mergeRound( uint32_t h, uint32_t v )
+{
+    h ^= xxh32_round( 0, v );
+    h = h * XXH32_PRIME_1 + XXH32_PRIME_4;
+    return h;
+}
+
+/**
+ * Based on xxHash implementation of Yann Collet
+ * @see https://github.com/Cyan4973/xxHash
+ */
+static uint32_t xx_x86_32_hash(
+    const std::vector< value_t >& key, uint32_t seed )
+{
+    uint32_t h;
+
+    auto it = key.cbegin();
+    const auto end = key.cend();
+
+    // 4 values at a time
+    if( key.size() >= 4 )
+    {
+        uint32_t v[ 4 ] = { seed + XXH32_PRIME_1 + XXH32_PRIME_2,
+            seed + XXH32_PRIME_2, seed, seed - XXH32_PRIME_1 };
+
+        for( ; ( it + 4 ) <= end; it += 4 )
+        {
+            v[ 0 ] = xxh32_round( v[ 0 ], value_hasher( *( it + 0 ) ) );
+            v[ 1 ] = xxh32_round( v[ 1 ], value_hasher( *( it + 1 ) ) );
+            v[ 2 ] = xxh32_round( v[ 2 ], value_hasher( *( it + 2 ) ) );
+            v[ 3 ] = xxh32_round( v[ 3 ], value_hasher( *( it + 3 ) ) );
+        }
+
+        h = rotate_left( v[ 0 ], 1 ) + rotate_left( v[ 1 ], 7 )
+            + rotate_left( v[ 2 ], 12 ) + rotate_left( v[ 3 ], 18 );
+    }
+    else
+    {
+        h = seed + XXH32_PRIME_5;
+    }
+
+    h += key.size() * sizeof( std::size_t );
+
+    // remaining values, one at a time
+    for( ; it != end; ++it )
+    {
+        h += value_hasher( *it ) * XXH32_PRIME_3;
+        h = rotate_left( h, 17 ) * XXH32_PRIME_4;
+    }
+
+    // finalization
+    h ^= h >> 15;
+    h *= XXH32_PRIME_2;
+    h ^= h >> 13;
+    h *= XXH32_PRIME_3;
+    h ^= h >> 16;
+
+    return h;
+}
+
+constexpr uint64_t XXH64_PRIME_1 = UINT64_C( 11400714785074694791 );
+constexpr uint64_t XXH64_PRIME_2 = UINT64_C( 14029467366897019727 );
+constexpr uint64_t XXH64_PRIME_3 = UINT64_C( 1609587929392839161 );
+constexpr uint64_t XXH64_PRIME_4 = UINT64_C( 9650029242287828579 );
+constexpr uint64_t XXH64_PRIME_5 = UINT64_C( 2870177450012600261 );
+
+static uint64_t xxh64_round( uint64_t h, uint64_t v )
+{
+    h += v * XXH64_PRIME_2;
+    h = rotate_left( h, 31 );
+    h *= XXH64_PRIME_1;
+    return h;
+}
+
+static uint64_t xxh64_mergeRound( uint64_t h, uint64_t v )
+{
+    h ^= xxh64_round( 0, v );
+    h = h * XXH64_PRIME_1 + XXH64_PRIME_4;
+    return h;
+}
+
+/**
+ * Based on xxHash implementation of Yann Collet
+ * @see https://github.com/Cyan4973/xxHash
+ */
+static uint64_t xx_x64_64_hash(
+    const std::vector< value_t >& key, uint64_t seed )
+{
+    uint64_t h;
+
+    auto it = key.cbegin();
+    const auto end = key.cend();
+
+    // 4 values at a time
+    if( key.size() >= 4 )
+    {
+        uint64_t v[ 4 ] = { seed + XXH64_PRIME_1 + XXH64_PRIME_2,
+            seed + XXH64_PRIME_2, seed, seed - XXH64_PRIME_1 };
+
+        for( ; ( it + 4 ) <= end; it += 4 )
+        {
+            v[ 0 ] = xxh64_round( v[ 0 ], value_hasher( *( it + 0 ) ) );
+            v[ 1 ] = xxh64_round( v[ 1 ], value_hasher( *( it + 1 ) ) );
+            v[ 2 ] = xxh64_round( v[ 2 ], value_hasher( *( it + 2 ) ) );
+            v[ 3 ] = xxh64_round( v[ 3 ], value_hasher( *( it + 3 ) ) );
+        }
+
+        h = rotate_left( v[ 0 ], 1 ) + rotate_left( v[ 1 ], 7 )
+            + rotate_left( v[ 2 ], 12 ) + rotate_left( v[ 3 ], 18 );
+
+        h = xxh64_mergeRound( h, v[ 0 ] );
+        h = xxh64_mergeRound( h, v[ 1 ] );
+        h = xxh64_mergeRound( h, v[ 2 ] );
+        h = xxh64_mergeRound( h, v[ 3 ] );
+    }
+    else
+    {
+        h = seed + XXH64_PRIME_5;
+    }
+
+    h += key.size() * sizeof( std::size_t );
+
+    // remaining values, one at a time
+    for( ; it != end; ++it )
+    {
+        h ^= xxh64_round( 0, value_hasher( *it ) );
+        h = rotate_left( h, 27 ) * XXH64_PRIME_1 + XXH64_PRIME_4;
+    }
+
+    // finalization
+    h ^= h >> 33;
+    h *= XXH64_PRIME_2;
+    h ^= h >> 29;
+    h *= XXH64_PRIME_3;
+    h ^= h >> 32;
+
+    return h;
+}
+
+static std::size_t xx_hash(
+    const std::vector< value_t >& key, std::size_t seed )
+{
+#if __SIZEOF_SIZE_T__ == 4
+    return xx_x86_32_hash( key, seed );
+#elif __SIZEOF_SIZE_T__ == 8
+    return xx_x64_64_hash( key, seed );
+#else
+    static_assert( false, "xx_hash not implemented for your platform" );
+#endif
+}
+
+/**
+ * Florians old implementation
+ */
+static std::size_t legacy_hash(
+    const std::vector< value_t >& key, std::size_t seed )
+{
+    std::size_t h = 0;
+    for( const auto& v : key )
+    {
+        h += value_hasher( v );
+    }
+    return h;
+}
+
+static void sip_round( uint64_t& v0, uint64_t& v1, uint64_t& v2, uint64_t& v3 )
+{
+    v0 += v1;
+    v2 += v3;
+    v1 = rotate_left( v1, 13 );
+    v3 = rotate_left( v3, 16 );
+
+    v1 ^= v0;
+    v3 ^= v2;
+    v0 = rotate_left( v0, 32 );
+
+    v0 += v3;
+    v2 += v1;
+    v1 = rotate_left( v1, 17 );
+    v3 = rotate_left( v3, 21 );
+
+    v1 ^= v2;
+    v3 ^= v0;
+    v2 = rotate_left( v2, 32 );
+}
+
+/**
+ * SipHash: a fast short-input PRF
+ * Jean-Philippe Aumasson and Daniel J. Bernstein
+ * @see https://131002.net/siphash/
+ */
+static std::size_t sip_x64_128_hash( const std::vector< value_t >& key,
+    const std::pair< uint64_t, uint64_t >& k )
+{
+    constexpr uint64_t c0 = UINT64_C( 0x736f6d6570736575 );
+    constexpr uint64_t c1 = UINT64_C( 0x646f72616e646f6d );
+    constexpr uint64_t c2 = UINT64_C( 0x6c7967656e657261 );
+    constexpr uint64_t c3 = UINT64_C( 0x7465646279746573 );
+
+    // sip hash iterations
+    constexpr int c = 2; // compression iterations, should be >= 2 (see paper)
+    constexpr int d = 4; // finalization iterations, should be >= 4 (see paper)
+
+    // initialization
+    uint64_t v0 = k.first ^ c0;
+    uint64_t v1 = k.second ^ c1;
+    uint64_t v2 = k.first ^ c2;
+    uint64_t v3 = k.second ^ c3;
+
+    // compression
+    for( const auto& v : key )
+    {
+        const uint64_t m = value_hasher( v );
+
+        v3 ^= m;
+        for( int i = 0; i < c; ++i )
+        {
+            sip_round( v0, v1, v2, v3 );
+        }
+        v0 ^= m;
+    }
+
+    // finalization
+    v2 ^= UINT64_C( 0xff );
+    for( int i = 0; i < d; ++i )
+    {
+        sip_round( v0, v1, v2, v3 );
+    }
+    return v0 ^ v1 ^ v2 ^ v3;
+}
+
+static std::size_t sip_x64_64_hash(
+    const std::vector< value_t >& key, std::size_t seed )
+{
+    return sip_x64_128_hash( key, std::make_pair( seed, seed ) );
+}
+
+static std::size_t sip_hash(
+    const std::vector< value_t >& key, std::size_t seed )
+{
+#if __SIZEOF_SIZE_T__ == 8
+    return sip_x64_64_hash( key, seed );
+#else
+    static_assert( false, "sip_hash not implemented for your platform" );
+#endif
+}
+
 namespace std
 {
     size_t hash< value_t >::operator()( const value_t& key ) const
@@ -1185,80 +1672,54 @@ namespace std
         {
             case TypeType::INTEGER:
             case TypeType::BIT:
-                return key.value.integer;
+                return std::hash< INTEGER_T >{}( key.value.integer );
             case TypeType::FLOATING:
-                static std::hash< FLOATING_T > floating_hasher;
-                return floating_hasher( key.value.float_ );
+                return std::hash< FLOATING_T >{}( key.value.float_ );
             case TypeType::BOOLEAN:
-                return key.value.boolean;
+                return std::hash< bool >{}( key.value.boolean );
             case TypeType::AGENT:
             case TypeType::UNDEF: // are UNDEF and SELF the same here?
                 return 0;
             case TypeType::RULEREF:
-                return reinterpret_cast< size_t >( key.value.rule );
+                return std::hash< RuleNode* >{}( key.value.rule );
             case TypeType::STRING:
-                static std::hash< std::string > string_hasher;
-                return string_hasher( *key.value.string );
+                return std::hash< std::string >{}( *key.value.string );
             case TypeType::TUPLE:
             case TypeType::TUPLE_OR_LIST:
             case TypeType::LIST:
             {
-                size_t h = 0;
+                size_t h = 0; // TODO incorporate the list size somehow
                 for( const value_t& v : *key.value.list )
                 {
-                    h = h * 31 + operator()( v );
+                    h = hash_combine( h, operator()( v ) );
                 }
                 return h;
             }
             case TypeType::ENUM:
                 return key.value.enum_val->id;
             case TypeType::RATIONAL:
-                return key.value.rat->numerator * 31
-                       + key.value.rat->denominator;
+                return hash_combine( 1,
+                    std::hash< INTEGER_T >{}( key.value.rat->numerator ),
+                    std::hash< INTEGER_T >{}( key.value.rat->denominator ) );
             case TypeType::SYMBOL:
-                return reinterpret_cast< size_t >( key.value.sym );
+                return std::hash< symbol_t* >{}( key.value.sym );
             case TypeType::NUMBER_RANGE:
-                return key.value.numberRange->bottom() * 31
-                       + key.value.numberRange->top();
+                return hash_combine( 2,
+                    std::hash< INTEGER_T >{}( key.value.numberRange->bottom() ),
+                    std::hash< INTEGER_T >{}( key.value.numberRange->top() ) );
             default:
                 throw RuntimeException(
                     "Unsupported type in std::hash<value_t>()" );
         }
     }
 
-    std::hash< value_t > hash< std::vector< value_t > >::hasher;
-
-    /**
-     * FNV-1a hash
-     * @see http://www.isthe.com/chongo/tech/comp/fnv/
-     */
     std::size_t hash< std::vector< value_t > >::operator()(
         const std::vector< value_t >& key ) const
     {
-#if __SIZEOF_SIZE_T__ == 4
-        constexpr std::size_t OFFSET_BASIS = 2166136261UL;
-        constexpr std::size_t FNV_PRIME = 16777619UL;
-#elif __SIZEOF_SIZE_T__ == 8
-        constexpr std::size_t OFFSET_BASIS = 14695981039346656037ULL;
-        constexpr std::size_t FNV_PRIME = 1099511628211ULL;
-#else
-        static_assert( false, "define an offset basis and a fnv prime" );
-#endif
+        // TODO seed should be injected
+        constexpr uint64_t seed = UINT64_C( 14695981039346656037 );
 
-        std::size_t h = OFFSET_BASIS;
-
-        for( const auto& v : key )
-        {
-            auto h1 = hasher( v );
-            for( int i = 0; i < sizeof( std::size_t ); i++ )
-            {
-                h ^= h1 & 0xFF;
-                h *= FNV_PRIME;
-                h1 >>= 8;
-            }
-        }
-
-        return h;
+        return murmur3_hash( key, seed );
     }
 
     std::hash< value_t > hash< HeadList >::hasher;

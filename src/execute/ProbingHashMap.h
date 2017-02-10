@@ -42,13 +42,13 @@ namespace details
             }
         };
 
-        // h(i, k) = h1(k) + i^2
+        // h(i, k) = h1(k) + i / 2 + i^2 / 2
         struct QuadraticProbing
         {
             static constexpr std::size_t probe(
                 const std::size_t index, const std::size_t round )
             {
-                return index + round * round;
+                return index + ( round + round * round ) / 2;
             }
         };
     }
@@ -61,7 +61,7 @@ namespace details
         using Hash = _Hash;
         using Pred = _Pred;
         using HashingStrategy = HashingStrategy::PowerOfTwoHashing;
-        using ProbingStrategy = ProbingStrategy::LinearProbing;
+        using ProbingStrategy = ProbingStrategy::QuadraticProbing;
 
         struct Entry
         {
@@ -115,6 +115,10 @@ class ProbingHashMap final : public HashMapBase< Details >
     Entry* searchEntry( const Key& key, const std::size_t hashCode ) const
         noexcept override
     {
+#ifdef HASH_MAP_PERF
+        HashMap::m_performanceStatistics.searched();
+#endif
+
         static Pred equals;
 
         const auto buckets = HashMap::m_buckets;
@@ -127,8 +131,10 @@ class ProbingHashMap final : public HashMapBase< Details >
         const auto initialIndex
             = HashingStrategy::compress( hashCode, capacity );
 
-        for( std::size_t round = 0; round < capacity; round++ )
+        for( std::size_t round = 0;; round++ )
         {
+            assert( round < capacity );
+
             const auto probedIndex
                 = ProbingStrategy::probe( initialIndex, round );
             const auto index
@@ -137,12 +143,18 @@ class ProbingHashMap final : public HashMapBase< Details >
 
             if( bucket->empty() )
             {
+#ifdef HASH_MAP_PERF
+                HashMap::m_performanceStatistics.probedOnSearch( round );
+#endif
                 return nullptr;
             }
 
             if( ( bucket->hashCode == hashCode )
                 and equals( bucket->entry->key, key ) )
             {
+#ifdef HASH_MAP_PERF
+                HashMap::m_performanceStatistics.probedOnSearch( round );
+#endif
                 return bucket->entry;
             }
         }
@@ -155,13 +167,19 @@ class ProbingHashMap final : public HashMapBase< Details >
     {
         assert( HashMap::m_buckets != nullptr );
 
+#ifdef HASH_MAP_PERF
+        HashMap::m_performanceStatistics.inserted();
+#endif
+
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
         const auto initialIndex
             = HashingStrategy::compress( hashCode, capacity );
 
-        for( std::size_t round = 0; round < capacity; round++ )
+        for( std::size_t round = 0;; round++ )
         {
+            assert( round < capacity );
+
             const auto probedIndex
                 = ProbingStrategy::probe( initialIndex, round );
             const auto index
@@ -170,6 +188,10 @@ class ProbingHashMap final : public HashMapBase< Details >
 
             if( bucket->empty() )
             {
+#ifdef HASH_MAP_PERF
+                HashMap::m_performanceStatistics.probedOnInsert( round );
+#endif
+
                 bucket->hashCode = hashCode;
                 bucket->entry = entry;
 
@@ -201,6 +223,10 @@ class ProbingHashMap final : public HashMapBase< Details >
             }
 
             delete oldBuckets;
+
+#ifdef HASH_MAP_PERF
+            HashMap::m_performanceStatistics.resized();
+#endif
         }
     }
 };
