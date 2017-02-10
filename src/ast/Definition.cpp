@@ -28,58 +28,37 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-VariableDefinition::VariableDefinition(
-    const std::string& identifier, libcasm_ir::Type* type )
-: Definition( Node::Type::VARIABLE_DEFINITION )
+Definition::Definition( Node::Type type, const IdentifierNode::Ptr& identifier )
+: Node( type )
 , m_identifier( identifier )
-, m_type( type )
 {
 }
 
-std::string VariableDefinition::identifier() const
+IdentifierNode::Ptr Definition::identifier() const
 {
     return m_identifier;
 }
 
-libcasm_ir::Type* VariableDefinition::type() const
-{
-    return m_type;
-}
-
-Signature::Signature( const std::vector< libcasm_ir::Type* >& argumentTypes,
-    libcasm_ir::Type* returnType )
-: m_argumentTypes( argumentTypes )
-, m_returnType( returnType )
+VariableDefinition::VariableDefinition(
+    const IdentifierNode::Ptr& identifier, const IdentifierNode::Ptr& typeName )
+: Definition( Node::Type::VARIABLE_DEFINITION, identifier )
+, m_typeName( typeName )
 {
 }
 
-Signature::Signature( const std::vector< libcasm_ir::Type* >& argumentTypes )
-: Signature( argumentTypes, nullptr /* TODO should be void */ )
+IdentifierNode::Ptr VariableDefinition::typeName() const
 {
-}
-
-std::vector< libcasm_ir::Type* > Signature::argumentTypes() const
-{
-    return m_argumentTypes;
-}
-
-libcasm_ir::Type* Signature::returnType() const
-{
-    return m_returnType;
-}
-
-std::size_t Signature::arity() const
-{
-    return m_argumentTypes.size();
+    return m_typeName;
 }
 
 FunctionDefinition::FunctionDefinition( FunctionDefinition::Category category,
-    const std::string& identifier,
-    const Signature::Ptr& signature )
-: Definition( Node::Type::FUNCTION_DEFINITION )
+    const IdentifierNode::Ptr& identifier,
+    const NodeList< IdentifierNode >::Ptr& argumentTypeNames,
+    const IdentifierNode::Ptr& returnTypeName )
+: Definition( Node::Type::FUNCTION_DEFINITION, identifier )
 , m_category( category )
-, m_identifier( identifier )
-, m_signature( signature )
+, m_argumentTypeNames( argumentTypeNames )
+, m_returnTypeName( returnTypeName )
 {
 }
 
@@ -88,14 +67,14 @@ FunctionDefinition::Category FunctionDefinition::category() const
     return m_category;
 }
 
-std::string FunctionDefinition::identifier() const
+NodeList< IdentifierNode >::Ptr FunctionDefinition::argumentTypeNames() const
 {
-    return m_identifier;
+    return m_argumentTypeNames;
 }
 
-Signature::Ptr FunctionDefinition::signature() const
+IdentifierNode::Ptr FunctionDefinition::returnTypeName() const
 {
-    return m_signature;
+    return m_returnTypeName;
 }
 
 void FunctionDefinition::setInitializers(
@@ -119,24 +98,25 @@ Atom::Ptr FunctionDefinition::defaultValue() const
     return m_defaultValue;
 }
 
-DerivedDefinition::DerivedDefinition( const std::string& identifier,
-    const Signature::Ptr& signature,
+DerivedDefinition::DerivedDefinition( const IdentifierNode::Ptr& identifier,
+    const NodeList< VariableDefinition >::Ptr& arguments,
+    const IdentifierNode::Ptr& returnTypeName,
     const Expression::Ptr& expression )
-: Definition( Node::Type::DERIVED_DEFINITION )
-, m_identifier( identifier )
-, m_signature( signature )
+: Definition( Node::Type::DERIVED_DEFINITION, identifier )
+, m_arguments( arguments )
+, m_returnTypeName( returnTypeName )
 , m_expression( expression )
 {
 }
 
-std::string DerivedDefinition::identifier() const
+NodeList< VariableDefinition >::Ptr DerivedDefinition::arguments() const
 {
-    return m_identifier;
+    return m_arguments;
 }
 
-Signature::Ptr DerivedDefinition::signature() const
+IdentifierNode::Ptr DerivedDefinition::returnTypeName() const
 {
-    return m_signature;
+    return m_returnTypeName;
 }
 
 Expression::Ptr DerivedDefinition::expression() const
@@ -144,24 +124,25 @@ Expression::Ptr DerivedDefinition::expression() const
     return m_expression;
 }
 
-RuleDefinition::RuleDefinition( const std::string& identifier,
-    const Signature::Ptr& signature,
+RuleDefinition::RuleDefinition( const IdentifierNode::Ptr& identifier,
+    const NodeList< VariableDefinition >::Ptr& arguments,
+    const IdentifierNode::Ptr& returnTypeName,
     const Rule::Ptr& rule )
-: Definition( Node::Type::RULE_DEFINITION )
-, m_identifier( identifier )
-, m_signature( signature )
+: Definition( Node::Type::RULE_DEFINITION, identifier )
+, m_arguments( arguments )
+, m_returnTypeName( returnTypeName )
 , m_rule( rule )
 {
 }
 
-std::string RuleDefinition::identifier() const
+NodeList< VariableDefinition >::Ptr RuleDefinition::arguments() const
 {
-    return m_identifier;
+    return m_arguments;
 }
 
-Signature::Ptr RuleDefinition::signature() const
+IdentifierNode::Ptr RuleDefinition::returnTypeName() const
 {
-    return m_signature;
+    return m_returnTypeName;
 }
 
 Rule::Ptr RuleDefinition::rule() const
@@ -169,20 +150,14 @@ Rule::Ptr RuleDefinition::rule() const
     return m_rule;
 }
 
-EnumerationDefinition::EnumerationDefinition( const std::string& identifier,
-    const std::vector< std::string >& enumerators )
-: Definition( Node::Type::ENUMERATION_DEFINITION )
-, m_identifier( identifier )
+EnumerationDefinition::EnumerationDefinition( const IdentifierNode::Ptr& identifier,
+    const NodeList< IdentifierNode >::Ptr& enumerators )
+: Definition( Node::Type::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
 }
 
-std::string EnumerationDefinition::identifier() const
-{
-    return m_identifier;
-}
-
-std::vector< std::string > EnumerationDefinition::enumerators() const
+NodeList< IdentifierNode >::Ptr EnumerationDefinition::enumerators() const
 {
     return m_enumerators;
 }

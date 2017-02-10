@@ -43,7 +43,13 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Definition >;
 
-            using Node::Node;
+            Definition( Node::Type type,
+                const IdentifierNode::Ptr& identifier );
+
+            IdentifierNode::Ptr identifier() const;
+
+          private:
+            IdentifierNode::Ptr m_identifier;
         };
 
         using Definitions = NodeList< Definition >;
@@ -54,33 +60,13 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< VariableDefinition >;
 
             VariableDefinition(
-                const std::string& identifier, libcasm_ir::Type* type );
+                const IdentifierNode::Ptr& identifier,
+                const IdentifierNode::Ptr& typeName );
 
-            std::string identifier() const;
-            libcasm_ir::Type* type() const;
-
-          private:
-            std::string m_identifier;
-            libcasm_ir::Type* m_type;
-        };
-
-        class Signature // TODO move it to the correct place
-        {
-          public:
-            using Ptr = std::shared_ptr< Signature >;
-
-            Signature( const std::vector< libcasm_ir::Type* >& argumentTypes,
-                libcasm_ir::Type* returnType );
-            Signature( const std::vector< libcasm_ir::Type* >& argumentTypes );
-
-            std::vector< libcasm_ir::Type* > argumentTypes() const;
-            libcasm_ir::Type* returnType() const;
-
-            std::size_t arity() const;
+            IdentifierNode::Ptr typeName() const;
 
           private:
-            std::vector< libcasm_ir::Type* > m_argumentTypes;
-            libcasm_ir::Type* m_returnType;
+            IdentifierNode::Ptr m_typeName;
         };
 
         class FunctionDefinition : public Definition
@@ -97,12 +83,13 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< FunctionDefinition >;
 
             FunctionDefinition( Category category,
-                const std::string& identifier,
-                const Signature::Ptr& signature );
+                const IdentifierNode::Ptr& identifier,
+                const NodeList< IdentifierNode >::Ptr& argumentTypeNames,
+                const IdentifierNode::Ptr& returnTypeName);
 
             Category category() const;
-            std::string identifier() const;
-            Signature::Ptr signature() const;
+            NodeList< IdentifierNode >::Ptr argumentTypeNames() const;
+            IdentifierNode::Ptr returnTypeName() const;
 
             void setInitializers(
                 const NodeList< UpdateRule >::Ptr& initializers );
@@ -113,8 +100,8 @@ namespace libcasm_fe
 
           private:
             Category m_category;
-            std::string m_identifier;
-            Signature::Ptr m_signature;
+            NodeList< IdentifierNode >::Ptr m_argumentTypeNames;
+            IdentifierNode::Ptr m_returnTypeName;
             NodeList< UpdateRule >::Ptr m_initializers;
             Atom::Ptr m_defaultValue;
         };
@@ -124,17 +111,18 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< DerivedDefinition >;
 
-            DerivedDefinition( const std::string& identifier,
-                const Signature::Ptr& signature,
+            DerivedDefinition( const IdentifierNode::Ptr& identifier,
+                const NodeList< VariableDefinition >::Ptr& arguments,
+                const IdentifierNode::Ptr& returnTypeName,
                 const Expression::Ptr& expression );
 
-            std::string identifier() const;
-            Signature::Ptr signature() const;
+            NodeList< VariableDefinition >::Ptr arguments() const;
+            IdentifierNode::Ptr returnTypeName() const;
             Expression::Ptr expression() const;
 
           private:
-            std::string m_identifier;
-            Signature::Ptr m_signature;
+            NodeList< VariableDefinition >::Ptr m_arguments;
+            IdentifierNode::Ptr m_returnTypeName;
             Expression::Ptr m_expression;
         };
 
@@ -143,17 +131,18 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< RuleDefinition >;
 
-            RuleDefinition( const std::string& identifier,
-                const Signature::Ptr& signature,
+            RuleDefinition( const IdentifierNode::Ptr& identifier,
+                const NodeList< VariableDefinition >::Ptr& arguments,
+                const IdentifierNode::Ptr& returnTypeName,
                 const Rule::Ptr& rule );
 
-            std::string identifier() const;
-            Signature::Ptr signature() const;
+            NodeList< VariableDefinition >::Ptr arguments() const;
+            IdentifierNode::Ptr returnTypeName() const;
             Rule::Ptr rule() const;
 
           private:
-            std::string m_identifier;
-            Signature::Ptr m_signature;
+            NodeList< VariableDefinition >::Ptr m_arguments;
+            IdentifierNode::Ptr m_returnTypeName;
             Rule::Ptr m_rule;
         };
 
@@ -162,15 +151,13 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< EnumerationDefinition >;
 
-            EnumerationDefinition( const std::string& identifier,
-                const std::vector< std::string >& enumerators );
+            EnumerationDefinition( const IdentifierNode::Ptr& identifier,
+                const NodeList< IdentifierNode >::Ptr& enumerators );
 
-            std::string identifier() const;
-            std::vector< std::string > enumerators() const;
+            NodeList< IdentifierNode >::Ptr enumerators() const;
 
           private:
-            std::string m_identifier;
-            std::vector< std::string > m_enumerators;
+            NodeList< IdentifierNode >::Ptr m_enumerators;
         };
     }
 }
