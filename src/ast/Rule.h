@@ -53,12 +53,12 @@ namespace libcasm_fe
 
             Expression::Ptr expression() const;
 
-            void setFilter( const std::string& filter );
-            std::string filter() const;
+            void setFilter( const IdentifierNode::Ptr& filter );
+            IdentifierNode::Ptr filter() const;
 
           private:
             Expression::Ptr m_expression;
-            std::string m_filter;
+            IdentifierNode::Ptr m_filter;
         };
 
         class AssertRule : public Rule

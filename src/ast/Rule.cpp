@@ -33,7 +33,7 @@ using namespace Ast;
 PrintRule::PrintRule( const Expression::Ptr& expression )
 : Rule( Node::Type::PRINT_RULE )
 , m_expression( expression )
-, m_filter()
+, m_filter( nullptr )
 {
 }
 
@@ -42,12 +42,12 @@ Expression::Ptr PrintRule::expression() const
     return m_expression;
 }
 
-void PrintRule::setFilter( const std::string& filter )
+void PrintRule::setFilter( const IdentifierNode::Ptr& filter )
 {
     m_filter = filter;
 }
 
-std::string PrintRule::filter() const
+IdentifierNode::Ptr PrintRule::filter() const
 {
     return m_filter;
 }
