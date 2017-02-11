@@ -100,6 +100,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< AbortRule >;
 
+            AbortRule(); // TODO
             AbortRule( const Expression::Ptr& expression );
 
             Expression::Ptr expression() const;

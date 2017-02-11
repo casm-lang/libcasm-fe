@@ -79,20 +79,25 @@ SkipRule::SkipRule()
 {
 }
 
+AbortRule::AbortRule()
+: AbortRule( nullptr )
+{
+}
+
 AbortRule::AbortRule( const Expression::Ptr& expression )
 : Rule( Node::Type::ABORT_RULE )
 , m_expression( expression )
 {
 }
 
-ImpossibleRule::ImpossibleRule()
-: Rule( Node::Type::IMPOSSIBLE_RULE )
-{
-}
-
 Expression::Ptr AbortRule::expression() const
 {
     return m_expression;
+}
+
+ImpossibleRule::ImpossibleRule()
+: Rule( Node::Type::IMPOSSIBLE_RULE )
+{
 }
 
 ConditionalRule::ConditionalRule( const Expression::Ptr& condition,

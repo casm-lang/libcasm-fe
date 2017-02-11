@@ -64,6 +64,22 @@ namespace libcasm_fe
             libcasm_ir::Value m_value;
         };
 
+        class ZeroAtom : public Expression
+        {
+        public:
+            using Ptr = std::shared_ptr< ZeroAtom >;
+
+            ZeroAtom();
+        };
+
+        class UndefAtom : public Expression
+        {
+        public:
+            using Ptr = std::shared_ptr< UndefAtom >;
+
+            UndefAtom();
+        };
+
         class DirectCallExpression : public Expression
         {
           public:

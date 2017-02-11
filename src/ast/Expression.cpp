@@ -56,6 +56,16 @@ libcasm_ir::Value ValueAtom::value() const
     return m_value;
 }
 
+ZeroAtom::ZeroAtom()
+: Expression( Node::Type::ZERO_ATOM )
+{
+}
+
+UndefAtom::UndefAtom()
+: Expression( Node::Type::UNDEF_ATOM )
+{
+}
+
 DirectCallExpression::DirectCallExpression(
     const std::string& identifier, const Expressions::Ptr& arguments )
 : Expression( Node::Type::DIRECT_CALL_EXPRESSION )
