@@ -49,7 +49,7 @@ ENDPAR          "endpar"        { return yy::Parser::make_ENDPAR(loc); }
 
 ASSERT          "assert"        { return yy::Parser::make_ASSERT(loc); }
 ASSURE          "assure"        { return yy::Parser::make_ASSURE(loc); }
-DIEDIE          "diedie"        { return yy::Parser::make_DIEDIE(loc); }
+ABORT           "abort"         { return yy::Parser::make_ABORT(loc); }
 IMPOSSIBLE      "impossible"    { return yy::Parser::make_IMPOSSIBLE(loc); }
 SKIP            "skip"          { return yy::Parser::make_SKIP(loc); }
 LET             "let"           { return yy::Parser::make_LET(loc); }
