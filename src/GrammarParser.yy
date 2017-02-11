@@ -214,7 +214,7 @@ END       0 "end of file"
 
 %type <Ast::NodeList< Ast::IdentifierNode >::Ptr> Identifiers IdentifiersNoComma
 %type <Ast::VariableDefinition::Ptr> Parameter
-%type <Ast::NodeList< Ast::VariableDefinition >::Ptr> ParametersNoComma Parameters
+%type <Ast::NodeList< Ast::VariableDefinition >::Ptr> ParameterList Parameters
 
 %type <Ast::FunctionDefinition::Ptr> FunctionDeclaration
 %type <Ast::FunctionDefinition::Ptr> ProgramFunctionDefinition
@@ -426,19 +426,9 @@ ProgramFunctionDefinition
 
 
 DerivedDefinition
-: DERIVED IDENTIFIER LPAREN Parameters RPAREN COLON Type EQUAL Expression
+: DERIVED IDENTIFIER Parameters COLON Type EQUAL Expression
   {
-      $$ = Ast::make< Ast::DerivedDefinition >( @$, $2, $4, $7, $9 );
-  }
-| DERIVED IDENTIFIER COLON Type EQUAL Expression
-  {
-      const auto parameters = Ast::make< Ast::NodeList< Ast::VariableDefinition > >( @$ );
-      $$ = Ast::make< Ast::DerivedDefinition >( @$, $2, parameters, $4, $6 );
-  }
-| DERIVED IDENTIFIER LPAREN RPAREN COLON Type EQUAL Expression
-  {
-      const auto parameters = Ast::make< Ast::NodeList< Ast::VariableDefinition > >( @$ );
-      $$ = Ast::make< Ast::DerivedDefinition >( @$, $2, parameters, $6, $8 );
+      $$ = Ast::make< Ast::DerivedDefinition >( @$, $2, $3, $5, $7 );
   }
 ;
 
@@ -487,20 +477,8 @@ Parameter
 ;
 
 
-Parameters
-: ParametersNoComma
-  {
-      $$ = $1;
-  }
-| ParametersNoComma COMMA
-  {
-      $$ = $1;
-  }
-;
-
-
-ParametersNoComma
-: ParametersNoComma COMMA Parameter
+ParameterList
+: ParameterList COMMA Parameter
   {
       auto parameters = $1;
       parameters->add( $3 );
@@ -514,6 +492,21 @@ ParametersNoComma
   }
 ;
 
+
+Parameters
+: LPAREN ParameterList RPAREN
+  {
+      $$ = $2;
+  }
+| LPAREN RPAREN
+  {
+      $$ = Ast::make< Ast::NodeList< Ast::VariableDefinition > >( @$ );
+  }
+| /* empty */
+  {
+      $$ = Ast::make< Ast::NodeList< Ast::VariableDefinition > >( @$ );
+  }
+;
 
 Type
 : IDENTIFIER
@@ -884,22 +877,10 @@ IndirectCallExpression
 
 
 RuleDefinition
-: RULE IDENTIFIER EQUAL Rule
+: RULE IDENTIFIER Parameters EQUAL Rule
   {
-      const auto parameters = Ast::make< Ast::VariableDefinition >( @$ );
-      $$ = Ast::make< Ast::RuleDefinition >( @$, $2, parameters, nullptr,
-                                             wrapInBlockRule( $4 ) ); // TODO nullptr -> void
-  }
-| RULE IDENTIFIER LPAREN RPAREN EQUAL Rule
-  {
-      const auto parameters = Ast::make< Ast::VariableDefinition >( @$ );
-      $$ = Ast::make< Ast::RuleDefinition >( @$, $2, parameters, nullptr,
-                                             wrapInBlockRule( $6 ) ); // TODO nullptr -> void
-  }
-| RULE IDENTIFIER LPAREN Parameters RPAREN EQUAL Rule
-  {
-      $$ = Ast::make< Ast::RuleDefinition >( @$, $2, $4, nullptr,
-                                             wrapInBlockRule( $7 ) ); // TODO nullptr -> void
+      $$ = Ast::make< Ast::RuleDefinition >( @$, $2, $3, nullptr,
+                                             wrapInBlockRule( $5 ) ); // TODO nullptr -> void
   }
 ;
 
