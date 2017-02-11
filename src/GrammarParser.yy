@@ -167,11 +167,6 @@
 
         return Ast::make< Ast::BlockRule >( rule );
     }
-
-    static Ast::Expressions emptyArguments( const yy::location& location )
-    {
-        return Ast::make< Ast::Expressions >( location );
-    }
 }
 
 
@@ -198,6 +193,7 @@ END       0 "end of file"
 
 // expressions
 %type <Ast::Expression::Ptr> Expression Atom Undefined
+%type <Ast::Expressions::Ptr> Expressions ExpressionsNoComma Arguments
 %type <Ast::ValueAtom::Ptr> Value Boolean NumberRange String IntegerNumber
                             FloatingNumber RationalNumber RuleReference
 %type <Ast::DirectCallExpression::Ptr> DirectCallExpression
@@ -847,44 +843,40 @@ ExpressionsNoComma
 ;
 
 
+Arguments
+: LPAREN ExpressionsNoComma RPAREN
+  {
+      $$ = $2;
+  }
+| LPAREN RPAREN
+  {
+      $$ = Ast::make< Ast::Expressions >( @$ );
+  }
+| /* empty */
+  {
+      $$ = Ast::make< Ast::Expressions >( @$ );
+  }
+;
+
+
 DirectCallExpression
-: CALL IDENTIFIER LPAREN Expressions RPAREN
+: CALL IDENTIFIER Arguments
   {
-      auto call = Ast::make< Ast::DirectCallExpression >( @$, $2, $4 );
+      auto call = Ast::make< Ast::DirectCallExpression >( @$, $2, $3 );
       call->setTargetType( Ast::DirectCallExpression::TargetType::Rule );
       $$ = call;
   }
-| CALL IDENTIFIER
+| IDENTIFIER Arguments
   {
-      auto call = Ast::make< Ast::DirectCallExpression >( @$, $2, emptyArguments( @$ ) );
-      call->setTargetType( Ast::DirectCallExpression::TargetType::Rule );
-      $$ = call;
-  }
-| IDENTIFIER
-  {
-      $$ = Ast::make< Ast::DirectCallExpression >( @$, $1, emptyArguments( @$ ) );
-  }
-| IDENTIFIER LPAREN RPAREN
-  {
-      $$ = Ast::make< Ast::DirectCallExpression >( @$, $1, emptyArguments( @$ ) );
-  }
-| IDENTIFIER LPAREN Expressions RPAREN
-  {
-      $$ = Ast::make< Ast::DirectCallExpression >( @$, $1, $3 );
+      $$ = Ast::make< Ast::DirectCallExpression >( @$, $1, $2 );
   }
 ;
 
 
 IndirectCallExpression
-: CALL Atom LPAREN Expressions RPAREN
+: CALL Atom Arguments
   {
-      auto call = Ast::make< Ast::IndirectCallExpression >( @$, $2, $4 );
-      call->setTargetType( Ast::IndirectCallExpression::TargetType::Rule );
-      $$ = call;
-  }
-| CALL Atom
-  {
-      auto call = Ast::make< Ast::IndirectCallExpression >( @$, $2, emptyArguments( @$ ) );
+      auto call = Ast::make< Ast::IndirectCallExpression >( @$, $2, $3 );
       call->setTargetType( Ast::IndirectCallExpression::TargetType::Rule );
       $$ = call;
   }
