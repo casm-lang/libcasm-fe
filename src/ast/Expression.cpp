@@ -68,7 +68,7 @@ UndefAtom::UndefAtom()
 }
 
 DirectCallExpression::DirectCallExpression(
-    const std::string& identifier, const Expressions::Ptr& arguments )
+    const IdentifierNode::Ptr& identifier, const Expressions::Ptr& arguments )
 : Expression( Node::Type::DIRECT_CALL_EXPRESSION )
 , m_identifier( identifier )
 , m_arguments( arguments )
@@ -76,7 +76,7 @@ DirectCallExpression::DirectCallExpression(
 {
 }
 
-std::string DirectCallExpression::identifier() const
+IdentifierNode::Ptr DirectCallExpression::identifier() const
 {
     return m_identifier;
 }

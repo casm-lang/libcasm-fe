@@ -96,17 +96,17 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< DirectCallExpression >;
 
-            DirectCallExpression( const std::string& identifier,
+            DirectCallExpression( const IdentifierNode::Ptr& identifier,
                 const Expressions::Ptr& arguments );
 
-            std::string identifier() const;
+            IdentifierNode::Ptr identifier() const;
             Expressions::Ptr arguments() const;
 
             void setTargetType( TargetType targetType );
             TargetType targetType() const;
 
           private:
-            std::string m_identifier;
+            IdentifierNode::Ptr m_identifier;
             Expressions::Ptr m_arguments;
             TargetType m_targetType;
         };
