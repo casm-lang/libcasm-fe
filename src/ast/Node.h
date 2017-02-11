@@ -63,12 +63,7 @@ namespace libcasm_fe
                 BINARY_EXPRESSION,
 
                 // rules
-                PRINT_RULE,
-                ASSERT_RULE,
-                ASSURE_RULE,
                 SKIP_RULE,
-                ABORT_RULE,
-                IMPOSSIBLE_RULE,
                 CONDITIONAL_RULE,
                 CASE_RULE,
                 LET_RULE,

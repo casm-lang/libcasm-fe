@@ -44,77 +44,12 @@ namespace libcasm_fe
 
         using Rules = NodeList< Rule >;
 
-        class PrintRule : public Rule
-        {
-          public:
-            using Ptr = std::shared_ptr< PrintRule >;
-
-            PrintRule( const Expression::Ptr& expression );
-
-            Expression::Ptr expression() const;
-
-            void setFilter( const IdentifierNode::Ptr& filter );
-            IdentifierNode::Ptr filter() const;
-
-          private:
-            Expression::Ptr m_expression;
-            IdentifierNode::Ptr m_filter;
-        };
-
-        class AssertRule : public Rule
-        {
-          public:
-            using Ptr = std::shared_ptr< AssertRule >;
-
-            AssertRule( const Expression::Ptr& expression );
-
-            Expression::Ptr expression() const;
-
-          private:
-            Expression::Ptr m_expression;
-        };
-
-        class AssureRule : public Rule
-        {
-          public:
-            using Ptr = std::shared_ptr< AssureRule >;
-
-            AssureRule( const Expression::Ptr& expression );
-
-            Expression::Ptr expression() const;
-
-          private:
-            Expression::Ptr m_expression;
-        };
-
         class SkipRule : public Rule
         {
           public:
             using Ptr = std::shared_ptr< SkipRule >;
 
             SkipRule();
-        };
-
-        class AbortRule : public Rule
-        {
-          public:
-            using Ptr = std::shared_ptr< AbortRule >;
-
-            AbortRule(); // TODO
-            AbortRule( const Expression::Ptr& expression );
-
-            Expression::Ptr expression() const;
-
-          private:
-            Expression::Ptr m_expression;
-        };
-
-        class ImpossibleRule : public Rule
-        {
-          public:
-            using Ptr = std::shared_ptr< ImpossibleRule >;
-
-            ImpossibleRule();
         };
 
         class ConditionalRule : public Rule

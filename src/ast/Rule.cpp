@@ -30,73 +30,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-PrintRule::PrintRule( const Expression::Ptr& expression )
-: Rule( Node::Type::PRINT_RULE )
-, m_expression( expression )
-, m_filter( nullptr )
-{
-}
-
-Expression::Ptr PrintRule::expression() const
-{
-    return m_expression;
-}
-
-void PrintRule::setFilter( const IdentifierNode::Ptr& filter )
-{
-    m_filter = filter;
-}
-
-IdentifierNode::Ptr PrintRule::filter() const
-{
-    return m_filter;
-}
-
-AssertRule::AssertRule( const Expression::Ptr& expression )
-: Rule( Node::Type::ASSERT_RULE )
-, m_expression( expression )
-{
-}
-
-Expression::Ptr AssertRule::expression() const
-{
-    return m_expression;
-}
-
-AssureRule::AssureRule( const Expression::Ptr& expression )
-: Rule( Node::Type::ASSURE_RULE )
-, m_expression( expression )
-{
-}
-
-Expression::Ptr AssureRule::expression() const
-{
-    return m_expression;
-}
-
 SkipRule::SkipRule()
 : Rule( Node::Type::SKIP_RULE )
-{
-}
-
-AbortRule::AbortRule()
-: AbortRule( nullptr )
-{
-}
-
-AbortRule::AbortRule( const Expression::Ptr& expression )
-: Rule( Node::Type::ABORT_RULE )
-, m_expression( expression )
-{
-}
-
-Expression::Ptr AbortRule::expression() const
-{
-    return m_expression;
-}
-
-ImpossibleRule::ImpossibleRule()
-: Rule( Node::Type::IMPOSSIBLE_RULE )
 {
 }
 

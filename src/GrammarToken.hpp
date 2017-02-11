@@ -47,10 +47,6 @@ PAR             "par"           { return yy::Parser::make_PAR(loc); }
 ENDPAR          "endpar"        { return yy::Parser::make_ENDPAR(loc); }
 
 
-ASSERT          "assert"        { return yy::Parser::make_ASSERT(loc); }
-ASSURE          "assure"        { return yy::Parser::make_ASSURE(loc); }
-ABORT           "abort"         { return yy::Parser::make_ABORT(loc); }
-IMPOSSIBLE      "impossible"    { return yy::Parser::make_IMPOSSIBLE(loc); }
 SKIP            "skip"          { return yy::Parser::make_SKIP(loc); }
 LET             "let"           { return yy::Parser::make_LET(loc); }
 IN              "in"            { return yy::Parser::make_IN(loc); }
@@ -65,8 +61,6 @@ CASE            "case"          { return yy::Parser::make_CASE(loc); }
 OF              "of"            { return yy::Parser::make_OF(loc); }
 DEFAULT         "default"       { return yy::Parser::make_DEFAULT(loc); }
 ENDCASE         "endcase"       { return yy::Parser::make_ENDCASE(loc); }
-PRINT           "print"         { return yy::Parser::make_PRINT(loc); }
-DEBUG           "debug"         { return yy::Parser::make_DEBUG(loc); }
 
 PUSH            "push"          { return yy::Parser::make_PUSH(loc); }
 INTO            "into"          { return yy::Parser::make_INTO(loc); }
@@ -74,7 +68,6 @@ POP             "pop"           { return yy::Parser::make_POP(loc); }
 FROM            "from"          { return yy::Parser::make_FROM(loc); }
 // OBJDUMP         "objdump"       { return yy::Parser::make_OBJDUMP(loc); }
 
-SELF            "self"          { return yy::Parser::make_SELF(loc); }
 UNDEF           "undef"         { return yy::Parser::make_UNDEF(loc); }
 FALSE           "false"         { return yy::Parser::make_FALSE(loc); }
 TRUE            "true"          { return yy::Parser::make_TRUE(loc); }

@@ -197,7 +197,7 @@ END       0 "end of file"
 %type <Ast::EnumerationDefinition::Ptr> EnumerationDefinition
 
 // expressions
-%type <Ast::Expression::Ptr> Expression Atom Undefined Self
+%type <Ast::Expression::Ptr> Expression Atom Undefined
 %type <Ast::ValueAtom::Ptr> Value Boolean NumberRange String IntegerNumber
                             FloatingNumber RationalNumber RuleReference
 %type <Ast::DirectCallExpression::Ptr> DirectCallExpression
@@ -206,12 +206,7 @@ END       0 "end of file"
 // rules
 %type <Ast::Rule::Ptr> Rule
 %type <Ast::Rules::Ptr> Rules
-%type <Ast::PrintRule::Ptr> PrintRule
-%type <Ast::AssertRule::Ptr> AssertRule
-%type <Ast::AssureRule::Ptr> AssureRule
 %type <Ast::SkipRule::Ptr> SkipRule
-%type <Ast::AbortRule::Ptr> AbortRule
-%type <Ast::ImpossibleRule::Ptr> ImpossibleRule
 %type <Ast::ConditionalRule::Ptr> ConditionalRule
 %type <Ast::CaseRule::Ptr> CaseRule
 %type <Ast::LetRule::Ptr> LetRule
@@ -659,10 +654,6 @@ Value
   {
       $$ = $1;
   }
-| Self
-  {
-      $$ = $1;
-  }
 | Undefined
   {
       $$ = $1; 
@@ -678,15 +669,6 @@ Undefined
 : UNDEF
   {
       $$ = Ast::make< Ast::UndefAtom >( @$ );
-  }
-;
-
-
-Self
-: SELF
-  {
-      const auto self = Ast::make< Ast::IdentifierNode >( "self" );
-      $$ = Ast::make< Ast::DirectCallExpression >( self, emptyArguments( @$ ) );
   }
 ;
 
@@ -931,27 +913,7 @@ RuleDefinition
 
 
 Rule
-: PrintRule
-  {
-      $$ = $1;
-  }
-| AssertRule
-  {
-      $$ = $1;
-  }
-| AssureRule
-  {
-      $$ = $1;
-  }
-| SkipRule
-  {
-      $$ = $1;
-  }
-| AbortRule
-  {
-      $$ = $1;
-  }
-| ImpossibleRule
+: SkipRule
   {
       $$ = $1;
   }
@@ -1014,60 +976,10 @@ Rules
 ;
 
 
-PrintRule
-: PRINT Expression
-  {
-      $$ = Ast::make< Ast::PrintRule >( @$, $2 );
-  }
-| DEBUG IDENTIFIER Expression
-  {
-      auto printRule = Ast::make< Ast::PrintRule >( @$, $3 );
-      printRule->setFilter( Ast::make< Ast::IdentifierNode >( $2 ) );
-      $$ = printRule;
-  }
-;
-
-
-AssertRule
-: ASSERT Expression
-  {
-      $$ = Ast::make< Ast::AssertRule >( @$, $2 );
-  }
-;
-
-
-AssureRule
-: ASSURE Expression
-  {
-      $$ = Ast::make< Ast::AssureRule >( @$, $2 );
-  }
-;
-
-
 SkipRule
 : SKIP
   {
       $$ = Ast::make< Ast::SkipRule >( @$ );
-  }
-;
-
-
-AbortRule
-: ABORT Expression
-  {
-      $$ = Ast::make< Ast::AbortRule >( @$, $2 );
-  }
-| ABORT
-  {
-      $$ = Ast::make< Ast::AbortRule >( @$ );
-  }
-;
-
-
-ImpossibleRule
-: IMPOSSIBLE
-  {
-      $$ = Ast::make< Ast::ImpossibleRule >( @$ );
   }
 ;
 
