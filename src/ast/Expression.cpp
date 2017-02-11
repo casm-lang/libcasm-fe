@@ -48,7 +48,8 @@ ValueAtom::ValueAtom( const libcasm_ir::Value& value )
 : Expression( Node::Type::VALUE_ATOM )
 , m_value( value )
 {
-    //Expression::setType( value.type() ); FIXME enable this when ir uses Type::Ptr!!
+    // Expression::setType( value.type() ); FIXME enable this when ir uses
+    // Type::Ptr!!
 }
 
 libcasm_ir::Value ValueAtom::value() const

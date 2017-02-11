@@ -37,7 +37,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Specification >;
 
-            Specification( const IdentifierNode::Ptr& name, const Definitions::Ptr& definitions );
+            Specification( const IdentifierNode::Ptr& name,
+                const Definitions::Ptr& definitions );
 
             IdentifierNode::Ptr name() const;
             Definitions::Ptr definitions() const;

@@ -28,7 +28,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-Specification::Specification( const IdentifierNode::Ptr& name, const Definitions::Ptr& definitions )
+Specification::Specification(
+    const IdentifierNode::Ptr& name, const Definitions::Ptr& definitions )
 : Node( Node::Type::SPECIFICATION )
 , m_name( name )
 , m_definitions( definitions )

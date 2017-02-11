@@ -38,12 +38,13 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Definition >;
 
-            Definition( Node::Type type,
-                const IdentifierNode::Ptr& identifier );
+            Definition(
+                Node::Type type, const IdentifierNode::Ptr& identifier );
 
             IdentifierNode::Ptr identifier() const;
 
-            void setRelationType( const libcasm_ir::RelationType::Ptr& relationType );
+            void setRelationType(
+                const libcasm_ir::RelationType::Ptr& relationType );
             libcasm_ir::RelationType::Ptr relationType() const;
 
           private:
@@ -58,8 +59,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< VariableDefinition >;
 
-            VariableDefinition(
-                const IdentifierNode::Ptr& identifier,
+            VariableDefinition( const IdentifierNode::Ptr& identifier,
                 const IdentifierNode::Ptr& typeName );
 
             IdentifierNode::Ptr typeName() const;
@@ -84,7 +84,7 @@ namespace libcasm_fe
             FunctionDefinition( Category category,
                 const IdentifierNode::Ptr& identifier,
                 const NodeList< IdentifierNode >::Ptr& argumentTypeNames,
-                const IdentifierNode::Ptr& returnTypeName);
+                const IdentifierNode::Ptr& returnTypeName );
 
             Category category() const;
             NodeList< IdentifierNode >::Ptr argumentTypeNames() const;

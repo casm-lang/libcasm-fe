@@ -40,7 +40,8 @@ IdentifierNode::Ptr Definition::identifier() const
     return m_identifier;
 }
 
-void Definition::setRelationType( const libcasm_ir::RelationType::Ptr& relationType )
+void Definition::setRelationType(
+    const libcasm_ir::RelationType::Ptr& relationType )
 {
     m_relationType = relationType;
 }
@@ -161,7 +162,8 @@ Rule::Ptr RuleDefinition::rule() const
     return m_rule;
 }
 
-EnumerationDefinition::EnumerationDefinition( const IdentifierNode::Ptr& identifier,
+EnumerationDefinition::EnumerationDefinition(
+    const IdentifierNode::Ptr& identifier,
     const NodeList< IdentifierNode >::Ptr& enumerators )
 : Definition( Node::Type::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )

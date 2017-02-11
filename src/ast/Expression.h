@@ -28,8 +28,8 @@
 
 #include "Node.h"
 
-#include "../../casm-ir/src/Value.h"
 #include "../../casm-ir/src/Type.h"
+#include "../../casm-ir/src/Value.h"
 
 namespace libcasm_fe
 {
@@ -66,7 +66,7 @@ namespace libcasm_fe
 
         class ZeroAtom : public Expression
         {
-        public:
+          public:
             using Ptr = std::shared_ptr< ZeroAtom >;
 
             ZeroAtom();
@@ -74,7 +74,7 @@ namespace libcasm_fe
 
         class UndefAtom : public Expression
         {
-        public:
+          public:
             using Ptr = std::shared_ptr< UndefAtom >;
 
             UndefAtom();
