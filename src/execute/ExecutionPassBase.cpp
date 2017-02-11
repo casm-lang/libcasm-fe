@@ -314,7 +314,8 @@ void ExecutionPassBase::visit_function_def_pre(
             libcasm_fe::Codes::FunctionDefaultValueInvalidRange );
     }
 
-    function_states[ function->id ] = FunctionState( function->argument_count() * 100 );
+    function_states[ function->id ]
+        = FunctionState( function->argument_count() * 100 );
     function_symbols[ function->id ] = function;
     functionDefaultValues[ function->id ] = defaultValue;
 

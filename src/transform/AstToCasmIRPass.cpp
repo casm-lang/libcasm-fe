@@ -1069,20 +1069,20 @@ bool AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
                 libcasm_ir::Type::RuleReference() );
             break;
         case TypeType::BOOLEAN:
-            ir_const = libcasm_ir::Constant::Undef(
-                libcasm_ir::Type::Boolean() );
+            ir_const
+                = libcasm_ir::Constant::Undef( libcasm_ir::Type::Boolean() );
             break;
         case TypeType::BIT:
             ir_const = libcasm_ir::Constant::Undef(
                 libcasm_ir::Type::Bit( node->type_.bitsize ) );
             break;
         case TypeType::INTEGER:
-            ir_const = libcasm_ir::Constant::Undef(
-                libcasm_ir::Type::Integer() );
+            ir_const
+                = libcasm_ir::Constant::Undef( libcasm_ir::Type::Integer() );
             break;
         case TypeType::STRING:
-            ir_const = libcasm_ir::Constant::Undef(
-                libcasm_ir::Type::String() );
+            ir_const
+                = libcasm_ir::Constant::Undef( libcasm_ir::Type::String() );
             break;
         default:
             assert( 0 && "unimplemented undef constant!" );
