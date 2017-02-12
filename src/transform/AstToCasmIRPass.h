@@ -69,7 +69,8 @@ namespace libcasm_fe
         LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
 
         libcasm_ir::Type* getType( Type* type );
-        libcasm_ir::Value* constant( const value_t& value, libcasm_ir::Type& hint );
+        libcasm_ir::Value* constant(
+            const value_t& value, libcasm_ir::Type& hint );
         value_t value_t_value( const libcasm_ir::Value& value );
 
       private:

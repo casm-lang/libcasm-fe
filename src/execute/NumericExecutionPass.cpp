@@ -244,42 +244,17 @@ value_t NumericExecutionPass::visit_expression_single(
 {
     using Opcode = libcasm_ir::Value::ID;
 
+    assert( expr->op == Opcode::NOT_INSTRUCTION );
+
     AstToCasmIRPass pass;
 
     auto arg = pass.constant( val, *libcasm_ir::Type::Boolean() );
 
     auto i = libcasm_ir::NotInstruction( arg );
+
     auto r = libcasm_rt::Value::execute( i );
 
-    assert( r );
-    return pass.value_t_value( *r );
-    
-
-    // // switch( expr->op )
-    // // {
-    // //     case Opcode::NOT_INSTRUCTION:
-    // //         return value_t( not val.value.boolean );
-    // //     default:
-    // //         assert( !"internal error" ); // PPA: FIXME: with better verbose
-    // //         info
-    // //                                      // etc.
-    // //         return value_t();
-    // // }
-
-    // if( val.is_undef() )
-    // {
-    //     return value_t();
-    // }
-
-    // switch( expr->op )
-    // {
-    //     case Opcode::NOT_INSTRUCTION:
-    //         return value_t( not val.value.boolean );
-    //     default:
-    //         assert( !"internal error" ); // PPA: FIXME: with better verbose info
-    //                                      // etc.
-    //         return value_t();
-    // }
+    return pass.value_t_value( r );
 }
 
 value_t NumericExecutionPass::visit_list_atom(
