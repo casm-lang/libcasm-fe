@@ -27,7 +27,6 @@
 CASM            "CASM"          { return yy::Parser::make_CASM(loc); }
 INIT            "init"          { return yy::Parser::make_INIT(loc); }
 
-// PROVIDER        "provider"      { return yy::Parser::make_PROVIDER(loc); }
 OPTION          "option"        { return yy::Parser::make_OPTION(loc); }
 
 DERIVED         "derived"       { return yy::Parser::make_DERIVED(loc); }
@@ -66,13 +65,10 @@ PUSH            "push"          { return yy::Parser::make_PUSH(loc); }
 INTO            "into"          { return yy::Parser::make_INTO(loc); }
 POP             "pop"           { return yy::Parser::make_POP(loc); }
 FROM            "from"          { return yy::Parser::make_FROM(loc); }
-// OBJDUMP         "objdump"       { return yy::Parser::make_OBJDUMP(loc); }
 
 UNDEF           "undef"         { return yy::Parser::make_UNDEF(loc); }
 FALSE           "false"         { return yy::Parser::make_FALSE(loc); }
 TRUE            "true"          { return yy::Parser::make_TRUE(loc); }
-// SYMBOL          "symbol"        { return yy::Parser::make_SYMBOL(loc); }
-// INTERN          "intern_debug"  { return yy::Parser::make_INTERN(loc); }
 
 AND             "and"           { return yy::Parser::make_AND(loc); }
 OR              "or"            { return yy::Parser::make_OR(loc); }
