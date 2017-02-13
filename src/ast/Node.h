@@ -78,8 +78,6 @@ namespace libcasm_fe
                 INIT,
                 PROVIDER,
                 OPTION,
-                POP_RULE,
-                PUSH_RULE,
             };
 
           public:

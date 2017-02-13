@@ -197,9 +197,6 @@ namespace libcasm_fe
             CallExpression::Ptr m_call;
             std::set< CallExpression::TargetType > m_allowedCallTargetTypes;
         };
-
-        // TODO add PushRule
-        // TODO add PopRule
     }
 }
 
