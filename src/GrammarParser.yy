@@ -211,6 +211,7 @@ END       0 "end of file"
 %type <Ast::BlockRule::Ptr> BlockRule
 %type <Ast::SequenceRule::Ptr> SequenceRule
 %type <Ast::UpdateRule::Ptr> UpdateRule
+%type <Ast::CallRule::Ptr> CallRule
 
 %type <Ast::NodeList< Ast::IdentifierNode >::Ptr> Identifiers IdentifiersNoComma
 %type <Ast::VariableDefinition::Ptr> Parameter
@@ -839,6 +840,12 @@ Arguments
   {
       $$ = $2;
   }
+| Expression
+  {
+      auto expressions = Ast::make< Ast::Expressions >( @$ );
+      expressions->add( $1 );
+      $$ = expressions;
+  }
 | LPAREN RPAREN
   {
       $$ = Ast::make< Ast::Expressions >( @$ );
@@ -851,13 +858,7 @@ Arguments
 
 
 DirectCallExpression
-: CALL IDENTIFIER Arguments
-  {
-      auto call = Ast::make< Ast::DirectCallExpression >( @$, $2, $3 );
-      call->setTargetType( Ast::DirectCallExpression::TargetType::Rule );
-      $$ = call;
-  }
-| IDENTIFIER Arguments
+: IDENTIFIER Arguments
   {
       $$ = Ast::make< Ast::DirectCallExpression >( @$, $1, $2 );
   }
@@ -865,11 +866,9 @@ DirectCallExpression
 
 
 IndirectCallExpression
-: CALL Atom Arguments
+: Atom Arguments
   {
-      auto call = Ast::make< Ast::IndirectCallExpression >( @$, $2, $3 );
-      call->setTargetType( Ast::IndirectCallExpression::TargetType::Rule );
-      $$ = call;
+      $$ = Ast::make< Ast::IndirectCallExpression >( @$, $1, $2 );
   }
 ;
 
@@ -917,6 +916,10 @@ Rule
       $$ = $1;
   }
 | UpdateRule
+  {
+      $$ = $1;
+  }
+| CallRule
   {
       $$ = $1;
   }
@@ -1050,6 +1053,30 @@ UpdateRule
 : DirectCallExpression UPDATE Expression
   {
       $$ = Ast::make< Ast::UpdateRule >( @$, $1, $3 );
+  }
+;
+
+
+CallRule
+: CALL DirectCallExpression
+  {
+      using CallTargetType = Ast::CallExpression::TargetType;
+      $$ = Ast::make< Ast::CallRule >( @$, $2, { CallTargetType::Rule } );
+  }
+| DirectCallExpression
+  {
+      using CallTargetType = Ast::CallExpression::TargetType;
+      $$ = Ast::make< Ast::CallRule >( @$, $1, { CallTargetType::Derived, CallTargetType::Builtin } );
+  }
+| CALL IndirectCallExpression
+  {
+      using CallTargetType = Ast::CallExpression::TargetType;
+      $$ = Ast::make< Ast::CallRule >( @$, $2, { CallTargetType::Rule } );
+  }
+| IndirectCallExpression
+  {
+      using CallTargetType = Ast::CallExpression::TargetType;
+      $$ = Ast::make< Ast::CallRule >( @$, $1, { CallTargetType::Derived, CallTargetType::Builtin } );
   }
 ;
 

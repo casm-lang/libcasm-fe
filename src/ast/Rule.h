@@ -180,6 +180,24 @@ namespace libcasm_fe
             Expression::Ptr m_expression;
         };
 
+        class CallRule : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< CallRule >;
+
+            CallRule( const CallExpression::Ptr& call,
+                const std::set< CallExpression::TargetType >&
+                    allowedCallTargetTypes );
+
+            CallExpression::Ptr call() const;
+            std::set< CallExpression::TargetType >
+            allowedCallTargetTypes() const;
+
+          private:
+            CallExpression::Ptr m_call;
+            std::set< CallExpression::TargetType > m_allowedCallTargetTypes;
+        };
+
         // TODO add PushRule
         // TODO add PopRule
     }

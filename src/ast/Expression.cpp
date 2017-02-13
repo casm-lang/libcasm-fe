@@ -67,12 +67,21 @@ UndefAtom::UndefAtom()
 {
 }
 
+void CallExpression::setTargetType( CallExpression::TargetType targetType )
+{
+    m_targetType = targetType;
+}
+
+CallExpression::TargetType CallExpression::targetType() const
+{
+    return m_targetType;
+}
+
 DirectCallExpression::DirectCallExpression(
     const IdentifierNode::Ptr& identifier, const Expressions::Ptr& arguments )
-: Expression( Node::Type::DIRECT_CALL_EXPRESSION )
+: CallExpression( Node::Type::DIRECT_CALL_EXPRESSION )
 , m_identifier( identifier )
 , m_arguments( arguments )
-, m_targetType( TargetType::Unknown )
 {
 }
 
@@ -86,23 +95,11 @@ Expressions::Ptr DirectCallExpression::arguments() const
     return m_arguments;
 }
 
-void DirectCallExpression::setTargetType(
-    DirectCallExpression::TargetType targetType )
-{
-    m_targetType = targetType;
-}
-
-DirectCallExpression::TargetType DirectCallExpression::targetType() const
-{
-    return m_targetType;
-}
-
 IndirectCallExpression::IndirectCallExpression(
     const Expression::Ptr& expression, const Expressions::Ptr& arguments )
-: Expression( Node::Type::INDIRECT_CALL_EXPRESSION )
+: CallExpression( Node::Type::INDIRECT_CALL_EXPRESSION )
 , m_expression( expression )
 , m_arguments( arguments )
-, m_targetType( TargetType::Unknown )
 {
 }
 
@@ -114,17 +111,6 @@ Expression::Ptr IndirectCallExpression::expression() const
 Expressions::Ptr IndirectCallExpression::arguments() const
 {
     return m_arguments;
-}
-
-void IndirectCallExpression::setTargetType(
-    IndirectCallExpression::TargetType targetType )
-{
-    m_targetType = targetType;
-}
-
-IndirectCallExpression::TargetType IndirectCallExpression::targetType() const
-{
-    return m_targetType;
 }
 
 UnaryExpression::UnaryExpression(

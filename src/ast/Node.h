@@ -72,6 +72,7 @@ namespace libcasm_fe
                 BLOCK_RULE,
                 SEQUENCE_RULE,
                 UPDATE_RULE,
+                CALL_RULE,
 
                 // TODO
                 INIT,

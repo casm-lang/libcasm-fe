@@ -80,7 +80,7 @@ namespace libcasm_fe
             UndefAtom();
         };
 
-        class DirectCallExpression : public Expression
+        class CallExpression : public Expression
         {
           public:
             enum class TargetType
@@ -94,6 +94,20 @@ namespace libcasm_fe
             };
 
           public:
+            using Ptr = std::shared_ptr< CallExpression >;
+
+            using Expression::Expression;
+
+            void setTargetType( TargetType targetType );
+            TargetType targetType() const;
+
+          private:
+            TargetType m_targetType = TargetType::Unknown;
+        };
+
+        class DirectCallExpression : public CallExpression
+        {
+          public:
             using Ptr = std::shared_ptr< DirectCallExpression >;
 
             DirectCallExpression( const IdentifierNode::Ptr& identifier,
@@ -102,24 +116,13 @@ namespace libcasm_fe
             IdentifierNode::Ptr identifier() const;
             Expressions::Ptr arguments() const;
 
-            void setTargetType( TargetType targetType );
-            TargetType targetType() const;
-
           private:
             IdentifierNode::Ptr m_identifier;
             Expressions::Ptr m_arguments;
-            TargetType m_targetType;
         };
 
-        class IndirectCallExpression : public Expression
+        class IndirectCallExpression : public CallExpression
         {
-          public:
-            enum class TargetType
-            {
-                Rule,
-                Unknown
-            };
-
           public:
             using Ptr = std::shared_ptr< IndirectCallExpression >;
 
@@ -129,13 +132,9 @@ namespace libcasm_fe
             Expression::Ptr expression() const;
             Expressions::Ptr arguments() const;
 
-            void setTargetType( TargetType targetType );
-            TargetType targetType() const;
-
           private:
             Expression::Ptr m_expression;
             Expressions::Ptr m_arguments;
-            TargetType m_targetType;
         };
 
         class UnaryExpression : public Expression

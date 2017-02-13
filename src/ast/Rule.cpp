@@ -181,3 +181,21 @@ Expression::Ptr UpdateRule::expression() const
 {
     return m_expression;
 }
+
+CallRule::CallRule( const CallExpression::Ptr& call,
+    const std::set< CallExpression::TargetType >& allowedCallTargetTypes )
+: Rule( Node::Type::CALL_RULE )
+, m_call( call )
+, m_allowedCallTargetTypes( allowedCallTargetTypes )
+{
+}
+
+CallExpression::Ptr CallRule::call() const
+{
+    return m_call;
+}
+
+std::set< CallExpression::TargetType > CallRule::allowedCallTargetTypes() const
+{
+    return m_allowedCallTargetTypes;
+}
