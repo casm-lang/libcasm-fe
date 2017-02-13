@@ -232,8 +232,6 @@ END       0 "end of file"
 
 %type <std::vector<Type*>> TypeStarList
 %type<std::vector<Type*>> Types
-%type <PushNode*> PushRule
-%type <PopNode*> PopRule
 
 
 %start Specification
@@ -922,14 +920,6 @@ Rule
   {
       $$ = $1;
   }
-| PushRule
-  {
-      $$ = $1;
-  }
-| PopRule
-  {
-      $$ = $1;
-  }
 ;
 
 
@@ -1060,22 +1050,6 @@ UpdateRule
 : DirectCallExpression UPDATE Expression
   {
       $$ = Ast::make< Ast::UpdateRule >( @$, $1, $3 );
-  }
-;
-
-
-PushRule
-: PUSH Expression INTO DirectCallExpression
-  {
-      // TODO
-  }
-;
-
-
-PopRule
-: POP DirectCallExpression FROM DirectCallExpression
-  {
-      // TODO
   }
 ;
 
