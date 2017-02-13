@@ -39,12 +39,10 @@ FUNCTION        "function"      { return yy::Parser::make_FUNCTION(loc); }
 INITIALLY       "initially"     { return yy::Parser::make_INITIALLY(loc); }
 DEFINED         "defined"       { return yy::Parser::make_DEFINED(loc); }
 
-
 SEQ             "seq"           { return yy::Parser::make_SEQ(loc); }
 ENDSEQ          "endseq"        { return yy::Parser::make_ENDSEQ(loc); }
 PAR             "par"           { return yy::Parser::make_PAR(loc); }
 ENDPAR          "endpar"        { return yy::Parser::make_ENDPAR(loc); }
-
 
 SKIP            "skip"          { return yy::Parser::make_SKIP(loc); }
 LET             "let"           { return yy::Parser::make_LET(loc); }
@@ -59,7 +57,6 @@ ELSE            "else"          { return yy::Parser::make_ELSE(loc); }
 CASE            "case"          { return yy::Parser::make_CASE(loc); }
 OF              "of"            { return yy::Parser::make_OF(loc); }
 DEFAULT         "default"       { return yy::Parser::make_DEFAULT(loc); }
-ENDCASE         "endcase"       { return yy::Parser::make_ENDCASE(loc); }
 
 UNDEF           "undef"         { return yy::Parser::make_UNDEF(loc); }
 FALSE           "false"         { return yy::Parser::make_FALSE(loc); }
