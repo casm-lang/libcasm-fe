@@ -61,11 +61,6 @@ OF              "of"            { return yy::Parser::make_OF(loc); }
 DEFAULT         "default"       { return yy::Parser::make_DEFAULT(loc); }
 ENDCASE         "endcase"       { return yy::Parser::make_ENDCASE(loc); }
 
-PUSH            "push"          { return yy::Parser::make_PUSH(loc); }
-INTO            "into"          { return yy::Parser::make_INTO(loc); }
-POP             "pop"           { return yy::Parser::make_POP(loc); }
-FROM            "from"          { return yy::Parser::make_FROM(loc); }
-
 UNDEF           "undef"         { return yy::Parser::make_UNDEF(loc); }
 FALSE           "false"         { return yy::Parser::make_FALSE(loc); }
 TRUE            "true"          { return yy::Parser::make_TRUE(loc); }
