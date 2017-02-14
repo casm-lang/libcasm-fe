@@ -193,10 +193,9 @@ END       0 "end of file"
 %type <Ast::EnumerationDefinition::Ptr> EnumerationDefinition
 
 // expressions
-%type <Ast::Expression::Ptr> Expression Atom Undefined
+%type <Ast::Expression::Ptr> Expression Atom Undefined Boolean NumberRange String
+                             IntegerNumber FloatingNumber RationalNumber RuleReference
 %type <Ast::Expressions::Ptr> MaybeExpressions Expressions Arguments
-%type <Ast::ValueAtom::Ptr> Value Boolean NumberRange String IntegerNumber
-                            FloatingNumber RationalNumber RuleReference
 %type <Ast::DirectCallExpression::Ptr> DirectCallExpression
 %type <Ast::IndirectCallExpression::Ptr> IndirectCallExpression
 
@@ -344,13 +343,13 @@ FunctionDefinition
 
       $$ = functionDefinition;
   }
-| FunctionDeclaration DEFINED LCURPAREN Value RCURPAREN
+| FunctionDeclaration DEFINED LCURPAREN Atom RCURPAREN
   {
       auto functionDefinition = $1;
       functionDefinition->setDefaultValue( $4 );
       $$ = functionDefinition;
   }
-| FunctionDeclaration DEFINED LCURPAREN Value RCURPAREN INITIALLY LCURPAREN Initializers RCURPAREN
+| FunctionDeclaration DEFINED LCURPAREN Atom RCURPAREN INITIALLY LCURPAREN Initializers RCURPAREN
   {
       auto functionDefinition = $1;
       functionDefinition->setDefaultValue( $4 );
@@ -601,10 +600,6 @@ Atom
   {
       $$ = $1;
   }
-| Value
-  {
-      $$ = $1;
-  }
 | LPAREN Expression RPAREN
   {
       $$ = $2;
@@ -619,11 +614,7 @@ Atom
       $$ = Ast::make< Ast::BinaryExpression >( @$, zero, $3,
                                                libcasm_ir::Value::SUB_INSTRUCTION );
   }
-;
-
-
-Value
-: RuleReference
+| RuleReference
   {
       $$ = $1;
   }
