@@ -220,8 +220,8 @@ END       0 "end of file"
 
 %type <Ast::NodeList< Ast::IdentifierNode >::Ptr> Identifiers IdentifiersNoComma
 
-%type <Ast::VariableDefinition::Ptr> Parameter
-%type <Ast::NodeList< Ast::VariableDefinition >::Ptr> ParameterList Parameters
+%type <Ast::VariableDefinition::Ptr> Variable
+%type <Ast::NodeList< Ast::VariableDefinition >::Ptr> Parameters MaybeParameters
 
 %type <Ast::FunctionDefinition::Ptr> FunctionDeclaration
 %type <Ast::FunctionDefinition::Ptr> ProgramFunctionDefinition
@@ -452,7 +452,7 @@ ProgramFunctionDefinition
 
 
 DerivedDefinition
-: DERIVED Identifier Parameters COLON Type EQUAL Expression
+: DERIVED Identifier MaybeParameters COLON Type EQUAL Expression
   {
       $$ = Ast::make< Ast::DerivedDefinition >( @$, $2, $3, $5, $7 );
   }
@@ -503,7 +503,7 @@ IdentifiersNoComma
 ;
 
 
-Parameter
+Variable
 : Identifier COLON Type
   {
       $$ = Ast::make< Ast::VariableDefinition >( @$, $1, $3 );
@@ -511,14 +511,14 @@ Parameter
 ;
 
 
-ParameterList
-: ParameterList COMMA Parameter
+Parameters
+: Parameters COMMA Variable
   {
       auto parameters = $1;
       parameters->add( $3 );
       $$ = parameters;
   }
-| Parameter
+| Variable
   {
       auto parameters = Ast::make< Ast::NodeList< Ast::VariableDefinition > >( @$ );
       parameters->add( $1 );
@@ -527,8 +527,8 @@ ParameterList
 ;
 
 
-Parameters
-: LPAREN ParameterList RPAREN
+MaybeParameters
+: LPAREN Parameters RPAREN
   {
       $$ = $2;
   }
@@ -914,7 +914,7 @@ IndirectCallExpression
 
 
 RuleDefinition
-: RULE Identifier Parameters EQUAL Rule
+: RULE Identifier MaybeParameters EQUAL Rule
   {
       $$ = Ast::make< Ast::RuleDefinition >( @$, $2, $3, nullptr,
                                              wrapInBlockRule( $5 ) ); // TODO nullptr -> void
