@@ -74,9 +74,8 @@ namespace libcasm_fe
             enum class Classification
             {
                 In, /**< only read by an ASM, only written by its env. */
-                Monitored = In,
                 Controlled, /**< read and written by an ASM */
-                Shared, /**< read and written by an ASM and its env. */
+                Shared,     /**< read and written by an ASM and its env. */
                 Out, /**< only written by an ASM, only read by its env. */
                 Static
             };
@@ -84,14 +83,18 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< FunctionDefinition >;
 
-            FunctionDefinition( Classification classification,
-                const IdentifierNode::Ptr& identifier,
+            FunctionDefinition( const IdentifierNode::Ptr& identifier,
                 const NodeList< IdentifierNode >::Ptr& argumentTypeNames,
                 const IdentifierNode::Ptr& returnTypeName );
 
-            Classification classification() const;
             NodeList< IdentifierNode >::Ptr argumentTypeNames() const;
             IdentifierNode::Ptr returnTypeName() const;
+
+            void setClassification( Classification classification );
+            Classification classification() const;
+
+            void setSymbolic( bool symbolic );
+            bool symbolic() const;
 
             void setInitializers(
                 const NodeList< UpdateRule >::Ptr& initializers );
@@ -104,6 +107,7 @@ namespace libcasm_fe
             Classification m_classification;
             NodeList< IdentifierNode >::Ptr m_argumentTypeNames;
             IdentifierNode::Ptr m_returnTypeName;
+            bool m_symbolic;
             NodeList< UpdateRule >::Ptr m_initializers;
             Expression::Ptr m_defaultValue;
         };

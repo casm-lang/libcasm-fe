@@ -67,87 +67,91 @@
 {
     yy::Parser::symbol_type yylex( libcasm_fe::Driver& driver );
         
-    void parse_function_attributes
-    ( Driver& driver
-    , const yy::location& loc
-    , const std::vector<std::string>& attribute_names
-    , Function* function
-    )
+    std::pair< Ast::FunctionDefinition::Classification, bool > parseFunctionAttributes(
+        Driver& driver, const Ast::NodeList< Ast::IdentifierNode >& attributes )
     {
-        bool is_static = false;
-        bool is_symbolic = false;
-        bool is_controlled = false;
-        
-        for( const auto& attribute_name : attribute_names )
+        using Classification = Ast::FunctionDefinition::Classification;
+
+        auto functionClass = Classification::Controlled;
+        bool symbolicFunction = false;
+
+        bool classAttributeAlreadyUsed = false;
+        Ast::IdentifierNode classAttribute;
+
+        bool symbolicAttributeAlreadyUsed = false;
+        Ast::IdentifierNode symbolicAttribute;
+
+        for( auto attribute : *attributes )
         {
-            if( attribute_name == "static" )
+            const auto& name = attribute->identifier();
+
+            if( name == "symbolic" )
             {
-                if( is_static )
+                symbolicFunction = true;
+
+                if( symbolicAttributeAlreadyUsed )
                 {
                     driver.error
-                    ( loc
-                    , "`static` attribute can only be used once per function"
-                    , libcasm_fe::Codes::FunctionAttributeMultipleUseOfStatic
-                    );
-                    break;
-                }
-                else
-                {
-                    is_static = true;
-                }
-            }
-            else if( attribute_name == "symbolic" )
-            {
-                if( is_symbolic )
-                {
-                    driver.error
-                    ( loc
+                    ( { symbolicAttribute->location(), attribute->location() }
                     , "`symbolic` attribute can only be used once per function"
                     , libcasm_fe::Codes::FunctionAttributeMultipleUseOfSymbolic
                     );
-                    break;
                 }
                 else
                 {
-                    is_symbolic = true;
+                    symbolicAttributeAlreadyUsed = true;
+                    symbolicAttribute = attribute;
                 }
+
+                continue;
             }
-            else if( attribute_name == "controlled" )
+
+            if( name == "in" or name == "monitored" )
             {
-                if( is_controlled )
-                {
-                    driver.error
-                    ( loc
-                    , "`controlled` attribute can only be used once per function"
-                      , libcasm_fe::Codes::FunctionAttributeMultipleUseOfControlled
-                    );
-                    break;
-                }
-                else
-                {
-                    is_controlled = true;
-                }
+                functionClass = Classification::In;
+            }
+            else if( name == "controlled" )
+            {
+                functionClass = Classification::Controlled;
+            }
+            else if( name == "shared" )
+            {
+                functionClass = Classification::Shared;
+            }
+            else if( name == "out" )
+            {
+                functionClass = Classification::Out;
+            }
+            else if( name == "static" )
+            {
+                functionClass = Classification::Static;
             }
             else
             {
                 driver.error
-                ( loc
-                , "`"+attribute_name+"` is no valid function attribute, only static, symbolic and controlled are allowed"
+                ( attribute->location(),
+                , "`" + name + "` is no valid function attribute, only in, monitored, "
+                + "controlled, shared, out, static and symbolic are allowed"
                 , libcasm_fe::Codes::FunctionAttributeIsInvalid
                 );
             }
+
+            if( classAttributeAlreadyUsed )
+            {
+                driver.error
+                ( { classAttribute->location(), attribute->location() }
+                , "a function classifier attribute can only be used once per function"
+                , libcasm_fe::Codes::FunctionAttributeMultipleUseOfFunctionClassifier
+                );
+            }
+            else
+            {
+                classAttributeAlreadyUsed = true;
+                classAttribute = attribute;
+            }
         }
-        if( is_static && is_controlled )
-        {
-            driver.error
-            ( loc
-            , "attributes `controlled` and `static` are mutually exclusive"
-            , libcasm_fe::Codes::FunctionAttributeControlledAndStaticIsInvalid
-            );
-        }
-        
-        function->is_static = is_static;
-        function->is_symbolic = is_symbolic;
+
+        return { functionClass, symbolicFunction };
     }
 
     static Ast::FunctionDefinition::Ptr createProgramFunction( yy::location& location )
@@ -155,11 +159,8 @@
         //auto argTypes = { new Type( TypeType::AGENT ) }; // TODO add args and return type
         //auto retType = new Type( TypeType::RuleReference );
 
-        using Classification = Ast::FunctionDefinition::Classification;
-
         const auto program = Ast::make< Ast::IdentifierNode >( location, "program" );
-        return Ast::make< Ast::FunctionDefinition >(
-            location, Classification::Controlled, program, nullptr, nullptr);
+        return Ast::make< Ast::FunctionDefinition >( location, program, nullptr, nullptr );
     }
 
     static Ast::Rule::Ptr wrapInBlockRule( const Ast::Rule::Ptr& rule )
@@ -380,13 +381,17 @@ FunctionDefinition
 FunctionDeclaration
 : FUNCTION LPAREN Identifiers RPAREN Identifier FunctionSignature
   {
-      auto function = new Function($5, @$, $6.first, $6.second);
-      //parse_function_attributes(driver, @$, $3, function); TODO
+      auto function = Ast::make< Ast::FunctionDefinition >( @$, @5, nullptr, nullptr ); // TODO
+
+      const auto attributes = parseFunctionAttributes( driver, $3 );
+      function->setClassification( attributes.first );
+      function->setSymbolic( attributes.second );
+
       $$ = function;
   }
 | FUNCTION Identifier FunctionSignature
   {
-      $$ = new Function($2, @$, $3.first, $3.second);
+      $$ = Ast::make< Ast::FunctionDefinition >( @$, @2, nullptr, nullptr ); // TODO
   }
 ;
 

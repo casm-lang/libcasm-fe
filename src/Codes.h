@@ -46,10 +46,8 @@ namespace libcasm_fe
         ,
         FunctionAttributeIsInvalid = 0xfa00 // fa** ... function attribute
         ,
-        FunctionAttributeMultipleUseOfStatic = 0xfa01,
-        FunctionAttributeMultipleUseOfSymbolic = 0xfa02,
-        FunctionAttributeMultipleUseOfControlled = 0xfa03,
-        FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
+        FunctionAttributeMultipleUseOfFunctionClassifier = 0xfa01,
+        FunctionAttributeMultipleUseOfSymbolic = 0xfa02
 
         ,
         FunctionDefaultValueInvalidRange = 0xfb01,

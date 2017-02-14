@@ -63,23 +63,17 @@ IdentifierNode::Ptr VariableDefinition::typeName() const
     return m_typeName;
 }
 
-FunctionDefinition::FunctionDefinition(
-    FunctionDefinition::Classification classification,
-    const IdentifierNode::Ptr& identifier,
+FunctionDefinition::FunctionDefinition( const IdentifierNode::Ptr& identifier,
     const NodeList< IdentifierNode >::Ptr& argumentTypeNames,
     const IdentifierNode::Ptr& returnTypeName )
 : Definition( Node::Type::FUNCTION_DEFINITION, identifier )
-, m_classification( classification )
+, m_classification( Classification::Controlled )
 , m_argumentTypeNames( argumentTypeNames )
 , m_returnTypeName( returnTypeName )
+, m_symbolic( false )
 , m_initializers( std::make_shared< NodeList< UpdateRule > >() )
 , m_defaultValue( std::make_shared< UndefAtom >() )
 {
-}
-
-FunctionDefinition::Classification FunctionDefinition::classification() const
-{
-    return m_classification;
 }
 
 NodeList< IdentifierNode >::Ptr FunctionDefinition::argumentTypeNames() const
@@ -90,6 +84,27 @@ NodeList< IdentifierNode >::Ptr FunctionDefinition::argumentTypeNames() const
 IdentifierNode::Ptr FunctionDefinition::returnTypeName() const
 {
     return m_returnTypeName;
+}
+
+void FunctionDefinition::setClassification(
+    FunctionDefinition::Classification classification )
+{
+    m_classification = classification;
+}
+
+FunctionDefinition::Classification FunctionDefinition::classification() const
+{
+    return m_classification;
+}
+
+void FunctionDefinition::setSymbolic( bool symbolic )
+{
+    m_symbolic = symbolic;
+}
+
+bool FunctionDefinition::symbolic() const
+{
+    return m_symbolic;
 }
 
 void FunctionDefinition::setInitializers(
