@@ -194,7 +194,7 @@ END       0 "end of file"
 
 // expressions
 %type <Ast::Expression::Ptr> Expression Atom Undefined
-%type <Ast::Expressions::Ptr> Expressions ExpressionsNoComma Arguments
+%type <Ast::Expressions::Ptr> MaybeExpressions Expressions Arguments
 %type <Ast::ValueAtom::Ptr> Value Boolean NumberRange String IntegerNumber
                             FloatingNumber RationalNumber RuleReference
 %type <Ast::DirectCallExpression::Ptr> DirectCallExpression
@@ -227,7 +227,7 @@ END       0 "end of file"
 // TODO
 %type <UpdateNode*> Initializer
 %type <std::vector<UpdateNode*>> Initializers InitializersNoComma
-%type <std::vector<ExpressionBase*>*> Expressions ExpressionsNoComma ListConstant
+%type <std::vector<ExpressionBase*>*> Expressions ExpressionsNoComma List
 
 %type <std::pair<std::vector<Type*>, Type*>> FunctionSignature
 %type <Type*> Type
@@ -585,7 +585,7 @@ Initializer
   {
       // TODO
   }
-| LPAREN Expressions RPAREN ARROW Atom
+| LPAREN MaybeExpressions RPAREN ARROW Atom
   {
       // TODO
   }
@@ -643,7 +643,7 @@ Value
   {
       $$ = $1;
   }
-| ListConstant
+| List
   {
       // TODO
   }
@@ -736,14 +736,10 @@ NumberRange
 ;
 
 
-ListConstant
-: LSQPAREN Expressions RSQPAREN
+List
+: LSQPAREN MaybeExpressions RSQPAREN
   {
-      $$ = $2;
-  }
-| LSQPAREN RSQPAREN
-  {
-      $$ = Ast::make< Ast::Expressions >( @$ );
+      // TODO
   }
 ;
 
@@ -816,20 +812,24 @@ Expression
 ;
 
 
-Expressions
-: ExpressionsNoComma
+MaybeExpressions
+: Expressions
   {
       $$ = $1;
   }
-| ExpressionsNoComma COMMA
+| Expressions COMMA
   {
       $$ = $1;
+  }
+| /* empty */
+  {
+      $$ = Ast::make< Ast::Expressions >( @$ );
   }
 ;
 
 
-ExpressionsNoComma
-: ExpressionsNoComma COMMA Expression
+Expressions
+: Expressions COMMA Expression
   {
       auto expressions = $1;
       expressions->add( $3 );
@@ -845,7 +845,7 @@ ExpressionsNoComma
 
 
 Arguments
-: LPAREN ExpressionsNoComma RPAREN
+: LPAREN Expressions RPAREN
   {
       $$ = $2;
   }
