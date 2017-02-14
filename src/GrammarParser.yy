@@ -541,7 +541,7 @@ MaybeParameters
   {
       $$ = Ast::make< Ast::NodeList< Ast::VariableDefinition > >( @$ );
   }
-| /* empty */
+| %empty
   {
       $$ = Ast::make< Ast::NodeList< Ast::VariableDefinition > >( @$ );
   }
@@ -592,7 +592,7 @@ MaybeInitializers
   {
       $$ = $1;
   }
-| /* empty */
+| %empty
   {
       $$ = Ast::make< Ast::NodeList< Ast::UpdateRule >::Ptr >( @$ );
   }
@@ -857,7 +857,7 @@ MaybeExpressions
   {
       $$ = $1;
   }
-| /* empty */
+| %empty
   {
       $$ = Ast::make< Ast::Expressions >( @$ );
   }
@@ -895,7 +895,7 @@ MaybeArguments
   {
       $$ = Ast::make< Ast::Expressions >( @$ );
   }
-| /* empty */
+| %empty
   {
       $$ = Ast::make< Ast::Expressions >( @$ );
   }
