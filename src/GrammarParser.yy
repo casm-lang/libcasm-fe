@@ -179,9 +179,10 @@ END       0 "end of file"
 %token <INTEGER_T> INTEGERCONST  "integer"
 %token <rational_t> RATIONALCONST "rational"
 %token <std::string> STRCONST      "string"
-%token <Ast::IdentifierNode::Ptr> IDENTIFIER "identifier"
+%token <std::string> IDENTIFIER "identifier"
 
 %type <Ast::Specification::Ptr> Specification
+%type <Ast::IdentifierNode::Ptr> Identifier
 
 // definitions
 %type <Ast::Definition::Ptr> Definition
@@ -371,13 +372,13 @@ FunctionDefinition
 
 
 FunctionDeclaration
-: FUNCTION LPAREN Identifiers RPAREN IDENTIFIER FunctionSignature
+: FUNCTION LPAREN Identifiers RPAREN Identifier FunctionSignature
   {
       auto function = new Function($5, @$, $6.first, $6.second);
       //parse_function_attributes(driver, @$, $3, function); TODO
       $$ = function;
   }
-| FUNCTION IDENTIFIER FunctionSignature
+| FUNCTION Identifier FunctionSignature
   {
       $$ = new Function($2, @$, $3.first, $3.second);
   }
@@ -413,7 +414,7 @@ TypeStarList
 
 
 ProgramFunctionDefinition
-: INIT IDENTIFIER
+: INIT Identifier
   {
     // TODO
   }
@@ -425,7 +426,7 @@ ProgramFunctionDefinition
 
 
 DerivedDefinition
-: DERIVED IDENTIFIER Parameters COLON Type EQUAL Expression
+: DERIVED Identifier Parameters COLON Type EQUAL Expression
   {
       $$ = Ast::make< Ast::DerivedDefinition >( @$, $2, $3, $5, $7 );
   }
@@ -433,9 +434,17 @@ DerivedDefinition
 
 
 EnumerationDefinition
-: ENUM IDENTIFIER EQUAL LCURPAREN Identifiers RCURPAREN
+: ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
   {
       $$ = Ast::make< Ast::EnumerationDefinition >( @$, $2, $5 );
+  }
+;
+
+
+Identifier
+: IDENTIFIER
+  {
+      $$ = Ast::make< Ast::IdentifierNode >( @$, $1 );
   }
 ;
 
@@ -453,13 +462,13 @@ Identifiers
 
 
 IdentifiersNoComma
-: IdentifiersNoComma COMMA IDENTIFIER
+: IdentifiersNoComma COMMA Identifier
   {
       auto identifiers = $1;
       identifiers->add( $3 );
       $$ = identifiers;
   }
-| IDENTIFIER
+| Identifier
   {
       auto identifiers = Ast::make< Ast::NodeList< Ast::Identifier > >( @$ );
       identifiers->add( $1 );
@@ -469,7 +478,7 @@ IdentifiersNoComma
 
 
 Parameter
-: IDENTIFIER COLON Type
+: Identifier COLON Type
   {
       $$ = Ast::make< Ast::VariableDefinition >( @$, $1, $3 );
   }
@@ -508,19 +517,19 @@ Parameters
 ;
 
 Type
-: IDENTIFIER
+: Identifier
   {
       // TODO
   }
-| IDENTIFIER LPAREN IntegerNumber RPAREN
+| Identifier LPAREN IntegerNumber RPAREN
   {
       // TODO
   }
-| IDENTIFIER LPAREN Types RPAREN
+| Identifier LPAREN Types RPAREN
   {
       // TODO
   }
-| IDENTIFIER LPAREN IntegerNumber DOTDOT IntegerNumber RPAREN
+| Identifier LPAREN IntegerNumber DOTDOT IntegerNumber RPAREN
   {
       // TODO
   }
@@ -858,7 +867,7 @@ Arguments
 
 
 DirectCallExpression
-: IDENTIFIER Arguments
+: Identifier Arguments
   {
       $$ = Ast::make< Ast::DirectCallExpression >( @$, $1, $2 );
   }
@@ -874,7 +883,7 @@ IndirectCallExpression
 
 
 RuleDefinition
-: RULE IDENTIFIER Parameters EQUAL Rule
+: RULE Identifier Parameters EQUAL Rule
   {
       $$ = Ast::make< Ast::RuleDefinition >( @$, $2, $3, nullptr,
                                              wrapInBlockRule( $5 ) ); // TODO nullptr -> void
