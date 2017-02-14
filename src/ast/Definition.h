@@ -71,7 +71,7 @@ namespace libcasm_fe
         class FunctionDefinition : public Definition
         {
           public:
-            enum class Category
+            enum class Classification
             {
                 Monitored,
                 Controlled,
@@ -81,12 +81,12 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< FunctionDefinition >;
 
-            FunctionDefinition( Category category,
+            FunctionDefinition( Classification classification,
                 const IdentifierNode::Ptr& identifier,
                 const NodeList< IdentifierNode >::Ptr& argumentTypeNames,
                 const IdentifierNode::Ptr& returnTypeName );
 
-            Category category() const;
+            Classification classification() const;
             NodeList< IdentifierNode >::Ptr argumentTypeNames() const;
             IdentifierNode::Ptr returnTypeName() const;
 
@@ -98,7 +98,7 @@ namespace libcasm_fe
             Expression::Ptr defaultValue() const;
 
           private:
-            Category m_category;
+            Classification m_classification;
             NodeList< IdentifierNode >::Ptr m_argumentTypeNames;
             IdentifierNode::Ptr m_returnTypeName;
             NodeList< UpdateRule >::Ptr m_initializers;

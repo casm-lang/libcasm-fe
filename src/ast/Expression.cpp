@@ -85,6 +85,12 @@ DirectCallExpression::DirectCallExpression(
 {
 }
 
+void DirectCallExpression::setIdentifier(
+    const IdentifierNode::Ptr& identifier )
+{
+    m_identifier = identifier;
+}
+
 IdentifierNode::Ptr DirectCallExpression::identifier() const
 {
     return m_identifier;

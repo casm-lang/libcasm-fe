@@ -113,7 +113,9 @@ namespace libcasm_fe
             DirectCallExpression( const IdentifierNode::Ptr& identifier,
                 const Expressions::Ptr& arguments );
 
+            void setIdentifier( const IdentifierNode::Ptr& identifier );
             IdentifierNode::Ptr identifier() const;
+
             Expressions::Ptr arguments() const;
 
           private:

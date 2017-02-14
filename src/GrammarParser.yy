@@ -150,11 +150,16 @@
         function->is_symbolic = is_symbolic;
     }
 
-    static Function* createProgramFunction( yy::location& location )
+    static Ast::FunctionDefinition::Ptr createProgramFunction( yy::location& location )
     {
-        auto argTypes = { new Type( TypeType::AGENT ) };
-        auto retType = new Type( TypeType::RuleReference );
-        return new Function( "program", location, argTypes, retType );
+        //auto argTypes = { new Type( TypeType::AGENT ) }; // TODO add args and return type
+        //auto retType = new Type( TypeType::RuleReference );
+
+        using Classification = Ast::FunctionDefinition::Classification;
+
+        const auto program = Ast::make< Ast::IdentifierNode >( location, "program" );
+        return Ast::make< Ast::FunctionDefinition >(
+            location, Classification::Controlled, program, nullptr, nullptr);
     }
 
     static Ast::Rule::Ptr wrapInBlockRule( const Ast::Rule::Ptr& rule )
@@ -214,6 +219,7 @@ END       0 "end of file"
 %type <Ast::CallRule::Ptr> CallRule
 
 %type <Ast::NodeList< Ast::IdentifierNode >::Ptr> Identifiers IdentifiersNoComma
+
 %type <Ast::VariableDefinition::Ptr> Parameter
 %type <Ast::NodeList< Ast::VariableDefinition >::Ptr> ParameterList Parameters
 
@@ -223,10 +229,10 @@ END       0 "end of file"
 %type <Ast::CaseRule::Case> CaseLabel
 %type <std::vector< Ast::CaseRule::Case >> CaseLabels
 
-// TODO
-%type <UpdateNode*> Initializer
-%type <std::vector<UpdateNode*>> Initializers InitializersNoComma
+%type <Ast::UpdateRule::Ptr> Initializer
+%type <Ast::NodeList< Ast::UpdateRule >::Ptr> MaybeInitializers Initializers
 
+// TODO
 %type <std::pair<std::vector<Type*>, Type*>> FunctionSignature
 %type <Type*> Type
 
@@ -330,13 +336,14 @@ FunctionDefinition
   {
       $$ = $1;
   }
-| FunctionDeclaration INITIALLY LCURPAREN Initializers RCURPAREN
+| FunctionDeclaration INITIALLY LCURPAREN MaybeInitializers RCURPAREN
   {
       auto functionDefinition = $1;
 
+      // apply the name of the function declaration to the initializer functions
       auto initializers = $4;
-      for (auto initializer : initializers) {
-          //initializer->func->name = $1->name; TODO
+      for (auto initializer : *initializers) {
+          initializer->function()->setIdentifier( functionDefinition->identifier() );
       }
       functionDefinition->setInitializers( initializers );
 
@@ -348,14 +355,15 @@ FunctionDefinition
       functionDefinition->setDefaultValue( $4 );
       $$ = functionDefinition;
   }
-| FunctionDeclaration DEFINED LCURPAREN Atom RCURPAREN INITIALLY LCURPAREN Initializers RCURPAREN
+| FunctionDeclaration DEFINED LCURPAREN Atom RCURPAREN INITIALLY LCURPAREN MaybeInitializers RCURPAREN
   {
       auto functionDefinition = $1;
       functionDefinition->setDefaultValue( $4 );
 
+      // apply the name of the function declaration to the initializer functions
       auto initializers = $8;
-      for (auto initializer : initializers) {
-           //initializer->func->name = $1->name; TODO
+      for (auto initializer : *initializers) {
+           initializer->function()->setIdentifier( functionDefinition->identifier() );
       }
       functionDefinition->setInitializers( initializers );
 
@@ -412,13 +420,33 @@ TypeStarList
 
 
 ProgramFunctionDefinition
-: INIT Identifier
+: INIT RuleReference
   {
-    // TODO
+      auto programDefinition = createProgramFunction();
+
+      auto arguments = Ast::make< Ast::Expressions >( @$ );
+      // TODO add `default` agent to arguments
+      const auto program = Ast::make< Ast::DirectCallExpression >(
+          @$, programDefinition->identifier(), arguments );
+
+      auto initializers = Ast::make< Ast::NodeList< Ast::UpdateRule >::Ptr >( @$ );
+      initializers->add( Ast::make< Ast::UpdateRule >( @$, program, $2 ) );
+      programDefinition->setInitializers( initializers );
+
+      $$ = programDefinition;
   }
-| INIT LCURPAREN Initializers RCURPAREN
+| INIT LCURPAREN MaybeInitializers RCURPAREN
   {
-    // TODO
+      auto programDefinition = createProgramFunction();
+
+      // apply the name of the program declaration to the initializer functions
+      auto initializers = $3;
+      for (auto initializer : *initializers) {
+          initializer->function()->setIdentifier( programDefinition->identifier() );
+      }
+      programDefinition->setInitializers( initializers );
+
+      $$ = programDefinition;
   }
 ;
 
@@ -550,26 +578,34 @@ Types
 ;
 
 
-Initializers
-: InitializersNoComma
+MaybeInitializers
+: Initializers
   {
       $$ = $1;
   }
-| InitializersNoComma COMMA
+| Initializers COMMA
   {
       $$ = $1;
+  }
+| /* empty */
+  {
+      $$ = Ast::make< Ast::NodeList< Ast::UpdateRule >::Ptr >( @$ );
   }
 ;
 
 
-InitializersNoComma
-: InitializersNoComma COMMA Initializer
+Initializers
+: Initializers COMMA Initializer
   {
-      // TODO
+      auto initializers = $1;
+      initializers->add( $3 );
+      $$ = initializers;
   }
 | Initializer
   {
-      // TODO
+      auto initializers = Ast::make< Ast::NodeList< Ast::UpdateRule >::Ptr >( @$ );
+      initializers->add( $1 );
+      $$ = initializers;
   }
 ;
 
@@ -577,15 +613,20 @@ InitializersNoComma
 Initializer
 : Atom
   {
-      // TODO
+      // the unknown function identifier will be replaced in FunctionDefinition
+      const auto unknown = Ast::make< Ast::IdentifierNode >( @$, std::string() );
+      const auto arguments = Ast::make< Ast::Expressions >( @$ );
+      const auto function = Ast::make< Ast::DirectCallExpression >( @$, unknown, arguments );
+
+      $$ = Ast::make< Ast::UpdateRule >( @$, function, $1 );
   }
-| Expression ARROW Atom
+| Arguments ARROW Atom
   {
-      // TODO
-  }
-| LPAREN MaybeExpressions RPAREN ARROW Atom
-  {
-      // TODO
+      // the unknown function identifier will be replaced in FunctionDefinition
+      const auto unknown = Ast::make< Ast::IdentifierNode >( @$, std::string() );
+      const auto function = Ast::make< Ast::DirectCallExpression >( @$, unknown, $1 );
+
+      $$ = Ast::make< Ast::UpdateRule >( @$, function, $3 );
   }
 ;
 

@@ -63,20 +63,23 @@ IdentifierNode::Ptr VariableDefinition::typeName() const
     return m_typeName;
 }
 
-FunctionDefinition::FunctionDefinition( FunctionDefinition::Category category,
+FunctionDefinition::FunctionDefinition(
+    FunctionDefinition::Classification classification,
     const IdentifierNode::Ptr& identifier,
     const NodeList< IdentifierNode >::Ptr& argumentTypeNames,
     const IdentifierNode::Ptr& returnTypeName )
 : Definition( Node::Type::FUNCTION_DEFINITION, identifier )
-, m_category( category )
+, m_classification( classification )
 , m_argumentTypeNames( argumentTypeNames )
 , m_returnTypeName( returnTypeName )
+, m_initializers( std::make_shared< NodeList< UpdateRule > >() )
+, m_defaultValue( std::make_shared< UndefAtom >() )
 {
 }
 
-FunctionDefinition::Category FunctionDefinition::category() const
+FunctionDefinition::Classification FunctionDefinition::classification() const
 {
-    return m_category;
+    return m_classification;
 }
 
 NodeList< IdentifierNode >::Ptr FunctionDefinition::argumentTypeNames() const
