@@ -199,7 +199,7 @@ END       0 "end of file"
 %type <Ast::EnumerationDefinition::Ptr> EnumerationDefinition
 
 // expressions
-%type <Ast::Expression::Ptr> Expression Atom Undefined Boolean Range String
+%type <Ast::Expression::Ptr> Expression Atom Undefined Boolean Range List String
                              IntegerNumber FloatingNumber RationalNumber RuleReference
 %type <Ast::Expressions::Ptr> MaybeExpressions Expressions MaybeArguments
 %type <Ast::DirectCallExpression::Ptr> DirectCallExpression
