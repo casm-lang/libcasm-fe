@@ -200,7 +200,7 @@ END       0 "end of file"
 // expressions
 %type <Ast::Expression::Ptr> Expression Atom Undefined Boolean Range String
                              IntegerNumber FloatingNumber RationalNumber RuleReference
-%type <Ast::Expressions::Ptr> MaybeExpressions Expressions Arguments
+%type <Ast::Expressions::Ptr> MaybeExpressions Expressions MaybeArguments
 %type <Ast::DirectCallExpression::Ptr> DirectCallExpression
 %type <Ast::IndirectCallExpression::Ptr> IndirectCallExpression
 
@@ -620,7 +620,7 @@ Initializer
 
       $$ = Ast::make< Ast::UpdateRule >( @$, function, $1 );
   }
-| Arguments ARROW Atom
+| MaybeArguments ARROW Atom
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto unknown = Ast::make< Ast::IdentifierNode >( @$, std::string() );
@@ -875,7 +875,7 @@ Expressions
 ;
 
 
-Arguments
+MaybeArguments
 : LPAREN Expressions RPAREN
   {
       $$ = $2;
@@ -898,7 +898,7 @@ Arguments
 
 
 DirectCallExpression
-: Identifier Arguments
+: Identifier MaybeArguments
   {
       $$ = Ast::make< Ast::DirectCallExpression >( @$, $1, $2 );
   }
@@ -906,7 +906,7 @@ DirectCallExpression
 
 
 IndirectCallExpression
-: Atom Arguments
+: Atom MaybeArguments
   {
       $$ = Ast::make< Ast::IndirectCallExpression >( @$, $1, $2 );
   }
