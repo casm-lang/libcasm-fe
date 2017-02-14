@@ -61,6 +61,7 @@ namespace libcasm_fe
                 INDIRECT_CALL_EXPRESSION,
                 UNARY_EXPRESSION,
                 BINARY_EXPRESSION,
+                NUMBER_RANGE_EXPRESSION,
 
                 // rules
                 SKIP_RULE,

@@ -170,6 +170,22 @@ namespace libcasm_fe
             Expression::Ptr m_left;
             Expression::Ptr m_right;
         };
+
+        class NumberRangeExpression : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< NumberRangeExpression >;
+
+            NumberRangeExpression(
+                const Expression::Ptr& left, const Expression::Ptr& right );
+
+            Expression::Ptr left() const;
+            Expression::Ptr right() const;
+
+          private:
+            Expression::Ptr m_left;
+            Expression::Ptr m_right;
+        };
     }
 }
 

@@ -154,3 +154,21 @@ Expression::Ptr BinaryExpression::right() const
 {
     return m_right;
 }
+
+NumberRangeExpression::NumberRangeExpression(
+    const Expression::Ptr& left, const Expression::Ptr& right )
+: Expression( Node::Type::NUMBER_RANGE_EXPRESSION )
+, m_left( left )
+, m_right( right )
+{
+}
+
+Expression::Ptr NumberRangeExpression::left() const
+{
+    return m_left;
+}
+
+Expression::Ptr NumberRangeExpression::right() const
+{
+    return m_right;
+}

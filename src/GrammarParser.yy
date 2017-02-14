@@ -722,7 +722,7 @@ RuleReference
 NumberRange
 : LSQPAREN Expression DOTDOT Expression RSQPAREN
   {
-      // TODO
+      $$ = Ast::make< Ast::NumberRangeExpression >( @$, $2, $4 );
   }
 ;
 
