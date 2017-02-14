@@ -193,7 +193,7 @@ END       0 "end of file"
 %type <Ast::EnumerationDefinition::Ptr> EnumerationDefinition
 
 // expressions
-%type <Ast::Expression::Ptr> Expression Atom Undefined Boolean NumberRange String
+%type <Ast::Expression::Ptr> Expression Atom Undefined Boolean Range String
                              IntegerNumber FloatingNumber RationalNumber RuleReference
 %type <Ast::Expressions::Ptr> MaybeExpressions Expressions Arguments
 %type <Ast::DirectCallExpression::Ptr> DirectCallExpression
@@ -638,7 +638,7 @@ Atom
   {
       $$ = $1;
   }
-| NumberRange
+| Range
   {
       $$ = $1;
   }
@@ -719,10 +719,10 @@ RuleReference
 ;
 
 
-NumberRange
+Range
 : LSQPAREN Expression DOTDOT Expression RSQPAREN
   {
-      $$ = Ast::make< Ast::NumberRangeExpression >( @$, $2, $4 );
+      $$ = Ast::make< Ast::RangeExpression >( @$, $2, $4 );
   }
 ;
 

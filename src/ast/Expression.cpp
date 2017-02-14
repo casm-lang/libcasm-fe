@@ -155,20 +155,20 @@ Expression::Ptr BinaryExpression::right() const
     return m_right;
 }
 
-NumberRangeExpression::NumberRangeExpression(
+RangeExpression::RangeExpression(
     const Expression::Ptr& left, const Expression::Ptr& right )
-: Expression( Node::Type::NUMBER_RANGE_EXPRESSION )
+: Expression( Node::Type::RANGE_EXPRESSION )
 , m_left( left )
 , m_right( right )
 {
 }
 
-Expression::Ptr NumberRangeExpression::left() const
+Expression::Ptr RangeExpression::left() const
 {
     return m_left;
 }
 
-Expression::Ptr NumberRangeExpression::right() const
+Expression::Ptr RangeExpression::right() const
 {
     return m_right;
 }

@@ -171,12 +171,12 @@ namespace libcasm_fe
             Expression::Ptr m_right;
         };
 
-        class NumberRangeExpression : public Expression
+        class RangeExpression : public Expression
         {
           public:
-            using Ptr = std::shared_ptr< NumberRangeExpression >;
+            using Ptr = std::shared_ptr< RangeExpression >;
 
-            NumberRangeExpression(
+            RangeExpression(
                 const Expression::Ptr& left, const Expression::Ptr& right );
 
             Expression::Ptr left() const;
