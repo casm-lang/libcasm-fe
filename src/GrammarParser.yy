@@ -201,7 +201,7 @@ END       0 "end of file"
 // expressions
 %type <Ast::Expression::Ptr> Expression Atom Undefined Boolean Range List String
                              IntegerNumber FloatingNumber RationalNumber RuleReference
-%type <Ast::Expressions::Ptr> MaybeExpressions Expressions MaybeArguments
+%type <Ast::Expressions::Ptr> MaybeExpressions Expressions Arguments MaybeArguments
 %type <Ast::DirectCallExpression::Ptr> DirectCallExpression
 %type <Ast::IndirectCallExpression::Ptr> IndirectCallExpression
 
@@ -880,20 +880,28 @@ Expressions
 ;
 
 
-MaybeArguments
+Arguments
 : LPAREN Expressions RPAREN
   {
       $$ = $2;
+  }
+| LPAREN RPAREN
+  {
+      $$ = Ast::make< Ast::Expressions >( @$ );
+  }
+;
+
+
+MaybeArguments
+: Arguments
+  {
+      $$ = $1;
   }
 | Expression
   {
       auto expressions = Ast::make< Ast::Expressions >( @$ );
       expressions->add( $1 );
       $$ = expressions;
-  }
-| LPAREN RPAREN
-  {
-      $$ = Ast::make< Ast::Expressions >( @$ );
   }
 | %empty
   {
@@ -911,9 +919,9 @@ DirectCallExpression
 
 
 IndirectCallExpression
-: Atom MaybeArguments
+: LPAREN Expression RPAREN Arguments
   {
-      $$ = Ast::make< Ast::IndirectCallExpression >( @$, $1, $2 );
+      $$ = Ast::make< Ast::IndirectCallExpression >( @$, $2, $4 );
   }
 ;
 
