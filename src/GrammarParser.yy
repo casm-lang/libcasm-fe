@@ -226,7 +226,6 @@ END       0 "end of file"
 // TODO
 %type <UpdateNode*> Initializer
 %type <std::vector<UpdateNode*>> Initializers InitializersNoComma
-%type <std::vector<ExpressionBase*>*> Expressions ExpressionsNoComma List
 
 %type <std::pair<std::vector<Type*>, Type*>> FunctionSignature
 %type <Type*> Type
