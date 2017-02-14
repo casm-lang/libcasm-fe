@@ -73,8 +73,11 @@ namespace libcasm_fe
           public:
             enum class Classification
             {
-                Monitored,
-                Controlled,
+                In, /**< only read by an ASM, only written by its env. */
+                Monitored = In,
+                Controlled, /**< read and written by an ASM */
+                Shared, /**< read and written by an ASM and its env. */
+                Out, /**< only written by an ASM, only read by its env. */
                 Static
             };
 
