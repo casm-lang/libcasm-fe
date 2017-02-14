@@ -636,7 +636,7 @@ Atom
   }
 | List
   {
-      // TODO
+      $$ = $1;
   }
 | NumberRange
   {
@@ -730,7 +730,7 @@ NumberRange
 List
 : LSQPAREN MaybeExpressions RSQPAREN
   {
-      // TODO
+      $$ = Ast::make< Ast::ListExpression >( @$, $2 );
   }
 ;
 

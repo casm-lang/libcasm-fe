@@ -62,6 +62,7 @@ namespace libcasm_fe
                 UNARY_EXPRESSION,
                 BINARY_EXPRESSION,
                 NUMBER_RANGE_EXPRESSION,
+                LIST_EXPRESSION,
 
                 // rules
                 SKIP_RULE,

@@ -186,6 +186,19 @@ namespace libcasm_fe
             Expression::Ptr m_left;
             Expression::Ptr m_right;
         };
+
+        class ListExpression : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< ListExpression >;
+
+            ListExpression( const Expressions::Ptr& expressions );
+
+            Expressions::Ptr expressions() const;
+
+          private:
+            Expressions::Ptr m_expressions;
+        };
     }
 }
 

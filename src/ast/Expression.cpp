@@ -172,3 +172,14 @@ Expression::Ptr NumberRangeExpression::right() const
 {
     return m_right;
 }
+
+ListExpression::ListExpression( const Expressions::Ptr& expressions )
+: Expression( Node::Type::LIST_EXPRESSION )
+, m_expressions( expressions )
+{
+}
+
+Expressions::Ptr ListExpression::expressions() const
+{
+    return m_expressions;
+}
