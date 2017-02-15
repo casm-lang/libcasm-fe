@@ -250,7 +250,7 @@ value_t NumericExecutionPass::visit_expression_single(
 
     auto arg = pass.constant( val, *libcasm_ir::Type::Boolean() );
 
-    auto i = libcasm_ir::NotInstruction( arg );
+    auto i = libcasm_ir::NotInstruction( arg.get() );
 
     auto r = libcasm_rt::Value::execute( i );
 

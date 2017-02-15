@@ -70,22 +70,39 @@ libcasm_ir::Type* AstToCasmIRPass::getType( Type* type )
     }
 }
 
-libcasm_ir::Value* AstToCasmIRPass::constant(
+libcasm_ir::Value::Ptr AstToCasmIRPass::constant(
     const value_t& value, libcasm_ir::Type& hint )
 {
     switch( value.type )
     {
         case TypeType::UNDEF:
         {
-            return libcasm_ir::Constant::Undef( &hint );
-        }
-        case TypeType::INTEGER:
-        {
-            return libcasm_ir::Constant::Integer( value.value.integer );
+            switch( hint.id() )
+            {
+                case libcasm_ir::Type::BOOLEAN:
+                {
+                    return libstdhl::make< libcasm_ir::BooleanConstant >();
+                }
+                case libcasm_ir::Type::INTEGER:
+                {
+                    return libstdhl::make< libcasm_ir::IntegerConstant >();
+                }
+                default:
+                {
+                    assert( !" unimplemented 'value_t' undef constant!" );
+                    return nullptr;
+                }
+            }
         }
         case TypeType::BOOLEAN:
         {
-            return libcasm_ir::Constant::Boolean( value.value.boolean );
+            return libstdhl::make< libcasm_ir::BooleanConstant >(
+                value.value.boolean );
+        }
+        case TypeType::INTEGER:
+        {
+            return libstdhl::make< libcasm_ir::IntegerConstant >(
+                value.value.integer );
         }
         default:
         {
@@ -95,14 +112,15 @@ libcasm_ir::Value* AstToCasmIRPass::constant(
     }
 }
 
-value_t AstToCasmIRPass::value_t_value( const libcasm_ir::Value& value )
+value_t AstToCasmIRPass::value_t_value( const libcasm_ir::Value::Ptr& value )
 {
-    switch( value.id() )
+    switch( value->id() )
     {
         case libcasm_ir::Value::BOOLEAN_CONSTANT:
         {
-            auto c = static_cast< const libcasm_ir::BooleanConstant& >( value );
-            return c.defined() ? value_t( c.value() ) : value_t();
+            auto c = static_cast< const libcasm_ir::BooleanConstant* >(
+                value.get() );
+            return c->defined() ? value_t( c->value() ) : value_t();
         }
         default:
         {
