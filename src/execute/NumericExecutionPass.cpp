@@ -248,7 +248,7 @@ value_t NumericExecutionPass::visit_expression_single(
 
     AstToCasmIRPass pass;
 
-    auto arg = pass.constant( val, *libcasm_ir::Type::Boolean() );
+    auto arg = pass.constant( val, expr->type_, *libcasm_ir::Type::Boolean() );
 
     auto i = libcasm_ir::NotInstruction( arg.get() );
 

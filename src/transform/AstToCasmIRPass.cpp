@@ -71,7 +71,7 @@ libcasm_ir::Type* AstToCasmIRPass::getType( Type* type )
 }
 
 libcasm_ir::Value::Ptr AstToCasmIRPass::constant(
-    const value_t& value, libcasm_ir::Type& hint )
+    const value_t& value, const Type& type, libcasm_ir::Type& hint )
 {
     switch( value.type )
     {
@@ -86,6 +86,11 @@ libcasm_ir::Value::Ptr AstToCasmIRPass::constant(
                 case libcasm_ir::Type::INTEGER:
                 {
                     return libstdhl::make< libcasm_ir::IntegerConstant >();
+                }
+                case libcasm_ir::Type::BIT:
+                {
+                    return libstdhl::make< libcasm_ir::BitConstant >(
+                        type.bitsize );
                 }
                 default:
                 {
@@ -103,6 +108,11 @@ libcasm_ir::Value::Ptr AstToCasmIRPass::constant(
         {
             return libstdhl::make< libcasm_ir::IntegerConstant >(
                 value.value.integer );
+        }
+        case TypeType::BIT:
+        {
+            return libstdhl::make< libcasm_ir::BitConstant >(
+                type.bitsize, (uint64_t)value.value.integer );
         }
         default:
         {

@@ -71,7 +71,7 @@ namespace libcasm_fe
         libcasm_ir::Type* getType( Type* type );
 
         libcasm_ir::Value::Ptr constant(
-            const value_t& value, libcasm_ir::Type& hint );
+            const value_t& value, const Type& type, libcasm_ir::Type& hint );
         value_t value_t_value( const libcasm_ir::Value::Ptr& value );
 
       private:
