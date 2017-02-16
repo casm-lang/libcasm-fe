@@ -233,16 +233,16 @@ END       0 "end of file"
                                                   MaybeFunctionAttributes
 %type <Ast::NodeList< Ast::VariableDefinition >::Ptr> Parameters MaybeParameters
 
-%type <Ast::FunctionDefinition::Ptr> FunctionDeclaration
 %type <Ast::FunctionDefinition::Ptr> ProgramFunctionDefinition
 
 %type <Ast::CaseRule::Case> CaseLabel
 %type <std::vector< Ast::CaseRule::Case >> CaseLabels
 
 %type <Ast::UpdateRule::Ptr> Initializer
-%type <Ast::NodeList< Ast::UpdateRule >::Ptr> Initializers MaybeInitializers
+%type <Ast::NodeList< Ast::UpdateRule >::Ptr> Initializers MaybeInitializers MaybeInitially
+%type <Ast::Expression::Ptr> MaybeDefined
 
-%type <Ast::Types::Ptr> TypeStarList MaybeTypeStarList
+%type <Ast::Types::Ptr> FunctionParameters MaybeFunctionParameters
 
 
 %start Specification
@@ -337,53 +337,7 @@ Definitions
 
 
 FunctionDefinition
-: FunctionDeclaration
-  {
-      $$ = $1;
-  }
-| FunctionDeclaration INITIALLY LCURPAREN MaybeInitializers RCURPAREN
-  {
-      auto functionDefinition = $1;
-
-      // apply the name of the function declaration to the initializer functions
-      auto initializers = $4;
-      for (auto initializer : *initializers) {
-          initializer->function()->setIdentifier( functionDefinition->identifier() );
-      }
-      functionDefinition->setInitializers( initializers );
-
-      $$ = functionDefinition;
-  }
-| FunctionDeclaration DEFINED LCURPAREN Atom RCURPAREN
-  {
-      auto functionDefinition = $1;
-      functionDefinition->setDefaultValue( $4 );
-      $$ = functionDefinition;
-  }
-| FunctionDeclaration DEFINED LCURPAREN Atom RCURPAREN INITIALLY LCURPAREN MaybeInitializers RCURPAREN
-  {
-      auto functionDefinition = $1;
-      functionDefinition->setDefaultValue( $4 );
-
-      // apply the name of the function declaration to the initializer functions
-      auto initializers = $8;
-      for (auto initializer : *initializers) {
-           initializer->function()->setIdentifier( functionDefinition->identifier() );
-      }
-      functionDefinition->setInitializers( initializers );
-
-      $$ = functionDefinition;
-  }
-| ProgramFunctionDefinition
-  {
-      // `init` special case
-      $$ = $1;
-  }
-;
-
-
-FunctionDeclaration
-: FUNCTION MaybeFunctionAttributes Identifier COLON MaybeTypeStarList ARROW Type
+: FUNCTION MaybeFunctionAttributes Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
   {
       auto function = Ast::make< Ast::FunctionDefinition >( @$, $3, $5, $7 );
 
@@ -391,13 +345,50 @@ FunctionDeclaration
       function->setClassification( attributes.first );
       function->setSymbolic( attributes.second );
 
+      function->setDefaultValue( $8 );
+
+      // apply the name of the function declaration to the initializer functions
+      auto initializers = $9;
+      for (auto initializer : *initializers) {
+           initializer->function()->setIdentifier( functionDefinition->identifier() );
+      }
+      function->setInitializers( initializers );
+
       $$ = function;
+  }
+| ProgramFunctionDefinition // `init` special case
+  {
+      $$ = $1;
   }
 ;
 
 
-TypeStarList
-: TypeStarList STAR Type
+MaybeInitially
+: INITIALLY LCURPAREN MaybeInitializers RCURPAREN
+  {
+      $$ = $3;
+  }
+| %empty
+  {
+      $$ = Ast::make< Ast::NodeList< Ast::UpdateRule > >( @$ );
+  }
+;
+
+
+MaybeDefined
+: DEFINED LCURPAREN Atom RCURPAREN
+  {
+      $$ = $3;
+  }
+| %empty
+  {
+      $$ = Ast::make< Ast::UndefAtom >( @$ );
+  }
+;
+
+
+FunctionParameters
+: FunctionParameters STAR Type
   {
       auto types = $1;
       types->add( $3 );
@@ -412,8 +403,8 @@ TypeStarList
 ;
 
 
-MaybeTypeStarList
-: TypeStarList
+MaybeFunctionParameters
+: FunctionParameters
   {
       $$ = $1;
   }
