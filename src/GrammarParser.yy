@@ -230,6 +230,7 @@ END       0 "end of file"
 
 // other
 %type <Ast::NodeList< Ast::IdentifierNode >::Ptr> Identifiers IdentifiersNoComma
+                                                  MaybeFunctionAttributes
 %type <Ast::NodeList< Ast::VariableDefinition >::Ptr> Parameters MaybeParameters
 
 %type <Ast::FunctionDefinition::Ptr> FunctionDeclaration
@@ -382,19 +383,15 @@ FunctionDefinition
 
 
 FunctionDeclaration
-: FUNCTION LPAREN Identifiers RPAREN Identifier COLON MaybeTypeStarList ARROW Type
+: FUNCTION MaybeFunctionAttributes Identifier COLON MaybeTypeStarList ARROW Type
   {
-      auto function = Ast::make< Ast::FunctionDefinition >( @$, $5, $7, $9 );
+      auto function = Ast::make< Ast::FunctionDefinition >( @$, $3, $5, $7 );
 
-      const auto attributes = parseFunctionAttributes( driver, $3 );
+      const auto attributes = parseFunctionAttributes( driver, $2 );
       function->setClassification( attributes.first );
       function->setSymbolic( attributes.second );
 
       $$ = function;
-  }
-| FUNCTION Identifier COLON MaybeTypeStarList ARROW Type
-  {
-      $$ = Ast::make< Ast::FunctionDefinition >( @$, $2, $4, $6 );
   }
 ;
 
@@ -423,6 +420,18 @@ MaybeTypeStarList
 | %empty
   {
       $$ = Ast::make< Ast::Types >( @$ );
+  }
+;
+
+
+MaybeFunctionAttributes
+: LPAREN Identifiers RPAREN
+  {
+      $$ = $2;
+  }
+| %empty
+  {
+      $$ = Ast::make< Ast::NodeList< Ast::IdentifierNode > >( @$ );
   }
 ;
 
