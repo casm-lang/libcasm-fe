@@ -1,27 +1,27 @@
-//  
+//
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
-//  
+//
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
-//  
+//
 //  This file is part of libcasm-fe.
-//  
+//
 //  libcasm-fe is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  libcasm-fe is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
-//  
+//
 
 %skeleton "lalr1.cc" /* -*- C++ -*- */
 %defines
@@ -35,7 +35,7 @@
 %code requires
 {
     #include "cpp/Type.h"
-    
+
     #include "src/Ast/Specification.h"
     #include "src/Types.h"
     #include "src/Driver.h"
@@ -66,7 +66,7 @@
 %code
 {
     yy::Parser::symbol_type yylex( libcasm_fe::Driver& driver );
-        
+
     std::pair< Ast::FunctionDefinition::Classification, bool > parseFunctionAttributes(
         Driver& driver, const Ast::NodeList< Ast::IdentifierNode >& attributes )
     {
@@ -242,13 +242,13 @@ END       0 "end of file"
 
 
 %start Specification
-     
+
 %precedence THEN
 %precedence ELSE
 
 //%precedence UPDATE ASSERT ASSURE ABORT
 // %precedence IDENTIFIER
-//%precedence INTEGERCONST STRCONST FLOATINGCONST RATIONALCONST 
+//%precedence INTEGERCONST STRCONST FLOATINGCONST RATIONALCONST
 // %precedence UNDEF
 // %precedence TRUE
 // %precedence FALSE
@@ -256,16 +256,16 @@ END       0 "end of file"
 %left AND
 %left XOR
 %left OR
-     
-%left EQUAL     
-%left NEQUAL 
-     
+
+%left EQUAL
+%left NEQUAL
+
 %left GREATEREQ
 %left LESSEQ
-     
+
 %left GREATER
 %left LESSER
-     
+
 %left PLUS
 %left MINUS
 %left PERCENT
@@ -276,7 +276,7 @@ END       0 "end of file"
 
 %nonassoc UPLUS
 %nonassoc UMINUS
-     
+
 %%
 
 Specification
@@ -689,7 +689,7 @@ Atom
   }
 | Undefined
   {
-      $$ = $1; 
+      $$ = $1;
   }
 | Boolean
   {
@@ -717,7 +717,7 @@ Boolean
       const auto value = libstdhl::get< libcasm_ir::BooleanConstant >( false );
       $$ = Ast::make< Ast::ValueAtom >( @$, value );
   }
-; 
+;
 
 
 String
@@ -1144,7 +1144,7 @@ void yy::Parser::error
     {
         i32 pos = (l.begin.line - 1);
         pos = ( pos > 0 ? pos : 1 );
-        
+
         driver.error
         ( yy::location( yy::position( 0, pos, 1 ) )
         , m
@@ -1158,7 +1158,7 @@ void yy::Parser::error
 }
 
 
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -1166,4 +1166,4 @@ void yy::Parser::error
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//
