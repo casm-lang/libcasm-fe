@@ -355,9 +355,9 @@ FunctionDefinition
 
       $$ = function;
   }
-| ProgramFunctionDefinition // `init` special case
+| ProgramFunctionDefinition
   {
-      $$ = $1;
+      $$ = $1; // `init` special case
   }
 ;
 

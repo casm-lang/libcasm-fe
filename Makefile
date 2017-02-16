@@ -37,11 +37,12 @@ $(OBJ)/src/various/Grammar.org: src/various/Grammar.org
 	cp -f $< $@
 
 src/various/Grammar.org: src/GrammarParser.yy src/GrammarToken.hpp
-	grep -e "^[:|] [alpha]*" $< -B 2 -A 1 | \
+	grep -e "^[:|] [alpha]*" $< -B 1 | \
 		sed "/^  {/d" | \
 		sed "/^  }/d" | \
 		sed "/^--/d"  | \
-		sed "/^\t/d"  > $@
+		sed "/^\t/d"  | \
+		sed "s/^[^:|]/\n&/" > $@
 
 $(OBJ)/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp
 	mkdir -p `dirname $@`

@@ -1,421 +1,256 @@
-     
-SPECIFICATION
-: HEADER BODY_ELEMENTS
 
-HEADER
-: CASM
+Specification
+: CASM Definitions
 
-BODY_ELEMENTS
-: BODY_ELEMENTS BODY_ELEMENT
-      $$ = $1;
-| BODY_ELEMENT
+Definition
+: FunctionDefinition
+| DerivedDefinition
+| RuleDefinition
+| EnumerationDefinition
 
-BODY_ELEMENT
-: OPTION_SYNTAX
-      $$ = new AstNode( NodeType::OPTION );
-| ENUM_SYNTAX
-      $$ = new EnumDefNode( @$, $1 );
-| FUNCTION_DEFINITION
-      }
-| FUNCTION_DEFINITION INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
-      $$ = node;
-| FUNCTION_DEFINITION DEFINED LCURPAREN VALUE RCURPAREN
-      $$ = node;
-| FUNCTION_DEFINITION DEFINED LCURPAREN VALUE RCURPAREN INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
-      $$ = node;
-| DERIVED_SYNTAX
-      }
-| INIT_SYNTAX
-      $$ = $1;
-| RULE_SYNTAX
+Definitions
+: Definitions Definition
+| Definition
 
-INIT_SYNTAX
-: INIT IDENTIFIER
-    $$ = new InitNode( @$, programDef );
-| INIT LCURPAREN INITIALIZER_LIST RCURPAREN
+FunctionDefinition
+: FUNCTION MaybeFunctionAttributes Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
+| ProgramFunctionDefinition
 
-OPTION_SYNTAX
-: OPTION IDENTIFIER DOT IDENTIFIER IDENTIFIER
-;
+MaybeInitially
+: INITIALLY LCURPAREN MaybeInitializers RCURPAREN
+| %empty
 
-ENUM_SYNTAX
-: ENUM IDENTIFIER EQUAL LCURPAREN IDENTIFIER_LIST RCURPAREN
+MaybeDefined
+: DEFINED LCURPAREN Atom RCURPAREN
+| %empty
 
-DERIVED_SYNTAX
-: DERIVED IDENTIFIER LPAREN PARAM_LIST RPAREN EQUAL EXPRESSION
-      $$ = new Function($2, @$, $4, $7, new Type(TypeType::UNKNOWN));
-| DERIVED IDENTIFIER EQUAL EXPRESSION
-      $$ = new Function($2, @$, $4, new Type(TypeType::UNKNOWN));
-| DERIVED IDENTIFIER LPAREN RPAREN EQUAL EXPRESSION
-      $$ = new Function($2, @$, $6, new Type(TypeType::UNKNOWN));
-| DERIVED IDENTIFIER LPAREN PARAM_LIST RPAREN COLON TYPE_SYNTAX EQUAL EXPRESSION
-      $$ = new Function($2, @$, $4, $9, $7);
-| DERIVED IDENTIFIER COLON TYPE_SYNTAX EQUAL EXPRESSION
-      $$ = new Function($2, @$, $6, $4);
-| DERIVED IDENTIFIER LPAREN RPAREN COLON TYPE_SYNTAX EQUAL EXPRESSION
+FunctionParameters
+: FunctionParameters STAR Type
+| Type
 
-FUNCTION_DEFINITION
-: FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE
-      $$ = function;
-| FUNCTION IDENTIFIER FUNCTION_SIGNATURE
+MaybeFunctionParameters
+: FunctionParameters
+| %empty
 
-IDENTIFIER_LIST
-: IDENTIFIER_LIST_NO_COMMA COMMA
-      $$ = std::move($1);
-| IDENTIFIER_LIST_NO_COMMA
+MaybeFunctionAttributes
+: LPAREN MaybeIdentifiers RPAREN
+| %empty
 
-IDENTIFIER_LIST_NO_COMMA
-: IDENTIFIER_LIST_NO_COMMA COMMA IDENTIFIER
-      $$.push_back( $3 );
-| IDENTIFIER
+ProgramFunctionDefinition
+: INIT RuleReference
+| INIT LCURPAREN MaybeInitializers RCURPAREN
 
-FUNCTION_SIGNATURE
-: COLON ARROW TYPE_SYNTAX
-      $$ = std::pair<std::vector<Type*>, Type*>(foo, $3);
-| COLON TYPE_IDENTIFIER_STARLIST ARROW TYPE_SYNTAX
+Initializer
+: Atom
+| MaybeArguments ARROW Atom
 
-PARAM
-: IDENTIFIER COLON TYPE_SYNTAX
-      $$ = $3;
-| IDENTIFIER
+Initializers
+: Initializers COMMA Initializer
+| Initializer
 
-PARAM_LIST
-: PARAM_LIST_NO_COMMA
-      $$ = std::move($1);
-| PARAM_LIST_NO_COMMA COMMA
+MaybeInitializers
+: Initializers
+| Initializers COMMA
+| %empty
 
-PARAM_LIST_NO_COMMA
-: PARAM_LIST_NO_COMMA COMMA PARAM
-      $$.push_back($3);
-| PARAM
+DerivedDefinition
+: DERIVED Identifier MaybeParameters COLON Type EQUAL Expression
 
-TYPE_IDENTIFIER_STARLIST
-: TYPE_SYNTAX STAR TYPE_IDENTIFIER_STARLIST
-      $$ = std::move($3);
-| TYPE_SYNTAX STAR
-      $$.push_back($1);
-| TYPE_SYNTAX
+EnumerationDefinition
+: ENUM Identifier EQUAL LCURPAREN MaybeIdentifiers RCURPAREN
 
-TYPE_SYNTAX
+Identifier
 : IDENTIFIER
-      }      
-| IDENTIFIER LPAREN INTEGER_NUMBER RPAREN
-      }
-| IDENTIFIER LPAREN TYPE_SYNTAX_LIST RPAREN
-      }      
-| IDENTIFIER LPAREN INTEGER_NUMBER DOTDOT INTEGER_NUMBER RPAREN
 
-TYPE_SYNTAX_LIST
-: TYPE_SYNTAX COMMA TYPE_SYNTAX_LIST
-      $$ = std::move( $3 );
-| TYPE_SYNTAX COMMA
-      $$.push_back( $1 );
-| TYPE_SYNTAX
+Identifiers
+: Identifiers COMMA Identifier
+| Identifier
 
-INITIALIZER_LIST
-: INITIALIZER_LIST_NO_COMMA
-      $$ = std::move($1);
-| INITIALIZER_LIST_NO_COMMA COMMA
+MaybeIdentifiers
+: Identifiers
+| Identifiers COMMA
+| %empty
 
-INITIALIZER_LIST_NO_COMMA
-: INITIALIZER_LIST_NO_COMMA COMMA INITIALIZER
-      $$.push_back($3);
-| INITIALIZER
+Variable
+: Identifier COLON Type
 
-INITIALIZER
-: ATOM
-      $$ = new UpdateNode( @$, function, $1 );
-| EXPRESSION ARROW ATOM
-      $$ = new UpdateNode( @$, function, $3 );
-| LPAREN EXPRESSION_LIST RPAREN ARROW ATOM
+Parameters
+: Parameters COMMA Variable
+| Variable
 
-ATOM
-: FUNCTION_SYNTAX
-      $$ = $1;
-| VALUE
-      $$ = $1;
-| LPAREN EXPRESSION RPAREN
-      $$ = $2;
-| PLUS LPAREN EXPRESSION RPAREN %prec UPLUS
-      $$ = $3;
-| MINUS LPAREN EXPRESSION RPAREN %prec UMINUS
+MaybeParameters
+: LPAREN Parameters RPAREN
+| LPAREN RPAREN
+| %empty
 
-VALUE
-: RULEREF
-      $$ = new RuleAtom( @$, std::move( $1 ) );
-| NUMBER
-      $$ = $1;
-| STRCONST
-      $$ = new StringAtom( @$, std::move( $1 ) );
-| LISTCONST
-      $$ = new ListAtom( @$, $1 );
-| NUMBER_RANGE
-      $$ = $1;
-| SELF
-      $$ = new SelfAtom( @$ );
-| UNDEFINED
-      $$ = $1; 
-| BOOLEAN
+Type
+: BasicType
+| ComposedType
+| StaticallySizedType
+| RangedType
 
-UNDEFINED
+BasicType
+: Identifier
+
+ComposedType
+: Identifier LPAREN Types RPAREN
+
+StaticallySizedType
+: Identifier LPAREN Atom RPAREN
+
+RangedType
+: Identifier LPAREN Atom DOTDOT Atom RPAREN
+
+Types
+: Types COMMA Type
+| Type
+
+Atom
+: DirectCallExpression
+| IndirectCallExpression
+| LPAREN Expression RPAREN
+| PLUS LPAREN Expression RPAREN %prec UPLUS
+| MINUS LPAREN Expression RPAREN %prec UMINUS
+| RuleReference
+| IntegerNumber
+| FloatingNumber
+| RationalNumber
+| String
+| List
+| Range
+| Undefined
+| Boolean
+
+Undefined
 : UNDEF
 
-BOOLEAN
+Boolean
 : TRUE
-      $$ = new BooleanAtom( @$, true );
 | FALSE
 
-NUMBER
-: INTEGER_NUMBER
-      $$ = $1;
-| FLOATING_NUMBER
-      $$ = $1;
-| RATIONAL_NUMBER
+String
+: STRCONST
 
-INTEGER_NUMBER
+IntegerNumber
 : INTEGERCONST
-      $$ = new IntegerAtom( @$, $1 );
-| PLUS INTEGER_NUMBER %prec UPLUS
-      $$ = $2;
-| MINUS INTEGER_NUMBER %prec UMINUS
 
-FLOATING_NUMBER
+FloatingNumber
 : FLOATINGCONST
-      $$ = new FloatingAtom( @$, $1 );
-| PLUS FLOATING_NUMBER %prec UPLUS
-      $$ = $2;
-| MINUS FLOATING_NUMBER %prec UMINUS
 
-RATIONAL_NUMBER
+RationalNumber
 : RATIONALCONST
-      $$ = new RationalAtom( @$, $1 );
-| PLUS RATIONAL_NUMBER %prec UPLUS
-      $$ = $2;
-| MINUS RATIONALCONST %prec UMINUS
 
-RULEREF
+RuleReference
 : AT IDENTIFIER
 
-NUMBER_RANGE
-: LSQPAREN EXPRESSION DOTDOT EXPRESSION RSQPAREN
+Range
+: LSQPAREN Atom DOTDOT Atom RSQPAREN
 
-LISTCONST
-: LSQPAREN EXPRESSION_LIST RSQPAREN
-      $$ = $2;
-| LSQPAREN RSQPAREN
+List
+: LSQPAREN MaybeExpressions RSQPAREN
 
-EXPRESSION_LIST
-: EXPRESSION_LIST_NO_COMMA
-      $$ = $1;
-| EXPRESSION_LIST_NO_COMMA COMMA
+Expression
+: Expression PLUS Expression
+| Expression MINUS Expression
+| Expression STAR Expression
+| Expression SLASH Expression
+| Expression PERCENT Expression
+| Expression NEQUAL Expression
+| Expression EQUAL Expression
+| Expression LESSER Expression
+| Expression GREATER Expression
+| Expression LESSEQ Expression
+| Expression GREATEREQ Expression
+| Expression OR Expression
+| Expression XOR Expression
+| Expression AND Expression
+| NOT Expression
+| Atom
 
-EXPRESSION_LIST_NO_COMMA
-: EXPRESSION_LIST_NO_COMMA COMMA EXPRESSION
-      $$->push_back( $3 );
-| EXPRESSION
+Expressions
+: Expressions COMMA Expression
+| Expression
 
-EXPRESSION
-: EXPRESSION PLUS EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
-| EXPRESSION MINUS EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::SUB_INSTRUCTION );
-| EXPRESSION STAR EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::MUL_INSTRUCTION );
-| EXPRESSION SLASH EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
-| EXPRESSION PERCENT EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
-| EXPRESSION NEQUAL EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
-| EXPRESSION EQUAL EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::EQU_INSTRUCTION );
-| EXPRESSION LESSER EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::LTH_INSTRUCTION );
-| EXPRESSION GREATER EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::GTH_INSTRUCTION );
-| EXPRESSION LESSEQ EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
-| EXPRESSION GREATEREQ EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
-| EXPRESSION OR EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::OR_INSTRUCTION );
-| EXPRESSION XOR EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::XOR_INSTRUCTION );
-| EXPRESSION AND EXPRESSION
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
-| NOT EXPRESSION
-      $$ = new UnaryExpression( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
-| ATOM
+MaybeExpressions
+: Expressions
+| Expressions COMMA
+| %empty
 
-FUNCTION_SYNTAX
-: IDENTIFIER
-      $$ = new FunctionAtom( @$, $1 );
-| IDENTIFIER LPAREN RPAREN
-      $$ = new FunctionAtom( @$, $1 );
-| IDENTIFIER LPAREN EXPRESSION_LIST RPAREN
+Arguments
+: LPAREN Expressions RPAREN
+| LPAREN RPAREN
 
-SCOPE
-: SEQ_SYNTAX
-      $$ = $1;
-| PAR_SYNTAX
+MaybeArguments
+: Arguments
+| Expression
+| %empty
 
-RULE_STMT
-: SCOPE
-      $$ = $1;
-| SIMPLE_STMT
+DirectCallExpression
+: Identifier MaybeArguments
 
-RULE_SYNTAX
-: RULE IDENTIFIER EQUAL RULE_STMT
-      $$ = new RuleNode( @$, $4, $2 );
-| RULE IDENTIFIER LPAREN RPAREN EQUAL RULE_STMT
-      $$ = new RuleNode( @$, $6, $2 );
-| RULE IDENTIFIER LPAREN PARAM_LIST RPAREN EQUAL RULE_STMT
-      $$ = new RuleNode( @$, $7, $2, $4 );
-| RULE IDENTIFIER DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
-      $$ = new RuleNode( @$, $6, $2, tmp, $4 );
-| RULE IDENTIFIER LPAREN RPAREN DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
-      $$ = new RuleNode( @$, $8, $2, tmp, $6 );
-| RULE IDENTIFIER LPAREN PARAM_LIST RPAREN DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
+IndirectCallExpression
+: LPAREN Expression RPAREN Arguments
 
-DUMPSPEC_LIST
-: DUMPSPEC_LIST COMMA DUMPSPEC
-      $$.push_back( $3 );
-| DUMPSPEC
+RuleDefinition
+: RULE Identifier MaybeParameters EQUAL Rule
 
-DUMPSPEC
-: LPAREN IDENTIFIER_LIST RPAREN ARROW IDENTIFIER
+Rule
+: SkipRule
+| ConditionalRule
+| CaseRule
+| LetRule
+| ForallRule
+| IterateRule
+| BlockRule
+| SequenceRule
+| UpdateRule
+| CallRule
 
-SIMPLE_STMT
-: ASSERT_SYNTAX
-      $$ = $1;
-| ASSURE_SYNTAX
-      $$ = $1;
-| DIEDIE_SYNTAX
-      $$ = $1;
-| IMPOSSIBLE_SYNTAX
-      $$ = $1;
-| DEBUG_SYNTAX
-      $$ = $1;
-| PRINT_SYNTAX
-      $$ = $1;
-| UPDATE_SYNTAX
-      $$ = $1;
-| CASE_SYNTAX
-      $$ = $1;
-| CALL_SYNTAX
-      $$ = $1;
-| IFTHENELSE
-      $$ = $1;
-| LET_SYNTAX
-      $$ = $1;
-| PUSH_SYNTAX
-      $$ = $1;
-| POP_SYNTAX
-      $$ = $1;
-| FORALL_SYNTAX
-      $$ = $1;
-| ITERATE_SYNTAX
-      $$ = $1;
-| SKIP
-      $$ = new AstNode( NodeType::SKIP );
-| IDENTIFIER
+Rules
+: Rules Rule
+| Rule
 
-STATEMENT
-: SCOPE
-      $$ = $1;
-| SIMPLE_STMT
+SkipRule
+: SKIP
 
-ASSERT_SYNTAX
-: ASSERT EXPRESSION
+ConditionalRule
+: IF Expression THEN Rule
+| IF Expression THEN Rule ELSE Rule
 
-ASSURE_SYNTAX
-: ASSURE EXPRESSION
+CaseRule
+: CASE Expression OF LCURPAREN CaseLabels RCURPAREN
 
-DIEDIE_SYNTAX
-: DIEDIE EXPRESSION
-      $$ = new DiedieNode( @$, $2 );
-| DIEDIE
+CaseLabel
+: DEFAULT COLON Rule
+| UNDERLINE COLON Rule
+| Atom COLON Rule
 
-IMPOSSIBLE_SYNTAX
-: IMPOSSIBLE
+CaseLabels
+: CaseLabel CaseLabels
+| CaseLabel
 
-PRINT_SYNTAX
-: PRINT EXPRESSION
+LetRule
+: LET Variable EQUAL Expression IN Rule
 
-DEBUG_SYNTAX
-: DEBUG IDENTIFIER EXPRESSION
+ForallRule
+: FORALL Variable IN Expression DO Rule
 
-UPDATE_SYNTAX
-: FUNCTION_SYNTAX UPDATE EXPRESSION
+IterateRule
+: ITERATE Rule
 
-CASE_SYNTAX
-: CASE EXPRESSION OF LCURPAREN CASE_LABEL_LIST RCURPAREN
+BlockRule
+: LCURPAREN Rules RCURPAREN
+| PAR Rules ENDPAR
 
-CASE_LABEL_LIST
-: CASE_LABEL CASE_LABEL_LIST
-      $$.push_back( $1 );
-| CASE_LABEL
+SequenceRule
+: SEQ_BRACKET Rules ENDSEQ_BRACKET
+| SEQ Rules ENDSEQ
 
-CASE_LABEL
-: CASE_VALUE COLON STATEMENT
+UpdateRule
+: DirectCallExpression UPDATE Expression
 
-CASE_VALUE
-: DEFAULT
-      $$ = nullptr;
-| UNDERLINE
-      $$ = nullptr;
-| UNDEFINED
-      $$ = $1;
-| BOOLEAN
-      $$ = $1;
-| NUMBER
-      $$ = $1;
-| STRCONST
-      $$ = new StringAtom( @$, std::move( $1 ) );
-| FUNCTION_SYNTAX
-
-CALL_SYNTAX
-: CALL LPAREN EXPRESSION RPAREN LPAREN EXPRESSION_LIST RPAREN
-      $$ = new CallNode( @$, "", $3, $6 );
-| CALL LPAREN EXPRESSION RPAREN
-      $$ = new CallNode( @$, "", $3 );
-| CALL IDENTIFIER LPAREN EXPRESSION_LIST RPAREN
-      $$ = new CallNode( @$, $2, nullptr, $4 );
-| CALL IDENTIFIER
-
-SEQ_SYNTAX
-: SEQ_BRACKET STATEMENTS ENDSEQ_BRACKET
-      $$ = new UnaryNode( @$, NodeType::SEQBLOCK, $2 );
-| SEQ STATEMENTS ENDSEQ
-
-PAR_SYNTAX
-: LCURPAREN STATEMENTS RCURPAREN
-      $$ = new UnaryNode( @$, NodeType::PARBLOCK, $2 );
-| PAR STATEMENTS ENDPAR
-
-STATEMENTS
-: STATEMENTS STATEMENT
-      $$ = $1;
-| STATEMENT
-
-IFTHENELSE
-: IF EXPRESSION THEN STATEMENT
-      $$ = new IfThenElseNode( @$, $2, $4, nullptr );
-| IF EXPRESSION THEN STATEMENT ELSE STATEMENT
-
-LET_SYNTAX
-: LET IDENTIFIER EQUAL
-      $$ = new LetNode( @$, Type( TypeType::UNKNOWN ), $2, $5, $7 );
-| LET IDENTIFIER COLON TYPE_SYNTAX EQUAL
-
-PUSH_SYNTAX
-: PUSH EXPRESSION INTO FUNCTION_SYNTAX
-
-POP_SYNTAX
-: POP FUNCTION_SYNTAX FROM FUNCTION_SYNTAX
-
-FORALL_SYNTAX
-: FORALL IDENTIFIER IN EXPRESSION DO STATEMENT
-
-ITERATE_SYNTAX
-: ITERATE STATEMENT
+CallRule
+: CALL DirectCallExpression
+| DirectCallExpression
+| CALL IndirectCallExpression
+| IndirectCallExpression
