@@ -186,9 +186,9 @@ END       0 "end of file"
 %token <std::string> STRCONST      "string"
 %token <std::string> IDENTIFIER "identifier"
 
-
 %type <Ast::Specification::Ptr> Specification
 %type <Ast::IdentifierNode::Ptr> Identifier
+%type <Ast::NodeList< Ast::IdentifierNode >::Ptr> Identifiers MaybeIdentifiers
 
 // definitions
 %type <Ast::Definition::Ptr> Definition
@@ -200,9 +200,12 @@ END       0 "end of file"
 %type <Ast::EnumerationDefinition::Ptr> EnumerationDefinition
 
 // expressions
-%type <Ast::Expression::Ptr> Expression Atom Undefined Boolean Range List String
-                             IntegerNumber FloatingNumber RationalNumber RuleReference
-%type <Ast::Expressions::Ptr> MaybeExpressions Expressions Arguments MaybeArguments
+%type <Ast::Expression::Ptr> Expression Atom
+%type <Ast::Expressions::Ptr> Expressions MaybeExpressions
+%type <Ast::ValueAtom::Ptr> Boolean String IntegerNumber FloatingNumber RationalNumber RuleReference
+%type <Ast::UndefAtom::Ptr> Undefined
+%type <Ast::RangeExpression::Ptr> Range
+%type <Ast::ListExpression::Ptr> List
 %type <Ast::DirectCallExpression::Ptr> DirectCallExpression
 %type <Ast::IndirectCallExpression::Ptr> IndirectCallExpression
 
@@ -229,20 +232,16 @@ END       0 "end of file"
 %type <Ast::RangedType::Ptr> RangedType
 
 // other
-%type <Ast::NodeList< Ast::IdentifierNode >::Ptr> Identifiers IdentifiersNoComma
-                                                  MaybeFunctionAttributes
-%type <Ast::NodeList< Ast::VariableDefinition >::Ptr> Parameters MaybeParameters
-
 %type <Ast::FunctionDefinition::Ptr> ProgramFunctionDefinition
-
 %type <Ast::CaseRule::Case> CaseLabel
 %type <std::vector< Ast::CaseRule::Case >> CaseLabels
-
 %type <Ast::UpdateRule::Ptr> Initializer
 %type <Ast::NodeList< Ast::UpdateRule >::Ptr> Initializers MaybeInitializers MaybeInitially
+%type <Ast::NodeList< Ast::IdentifierNode >::Ptr> MaybeFunctionAttributes
 %type <Ast::Expression::Ptr> MaybeDefined
-
 %type <Ast::Types::Ptr> FunctionParameters MaybeFunctionParameters
+%type <Ast::Expressions::Ptr> Arguments MaybeArguments
+%type <Ast::NodeList< Ast::VariableDefinition >::Ptr> Parameters MaybeParameters
 
 
 %start Specification
@@ -416,7 +415,7 @@ MaybeFunctionParameters
 
 
 MaybeFunctionAttributes
-: LPAREN Identifiers RPAREN
+: LPAREN MaybeIdentifiers RPAREN
   {
       $$ = $2;
   }
@@ -521,7 +520,7 @@ DerivedDefinition
 
 
 EnumerationDefinition
-: ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
+: ENUM Identifier EQUAL LCURPAREN MaybeIdentifiers RCURPAREN
   {
       $$ = Ast::make< Ast::EnumerationDefinition >( @$, $2, $5 );
   }
@@ -537,19 +536,7 @@ Identifier
 
 
 Identifiers
-: IdentifiersNoComma COMMA
-  {
-      $$ = $1;
-  }
-| IdentifiersNoComma
-  {
-      $$ = $1;
-  }
-;
-
-
-IdentifiersNoComma
-: IdentifiersNoComma COMMA Identifier
+: Identifiers COMMA Identifier
   {
       auto identifiers = $1;
       identifiers->add( $3 );
@@ -560,6 +547,22 @@ IdentifiersNoComma
       auto identifiers = Ast::make< Ast::NodeList< Ast::Identifier > >( @$ );
       identifiers->add( $1 );
       $$ = identifiers;
+  }
+;
+
+
+MaybeIdentifiers
+: Identifiers
+  {
+      $$ = $1;
+  }
+| Identifiers COMMA
+  {
+      $$ = $1;
+  }
+| %empty
+  {
+      $$ = Ast::make< Ast::NodeList< Ast::Identifier > >( @$ );
   }
 ;
 
