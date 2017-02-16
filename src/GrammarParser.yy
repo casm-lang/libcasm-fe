@@ -468,6 +468,59 @@ ProgramFunctionDefinition
 ;
 
 
+Initializer
+: Atom
+  {
+      // the unknown function identifier will be replaced in FunctionDefinition
+      const auto unknown = Ast::make< Ast::IdentifierNode >( @$, std::string() );
+      const auto arguments = Ast::make< Ast::Expressions >( @$ );
+      const auto function = Ast::make< Ast::DirectCallExpression >( @$, unknown, arguments );
+
+      $$ = Ast::make< Ast::UpdateRule >( @$, function, $1 );
+  }
+| MaybeArguments ARROW Atom
+  {
+      // the unknown function identifier will be replaced in FunctionDefinition
+      const auto unknown = Ast::make< Ast::IdentifierNode >( @$, std::string() );
+      const auto function = Ast::make< Ast::DirectCallExpression >( @$, unknown, $1 );
+
+      $$ = Ast::make< Ast::UpdateRule >( @$, function, $3 );
+  }
+;
+
+
+Initializers
+: Initializers COMMA Initializer
+  {
+      auto initializers = $1;
+      initializers->add( $3 );
+      $$ = initializers;
+  }
+| Initializer
+  {
+      auto initializers = Ast::make< Ast::NodeList< Ast::UpdateRule > >( @$ );
+      initializers->add( $1 );
+      $$ = initializers;
+  }
+;
+
+
+MaybeInitializers
+: Initializers
+  {
+      $$ = $1;
+  }
+| Initializers COMMA
+  {
+      $$ = $1;
+  }
+| %empty
+  {
+      $$ = Ast::make< Ast::NodeList< Ast::UpdateRule > >( @$ );
+  }
+;
+
+
 DerivedDefinition
 : DERIVED Identifier MaybeParameters COLON Type EQUAL Expression
   {
@@ -624,59 +677,6 @@ Types
       auto types = Ast::make< Ast::Types >( @$ );
       types->add( $1 );
       $$ = types;
-  }
-;
-
-
-MaybeInitializers
-: Initializers
-  {
-      $$ = $1;
-  }
-| Initializers COMMA
-  {
-      $$ = $1;
-  }
-| %empty
-  {
-      $$ = Ast::make< Ast::NodeList< Ast::UpdateRule > >( @$ );
-  }
-;
-
-
-Initializers
-: Initializers COMMA Initializer
-  {
-      auto initializers = $1;
-      initializers->add( $3 );
-      $$ = initializers;
-  }
-| Initializer
-  {
-      auto initializers = Ast::make< Ast::NodeList< Ast::UpdateRule > >( @$ );
-      initializers->add( $1 );
-      $$ = initializers;
-  }
-;
-
-
-Initializer
-: Atom
-  {
-      // the unknown function identifier will be replaced in FunctionDefinition
-      const auto unknown = Ast::make< Ast::IdentifierNode >( @$, std::string() );
-      const auto arguments = Ast::make< Ast::Expressions >( @$ );
-      const auto function = Ast::make< Ast::DirectCallExpression >( @$, unknown, arguments );
-
-      $$ = Ast::make< Ast::UpdateRule >( @$, function, $1 );
-  }
-| MaybeArguments ARROW Atom
-  {
-      // the unknown function identifier will be replaced in FunctionDefinition
-      const auto unknown = Ast::make< Ast::IdentifierNode >( @$, std::string() );
-      const auto function = Ast::make< Ast::DirectCallExpression >( @$, unknown, $1 );
-
-      $$ = Ast::make< Ast::UpdateRule >( @$, function, $3 );
   }
 ;
 
@@ -893,22 +893,6 @@ Expression
 ;
 
 
-MaybeExpressions
-: Expressions
-  {
-      $$ = $1;
-  }
-| Expressions COMMA
-  {
-      $$ = $1;
-  }
-| %empty
-  {
-      $$ = Ast::make< Ast::Expressions >( @$ );
-  }
-;
-
-
 Expressions
 : Expressions COMMA Expression
   {
@@ -921,6 +905,22 @@ Expressions
       auto expressions = Ast::make< Ast::Expressions >( @$ );
       expressions->add( $1 );
       $$ = expressions;
+  }
+;
+
+
+MaybeExpressions
+: Expressions
+  {
+      $$ = $1;
+  }
+| Expressions COMMA
+  {
+      $$ = $1;
+  }
+| %empty
+  {
+      $$ = Ast::make< Ast::Expressions >( @$ );
   }
 ;
 
