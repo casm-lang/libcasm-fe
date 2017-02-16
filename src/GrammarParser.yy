@@ -37,7 +37,6 @@
     #include "cpp/Type.h"
 
     #include "src/Ast/Specification.h"
-    #include "src/Types.h"
     #include "src/Driver.h"
     #include "src/Codes.h"
 
@@ -187,12 +186,14 @@ END       0 "end of file"
 %token <std::string> STRCONST      "string"
 %token <std::string> IDENTIFIER "identifier"
 
+
 %type <Ast::Specification::Ptr> Specification
 %type <Ast::IdentifierNode::Ptr> Identifier
 
 // definitions
 %type <Ast::Definition::Ptr> Definition
 %type <Ast::Definitions::Ptr> Definitions
+%type <Ast::VariableDefinition::Ptr> Variable
 %type <Ast::FunctionDefinition::Ptr> FunctionDefinition
 %type <Ast::DerivedDefinition::Ptr> DerivedDefinition
 %type <Ast::RuleDefinition::Ptr> RuleDefinition
@@ -219,9 +220,16 @@ END       0 "end of file"
 %type <Ast::UpdateRule::Ptr> UpdateRule
 %type <Ast::CallRule::Ptr> CallRule
 
-%type <Ast::NodeList< Ast::IdentifierNode >::Ptr> Identifiers IdentifiersNoComma
+// types
+%type <Ast::Type::Ptr> Type
+%type <Ast::Types::Ptr> Types
+%type <Ast::BasicType::Ptr> BasicType
+%type <Ast::ComposedType::Ptr> ComposedType
+%type <Ast::StaticallySizedType::Ptr> StaticallySizedType
+%type <Ast::RangedType::Ptr> RangedType
 
-%type <Ast::VariableDefinition::Ptr> Variable
+// other
+%type <Ast::NodeList< Ast::IdentifierNode >::Ptr> Identifiers IdentifiersNoComma
 %type <Ast::NodeList< Ast::VariableDefinition >::Ptr> Parameters MaybeParameters
 
 %type <Ast::FunctionDefinition::Ptr> FunctionDeclaration
@@ -231,14 +239,9 @@ END       0 "end of file"
 %type <std::vector< Ast::CaseRule::Case >> CaseLabels
 
 %type <Ast::UpdateRule::Ptr> Initializer
-%type <Ast::NodeList< Ast::UpdateRule >::Ptr> MaybeInitializers Initializers
+%type <Ast::NodeList< Ast::UpdateRule >::Ptr> Initializers MaybeInitializers
 
-// TODO
-%type <std::pair<std::vector<Type*>, Type*>> FunctionSignature
-%type <Type*> Type
-
-%type <std::vector<Type*>> TypeStarList
-%type<std::vector<Type*>> Types
+%type <Ast::Types::Ptr> TypeStarList MaybeTypeStarList
 
 
 %start Specification
@@ -379,9 +382,9 @@ FunctionDefinition
 
 
 FunctionDeclaration
-: FUNCTION LPAREN Identifiers RPAREN Identifier FunctionSignature
+: FUNCTION LPAREN Identifiers RPAREN Identifier COLON MaybeTypeStarList ARROW Type
   {
-      auto function = Ast::make< Ast::FunctionDefinition >( @$, @5, nullptr, nullptr ); // TODO
+      auto function = Ast::make< Ast::FunctionDefinition >( @$, $5, $7, $9 );
 
       const auto attributes = parseFunctionAttributes( driver, $3 );
       function->setClassification( attributes.first );
@@ -389,37 +392,37 @@ FunctionDeclaration
 
       $$ = function;
   }
-| FUNCTION Identifier FunctionSignature
+| FUNCTION Identifier COLON MaybeTypeStarList ARROW Type
   {
-      $$ = Ast::make< Ast::FunctionDefinition >( @$, @2, nullptr, nullptr ); // TODO
-  }
-;
-
-
-FunctionSignature
-: COLON ARROW Type
-  {
-      // TODO
-  }
-| COLON TypeStarList ARROW Type
-  {
-      // TODO
+      $$ = Ast::make< Ast::FunctionDefinition >( @$, $2, $4, $6 );
   }
 ;
 
 
 TypeStarList
-: Type STAR TypeStarList
+: TypeStarList STAR Type
   {
-      // TODO
-  }
-| Type STAR
-  {
-      // TODO
+      auto types = $1;
+      types->add( $3 );
+      $$ = types;
   }
 | Type
   {
-      // TODO
+      auto types = Ast::make< Ast::Types >( @$ );
+      types->add( $1 );
+      $$ = types;
+  }
+;
+
+
+MaybeTypeStarList
+: TypeStarList
+  {
+      $$ = $1;
+  }
+| %empty
+  {
+      $$ = Ast::make< Ast::Types >( @$ );
   }
 ;
 
@@ -434,7 +437,7 @@ ProgramFunctionDefinition
       const auto program = Ast::make< Ast::DirectCallExpression >(
           @$, programDefinition->identifier(), arguments );
 
-      auto initializers = Ast::make< Ast::NodeList< Ast::UpdateRule >::Ptr >( @$ );
+      auto initializers = Ast::make< Ast::NodeList< Ast::UpdateRule > >( @$ );
       initializers->add( Ast::make< Ast::UpdateRule >( @$, program, $2 ) );
       programDefinition->setInitializers( initializers );
 
@@ -547,38 +550,71 @@ MaybeParameters
   }
 ;
 
+
 Type
+: BasicType
+  {
+      $$ = $1;
+  }
+| ComposedType
+  {
+      $$ = $1;
+  }
+| StaticallySizedType
+  {
+      $$ = $1;
+  }
+| RangedType
+  {
+      $$ = $1;
+  }
+;
+
+
+BasicType
 : Identifier
   {
-      // TODO
+      $$ = Ast::make< Ast::BasicType >( @$, $1 );
   }
-| Identifier LPAREN IntegerNumber RPAREN
+;
+
+
+ComposedType
+: Identifier LPAREN Types RPAREN
   {
-      // TODO
+      $$ = Ast::make< Ast::ComposedType >( @$, $1, $3 );
   }
-| Identifier LPAREN Types RPAREN
+;
+
+
+StaticallySizedType
+: Identifier LPAREN Atom RPAREN
   {
-      // TODO
+      $$ = Ast::make< Ast::StaticallySizedType >( @$, $1, $3 );
   }
-| Identifier LPAREN IntegerNumber DOTDOT IntegerNumber RPAREN
+;
+
+
+RangedType
+: Identifier LPAREN Atom DOTDOT Atom RPAREN
   {
-      // TODO
+      $$ = Ast::make< Ast::RangedType >( @$, $1, $3, $5 );
   }
 ;
 
 
 Types
-: Type COMMA Types
+: Types COMMA Type
   {
-      // TODO
-  }
-| Type COMMA
-  {
-      // TODO
+      auto types = $1;
+      types->add( $3 );
+      $$ = types;
   }
 | Type
   {
-      // TODO
+      auto types = Ast::make< Ast::Types >( @$ );
+      types->add( $1 );
+      $$ = types;
   }
 ;
 
@@ -594,7 +630,7 @@ MaybeInitializers
   }
 | %empty
   {
-      $$ = Ast::make< Ast::NodeList< Ast::UpdateRule >::Ptr >( @$ );
+      $$ = Ast::make< Ast::NodeList< Ast::UpdateRule > >( @$ );
   }
 ;
 
@@ -608,7 +644,7 @@ Initializers
   }
 | Initializer
   {
-      auto initializers = Ast::make< Ast::NodeList< Ast::UpdateRule >::Ptr >( @$ );
+      auto initializers = Ast::make< Ast::NodeList< Ast::UpdateRule > >( @$ );
       initializers->add( $1 );
       $$ = initializers;
   }
@@ -765,7 +801,7 @@ RuleReference
 
 
 Range
-: LSQPAREN Expression DOTDOT Expression RSQPAREN
+: LSQPAREN Atom DOTDOT Atom RSQPAREN
   {
       $$ = Ast::make< Ast::RangeExpression >( @$, $2, $4 );
   }

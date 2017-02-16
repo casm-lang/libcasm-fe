@@ -26,8 +26,8 @@
 #ifndef _LIB_CASMFE_DEFINITION_H_
 #define _LIB_CASMFE_DEFINITION_H_
 
-#include "Node.h"
 #include "Rule.h"
+#include "Type.h"
 
 namespace libcasm_fe
 {
@@ -60,12 +60,12 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< VariableDefinition >;
 
             VariableDefinition( const IdentifierNode::Ptr& identifier,
-                const IdentifierNode::Ptr& typeName );
+                const Type::Ptr& variableType );
 
-            IdentifierNode::Ptr typeName() const;
+            Type::Ptr variableType() const;
 
           private:
-            IdentifierNode::Ptr m_typeName;
+            Type::Ptr m_variableType;
         };
 
         class FunctionDefinition : public Definition
@@ -84,11 +84,11 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< FunctionDefinition >;
 
             FunctionDefinition( const IdentifierNode::Ptr& identifier,
-                const NodeList< IdentifierNode >::Ptr& argumentTypeNames,
-                const IdentifierNode::Ptr& returnTypeName );
+                const Types::Ptr& argumentTypes,
+                const Type::Ptr& returnType );
 
-            NodeList< IdentifierNode >::Ptr argumentTypeNames() const;
-            IdentifierNode::Ptr returnTypeName() const;
+            Types::Ptr argumentTypes() const;
+            Type::Ptr returnType() const;
 
             void setClassification( Classification classification );
             Classification classification() const;
@@ -105,8 +105,8 @@ namespace libcasm_fe
 
           private:
             Classification m_classification;
-            NodeList< IdentifierNode >::Ptr m_argumentTypeNames;
-            IdentifierNode::Ptr m_returnTypeName;
+            Types::Ptr m_argumentTypes;
+            Type::Ptr m_returnType;
             bool m_symbolic;
             NodeList< UpdateRule >::Ptr m_initializers;
             Expression::Ptr m_defaultValue;
@@ -119,16 +119,16 @@ namespace libcasm_fe
 
             DerivedDefinition( const IdentifierNode::Ptr& identifier,
                 const NodeList< VariableDefinition >::Ptr& arguments,
-                const IdentifierNode::Ptr& returnTypeName,
+                const Type::Ptr& returnType,
                 const Expression::Ptr& expression );
 
             NodeList< VariableDefinition >::Ptr arguments() const;
-            IdentifierNode::Ptr returnTypeName() const;
+            Type::Ptr returnType() const;
             Expression::Ptr expression() const;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
-            IdentifierNode::Ptr m_returnTypeName;
+            Type::Ptr m_returnType;
             Expression::Ptr m_expression;
         };
 
@@ -139,16 +139,16 @@ namespace libcasm_fe
 
             RuleDefinition( const IdentifierNode::Ptr& identifier,
                 const NodeList< VariableDefinition >::Ptr& arguments,
-                const IdentifierNode::Ptr& returnTypeName,
+                const Type::Ptr& returnType,
                 const Rule::Ptr& rule );
 
             NodeList< VariableDefinition >::Ptr arguments() const;
-            IdentifierNode::Ptr returnTypeName() const;
+            Type::Ptr returnType() const;
             Rule::Ptr rule() const;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
-            IdentifierNode::Ptr m_returnTypeName;
+            Type::Ptr m_returnType;
             Rule::Ptr m_rule;
         };
 

@@ -76,6 +76,12 @@ namespace libcasm_fe
                 UPDATE_RULE,
                 CALL_RULE,
 
+                // types
+                BASIC_TYPE,
+                COMPOSED_TYPE,
+                STATICALLY_SIZED_TYPE,
+                RANGED_TYPE,
+
                 // TODO
                 INIT,
                 PROVIDER,
