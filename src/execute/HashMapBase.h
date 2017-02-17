@@ -120,6 +120,10 @@ class HashMapPerformanceStatistics
     void inserted() const;
     void resized() const;
 
+    void unsuccessfulSearch() const;
+    void read() const;
+    void write() const;
+
     std::size_t longestSearchProbeSequenceLength() const;
     std::size_t cumulativeSearchProbeSequenceLength() const;
 
@@ -129,6 +133,10 @@ class HashMapPerformanceStatistics
     std::size_t numberOfSearches() const;
     std::size_t numberOfInsertions() const;
     std::size_t numberOfResizes() const;
+
+    std::size_t numberOfUnsuccessfulSearches() const;
+    std::size_t numberOfReads() const;
+    std::size_t numberOfWrites() const;
 
     static HashMapPerformanceStatistics& overallStatistics();
 
@@ -140,6 +148,9 @@ class HashMapPerformanceStatistics
     mutable std::size_t m_numberOfSearches = 0UL;
     mutable std::size_t m_numberOfInsertions = 0UL;
     mutable std::size_t m_numberOfResizes = 0UL;
+    mutable std::size_t m_numberOfUnsuccessfulSearches = 0UL;
+    mutable std::size_t m_numberOfReads = 0UL;
+    mutable std::size_t m_numberOfWrites = 0UL;
 };
 
 std::ostream& operator<<(
@@ -308,6 +319,10 @@ class HashMapBase
     std::pair< const_iterator, bool > insert(
         const Key& key, const Value& value )
     {
+#ifdef HASH_MAP_PERF
+        m_performanceStatistics.write();
+#endif
+
         growIfNecessary();
 
         const auto hashCode = hashCodeOf( key );
@@ -330,6 +345,10 @@ class HashMapBase
      */
     void insertOrAssign( const Key& key, const Value& value )
     {
+#ifdef HASH_MAP_PERF
+        m_performanceStatistics.write();
+#endif
+
         growIfNecessary();
 
         const auto hashCode = hashCodeOf( key );
@@ -352,6 +371,10 @@ class HashMapBase
      */
     const Value& get( const Key& key ) const
     {
+#ifdef HASH_MAP_PERF
+        m_performanceStatistics.read();
+#endif
+
         const auto hashCode = hashCodeOf( key );
         const auto entry = searchEntry( key, hashCode );
         if( entry )
@@ -360,14 +383,27 @@ class HashMapBase
         }
         else
         {
+#ifdef HASH_MAP_PERF
+            m_performanceStatistics.unsuccessfulSearch();
+#endif
             throw std::out_of_range( "key not found" );
         }
     }
 
     const_iterator find( const Key& key ) const noexcept
     {
+#ifdef HASH_MAP_PERF
+        m_performanceStatistics.read();
+#endif
+
         const auto hashCode = hashCodeOf( key );
         const auto entry = searchEntry( key, hashCode );
+#ifdef HASH_MAP_PERF
+        if( not entry )
+        {
+            m_performanceStatistics.unsuccessfulSearch();
+        }
+#endif
         return const_iterator( entry );
     }
 
