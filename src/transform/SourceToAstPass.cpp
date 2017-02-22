@@ -40,11 +40,11 @@ static libpass::PassRegistration< SourceToAstPass > PASS( "Source To AST Pass",
 
 bool SourceToAstPass::run( libpass::PassResult& pr )
 {
-    const char* file_name = (const char*)pr.result< libpass::LoadFilePass >();
+    auto load_file_pass = pr.result< libpass::LoadFilePass >();
 
     global_driver = new Driver;
 
-    Ast* node = global_driver->parse( file_name );
+    Ast* node = global_driver->parse( load_file_pass->filename() );
 
     if( !node )
     {
@@ -56,7 +56,7 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< SourceToAstPass >( node );
+    pr.setResult< SourceToAstPass >( libstdhl::make< Data >( node ) );
 
     return true;
 }

@@ -37,10 +37,10 @@ static libpass::PassRegistration< AstDumpPass > PASS( "AST Dumping Pass",
 
 bool AstDumpPass::run( libpass::PassResult& pr )
 {
-    Ast* node = (Ast*)pr.result< TypeCheckPass >();
+    auto node = pr.result< TypeCheckPass >();
 
     AstWalker< AstDumpPass, bool > dump_walker( *this );
-    dump_walker.walk_specification( node );
+    dump_walker.walk_specification( node->root() );
 
     // std::cout << this->get_dump() << std::endl;
 

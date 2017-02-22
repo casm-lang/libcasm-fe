@@ -153,16 +153,18 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
     initially_update_scope = 0;
     is_initially = false;
 
-    Ast* root = (Ast*)pr.result< TypeCheckPass >();
+    auto node = pr.result< TypeCheckPass >();
 
     AstWalker< AstToCasmIRPass, bool > walker( *this );
-    walker.walk_specification( root );
+    walker.walk_specification( node->root() );
 
     // casm_frontend_destroy(); // PPA: enable this if it is safe to remove the
     // AST object
 
-    pr.setResult< AstToCasmIRPass >( &m_specification );
-    pr.setResult< libcasm_ir::CasmIRDumpPass >( &m_specification );
+    auto data = libstdhl::make< Data >( m_specification );
+
+    pr.setResult< AstToCasmIRPass >( data );
+    pr.setResult< libcasm_ir::CasmIRDumpPass >( data );
 
     return true;
 }

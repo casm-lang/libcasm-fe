@@ -36,16 +36,37 @@
 
 namespace libcasm_fe
 {
-    class SourceToAstPass : public libpass::Pass
+    class Ast;
+
+    class SourceToAstPass final : public libpass::Pass
     {
       public:
         static char id;
 
-        bool run( libpass::PassResult& pr ) override final;
+        bool run( libpass::PassResult& pr ) override;
+
+        class Data : public libpass::PassData
+        {
+          public:
+            using Ptr = std::shared_ptr< Data >;
+
+            Data( Ast* root )
+            : m_root( root )
+            {
+            }
+
+            Ast* root( void ) const
+            {
+                return m_root;
+            }
+
+          private:
+            Ast* m_root;
+        };
     };
 }
 
-#endif /* _LIB_CASMFE_SOURCETOASTPASS_H_ */
+#endif // _LIB_CASMFE_SOURCETOASTPASS_H_
 
 //
 //  Local variables:

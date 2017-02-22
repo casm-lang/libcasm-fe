@@ -61,9 +61,9 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new NumericExecutionWalker( *this );
 
-    const bool dump_updates = (bool)pr.results()[ (void*)2 ];
+    const bool dump_updates = m_dump_updates;
 
-    Ast* root = (Ast*)pr.result< TypeCheckPass >();
+    auto node = pr.result< TypeCheckPass >();
 
     rule_bindings.push_back( &main_bindings );
     function_states
@@ -75,7 +75,7 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
 
     try
     {
-        walker->walk_specification( root );
+        walker->walk_specification( node->root() );
         if( dump_updates )
         {
             dumpUpdates();

@@ -30,6 +30,8 @@
 
 #include "../Visitor.h"
 
+#include "../casm-ir/src/analyze/CasmIRDumpPass.h"
+
 /**
    @brief    TODO
 
@@ -48,6 +50,8 @@ namespace libcasm_fe
     class AstToCasmIRPass : public libpass::Pass, public Visitor< bool, bool >
     {
       public:
+        using Data = libcasm_ir::CasmIRDumpPass::Data;
+
         static char id;
 
         bool run( libpass::PassResult& pr ) override final;
