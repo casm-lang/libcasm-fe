@@ -246,18 +246,14 @@ value_t NumericExecutionPass::visit_expression_single(
 
     assert( expr->op == Opcode::NOT_INSTRUCTION );
 
-    return value_t( not val.value.boolean );
-
-    // AstToCasmIRPass pass;
-
-    // auto arg = pass.constant( val, expr->type_, *libcasm_ir::Type::Boolean()
-    // );
-
-    // auto i = libcasm_ir::NotInstruction( arg.get() );
-
-    // auto r = libcasm_rt::Value::execute( i );
-
-    // return pass.value_t_value( r );
+    if( val.is_undef() )
+    {
+        return value_t();
+    }
+    else
+    {
+        return value_t( not val.value.boolean );
+    }
 }
 
 value_t NumericExecutionPass::visit_list_atom(
