@@ -25,6 +25,10 @@
 
 #include "HashMapBase.h"
 
+#ifdef HASH_MAP_PERF
+#include <iostream>
+#endif
+
 namespace details
 {
     std::size_t nextPowerOfTwo( std::size_t n ) noexcept
@@ -367,3 +371,124 @@ namespace details
         }
     }
 }
+
+#ifdef HASH_MAP_PERF
+
+void HashMapPerformanceStatistics::probedOnSearch(
+    std::size_t probeSequenceLength ) const
+{
+    m_longestSearchProbeSequenceLength
+        = std::max( m_longestSearchProbeSequenceLength, probeSequenceLength );
+    m_cumulativeSearchProbeSequenceLength += probeSequenceLength;
+
+    overallStatistics().m_longestSearchProbeSequenceLength
+        = std::max( overallStatistics().m_longestSearchProbeSequenceLength,
+            probeSequenceLength );
+    overallStatistics().m_cumulativeSearchProbeSequenceLength
+        += probeSequenceLength;
+}
+
+void HashMapPerformanceStatistics::probedOnInsert(
+    std::size_t probeSequenceLength ) const
+{
+    m_longestInsertProbeSequenceLength
+        = std::max( m_longestInsertProbeSequenceLength, probeSequenceLength );
+    m_cumulativeInsertProbeSequenceLength += probeSequenceLength;
+
+    overallStatistics().m_longestInsertProbeSequenceLength
+        = std::max( overallStatistics().m_longestInsertProbeSequenceLength,
+            probeSequenceLength );
+    overallStatistics().m_cumulativeInsertProbeSequenceLength
+        += probeSequenceLength;
+}
+
+void HashMapPerformanceStatistics::searched() const
+{
+    ++m_numberOfSearches;
+    ++overallStatistics().m_numberOfSearches;
+}
+
+void HashMapPerformanceStatistics::inserted() const
+{
+    ++m_numberOfInsertions;
+    ++overallStatistics().m_numberOfInsertions;
+}
+
+void HashMapPerformanceStatistics::resized() const
+{
+    ++m_numberOfResizes;
+    ++overallStatistics().m_numberOfResizes;
+}
+
+std::size_t
+HashMapPerformanceStatistics::longestSearchProbeSequenceLength() const
+{
+    return m_longestSearchProbeSequenceLength;
+}
+
+std::size_t
+HashMapPerformanceStatistics::cumulativeSearchProbeSequenceLength() const
+{
+    return m_cumulativeSearchProbeSequenceLength;
+}
+
+std::size_t
+HashMapPerformanceStatistics::longestInsertProbeSequenceLength() const
+{
+    return m_longestInsertProbeSequenceLength;
+}
+
+std::size_t
+HashMapPerformanceStatistics::cumulativeInsertProbeSequenceLength() const
+{
+    return m_cumulativeInsertProbeSequenceLength;
+}
+
+std::size_t HashMapPerformanceStatistics::numberOfSearches() const
+{
+    return m_numberOfSearches;
+}
+
+std::size_t HashMapPerformanceStatistics::numberOfInsertions() const
+{
+    return m_numberOfInsertions;
+}
+
+std::size_t HashMapPerformanceStatistics::numberOfResizes() const
+{
+    return m_numberOfResizes;
+}
+
+HashMapPerformanceStatistics& HashMapPerformanceStatistics::overallStatistics()
+{
+    static HashMapPerformanceStatistics overallStatistics;
+    return overallStatistics;
+}
+
+std::ostream& operator<<(
+    std::ostream& stream, const HashMapPerformanceStatistics& statistics )
+{
+    stream << "HashMap Performance Statistics:" << std::endl
+           << " - Longest search probe sequence length: "
+           << std::to_string( statistics.longestSearchProbeSequenceLength() )
+           << std::endl
+           << " - Cumulative search probe sequence length: "
+           << std::to_string( statistics.cumulativeSearchProbeSequenceLength() )
+           << std::endl
+           << " - Longest insert probe sequence length: "
+           << std::to_string( statistics.longestInsertProbeSequenceLength() )
+           << std::endl
+           << " - Cumulative insert probe sequence length: "
+           << std::to_string( statistics.cumulativeInsertProbeSequenceLength() )
+           << std::endl
+           << " - Number of searches: "
+           << std::to_string( statistics.numberOfSearches() ) << std::endl
+           << " - Number of insertions: "
+           << std::to_string( statistics.numberOfInsertions() ) << std::endl
+           << " - Number of resizes: "
+           << std::to_string( statistics.numberOfResizes() );
+
+    return stream;
+}
+
+#endif
