@@ -32,6 +32,8 @@
 
 #include "../Visitor.h"
 
+#include "../transform/SourceToAstPass.h"
+
 /**
    @brief    TODO
 
@@ -40,12 +42,13 @@
 
 namespace libcasm_fe
 {
-    class TypeCheckPass : public libpass::Pass, public Visitor< Type*, Type* >
+    class TypeCheckPass final : public libpass::Pass,
+                                public Visitor< Type *, Type * >
     {
       public:
         static char id;
 
-        bool run( libpass::PassResult& pr ) override final;
+        bool run( libpass::PassResult& pr ) override;
 
         LIB_CASMFE_VISITOR_INTERFACE( Type*, Type* );
 
@@ -71,13 +74,16 @@ namespace libcasm_fe
 
         // indicates if the type checker has found an init node
         bool m_specificationHasInitNode = false;
+
+      public:
+        using Data = SourceToAstPass::Data;
     };
 
     template <>
     void AstWalker< TypeCheckPass, Type* >::walk_forall( ForallNode* node );
 }
 
-#endif /* _LIB_CASMFE_TYPECHECKPASS_H_ */
+#endif // _LIB_CASMFE_TYPECHECKPASS_H_
 
 //
 //  Local variables:

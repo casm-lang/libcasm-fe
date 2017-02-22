@@ -129,9 +129,9 @@ add_executable( ${TARGET}-check
 
 target_link_libraries( ${TARGET}-check
   ${TARGET}
+  casm-ir
   pass
   stdhl
-  casm-ir
   pthread
 )
 
