@@ -26,6 +26,7 @@
 #include "NumericExecutionPass.h"
 
 #include "../analyze/TypeCheckPass.h"
+#include "../transform/AstToCasmIRPass.h"
 
 #include "../Driver.h"
 #include "../Exceptions.h"
@@ -39,8 +40,6 @@
 #include "../casm-ir/src/Instruction.h"
 #include "../casm-ir/src/Value.h"
 #include "../casm-ir/src/analyze/CasmIRDumpPass.h"
-#include "../casm-rt/src/Value.h"
-#include "../transform/AstToCasmIRPass.h"
 
 using namespace libcasm_fe;
 
