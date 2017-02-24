@@ -28,8 +28,8 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cstdlib>
-#include <memory>
+
+#include "MemoryPool.h"
 
 template < size_t BlockSize >
 class BlockAllocator
@@ -91,47 +91,6 @@ class BlockAllocator
         Block* m_previous;
     };
 
-    class MemoryPool
-    {
-      public:
-        void* get()
-        {
-            if( m_freeMemory )
-            {
-                auto memory = m_freeMemory;
-                m_freeMemory = reinterpret_cast< void** >( *memory );
-                return reinterpret_cast< void* >( memory );
-            }
-            else
-            {
-                return aligned_alloc( BlockSize, BlockSize );
-            }
-        }
-
-        void release( void* memory )
-        {
-            auto p = reinterpret_cast< void** >( memory );
-            *p = m_freeMemory; // build a linked-list
-            m_freeMemory = p;
-        }
-
-        static MemoryPool& instance()
-        {
-            static MemoryPool instance;
-            return instance;
-        }
-
-      private:
-        MemoryPool() = default;
-        MemoryPool( const MemoryPool& ) = delete;
-        MemoryPool& operator=( const MemoryPool& ) = delete;
-        MemoryPool( MemoryPool&& ) = delete;
-        MemoryPool& operator=( MemoryPool&& ) = delete;
-
-      private:
-        void** m_freeMemory = nullptr; // linked list of free memory blocks
-    };
-
   public:
     BlockAllocator()
     {
@@ -190,7 +149,7 @@ class BlockAllocator
         {
             const auto b = block;
             block = block->previous();
-            MemoryPool::instance().release( b );
+            MemoryPool< BlockSize >::instance().release( b );
         }
 
         m_topBlock = currentBlock;
@@ -202,7 +161,7 @@ class BlockAllocator
         {
             const auto b = block;
             block = block->previous();
-            MemoryPool::instance().release( b );
+            MemoryPool< BlockSize >::instance().release( b );
         }
 
         m_topBlock = nullptr;
@@ -214,7 +173,7 @@ class BlockAllocator
 
     Block* allocateNewBlock() const
     {
-        const auto memory = MemoryPool::instance().get();
+        const auto memory = MemoryPool< BlockSize >::instance().get();
         const auto block = new( memory ) Block( m_topBlock );
         return block;
     }
