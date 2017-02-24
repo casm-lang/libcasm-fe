@@ -34,11 +34,12 @@
 
 %code requires
 {
-    #include "cpp/Type.h"
-
-    #include "src/Ast/Specification.h"
     #include "src/Driver.h"
     #include "src/Codes.h"
+
+    #include "src/ast/Specification.h"
+
+    #include "../stdhl/cpp/Type.h"
 
     #include "../casm-ir/src/Value.h"
 
