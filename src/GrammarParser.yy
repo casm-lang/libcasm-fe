@@ -165,8 +165,8 @@
 
     static Ast::Rule::Ptr wrapInBlockRule( const Ast::Rule::Ptr& rule )
     {
-        if ( (rule->type() == Ast::Node::Type::BlockRule)
-                or (rule->type() == Ast::Node::Type::SequenceRule) )
+        if( (rule->id() == Ast::Node::BLOCK_RULE )
+                or (rule->id() == Ast::Node::SEQUENCE_RULE ) )
         {
             return rule; // no need to wrap it
         }
