@@ -40,10 +40,11 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Expression >;
 
-            Expression( Node::Type type );
+            Expression( Node::ID id );
 
             void setType( const libcasm_ir::Type::Ptr& type );
-            libcasm_ir::Type::Ptr type() const;
+
+            libcasm_ir::Type::Ptr type( void ) const;
 
           private:
             libcasm_ir::Type::Ptr m_type;
@@ -58,7 +59,7 @@ namespace libcasm_fe
 
             ValueAtom( const libcasm_ir::Value& value );
 
-            libcasm_ir::Value value() const;
+            libcasm_ir::Value value( void ) const;
 
           private:
             libcasm_ir::Value m_value;
@@ -69,7 +70,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ZeroAtom >;
 
-            ZeroAtom();
+            ZeroAtom( void );
         };
 
         class UndefAtom : public Expression
@@ -77,7 +78,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UndefAtom >;
 
-            UndefAtom();
+            UndefAtom( void );
         };
 
         class CallExpression : public Expression
@@ -99,7 +100,8 @@ namespace libcasm_fe
             using Expression::Expression;
 
             void setTargetType( TargetType targetType );
-            TargetType targetType() const;
+
+            TargetType targetType( void ) const;
 
           private:
             TargetType m_targetType = TargetType::Unknown;
@@ -114,12 +116,13 @@ namespace libcasm_fe
                 const Expressions::Ptr& arguments );
 
             void setIdentifier( const IdentifierNode::Ptr& identifier );
-            IdentifierNode::Ptr identifier() const;
+            IdentifierNode::Ptr identifier( void ) const;
 
-            Expressions::Ptr arguments() const;
+            Expressions::Ptr arguments( void ) const;
 
           private:
             IdentifierNode::Ptr m_identifier;
+
             Expressions::Ptr m_arguments;
         };
 
@@ -131,11 +134,13 @@ namespace libcasm_fe
             IndirectCallExpression( const Expression::Ptr& expression,
                 const Expressions::Ptr& arguments );
 
-            Expression::Ptr expression() const;
-            Expressions::Ptr arguments() const;
+            Expression::Ptr expression( void ) const;
+
+            Expressions::Ptr arguments( void ) const;
 
           private:
             Expression::Ptr m_expression;
+
             Expressions::Ptr m_arguments;
         };
 
@@ -147,11 +152,13 @@ namespace libcasm_fe
             UnaryExpression(
                 const Expression::Ptr& expression, libcasm_ir::Value::ID op );
 
-            libcasm_ir::Value::ID op() const;
-            Expression::Ptr expression() const;
+            libcasm_ir::Value::ID op( void ) const;
+
+            Expression::Ptr expression( void ) const;
 
           private:
             libcasm_ir::Value::ID m_op;
+
             Expression::Ptr m_expression;
         };
 
@@ -163,9 +170,9 @@ namespace libcasm_fe
             BinaryExpression( const Expression::Ptr& left,
                 const Expression::Ptr& right, libcasm_ir::Value::ID op );
 
-            libcasm_ir::Value::ID op() const;
-            Expression::Ptr left() const;
-            Expression::Ptr right() const;
+            libcasm_ir::Value::ID op( void ) const;
+            Expression::Ptr left( void ) const;
+            Expression::Ptr right( void ) const;
 
           private:
             libcasm_ir::Value::ID m_op;
@@ -181,8 +188,8 @@ namespace libcasm_fe
             RangeExpression(
                 const Expression::Ptr& left, const Expression::Ptr& right );
 
-            Expression::Ptr left() const;
-            Expression::Ptr right() const;
+            Expression::Ptr left( void ) const;
+            Expression::Ptr right( void ) const;
 
           private:
             Expression::Ptr m_left;
@@ -196,7 +203,7 @@ namespace libcasm_fe
 
             ListExpression( const Expressions::Ptr& expressions );
 
-            Expressions::Ptr expressions() const;
+            Expressions::Ptr expressions( void ) const;
 
           private:
             Expressions::Ptr m_expressions;

@@ -26,9 +26,9 @@
 #ifndef _LIB_CASMFE_NODE_H_
 #define _LIB_CASMFE_NODE_H_
 
-#include "CasmFE.h"
+#include "../CasmFE.h"
 
-#include "various/location.hh"
+#include "../various/location.hh"
 
 #include "../stdhl/cpp/List.h"
 #include "../stdhl/cpp/Type.h"
@@ -40,7 +40,7 @@ namespace libcasm_fe
         class Node : public CasmFE
         {
           public:
-            enum class Type
+            enum ID : u8
             {
                 NODE_LIST,
                 SPECIFICATION,
@@ -91,15 +91,17 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Node >;
 
-            Node( Type type );
+            Node( ID id );
 
-            Type type() const;
+            ID id( void ) const;
 
             void setLocation( const yy::location& location );
-            yy::location location() const;
+
+            yy::location location( void ) const;
 
           private:
-            Type m_type;
+            ID m_id;
+
             yy::location m_location;
         };
 
@@ -109,8 +111,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< NodeList >;
 
-            NodeList()
-            : Node( Node::Type::NODE_LIST )
+            NodeList( void )
+            : Node( Node::NODE_LIST )
             {
             }
         };
@@ -122,7 +124,7 @@ namespace libcasm_fe
 
             IdentifierNode( const std::string& identifier );
 
-            std::string identifier() const;
+            std::string identifier( void ) const;
 
           private:
             std::string m_identifier;

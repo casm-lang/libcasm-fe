@@ -28,34 +28,34 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-libcasm_fe::Ast::Node::Node( libcasm_fe::Ast::Node::Type type )
-: m_type( type )
+Node::Node( Node::ID id )
+: m_id( id )
 , m_location()
 {
 }
 
-libcasm_fe::Ast::Node::Type libcasm_fe::Ast::Node::type() const
+Node::ID Node::id( void ) const
 {
-    return m_type;
+    return m_id;
 }
 
-void libcasm_fe::Ast::Node::setLocation( const yy::location& location )
+void Node::setLocation( const yy::location& location )
 {
     m_location = location;
 }
 
-yy::location libcasm_fe::Ast::Node::location() const
+yy::location Node::location( void ) const
 {
     return m_location;
 }
 
 IdentifierNode::IdentifierNode( const std::string& identifier )
-: Node( Node::Type::IDENTIFIER )
+: Node( Node::IDENTIFIER )
 , m_identifier( identifier )
 {
 }
 
-std::string IdentifierNode::identifier() const
+std::string IdentifierNode::identifier( void ) const
 {
     return m_identifier;
 }

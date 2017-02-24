@@ -28,14 +28,14 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-Definition::Definition( Node::Type type, const IdentifierNode::Ptr& identifier )
+Definition::Definition( Node::ID type, const IdentifierNode::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
 , m_relationType( nullptr )
 {
 }
 
-IdentifierNode::Ptr Definition::identifier() const
+IdentifierNode::Ptr Definition::identifier( void ) const
 {
     return m_identifier;
 }
@@ -46,19 +46,19 @@ void Definition::setRelationType(
     m_relationType = relationType;
 }
 
-libcasm_ir::RelationType::Ptr Definition::relationType() const
+libcasm_ir::RelationType::Ptr Definition::relationType( void ) const
 {
     return m_relationType;
 }
 
 VariableDefinition::VariableDefinition(
     const IdentifierNode::Ptr& identifier, const Type::Ptr& variableType )
-: Definition( Node::Type::VARIABLE_DEFINITION, identifier )
+: Definition( Node::VARIABLE_DEFINITION, identifier )
 , m_variableType( variableType )
 {
 }
 
-Type::Ptr VariableDefinition::variableType() const
+Type::Ptr VariableDefinition::variableType( void ) const
 {
     return m_variableType;
 }
@@ -66,7 +66,7 @@ Type::Ptr VariableDefinition::variableType() const
 FunctionDefinition::FunctionDefinition( const IdentifierNode::Ptr& identifier,
     const Types::Ptr& argumentTypes,
     const Type::Ptr& returnType )
-: Definition( Node::Type::FUNCTION_DEFINITION, identifier )
+: Definition( Node::FUNCTION_DEFINITION, identifier )
 , m_classification( Classification::Controlled )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
@@ -76,12 +76,12 @@ FunctionDefinition::FunctionDefinition( const IdentifierNode::Ptr& identifier,
 {
 }
 
-Types::Ptr FunctionDefinition::argumentTypes() const
+Types::Ptr FunctionDefinition::argumentTypes( void ) const
 {
-    return m_argumentTypeNames;
+    return m_argumentTypes;
 }
 
-Type::Ptr FunctionDefinition::returnType() const
+Type::Ptr FunctionDefinition::returnType( void ) const
 {
     return m_returnType;
 }
@@ -92,7 +92,8 @@ void FunctionDefinition::setClassification(
     m_classification = classification;
 }
 
-FunctionDefinition::Classification FunctionDefinition::classification() const
+FunctionDefinition::Classification FunctionDefinition::classification(
+    void ) const
 {
     return m_classification;
 }
@@ -102,7 +103,7 @@ void FunctionDefinition::setSymbolic( bool symbolic )
     m_symbolic = symbolic;
 }
 
-bool FunctionDefinition::symbolic() const
+bool FunctionDefinition::symbolic( void ) const
 {
     return m_symbolic;
 }
@@ -113,7 +114,7 @@ void FunctionDefinition::setInitializers(
     m_initializers = initializers;
 }
 
-NodeList< UpdateRule >::Ptr FunctionDefinition::initializers() const
+NodeList< UpdateRule >::Ptr FunctionDefinition::initializers( void ) const
 {
     return m_initializers;
 }
@@ -123,7 +124,7 @@ void FunctionDefinition::setDefaultValue( const Expression::Ptr& defaultValue )
     m_defaultValue = defaultValue;
 }
 
-Expression::Ptr FunctionDefinition::defaultValue() const
+Expression::Ptr FunctionDefinition::defaultValue( void ) const
 {
     return m_defaultValue;
 }
@@ -132,24 +133,24 @@ DerivedDefinition::DerivedDefinition( const IdentifierNode::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Expression::Ptr& expression )
-: Definition( Node::Type::DERIVED_DEFINITION, identifier )
+: Definition( Node::DERIVED_DEFINITION, identifier )
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_expression( expression )
 {
 }
 
-NodeList< VariableDefinition >::Ptr DerivedDefinition::arguments() const
+NodeList< VariableDefinition >::Ptr DerivedDefinition::arguments( void ) const
 {
     return m_arguments;
 }
 
-Type::Ptr DerivedDefinition::returnType() const
+Type::Ptr DerivedDefinition::returnType( void ) const
 {
     return m_returnType;
 }
 
-Expression::Ptr DerivedDefinition::expression() const
+Expression::Ptr DerivedDefinition::expression( void ) const
 {
     return m_expression;
 }
@@ -158,24 +159,24 @@ RuleDefinition::RuleDefinition( const IdentifierNode::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Rule::Ptr& rule )
-: Definition( Node::Type::RULE_DEFINITION, identifier )
+: Definition( Node::RULE_DEFINITION, identifier )
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_rule( rule )
 {
 }
 
-NodeList< VariableDefinition >::Ptr RuleDefinition::arguments() const
+NodeList< VariableDefinition >::Ptr RuleDefinition::arguments( void ) const
 {
     return m_arguments;
 }
 
-Type::Ptr RuleDefinition::returnType() const
+Type::Ptr RuleDefinition::returnType( void ) const
 {
     return m_returnType;
 }
 
-Rule::Ptr RuleDefinition::rule() const
+Rule::Ptr RuleDefinition::rule( void ) const
 {
     return m_rule;
 }
@@ -183,12 +184,12 @@ Rule::Ptr RuleDefinition::rule() const
 EnumerationDefinition::EnumerationDefinition(
     const IdentifierNode::Ptr& identifier,
     const NodeList< IdentifierNode >::Ptr& enumerators )
-: Definition( Node::Type::ENUMERATION_DEFINITION, identifier )
+: Definition( Node::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
 }
 
-NodeList< IdentifierNode >::Ptr EnumerationDefinition::enumerators() const
+NodeList< IdentifierNode >::Ptr EnumerationDefinition::enumerators( void ) const
 {
     return m_enumerators;
 }

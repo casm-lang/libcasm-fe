@@ -28,8 +28,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-Expression::Expression( Node::Type type )
-: Node( type )
+Expression::Expression( Node::ID id )
+: Node( id )
 , m_type( nullptr )
 {
 }
@@ -39,31 +39,31 @@ void Expression::setType( const libcasm_ir::Type::Ptr& type )
     m_type = type;
 }
 
-libcasm_ir::Type::Ptr Expression::type() const
+libcasm_ir::Type::Ptr Expression::type( void ) const
 {
     return m_type;
 }
 
 ValueAtom::ValueAtom( const libcasm_ir::Value& value )
-: Expression( Node::Type::VALUE_ATOM )
+: Expression( Node::VALUE_ATOM )
 , m_value( value )
 {
     // Expression::setType( value.type() ); FIXME enable this when ir uses
     // Type::Ptr!!
 }
 
-libcasm_ir::Value ValueAtom::value() const
+libcasm_ir::Value ValueAtom::value( void ) const
 {
     return m_value;
 }
 
-ZeroAtom::ZeroAtom()
-: Expression( Node::Type::ZERO_ATOM )
+ZeroAtom::ZeroAtom( void )
+: Expression( Node::ZERO_ATOM )
 {
 }
 
-UndefAtom::UndefAtom()
-: Expression( Node::Type::UNDEF_ATOM )
+UndefAtom::UndefAtom( void )
+: Expression( Node::UNDEF_ATOM )
 {
 }
 
@@ -72,14 +72,14 @@ void CallExpression::setTargetType( CallExpression::TargetType targetType )
     m_targetType = targetType;
 }
 
-CallExpression::TargetType CallExpression::targetType() const
+CallExpression::TargetType CallExpression::targetType( void ) const
 {
     return m_targetType;
 }
 
 DirectCallExpression::DirectCallExpression(
     const IdentifierNode::Ptr& identifier, const Expressions::Ptr& arguments )
-: CallExpression( Node::Type::DIRECT_CALL_EXPRESSION )
+: CallExpression( Node::DIRECT_CALL_EXPRESSION )
 , m_identifier( identifier )
 , m_arguments( arguments )
 {
@@ -91,101 +91,101 @@ void DirectCallExpression::setIdentifier(
     m_identifier = identifier;
 }
 
-IdentifierNode::Ptr DirectCallExpression::identifier() const
+IdentifierNode::Ptr DirectCallExpression::identifier( void ) const
 {
     return m_identifier;
 }
 
-Expressions::Ptr DirectCallExpression::arguments() const
+Expressions::Ptr DirectCallExpression::arguments( void ) const
 {
     return m_arguments;
 }
 
 IndirectCallExpression::IndirectCallExpression(
     const Expression::Ptr& expression, const Expressions::Ptr& arguments )
-: CallExpression( Node::Type::INDIRECT_CALL_EXPRESSION )
+: CallExpression( Node::INDIRECT_CALL_EXPRESSION )
 , m_expression( expression )
 , m_arguments( arguments )
 {
 }
 
-Expression::Ptr IndirectCallExpression::expression() const
+Expression::Ptr IndirectCallExpression::expression( void ) const
 {
     return m_expression;
 }
 
-Expressions::Ptr IndirectCallExpression::arguments() const
+Expressions::Ptr IndirectCallExpression::arguments( void ) const
 {
     return m_arguments;
 }
 
 UnaryExpression::UnaryExpression(
     const Expression::Ptr& expression, libcasm_ir::Value::ID op )
-: Expression( Node::Type::UNARY_EXPRESSION )
+: Expression( Node::UNARY_EXPRESSION )
 , m_op( op )
 , m_expression( expression )
 {
 }
 
-libcasm_ir::Value::ID UnaryExpression::op() const
+libcasm_ir::Value::ID UnaryExpression::op( void ) const
 {
     return m_op;
 }
 
-Expression::Ptr UnaryExpression::expression() const
+Expression::Ptr UnaryExpression::expression( void ) const
 {
     return m_expression;
 }
 
 BinaryExpression::BinaryExpression( const Expression::Ptr& left,
     const Expression::Ptr& right, libcasm_ir::Value::ID op )
-: Expression( Node::Type::BINARY_EXPRESSION )
+: Expression( Node::BINARY_EXPRESSION )
 , m_op( op )
 , m_left( left )
 , m_right( right )
 {
 }
 
-libcasm_ir::Value::ID BinaryExpression::op() const
+libcasm_ir::Value::ID BinaryExpression::op( void ) const
 {
     return m_op;
 }
 
-Expression::Ptr BinaryExpression::left() const
+Expression::Ptr BinaryExpression::left( void ) const
 {
     return m_left;
 }
 
-Expression::Ptr BinaryExpression::right() const
+Expression::Ptr BinaryExpression::right( void ) const
 {
     return m_right;
 }
 
 RangeExpression::RangeExpression(
     const Expression::Ptr& left, const Expression::Ptr& right )
-: Expression( Node::Type::RANGE_EXPRESSION )
+: Expression( Node::RANGE_EXPRESSION )
 , m_left( left )
 , m_right( right )
 {
 }
 
-Expression::Ptr RangeExpression::left() const
+Expression::Ptr RangeExpression::left( void ) const
 {
     return m_left;
 }
 
-Expression::Ptr RangeExpression::right() const
+Expression::Ptr RangeExpression::right( void ) const
 {
     return m_right;
 }
 
 ListExpression::ListExpression( const Expressions::Ptr& expressions )
-: Expression( Node::Type::LIST_EXPRESSION )
+: Expression( Node::LIST_EXPRESSION )
 , m_expressions( expressions )
 {
 }
 
-Expressions::Ptr ListExpression::expressions() const
+Expressions::Ptr ListExpression::expressions( void ) const
 {
     return m_expressions;
 }

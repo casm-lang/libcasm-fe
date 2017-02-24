@@ -26,6 +26,8 @@
 #ifndef _LIB_CASMFE_SPECIFICATION_H_
 #define _LIB_CASMFE_SPECIFICATION_H_
 
+#include "Node.h"
+
 #include "Definition.h"
 
 namespace libcasm_fe
@@ -40,8 +42,8 @@ namespace libcasm_fe
             Specification( const IdentifierNode::Ptr& name,
                 const Definitions::Ptr& definitions );
 
-            IdentifierNode::Ptr name() const;
-            Definitions::Ptr definitions() const;
+            IdentifierNode::Ptr name( void ) const;
+            Definitions::Ptr definitions( void ) const;
 
           private:
             IdentifierNode::Ptr m_name;

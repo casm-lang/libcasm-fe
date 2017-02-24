@@ -26,6 +26,8 @@
 #ifndef _LIB_CASMFE_RULE_H_
 #define _LIB_CASMFE_RULE_H_
 
+#include "Node.h"
+
 #include "Expression.h"
 
 namespace libcasm_fe
@@ -49,7 +51,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< SkipRule >;
 
-            SkipRule();
+            SkipRule( void );
         };
 
         class ConditionalRule : public Rule
@@ -62,9 +64,9 @@ namespace libcasm_fe
             ConditionalRule(
                 const Expression::Ptr& condition, const Rule::Ptr& thenRule );
 
-            Expression::Ptr condition() const;
-            Rule::Ptr thenRule() const;
-            Rule::Ptr elseRule() const;
+            Expression::Ptr condition( void ) const;
+            Rule::Ptr thenRule( void ) const;
+            Rule::Ptr elseRule( void ) const;
 
           private:
             Expression::Ptr m_condition;
@@ -81,8 +83,8 @@ namespace libcasm_fe
             CaseRule( const Expression::Ptr& expression,
                 const std::vector< Case >& cases );
 
-            Expression::Ptr expression() const;
-            std::vector< Case > cases() const;
+            Expression::Ptr expression( void ) const;
+            std::vector< Case > cases( void ) const;
 
           private:
             Expression::Ptr m_expression;
@@ -97,9 +99,9 @@ namespace libcasm_fe
             LetRule( const std::shared_ptr< VariableDefinition >& variable,
                 const Expression::Ptr& expression, const Rule::Ptr& rule );
 
-            std::shared_ptr< VariableDefinition > variable() const;
-            Expression::Ptr expression() const;
-            Rule::Ptr rule() const;
+            std::shared_ptr< VariableDefinition > variable( void ) const;
+            Expression::Ptr expression( void ) const;
+            Rule::Ptr rule( void ) const;
 
           private:
             std::shared_ptr< VariableDefinition > m_variable;
@@ -115,9 +117,9 @@ namespace libcasm_fe
             ForallRule( const std::shared_ptr< VariableDefinition >& variable,
                 const Expression::Ptr& expression, const Rule::Ptr& rule );
 
-            std::shared_ptr< VariableDefinition > variable() const;
-            Expression::Ptr expression() const;
-            Rule::Ptr rule() const;
+            std::shared_ptr< VariableDefinition > variable( void ) const;
+            Expression::Ptr expression( void ) const;
+            Rule::Ptr rule( void ) const;
 
           private:
             std::shared_ptr< VariableDefinition > m_variable;
@@ -132,7 +134,7 @@ namespace libcasm_fe
 
             IterateRule( const Rule::Ptr& rule );
 
-            Rule::Ptr rule() const;
+            Rule::Ptr rule( void ) const;
 
           private:
             Rule::Ptr m_rule;
@@ -145,7 +147,7 @@ namespace libcasm_fe
 
             BlockRule( const Rules::Ptr& rules );
 
-            Rules::Ptr rules() const;
+            Rules::Ptr rules( void ) const;
 
           private:
             Rules::Ptr m_rules;
@@ -158,7 +160,7 @@ namespace libcasm_fe
 
             SequenceRule( const Rules::Ptr& rules );
 
-            Rules::Ptr rules() const;
+            Rules::Ptr rules( void ) const;
 
           private:
             Rules::Ptr m_rules;
@@ -172,8 +174,8 @@ namespace libcasm_fe
             UpdateRule( const DirectCallExpression::Ptr& function,
                 const Expression::Ptr& expression );
 
-            DirectCallExpression::Ptr function() const;
-            Expression::Ptr expression() const;
+            DirectCallExpression::Ptr function( void ) const;
+            Expression::Ptr expression( void ) const;
 
           private:
             DirectCallExpression::Ptr m_function;
@@ -189,9 +191,9 @@ namespace libcasm_fe
                 const std::set< CallExpression::TargetType >&
                     allowedCallTargetTypes );
 
-            CallExpression::Ptr call() const;
-            std::set< CallExpression::TargetType >
-            allowedCallTargetTypes() const;
+            CallExpression::Ptr call( void ) const;
+            std::set< CallExpression::TargetType > allowedCallTargetTypes(
+                void ) const;
 
           private:
             CallExpression::Ptr m_call;

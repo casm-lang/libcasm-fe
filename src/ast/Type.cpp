@@ -28,60 +28,60 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-Type::Type( Node::Type type, const IdentifierNode::Ptr& name )
-: Node( type )
+Type::Type( Node::ID id, const IdentifierNode::Ptr& name )
+: Node( id )
 , m_name( name )
 {
 }
 
-IdentifierNode::Ptr Type::name() const
+IdentifierNode::Ptr Type::name( void ) const
 {
     return m_name;
 }
 
 BasicType::BasicType( const IdentifierNode::Ptr& identifier )
-: Type( Node::Type::BASIC_TYPE, identifier )
+: Type( Node::BASIC_TYPE, identifier )
 {
 }
 
 ComposedType::ComposedType(
     const IdentifierNode::Ptr& identifier, const Types::Ptr& subTypes )
-: Type( Node::Type::COMPOSED_TYPE, identifier )
+: Type( Node::COMPOSED_TYPE, identifier )
 , m_subTypes( subTypes )
 {
 }
 
-Types::Ptr ComposedType::subTypes() const
+Types::Ptr ComposedType::subTypes( void ) const
 {
     return m_subTypes;
 }
 
 StaticallySizedType::StaticallySizedType(
     const IdentifierNode::Ptr& identifier, const Expression::Ptr& size )
-: Type( Node::Type::STATICALLY_SIZED_TYPE, identifier )
+: Type( Node::STATICALLY_SIZED_TYPE, identifier )
 , m_size( size )
 {
 }
 
-Expression::Ptr StaticallySizedType::size() const
+Expression::Ptr StaticallySizedType::size( void ) const
 {
     return m_size;
 }
 
 RangedType::RangedType( const IdentifierNode::Ptr& identifier,
     const Expression::Ptr& lowerBound, const Expression::Ptr& upperBound )
-: Type( Node::Type::RANGED_TYPE, identifier )
+: Type( Node::RANGED_TYPE, identifier )
 , m_lowerBound( lowerBound )
 , m_upperBound( upperBound )
 {
 }
 
-Expression::Ptr RangedType::lowerBound() const
+Expression::Ptr RangedType::lowerBound( void ) const
 {
     return m_lowerBound;
 }
 
-Expression::Ptr RangedType::upperBound() const
+Expression::Ptr RangedType::upperBound( void ) const
 {
     return m_upperBound;
 }

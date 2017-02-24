@@ -30,18 +30,18 @@ using namespace Ast;
 
 Specification::Specification(
     const IdentifierNode::Ptr& name, const Definitions::Ptr& definitions )
-: Node( Node::Type::SPECIFICATION )
+: Node( Node::SPECIFICATION )
 , m_name( name )
 , m_definitions( definitions )
 {
 }
 
-IdentifierNode::Ptr Specification::name() const
+IdentifierNode::Ptr Specification::name( void ) const
 {
     return m_name;
 }
 
-Definitions::Ptr Specification::definitions() const
+Definitions::Ptr Specification::definitions( void ) const
 {
     return m_definitions;
 }

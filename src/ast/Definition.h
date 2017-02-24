@@ -26,6 +26,8 @@
 #ifndef _LIB_CASMFE_DEFINITION_H_
 #define _LIB_CASMFE_DEFINITION_H_
 
+#include "Node.h"
+
 #include "Rule.h"
 #include "Type.h"
 
@@ -38,17 +40,18 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Definition >;
 
-            Definition(
-                Node::Type type, const IdentifierNode::Ptr& identifier );
+            Definition( Node::ID id, const IdentifierNode::Ptr& identifier );
 
-            IdentifierNode::Ptr identifier() const;
+            IdentifierNode::Ptr identifier( void ) const;
 
             void setRelationType(
                 const libcasm_ir::RelationType::Ptr& relationType );
-            libcasm_ir::RelationType::Ptr relationType() const;
+
+            libcasm_ir::RelationType::Ptr relationType( void ) const;
 
           private:
             IdentifierNode::Ptr m_identifier;
+
             libcasm_ir::RelationType::Ptr m_relationType;
         };
 
@@ -62,7 +65,7 @@ namespace libcasm_fe
             VariableDefinition( const IdentifierNode::Ptr& identifier,
                 const Type::Ptr& variableType );
 
-            Type::Ptr variableType() const;
+            Type::Ptr variableType( void ) const;
 
           private:
             Type::Ptr m_variableType;
@@ -87,28 +90,38 @@ namespace libcasm_fe
                 const Types::Ptr& argumentTypes,
                 const Type::Ptr& returnType );
 
-            Types::Ptr argumentTypes() const;
-            Type::Ptr returnType() const;
+            Types::Ptr argumentTypes( void ) const;
+
+            Type::Ptr returnType( void ) const;
 
             void setClassification( Classification classification );
-            Classification classification() const;
+
+            Classification classification( void ) const;
 
             void setSymbolic( bool symbolic );
-            bool symbolic() const;
+
+            bool symbolic( void ) const;
 
             void setInitializers(
                 const NodeList< UpdateRule >::Ptr& initializers );
-            NodeList< UpdateRule >::Ptr initializers() const;
+
+            NodeList< UpdateRule >::Ptr initializers( void ) const;
 
             void setDefaultValue( const Expression::Ptr& defaultValue );
-            Expression::Ptr defaultValue() const;
+
+            Expression::Ptr defaultValue( void ) const;
 
           private:
             Classification m_classification;
+
             Types::Ptr m_argumentTypes;
+
             Type::Ptr m_returnType;
+
             bool m_symbolic;
+
             NodeList< UpdateRule >::Ptr m_initializers;
+
             Expression::Ptr m_defaultValue;
         };
 
@@ -122,13 +135,17 @@ namespace libcasm_fe
                 const Type::Ptr& returnType,
                 const Expression::Ptr& expression );
 
-            NodeList< VariableDefinition >::Ptr arguments() const;
-            Type::Ptr returnType() const;
-            Expression::Ptr expression() const;
+            NodeList< VariableDefinition >::Ptr arguments( void ) const;
+
+            Type::Ptr returnType( void ) const;
+
+            Expression::Ptr expression( void ) const;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
+
             Type::Ptr m_returnType;
+
             Expression::Ptr m_expression;
         };
 
@@ -142,13 +159,17 @@ namespace libcasm_fe
                 const Type::Ptr& returnType,
                 const Rule::Ptr& rule );
 
-            NodeList< VariableDefinition >::Ptr arguments() const;
-            Type::Ptr returnType() const;
-            Rule::Ptr rule() const;
+            NodeList< VariableDefinition >::Ptr arguments( void ) const;
+
+            Type::Ptr returnType( void ) const;
+
+            Rule::Ptr rule( void ) const;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
+
             Type::Ptr m_returnType;
+
             Rule::Ptr m_rule;
         };
 
@@ -160,7 +181,7 @@ namespace libcasm_fe
             EnumerationDefinition( const IdentifierNode::Ptr& identifier,
                 const NodeList< IdentifierNode >::Ptr& enumerators );
 
-            NodeList< IdentifierNode >::Ptr enumerators() const;
+            NodeList< IdentifierNode >::Ptr enumerators( void ) const;
 
           private:
             NodeList< IdentifierNode >::Ptr m_enumerators;
