@@ -42,7 +42,7 @@ foreach( DEPENDENCY
 endforeach()
 
 
-file( GLOB_RECURSE CXX_SRC_FILES "src/*.cpp" )
+file( GLOB_RECURSE CXX_SRC_FILES "src/ast/*.cpp" )
 file( GLOB_RECURSE CXX_UTS_FILES "uts/*.cpp" )
 
 
@@ -52,7 +52,7 @@ project( ${TARGET} )
 
 include_directories(
   .
-  src
+  src/ast
   ${LIBS}/gtest/googletest
   ${LIBS}/gtest/googletest/include
   ${LIBS}/hayai/src
