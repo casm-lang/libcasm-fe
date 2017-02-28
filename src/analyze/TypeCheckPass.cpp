@@ -45,12 +45,12 @@ static libpass::PassRegistration< TypeCheckPass > PASS( "Type Check Pass",
 
 bool TypeCheckPass::run( libpass::PassResult& pr )
 {
-    Ast* node = (Ast*)pr.result< SourceToAstPass >();
+    auto node = pr.result< SourceToAstPass >();
 
     try
     {
         AstWalker< TypeCheckPass, Type* > typecheck_walker( *this );
-        typecheck_walker.walk_specification( node );
+        typecheck_walker.walk_specification( node->root() );
     }
     catch( const CompiletimeException& e )
     {
@@ -59,7 +59,7 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 
     if( not m_specificationHasInitNode )
     {
-        global_driver->error( node->location, "no 'init' node defined",
+        global_driver->error( node->root()->location, "no 'init' node defined",
             libcasm_fe::Codes::AgentInitRuleNotDefined );
     }
 

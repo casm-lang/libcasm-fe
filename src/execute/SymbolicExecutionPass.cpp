@@ -57,7 +57,7 @@ bool SymbolicExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new SymbolicExecutionWalker( *this );
 
-    Ast* root = (Ast*)pr.result< TypeCheckPass >();
+    auto node = pr.result< TypeCheckPass >();
 
     rule_bindings.push_back( &main_bindings );
     function_states
@@ -69,7 +69,7 @@ bool SymbolicExecutionPass::run( libpass::PassResult& pr )
 
     try
     {
-        walker->walk_specification( root );
+        walker->walk_specification( node->root() );
         dumpUpdates();
         applyUpdates();
 

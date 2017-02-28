@@ -420,6 +420,24 @@ void HashMapPerformanceStatistics::resized() const
     ++overallStatistics().m_numberOfResizes;
 }
 
+void HashMapPerformanceStatistics::unsuccessfulSearch() const
+{
+    ++m_numberOfUnsuccessfulSearches;
+    ++overallStatistics().m_numberOfUnsuccessfulSearches;
+}
+
+void HashMapPerformanceStatistics::read() const
+{
+    ++m_numberOfReads;
+    ++overallStatistics().m_numberOfReads;
+}
+
+void HashMapPerformanceStatistics::write() const
+{
+    ++m_numberOfWrites;
+    ++overallStatistics().m_numberOfWrites;
+}
+
 std::size_t
 HashMapPerformanceStatistics::longestSearchProbeSequenceLength() const
 {
@@ -459,6 +477,21 @@ std::size_t HashMapPerformanceStatistics::numberOfResizes() const
     return m_numberOfResizes;
 }
 
+std::size_t HashMapPerformanceStatistics::numberOfUnsuccessfulSearches() const
+{
+    return m_numberOfUnsuccessfulSearches;
+}
+
+std::size_t HashMapPerformanceStatistics::numberOfReads() const
+{
+    return m_numberOfReads;
+}
+
+std::size_t HashMapPerformanceStatistics::numberOfWrites() const
+{
+    return m_numberOfWrites;
+}
+
 HashMapPerformanceStatistics& HashMapPerformanceStatistics::overallStatistics()
 {
     static HashMapPerformanceStatistics overallStatistics;
@@ -486,7 +519,14 @@ std::ostream& operator<<(
            << " - Number of insertions: "
            << std::to_string( statistics.numberOfInsertions() ) << std::endl
            << " - Number of resizes: "
-           << std::to_string( statistics.numberOfResizes() );
+           << std::to_string( statistics.numberOfResizes() ) << std::endl
+           << " - Number of unsuccessful searches: "
+           << std::to_string( statistics.numberOfUnsuccessfulSearches() )
+           << std::endl
+           << " - Number of reads: "
+           << std::to_string( statistics.numberOfReads() ) << std::endl
+           << " - Number of writes: "
+           << std::to_string( statistics.numberOfWrites() ) << std::endl;
 
     return stream;
 }

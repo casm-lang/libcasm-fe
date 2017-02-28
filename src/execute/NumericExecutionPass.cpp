@@ -26,6 +26,7 @@
 #include "NumericExecutionPass.h"
 
 #include "../analyze/TypeCheckPass.h"
+#include "../transform/AstToCasmIRPass.h"
 
 #include "../Driver.h"
 #include "../Exceptions.h"
@@ -35,6 +36,10 @@
 #include "cpp/Math.h"
 
 #include <sys/wait.h>
+
+#include "../casm-ir/src/Instruction.h"
+#include "../casm-ir/src/Value.h"
+#include "../casm-ir/src/analyze/CasmIRDumpPass.h"
 
 using namespace libcasm_fe;
 
@@ -55,9 +60,9 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new NumericExecutionWalker( *this );
 
-    const bool dump_updates = (bool)pr.results()[ (void*)2 ];
+    const bool dump_updates = m_dump_updates;
 
-    Ast* root = (Ast*)pr.result< TypeCheckPass >();
+    auto node = pr.result< TypeCheckPass >();
 
     rule_bindings.push_back( &main_bindings );
     function_states
@@ -69,7 +74,7 @@ bool NumericExecutionPass::run( libpass::PassResult& pr )
 
     try
     {
-        walker->walk_specification( root );
+        walker->walk_specification( node->root() );
         if( dump_updates )
         {
             dumpUpdates();
@@ -242,19 +247,15 @@ value_t NumericExecutionPass::visit_expression_single(
 {
     using Opcode = libcasm_ir::Value::ID;
 
+    assert( expr->op == Opcode::NOT_INSTRUCTION );
+
     if( val.is_undef() )
     {
         return value_t();
     }
-
-    switch( expr->op )
+    else
     {
-        case Opcode::NOT_INSTRUCTION:
-            return value_t( not val.value.boolean );
-        default:
-            assert( !"internal error" ); // PPA: FIXME: with better verbose info
-                                         // etc.
-            return value_t();
+        return value_t( not val.value.boolean );
     }
 }
 

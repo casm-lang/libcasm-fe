@@ -62,11 +62,17 @@ namespace libcasm_fe
         value_t visit_list_atom(
             ListAtom* atom, const std::vector< value_t >& vals ) override;
 
+        void setDumpUpdates( u1 enabled )
+        {
+            m_dump_updates = enabled;
+        }
+
       private:
         void dumpUpdates() const;
 
-      private:
         AstWalker< libcasm_fe::NumericExecutionPass, value_t >* walker;
+
+        bool m_dump_updates;
     };
 
     using NumericExecutionWalker

@@ -30,6 +30,8 @@
 
 #include "../Visitor.h"
 
+#include "../casm-ir/src/analyze/CasmIRDumpPass.h"
+
 /**
    @brief    TODO
 
@@ -48,32 +50,44 @@ namespace libcasm_fe
     class AstToCasmIRPass : public libpass::Pass, public Visitor< bool, bool >
     {
       public:
+        using Data = libcasm_ir::CasmIRDumpPass::Data;
+
         static char id;
 
         bool run( libpass::PassResult& pr ) override final;
 
-      private:
-        std::unordered_map< AstNode*, libcasm_ir::Value* > ast2casmir;
-        std::unordered_map< AstNode*, AstNode* > ast2parent;
-
-        std::vector< libcasm_ir::Value* > current_scope;
-
-        libcasm_ir::Specification* specification;
-        libcasm_ir::ExecutionSemanticsBlock* initially_scope;
-        libcasm_ir::ExecutionSemanticsBlock* initially_update_scope;
-        u1 is_initially;
-
-      public:
-        libcasm_ir::Specification* getSpecification( void ) const;
+        std::shared_ptr< libcasm_ir::Specification > getSpecification(
+            void ) const;
 
         LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
 
-      private:
-        template < class C >
-        C* lookupParent( AstNode* node );
+        libcasm_ir::Type::Ptr getType( Type* type );
 
-        template < class C >
-        C* lookup( AstNode* node );
+        libcasm_ir::Value::Ptr constant(
+            const value_t& value, const Type& type, libcasm_ir::Type& hint );
+        value_t value_t_value( const libcasm_ir::Value::Ptr& value );
+
+      private:
+        template < typename C >
+        typename C::Ptr lookupParent( AstNode* node );
+
+        template < typename C >
+        typename C::Ptr lookup( AstNode* node );
+
+        std::unordered_map< AstNode*, std::shared_ptr< libcasm_ir::Value > >
+            ast2casmir;
+        std::unordered_map< AstNode*, AstNode* > ast2parent;
+
+        std::vector< libcasm_ir::Value::Ptr > current_scope;
+
+        std::shared_ptr< libcasm_ir::Specification > m_specification;
+        std::shared_ptr< libcasm_ir::Agent > m_agent;
+
+        std::shared_ptr< libcasm_ir::ExecutionSemanticsBlock > initially_scope;
+        std::shared_ptr< libcasm_ir::ExecutionSemanticsBlock >
+            initially_update_scope;
+
+        u1 is_initially;
     };
 }
 
