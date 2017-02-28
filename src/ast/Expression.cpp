@@ -48,8 +48,7 @@ ValueAtom::ValueAtom( const libcasm_ir::Value& value )
 : Expression( Node::ID::VALUE_ATOM )
 , m_value( value )
 {
-    // Expression::setType( value.type() ); FIXME enable this when ir uses
-    // Type::Ptr!!
+    Expression::setType( value.ptr_type() );
 }
 
 libcasm_ir::Value ValueAtom::value( void ) const
@@ -60,6 +59,7 @@ libcasm_ir::Value ValueAtom::value( void ) const
 RuleReferenceAtom::RuleReferenceAtom( const IdentifierNode::Ptr& identifier )
 : Expression( Node::ID::RULE_REFERENCE_ATOM )
 , m_identifier( identifier )
+, m_ruleReference( nullptr )
 {
     Expression::setType( libstdhl::get< libcasm_ir::RuleReferenceType >() );
 }
