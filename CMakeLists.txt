@@ -43,6 +43,7 @@ endforeach()
 
 
 file( GLOB_RECURSE CXX_SRC_FILES "src/ast/*.cpp" )
+file( GLOB_RECURSE CXX_SRC2_FILES "src/various/*.cpp" )
 file( GLOB_RECURSE CXX_UTS_FILES "uts/*.cpp" )
 
 
@@ -109,6 +110,7 @@ add_custom_command(
 
 add_library( ${TARGET} STATIC
   ${CXX_SRC_FILES}
+#  ${CXX_SRC2_FILES}
 )
 
 add_custom_target( ${TARGET}-grammar ALL

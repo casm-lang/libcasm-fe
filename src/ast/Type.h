@@ -69,12 +69,12 @@ namespace libcasm_fe
             Types::Ptr m_subTypes;
         };
 
-        class StaticallySizedType : public Type
+        class FixedSizedType : public Type
         {
           public:
-            using Ptr = std::shared_ptr< StaticallySizedType >;
+            using Ptr = std::shared_ptr< FixedSizedType >;
 
-            StaticallySizedType( const IdentifierNode::Ptr& identifier,
+            FixedSizedType( const IdentifierNode::Ptr& identifier,
                 const Expression::Ptr& size );
 
             Expression::Ptr size( void ) const;

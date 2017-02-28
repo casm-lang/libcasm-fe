@@ -84,14 +84,14 @@ namespace libcasm_fe
         class CallExpression : public Expression
         {
           public:
-            enum class TargetType
+            enum TargetType : u8
             {
-                Function,
-                Derived,
-                Builtin,
-                Rule,
-                Variable,
-                Unknown
+                FUNCTION = 0,
+                DERIVED,
+                BUILTIN,
+                RULE,
+                VARIABLE,
+                UNKNOWN
             };
 
           public:
@@ -104,7 +104,7 @@ namespace libcasm_fe
             TargetType targetType( void ) const;
 
           private:
-            TargetType m_targetType = TargetType::Unknown;
+            TargetType m_targetType = UNKNOWN;
         };
 
         class DirectCallExpression : public CallExpression

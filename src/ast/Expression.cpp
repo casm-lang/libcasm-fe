@@ -45,7 +45,7 @@ libcasm_ir::Type::Ptr Expression::type( void ) const
 }
 
 ValueAtom::ValueAtom( const libcasm_ir::Value& value )
-: Expression( Node::VALUE_ATOM )
+: Expression( Node::ID::VALUE_ATOM )
 , m_value( value )
 {
     // Expression::setType( value.type() ); FIXME enable this when ir uses
@@ -58,12 +58,12 @@ libcasm_ir::Value ValueAtom::value( void ) const
 }
 
 ZeroAtom::ZeroAtom( void )
-: Expression( Node::ZERO_ATOM )
+    : Expression( Node::ID::ZERO_ATOM )
 {
 }
 
 UndefAtom::UndefAtom( void )
-: Expression( Node::UNDEF_ATOM )
+: Expression( Node::ID::UNDEF_ATOM )
 {
 }
 
@@ -79,7 +79,7 @@ CallExpression::TargetType CallExpression::targetType( void ) const
 
 DirectCallExpression::DirectCallExpression(
     const IdentifierNode::Ptr& identifier, const Expressions::Ptr& arguments )
-: CallExpression( Node::DIRECT_CALL_EXPRESSION )
+: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION )
 , m_identifier( identifier )
 , m_arguments( arguments )
 {
@@ -103,7 +103,7 @@ Expressions::Ptr DirectCallExpression::arguments( void ) const
 
 IndirectCallExpression::IndirectCallExpression(
     const Expression::Ptr& expression, const Expressions::Ptr& arguments )
-: CallExpression( Node::INDIRECT_CALL_EXPRESSION )
+: CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION )
 , m_expression( expression )
 , m_arguments( arguments )
 {
@@ -121,7 +121,7 @@ Expressions::Ptr IndirectCallExpression::arguments( void ) const
 
 UnaryExpression::UnaryExpression(
     const Expression::Ptr& expression, libcasm_ir::Value::ID op )
-: Expression( Node::UNARY_EXPRESSION )
+: Expression( Node::ID::UNARY_EXPRESSION )
 , m_op( op )
 , m_expression( expression )
 {
@@ -139,7 +139,7 @@ Expression::Ptr UnaryExpression::expression( void ) const
 
 BinaryExpression::BinaryExpression( const Expression::Ptr& left,
     const Expression::Ptr& right, libcasm_ir::Value::ID op )
-: Expression( Node::BINARY_EXPRESSION )
+: Expression( Node::ID::BINARY_EXPRESSION )
 , m_op( op )
 , m_left( left )
 , m_right( right )
@@ -163,7 +163,7 @@ Expression::Ptr BinaryExpression::right( void ) const
 
 RangeExpression::RangeExpression(
     const Expression::Ptr& left, const Expression::Ptr& right )
-: Expression( Node::RANGE_EXPRESSION )
+: Expression( Node::ID::RANGE_EXPRESSION )
 , m_left( left )
 , m_right( right )
 {
@@ -180,7 +180,7 @@ Expression::Ptr RangeExpression::right( void ) const
 }
 
 ListExpression::ListExpression( const Expressions::Ptr& expressions )
-: Expression( Node::LIST_EXPRESSION )
+: Expression( Node::ID::LIST_EXPRESSION )
 , m_expressions( expressions )
 {
 }

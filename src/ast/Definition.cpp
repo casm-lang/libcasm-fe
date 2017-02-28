@@ -53,7 +53,7 @@ libcasm_ir::RelationType::Ptr Definition::relationType( void ) const
 
 VariableDefinition::VariableDefinition(
     const IdentifierNode::Ptr& identifier, const Type::Ptr& variableType )
-: Definition( Node::VARIABLE_DEFINITION, identifier )
+: Definition( Node::ID::VARIABLE_DEFINITION, identifier )
 , m_variableType( variableType )
 {
 }
@@ -66,8 +66,8 @@ Type::Ptr VariableDefinition::variableType( void ) const
 FunctionDefinition::FunctionDefinition( const IdentifierNode::Ptr& identifier,
     const Types::Ptr& argumentTypes,
     const Type::Ptr& returnType )
-: Definition( Node::FUNCTION_DEFINITION, identifier )
-, m_classification( Classification::Controlled )
+: Definition( Node::ID::FUNCTION_DEFINITION, identifier )
+, m_classification( Classification::CONTROLLED )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
 , m_symbolic( false )
@@ -133,7 +133,7 @@ DerivedDefinition::DerivedDefinition( const IdentifierNode::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Expression::Ptr& expression )
-: Definition( Node::DERIVED_DEFINITION, identifier )
+: Definition( Node::ID::DERIVED_DEFINITION, identifier )
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_expression( expression )
@@ -159,7 +159,7 @@ RuleDefinition::RuleDefinition( const IdentifierNode::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Rule::Ptr& rule )
-: Definition( Node::RULE_DEFINITION, identifier )
+: Definition( Node::ID::RULE_DEFINITION, identifier )
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_rule( rule )
@@ -184,7 +184,7 @@ Rule::Ptr RuleDefinition::rule( void ) const
 EnumerationDefinition::EnumerationDefinition(
     const IdentifierNode::Ptr& identifier,
     const NodeList< IdentifierNode >::Ptr& enumerators )
-: Definition( Node::ENUMERATION_DEFINITION, identifier )
+: Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
 }

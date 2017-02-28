@@ -31,13 +31,13 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 SkipRule::SkipRule( void )
-: Rule( Node::SKIP_RULE )
+: Rule( Node::ID::SKIP_RULE )
 {
 }
 
 ConditionalRule::ConditionalRule( const Expression::Ptr& condition,
     const Rule::Ptr& thenRule, const Rule::Ptr& elseRule )
-: Rule( Node::CONDITIONAL_RULE )
+: Rule( Node::ID::CONDITIONAL_RULE )
 , m_condition( condition )
 , m_thenRule( thenRule )
 , m_elseRule( elseRule )
@@ -67,7 +67,7 @@ Rule::Ptr ConditionalRule::elseRule( void ) const
 
 CaseRule::CaseRule(
     const Expression::Ptr& expression, const std::vector< Case >& cases )
-: Rule( Node::CASE_RULE )
+: Rule( Node::ID::CASE_RULE )
 , m_expression( expression )
 , m_cases( cases )
 {
@@ -85,7 +85,7 @@ std::vector< CaseRule::Case > CaseRule::cases( void ) const
 
 LetRule::LetRule( const VariableDefinition::Ptr& variable,
     const Expression::Ptr& expression, const Rule::Ptr& rule )
-: Rule( Node::LET_RULE )
+: Rule( Node::ID::LET_RULE )
 , m_variable( variable )
 , m_expression( expression )
 , m_rule( rule )
@@ -109,7 +109,7 @@ Rule::Ptr LetRule::rule( void ) const
 
 ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
     const Expression::Ptr& expression, const Rule::Ptr& rule )
-: Rule( Node::FORALL_RULE )
+: Rule( Node::ID::FORALL_RULE )
 , m_variable( variable )
 , m_expression( expression )
 , m_rule( rule )
@@ -132,7 +132,7 @@ Rule::Ptr ForallRule::rule( void ) const
 }
 
 IterateRule::IterateRule( const Rule::Ptr& rule )
-: Rule( Node::ITERATE_RULE )
+: Rule( Node::ID::ITERATE_RULE )
 , m_rule( rule )
 {
 }
@@ -143,7 +143,7 @@ Rule::Ptr IterateRule::rule( void ) const
 }
 
 BlockRule::BlockRule( const Rules::Ptr& rules )
-: Rule( Node::BLOCK_RULE )
+: Rule( Node::ID::BLOCK_RULE )
 , m_rules( rules )
 {
 }
@@ -154,7 +154,7 @@ Rules::Ptr BlockRule::rules( void ) const
 }
 
 SequenceRule::SequenceRule( const Rules::Ptr& rules )
-: Rule( Node::SEQUENCE_RULE )
+: Rule( Node::ID::SEQUENCE_RULE )
 , m_rules( rules )
 {
 }
@@ -166,7 +166,7 @@ Rules::Ptr SequenceRule::rules( void ) const
 
 UpdateRule::UpdateRule( const DirectCallExpression::Ptr& function,
     const Expression::Ptr& expression )
-: Rule( Node::UPDATE_RULE )
+: Rule( Node::ID::UPDATE_RULE )
 , m_function( function )
 , m_expression( expression )
 {
@@ -184,7 +184,7 @@ Expression::Ptr UpdateRule::expression( void ) const
 
 CallRule::CallRule( const CallExpression::Ptr& call,
     const std::set< CallExpression::TargetType >& allowedCallTargetTypes )
-: Rule( Node::CALL_RULE )
+: Rule( Node::ID::CALL_RULE )
 , m_call( call )
 , m_allowedCallTargetTypes( allowedCallTargetTypes )
 {

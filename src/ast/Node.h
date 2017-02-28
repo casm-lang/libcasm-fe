@@ -40,9 +40,10 @@ namespace libcasm_fe
         class Node : public CasmFE
         {
           public:
-            enum ID : u8
+            enum class ID
             {
-                NODE_LIST,
+                NODE_LIST = 0,
+
                 SPECIFICATION,
                 IDENTIFIER,
 
@@ -79,7 +80,7 @@ namespace libcasm_fe
                 // types
                 BASIC_TYPE,
                 COMPOSED_TYPE,
-                STATICALLY_SIZED_TYPE,
+                FIXED_SIZED_TYPE,
                 RANGED_TYPE,
 
                 // TODO
@@ -112,7 +113,7 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< NodeList >;
 
             NodeList( void )
-            : Node( Node::NODE_LIST )
+            : Node( Node::ID::NODE_LIST )
             {
             }
         };

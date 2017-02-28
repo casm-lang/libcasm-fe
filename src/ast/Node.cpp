@@ -50,7 +50,7 @@ yy::location Node::location( void ) const
 }
 
 IdentifierNode::IdentifierNode( const std::string& identifier )
-: Node( Node::IDENTIFIER )
+: Node( Node::ID::IDENTIFIER )
 , m_identifier( identifier )
 {
 }
