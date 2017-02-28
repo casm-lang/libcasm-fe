@@ -232,7 +232,7 @@ END       0 "end of file"
 %type <Types::Ptr> Types
 %type <BasicType::Ptr> BasicType
 %type <ComposedType::Ptr> ComposedType
-%type <StaticallySizedType::Ptr> StaticallySizedType
+%type <FixedSizedType::Ptr> FixedSizedType
 %type <RangedType::Ptr> RangedType
 
 // other
@@ -620,7 +620,7 @@ Type
   {
       $$ = $1;
   }
-| StaticallySizedType
+| FixedSizedType
   {
       $$ = $1;
   }
@@ -647,10 +647,10 @@ ComposedType
 ;
 
 
-StaticallySizedType
+FixedSizedType
 : Identifier LPAREN Atom RPAREN
   {
-      $$ = make< StaticallySizedType >( @$, $1, $3 );
+      $$ = make< FixedSizedType >( @$, $1, $3 );
   }
 ;
 
