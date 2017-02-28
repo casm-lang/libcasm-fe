@@ -42,7 +42,7 @@ static yy::location loc;
 
 // driver must be global, because it is needed for YY_INPUT
 // defined in src/libsyntax/driver.cpp
-extern Driver *global_driver;
+extern libcasm_fe::Driver *global_driver;
 
 #define STRBUF_LENGTH 1000
 void yyerror(const char *s);

@@ -35,21 +35,19 @@
 %code requires
 {
     #include "src/Driver.h"
-    #include "src/Codes.h"
+    #include "src/Exceptions.h"
 
     #include "src/ast/Specification.h"
 
     #include "../stdhl/cpp/Type.h"
-
-    #include "../casm-ir/src/Value.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
 }
 
 // The parsing context.
-%parse-param { libcasm_fe::Driver& driver }
-%lex-param   { libcasm_fe::Driver& driver }
+//%parse-param { libcasm_fe::Driver& driver }
+//%lex-param   { libcasm_fe::Driver& driver }
 
 %locations
 %initial-action

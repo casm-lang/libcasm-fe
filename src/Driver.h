@@ -29,18 +29,12 @@
 #include "cpp/Default.h"
 #include "cpp/Type.h"
 
-#include "Ast.h"
-#include "Codes.h"
-#include "Symbols.h"
+#include "Exceptions.h"
 
 #include "various/GrammarParser.tab.h"
 
 namespace libcasm_fe
 {
-
-    class AstNode;
-    class RuleNode;
-
     class Driver
     {
       private:
@@ -54,8 +48,6 @@ namespace libcasm_fe
         Driver();
         virtual ~Driver();
 
-        std::map< std::string, RuleNode* > rules_map_;
-        Ast* result;
         std::string spec_name;
 
         // State information for the lexer
@@ -64,9 +56,6 @@ namespace libcasm_fe
 
         // Handling the scanner.
         size_t get_next_chars( char buffer[], size_t max_size );
-
-        // Run the parser. Return 0 on success.
-        Ast* parse( const std::string& f );
 
         // Error handling.
         void error( const yy::location& l, const std::string& m,
@@ -84,31 +73,6 @@ namespace libcasm_fe
 
         uint64_t get_error_count() const;
         uint64_t get_warning_count() const;
-
-        // Rule handling
-        /**
-         * @throws RuleAlreadyExists when the rules table contains a rule with
-         *         the same name as the name of the \a rule_root.
-         * @throws IdentifierAlreadyUsed when the name of the \a rule_root is
-         * already
-         *         used somewhere else (e.g. for a function).
-         */
-        void add( RuleNode* rule_root );
-
-        // functions
-        /**
-         * @throws SymbolAlreadyExists when the symbol table contains a symbol
-         * with
-         *         the same name as the name of the \a function.
-         * @throws IdentifierAlreadyUsed when the name of the \a function is
-         * already
-         *         used somewhere else (e.g. for a rule).
-         */
-        void add( Function* function );
-        SymbolTable function_table;
-
-        // Bindings
-        std::map< std::string, size_t > binding_offsets;
 
         // Dumplist map
         std::unordered_map< size_t, const std::string > function_trace_map;

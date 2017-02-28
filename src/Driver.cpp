@@ -48,11 +48,8 @@ Driver::Driver()
 , warning_( 0 )
 , trace_parsing( false )
 , trace_scanning( false )
-, function_table()
-, function_trace_map()
 {
     file_ = nullptr;
-    result = nullptr;
 
     lines_.push_back( "" );
 }
@@ -90,46 +87,6 @@ size_t Driver::get_next_chars( char buf[], size_t max_size )
         }
         return strlen( buf );
     }
-}
-
-Ast* Driver::parse( const std::string& f )
-{
-    int res = -1;
-
-    if( file_ != nullptr )
-    {
-        fclose( file_ );
-    }
-
-    filename_ = f;
-    file_ = fopen( filename_.c_str(), "rt" );
-    if( file_ == NULL )
-    {
-        std::cerr << "error: could not open `" << filename_ << "´" << std::endl;
-        return nullptr;
-    }
-
-    yy::Parser parser( *this );
-    parser.set_debug_level( trace_parsing );
-
-    try
-    {
-        res = parser.parse();
-
-        // TODO check leak on parser error
-        if( res != 0 || error_ > 0 )
-        {
-            return nullptr;
-        }
-    }
-    catch( const std::exception& e )
-    {
-        std::cerr << "error: got exception: " << e.what() << " -- exiting"
-                  << std::endl;
-        return nullptr;
-    }
-
-    return result;
 }
 
 void Driver::error(
@@ -242,58 +199,6 @@ uint64_t Driver::get_error_count() const
 uint64_t Driver::get_warning_count() const
 {
     return warning_;
-}
-
-void Driver::add( RuleNode* rule_root )
-{
-    Function* function = function_table.get_function( rule_root->name );
-
-    if( function )
-    {
-        // rules and functions can't have the same name
-        throw CompiletimeException(
-            { &rule_root->location, &function->location },
-            "redefinition of '" + rule_root->name + "'",
-            libcasm_fe::Codes::IdentifierAlreadyUsed );
-    }
-
-    const auto result = rules_map_.emplace( rule_root->name, rule_root );
-
-    if( result.second )
-    {
-        DEBUG( "Add symbol " + rule_root->name );
-        rule_root->binding_offsets = std::move( binding_offsets );
-        binding_offsets
-            .clear(); // TODO: is this necessary? move should empty map
-    }
-    else
-    {
-        const auto it = result.first;
-        RuleNode* existingRule = it->second;
-
-        throw CompiletimeException(
-            { &rule_root->location, &existingRule->location },
-            "redefinition of '" + rule_root->name + "'",
-            libcasm_fe::Codes::IdentifierAlreadyUsed );
-    }
-}
-
-void Driver::add( Function* function )
-{
-    const auto it = rules_map_.find( function->name );
-
-    if( it != rules_map_.cend() )
-    {
-        // rules and functions can't have the same name
-        RuleNode* existingRule = it->second;
-
-        throw CompiletimeException(
-            { &function->location, &existingRule->location },
-            "redefinition of '" + function->name + "'",
-            libcasm_fe::Codes::IdentifierAlreadyUsed );
-    }
-
-    function_table.add( function );
 }
 
 const std::string& Driver::get_filename()

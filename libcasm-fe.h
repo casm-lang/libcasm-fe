@@ -26,18 +26,10 @@
 #ifndef _LIB_CASMFE_H_
 #define _LIB_CASMFE_H_
 
-#include "src/Ast.h"
 #include "src/CasmFE.h"
 #include "src/Codes.h"
 #include "src/Driver.h"
 #include "src/Exceptions.h"
-#include "src/LexerHelpers.h"
-#include "src/Macros.h"
-#include "src/Symbolic.h"
-#include "src/Symbols.h"
-#include "src/Types.h"
-#include "src/Value.h"
-#include "src/Visitor.h"
 
 #include "src/various/GrammarParser.tab.h"
 #include "src/various/location.hh"

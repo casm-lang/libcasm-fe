@@ -86,7 +86,7 @@ MaybeParameters
 Type
 : BasicType
 | ComposedType
-| StaticallySizedType
+| FixedSizedType
 | RangedType
 
 BasicType
@@ -95,7 +95,7 @@ BasicType
 ComposedType
 : Identifier LPAREN Types RPAREN
 
-StaticallySizedType
+FixedSizedType
 : Identifier LPAREN Atom RPAREN
 
 RangedType
@@ -112,6 +112,7 @@ Atom
 | PLUS LPAREN Expression RPAREN %prec UPLUS
 | MINUS LPAREN Expression RPAREN %prec UMINUS
 | RuleReference
+| BitNumber
 | IntegerNumber
 | FloatingNumber
 | RationalNumber
@@ -129,16 +130,20 @@ Boolean
 | FALSE
 
 String
-: STRCONST
+: STRING
+
+BitNumber
+: BINARY
+| HEXADECIMAL
 
 IntegerNumber
-: INTEGERCONST
+: INTEGER
 
 FloatingNumber
-: FLOATINGCONST
+: FLOATING
 
 RationalNumber
-: RATIONALCONST
+: RATIONAL
 
 RuleReference
 : AT IDENTIFIER

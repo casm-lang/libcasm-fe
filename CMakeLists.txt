@@ -41,9 +41,18 @@ foreach( DEPENDENCY
   endif()  
 endforeach()
 
+set( CXX_SRC_FILES
+  src/Driver.cpp
+  src/Exceptions.cpp
 
-file( GLOB_RECURSE CXX_SRC_FILES "src/ast/*.cpp" )
-file( GLOB_RECURSE CXX_SRC2_FILES "src/various/*.cpp" )
+  src/ast/Definition.cpp
+  src/ast/Expression.cpp
+  src/ast/Node.cpp
+  src/ast/Rule.cpp
+  src/ast/Specification.cpp
+  src/ast/Type.cpp
+)
+
 file( GLOB_RECURSE CXX_UTS_FILES "uts/*.cpp" )
 
 
@@ -53,7 +62,6 @@ project( ${TARGET} )
 
 include_directories(
   .
-  src/ast
   ${LIBS}/gtest/googletest
   ${LIBS}/gtest/googletest/include
   ${LIBS}/hayai/src
@@ -110,7 +118,6 @@ add_custom_command(
 
 add_library( ${TARGET} STATIC
   ${CXX_SRC_FILES}
-#  ${CXX_SRC2_FILES}
 )
 
 add_custom_target( ${TARGET}-grammar ALL
