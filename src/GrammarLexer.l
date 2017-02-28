@@ -28,9 +28,7 @@
 #include <string.h>
 #include <cstdint>
 
-#include "src/Types.h"
 #include "src/Driver.h"
-#include "src/LexerHelpers.h"
 
 #include "src/various/GrammarParser.tab.h"
 
@@ -81,28 +79,23 @@ char strbuf[STRBUF_LENGTH];
 %}
 
 0[bB][01][01\']*[01]* {
-    const auto val = convert_to_long( yytext + 2, 2, driver, loc );
-    return yy::Parser::make_INTEGERCONST( val, loc );
+    return yy::Parser::make_BINARY( yytext + 2, loc );
 }
 
 0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
-    const auto val = convert_to_long( yytext + 2, 16, driver, loc );
-    return yy::Parser::make_INTEGERCONST( val, loc );
+    return yy::Parser::make_HEXADECIMAL( yytext + 2, loc );
 }
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
-    const auto val = convert_to_rational( yytext + 2, driver, loc );
-    return yy::Parser::make_RATIONALCONST( val, loc );
+    return yy::Parser::make_RATIONAL( yytext + 2, loc );
 }
 
 [0-9][0-9\']*[0-9]* {
-    const auto val = convert_to_long( yytext, 10, driver, loc );
-    return yy::Parser::make_INTEGERCONST( val, loc );
+    return yy::Parser::make_INTEGER( yytext, loc );
 }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
-    const auto val = convert_to_float( yytext, driver, loc );
-    return yy::Parser::make_FLOATINGCONST( val, loc );
+    return yy::Parser::make_FLOATING( yytext, loc );
 }
 
 {{grammartoken}}
@@ -173,7 +166,7 @@ char strbuf[STRBUF_LENGTH];
 }
 <STRING>\" {
     BEGIN( INITIAL );
-    return yy::Parser::make_STRCONST( strbuf, loc );
+    return yy::Parser::make_STRING( strbuf, loc );
 }
 
 . {
