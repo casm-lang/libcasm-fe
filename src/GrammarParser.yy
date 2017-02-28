@@ -67,7 +67,7 @@
     yy::Parser::symbol_type yylex( libcasm_fe::Driver& driver );
 
     std::pair< FunctionDefinition::Classification, bool > parseFunctionAttributes(
-        libcasm_fe::Driver& driver, const NodeList< IdentifierNode >& attributes )
+        libcasm_fe::Driver& driver, const NodeList< IdentifierNode >::Ptr& attributes )
     {
         using Classification = FunctionDefinition::Classification;
 
