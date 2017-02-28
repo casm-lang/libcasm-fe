@@ -28,8 +28,7 @@
 
 #include "Node.h"
 
-#include "../../casm-ir/src/Type.h"
-#include "../../casm-ir/src/Value.h"
+#include "../../casm-ir/src/Constant.h"
 
 namespace libcasm_fe
 {
@@ -63,6 +62,23 @@ namespace libcasm_fe
 
           private:
             libcasm_ir::Value m_value;
+        };
+
+        class RuleReferenceAtom : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< RuleReferenceAtom >;
+
+            RuleReferenceAtom( const IdentifierNode::Ptr& identifier );
+
+            IdentifierNode::Ptr identifier( void ) const;
+
+            void setRuleReference( const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference );
+            libcasm_ir::RuleReferenceConstant::Ptr ruleReference( void ) const;
+
+          private:
+            IdentifierNode::Ptr m_identifier;
+            libcasm_ir::RuleReferenceConstant::Ptr m_ruleReference;
         };
 
         class ZeroAtom : public Expression

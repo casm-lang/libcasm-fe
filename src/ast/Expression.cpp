@@ -57,6 +57,28 @@ libcasm_ir::Value ValueAtom::value( void ) const
     return m_value;
 }
 
+RuleReferenceAtom::RuleReferenceAtom( const IdentifierNode::Ptr& identifier )
+: Expression( Node::ID::RULE_REFERENCE_ATOM )
+, m_identifier( identifier )
+{
+    Expression::setType( libstdhl::get< libcasm_ir::RuleReferenceType >() );
+}
+
+IdentifierNode::Ptr RuleReferenceAtom::identifier() const
+{
+    return m_identifier;
+}
+
+void RuleReferenceAtom::setRuleReference(const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference)
+{
+    m_ruleReference = ruleReference;
+}
+
+libcasm_ir::RuleReferenceConstant::Ptr RuleReferenceAtom::ruleReference( void ) const
+{
+    return m_ruleReference;
+}
+
 ZeroAtom::ZeroAtom( void )
     : Expression( Node::ID::ZERO_ATOM )
 {
