@@ -202,7 +202,7 @@ END       0 "end of file"
 %type <EnumerationDefinition::Ptr> EnumerationDefinition
 
 // expressions
-%type <Expression::Ptr> Expression Atom
+%type <Expression::Ptr> Expression Term Atom
 %type <Expressions::Ptr> Expressions MaybeExpressions
 %type <ValueAtom::Ptr> Boolean String BitNumber IntegerNumber FloatingNumber RationalNumber
 %type <RuleReferenceAtom::Ptr> RuleReference
@@ -252,36 +252,24 @@ END       0 "end of file"
 %precedence THEN
 %precedence ELSE
 
-//%precedence UPDATE ASSERT ASSURE ABORT
-// %precedence IDENTIFIER
-//%precedence INTEGER STRING FLOATING RATIONAL
-// %precedence UNDEF
-// %precedence TRUE
-// %precedence FALSE
+%left COMMA
 
-%left AND
-%left XOR
+%precedence UPDATE
+
 %left OR
+%left XOR
+%left AND
 
-%left EQUAL
-%left NEQUAL
+%left EQUAL NEQUAL
+%left GREATEREQ LESSEQ GREATER LESSER
 
-%left GREATEREQ
-%left LESSEQ
+%left PLUS MINUS
+%left PERCENT SLASH ASTERIX
+%left CARET
 
-%left GREATER
-%left LESSER
+%right UPLUS UMINUS NOT UASTERIX
 
-%left PLUS
-%left MINUS
-%left PERCENT
-%left SLASH
-%left STAR
-
-%precedence NOT
-
-%nonassoc UPLUS
-%nonassoc UMINUS
+%left ARROW
 
 %%
 
@@ -390,7 +378,7 @@ MaybeDefined
 
 
 FunctionParameters
-: FunctionParameters STAR Type
+: FunctionParameters ASTERIX Type
   {
       auto types = $1;
       types->add( $3 );
@@ -430,7 +418,7 @@ MaybeFunctionAttributes
 
 
 ProgramFunctionDefinition
-: INIT RuleReference
+: INIT Identifier
   {
       auto programDefinition = createProgramFunction();
 
@@ -439,8 +427,10 @@ ProgramFunctionDefinition
       const auto program = make< DirectCallExpression >(
           @$, programDefinition->identifier(), arguments );
 
+      const auto ruleReference = make< RuleReferenceAtom >( @$, $2 );
+
       auto initializers = make< NodeList< UpdateRule > >( @$ );
-      initializers->add( make< UpdateRule >( @$, program, $2 ) );
+      initializers->add( make< UpdateRule >( @$, program, ruleReference ) );
       programDefinition->setInitializers( initializers );
 
       $$ = programDefinition;
@@ -462,7 +452,7 @@ ProgramFunctionDefinition
 
 
 Initializer
-: Atom
+: Term
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto unknown = make< IdentifierNode >( @$, std::string() );
@@ -471,7 +461,18 @@ Initializer
 
       $$ = make< UpdateRule >( @$, function, $1 );
   }
-| MaybeArguments ARROW Atom
+| Term ARROW Term
+  {
+      auto arguments = make< Expressions >( @$ );
+      arguments->add( $1 );
+
+      // the unknown function identifier will be replaced in FunctionDefinition
+      const auto unknown = make< IdentifierNode >( @$, std::string() );
+      const auto function = make< DirectCallExpression >( @$, unknown, args );
+
+      $$ = make< UpdateRule >( @$, function, $3 );
+  }
+| Arguments ARROW Term
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto unknown = make< IdentifierNode >( @$, std::string() );
@@ -503,10 +504,6 @@ MaybeInitializers
   {
       $$ = $1;
   }
-| Initializers COMMA
-  {
-      $$ = $1;
-  }
 | %empty
   {
       $$ = make< NodeList< UpdateRule > >( @$ );
@@ -515,7 +512,7 @@ MaybeInitializers
 
 
 DerivedDefinition
-: DERIVED Identifier MaybeParameters COLON Type EQUAL Expression
+: DERIVED Identifier MaybeParameters ARROW Type EQUAL Term
   {
       $$ = make< DerivedDefinition >( @$, $2, $3, $5, $7 );
   }
@@ -523,7 +520,7 @@ DerivedDefinition
 
 
 EnumerationDefinition
-: ENUM Identifier EQUAL LCURPAREN MaybeIdentifiers RCURPAREN
+: ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
   {
       $$ = make< EnumerationDefinition >( @$, $2, $5 );
   }
@@ -559,10 +556,6 @@ MaybeIdentifiers
   {
       $$ = $1;
   }
-| Identifiers COMMA
-  {
-      $$ = $1;
-  }
 | %empty
   {
       $$ = make< NodeList< Identifier > >( @$ );
@@ -574,6 +567,10 @@ Variable
 : Identifier COLON Type
   {
       $$ = make< VariableDefinition >( @$, $1, $3 );
+  }
+| Identifier
+  {
+      $$ = make< VariableDefinition >( @$, $1, ... ); // TODO
   }
 ;
 
@@ -598,10 +595,6 @@ MaybeParameters
 : LPAREN Parameters RPAREN
   {
       $$ = $2;
-  }
-| LPAREN RPAREN
-  {
-      $$ = make< NodeList< VariableDefinition > >( @$ );
   }
 | %empty
   {
@@ -647,7 +640,7 @@ ComposedType
 
 
 FixedSizedType
-: Identifier LPAREN Atom RPAREN
+: Identifier LESSER Term GREATER
   {
       $$ = make< FixedSizedType >( @$, $1, $3 );
   }
@@ -655,7 +648,7 @@ FixedSizedType
 
 
 RangedType
-: Identifier LPAREN Atom DOTDOT Atom RPAREN
+: Identifier LESSER Term DOTDOT Term GREATER
   {
       $$ = make< RangedType >( @$, $1, $3, $5 );
   }
@@ -679,29 +672,7 @@ Types
 
 
 Atom
-: DirectCallExpression
-  {
-      $$ = $1;
-  }
-| IndirectCallExpression
-  {
-      $$ = $1;
-  }
-| LPAREN Expression RPAREN
-  {
-      $$ = $2;
-  }
-| PLUS LPAREN Expression RPAREN %prec UPLUS
-  {
-      $$ = $3;
-  }
-| MINUS LPAREN Expression RPAREN %prec UMINUS
-  {
-      const auto zero = make< ZeroAtom >( @$ );
-      $$ = make< BinaryExpression >( @$, zero, $3,
-                                               libcasm_ir::Value::SUB_INSTRUCTION );
-  }
-| RuleReference
+: RuleReference
   {
       $$ = $1;
   }
@@ -725,14 +696,6 @@ Atom
   {
       $$ = $1;
   }
-| List
-  {
-      $$ = $1;
-  }
-| Range
-  {
-      $$ = $1;
-  }
 | Undefined
   {
       $$ = $1;
@@ -740,6 +703,16 @@ Atom
 | Boolean
   {
       $$ = $1;
+  }
+| PLUS Atom %prec UPLUS
+  {
+      $$ = $2;
+  }
+| MINUS Atom %prec UMINUS
+  {
+      const auto zero = make< ZeroAtom >( @$ );
+      $$ = make< BinaryExpression >( @$, zero, $2,
+                                               libcasm_ir::Value::SUB_INSTRUCTION );
   }
 ;
 
@@ -825,7 +798,7 @@ RuleReference
 
 
 Range
-: LSQPAREN Atom DOTDOT Atom RSQPAREN
+: LSQPAREN Term DOTDOT Term RSQPAREN
   {
       $$ = make< RangeExpression >( @$, $2, $4 );
   }
@@ -841,67 +814,109 @@ List
 
 
 Expression
-: Expression PLUS Expression
+: Term PLUS Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
   }
-| Expression MINUS Expression
+| Term MINUS Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::SUB_INSTRUCTION );
   }
-| Expression STAR Expression
+| Term ASTERIX Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MUL_INSTRUCTION );
   }
-| Expression SLASH Expression
+| Term SLASH Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
   }
-| Expression PERCENT Expression
+| Term PERCENT Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
   }
-| Expression NEQUAL Expression
+| Term CARET Term
+  {
+      // TODO call caret builtin
+  }
+| Term NEQUAL Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
   }
-| Expression EQUAL Expression
+| Term EQUAL Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::EQU_INSTRUCTION );
   }
-| Expression LESSER Expression
+| Term LESSER Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LTH_INSTRUCTION );
   }
-| Expression GREATER Expression
+| Term GREATER Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GTH_INSTRUCTION );
   }
-| Expression LESSEQ Expression
+| Term LESSEQ Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
   }
-| Expression GREATEREQ Expression
+| Term GREATEREQ Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
   }
-| Expression OR Expression
+| Term OR Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::OR_INSTRUCTION );
   }
-| Expression XOR Expression
+| Term XOR Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::XOR_INSTRUCTION );
   }
-| Expression AND Expression
+| Term AND Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
   }
-| NOT Expression
+| NOT Term
   {
       $$ = make< UnaryExpression >( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
   }
+| PLUS LPAREN Expression RPAREN %prec UPLUS
+  {
+      $$ = $3;
+  }
+| MINUS LPAREN Expression RPAREN %prec UMINUS
+  {
+      const auto zero = make< ZeroAtom >( @$ );
+      $$ = make< BinaryExpression >( @$, zero, $3,
+                                               libcasm_ir::Value::SUB_INSTRUCTION );
+  }
+| DirectCallExpression
+  {
+      $$ = $1;
+  }
+| IndirectCallExpression
+  {
+      $$ = $1;
+  }
+| List
+  {
+      $$ = $1;
+  }
+| Range
+  {
+      $$ = $1;
+  }
 | Atom
+  {
+      $$ = $1;
+  }
+;
+
+
+Term
+: LPAREN Expression RPAREN
+  {
+      $$ = $2;
+  }
+| Expression
   {
       $$ = $1;
   }
@@ -929,10 +944,6 @@ MaybeExpressions
   {
       $$ = $1;
   }
-| Expressions COMMA
-  {
-      $$ = $1;
-  }
 | %empty
   {
       $$ = make< Expressions >( @$ );
@@ -941,13 +952,9 @@ MaybeExpressions
 
 
 Arguments
-: LPAREN Expressions RPAREN
+: LPAREN MaybeExpressions RPAREN
   {
       $$ = $2;
-  }
-| LPAREN RPAREN
-  {
-      $$ = make< Expressions >( @$ );
   }
 ;
 
@@ -956,12 +963,6 @@ MaybeArguments
 : Arguments
   {
       $$ = $1;
-  }
-| Expression
-  {
-      auto expressions = make< Expressions >( @$ );
-      expressions->add( $1 );
-      $$ = expressions;
   }
 | %empty
   {
@@ -979,9 +980,9 @@ DirectCallExpression
 
 
 IndirectCallExpression
-: LPAREN Expression RPAREN Arguments
+: ASTERIX Term Arguments %prec UASTERIX
   {
-      $$ = make< IndirectCallExpression >( @$, $2, $4 );
+      $$ = make< IndirectCallExpression >( @$, $2, $3 );
   }
 ;
 
@@ -990,7 +991,12 @@ RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
   {
       $$ = make< RuleDefinition >( @$, $2, $3, nullptr,
-                                             wrapInBlockRule( $5 ) ); // TODO nullptr -> void
+                                   wrapInBlockRule( $5 ) ); // TODO nullptr -> void
+  }
+| RULE Identifier MaybeParameters ARROW Type EQUAL Rule
+  {
+      $$ = make< RuleDefinition >( @$, $2, $3, $5,
+                                   wrapInBlockRule( $7 ) );
   }
 ;
 
@@ -1064,11 +1070,11 @@ SkipRule
 
 
 ConditionalRule
-: IF Expression THEN Rule
+: IF Term THEN Rule
   {
       $$ = make< ConditionalRule >( @$, $2, $4 );
   }
-| IF Expression THEN Rule ELSE Rule
+| IF Term THEN Rule ELSE Rule
   {
       $$ = make< ConditionalRule >( @$, $2, $4, $6 );
   }
@@ -1076,7 +1082,7 @@ ConditionalRule
 
 
 CaseRule
-: CASE Expression OF LCURPAREN CaseLabels RCURPAREN
+: CASE Term OF LCURPAREN CaseLabels RCURPAREN
   {
       $$ = make< CaseRule >( @$, $2, $5 );
   }
@@ -1094,7 +1100,7 @@ CaseLabel
       // default case
       $$ = CaseRule::Case( nullptr, $3 );
   }
-| Atom COLON Rule
+| Term COLON Rule
   {
       $$ = CaseRule::Case( $1, $3 );
   }
@@ -1115,7 +1121,7 @@ CaseLabels
 
 
 LetRule
-: LET Variable EQUAL Expression IN Rule
+: LET Variable EQUAL Term IN Rule
   {
       $$ = make< LetRule >( @$, $2, $4, $6 );
   }
@@ -1123,7 +1129,7 @@ LetRule
 
 
 ForallRule
-: FORALL Variable IN Expression DO Rule
+: FORALL Variable IN Term DO Rule
   {
       $$ = make< ForallRule >( @$, $2, $4, $6 );
   }
@@ -1163,7 +1169,7 @@ SequenceRule
 
 
 UpdateRule
-: DirectCallExpression UPDATE Expression
+: DirectCallExpression UPDATE Term
   {
       $$ = make< UpdateRule >( @$, $1, $3 );
   }

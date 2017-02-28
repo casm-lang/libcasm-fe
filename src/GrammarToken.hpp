@@ -76,16 +76,16 @@ LSQPAREN        "["             { return yy::Parser::make_LSQPAREN(loc); }
 RSQPAREN        "]"             { return yy::Parser::make_RSQPAREN(loc); }
 LCURPAREN       "{"             { return yy::Parser::make_LCURPAREN(loc); }
 RCURPAREN       "}"             { return yy::Parser::make_RCURPAREN(loc); }
-DOT             "."             { return yy::Parser::make_DOT(loc); }
 COLON           ":"             { return yy::Parser::make_COLON(loc); }
 UNDERLINE       "_"             { return yy::Parser::make_UNDERLINE(loc); }
 AT              "@"             { return yy::Parser::make_AT(loc); }
 COMMA           ","             { return yy::Parser::make_COMMA(loc); }
 LESSER          "<"             { return yy::Parser::make_LESSER(loc); }
 GREATER         ">"             { return yy::Parser::make_GREATER(loc); }
-STAR            "*"             { return yy::Parser::make_STAR(loc); }
+ASTERIX         "*"             { return yy::Parser::make_ASTERIX(loc); }
 SLASH           "/"             { return yy::Parser::make_SLASH(loc); }
 PERCENT         "%"             { return yy::Parser::make_PERCENT(loc); }
+CARET           "^"             { return yy::Parser::make_CARET(loc); }
 
 DOTDOT          ".."            { return yy::Parser::make_DOTDOT(loc); }
 ARROW           "->"            { return yy::Parser::make_ARROW(loc); }

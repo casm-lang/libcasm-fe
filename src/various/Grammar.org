@@ -25,7 +25,7 @@ MaybeDefined
 | %empty
 
 FunctionParameters
-: FunctionParameters STAR Type
+: FunctionParameters ASTERIX Type
 | Type
 
 MaybeFunctionParameters
@@ -37,12 +37,13 @@ MaybeFunctionAttributes
 | %empty
 
 ProgramFunctionDefinition
-: INIT RuleReference
+: INIT Identifier
 | INIT LCURPAREN MaybeInitializers RCURPAREN
 
 Initializer
-: Atom
-| MaybeArguments ARROW Atom
+: Term
+| Term ARROW Term
+| Arguments ARROW Term
 
 Initializers
 : Initializers COMMA Initializer
@@ -50,14 +51,13 @@ Initializers
 
 MaybeInitializers
 : Initializers
-| Initializers COMMA
 | %empty
 
 DerivedDefinition
-: DERIVED Identifier MaybeParameters COLON Type EQUAL Expression
+: DERIVED Identifier MaybeParameters ARROW Type EQUAL Term
 
 EnumerationDefinition
-: ENUM Identifier EQUAL LCURPAREN MaybeIdentifiers RCURPAREN
+: ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
 
 Identifier
 : IDENTIFIER
@@ -68,11 +68,11 @@ Identifiers
 
 MaybeIdentifiers
 : Identifiers
-| Identifiers COMMA
 | %empty
 
 Variable
 : Identifier COLON Type
+| Identifier
 
 Parameters
 : Parameters COMMA Variable
@@ -80,7 +80,6 @@ Parameters
 
 MaybeParameters
 : LPAREN Parameters RPAREN
-| LPAREN RPAREN
 | %empty
 
 Type
@@ -96,31 +95,26 @@ ComposedType
 : Identifier LPAREN Types RPAREN
 
 FixedSizedType
-: Identifier LPAREN Atom RPAREN
+: Identifier LESSER Term GREATER
 
 RangedType
-: Identifier LPAREN Atom DOTDOT Atom RPAREN
+: Identifier LESSER Term DOTDOT Term GREATER
 
 Types
 : Types COMMA Type
 | Type
 
 Atom
-: DirectCallExpression
-| IndirectCallExpression
-| LPAREN Expression RPAREN
-| PLUS LPAREN Expression RPAREN %prec UPLUS
-| MINUS LPAREN Expression RPAREN %prec UMINUS
-| RuleReference
+: RuleReference
 | BitNumber
 | IntegerNumber
 | FloatingNumber
 | RationalNumber
 | String
-| List
-| Range
 | Undefined
 | Boolean
+| PLUS Atom %prec UPLUS
+| MINUS Atom %prec UMINUS
 
 Undefined
 : UNDEF
@@ -149,28 +143,39 @@ RuleReference
 : AT IDENTIFIER
 
 Range
-: LSQPAREN Atom DOTDOT Atom RSQPAREN
+: LSQPAREN Term DOTDOT Term RSQPAREN
 
 List
 : LSQPAREN MaybeExpressions RSQPAREN
 
 Expression
-: Expression PLUS Expression
-| Expression MINUS Expression
-| Expression STAR Expression
-| Expression SLASH Expression
-| Expression PERCENT Expression
-| Expression NEQUAL Expression
-| Expression EQUAL Expression
-| Expression LESSER Expression
-| Expression GREATER Expression
-| Expression LESSEQ Expression
-| Expression GREATEREQ Expression
-| Expression OR Expression
-| Expression XOR Expression
-| Expression AND Expression
-| NOT Expression
+: Term PLUS Term
+| Term MINUS Term
+| Term ASTERIX Term
+| Term SLASH Term
+| Term PERCENT Term
+| Term CARET Term
+| Term NEQUAL Term
+| Term EQUAL Term
+| Term LESSER Term
+| Term GREATER Term
+| Term LESSEQ Term
+| Term GREATEREQ Term
+| Term OR Term
+| Term XOR Term
+| Term AND Term
+| NOT Term
+| PLUS LPAREN Expression RPAREN %prec UPLUS
+| MINUS LPAREN Expression RPAREN %prec UMINUS
+| DirectCallExpression %prec DIRECT_CALL
+| IndirectCallExpression
+| List
+| Range
 | Atom
+
+Term
+: LPAREN Expression RPAREN
+| Expression
 
 Expressions
 : Expressions COMMA Expression
@@ -178,26 +183,24 @@ Expressions
 
 MaybeExpressions
 : Expressions
-| Expressions COMMA
 | %empty
 
 Arguments
-: LPAREN Expressions RPAREN
-| LPAREN RPAREN
+: LPAREN MaybeExpressions RPAREN
 
 MaybeArguments
 : Arguments
-| Expression
 | %empty
 
 DirectCallExpression
 : Identifier MaybeArguments
 
 IndirectCallExpression
-: LPAREN Expression RPAREN Arguments
+: ASTERIX Term Arguments %prec UASTERIX
 
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
+| RULE Identifier MaybeParameters ARROW Type EQUAL Rule
 
 Rule
 : SkipRule
@@ -219,26 +222,26 @@ SkipRule
 : SKIP
 
 ConditionalRule
-: IF Expression THEN Rule
-| IF Expression THEN Rule ELSE Rule
+: IF Term THEN Rule
+| IF Term THEN Rule ELSE Rule
 
 CaseRule
-: CASE Expression OF LCURPAREN CaseLabels RCURPAREN
+: CASE Term OF LCURPAREN CaseLabels RCURPAREN
 
 CaseLabel
 : DEFAULT COLON Rule
 | UNDERLINE COLON Rule
-| Atom COLON Rule
+| Term COLON Rule
 
 CaseLabels
 : CaseLabel CaseLabels
 | CaseLabel
 
 LetRule
-: LET Variable EQUAL Expression IN Rule
+: LET Variable EQUAL Term IN Rule
 
 ForallRule
-: FORALL Variable IN Expression DO Rule
+: FORALL Variable IN Term DO Rule
 
 IterateRule
 : ITERATE Rule
@@ -252,7 +255,7 @@ SequenceRule
 | SEQ Rules ENDSEQ
 
 UpdateRule
-: DirectCallExpression UPDATE Expression
+: DirectCallExpression UPDATE Term
 
 CallRule
 : CALL DirectCallExpression
