@@ -56,7 +56,7 @@ libcasm_ir::Type::Ptr AstToCasmIRPass::getType( Type* type )
     switch( type->t )
     {
         case TypeType::AGENT:
-            return libstdhl::get< libcasm_ir::AgentType >();
+            return libstdhl::get< libcasm_ir::AgentType >( m_agent );
         case TypeType::RULEREF:
             return libstdhl::get< libcasm_ir::RuleReferenceType >();
         case TypeType::BOOLEAN:
@@ -223,7 +223,9 @@ void AstToCasmIRPass::visit_specification( SpecificationNode* node )
         = libstdhl::get< libcasm_ir::RuleReferenceConstant >(
             ir_initially_rule );
 
-    m_agent = libstdhl::make< libcasm_ir::Agent >( ir_agent_init_rule );
+    std::vector< std::string > agents = { "agent0" };
+
+    m_agent = libstdhl::make< libcasm_ir::Agent >( agents );
 
     getSpecification()->add( m_agent );
 }
@@ -1139,7 +1141,8 @@ bool AstToCasmIRPass::visit_string_atom( StringAtom* node )
 bool AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::AgentConstant >( m_agent );
+    auto ir_const = libstdhl::get< libcasm_ir::AgentConstant >(
+        libstdhl::get< libcasm_ir::AgentType >( m_agent ), "agent0" );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
