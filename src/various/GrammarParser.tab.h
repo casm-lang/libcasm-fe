@@ -394,32 +394,35 @@ namespace yy {
       // RuleDefinition
       char dummy29[sizeof(RuleDefinition::Ptr)];
 
+      // RuleReference
+      char dummy30[sizeof(RuleReferenceAtom::Ptr)];
+
       // Rules
-      char dummy30[sizeof(Rules::Ptr)];
+      char dummy31[sizeof(Rules::Ptr)];
 
       // SequenceRule
-      char dummy31[sizeof(SequenceRule::Ptr)];
+      char dummy32[sizeof(SequenceRule::Ptr)];
 
       // SkipRule
-      char dummy32[sizeof(SkipRule::Ptr)];
+      char dummy33[sizeof(SkipRule::Ptr)];
 
       // Specification
-      char dummy33[sizeof(Specification::Ptr)];
+      char dummy34[sizeof(Specification::Ptr)];
 
       // Type
-      char dummy34[sizeof(Type::Ptr)];
+      char dummy35[sizeof(Type::Ptr)];
 
       // FunctionParameters
       // MaybeFunctionParameters
       // Types
-      char dummy35[sizeof(Types::Ptr)];
+      char dummy36[sizeof(Types::Ptr)];
 
       // Undefined
-      char dummy36[sizeof(UndefAtom::Ptr)];
+      char dummy37[sizeof(UndefAtom::Ptr)];
 
       // Initializer
       // UpdateRule
-      char dummy37[sizeof(UpdateRule::Ptr)];
+      char dummy38[sizeof(UpdateRule::Ptr)];
 
       // Boolean
       // String
@@ -427,11 +430,10 @@ namespace yy {
       // IntegerNumber
       // FloatingNumber
       // RationalNumber
-      // RuleReference
-      char dummy38[sizeof(ValueAtom::Ptr)];
+      char dummy39[sizeof(ValueAtom::Ptr)];
 
       // Variable
-      char dummy39[sizeof(VariableDefinition::Ptr)];
+      char dummy40[sizeof(VariableDefinition::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -440,10 +442,10 @@ namespace yy {
       // "floating"
       // "string"
       // "identifier"
-      char dummy40[sizeof(std::string)];
+      char dummy41[sizeof(std::string)];
 
       // CaseLabels
-      char dummy41[sizeof(std::vector< CaseRule::Case >)];
+      char dummy42[sizeof(std::vector< CaseRule::Case >)];
 };
 
     /// Symbol semantic values.
@@ -631,6 +633,8 @@ namespace yy {
   basic_symbol (typename Base::kind_type t, const Rule::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const RuleReferenceAtom::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Rules::Ptr v, const location_type& l);
 
@@ -1426,6 +1430,10 @@ namespace yy {
         value.copy< RuleDefinition::Ptr > (other.value);
         break;
 
+      case 109: // RuleReference
+        value.copy< RuleReferenceAtom::Ptr > (other.value);
+        break;
+
       case 121: // Rules
         value.copy< Rules::Ptr > (other.value);
         break;
@@ -1467,7 +1475,6 @@ namespace yy {
       case 106: // IntegerNumber
       case 107: // FloatingNumber
       case 108: // RationalNumber
-      case 109: // RuleReference
         value.copy< ValueAtom::Ptr > (other.value);
         break;
 
@@ -1633,6 +1640,10 @@ namespace yy {
         value.copy< RuleDefinition::Ptr > (v);
         break;
 
+      case 109: // RuleReference
+        value.copy< RuleReferenceAtom::Ptr > (v);
+        break;
+
       case 121: // Rules
         value.copy< Rules::Ptr > (v);
         break;
@@ -1674,7 +1685,6 @@ namespace yy {
       case 106: // IntegerNumber
       case 107: // FloatingNumber
       case 108: // RationalNumber
-      case 109: // RuleReference
         value.copy< ValueAtom::Ptr > (v);
         break;
 
@@ -1909,6 +1919,13 @@ namespace yy {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RuleReferenceAtom::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2151,6 +2168,10 @@ namespace yy {
         value.template destroy< RuleDefinition::Ptr > ();
         break;
 
+      case 109: // RuleReference
+        value.template destroy< RuleReferenceAtom::Ptr > ();
+        break;
+
       case 121: // Rules
         value.template destroy< Rules::Ptr > ();
         break;
@@ -2192,7 +2213,6 @@ namespace yy {
       case 106: // IntegerNumber
       case 107: // FloatingNumber
       case 108: // RationalNumber
-      case 109: // RuleReference
         value.template destroy< ValueAtom::Ptr > ();
         break;
 
@@ -2364,6 +2384,10 @@ namespace yy {
         value.move< RuleDefinition::Ptr > (s.value);
         break;
 
+      case 109: // RuleReference
+        value.move< RuleReferenceAtom::Ptr > (s.value);
+        break;
+
       case 121: // Rules
         value.move< Rules::Ptr > (s.value);
         break;
@@ -2405,7 +2429,6 @@ namespace yy {
       case 106: // IntegerNumber
       case 107: // FloatingNumber
       case 108: // RationalNumber
-      case 109: // RuleReference
         value.move< ValueAtom::Ptr > (s.value);
         break;
 
@@ -2923,7 +2946,7 @@ namespace yy {
 
 
 } // yy
-#line 2927 "GrammarParser.tab.h" // lalr1.cc:377
+#line 2950 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

@@ -204,7 +204,8 @@ END       0 "end of file"
 // expressions
 %type <Expression::Ptr> Expression Atom
 %type <Expressions::Ptr> Expressions MaybeExpressions
-%type <ValueAtom::Ptr> Boolean String BitNumber IntegerNumber FloatingNumber RationalNumber RuleReference
+%type <ValueAtom::Ptr> Boolean String BitNumber IntegerNumber FloatingNumber RationalNumber
+%type <RuleReferenceAtom::Ptr> RuleReference
 %type <UndefAtom::Ptr> Undefined
 %type <RangeExpression::Ptr> Range
 %type <ListExpression::Ptr> List
@@ -818,8 +819,7 @@ RationalNumber
 RuleReference
 : AT IDENTIFIER
   {
-      const auto value = libstdhl::get< libcasm_ir::RuleReferenceConstant >( $2 );
-      $$ = make< ValueAtom >( @$, value );
+      $$ = make< RuleReferenceAtom >( @$, $2 );
   }
 ;
 
