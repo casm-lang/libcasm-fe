@@ -113,8 +113,6 @@ Atom
 | String
 | Undefined
 | Boolean
-| PLUS Atom %prec UPLUS
-| MINUS Atom %prec UMINUS
 
 Undefined
 : UNDEF
@@ -142,14 +140,20 @@ RationalNumber
 RuleReference
 : AT IDENTIFIER
 
-Range
-: LSQPAREN Term DOTDOT Term RSQPAREN
-
-List
-: LSQPAREN MaybeExpressions RSQPAREN
+Term
+: DirectCallExpression
+| IndirectCallExpression
+| Expression
+| List
+| Range
+| Atom
 
 Expression
-: Term PLUS Term
+: LPAREN Expression RPAREN
+| PLUS Term %prec UPLUS
+| LPAREN Term RPAREN
+| MINUS Term %prec UMINUS
+| Term PLUS Term
 | Term MINUS Term
 | Term ASTERIX Term
 | Term SLASH Term
@@ -165,38 +169,29 @@ Expression
 | Term XOR Term
 | Term AND Term
 | NOT Term
-| PLUS LPAREN Expression RPAREN %prec UPLUS
-| MINUS LPAREN Expression RPAREN %prec UMINUS
-| DirectCallExpression %prec DIRECT_CALL
-| IndirectCallExpression
-| List
-| Range
-| Atom
 
-Term
-: LPAREN Expression RPAREN
-| Expression
+Range
+: LSQPAREN Term DOTDOT Term RSQPAREN
 
-Expressions
-: Expressions COMMA Expression
-| Expression
+List
+: LSQPAREN RSQPAREN
+| LSQPAREN Term RSQPAREN
+| LSQPAREN TermList RSQPAREN
 
-MaybeExpressions
-: Expressions
-| %empty
+TermList
+: TermList Term COMMA
+| Term COMMA
 
 Arguments
-: LPAREN MaybeExpressions RPAREN
-
-MaybeArguments
-: Arguments
-| %empty
+: LPAREN TermList RPAREN
+| LPAREN RPAREN
 
 DirectCallExpression
-: Identifier MaybeArguments
+: Identifier %prec DIRECT_CALL_EXPR_NO_ARG
+| Identifier Arguments
 
 IndirectCallExpression
-: ASTERIX Term Arguments %prec UASTERIX
+: LPAREN ASTERIX Term RPAREN Arguments
 
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule

@@ -30,7 +30,7 @@ include .config.mk
 
 LX  = flex
 YC  = bison
-YF  = -Wall
+YF  = -Wall -v
 
 $(OBJ)/src/various/Grammar.org: src/various/Grammar.org
 	mkdir -p `dirname $@`

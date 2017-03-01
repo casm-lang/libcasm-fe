@@ -189,6 +189,7 @@ END       0 "end of file"
 %token <std::string> IDENTIFIER  "identifier"
 
 %type <Specification::Ptr> Specification
+
 %type <IdentifierNode::Ptr> Identifier
 %type <NodeList< IdentifierNode >::Ptr> Identifiers MaybeIdentifiers
 
@@ -203,7 +204,7 @@ END       0 "end of file"
 
 // expressions
 %type <Expression::Ptr> Expression Term Atom
-%type <Expressions::Ptr> Expressions MaybeExpressions
+%type <Expressions::Ptr> TermList
 %type <ValueAtom::Ptr> Boolean String BitNumber IntegerNumber FloatingNumber RationalNumber
 %type <RuleReferenceAtom::Ptr> RuleReference
 %type <UndefAtom::Ptr> Undefined
@@ -243,7 +244,7 @@ END       0 "end of file"
 %type <NodeList< IdentifierNode >::Ptr> MaybeFunctionAttributes
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
-%type <Expressions::Ptr> Arguments MaybeArguments
+%type <Expressions::Ptr> Arguments
 %type <NodeList< VariableDefinition >::Ptr> Parameters MaybeParameters
 
 
@@ -251,8 +252,6 @@ END       0 "end of file"
 
 %precedence THEN
 %precedence ELSE
-
-%left COMMA
 
 %precedence UPDATE
 
@@ -267,9 +266,11 @@ END       0 "end of file"
 %left PERCENT SLASH ASTERIX
 %left CARET
 
-%right UPLUS UMINUS NOT UASTERIX
+%precedence UPLUS UMINUS
+%precedence NOT
 
-%left ARROW
+%precedence LPAREN
+%precedence DIRECT_CALL_EXPR_NO_ARG
 
 %%
 
@@ -704,16 +705,6 @@ Atom
   {
       $$ = $1;
   }
-| PLUS Atom %prec UPLUS
-  {
-      $$ = $2;
-  }
-| MINUS Atom %prec UMINUS
-  {
-      const auto zero = make< ZeroAtom >( @$ );
-      $$ = make< BinaryExpression >( @$, zero, $2,
-                                               libcasm_ir::Value::SUB_INSTRUCTION );
-  }
 ;
 
 
@@ -797,24 +788,55 @@ RuleReference
 ;
 
 
-Range
-: LSQPAREN Term DOTDOT Term RSQPAREN
+
+
+Term
+: DirectCallExpression
   {
-      $$ = make< RangeExpression >( @$, $2, $4 );
+      $$ = $1;
   }
-;
-
-
-List
-: LSQPAREN MaybeExpressions RSQPAREN
+| IndirectCallExpression
   {
-      $$ = make< ListExpression >( @$, $2 );
+      $$ = $1;
+  }
+| Expression
+  {
+      $$ = $1;
+  }
+| List
+  {
+      $$ = $1;
+  }
+| Range
+  {
+      $$ = $1;
+  }
+| Atom
+  {
+      $$ = $1;
   }
 ;
 
 
 Expression
-: Term PLUS Term
+: LPAREN Expression RPAREN
+  {
+      $$ = $2;
+  }
+| PLUS Term %prec UPLUS
+  {
+      $$ = $2;
+  }
+| LPAREN Term RPAREN
+  {
+      $$ = $2;
+  }
+| MINUS Term %prec UMINUS
+  {
+      const auto zero = make< ZeroAtom >( @$ );
+      $$ = make< BinaryExpression >( @$, zero, $2, libcasm_ir::Value::SUB_INSTRUCTION );
+  }
+| Term PLUS Term
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
   }
@@ -878,101 +900,72 @@ Expression
   {
       $$ = make< UnaryExpression >( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
   }
-| PLUS LPAREN Expression RPAREN %prec UPLUS
+;
+
+
+
+Range
+: LSQPAREN Term DOTDOT Term RSQPAREN
   {
-      $$ = $3;
-  }
-| MINUS LPAREN Expression RPAREN %prec UMINUS
-  {
-      const auto zero = make< ZeroAtom >( @$ );
-      $$ = make< BinaryExpression >( @$, zero, $3,
-                                               libcasm_ir::Value::SUB_INSTRUCTION );
-  }
-| DirectCallExpression
-  {
-      $$ = $1;
-  }
-| IndirectCallExpression
-  {
-      $$ = $1;
-  }
-| List
-  {
-      $$ = $1;
-  }
-| Range
-  {
-      $$ = $1;
-  }
-| Atom
-  {
-      $$ = $1;
+      $$ = make< RangeExpression >( @$, $2, $4 );
   }
 ;
 
 
-Term
-: LPAREN Expression RPAREN
+List
+: LSQPAREN RSQPAREN
   {
-      $$ = $2;
-  }
-| Expression
-  {
-      $$ = $1;
-  }
-;
+      const auto expressions = make< Expressions >( @$ );
 
-
-Expressions
-: Expressions COMMA Expression
-  {
-      auto expressions = $1;
-      expressions->add( $3 );
-      $$ = expressions;
+      $$ = make< ListExpression >( @$, expressions );
   }
-| Expression
+| LSQPAREN Term RSQPAREN
   {
       auto expressions = make< Expressions >( @$ );
-      expressions->add( $1 );
-      $$ = expressions;
+      expressions->add( $2 );
+      $$ = make< ListExpression >( @$, expressions );
+  }
+| LSQPAREN TermList RSQPAREN
+  {
+      $$ = make< ListExpression >( @$, $2 );
   }
 ;
 
-
-MaybeExpressions
-: Expressions
+TermList
+: TermList Term COMMA
   {
-      $$ = $1;
+      auto expressions = $1;
+      expressions->add( $2 );
+      $$ = expressions;
   }
-| %empty
+| Term COMMA
   {
-      $$ = make< Expressions >( @$ );
+      
+      $$ = expressions;
   }
 ;
 
 
 Arguments
-: LPAREN MaybeExpressions RPAREN
+: LPAREN TermList RPAREN
   {
       $$ = $2;
   }
-;
-
-
-MaybeArguments
-: Arguments
+| LPAREN RPAREN
   {
-      $$ = $1;
-  }
-| %empty
-  {
-      $$ = make< Expressions >( @$ );
+      const auto expressions = make< Expressions >( @$ );
+      $$ = expression;
   }
 ;
 
 
 DirectCallExpression
-: Identifier MaybeArguments
+: Identifier %prec DIRECT_CALL_EXPR_NO_ARG
+  {
+      const auto arguments = make< Expressions >( @$ );
+      $$ = make< DirectCallExpression >( @$, $1, arguments );
+  }
+| Identifier Arguments
   {
       $$ = make< DirectCallExpression >( @$, $1, $2 );
   }
@@ -980,9 +973,9 @@ DirectCallExpression
 
 
 IndirectCallExpression
-: ASTERIX Term Arguments %prec UASTERIX
+: LPAREN ASTERIX Term RPAREN Arguments
   {
-      $$ = make< IndirectCallExpression >( @$, $2, $3 );
+      $$ = make< IndirectCallExpression >( @$, $3, $5 );
   }
 ;
 
