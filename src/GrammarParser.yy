@@ -211,6 +211,7 @@ END       0 "end of file"
 %type <ListExpression::Ptr> List
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
+%type <ConditionalExpression::Ptr> ConditionalExpression
 
 // rules
 %type <Rule::Ptr> Rule
@@ -896,6 +897,10 @@ Expression
   {
       $$ = $1;
   }
+| ConditionalExpression
+  {
+      $$ = $1;
+  }
 | List
   {
       $$ = $1;
@@ -983,6 +988,14 @@ IndirectCallExpression
 : ASTERIX Term Arguments %prec UASTERIX
   {
       $$ = make< IndirectCallExpression >( @$, $2, $3 );
+  }
+;
+
+
+ConditionalExpression
+: IF Term THEN Term ELSE Term
+  {
+      $$ = make< ConditionalExpression >( @$, $2, $4, $6 );
   }
 ;
 

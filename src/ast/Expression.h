@@ -225,6 +225,25 @@ namespace libcasm_fe
           private:
             Expressions::Ptr m_expressions;
         };
+
+        class ConditionalExpression : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< ConditionalExpression >;
+
+            ConditionalExpression( const Expression::Ptr& condition,
+                const Expression::Ptr& thenExpression,
+                const Expression::Ptr& elseExpression );
+
+            Expression::Ptr condition( void ) const;
+            Expression::Ptr thenExpression( void ) const;
+            Expression::Ptr elseExpression( void ) const;
+
+          private:
+            Expression::Ptr m_condition;
+            Expression::Ptr m_thenExpression;
+            Expression::Ptr m_elseExpression;
+        };
     }
 }
 

@@ -213,3 +213,28 @@ Expressions::Ptr ListExpression::expressions( void ) const
 {
     return m_expressions;
 }
+
+ConditionalExpression::ConditionalExpression( const Expression::Ptr& condition,
+    const Expression::Ptr& thenExpression,
+    const Expression::Ptr& elseExpression )
+: Expression( Node::ID::CONDITIONAL_EXPRESSION )
+, m_condition( condition )
+, m_thenExpression( thenExpression )
+, m_elseExpression( elseExpression )
+{
+}
+
+Expression::Ptr ConditionalExpression::condition( void ) const
+{
+    return m_condition;
+}
+
+Expression::Ptr ConditionalExpression::thenExpression( void ) const
+{
+    return m_thenExpression;
+}
+
+Expression::Ptr ConditionalExpression::elseExpression( void ) const
+{
+    return m_elseExpression;
+}

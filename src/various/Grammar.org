@@ -167,8 +167,9 @@ Expression
 | NOT Term
 | PLUS LPAREN Expression RPAREN %prec UPLUS
 | MINUS LPAREN Expression RPAREN %prec UMINUS
-| DirectCallExpression %prec DIRECT_CALL
+| DirectCallExpression
 | IndirectCallExpression
+| ConditionalExpression
 | List
 | Range
 | Atom
@@ -197,6 +198,9 @@ DirectCallExpression
 
 IndirectCallExpression
 : ASTERIX Term Arguments %prec UASTERIX
+
+ConditionalExpression
+: IF Term THEN Term ELSE Term
 
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
