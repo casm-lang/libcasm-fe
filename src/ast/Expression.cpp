@@ -25,6 +25,8 @@
 
 #include "Expression.h"
 
+#include "Definition.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -237,4 +239,48 @@ Expression::Ptr ConditionalExpression::thenExpression( void ) const
 Expression::Ptr ConditionalExpression::elseExpression( void ) const
 {
     return m_elseExpression;
+}
+
+QuantifierExpression::QuantifierExpression( Node::ID id,
+    const VariableDefinition::Ptr& predicateVariable,
+    const Expression::Ptr& universe,
+    const Expression::Ptr& proposition )
+: Expression( id )
+, m_predicateVariable( predicateVariable )
+, m_universe( universe )
+, m_proposition( proposition )
+{
+}
+
+VariableDefinition::Ptr QuantifierExpression::predicateVariable( void ) const
+{
+    return m_predicateVariable;
+}
+
+Expression::Ptr QuantifierExpression::universe( void ) const
+{
+    return m_universe;
+}
+
+Expression::Ptr QuantifierExpression::proposition( void ) const
+{
+    return m_proposition;
+}
+
+UniversalQuantifierExpression::UniversalQuantifierExpression(
+    const std::shared_ptr< VariableDefinition >& predicateVariable,
+    const Expression::Ptr& universe,
+    const Expression::Ptr& proposition )
+: QuantifierExpression( Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION,
+      predicateVariable, universe, proposition )
+{
+}
+
+ExistentialQuantifierExpression::ExistentialQuantifierExpression(
+    const std::shared_ptr< VariableDefinition >& predicateVariable,
+    const Expression::Ptr& universe,
+    const Expression::Ptr& proposition )
+: QuantifierExpression( Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION,
+      predicateVariable, universe, proposition )
+{
 }

@@ -57,6 +57,9 @@ ELSE            "else"          { return yy::Parser::make_ELSE(loc); }
 CASE            "case"          { return yy::Parser::make_CASE(loc); }
 OF              "of"            { return yy::Parser::make_OF(loc); }
 DEFAULT         "default"       { return yy::Parser::make_DEFAULT(loc); }
+HOLDS           "holds"         { return yy::Parser::make_HOLDS(loc); }
+EXISTS          "exists"        { return yy::Parser::make_EXISTS(loc); }
+WITH            "with"          { return yy::Parser::make_WITH(loc); }
 
 UNDEF           "undef"         { return yy::Parser::make_UNDEF(loc); }
 FALSE           "false"         { return yy::Parser::make_FALSE(loc); }

@@ -212,6 +212,8 @@ END       0 "end of file"
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
 %type <ConditionalExpression::Ptr> ConditionalExpression
+%type <UniversalQuantifierExpression::Ptr> UniversalQuantifierExpression
+%type <ExistentialQuantifierExpression::Ptr> ExistentialQuantifierExpression
 
 // rules
 %type <Rule::Ptr> Rule
@@ -271,6 +273,8 @@ END       0 "end of file"
 %right UPLUS UMINUS NOT UASTERIX
 
 %left ARROW
+
+%precedence HOLDS WITH
 
 %%
 
@@ -903,6 +907,14 @@ Term
   {
       $$ = $1;
   }
+| UniversalQuantifierExpression
+  {
+      $$ = $1;
+  }
+| ExistentialQuantifierExpression
+  {
+      $$ = $1;
+  }
 | List
   {
       $$ = $1;
@@ -986,6 +998,22 @@ ConditionalExpression
 : IF Expression THEN Expression ELSE Expression
   {
       $$ = make< ConditionalExpression >( @$, $2, $4, $6 );
+  }
+;
+
+
+UniversalQuantifierExpression
+: FORALL Variable IN Expression HOLDS Expression
+  {
+      $$ = make< UniversalQuantifierExpression >( @$, $2, $4, $6 );
+  }
+;
+
+
+ExistentialQuantifierExpression
+: EXISTS Variable IN Expression WITH Expression
+  {
+      $$ = make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
   }
 ;
 

@@ -172,6 +172,8 @@ Term
 | DirectCallExpression
 | IndirectCallExpression
 | ConditionalExpression
+| UniversalQuantifierExpression
+| ExistentialQuantifierExpression
 | List
 | Range
 | Atom
@@ -199,6 +201,12 @@ IndirectCallExpression
 
 ConditionalExpression
 : IF Expression THEN Expression ELSE Expression
+
+UniversalQuantifierExpression
+: FORALL Variable IN Expression HOLDS Expression
+
+ExistentialQuantifierExpression
+: EXISTS Variable IN Expression WITH Expression
 
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
