@@ -68,6 +68,7 @@ TRUE            "true"          { return yy::Parser::make_TRUE(loc); }
 AND             "and"           { return yy::Parser::make_AND(loc); }
 OR              "or"            { return yy::Parser::make_OR(loc); }
 XOR             "xor"           { return yy::Parser::make_XOR(loc); }
+IMPLIES         "implies"       { return yy::Parser::make_IMPLIES(loc); }
 NOT             "not"           { return yy::Parser::make_NOT(loc); }
 
 PLUS            "+"             { return yy::Parser::make_PLUS(loc); }

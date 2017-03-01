@@ -162,6 +162,7 @@ Expression
 | Expression OR Expression
 | Expression XOR Expression
 | Expression AND Expression
+| Expression IMPLIES Expression
 | NOT Expression
 | Term
 

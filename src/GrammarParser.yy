@@ -259,6 +259,7 @@ END       0 "end of file"
 
 %precedence UPDATE
 
+%left IMPLIES
 %left OR
 %left XOR
 %left AND
@@ -831,7 +832,7 @@ Expression
   }
 | Expression CARET Expression
   {
-      // TODO call caret builtin
+      // TODO call power builtin
   }
 | Expression NEQUAL Expression
   {
@@ -868,6 +869,10 @@ Expression
 | Expression AND Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
+  }
+| Expression IMPLIES Expression
+  {
+      // TODO add implies instruction
   }
 | NOT Expression
   {
