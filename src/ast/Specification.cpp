@@ -30,7 +30,7 @@ using namespace Ast;
 
 Specification::Specification(
     const IdentifierNode::Ptr& name, const Definitions::Ptr& definitions )
-    : Node( Node::ID::SPECIFICATION )
+: Node( Node::ID::SPECIFICATION )
 , m_name( name )
 , m_definitions( definitions )
 {

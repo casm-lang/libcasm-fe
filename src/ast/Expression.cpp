@@ -69,18 +69,20 @@ IdentifierNode::Ptr RuleReferenceAtom::identifier() const
     return m_identifier;
 }
 
-void RuleReferenceAtom::setRuleReference(const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference)
+void RuleReferenceAtom::setRuleReference(
+    const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference )
 {
     m_ruleReference = ruleReference;
 }
 
-libcasm_ir::RuleReferenceConstant::Ptr RuleReferenceAtom::ruleReference( void ) const
+libcasm_ir::RuleReferenceConstant::Ptr RuleReferenceAtom::ruleReference(
+    void ) const
 {
     return m_ruleReference;
 }
 
 ZeroAtom::ZeroAtom( void )
-    : Expression( Node::ID::ZERO_ATOM )
+: Expression( Node::ID::ZERO_ATOM )
 {
 }
 

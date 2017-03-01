@@ -73,7 +73,8 @@ namespace libcasm_fe
 
             IdentifierNode::Ptr identifier( void ) const;
 
-            void setRuleReference( const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference );
+            void setRuleReference(
+                const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference );
             libcasm_ir::RuleReferenceConstant::Ptr ruleReference( void ) const;
 
           private:
