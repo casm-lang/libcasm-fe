@@ -26,8 +26,8 @@
 #ifndef _LIB_CASMFE_UPDATESET_H_
 #define _LIB_CASMFE_UPDATESET_H_
 
-#include <stack>
 #include <stdexcept>
+#include <vector>
 
 #include "../Value.h"
 #include "../various/location.hh"
@@ -421,7 +421,7 @@ class UpdateSetManager
     std::size_t size() const noexcept;
 
   private:
-    std::stack< UpdateSet* > m_updateSets;
+    std::vector< UpdateSet* > m_updateSets;
 };
 
 #endif // _LIB_CASMFE_UPDATESET_H_

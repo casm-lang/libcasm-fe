@@ -61,7 +61,7 @@ std::size_t UpdateSet::size() const noexcept
     return m_set.size();
 }
 
-void UpdateSet::reserveAdditionally(std::size_t size)
+void UpdateSet::reserveAdditionally( std::size_t size )
 {
     m_set.reserve( m_set.size() + size );
 }
@@ -204,10 +204,12 @@ void UpdateSetManager::fork(
         switch( updateSetType )
         {
             case UpdateSet::Type::Sequential:
-                m_updateSets.push( new SequentialUpdateSet( initialSize ) );
+                m_updateSets.emplace_back(
+                    new SequentialUpdateSet( initialSize ) );
                 break;
             case UpdateSet::Type::Parallel:
-                m_updateSets.push( new ParallelUpdateSet( initialSize ) );
+                m_updateSets.emplace_back(
+                    new ParallelUpdateSet( initialSize ) );
                 break;
         }
     }
@@ -216,7 +218,7 @@ void UpdateSetManager::fork(
         const auto updateSet = currentUpdateSet();
         const auto forkedUpdateSet
             = updateSet->fork( updateSetType, initialSize );
-        m_updateSets.push( forkedUpdateSet );
+        m_updateSets.emplace_back( forkedUpdateSet );
     }
 }
 
@@ -226,7 +228,7 @@ void UpdateSetManager::merge()
     {
         const auto updateSet = currentUpdateSet();
         updateSet->merge();
-        m_updateSets.pop();
+        m_updateSets.pop_back();
         delete updateSet;
     }
 }
@@ -235,15 +237,15 @@ void UpdateSetManager::clear()
 {
     while( not m_updateSets.empty() )
     {
-        delete m_updateSets.top();
-        m_updateSets.pop();
+        delete m_updateSets.back();
+        m_updateSets.pop_back();
     }
 }
 
 UpdateSet* UpdateSetManager::currentUpdateSet() const
 {
     assert( not m_updateSets.empty() );
-    return m_updateSets.top();
+    return m_updateSets.back();
 }
 
 std::size_t UpdateSetManager::size() const noexcept
