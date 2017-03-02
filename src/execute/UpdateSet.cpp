@@ -25,8 +25,6 @@
 
 #include "UpdateSet.h"
 
-#include "cpp/Default.h"
-
 UpdateSet::Conflict::Conflict(
     const std::string& msg, Update* conflictingUpdate, Update* existingUpdate )
 : std::logic_error( msg )
