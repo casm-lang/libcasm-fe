@@ -156,6 +156,15 @@ class UpdateSet
     std::size_t size() const noexcept;
 
     /**
+     * Request more space so that the update set can store an additional number
+     * of \a size updates without intermediate resizing.
+     *
+     * @param size The additional number of updates the update-set should be
+     *             able to handle without resizing
+     */
+    void reserveAdditionally( std::size_t size );
+
+    /**
      * Adds the \a update for the \a location to the update-set
      *
      * The handling of multiple updates for the same location depends on the

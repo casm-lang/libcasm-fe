@@ -61,6 +61,11 @@ std::size_t UpdateSet::size() const noexcept
     return m_set.size();
 }
 
+void UpdateSet::reserveAdditionally(std::size_t size)
+{
+    m_set.reserve( m_set.size() + size );
+}
+
 Update* UpdateSet::lookup( const libcasm_fe::value_t* location ) const noexcept
 {
     if( m_parent )
@@ -93,7 +98,7 @@ void UpdateSet::merge()
     }
     else
     {
-        m_parent->m_set.reserve( m_parent->m_set.size() + m_set.size() );
+        m_parent->reserveAdditionally( m_set.size() );
         const auto end = m_set.end();
         for( auto it = m_set.begin(); it != end; ++it )
         {
