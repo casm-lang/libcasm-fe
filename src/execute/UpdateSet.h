@@ -419,6 +419,7 @@ class UpdateSetManager
 
   private:
     std::vector< std::unique_ptr< UpdateSet > > m_updateSets;
+    std::vector< bool > m_forked;
 };
 
 #endif // _LIB_CASMFE_UPDATESET_H_

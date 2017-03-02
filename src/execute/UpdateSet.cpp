@@ -169,6 +169,7 @@ void ParallelUpdateSet::add(
 
 UpdateSetManager::UpdateSetManager()
 : m_updateSets()
+, m_forked()
 {
 }
 
@@ -208,27 +209,48 @@ void UpdateSetManager::fork(
                 break;
         }
     }
-    else
+    else // only fork if necessary
     {
         const auto updateSet = currentUpdateSet();
+        if( updateSet->type() == updateSetType )
+        {
+            // no need to fork the update set, use the current one
+            updateSet->reserveAdditionally( initialSize );
+            m_forked.push_back( false );
+            return;
+        }
+
         m_updateSets.emplace_back(
             updateSet->fork( updateSetType, initialSize ) );
     }
+
+    m_forked.push_back( true );
 }
 
 void UpdateSetManager::merge()
 {
-    if( size() > 1 )
+    if( size() < 2 )
     {
-        const auto updateSet = currentUpdateSet();
-        updateSet->merge();
-        m_updateSets.pop_back();
+        return;
     }
+
+    const auto forked = m_forked.back();
+    m_forked.pop_back();
+    if( not forked )
+    {
+        // previous fork call didn't actually fork the update set
+        return;
+    }
+
+    const auto updateSet = currentUpdateSet();
+    updateSet->merge();
+    m_updateSets.pop_back();
 }
 
 void UpdateSetManager::clear()
 {
     m_updateSets.clear();
+    m_forked.clear();
 }
 
 UpdateSet* UpdateSetManager::currentUpdateSet() const
@@ -239,7 +261,8 @@ UpdateSet* UpdateSetManager::currentUpdateSet() const
 
 std::size_t UpdateSetManager::size() const noexcept
 {
-    return m_updateSets.size();
+    assert( m_forked.size() >= m_updateSets.size() );
+    return m_forked.size();
 }
 
 //
