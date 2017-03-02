@@ -76,15 +76,17 @@ Update* UpdateSet::lookup( const libcasm_fe::value_t* location ) const noexcept
     return nullptr;
 }
 
-UpdateSet* UpdateSet::fork(
+std::unique_ptr< UpdateSet > UpdateSet::fork(
     UpdateSet::Type updateSetType, std::size_t initialSize )
 {
     switch( updateSetType )
     {
         case Type::Sequential:
-            return new SequentialUpdateSet( initialSize, this );
+            return std::unique_ptr< SequentialUpdateSet >(
+                new SequentialUpdateSet( initialSize, this ) );
         case Type::Parallel:
-            return new ParallelUpdateSet( initialSize, this );
+            return std::unique_ptr< ParallelUpdateSet >(
+                new ParallelUpdateSet( initialSize, this ) );
     }
 }
 
@@ -172,11 +174,6 @@ UpdateSetManager::UpdateSetManager()
 {
 }
 
-UpdateSetManager::~UpdateSetManager()
-{
-    clear();
-}
-
 void UpdateSetManager::add(
     const libcasm_fe::value_t* location, Update* update )
 {
@@ -216,9 +213,8 @@ void UpdateSetManager::fork(
     else
     {
         const auto updateSet = currentUpdateSet();
-        const auto forkedUpdateSet
-            = updateSet->fork( updateSetType, initialSize );
-        m_updateSets.emplace_back( forkedUpdateSet );
+        m_updateSets.emplace_back(
+            updateSet->fork( updateSetType, initialSize ) );
     }
 }
 
@@ -229,23 +225,18 @@ void UpdateSetManager::merge()
         const auto updateSet = currentUpdateSet();
         updateSet->merge();
         m_updateSets.pop_back();
-        delete updateSet;
     }
 }
 
 void UpdateSetManager::clear()
 {
-    while( not m_updateSets.empty() )
-    {
-        delete m_updateSets.back();
-        m_updateSets.pop_back();
-    }
+    m_updateSets.clear();
 }
 
 UpdateSet* UpdateSetManager::currentUpdateSet() const
 {
     assert( not m_updateSets.empty() );
-    return m_updateSets.back();
+    return m_updateSets.back().get();
 }
 
 std::size_t UpdateSetManager::size() const noexcept

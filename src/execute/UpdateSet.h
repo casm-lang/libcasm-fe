@@ -26,6 +26,7 @@
 #ifndef _LIB_CASMFE_UPDATESET_H_
 #define _LIB_CASMFE_UPDATESET_H_
 
+#include <memory>
 #include <stdexcept>
 #include <vector>
 
@@ -206,7 +207,8 @@ class UpdateSet
      * @return A new update-set of type \a updateSetType with the current
      *         update-set as parent
      */
-    UpdateSet* fork( UpdateSet::Type updateSetType, std::size_t initialSize );
+    std::unique_ptr< UpdateSet > fork(
+        UpdateSet::Type updateSetType, std::size_t initialSize );
 
     /**
      * Merges all updates of the current update-set into its parent update-set
@@ -336,11 +338,6 @@ class UpdateSetManager
     UpdateSetManager();
 
     /**
-     * Destroys the update-set manager and frees all update-sets
-     */
-    virtual ~UpdateSetManager();
-
-    /**
      * Adds the \a update for the \a location to the current update-set
      *
      * The handling of multiple updates for the same location depends on the
@@ -421,7 +418,7 @@ class UpdateSetManager
     std::size_t size() const noexcept;
 
   private:
-    std::vector< UpdateSet* > m_updateSets;
+    std::vector< std::unique_ptr< UpdateSet > > m_updateSets;
 };
 
 #endif // _LIB_CASMFE_UPDATESET_H_
