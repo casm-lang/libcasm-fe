@@ -38,7 +38,6 @@
 #include "../casm-ir/src/Specification.h"
 #include "../casm-ir/src/Statement.h"
 #include "../casm-ir/src/Type.h"
-#include "../casm-ir/src/analyze/CasmIRDumpPass.h"
 
 using namespace libcasm_fe;
 
@@ -164,7 +163,7 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
     auto data = libstdhl::make< Data >( m_specification );
 
     pr.setResult< AstToCasmIRPass >( data );
-    pr.setResult< libcasm_ir::CasmIRDumpPass >( data );
+    pr.setResult< libcasm_ir::ConsistencyCheckPass >( data );
 
     return true;
 }
