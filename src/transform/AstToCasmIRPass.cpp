@@ -206,12 +206,12 @@ void AstToCasmIRPass::visit_specification( SpecificationNode* node )
     getSpecification()->add( ir_initially_rule );
 
     auto ir_initially_rule_scope
-        = libstdhl::make< libcasm_ir::ParallelBlock >();
+        = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
     ir_initially_rule->setContext( ir_initially_rule_scope );
 
     auto ir_initially_rule_inner_scope
-        = libstdhl::make< libcasm_ir::SequentialBlock >();
+        = libstdhl::make< libcasm_ir::SequentialBlock >()->init();
 
     ir_initially_rule_scope->add( ir_initially_rule_inner_scope );
 
@@ -252,8 +252,9 @@ void AstToCasmIRPass::visit_function_def_pre( FunctionDefNode* node, bool )
 
     if( node->initializers().size() > 0 )
     {
-        initially_update_scope = libstdhl::make< libcasm_ir::ParallelBlock >();
-        assert( initially_update_scope );
+        initially_update_scope
+            = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
+
         assert( initially_scope );
         initially_scope->add( initially_update_scope );
     }
@@ -383,8 +384,8 @@ void AstToCasmIRPass::visit_rule( RuleNode* node )
 
     if( node->child_->node_type_ != NodeType::PARBLOCK )
     {
-        auto ir_scope = libstdhl::make< libcasm_ir::ParallelBlock >();
-        assert( ir_scope );
+        auto ir_scope = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
+
         ast2casmir[ node ] = ir_scope;
 
         ir_rule->setContext( ir_scope );
@@ -425,7 +426,7 @@ void AstToCasmIRPass::visit_parblock_pre( UnaryNode* node )
     VISIT;
     assert( node );
 
-    auto ir_scope = libstdhl::make< libcasm_ir::ParallelBlock >();
+    auto ir_scope = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
     ast2casmir[ node ] = ir_scope;
     ast2parent[ node->child_ ] = node;
@@ -467,7 +468,7 @@ void AstToCasmIRPass::visit_seqblock_pre( UnaryNode* node )
     VISIT;
     assert( node );
 
-    auto ir_scope = libstdhl::make< libcasm_ir::SequentialBlock >();
+    auto ir_scope = libstdhl::make< libcasm_ir::SequentialBlock >()->init();
 
     ast2casmir[ node ] = ir_scope;
     ast2parent[ node->child_ ] = node;
@@ -699,7 +700,7 @@ void AstToCasmIRPass::visit_let( LetNode* node, bool var )
         assert( 0 );
     }
 
-    auto ir_block = libstdhl::make< libcasm_ir::SequentialBlock >();
+    auto ir_block = libstdhl::make< libcasm_ir::SequentialBlock >()->init();
     ir_scope->add( ir_block );
     ir_block->setParent( ir_scope );
 
@@ -751,7 +752,7 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
     auto ir_select = libstdhl::make< libcasm_ir::SelectInstruction >( ir_cond );
 
     assert( node->then_ );
-    auto ir_case_true = libstdhl::make< libcasm_ir::ParallelBlock >();
+    auto ir_case_true = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
     ast2casmir[ node ] = ir_case_true;
     ast2parent[ node->then_ ] = node;
@@ -767,7 +768,8 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
 
     if( node->else_ )
     {
-        auto ir_case_false = libstdhl::make< libcasm_ir::ParallelBlock >();
+        auto ir_case_false
+            = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
         ast2casmir[ node->condition_ ] = ir_case_false;
         ast2parent[ node->condition_ ] = node;
@@ -791,7 +793,7 @@ void AstToCasmIRPass::visit_case_pre( CaseNode* node, bool val )
 
     for( auto& a : node->case_list )
     {
-        auto ir_case = libstdhl::make< libcasm_ir::ParallelBlock >();
+        auto ir_case = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
         ast2casmir[ (AstNode*)&a ] = ir_case;
         ast2parent[ a.second ] = (AstNode*)&a;
