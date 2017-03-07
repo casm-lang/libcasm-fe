@@ -850,7 +850,7 @@ void SymbolicExecutionPass::dumpUpdates()
             const auto update = updateSet->get( &value );
             if( update )
             {
-                ::symbolic::dump_update( trace, function, update );
+                ::symbolic::dump_update( trace, function, update.value() );
             }
             else
             {

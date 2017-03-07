@@ -30,6 +30,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include <boost/optional.hpp>
+
 #include "../Value.h"
 #include "../various/location.hh"
 
@@ -190,11 +192,10 @@ class UpdateSet
      *
      * @param location The location of the update of interest
      *
-     * @return The update for the \a location or nullptr if no update for the
-     *         \a location could be found.
+     * @return The update for the \a location if exists.
      */
-    virtual Update* lookup( const libcasm_fe::value_t* location ) const
-        noexcept;
+    virtual boost::optional< Update* > lookup(
+        const libcasm_fe::value_t* location ) const noexcept;
 
     /**
      * Forks the current update-set
@@ -242,10 +243,10 @@ class UpdateSet
      *
      * @param location The location of the update of interest
      *
-     * @return The update for the \a location or nullptr if no update for the
-     *         \a location could be found.
+     * @return The update for the \a location if exists.
      */
-    Update* get( const libcasm_fe::value_t* location ) const noexcept;
+    boost::optional< Update* > get( const libcasm_fe::value_t* location ) const
+        noexcept;
 
   protected:
     UpdateHashMap m_set;
@@ -290,11 +291,10 @@ class SequentialUpdateSet final : public UpdateSet
      *
      * @param location The location of the update of interest
      *
-     * @return The update for the \a location or nullptr if no update for the
-     *         \a location could be found.
+     * @return The update for the \a location if exists.
      */
-    Update* lookup( const libcasm_fe::value_t* location ) const
-        noexcept override;
+    boost::optional< Update* > lookup(
+        const libcasm_fe::value_t* location ) const noexcept override;
 };
 
 /**
@@ -364,10 +364,10 @@ class UpdateSetManager
      *
      * @param location The location of the update of interest
      *
-     * @return The update for the \a location or nullptr if no update for the
-     *         \a location could be found.
+     * @return The update for the \a location if exists.
      */
-    Update* lookup( const libcasm_fe::value_t* location ) const noexcept;
+    boost::optional< Update* > lookup(
+        const libcasm_fe::value_t* location ) const noexcept;
 
     /**
      * Forks the current update-set or creates a new update-set if the

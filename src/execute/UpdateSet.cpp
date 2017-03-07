@@ -64,14 +64,15 @@ void UpdateSet::reserveAdditionally( std::size_t size )
     m_set.reserve( m_set.size() + size );
 }
 
-Update* UpdateSet::lookup( const libcasm_fe::value_t* location ) const noexcept
+boost::optional< Update* > UpdateSet::lookup(
+    const libcasm_fe::value_t* location ) const noexcept
 {
     if( m_parent )
     {
         return m_parent->lookup( location );
     }
 
-    return nullptr;
+    return boost::none;
 }
 
 std::unique_ptr< UpdateSet > UpdateSet::fork(
@@ -117,10 +118,16 @@ typename UpdateSet::const_iterator UpdateSet::end() const noexcept
     return m_set.end();
 }
 
-Update* UpdateSet::get( const libcasm_fe::value_t* location ) const noexcept
+boost::optional< Update* > UpdateSet::get(
+    const libcasm_fe::value_t* location ) const noexcept
 {
     const auto it = m_set.find( location );
-    return ( it != m_set.end() ) ? it.value() : nullptr;
+    if( it != m_set.end() )
+    {
+        return it.value();
+    }
+
+    return boost::none;
 }
 
 UpdateSet::Type SequentialUpdateSet::type() const noexcept
@@ -134,8 +141,8 @@ void SequentialUpdateSet::add(
     m_set.insertOrAssign( location, update );
 }
 
-Update* SequentialUpdateSet::lookup( const libcasm_fe::value_t* location ) const
-    noexcept
+boost::optional< Update* > SequentialUpdateSet::lookup(
+    const libcasm_fe::value_t* location ) const noexcept
 {
     const auto it = m_set.find( location );
     if( it != m_set.end() )
@@ -179,12 +186,12 @@ void UpdateSetManager::add(
     currentUpdateSet()->add( location, update );
 }
 
-Update* UpdateSetManager::lookup( const libcasm_fe::value_t* location ) const
-    noexcept
+boost::optional< Update* > UpdateSetManager::lookup(
+    const libcasm_fe::value_t* location ) const noexcept
 {
     if( m_updateSets.empty() )
     {
-        return nullptr;
+        return boost::none;
     }
     else
     {

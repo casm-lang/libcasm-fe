@@ -263,7 +263,7 @@ value_t ExecutionPassBase::functionValue(
 
         if( update )
         {
-            return update->value;
+            return update.value()->value;
         }
         else
         {
