@@ -173,9 +173,13 @@ libcasm_ir::Specification::Ptr AstToCasmIRPass::getSpecification( void ) const
     return m_specification;
 }
 
+#if 1
+#define VISIT
+#else
 #define VISIT                                                                  \
-/*printf( "===--- %s:%i: %s: %p: %s\n", __FILE__, __LINE__, __FUNCTION__,      \
-  node, node->to_str().c_str() )*/
+    printf( "===--- %s:%i: %s: %p: %s\n", __FILE__, __LINE__, __FUNCTION__,    \
+        node, node->to_str().c_str() )
+#endif
 
 #define FIXME                                                                  \
     printf( "+++ FIXME +++: '%s:%i' in '%s'\n", __FILE__, __LINE__,            \
