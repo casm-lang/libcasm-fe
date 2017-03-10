@@ -33,9 +33,62 @@
 #include "../allocator/BlockAllocator.h"
 #include "UpdateSet.h"
 
+#include "../Value.h"
+#include "../various/location.hh"
+
 #include "ChainedHashMap.h"
 #include "ProbingHashMap.h"
 #include "RobinHoodHashMap.h"
+
+struct LocationHash
+{
+    /**
+     * Directly using a libcasm_fe::value_t pointer as hash value has the
+     * problem that the
+     * first
+     * 4 bits of the hash value are always 0, because the size of
+     * libcasm_fe::value_t is 16
+     * bytes.
+     * Some bit shifting avoids this problem.
+     *
+     * Forumla is from LLVM's DenseMapInfo<T*>
+     */
+    std::size_t operator()( const libcasm_fe::value_t* location ) const
+    {
+        return ( reinterpret_cast< std::uintptr_t >( location ) >> 4 )
+               ^ ( reinterpret_cast< std::uintptr_t >( location ) >> 9 );
+    }
+};
+
+/**
+ * @brief Represents an update
+ */
+struct Update
+{
+    libcasm_fe::value_t value; /**< The value of the update */
+    const std::vector< libcasm_fe::value_t >*
+        args; /**< The function arguments of the update */
+    const yy::location*
+        location;  /**< The source-code location of the update producer */
+    uint32_t func; /**< The function uid of the update */
+};
+
+struct UpdateEquals : public std::binary_function< Update*, Update*, bool >
+{
+    bool operator()( Update* lhs, Update* rhs ) const
+    {
+        return lhs->value == rhs->value;
+    }
+};
+
+struct UpdateSetDetails
+{
+    using Location = const libcasm_fe::value_t*;
+    using Value = Update*;
+    using LocationHash = LocationHash;
+    using LocationEquals = std::equal_to< Location >;
+    using ValueEquals = UpdateEquals;
+};
 
 /**
    @brief    TODO
@@ -46,6 +99,7 @@
 namespace libcasm_fe
 {
     using FunctionState = ProbingHashMap< std::vector< value_t >, value_t >;
+    using ExecutionUpdateSet = UpdateSet< UpdateSetDetails >;
 
     class ExecutionPassBase : public Visitor< value_t >
     {
@@ -58,7 +112,7 @@ namespace libcasm_fe
             const yy::location& location );
         void applyUpdates();
 
-        void fork( const UpdateSet::Type updateSetType );
+        void fork( ExecutionUpdateSet::Semantics semantics );
         void merge();
 
         value_t functionValue(
@@ -162,7 +216,7 @@ namespace libcasm_fe
         std::vector< value_t > main_bindings;
         std::vector< std::vector< value_t >* > rule_bindings;
 
-        UpdateSetManager updateSetManager;
+        UpdateSetManager< ExecutionUpdateSet > updateSetManager;
 
         std::vector< FunctionState > function_states;
         std::vector< const Function* > function_symbols;
