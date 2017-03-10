@@ -25,6 +25,8 @@
 
 #include "Expression.h"
 
+#include "Definition.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -69,18 +71,20 @@ IdentifierNode::Ptr RuleReferenceAtom::identifier() const
     return m_identifier;
 }
 
-void RuleReferenceAtom::setRuleReference(const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference)
+void RuleReferenceAtom::setRuleReference(
+    const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference )
 {
     m_ruleReference = ruleReference;
 }
 
-libcasm_ir::RuleReferenceConstant::Ptr RuleReferenceAtom::ruleReference( void ) const
+libcasm_ir::RuleReferenceConstant::Ptr RuleReferenceAtom::ruleReference(
+    void ) const
 {
     return m_ruleReference;
 }
 
 ZeroAtom::ZeroAtom( void )
-    : Expression( Node::ID::ZERO_ATOM )
+: Expression( Node::ID::ZERO_ATOM )
 {
 }
 
@@ -210,4 +214,73 @@ ListExpression::ListExpression( const Expressions::Ptr& expressions )
 Expressions::Ptr ListExpression::expressions( void ) const
 {
     return m_expressions;
+}
+
+ConditionalExpression::ConditionalExpression( const Expression::Ptr& condition,
+    const Expression::Ptr& thenExpression,
+    const Expression::Ptr& elseExpression )
+: Expression( Node::ID::CONDITIONAL_EXPRESSION )
+, m_condition( condition )
+, m_thenExpression( thenExpression )
+, m_elseExpression( elseExpression )
+{
+}
+
+Expression::Ptr ConditionalExpression::condition( void ) const
+{
+    return m_condition;
+}
+
+Expression::Ptr ConditionalExpression::thenExpression( void ) const
+{
+    return m_thenExpression;
+}
+
+Expression::Ptr ConditionalExpression::elseExpression( void ) const
+{
+    return m_elseExpression;
+}
+
+QuantifierExpression::QuantifierExpression( Node::ID id,
+    const VariableDefinition::Ptr& predicateVariable,
+    const Expression::Ptr& universe,
+    const Expression::Ptr& proposition )
+: Expression( id )
+, m_predicateVariable( predicateVariable )
+, m_universe( universe )
+, m_proposition( proposition )
+{
+}
+
+VariableDefinition::Ptr QuantifierExpression::predicateVariable( void ) const
+{
+    return m_predicateVariable;
+}
+
+Expression::Ptr QuantifierExpression::universe( void ) const
+{
+    return m_universe;
+}
+
+Expression::Ptr QuantifierExpression::proposition( void ) const
+{
+    return m_proposition;
+}
+
+UniversalQuantifierExpression::UniversalQuantifierExpression(
+    const std::shared_ptr< VariableDefinition >& predicateVariable,
+    const Expression::Ptr& universe,
+    const Expression::Ptr& proposition )
+: QuantifierExpression( Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION,
+      predicateVariable, universe, proposition )
+{
+}
+
+ExistentialQuantifierExpression::ExistentialQuantifierExpression(
+    const std::shared_ptr< VariableDefinition >& predicateVariable,
+    const Expression::Ptr& universe,
+    const Expression::Ptr& proposition )
+: QuantifierExpression( Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION,
+      predicateVariable, universe, proposition )
+{
 }

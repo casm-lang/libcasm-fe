@@ -34,6 +34,8 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class VariableDefinition;
+
         class Expression : public Node
         {
           public:
@@ -73,7 +75,8 @@ namespace libcasm_fe
 
             IdentifierNode::Ptr identifier( void ) const;
 
-            void setRuleReference( const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference );
+            void setRuleReference(
+                const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference );
             libcasm_ir::RuleReferenceConstant::Ptr ruleReference( void ) const;
 
           private:
@@ -223,6 +226,68 @@ namespace libcasm_fe
 
           private:
             Expressions::Ptr m_expressions;
+        };
+
+        class ConditionalExpression : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< ConditionalExpression >;
+
+            ConditionalExpression( const Expression::Ptr& condition,
+                const Expression::Ptr& thenExpression,
+                const Expression::Ptr& elseExpression );
+
+            Expression::Ptr condition( void ) const;
+            Expression::Ptr thenExpression( void ) const;
+            Expression::Ptr elseExpression( void ) const;
+
+          private:
+            Expression::Ptr m_condition;
+            Expression::Ptr m_thenExpression;
+            Expression::Ptr m_elseExpression;
+        };
+
+        class QuantifierExpression : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< QuantifierExpression >;
+
+            QuantifierExpression( Node::ID id,
+                const std::shared_ptr< VariableDefinition >& predicateVariable,
+                const Expression::Ptr& universe,
+                const Expression::Ptr& proposition );
+
+            std::shared_ptr< VariableDefinition > predicateVariable(
+                void ) const;
+            Expression::Ptr universe( void ) const;
+            Expression::Ptr proposition( void ) const;
+
+          private:
+            std::shared_ptr< VariableDefinition > m_predicateVariable;
+            Expression::Ptr m_universe;
+            Expression::Ptr m_proposition;
+        };
+
+        class UniversalQuantifierExpression : public QuantifierExpression
+        {
+          public:
+            using Ptr = std::shared_ptr< UniversalQuantifierExpression >;
+
+            UniversalQuantifierExpression(
+                const std::shared_ptr< VariableDefinition >& predicateVariable,
+                const Expression::Ptr& universe,
+                const Expression::Ptr& proposition );
+        };
+
+        class ExistentialQuantifierExpression : public QuantifierExpression
+        {
+          public:
+            using Ptr = std::shared_ptr< ExistentialQuantifierExpression >;
+
+            ExistentialQuantifierExpression(
+                const std::shared_ptr< VariableDefinition >& predicateVariable,
+                const Expression::Ptr& universe,
+                const Expression::Ptr& proposition );
         };
     }
 }

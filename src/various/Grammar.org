@@ -21,7 +21,7 @@ MaybeInitially
 | %empty
 
 MaybeDefined
-: DEFINED LCURPAREN Atom RCURPAREN
+: DEFINED LCURPAREN Expression RCURPAREN
 | %empty
 
 FunctionParameters
@@ -41,9 +41,9 @@ ProgramFunctionDefinition
 | INIT LCURPAREN MaybeInitializers RCURPAREN
 
 Initializer
-: Term
-| Term ARROW Term
-| Arguments ARROW Term
+: Expression
+| Expression ARROW Expression
+| Arguments ARROW Expression
 
 Initializers
 : Initializers COMMA Initializer
@@ -54,7 +54,7 @@ MaybeInitializers
 | %empty
 
 DerivedDefinition
-: DERIVED Identifier MaybeParameters ARROW Type EQUAL Term
+: DERIVED Identifier MaybeParameters ARROW Type EQUAL Expression
 
 EnumerationDefinition
 : ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
@@ -95,10 +95,10 @@ ComposedType
 : Identifier LPAREN Types RPAREN
 
 FixedSizedType
-: Identifier LESSER Term GREATER
+: Identifier LESSER Expression GREATER
 
 RangedType
-: Identifier LESSER Term DOTDOT Term GREATER
+: Identifier LESSER Expression DOTDOT Expression GREATER
 
 Types
 : Types COMMA Type
@@ -154,21 +154,22 @@ Expression
 | LPAREN Term RPAREN
 | MINUS Term %prec UMINUS
 | Term PLUS Term
-| Term MINUS Term
-| Term ASTERIX Term
-| Term SLASH Term
-| Term PERCENT Term
-| Term CARET Term
-| Term NEQUAL Term
-| Term EQUAL Term
-| Term LESSER Term
-| Term GREATER Term
-| Term LESSEQ Term
-| Term GREATEREQ Term
-| Term OR Term
-| Term XOR Term
-| Term AND Term
-| NOT Term
+| Expression MINUS Expression
+| Expression ASTERIX Expression
+| Expression SLASH Expression
+| Expression PERCENT Expression
+| Expression CARET Expression
+| Expression NEQUAL Expression
+| Expression EQUAL Expression
+| Expression LESSER Expression
+| Expression GREATER Expression
+| Expression LESSEQ Expression
+| Expression GREATEREQ Expression
+| Expression OR Expression
+| Expression XOR Expression
+| Expression AND Expression
+| Expression IMPLIES Expression
+| NOT Expression
 
 Range
 : LSQPAREN Term DOTDOT Term RSQPAREN
@@ -192,6 +193,15 @@ DirectCallExpression
 
 IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
+
+ConditionalExpression
+: IF Expression THEN Expression ELSE Expression
+
+UniversalQuantifierExpression
+: FORALL Variable IN Expression HOLDS Expression
+
+ExistentialQuantifierExpression
+: EXISTS Variable IN Expression WITH Expression
 
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
@@ -217,26 +227,26 @@ SkipRule
 : SKIP
 
 ConditionalRule
-: IF Term THEN Rule
-| IF Term THEN Rule ELSE Rule
+: IF Expression THEN Rule
+| IF Expression THEN Rule ELSE Rule
 
 CaseRule
-: CASE Term OF LCURPAREN CaseLabels RCURPAREN
+: CASE Expression OF LCURPAREN CaseLabels RCURPAREN
 
 CaseLabel
 : DEFAULT COLON Rule
 | UNDERLINE COLON Rule
-| Term COLON Rule
+| Expression COLON Rule
 
 CaseLabels
 : CaseLabel CaseLabels
 | CaseLabel
 
 LetRule
-: LET Variable EQUAL Term IN Rule
+: LET Variable EQUAL Expression IN Rule
 
 ForallRule
-: FORALL Variable IN Term DO Rule
+: FORALL Variable IN Expression DO Rule
 
 IterateRule
 : ITERATE Rule
@@ -250,7 +260,7 @@ SequenceRule
 | SEQ Rules ENDSEQ
 
 UpdateRule
-: DirectCallExpression UPDATE Term
+: DirectCallExpression UPDATE Expression
 
 CallRule
 : CALL DirectCallExpression

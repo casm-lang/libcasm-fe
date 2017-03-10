@@ -212,6 +212,9 @@ END       0 "end of file"
 %type <ListExpression::Ptr> List
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
+%type <ConditionalExpression::Ptr> ConditionalExpression
+%type <UniversalQuantifierExpression::Ptr> UniversalQuantifierExpression
+%type <ExistentialQuantifierExpression::Ptr> ExistentialQuantifierExpression
 
 // rules
 %type <Rule::Ptr> Rule
@@ -255,6 +258,7 @@ END       0 "end of file"
 
 %precedence UPDATE
 
+%left IMPLIES
 %left OR
 %left XOR
 %left AND
@@ -271,6 +275,8 @@ END       0 "end of file"
 
 %precedence LPAREN
 %precedence DIRECT_CALL_EXPR_NO_ARG
+
+%precedence HOLDS WITH
 
 %%
 
@@ -367,7 +373,7 @@ MaybeInitially
 
 
 MaybeDefined
-: DEFINED LCURPAREN Atom RCURPAREN
+: DEFINED LCURPAREN Expression RCURPAREN
   {
       $$ = $3;
   }
@@ -453,7 +459,7 @@ ProgramFunctionDefinition
 
 
 Initializer
-: Term
+: Expression
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto unknown = make< IdentifierNode >( @$, std::string() );
@@ -462,7 +468,7 @@ Initializer
 
       $$ = make< UpdateRule >( @$, function, $1 );
   }
-| Term ARROW Term
+| Expression ARROW Expression
   {
       auto arguments = make< Expressions >( @$ );
       arguments->add( $1 );
@@ -473,7 +479,7 @@ Initializer
 
       $$ = make< UpdateRule >( @$, function, $3 );
   }
-| Arguments ARROW Term
+| Arguments ARROW Expression
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto unknown = make< IdentifierNode >( @$, std::string() );
@@ -513,7 +519,7 @@ MaybeInitializers
 
 
 DerivedDefinition
-: DERIVED Identifier MaybeParameters ARROW Type EQUAL Term
+: DERIVED Identifier MaybeParameters ARROW Type EQUAL Expression
   {
       $$ = make< DerivedDefinition >( @$, $2, $3, $5, $7 );
   }
@@ -641,7 +647,7 @@ ComposedType
 
 
 FixedSizedType
-: Identifier LESSER Term GREATER
+: Identifier LESSER Expression GREATER
   {
       $$ = make< FixedSizedType >( @$, $1, $3 );
   }
@@ -649,7 +655,7 @@ FixedSizedType
 
 
 RangedType
-: Identifier LESSER Term DOTDOT Term GREATER
+: Identifier LESSER Expression DOTDOT Expression GREATER
   {
       $$ = make< RangedType >( @$, $1, $3, $5 );
   }
@@ -788,8 +794,6 @@ RuleReference
 ;
 
 
-
-
 Term
 : DirectCallExpression
   {
@@ -840,63 +844,67 @@ Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
   }
-| Term MINUS Term
+| Expression MINUS Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::SUB_INSTRUCTION );
   }
-| Term ASTERIX Term
+| Expression ASTERIX Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MUL_INSTRUCTION );
   }
-| Term SLASH Term
+| Expression SLASH Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
   }
-| Term PERCENT Term
+| Expression PERCENT Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
   }
-| Term CARET Term
+| Expression CARET Expression
   {
-      // TODO call caret builtin
+      // TODO call power builtin
   }
-| Term NEQUAL Term
+| Expression NEQUAL Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
   }
-| Term EQUAL Term
+| Expression EQUAL Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::EQU_INSTRUCTION );
   }
-| Term LESSER Term
+| Expression LESSER Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LTH_INSTRUCTION );
   }
-| Term GREATER Term
+| Expression GREATER Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GTH_INSTRUCTION );
   }
-| Term LESSEQ Term
+| Expression LESSEQ Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
   }
-| Term GREATEREQ Term
+| Expression GREATEREQ Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
   }
-| Term OR Term
+| Expression OR Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::OR_INSTRUCTION );
   }
-| Term XOR Term
+| Expression XOR Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::XOR_INSTRUCTION );
   }
-| Term AND Term
+| Expression AND Expression
   {
       $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
   }
-| NOT Term
+| Expression IMPLIES Expression
+  {
+      // TODO add implies instruction
+  }
+| NOT Expression
   {
       $$ = make< UnaryExpression >( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
   }
@@ -976,6 +984,30 @@ IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
   {
       $$ = make< IndirectCallExpression >( @$, $3, $5 );
+  }
+;
+
+
+ConditionalExpression
+: IF Expression THEN Expression ELSE Expression
+  {
+      $$ = make< ConditionalExpression >( @$, $2, $4, $6 );
+  }
+;
+
+
+UniversalQuantifierExpression
+: FORALL Variable IN Expression HOLDS Expression
+  {
+      $$ = make< UniversalQuantifierExpression >( @$, $2, $4, $6 );
+  }
+;
+
+
+ExistentialQuantifierExpression
+: EXISTS Variable IN Expression WITH Expression
+  {
+      $$ = make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
   }
 ;
 
@@ -1063,11 +1095,11 @@ SkipRule
 
 
 ConditionalRule
-: IF Term THEN Rule
+: IF Expression THEN Rule
   {
       $$ = make< ConditionalRule >( @$, $2, $4 );
   }
-| IF Term THEN Rule ELSE Rule
+| IF Expression THEN Rule ELSE Rule
   {
       $$ = make< ConditionalRule >( @$, $2, $4, $6 );
   }
@@ -1075,7 +1107,7 @@ ConditionalRule
 
 
 CaseRule
-: CASE Term OF LCURPAREN CaseLabels RCURPAREN
+: CASE Expression OF LCURPAREN CaseLabels RCURPAREN
   {
       $$ = make< CaseRule >( @$, $2, $5 );
   }
@@ -1093,7 +1125,7 @@ CaseLabel
       // default case
       $$ = CaseRule::Case( nullptr, $3 );
   }
-| Term COLON Rule
+| Expression COLON Rule
   {
       $$ = CaseRule::Case( $1, $3 );
   }
@@ -1114,7 +1146,7 @@ CaseLabels
 
 
 LetRule
-: LET Variable EQUAL Term IN Rule
+: LET Variable EQUAL Expression IN Rule
   {
       $$ = make< LetRule >( @$, $2, $4, $6 );
   }
@@ -1122,7 +1154,7 @@ LetRule
 
 
 ForallRule
-: FORALL Variable IN Term DO Rule
+: FORALL Variable IN Expression DO Rule
   {
       $$ = make< ForallRule >( @$, $2, $4, $6 );
   }
@@ -1162,7 +1194,7 @@ SequenceRule
 
 
 UpdateRule
-: DirectCallExpression UPDATE Term
+: DirectCallExpression UPDATE Expression
   {
       $$ = make< UpdateRule >( @$, $1, $3 );
   }
