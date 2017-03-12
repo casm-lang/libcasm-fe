@@ -45,3 +45,8 @@ Definitions::Ptr Specification::definitions( void ) const
 {
     return m_definitions;
 }
+
+void Specification::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}

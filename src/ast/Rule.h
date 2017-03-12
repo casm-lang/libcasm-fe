@@ -52,6 +52,8 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< SkipRule >;
 
             SkipRule( void );
+
+            void accept( Visitor& visitor ) override final;
         };
 
         class ConditionalRule : public Rule
@@ -67,6 +69,8 @@ namespace libcasm_fe
             Expression::Ptr condition( void ) const;
             Rule::Ptr thenRule( void ) const;
             Rule::Ptr elseRule( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_condition;
@@ -86,6 +90,8 @@ namespace libcasm_fe
             Expression::Ptr expression( void ) const;
             std::vector< Case > cases( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             Expression::Ptr m_expression;
             std::vector< Case > m_cases;
@@ -102,6 +108,8 @@ namespace libcasm_fe
             std::shared_ptr< VariableDefinition > variable( void ) const;
             Expression::Ptr expression( void ) const;
             Rule::Ptr rule( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             std::shared_ptr< VariableDefinition > m_variable;
@@ -121,6 +129,8 @@ namespace libcasm_fe
             Expression::Ptr expression( void ) const;
             Rule::Ptr rule( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             std::shared_ptr< VariableDefinition > m_variable;
             Expression::Ptr m_expression;
@@ -136,6 +146,8 @@ namespace libcasm_fe
 
             Rule::Ptr rule( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             Rule::Ptr m_rule;
         };
@@ -149,6 +161,8 @@ namespace libcasm_fe
 
             Rules::Ptr rules( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             Rules::Ptr m_rules;
         };
@@ -161,6 +175,8 @@ namespace libcasm_fe
             SequenceRule( const Rules::Ptr& rules );
 
             Rules::Ptr rules( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             Rules::Ptr m_rules;
@@ -176,6 +192,8 @@ namespace libcasm_fe
 
             DirectCallExpression::Ptr function( void ) const;
             Expression::Ptr expression( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             DirectCallExpression::Ptr m_function;
@@ -194,6 +212,8 @@ namespace libcasm_fe
             CallExpression::Ptr call( void ) const;
             std::set< CallExpression::TargetType > allowedCallTargetTypes(
                 void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             CallExpression::Ptr m_call;

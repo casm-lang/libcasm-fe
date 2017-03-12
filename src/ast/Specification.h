@@ -45,6 +45,8 @@ namespace libcasm_fe
             IdentifierNode::Ptr name( void ) const;
             Definitions::Ptr definitions( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             IdentifierNode::Ptr m_name;
             Definitions::Ptr m_definitions;

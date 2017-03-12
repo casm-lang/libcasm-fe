@@ -62,6 +62,8 @@ namespace libcasm_fe
 
             libcasm_ir::Value value( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             libcasm_ir::Value m_value;
         };
@@ -79,6 +81,8 @@ namespace libcasm_fe
                 const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference );
             libcasm_ir::RuleReferenceConstant::Ptr ruleReference( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             IdentifierNode::Ptr m_identifier;
             libcasm_ir::RuleReferenceConstant::Ptr m_ruleReference;
@@ -90,6 +94,8 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< ZeroAtom >;
 
             ZeroAtom( void );
+
+            void accept( Visitor& visitor ) override final;
         };
 
         class UndefAtom : public Expression
@@ -98,6 +104,8 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< UndefAtom >;
 
             UndefAtom( void );
+
+            void accept( Visitor& visitor ) override final;
         };
 
         class CallExpression : public Expression
@@ -139,6 +147,8 @@ namespace libcasm_fe
 
             Expressions::Ptr arguments( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             IdentifierNode::Ptr m_identifier;
 
@@ -156,6 +166,8 @@ namespace libcasm_fe
             Expression::Ptr expression( void ) const;
 
             Expressions::Ptr arguments( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_expression;
@@ -175,6 +187,8 @@ namespace libcasm_fe
 
             Expression::Ptr expression( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             libcasm_ir::Value::ID m_op;
 
@@ -193,6 +207,8 @@ namespace libcasm_fe
             Expression::Ptr left( void ) const;
             Expression::Ptr right( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             libcasm_ir::Value::ID m_op;
             Expression::Ptr m_left;
@@ -210,6 +226,8 @@ namespace libcasm_fe
             Expression::Ptr left( void ) const;
             Expression::Ptr right( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             Expression::Ptr m_left;
             Expression::Ptr m_right;
@@ -223,6 +241,8 @@ namespace libcasm_fe
             ListExpression( const Expressions::Ptr& expressions );
 
             Expressions::Ptr expressions( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             Expressions::Ptr m_expressions;
@@ -240,6 +260,8 @@ namespace libcasm_fe
             Expression::Ptr condition( void ) const;
             Expression::Ptr thenExpression( void ) const;
             Expression::Ptr elseExpression( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_condition;
@@ -277,6 +299,8 @@ namespace libcasm_fe
                 const std::shared_ptr< VariableDefinition >& predicateVariable,
                 const Expression::Ptr& universe,
                 const Expression::Ptr& proposition );
+
+            void accept( Visitor& visitor ) override final;
         };
 
         class ExistentialQuantifierExpression : public QuantifierExpression
@@ -288,6 +312,8 @@ namespace libcasm_fe
                 const std::shared_ptr< VariableDefinition >& predicateVariable,
                 const Expression::Ptr& universe,
                 const Expression::Ptr& proposition );
+
+            void accept( Visitor& visitor ) override final;
         };
     }
 }

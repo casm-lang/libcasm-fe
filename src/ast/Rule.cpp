@@ -35,6 +35,11 @@ SkipRule::SkipRule( void )
 {
 }
 
+void SkipRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 ConditionalRule::ConditionalRule( const Expression::Ptr& condition,
     const Rule::Ptr& thenRule, const Rule::Ptr& elseRule )
 : Rule( Node::ID::CONDITIONAL_RULE )
@@ -65,6 +70,11 @@ Rule::Ptr ConditionalRule::elseRule( void ) const
     return m_elseRule;
 }
 
+void ConditionalRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 CaseRule::CaseRule(
     const Expression::Ptr& expression, const std::vector< Case >& cases )
 : Rule( Node::ID::CASE_RULE )
@@ -81,6 +91,11 @@ Expression::Ptr CaseRule::expression( void ) const
 std::vector< CaseRule::Case > CaseRule::cases( void ) const
 {
     return m_cases;
+}
+
+void CaseRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
 }
 
 LetRule::LetRule( const VariableDefinition::Ptr& variable,
@@ -107,6 +122,11 @@ Rule::Ptr LetRule::rule( void ) const
     return m_rule;
 }
 
+void LetRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
     const Expression::Ptr& expression, const Rule::Ptr& rule )
 : Rule( Node::ID::FORALL_RULE )
@@ -131,6 +151,11 @@ Rule::Ptr ForallRule::rule( void ) const
     return m_rule;
 }
 
+void ForallRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 IterateRule::IterateRule( const Rule::Ptr& rule )
 : Rule( Node::ID::ITERATE_RULE )
 , m_rule( rule )
@@ -140,6 +165,11 @@ IterateRule::IterateRule( const Rule::Ptr& rule )
 Rule::Ptr IterateRule::rule( void ) const
 {
     return m_rule;
+}
+
+void IterateRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
 }
 
 BlockRule::BlockRule( const Rules::Ptr& rules )
@@ -153,6 +183,11 @@ Rules::Ptr BlockRule::rules( void ) const
     return m_rules;
 }
 
+void BlockRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 SequenceRule::SequenceRule( const Rules::Ptr& rules )
 : Rule( Node::ID::SEQUENCE_RULE )
 , m_rules( rules )
@@ -162,6 +197,11 @@ SequenceRule::SequenceRule( const Rules::Ptr& rules )
 Rules::Ptr SequenceRule::rules( void ) const
 {
     return m_rules;
+}
+
+void SequenceRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
 }
 
 UpdateRule::UpdateRule( const DirectCallExpression::Ptr& function,
@@ -182,6 +222,11 @@ Expression::Ptr UpdateRule::expression( void ) const
     return m_expression;
 }
 
+void UpdateRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 CallRule::CallRule( const CallExpression::Ptr& call,
     const std::set< CallExpression::TargetType >& allowedCallTargetTypes )
 : Rule( Node::ID::CALL_RULE )
@@ -199,4 +244,9 @@ std::set< CallExpression::TargetType > CallRule::allowedCallTargetTypes(
     void ) const
 {
     return m_allowedCallTargetTypes;
+}
+
+void CallRule::accept( Visitor& visitor )
+{
+    visitor.visit( this );
 }

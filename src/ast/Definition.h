@@ -67,6 +67,8 @@ namespace libcasm_fe
 
             Type::Ptr variableType( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             Type::Ptr m_variableType;
         };
@@ -111,6 +113,8 @@ namespace libcasm_fe
 
             Expression::Ptr defaultValue( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             Classification m_classification;
 
@@ -141,6 +145,8 @@ namespace libcasm_fe
 
             Expression::Ptr expression( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
 
@@ -165,6 +171,8 @@ namespace libcasm_fe
 
             Rule::Ptr rule( void ) const;
 
+            void accept( Visitor& visitor ) override final;
+
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
 
@@ -182,6 +190,8 @@ namespace libcasm_fe
                 const NodeList< IdentifierNode >::Ptr& enumerators );
 
             NodeList< IdentifierNode >::Ptr enumerators( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             NodeList< IdentifierNode >::Ptr m_enumerators;

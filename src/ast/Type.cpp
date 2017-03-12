@@ -44,6 +44,11 @@ BasicType::BasicType( const IdentifierNode::Ptr& identifier )
 {
 }
 
+void BasicType::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 ComposedType::ComposedType(
     const IdentifierNode::Ptr& identifier, const Types::Ptr& subTypes )
 : Type( Node::ID::COMPOSED_TYPE, identifier )
@@ -56,6 +61,11 @@ Types::Ptr ComposedType::subTypes( void ) const
     return m_subTypes;
 }
 
+void ComposedType::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 FixedSizedType::FixedSizedType(
     const IdentifierNode::Ptr& identifier, const Expression::Ptr& size )
 : Type( Node::ID::FIXED_SIZED_TYPE, identifier )
@@ -66,6 +76,11 @@ FixedSizedType::FixedSizedType(
 Expression::Ptr FixedSizedType::size( void ) const
 {
     return m_size;
+}
+
+void FixedSizedType::accept( Visitor& visitor )
+{
+    visitor.visit( this );
 }
 
 RangedType::RangedType( const IdentifierNode::Ptr& identifier,
@@ -84,4 +99,9 @@ Expression::Ptr RangedType::lowerBound( void ) const
 Expression::Ptr RangedType::upperBound( void ) const
 {
     return m_upperBound;
+}
+
+void RangedType::accept( Visitor& visitor )
+{
+    visitor.visit( this );
 }

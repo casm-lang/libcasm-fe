@@ -53,6 +53,8 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< BasicType >;
 
             BasicType( const IdentifierNode::Ptr& identifier );
+
+            void accept( Visitor& visitor ) override final;
         };
 
         class ComposedType : public Type
@@ -64,6 +66,8 @@ namespace libcasm_fe
                 const Types::Ptr& subTypes );
 
             Types::Ptr subTypes( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             Types::Ptr m_subTypes;
@@ -78,6 +82,8 @@ namespace libcasm_fe
                 const Expression::Ptr& size );
 
             Expression::Ptr size( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_size;
@@ -95,6 +101,8 @@ namespace libcasm_fe
             Expression::Ptr lowerBound( void ) const;
 
             Expression::Ptr upperBound( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_lowerBound;

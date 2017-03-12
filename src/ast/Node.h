@@ -37,6 +37,8 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class Visitor;
+
         class Node : public CasmFE
         {
           public:
@@ -104,6 +106,8 @@ namespace libcasm_fe
 
             yy::location location( void ) const;
 
+            virtual void accept( Visitor& visitor ) = 0;
+
           private:
             ID m_id;
 
@@ -120,6 +124,14 @@ namespace libcasm_fe
             : Node( Node::ID::NODE_LIST )
             {
             }
+
+            void accept( Visitor& visitor ) override final
+            {
+                for (auto& node : *this)
+                {
+                    node.accept( visitor );
+                }
+            }
         };
 
         class IdentifierNode : public Node
@@ -130,6 +142,8 @@ namespace libcasm_fe
             IdentifierNode( const std::string& identifier );
 
             std::string identifier( void ) const;
+
+            void accept( Visitor& visitor ) override final;
 
           private:
             std::string m_identifier;

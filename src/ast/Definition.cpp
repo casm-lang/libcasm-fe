@@ -63,6 +63,11 @@ Type::Ptr VariableDefinition::variableType( void ) const
     return m_variableType;
 }
 
+void VariableDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 FunctionDefinition::FunctionDefinition( const IdentifierNode::Ptr& identifier,
     const Types::Ptr& argumentTypes,
     const Type::Ptr& returnType )
@@ -129,6 +134,11 @@ Expression::Ptr FunctionDefinition::defaultValue( void ) const
     return m_defaultValue;
 }
 
+void FunctionDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 DerivedDefinition::DerivedDefinition( const IdentifierNode::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
@@ -153,6 +163,11 @@ Type::Ptr DerivedDefinition::returnType( void ) const
 Expression::Ptr DerivedDefinition::expression( void ) const
 {
     return m_expression;
+}
+
+void DerivedDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( this );
 }
 
 RuleDefinition::RuleDefinition( const IdentifierNode::Ptr& identifier,
@@ -181,6 +196,11 @@ Rule::Ptr RuleDefinition::rule( void ) const
     return m_rule;
 }
 
+void RuleDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
+
 EnumerationDefinition::EnumerationDefinition(
     const IdentifierNode::Ptr& identifier,
     const NodeList< IdentifierNode >::Ptr& enumerators )
@@ -192,4 +212,9 @@ EnumerationDefinition::EnumerationDefinition(
 NodeList< IdentifierNode >::Ptr EnumerationDefinition::enumerators( void ) const
 {
     return m_enumerators;
+}
+
+void EnumerationDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( this );
 }

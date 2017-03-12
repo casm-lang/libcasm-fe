@@ -30,35 +30,42 @@
 
 namespace libcasm_fe
 {
-    class NodeClass; // TODO
-    // TODO
-
-    class Context : public CasmFE
+    namespace Ast
     {
-    };
+        class Specification;
 
-    class Visitor : public CasmFE
-    {
-      public:
-        virtual ~Visitor( void ) = default;
+        class Visitor : public CasmFE
+        {
+        public:
+            virtual ~Visitor( void ) = default;
 
-        virtual void dispatch( Stage stage, Value& value, Context& cxt ) final;
-
-#define LIB_CASMFE_VISITOR_INTERFACE_( PREFIX, POSTFIX )                       \
-    PREFIX void visit(                                                         \
-        libcasm_fe::NodeClass& value, libcasm_fe::Context& cxt ) POSTFIX;      \
-    PREFIX void visit_epilog(                                                  \
-        libcasm_fe::NodeClass& value, libcasm_fe::Context& cxt ) POSTFIX;      \
-                                                                               \
-    PREFIX void visit_prolog(                                                  \
-        libcasm_fe::NodeClass& value, libcasm_fe::Context& cxt ) POSTFIX;      \
-    PREFIX void visit_epilog(                                                  \
-        libcasm_fe::NodeClass& value, libcasm_fe::Context& cxt ) POSTFIX
-
-#define LIB_CASMFE_VISITOR_INTERFACE LIB_CASMFE_VISITOR_INTERFACE_(, override )
-
-        LIB_CASMFE_VISITOR_INTERFACE_( virtual, = 0 );
-    };
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+            virtual void visit( Specification& node);
+        };
+    }
 }
 
 #endif // _LIB_CASMFE_VISITOR_H_

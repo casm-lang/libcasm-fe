@@ -59,3 +59,8 @@ std::string IdentifierNode::identifier( void ) const
 {
     return m_identifier;
 }
+
+void IdentifierNode::accept( Visitor& visitor )
+{
+    visitor.visit( this );
+}
