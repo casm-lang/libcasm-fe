@@ -326,9 +326,9 @@ void AstToCasmIRPass::visit_derived_def( DerivedDefNode* node, bool expr )
 
     assert( node->sym->type == Symbol::SymbolType::DERIVED );
 
-    auto ir_expr = lookup< libcasm_ir::Instruction >( node->sym->derived );
-
     auto ir_stmt = libstdhl::make< libcasm_ir::TrivialStatement >();
+
+    auto ir_expr = lookup< libcasm_ir::Instruction >( node->sym->derived );
     ir_stmt->add( ir_expr );
 
     assert( libcasm_ir::isa< libcasm_ir::Derived >( current_scope.back() )
