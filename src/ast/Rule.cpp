@@ -37,7 +37,7 @@ SkipRule::SkipRule( void )
 
 void SkipRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 ConditionalRule::ConditionalRule( const Expression::Ptr& condition,
@@ -72,7 +72,7 @@ Rule::Ptr ConditionalRule::elseRule( void ) const
 
 void ConditionalRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 CaseRule::CaseRule(
@@ -95,7 +95,7 @@ std::vector< CaseRule::Case > CaseRule::cases( void ) const
 
 void CaseRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 LetRule::LetRule( const VariableDefinition::Ptr& variable,
@@ -124,7 +124,7 @@ Rule::Ptr LetRule::rule( void ) const
 
 void LetRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
@@ -153,7 +153,7 @@ Rule::Ptr ForallRule::rule( void ) const
 
 void ForallRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 IterateRule::IterateRule( const Rule::Ptr& rule )
@@ -169,7 +169,7 @@ Rule::Ptr IterateRule::rule( void ) const
 
 void IterateRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 BlockRule::BlockRule( const Rules::Ptr& rules )
@@ -185,7 +185,7 @@ Rules::Ptr BlockRule::rules( void ) const
 
 void BlockRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 SequenceRule::SequenceRule( const Rules::Ptr& rules )
@@ -201,7 +201,7 @@ Rules::Ptr SequenceRule::rules( void ) const
 
 void SequenceRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 UpdateRule::UpdateRule( const DirectCallExpression::Ptr& function,
@@ -224,7 +224,7 @@ Expression::Ptr UpdateRule::expression( void ) const
 
 void UpdateRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 CallRule::CallRule( const CallExpression::Ptr& call,
@@ -248,5 +248,5 @@ std::set< CallExpression::TargetType > CallRule::allowedCallTargetTypes(
 
 void CallRule::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }

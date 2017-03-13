@@ -26,44 +26,96 @@
 #ifndef _LIB_CASMFE_VISITOR_H_
 #define _LIB_CASMFE_VISITOR_H_
 
-#include "CasmFE.h"
+#include "../CasmFE.h"
 
 namespace libcasm_fe
 {
     namespace Ast
     {
+        class IdentifierNode;
+
         class Specification;
+
+        class VariableDefinition;
+        class FunctionDefinition;
+        class DerivedDefinition;
+        class RuleDefinition;
+        class EnumerationDefinition;
+
+        class ValueAtom;
+        class RuleReferenceAtom;
+        class ZeroAtom;
+        class UndefAtom;
+        class DirectCallExpression;
+        class IndirectCallExpression;
+        class UnaryExpression;
+        class BinaryExpression;
+        class RangeExpression;
+        class ListExpression;
+        class ConditionalExpression;
+        class UniversalQuantifierExpression;
+        class ExistentialQuantifierExpression;
+
+        class SkipRule;
+        class ConditionalRule;
+        class CaseRule;
+        class LetRule;
+        class ForallRule;
+        class IterateRule;
+        class BlockRule;
+        class SequenceRule;
+        class UpdateRule;
+        class CallRule;
+
+        class BasicType;
+        class ComposedType;
+        class FixedSizedType;
+        class RangedType;
 
         class Visitor : public CasmFE
         {
-        public:
+          public:
             virtual ~Visitor( void ) = default;
 
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
-            virtual void visit( Specification& node);
+            virtual void visit( IdentifierNode& node ) = 0;
+
+            virtual void visit( Specification& node ) = 0;
+
+            virtual void visit( VariableDefinition& node ) = 0;
+            virtual void visit( FunctionDefinition& node ) = 0;
+            virtual void visit( DerivedDefinition& node ) = 0;
+            virtual void visit( RuleDefinition& node ) = 0;
+            virtual void visit( EnumerationDefinition& node ) = 0;
+
+            virtual void visit( ValueAtom& node ) = 0;
+            virtual void visit( RuleReferenceAtom& node ) = 0;
+            virtual void visit( ZeroAtom& node ) = 0;
+            virtual void visit( UndefAtom& node ) = 0;
+            virtual void visit( DirectCallExpression& node ) = 0;
+            virtual void visit( IndirectCallExpression& node ) = 0;
+            virtual void visit( UnaryExpression& node ) = 0;
+            virtual void visit( BinaryExpression& node ) = 0;
+            virtual void visit( RangeExpression& node ) = 0;
+            virtual void visit( ListExpression& node ) = 0;
+            virtual void visit( ConditionalExpression& node ) = 0;
+            virtual void visit( UniversalQuantifierExpression& node ) = 0;
+            virtual void visit( ExistentialQuantifierExpression& node ) = 0;
+
+            virtual void visit( SkipRule& node ) = 0;
+            virtual void visit( ConditionalRule& node ) = 0;
+            virtual void visit( CaseRule& node ) = 0;
+            virtual void visit( LetRule& node ) = 0;
+            virtual void visit( ForallRule& node ) = 0;
+            virtual void visit( IterateRule& node ) = 0;
+            virtual void visit( BlockRule& node ) = 0;
+            virtual void visit( SequenceRule& node ) = 0;
+            virtual void visit( UpdateRule& node ) = 0;
+            virtual void visit( CallRule& node ) = 0;
+
+            virtual void visit( BasicType& node ) = 0;
+            virtual void visit( ComposedType& node ) = 0;
+            virtual void visit( FixedSizedType& node ) = 0;
+            virtual void visit( RangedType& node ) = 0;
         };
     }
 }

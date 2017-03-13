@@ -65,7 +65,7 @@ Type::Ptr VariableDefinition::variableType( void ) const
 
 void VariableDefinition::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 FunctionDefinition::FunctionDefinition( const IdentifierNode::Ptr& identifier,
@@ -136,7 +136,7 @@ Expression::Ptr FunctionDefinition::defaultValue( void ) const
 
 void FunctionDefinition::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 DerivedDefinition::DerivedDefinition( const IdentifierNode::Ptr& identifier,
@@ -167,7 +167,7 @@ Expression::Ptr DerivedDefinition::expression( void ) const
 
 void DerivedDefinition::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 RuleDefinition::RuleDefinition( const IdentifierNode::Ptr& identifier,
@@ -198,7 +198,7 @@ Rule::Ptr RuleDefinition::rule( void ) const
 
 void RuleDefinition::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 EnumerationDefinition::EnumerationDefinition(
@@ -216,5 +216,5 @@ NodeList< IdentifierNode >::Ptr EnumerationDefinition::enumerators( void ) const
 
 void EnumerationDefinition::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }

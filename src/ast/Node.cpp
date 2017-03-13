@@ -62,5 +62,5 @@ std::string IdentifierNode::identifier( void ) const
 
 void IdentifierNode::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }

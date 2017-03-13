@@ -51,6 +51,7 @@ set( CXX_SRC_FILES
   src/ast/Rule.cpp
   src/ast/Specification.cpp
   src/ast/Type.cpp
+  src/ast/RecursiveVisitor.cpp
 )
 
 file( GLOB_RECURSE CXX_UTS_FILES "uts/*.cpp" )

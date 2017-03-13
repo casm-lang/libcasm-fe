@@ -48,5 +48,5 @@ Definitions::Ptr Specification::definitions( void ) const
 
 void Specification::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }

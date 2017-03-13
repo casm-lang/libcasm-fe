@@ -26,6 +26,8 @@
 #ifndef _LIB_CASMFE_NODE_H_
 #define _LIB_CASMFE_NODE_H_
 
+#include "Visitor.h"
+
 #include "../CasmFE.h"
 
 #include "../various/location.hh"
@@ -37,8 +39,6 @@ namespace libcasm_fe
 {
     namespace Ast
     {
-        class Visitor;
-
         class Node : public CasmFE
         {
           public:
@@ -127,9 +127,9 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final
             {
-                for (auto& node : *this)
+                for( auto& node : *this )
                 {
-                    node.accept( visitor );
+                    node->accept( visitor );
                 }
             }
         };

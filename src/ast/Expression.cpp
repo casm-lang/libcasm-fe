@@ -60,7 +60,7 @@ libcasm_ir::Value ValueAtom::value( void ) const
 
 void ValueAtom::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 RuleReferenceAtom::RuleReferenceAtom( const IdentifierNode::Ptr& identifier )
@@ -90,7 +90,7 @@ libcasm_ir::RuleReferenceConstant::Ptr RuleReferenceAtom::ruleReference(
 
 void RuleReferenceAtom::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 ZeroAtom::ZeroAtom( void )
@@ -100,7 +100,7 @@ ZeroAtom::ZeroAtom( void )
 
 void ZeroAtom::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 UndefAtom::UndefAtom( void )
@@ -110,7 +110,7 @@ UndefAtom::UndefAtom( void )
 
 void UndefAtom::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 void CallExpression::setTargetType( CallExpression::TargetType targetType )
@@ -149,7 +149,7 @@ Expressions::Ptr DirectCallExpression::arguments( void ) const
 
 void DirectCallExpression::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 IndirectCallExpression::IndirectCallExpression(
@@ -172,7 +172,7 @@ Expressions::Ptr IndirectCallExpression::arguments( void ) const
 
 void IndirectCallExpression::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 UnaryExpression::UnaryExpression(
@@ -195,7 +195,7 @@ Expression::Ptr UnaryExpression::expression( void ) const
 
 void UnaryExpression::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 BinaryExpression::BinaryExpression( const Expression::Ptr& left,
@@ -224,7 +224,7 @@ Expression::Ptr BinaryExpression::right( void ) const
 
 void BinaryExpression::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 RangeExpression::RangeExpression(
@@ -247,7 +247,7 @@ Expression::Ptr RangeExpression::right( void ) const
 
 void RangeExpression::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 ListExpression::ListExpression( const Expressions::Ptr& expressions )
@@ -263,7 +263,7 @@ Expressions::Ptr ListExpression::expressions( void ) const
 
 void ListExpression::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 ConditionalExpression::ConditionalExpression( const Expression::Ptr& condition,
@@ -293,7 +293,7 @@ Expression::Ptr ConditionalExpression::elseExpression( void ) const
 
 void ConditionalExpression::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 QuantifierExpression::QuantifierExpression( Node::ID id,
@@ -333,7 +333,7 @@ UniversalQuantifierExpression::UniversalQuantifierExpression(
 
 void UniversalQuantifierExpression::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
 
 ExistentialQuantifierExpression::ExistentialQuantifierExpression(
@@ -347,5 +347,5 @@ ExistentialQuantifierExpression::ExistentialQuantifierExpression(
 
 void ExistentialQuantifierExpression::accept( Visitor& visitor )
 {
-    visitor.visit( this );
+    visitor.visit( *this );
 }
