@@ -25,9 +25,10 @@
 
 #include "AstDumpPass.h"
 
-#include "TypeCheckPass.h"
+#include "../ast/Specification.h"
 
 using namespace libcasm_fe;
+using namespace Ast;
 
 char AstDumpPass::id = 0;
 
@@ -37,422 +38,235 @@ static libpass::PassRegistration< AstDumpPass > PASS( "AST Dumping Pass",
 
 bool AstDumpPass::run( libpass::PassResult& pr )
 {
-    auto node = pr.result< TypeCheckPass >();
-
-    AstWalker< AstDumpPass, bool > dump_walker( *this );
-    dump_walker.walk_specification( node->root() );
-
-    // std::cout << this->get_dump() << std::endl;
-
     std::ofstream dotfile( "./obj/out.dot" );
-    dotfile << this->get_dump() << "\n";
+    dotfile << "digraph \"main\" {\n";
+
+    AstDumpVisitor visitor{dotfile};
+    // specification.accept( visitor );
+
+    dotfile << "}\n";
     dotfile.close();
 
     return true;
 }
 
-std::string AstDumpPass::get_dump()
-{
-    return std::string( "digraph \"main\" {\n" ) + dump_stream_.str()
-           + std::string( "}" );
-}
-
-void AstDumpPass::dump_node( uint64_t key, const std::string& name )
-{
-    dump_stream_ << "    " << key << " [label=\"" << name << "\"];"
-                 << std::endl;
-}
-
-void AstDumpPass::dump_node( AstNode* n, const std::string& name )
-{
-    dump_node( (uint64_t)n, name );
-}
-
-void AstDumpPass::dump_link( uint64_t from, uint64_t to )
-{
-    dump_stream_ << "    " << from << " -> " << to << ";" << std::endl;
-}
-
-void AstDumpPass::dump_link( AstNode* from, AstNode* to )
-{
-    dump_link( (uint64_t)from, (uint64_t)to );
-}
-
-void AstDumpPass::dump_arguments(
-    AstNode* from, std::vector< ExpressionBase* >* arguments )
-{
-    if( arguments )
-    {
-        for( auto arg : *arguments )
-        {
-            dump_link( from, arg );
-        }
-    }
-}
-
-void AstDumpPass::visit_root( Ast* node )
-{
-    dump_node( node, "CASM" );
-    dump_link( node, node->getSpecification() );
-    dump_link( node, node->getElements() );
-}
-
-void AstDumpPass::visit_specification( SpecificationNode* node )
-{
-    dump_node( node, "Specification\\n'" + node->identifier + "'" );
-}
-
-void AstDumpPass::visit_body_elements_pre( AstListNode* body_elements )
-{
-    dump_node( body_elements, "BodyElements" );
-}
-
-void AstDumpPass::visit_body_elements_post( AstListNode* body_elements )
-{
-    for( auto s : body_elements->nodes )
-    {
-        dump_link( body_elements, s );
-    }
-}
-
-void AstDumpPass::visit_function_def_pre( FunctionDefNode* def, bool )
-{
-    dump_node( def, "Function Definition: '" + def->sym->name + "'\\n"
-                        + def->sym->to_str() );
-    dump_link( def, def->defaultValue() );
-}
-
-void AstDumpPass::visit_function_def_post( FunctionDefNode* def )
-{
-    for( auto initializer : def->initializers() )
-    {
-        dump_link( def, initializer );
-    }
-}
-
-void AstDumpPass::visit_derived_def_pre( DerivedDefNode* def )
-{
-    dump_node( def,
-        "Derived Definition: " + def->sym->name + " " + def->sym->to_str() );
-}
-
-void AstDumpPass::visit_derived_def( DerivedDefNode* def, bool )
-{
-    dump_link( def, def->sym->derived );
-}
-
-bool AstDumpPass::visit_derived_function_atom( FunctionAtom* atom, bool )
-{
-    dump_node( atom, "Derived: '" + atom->name + "'" );
-    dump_arguments( atom, atom->arguments );
-    return true;
-}
-
-void AstDumpPass::visit_init( InitNode* init )
-{
-    dump_node( init, "Init" );
-    dump_link( init, init->progamDef );
-}
-
-void AstDumpPass::visit_rule_post( RuleNode* rule )
-{
-    dump_node( rule, "Rule: '" + rule->name + "'" );
-}
-
-void AstDumpPass::visit_rule( RuleNode* rule )
-{
-    dump_link( rule, rule->child_ );
-}
-
-void AstDumpPass::visit_statements( AstListNode* stmts )
-{
-    dump_node( stmts, "Statements" );
-
-    for( auto s : stmts->nodes )
-    {
-        dump_link( stmts, s );
-    }
-}
-
-void AstDumpPass::visit_statement( AstNode* stmt )
-{
-    dump_node( stmt, "Statement" );
-    // dump_link((uint64_t) rule, (uint64_t) rule->child_);
-}
-
-void AstDumpPass::visit_ifthenelse( IfThenElseNode* node, bool )
-{
-    dump_node( node, "IfThenElse" );
-    dump_link( node, node->condition_ );
-    dump_link( node, node->then_ );
-    if( node->else_ )
-    {
-        dump_link( node, node->else_ );
-    }
-}
-
-void AstDumpPass::visit_assert( UnaryNode* assert, bool )
-{
-    dump_node( assert, "Assert" );
-    dump_link( assert, assert->child_ );
-}
-
-void AstDumpPass::visit_assure( UnaryNode* assure, bool )
-{
-    dump_node( assure, "Assure" );
-    dump_link( assure, assure->child_ );
-}
-
-void AstDumpPass::visit_seqblock_pre( UnaryNode* seqblock )
-{
-    dump_node( seqblock, "Seqblock" );
-}
-
-void AstDumpPass::visit_seqblock_post( UnaryNode* seqblock )
-{
-    dump_link( seqblock, seqblock->child_ );
-}
-
-void AstDumpPass::visit_parblock_pre( UnaryNode* parblock )
-{
-    dump_node( parblock, "Parblock" );
-}
-
-void AstDumpPass::visit_parblock_post( UnaryNode* parblock )
-{
-    dump_link( parblock, parblock->child_ );
-}
-
-void AstDumpPass::visit_update(
-    UpdateNode* update, std::vector< bool >& args, bool )
-{
-    dump_node( update, "Update" );
-    visit_function_atom( update->func, args );
-    dump_link( update, update->func );
-    dump_link( update, update->expr_ );
-}
-
-void AstDumpPass::visit_call_pre( CallNode* call )
-{
-    dump_node( call, "Direct Call: '" + call->rule_name + "'" );
-    dump_arguments( call, call->arguments );
-}
-
-void AstDumpPass::visit_call_pre( CallNode* call, bool )
-{
-    dump_node( call, "Indirect Call" );
-    dump_link( call, call->ruleref );
-    dump_arguments( call, call->arguments );
-}
-
-void AstDumpPass::visit_case( CaseNode* node, bool, const std::vector< bool >& )
-{
-    dump_node( node, "Case" );
-    dump_link( node, node->expr );
-
-    for( const auto& a : node->case_list )
-    {
-        dump_link( node, a.first );
-        dump_link( a.first, a.second );
-    }
-}
-
-void AstDumpPass::visit_forall_pre( ForallNode* node )
-{
-    dump_node( node, "Forall" );
-}
-
-void AstDumpPass::visit_forall_post( ForallNode* node )
-{
-    dump_link( node, node->in_expr );
-    dump_link( node, node->statement );
-}
-
-void AstDumpPass::visit_iterate( UnaryNode* node )
-{
-    dump_node( node, "Iterate" );
-    dump_link( node, node->child_ );
-}
-
-void AstDumpPass::visit_print( PrintNode* node, bool )
-{
-    dump_node( node, "Print" );
-    dump_link( node, node->getAtom() );
-}
-
-void AstDumpPass::visit_let( LetNode* node, bool )
-{
-    dump_node( node, "Let " + node->identifier );
-}
-
-void AstDumpPass::visit_let_post( LetNode* node )
-{
-    dump_link( node, node->expr );
-    dump_link( node, node->stmt );
-}
-
-void AstDumpPass::visit_pop( PopNode* node, bool )
-{
-    dump_node( node, "Pop" );
-    dump_link( node, node->to );
-    dump_link( node, node->from );
-}
-
-void AstDumpPass::visit_push( PushNode* node, bool, bool )
-{
-    dump_node( node, "Push" );
-    dump_link( node, node->expr );
-    dump_link( node, node->to );
-}
-
-bool AstDumpPass::visit_expression( BinaryExpression* expr, bool, bool )
-{
-    dump_node( expr, "Expression: " + operator_to_str( expr->op ) );
-    dump_link( expr, expr->left_ );
-    dump_link( expr, expr->right_ );
-    return true;
-}
-
-bool AstDumpPass::visit_expression_single( UnaryExpression* expr, bool )
-{
-    dump_node( expr, "Expression: " + operator_to_str( expr->op ) );
-    dump_link( expr, expr->expr_ );
-    return true;
-}
-
-bool AstDumpPass::visit_zero_atom( ZeroAtom* atom )
-{
-    dump_node( atom, "ZeroAtom: 0" );
-    return true;
-}
-
-bool AstDumpPass::visit_int_atom( IntegerAtom* atom )
-{
-    dump_node( atom, "Integer: " + std::to_string( atom->val_ ) );
-    return true;
-}
-
-bool AstDumpPass::visit_bit_atom( IntegerAtom* atom )
-{
-    dump_node( atom, "Bit(" + std::to_string( atom->type_.bitsize ) + "): "
-                         + std::to_string( atom->val_ ) );
-
-    return true;
-}
-
-bool AstDumpPass::visit_floating_atom( FloatingAtom* atom )
-{
-    dump_node( atom, "Floating: " + std::to_string( atom->val_ ) );
-    return true;
-}
-
-bool AstDumpPass::visit_undef_atom( UndefAtom* atom )
-{
-    dump_node( atom, "'undef'" );
-    return true;
-}
-
-bool AstDumpPass::visit_function_atom(
-    FunctionAtom* atom, std::vector< bool >& )
-{
-    dump_node( atom, "Function: '" + atom->name + "'" );
-    dump_arguments( atom, atom->arguments );
-    return true;
-}
-
-bool AstDumpPass::visit_builtin_atom( BuiltinAtom* atom, std::vector< bool >& )
-{
-    dump_node( atom, "Builtin: '" + atom->to_str() + "'" );
-    dump_arguments( atom, atom->arguments );
-    return true;
-}
-
-bool AstDumpPass::visit_self_atom( SelfAtom* atom )
-{
-    dump_node( atom, "Agent: 'self'" );
-    return true;
-}
-
-bool AstDumpPass::visit_rule_atom( RuleAtom* atom )
-{
-    dump_node( atom, "RuleRef: '@" + atom->name + "'" );
-    return true;
-}
-
-bool AstDumpPass::visit_boolean_atom( BooleanAtom* atom )
-{
-    dump_node(
-        atom, "Boolean: " + std::string( atom->value ? "true" : "false" ) );
-    return true;
-}
-
-bool AstDumpPass::visit_string_atom( StringAtom* atom )
-{
-    dump_node( atom, "String: \\\"" + atom->string + "\\\"" );
-    return true;
-}
-
-bool AstDumpPass::visit_list_atom( ListAtom* atom, const std::vector< bool >& )
-{
-    dump_node( atom, "List: " );
-
-    for( auto a : *( atom->expr_list ) )
-    {
-        dump_link( atom, a );
-    }
-
-    return true;
-}
-
-bool AstDumpPass::visit_number_range_atom( NumberRangeAtom* atom, bool, bool )
-{
-    dump_node( atom, "NumberRange" );
-    dump_link( atom, atom->left );
-    dump_link( atom, atom->right );
-    return true;
-}
-
-void AstDumpPass::visit_call(
-    CallNode*, std::vector< bool, std::allocator< bool > >& )
+AstDumpVisitor::AstDumpVisitor(std::ostream& stream)
+: m_stream(stream)
 {
 }
 
-void AstDumpPass::visit_call_post( CallNode* )
+void AstDumpVisitor::visit( IdentifierNode& node )
 {
+    dumpNode( node, node.identifier() );
+    RecursiveVisitor::visit( node );
 }
 
-void AstDumpPass::visit_diedie( DiedieNode*, bool )
+void AstDumpVisitor::visit( Specification& node )
 {
+    dumpNode( node, "CASM\\nSpecification" );
+    RecursiveVisitor::visit( node );
 }
 
-void AstDumpPass::visit_impossible( AstNode* )
+void AstDumpVisitor::visit( VariableDefinition& node )
 {
+    dumpNode( node, "VariableDefinition" );
+    RecursiveVisitor::visit( node );
 }
 
-void AstDumpPass::visit_case_pre( CaseNode*, bool )
+void AstDumpVisitor::visit( FunctionDefinition& node )
 {
+    dumpNode( node, "FunctionDefinition" );
+    RecursiveVisitor::visit( node );
 }
 
-void AstDumpPass::visit_skip( AstNode* )
+void AstDumpVisitor::visit( DerivedDefinition& node )
 {
+    dumpNode( node, "DerivedDefinition" );
+    RecursiveVisitor::visit( node );
 }
 
-void AstDumpPass::visit_forall_iteration_pre( ForallNode*, bool )
+void AstDumpVisitor::visit( RuleDefinition& node )
 {
+    dumpNode( node, "RuleDefinition" );
+    RecursiveVisitor::visit( node );
 }
 
-void AstDumpPass::visit_forall_iteration_post( ForallNode* )
+void AstDumpVisitor::visit( EnumerationDefinition& node )
 {
+    dumpNode( node, "EnumerationDefinition" );
+    RecursiveVisitor::visit( node );
 }
 
-bool AstDumpPass::visit_rational_atom( RationalAtom* )
+void AstDumpVisitor::visit( ValueAtom& node )
 {
-    return false;
+    dumpNode( node, "ValueAtom" ); // TODO dump value
+    RecursiveVisitor::visit( node );
 }
 
-void AstDumpPass::visit_derived_function_atom_pre(
-    FunctionAtom*, std::vector< bool, std::allocator< bool > >& )
+void AstDumpVisitor::visit( RuleReferenceAtom& node )
 {
+    dumpNode( node, "RuleReferenceAtom" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( ZeroAtom& node )
+{
+    dumpNode( node, "ZeroAtom" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( UndefAtom& node )
+{
+    dumpNode( node, "UndefAtom" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( DirectCallExpression& node )
+{
+    dumpNode( node, "DirectCallExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( IndirectCallExpression& node )
+{
+    dumpNode( node, "IndirectCallExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( UnaryExpression& node )
+{
+    dumpNode( node, "Expression" ); // TODO dump operator
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( BinaryExpression& node )
+{
+    dumpNode( node, "Expression" ); // TODO dump operator
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( RangeExpression& node )
+{
+    dumpNode( node, "RangeExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( ListExpression& node )
+{
+    dumpNode( node, "ListExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( ConditionalExpression& node )
+{
+    dumpNode( node, "ConditionalExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( UniversalQuantifierExpression& node )
+{
+    dumpNode( node, "UniversalQuantifierExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( ExistentialQuantifierExpression& node )
+{
+    dumpNode( node, "ExistentialQuantifierExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( SkipRule& node )
+{
+    dumpNode( node, "SkipRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( ConditionalRule& node )
+{
+    dumpNode( node, "ConditionalRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( CaseRule& node )
+{
+    dumpNode( node, "CaseRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( LetRule& node )
+{
+    dumpNode( node, "LetRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( ForallRule& node )
+{
+    dumpNode( node, "ForallRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( IterateRule& node )
+{
+    dumpNode( node, "IterateRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( BlockRule& node )
+{
+    dumpNode( node, "BlockRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( SequenceRule& node )
+{
+    dumpNode( node, "SequenceRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( UpdateRule& node )
+{
+    dumpNode( node, "UpdateRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( CallRule& node )
+{
+    dumpNode( node, "CallRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( BasicType& node )
+{
+    dumpNode( node, "BasicType" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( ComposedType& node )
+{
+    dumpNode( node, "ComposedType" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( FixedSizedType& node )
+{
+    dumpNode( node, "FixedSizedType" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::visit( RangedType& node )
+{
+    dumpNode( node, "RangedType" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpVisitor::dumpNode( const Ast::Node& node, const std::string& name )
+{
+    m_stream << "    " << &node << " [label=\"" << name << "\"];\n";
+}
+
+void AstDumpVisitor::dumpLink( const Ast::Node& from, const Ast::Node& to )
+{
+    m_stream << "    " << &from << " -> " << &to << ";\n";
 }
 
 //

@@ -52,6 +52,8 @@ set( CXX_SRC_FILES
   src/ast/Specification.cpp
   src/ast/Type.cpp
   src/ast/RecursiveVisitor.cpp
+
+  src/analyze/AstDumpPass.cpp
 )
 
 file( GLOB_RECURSE CXX_UTS_FILES "uts/*.cpp" )

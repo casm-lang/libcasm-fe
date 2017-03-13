@@ -26,9 +26,11 @@
 #ifndef _LIB_CASMFE_ASTDUMPPASS_H_
 #define _LIB_CASMFE_ASTDUMPPASS_H_
 
+#include <ostream>
+
 #include "libpass.h"
 
-#include "../Visitor.h"
+#include "../ast/RecursiveVisitor.h"
 
 /**
    @brief    TODO
@@ -38,27 +40,70 @@
 
 namespace libcasm_fe
 {
-    class AstDumpPass : public libpass::Pass, public Visitor< bool, bool >
+    namespace Ast
     {
-      private:
-        std::stringstream dump_stream_;
+        class Node;
+    }
 
-        void dump_node( uint64_t key, const std::string& name );
-        void dump_node( AstNode* n, const std::string& name );
-        void dump_link( uint64_t from, uint64_t to );
-        void dump_link( AstNode* from, AstNode* to );
-
-        void dump_arguments(
-            AstNode* from, std::vector< ExpressionBase* >* arguments );
-
+    class AstDumpPass final : public libpass::Pass
+    {
       public:
         static char id;
 
-        bool run( libpass::PassResult& pr ) override final;
+        bool run( libpass::PassResult& pr ) override;
+    };
 
-        std::string get_dump();
+    class AstDumpVisitor final : public Ast::RecursiveVisitor
+    {
+    public:
+        AstDumpVisitor( std::ostream& stream );
 
-        LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
+        void visit( Ast::IdentifierNode& node ) override;
+
+        void visit( Ast::Specification& node ) override;
+
+        void visit( Ast::VariableDefinition& node ) override;
+        void visit( Ast::FunctionDefinition& node ) override;
+        void visit( Ast::DerivedDefinition& node ) override;
+        void visit( Ast::RuleDefinition& node ) override;
+        void visit( Ast::EnumerationDefinition& node ) override;
+
+        void visit( Ast::ValueAtom& node ) override;
+        void visit( Ast::RuleReferenceAtom& node ) override;
+        void visit( Ast::ZeroAtom& node ) override;
+        void visit( Ast::UndefAtom& node ) override;
+        void visit( Ast::DirectCallExpression& node ) override;
+        void visit( Ast::IndirectCallExpression& node ) override;
+        void visit( Ast::UnaryExpression& node ) override;
+        void visit( Ast::BinaryExpression& node ) override;
+        void visit( Ast::RangeExpression& node ) override;
+        void visit( Ast::ListExpression& node ) override;
+        void visit( Ast::ConditionalExpression& node ) override;
+        void visit( Ast::UniversalQuantifierExpression& node ) override;
+        void visit( Ast::ExistentialQuantifierExpression& node ) override;
+
+        void visit( Ast::SkipRule& node ) override;
+        void visit( Ast::ConditionalRule& node ) override;
+        void visit( Ast::CaseRule& node ) override;
+        void visit( Ast::LetRule& node ) override;
+        void visit( Ast::ForallRule& node ) override;
+        void visit( Ast::IterateRule& node ) override;
+        void visit( Ast::BlockRule& node ) override;
+        void visit( Ast::SequenceRule& node ) override;
+        void visit( Ast::UpdateRule& node ) override;
+        void visit( Ast::CallRule& node ) override;
+
+        void visit( Ast::BasicType& node ) override;
+        void visit( Ast::ComposedType& node ) override;
+        void visit( Ast::FixedSizedType& node ) override;
+        void visit( Ast::RangedType& node ) override;
+
+    private:
+        void dumpNode( const Ast::Node& node, const std::string& name );
+        void dumpLink( const Ast::Node& from, const Ast::Node& to );
+
+    private:
+        std::ostream& m_stream;
     };
 }
 
