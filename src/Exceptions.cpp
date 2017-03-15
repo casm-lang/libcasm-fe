@@ -42,15 +42,12 @@ Exception::Exception( const yy::location& location, const std::string& msg,
     addLocation( location );
 }
 
-Exception::Exception( const std::vector< const yy::location* >& location,
+Exception::Exception( const std::vector< yy::location >& location,
     const std::string& msg, const libcasm_fe::Codes error_code )
 : msg_( msg )
 , error_code_( error_code )
 {
-    for( auto loc : location )
-    {
-        addLocation( *loc );
-    }
+    location_.insert( location_.end(), location.cbegin(), location.cend() );
 }
 
 const char* Exception::what() const throw()
@@ -60,10 +57,10 @@ const char* Exception::what() const throw()
 
 void Exception::addLocation( const yy::location& location )
 {
-    location_.push_back( &location );
+    location_.push_back( location );
 }
 
-const std::vector< const yy::location* >& Exception::getLocations( void ) const
+const std::vector< yy::location >& Exception::getLocations( void ) const
 {
     return location_;
 }

@@ -46,14 +46,14 @@ libcasm_ir::Type::Ptr Expression::type( void ) const
     return m_type;
 }
 
-ValueAtom::ValueAtom( const libcasm_ir::Value& value )
+ValueAtom::ValueAtom( const libcasm_ir::Value::Ptr& value )
 : Expression( Node::ID::VALUE_ATOM )
 , m_value( value )
 {
-    Expression::setType( value.ptr_type() );
+    Expression::setType( value->ptr_type() );
 }
 
-libcasm_ir::Value ValueAtom::value( void ) const
+libcasm_ir::Value::Ptr ValueAtom::value( void ) const
 {
     return m_value;
 }

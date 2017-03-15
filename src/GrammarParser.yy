@@ -34,7 +34,6 @@
 
 %code requires
 {
-    #include "src/Driver.h"
     #include "src/Exceptions.h"
 
     #include "src/ast/Specification.h"
@@ -46,8 +45,8 @@
 }
 
 // The parsing context.
-//%parse-param { libcasm_fe::Driver& driver }
-//%lex-param   { libcasm_fe::Driver& driver }
+//%parse-param { libcasm_fe::Driver& driver } TODO
+//%lex-param   { libcasm_fe::Driver& driver } TODO
 
 %locations
 %initial-action
@@ -64,10 +63,10 @@
 
 %code
 {
-    yy::Parser::symbol_type yylex( libcasm_fe::Driver& driver );
+    yy::Parser::symbol_type yylex();
 
     std::pair< FunctionDefinition::Classification, bool > parseFunctionAttributes(
-        libcasm_fe::Driver& driver, const NodeList< IdentifierNode >::Ptr& attributes )
+        const NodeList< IdentifierNode >::Ptr& attributes )
     {
         using Classification = FunctionDefinition::Classification;
 
@@ -80,7 +79,7 @@
         bool symbolicAttributeAlreadyUsed = false;
         IdentifierNode::Ptr symbolicAttribute;
 
-        for( auto attribute : attributes )
+        for( const auto& attribute : *attributes )
         {
             const auto& name = attribute->identifier();
 
@@ -90,11 +89,11 @@
 
                 if( symbolicAttributeAlreadyUsed )
                 {
-                    driver.error
+                    /*driver.error
                     ( { symbolicAttribute->location(), attribute->location() }
                     , "`symbolic` attribute can only be used once per function"
                     , libcasm_fe::Codes::FunctionAttributeMultipleUseOfSymbolic
-                    );
+                    ); TODO */
                 }
                 else
                 {
@@ -127,21 +126,21 @@
             }
             else
             {
-                driver.error
-                ( attribute->location(),
+                /*driver.error
+                ( attribute->location()
                 , "`" + name + "` is no valid function attribute, only in, monitored, "
                 + "controlled, shared, out, static and symbolic are allowed"
                 , libcasm_fe::Codes::FunctionAttributeIsInvalid
-                );
+                ); TODO */
             }
 
             if( classAttributeAlreadyUsed )
             {
-                driver.error
+                /*driver.error
                 ( { classAttribute->location(), attribute->location() }
                 , "a function classifier attribute can only be used once per function"
                 , libcasm_fe::Codes::FunctionAttributeMultipleUseOfFunctionClassifier
-                );
+                ); TODO */
             }
             else
             {
@@ -164,13 +163,16 @@
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
     {
-        if( (rule->id() == Node::BLOCK_RULE )
-                or (rule->id() == Node::SEQUENCE_RULE ) )
+        if( (rule->id() == Node::ID::BLOCK_RULE )
+                or (rule->id() == Node::ID::SEQUENCE_RULE ) )
         {
             return rule; // no need to wrap it
         }
 
-        return make< BlockRule >( rule );
+        const auto& location = rule->location();
+        const auto rules = make< Rules >( location );
+        rules->add( rule );
+        return make< BlockRule >( location, rules );
     }
 }
 
@@ -204,7 +206,7 @@ END       0 "end of file"
 
 // expressions
 %type <Expression::Ptr> Expression Term Atom
-%type <Expressions::Ptr> TermList
+%type <Expressions::Ptr> Terms
 %type <ValueAtom::Ptr> Boolean String BitNumber IntegerNumber FloatingNumber RationalNumber
 %type <RuleReferenceAtom::Ptr> RuleReference
 %type <UndefAtom::Ptr> Undefined
@@ -283,13 +285,13 @@ END       0 "end of file"
 Specification
 : CASM Definitions
   {
-      const std::string& filepath = driver.get_filename();
+      /*const std::string& filepath = driver.get_filename();
       const std::string& filename
           = filepath.substr( filepath.find_last_of( "/\\" ) + 1 );
       const std::string& filenameWithoutExtension
-          = filename.substr( 0, filename.rfind( "." ) );
+          = filename.substr( 0, filename.rfind( "." ) );*/
 
-      const auto name = make< IdentifierNode >( filenameWithoutExtension );
+      const auto name = make< IdentifierNode >( @$, "filenameWithoutExtension" );
       const auto specification = make< Specification >( @$, name, $2 );
 
       //driver.result = specification; TODO
@@ -336,9 +338,11 @@ Definitions
 FunctionDefinition
 : FUNCTION MaybeFunctionAttributes Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
   {
-      auto function = make< FunctionDefinition >( @$, $3, $5, $7 );
+      const auto identifier = $3;
 
-      const auto attributes = parseFunctionAttributes( driver, $2 );
+      auto function = make< FunctionDefinition >( @$, identifier, $5, $7 );
+
+      const auto attributes = parseFunctionAttributes( $2 );
       function->setClassification( attributes.first );
       function->setSymbolic( attributes.second );
 
@@ -346,8 +350,8 @@ FunctionDefinition
 
       // apply the name of the function declaration to the initializer functions
       auto initializers = $9;
-      for (auto initializer : *initializers) {
-           initializer->function()->setIdentifier( functionDefinition->identifier() );
+      for (auto& initializer : *initializers) {
+           initializer->function()->setIdentifier( identifier );
       }
       function->setInitializers( initializers );
 
@@ -427,7 +431,7 @@ MaybeFunctionAttributes
 ProgramFunctionDefinition
 : INIT Identifier
   {
-      auto programDefinition = createProgramFunction();
+      auto programDefinition = createProgramFunction( @$ );
 
       auto arguments = make< Expressions >( @$ );
       // TODO add `default` agent to arguments
@@ -444,11 +448,11 @@ ProgramFunctionDefinition
   }
 | INIT LCURPAREN MaybeInitializers RCURPAREN
   {
-      auto programDefinition = createProgramFunction();
+      auto programDefinition = createProgramFunction( @$ );
 
       // apply the name of the program declaration to the initializer functions
       auto initializers = $3;
-      for (auto initializer : *initializers) {
+      for (auto& initializer : *initializers) {
           initializer->function()->setIdentifier( programDefinition->identifier() );
       }
       programDefinition->setInitializers( initializers );
@@ -475,7 +479,7 @@ Initializer
 
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto unknown = make< IdentifierNode >( @$, std::string() );
-      const auto function = make< DirectCallExpression >( @$, unknown, args );
+      const auto function = make< DirectCallExpression >( @$, unknown, arguments );
 
       $$ = make< UpdateRule >( @$, function, $3 );
   }
@@ -551,7 +555,7 @@ Identifiers
   }
 | Identifier
   {
-      auto identifiers = make< NodeList< Identifier > >( @$ );
+      auto identifiers = make< NodeList< IdentifierNode > >( @$ );
       identifiers->add( $1 );
       $$ = identifiers;
   }
@@ -565,7 +569,7 @@ MaybeIdentifiers
   }
 | %empty
   {
-      $$ = make< NodeList< Identifier > >( @$ );
+      $$ = make< NodeList< IdentifierNode > >( @$ );
   }
 ;
 
@@ -577,7 +581,7 @@ Variable
   }
 | Identifier
   {
-      $$ = make< VariableDefinition >( @$, $1, ... ); // TODO
+      $$ = make< VariableDefinition >( @$, $1, nullptr ); // TODO
   }
 ;
 
@@ -789,7 +793,8 @@ RationalNumber
 RuleReference
 : AT IDENTIFIER
   {
-      $$ = make< RuleReferenceAtom >( @$, $2 );
+      const auto ruleName = make< IdentifierNode >( @$, $2 );
+      $$ = make< RuleReferenceAtom >( @$, ruleName );
   }
 ;
 
@@ -800,6 +805,18 @@ Term
       $$ = $1;
   }
 | IndirectCallExpression
+  {
+      $$ = $1;
+  }
+| ConditionalExpression
+  {
+      $$ = $1;
+  }
+| UniversalQuantifierExpression
+  {
+      $$ = $1;
+  }
+| ExistentialQuantifierExpression
   {
       $$ = $1;
   }
@@ -924,7 +941,6 @@ List
 : LSQPAREN RSQPAREN
   {
       const auto expressions = make< Expressions >( @$ );
-
       $$ = make< ListExpression >( @$, expressions );
   }
 | LSQPAREN Term RSQPAREN
@@ -933,14 +949,14 @@ List
       expressions->add( $2 );
       $$ = make< ListExpression >( @$, expressions );
   }
-| LSQPAREN TermList RSQPAREN
+| LSQPAREN Terms RSQPAREN
   {
       $$ = make< ListExpression >( @$, $2 );
   }
 ;
 
-TermList
-: TermList Term COMMA
+Terms
+: Terms Term COMMA
   {
       auto expressions = $1;
       expressions->add( $2 );
@@ -948,21 +964,21 @@ TermList
   }
 | Term COMMA
   {
-      
+      const auto expressions = make< Expressions >( @$ );
       $$ = expressions;
   }
 ;
 
 
 Arguments
-: LPAREN TermList RPAREN
+: LPAREN Terms RPAREN
   {
       $$ = $2;
   }
 | LPAREN RPAREN
   {
       const auto expressions = make< Expressions >( @$ );
-      $$ = expression;
+      $$ = expressions;
   }
 ;
 
@@ -1204,19 +1220,29 @@ UpdateRule
 CallRule
 : CALL DirectCallExpression
   {
-      $$ = make< CallRule >( @$, $2, { CallExpression::TargetType::RULE } );
+      const std::set< CallExpression::TargetType >
+          allowedCallTargetTypes{ CallExpression::TargetType::RULE };
+      $$ = make< CallRule >( @$, $2, allowedCallTargetTypes );
   }
 | DirectCallExpression
   {
-      $$ = make< CallRule >( @$, $1, { CallExpression::TargetType::DERIVED, CallExpression::TargetType::BUILTIN } );
+      const std::set< CallExpression::TargetType >
+          allowedCallTargetTypes{ CallExpression::TargetType::DERIVED,
+                                  CallExpression::TargetType::BUILTIN };
+      $$ = make< CallRule >( @$, $1, allowedCallTargetTypes );
   }
 | CALL IndirectCallExpression
   {
-      $$ = make< CallRule >( @$, $2, { CallExpression::TargetType::RULE } );
+      const std::set< CallExpression::TargetType >
+          allowedCallTargetTypes{ CallExpression::TargetType::RULE };
+      $$ = make< CallRule >( @$, $2, allowedCallTargetTypes );
   }
 | IndirectCallExpression
   {
-      $$ = make< CallRule >( @$, $1, { CallExpression::TargetType::DERIVED, CallExpression::TargetType::BUILTIN } );
+      const std::set< CallExpression::TargetType >
+          allowedCallTargetTypes{ CallExpression::TargetType::DERIVED,
+                                  CallExpression::TargetType::BUILTIN };
+      $$ = make< CallRule >( @$, $1, allowedCallTargetTypes );
   }
 ;
 
@@ -1232,15 +1258,15 @@ void yy::Parser::error
         i32 pos = (l.begin.line - 1);
         pos = ( pos > 0 ? pos : 1 );
 
-        driver.error
+        /*driver.error
         ( yy::location( yy::position( 0, pos, 1 ) )
         , m
         , libcasm_fe::Codes::SyntaxError
-        );
+        ); TODO */
     }
     else
     {
-        driver.error( l, m, libcasm_fe::Codes::SyntaxError );
+        //driver.error( l, m, libcasm_fe::Codes::SyntaxError ); TODO
     }
 }
 

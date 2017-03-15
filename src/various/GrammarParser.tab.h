@@ -42,7 +42,6 @@
 // //                    "%code requires" blocks.
 #line 36 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 
-    #include "src/Driver.h"
     #include "src/Exceptions.h"
 
     #include "src/ast/Specification.h"
@@ -52,7 +51,7 @@
     using namespace libcasm_fe;
     using namespace Ast;
 
-#line 56 "GrammarParser.tab.h" // lalr1.cc:377
+#line 55 "GrammarParser.tab.h" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -129,7 +128,7 @@
 
 
 namespace yy {
-#line 133 "GrammarParser.tab.h" // lalr1.cc:377
+#line 132 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
@@ -314,114 +313,123 @@ namespace yy {
       // ComposedType
       char dummy6[sizeof(ComposedType::Ptr)];
 
+      // ConditionalExpression
+      char dummy7[sizeof(ConditionalExpression::Ptr)];
+
       // ConditionalRule
-      char dummy7[sizeof(ConditionalRule::Ptr)];
+      char dummy8[sizeof(ConditionalRule::Ptr)];
 
       // Definition
-      char dummy8[sizeof(Definition::Ptr)];
+      char dummy9[sizeof(Definition::Ptr)];
 
       // Definitions
-      char dummy9[sizeof(Definitions::Ptr)];
+      char dummy10[sizeof(Definitions::Ptr)];
 
       // DerivedDefinition
-      char dummy10[sizeof(DerivedDefinition::Ptr)];
+      char dummy11[sizeof(DerivedDefinition::Ptr)];
 
       // DirectCallExpression
-      char dummy11[sizeof(DirectCallExpression::Ptr)];
+      char dummy12[sizeof(DirectCallExpression::Ptr)];
 
       // EnumerationDefinition
-      char dummy12[sizeof(EnumerationDefinition::Ptr)];
+      char dummy13[sizeof(EnumerationDefinition::Ptr)];
+
+      // ExistentialQuantifierExpression
+      char dummy14[sizeof(ExistentialQuantifierExpression::Ptr)];
 
       // MaybeDefined
       // Atom
       // Term
       // Expression
-      char dummy13[sizeof(Expression::Ptr)];
+      char dummy15[sizeof(Expression::Ptr)];
 
-      // TermList
+      // Terms
       // Arguments
-      char dummy14[sizeof(Expressions::Ptr)];
+      char dummy16[sizeof(Expressions::Ptr)];
 
       // FixedSizedType
-      char dummy15[sizeof(FixedSizedType::Ptr)];
+      char dummy17[sizeof(FixedSizedType::Ptr)];
 
       // ForallRule
-      char dummy16[sizeof(ForallRule::Ptr)];
+      char dummy18[sizeof(ForallRule::Ptr)];
 
       // FunctionDefinition
       // ProgramFunctionDefinition
-      char dummy17[sizeof(FunctionDefinition::Ptr)];
+      char dummy19[sizeof(FunctionDefinition::Ptr)];
 
       // Identifier
-      char dummy18[sizeof(IdentifierNode::Ptr)];
+      char dummy20[sizeof(IdentifierNode::Ptr)];
 
       // IndirectCallExpression
-      char dummy19[sizeof(IndirectCallExpression::Ptr)];
+      char dummy21[sizeof(IndirectCallExpression::Ptr)];
 
       // IterateRule
-      char dummy20[sizeof(IterateRule::Ptr)];
+      char dummy22[sizeof(IterateRule::Ptr)];
 
       // LetRule
-      char dummy21[sizeof(LetRule::Ptr)];
+      char dummy23[sizeof(LetRule::Ptr)];
 
       // List
-      char dummy22[sizeof(ListExpression::Ptr)];
+      char dummy24[sizeof(ListExpression::Ptr)];
 
       // MaybeFunctionAttributes
       // Identifiers
       // MaybeIdentifiers
-      char dummy23[sizeof(NodeList< IdentifierNode >::Ptr)];
+      char dummy25[sizeof(NodeList< IdentifierNode >::Ptr)];
 
       // MaybeInitially
       // Initializers
       // MaybeInitializers
-      char dummy24[sizeof(NodeList< UpdateRule >::Ptr)];
+      char dummy26[sizeof(NodeList< UpdateRule >::Ptr)];
 
       // Parameters
       // MaybeParameters
-      char dummy25[sizeof(NodeList< VariableDefinition >::Ptr)];
+      char dummy27[sizeof(NodeList< VariableDefinition >::Ptr)];
 
       // Range
-      char dummy26[sizeof(RangeExpression::Ptr)];
+      char dummy28[sizeof(RangeExpression::Ptr)];
 
       // RangedType
-      char dummy27[sizeof(RangedType::Ptr)];
+      char dummy29[sizeof(RangedType::Ptr)];
 
       // Rule
-      char dummy28[sizeof(Rule::Ptr)];
+      char dummy30[sizeof(Rule::Ptr)];
 
       // RuleDefinition
-      char dummy29[sizeof(RuleDefinition::Ptr)];
+      char dummy31[sizeof(RuleDefinition::Ptr)];
 
       // RuleReference
-      char dummy30[sizeof(RuleReferenceAtom::Ptr)];
+      char dummy32[sizeof(RuleReferenceAtom::Ptr)];
 
       // Rules
-      char dummy31[sizeof(Rules::Ptr)];
+      char dummy33[sizeof(Rules::Ptr)];
 
       // SequenceRule
-      char dummy32[sizeof(SequenceRule::Ptr)];
+      char dummy34[sizeof(SequenceRule::Ptr)];
 
       // SkipRule
-      char dummy33[sizeof(SkipRule::Ptr)];
+      char dummy35[sizeof(SkipRule::Ptr)];
 
       // Specification
-      char dummy34[sizeof(Specification::Ptr)];
+      char dummy36[sizeof(Specification::Ptr)];
 
       // Type
-      char dummy35[sizeof(Type::Ptr)];
+      char dummy37[sizeof(Type::Ptr)];
 
       // FunctionParameters
       // MaybeFunctionParameters
       // Types
-      char dummy36[sizeof(Types::Ptr)];
+      char dummy38[sizeof(Types::Ptr)];
 
       // Undefined
-      char dummy37[sizeof(UndefAtom::Ptr)];
+      char dummy39[sizeof(UndefAtom::Ptr)];
+
+      // UniversalQuantifierExpression
+      char dummy40[sizeof(UniversalQuantifierExpression::Ptr)];
 
       // Initializer
       // UpdateRule
-      char dummy38[sizeof(UpdateRule::Ptr)];
+      char dummy41[sizeof(UpdateRule::Ptr)];
 
       // Boolean
       // String
@@ -429,10 +437,10 @@ namespace yy {
       // IntegerNumber
       // FloatingNumber
       // RationalNumber
-      char dummy39[sizeof(ValueAtom::Ptr)];
+      char dummy42[sizeof(ValueAtom::Ptr)];
 
       // Variable
-      char dummy40[sizeof(VariableDefinition::Ptr)];
+      char dummy43[sizeof(VariableDefinition::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -441,10 +449,10 @@ namespace yy {
       // "floating"
       // "string"
       // "identifier"
-      char dummy41[sizeof(std::string)];
+      char dummy44[sizeof(std::string)];
 
       // CaseLabels
-      char dummy42[sizeof(std::vector< CaseRule::Case >)];
+      char dummy45[sizeof(std::vector< CaseRule::Case >)];
 };
 
     /// Symbol semantic values.
@@ -592,6 +600,8 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const ComposedType::Ptr v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Definition::Ptr v, const location_type& l);
@@ -603,6 +613,8 @@ namespace yy {
   basic_symbol (typename Base::kind_type t, const DirectCallExpression::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const EnumerationDefinition::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const ExistentialQuantifierExpression::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Expression::Ptr v, const location_type& l);
 
@@ -653,6 +665,8 @@ namespace yy {
   basic_symbol (typename Base::kind_type t, const Types::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const UndefAtom::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l);
 
@@ -1240,8 +1254,8 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1151,     ///< Last index in yytable_.
-      yynnts_ = 60,  ///< Number of nonterminal symbols.
+      yylast_ = 1519,     ///< Last index in yytable_.
+      yynnts_ = 63,  ///< Number of nonterminal symbols.
       yyfinal_ = 15, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -1332,19 +1346,19 @@ namespace yy {
         value.copy< BasicType::Ptr > (other.value);
         break;
 
-      case 134: // BlockRule
+      case 137: // BlockRule
         value.copy< BlockRule::Ptr > (other.value);
         break;
 
-      case 137: // CallRule
+      case 140: // CallRule
         value.copy< CallRule::Ptr > (other.value);
         break;
 
-      case 129: // CaseLabel
+      case 132: // CaseLabel
         value.copy< CaseRule::Case > (other.value);
         break;
 
-      case 128: // CaseRule
+      case 131: // CaseRule
         value.copy< CaseRule::Ptr > (other.value);
         break;
 
@@ -1352,7 +1366,11 @@ namespace yy {
         value.copy< ComposedType::Ptr > (other.value);
         break;
 
-      case 127: // ConditionalRule
+      case 123: // ConditionalExpression
+        value.copy< ConditionalExpression::Ptr > (other.value);
+        break;
+
+      case 130: // ConditionalRule
         value.copy< ConditionalRule::Ptr > (other.value);
         break;
 
@@ -1376,6 +1394,10 @@ namespace yy {
         value.copy< EnumerationDefinition::Ptr > (other.value);
         break;
 
+      case 125: // ExistentialQuantifierExpression
+        value.copy< ExistentialQuantifierExpression::Ptr > (other.value);
+        break;
+
       case 84: // MaybeDefined
       case 106: // Atom
       case 115: // Term
@@ -1383,7 +1405,7 @@ namespace yy {
         value.copy< Expression::Ptr > (other.value);
         break;
 
-      case 119: // TermList
+      case 119: // Terms
       case 120: // Arguments
         value.copy< Expressions::Ptr > (other.value);
         break;
@@ -1392,7 +1414,7 @@ namespace yy {
         value.copy< FixedSizedType::Ptr > (other.value);
         break;
 
-      case 132: // ForallRule
+      case 135: // ForallRule
         value.copy< ForallRule::Ptr > (other.value);
         break;
 
@@ -1409,11 +1431,11 @@ namespace yy {
         value.copy< IndirectCallExpression::Ptr > (other.value);
         break;
 
-      case 133: // IterateRule
+      case 136: // IterateRule
         value.copy< IterateRule::Ptr > (other.value);
         break;
 
-      case 131: // LetRule
+      case 134: // LetRule
         value.copy< LetRule::Ptr > (other.value);
         break;
 
@@ -1446,11 +1468,11 @@ namespace yy {
         value.copy< RangedType::Ptr > (other.value);
         break;
 
-      case 124: // Rule
+      case 127: // Rule
         value.copy< Rule::Ptr > (other.value);
         break;
 
-      case 123: // RuleDefinition
+      case 126: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (other.value);
         break;
 
@@ -1458,15 +1480,15 @@ namespace yy {
         value.copy< RuleReferenceAtom::Ptr > (other.value);
         break;
 
-      case 125: // Rules
+      case 128: // Rules
         value.copy< Rules::Ptr > (other.value);
         break;
 
-      case 135: // SequenceRule
+      case 138: // SequenceRule
         value.copy< SequenceRule::Ptr > (other.value);
         break;
 
-      case 126: // SkipRule
+      case 129: // SkipRule
         value.copy< SkipRule::Ptr > (other.value);
         break;
 
@@ -1488,8 +1510,12 @@ namespace yy {
         value.copy< UndefAtom::Ptr > (other.value);
         break;
 
+      case 124: // UniversalQuantifierExpression
+        value.copy< UniversalQuantifierExpression::Ptr > (other.value);
+        break;
+
       case 89: // Initializer
-      case 136: // UpdateRule
+      case 139: // UpdateRule
         value.copy< UpdateRule::Ptr > (other.value);
         break;
 
@@ -1516,7 +1542,7 @@ namespace yy {
         value.copy< std::string > (other.value);
         break;
 
-      case 130: // CaseLabels
+      case 133: // CaseLabels
         value.copy< std::vector< CaseRule::Case > > (other.value);
         break;
 
@@ -1541,19 +1567,19 @@ namespace yy {
         value.copy< BasicType::Ptr > (v);
         break;
 
-      case 134: // BlockRule
+      case 137: // BlockRule
         value.copy< BlockRule::Ptr > (v);
         break;
 
-      case 137: // CallRule
+      case 140: // CallRule
         value.copy< CallRule::Ptr > (v);
         break;
 
-      case 129: // CaseLabel
+      case 132: // CaseLabel
         value.copy< CaseRule::Case > (v);
         break;
 
-      case 128: // CaseRule
+      case 131: // CaseRule
         value.copy< CaseRule::Ptr > (v);
         break;
 
@@ -1561,7 +1587,11 @@ namespace yy {
         value.copy< ComposedType::Ptr > (v);
         break;
 
-      case 127: // ConditionalRule
+      case 123: // ConditionalExpression
+        value.copy< ConditionalExpression::Ptr > (v);
+        break;
+
+      case 130: // ConditionalRule
         value.copy< ConditionalRule::Ptr > (v);
         break;
 
@@ -1585,6 +1615,10 @@ namespace yy {
         value.copy< EnumerationDefinition::Ptr > (v);
         break;
 
+      case 125: // ExistentialQuantifierExpression
+        value.copy< ExistentialQuantifierExpression::Ptr > (v);
+        break;
+
       case 84: // MaybeDefined
       case 106: // Atom
       case 115: // Term
@@ -1592,7 +1626,7 @@ namespace yy {
         value.copy< Expression::Ptr > (v);
         break;
 
-      case 119: // TermList
+      case 119: // Terms
       case 120: // Arguments
         value.copy< Expressions::Ptr > (v);
         break;
@@ -1601,7 +1635,7 @@ namespace yy {
         value.copy< FixedSizedType::Ptr > (v);
         break;
 
-      case 132: // ForallRule
+      case 135: // ForallRule
         value.copy< ForallRule::Ptr > (v);
         break;
 
@@ -1618,11 +1652,11 @@ namespace yy {
         value.copy< IndirectCallExpression::Ptr > (v);
         break;
 
-      case 133: // IterateRule
+      case 136: // IterateRule
         value.copy< IterateRule::Ptr > (v);
         break;
 
-      case 131: // LetRule
+      case 134: // LetRule
         value.copy< LetRule::Ptr > (v);
         break;
 
@@ -1655,11 +1689,11 @@ namespace yy {
         value.copy< RangedType::Ptr > (v);
         break;
 
-      case 124: // Rule
+      case 127: // Rule
         value.copy< Rule::Ptr > (v);
         break;
 
-      case 123: // RuleDefinition
+      case 126: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (v);
         break;
 
@@ -1667,15 +1701,15 @@ namespace yy {
         value.copy< RuleReferenceAtom::Ptr > (v);
         break;
 
-      case 125: // Rules
+      case 128: // Rules
         value.copy< Rules::Ptr > (v);
         break;
 
-      case 135: // SequenceRule
+      case 138: // SequenceRule
         value.copy< SequenceRule::Ptr > (v);
         break;
 
-      case 126: // SkipRule
+      case 129: // SkipRule
         value.copy< SkipRule::Ptr > (v);
         break;
 
@@ -1697,8 +1731,12 @@ namespace yy {
         value.copy< UndefAtom::Ptr > (v);
         break;
 
+      case 124: // UniversalQuantifierExpression
+        value.copy< UniversalQuantifierExpression::Ptr > (v);
+        break;
+
       case 89: // Initializer
-      case 136: // UpdateRule
+      case 139: // UpdateRule
         value.copy< UpdateRule::Ptr > (v);
         break;
 
@@ -1725,7 +1763,7 @@ namespace yy {
         value.copy< std::string > (v);
         break;
 
-      case 130: // CaseLabels
+      case 133: // CaseLabels
         value.copy< std::vector< CaseRule::Case > > (v);
         break;
 
@@ -1787,6 +1825,13 @@ namespace yy {
   {}
 
   template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -1823,6 +1868,13 @@ namespace yy {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const EnumerationDefinition::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExistentialQuantifierExpression::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2004,6 +2056,13 @@ namespace yy {
   {}
 
   template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -2068,19 +2127,19 @@ namespace yy {
         value.template destroy< BasicType::Ptr > ();
         break;
 
-      case 134: // BlockRule
+      case 137: // BlockRule
         value.template destroy< BlockRule::Ptr > ();
         break;
 
-      case 137: // CallRule
+      case 140: // CallRule
         value.template destroy< CallRule::Ptr > ();
         break;
 
-      case 129: // CaseLabel
+      case 132: // CaseLabel
         value.template destroy< CaseRule::Case > ();
         break;
 
-      case 128: // CaseRule
+      case 131: // CaseRule
         value.template destroy< CaseRule::Ptr > ();
         break;
 
@@ -2088,7 +2147,11 @@ namespace yy {
         value.template destroy< ComposedType::Ptr > ();
         break;
 
-      case 127: // ConditionalRule
+      case 123: // ConditionalExpression
+        value.template destroy< ConditionalExpression::Ptr > ();
+        break;
+
+      case 130: // ConditionalRule
         value.template destroy< ConditionalRule::Ptr > ();
         break;
 
@@ -2112,6 +2175,10 @@ namespace yy {
         value.template destroy< EnumerationDefinition::Ptr > ();
         break;
 
+      case 125: // ExistentialQuantifierExpression
+        value.template destroy< ExistentialQuantifierExpression::Ptr > ();
+        break;
+
       case 84: // MaybeDefined
       case 106: // Atom
       case 115: // Term
@@ -2119,7 +2186,7 @@ namespace yy {
         value.template destroy< Expression::Ptr > ();
         break;
 
-      case 119: // TermList
+      case 119: // Terms
       case 120: // Arguments
         value.template destroy< Expressions::Ptr > ();
         break;
@@ -2128,7 +2195,7 @@ namespace yy {
         value.template destroy< FixedSizedType::Ptr > ();
         break;
 
-      case 132: // ForallRule
+      case 135: // ForallRule
         value.template destroy< ForallRule::Ptr > ();
         break;
 
@@ -2145,11 +2212,11 @@ namespace yy {
         value.template destroy< IndirectCallExpression::Ptr > ();
         break;
 
-      case 133: // IterateRule
+      case 136: // IterateRule
         value.template destroy< IterateRule::Ptr > ();
         break;
 
-      case 131: // LetRule
+      case 134: // LetRule
         value.template destroy< LetRule::Ptr > ();
         break;
 
@@ -2182,11 +2249,11 @@ namespace yy {
         value.template destroy< RangedType::Ptr > ();
         break;
 
-      case 124: // Rule
+      case 127: // Rule
         value.template destroy< Rule::Ptr > ();
         break;
 
-      case 123: // RuleDefinition
+      case 126: // RuleDefinition
         value.template destroy< RuleDefinition::Ptr > ();
         break;
 
@@ -2194,15 +2261,15 @@ namespace yy {
         value.template destroy< RuleReferenceAtom::Ptr > ();
         break;
 
-      case 125: // Rules
+      case 128: // Rules
         value.template destroy< Rules::Ptr > ();
         break;
 
-      case 135: // SequenceRule
+      case 138: // SequenceRule
         value.template destroy< SequenceRule::Ptr > ();
         break;
 
-      case 126: // SkipRule
+      case 129: // SkipRule
         value.template destroy< SkipRule::Ptr > ();
         break;
 
@@ -2224,8 +2291,12 @@ namespace yy {
         value.template destroy< UndefAtom::Ptr > ();
         break;
 
+      case 124: // UniversalQuantifierExpression
+        value.template destroy< UniversalQuantifierExpression::Ptr > ();
+        break;
+
       case 89: // Initializer
-      case 136: // UpdateRule
+      case 139: // UpdateRule
         value.template destroy< UpdateRule::Ptr > ();
         break;
 
@@ -2252,7 +2323,7 @@ namespace yy {
         value.template destroy< std::string > ();
         break;
 
-      case 130: // CaseLabels
+      case 133: // CaseLabels
         value.template destroy< std::vector< CaseRule::Case > > ();
         break;
 
@@ -2283,19 +2354,19 @@ namespace yy {
         value.move< BasicType::Ptr > (s.value);
         break;
 
-      case 134: // BlockRule
+      case 137: // BlockRule
         value.move< BlockRule::Ptr > (s.value);
         break;
 
-      case 137: // CallRule
+      case 140: // CallRule
         value.move< CallRule::Ptr > (s.value);
         break;
 
-      case 129: // CaseLabel
+      case 132: // CaseLabel
         value.move< CaseRule::Case > (s.value);
         break;
 
-      case 128: // CaseRule
+      case 131: // CaseRule
         value.move< CaseRule::Ptr > (s.value);
         break;
 
@@ -2303,7 +2374,11 @@ namespace yy {
         value.move< ComposedType::Ptr > (s.value);
         break;
 
-      case 127: // ConditionalRule
+      case 123: // ConditionalExpression
+        value.move< ConditionalExpression::Ptr > (s.value);
+        break;
+
+      case 130: // ConditionalRule
         value.move< ConditionalRule::Ptr > (s.value);
         break;
 
@@ -2327,6 +2402,10 @@ namespace yy {
         value.move< EnumerationDefinition::Ptr > (s.value);
         break;
 
+      case 125: // ExistentialQuantifierExpression
+        value.move< ExistentialQuantifierExpression::Ptr > (s.value);
+        break;
+
       case 84: // MaybeDefined
       case 106: // Atom
       case 115: // Term
@@ -2334,7 +2413,7 @@ namespace yy {
         value.move< Expression::Ptr > (s.value);
         break;
 
-      case 119: // TermList
+      case 119: // Terms
       case 120: // Arguments
         value.move< Expressions::Ptr > (s.value);
         break;
@@ -2343,7 +2422,7 @@ namespace yy {
         value.move< FixedSizedType::Ptr > (s.value);
         break;
 
-      case 132: // ForallRule
+      case 135: // ForallRule
         value.move< ForallRule::Ptr > (s.value);
         break;
 
@@ -2360,11 +2439,11 @@ namespace yy {
         value.move< IndirectCallExpression::Ptr > (s.value);
         break;
 
-      case 133: // IterateRule
+      case 136: // IterateRule
         value.move< IterateRule::Ptr > (s.value);
         break;
 
-      case 131: // LetRule
+      case 134: // LetRule
         value.move< LetRule::Ptr > (s.value);
         break;
 
@@ -2397,11 +2476,11 @@ namespace yy {
         value.move< RangedType::Ptr > (s.value);
         break;
 
-      case 124: // Rule
+      case 127: // Rule
         value.move< Rule::Ptr > (s.value);
         break;
 
-      case 123: // RuleDefinition
+      case 126: // RuleDefinition
         value.move< RuleDefinition::Ptr > (s.value);
         break;
 
@@ -2409,15 +2488,15 @@ namespace yy {
         value.move< RuleReferenceAtom::Ptr > (s.value);
         break;
 
-      case 125: // Rules
+      case 128: // Rules
         value.move< Rules::Ptr > (s.value);
         break;
 
-      case 135: // SequenceRule
+      case 138: // SequenceRule
         value.move< SequenceRule::Ptr > (s.value);
         break;
 
-      case 126: // SkipRule
+      case 129: // SkipRule
         value.move< SkipRule::Ptr > (s.value);
         break;
 
@@ -2439,8 +2518,12 @@ namespace yy {
         value.move< UndefAtom::Ptr > (s.value);
         break;
 
+      case 124: // UniversalQuantifierExpression
+        value.move< UniversalQuantifierExpression::Ptr > (s.value);
+        break;
+
       case 89: // Initializer
-      case 136: // UpdateRule
+      case 139: // UpdateRule
         value.move< UpdateRule::Ptr > (s.value);
         break;
 
@@ -2467,7 +2550,7 @@ namespace yy {
         value.move< std::string > (s.value);
         break;
 
-      case 130: // CaseLabels
+      case 133: // CaseLabels
         value.move< std::vector< CaseRule::Case > > (s.value);
         break;
 
@@ -2997,7 +3080,7 @@ namespace yy {
 
 
 } // yy
-#line 3001 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3084 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

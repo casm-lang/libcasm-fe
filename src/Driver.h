@@ -61,7 +61,7 @@ namespace libcasm_fe
         void error( const yy::location& l, const std::string& m,
             libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
 
-        void error( const std::vector< const yy::location* >& locations,
+        void error( const std::vector< yy::location >& locations,
             const std::string& m,
             libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
 

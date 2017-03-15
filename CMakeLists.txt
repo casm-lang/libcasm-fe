@@ -54,6 +54,9 @@ set( CXX_SRC_FILES
   src/ast/RecursiveVisitor.cpp
 
   src/analyze/AstDumpPass.cpp
+
+  src/various/GrammarParser.cpp
+  src/various/GrammarLexer.cpp
 )
 
 file( GLOB_RECURSE CXX_UTS_FILES "uts/*.cpp" )
@@ -65,6 +68,7 @@ project( ${TARGET} )
 
 include_directories(
   .
+  src/various
   ${LIBS}/gtest/googletest
   ${LIBS}/gtest/googletest/include
   ${LIBS}/hayai/src

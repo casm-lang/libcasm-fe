@@ -41,7 +41,7 @@
 class Exception : public std::exception
 {
   private:
-    std::vector< const yy::location* > location_;
+    std::vector< yy::location > location_;
     const std::string msg_;
     const libcasm_fe::Codes error_code_;
 
@@ -52,7 +52,7 @@ class Exception : public std::exception
     explicit Exception( const yy::location& location, const std::string& msg,
         const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
 
-    explicit Exception( const std::vector< const yy::location* >& location,
+    explicit Exception( const std::vector< yy::location >& location,
         const std::string& msg,
         const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
 
@@ -60,7 +60,7 @@ class Exception : public std::exception
 
     void addLocation( const yy::location& location );
 
-    const std::vector< const yy::location* >& getLocations( void ) const;
+    const std::vector< yy::location >& getLocations( void ) const;
 
     const libcasm_fe::Codes getErrorCode( void ) const;
 };

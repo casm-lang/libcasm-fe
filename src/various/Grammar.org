@@ -143,6 +143,9 @@ RuleReference
 Term
 : DirectCallExpression
 | IndirectCallExpression
+| ConditionalExpression
+| UniversalQuantifierExpression
+| ExistentialQuantifierExpression
 | Expression
 | List
 | Range
@@ -177,14 +180,14 @@ Range
 List
 : LSQPAREN RSQPAREN
 | LSQPAREN Term RSQPAREN
-| LSQPAREN TermList RSQPAREN
+| LSQPAREN Terms RSQPAREN
 
-TermList
-: TermList Term COMMA
+Terms
+: Terms Term COMMA
 | Term COMMA
 
 Arguments
-: LPAREN TermList RPAREN
+: LPAREN Terms RPAREN
 | LPAREN RPAREN
 
 DirectCallExpression

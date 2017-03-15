@@ -92,15 +92,15 @@ size_t Driver::get_next_chars( char buf[], size_t max_size )
 void Driver::error(
     const yy::location& l, const std::string& m, libcasm_fe::Codes code )
 {
-    error( { &l }, m, code );
+    error( { l }, m, code );
 }
 
-void Driver::error( const std::vector< const yy::location* >& locations,
+void Driver::error( const std::vector< yy::location >& locations,
     const std::string& m, libcasm_fe::Codes code )
 {
-    assert( locations.size() > 0 and locations[ 0 ] );
+    assert( locations.size() > 0 );
 
-    const yy::location& l = *locations[ 0 ];
+    const yy::location& l = locations.at( 0 );
 
     // Set state to error!
     error_++;
@@ -112,10 +112,10 @@ void Driver::error( const std::vector< const yy::location* >& locations,
 
     if( code != libcasm_fe::Codes::Unspecified )
     {
-        for( auto loc : locations )
+        for( const auto& loc : locations )
         {
             fprintf(
-                stderr, " " YELLOW "@%i{%04x}" RESET, loc->begin.line, code );
+                stderr, " " YELLOW "@%i{%04x}" RESET, loc.begin.line, code );
         }
     }
 
@@ -123,7 +123,7 @@ void Driver::error( const std::vector< const yy::location* >& locations,
 
     for( auto loc : locations )
     {
-        underline( *loc );
+        underline( loc );
     }
 
     if( code == libcasm_fe::Codes::Unspecified )
