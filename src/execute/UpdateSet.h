@@ -64,7 +64,7 @@ struct Update
     libcasm_fe::value_t value; /**< The value of the update */
     const std::vector< libcasm_fe::value_t >*
         args; /**< The function arguments of the update */
-    const yy::location*
+    const location*
         location;  /**< The source-code location of the update producer */
     uint32_t func; /**< The function uid of the update */
 };

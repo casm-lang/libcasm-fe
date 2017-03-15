@@ -46,7 +46,7 @@ bool ExecutionPassBase::hasEmptyUpdateSet() const
 
 Update* ExecutionPassBase::addUpdate( Function* function,
     const std::vector< value_t >& arguments, const value_t& value,
-    const yy::location& location )
+    const location& location )
 {
     if( function->checkArguments )
     {

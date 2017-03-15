@@ -112,14 +112,14 @@ namespace libcasm_fe
     class AstNode
     {
       public:
-        yy::location location;
+        location location;
         NodeType node_type_;
 
         Type type_;
 
         AstNode( NodeType node_type );
-        AstNode( yy::location& loc, NodeType node_type );
-        AstNode( yy::location& loc, NodeType node_type, Type type );
+        AstNode( location& loc, NodeType node_type );
+        AstNode( location& loc, NodeType node_type, Type type );
         virtual ~AstNode();
         virtual std::string to_str() const;
         virtual bool equals( AstNode* other ) const;
@@ -131,7 +131,7 @@ namespace libcasm_fe
       public:
         std::vector< AstNode* > nodes;
 
-        AstListNode( yy::location& loc, NodeType node_type );
+        AstListNode( location& loc, NodeType node_type );
         ~AstListNode() override;
         void add( AstNode* n );
         bool equals( AstNode* other ) const override;
@@ -142,7 +142,7 @@ namespace libcasm_fe
       public:
         AstNode* child_;
 
-        UnaryNode( yy::location& loc, NodeType node_type, AstNode* child );
+        UnaryNode( location& loc, NodeType node_type, AstNode* child );
         ~UnaryNode() override;
         bool equals( AstNode* other ) const override;
     };
@@ -159,10 +159,10 @@ namespace libcasm_fe
             std::vector< std::string > > >
             dump_list;
 
-        RuleNode( yy::location& loc, AstNode* child, const std::string& name );
-        RuleNode( yy::location& loc, AstNode* child, const std::string& name,
+        RuleNode( location& loc, AstNode* child, const std::string& name );
+        RuleNode( location& loc, AstNode* child, const std::string& name,
             std::vector< Type* >& args );
-        RuleNode( yy::location& loc, AstNode* child, const std::string& name,
+        RuleNode( location& loc, AstNode* child, const std::string& name,
             std::vector< Type* >& args,
             const std::vector< std::pair< std::string,
                 std::vector< std::string > > >& dump_list );
@@ -172,7 +172,7 @@ namespace libcasm_fe
     {
       public:
         Function* sym;
-        FunctionDefNode( yy::location& loc, Function* sym );
+        FunctionDefNode( location& loc, Function* sym );
         ~FunctionDefNode() override;
 
         void setInitializers( const std::vector< UpdateNode* >& initializers );
@@ -190,7 +190,7 @@ namespace libcasm_fe
     {
       public:
         Function* sym;
-        DerivedDefNode( yy::location& loc, Function* sym );
+        DerivedDefNode( location& loc, Function* sym );
         ~DerivedDefNode() override;
     };
 
@@ -198,7 +198,7 @@ namespace libcasm_fe
     {
       public:
         Enum* enum_;
-        EnumDefNode( yy::location& loc, Enum* enum_ );
+        EnumDefNode( location& loc, Enum* enum_ );
         ~EnumDefNode() override;
     };
 
@@ -209,14 +209,14 @@ namespace libcasm_fe
         AstNode* then_; // should always be a statement
         AstNode* else_; // should always be a statement
 
-        IfThenElseNode( yy::location& loc, ExpressionBase* condition,
-            AstNode* then, AstNode* els );
+        IfThenElseNode( location& loc, ExpressionBase* condition, AstNode* then,
+            AstNode* els );
     };
 
     class ExpressionBase : public AstNode
     {
       public:
-        ExpressionBase( yy::location& loc, NodeType node_type, Type type )
+        ExpressionBase( location& loc, NodeType node_type, Type type )
         : AstNode( loc, node_type, type )
         {
         }
@@ -225,7 +225,7 @@ namespace libcasm_fe
     class AtomNode : public ExpressionBase
     {
       public:
-        AtomNode( yy::location& loc, NodeType node_type, Type type )
+        AtomNode( location& loc, NodeType node_type, Type type )
         : ExpressionBase( loc, node_type, type )
         {
         }
@@ -237,7 +237,7 @@ namespace libcasm_fe
         AstNode* ref;
 
       public:
-        ZeroAtom( yy::location& loc, AstNode* reference );
+        ZeroAtom( location& loc, AstNode* reference );
         const AstNode* getRef( void ) const;
     };
 
@@ -246,7 +246,7 @@ namespace libcasm_fe
       public:
         INTEGER_T val_;
 
-        IntegerAtom( yy::location& loc, INTEGER_T val );
+        IntegerAtom( location& loc, INTEGER_T val );
         ~IntegerAtom() override;
         bool equals( AstNode* other ) const override;
     };
@@ -256,7 +256,7 @@ namespace libcasm_fe
       public:
         FLOATING_T val_;
 
-        FloatingAtom( yy::location& loc, FLOATING_T val );
+        FloatingAtom( location& loc, FLOATING_T val );
         ~FloatingAtom() override;
         bool equals( AstNode* other ) const override;
     };
@@ -266,20 +266,20 @@ namespace libcasm_fe
       public:
         const rational_t val_;
 
-        RationalAtom( yy::location& loc, const rational_t& rat );
+        RationalAtom( location& loc, const rational_t& rat );
     };
 
     class UndefAtom : public AtomNode
     {
       public:
-        UndefAtom( yy::location& loc );
+        UndefAtom( location& loc );
         bool equals( AstNode* other ) const override;
     };
 
     class SelfAtom : public AtomNode
     {
       public:
-        SelfAtom( yy::location& loc );
+        SelfAtom( location& loc );
         bool equals( AstNode* other ) const override;
     };
 
@@ -287,7 +287,7 @@ namespace libcasm_fe
     {
       public:
         bool value;
-        BooleanAtom( yy::location& loc, bool value );
+        BooleanAtom( location& loc, bool value );
         bool equals( AstNode* other ) const override;
     };
 
@@ -297,7 +297,7 @@ namespace libcasm_fe
         std::string name;
         std::vector< ExpressionBase* >* arguments;
 
-        BaseFunctionAtom( yy::location& loc, NodeType t, const std::string name,
+        BaseFunctionAtom( location& loc, NodeType t, const std::string name,
             std::vector< ExpressionBase* >* args );
 
         std::string to_str() const override;
@@ -325,8 +325,8 @@ namespace libcasm_fe
             Enum* enum_;
         };
 
-        FunctionAtom( yy::location& loc, const std::string name );
-        FunctionAtom( yy::location& loc, const std::string name,
+        FunctionAtom( location& loc, const std::string name );
+        FunctionAtom( location& loc, const std::string name,
             std::vector< ExpressionBase* >* args );
 
         ~FunctionAtom() override;
@@ -341,7 +341,7 @@ namespace libcasm_fe
         std::vector< Type* > types;
         Type* return_type;
 
-        BuiltinAtom( yy::location& loc, const std::string name,
+        BuiltinAtom( location& loc, const std::string name,
             std::vector< ExpressionBase* >* args );
 
         ~BuiltinAtom() override;
@@ -355,7 +355,7 @@ namespace libcasm_fe
         RuleNode* rule;
         const std::string name;
 
-        RuleAtom( yy::location& loc, const std::string& name );
+        RuleAtom( location& loc, const std::string& name );
 
         ~RuleAtom() override;
         bool equals( AstNode* other ) const override;
@@ -366,7 +366,7 @@ namespace libcasm_fe
       public:
         std::string string;
 
-        StringAtom( yy::location& loc, std::string&& name );
+        StringAtom( location& loc, std::string&& name );
 
         ~StringAtom() override;
         bool equals( AstNode* other ) const override;
@@ -377,7 +377,7 @@ namespace libcasm_fe
       public:
         std::vector< ExpressionBase* >* expr_list;
 
-        ListAtom( yy::location& loc, std::vector< ExpressionBase* >* exprs );
+        ListAtom( location& loc, std::vector< ExpressionBase* >* exprs );
     };
 
     class NumberRangeAtom : public AtomNode
@@ -387,7 +387,7 @@ namespace libcasm_fe
         ExpressionBase* right;
 
         NumberRangeAtom(
-            yy::location& loc, ExpressionBase* left, ExpressionBase* right );
+            location& loc, ExpressionBase* left, ExpressionBase* right );
     };
 
     class BinaryExpression : public ExpressionBase
@@ -398,7 +398,7 @@ namespace libcasm_fe
 
         libcasm_ir::Value::ID op;
 
-        BinaryExpression( yy::location& loc, ExpressionBase* left,
+        BinaryExpression( location& loc, ExpressionBase* left,
             ExpressionBase* right, libcasm_ir::Value::ID op );
         ~BinaryExpression() override;
         bool equals( AstNode* other ) const override;
@@ -412,7 +412,7 @@ namespace libcasm_fe
         libcasm_ir::Value::ID op;
 
         UnaryExpression(
-            yy::location& loc, ExpressionBase* expr, libcasm_ir::Value::ID op );
+            location& loc, ExpressionBase* expr, libcasm_ir::Value::ID op );
         ~UnaryExpression() override;
         bool equals( AstNode* other ) const override;
     };
@@ -427,8 +427,7 @@ namespace libcasm_fe
 
         bool dump = false;
 
-        UpdateNode(
-            yy::location& loc, FunctionAtom* func, ExpressionBase* expr );
+        UpdateNode( location& loc, FunctionAtom* func, ExpressionBase* expr );
         ~UpdateNode() override;
         bool equals( AstNode* other ) const override;
     };
@@ -439,7 +438,7 @@ namespace libcasm_fe
         ExpressionBase* expr;
         FunctionAtom* to;
 
-        PushNode( yy::location& loc, ExpressionBase* expr, FunctionAtom* to );
+        PushNode( location& loc, ExpressionBase* expr, FunctionAtom* to );
         ~PushNode() override;
         bool equals( AstNode* other ) const override;
     };
@@ -452,7 +451,7 @@ namespace libcasm_fe
 
         Type from_type;
 
-        PopNode( yy::location& loc, FunctionAtom* to, FunctionAtom* from );
+        PopNode( location& loc, FunctionAtom* to, FunctionAtom* from );
         ~PopNode() override;
         bool equals( AstNode* other ) const override;
     };
@@ -464,7 +463,7 @@ namespace libcasm_fe
         ExpressionBase* in_expr;
         AstNode* statement;
 
-        ForallNode( yy::location& loc, const std::string& ident,
+        ForallNode( location& loc, const std::string& ident,
             ExpressionBase* expr, AstNode* stmt );
         ~ForallNode() override;
     };
@@ -479,7 +478,7 @@ namespace libcasm_fe
 
         bool map_fixed;
 
-        CaseNode( yy::location& loc, ExpressionBase* expr,
+        CaseNode( location& loc, ExpressionBase* expr,
             std::vector< std::pair< AtomNode*, AstNode* > >& case_list );
         ~CaseNode() override;
         bool equals( AstNode* other ) const override;
@@ -493,9 +492,9 @@ namespace libcasm_fe
         std::vector< ExpressionBase* >* arguments;
         ExpressionBase* ruleref;
 
-        CallNode( yy::location& loc, const std::string& rule_name,
+        CallNode( location& loc, const std::string& rule_name,
             ExpressionBase* ruleref );
-        CallNode( yy::location& loc, const std::string& rule_name,
+        CallNode( location& loc, const std::string& rule_name,
             ExpressionBase* ruleref, std::vector< ExpressionBase* >* args );
     };
 
@@ -506,9 +505,9 @@ namespace libcasm_fe
         std::string filter;
 
       public:
-        PrintNode( yy::location& loc, ExpressionBase* atom );
-        PrintNode( yy::location& loc, ExpressionBase* atom,
-            const std::string& filter );
+        PrintNode( location& loc, ExpressionBase* atom );
+        PrintNode(
+            location& loc, ExpressionBase* atom, const std::string& filter );
 
         ExpressionBase* getAtom( void ) const;
         const std::string& getFilter( void ) const;
@@ -521,7 +520,7 @@ namespace libcasm_fe
         ExpressionBase* expr;
         AstNode* stmt;
 
-        LetNode( yy::location& loc, Type type, const std::string& identifier,
+        LetNode( location& loc, Type type, const std::string& identifier,
             ExpressionBase* expr, AstNode* stmt );
     };
 
@@ -530,7 +529,7 @@ namespace libcasm_fe
       public:
         ExpressionBase* msg;
 
-        DiedieNode( yy::location& loc, ExpressionBase* msg );
+        DiedieNode( location& loc, ExpressionBase* msg );
     };
 
     class InitNode : public AstNode
@@ -538,7 +537,7 @@ namespace libcasm_fe
       public:
         FunctionDefNode* progamDef;
 
-        InitNode( yy::location& loc, FunctionDefNode* progamDef );
+        InitNode( location& loc, FunctionDefNode* progamDef );
     };
 
     class SpecificationNode : public AstNode
@@ -546,7 +545,7 @@ namespace libcasm_fe
       public:
         const std::string identifier;
 
-        SpecificationNode( yy::location& loc, const std::string& identifier );
+        SpecificationNode( location& loc, const std::string& identifier );
     };
 
     // root level AST node
@@ -556,8 +555,7 @@ namespace libcasm_fe
         AstListNode* elements;
 
       public:
-        Ast(
-            yy::location& loc, SpecificationNode* spec, AstListNode* elements );
+        Ast( location& loc, SpecificationNode* spec, AstListNode* elements );
 
         SpecificationNode* getSpecification( void );
         AstListNode* getElements( void );

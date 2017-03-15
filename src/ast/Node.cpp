@@ -39,12 +39,12 @@ Node::ID Node::id( void ) const
     return m_id;
 }
 
-void Node::setLocation( const yy::location& location )
+void Node::setLocation( const class location& location )
 {
     m_location = location;
 }
 
-yy::location Node::location( void ) const
+location Node::location( void ) const
 {
     return m_location;
 }

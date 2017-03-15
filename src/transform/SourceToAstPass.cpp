@@ -52,11 +52,10 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    yy::Lexer lexer( sourceFile, std::cout );
+    Lexer lexer( sourceFile, std::cout );
 
-    yy::Parser parser( lexer );
+    Parser parser( lexer );
     parser.set_debug_level( false );
-
 
     try
     {
@@ -68,7 +67,7 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    //pr.setResult< SourceToAstPass >( libstdhl::make< Data >( node ) );
+    // pr.setResult< SourceToAstPass >( libstdhl::make< Data >( node ) );
 
     return true;
 }

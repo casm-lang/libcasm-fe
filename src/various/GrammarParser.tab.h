@@ -32,7 +32,7 @@
 
 /**
  ** \file GrammarParser.tab.h
- ** Define the yy::parser class.
+ ** Define the libcasm_fe::parser class.
  */
 
 // C++ LALR(1) parser skeleton written by Akim Demaille.
@@ -42,15 +42,15 @@
 // //                    "%code requires" blocks.
 #line 44 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 
+    namespace libcasm_fe
+    {
+        class Lexer;
+    }
+
     #include "src/ast/Specification.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
-
-    namespace yy
-    {
-        class Lexer;
-    }
 
 #line 56 "GrammarParser.tab.h" // lalr1.cc:377
 
@@ -127,8 +127,8 @@
 # define YYDEBUG 1
 #endif
 
-
-namespace yy {
+#line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+namespace libcasm_fe {
 #line 133 "GrammarParser.tab.h" // lalr1.cc:377
 
 
@@ -1052,7 +1052,7 @@ namespace yy {
 
 
     /// Build a parser object.
-    Parser (yy::Lexer& lexer_yyarg);
+    Parser (Lexer& lexer_yyarg);
     virtual ~Parser ();
 
     /// Parse.
@@ -1265,7 +1265,7 @@ namespace yy {
 
 
     // User arguments.
-    yy::Lexer& lexer;
+    Lexer& lexer;
   };
 
   // Symbol number corresponding to token number t.
@@ -3081,8 +3081,8 @@ namespace yy {
   }
 
 
-
-} // yy
+#line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+} // libcasm_fe
 #line 3087 "GrammarParser.tab.h" // lalr1.cc:377
 
 

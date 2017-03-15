@@ -69,7 +69,7 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 }
 
 void TypeCheckPass::check_type_valid(
-    const yy::location& location, const Type& type )
+    const location& location, const Type& type )
 {
     if( type == TypeType::ENUM
         && !global_driver->function_table.get_enum( type.enum_name ) )
@@ -654,7 +654,7 @@ void TypeCheckPass::visit_case(
 }
 
 void TypeCheckPass::check_numeric_operator(
-    const yy::location& loc, Type* type, const libcasm_ir::Value::ID op )
+    const location& loc, Type* type, const libcasm_ir::Value::ID op )
 {
     if( *type == TypeType::UNKNOWN )
     {

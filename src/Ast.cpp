@@ -85,14 +85,14 @@ AstNode::AstNode( NodeType node_type )
     // DEBUG(this->to_str());
 }
 
-AstNode::AstNode( yy::location& loc, NodeType nt )
+AstNode::AstNode( location& loc, NodeType nt )
 : location( loc )
 , node_type_( nt )
 , type_( TypeType::UNKNOWN )
 {
 }
 
-AstNode::AstNode( yy::location& loc, NodeType nt, Type t )
+AstNode::AstNode( location& loc, NodeType nt, Type t )
 : location( loc )
 , node_type_( nt )
 , type_( t )
@@ -126,7 +126,7 @@ std::string AstNode::location_str() const
     }
 }
 
-AstListNode::AstListNode( yy::location& loc, NodeType node_type )
+AstListNode::AstListNode( location& loc, NodeType node_type )
 : AstNode( loc, node_type )
 {
 }
@@ -177,7 +177,7 @@ bool AstListNode::equals( AstNode* other ) const
     }
 }
 
-FunctionDefNode::FunctionDefNode( yy::location& loc, Function* sym )
+FunctionDefNode::FunctionDefNode( location& loc, Function* sym )
 : AstNode( loc, NodeType::FUNCTION )
 , sym( sym )
 , m_initializers()
@@ -222,7 +222,7 @@ ExpressionBase* FunctionDefNode::defaultValue() const
     return m_defaultValue;
 }
 
-DerivedDefNode::DerivedDefNode( yy::location& loc, Function* sym )
+DerivedDefNode::DerivedDefNode( location& loc, Function* sym )
 : AstNode( loc, NodeType::DERIVED )
 , sym( sym )
 {
@@ -233,7 +233,7 @@ DerivedDefNode::~DerivedDefNode()
     // sym is deleted in the symbol table
 }
 
-EnumDefNode::EnumDefNode( yy::location& loc, Enum* enum_ )
+EnumDefNode::EnumDefNode( location& loc, Enum* enum_ )
 : AstNode( loc, NodeType::ENUM )
 , enum_( enum_ )
 {
@@ -245,7 +245,7 @@ EnumDefNode::~EnumDefNode()
 }
 
 IfThenElseNode::IfThenElseNode(
-    yy::location& loc, ExpressionBase* condition, AstNode* then, AstNode* els )
+    location& loc, ExpressionBase* condition, AstNode* then, AstNode* els )
 : AstNode( loc, NodeType::IFTHENELSE )
 , condition_( condition )
 , then_( then )
@@ -253,7 +253,7 @@ IfThenElseNode::IfThenElseNode(
 {
 }
 
-ZeroAtom::ZeroAtom( yy::location& loc, AstNode* reference )
+ZeroAtom::ZeroAtom( location& loc, AstNode* reference )
 : AtomNode( loc, NodeType::ZERO_ATOM, Type( TypeType::UNKNOWN ) )
 , ref( reference )
 {
@@ -265,7 +265,7 @@ const AstNode* ZeroAtom::getRef( void ) const
     return ref;
 }
 
-IntegerAtom::IntegerAtom( yy::location& loc, INTEGER_T val )
+IntegerAtom::IntegerAtom( location& loc, INTEGER_T val )
 : AtomNode( loc, NodeType::INTEGER_ATOM, Type( TypeType::INTEGER ) )
 {
     if( val > 0 )
@@ -299,7 +299,7 @@ bool IntegerAtom::equals( AstNode* other ) const
     return val_ == other_cast->val_;
 }
 
-FloatingAtom::FloatingAtom( yy::location& loc, FLOATING_T val )
+FloatingAtom::FloatingAtom( location& loc, FLOATING_T val )
 : AtomNode( loc, NodeType::FLOATING_ATOM, Type( TypeType::FLOATING ) )
 {
     val_ = val;
@@ -320,13 +320,13 @@ bool FloatingAtom::equals( AstNode* other ) const
     return val_ == other_cast->val_;
 }
 
-RationalAtom::RationalAtom( yy::location& loc, const rational_t& val )
+RationalAtom::RationalAtom( location& loc, const rational_t& val )
 : AtomNode( loc, NodeType::RATIONAL_ATOM, Type( TypeType::RATIONAL ) )
 , val_( val )
 {
 }
 
-UndefAtom::UndefAtom( yy::location& loc )
+UndefAtom::UndefAtom( location& loc )
 : AtomNode( loc, NodeType::UNDEF_ATOM, Type( TypeType::UNKNOWN ) )
 {
 }
@@ -343,7 +343,7 @@ bool UndefAtom::equals( AstNode* other ) const
     }
 }
 
-SelfAtom::SelfAtom( yy::location& loc )
+SelfAtom::SelfAtom( location& loc )
 : AtomNode( loc, NodeType::SELF_ATOM, Type( TypeType::AGENT ) )
 {
     DEBUG( "TRUE" );
@@ -361,7 +361,7 @@ bool SelfAtom::equals( AstNode* other ) const
     }
 }
 
-BooleanAtom::BooleanAtom( yy::location& loc, bool value )
+BooleanAtom::BooleanAtom( location& loc, bool value )
 : AtomNode( loc, NodeType::BOOLEAN_ATOM, Type( TypeType::BOOLEAN ) )
 , value( value )
 {
@@ -378,7 +378,7 @@ bool BooleanAtom::equals( AstNode* other ) const
     return value == other_b->value;
 }
 
-RuleAtom::RuleAtom( yy::location& loc, const std::string& name )
+RuleAtom::RuleAtom( location& loc, const std::string& name )
 : AtomNode( loc, NodeType::RULE_ATOM, Type( TypeType::RULEREF ) )
 , name( name )
 {
@@ -393,7 +393,7 @@ bool RuleAtom::equals( AstNode* ) const
     throw "NOT IMPLEMENTED";
 }
 
-StringAtom::StringAtom( yy::location& loc, std::string&& string )
+StringAtom::StringAtom( location& loc, std::string&& string )
 : AtomNode( loc, NodeType::STRING_ATOM, Type( TypeType::STRING ) )
 , string( string )
 {
@@ -409,7 +409,7 @@ bool StringAtom::equals( AstNode* ) const
     throw "NOT IMPLEMENTED";
 }
 
-BaseFunctionAtom::BaseFunctionAtom( yy::location& loc, NodeType t,
+BaseFunctionAtom::BaseFunctionAtom( location& loc, NodeType t,
     const std::string name, std::vector< ExpressionBase* >* args )
 : AtomNode( loc, t, Type( TypeType::UNKNOWN ) )
 , name( name )
@@ -422,12 +422,12 @@ std::string BaseFunctionAtom::to_str() const
     return name;
 }
 
-FunctionAtom::FunctionAtom( yy::location& loc, const std::string name )
+FunctionAtom::FunctionAtom( location& loc, const std::string name )
 : FunctionAtom( loc, name, nullptr )
 {
 }
 
-FunctionAtom::FunctionAtom( yy::location& loc, const std::string name,
+FunctionAtom::FunctionAtom( location& loc, const std::string name,
     std::vector< ExpressionBase* >* args )
 : BaseFunctionAtom( loc, NodeType::FUNCTION_ATOM, name, args )
 , symbol_type( SymbolType::UNSET )
@@ -505,7 +505,7 @@ static Type* builtin_atom_new_type( TypeType t )
     }
 }
 
-BuiltinAtom::BuiltinAtom( yy::location& loc, const std::string name,
+BuiltinAtom::BuiltinAtom( location& loc, const std::string name,
     std::vector< ExpressionBase* >* args )
 : BaseFunctionAtom( loc, NodeType::BUILTIN_ATOM, name, args )
 , return_type( nullptr )
@@ -551,7 +551,7 @@ std::string BuiltinAtom::to_str() const
     return built_in->name;
 }
 
-ListAtom::ListAtom( yy::location& loc, std::vector< ExpressionBase* >* exprs )
+ListAtom::ListAtom( location& loc, std::vector< ExpressionBase* >* exprs )
 : AtomNode( loc, NodeType::LIST_ATOM, TypeType::UNKNOWN )
 , expr_list( exprs )
 {
@@ -560,14 +560,14 @@ ListAtom::ListAtom( yy::location& loc, std::vector< ExpressionBase* >* exprs )
 }
 
 NumberRangeAtom::NumberRangeAtom(
-    yy::location& loc, ExpressionBase* left, ExpressionBase* right )
+    location& loc, ExpressionBase* left, ExpressionBase* right )
 : AtomNode( loc, NodeType::NUMBER_RANGE_ATOM, TypeType::NUMBER_RANGE )
 , left( left )
 , right( right )
 {
 }
 
-BinaryExpression::BinaryExpression( yy::location& loc, ExpressionBase* left,
+BinaryExpression::BinaryExpression( location& loc, ExpressionBase* left,
     ExpressionBase* right, libcasm_ir::Value::ID op )
 : ExpressionBase( loc, NodeType::BINARY_EXPRESSION, Type( TypeType::UNKNOWN ) )
 , left_( left )
@@ -603,7 +603,7 @@ bool BinaryExpression::equals( AstNode* other ) const
 }
 
 UnaryExpression::UnaryExpression(
-    yy::location& loc, ExpressionBase* expr, libcasm_ir::Value::ID op )
+    location& loc, ExpressionBase* expr, libcasm_ir::Value::ID op )
 : ExpressionBase( loc, NodeType::UNARY_EXPRESSION, Type( TypeType::UNKNOWN ) )
 , expr_( expr )
 , op( op )
@@ -678,7 +678,7 @@ std::string libcasm_fe::operator_to_str( libcasm_ir::Value::ID op )
 }
 
 UpdateNode::UpdateNode(
-    yy::location& loc, FunctionAtom* func, ExpressionBase* expr )
+    location& loc, FunctionAtom* func, ExpressionBase* expr )
 : AstNode( loc, NodeType::UPDATE )
 , func( func )
 , expr_( expr )
@@ -703,7 +703,7 @@ bool UpdateNode::equals( AstNode* other ) const
            && func->equals( other_cast->func );
 }
 
-PushNode::PushNode( yy::location& loc, ExpressionBase* expr, FunctionAtom* to )
+PushNode::PushNode( location& loc, ExpressionBase* expr, FunctionAtom* to )
 : AstNode( loc, NodeType::PUSH )
 , expr( expr )
 , to( to )
@@ -727,7 +727,7 @@ bool PushNode::equals( AstNode* other ) const
     FAILURE();
 }
 
-PopNode::PopNode( yy::location& loc, FunctionAtom* to, FunctionAtom* from )
+PopNode::PopNode( location& loc, FunctionAtom* to, FunctionAtom* from )
 : AstNode( loc, NodeType::POP )
 , to( std::move( to ) )
 , from( from )
@@ -751,7 +751,7 @@ bool PopNode::equals( AstNode* other ) const
     FAILURE();
 }
 
-ForallNode::ForallNode( yy::location& loc, const std::string& ident,
+ForallNode::ForallNode( location& loc, const std::string& ident,
     ExpressionBase* expr, AstNode* stmt )
 : AstNode( loc, NodeType::FORALL )
 , identifier( std::move( ident ) )
@@ -765,7 +765,7 @@ ForallNode::~ForallNode()
     delete statement;
 }
 
-CaseNode::CaseNode( yy::location& loc, ExpressionBase* expr,
+CaseNode::CaseNode( location& loc, ExpressionBase* expr,
     std::vector< std::pair< AtomNode*, AstNode* > >& case_list )
 : AstNode( loc, NodeType::CASE )
 , expr( expr )
@@ -788,7 +788,7 @@ bool CaseNode::equals( AstNode* other ) const
     FAILURE();
 }
 
-UnaryNode::UnaryNode( yy::location& loc, NodeType node_type, AstNode* child )
+UnaryNode::UnaryNode( location& loc, NodeType node_type, AstNode* child )
 : AstNode( loc, node_type )
 {
     child_ = child;
@@ -810,7 +810,7 @@ bool UnaryNode::equals( AstNode* other ) const
     return child_->equals( other_cast->child_ );
 }
 
-RuleNode::RuleNode( yy::location& loc, AstNode* child, const std::string& name )
+RuleNode::RuleNode( location& loc, AstNode* child, const std::string& name )
 : UnaryNode( loc, NodeType::RULE, child )
 , name( std::move( name ) )
 , arguments()
@@ -819,7 +819,7 @@ RuleNode::RuleNode( yy::location& loc, AstNode* child, const std::string& name )
 {
 }
 
-RuleNode::RuleNode( yy::location& loc,
+RuleNode::RuleNode( location& loc,
     AstNode* child,
     const std::string& name,
     std::vector< Type* >& args )
@@ -831,7 +831,7 @@ RuleNode::RuleNode( yy::location& loc,
 {
 }
 
-RuleNode::RuleNode( yy::location& loc, AstNode* child, const std::string& name,
+RuleNode::RuleNode( location& loc, AstNode* child, const std::string& name,
     std::vector< Type* >& args,
     const std::vector< std::pair< std::string, std::vector< std::string > > >&
         dump_list )
@@ -844,12 +844,12 @@ RuleNode::RuleNode( yy::location& loc, AstNode* child, const std::string& name,
 }
 
 CallNode::CallNode(
-    yy::location& loc, const std::string& rule_name, ExpressionBase* ruleref )
+    location& loc, const std::string& rule_name, ExpressionBase* ruleref )
 : CallNode( loc, rule_name, ruleref, nullptr )
 {
 }
 
-CallNode::CallNode( yy::location& loc, const std::string& rule_name,
+CallNode::CallNode( location& loc, const std::string& rule_name,
     ExpressionBase* ruleref, std::vector< ExpressionBase* >* args )
 : AstNode( loc, NodeType::CALL, Type( TypeType::NO_TYPE ) )
 , rule_name( rule_name )
@@ -860,7 +860,7 @@ CallNode::CallNode( yy::location& loc, const std::string& rule_name,
 }
 
 PrintNode::PrintNode(
-    yy::location& loc, ExpressionBase* atom, const std::string& filter )
+    location& loc, ExpressionBase* atom, const std::string& filter )
 : AstNode( loc, NodeType::PRINT, Type( TypeType::NO_TYPE ) )
 , atom( atom )
 , filter( filter )
@@ -868,7 +868,7 @@ PrintNode::PrintNode(
     assert( atom and " invalid PrintNode created! " );
 }
 
-PrintNode::PrintNode( yy::location& loc, ExpressionBase* atom )
+PrintNode::PrintNode( location& loc, ExpressionBase* atom )
 : PrintNode( loc, atom, "" )
 {
 }
@@ -883,7 +883,7 @@ const std::string& PrintNode::getFilter( void ) const
     return filter;
 }
 
-LetNode::LetNode( yy::location& loc, Type type, const std::string& identifier,
+LetNode::LetNode( location& loc, Type type, const std::string& identifier,
     ExpressionBase* expr, AstNode* stmt )
 : AstNode( loc, NodeType::LET, type )
 , identifier( identifier )
@@ -892,26 +892,26 @@ LetNode::LetNode( yy::location& loc, Type type, const std::string& identifier,
 {
 }
 
-DiedieNode::DiedieNode( yy::location& loc, ExpressionBase* msg )
+DiedieNode::DiedieNode( location& loc, ExpressionBase* msg )
 : AstNode( loc, NodeType::DIEDIE )
 , msg( msg )
 {
 }
 
-InitNode::InitNode( yy::location& loc, FunctionDefNode* progamDef )
+InitNode::InitNode( location& loc, FunctionDefNode* progamDef )
 : AstNode( loc, NodeType::INIT )
 , progamDef( progamDef )
 {
 }
 
 SpecificationNode::SpecificationNode(
-    yy::location& loc, const std::string& identifier )
+    location& loc, const std::string& identifier )
 : AstNode( loc, NodeType::SPECIFICATION )
 , identifier( identifier )
 {
 }
 
-Ast::Ast( yy::location& loc, SpecificationNode* spec, AstListNode* elements )
+Ast::Ast( location& loc, SpecificationNode* spec, AstListNode* elements )
 : AstNode( loc, NodeType::SPECIFICATION )
 , spec( spec )
 , elements( elements )

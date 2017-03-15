@@ -28,7 +28,7 @@
 //%debug
 
 %defines
-//%define api.namespace {libcasm_fe}
+%define api.namespace {libcasm_fe}
 %define parser_class_name {Parser}
 
 %define api.token.constructor
@@ -42,18 +42,18 @@
 
 %code requires
 {
+    namespace libcasm_fe
+    {
+        class Lexer;
+    }
+
     #include "src/ast/Specification.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
-
-    namespace yy
-    {
-        class Lexer;
-    }
 }
 
-%parse-param { yy::Lexer& lexer }
+%parse-param { Lexer& lexer }
 
 %initial-action
 {
@@ -160,7 +160,7 @@
         return { functionClass, symbolicFunction };
     }
 
-    static FunctionDefinition::Ptr createProgramFunction( yy::location& location )
+    static FunctionDefinition::Ptr createProgramFunction( location& location )
     {
         //auto argTypes = { new Type( TypeType::AGENT ) }; // TODO add args and return type
         //auto retType = new Type( TypeType::RuleReference );
@@ -1256,7 +1256,7 @@ CallRule
 
 %%
 
-void yy::Parser::error( const location_type& l, const std::string& m )
+void Parser::error( const location_type& l, const std::string& m )
 {
     if( m.compare( "syntax error, unexpected end of file, expecting CASM" ) == 0 )
     {
@@ -1264,7 +1264,7 @@ void yy::Parser::error( const location_type& l, const std::string& m )
         pos = ( pos > 0 ? pos : 1 );
 
         /*driver.error
-        ( yy::location( yy::position( 0, pos, 1 ) )
+        ( location( position( 0, pos, 1 ) )
         , m
         , libcasm_fe::Codes::SyntaxError
         ); TODO */

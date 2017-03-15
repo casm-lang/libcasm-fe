@@ -55,7 +55,7 @@ namespace libcasm_fe
         bool hasEmptyUpdateSet() const;
         Update* addUpdate( Function* function,
             const std::vector< value_t >& arguments, const value_t& value,
-            const yy::location& location );
+            const location& location );
         void applyUpdates();
 
         void fork( const UpdateSet::Type updateSetType );

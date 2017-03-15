@@ -55,7 +55,7 @@ namespace libcasm_fe
 
     class AstDumpVisitor final : public Ast::RecursiveVisitor
     {
-    public:
+      public:
         AstDumpVisitor( std::ostream& stream );
 
         void visit( Ast::IdentifierNode& node ) override;
@@ -98,11 +98,11 @@ namespace libcasm_fe
         void visit( Ast::FixedSizedType& node ) override;
         void visit( Ast::RangedType& node ) override;
 
-    private:
+      private:
         void dumpNode( const Ast::Node& node, const std::string& name );
         void dumpLink( const Ast::Node& from, const Ast::Node& to );
 
-    private:
+      private:
         std::ostream& m_stream;
     };
 }

@@ -41,7 +41,7 @@ bool AstDumpPass::run( libpass::PassResult& pr )
     std::ofstream dotfile( "./obj/out.dot" );
     dotfile << "digraph \"main\" {\n";
 
-    AstDumpVisitor visitor{dotfile};
+    AstDumpVisitor visitor{ dotfile };
     // specification.accept( visitor );
 
     dotfile << "}\n";
@@ -50,8 +50,8 @@ bool AstDumpPass::run( libpass::PassResult& pr )
     return true;
 }
 
-AstDumpVisitor::AstDumpVisitor(std::ostream& stream)
-: m_stream(stream)
+AstDumpVisitor::AstDumpVisitor( std::ostream& stream )
+: m_stream( stream )
 {
 }
 

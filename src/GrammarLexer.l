@@ -25,10 +25,12 @@
 
 #include "src/Lexer.h"
 
-#undef YY_DECL
-#define YY_DECL yy::Parser::symbol_type yy::Lexer::nextToken()
+using namespace libcasm_fe;
 
-#define yyterminate() return( yy::Parser::make_END(loc) )
+#undef YY_DECL
+#define YY_DECL Parser::symbol_type Lexer::nextToken()
+
+#define yyterminate() return( Parser::make_END(loc) )
 
 // Code run each time a pattern is matched.
 #define YY_USER_ACTION loc.columns( yyleng );
@@ -41,7 +43,7 @@
 %option nounput
 %option batch
 %option noinput
-%option yyclass="yy::Lexer"
+%option yyclass="Lexer"
 %option c++
 
 %x LCOMMENT
@@ -55,29 +57,29 @@
 %}
 
 0[bB][01][01\']*[01]* {
-    return yy::Parser::make_BINARY( yytext + 2, loc );
+    return Parser::make_BINARY( yytext + 2, loc );
 }
 
 0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
-    return yy::Parser::make_HEXADECIMAL( yytext + 2, loc );
+    return Parser::make_HEXADECIMAL( yytext + 2, loc );
 }
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
-    return yy::Parser::make_RATIONAL( yytext + 2, loc );
+    return Parser::make_RATIONAL( yytext + 2, loc );
 }
 
 [0-9][0-9\']*[0-9]* {
-    return yy::Parser::make_INTEGER( yytext, loc );
+    return Parser::make_INTEGER( yytext, loc );
 }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
-    return yy::Parser::make_FLOATING( yytext, loc );
+    return Parser::make_FLOATING( yytext, loc );
 }
 
 {{grammartoken}}
 
 [a-zA-Z_][a-zA-Z0-9\_]* {
-    return yy::Parser::make_IDENTIFIER( yytext, loc );
+    return Parser::make_IDENTIFIER( yytext, loc );
 }
 
 [ \t\r]+ { /* ignore spaces */
@@ -137,24 +139,24 @@
 }
 <STRING><<EOF>> {
     /*global_driver->error( loc, "unclosed string",
-            libcasm_fe::Codes::SyntaxErrorUnclosedString ); TODO*/
+            Codes::SyntaxErrorUnclosedString ); TODO*/
     exit( 1 ); // FIXME no exit!!
 }
 <STRING>\" {
     BEGIN( INITIAL );
-    return yy::Parser::make_STRING( strbuf, loc );
+    return Parser::make_STRING( strbuf, loc );
 }
 
 . {
     /*global_driver->error( loc,
             "unrecognized character '" + std::string( yytext ) + "'",
-            libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter ); TODO*/
+            Codes::SyntaxErrorUnrecognizedCharacter ); TODO*/
     exit( 1 ); // FIXME no exit!!
 }
 
 %%
 
-yy::Lexer::Lexer( std::istream& in, std::ostream& out )
+Lexer::Lexer( std::istream& in, std::ostream& out )
 : yyFlexLexer( in, out )
 , loc()
 , strbuf()

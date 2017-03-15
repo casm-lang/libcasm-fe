@@ -53,17 +53,17 @@ Driver::Driver()
 }
 
 void Driver::error(
-    const yy::location& l, const std::string& m, libcasm_fe::Codes code )
+    const location& l, const std::string& m, libcasm_fe::Codes code )
 {
     error( { l }, m, code );
 }
 
-void Driver::error( const std::vector< yy::location >& locations,
+void Driver::error( const std::vector< location >& locations,
     const std::string& m, libcasm_fe::Codes code )
 {
     assert( locations.size() > 0 );
 
-    const yy::location& l = locations.at( 0 );
+    const location& l = locations.at( 0 );
 
     // Set state to error!
     error_++;
@@ -101,7 +101,7 @@ void Driver::error( const Exception& exception )
         exception.getLocations(), exception.what(), exception.getErrorCode() );
 }
 
-void Driver::warning( const yy::location& l, const std::string& m )
+void Driver::warning( const location& l, const std::string& m )
 {
     // increment warning counter
     warning_++;
@@ -114,7 +114,7 @@ void Driver::warning( const yy::location& l, const std::string& m )
     underline( l );
 }
 
-void Driver::info( const yy::location& l, const std::string& m )
+void Driver::info( const location& l, const std::string& m )
 {
     std::cerr << BOLD_BLACK << filename_ << ":" << l.begin.line << "."
               << l.begin.column << "-" << l.end.line << "." << l.end.column
@@ -124,7 +124,7 @@ void Driver::info( const yy::location& l, const std::string& m )
     underline( l );
 }
 
-void Driver::underline( const yy::location& l )
+void Driver::underline( const location& l )
 {
     if( l.begin.line == l.end.line && l.begin.line <= lines_.size() )
     {

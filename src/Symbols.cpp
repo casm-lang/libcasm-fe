@@ -620,7 +620,7 @@ Builtin built_ins[] = { { "isSymbolic", Builtin::Id::IS_SYMBOLIC,
 };
 
 Symbol::Symbol(
-    const std::string& name, const yy::location& location, SymbolType type )
+    const std::string& name, const location& location, SymbolType type )
 : name( std::move( name ) )
 , location( std::move( location ) )
 , type( type )
@@ -633,7 +633,7 @@ Symbol::Symbol(
 
 uint64_t Function::counter = 0;
 
-Function::Function( const std::string name, const yy::location& location,
+Function::Function( const std::string name, const location& location,
     const std::vector< Type* >& args, Type* return_type )
 : Symbol( name, location, SymbolType::FUNCTION )
 , arguments_( std::move( args ) )
@@ -649,7 +649,7 @@ Function::Function( const std::string name, const yy::location& location,
     initRangeCheck();
 }
 
-Function::Function( const std::string name, const yy::location& location,
+Function::Function( const std::string name, const location& location,
     const std::vector< Type* >& args, ExpressionBase* expr, Type* return_type )
 : Symbol( name, location, SymbolType::DERIVED )
 , arguments_( std::move( args ) )
@@ -663,7 +663,7 @@ Function::Function( const std::string name, const yy::location& location,
     initRangeCheck();
 }
 
-Function::Function( const std::string name, const yy::location& location,
+Function::Function( const std::string name, const location& location,
     ExpressionBase* expr, Type* return_type )
 : Function( name, location, {}, expr, return_type )
 {
@@ -743,7 +743,7 @@ enum_value_t::enum_value_t( std::string* name, const uint16_t id )
 {
 }
 
-Enum::Enum( const std::string& name, const yy::location& location )
+Enum::Enum( const std::string& name, const location& location )
 : Symbol( name, location, Symbol::SymbolType::ENUM )
 , mapping()
 {

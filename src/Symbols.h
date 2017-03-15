@@ -236,7 +236,7 @@ namespace libcasm_fe
     {
       public:
         const std::string name;
-        const yy::location location;
+        const location location;
 
         enum class SymbolType
         {
@@ -249,7 +249,7 @@ namespace libcasm_fe
 
         SymbolType type;
 
-        Symbol( const std::string& name, const yy::location& location,
+        Symbol( const std::string& name, const location& location,
             SymbolType type );
     };
 
@@ -276,12 +276,12 @@ namespace libcasm_fe
         bool checkArguments;
         bool checkReturnValue;
 
-        Function( const std::string name, const yy::location& location,
+        Function( const std::string name, const location& location,
             const std::vector< Type* >& args, Type* return_type );
-        Function( const std::string name, const yy::location& location,
+        Function( const std::string name, const location& location,
             const std::vector< Type* >& args, ExpressionBase* expr,
             Type* return_type );
-        Function( const std::string name, const yy::location& location,
+        Function( const std::string name, const location& location,
             ExpressionBase* expr, Type* return_type );
         ~Function();
 
@@ -313,7 +313,7 @@ namespace libcasm_fe
         // forall
         std::map< std::string, enum_value_t* > mapping;
 
-        Enum( const std::string& name, const yy::location& location );
+        Enum( const std::string& name, const location& location );
         bool add_enum_element( const std::string& name );
     };
 

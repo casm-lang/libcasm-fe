@@ -26,25 +26,25 @@
 #ifndef _LIB_CASMFE_LEXER_H_
 #define _LIB_CASMFE_LEXER_H_
 
-#include <string>
 #include <FlexLexer.h>
+#include <string>
 
 #include "various/GrammarParser.tab.h"
 
-namespace yy
+namespace libcasm_fe
 {
     class Lexer : public yyFlexLexer
     {
-    public:
+      public:
         Lexer( std::istream& in, std::ostream& out );
 
-        yy::Parser::symbol_type nextToken();
+        Parser::symbol_type nextToken();
 
-    protected:
-        //void LexerError( const char* msg ) override; TODO
+      protected:
+        // void LexerError( const char* msg ) override; TODO
 
-    private:
-        yy::Parser::location_type loc;
+      private:
+        Parser::location_type loc;
         std::string strbuf;
     };
 }

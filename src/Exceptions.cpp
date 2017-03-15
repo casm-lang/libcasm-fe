@@ -25,25 +25,26 @@
 
 #include "Exceptions.h"
 
-Exception::Exception(
-    const std::string& msg, const libcasm_fe::Codes error_code )
+using namespace libcasm_fe;
+
+Exception::Exception( const std::string& msg, const Codes error_code )
 : msg_( msg )
 , error_code_( error_code )
 {
-    addLocation( yy::location( yy::position( 0, 0, 0 ) ) );
+    addLocation( location( position( 0, 0, 0 ) ) );
     fprintf( stderr, "RUNTIME_EXCEPTION_WITH_UNKNOWN_LOCATION!!!\n" );
 }
 
-Exception::Exception( const yy::location& location, const std::string& msg,
-    const libcasm_fe::Codes error_code )
+Exception::Exception(
+    const location& location, const std::string& msg, const Codes error_code )
 : msg_( msg )
 , error_code_( error_code )
 {
     addLocation( location );
 }
 
-Exception::Exception( const std::vector< yy::location >& location,
-    const std::string& msg, const libcasm_fe::Codes error_code )
+Exception::Exception( const std::vector< location >& location,
+    const std::string& msg, const Codes error_code )
 : msg_( msg )
 , error_code_( error_code )
 {
@@ -55,17 +56,17 @@ const char* Exception::what() const throw()
     return msg_.c_str();
 }
 
-void Exception::addLocation( const yy::location& location )
+void Exception::addLocation( const location& location )
 {
     location_.push_back( location );
 }
 
-const std::vector< yy::location >& Exception::getLocations( void ) const
+const std::vector< location >& Exception::getLocations( void ) const
 {
     return location_;
 }
 
-const libcasm_fe::Codes Exception::getErrorCode( void ) const
+const Codes Exception::getErrorCode( void ) const
 {
     return error_code_;
 }

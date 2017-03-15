@@ -28,8 +28,8 @@
 
 #include "Visitor.h"
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "../various/location.hh"
 
@@ -104,16 +104,16 @@ namespace libcasm_fe
 
             ID id( void ) const;
 
-            void setLocation( const yy::location& location );
+            void setLocation( const class location& location );
 
-            yy::location location( void ) const;
+            location location( void ) const;
 
             virtual void accept( Visitor& visitor ) = 0;
 
           private:
             ID m_id;
 
-            yy::location m_location;
+            class location m_location;
         };
 
         template < typename T >
@@ -122,7 +122,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< NodeList >;
             using iterator = typename std::vector< typename T::Ptr >::iterator;
-            using const_iterator = typename std::vector< typename T::Ptr >::const_iterator;
+            using const_iterator =
+                typename std::vector< typename T::Ptr >::const_iterator;
 
             NodeList( void )
             : Node( Node::ID::NODE_LIST )
@@ -172,7 +173,7 @@ namespace libcasm_fe
                 }
             }
 
-        private:
+          private:
             std::vector< typename T::Ptr > m_elements;
         };
 
@@ -192,9 +193,10 @@ namespace libcasm_fe
         };
 
         template < typename T, typename... Args >
-        typename T::Ptr make( const yy::location& location, Args&&... args )
+        typename T::Ptr make( const location& location, Args&&... args )
         {
-            auto node = std::make_shared< T >( std::forward< Args >( args )... );
+            auto node
+                = std::make_shared< T >( std::forward< Args >( args )... );
             node->setLocation( location );
             return node;
         }

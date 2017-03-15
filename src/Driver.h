@@ -29,8 +29,8 @@
 #include "cpp/Default.h"
 #include "cpp/Type.h"
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "Exceptions.h"
 #include "various/location.hh"
@@ -55,17 +55,17 @@ namespace libcasm_fe
         bool trace_scanning;
 
         // Error handling.
-        void error( const yy::location& l, const std::string& m,
+        void error( const location& l, const std::string& m,
             libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
 
-        void error( const std::vector< yy::location >& locations,
+        void error( const std::vector< location >& locations,
             const std::string& m,
             libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
 
         void error( const Exception& exception );
 
-        void warning( const yy::location& l, const std::string& m );
-        void info( const yy::location& l, const std::string& m );
+        void warning( const location& l, const std::string& m );
+        void info( const location& l, const std::string& m );
         bool ok() const;
 
         uint64_t get_error_count() const;
@@ -77,7 +77,7 @@ namespace libcasm_fe
         const std::string& get_filename();
 
       private:
-        void underline( const yy::location& l );
+        void underline( const location& l );
     };
 }
 

@@ -29,50 +29,50 @@
 #include <exception>
 #include <stdexcept>
 #include <string>
-
-#include "cpp/Type.h"
+#include <vector>
 
 #include "various/location.hh"
 
 #include "Codes.h"
 
-// TODO: namespace libcasm_fe
-
-class Exception : public std::exception
+namespace libcasm_fe
 {
-  private:
-    std::vector< yy::location > location_;
-    const std::string msg_;
-    const libcasm_fe::Codes error_code_;
+    class Exception : public std::exception
+    {
+      private:
+        std::vector< location > location_;
+        const std::string msg_;
+        const Codes error_code_;
 
-  public:
-    explicit Exception( const std::string& msg,
-        const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
+      public:
+        explicit Exception( const std::string& msg,
+            const Codes error_code = Codes::Unspecified );
 
-    explicit Exception( const yy::location& location, const std::string& msg,
-        const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
+        explicit Exception( const location& location, const std::string& msg,
+            const Codes error_code = Codes::Unspecified );
 
-    explicit Exception( const std::vector< yy::location >& location,
-        const std::string& msg,
-        const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
+        explicit Exception( const std::vector< location >& location,
+            const std::string& msg,
+            const Codes error_code = Codes::Unspecified );
 
-    virtual const char* what() const throw();
+        virtual const char* what() const throw();
 
-    void addLocation( const yy::location& location );
+        void addLocation( const location& location );
 
-    const std::vector< yy::location >& getLocations( void ) const;
+        const std::vector< location >& getLocations( void ) const;
 
-    const libcasm_fe::Codes getErrorCode( void ) const;
-};
+        const Codes getErrorCode( void ) const;
+    };
 
-class RuntimeException : public Exception
-{
-    using Exception::Exception;
-};
+    class RuntimeException : public Exception
+    {
+        using Exception::Exception;
+    };
 
-class CompiletimeException : public Exception
-{
-    using Exception::Exception;
-};
+    class CompiletimeException : public Exception
+    {
+        using Exception::Exception;
+    };
+}
 
 #endif // _LIB_CASMFE_EXCEPTIONS_H_
