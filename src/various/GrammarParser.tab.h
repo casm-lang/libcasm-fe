@@ -1052,7 +1052,7 @@ namespace libcasm_fe {
 
 
     /// Build a parser object.
-    Parser (Lexer& lexer_yyarg);
+    Parser (Lexer& lexer_yyarg, const std::string& specificationName_yyarg, Specification::Ptr& result_yyarg);
     virtual ~Parser ();
 
     /// Parse.
@@ -1266,6 +1266,8 @@ namespace libcasm_fe {
 
     // User arguments.
     Lexer& lexer;
+    const std::string& specificationName;
+    Specification::Ptr& result;
   };
 
   // Symbol number corresponding to token number t.
@@ -3083,7 +3085,7 @@ namespace libcasm_fe {
 
 #line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 } // libcasm_fe
-#line 3087 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3089 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

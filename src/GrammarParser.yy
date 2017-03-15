@@ -54,6 +54,8 @@
 }
 
 %parse-param { Lexer& lexer }
+%parse-param { const std::string& specificationName }
+%parse-param { Specification::Ptr& result }
 
 %initial-action
 {
@@ -293,16 +295,8 @@ END       0 "end of file"
 Specification
 : CASM Definitions
   {
-      /*const std::string& filepath = driver.get_filename();
-      const std::string& filename
-          = filepath.substr( filepath.find_last_of( "/\\" ) + 1 );
-      const std::string& filenameWithoutExtension
-          = filename.substr( 0, filename.rfind( "." ) );*/
-
-      const auto name = make< IdentifierNode >( @$, "filenameWithoutExtension" );
-      const auto specification = make< Specification >( @$, name, $2 );
-
-      //driver.result = specification; TODO
+      const auto name = make< IdentifierNode >( @$, specificationName );
+      result = make< Specification >( @$, name, $2 );
   }
 ;
 

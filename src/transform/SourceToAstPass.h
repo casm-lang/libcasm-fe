@@ -28,6 +28,8 @@
 
 #include "libpass.h"
 
+#include "../ast/Specification.h"
+
 /**
    @brief    TODO
 
@@ -48,18 +50,18 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Data >;
 
-            /*Data( Ast* root )
-            : m_root( root )
+            Data( const Ast::Specification::Ptr& specification )
+            : m_specification( specification )
             {
             }
 
-            Ast* root( void ) const
+            Ast::Specification::Ptr specification( void ) const
             {
-                return m_root;
+                return m_specification;
             }
 
           private:
-            Ast* m_root;*/
+            Ast::Specification::Ptr m_specification;
         };
     };
 }

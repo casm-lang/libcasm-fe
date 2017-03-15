@@ -43,23 +43,34 @@ static libpass::PassRegistration< SourceToAstPass > PASS( "Source To AST Pass",
 bool SourceToAstPass::run( libpass::PassResult& pr )
 {
     const auto loadFilePass = pr.result< libpass::LoadFilePass >();
-    const auto& filename = loadFilePass->filename();
+    const auto filePath = std::string(
+        loadFilePass->filename() ); // TODO char* -> string in load pass
 
-    std::ifstream sourceFile( filename );
+    std::ifstream sourceFile( filePath );
     if( not sourceFile )
     {
-        std::cerr << "error: could not open `" << filename << "´" << std::endl;
+        std::cerr << "error: could not open `" << filePath << "´" << std::endl;
         return false;
     }
 
-    Lexer lexer( sourceFile, std::cout );
+    const std::string& fileName
+        = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
+    const std::string& specificationName
+        = fileName.substr( 0, fileName.rfind( "." ) );
 
-    Parser parser( lexer );
-    parser.set_debug_level( false );
+    Ast::Specification::Ptr specification;
+
+    Lexer lexer( sourceFile, std::cout );
+    Parser parser( lexer, specificationName, specification );
+    parser.set_debug_level( false ); // TODO add flag
 
     try
     {
-        parser.parse();
+        if( ( parser.parse() != 0 ) or not specification )
+        {
+            std::cerr << "Error parsing file" << std::endl;
+            return false;
+        }
     }
     catch( const std::exception& e )
     {
@@ -67,7 +78,7 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    // pr.setResult< SourceToAstPass >( libstdhl::make< Data >( node ) );
+    pr.setResult< SourceToAstPass >( libstdhl::make< Data >( specification ) );
 
     return true;
 }
