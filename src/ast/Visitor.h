@@ -26,8 +26,6 @@
 #ifndef _LIB_CASMFE_VISITOR_H_
 #define _LIB_CASMFE_VISITOR_H_
 
-#include "../CasmFE.h"
-
 namespace libcasm_fe
 {
     namespace Ast
@@ -72,7 +70,10 @@ namespace libcasm_fe
         class FixedSizedType;
         class RangedType;
 
-        class Visitor : public CasmFE
+        /**
+         * @extends CasmFE
+         */
+        class Visitor
         {
           public:
             virtual ~Visitor( void ) = default;

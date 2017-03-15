@@ -31,15 +31,16 @@
 #include <vector>
 #include <memory>
 
-#include "../CasmFE.h"
-
 #include "../various/location.hh"
 
 namespace libcasm_fe
 {
     namespace Ast
     {
-        class Node : public CasmFE
+        /**
+         * @extends CasmFE
+         */
+        class Node
         {
           public:
             enum class ID
