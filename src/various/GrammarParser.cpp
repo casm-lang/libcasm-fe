@@ -86,7 +86,7 @@
                     /*driver.error
                     ( { symbolicAttribute->location(), attribute->location() }
                     , "`symbolic` attribute can only be used once per function"
-                    , libcasm_fe::Codes::FunctionAttributeMultipleUseOfSymbolic
+                    , libcasm_fe::Code::FunctionAttributeMultipleUseOfSymbolic
                     ); TODO */
                 }
                 else
@@ -124,7 +124,7 @@
                 ( attribute->location()
                 , "`" + name + "` is no valid function attribute, only in, monitored, "
                 + "controlled, shared, out, static and symbolic are allowed"
-                , libcasm_fe::Codes::FunctionAttributeIsInvalid
+                , libcasm_fe::Code::FunctionAttributeIsInvalid
                 ); TODO */
             }
 
@@ -133,7 +133,7 @@
                 /*driver.error
                 ( { classAttribute->location(), attribute->location() }
                 , "a function classifier attribute can only be used once per function"
-                , libcasm_fe::Codes::FunctionAttributeMultipleUseOfFunctionClassifier
+                , libcasm_fe::Code::FunctionAttributeMultipleUseOfFunctionClassifier
                 ); TODO */
             }
             else
@@ -3399,12 +3399,12 @@ void Parser::error( const location_type& l, const std::string& m )
         /*driver.error
         ( location( position( 0, pos, 1 ) )
         , m
-        , libcasm_fe::Codes::SyntaxError
+        , libcasm_fe::Code::SyntaxError
         ); TODO */
     }
     else
     {
-        //driver.error( l, m, libcasm_fe::Codes::SyntaxError ); TODO
+        //driver.error( l, m, libcasm_fe::Code::SyntaxError ); TODO
     }
 }
 

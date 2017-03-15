@@ -53,13 +53,13 @@ Driver::Driver()
 }
 
 void Driver::error(
-    const location& l, const std::string& m, libcasm_fe::Codes code )
+    const location& l, const std::string& m, libcasm_fe::Code code )
 {
     error( { l }, m, code );
 }
 
 void Driver::error( const std::vector< location >& locations,
-    const std::string& m, libcasm_fe::Codes code )
+    const std::string& m, libcasm_fe::Code code )
 {
     assert( locations.size() > 0 );
 
@@ -73,7 +73,7 @@ void Driver::error( const std::vector< location >& locations,
               << ": " << BOLD_RED << "error: " << RESET << BOLD_BLACK << m
               << RESET;
 
-    if( code != libcasm_fe::Codes::Unspecified )
+    if( code != libcasm_fe::Code::Unspecified )
     {
         for( const auto& loc : locations )
         {
@@ -89,7 +89,7 @@ void Driver::error( const std::vector< location >& locations,
         underline( loc );
     }
 
-    if( code == libcasm_fe::Codes::Unspecified )
+    if( code == libcasm_fe::Code::Unspecified )
     {
         warning( l, "unspecified error code!" );
     }
@@ -97,8 +97,7 @@ void Driver::error( const std::vector< location >& locations,
 
 void Driver::error( const Exception& exception )
 {
-    error(
-        exception.getLocations(), exception.what(), exception.getErrorCode() );
+    error( exception.locations(), exception.what(), exception.errorCode() );
 }
 
 void Driver::warning( const location& l, const std::string& m )

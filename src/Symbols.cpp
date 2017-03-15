@@ -860,6 +860,6 @@ void SymbolTable::add_or_throw( const std::string& name, Symbol* sym )
         throw CompiletimeException(
             { &sym->location, &existingSymbol->location },
             "redefinition of '" + name + "'",
-            libcasm_fe::Codes::IdentifierAlreadyUsed );
+            libcasm_fe::Code::IdentifierAlreadyUsed );
     }
 }

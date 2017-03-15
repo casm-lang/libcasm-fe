@@ -28,7 +28,7 @@
 
 namespace libcasm_fe
 {
-    enum class Codes
+    enum class Code
     // --------------------------------------------------------- 0*** ...
     // generic syntax error
     {

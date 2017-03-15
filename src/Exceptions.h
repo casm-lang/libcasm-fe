@@ -27,7 +27,6 @@
 #define _LIB_CASMFE_EXCEPTIONS_H_
 
 #include <exception>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -39,29 +38,23 @@ namespace libcasm_fe
 {
     class Exception : public std::exception
     {
-      private:
-        std::vector< location > location_;
-        const std::string msg_;
-        const Codes error_code_;
-
       public:
-        explicit Exception( const std::string& msg,
-            const Codes error_code = Codes::Unspecified );
+        Exception( const std::string& msg, Code errorCode );
+        Exception(
+            const location& location, const std::string& msg, Code errorCode );
+        Exception( const std::vector< location >& locations,
+            const std::string& msg, Code errorCode );
 
-        explicit Exception( const location& location, const std::string& msg,
-            const Codes error_code = Codes::Unspecified );
+        const char* what() const noexcept override;
 
-        explicit Exception( const std::vector< location >& location,
-            const std::string& msg,
-            const Codes error_code = Codes::Unspecified );
+        const std::vector< location >& locations( void ) const noexcept;
 
-        virtual const char* what() const throw();
+        Code errorCode( void ) const noexcept;
 
-        void addLocation( const location& location );
-
-        const std::vector< location >& getLocations( void ) const;
-
-        const Codes getErrorCode( void ) const;
+      private:
+        const std::string m_msg;
+        const std::vector< location > m_locations;
+        const Code m_errorCode;
     };
 
     class RuntimeException : public Exception

@@ -1310,7 +1310,7 @@ case YY_STATE_EOF(STRING):
 #line 219 "obj/src/GrammarLexer.l"
 {
     /*global_driver->error( loc, "unclosed string",
-            Codes::SyntaxErrorUnclosedString ); TODO*/
+            Code::SyntaxErrorUnclosedString ); TODO*/
     exit( 1 ); // FIXME no exit!!
 }
 	YY_BREAK
@@ -1328,7 +1328,7 @@ YY_RULE_SETUP
 {
     /*global_driver->error( loc,
             "unrecognized character '" + std::string( yytext ) + "'",
-            Codes::SyntaxErrorUnrecognizedCharacter ); TODO*/
+            Code::SyntaxErrorUnrecognizedCharacter ); TODO*/
     exit( 1 ); // FIXME no exit!!
 }
 	YY_BREAK

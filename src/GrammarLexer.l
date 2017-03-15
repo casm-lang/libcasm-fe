@@ -139,7 +139,7 @@ using namespace libcasm_fe;
 }
 <STRING><<EOF>> {
     /*global_driver->error( loc, "unclosed string",
-            Codes::SyntaxErrorUnclosedString ); TODO*/
+            Code::SyntaxErrorUnclosedString ); TODO*/
     exit( 1 ); // FIXME no exit!!
 }
 <STRING>\" {
@@ -150,7 +150,7 @@ using namespace libcasm_fe;
 . {
     /*global_driver->error( loc,
             "unrecognized character '" + std::string( yytext ) + "'",
-            Codes::SyntaxErrorUnrecognizedCharacter ); TODO*/
+            Code::SyntaxErrorUnrecognizedCharacter ); TODO*/
     exit( 1 ); // FIXME no exit!!
 }
 

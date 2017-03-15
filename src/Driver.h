@@ -56,11 +56,11 @@ namespace libcasm_fe
 
         // Error handling.
         void error( const location& l, const std::string& m,
-            libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
+            libcasm_fe::Code code = libcasm_fe::Code::Unspecified );
 
         void error( const std::vector< location >& locations,
             const std::string& m,
-            libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
+            libcasm_fe::Code code = libcasm_fe::Code::Unspecified );
 
         void error( const Exception& exception );
 

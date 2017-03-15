@@ -57,7 +57,7 @@ Update* ExecutionPassBase::addUpdate( Function* function,
         catch( const std::domain_error& e )
         {
             throw RuntimeException( location, e.what(),
-                libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtUpdate );
+                libcasm_fe::Code::FunctionArgumentsInvalidRangeAtUpdate );
         }
     }
 
@@ -71,7 +71,7 @@ Update* ExecutionPassBase::addUpdate( Function* function,
         {
             throw RuntimeException( location,
                 std::string( e.what() ) + " of `" + function->name + "`",
-                libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate );
+                libcasm_fe::Code::FunctionValueInvalidRangeAtUpdate );
         }
     }
 
@@ -110,7 +110,7 @@ Update* ExecutionPassBase::addUpdate( Function* function,
               + " with value '" + existingUpdate->value.to_str() + "'";
         throw RuntimeException(
             { existingUpdate->location, conflictingUpdate->location }, info,
-            libcasm_fe::Codes::UpdateSetClash );
+            libcasm_fe::Code::UpdateSetClash );
     }
 
     return up;
@@ -146,7 +146,7 @@ void ExecutionPassBase::merge()
               + " with value '" + existingUpdate->value.to_str() + "'";
         throw RuntimeException(
             { existingUpdate->location, conflictingUpdate->location }, info,
-            libcasm_fe::Codes::UpdateSetMergeConflict );
+            libcasm_fe::Code::UpdateSetMergeConflict );
     }
 }
 
@@ -249,7 +249,7 @@ value_t ExecutionPassBase::functionValue(
         catch( const std::domain_error& e )
         {
             throw RuntimeException( function->location, e.what(),
-                libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtLookup );
+                libcasm_fe::Code::FunctionArgumentsInvalidRangeAtLookup );
         }
     }
 
@@ -311,7 +311,7 @@ void ExecutionPassBase::visit_function_def_pre(
     {
         throw RuntimeException( node->defaultValue()->location,
             std::string( e.what() ) + " of `" + function->name + "`",
-            libcasm_fe::Codes::FunctionDefaultValueInvalidRange );
+            libcasm_fe::Code::FunctionDefaultValueInvalidRange );
     }
 
     function_states[ function->id ]
@@ -851,7 +851,7 @@ void ExecutionPassBase::visit_assert( UnaryNode* node, const value_t& value )
     if( not value.value.boolean )
     {
         throw RuntimeException( node->location, "assertion failed",
-            libcasm_fe::Codes::AssertInvalidExpression );
+            libcasm_fe::Code::AssertInvalidExpression );
     }
 }
 
@@ -912,7 +912,7 @@ void ExecutionPassBase::visit_call(
                     + " arguments but "
                     + std::to_string( args_provided )
                     + " were provided",
-                libcasm_fe::Codes::RuleArgumentsSizeInvalidAtIndirectCall );
+                libcasm_fe::Code::RuleArgumentsSizeInvalidAtIndirectCall );
         }
         else
         {
@@ -935,7 +935,7 @@ void ExecutionPassBase::visit_call(
                             + "` but was `"
                             + argType.to_str()
                             + "`",
-                        libcasm_fe::Codes::
+                        libcasm_fe::Code::
                             RuleArgumentsTypeInvalidAtIndirectCall );
                 }
             }
@@ -955,7 +955,7 @@ void ExecutionPassBase::visit_call(
             std::string( e.what() ) + " of rule '"
                 + ( call->ruleref ? call->rule->name : call->rule_name )
                 + "'",
-            libcasm_fe::Codes::RuleArgumentsInvalidRangeAtCall );
+            libcasm_fe::Code::RuleArgumentsInvalidRangeAtCall );
     }
 
     rule_bindings.push_back( &arguments );
@@ -1159,7 +1159,7 @@ void ExecutionPassBase::visit_derived_function_atom_pre(
                 std::string( e.what() ) + " of derived '"
                     + function->symbol->name
                     + "'",
-                libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup );
+                libcasm_fe::Code::DerivedArgumentsInvalidRangeAtLookup );
         }
     }
 
@@ -1183,7 +1183,7 @@ value_t ExecutionPassBase::visit_derived_function_atom(
                 std::string( e.what() ) + " of the return value of derived `"
                     + function->symbol->name
                     + "`",
-                libcasm_fe::Codes::DerivedReturnValueInvalidRange );
+                libcasm_fe::Code::DerivedReturnValueInvalidRange );
         }
     }
 
