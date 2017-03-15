@@ -26,6 +26,7 @@
 #include "AstDumpPass.h"
 
 #include "../ast/Specification.h"
+#include "../ast/RecursiveVisitor.h"
 #include "../transform/SourceToAstPass.h"
 
 using namespace libcasm_fe;
@@ -37,22 +38,58 @@ static libpass::PassRegistration< AstDumpPass > PASS( "AST Dumping Pass",
     "generates a DOT graph of the AST and dumps it to './obj/out.dot' for now",
     "ast-dump", 0 );
 
-bool AstDumpPass::run( libpass::PassResult& pr )
+class AstDumpVisitor final : public Ast::RecursiveVisitor
 {
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
+public:
+    AstDumpVisitor( std::ostream& stream );
 
-    std::ofstream dotfile( "./obj/out.dot" );
-    dotfile << "digraph \"main\" {\n";
+    void visit( Ast::IdentifierNode& node ) override;
 
-    AstDumpVisitor visitor{ dotfile };
-    specification->accept( visitor );
+    void visit( Ast::Specification& node ) override;
 
-    dotfile << "}\n";
-    dotfile.close();
+    void visit( Ast::VariableDefinition& node ) override;
+    void visit( Ast::FunctionDefinition& node ) override;
+    void visit( Ast::DerivedDefinition& node ) override;
+    void visit( Ast::RuleDefinition& node ) override;
+    void visit( Ast::EnumerationDefinition& node ) override;
 
-    return true;
-}
+    void visit( Ast::ValueAtom& node ) override;
+    void visit( Ast::RuleReferenceAtom& node ) override;
+    void visit( Ast::ZeroAtom& node ) override;
+    void visit( Ast::UndefAtom& node ) override;
+    void visit( Ast::DirectCallExpression& node ) override;
+    void visit( Ast::IndirectCallExpression& node ) override;
+    void visit( Ast::UnaryExpression& node ) override;
+    void visit( Ast::BinaryExpression& node ) override;
+    void visit( Ast::RangeExpression& node ) override;
+    void visit( Ast::ListExpression& node ) override;
+    void visit( Ast::ConditionalExpression& node ) override;
+    void visit( Ast::UniversalQuantifierExpression& node ) override;
+    void visit( Ast::ExistentialQuantifierExpression& node ) override;
+
+    void visit( Ast::SkipRule& node ) override;
+    void visit( Ast::ConditionalRule& node ) override;
+    void visit( Ast::CaseRule& node ) override;
+    void visit( Ast::LetRule& node ) override;
+    void visit( Ast::ForallRule& node ) override;
+    void visit( Ast::IterateRule& node ) override;
+    void visit( Ast::BlockRule& node ) override;
+    void visit( Ast::SequenceRule& node ) override;
+    void visit( Ast::UpdateRule& node ) override;
+    void visit( Ast::CallRule& node ) override;
+
+    void visit( Ast::BasicType& node ) override;
+    void visit( Ast::ComposedType& node ) override;
+    void visit( Ast::FixedSizedType& node ) override;
+    void visit( Ast::RangedType& node ) override;
+
+private:
+    void dumpNode( const Ast::Node& node, const std::string& name );
+    void dumpLink( const Ast::Node& from, const Ast::Node& to );
+
+private:
+    std::ostream& m_stream;
+};
 
 AstDumpVisitor::AstDumpVisitor( std::ostream& stream )
 : m_stream( stream )
@@ -271,6 +308,23 @@ void AstDumpVisitor::dumpNode( const Ast::Node& node, const std::string& name )
 void AstDumpVisitor::dumpLink( const Ast::Node& from, const Ast::Node& to )
 {
     m_stream << "    " << &from << " -> " << &to << ";\n";
+}
+
+bool AstDumpPass::run( libpass::PassResult& pr )
+{
+    const auto sourceToAstPass = pr.result< SourceToAstPass >();
+    const auto specification = sourceToAstPass->specification();
+
+    std::ofstream dotfile( "./obj/out.dot" );
+    dotfile << "digraph \"main\" {\n";
+
+    AstDumpVisitor visitor{ dotfile };
+    specification->accept( visitor );
+
+    dotfile << "}\n";
+    dotfile.close();
+
+    return true;
 }
 
 //
