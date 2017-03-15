@@ -40,18 +40,19 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 36 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
-
-    #include "src/Exceptions.h"
+#line 44 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 
     #include "src/ast/Specification.h"
-
-    #include "../stdhl/cpp/Type.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
 
-#line 55 "GrammarParser.tab.h" // lalr1.cc:377
+    namespace yy
+    {
+        class Lexer;
+    }
+
+#line 56 "GrammarParser.tab.h" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -128,7 +129,7 @@
 
 
 namespace yy {
-#line 132 "GrammarParser.tab.h" // lalr1.cc:377
+#line 133 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
@@ -1051,7 +1052,7 @@ namespace yy {
 
 
     /// Build a parser object.
-    Parser ();
+    Parser (yy::Lexer& lexer_yyarg);
     virtual ~Parser ();
 
     /// Parse.
@@ -1263,6 +1264,8 @@ namespace yy {
     };
 
 
+    // User arguments.
+    yy::Lexer& lexer;
   };
 
   // Symbol number corresponding to token number t.
@@ -3080,7 +3083,7 @@ namespace yy {
 
 
 } // yy
-#line 3084 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3087 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

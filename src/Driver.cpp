@@ -25,6 +25,8 @@
 
 #include "Driver.h"
 
+#include <cassert>
+
 using namespace libcasm_fe;
 
 #define BOLD_BLACK "\x1b[1m"
@@ -38,8 +40,6 @@ using namespace libcasm_fe;
 #define MAGENTA "\x1b[35m"
 #define RESET "\x1b[0m"
 
-extern int yylex_destroy( void );
-
 // driver must be global, because it is needed for YY_INPUT
 Driver* global_driver;
 
@@ -49,44 +49,7 @@ Driver::Driver()
 , trace_parsing( false )
 , trace_scanning( false )
 {
-    file_ = nullptr;
-
     lines_.push_back( "" );
-}
-
-Driver::~Driver()
-{
-    if( file_ != nullptr )
-    {
-        fclose( file_ );
-    }
-    yylex_destroy();
-}
-
-size_t Driver::get_next_chars( char buf[], size_t max_size )
-{
-    if( fgets( buf, max_size, file_ ) == NULL )
-    {
-        if( ferror( file_ ) )
-        {
-            return -1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    else
-    {
-        // lines_ must not be empty (initialized with empty string in
-        // constructor)
-        lines_.back().append( buf );
-        if( buf[ strlen( buf ) - 1 ] == '\n' )
-        {
-            lines_.push_back( "" );
-        }
-        return strlen( buf );
-    }
 }
 
 void Driver::error(

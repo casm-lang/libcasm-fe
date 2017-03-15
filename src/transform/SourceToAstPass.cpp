@@ -25,11 +25,13 @@
 
 #include "SourceToAstPass.h"
 
-#include "../Driver.h"
+#include <fstream>
+#include <iostream>
+
+#include "../Lexer.h"
+#include "../various/GrammarParser.tab.h"
 
 using namespace libcasm_fe;
-
-extern Driver* global_driver;
 
 char SourceToAstPass::id = 0;
 
@@ -40,23 +42,33 @@ static libpass::PassRegistration< SourceToAstPass > PASS( "Source To AST Pass",
 
 bool SourceToAstPass::run( libpass::PassResult& pr )
 {
-    auto load_file_pass = pr.result< libpass::LoadFilePass >();
+    const auto loadFilePass = pr.result< libpass::LoadFilePass >();
+    const auto& filename = loadFilePass->filename();
 
-    global_driver = new Driver;
-
-    Ast* node = global_driver->parse( load_file_pass->filename() );
-
-    if( !node )
+    std::ifstream sourceFile( filename );
+    if( not sourceFile )
     {
-        // TODO: FIXME: PPA: better error messages,
-        // can be improved with the new libstdhl Verbose support
-
-        std::cerr << "Error parsing file" << std::endl;
-
+        std::cerr << "error: could not open `" << filename << "´" << std::endl;
         return false;
     }
 
-    pr.setResult< SourceToAstPass >( libstdhl::make< Data >( node ) );
+    yy::Lexer lexer( sourceFile, std::cout );
+
+    yy::Parser parser( lexer );
+    parser.set_debug_level( false );
+
+
+    try
+    {
+        parser.parse();
+    }
+    catch( const std::exception& e )
+    {
+        std::cerr << "error: got exception: " << e.what() << std::endl;
+        return false;
+    }
+
+    //pr.setResult< SourceToAstPass >( libstdhl::make< Data >( node ) );
 
     return true;
 }

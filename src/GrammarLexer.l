@@ -23,55 +23,31 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <cstdint>
+#include "src/Lexer.h"
 
-#include "src/Driver.h"
-
-#include "src/various/GrammarParser.tab.h"
-
-#define YY_DECL yy::Parser::symbol_type yylex( libcasm_fe::Driver& driver )
-
-#undef yywrap
-#define yywrap() 1
-
-// The location of the current token.
-static yy::location loc;
-
-// driver must be global, because it is needed for YY_INPUT
-// defined in src/libsyntax/driver.cpp
-extern libcasm_fe::Driver *global_driver;
-
-#define STRBUF_LENGTH 1000
-void yyerror(const char *s);
-char strbuf[STRBUF_LENGTH];
-
-#define YY_INPUT(buf,result,max_size) { \
-  result = global_driver->get_next_chars(buf, max_size); \
-  if (  result <= 0  ) \
-      result = YY_NULL; \
-}
+#undef YY_DECL
+#define YY_DECL yy::Parser::symbol_type yy::Lexer::nextToken()
 
 #define yyterminate() return( yy::Parser::make_END(loc) )
 
-// flex uses `register` keyword, which is deprecated in c++11
-#pragma GCC diagnostic ignored "-Wdeprecated-register"
+// Code run each time a pattern is matched.
+#define YY_USER_ACTION loc.columns( yyleng );
 
 %}
 
-/* use debug option for more output */
-%option noyywrap nounput batch noinput
+/* %option debug */
+%option noyywrap
+%option nodefault
+%option nounput
+%option batch
+%option noinput
+%option yyclass="yy::Lexer"
+%option c++
 
 %x LCOMMENT
 %x COMMENT
 %x STRING
 
-%{
-    // Code run each time a pattern is matched.
-    #define YY_USER_ACTION  loc.columns( yyleng );
-%}
 %%
 %{
     // Code run each time yylex is called.
@@ -141,28 +117,28 @@ char strbuf[STRBUF_LENGTH];
 
 \" {
     BEGIN( STRING );
-    strbuf[0] = '\0';
+    strbuf.clear();
 }
 <STRING>[^\\\"\n]* { /* eat all tokens */
-    strncat( strbuf, yytext, STRBUF_LENGTH - 1 );
+    strbuf.append( yytext );
 }
 <STRING>\n
 <STRING>\\n {
-    strncat( strbuf, "\n", STRBUF_LENGTH - 1 );
+    strbuf.append( "\n" );
 }
 <STRING>\\t {
-    strncat( strbuf, "\t", STRBUF_LENGTH - 1 );
+    strbuf.append( "\t" );
 }
 <STRING>\\\" {
-    strncat( strbuf, "\"", STRBUF_LENGTH - 1 );
+    strbuf.append( "\"" );
 }
 <STRING>\\' {
-    strncat( strbuf, "\'", STRBUF_LENGTH - 1 );
+    strbuf.append( "\'" );
 }
 <STRING><<EOF>> {
-    global_driver->error( loc, "unclosed string",
-            libcasm_fe::Codes::SyntaxErrorUnclosedString );
-    exit( 1 );
+    /*global_driver->error( loc, "unclosed string",
+            libcasm_fe::Codes::SyntaxErrorUnclosedString ); TODO*/
+    exit( 1 ); // FIXME no exit!!
 }
 <STRING>\" {
     BEGIN( INITIAL );
@@ -170,13 +146,20 @@ char strbuf[STRBUF_LENGTH];
 }
 
 . {
-    global_driver->error( loc,
+    /*global_driver->error( loc,
             "unrecognized character '" + std::string( yytext ) + "'",
-            libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter );
-    exit( 1 );
+            libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter ); TODO*/
+    exit( 1 ); // FIXME no exit!!
 }
 
 %%
+
+yy::Lexer::Lexer( std::istream& in, std::ostream& out )
+: yyFlexLexer( in, out )
+, loc()
+, strbuf()
+{
+}
 
 //  
 //  Local variables:

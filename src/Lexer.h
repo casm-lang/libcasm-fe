@@ -23,48 +23,33 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_SOURCETOASTPASS_H_
-#define _LIB_CASMFE_SOURCETOASTPASS_H_
+#ifndef _LIB_CASMFE_LEXER_H_
+#define _LIB_CASMFE_LEXER_H_
 
-#include "libpass.h"
+#include <string>
+#include <FlexLexer.h>
 
-/**
-   @brief    TODO
+#include "various/GrammarParser.tab.h"
 
-   TODO
-*/
-
-namespace libcasm_fe
+namespace yy
 {
-    class SourceToAstPass final : public libpass::Pass
+    class Lexer : public yyFlexLexer
     {
-      public:
-        static char id;
+    public:
+        Lexer( std::istream& in, std::ostream& out );
 
-        bool run( libpass::PassResult& pr ) override;
+        yy::Parser::symbol_type nextToken();
 
-        class Data : public libpass::PassData
-        {
-          public:
-            using Ptr = std::shared_ptr< Data >;
+    protected:
+        //void LexerError( const char* msg ) override; TODO
 
-            /*Data( Ast* root )
-            : m_root( root )
-            {
-            }
-
-            Ast* root( void ) const
-            {
-                return m_root;
-            }
-
-          private:
-            Ast* m_root;*/
-        };
+    private:
+        yy::Parser::location_type loc;
+        std::string strbuf;
     };
 }
 
-#endif // _LIB_CASMFE_SOURCETOASTPASS_H_
+#endif // _LIB_CASMFE_LEXER_H_
 
 //
 //  Local variables:

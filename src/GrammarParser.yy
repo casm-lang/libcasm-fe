@@ -23,32 +23,38 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-%skeleton "lalr1.cc" /* -*- C++ -*- */
+%skeleton "lalr1.cc"
+%require "3.0"
+//%debug
+
 %defines
+//%define api.namespace {libcasm_fe}
 %define parser_class_name {Parser}
 
 %define api.token.constructor
 %define api.value.type variant
-%define parse.assert
 
+%define parse.assert
+%define parse.trace
+%define parse.error verbose
+
+%locations
 
 %code requires
 {
-    #include "src/Exceptions.h"
-
     #include "src/ast/Specification.h"
-
-    #include "../stdhl/cpp/Type.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
+
+    namespace yy
+    {
+        class Lexer;
+    }
 }
 
-// The parsing context.
-//%parse-param { libcasm_fe::Driver& driver } TODO
-//%lex-param   { libcasm_fe::Driver& driver } TODO
+%parse-param { yy::Lexer& lexer }
 
-%locations
 %initial-action
 {
   // Initialize the initial location.
@@ -57,13 +63,15 @@
   // @$.begin.filename = @$.end.filename = driver.get_filename_ptr();
 };
 
-%define parse.trace
-%define parse.error verbose
-
-
 %code
 {
-    yy::Parser::symbol_type yylex();
+    #include "src/Lexer.h"
+    #include "src/Exceptions.h"
+
+    #include "../stdhl/cpp/Type.h"
+
+    #undef yylex
+    #define yylex lexer.nextToken
 
     std::pair< FunctionDefinition::Classification, bool > parseFunctionAttributes(
         const NodeList< IdentifierNode >::Ptr& attributes )
@@ -1248,10 +1256,7 @@ CallRule
 
 %%
 
-void yy::Parser::error
-( const location_type& l
-, const std::string& m
-)
+void yy::Parser::error( const location_type& l, const std::string& m )
 {
     if( m.compare( "syntax error, unexpected end of file, expecting CASM" ) == 0 )
     {
@@ -1269,7 +1274,6 @@ void yy::Parser::error
         //driver.error( l, m, libcasm_fe::Codes::SyntaxError ); TODO
     }
 }
-
 
 //
 //  Local variables:

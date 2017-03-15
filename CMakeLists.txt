@@ -55,6 +55,8 @@ set( CXX_SRC_FILES
 
   src/analyze/AstDumpPass.cpp
 
+  src/transform/SourceToAstPass.cpp
+
   src/various/GrammarParser.cpp
   src/various/GrammarLexer.cpp
 )

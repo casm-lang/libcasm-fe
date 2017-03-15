@@ -29,9 +29,11 @@
 #include "cpp/Default.h"
 #include "cpp/Type.h"
 
-#include "Exceptions.h"
+#include <vector>
+#include <unordered_map>
 
-#include "various/GrammarParser.tab.h"
+#include "Exceptions.h"
+#include "various/location.hh"
 
 namespace libcasm_fe
 {
@@ -39,23 +41,18 @@ namespace libcasm_fe
     {
       private:
         std::string filename_;
-        FILE* file_;
         std::vector< std::string > lines_;
         uint64_t error_;
         uint64_t warning_;
 
       public:
         Driver();
-        virtual ~Driver();
 
         std::string spec_name;
 
         // State information for the lexer
         bool trace_parsing;
         bool trace_scanning;
-
-        // Handling the scanner.
-        size_t get_next_chars( char buffer[], size_t max_size );
 
         // Error handling.
         void error( const yy::location& l, const std::string& m,
