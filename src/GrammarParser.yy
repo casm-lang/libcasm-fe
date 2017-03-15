@@ -752,12 +752,12 @@ String
 BitNumber
 : BINARY
   {
-      const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, 2 );
+      const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::BINARY );
       $$ = make< ValueAtom >( @$, value );
   }
 | HEXADECIMAL
   {
-      const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, 16 );
+      const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::HEXADECIMAL );
       $$ = make< ValueAtom >( @$, value );
   }
 ;
@@ -766,7 +766,7 @@ BitNumber
 IntegerNumber
 : INTEGER
   {
-      const auto value = libstdhl::get< libcasm_ir::IntegerConstant >( $1 );
+      const auto value = libstdhl::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
       $$ = make< ValueAtom >( @$, value );
   }
 ;
