@@ -100,6 +100,7 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< Node >;
 
             Node( ID id );
+            virtual ~Node() = default;
 
             ID id( void ) const;
 
