@@ -26,6 +26,7 @@
 #include "AstDumpPass.h"
 
 #include "../ast/Specification.h"
+#include "../transform/SourceToAstPass.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -38,11 +39,14 @@ static libpass::PassRegistration< AstDumpPass > PASS( "AST Dumping Pass",
 
 bool AstDumpPass::run( libpass::PassResult& pr )
 {
+    const auto sourceToAstPass = pr.result< SourceToAstPass >();
+    const auto specification = sourceToAstPass->specification();
+
     std::ofstream dotfile( "./obj/out.dot" );
     dotfile << "digraph \"main\" {\n";
 
     AstDumpVisitor visitor{ dotfile };
-    // specification.accept( visitor );
+    specification->accept( visitor );
 
     dotfile << "}\n";
     dotfile.close();
