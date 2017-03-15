@@ -25,8 +25,8 @@
 
 #include "AstDumpPass.h"
 
-#include "../ast/Specification.h"
 #include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
 #include "../transform/SourceToAstPass.h"
 
 using namespace libcasm_fe;
@@ -40,7 +40,7 @@ static libpass::PassRegistration< AstDumpPass > PASS( "AST Dumping Pass",
 
 class AstDumpVisitor final : public Ast::RecursiveVisitor
 {
-public:
+  public:
     AstDumpVisitor( std::ostream& stream );
 
     void visit( Ast::IdentifierNode& node ) override;
@@ -83,11 +83,11 @@ public:
     void visit( Ast::FixedSizedType& node ) override;
     void visit( Ast::RangedType& node ) override;
 
-private:
+  private:
     void dumpNode( const Ast::Node& node, const std::string& name );
     void dumpLink( const Ast::Node& from, const Ast::Node& to );
 
-private:
+  private:
     std::ostream& m_stream;
 };
 
