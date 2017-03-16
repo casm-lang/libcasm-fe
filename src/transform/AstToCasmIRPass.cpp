@@ -205,7 +205,7 @@ void AstToCasmIRPass::visit_specification( SpecificationNode* node )
         = libstdhl::make< libcasm_ir::Specification >( node->identifier );
 
     auto ir_initially_rule = libstdhl::make< libcasm_ir::Rule >(
-        ".initially", libstdhl::get< libcasm_ir::RuleReferenceType >() );
+        ".initially", libstdhl::get< libcasm_ir::VoidType >() );
 
     getSpecification()->add( ir_initially_rule );
 
@@ -230,7 +230,7 @@ void AstToCasmIRPass::visit_specification( SpecificationNode* node )
 
     m_agent = libstdhl::make< libcasm_ir::Agent >( agents );
 
-    getSpecification()->add( m_agent );
+    getSpecification()->setAgent( m_agent );
 }
 
 void AstToCasmIRPass::visit_init( InitNode* node )
@@ -381,7 +381,7 @@ void AstToCasmIRPass::visit_rule( RuleNode* node )
     }
 
     auto ir_rule = libstdhl::make< libcasm_ir::Rule >(
-        node->name.c_str(), libstdhl::get< libcasm_ir::RuleReferenceType >() );
+        node->name.c_str(), libstdhl::get< libcasm_ir::VoidType >() );
 
     ast2casmir[ node ] = ir_rule;
     ast2parent[ node->child_ ] = node;
@@ -614,21 +614,23 @@ void AstToCasmIRPass::visit_print( PrintNode* node, bool expr )
 
     ast2casmir[ node ] = ir_stmt;
 
-    auto ir_print = libstdhl::make< libcasm_ir::PrintInstruction >();
+    assert( !" TODO! no print instr, use print builtin! " );
+    // auto ir_print = libstdhl::make< libcasm_ir::PrintInstruction >();
 
-    // for( auto a : node->atoms )
-    // {
-    //     Value* instr = lookup< Value >( a );
-    //     ir_print->add( instr );
-    // }
-    ir_print->add( lookup< libcasm_ir::Value >( node->getAtom() ) );
+    // // for( auto a : node->atoms )
+    // // {
+    // //     Value* instr = lookup< Value >( a );
+    // //     ir_print->add( instr );
+    // // }
+    // ir_print->add( lookup< libcasm_ir::Value >( node->getAtom() ) );
 
-    // INFO: PPA: commented line below, because the 'IR' itself adds this during
-    // runtime (interpreter)
-    // and compilation --> this should not be part of the CASM IR!!!
-    // ir_print->add( StringConstant::create( (const char*)"\n" ) );
+    // // INFO: PPA: commented line below, because the 'IR' itself adds this
+    // during
+    // // runtime (interpreter)
+    // // and compilation --> this should not be part of the CASM IR!!!
+    // // ir_print->add( StringConstant::create( (const char*)"\n" ) );
 
-    ir_stmt->add( ir_print );
+    // ir_stmt->add( ir_print );
 }
 
 void AstToCasmIRPass::visit_diedie( DiedieNode* node, bool msg )
@@ -763,7 +765,8 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
 
     ir_stmt->add( ir_case_true );
 
-    auto ir_true = libstdhl::get< libcasm_ir::BooleanConstant >( true );
+    const libcasm_ir::Constant::Ptr ir_true
+        = libstdhl::get< libcasm_ir::BooleanConstant >( true );
 
     getSpecification()->add( ir_true );
 
@@ -781,7 +784,8 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
 
         ir_stmt->add( ir_case_false );
 
-        auto ir_false = libstdhl::get< libcasm_ir::BooleanConstant >( false );
+        const libcasm_ir::Constant::Ptr ir_false
+            = libstdhl::get< libcasm_ir::BooleanConstant >( false );
         getSpecification()->add( ir_false );
 
         ir_select->add( ir_false );
@@ -1083,7 +1087,8 @@ bool AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
 bool AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::BooleanConstant >( node->value );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::BooleanConstant >( node->value );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1095,7 +1100,8 @@ bool AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
 bool AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::IntegerConstant >( node->val_ );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::IntegerConstant >( node->val_ );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1107,8 +1113,9 @@ bool AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
 bool AstToCasmIRPass::visit_bit_atom( IntegerAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::BitConstant >(
-        node->type_.bitsize, (u64)node->val_ );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::BitConstant >(
+            node->type_.bitsize, (u64)node->val_ );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1134,7 +1141,8 @@ bool AstToCasmIRPass::visit_rational_atom( RationalAtom* node )
 bool AstToCasmIRPass::visit_string_atom( StringAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::StringConstant >( node->string );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::StringConstant >( node->string );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1146,8 +1154,9 @@ bool AstToCasmIRPass::visit_string_atom( StringAtom* node )
 bool AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::AgentConstant >(
-        libstdhl::get< libcasm_ir::AgentType >( m_agent ), "agent0" );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::AgentConstant >(
+            libstdhl::get< libcasm_ir::AgentType >( m_agent ), "agent0" );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1166,7 +1175,8 @@ bool AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
         rule = lookup< libcasm_ir::Rule >( node->rule );
     }
 
-    auto ir_const = libstdhl::get< libcasm_ir::RuleReferenceConstant >( rule );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::RuleReferenceConstant >( rule );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
