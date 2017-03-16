@@ -38,7 +38,7 @@
 
 #include "src/allocator/BlockAllocator.h"
 
-#include "src/analyze/AstDumpPass.h"
+#include "src/analyze/AstDumpDotPass.h"
 #include "src/analyze/TypeCheckPass.h"
 
 #include "src/execute/ChainedHashMap.h"
@@ -57,7 +57,7 @@ namespace libcasm_fe
 {
 }
 
-#endif /* _LIB_CASMFE_H_ */
+#endif // _LIB_CASMFE_H_
 
 //
 //  Local variables:

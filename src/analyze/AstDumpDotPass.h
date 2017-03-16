@@ -36,7 +36,7 @@
 
 namespace libcasm_fe
 {
-    class AstDumpPass final : public libpass::Pass
+    class AstDumpDotPass final : public libpass::Pass
     {
       public:
         static char id;
