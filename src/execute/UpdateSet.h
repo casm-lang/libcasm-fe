@@ -26,8 +26,9 @@
 #ifndef _LIB_CASMFE_UPDATESET_H_
 #define _LIB_CASMFE_UPDATESET_H_
 
-#include <stack>
+#include <memory>
 #include <stdexcept>
+#include <vector>
 
 #include "../Value.h"
 #include "../various/location.hh"
@@ -156,6 +157,15 @@ class UpdateSet
     std::size_t size() const noexcept;
 
     /**
+     * Request more space so that the update set can store an additional number
+     * of \a size updates without intermediate resizing.
+     *
+     * @param size The additional number of updates the update-set should be
+     *             able to handle without resizing
+     */
+    void reserveAdditionally( std::size_t size );
+
+    /**
      * Adds the \a update for the \a location to the update-set
      *
      * The handling of multiple updates for the same location depends on the
@@ -197,7 +207,8 @@ class UpdateSet
      * @return A new update-set of type \a updateSetType with the current
      *         update-set as parent
      */
-    UpdateSet* fork( UpdateSet::Type updateSetType, std::size_t initialSize );
+    std::unique_ptr< UpdateSet > fork(
+        UpdateSet::Type updateSetType, std::size_t initialSize );
 
     /**
      * Merges all updates of the current update-set into its parent update-set
@@ -327,11 +338,6 @@ class UpdateSetManager
     UpdateSetManager();
 
     /**
-     * Destroys the update-set manager and frees all update-sets
-     */
-    virtual ~UpdateSetManager();
-
-    /**
      * Adds the \a update for the \a location to the current update-set
      *
      * The handling of multiple updates for the same location depends on the
@@ -412,7 +418,8 @@ class UpdateSetManager
     std::size_t size() const noexcept;
 
   private:
-    std::stack< UpdateSet* > m_updateSets;
+    std::vector< std::unique_ptr< UpdateSet > > m_updateSets;
+    std::vector< bool > m_forked;
 };
 
 #endif // _LIB_CASMFE_UPDATESET_H_

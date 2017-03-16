@@ -203,7 +203,7 @@ class RobinHoodHashMap final : public HashMapBase< Details >
                 }
             }
 
-            delete oldBuckets;
+            delete[] oldBuckets;
 
 #ifdef HASH_MAP_PERF
             HashMap::m_performanceStatistics.resized();

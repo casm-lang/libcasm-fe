@@ -25,8 +25,6 @@
 
 #include "UpdateSet.h"
 
-#include "cpp/Default.h"
-
 UpdateSet::Conflict::Conflict(
     const std::string& msg, Update* conflictingUpdate, Update* existingUpdate )
 : std::logic_error( msg )
@@ -61,6 +59,11 @@ std::size_t UpdateSet::size() const noexcept
     return m_set.size();
 }
 
+void UpdateSet::reserveAdditionally( std::size_t size )
+{
+    m_set.reserve( m_set.size() + size );
+}
+
 Update* UpdateSet::lookup( const libcasm_fe::value_t* location ) const noexcept
 {
     if( m_parent )
@@ -71,15 +74,17 @@ Update* UpdateSet::lookup( const libcasm_fe::value_t* location ) const noexcept
     return nullptr;
 }
 
-UpdateSet* UpdateSet::fork(
+std::unique_ptr< UpdateSet > UpdateSet::fork(
     UpdateSet::Type updateSetType, std::size_t initialSize )
 {
     switch( updateSetType )
     {
         case Type::Sequential:
-            return new SequentialUpdateSet( initialSize, this );
+            return std::unique_ptr< SequentialUpdateSet >(
+                new SequentialUpdateSet( initialSize, this ) );
         case Type::Parallel:
-            return new ParallelUpdateSet( initialSize, this );
+            return std::unique_ptr< ParallelUpdateSet >(
+                new ParallelUpdateSet( initialSize, this ) );
     }
 }
 
@@ -93,7 +98,7 @@ void UpdateSet::merge()
     }
     else
     {
-        m_parent->m_set.reserve( m_parent->m_set.size() + m_set.size() );
+        m_parent->reserveAdditionally( m_set.size() );
         const auto end = m_set.end();
         for( auto it = m_set.begin(); it != end; ++it )
         {
@@ -164,12 +169,8 @@ void ParallelUpdateSet::add(
 
 UpdateSetManager::UpdateSetManager()
 : m_updateSets()
+, m_forked()
 {
-}
-
-UpdateSetManager::~UpdateSetManager()
-{
-    clear();
 }
 
 void UpdateSetManager::add(
@@ -199,51 +200,69 @@ void UpdateSetManager::fork(
         switch( updateSetType )
         {
             case UpdateSet::Type::Sequential:
-                m_updateSets.push( new SequentialUpdateSet( initialSize ) );
+                m_updateSets.emplace_back(
+                    new SequentialUpdateSet( initialSize ) );
                 break;
             case UpdateSet::Type::Parallel:
-                m_updateSets.push( new ParallelUpdateSet( initialSize ) );
+                m_updateSets.emplace_back(
+                    new ParallelUpdateSet( initialSize ) );
                 break;
         }
     }
-    else
+    else // only fork if necessary
     {
         const auto updateSet = currentUpdateSet();
-        const auto forkedUpdateSet
-            = updateSet->fork( updateSetType, initialSize );
-        m_updateSets.push( forkedUpdateSet );
+        if( updateSet->type() == updateSetType )
+        {
+            // no need to fork the update set, use the current one
+            updateSet->reserveAdditionally( initialSize );
+            m_forked.push_back( false );
+            return;
+        }
+
+        m_updateSets.emplace_back(
+            updateSet->fork( updateSetType, initialSize ) );
     }
+
+    m_forked.push_back( true );
 }
 
 void UpdateSetManager::merge()
 {
-    if( size() > 1 )
+    if( size() < 2 )
     {
-        const auto updateSet = currentUpdateSet();
-        updateSet->merge();
-        m_updateSets.pop();
-        delete updateSet;
+        return;
     }
+
+    const auto forked = m_forked.back();
+    m_forked.pop_back();
+    if( not forked )
+    {
+        // previous fork call didn't actually fork the update set
+        return;
+    }
+
+    const auto updateSet = currentUpdateSet();
+    updateSet->merge();
+    m_updateSets.pop_back();
 }
 
 void UpdateSetManager::clear()
 {
-    while( not m_updateSets.empty() )
-    {
-        delete m_updateSets.top();
-        m_updateSets.pop();
-    }
+    m_updateSets.clear();
+    m_forked.clear();
 }
 
 UpdateSet* UpdateSetManager::currentUpdateSet() const
 {
     assert( not m_updateSets.empty() );
-    return m_updateSets.top();
+    return m_updateSets.back().get();
 }
 
 std::size_t UpdateSetManager::size() const noexcept
 {
-    return m_updateSets.size();
+    assert( m_forked.size() >= m_updateSets.size() );
+    return m_forked.size();
 }
 
 //
