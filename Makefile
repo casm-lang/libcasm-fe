@@ -32,6 +32,9 @@ LX  = flex
 YC  = bison
 YF  = -Wall -v
 
+grammar: $(OBJ)/src/various/GrammarParser.cpp $(OBJ)/src/various/GrammarLexer.cpp
+.PHONY: grammar
+
 $(OBJ)/src/various/Grammar.org: src/various/Grammar.org
 	mkdir -p `dirname $@`
 	cp -f $< $@
