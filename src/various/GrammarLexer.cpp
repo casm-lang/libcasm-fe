@@ -20,7 +20,7 @@
      * We will address this in a future release of flex, or omit the C++ scanner
      * altogether.
      */
-    #define yyFlexLexer yyFlexLexer
+    
 
     #define yyalloc yyalloc
 

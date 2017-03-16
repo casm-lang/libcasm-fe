@@ -115,7 +115,7 @@ add_custom_command(
 
 set( DEF_GRAMMAR_LEXER "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarLexer.l;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
 set( CXX_GRAMMAR_LEXER "${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarLexer.cpp" )
-set(     GRAMMAR_LEXER "src/various/GrammarLexer.cpp" )
+set(     GRAMMAR_LEXER "obj/src/various/GrammarLexer.cpp" )
 
 add_custom_command(
   OUTPUT  ${CXX_GRAMMAR_LEXER}

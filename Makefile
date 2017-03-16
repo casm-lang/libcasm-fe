@@ -61,6 +61,7 @@ src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hpp
 
 $(OBJ)/src/various/GrammarLexer.cpp: src/various/GrammarLexer.cpp
 	mkdir -p `dirname $@`
+	sed -i "s/#define yyFlexLexer yyFlexLexer//g" $<
 	cp -f $< $@
 
 src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
