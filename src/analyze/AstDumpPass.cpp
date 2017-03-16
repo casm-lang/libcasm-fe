@@ -104,8 +104,12 @@ void AstDumpVisitor::visit( IdentifierNode& node )
 
 void AstDumpVisitor::visit( Specification& node )
 {
+    m_stream << "digraph \"main\" {\n";
+
     dumpNode( node, "CASM\\nSpecification" );
     RecursiveVisitor::visit( node );
+
+    m_stream << "}\n";
 }
 
 void AstDumpVisitor::visit( VariableDefinition& node )
@@ -316,12 +320,10 @@ bool AstDumpPass::run( libpass::PassResult& pr )
     const auto specification = sourceToAstPass->specification();
 
     std::ofstream dotfile( "./obj/out.dot" );
-    dotfile << "digraph \"main\" {\n";
 
     AstDumpVisitor visitor{ dotfile };
     specification->accept( visitor );
 
-    dotfile << "}\n";
     dotfile.close();
 
     return true;
