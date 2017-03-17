@@ -958,15 +958,16 @@ List
 ;
 
 Terms
-: Terms Term COMMA
+: Terms COMMA Term
   {
       auto expressions = $1;
-      expressions->add( $2 );
+      expressions->add( $3 );
       $$ = expressions;
   }
-| Term COMMA
+| Term
   {
       const auto expressions = make< Expressions >( @$ );
+      expressions->add( $1 );
       $$ = expressions;
   }
 ;
@@ -986,7 +987,7 @@ Arguments
 
 
 DirectCallExpression
-: Identifier %prec DIRECT_CALL_EXPR_NO_ARG
+: Identifier
   {
       const auto arguments = make< Expressions >( @$ );
       $$ = make< DirectCallExpression >( @$, $1, arguments );
