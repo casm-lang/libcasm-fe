@@ -1621,8 +1621,8 @@ namespace libcasm_fe {
   case 38:
 #line 669 "../../obj/src/GrammarParser.yy" // lalr1.cc:859
     {
-      const auto voidType = make< VoidType >( yylhs.location );
-      yylhs.value.as< VariableDefinition::Ptr > () = make< VariableDefinition >( yylhs.location, yystack_[0].value.as< IdentifierNode::Ptr > (), voidType );
+      const auto unresolvedType = make< UnresolvedType >( yylhs.location );
+      yylhs.value.as< VariableDefinition::Ptr > () = make< VariableDefinition >( yylhs.location, yystack_[0].value.as< IdentifierNode::Ptr > (), unresolvedType );
   }
 #line 1628 "GrammarParser.cpp" // lalr1.cc:859
     break;

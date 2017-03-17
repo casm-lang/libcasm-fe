@@ -589,8 +589,8 @@ Variable
   }
 | Identifier
   {
-      const auto voidType = make< VoidType >( @$ );
-      $$ = make< VariableDefinition >( @$, $1, voidType );
+      const auto unresolvedType = make< UnresolvedType >( @$ );
+      $$ = make< VariableDefinition >( @$, $1, unresolvedType );
   }
 ;
 
