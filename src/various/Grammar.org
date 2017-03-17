@@ -183,15 +183,15 @@ List
 | LSQPAREN Terms RSQPAREN
 
 Terms
-: Terms Term COMMA
-| Term COMMA
+: Terms COMMA Term
+| Term
 
 Arguments
 : LPAREN Terms RPAREN
 | LPAREN RPAREN
 
 DirectCallExpression
-: Identifier %prec DIRECT_CALL_EXPR_NO_ARG
+: Identifier
 | Identifier Arguments
 
 IndirectCallExpression

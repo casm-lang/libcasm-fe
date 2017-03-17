@@ -2,9 +2,13 @@ Terminals unused in grammar
 
    "option"
    "dumps"
+   DIRECT_CALL_EXPR_NO_ARG
 
 
+State 46 conflicts: 1 shift/reduce
+State 84 conflicts: 1 shift/reduce
 State 85 conflicts: 1 shift/reduce
+State 88 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -154,8 +158,8 @@ Grammar
   102     | "[" Term "]"
   103     | "[" Terms "]"
 
-  104 Terms: Terms Term ","
-  105      | Term ","
+  104 Terms: Terms "," Term
+  105      | Term
 
   106 Arguments: "(" Terms ")"
   107          | "(" ")"
@@ -276,7 +280,7 @@ error (256)
 ":" (305) 8 36 132 133 134
 "_" (306) 133
 "@" (307) 69
-"," (308) 25 32 38 50 104 105
+"," (308) 25 32 38 50 104
 "<" (309) 48 49 91
 ">" (310) 48 49 92
 "*" (311) 14 85 110
@@ -1118,6 +1122,9 @@ State 46
   108 DirectCallExpression: Identifier .
   109                     | Identifier . Arguments
 
+    "("  shift, and go to state 93
+
+    "("       [reduce using rule 108 (DirectCallExpression)]
     $default  reduce using rule 108 (DirectCallExpression)
 
     Arguments  go to state 94
@@ -1607,7 +1614,7 @@ State 84
    96           | Term . "xor" Term
    97           | Term . "and" Term
    98           | Term . "implies" Term
-  105 Terms: Term . ","
+  105 Terms: Term .
 
     "and"      shift, and go to state 95
     "or"       shift, and go to state 96
@@ -1617,7 +1624,6 @@ State 84
     "-"        shift, and go to state 100
     "="        shift, and go to state 101
     ")"        shift, and go to state 128
-    ","        shift, and go to state 129
     "<"        shift, and go to state 102
     ">"        shift, and go to state 103
     "*"        shift, and go to state 104
@@ -1628,13 +1634,16 @@ State 84
     "<="       shift, and go to state 110
     ">="       shift, and go to state 111
 
+    ")"       [reduce using rule 105 (Terms)]
+    $default  reduce using rule 105 (Terms)
+
 
 State 85
 
    75 Term: Expression .
    79 Expression: "(" Expression . ")"
 
-    ")"  shift, and go to state 130
+    ")"  shift, and go to state 129
 
     ")"       [reduce using rule 75 (Term)]
     $default  reduce using rule 75 (Term)
@@ -1642,49 +1651,11 @@ State 85
 
 State 86
 
-  104 Terms: Terms . Term ","
+  104 Terms: Terms . "," Term
   106 Arguments: "(" Terms . ")"
 
-    "forall"       shift, and go to state 25
-    "if"           shift, and go to state 26
-    "exists"       shift, and go to state 27
-    "undef"        shift, and go to state 28
-    "false"        shift, and go to state 29
-    "true"         shift, and go to state 30
-    "not"          shift, and go to state 31
-    "+"            shift, and go to state 32
-    "-"            shift, and go to state 33
-    "("            shift, and go to state 76
-    ")"            shift, and go to state 131
-    "["            shift, and go to state 35
-    "@"            shift, and go to state 36
-    "binary"       shift, and go to state 37
-    "hexadecimal"  shift, and go to state 38
-    "integer"      shift, and go to state 39
-    "rational"     shift, and go to state 40
-    "floating"     shift, and go to state 41
-    "string"       shift, and go to state 42
-    "identifier"   shift, and go to state 17
-
-    Identifier                       go to state 46
-    Atom                             go to state 47
-    Undefined                        go to state 48
-    Boolean                          go to state 49
-    String                           go to state 50
-    BitNumber                        go to state 51
-    IntegerNumber                    go to state 52
-    FloatingNumber                   go to state 53
-    RationalNumber                   go to state 54
-    RuleReference                    go to state 55
-    Term                             go to state 132
-    Expression                       go to state 57
-    Range                            go to state 58
-    List                             go to state 59
-    DirectCallExpression             go to state 61
-    IndirectCallExpression           go to state 62
-    ConditionalExpression            go to state 63
-    UniversalQuantifierExpression    go to state 64
-    ExistentialQuantifierExpression  go to state 65
+    ")"  shift, and go to state 130
+    ","  shift, and go to state 131
 
 
 State 87
@@ -1714,7 +1685,7 @@ State 88
    98           | Term . "implies" Term
   100 Range: "[" Term . ".." Term "]"
   102 List: "[" Term . "]"
-  105 Terms: Term . ","
+  105 Terms: Term .
 
     "and"      shift, and go to state 95
     "or"       shift, and go to state 96
@@ -1723,65 +1694,29 @@ State 88
     "+"        shift, and go to state 99
     "-"        shift, and go to state 100
     "="        shift, and go to state 101
-    "]"        shift, and go to state 133
-    ","        shift, and go to state 129
+    "]"        shift, and go to state 132
     "<"        shift, and go to state 102
     ">"        shift, and go to state 103
     "*"        shift, and go to state 104
     "/"        shift, and go to state 105
     "%"        shift, and go to state 106
     "^"        shift, and go to state 107
-    ".."       shift, and go to state 134
+    ".."       shift, and go to state 133
     "!="       shift, and go to state 109
     "<="       shift, and go to state 110
     ">="       shift, and go to state 111
+
+    "]"       [reduce using rule 105 (Terms)]
+    $default  reduce using rule 105 (Terms)
 
 
 State 89
 
   103 List: "[" Terms . "]"
-  104 Terms: Terms . Term ","
+  104 Terms: Terms . "," Term
 
-    "forall"       shift, and go to state 25
-    "if"           shift, and go to state 26
-    "exists"       shift, and go to state 27
-    "undef"        shift, and go to state 28
-    "false"        shift, and go to state 29
-    "true"         shift, and go to state 30
-    "not"          shift, and go to state 31
-    "+"            shift, and go to state 32
-    "-"            shift, and go to state 33
-    "("            shift, and go to state 76
-    "["            shift, and go to state 35
-    "]"            shift, and go to state 135
-    "@"            shift, and go to state 36
-    "binary"       shift, and go to state 37
-    "hexadecimal"  shift, and go to state 38
-    "integer"      shift, and go to state 39
-    "rational"     shift, and go to state 40
-    "floating"     shift, and go to state 41
-    "string"       shift, and go to state 42
-    "identifier"   shift, and go to state 17
-
-    Identifier                       go to state 46
-    Atom                             go to state 47
-    Undefined                        go to state 48
-    Boolean                          go to state 49
-    String                           go to state 50
-    BitNumber                        go to state 51
-    IntegerNumber                    go to state 52
-    FloatingNumber                   go to state 53
-    RationalNumber                   go to state 54
-    RuleReference                    go to state 55
-    Term                             go to state 132
-    Expression                       go to state 57
-    Range                            go to state 58
-    List                             go to state 59
-    DirectCallExpression             go to state 61
-    IndirectCallExpression           go to state 62
-    ConditionalExpression            go to state 63
-    UniversalQuantifierExpression    go to state 64
-    ExistentialQuantifierExpression  go to state 65
+    "]"  shift, and go to state 134
+    ","  shift, and go to state 131
 
 
 State 90
@@ -1815,7 +1750,7 @@ State 91
     "string"       shift, and go to state 42
     "identifier"   shift, and go to state 17
 
-    Initializer                      go to state 136
+    Initializer                      go to state 135
     Identifier                       go to state 46
     Atom                             go to state 47
     Undefined                        go to state 48
@@ -1881,7 +1816,7 @@ State 93
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 137
+    Term                             go to state 136
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -1934,7 +1869,7 @@ State 95
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 138
+    Term                             go to state 137
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -1979,7 +1914,7 @@ State 96
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 139
+    Term                             go to state 138
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2024,7 +1959,7 @@ State 97
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 140
+    Term                             go to state 139
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2069,7 +2004,7 @@ State 98
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 141
+    Term                             go to state 140
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2114,7 +2049,7 @@ State 99
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 142
+    Term                             go to state 141
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2159,7 +2094,7 @@ State 100
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 143
+    Term                             go to state 142
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2204,7 +2139,7 @@ State 101
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 144
+    Term                             go to state 143
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2249,7 +2184,7 @@ State 102
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 145
+    Term                             go to state 144
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2294,7 +2229,7 @@ State 103
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 146
+    Term                             go to state 145
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2339,7 +2274,7 @@ State 104
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 147
+    Term                             go to state 146
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2384,7 +2319,7 @@ State 105
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 148
+    Term                             go to state 147
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2429,7 +2364,7 @@ State 106
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 149
+    Term                             go to state 148
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2474,7 +2409,7 @@ State 107
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 150
+    Term                             go to state 149
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2519,7 +2454,7 @@ State 108
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 151
+    Term                             go to state 150
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2564,7 +2499,7 @@ State 109
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 152
+    Term                             go to state 151
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2609,7 +2544,7 @@ State 110
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 153
+    Term                             go to state 152
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2654,7 +2589,7 @@ State 111
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 154
+    Term                             go to state 153
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2699,7 +2634,7 @@ State 112
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 155
+    Term                             go to state 154
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2722,8 +2657,8 @@ State 114
    38 Parameters: Parameters . "," Variable
    40 MaybeParameters: "(" Parameters . ")"
 
-    ")"  shift, and go to state 156
-    ","  shift, and go to state 157
+    ")"  shift, and go to state 155
+    ","  shift, and go to state 156
 
 
 State 115
@@ -2732,12 +2667,12 @@ State 115
 
     "identifier"  shift, and go to state 17
 
-    Identifier      go to state 158
-    Type            go to state 159
-    BasicType       go to state 160
-    ComposedType    go to state 161
-    FixedSizedType  go to state 162
-    RangedType      go to state 163
+    Identifier      go to state 157
+    Type            go to state 158
+    BasicType       go to state 159
+    ComposedType    go to state 160
+    FixedSizedType  go to state 161
+    RangedType      go to state 162
 
 
 State 116
@@ -2747,41 +2682,41 @@ State 116
     "identifier"  shift, and go to state 17
 
     Identifier   go to state 70
-    Identifiers  go to state 164
+    Identifiers  go to state 163
 
 
 State 117
 
   114 RuleDefinition: "rule" Identifier MaybeParameters "=" . Rule
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 179
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 178
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 118
@@ -2790,12 +2725,12 @@ State 118
 
     "identifier"  shift, and go to state 17
 
-    Identifier      go to state 158
-    Type            go to state 190
-    BasicType       go to state 160
-    ComposedType    go to state 161
-    FixedSizedType  go to state 162
-    RangedType      go to state 163
+    Identifier      go to state 157
+    Type            go to state 189
+    BasicType       go to state 159
+    ComposedType    go to state 160
+    FixedSizedType  go to state 161
+    RangedType      go to state 162
 
 
 State 119
@@ -2804,7 +2739,7 @@ State 119
 
     "identifier"  shift, and go to state 17
 
-    Identifier  go to state 191
+    Identifier  go to state 190
 
 
 State 120
@@ -2822,14 +2757,14 @@ State 121
 
     $default  reduce using rule 17 (MaybeFunctionParameters)
 
-    FunctionParameters       go to state 192
-    MaybeFunctionParameters  go to state 193
-    Identifier               go to state 158
-    Type                     go to state 194
-    BasicType                go to state 160
-    ComposedType             go to state 161
-    FixedSizedType           go to state 162
-    RangedType               go to state 163
+    FunctionParameters       go to state 191
+    MaybeFunctionParameters  go to state 192
+    Identifier               go to state 157
+    Type                     go to state 193
+    BasicType                go to state 159
+    ComposedType             go to state 160
+    FixedSizedType           go to state 161
+    RangedType               go to state 162
 
 
 State 122
@@ -2838,12 +2773,12 @@ State 122
 
     "identifier"  shift, and go to state 17
 
-    Identifier      go to state 158
-    Type            go to state 195
-    BasicType       go to state 160
-    ComposedType    go to state 161
-    FixedSizedType  go to state 162
-    RangedType      go to state 163
+    Identifier      go to state 157
+    Type            go to state 194
+    BasicType       go to state 159
+    ComposedType    go to state 160
+    FixedSizedType  go to state 161
+    RangedType      go to state 162
 
 
 State 123
@@ -2880,7 +2815,7 @@ State 123
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 196
+    Term                             go to state 195
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -2964,7 +2899,7 @@ State 125
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 197
+    Term                             go to state 196
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -3009,7 +2944,7 @@ State 126
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 198
+    Term                             go to state 197
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -3047,7 +2982,7 @@ State 127
     "+"        shift, and go to state 99
     "-"        shift, and go to state 100
     "="        shift, and go to state 101
-    ")"        shift, and go to state 199
+    ")"        shift, and go to state 198
     "<"        shift, and go to state 102
     ">"        shift, and go to state 103
     "*"        shift, and go to state 104
@@ -3068,72 +3003,71 @@ State 128
 
 State 129
 
-  105 Terms: Term "," .
-
-    $default  reduce using rule 105 (Terms)
-
-
-State 130
-
    79 Expression: "(" Expression ")" .
 
     $default  reduce using rule 79 (Expression)
 
 
-State 131
+State 130
 
   106 Arguments: "(" Terms ")" .
 
     $default  reduce using rule 106 (Arguments)
 
 
+State 131
+
+  104 Terms: Terms "," . Term
+
+    "forall"       shift, and go to state 25
+    "if"           shift, and go to state 26
+    "exists"       shift, and go to state 27
+    "undef"        shift, and go to state 28
+    "false"        shift, and go to state 29
+    "true"         shift, and go to state 30
+    "not"          shift, and go to state 31
+    "+"            shift, and go to state 32
+    "-"            shift, and go to state 33
+    "("            shift, and go to state 76
+    "["            shift, and go to state 35
+    "@"            shift, and go to state 36
+    "binary"       shift, and go to state 37
+    "hexadecimal"  shift, and go to state 38
+    "integer"      shift, and go to state 39
+    "rational"     shift, and go to state 40
+    "floating"     shift, and go to state 41
+    "string"       shift, and go to state 42
+    "identifier"   shift, and go to state 17
+
+    Identifier                       go to state 46
+    Atom                             go to state 47
+    Undefined                        go to state 48
+    Boolean                          go to state 49
+    String                           go to state 50
+    BitNumber                        go to state 51
+    IntegerNumber                    go to state 52
+    FloatingNumber                   go to state 53
+    RationalNumber                   go to state 54
+    RuleReference                    go to state 55
+    Term                             go to state 199
+    Expression                       go to state 57
+    Range                            go to state 58
+    List                             go to state 59
+    DirectCallExpression             go to state 61
+    IndirectCallExpression           go to state 62
+    ConditionalExpression            go to state 63
+    UniversalQuantifierExpression    go to state 64
+    ExistentialQuantifierExpression  go to state 65
+
+
 State 132
-
-   83 Expression: Term . "+" Term
-   84           | Term . "-" Term
-   85           | Term . "*" Term
-   86           | Term . "/" Term
-   87           | Term . "%" Term
-   88           | Term . "^" Term
-   89           | Term . "!=" Term
-   90           | Term . "=" Term
-   91           | Term . "<" Term
-   92           | Term . ">" Term
-   93           | Term . "<=" Term
-   94           | Term . ">=" Term
-   95           | Term . "or" Term
-   96           | Term . "xor" Term
-   97           | Term . "and" Term
-   98           | Term . "implies" Term
-  104 Terms: Terms Term . ","
-
-    "and"      shift, and go to state 95
-    "or"       shift, and go to state 96
-    "xor"      shift, and go to state 97
-    "implies"  shift, and go to state 98
-    "+"        shift, and go to state 99
-    "-"        shift, and go to state 100
-    "="        shift, and go to state 101
-    ","        shift, and go to state 200
-    "<"        shift, and go to state 102
-    ">"        shift, and go to state 103
-    "*"        shift, and go to state 104
-    "/"        shift, and go to state 105
-    "%"        shift, and go to state 106
-    "^"        shift, and go to state 107
-    "!="       shift, and go to state 109
-    "<="       shift, and go to state 110
-    ">="       shift, and go to state 111
-
-
-State 133
 
   102 List: "[" Term "]" .
 
     $default  reduce using rule 102 (List)
 
 
-State 134
+State 133
 
   100 Range: "[" Term ".." . Term "]"
 
@@ -3167,7 +3101,7 @@ State 134
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 201
+    Term                             go to state 200
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -3178,21 +3112,21 @@ State 134
     ExistentialQuantifierExpression  go to state 65
 
 
-State 135
+State 134
 
   103 List: "[" Terms "]" .
 
     $default  reduce using rule 103 (List)
 
 
-State 136
+State 135
 
    25 Initializers: Initializers "," Initializer .
 
     $default  reduce using rule 25 (Initializers)
 
 
-State 137
+State 136
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3210,7 +3144,7 @@ State 137
    96           | Term . "xor" Term
    97           | Term . "and" Term
    98           | Term . "implies" Term
-  105 Terms: Term . ","
+  105 Terms: Term .
 
     "and"      shift, and go to state 95
     "or"       shift, and go to state 96
@@ -3219,7 +3153,6 @@ State 137
     "+"        shift, and go to state 99
     "-"        shift, and go to state 100
     "="        shift, and go to state 101
-    ","        shift, and go to state 129
     "<"        shift, and go to state 102
     ">"        shift, and go to state 103
     "*"        shift, and go to state 104
@@ -3230,8 +3163,10 @@ State 137
     "<="       shift, and go to state 110
     ">="       shift, and go to state 111
 
+    $default  reduce using rule 105 (Terms)
 
-State 138
+
+State 137
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3267,7 +3202,7 @@ State 138
     $default  reduce using rule 97 (Expression)
 
 
-State 139
+State 138
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3305,7 +3240,7 @@ State 139
     $default  reduce using rule 95 (Expression)
 
 
-State 140
+State 139
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3342,7 +3277,7 @@ State 140
     $default  reduce using rule 96 (Expression)
 
 
-State 141
+State 140
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3381,7 +3316,7 @@ State 141
     $default  reduce using rule 98 (Expression)
 
 
-State 142
+State 141
 
    83 Expression: Term . "+" Term
    83           | Term "+" Term .
@@ -3409,7 +3344,7 @@ State 142
     $default  reduce using rule 83 (Expression)
 
 
-State 143
+State 142
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3437,7 +3372,7 @@ State 143
     $default  reduce using rule 84 (Expression)
 
 
-State 144
+State 143
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3471,7 +3406,7 @@ State 144
     $default  reduce using rule 90 (Expression)
 
 
-State 145
+State 144
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3501,7 +3436,7 @@ State 145
     $default  reduce using rule 91 (Expression)
 
 
-State 146
+State 145
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3531,7 +3466,7 @@ State 146
     $default  reduce using rule 92 (Expression)
 
 
-State 147
+State 146
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3556,7 +3491,7 @@ State 147
     $default  reduce using rule 85 (Expression)
 
 
-State 148
+State 147
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3581,7 +3516,7 @@ State 148
     $default  reduce using rule 86 (Expression)
 
 
-State 149
+State 148
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3606,7 +3541,7 @@ State 149
     $default  reduce using rule 87 (Expression)
 
 
-State 150
+State 149
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3629,7 +3564,7 @@ State 150
     $default  reduce using rule 88 (Expression)
 
 
-State 151
+State 150
 
    23 Initializer: Term "->" Term .
    83 Expression: Term . "+" Term
@@ -3669,7 +3604,7 @@ State 151
     $default  reduce using rule 23 (Initializer)
 
 
-State 152
+State 151
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3703,7 +3638,7 @@ State 152
     $default  reduce using rule 89 (Expression)
 
 
-State 153
+State 152
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3733,7 +3668,7 @@ State 153
     $default  reduce using rule 93 (Expression)
 
 
-State 154
+State 153
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -3763,7 +3698,7 @@ State 154
     $default  reduce using rule 94 (Expression)
 
 
-State 155
+State 154
 
    24 Initializer: Arguments "->" Term .
    83 Expression: Term . "+" Term
@@ -3803,160 +3738,170 @@ State 155
     $default  reduce using rule 24 (Initializer)
 
 
-State 156
+State 155
 
    40 MaybeParameters: "(" Parameters ")" .
 
     $default  reduce using rule 40 (MaybeParameters)
 
 
-State 157
+State 156
 
    38 Parameters: Parameters "," . Variable
 
     "identifier"  shift, and go to state 17
 
     Identifier  go to state 74
-    Variable    go to state 202
+    Variable    go to state 201
 
 
-State 158
+State 157
 
    46 BasicType: Identifier .
    47 ComposedType: Identifier . "(" Types ")"
    48 FixedSizedType: Identifier . "<" Term ">"
    49 RangedType: Identifier . "<" Term ".." Term ">"
 
-    "("  shift, and go to state 203
-    "<"  shift, and go to state 204
+    "("  shift, and go to state 202
+    "<"  shift, and go to state 203
 
     $default  reduce using rule 46 (BasicType)
 
 
-State 159
+State 158
 
    29 DerivedDefinition: "derived" Identifier MaybeParameters "->" Type . "=" Term
 
-    "="  shift, and go to state 205
+    "="  shift, and go to state 204
 
 
-State 160
+State 159
 
    42 Type: BasicType .
 
     $default  reduce using rule 42 (Type)
 
 
-State 161
+State 160
 
    43 Type: ComposedType .
 
     $default  reduce using rule 43 (Type)
 
 
-State 162
+State 161
 
    44 Type: FixedSizedType .
 
     $default  reduce using rule 44 (Type)
 
 
-State 163
+State 162
 
    45 Type: RangedType .
 
     $default  reduce using rule 45 (Type)
 
 
-State 164
+State 163
 
    30 EnumerationDefinition: "enum" Identifier "=" "{" Identifiers . "}"
    32 Identifiers: Identifiers . "," Identifier
 
-    "}"  shift, and go to state 206
+    "}"  shift, and go to state 205
     ","  shift, and go to state 119
+
+
+State 164
+
+  143 SequenceRule: "seq" . Rules "endseq"
+
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
+    "identifier"  shift, and go to state 17
+
+    Identifier              go to state 46
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 206
+    Rules                   go to state 207
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 165
 
-  143 SequenceRule: "seq" . Rules "endseq"
+  141 BlockRule: "par" . Rules "endpar"
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 207
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 206
     Rules                   go to state 208
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 166
-
-  141 BlockRule: "par" . Rules "endpar"
-
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
-    "identifier"  shift, and go to state 17
-
-    Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 207
-    Rules                   go to state 209
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
-
-
-State 167
 
   128 SkipRule: "skip" .
 
     $default  reduce using rule 128 (SkipRule)
 
 
-State 168
+State 167
 
   137 LetRule: "let" . Variable "=" Term "in" Rule
+
+    "identifier"  shift, and go to state 17
+
+    Identifier  go to state 74
+    Variable    go to state 209
+
+
+State 168
+
+  138 ForallRule: "forall" . Variable "in" Term "do" Rule
 
     "identifier"  shift, and go to state 17
 
@@ -3966,65 +3911,100 @@ State 168
 
 State 169
 
-  138 ForallRule: "forall" . Variable "in" Term "do" Rule
+  139 IterateRule: "iterate" . Rule
 
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
-    Identifier  go to state 74
-    Variable    go to state 211
+    Identifier              go to state 46
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 211
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 170
 
-  139 IterateRule: "iterate" . Rule
+  145 CallRule: "call" . DirectCallExpression
+  147         | "call" . IndirectCallExpression
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "("           shift, and go to state 173
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 212
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    DirectCallExpression    go to state 212
+    IndirectCallExpression  go to state 213
 
 
 State 171
 
-  145 CallRule: "call" . DirectCallExpression
-  147         | "call" . IndirectCallExpression
+  129 ConditionalRule: "if" . Term "then" Rule
+  130                | "if" . Term "then" Rule "else" Rule
 
-    "("           shift, and go to state 174
-    "identifier"  shift, and go to state 17
+    "forall"       shift, and go to state 25
+    "if"           shift, and go to state 26
+    "exists"       shift, and go to state 27
+    "undef"        shift, and go to state 28
+    "false"        shift, and go to state 29
+    "true"         shift, and go to state 30
+    "not"          shift, and go to state 31
+    "+"            shift, and go to state 32
+    "-"            shift, and go to state 33
+    "("            shift, and go to state 76
+    "["            shift, and go to state 35
+    "@"            shift, and go to state 36
+    "binary"       shift, and go to state 37
+    "hexadecimal"  shift, and go to state 38
+    "integer"      shift, and go to state 39
+    "rational"     shift, and go to state 40
+    "floating"     shift, and go to state 41
+    "string"       shift, and go to state 42
+    "identifier"   shift, and go to state 17
 
-    Identifier              go to state 46
-    DirectCallExpression    go to state 213
-    IndirectCallExpression  go to state 214
+    Identifier                       go to state 46
+    Atom                             go to state 47
+    Undefined                        go to state 48
+    Boolean                          go to state 49
+    String                           go to state 50
+    BitNumber                        go to state 51
+    IntegerNumber                    go to state 52
+    FloatingNumber                   go to state 53
+    RationalNumber                   go to state 54
+    RuleReference                    go to state 55
+    Term                             go to state 214
+    Expression                       go to state 57
+    Range                            go to state 58
+    List                             go to state 59
+    DirectCallExpression             go to state 61
+    IndirectCallExpression           go to state 62
+    ConditionalExpression            go to state 63
+    UniversalQuantifierExpression    go to state 64
+    ExistentialQuantifierExpression  go to state 65
 
 
 State 172
 
-  129 ConditionalRule: "if" . Term "then" Rule
-  130                | "if" . Term "then" Rule "else" Rule
+  131 CaseRule: "case" . Term "of" "{" CaseLabels "}"
 
     "forall"       shift, and go to state 25
     "if"           shift, and go to state 26
@@ -4069,263 +4049,257 @@ State 172
 
 State 173
 
-  131 CaseRule: "case" . Term "of" "{" CaseLabels "}"
-
-    "forall"       shift, and go to state 25
-    "if"           shift, and go to state 26
-    "exists"       shift, and go to state 27
-    "undef"        shift, and go to state 28
-    "false"        shift, and go to state 29
-    "true"         shift, and go to state 30
-    "not"          shift, and go to state 31
-    "+"            shift, and go to state 32
-    "-"            shift, and go to state 33
-    "("            shift, and go to state 76
-    "["            shift, and go to state 35
-    "@"            shift, and go to state 36
-    "binary"       shift, and go to state 37
-    "hexadecimal"  shift, and go to state 38
-    "integer"      shift, and go to state 39
-    "rational"     shift, and go to state 40
-    "floating"     shift, and go to state 41
-    "string"       shift, and go to state 42
-    "identifier"   shift, and go to state 17
-
-    Identifier                       go to state 46
-    Atom                             go to state 47
-    Undefined                        go to state 48
-    Boolean                          go to state 49
-    String                           go to state 50
-    BitNumber                        go to state 51
-    IntegerNumber                    go to state 52
-    FloatingNumber                   go to state 53
-    RationalNumber                   go to state 54
-    RuleReference                    go to state 55
-    Term                             go to state 216
-    Expression                       go to state 57
-    Range                            go to state 58
-    List                             go to state 59
-    DirectCallExpression             go to state 61
-    IndirectCallExpression           go to state 62
-    ConditionalExpression            go to state 63
-    UniversalQuantifierExpression    go to state 64
-    ExistentialQuantifierExpression  go to state 65
-
-
-State 174
-
   110 IndirectCallExpression: "(" . "*" Term ")" Arguments
 
     "*"  shift, and go to state 83
 
 
-State 175
+State 174
 
   140 BlockRule: "{" . Rules "}"
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 207
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 206
+    Rules                   go to state 216
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
+
+
+State 175
+
+  142 SequenceRule: "{|" . Rules "|}"
+
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
+    "identifier"  shift, and go to state 17
+
+    Identifier              go to state 46
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 206
     Rules                   go to state 217
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 176
 
-  142 SequenceRule: "{|" . Rules "|}"
-
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
-    "identifier"  shift, and go to state 17
-
-    Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 207
-    Rules                   go to state 218
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
-
-
-State 177
-
   144 UpdateRule: DirectCallExpression . ":=" Term
   146 CallRule: DirectCallExpression .
 
-    ":="  shift, and go to state 219
+    ":="  shift, and go to state 218
 
     $default  reduce using rule 146 (CallRule)
 
 
-State 178
+State 177
 
   148 CallRule: IndirectCallExpression .
 
     $default  reduce using rule 148 (CallRule)
 
 
-State 179
+State 178
 
   114 RuleDefinition: "rule" Identifier MaybeParameters "=" Rule .
 
     $default  reduce using rule 114 (RuleDefinition)
 
 
-State 180
+State 179
 
   116 Rule: SkipRule .
 
     $default  reduce using rule 116 (Rule)
 
 
-State 181
+State 180
 
   117 Rule: ConditionalRule .
 
     $default  reduce using rule 117 (Rule)
 
 
-State 182
+State 181
 
   118 Rule: CaseRule .
 
     $default  reduce using rule 118 (Rule)
 
 
-State 183
+State 182
 
   119 Rule: LetRule .
 
     $default  reduce using rule 119 (Rule)
 
 
-State 184
+State 183
 
   120 Rule: ForallRule .
 
     $default  reduce using rule 120 (Rule)
 
 
-State 185
+State 184
 
   121 Rule: IterateRule .
 
     $default  reduce using rule 121 (Rule)
 
 
-State 186
+State 185
 
   122 Rule: BlockRule .
 
     $default  reduce using rule 122 (Rule)
 
 
-State 187
+State 186
 
   123 Rule: SequenceRule .
 
     $default  reduce using rule 123 (Rule)
 
 
-State 188
+State 187
 
   124 Rule: UpdateRule .
 
     $default  reduce using rule 124 (Rule)
 
 
-State 189
+State 188
 
   125 Rule: CallRule .
 
     $default  reduce using rule 125 (Rule)
 
 
-State 190
+State 189
 
   115 RuleDefinition: "rule" Identifier MaybeParameters "->" Type . "=" Rule
 
-    "="  shift, and go to state 220
+    "="  shift, and go to state 219
 
 
-State 191
+State 190
 
    32 Identifiers: Identifiers "," Identifier .
 
     $default  reduce using rule 32 (Identifiers)
 
 
-State 192
+State 191
 
    14 FunctionParameters: FunctionParameters . "*" Type
    16 MaybeFunctionParameters: FunctionParameters .
 
-    "*"  shift, and go to state 221
+    "*"  shift, and go to state 220
 
     $default  reduce using rule 16 (MaybeFunctionParameters)
 
 
-State 193
+State 192
 
     8 FunctionDefinition: "function" MaybeFunctionAttributes Identifier ":" MaybeFunctionParameters . "->" Type MaybeDefined MaybeInitially
 
-    "->"  shift, and go to state 222
+    "->"  shift, and go to state 221
 
 
-State 194
+State 193
 
    15 FunctionParameters: Type .
 
     $default  reduce using rule 15 (FunctionParameters)
 
 
-State 195
+State 194
 
    36 Variable: Identifier ":" Type .
 
     $default  reduce using rule 36 (Variable)
+
+
+State 195
+
+   83 Expression: Term . "+" Term
+   84           | Term . "-" Term
+   85           | Term . "*" Term
+   86           | Term . "/" Term
+   87           | Term . "%" Term
+   88           | Term . "^" Term
+   89           | Term . "!=" Term
+   90           | Term . "=" Term
+   91           | Term . "<" Term
+   92           | Term . ">" Term
+   93           | Term . "<=" Term
+   94           | Term . ">=" Term
+   95           | Term . "or" Term
+   96           | Term . "xor" Term
+   97           | Term . "and" Term
+   98           | Term . "implies" Term
+  112 UniversalQuantifierExpression: "forall" Variable "in" Term . "holds" Term
+
+    "holds"    shift, and go to state 222
+    "and"      shift, and go to state 95
+    "or"       shift, and go to state 96
+    "xor"      shift, and go to state 97
+    "implies"  shift, and go to state 98
+    "+"        shift, and go to state 99
+    "-"        shift, and go to state 100
+    "="        shift, and go to state 101
+    "<"        shift, and go to state 102
+    ">"        shift, and go to state 103
+    "*"        shift, and go to state 104
+    "/"        shift, and go to state 105
+    "%"        shift, and go to state 106
+    "^"        shift, and go to state 107
+    "!="       shift, and go to state 109
+    "<="       shift, and go to state 110
+    ">="       shift, and go to state 111
 
 
 State 196
@@ -4346,9 +4320,9 @@ State 196
    96           | Term . "xor" Term
    97           | Term . "and" Term
    98           | Term . "implies" Term
-  112 UniversalQuantifierExpression: "forall" Variable "in" Term . "holds" Term
+  111 ConditionalExpression: "if" Term "then" Term . "else" Term
 
-    "holds"    shift, and go to state 223
+    "else"     shift, and go to state 223
     "and"      shift, and go to state 95
     "or"       shift, and go to state 96
     "xor"      shift, and go to state 97
@@ -4385,9 +4359,9 @@ State 197
    96           | Term . "xor" Term
    97           | Term . "and" Term
    98           | Term . "implies" Term
-  111 ConditionalExpression: "if" Term "then" Term . "else" Term
+  113 ExistentialQuantifierExpression: "exists" Variable "in" Term . "with" Term
 
-    "else"     shift, and go to state 224
+    "with"     shift, and go to state 224
     "and"      shift, and go to state 95
     "or"       shift, and go to state 96
     "xor"      shift, and go to state 97
@@ -4408,6 +4382,15 @@ State 197
 
 State 198
 
+  110 IndirectCallExpression: "(" "*" Term ")" . Arguments
+
+    "("  shift, and go to state 93
+
+    Arguments  go to state 225
+
+
+State 199
+
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
    85           | Term . "*" Term
@@ -4424,9 +4407,8 @@ State 198
    96           | Term . "xor" Term
    97           | Term . "and" Term
    98           | Term . "implies" Term
-  113 ExistentialQuantifierExpression: "exists" Variable "in" Term . "with" Term
+  104 Terms: Terms "," Term .
 
-    "with"     shift, and go to state 225
     "and"      shift, and go to state 95
     "or"       shift, and go to state 96
     "xor"      shift, and go to state 97
@@ -4444,24 +4426,10 @@ State 198
     "<="       shift, and go to state 110
     ">="       shift, and go to state 111
 
-
-State 199
-
-  110 IndirectCallExpression: "(" "*" Term ")" . Arguments
-
-    "("  shift, and go to state 93
-
-    Arguments  go to state 226
-
-
-State 200
-
-  104 Terms: Terms Term "," .
-
     $default  reduce using rule 104 (Terms)
 
 
-State 201
+State 200
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -4488,7 +4456,7 @@ State 201
     "+"        shift, and go to state 99
     "-"        shift, and go to state 100
     "="        shift, and go to state 101
-    "]"        shift, and go to state 227
+    "]"        shift, and go to state 226
     "<"        shift, and go to state 102
     ">"        shift, and go to state 103
     "*"        shift, and go to state 104
@@ -4500,32 +4468,77 @@ State 201
     ">="       shift, and go to state 111
 
 
-State 202
+State 201
 
    38 Parameters: Parameters "," Variable .
 
     $default  reduce using rule 38 (Parameters)
 
 
-State 203
+State 202
 
    47 ComposedType: Identifier "(" . Types ")"
 
     "identifier"  shift, and go to state 17
 
-    Identifier      go to state 158
-    Type            go to state 228
-    BasicType       go to state 160
-    ComposedType    go to state 161
-    FixedSizedType  go to state 162
-    RangedType      go to state 163
-    Types           go to state 229
+    Identifier      go to state 157
+    Type            go to state 227
+    BasicType       go to state 159
+    ComposedType    go to state 160
+    FixedSizedType  go to state 161
+    RangedType      go to state 162
+    Types           go to state 228
+
+
+State 203
+
+   48 FixedSizedType: Identifier "<" . Term ">"
+   49 RangedType: Identifier "<" . Term ".." Term ">"
+
+    "forall"       shift, and go to state 25
+    "if"           shift, and go to state 26
+    "exists"       shift, and go to state 27
+    "undef"        shift, and go to state 28
+    "false"        shift, and go to state 29
+    "true"         shift, and go to state 30
+    "not"          shift, and go to state 31
+    "+"            shift, and go to state 32
+    "-"            shift, and go to state 33
+    "("            shift, and go to state 76
+    "["            shift, and go to state 35
+    "@"            shift, and go to state 36
+    "binary"       shift, and go to state 37
+    "hexadecimal"  shift, and go to state 38
+    "integer"      shift, and go to state 39
+    "rational"     shift, and go to state 40
+    "floating"     shift, and go to state 41
+    "string"       shift, and go to state 42
+    "identifier"   shift, and go to state 17
+
+    Identifier                       go to state 46
+    Atom                             go to state 47
+    Undefined                        go to state 48
+    Boolean                          go to state 49
+    String                           go to state 50
+    BitNumber                        go to state 51
+    IntegerNumber                    go to state 52
+    FloatingNumber                   go to state 53
+    RationalNumber                   go to state 54
+    RuleReference                    go to state 55
+    Term                             go to state 229
+    Expression                       go to state 57
+    Range                            go to state 58
+    List                             go to state 59
+    DirectCallExpression             go to state 61
+    IndirectCallExpression           go to state 62
+    ConditionalExpression            go to state 63
+    UniversalQuantifierExpression    go to state 64
+    ExistentialQuantifierExpression  go to state 65
 
 
 State 204
 
-   48 FixedSizedType: Identifier "<" . Term ">"
-   49 RangedType: Identifier "<" . Term ".." Term ">"
+   29 DerivedDefinition: "derived" Identifier MaybeParameters "->" Type "=" . Term
 
     "forall"       shift, and go to state 25
     "if"           shift, and go to state 26
@@ -4570,171 +4583,126 @@ State 204
 
 State 205
 
-   29 DerivedDefinition: "derived" Identifier MaybeParameters "->" Type "=" . Term
-
-    "forall"       shift, and go to state 25
-    "if"           shift, and go to state 26
-    "exists"       shift, and go to state 27
-    "undef"        shift, and go to state 28
-    "false"        shift, and go to state 29
-    "true"         shift, and go to state 30
-    "not"          shift, and go to state 31
-    "+"            shift, and go to state 32
-    "-"            shift, and go to state 33
-    "("            shift, and go to state 76
-    "["            shift, and go to state 35
-    "@"            shift, and go to state 36
-    "binary"       shift, and go to state 37
-    "hexadecimal"  shift, and go to state 38
-    "integer"      shift, and go to state 39
-    "rational"     shift, and go to state 40
-    "floating"     shift, and go to state 41
-    "string"       shift, and go to state 42
-    "identifier"   shift, and go to state 17
-
-    Identifier                       go to state 46
-    Atom                             go to state 47
-    Undefined                        go to state 48
-    Boolean                          go to state 49
-    String                           go to state 50
-    BitNumber                        go to state 51
-    IntegerNumber                    go to state 52
-    FloatingNumber                   go to state 53
-    RationalNumber                   go to state 54
-    RuleReference                    go to state 55
-    Term                             go to state 231
-    Expression                       go to state 57
-    Range                            go to state 58
-    List                             go to state 59
-    DirectCallExpression             go to state 61
-    IndirectCallExpression           go to state 62
-    ConditionalExpression            go to state 63
-    UniversalQuantifierExpression    go to state 64
-    ExistentialQuantifierExpression  go to state 65
-
-
-State 206
-
    30 EnumerationDefinition: "enum" Identifier "=" "{" Identifiers "}" .
 
     $default  reduce using rule 30 (EnumerationDefinition)
 
 
-State 207
+State 206
 
   127 Rules: Rule .
 
     $default  reduce using rule 127 (Rules)
 
 
-State 208
+State 207
 
   126 Rules: Rules . Rule
   143 SequenceRule: "seq" Rules . "endseq"
 
-    "seq"         shift, and go to state 165
-    "endseq"      shift, and go to state 232
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "endseq"      shift, and go to state 231
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 233
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 232
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
-State 209
+State 208
 
   126 Rules: Rules . Rule
   141 BlockRule: "par" Rules . "endpar"
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "endpar"      shift, and go to state 234
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "endpar"      shift, and go to state 233
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 233
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 232
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
+
+
+State 209
+
+  137 LetRule: "let" Variable . "=" Term "in" Rule
+
+    "="  shift, and go to state 234
 
 
 State 210
 
-  137 LetRule: "let" Variable . "=" Term "in" Rule
+  138 ForallRule: "forall" Variable . "in" Term "do" Rule
 
-    "="  shift, and go to state 235
+    "in"  shift, and go to state 235
 
 
 State 211
-
-  138 ForallRule: "forall" Variable . "in" Term "do" Rule
-
-    "in"  shift, and go to state 236
-
-
-State 212
 
   139 IterateRule: "iterate" Rule .
 
     $default  reduce using rule 139 (IterateRule)
 
 
-State 213
+State 212
 
   145 CallRule: "call" DirectCallExpression .
 
     $default  reduce using rule 145 (CallRule)
 
 
-State 214
+State 213
 
   147 CallRule: "call" IndirectCallExpression .
 
     $default  reduce using rule 147 (CallRule)
 
 
-State 215
+State 214
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -4755,7 +4723,46 @@ State 215
   129 ConditionalRule: "if" Term . "then" Rule
   130                | "if" Term . "then" Rule "else" Rule
 
-    "then"     shift, and go to state 237
+    "then"     shift, and go to state 236
+    "and"      shift, and go to state 95
+    "or"       shift, and go to state 96
+    "xor"      shift, and go to state 97
+    "implies"  shift, and go to state 98
+    "+"        shift, and go to state 99
+    "-"        shift, and go to state 100
+    "="        shift, and go to state 101
+    "<"        shift, and go to state 102
+    ">"        shift, and go to state 103
+    "*"        shift, and go to state 104
+    "/"        shift, and go to state 105
+    "%"        shift, and go to state 106
+    "^"        shift, and go to state 107
+    "!="       shift, and go to state 109
+    "<="       shift, and go to state 110
+    ">="       shift, and go to state 111
+
+
+State 215
+
+   83 Expression: Term . "+" Term
+   84           | Term . "-" Term
+   85           | Term . "*" Term
+   86           | Term . "/" Term
+   87           | Term . "%" Term
+   88           | Term . "^" Term
+   89           | Term . "!=" Term
+   90           | Term . "=" Term
+   91           | Term . "<" Term
+   92           | Term . ">" Term
+   93           | Term . "<=" Term
+   94           | Term . ">=" Term
+   95           | Term . "or" Term
+   96           | Term . "xor" Term
+   97           | Term . "and" Term
+   98           | Term . "implies" Term
+  131 CaseRule: "case" Term . "of" "{" CaseLabels "}"
+
+    "of"       shift, and go to state 237
     "and"      shift, and go to state 95
     "or"       shift, and go to state 96
     "xor"      shift, and go to state 97
@@ -4776,116 +4783,77 @@ State 215
 
 State 216
 
-   83 Expression: Term . "+" Term
-   84           | Term . "-" Term
-   85           | Term . "*" Term
-   86           | Term . "/" Term
-   87           | Term . "%" Term
-   88           | Term . "^" Term
-   89           | Term . "!=" Term
-   90           | Term . "=" Term
-   91           | Term . "<" Term
-   92           | Term . ">" Term
-   93           | Term . "<=" Term
-   94           | Term . ">=" Term
-   95           | Term . "or" Term
-   96           | Term . "xor" Term
-   97           | Term . "and" Term
-   98           | Term . "implies" Term
-  131 CaseRule: "case" Term . "of" "{" CaseLabels "}"
+  126 Rules: Rules . Rule
+  140 BlockRule: "{" Rules . "}"
 
-    "of"       shift, and go to state 238
-    "and"      shift, and go to state 95
-    "or"       shift, and go to state 96
-    "xor"      shift, and go to state 97
-    "implies"  shift, and go to state 98
-    "+"        shift, and go to state 99
-    "-"        shift, and go to state 100
-    "="        shift, and go to state 101
-    "<"        shift, and go to state 102
-    ">"        shift, and go to state 103
-    "*"        shift, and go to state 104
-    "/"        shift, and go to state 105
-    "%"        shift, and go to state 106
-    "^"        shift, and go to state 107
-    "!="       shift, and go to state 109
-    "<="       shift, and go to state 110
-    ">="       shift, and go to state 111
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "}"           shift, and go to state 238
+    "{|"          shift, and go to state 175
+    "identifier"  shift, and go to state 17
+
+    Identifier              go to state 46
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 232
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 217
 
   126 Rules: Rules . Rule
-  140 BlockRule: "{" Rules . "}"
+  142 SequenceRule: "{|" Rules . "|}"
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "}"           shift, and go to state 239
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
+    "|}"          shift, and go to state 239
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 233
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 232
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 218
-
-  126 Rules: Rules . Rule
-  142 SequenceRule: "{|" Rules . "|}"
-
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
-    "|}"          shift, and go to state 240
-    "identifier"  shift, and go to state 17
-
-    Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 233
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
-
-
-State 219
 
   144 UpdateRule: DirectCallExpression ":=" . Term
 
@@ -4919,7 +4887,7 @@ State 219
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 241
+    Term                             go to state 240
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -4930,71 +4898,116 @@ State 219
     ExistentialQuantifierExpression  go to state 65
 
 
-State 220
+State 219
 
   115 RuleDefinition: "rule" Identifier MaybeParameters "->" Type "=" . Rule
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 242
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 241
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
-State 221
+State 220
 
    14 FunctionParameters: FunctionParameters "*" . Type
 
     "identifier"  shift, and go to state 17
 
-    Identifier      go to state 158
-    Type            go to state 243
-    BasicType       go to state 160
-    ComposedType    go to state 161
-    FixedSizedType  go to state 162
-    RangedType      go to state 163
+    Identifier      go to state 157
+    Type            go to state 242
+    BasicType       go to state 159
+    ComposedType    go to state 160
+    FixedSizedType  go to state 161
+    RangedType      go to state 162
 
 
-State 222
+State 221
 
     8 FunctionDefinition: "function" MaybeFunctionAttributes Identifier ":" MaybeFunctionParameters "->" . Type MaybeDefined MaybeInitially
 
     "identifier"  shift, and go to state 17
 
-    Identifier      go to state 158
-    Type            go to state 244
-    BasicType       go to state 160
-    ComposedType    go to state 161
-    FixedSizedType  go to state 162
-    RangedType      go to state 163
+    Identifier      go to state 157
+    Type            go to state 243
+    BasicType       go to state 159
+    ComposedType    go to state 160
+    FixedSizedType  go to state 161
+    RangedType      go to state 162
+
+
+State 222
+
+  112 UniversalQuantifierExpression: "forall" Variable "in" Term "holds" . Term
+
+    "forall"       shift, and go to state 25
+    "if"           shift, and go to state 26
+    "exists"       shift, and go to state 27
+    "undef"        shift, and go to state 28
+    "false"        shift, and go to state 29
+    "true"         shift, and go to state 30
+    "not"          shift, and go to state 31
+    "+"            shift, and go to state 32
+    "-"            shift, and go to state 33
+    "("            shift, and go to state 76
+    "["            shift, and go to state 35
+    "@"            shift, and go to state 36
+    "binary"       shift, and go to state 37
+    "hexadecimal"  shift, and go to state 38
+    "integer"      shift, and go to state 39
+    "rational"     shift, and go to state 40
+    "floating"     shift, and go to state 41
+    "string"       shift, and go to state 42
+    "identifier"   shift, and go to state 17
+
+    Identifier                       go to state 46
+    Atom                             go to state 47
+    Undefined                        go to state 48
+    Boolean                          go to state 49
+    String                           go to state 50
+    BitNumber                        go to state 51
+    IntegerNumber                    go to state 52
+    FloatingNumber                   go to state 53
+    RationalNumber                   go to state 54
+    RuleReference                    go to state 55
+    Term                             go to state 244
+    Expression                       go to state 57
+    Range                            go to state 58
+    List                             go to state 59
+    DirectCallExpression             go to state 61
+    IndirectCallExpression           go to state 62
+    ConditionalExpression            go to state 63
+    UniversalQuantifierExpression    go to state 64
+    ExistentialQuantifierExpression  go to state 65
 
 
 State 223
 
-  112 UniversalQuantifierExpression: "forall" Variable "in" Term "holds" . Term
+  111 ConditionalExpression: "if" Term "then" Term "else" . Term
 
     "forall"       shift, and go to state 25
     "if"           shift, and go to state 26
@@ -5039,7 +5052,7 @@ State 223
 
 State 224
 
-  111 ConditionalExpression: "if" Term "then" Term "else" . Term
+  113 ExistentialQuantifierExpression: "exists" Variable "in" Term "with" . Term
 
     "forall"       shift, and go to state 25
     "if"           shift, and go to state 26
@@ -5084,80 +5097,35 @@ State 224
 
 State 225
 
-  113 ExistentialQuantifierExpression: "exists" Variable "in" Term "with" . Term
-
-    "forall"       shift, and go to state 25
-    "if"           shift, and go to state 26
-    "exists"       shift, and go to state 27
-    "undef"        shift, and go to state 28
-    "false"        shift, and go to state 29
-    "true"         shift, and go to state 30
-    "not"          shift, and go to state 31
-    "+"            shift, and go to state 32
-    "-"            shift, and go to state 33
-    "("            shift, and go to state 76
-    "["            shift, and go to state 35
-    "@"            shift, and go to state 36
-    "binary"       shift, and go to state 37
-    "hexadecimal"  shift, and go to state 38
-    "integer"      shift, and go to state 39
-    "rational"     shift, and go to state 40
-    "floating"     shift, and go to state 41
-    "string"       shift, and go to state 42
-    "identifier"   shift, and go to state 17
-
-    Identifier                       go to state 46
-    Atom                             go to state 47
-    Undefined                        go to state 48
-    Boolean                          go to state 49
-    String                           go to state 50
-    BitNumber                        go to state 51
-    IntegerNumber                    go to state 52
-    FloatingNumber                   go to state 53
-    RationalNumber                   go to state 54
-    RuleReference                    go to state 55
-    Term                             go to state 247
-    Expression                       go to state 57
-    Range                            go to state 58
-    List                             go to state 59
-    DirectCallExpression             go to state 61
-    IndirectCallExpression           go to state 62
-    ConditionalExpression            go to state 63
-    UniversalQuantifierExpression    go to state 64
-    ExistentialQuantifierExpression  go to state 65
-
-
-State 226
-
   110 IndirectCallExpression: "(" "*" Term ")" Arguments .
 
     $default  reduce using rule 110 (IndirectCallExpression)
 
 
-State 227
+State 226
 
   100 Range: "[" Term ".." Term "]" .
 
     $default  reduce using rule 100 (Range)
 
 
-State 228
+State 227
 
    51 Types: Type .
 
     $default  reduce using rule 51 (Types)
 
 
-State 229
+State 228
 
    47 ComposedType: Identifier "(" Types . ")"
    50 Types: Types . "," Type
 
-    ")"  shift, and go to state 248
-    ","  shift, and go to state 249
+    ")"  shift, and go to state 247
+    ","  shift, and go to state 248
 
 
-State 230
+State 229
 
    48 FixedSizedType: Identifier "<" Term . ">"
    49 RangedType: Identifier "<" Term . ".." Term ">"
@@ -5186,18 +5154,18 @@ State 230
     "-"        shift, and go to state 100
     "="        shift, and go to state 101
     "<"        shift, and go to state 102
-    ">"        shift, and go to state 250
+    ">"        shift, and go to state 249
     "*"        shift, and go to state 104
     "/"        shift, and go to state 105
     "%"        shift, and go to state 106
     "^"        shift, and go to state 107
-    ".."       shift, and go to state 251
+    ".."       shift, and go to state 250
     "!="       shift, and go to state 109
     "<="       shift, and go to state 110
     ">="       shift, and go to state 111
 
 
-State 231
+State 230
 
    29 DerivedDefinition: "derived" Identifier MaybeParameters "->" Type "=" Term .
    83 Expression: Term . "+" Term
@@ -5237,30 +5205,75 @@ State 231
     $default  reduce using rule 29 (DerivedDefinition)
 
 
-State 232
+State 231
 
   143 SequenceRule: "seq" Rules "endseq" .
 
     $default  reduce using rule 143 (SequenceRule)
 
 
-State 233
+State 232
 
   126 Rules: Rules Rule .
 
     $default  reduce using rule 126 (Rules)
 
 
-State 234
+State 233
 
   141 BlockRule: "par" Rules "endpar" .
 
     $default  reduce using rule 141 (BlockRule)
 
 
-State 235
+State 234
 
   137 LetRule: "let" Variable "=" . Term "in" Rule
+
+    "forall"       shift, and go to state 25
+    "if"           shift, and go to state 26
+    "exists"       shift, and go to state 27
+    "undef"        shift, and go to state 28
+    "false"        shift, and go to state 29
+    "true"         shift, and go to state 30
+    "not"          shift, and go to state 31
+    "+"            shift, and go to state 32
+    "-"            shift, and go to state 33
+    "("            shift, and go to state 76
+    "["            shift, and go to state 35
+    "@"            shift, and go to state 36
+    "binary"       shift, and go to state 37
+    "hexadecimal"  shift, and go to state 38
+    "integer"      shift, and go to state 39
+    "rational"     shift, and go to state 40
+    "floating"     shift, and go to state 41
+    "string"       shift, and go to state 42
+    "identifier"   shift, and go to state 17
+
+    Identifier                       go to state 46
+    Atom                             go to state 47
+    Undefined                        go to state 48
+    Boolean                          go to state 49
+    String                           go to state 50
+    BitNumber                        go to state 51
+    IntegerNumber                    go to state 52
+    FloatingNumber                   go to state 53
+    RationalNumber                   go to state 54
+    RuleReference                    go to state 55
+    Term                             go to state 251
+    Expression                       go to state 57
+    Range                            go to state 58
+    List                             go to state 59
+    DirectCallExpression             go to state 61
+    IndirectCallExpression           go to state 62
+    ConditionalExpression            go to state 63
+    UniversalQuantifierExpression    go to state 64
+    ExistentialQuantifierExpression  go to state 65
+
+
+State 235
+
+  138 ForallRule: "forall" Variable "in" . Term "do" Rule
 
     "forall"       shift, and go to state 25
     "if"           shift, and go to state 26
@@ -5305,106 +5318,61 @@ State 235
 
 State 236
 
-  138 ForallRule: "forall" Variable "in" . Term "do" Rule
+  129 ConditionalRule: "if" Term "then" . Rule
+  130                | "if" Term "then" . Rule "else" Rule
 
-    "forall"       shift, and go to state 25
-    "if"           shift, and go to state 26
-    "exists"       shift, and go to state 27
-    "undef"        shift, and go to state 28
-    "false"        shift, and go to state 29
-    "true"         shift, and go to state 30
-    "not"          shift, and go to state 31
-    "+"            shift, and go to state 32
-    "-"            shift, and go to state 33
-    "("            shift, and go to state 76
-    "["            shift, and go to state 35
-    "@"            shift, and go to state 36
-    "binary"       shift, and go to state 37
-    "hexadecimal"  shift, and go to state 38
-    "integer"      shift, and go to state 39
-    "rational"     shift, and go to state 40
-    "floating"     shift, and go to state 41
-    "string"       shift, and go to state 42
-    "identifier"   shift, and go to state 17
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
+    "identifier"  shift, and go to state 17
 
-    Identifier                       go to state 46
-    Atom                             go to state 47
-    Undefined                        go to state 48
-    Boolean                          go to state 49
-    String                           go to state 50
-    BitNumber                        go to state 51
-    IntegerNumber                    go to state 52
-    FloatingNumber                   go to state 53
-    RationalNumber                   go to state 54
-    RuleReference                    go to state 55
-    Term                             go to state 253
-    Expression                       go to state 57
-    Range                            go to state 58
-    List                             go to state 59
-    DirectCallExpression             go to state 61
-    IndirectCallExpression           go to state 62
-    ConditionalExpression            go to state 63
-    UniversalQuantifierExpression    go to state 64
-    ExistentialQuantifierExpression  go to state 65
+    Identifier              go to state 46
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 253
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 237
 
-  129 ConditionalRule: "if" Term "then" . Rule
-  130                | "if" Term "then" . Rule "else" Rule
+  131 CaseRule: "case" Term "of" . "{" CaseLabels "}"
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
-    "identifier"  shift, and go to state 17
-
-    Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 254
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    "{"  shift, and go to state 254
 
 
 State 238
-
-  131 CaseRule: "case" Term "of" . "{" CaseLabels "}"
-
-    "{"  shift, and go to state 255
-
-
-State 239
 
   140 BlockRule: "{" Rules "}" .
 
     $default  reduce using rule 140 (BlockRule)
 
 
-State 240
+State 239
 
   142 SequenceRule: "{|" Rules "|}" .
 
     $default  reduce using rule 142 (SequenceRule)
 
 
-State 241
+State 240
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -5444,32 +5412,32 @@ State 241
     $default  reduce using rule 144 (UpdateRule)
 
 
-State 242
+State 241
 
   115 RuleDefinition: "rule" Identifier MaybeParameters "->" Type "=" Rule .
 
     $default  reduce using rule 115 (RuleDefinition)
 
 
-State 243
+State 242
 
    14 FunctionParameters: FunctionParameters "*" Type .
 
     $default  reduce using rule 14 (FunctionParameters)
 
 
-State 244
+State 243
 
     8 FunctionDefinition: "function" MaybeFunctionAttributes Identifier ":" MaybeFunctionParameters "->" Type . MaybeDefined MaybeInitially
 
-    "defined"  shift, and go to state 256
+    "defined"  shift, and go to state 255
 
     $default  reduce using rule 13 (MaybeDefined)
 
-    MaybeDefined  go to state 257
+    MaybeDefined  go to state 256
 
 
-State 245
+State 244
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -5492,7 +5460,7 @@ State 245
     $default  reduce using rule 112 (UniversalQuantifierExpression)
 
 
-State 246
+State 245
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -5532,7 +5500,7 @@ State 246
     $default  reduce using rule 111 (ConditionalExpression)
 
 
-State 247
+State 246
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -5555,28 +5523,28 @@ State 247
     $default  reduce using rule 113 (ExistentialQuantifierExpression)
 
 
-State 248
+State 247
 
    47 ComposedType: Identifier "(" Types ")" .
 
     $default  reduce using rule 47 (ComposedType)
 
 
-State 249
+State 248
 
    50 Types: Types "," . Type
 
     "identifier"  shift, and go to state 17
 
-    Identifier      go to state 158
-    Type            go to state 258
-    BasicType       go to state 160
-    ComposedType    go to state 161
-    FixedSizedType  go to state 162
-    RangedType      go to state 163
+    Identifier      go to state 157
+    Type            go to state 257
+    BasicType       go to state 159
+    ComposedType    go to state 160
+    FixedSizedType  go to state 161
+    RangedType      go to state 162
 
 
-State 250
+State 249
 
    48 FixedSizedType: Identifier "<" Term ">" .
    92 Expression: Term ">" . Term
@@ -5613,7 +5581,7 @@ State 250
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 146
+    Term                             go to state 145
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -5624,7 +5592,7 @@ State 250
     ExistentialQuantifierExpression  go to state 65
 
 
-State 251
+State 250
 
    49 RangedType: Identifier "<" Term ".." . Term ">"
 
@@ -5658,7 +5626,7 @@ State 251
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 259
+    Term                             go to state 258
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -5667,6 +5635,45 @@ State 251
     ConditionalExpression            go to state 63
     UniversalQuantifierExpression    go to state 64
     ExistentialQuantifierExpression  go to state 65
+
+
+State 251
+
+   83 Expression: Term . "+" Term
+   84           | Term . "-" Term
+   85           | Term . "*" Term
+   86           | Term . "/" Term
+   87           | Term . "%" Term
+   88           | Term . "^" Term
+   89           | Term . "!=" Term
+   90           | Term . "=" Term
+   91           | Term . "<" Term
+   92           | Term . ">" Term
+   93           | Term . "<=" Term
+   94           | Term . ">=" Term
+   95           | Term . "or" Term
+   96           | Term . "xor" Term
+   97           | Term . "and" Term
+   98           | Term . "implies" Term
+  137 LetRule: "let" Variable "=" Term . "in" Rule
+
+    "in"       shift, and go to state 259
+    "and"      shift, and go to state 95
+    "or"       shift, and go to state 96
+    "xor"      shift, and go to state 97
+    "implies"  shift, and go to state 98
+    "+"        shift, and go to state 99
+    "-"        shift, and go to state 100
+    "="        shift, and go to state 101
+    "<"        shift, and go to state 102
+    ">"        shift, and go to state 103
+    "*"        shift, and go to state 104
+    "/"        shift, and go to state 105
+    "%"        shift, and go to state 106
+    "^"        shift, and go to state 107
+    "!="       shift, and go to state 109
+    "<="       shift, and go to state 110
+    ">="       shift, and go to state 111
 
 
 State 252
@@ -5687,9 +5694,9 @@ State 252
    96           | Term . "xor" Term
    97           | Term . "and" Term
    98           | Term . "implies" Term
-  137 LetRule: "let" Variable "=" Term . "in" Rule
+  138 ForallRule: "forall" Variable "in" Term . "do" Rule
 
-    "in"       shift, and go to state 260
+    "do"       shift, and go to state 260
     "and"      shift, and go to state 95
     "or"       shift, and go to state 96
     "xor"      shift, and go to state 97
@@ -5710,60 +5717,21 @@ State 252
 
 State 253
 
-   83 Expression: Term . "+" Term
-   84           | Term . "-" Term
-   85           | Term . "*" Term
-   86           | Term . "/" Term
-   87           | Term . "%" Term
-   88           | Term . "^" Term
-   89           | Term . "!=" Term
-   90           | Term . "=" Term
-   91           | Term . "<" Term
-   92           | Term . ">" Term
-   93           | Term . "<=" Term
-   94           | Term . ">=" Term
-   95           | Term . "or" Term
-   96           | Term . "xor" Term
-   97           | Term . "and" Term
-   98           | Term . "implies" Term
-  138 ForallRule: "forall" Variable "in" Term . "do" Rule
-
-    "do"       shift, and go to state 261
-    "and"      shift, and go to state 95
-    "or"       shift, and go to state 96
-    "xor"      shift, and go to state 97
-    "implies"  shift, and go to state 98
-    "+"        shift, and go to state 99
-    "-"        shift, and go to state 100
-    "="        shift, and go to state 101
-    "<"        shift, and go to state 102
-    ">"        shift, and go to state 103
-    "*"        shift, and go to state 104
-    "/"        shift, and go to state 105
-    "%"        shift, and go to state 106
-    "^"        shift, and go to state 107
-    "!="       shift, and go to state 109
-    "<="       shift, and go to state 110
-    ">="       shift, and go to state 111
-
-
-State 254
-
   129 ConditionalRule: "if" Term "then" Rule .
   130                | "if" Term "then" Rule . "else" Rule
 
-    "else"  shift, and go to state 262
+    "else"  shift, and go to state 261
 
     $default  reduce using rule 129 (ConditionalRule)
 
 
-State 255
+State 254
 
   131 CaseRule: "case" Term "of" "{" . CaseLabels "}"
 
     "forall"       shift, and go to state 25
     "if"           shift, and go to state 26
-    "default"      shift, and go to state 263
+    "default"      shift, and go to state 262
     "exists"       shift, and go to state 27
     "undef"        shift, and go to state 28
     "false"        shift, and go to state 29
@@ -5773,7 +5741,7 @@ State 255
     "-"            shift, and go to state 33
     "("            shift, and go to state 76
     "["            shift, and go to state 35
-    "_"            shift, and go to state 264
+    "_"            shift, and go to state 263
     "@"            shift, and go to state 36
     "binary"       shift, and go to state 37
     "hexadecimal"  shift, and go to state 38
@@ -5793,7 +5761,7 @@ State 255
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 265
+    Term                             go to state 264
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -5802,36 +5770,36 @@ State 255
     ConditionalExpression            go to state 63
     UniversalQuantifierExpression    go to state 64
     ExistentialQuantifierExpression  go to state 65
-    CaseLabel                        go to state 266
-    CaseLabels                       go to state 267
+    CaseLabel                        go to state 265
+    CaseLabels                       go to state 266
+
+
+State 255
+
+   12 MaybeDefined: "defined" . "{" Term "}"
+
+    "{"  shift, and go to state 267
 
 
 State 256
 
-   12 MaybeDefined: "defined" . "{" Term "}"
-
-    "{"  shift, and go to state 268
-
-
-State 257
-
     8 FunctionDefinition: "function" MaybeFunctionAttributes Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined . MaybeInitially
 
-    "initially"  shift, and go to state 269
+    "initially"  shift, and go to state 268
 
     $default  reduce using rule 11 (MaybeInitially)
 
-    MaybeInitially  go to state 270
+    MaybeInitially  go to state 269
 
 
-State 258
+State 257
 
    50 Types: Types "," Type .
 
     $default  reduce using rule 50 (Types)
 
 
-State 259
+State 258
 
    49 RangedType: Identifier "<" Term ".." Term . ">"
    83 Expression: Term . "+" Term
@@ -5859,7 +5827,7 @@ State 259
     "-"        shift, and go to state 100
     "="        shift, and go to state 101
     "<"        shift, and go to state 102
-    ">"        shift, and go to state 271
+    ">"        shift, and go to state 270
     "*"        shift, and go to state 104
     "/"        shift, and go to state 105
     "%"        shift, and go to state 106
@@ -5869,123 +5837,123 @@ State 259
     ">="       shift, and go to state 111
 
 
-State 260
+State 259
 
   137 LetRule: "let" Variable "=" Term "in" . Rule
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 271
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
+
+
+State 260
+
+  138 ForallRule: "forall" Variable "in" Term "do" . Rule
+
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
+    "identifier"  shift, and go to state 17
+
+    Identifier              go to state 46
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
     Rule                    go to state 272
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 261
 
-  138 ForallRule: "forall" Variable "in" Term "do" . Rule
+  130 ConditionalRule: "if" Term "then" Rule "else" . Rule
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
     Rule                    go to state 273
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 262
 
-  130 ConditionalRule: "if" Term "then" Rule "else" . Rule
+  132 CaseLabel: "default" . ":" Rule
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
-    "identifier"  shift, and go to state 17
-
-    Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 274
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    ":"  shift, and go to state 274
 
 
 State 263
 
-  132 CaseLabel: "default" . ":" Rule
+  133 CaseLabel: "_" . ":" Rule
 
     ":"  shift, and go to state 275
 
 
 State 264
-
-  133 CaseLabel: "_" . ":" Rule
-
-    ":"  shift, and go to state 276
-
-
-State 265
 
    83 Expression: Term . "+" Term
    84           | Term . "-" Term
@@ -6012,7 +5980,7 @@ State 265
     "+"        shift, and go to state 99
     "-"        shift, and go to state 100
     "="        shift, and go to state 101
-    ":"        shift, and go to state 277
+    ":"        shift, and go to state 276
     "<"        shift, and go to state 102
     ">"        shift, and go to state 103
     "*"        shift, and go to state 104
@@ -6024,14 +5992,14 @@ State 265
     ">="       shift, and go to state 111
 
 
-State 266
+State 265
 
   135 CaseLabels: CaseLabel . CaseLabels
   136           | CaseLabel .
 
     "forall"       shift, and go to state 25
     "if"           shift, and go to state 26
-    "default"      shift, and go to state 263
+    "default"      shift, and go to state 262
     "exists"       shift, and go to state 27
     "undef"        shift, and go to state 28
     "false"        shift, and go to state 29
@@ -6041,7 +6009,7 @@ State 266
     "-"            shift, and go to state 33
     "("            shift, and go to state 76
     "["            shift, and go to state 35
-    "_"            shift, and go to state 264
+    "_"            shift, and go to state 263
     "@"            shift, and go to state 36
     "binary"       shift, and go to state 37
     "hexadecimal"  shift, and go to state 38
@@ -6063,7 +6031,7 @@ State 266
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 265
+    Term                             go to state 264
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -6072,18 +6040,18 @@ State 266
     ConditionalExpression            go to state 63
     UniversalQuantifierExpression    go to state 64
     ExistentialQuantifierExpression  go to state 65
-    CaseLabel                        go to state 266
-    CaseLabels                       go to state 278
+    CaseLabel                        go to state 265
+    CaseLabels                       go to state 277
 
 
-State 267
+State 266
 
   131 CaseRule: "case" Term "of" "{" CaseLabels . "}"
 
-    "}"  shift, and go to state 279
+    "}"  shift, and go to state 278
 
 
-State 268
+State 267
 
    12 MaybeDefined: "defined" "{" . Term "}"
 
@@ -6117,7 +6085,7 @@ State 268
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 280
+    Term                             go to state 279
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -6128,21 +6096,21 @@ State 268
     ExistentialQuantifierExpression  go to state 65
 
 
-State 269
+State 268
 
    10 MaybeInitially: "initially" . "{" MaybeInitializers "}"
 
-    "{"  shift, and go to state 281
+    "{"  shift, and go to state 280
 
 
-State 270
+State 269
 
     8 FunctionDefinition: "function" MaybeFunctionAttributes Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially .
 
     $default  reduce using rule 8 (FunctionDefinition)
 
 
-State 271
+State 270
 
    49 RangedType: Identifier "<" Term ".." Term ">" .
    92 Expression: Term ">" . Term
@@ -6179,7 +6147,7 @@ State 271
     FloatingNumber                   go to state 53
     RationalNumber                   go to state 54
     RuleReference                    go to state 55
-    Term                             go to state 146
+    Term                             go to state 145
     Expression                       go to state 57
     Range                            go to state 58
     List                             go to state 59
@@ -6190,144 +6158,144 @@ State 271
     ExistentialQuantifierExpression  go to state 65
 
 
-State 272
+State 271
 
   137 LetRule: "let" Variable "=" Term "in" Rule .
 
     $default  reduce using rule 137 (LetRule)
 
 
-State 273
+State 272
 
   138 ForallRule: "forall" Variable "in" Term "do" Rule .
 
     $default  reduce using rule 138 (ForallRule)
 
 
-State 274
+State 273
 
   130 ConditionalRule: "if" Term "then" Rule "else" Rule .
 
     $default  reduce using rule 130 (ConditionalRule)
 
 
-State 275
+State 274
 
   132 CaseLabel: "default" ":" . Rule
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
+    Rule                    go to state 281
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
+
+
+State 275
+
+  133 CaseLabel: "_" ":" . Rule
+
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
+    "identifier"  shift, and go to state 17
+
+    Identifier              go to state 46
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
     Rule                    go to state 282
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 276
 
-  133 CaseLabel: "_" ":" . Rule
+  134 CaseLabel: Term ":" . Rule
 
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
+    "seq"         shift, and go to state 164
+    "par"         shift, and go to state 165
+    "skip"        shift, and go to state 166
+    "let"         shift, and go to state 167
+    "forall"      shift, and go to state 168
+    "iterate"     shift, and go to state 169
+    "call"        shift, and go to state 170
+    "if"          shift, and go to state 171
+    "case"        shift, and go to state 172
+    "("           shift, and go to state 173
+    "{"           shift, and go to state 174
+    "{|"          shift, and go to state 175
     "identifier"  shift, and go to state 17
 
     Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
+    DirectCallExpression    go to state 176
+    IndirectCallExpression  go to state 177
     Rule                    go to state 283
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
+    SkipRule                go to state 179
+    ConditionalRule         go to state 180
+    CaseRule                go to state 181
+    LetRule                 go to state 182
+    ForallRule              go to state 183
+    IterateRule             go to state 184
+    BlockRule               go to state 185
+    SequenceRule            go to state 186
+    UpdateRule              go to state 187
+    CallRule                go to state 188
 
 
 State 277
-
-  134 CaseLabel: Term ":" . Rule
-
-    "seq"         shift, and go to state 165
-    "par"         shift, and go to state 166
-    "skip"        shift, and go to state 167
-    "let"         shift, and go to state 168
-    "forall"      shift, and go to state 169
-    "iterate"     shift, and go to state 170
-    "call"        shift, and go to state 171
-    "if"          shift, and go to state 172
-    "case"        shift, and go to state 173
-    "("           shift, and go to state 174
-    "{"           shift, and go to state 175
-    "{|"          shift, and go to state 176
-    "identifier"  shift, and go to state 17
-
-    Identifier              go to state 46
-    DirectCallExpression    go to state 177
-    IndirectCallExpression  go to state 178
-    Rule                    go to state 284
-    SkipRule                go to state 180
-    ConditionalRule         go to state 181
-    CaseRule                go to state 182
-    LetRule                 go to state 183
-    ForallRule              go to state 184
-    IterateRule             go to state 185
-    BlockRule               go to state 186
-    SequenceRule            go to state 187
-    UpdateRule              go to state 188
-    CallRule                go to state 189
-
-
-State 278
 
   135 CaseLabels: CaseLabel CaseLabels .
 
     $default  reduce using rule 135 (CaseLabels)
 
 
-State 279
+State 278
 
   131 CaseRule: "case" Term "of" "{" CaseLabels "}" .
 
     $default  reduce using rule 131 (CaseRule)
 
 
-State 280
+State 279
 
    12 MaybeDefined: "defined" "{" Term . "}"
    83 Expression: Term . "+" Term
@@ -6354,7 +6322,7 @@ State 280
     "+"        shift, and go to state 99
     "-"        shift, and go to state 100
     "="        shift, and go to state 101
-    "}"        shift, and go to state 285
+    "}"        shift, and go to state 284
     "<"        shift, and go to state 102
     ">"        shift, and go to state 103
     "*"        shift, and go to state 104
@@ -6366,7 +6334,7 @@ State 280
     ">="       shift, and go to state 111
 
 
-State 281
+State 280
 
    10 MaybeInitially: "initially" "{" . MaybeInitializers "}"
 
@@ -6394,7 +6362,7 @@ State 281
 
     Initializer                      go to state 43
     Initializers                     go to state 44
-    MaybeInitializers                go to state 286
+    MaybeInitializers                go to state 285
     Identifier                       go to state 46
     Atom                             go to state 47
     Undefined                        go to state 48
@@ -6417,42 +6385,42 @@ State 281
     ExistentialQuantifierExpression  go to state 65
 
 
-State 282
+State 281
 
   132 CaseLabel: "default" ":" Rule .
 
     $default  reduce using rule 132 (CaseLabel)
 
 
-State 283
+State 282
 
   133 CaseLabel: "_" ":" Rule .
 
     $default  reduce using rule 133 (CaseLabel)
 
 
-State 284
+State 283
 
   134 CaseLabel: Term ":" Rule .
 
     $default  reduce using rule 134 (CaseLabel)
 
 
-State 285
+State 284
 
    12 MaybeDefined: "defined" "{" Term "}" .
 
     $default  reduce using rule 12 (MaybeDefined)
 
 
-State 286
+State 285
 
    10 MaybeInitially: "initially" "{" MaybeInitializers . "}"
 
-    "}"  shift, and go to state 287
+    "}"  shift, and go to state 286
 
 
-State 287
+State 286
 
    10 MaybeInitially: "initially" "{" MaybeInitializers "}" .
 

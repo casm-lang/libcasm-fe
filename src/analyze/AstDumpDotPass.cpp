@@ -38,54 +38,56 @@ static libpass::PassRegistration< AstDumpDotPass > PASS( "AST Dumping Pass",
     "generates a DOT graph of the AST and dumps it to './obj/out.dot' for now",
     "ast-dump", 0 );
 
-class AstDumpDotVisitor final : public Ast::RecursiveVisitor
+class AstDumpDotVisitor final : public RecursiveVisitor
 {
   public:
     AstDumpDotVisitor( std::ostream& stream );
 
-    void visit( Ast::IdentifierNode& node ) override;
+    void visit( IdentifierNode& node ) override;
 
-    void visit( Ast::Specification& node ) override;
+    void visit( Specification& node ) override;
 
-    void visit( Ast::VariableDefinition& node ) override;
-    void visit( Ast::FunctionDefinition& node ) override;
-    void visit( Ast::DerivedDefinition& node ) override;
-    void visit( Ast::RuleDefinition& node ) override;
-    void visit( Ast::EnumerationDefinition& node ) override;
+    void visit( VariableDefinition& node ) override;
+    void visit( FunctionDefinition& node ) override;
+    void visit( DerivedDefinition& node ) override;
+    void visit( RuleDefinition& node ) override;
+    void visit( EnumerationDefinition& node ) override;
 
-    void visit( Ast::ValueAtom& node ) override;
-    void visit( Ast::RuleReferenceAtom& node ) override;
-    void visit( Ast::ZeroAtom& node ) override;
-    void visit( Ast::UndefAtom& node ) override;
-    void visit( Ast::DirectCallExpression& node ) override;
-    void visit( Ast::IndirectCallExpression& node ) override;
-    void visit( Ast::UnaryExpression& node ) override;
-    void visit( Ast::BinaryExpression& node ) override;
-    void visit( Ast::RangeExpression& node ) override;
-    void visit( Ast::ListExpression& node ) override;
-    void visit( Ast::ConditionalExpression& node ) override;
-    void visit( Ast::UniversalQuantifierExpression& node ) override;
-    void visit( Ast::ExistentialQuantifierExpression& node ) override;
+    void visit( ValueAtom& node ) override;
+    void visit( RuleReferenceAtom& node ) override;
+    void visit( ZeroAtom& node ) override;
+    void visit( UndefAtom& node ) override;
+    void visit( DirectCallExpression& node ) override;
+    void visit( IndirectCallExpression& node ) override;
+    void visit( UnaryExpression& node ) override;
+    void visit( BinaryExpression& node ) override;
+    void visit( RangeExpression& node ) override;
+    void visit( ListExpression& node ) override;
+    void visit( ConditionalExpression& node ) override;
+    void visit( UniversalQuantifierExpression& node ) override;
+    void visit( ExistentialQuantifierExpression& node ) override;
 
-    void visit( Ast::SkipRule& node ) override;
-    void visit( Ast::ConditionalRule& node ) override;
-    void visit( Ast::CaseRule& node ) override;
-    void visit( Ast::LetRule& node ) override;
-    void visit( Ast::ForallRule& node ) override;
-    void visit( Ast::IterateRule& node ) override;
-    void visit( Ast::BlockRule& node ) override;
-    void visit( Ast::SequenceRule& node ) override;
-    void visit( Ast::UpdateRule& node ) override;
-    void visit( Ast::CallRule& node ) override;
+    void visit( SkipRule& node ) override;
+    void visit( ConditionalRule& node ) override;
+    void visit( CaseRule& node ) override;
+    void visit( LetRule& node ) override;
+    void visit( ForallRule& node ) override;
+    void visit( IterateRule& node ) override;
+    void visit( BlockRule& node ) override;
+    void visit( SequenceRule& node ) override;
+    void visit( UpdateRule& node ) override;
+    void visit( CallRule& node ) override;
 
-    void visit( Ast::BasicType& node ) override;
-    void visit( Ast::ComposedType& node ) override;
-    void visit( Ast::FixedSizedType& node ) override;
-    void visit( Ast::RangedType& node ) override;
+    void visit( VoidType& node ) override;
+    void visit( UnresolvedType& node ) override;
+    void visit( BasicType& node ) override;
+    void visit( ComposedType& node ) override;
+    void visit( FixedSizedType& node ) override;
+    void visit( RangedType& node ) override;
 
   private:
-    void dumpNode( const Ast::Node& node, const std::string& name );
-    void dumpLink( const Ast::Node& from, const Ast::Node& to );
+    void dumpNode( const Node& node, const std::string& name );
+    void dumpLink( const Node& from, const Node& to );
 
   private:
     std::ostream& m_stream;
@@ -280,6 +282,18 @@ void AstDumpDotVisitor::visit( CallRule& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( VoidType& node )
+{
+    dumpNode( node, "VoidType" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( UnresolvedType& node )
+{
+    dumpNode( node, "UnresolvedType" );
+    RecursiveVisitor::visit( node );
+}
+
 void AstDumpDotVisitor::visit( BasicType& node )
 {
     dumpNode( node, "BasicType" );
@@ -305,14 +319,14 @@ void AstDumpDotVisitor::visit( RangedType& node )
 }
 
 void AstDumpDotVisitor::dumpNode(
-    const Ast::Node& node, const std::string& name )
+    const Node& node, const std::string& name )
 {
-    m_stream << "    " << &node << " [label=\"" << name << "\"];\n";
+    m_stream << "    \"" << &node << "\" [label=\"" << name << "\"];\n";
 }
 
-void AstDumpDotVisitor::dumpLink( const Ast::Node& from, const Ast::Node& to )
+void AstDumpDotVisitor::dumpLink( const Node& from, const Node& to )
 {
-    m_stream << "    " << &from << " -> " << &to << ";\n";
+    m_stream << "    \"" << &from << "\" -> \"" << &to << "\";\n";
 }
 
 bool AstDumpDotPass::run( libpass::PassResult& pr )

@@ -65,6 +65,8 @@ namespace libcasm_fe
         class UpdateRule;
         class CallRule;
 
+        class VoidType;
+        class UnresolvedType;
         class BasicType;
         class ComposedType;
         class FixedSizedType;
@@ -113,6 +115,8 @@ namespace libcasm_fe
             virtual void visit( UpdateRule& node ) = 0;
             virtual void visit( CallRule& node ) = 0;
 
+            virtual void visit( VoidType& node ) = 0;
+            virtual void visit( UnresolvedType& node ) = 0;
             virtual void visit( BasicType& node ) = 0;
             virtual void visit( ComposedType& node ) = 0;
             virtual void visit( FixedSizedType& node ) = 0;

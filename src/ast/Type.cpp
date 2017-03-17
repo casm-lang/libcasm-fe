@@ -39,6 +39,29 @@ IdentifierNode::Ptr Type::name( void ) const
     return m_name;
 }
 
+static const auto VoidTypeName = std::make_shared< IdentifierNode >( "Void" );
+static const auto UnresolvedTypeName = std::make_shared< IdentifierNode >( "Unresolved" );
+
+VoidType::VoidType( void )
+: Type( Node::ID::VOID_TYPE, VoidTypeName )
+{
+}
+
+void VoidType::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+UnresolvedType::UnresolvedType( void )
+: Type( Node::ID::UNRESOLVED_TYPE, UnresolvedTypeName )
+{
+}
+
+void UnresolvedType::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 BasicType::BasicType( const IdentifierNode::Ptr& identifier )
 : Type( Node::ID::BASIC_TYPE, identifier )
 {

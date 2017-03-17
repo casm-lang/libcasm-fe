@@ -70,6 +70,8 @@ namespace libcasm_fe
             void visit( UpdateRule& node ) override;
             void visit( CallRule& node ) override;
 
+            void visit( VoidType& node ) override;
+            void visit( UnresolvedType& node ) override;
             void visit( BasicType& node ) override;
             void visit( ComposedType& node ) override;
             void visit( FixedSizedType& node ) override;

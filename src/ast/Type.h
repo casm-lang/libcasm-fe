@@ -47,6 +47,26 @@ namespace libcasm_fe
 
         using Types = NodeList< Type >;
 
+        class VoidType : public Type
+        {
+          public:
+            using Ptr = std::shared_ptr< VoidType >;
+
+            VoidType( void );
+
+            void accept( Visitor& visitor ) override final;
+        };
+
+        class UnresolvedType : public Type
+        {
+          public:
+            using Ptr = std::shared_ptr< UnresolvedType >;
+
+            UnresolvedType( void );
+
+            void accept( Visitor& visitor ) override final;
+        };
+
         class BasicType : public Type
         {
           public:

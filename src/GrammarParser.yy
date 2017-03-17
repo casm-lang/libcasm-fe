@@ -164,11 +164,17 @@
 
     static FunctionDefinition::Ptr createProgramFunction( location& sourceLocation )
     {
-        //auto argTypes = { new Type( TypeType::AGENT ) }; // TODO add args and return type
-        //auto retType = new Type( TypeType::RuleReference );
+        const auto agentTypeName = make< IdentifierNode >( sourceLocation, "Agent" );
+        const auto agentType = make< BasicType >( sourceLocation, agentTypeName );
+
+        const auto ruleRefTypeName = make< IdentifierNode >( sourceLocation, "RuleReference" );
+        const auto ruleRefType = make< BasicType >( sourceLocation, ruleRefTypeName );
+
+        const auto argTypes = make< Types >( sourceLocation );
+        argTypes->add( agentType );
 
         const auto program = make< IdentifierNode >( sourceLocation, "program" );
-        return make< FunctionDefinition >( sourceLocation, program, nullptr, nullptr );
+        return make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
@@ -583,7 +589,8 @@ Variable
   }
 | Identifier
   {
-      $$ = make< VariableDefinition >( @$, $1, nullptr ); // TODO
+      const auto voidType = make< VoidType >( @$ );
+      $$ = make< VariableDefinition >( @$, $1, voidType );
   }
 ;
 
@@ -1034,8 +1041,8 @@ ExistentialQuantifierExpression
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
   {
-      $$ = make< RuleDefinition >( @$, $2, $3, nullptr,
-                                   wrapInBlockRule( $5 ) ); // TODO nullptr -> void
+      $$ = make< RuleDefinition >( @$, $2, $3, make< VoidType >( @$ ),
+                                   wrapInBlockRule( $5 ) );
   }
 | RULE Identifier MaybeParameters ARROW Type EQUAL Rule
   {

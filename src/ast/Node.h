@@ -85,6 +85,8 @@ namespace libcasm_fe
                 CALL_RULE,
 
                 // types
+                VOID_TYPE,
+                UNRESOLVED_TYPE,
                 BASIC_TYPE,
                 COMPOSED_TYPE,
                 FIXED_SIZED_TYPE,
