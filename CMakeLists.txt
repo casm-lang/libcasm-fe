@@ -38,7 +38,7 @@ foreach( DEPENDENCY
     )
   if( NOT TARGET ${DEPENDENCY} )
     add_subdirectory( ${LIBS}/${DEPENDENCY} lib/${DEPENDENCY} )
-  endif()  
+  endif()
 endforeach()
 
 set( CXX_SRC_FILES
@@ -92,22 +92,20 @@ string( LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CWD_LENGTH )
 
 set( DEF_GRAMMAR "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
 set( ORG_GRAMMAR "${CMAKE_CURRENT_BINARY_DIR}/src/various/Grammar.org" )
-set( GRAMMAR     "obj/src/various/Grammar.org" )
 
 add_custom_command(
   OUTPUT  ${ORG_GRAMMAR}
-  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR}
+  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${ORG_GRAMMAR}
   DEPENDS ${DEF_GRAMMAR}
   COMMENT ""
 )
 
 set( DEF_GRAMMAR_PARSER "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
 set( CXX_GRAMMAR_PARSER "${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarParser.cpp" )
-set(     GRAMMAR_PARSER "obj/src/various/GrammarParser.cpp" )
 
 add_custom_command(
   OUTPUT  ${CXX_GRAMMAR_PARSER}
-  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR_PARSER}
+  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${CXX_GRAMMAR_PARSER}
   DEPENDS ${DEF_GRAMMAR_PARSER}
   COMMENT ""
 )
@@ -115,11 +113,10 @@ add_custom_command(
 
 set( DEF_GRAMMAR_LEXER "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarLexer.l;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
 set( CXX_GRAMMAR_LEXER "${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarLexer.cpp" )
-set(     GRAMMAR_LEXER "obj/src/various/GrammarLexer.cpp" )
 
 add_custom_command(
   OUTPUT  ${CXX_GRAMMAR_LEXER}
-  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR_LEXER}
+  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${CXX_GRAMMAR_LEXER}
   DEPENDS ${DEF_GRAMMAR_LEXER}
   COMMENT ""
 )
@@ -141,7 +138,7 @@ add_library( ${TARGET}-test OBJECT
 
 add_executable( ${TARGET}-check
   ${LIBS}/gtest/googletest/src/gtest_main.cc
-  ${LIBS}/gtest/googletest/src/gtest-all.cc  
+  ${LIBS}/gtest/googletest/src/gtest-all.cc
   $<TARGET_OBJECTS:${TARGET}-test>
 )
 
@@ -157,7 +154,7 @@ target_link_libraries( ${TARGET}-check
 add_library( ${TARGET}-benchmark OBJECT
   ${LIBS}/hayai/src/hayai_posix_main.cpp
 )
-  
+
 add_executable( ${TARGET}-run
   $<TARGET_OBJECTS:${TARGET}-benchmark>
 )
