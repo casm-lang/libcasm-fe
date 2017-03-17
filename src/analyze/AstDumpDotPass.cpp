@@ -339,14 +339,12 @@ void AstDumpDotVisitor::visit( VoidType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "VoidType" );
-    RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( UnresolvedType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UnresolvedType" );
-    RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BasicType& node )
