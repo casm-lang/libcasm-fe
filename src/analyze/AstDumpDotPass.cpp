@@ -25,6 +25,8 @@
 
 #include "AstDumpDotPass.h"
 
+#include <vector>
+
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 #include "../transform/SourceToAstPass.h"
@@ -40,6 +42,30 @@ static libpass::PassRegistration< AstDumpDotPass > PASS( "AST Dumping Pass",
 
 class AstDumpDotVisitor final : public RecursiveVisitor
 {
+  private:
+    class DotLink
+    {
+      public:
+        DotLink( AstDumpDotVisitor* visitor, Node* node )
+        : m_visitor( visitor )
+        {
+            if( not visitor->m_parentNodes.empty() )
+            {
+                auto parentNode = visitor->m_parentNodes.back();
+                visitor->dumpLink( parentNode, node );
+            }
+            visitor->m_parentNodes.push_back( node );
+        }
+
+        ~DotLink()
+        {
+            m_visitor->m_parentNodes.pop_back();
+        }
+
+      private:
+        AstDumpDotVisitor* m_visitor;
+    };
+
   public:
     AstDumpDotVisitor( std::ostream& stream );
 
@@ -87,10 +113,11 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
   private:
     void dumpNode( const Node& node, const std::string& name );
-    void dumpLink( const Node& from, const Node& to );
+    void dumpLink( Node* from, Node* to );
 
   private:
     std::ostream& m_stream;
+    std::vector< Node* > m_parentNodes;
 };
 
 AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
@@ -100,220 +127,252 @@ AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
 
 void AstDumpDotVisitor::visit( IdentifierNode& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, node.identifier() );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( Specification& node )
 {
-    m_stream << "digraph \"main\" {\n";
-
+    DotLink link( this, &node );
     dumpNode( node, "CASM\\nSpecification" );
     RecursiveVisitor::visit( node );
-
-    m_stream << "}\n";
 }
 
 void AstDumpDotVisitor::visit( VariableDefinition& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "VariableDefinition" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( FunctionDefinition& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "FunctionDefinition" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( DerivedDefinition& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "DerivedDefinition" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( RuleDefinition& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "RuleDefinition" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( EnumerationDefinition& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "EnumerationDefinition" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( ValueAtom& node )
 {
-    dumpNode( node, "ValueAtom" ); // TODO dump value
+    DotLink link( this, &node );
+    dumpNode( node, "ValueAtom: " + node.value()->name() );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( RuleReferenceAtom& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "RuleReferenceAtom" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( ZeroAtom& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "ZeroAtom" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( UndefAtom& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "UndefAtom" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( DirectCallExpression& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "DirectCallExpression" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( IndirectCallExpression& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "IndirectCallExpression" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( UnaryExpression& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "Expression" ); // TODO dump operator
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BinaryExpression& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "Expression" ); // TODO dump operator
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( RangeExpression& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "RangeExpression" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( ListExpression& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "ListExpression" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( ConditionalExpression& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "ConditionalExpression" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( UniversalQuantifierExpression& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "UniversalQuantifierExpression" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( ExistentialQuantifierExpression& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "ExistentialQuantifierExpression" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( SkipRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "SkipRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( ConditionalRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "ConditionalRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( CaseRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "CaseRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( LetRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "LetRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( ForallRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "ForallRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( IterateRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "IterateRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BlockRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "BlockRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( SequenceRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "SequenceRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( UpdateRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "UpdateRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( CallRule& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "CallRule" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( VoidType& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "VoidType" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( UnresolvedType& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "UnresolvedType" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BasicType& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "BasicType" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( ComposedType& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "ComposedType" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( FixedSizedType& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "FixedSizedType" );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( RangedType& node )
 {
+    DotLink link( this, &node );
     dumpNode( node, "RangedType" );
     RecursiveVisitor::visit( node );
 }
@@ -321,12 +380,12 @@ void AstDumpDotVisitor::visit( RangedType& node )
 void AstDumpDotVisitor::dumpNode(
     const Node& node, const std::string& name )
 {
-    m_stream << "    \"" << &node << "\" [label=\"" << name << "\"];\n";
+    m_stream << "\"" << &node << "\" [label=\"" << name << "\"];\n";
 }
 
-void AstDumpDotVisitor::dumpLink( const Node& from, const Node& to )
+void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
 {
-    m_stream << "    \"" << &from << "\" -> \"" << &to << "\";\n";
+    m_stream << "\"" << from << "\" -> \"" << to << "\";\n";
 }
 
 bool AstDumpDotPass::run( libpass::PassResult& pr )
@@ -334,10 +393,14 @@ bool AstDumpDotPass::run( libpass::PassResult& pr )
     const auto sourceToAstPass = pr.result< SourceToAstPass >();
     const auto specification = sourceToAstPass->specification();
 
-    std::ofstream dotfile( "./obj/out.dot" );
+    std::ofstream dotfile( "./out.dot" );
+
+    dotfile << "digraph \"main\" {\n";
 
     AstDumpDotVisitor visitor{ dotfile };
     specification->accept( visitor );
+
+    dotfile << "}\n";
 
     dotfile.close();
 
