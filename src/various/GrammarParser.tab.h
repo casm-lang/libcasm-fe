@@ -1108,7 +1108,7 @@ namespace libcasm_fe {
     /// \param yyvalue   the value to check
     static bool yy_table_value_is_error_ (int yyvalue);
 
-    static const signed char yypact_ninf_;
+    static const short int yypact_ninf_;
     static const signed char yytable_ninf_;
 
     /// Convert a scanner token number \a t to a symbol number.
@@ -1133,7 +1133,7 @@ namespace libcasm_fe {
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
   // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const short int yytable_[];
+  static const unsigned short int yytable_[];
 
   static const short int yycheck_[];
 
@@ -1255,7 +1255,7 @@ namespace libcasm_fe {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1519,     ///< Last index in yytable_.
+      yylast_ = 1603,     ///< Last index in yytable_.
       yynnts_ = 63,  ///< Number of nonterminal symbols.
       yyfinal_ = 15, ///< Termination state number.
       yyterror_ = 1,
