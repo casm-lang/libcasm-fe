@@ -51,7 +51,7 @@ ConditionalRule::ConditionalRule( const Expression::Ptr& condition,
 
 ConditionalRule::ConditionalRule(
     const Expression::Ptr& condition, const Rule::Ptr& thenRule )
-: ConditionalRule( condition, thenRule, nullptr )
+: ConditionalRule( condition, thenRule, std::make_shared< SkipRule >() )
 {
 }
 
