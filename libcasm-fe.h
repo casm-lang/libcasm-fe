@@ -26,31 +26,13 @@
 #ifndef _LIB_CASMFE_H_
 #define _LIB_CASMFE_H_
 
-#include "src/CasmFE.h"
-#include "src/Codes.h"
-#include "src/Driver.h"
-#include "src/Exceptions.h"
-
-#include "src/various/GrammarParser.tab.h"
-#include "src/various/location.hh"
-#include "src/various/position.hh"
-#include "src/various/stack.hh"
-
-#include "src/allocator/BlockAllocator.h"
-
 #include "src/analyze/AstDumpDotPass.h"
-#include "src/analyze/TypeCheckPass.h"
+//#include "src/analyze/TypeCheckPass.h"
 
-#include "src/execute/ChainedHashMap.h"
-#include "src/execute/ExecutionPassBase.h"
-#include "src/execute/HashMapBase.h"
-#include "src/execute/NumericExecutionPass.h"
-#include "src/execute/ProbingHashMap.h"
-#include "src/execute/RobinHoodHashMap.h"
-#include "src/execute/SymbolicExecutionPass.h"
-#include "src/execute/UpdateSet.h"
+//#include "src/execute/NumericExecutionPass.h"
+//#include "src/execute/SymbolicExecutionPass.h"
 
-#include "src/transform/AstToCasmIRPass.h"
+//#include "src/transform/AstToCasmIRPass.h"
 #include "src/transform/SourceToAstPass.h"
 
 namespace libcasm_fe
