@@ -30,7 +30,7 @@ using namespace Ast;
 
 Node::Node( Node::ID id )
 : m_id( id )
-, m_location()
+, m_sourceLocation()
 {
 }
 
@@ -39,14 +39,14 @@ Node::ID Node::id( void ) const
     return m_id;
 }
 
-void Node::setLocation( const class location& location )
+void Node::setSourceLocation( const location& sourceLocation )
 {
-    m_location = location;
+    m_sourceLocation = sourceLocation;
 }
 
-location Node::location( void ) const
+location Node::sourceLocation( void ) const
 {
-    return m_location;
+    return m_sourceLocation;
 }
 
 IdentifierNode::IdentifierNode( const std::string& identifier )

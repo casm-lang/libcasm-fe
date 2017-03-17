@@ -162,13 +162,13 @@
         return { functionClass, symbolicFunction };
     }
 
-    static FunctionDefinition::Ptr createProgramFunction( location& location )
+    static FunctionDefinition::Ptr createProgramFunction( location& sourceLocation )
     {
         //auto argTypes = { new Type( TypeType::AGENT ) }; // TODO add args and return type
         //auto retType = new Type( TypeType::RuleReference );
 
-        const auto program = make< IdentifierNode >( location, "program" );
-        return make< FunctionDefinition >( location, program, nullptr, nullptr );
+        const auto program = make< IdentifierNode >( sourceLocation, "program" );
+        return make< FunctionDefinition >( sourceLocation, program, nullptr, nullptr );
     }
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
@@ -179,10 +179,10 @@
             return rule; // no need to wrap it
         }
 
-        const auto& location = rule->location();
-        const auto rules = make< Rules >( location );
+        const auto& sourceLocation = rule->sourceLocation();
+        const auto rules = make< Rules >( sourceLocation );
         rules->add( rule );
-        return make< BlockRule >( location, rules );
+        return make< BlockRule >( sourceLocation, rules );
     }
 }
 
@@ -1267,6 +1267,8 @@ void Parser::error( const location_type& l, const std::string& m )
     {
         //driver.error( l, m, libcasm_fe::Codes::SyntaxError ); TODO
     }
+
+    std::cerr << l << ": " << m << std::endl;
 }
 
 //

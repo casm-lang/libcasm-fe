@@ -86,7 +86,7 @@
                     /*driver.error
                     ( { symbolicAttribute->location(), attribute->location() }
                     , "`symbolic` attribute can only be used once per function"
-                    , libcasm_fe::Code::FunctionAttributeMultipleUseOfSymbolic
+                    , libcasm_fe::Codes::FunctionAttributeMultipleUseOfSymbolic
                     ); TODO */
                 }
                 else
@@ -124,7 +124,7 @@
                 ( attribute->location()
                 , "`" + name + "` is no valid function attribute, only in, monitored, "
                 + "controlled, shared, out, static and symbolic are allowed"
-                , libcasm_fe::Code::FunctionAttributeIsInvalid
+                , libcasm_fe::Codes::FunctionAttributeIsInvalid
                 ); TODO */
             }
 
@@ -133,7 +133,7 @@
                 /*driver.error
                 ( { classAttribute->location(), attribute->location() }
                 , "a function classifier attribute can only be used once per function"
-                , libcasm_fe::Code::FunctionAttributeMultipleUseOfFunctionClassifier
+                , libcasm_fe::Codes::FunctionAttributeMultipleUseOfFunctionClassifier
                 ); TODO */
             }
             else
@@ -146,13 +146,13 @@
         return { functionClass, symbolicFunction };
     }
 
-    static FunctionDefinition::Ptr createProgramFunction( location& location )
+    static FunctionDefinition::Ptr createProgramFunction( location& sourceLocation )
     {
         //auto argTypes = { new Type( TypeType::AGENT ) }; // TODO add args and return type
         //auto retType = new Type( TypeType::RuleReference );
 
-        const auto program = make< IdentifierNode >( location, "program" );
-        return make< FunctionDefinition >( location, program, nullptr, nullptr );
+        const auto program = make< IdentifierNode >( sourceLocation, "program" );
+        return make< FunctionDefinition >( sourceLocation, program, nullptr, nullptr );
     }
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
@@ -163,10 +163,10 @@
             return rule; // no need to wrap it
         }
 
-        const auto& location = rule->location();
-        const auto rules = make< Rules >( location );
+        const auto& sourceLocation = rule->sourceLocation();
+        const auto rules = make< Rules >( sourceLocation );
         rules->add( rule );
-        return make< BlockRule >( location, rules );
+        return make< BlockRule >( sourceLocation, rules );
     }
 
 #line 173 "GrammarParser.cpp" // lalr1.cc:413
@@ -3399,13 +3399,15 @@ void Parser::error( const location_type& l, const std::string& m )
         /*driver.error
         ( location( position( 0, pos, 1 ) )
         , m
-        , libcasm_fe::Code::SyntaxError
+        , libcasm_fe::Codes::SyntaxError
         ); TODO */
     }
     else
     {
-        //driver.error( l, m, libcasm_fe::Code::SyntaxError ); TODO
+        //driver.error( l, m, libcasm_fe::Codes::SyntaxError ); TODO
     }
+
+    std::cerr << l << ": " << m << std::endl;
 }
 
 //

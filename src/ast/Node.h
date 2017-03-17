@@ -104,16 +104,16 @@ namespace libcasm_fe
 
             ID id( void ) const;
 
-            void setLocation( const class location& location );
+            void setSourceLocation( const location& sourceLocation );
 
-            location location( void ) const;
+            location sourceLocation( void ) const;
 
             virtual void accept( Visitor& visitor ) = 0;
 
           private:
             ID m_id;
 
-            class location m_location;
+            location m_sourceLocation;
         };
 
         template < typename T >
@@ -197,7 +197,7 @@ namespace libcasm_fe
         {
             auto node
                 = std::make_shared< T >( std::forward< Args >( args )... );
-            node->setLocation( location );
+            node->setSourceLocation( location );
             return node;
         }
     }
