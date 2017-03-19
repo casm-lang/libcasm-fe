@@ -72,6 +72,8 @@ class AstDumpDotVisitor final : public RecursiveVisitor
   public:
     AstDumpDotVisitor( std::ostream& stream );
 
+    void setDumpNodeLocation( bool dumpNodeLocation );
+
     void visit( IdentifierNode& node ) override;
 
     void visit( Specification& node ) override;
@@ -121,11 +123,19 @@ class AstDumpDotVisitor final : public RecursiveVisitor
   private:
     std::ostream& m_stream;
     std::stack< Node* > m_parentNodes; /**< holds the parent nodes of DotLink */
+    bool m_dumpNodeLocation = false;   /**< dump node source code location */
 };
 
 AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
 : m_stream( stream )
+, m_parentNodes()
+, m_dumpNodeLocation( false )
 {
+}
+
+void AstDumpDotVisitor::setDumpNodeLocation( bool dumpNodeLocation )
+{
+    m_dumpNodeLocation = dumpNodeLocation;
 }
 
 void AstDumpDotVisitor::visit( IdentifierNode& node )
@@ -380,7 +390,14 @@ void AstDumpDotVisitor::visit( RangedType& node )
 
 void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
 {
-    m_stream << "\"" << &node << "\" [label=\"" << name << "\"];\n";
+    m_stream << "\"" << &node << "\" [label=\"" << name;
+
+    if( m_dumpNodeLocation )
+    {
+        m_stream << "\n" << node.sourceLocation();
+    }
+
+    m_stream << "\"];\n";
 }
 
 void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
@@ -403,6 +420,8 @@ bool AstDumpDotPass::run( libpass::PassResult& pr )
     dotfile << "digraph \"main\" {\n";
 
     AstDumpDotVisitor visitor{ dotfile };
+    visitor.setDumpNodeLocation( true ); // TODO add command-line switch
+
     specification->accept( visitor );
 
     dotfile << "}\n";
