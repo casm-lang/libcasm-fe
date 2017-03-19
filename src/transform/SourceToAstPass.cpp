@@ -47,7 +47,7 @@ bool SourceToAstPass::run( libpass::PassResult& pr )
         loadFilePass->filename() ); // TODO char* -> string in load pass
 
     std::ifstream sourceFile( filePath );
-    if( not sourceFile )
+    if( not sourceFile.is_open() )
     {
         std::cerr << "error: could not open `" << filePath << "´" << std::endl;
         return false;
