@@ -45,7 +45,7 @@ namespace libcasm_fe
           public:
             enum class ID
             {
-                NODE_LIST = 0,
+                NODE_LIST,
 
                 SPECIFICATION,
                 IDENTIFIER,
@@ -91,11 +91,6 @@ namespace libcasm_fe
                 COMPOSED_TYPE,
                 FIXED_SIZED_TYPE,
                 RANGED_TYPE,
-
-                // TODO
-                INIT,
-                PROVIDER,
-                OPTION,
             };
 
           public:
@@ -107,14 +102,12 @@ namespace libcasm_fe
             ID id( void ) const;
 
             void setSourceLocation( const location& sourceLocation );
-
             location sourceLocation( void ) const;
 
             virtual void accept( Visitor& visitor ) = 0;
 
           private:
             ID m_id;
-
             location m_sourceLocation;
         };
 
@@ -195,11 +188,11 @@ namespace libcasm_fe
         };
 
         template < typename T, typename... Args >
-        typename T::Ptr make( const location& location, Args&&... args )
+        typename T::Ptr make( const location& sourceLocation, Args&&... args )
         {
             auto node
                 = std::make_shared< T >( std::forward< Args >( args )... );
-            node->setSourceLocation( location );
+            node->setSourceLocation( sourceLocation );
             return node;
         }
     }

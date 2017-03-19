@@ -46,12 +46,10 @@ namespace libcasm_fe
 
             void setRelationType(
                 const libcasm_ir::RelationType::Ptr& relationType );
-
             libcasm_ir::RelationType::Ptr relationType( void ) const;
 
           private:
             IdentifierNode::Ptr m_identifier;
-
             libcasm_ir::RelationType::Ptr m_relationType;
         };
 
@@ -93,39 +91,29 @@ namespace libcasm_fe
                 const Type::Ptr& returnType );
 
             Types::Ptr argumentTypes( void ) const;
-
             Type::Ptr returnType( void ) const;
 
             void setClassification( Classification classification );
-
             Classification classification( void ) const;
 
             void setSymbolic( bool symbolic );
-
             bool symbolic( void ) const;
 
             void setInitializers(
                 const NodeList< UpdateRule >::Ptr& initializers );
-
             NodeList< UpdateRule >::Ptr initializers( void ) const;
 
             void setDefaultValue( const Expression::Ptr& defaultValue );
-
             Expression::Ptr defaultValue( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             Classification m_classification;
-
             Types::Ptr m_argumentTypes;
-
             Type::Ptr m_returnType;
-
             bool m_symbolic;
-
             NodeList< UpdateRule >::Ptr m_initializers;
-
             Expression::Ptr m_defaultValue;
         };
 
@@ -142,16 +130,13 @@ namespace libcasm_fe
             NodeList< VariableDefinition >::Ptr arguments( void ) const;
 
             Type::Ptr returnType( void ) const;
-
             Expression::Ptr expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
-
             Type::Ptr m_returnType;
-
             Expression::Ptr m_expression;
         };
 
@@ -168,16 +153,13 @@ namespace libcasm_fe
             NodeList< VariableDefinition >::Ptr arguments( void ) const;
 
             Type::Ptr returnType( void ) const;
-
             Rule::Ptr rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
-
             Type::Ptr m_returnType;
-
             Rule::Ptr m_rule;
         };
 

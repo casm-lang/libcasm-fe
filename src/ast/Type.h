@@ -119,14 +119,12 @@ namespace libcasm_fe
                 const Expression::Ptr& upperBound );
 
             Expression::Ptr lowerBound( void ) const;
-
             Expression::Ptr upperBound( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_lowerBound;
-
             Expression::Ptr m_upperBound;
         };
     }

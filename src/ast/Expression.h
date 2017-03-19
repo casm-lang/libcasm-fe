@@ -44,7 +44,6 @@ namespace libcasm_fe
             Expression( Node::ID id );
 
             void setType( const libcasm_ir::Type::Ptr& type );
-
             libcasm_ir::Type::Ptr type( void ) const;
 
           private:
@@ -113,7 +112,7 @@ namespace libcasm_fe
           public:
             enum class TargetType
             {
-                FUNCTION = 0,
+                FUNCTION,
                 DERIVED,
                 BUILTIN,
                 RULE,
@@ -127,7 +126,6 @@ namespace libcasm_fe
             using Expression::Expression;
 
             void setTargetType( TargetType targetType );
-
             TargetType targetType( void ) const;
 
           private:
@@ -151,7 +149,6 @@ namespace libcasm_fe
 
           private:
             IdentifierNode::Ptr m_identifier;
-
             Expressions::Ptr m_arguments;
         };
 
@@ -164,14 +161,12 @@ namespace libcasm_fe
                 const Expressions::Ptr& arguments );
 
             Expression::Ptr expression( void ) const;
-
             Expressions::Ptr arguments( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_expression;
-
             Expressions::Ptr m_arguments;
         };
 
@@ -184,14 +179,12 @@ namespace libcasm_fe
                 const Expression::Ptr& expression, libcasm_ir::Value::ID op );
 
             libcasm_ir::Value::ID op( void ) const;
-
             Expression::Ptr expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             libcasm_ir::Value::ID m_op;
-
             Expression::Ptr m_expression;
         };
 
