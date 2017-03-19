@@ -23,19 +23,16 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_ASTDUMPPASS_H_
-#define _LIB_CASMFE_ASTDUMPPASS_H_
+#ifndef _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
+#define _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
 
 #include "libpass.h"
 
-/**
-   @brief    TODO
-
-   TODO
-*/
-
 namespace libcasm_fe
 {
+    /**
+     * @brief Generates a DOT graph of the AST
+     */
     class AstDumpDotPass final : public libpass::Pass
     {
       public:
@@ -45,7 +42,7 @@ namespace libcasm_fe
     };
 }
 
-#endif /* _LIB_CASMFE_ASTDUMPPASS_H_ */
+#endif /* _LIB_CASMFE_AST_DUMP_DOT_PASS_H_ */
 
 //
 //  Local variables:

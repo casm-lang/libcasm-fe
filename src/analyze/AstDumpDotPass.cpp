@@ -25,7 +25,7 @@
 
 #include "AstDumpDotPass.h"
 
-#include <vector>
+#include <stack>
 
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
@@ -37,12 +37,15 @@ using namespace Ast;
 char AstDumpDotPass::id = 0;
 
 static libpass::PassRegistration< AstDumpDotPass > PASS( "AST Dumping Pass",
-    "generates a DOT graph of the AST and dumps it to './obj/out.dot' for now",
+    "generates a DOT graph of the AST and dumps it to './out.dot' for now",
     "ast-dump", 0 );
 
 class AstDumpDotVisitor final : public RecursiveVisitor
 {
   private:
+    /**
+     * @brief RAII dot link
+     */
     class DotLink
     {
       public:
@@ -51,15 +54,15 @@ class AstDumpDotVisitor final : public RecursiveVisitor
         {
             if( not visitor->m_parentNodes.empty() )
             {
-                auto parentNode = visitor->m_parentNodes.back();
+                auto parentNode = visitor->m_parentNodes.top();
                 visitor->dumpLink( parentNode, node );
             }
-            visitor->m_parentNodes.push_back( node );
+            visitor->m_parentNodes.push( node );
         }
 
         ~DotLink()
         {
-            m_visitor->m_parentNodes.pop_back();
+            m_visitor->m_parentNodes.pop();
         }
 
       private:
@@ -117,7 +120,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
   private:
     std::ostream& m_stream;
-    std::vector< Node* > m_parentNodes;
+    std::stack< Node* > m_parentNodes; /**< holds the parent nodes of DotLink */
 };
 
 AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
@@ -391,6 +394,11 @@ bool AstDumpDotPass::run( libpass::PassResult& pr )
     const auto specification = sourceToAstPass->specification();
 
     std::ofstream dotfile( "./out.dot" );
+    if( not dotfile.is_open() )
+    {
+        std::cerr << "error: could not open `out.dot`" << std::endl;
+        return false;
+    }
 
     dotfile << "digraph \"main\" {\n";
 
