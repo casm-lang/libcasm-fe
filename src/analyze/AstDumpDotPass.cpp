@@ -375,8 +375,7 @@ void AstDumpDotVisitor::visit( RangedType& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::dumpNode(
-    const Node& node, const std::string& name )
+void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
 {
     m_stream << "\"" << &node << "\" [label=\"" << name << "\"];\n";
 }

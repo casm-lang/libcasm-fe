@@ -40,7 +40,8 @@ IdentifierNode::Ptr Type::name( void ) const
 }
 
 static const auto VoidTypeName = std::make_shared< IdentifierNode >( "Void" );
-static const auto UnresolvedTypeName = std::make_shared< IdentifierNode >( "Unresolved" );
+static const auto UnresolvedTypeName
+    = std::make_shared< IdentifierNode >( "Unresolved" );
 
 VoidType::VoidType( void )
 : Type( Node::ID::VOID_TYPE, VoidTypeName )
