@@ -155,7 +155,7 @@ void AstDumpDotVisitor::visit( Specification& node )
         dumpNode( node, "CASM\\nSpecification" );
         RecursiveVisitor::visit( node );
     }
-    
+
     m_stream << "}\n";
 }
 
