@@ -57,14 +57,6 @@
 %parse-param { const std::string& specificationName }
 %parse-param { Specification::Ptr& result }
 
-%initial-action
-{
-  // Initialize the initial location.
-  // Error messages are printed in Driver, I guess location does not
-  // need to know about the filename
-  // @$.begin.filename = @$.end.filename = driver.get_filename_ptr();
-};
-
 %code
 {
     #include "src/Lexer.h"
