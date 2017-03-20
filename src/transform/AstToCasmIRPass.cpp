@@ -48,6 +48,8 @@ static libpass::PassRegistration< AstToCasmIRPass > PASS( "AST to CASM IR",
     "ast2ir",
     0 );
 
+constexpr const char* single_execution_agent = "agent0";
+
 libcasm_ir::Type::Ptr AstToCasmIRPass::getType( Type* type )
 {
     assert( type && "not initialized type used" );
@@ -67,10 +69,10 @@ libcasm_ir::Type::Ptr AstToCasmIRPass::getType( Type* type )
         case TypeType::STRING:
             return libstdhl::get< libcasm_ir::StringType >();
         default:
-            std::cerr << type->to_str()
-                      << "\n"; // PPA: FIXME: TODO: error message
-            assert( 0 && "not implemented function atom identifier type" );
-            return 0;
+            throw std::domain_error(
+                "unimplemented function atom identifier type '" + type->to_str()
+                + "'" );
+            return nullptr;
     }
 }
 
@@ -157,9 +159,6 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
     AstWalker< AstToCasmIRPass, bool > walker( *this );
     walker.walk_specification( node->root() );
 
-    // casm_frontend_destroy(); // PPA: enable this if it is safe to remove the
-    // AST object
-
     auto data = libstdhl::make< Data >( m_specification );
 
     pr.setResult< AstToCasmIRPass >( data );
@@ -226,7 +225,7 @@ void AstToCasmIRPass::visit_specification( SpecificationNode* node )
         = libstdhl::get< libcasm_ir::RuleReferenceConstant >(
             ir_initially_rule );
 
-    std::vector< std::string > agents = { "agent0" };
+    std::vector< std::string > agents = { single_execution_agent };
 
     m_agent = libstdhl::make< libcasm_ir::Agent >( agents );
 
@@ -582,12 +581,10 @@ void AstToCasmIRPass::visit_update(
 
 void AstToCasmIRPass::visit_call_pre( CallNode* node )
 {
-    // VISIT;
 }
 
 void AstToCasmIRPass::visit_call_pre( CallNode* node, bool expr )
 {
-    // VISIT;
 }
 
 void AstToCasmIRPass::visit_call( CallNode* node, std::vector< bool >& args )
@@ -600,7 +597,6 @@ void AstToCasmIRPass::visit_call( CallNode* node, std::vector< bool >& args )
 
 void AstToCasmIRPass::visit_call_post( CallNode* node )
 {
-    // VISIT;
 }
 
 void AstToCasmIRPass::visit_print( PrintNode* node, bool expr )
@@ -615,22 +611,6 @@ void AstToCasmIRPass::visit_print( PrintNode* node, bool expr )
     ast2casmir[ node ] = ir_stmt;
 
     assert( !" TODO! no print instr, use print builtin! " );
-    // auto ir_print = libstdhl::make< libcasm_ir::PrintInstruction >();
-
-    // // for( auto a : node->atoms )
-    // // {
-    // //     Value* instr = lookup< Value >( a );
-    // //     ir_print->add( instr );
-    // // }
-    // ir_print->add( lookup< libcasm_ir::Value >( node->getAtom() ) );
-
-    // // INFO: PPA: commented line below, because the 'IR' itself adds this
-    // during
-    // // runtime (interpreter)
-    // // and compilation --> this should not be part of the CASM IR!!!
-    // // ir_print->add( StringConstant::create( (const char*)"\n" ) );
-
-    // ir_stmt->add( ir_print );
 }
 
 void AstToCasmIRPass::visit_diedie( DiedieNode* node, bool msg )
@@ -933,8 +913,7 @@ bool AstToCasmIRPass::visit_expression(
                 ir_lhs, ir_rhs );
             break;
         default:
-            assert( !"internal error" ); // PPA: FIXME: with better verbose info
-                                         // etc.
+            assert( !"internal error" );
     }
 
     assert( ir_expr );
@@ -945,7 +924,6 @@ bool AstToCasmIRPass::visit_expression(
 bool AstToCasmIRPass::visit_expression_single( UnaryExpression* node, bool val )
 {
     VISIT;
-    // printf( "%s, %p\n", operator_to_str( node->op ).c_str(), node->left_ );
 
     auto ir_lhs = lookup< libcasm_ir::Value >( node->expr_ );
 
@@ -959,8 +937,7 @@ bool AstToCasmIRPass::visit_expression_single( UnaryExpression* node, bool val )
             ir_expr = libstdhl::make< libcasm_ir::NotInstruction >( ir_lhs );
             break;
         default:
-            assert( !"internal error" ); // PPA: FIXME: with better verbose info
-                                         // etc.
+            assert( !"internal error" );
     }
 
     assert( ir_expr );
@@ -1156,7 +1133,8 @@ bool AstToCasmIRPass::visit_self_atom( SelfAtom* node )
     VISIT;
     const libcasm_ir::Constant::Ptr ir_const
         = libstdhl::get< libcasm_ir::AgentConstant >(
-            libstdhl::get< libcasm_ir::AgentType >( m_agent ), "agent0" );
+            libstdhl::get< libcasm_ir::AgentType >( m_agent ),
+            single_execution_agent );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1263,13 +1241,9 @@ bool AstToCasmIRPass::visit_zero_atom( ZeroAtom* node )
 template < class C >
 typename C::Ptr AstToCasmIRPass::lookupParent( AstNode* node )
 {
-    // printf( "%s: ??? %p\n", __FUNCTION__, node );
-
     auto result = ast2parent.find( node );
     if( result != ast2parent.end() )
     {
-        // printf( "%s: %p, %p\n", __FUNCTION__, result->first, result->second
-        // );
         return lookup< C >( result->second );
     }
 
@@ -1279,12 +1253,9 @@ typename C::Ptr AstToCasmIRPass::lookupParent( AstNode* node )
 template < typename C >
 typename C::Ptr AstToCasmIRPass::lookup( AstNode* node )
 {
-    // printf( "%s: %p\n", __FUNCTION__, node );
-
     auto result = ast2casmir.find( node );
     if( result != ast2casmir.end() )
     {
-        // printf( "%s: %p\n", __FUNCTION__, result->second );
         if( libcasm_ir::isa< C >( result->second ) )
         {
             return std::static_pointer_cast< C >( result->second );
