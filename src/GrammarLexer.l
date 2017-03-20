@@ -82,49 +82,53 @@ using namespace libcasm_fe;
     return Parser::make_IDENTIFIER( yytext, loc );
 }
 
-[ \t\r]+ { /* ignore spaces */
+[ \t\r]+ { // ignore spaces
     loc.step();
 }
 
-\n+ { /* ignore newlines too, but reset yycolumn */
+\n+ { // ignore newlines
     loc.lines( yyleng );
     loc.step();
 }
 
-"//" {
+"//" { // single-line comments
     BEGIN( LCOMMENT );
-    loc.lines( 1 );
     loc.step();
 }
 <LCOMMENT>.
 <LCOMMENT>\n {
     BEGIN( INITIAL );
+    loc.lines();
 }
 <LCOMMENT><<EOF>> {
     BEGIN( INITIAL );
 }
 
-"/*" { /* ignore multi line comments */
+"/*" { // multi-line comments
     BEGIN( COMMENT );
 }
 <COMMENT>"*/" {
     BEGIN( INITIAL );
 }
-<COMMENT>\n
-<COMMENT>([^*]|\n|\r)+|.
+<COMMENT>\n {
+    loc.lines();
+}
+<COMMENT>([^*\n]|\r)+|.
 <COMMENT><<EOF>> {
     printf( "Multiline comment not terminated on line %d", yylineno );
-    exit( 2 );
+    exit( 2 ); // FIXME no exit!!
 }
 
-\" {
+\" { // strings
     BEGIN( STRING );
     strbuf.clear();
 }
 <STRING>[^\\\"\n]* { /* eat all tokens */
     strbuf.append( yytext );
 }
-<STRING>\n
+<STRING>\n {
+    loc.lines();
+}
 <STRING>\\n {
     strbuf.append( "\n" );
 }
