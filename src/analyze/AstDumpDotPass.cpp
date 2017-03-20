@@ -109,7 +109,6 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
 
-    void visit( VoidType& node ) override;
     void visit( UnresolvedType& node ) override;
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
@@ -353,12 +352,6 @@ void AstDumpDotVisitor::visit( CallRule& node )
     DotLink link( this, &node );
     dumpNode( node, "CallRule" );
     RecursiveVisitor::visit( node );
-}
-
-void AstDumpDotVisitor::visit( VoidType& node )
-{
-    DotLink link( this, &node );
-    dumpNode( node, "VoidType" );
 }
 
 void AstDumpDotVisitor::visit( UnresolvedType& node )

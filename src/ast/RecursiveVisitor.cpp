@@ -211,11 +211,6 @@ void RecursiveVisitor::visit( CallRule& node )
     node.call()->accept( *this );
 }
 
-void RecursiveVisitor::visit( VoidType& node )
-{
-    node.name()->accept( *this );
-}
-
 void RecursiveVisitor::visit( UnresolvedType& node )
 {
     node.name()->accept( *this );

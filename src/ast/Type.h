@@ -41,8 +41,12 @@ namespace libcasm_fe
 
             IdentifierNode::Ptr name( void ) const;
 
+            void setType( const libcasm_ir::Type::Ptr& type );
+            libcasm_ir::Type::Ptr type( void ) const;
+
           private:
             IdentifierNode::Ptr m_name;
+            libcasm_ir::Type::Ptr m_type;
         };
 
         using Types = NodeList< Type >;

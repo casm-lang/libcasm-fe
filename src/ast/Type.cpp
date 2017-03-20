@@ -31,6 +31,7 @@ using namespace Ast;
 Type::Type( Node::ID id, const IdentifierNode::Ptr& name )
 : Node( id )
 , m_name( name )
+, m_type( nullptr )
 {
 }
 
@@ -39,22 +40,23 @@ IdentifierNode::Ptr Type::name( void ) const
     return m_name;
 }
 
-static const auto VoidTypeName = std::make_shared< IdentifierNode >( "Void" );
-static const auto UnresolvedTypeName
-    = std::make_shared< IdentifierNode >( "Unresolved" );
-
-VoidType::VoidType( void )
-: Type( Node::ID::VOID_TYPE, VoidTypeName )
+void Type::setType( const libcasm_ir::Type::Ptr& type )
 {
+    m_type = type;
 }
 
-void VoidType::accept( Visitor& visitor )
+libcasm_ir::Type::Ptr Type::type( void ) const
 {
-    visitor.visit( *this );
+    return m_type;
+}
+
+static IdentifierNode::Ptr createUnresolvedIdentifier()
+{
+    return std::make_shared< IdentifierNode >( "Unresolved" );
 }
 
 UnresolvedType::UnresolvedType( void )
-: Type( Node::ID::UNRESOLVED_TYPE, UnresolvedTypeName )
+: Type( Node::ID::UNRESOLVED_TYPE, createUnresolvedIdentifier() )
 {
 }
 

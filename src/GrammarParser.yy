@@ -154,13 +154,35 @@
         return { functionClass, symbolicFunction };
     }
 
+    static BasicType::Ptr createVoidType( location& sourceLocation )
+    {
+        const auto type = libstdhl::get< libcasm_ir::VoidType >();
+        const auto name = make< IdentifierNode >( sourceLocation, type->description() );
+        const auto node = make< BasicType >( sourceLocation, name );
+        node->setType( type );
+        return node;
+    }
+
+    static BasicType::Ptr createRuleRefType( location& sourceLocation )
+    {
+        const auto type = libstdhl::get< libcasm_ir::RuleReferenceType >();
+        const auto name = make< IdentifierNode >( sourceLocation, type->description() );
+        const auto node = make< BasicType >( sourceLocation, name );
+        node->setType( type );
+        return node;
+    }
+
+    static BasicType::Ptr createAgentType( location& sourceLocation )
+    {
+        const auto name = make< IdentifierNode >( sourceLocation, "Agent" );
+        const auto node = make< BasicType >( sourceLocation, name );
+        return node;
+    }
+
     static FunctionDefinition::Ptr createProgramFunction( location& sourceLocation )
     {
-        const auto agentTypeName = make< IdentifierNode >( sourceLocation, "Agent" );
-        const auto agentType = make< BasicType >( sourceLocation, agentTypeName );
-
-        const auto ruleRefTypeName = make< IdentifierNode >( sourceLocation, "RuleReference" );
-        const auto ruleRefType = make< BasicType >( sourceLocation, ruleRefTypeName );
+        const auto agentType = createAgentType( sourceLocation );
+        const auto ruleRefType = createRuleRefType( sourceLocation );
 
         const auto argTypes = make< Types >( sourceLocation );
         argTypes->add( agentType );
@@ -1033,7 +1055,7 @@ ExistentialQuantifierExpression
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
   {
-      $$ = make< RuleDefinition >( @$, $2, $3, make< VoidType >( @$ ),
+      $$ = make< RuleDefinition >( @$, $2, $3, createVoidType( @$ ),
                                    wrapInBlockRule( $5 ) );
   }
 | RULE Identifier MaybeParameters ARROW Type EQUAL Rule
