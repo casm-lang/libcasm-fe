@@ -147,9 +147,16 @@ void AstDumpDotVisitor::visit( IdentifierNode& node )
 
 void AstDumpDotVisitor::visit( Specification& node )
 {
-    DotLink link( this, &node );
-    dumpNode( node, "CASM\\nSpecification" );
-    RecursiveVisitor::visit( node );
+    m_stream << "subgraph \"" << node.name()->identifier() << "\" {\n";
+
+    { // scope for DotLink object
+        DotLink link( this, &node );
+
+        dumpNode( node, "CASM\\nSpecification" );
+        RecursiveVisitor::visit( node );
+    }
+    
+    m_stream << "}\n";
 }
 
 void AstDumpDotVisitor::visit( VariableDefinition& node )
