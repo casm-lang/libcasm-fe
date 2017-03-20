@@ -1254,13 +1254,12 @@ YY_RULE_SETUP
 case YY_STATE_EOF(COMMENT):
 #line 196 "obj/src/GrammarLexer.l"
 {
-    printf( "Multiline comment not terminated on line %d", yylineno );
-    exit( 2 ); // FIXME no exit!!
+    std::cerr << loc << ": multiline comment not terminated\n"; // TODO use log
 }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 201 "obj/src/GrammarLexer.l"
+#line 200 "obj/src/GrammarLexer.l"
 { // strings
     BEGIN( STRING );
     strbuf.clear();
@@ -1268,7 +1267,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 205 "obj/src/GrammarLexer.l"
+#line 204 "obj/src/GrammarLexer.l"
 { /* eat all tokens */
     strbuf.append( yytext );
 }
@@ -1276,50 +1275,48 @@ YY_RULE_SETUP
 case 83:
 /* rule 83 can match eol */
 YY_RULE_SETUP
-#line 208 "obj/src/GrammarLexer.l"
+#line 207 "obj/src/GrammarLexer.l"
 {
     loc.lines();
 }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 211 "obj/src/GrammarLexer.l"
+#line 210 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\n" );
 }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 214 "obj/src/GrammarLexer.l"
+#line 213 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\t" );
 }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 217 "obj/src/GrammarLexer.l"
+#line 216 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\"" );
 }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 220 "obj/src/GrammarLexer.l"
+#line 219 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\'" );
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 223 "obj/src/GrammarLexer.l"
+#line 222 "obj/src/GrammarLexer.l"
 {
-    /*global_driver->error( loc, "unclosed string",
-            Code::SyntaxErrorUnclosedString ); TODO*/
-    exit( 1 ); // FIXME no exit!!
+    std::cerr << loc << ": string not terminated\n"; // TODO use log
 }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 228 "obj/src/GrammarLexer.l"
+#line 225 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     return Parser::make_STRING( strbuf, loc );
@@ -1327,20 +1324,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 233 "obj/src/GrammarLexer.l"
+#line 230 "obj/src/GrammarLexer.l"
 {
-    /*global_driver->error( loc,
-            "unrecognized character '" + std::string( yytext ) + "'",
-            Code::SyntaxErrorUnrecognizedCharacter ); TODO*/
-    exit( 1 ); // FIXME no exit!!
+    std::cerr << loc << ": unrecognized character '" << yytext << "'\n"; // TODO use log
 }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 240 "obj/src/GrammarLexer.l"
+#line 234 "obj/src/GrammarLexer.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1343 "src/various/GrammarLexer.cpp"
+#line 1337 "src/various/GrammarLexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2296,7 +2290,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 240 "obj/src/GrammarLexer.l"
+#line 234 "obj/src/GrammarLexer.l"
 
 
 Lexer::Lexer( std::istream& in, std::ostream& out )
@@ -2304,6 +2298,11 @@ Lexer::Lexer( std::istream& in, std::ostream& out )
 , loc()
 , strbuf()
 {
+}
+
+void Lexer::LexerError( const char* msg )
+{
+    std::cerr << loc << ": " << msg << "\n"; // TODO use log
 }
 
 //  

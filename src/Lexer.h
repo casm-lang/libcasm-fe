@@ -41,7 +41,7 @@ namespace libcasm_fe
         Parser::symbol_type nextToken();
 
       protected:
-        // void LexerError( const char* msg ) override; TODO
+        void LexerError( const char* msg ) override;
 
       private:
         Parser::location_type loc;

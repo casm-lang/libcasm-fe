@@ -115,8 +115,7 @@ using namespace libcasm_fe;
 }
 <COMMENT>([^*\n]|\r)+|.
 <COMMENT><<EOF>> {
-    printf( "Multiline comment not terminated on line %d", yylineno );
-    exit( 2 ); // FIXME no exit!!
+    std::cerr << loc << ": multiline comment not terminated\n"; // TODO use log
 }
 
 \" { // strings
@@ -142,9 +141,7 @@ using namespace libcasm_fe;
     strbuf.append( "\'" );
 }
 <STRING><<EOF>> {
-    /*global_driver->error( loc, "unclosed string",
-            Code::SyntaxErrorUnclosedString ); TODO*/
-    exit( 1 ); // FIXME no exit!!
+    std::cerr << loc << ": string not terminated\n"; // TODO use log
 }
 <STRING>\" {
     BEGIN( INITIAL );
@@ -152,10 +149,7 @@ using namespace libcasm_fe;
 }
 
 . {
-    /*global_driver->error( loc,
-            "unrecognized character '" + std::string( yytext ) + "'",
-            Code::SyntaxErrorUnrecognizedCharacter ); TODO*/
-    exit( 1 ); // FIXME no exit!!
+    std::cerr << loc << ": unrecognized character '" << yytext << "'\n"; // TODO use log
 }
 
 %%
@@ -165,6 +159,11 @@ Lexer::Lexer( std::istream& in, std::ostream& out )
 , loc()
 , strbuf()
 {
+}
+
+void Lexer::LexerError( const char* msg )
+{
+    std::cerr << loc << ": " << msg << "\n"; // TODO use log
 }
 
 //  
