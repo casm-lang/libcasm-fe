@@ -30,8 +30,6 @@ namespace libcasm_fe
 {
     namespace Ast
     {
-        class IdentifierNode;
-
         class Specification;
 
         class VariableDefinition;
@@ -71,6 +69,10 @@ namespace libcasm_fe
         class FixedSizedType;
         class RangedType;
 
+        class IdentifierNode;
+        class ExpressionCase;
+        class DefaultCase;
+
         /**
          * @extends CasmFE
          */
@@ -78,8 +80,6 @@ namespace libcasm_fe
         {
           public:
             virtual ~Visitor( void ) = default;
-
-            virtual void visit( IdentifierNode& node ) = 0;
 
             virtual void visit( Specification& node ) = 0;
 
@@ -119,6 +119,10 @@ namespace libcasm_fe
             virtual void visit( ComposedType& node ) = 0;
             virtual void visit( FixedSizedType& node ) = 0;
             virtual void visit( RangedType& node ) = 0;
+
+            virtual void visit( IdentifierNode& node ) = 0;
+            virtual void visit( ExpressionCase& node ) = 0;
+            virtual void visit( DefaultCase& node ) = 0;
         };
     }
 }

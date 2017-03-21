@@ -75,8 +75,45 @@ void ConditionalRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-CaseRule::CaseRule(
-    const Expression::Ptr& expression, const std::vector< Case >& cases )
+Case::Case( Node::ID id, const Rule::Ptr& rule )
+: Node( id )
+, m_rule( rule )
+{
+}
+
+Rule::Ptr Case::rule() const
+{
+    return m_rule;
+}
+
+ExpressionCase::ExpressionCase(
+    const Expression::Ptr& expression, const Rule::Ptr& rule )
+: Case( Node::ID::EXPRESSION_CASE, rule )
+, m_expression( expression )
+{
+}
+
+Expression::Ptr ExpressionCase::expression() const
+{
+    return m_expression;
+}
+
+void ExpressionCase::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+DefaultCase::DefaultCase( const Rule::Ptr& rule )
+: Case( Node::ID::DEFAULT_CASE, rule )
+{
+}
+
+void DefaultCase::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+CaseRule::CaseRule( const Expression::Ptr& expression, const Cases::Ptr& cases )
 : Rule( Node::ID::CASE_RULE )
 , m_expression( expression )
 , m_cases( cases )
@@ -88,7 +125,7 @@ Expression::Ptr CaseRule::expression( void ) const
     return m_expression;
 }
 
-std::vector< CaseRule::Case > CaseRule::cases( void ) const
+Cases::Ptr CaseRule::cases( void ) const
 {
     return m_cases;
 }

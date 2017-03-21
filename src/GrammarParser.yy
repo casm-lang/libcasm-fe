@@ -272,8 +272,8 @@ END       0 "end of file"
 
 // other
 %type <FunctionDefinition::Ptr> ProgramFunctionDefinition
-%type <CaseRule::Case> CaseLabel
-%type <std::vector< CaseRule::Case >> CaseLabels
+%type <Case::Ptr> CaseLabel
+%type <Cases::Ptr> CaseLabels
 %type <UpdateRule::Ptr> Initializer
 %type <NodeList< UpdateRule >::Ptr> Initializers MaybeInitializers MaybeInitially
 %type <NodeList< IdentifierNode >::Ptr> MaybeFunctionAttributes
@@ -1157,17 +1157,15 @@ CaseRule
 CaseLabel
 : DEFAULT COLON Rule
   {
-      // default case
-      $$ = CaseRule::Case( nullptr, $3 );
+      $$ = make< DefaultCase >( @$, $3 );
   }
 | UNDERLINE COLON Rule
   {
-      // default case
-      $$ = CaseRule::Case( nullptr, $3 );
+      $$ = make< DefaultCase >( @$, $3 );
   }
 | Term COLON Rule
   {
-      $$ = CaseRule::Case( $1, $3 );
+      $$ = make< ExpressionCase >( @$, $1, $3 );
   }
 ;
 
@@ -1175,12 +1173,15 @@ CaseLabel
 CaseLabels
 : CaseLabel CaseLabels
   {
-      $$ = std::move( $2 );
-      $$.push_back( $1 );
+      auto cases = $2;
+      cases->add( $1 );
+      $$ = cases;
   }
 | CaseLabel
   {
-      $$ = { $1 };
+      auto cases = make< Cases >( @$ );
+      cases->add( $1 );
+      $$ = cases;
   }
 ;
 

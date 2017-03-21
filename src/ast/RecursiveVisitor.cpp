@@ -30,10 +30,6 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-void RecursiveVisitor::visit( IdentifierNode& node )
-{
-}
-
 void RecursiveVisitor::visit( Specification& node )
 {
     node.name()->accept( *this );
@@ -163,12 +159,7 @@ void RecursiveVisitor::visit( ConditionalRule& node )
 void RecursiveVisitor::visit( CaseRule& node )
 {
     node.expression()->accept( *this );
-
-    for( auto& c : node.cases() )
-    {
-        c.first->accept( *this );
-        c.second->accept( *this );
-    }
+    node.cases()->accept( *this );
 }
 
 void RecursiveVisitor::visit( LetRule& node )
@@ -238,6 +229,21 @@ void RecursiveVisitor::visit( RangedType& node )
     node.name()->accept( *this );
     node.lowerBound()->accept( *this );
     node.upperBound()->accept( *this );
+}
+
+void RecursiveVisitor::visit( IdentifierNode& node )
+{
+}
+
+void RecursiveVisitor::visit( ExpressionCase& node )
+{
+    node.expression()->accept( *this );
+    node.rule()->accept( *this );
+}
+
+void RecursiveVisitor::visit( DefaultCase& node )
+{
+    node.rule()->accept( *this );
 }
 
 //

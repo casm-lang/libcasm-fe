@@ -306,131 +306,134 @@ namespace libcasm_fe {
       char dummy3[sizeof(CallRule::Ptr)];
 
       // CaseLabel
-      char dummy4[sizeof(CaseRule::Case)];
+      char dummy4[sizeof(Case::Ptr)];
 
       // CaseRule
       char dummy5[sizeof(CaseRule::Ptr)];
 
+      // CaseLabels
+      char dummy6[sizeof(Cases::Ptr)];
+
       // ComposedType
-      char dummy6[sizeof(ComposedType::Ptr)];
+      char dummy7[sizeof(ComposedType::Ptr)];
 
       // ConditionalExpression
-      char dummy7[sizeof(ConditionalExpression::Ptr)];
+      char dummy8[sizeof(ConditionalExpression::Ptr)];
 
       // ConditionalRule
-      char dummy8[sizeof(ConditionalRule::Ptr)];
+      char dummy9[sizeof(ConditionalRule::Ptr)];
 
       // Definition
-      char dummy9[sizeof(Definition::Ptr)];
+      char dummy10[sizeof(Definition::Ptr)];
 
       // Definitions
-      char dummy10[sizeof(Definitions::Ptr)];
+      char dummy11[sizeof(Definitions::Ptr)];
 
       // DerivedDefinition
-      char dummy11[sizeof(DerivedDefinition::Ptr)];
+      char dummy12[sizeof(DerivedDefinition::Ptr)];
 
       // DirectCallExpression
-      char dummy12[sizeof(DirectCallExpression::Ptr)];
+      char dummy13[sizeof(DirectCallExpression::Ptr)];
 
       // EnumerationDefinition
-      char dummy13[sizeof(EnumerationDefinition::Ptr)];
+      char dummy14[sizeof(EnumerationDefinition::Ptr)];
 
       // ExistentialQuantifierExpression
-      char dummy14[sizeof(ExistentialQuantifierExpression::Ptr)];
+      char dummy15[sizeof(ExistentialQuantifierExpression::Ptr)];
 
       // MaybeDefined
       // Atom
       // Term
       // Expression
-      char dummy15[sizeof(Expression::Ptr)];
+      char dummy16[sizeof(Expression::Ptr)];
 
       // Terms
       // Arguments
-      char dummy16[sizeof(Expressions::Ptr)];
+      char dummy17[sizeof(Expressions::Ptr)];
 
       // FixedSizedType
-      char dummy17[sizeof(FixedSizedType::Ptr)];
+      char dummy18[sizeof(FixedSizedType::Ptr)];
 
       // ForallRule
-      char dummy18[sizeof(ForallRule::Ptr)];
+      char dummy19[sizeof(ForallRule::Ptr)];
 
       // FunctionDefinition
       // ProgramFunctionDefinition
-      char dummy19[sizeof(FunctionDefinition::Ptr)];
+      char dummy20[sizeof(FunctionDefinition::Ptr)];
 
       // Identifier
-      char dummy20[sizeof(IdentifierNode::Ptr)];
+      char dummy21[sizeof(IdentifierNode::Ptr)];
 
       // IndirectCallExpression
-      char dummy21[sizeof(IndirectCallExpression::Ptr)];
+      char dummy22[sizeof(IndirectCallExpression::Ptr)];
 
       // IterateRule
-      char dummy22[sizeof(IterateRule::Ptr)];
+      char dummy23[sizeof(IterateRule::Ptr)];
 
       // LetRule
-      char dummy23[sizeof(LetRule::Ptr)];
+      char dummy24[sizeof(LetRule::Ptr)];
 
       // List
-      char dummy24[sizeof(ListExpression::Ptr)];
+      char dummy25[sizeof(ListExpression::Ptr)];
 
       // MaybeFunctionAttributes
       // Identifiers
       // MaybeIdentifiers
-      char dummy25[sizeof(NodeList< IdentifierNode >::Ptr)];
+      char dummy26[sizeof(NodeList< IdentifierNode >::Ptr)];
 
       // MaybeInitially
       // Initializers
       // MaybeInitializers
-      char dummy26[sizeof(NodeList< UpdateRule >::Ptr)];
+      char dummy27[sizeof(NodeList< UpdateRule >::Ptr)];
 
       // Parameters
       // MaybeParameters
-      char dummy27[sizeof(NodeList< VariableDefinition >::Ptr)];
+      char dummy28[sizeof(NodeList< VariableDefinition >::Ptr)];
 
       // Range
-      char dummy28[sizeof(RangeExpression::Ptr)];
+      char dummy29[sizeof(RangeExpression::Ptr)];
 
       // RangedType
-      char dummy29[sizeof(RangedType::Ptr)];
+      char dummy30[sizeof(RangedType::Ptr)];
 
       // Rule
-      char dummy30[sizeof(Rule::Ptr)];
+      char dummy31[sizeof(Rule::Ptr)];
 
       // RuleDefinition
-      char dummy31[sizeof(RuleDefinition::Ptr)];
+      char dummy32[sizeof(RuleDefinition::Ptr)];
 
       // RuleReference
-      char dummy32[sizeof(RuleReferenceAtom::Ptr)];
+      char dummy33[sizeof(RuleReferenceAtom::Ptr)];
 
       // Rules
-      char dummy33[sizeof(Rules::Ptr)];
+      char dummy34[sizeof(Rules::Ptr)];
 
       // SequenceRule
-      char dummy34[sizeof(SequenceRule::Ptr)];
+      char dummy35[sizeof(SequenceRule::Ptr)];
 
       // SkipRule
-      char dummy35[sizeof(SkipRule::Ptr)];
+      char dummy36[sizeof(SkipRule::Ptr)];
 
       // Specification
-      char dummy36[sizeof(Specification::Ptr)];
+      char dummy37[sizeof(Specification::Ptr)];
 
       // Type
-      char dummy37[sizeof(Type::Ptr)];
+      char dummy38[sizeof(Type::Ptr)];
 
       // FunctionParameters
       // MaybeFunctionParameters
       // Types
-      char dummy38[sizeof(Types::Ptr)];
+      char dummy39[sizeof(Types::Ptr)];
 
       // Undefined
-      char dummy39[sizeof(UndefAtom::Ptr)];
+      char dummy40[sizeof(UndefAtom::Ptr)];
 
       // UniversalQuantifierExpression
-      char dummy40[sizeof(UniversalQuantifierExpression::Ptr)];
+      char dummy41[sizeof(UniversalQuantifierExpression::Ptr)];
 
       // Initializer
       // UpdateRule
-      char dummy41[sizeof(UpdateRule::Ptr)];
+      char dummy42[sizeof(UpdateRule::Ptr)];
 
       // Boolean
       // String
@@ -438,10 +441,10 @@ namespace libcasm_fe {
       // IntegerNumber
       // FloatingNumber
       // RationalNumber
-      char dummy42[sizeof(ValueAtom::Ptr)];
+      char dummy43[sizeof(ValueAtom::Ptr)];
 
       // Variable
-      char dummy43[sizeof(VariableDefinition::Ptr)];
+      char dummy44[sizeof(VariableDefinition::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -450,10 +453,7 @@ namespace libcasm_fe {
       // "floating"
       // "string"
       // "identifier"
-      char dummy44[sizeof(std::string)];
-
-      // CaseLabels
-      char dummy45[sizeof(std::vector< CaseRule::Case >)];
+      char dummy45[sizeof(std::string)];
 };
 
     /// Symbol semantic values.
@@ -595,9 +595,11 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const CallRule::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const CaseRule::Case v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Case::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const CaseRule::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const Cases::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const ComposedType::Ptr v, const location_type& l);
 
@@ -676,8 +678,6 @@ namespace libcasm_fe {
   basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const std::vector< CaseRule::Case > v, const location_type& l);
 
 
       /// Constructor for symbols with semantic value.
@@ -1360,11 +1360,15 @@ namespace libcasm_fe {
         break;
 
       case 132: // CaseLabel
-        value.copy< CaseRule::Case > (other.value);
+        value.copy< Case::Ptr > (other.value);
         break;
 
       case 131: // CaseRule
         value.copy< CaseRule::Ptr > (other.value);
+        break;
+
+      case 133: // CaseLabels
+        value.copy< Cases::Ptr > (other.value);
         break;
 
       case 102: // ComposedType
@@ -1547,10 +1551,6 @@ namespace libcasm_fe {
         value.copy< std::string > (other.value);
         break;
 
-      case 133: // CaseLabels
-        value.copy< std::vector< CaseRule::Case > > (other.value);
-        break;
-
       default:
         break;
     }
@@ -1581,11 +1581,15 @@ namespace libcasm_fe {
         break;
 
       case 132: // CaseLabel
-        value.copy< CaseRule::Case > (v);
+        value.copy< Case::Ptr > (v);
         break;
 
       case 131: // CaseRule
         value.copy< CaseRule::Ptr > (v);
+        break;
+
+      case 133: // CaseLabels
+        value.copy< Cases::Ptr > (v);
         break;
 
       case 102: // ComposedType
@@ -1768,10 +1772,6 @@ namespace libcasm_fe {
         value.copy< std::string > (v);
         break;
 
-      case 133: // CaseLabels
-        value.copy< std::vector< CaseRule::Case > > (v);
-        break;
-
       default:
         break;
     }
@@ -1809,7 +1809,7 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CaseRule::Case v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Case::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -1817,6 +1817,13 @@ namespace libcasm_fe {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CaseRule::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Cases::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2095,13 +2102,6 @@ namespace libcasm_fe {
     , location (l)
   {}
 
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector< CaseRule::Case > v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
 
   template <typename Base>
   inline
@@ -2141,11 +2141,15 @@ namespace libcasm_fe {
         break;
 
       case 132: // CaseLabel
-        value.template destroy< CaseRule::Case > ();
+        value.template destroy< Case::Ptr > ();
         break;
 
       case 131: // CaseRule
         value.template destroy< CaseRule::Ptr > ();
+        break;
+
+      case 133: // CaseLabels
+        value.template destroy< Cases::Ptr > ();
         break;
 
       case 102: // ComposedType
@@ -2328,10 +2332,6 @@ namespace libcasm_fe {
         value.template destroy< std::string > ();
         break;
 
-      case 133: // CaseLabels
-        value.template destroy< std::vector< CaseRule::Case > > ();
-        break;
-
       default:
         break;
     }
@@ -2368,11 +2368,15 @@ namespace libcasm_fe {
         break;
 
       case 132: // CaseLabel
-        value.move< CaseRule::Case > (s.value);
+        value.move< Case::Ptr > (s.value);
         break;
 
       case 131: // CaseRule
         value.move< CaseRule::Ptr > (s.value);
+        break;
+
+      case 133: // CaseLabels
+        value.move< Cases::Ptr > (s.value);
         break;
 
       case 102: // ComposedType
@@ -2553,10 +2557,6 @@ namespace libcasm_fe {
       case 73: // "string"
       case 74: // "identifier"
         value.move< std::string > (s.value);
-        break;
-
-      case 133: // CaseLabels
-        value.move< std::vector< CaseRule::Case > > (s.value);
         break;
 
       default:

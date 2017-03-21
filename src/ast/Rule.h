@@ -78,23 +78,63 @@ namespace libcasm_fe
             Rule::Ptr m_elseRule;
         };
 
-        class CaseRule : public Rule
+        class Case : public Node
         {
           public:
-            using Ptr = std::shared_ptr< CaseRule >;
-            using Case = std::pair< Expression::Ptr, Rule::Ptr >;
+            using Ptr = std::shared_ptr< Case >;
 
-            CaseRule( const Expression::Ptr& expression,
-                const std::vector< Case >& cases );
+            Case( Node::ID id, const Rule::Ptr& rule );
+
+            Rule::Ptr rule( void ) const;
+
+          private:
+            Rule::Ptr m_rule;
+        };
+
+        using Cases = NodeList< Case >;
+
+        class ExpressionCase : public Case
+        {
+          public:
+            using Ptr = std::shared_ptr< ExpressionCase >;
+
+            ExpressionCase(
+                const Expression::Ptr& expression, const Rule::Ptr& rule );
 
             Expression::Ptr expression( void ) const;
-            std::vector< Case > cases( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_expression;
-            std::vector< Case > m_cases;
+        };
+
+        class DefaultCase : public Case
+        {
+          public:
+            using Ptr = std::shared_ptr< DefaultCase >;
+
+            DefaultCase( const Rule::Ptr& rule );
+
+            void accept( Visitor& visitor ) override final;
+        };
+
+        class CaseRule : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< CaseRule >;
+
+            CaseRule(
+                const Expression::Ptr& expression, const Cases::Ptr& cases );
+
+            Expression::Ptr expression( void ) const;
+            Cases::Ptr cases( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            Expression::Ptr m_expression;
+            Cases::Ptr m_cases;
         };
 
         class LetRule : public Rule

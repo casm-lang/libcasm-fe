@@ -45,10 +45,7 @@ namespace libcasm_fe
           public:
             enum class ID
             {
-                NODE_LIST,
-
                 SPECIFICATION,
-                IDENTIFIER,
 
                 // definitions
                 VARIABLE_DEFINITION,
@@ -90,6 +87,12 @@ namespace libcasm_fe
                 COMPOSED_TYPE,
                 FIXED_SIZED_TYPE,
                 RANGED_TYPE,
+
+                // other
+                NODE_LIST,
+                IDENTIFIER,
+                EXPRESSION_CASE,
+                DEFAULT_CASE,
             };
 
           public:

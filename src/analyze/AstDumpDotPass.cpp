@@ -74,8 +74,6 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
     void setDumpNodeLocation( bool dumpNodeLocation );
 
-    void visit( IdentifierNode& node ) override;
-
     void visit( Specification& node ) override;
 
     void visit( VariableDefinition& node ) override;
@@ -115,6 +113,10 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( FixedSizedType& node ) override;
     void visit( RangedType& node ) override;
 
+    void visit( IdentifierNode& node ) override;
+    void visit( ExpressionCase& node ) override;
+    void visit( DefaultCase& node ) override;
+
   private:
     void dumpNode( const Node& node, const std::string& name );
     void dumpLink( Node* from, Node* to );
@@ -135,13 +137,6 @@ AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
 void AstDumpDotVisitor::setDumpNodeLocation( bool dumpNodeLocation )
 {
     m_dumpNodeLocation = dumpNodeLocation;
-}
-
-void AstDumpDotVisitor::visit( IdentifierNode& node )
-{
-    DotLink link( this, &node );
-    dumpNode( node, node.identifier() );
-    RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( Specification& node )
@@ -385,6 +380,27 @@ void AstDumpDotVisitor::visit( RangedType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RangedType" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( IdentifierNode& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, node.identifier() );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( ExpressionCase& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "ExpressionCase" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( DefaultCase& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "DefaultCase" );
     RecursiveVisitor::visit( node );
 }
 

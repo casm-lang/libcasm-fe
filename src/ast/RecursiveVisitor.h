@@ -35,8 +35,6 @@ namespace libcasm_fe
         class RecursiveVisitor : public Visitor
         {
           public:
-            void visit( IdentifierNode& node ) override;
-
             void visit( Specification& node ) override;
 
             void visit( VariableDefinition& node ) override;
@@ -75,6 +73,10 @@ namespace libcasm_fe
             void visit( ComposedType& node ) override;
             void visit( FixedSizedType& node ) override;
             void visit( RangedType& node ) override;
+
+            void visit( IdentifierNode& node ) override;
+            void visit( ExpressionCase& node ) override;
+            void visit( DefaultCase& node ) override;
         };
     }
 }
