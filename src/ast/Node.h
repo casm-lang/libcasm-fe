@@ -162,6 +162,11 @@ namespace libcasm_fe
                 return m_elements.cend();
             }
 
+            bool empty( void ) const
+            {
+                return m_elements.empty();
+            }
+
             void accept( Visitor& visitor ) override final
             {
                 for( auto& node : *this )
