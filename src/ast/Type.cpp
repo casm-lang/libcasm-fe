@@ -52,7 +52,7 @@ libcasm_ir::Type::Ptr Type::type( void ) const
 
 static IdentifierNode::Ptr createUnresolvedIdentifier()
 {
-    return std::make_shared< IdentifierNode >( "Unresolved" );
+    return std::make_shared< IdentifierNode >( "$unresolved$" );
 }
 
 UnresolvedType::UnresolvedType( void )
