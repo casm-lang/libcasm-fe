@@ -38,7 +38,6 @@
 #include "../casm-ir/src/Specification.h"
 #include "../casm-ir/src/Statement.h"
 #include "../casm-ir/src/Type.h"
-#include "../casm-ir/src/analyze/CasmIRDumpPass.h"
 
 using namespace libcasm_fe;
 
@@ -49,6 +48,8 @@ static libpass::PassRegistration< AstToCasmIRPass > PASS( "AST to CASM IR",
     "ast2ir",
     0 );
 
+constexpr const char* single_execution_agent = "agent0";
+
 libcasm_ir::Type::Ptr AstToCasmIRPass::getType( Type* type )
 {
     assert( type && "not initialized type used" );
@@ -56,7 +57,7 @@ libcasm_ir::Type::Ptr AstToCasmIRPass::getType( Type* type )
     switch( type->t )
     {
         case TypeType::AGENT:
-            return libstdhl::get< libcasm_ir::AgentType >();
+            return libstdhl::get< libcasm_ir::AgentType >( m_agent );
         case TypeType::RULEREF:
             return libstdhl::get< libcasm_ir::RuleReferenceType >();
         case TypeType::BOOLEAN:
@@ -68,10 +69,10 @@ libcasm_ir::Type::Ptr AstToCasmIRPass::getType( Type* type )
         case TypeType::STRING:
             return libstdhl::get< libcasm_ir::StringType >();
         default:
-            std::cerr << type->to_str()
-                      << "\n"; // PPA: FIXME: TODO: error message
-            assert( 0 && "not implemented function atom identifier type" );
-            return 0;
+            throw std::domain_error(
+                "unimplemented function atom identifier type '" + type->to_str()
+                + "'" );
+            return nullptr;
     }
 }
 
@@ -158,13 +159,10 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
     AstWalker< AstToCasmIRPass, bool > walker( *this );
     walker.walk_specification( node->root() );
 
-    // casm_frontend_destroy(); // PPA: enable this if it is safe to remove the
-    // AST object
-
     auto data = libstdhl::make< Data >( m_specification );
 
     pr.setResult< AstToCasmIRPass >( data );
-    pr.setResult< libcasm_ir::CasmIRDumpPass >( data );
+    pr.setResult< libcasm_ir::ConsistencyCheckPass >( data );
 
     return true;
 }
@@ -174,9 +172,13 @@ libcasm_ir::Specification::Ptr AstToCasmIRPass::getSpecification( void ) const
     return m_specification;
 }
 
+#if 1
+#define VISIT
+#else
 #define VISIT                                                                  \
-/*printf( "===--- %s:%i: %s: %p: %s\n", __FILE__, __LINE__, __FUNCTION__,      \
-  node, node->to_str().c_str() )*/
+    printf( "===--- %s:%i: %s: %p: %s\n", __FILE__, __LINE__, __FUNCTION__,    \
+        node, node->to_str().c_str() )
+#endif
 
 #define FIXME                                                                  \
     printf( "+++ FIXME +++: '%s:%i' in '%s'\n", __FILE__, __LINE__,            \
@@ -202,17 +204,17 @@ void AstToCasmIRPass::visit_specification( SpecificationNode* node )
         = libstdhl::make< libcasm_ir::Specification >( node->identifier );
 
     auto ir_initially_rule = libstdhl::make< libcasm_ir::Rule >(
-        ".initially", libstdhl::get< libcasm_ir::RuleReferenceType >() );
+        ".initially", libstdhl::get< libcasm_ir::VoidType >() );
 
     getSpecification()->add( ir_initially_rule );
 
     auto ir_initially_rule_scope
-        = libstdhl::make< libcasm_ir::ParallelBlock >();
+        = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
     ir_initially_rule->setContext( ir_initially_rule_scope );
 
     auto ir_initially_rule_inner_scope
-        = libstdhl::make< libcasm_ir::SequentialBlock >();
+        = libstdhl::make< libcasm_ir::SequentialBlock >()->init();
 
     ir_initially_rule_scope->add( ir_initially_rule_inner_scope );
 
@@ -223,9 +225,11 @@ void AstToCasmIRPass::visit_specification( SpecificationNode* node )
         = libstdhl::get< libcasm_ir::RuleReferenceConstant >(
             ir_initially_rule );
 
-    m_agent = libstdhl::make< libcasm_ir::Agent >( ir_agent_init_rule );
+    std::vector< std::string > agents = { single_execution_agent };
 
-    getSpecification()->add( m_agent );
+    m_agent = libstdhl::make< libcasm_ir::Agent >( agents );
+
+    getSpecification()->setAgent( m_agent );
 }
 
 void AstToCasmIRPass::visit_init( InitNode* node )
@@ -251,8 +255,9 @@ void AstToCasmIRPass::visit_function_def_pre( FunctionDefNode* node, bool )
 
     if( node->initializers().size() > 0 )
     {
-        initially_update_scope = libstdhl::make< libcasm_ir::ParallelBlock >();
-        assert( initially_update_scope );
+        initially_update_scope
+            = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
+
         assert( initially_scope );
         initially_scope->add( initially_update_scope );
     }
@@ -320,9 +325,9 @@ void AstToCasmIRPass::visit_derived_def( DerivedDefNode* node, bool expr )
 
     assert( node->sym->type == Symbol::SymbolType::DERIVED );
 
-    auto ir_expr = lookup< libcasm_ir::Instruction >( node->sym->derived );
-
     auto ir_stmt = libstdhl::make< libcasm_ir::TrivialStatement >();
+
+    auto ir_expr = lookup< libcasm_ir::Instruction >( node->sym->derived );
     ir_stmt->add( ir_expr );
 
     assert( libcasm_ir::isa< libcasm_ir::Derived >( current_scope.back() )
@@ -375,15 +380,15 @@ void AstToCasmIRPass::visit_rule( RuleNode* node )
     }
 
     auto ir_rule = libstdhl::make< libcasm_ir::Rule >(
-        node->name.c_str(), libstdhl::get< libcasm_ir::RuleReferenceType >() );
+        node->name.c_str(), libstdhl::get< libcasm_ir::VoidType >() );
 
     ast2casmir[ node ] = ir_rule;
     ast2parent[ node->child_ ] = node;
 
     if( node->child_->node_type_ != NodeType::PARBLOCK )
     {
-        auto ir_scope = libstdhl::make< libcasm_ir::ParallelBlock >();
-        assert( ir_scope );
+        auto ir_scope = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
+
         ast2casmir[ node ] = ir_scope;
 
         ir_rule->setContext( ir_scope );
@@ -424,7 +429,7 @@ void AstToCasmIRPass::visit_parblock_pre( UnaryNode* node )
     VISIT;
     assert( node );
 
-    auto ir_scope = libstdhl::make< libcasm_ir::ParallelBlock >();
+    auto ir_scope = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
     ast2casmir[ node ] = ir_scope;
     ast2parent[ node->child_ ] = node;
@@ -466,7 +471,7 @@ void AstToCasmIRPass::visit_seqblock_pre( UnaryNode* node )
     VISIT;
     assert( node );
 
-    auto ir_scope = libstdhl::make< libcasm_ir::SequentialBlock >();
+    auto ir_scope = libstdhl::make< libcasm_ir::SequentialBlock >()->init();
 
     ast2casmir[ node ] = ir_scope;
     ast2parent[ node->child_ ] = node;
@@ -576,12 +581,10 @@ void AstToCasmIRPass::visit_update(
 
 void AstToCasmIRPass::visit_call_pre( CallNode* node )
 {
-    // VISIT;
 }
 
 void AstToCasmIRPass::visit_call_pre( CallNode* node, bool expr )
 {
-    // VISIT;
 }
 
 void AstToCasmIRPass::visit_call( CallNode* node, std::vector< bool >& args )
@@ -594,7 +597,6 @@ void AstToCasmIRPass::visit_call( CallNode* node, std::vector< bool >& args )
 
 void AstToCasmIRPass::visit_call_post( CallNode* node )
 {
-    // VISIT;
 }
 
 void AstToCasmIRPass::visit_print( PrintNode* node, bool expr )
@@ -608,21 +610,7 @@ void AstToCasmIRPass::visit_print( PrintNode* node, bool expr )
 
     ast2casmir[ node ] = ir_stmt;
 
-    auto ir_print = libstdhl::make< libcasm_ir::PrintInstruction >();
-
-    // for( auto a : node->atoms )
-    // {
-    //     Value* instr = lookup< Value >( a );
-    //     ir_print->add( instr );
-    // }
-    ir_print->add( lookup< libcasm_ir::Value >( node->getAtom() ) );
-
-    // INFO: PPA: commented line below, because the 'IR' itself adds this during
-    // runtime (interpreter)
-    // and compilation --> this should not be part of the CASM IR!!!
-    // ir_print->add( StringConstant::create( (const char*)"\n" ) );
-
-    ir_stmt->add( ir_print );
+    assert( !" TODO! no print instr, use print builtin! " );
 }
 
 void AstToCasmIRPass::visit_diedie( DiedieNode* node, bool msg )
@@ -698,7 +686,7 @@ void AstToCasmIRPass::visit_let( LetNode* node, bool var )
         assert( 0 );
     }
 
-    auto ir_block = libstdhl::make< libcasm_ir::SequentialBlock >();
+    auto ir_block = libstdhl::make< libcasm_ir::SequentialBlock >()->init();
     ir_scope->add( ir_block );
     ir_block->setParent( ir_scope );
 
@@ -750,14 +738,15 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
     auto ir_select = libstdhl::make< libcasm_ir::SelectInstruction >( ir_cond );
 
     assert( node->then_ );
-    auto ir_case_true = libstdhl::make< libcasm_ir::ParallelBlock >();
+    auto ir_case_true = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
     ast2casmir[ node ] = ir_case_true;
     ast2parent[ node->then_ ] = node;
 
     ir_stmt->add( ir_case_true );
 
-    auto ir_true = libstdhl::get< libcasm_ir::BooleanConstant >( true );
+    const libcasm_ir::Constant::Ptr ir_true
+        = libstdhl::get< libcasm_ir::BooleanConstant >( true );
 
     getSpecification()->add( ir_true );
 
@@ -766,7 +755,8 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
 
     if( node->else_ )
     {
-        auto ir_case_false = libstdhl::make< libcasm_ir::ParallelBlock >();
+        auto ir_case_false
+            = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
         ast2casmir[ node->condition_ ] = ir_case_false;
         ast2parent[ node->condition_ ] = node;
@@ -774,7 +764,8 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
 
         ir_stmt->add( ir_case_false );
 
-        auto ir_false = libstdhl::get< libcasm_ir::BooleanConstant >( false );
+        const libcasm_ir::Constant::Ptr ir_false
+            = libstdhl::get< libcasm_ir::BooleanConstant >( false );
         getSpecification()->add( ir_false );
 
         ir_select->add( ir_false );
@@ -790,7 +781,7 @@ void AstToCasmIRPass::visit_case_pre( CaseNode* node, bool val )
 
     for( auto& a : node->case_list )
     {
-        auto ir_case = libstdhl::make< libcasm_ir::ParallelBlock >();
+        auto ir_case = libstdhl::make< libcasm_ir::ParallelBlock >()->init();
 
         ast2casmir[ (AstNode*)&a ] = ir_case;
         ast2parent[ a.second ] = (AstNode*)&a;
@@ -922,8 +913,7 @@ bool AstToCasmIRPass::visit_expression(
                 ir_lhs, ir_rhs );
             break;
         default:
-            assert( !"internal error" ); // PPA: FIXME: with better verbose info
-                                         // etc.
+            assert( !"internal error" );
     }
 
     assert( ir_expr );
@@ -934,7 +924,6 @@ bool AstToCasmIRPass::visit_expression(
 bool AstToCasmIRPass::visit_expression_single( UnaryExpression* node, bool val )
 {
     VISIT;
-    // printf( "%s, %p\n", operator_to_str( node->op ).c_str(), node->left_ );
 
     auto ir_lhs = lookup< libcasm_ir::Value >( node->expr_ );
 
@@ -948,8 +937,7 @@ bool AstToCasmIRPass::visit_expression_single( UnaryExpression* node, bool val )
             ir_expr = libstdhl::make< libcasm_ir::NotInstruction >( ir_lhs );
             break;
         default:
-            assert( !"internal error" ); // PPA: FIXME: with better verbose info
-                                         // etc.
+            assert( !"internal error" );
     }
 
     assert( ir_expr );
@@ -1076,7 +1064,8 @@ bool AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
 bool AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::BooleanConstant >( node->value );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::BooleanConstant >( node->value );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1088,7 +1077,8 @@ bool AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
 bool AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::IntegerConstant >( node->val_ );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::IntegerConstant >( node->val_ );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1100,8 +1090,9 @@ bool AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
 bool AstToCasmIRPass::visit_bit_atom( IntegerAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::BitConstant >(
-        node->type_.bitsize, (u64)node->val_ );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::BitConstant >(
+            node->type_.bitsize, (u64)node->val_ );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1127,7 +1118,8 @@ bool AstToCasmIRPass::visit_rational_atom( RationalAtom* node )
 bool AstToCasmIRPass::visit_string_atom( StringAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::StringConstant >( node->string );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::StringConstant >( node->string );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1139,7 +1131,10 @@ bool AstToCasmIRPass::visit_string_atom( StringAtom* node )
 bool AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
     VISIT;
-    auto ir_const = libstdhl::get< libcasm_ir::AgentConstant >( m_agent );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::AgentConstant >(
+            libstdhl::get< libcasm_ir::AgentType >( m_agent ),
+            single_execution_agent );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1158,7 +1153,8 @@ bool AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
         rule = lookup< libcasm_ir::Rule >( node->rule );
     }
 
-    auto ir_const = libstdhl::get< libcasm_ir::RuleReferenceConstant >( rule );
+    const libcasm_ir::Constant::Ptr ir_const
+        = libstdhl::get< libcasm_ir::RuleReferenceConstant >( rule );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -1245,13 +1241,9 @@ bool AstToCasmIRPass::visit_zero_atom( ZeroAtom* node )
 template < class C >
 typename C::Ptr AstToCasmIRPass::lookupParent( AstNode* node )
 {
-    // printf( "%s: ??? %p\n", __FUNCTION__, node );
-
     auto result = ast2parent.find( node );
     if( result != ast2parent.end() )
     {
-        // printf( "%s: %p, %p\n", __FUNCTION__, result->first, result->second
-        // );
         return lookup< C >( result->second );
     }
 
@@ -1261,12 +1253,9 @@ typename C::Ptr AstToCasmIRPass::lookupParent( AstNode* node )
 template < typename C >
 typename C::Ptr AstToCasmIRPass::lookup( AstNode* node )
 {
-    // printf( "%s: %p\n", __FUNCTION__, node );
-
     auto result = ast2casmir.find( node );
     if( result != ast2casmir.end() )
     {
-        // printf( "%s: %p\n", __FUNCTION__, result->second );
         if( libcasm_ir::isa< C >( result->second ) )
         {
             return std::static_pointer_cast< C >( result->second );

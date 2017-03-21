@@ -39,7 +39,6 @@
 
 #include "../casm-ir/src/Instruction.h"
 #include "../casm-ir/src/Value.h"
-#include "../casm-ir/src/analyze/CasmIRDumpPass.h"
 
 using namespace libcasm_fe;
 
