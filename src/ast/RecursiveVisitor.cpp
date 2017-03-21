@@ -181,7 +181,7 @@ void RecursiveVisitor::visit( LetRule& node )
 void RecursiveVisitor::visit( ForallRule& node )
 {
     node.variable()->accept( *this );
-    node.expression()->accept( *this );
+    node.universe()->accept( *this );
     node.rule()->accept( *this );
 }
 

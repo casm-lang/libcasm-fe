@@ -123,17 +123,17 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< ForallRule >;
 
             ForallRule( const std::shared_ptr< VariableDefinition >& variable,
-                const Expression::Ptr& expression, const Rule::Ptr& rule );
+                const Expression::Ptr& universe, const Rule::Ptr& rule );
 
             std::shared_ptr< VariableDefinition > variable( void ) const;
-            Expression::Ptr expression( void ) const;
+            Expression::Ptr universe( void ) const;
             Rule::Ptr rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             std::shared_ptr< VariableDefinition > m_variable;
-            Expression::Ptr m_expression;
+            Expression::Ptr m_universe;
             Rule::Ptr m_rule;
         };
 

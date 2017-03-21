@@ -128,10 +128,10 @@ void LetRule::accept( Visitor& visitor )
 }
 
 ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
-    const Expression::Ptr& expression, const Rule::Ptr& rule )
+    const Expression::Ptr& universe, const Rule::Ptr& rule )
 : Rule( Node::ID::FORALL_RULE )
 , m_variable( variable )
-, m_expression( expression )
+, m_universe( universe )
 , m_rule( rule )
 {
 }
@@ -141,9 +141,9 @@ VariableDefinition::Ptr ForallRule::variable( void ) const
     return m_variable;
 }
 
-Expression::Ptr ForallRule::expression( void ) const
+Expression::Ptr ForallRule::universe( void ) const
 {
-    return m_expression;
+    return m_universe;
 }
 
 Rule::Ptr ForallRule::rule( void ) const
