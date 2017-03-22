@@ -23,24 +23,26 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_H_
-#define _LIB_CASMFE_H_
+#ifndef _LIB_CASMFE_AST_TO_SOURCE_PASS_H_
+#define _LIB_CASMFE_AST_TO_SOURCE_PASS_H_
 
-#include "src/analyze/AstDumpDotPass.h"
-//#include "src/analyze/TypeCheckPass.h"
-
-//#include "src/execute/NumericExecutionPass.h"
-//#include "src/execute/SymbolicExecutionPass.h"
-
-//#include "src/transform/AstToCasmIRPass.h"
-#include "src/transform/AstToSourcePass.h"
-#include "src/transform/SourceToAstPass.h"
+#include "libpass.h"
 
 namespace libcasm_fe
 {
+    /**
+     * @brief Translates the AST into CASM source code
+     */
+    class AstToSourcePass final : public libpass::Pass
+    {
+      public:
+        static char id;
+
+        bool run( libpass::PassResult& pr ) override;
+    };
 }
 
-#endif // _LIB_CASMFE_H_
+#endif /* _LIB_CASMFE_AST_TO_SOURCE_PASS_H_ */
 
 //
 //  Local variables:
