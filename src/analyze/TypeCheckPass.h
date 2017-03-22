@@ -23,67 +23,47 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_TYPECHECKPASS_H_
-#define _LIB_CASMFE_TYPECHECKPASS_H_
-
-#include <set>
+#ifndef _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#define _LIB_CASMFE_TYPE_CHECK_PASS_H_
 
 #include "libpass.h"
 
-#include "../Visitor.h"
-
-#include "../transform/SourceToAstPass.h"
-
-/**
-   @brief    TODO
-
-   TODO
-*/
+#include "../ast/Specification.h"
 
 namespace libcasm_fe
 {
-    class TypeCheckPass final : public libpass::Pass,
-                                public Visitor< Type *, Type * >
+    /**
+     * @brief Generates a DOT graph of the AST
+     */
+    class TypeCheckPass final : public libpass::Pass
     {
       public:
         static char id;
 
         bool run( libpass::PassResult& pr ) override;
 
-        LIB_CASMFE_VISITOR_INTERFACE( Type*, Type* );
+        class Data : public libpass::PassData
+        {
+        public:
+            using Ptr = std::shared_ptr< Data >;
 
-        void check_type_valid( const location& location, const Type& type );
+            Data( const Ast::Specification::Ptr& specification )
+            : m_specification( specification )
+            {
+            }
 
-        void check_numeric_operator(
-            const location& loc, Type* type, const libcasm_ir::Value::ID op );
+            Ast::Specification::Ptr specification( void ) const
+            {
+                return m_specification;
+            }
 
-        std::vector< std::vector< Type* >* > rule_binding_types;
-        std::vector< std::map< std::string, size_t >* > rule_binding_offsets;
-
-        bool forall_head;
-
-      private:
-        // type checker is in a function definition
-        bool m_isInFunctionDefinition = false;
-        // type checker is in a rule
-        bool m_isInRule = false;
-
-        // to simulate top-down function declaration (used during function
-        // initialization)
-        std::set< std::string > m_declaredFunctions;
-
-        // indicates if the type checker has found an init node
-        bool m_specificationHasInitNode = false;
-
-      public:
-        using Data = SourceToAstPass::Data;
+        private:
+            Ast::Specification::Ptr m_specification;
+        };
     };
-
-    template <>
-    void AstWalker< TypeCheckPass, Type* >::walk_forall( ForallNode* node );
 }
 
-#endif // _LIB_CASMFE_TYPECHECKPASS_H_
+#endif // _LIB_CASMFE_TYPE_CHECK_PASS_H_
 
 //
 //  Local variables:
