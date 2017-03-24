@@ -84,7 +84,6 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
     void visit( ValueAtom& node ) override;
     void visit( RuleReferenceAtom& node ) override;
-    void visit( ZeroAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
@@ -199,13 +198,6 @@ void AstDumpDotVisitor::visit( RuleReferenceAtom& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RuleReferenceAtom" );
-    RecursiveVisitor::visit( node );
-}
-
-void AstDumpDotVisitor::visit( ZeroAtom& node )
-{
-    DotLink link( this, &node );
-    dumpNode( node, "ZeroAtom" );
     RecursiveVisitor::visit( node );
 }
 
