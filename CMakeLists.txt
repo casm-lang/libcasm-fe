@@ -55,6 +55,7 @@ set( CXX_SRC_FILES
   src/ast/RecursiveVisitor.cpp
 
   src/analyze/AstDumpDotPass.cpp
+  src/analyze/AttributionPass.cpp
 
   src/transform/SourceToAstPass.cpp
 
