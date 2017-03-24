@@ -109,6 +109,8 @@ namespace libcasm_fe
             void setSourceLocation( const location& sourceLocation );
             location sourceLocation( void ) const;
 
+            std::string name( void ) const;
+
             virtual void accept( Visitor& visitor ) = 0;
 
           private:
