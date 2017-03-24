@@ -659,8 +659,7 @@ void TypeCheckPass::check_numeric_operator(
     if( *type == TypeType::UNKNOWN )
     {
         type->constraints.push_back( new Type( TypeType::INTEGER ) );
-        if( op != libcasm_ir::Value::MOD_INSTRUCTION
-            || op == libcasm_ir::Value::RIV_INSTRUCTION )
+        if( op != libcasm_ir::Value::MOD_INSTRUCTION )
         {
             type->constraints.push_back( new Type( TypeType::RATIONAL ) );
             type->constraints.push_back( new Type( TypeType::FLOATING ) );
@@ -668,17 +667,7 @@ void TypeCheckPass::check_numeric_operator(
     }
     else
     {
-        if( op == libcasm_ir::Value::RIV_INSTRUCTION )
-        {
-            if( *type != TypeType::INTEGER )
-            {
-                global_driver->error( loc,
-                    "operands of operator `" + operator_to_str( op )
-                        + "` must be Integer but were "
-                        + type->to_str() );
-            }
-        }
-        else if( op == libcasm_ir::Value::MOD_INSTRUCTION )
+        if( op == libcasm_ir::Value::MOD_INSTRUCTION )
         {
             if( *type != TypeType::INTEGER && *type != TypeType::FLOATING )
             {
@@ -790,11 +779,6 @@ Type* TypeCheckPass::visit_expression( BinaryExpression* expr, Type*, Type* )
             check_numeric_operator(
                 expr->location, &expr->left_->type_, expr->op );
             expr->type_.unify( &expr->left_->type_ );
-            break;
-        case Opcode::RIV_INSTRUCTION:
-            check_numeric_operator(
-                expr->location, &expr->left_->type_, expr->op );
-            expr->type_.unify( Type( TypeType::RATIONAL ) );
             break;
         case Opcode::EQU_INSTRUCTION:
         case Opcode::NEQ_INSTRUCTION:
