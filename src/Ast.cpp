@@ -648,8 +648,6 @@ std::string libcasm_fe::operator_to_str( libcasm_ir::Value::ID op )
             return "/";
         case libcasm_ir::Value::MOD_INSTRUCTION:
             return "%";
-        case libcasm_ir::Value::RIV_INSTRUCTION:
-            return "div";
         case libcasm_ir::Value::EQU_INSTRUCTION:
             return "=";
         case libcasm_ir::Value::NEQ_INSTRUCTION:
