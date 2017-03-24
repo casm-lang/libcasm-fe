@@ -82,10 +82,6 @@ void RecursiveVisitor::visit( RuleReferenceAtom& node )
     node.identifier()->accept( *this );
 }
 
-void RecursiveVisitor::visit( ZeroAtom& node )
-{
-}
-
 void RecursiveVisitor::visit( UndefAtom& node )
 {
 }

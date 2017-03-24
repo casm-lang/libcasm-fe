@@ -877,8 +877,7 @@ Expression
   }
 | MINUS Term %prec UMINUS
   {
-      const auto zero = make< ZeroAtom >( @$ );
-      $$ = make< BinaryExpression >( @$, zero, $2, libcasm_ir::Value::SUB_INSTRUCTION );
+      $$ = make< UnaryExpression >( @$, $2, libcasm_ir::Value::INV_INSTRUCTION );
   }
 | Term PLUS Term
   {

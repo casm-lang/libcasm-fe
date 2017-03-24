@@ -93,16 +93,6 @@ void RuleReferenceAtom::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-ZeroAtom::ZeroAtom( void )
-: Expression( Node::ID::ZERO_ATOM )
-{
-}
-
-void ZeroAtom::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
 UndefAtom::UndefAtom( void )
 : Expression( Node::ID::UNDEF_ATOM )
 {
