@@ -32,6 +32,7 @@ Definition::Definition( Node::ID type, const IdentifierNode::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
 , m_relationType( nullptr )
+, m_attributes( std::make_shared< Attributes >() )
 {
 }
 
@@ -49,6 +50,16 @@ void Definition::setRelationType(
 libcasm_ir::RelationType::Ptr Definition::relationType( void ) const
 {
     return m_relationType;
+}
+
+void Definition::setAttributes( const Attributes::Ptr& attributes )
+{
+    m_attributes = attributes;
+}
+
+Attributes::Ptr Definition::attributes( void ) const
+{
+    return m_attributes;
 }
 
 VariableDefinition::VariableDefinition(

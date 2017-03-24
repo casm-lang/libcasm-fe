@@ -27,7 +27,7 @@
 #define _LIB_CASMFE_DEFINITION_H_
 
 #include "Node.h"
-
+#include "Attribute.h"
 #include "Rule.h"
 #include "Type.h"
 
@@ -48,9 +48,13 @@ namespace libcasm_fe
                 const libcasm_ir::RelationType::Ptr& relationType );
             libcasm_ir::RelationType::Ptr relationType( void ) const;
 
+            void setAttributes( const Attributes::Ptr& attributes );
+            Attributes::Ptr attributes( void ) const;
+
           private:
             IdentifierNode::Ptr m_identifier;
             libcasm_ir::RelationType::Ptr m_relationType;
+            Attributes::Ptr m_attributes;
         };
 
         using Definitions = NodeList< Definition >;

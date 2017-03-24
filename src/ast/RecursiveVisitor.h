@@ -73,6 +73,9 @@ namespace libcasm_fe
             void visit( FixedSizedType& node ) override;
             void visit( RangedType& node ) override;
 
+            void visit( BasicAttribute& node ) override;
+            void visit( ExpressionAttribute& node ) override;
+
             void visit( IdentifierNode& node ) override;
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;

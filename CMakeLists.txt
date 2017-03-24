@@ -45,6 +45,7 @@ set( CXX_SRC_FILES
   src/Driver.cpp
   src/Exceptions.cpp
 
+  src/ast/Attribute.cpp
   src/ast/Definition.cpp
   src/ast/Expression.cpp
   src/ast/Node.cpp

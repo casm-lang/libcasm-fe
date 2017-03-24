@@ -40,6 +40,7 @@ void RecursiveVisitor::visit( VariableDefinition& node )
 {
     node.identifier()->accept( *this );
     node.variableType()->accept( *this );
+    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( FunctionDefinition& node )
@@ -49,6 +50,7 @@ void RecursiveVisitor::visit( FunctionDefinition& node )
     node.returnType()->accept( *this );
     node.initializers()->accept( *this );
     node.defaultValue()->accept( *this );
+    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DerivedDefinition& node )
@@ -57,6 +59,7 @@ void RecursiveVisitor::visit( DerivedDefinition& node )
     node.arguments()->accept( *this );
     node.returnType()->accept( *this );
     node.expression()->accept( *this );
+    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RuleDefinition& node )
@@ -65,12 +68,14 @@ void RecursiveVisitor::visit( RuleDefinition& node )
     node.arguments()->accept( *this );
     node.returnType()->accept( *this );
     node.rule()->accept( *this );
+    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( EnumerationDefinition& node )
 {
     node.identifier()->accept( *this );
     node.enumerators()->accept( *this );
+    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ValueAtom& node )
@@ -225,6 +230,17 @@ void RecursiveVisitor::visit( RangedType& node )
     node.name()->accept( *this );
     node.lowerBound()->accept( *this );
     node.upperBound()->accept( *this );
+}
+
+void RecursiveVisitor::visit( BasicAttribute& node )
+{
+    node.identifier()->accept( *this );
+}
+
+void RecursiveVisitor::visit( ExpressionAttribute& node )
+{
+    node.identifier()->accept( *this );
+    node.expression()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IdentifierNode& node )

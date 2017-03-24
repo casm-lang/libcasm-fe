@@ -87,6 +87,10 @@ namespace libcasm_fe
                 FIXED_SIZED_TYPE,
                 RANGED_TYPE,
 
+                // attributes
+                BASIC_ATTRIBUTE,
+                EXPRESSION_ATTRIBUTE,
+
                 // other
                 NODE_LIST,
                 IDENTIFIER,
