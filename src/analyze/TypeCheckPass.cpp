@@ -43,7 +43,7 @@ static libpass::PassRegistration< TypeCheckPass > PASS( "Type Check Pass",
 
 // PPA: TODO: dependency SourceToAstPass
 
-bool TypeCheckPass::run( libpass::PassResult& pr )
+u1 TypeCheckPass::run( libpass::PassResult& pr )
 {
     auto node = pr.result< SourceToAstPass >();
 
@@ -1006,7 +1006,7 @@ Type* TypeCheckPass::visit_builtin_atom(
             && atom->types[ 0 ]->subtypes[ 0 ]->t != TypeType::UNKNOWN )
         {
             Type first = *atom->types[ 0 ]->subtypes[ 0 ];
-            bool all_equal = true;
+            u1 all_equal = true;
             for( size_t i = 1; i < atom->types[ 0 ]->subtypes.size(); i++ )
             {
                 if( first != *atom->types[ 0 ]->subtypes[ i ] )
@@ -1145,8 +1145,8 @@ Type* TypeCheckPass::visit_list_atom(
     if( vals.size() > 0 )
     {
         Type first = *( vals[ 0 ] );
-        bool all_known = first.is_complete();
-        bool all_equal = true;
+        u1 all_known = first.is_complete();
+        u1 all_equal = true;
         for( size_t i = 1; i < vals.size(); i++ )
         {
             all_known = all_known && vals[ i ]->is_complete();

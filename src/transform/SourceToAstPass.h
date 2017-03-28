@@ -23,8 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_SOURCETOASTPASS_H_
-#define _LIB_CASMFE_SOURCETOASTPASS_H_
+#ifndef _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
+#define _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
 
 #include "libpass.h"
 
@@ -43,7 +43,7 @@ namespace libcasm_fe
       public:
         static char id;
 
-        bool run( libpass::PassResult& pr ) override;
+        u1 run( libpass::PassResult& pr ) override;
 
         class Data : public libpass::PassData
         {
@@ -66,7 +66,7 @@ namespace libcasm_fe
     };
 }
 
-#endif // _LIB_CASMFE_SOURCETOASTPASS_H_
+#endif // _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
 
 //
 //  Local variables:

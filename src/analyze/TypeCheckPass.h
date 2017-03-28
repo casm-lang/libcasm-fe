@@ -48,7 +48,7 @@ namespace libcasm_fe
       public:
         static char id;
 
-        bool run( libpass::PassResult& pr ) override;
+        u1 run( libpass::PassResult& pr ) override;
 
         LIB_CASMFE_VISITOR_INTERFACE( Type*, Type* );
 
@@ -60,20 +60,20 @@ namespace libcasm_fe
         std::vector< std::vector< Type* >* > rule_binding_types;
         std::vector< std::map< std::string, size_t >* > rule_binding_offsets;
 
-        bool forall_head;
+        u1 forall_head;
 
       private:
         // type checker is in a function definition
-        bool m_isInFunctionDefinition = false;
+        u1 m_isInFunctionDefinition = false;
         // type checker is in a rule
-        bool m_isInRule = false;
+        u1 m_isInRule = false;
 
         // to simulate top-down function declaration (used during function
         // initialization)
         std::set< std::string > m_declaredFunctions;
 
         // indicates if the type checker has found an init node
-        bool m_specificationHasInitNode = false;
+        u1 m_specificationHasInitNode = false;
 
       public:
         using Data = SourceToAstPass::Data;

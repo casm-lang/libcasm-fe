@@ -38,11 +38,11 @@ namespace libcasm_fe
       public:
         static char id;
 
-        bool run( libpass::PassResult& pr ) override;
+        u1 run( libpass::PassResult& pr ) override;
     };
 }
 
-#endif /* _LIB_CASMFE_AST_DUMP_DOT_PASS_H_ */
+#endif // _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
 
 //
 //  Local variables:

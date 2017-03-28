@@ -55,11 +55,11 @@ NumericExecutionPass::~NumericExecutionPass()
     delete walker;
 }
 
-bool NumericExecutionPass::run( libpass::PassResult& pr )
+u1 NumericExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new NumericExecutionWalker( *this );
 
-    const bool dump_updates = m_dump_updates;
+    const u1 dump_updates = m_dump_updates;
 
     auto node = pr.result< TypeCheckPass >();
 
@@ -128,7 +128,7 @@ void NumericExecutionPass::dumpUpdates() const
 {
     std::cout << "{";
 
-    bool firstDump = true;
+    u1 firstDump = true;
 
     const auto updateSet = updateSetManager.currentUpdateSet();
     const auto end = updateSet->end();
