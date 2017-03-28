@@ -167,7 +167,7 @@ namespace libcasm_fe
                 return m_elements.cend();
             }
 
-            bool empty( void ) const
+            u1 empty( void ) const
             {
                 return m_elements.empty();
             }

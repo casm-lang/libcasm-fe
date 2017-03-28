@@ -26,8 +26,8 @@
 #ifndef _LIB_CASMFE_DEFINITION_H_
 #define _LIB_CASMFE_DEFINITION_H_
 
-#include "Node.h"
 #include "Attribute.h"
+#include "Node.h"
 #include "Rule.h"
 #include "Type.h"
 
@@ -100,8 +100,8 @@ namespace libcasm_fe
             void setClassification( Classification classification );
             Classification classification( void ) const;
 
-            void setSymbolic( bool symbolic );
-            bool symbolic( void ) const;
+            void setSymbolic( u1 symbolic );
+            u1 symbolic( void ) const;
 
             void setInitializers(
                 const NodeList< UpdateRule >::Ptr& initializers );
@@ -116,7 +116,7 @@ namespace libcasm_fe
             Classification m_classification;
             Types::Ptr m_argumentTypes;
             Type::Ptr m_returnType;
-            bool m_symbolic;
+            u1 m_symbolic;
             NodeList< UpdateRule >::Ptr m_initializers;
             Expression::Ptr m_defaultValue;
         };

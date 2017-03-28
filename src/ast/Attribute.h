@@ -26,8 +26,8 @@
 #ifndef _LIB_CASMFE_ATTRIBUTE_H_
 #define _LIB_CASMFE_ATTRIBUTE_H_
 
-#include "Node.h"
 #include "Expression.h"
+#include "Node.h"
 
 namespace libcasm_fe
 {
