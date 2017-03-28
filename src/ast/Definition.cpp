@@ -114,12 +114,12 @@ FunctionDefinition::Classification FunctionDefinition::classification(
     return m_classification;
 }
 
-void FunctionDefinition::setSymbolic( bool symbolic )
+void FunctionDefinition::setSymbolic( u1 symbolic )
 {
     m_symbolic = symbolic;
 }
 
-bool FunctionDefinition::symbolic( void ) const
+u1 FunctionDefinition::symbolic( void ) const
 {
     return m_symbolic;
 }
