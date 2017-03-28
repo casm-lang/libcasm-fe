@@ -28,8 +28,7 @@
 
 #include "Visitor.h"
 
-#include <memory>
-#include <vector>
+#include "../stdhl/cpp/Type.h"
 
 #include "../various/location.hh"
 
