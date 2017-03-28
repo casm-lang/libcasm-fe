@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -23,21 +23,30 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef CASMI_LIBPARSE_LEXER_HELPERS_H
-#define CASMI_LIBPARSE_LEXER_HELPERS_H
+#include "Specification.h"
 
-#include <cstdint>
-#include <iostream>
+using namespace libcasm_fe;
+using namespace Ast;
 
-#include "Driver.h"
-#include "Types.h"
+Specification::Specification(
+    const IdentifierNode::Ptr& name, const Definitions::Ptr& definitions )
+: Node( Node::ID::SPECIFICATION )
+, m_name( name )
+, m_definitions( definitions )
+{
+}
 
-#include "various/GrammarParser.tab.h"
+IdentifierNode::Ptr Specification::name( void ) const
+{
+    return m_name;
+}
 
-INTEGER_T convert_to_long(
-    const char* val, int base, Driver& driver, yy::location loc );
-FLOATING_T convert_to_float(
-    const char* val, Driver& driver, yy::location loc );
-rational_t convert_to_rational( char* val, Driver& driver, yy::location loc );
+Definitions::Ptr Specification::definitions( void ) const
+{
+    return m_definitions;
+}
 
-#endif
+void Specification::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}

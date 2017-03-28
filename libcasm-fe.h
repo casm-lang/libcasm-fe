@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -26,46 +26,21 @@
 #ifndef _LIB_CASMFE_H_
 #define _LIB_CASMFE_H_
 
-#include "src/Ast.h"
-#include "src/CasmFE.h"
-#include "src/Codes.h"
-#include "src/Driver.h"
-#include "src/Exceptions.h"
-#include "src/LexerHelpers.h"
-#include "src/Macros.h"
-#include "src/Symbolic.h"
-#include "src/Symbols.h"
-#include "src/Types.h"
-#include "src/Value.h"
-#include "src/Visitor.h"
+#include "src/analyze/AttributionPass.h"
+//#include "src/analyze/TypeCheckPass.h"
 
-#include "src/various/GrammarParser.tab.h"
-#include "src/various/location.hh"
-#include "src/various/position.hh"
-#include "src/various/stack.hh"
+//#include "src/execute/NumericExecutionPass.h"
+//#include "src/execute/SymbolicExecutionPass.h"
 
-#include "src/allocator/BlockAllocator.h"
-
-#include "src/analyze/AstDumpPass.h"
-#include "src/analyze/TypeCheckPass.h"
-
-#include "src/execute/ChainedHashMap.h"
-#include "src/execute/ExecutionPassBase.h"
-#include "src/execute/HashMapBase.h"
-#include "src/execute/NumericExecutionPass.h"
-#include "src/execute/ProbingHashMap.h"
-#include "src/execute/RobinHoodHashMap.h"
-#include "src/execute/SymbolicExecutionPass.h"
-#include "src/execute/UpdateSet.h"
-
-#include "src/transform/AstToCasmIRPass.h"
+//#include "src/transform/AstToCasmIRPass.h"
 #include "src/transform/SourceToAstPass.h"
+#include "src/transform/AstDumpDotPass.h"
 
 namespace libcasm_fe
 {
 }
 
-#endif /* _LIB_CASMFE_H_ */
+#endif // _LIB_CASMFE_H_
 
 //
 //  Local variables:

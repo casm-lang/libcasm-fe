@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -29,86 +29,47 @@
 #include "cpp/Default.h"
 #include "cpp/Type.h"
 
-#include "Ast.h"
-#include "Codes.h"
-#include "Symbols.h"
+#include <unordered_map>
+#include <vector>
 
-#include "various/GrammarParser.tab.h"
+#include "Exceptions.h"
+#include "various/location.hh"
 
 namespace libcasm_fe
 {
-
-    class AstNode;
-    class RuleNode;
-
     class Driver
     {
       private:
         std::string filename_;
-        FILE* file_;
         std::vector< std::string > lines_;
         uint64_t error_;
         uint64_t warning_;
 
       public:
         Driver();
-        virtual ~Driver();
 
-        std::map< std::string, RuleNode* > rules_map_;
-        Ast* result;
         std::string spec_name;
 
         // State information for the lexer
         bool trace_parsing;
         bool trace_scanning;
 
-        // Handling the scanner.
-        size_t get_next_chars( char buffer[], size_t max_size );
-
-        // Run the parser. Return 0 on success.
-        Ast* parse( const std::string& f );
-
         // Error handling.
-        void error( const yy::location& l, const std::string& m,
-            libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
+        void error( const location& l, const std::string& m,
+            libcasm_fe::Code code = libcasm_fe::Code::Unspecified );
 
-        void error( const std::vector< const yy::location* >& locations,
+        void error( const std::vector< location >& locations,
             const std::string& m,
-            libcasm_fe::Codes code = libcasm_fe::Codes::Unspecified );
+            libcasm_fe::Code code = libcasm_fe::Code::Unspecified );
 
         void error( const Exception& exception );
 
-        void warning( const yy::location& l, const std::string& m );
-        void info( const yy::location& l, const std::string& m );
+        void warning( const location& l, const std::string& m );
+        void info( const location& l, const std::string& m );
         bool ok() const;
 
         uint64_t get_error_count() const;
         uint64_t get_warning_count() const;
-
-        // Rule handling
-        /**
-         * @throws RuleAlreadyExists when the rules table contains a rule with
-         *         the same name as the name of the \a rule_root.
-         * @throws IdentifierAlreadyUsed when the name of the \a rule_root is
-         * already
-         *         used somewhere else (e.g. for a function).
-         */
-        void add( RuleNode* rule_root );
-
-        // functions
-        /**
-         * @throws SymbolAlreadyExists when the symbol table contains a symbol
-         * with
-         *         the same name as the name of the \a function.
-         * @throws IdentifierAlreadyUsed when the name of the \a function is
-         * already
-         *         used somewhere else (e.g. for a rule).
-         */
-        void add( Function* function );
-        SymbolTable function_table;
-
-        // Bindings
-        std::map< std::string, size_t > binding_offsets;
 
         // Dumplist map
         std::unordered_map< size_t, const std::string > function_trace_map;
@@ -116,7 +77,7 @@ namespace libcasm_fe
         const std::string& get_filename();
 
       private:
-        void underline( const yy::location& l );
+        void underline( const location& l );
     };
 }
 

@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -48,32 +48,32 @@ namespace libcasm_fe
       public:
         static char id;
 
-        bool run( libpass::PassResult& pr ) override;
+        u1 run( libpass::PassResult& pr ) override;
 
         LIB_CASMFE_VISITOR_INTERFACE( Type*, Type* );
 
-        void check_type_valid( const yy::location& location, const Type& type );
+        void check_type_valid( const location& location, const Type& type );
 
-        void check_numeric_operator( const yy::location& loc, Type* type,
-            const libcasm_ir::Value::ID op );
+        void check_numeric_operator(
+            const location& loc, Type* type, const libcasm_ir::Value::ID op );
 
         std::vector< std::vector< Type* >* > rule_binding_types;
         std::vector< std::map< std::string, size_t >* > rule_binding_offsets;
 
-        bool forall_head;
+        u1 forall_head;
 
       private:
         // type checker is in a function definition
-        bool m_isInFunctionDefinition = false;
+        u1 m_isInFunctionDefinition = false;
         // type checker is in a rule
-        bool m_isInRule = false;
+        u1 m_isInRule = false;
 
         // to simulate top-down function declaration (used during function
         // initialization)
         std::set< std::string > m_declaredFunctions;
 
         // indicates if the type checker has found an init node
-        bool m_specificationHasInitNode = false;
+        u1 m_specificationHasInitNode = false;
 
       public:
         using Data = SourceToAstPass::Data;

@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -28,7 +28,7 @@
 
 namespace libcasm_fe
 {
-    enum class Codes
+    enum class Code
     // --------------------------------------------------------- 0*** ...
     // generic syntax error
     {
@@ -46,10 +46,8 @@ namespace libcasm_fe
         ,
         FunctionAttributeIsInvalid = 0xfa00 // fa** ... function attribute
         ,
-        FunctionAttributeMultipleUseOfStatic = 0xfa01,
-        FunctionAttributeMultipleUseOfSymbolic = 0xfa02,
-        FunctionAttributeMultipleUseOfControlled = 0xfa03,
-        FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
+        FunctionAttributeMultipleUseOfFunctionClassifier = 0xfa01,
+        FunctionAttributeMultipleUseOfSymbolic = 0xfa02
 
         ,
         FunctionDefaultValueInvalidRange = 0xfb01,

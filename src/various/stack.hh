@@ -32,7 +32,7 @@
 
 /**
  ** \file stack.hh
- ** Define the yy::stack class.
+ ** Define the libcasm_fe::stack class.
  */
 
 #ifndef YY_YY_STACK_HH_INCLUDED
@@ -40,8 +40,8 @@
 
 # include <vector>
 
-
-namespace yy {
+#line 31 "../../obj/src/GrammarParser.yy" // stack.hh:132
+namespace libcasm_fe {
 #line 46 "stack.hh" // stack.hh:132
   template <class T, class S = std::vector<T> >
   class stack
@@ -150,8 +150,8 @@ namespace yy {
     unsigned int range_;
   };
 
-
-} // yy
+#line 31 "../../obj/src/GrammarParser.yy" // stack.hh:132
+} // libcasm_fe
 #line 156 "stack.hh" // stack.hh:132
 
 #endif // !YY_YY_STACK_HH_INCLUDED

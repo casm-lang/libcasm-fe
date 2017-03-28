@@ -32,7 +32,7 @@
 
 /**
  ** \file location.hh
- ** Define the yy::location class.
+ ** Define the libcasm_fe::location class.
  */
 
 #ifndef YY_YY_LOCATION_HH_INCLUDED
@@ -40,8 +40,8 @@
 
 # include "position.hh"
 
-
-namespace yy {
+#line 31 "../../obj/src/GrammarParser.yy" // location.cc:296
+namespace libcasm_fe {
 #line 46 "location.hh" // location.cc:296
   /// Abstract a location.
   class location
@@ -186,7 +186,7 @@ namespace yy {
     return ostr;
   }
 
-
-} // yy
+#line 31 "../../obj/src/GrammarParser.yy" // location.cc:296
+} // libcasm_fe
 #line 192 "location.hh" // location.cc:296
 #endif // !YY_YY_LOCATION_HH_INCLUDED

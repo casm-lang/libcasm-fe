@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -23,8 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_EXECUTIONPASSBASE_H_
-#define _LIB_CASMFE_EXECUTIONPASSBASE_H_
+#ifndef _LIB_CASMFE_EXECUTION_PASS_BASE_H_
+#define _LIB_CASMFE_EXECUTION_PASS_BASE_H_
 
 #include <set>
 
@@ -52,10 +52,10 @@ namespace libcasm_fe
       public:
         static char id;
 
-        bool hasEmptyUpdateSet() const;
+        u1 hasEmptyUpdateSet() const;
         Update* addUpdate( Function* function,
             const std::vector< value_t >& arguments, const value_t& value,
-            const yy::location& location );
+            const location& location );
         void applyUpdates();
 
         void fork( const UpdateSet::Type updateSetType );
@@ -156,7 +156,7 @@ namespace libcasm_fe
         virtual value_t defaultFunctionValue(
             Function* function, const std::vector< value_t >& arguments );
 
-        bool filter_enabled( const std::string& filter );
+        u1 filter_enabled( const std::string& filter );
 
       protected:
         std::vector< value_t > main_bindings;
@@ -171,7 +171,7 @@ namespace libcasm_fe
         std::vector< List* > temp_lists;
 
       private:
-        std::map< const std::string, bool > debuginfo_filters;
+        std::map< const std::string, u1 > debuginfo_filters;
 
         BlockAllocator< 4096 > stack;
     };
@@ -186,7 +186,7 @@ namespace libcasm_fe
     }
 }
 
-#endif /* _LIB_CASMFE_EXECUTIONPASSBASE_H_ */
+#endif // _LIB_CASMFE_EXECUTION_PASS_BASE_H_
 
 //
 //  Local variables:

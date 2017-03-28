@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -44,7 +44,7 @@ extern Driver* global_driver;
 char SymbolicExecutionPass::id = 0;
 
 static libpass::PassRegistration< SymbolicExecutionPass > PASS(
-    "Symbolic Execution Pass",
+    "SymbolicExecutionPass",
     "execute symbolically over the AST input specification", "ast-exec-sym",
     0 );
 
@@ -53,7 +53,7 @@ SymbolicExecutionPass::~SymbolicExecutionPass()
     delete walker;
 }
 
-bool SymbolicExecutionPass::run( libpass::PassResult& pr )
+u1 SymbolicExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new SymbolicExecutionWalker( *this );
 
@@ -265,7 +265,7 @@ namespace libcasm_fe
 
         static void dump_pathcond_match( std::vector< std::string >& trace,
             const std::string& filename, size_t lineno,
-            const symbolic_condition_t* cond, bool status )
+            const symbolic_condition_t* cond, u1 status )
         {
             std::stringstream ss;
             ss << "% " << filename << ":" << lineno << " PC-LOOKUP ("

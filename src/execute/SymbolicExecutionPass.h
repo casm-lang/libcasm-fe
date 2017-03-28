@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -23,8 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_
-#define _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_
+#ifndef _LIB_CASMFE_SYMBOLIC_EXECUTION_PASS_H_
+#define _LIB_CASMFE_SYMBOLIC_EXECUTION_PASS_H_
 
 #include "libpass.h"
 
@@ -46,7 +46,7 @@ namespace libcasm_fe
 
         ~SymbolicExecutionPass() override;
 
-        bool run( libpass::PassResult& pr ) override;
+        u1 run( libpass::PassResult& pr ) override;
 
         void visit_assure( UnaryNode* node, const value_t& value ) override;
 
@@ -102,7 +102,7 @@ namespace libcasm_fe
     void SymbolicExecutionWalker::walk_iterate( UnaryNode* node );
 }
 
-#endif /* _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_ */
+#endif // _LIB_CASMFE_SYMBOLIC_EXECUTION_PASS_H_
 
 //
 //  Local variables:

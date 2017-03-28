@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -23,46 +23,26 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_ASTDUMPPASS_H_
-#define _LIB_CASMFE_ASTDUMPPASS_H_
+#ifndef _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
+#define _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
 
 #include "libpass.h"
 
-#include "../Visitor.h"
-
-/**
-   @brief    TODO
-
-   TODO
-*/
-
 namespace libcasm_fe
 {
-    class AstDumpPass : public libpass::Pass, public Visitor< bool, bool >
+    /**
+     * @brief Generates a DOT graph of the AST
+     */
+    class AstDumpDotPass final : public libpass::Pass
     {
-      private:
-        std::stringstream dump_stream_;
-
-        void dump_node( uint64_t key, const std::string& name );
-        void dump_node( AstNode* n, const std::string& name );
-        void dump_link( uint64_t from, uint64_t to );
-        void dump_link( AstNode* from, AstNode* to );
-
-        void dump_arguments(
-            AstNode* from, std::vector< ExpressionBase* >* arguments );
-
       public:
         static char id;
 
-        bool run( libpass::PassResult& pr ) override final;
-
-        std::string get_dump();
-
-        LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
+        u1 run( libpass::PassResult& pr ) override;
     };
 }
 
-#endif /* _LIB_CASMFE_ASTDUMPPASS_H_ */
+#endif // _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
 
 //
 //  Local variables:

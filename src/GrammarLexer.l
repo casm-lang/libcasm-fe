@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //  
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //  
 //  This file is part of libcasm-fe.
@@ -23,57 +23,33 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <cstdint>
+#include "src/Lexer.h"
 
-#include "src/Types.h"
-#include "src/Driver.h"
-#include "src/LexerHelpers.h"
+using namespace libcasm_fe;
 
-#include "src/various/GrammarParser.tab.h"
+#undef YY_DECL
+#define YY_DECL Parser::symbol_type Lexer::nextToken()
 
-#define YY_DECL yy::Parser::symbol_type yylex( libcasm_fe::Driver& driver )
+#define yyterminate() return( Parser::make_END(loc) )
 
-#undef yywrap
-#define yywrap() 1
-
-// The location of the current token.
-static yy::location loc;
-
-// driver must be global, because it is needed for YY_INPUT
-// defined in src/libsyntax/driver.cpp
-extern Driver *global_driver;
-
-#define STRBUF_LENGTH 1000
-void yyerror(const char *s);
-char strbuf[STRBUF_LENGTH];
-
-#define YY_INPUT(buf,result,max_size) { \
-  result = global_driver->get_next_chars(buf, max_size); \
-  if (  result <= 0  ) \
-      result = YY_NULL; \
-}
-
-#define yyterminate() return( yy::Parser::make_END(loc) )
-
-// flex uses `register` keyword, which is deprecated in c++11
-#pragma GCC diagnostic ignored "-Wdeprecated-register"
+// Code run each time a pattern is matched.
+#define YY_USER_ACTION loc.columns( yyleng );
 
 %}
 
-/* use debug option for more output */
-%option noyywrap nounput batch noinput
+/* %option debug */
+%option noyywrap
+%option nodefault
+%option nounput
+%option batch
+%option noinput
+%option yyclass="Lexer"
+%option c++
 
 %x LCOMMENT
 %x COMMENT
 %x STRING
 
-%{
-    // Code run each time a pattern is matched.
-    #define YY_USER_ACTION  loc.columns( yyleng );
-%}
 %%
 %{
     // Code run each time yylex is called.
@@ -81,109 +57,114 @@ char strbuf[STRBUF_LENGTH];
 %}
 
 0[bB][01][01\']*[01]* {
-    const auto val = convert_to_long( yytext + 2, 2, driver, loc );
-    return yy::Parser::make_INTEGERCONST( val, loc );
+    return Parser::make_BINARY( yytext + 2, loc );
 }
 
 0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
-    const auto val = convert_to_long( yytext + 2, 16, driver, loc );
-    return yy::Parser::make_INTEGERCONST( val, loc );
+    return Parser::make_HEXADECIMAL( yytext + 2, loc );
 }
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
-    const auto val = convert_to_rational( yytext + 2, driver, loc );
-    return yy::Parser::make_RATIONALCONST( val, loc );
+    return Parser::make_RATIONAL( yytext + 2, loc );
 }
 
 [0-9][0-9\']*[0-9]* {
-    const auto val = convert_to_long( yytext, 10, driver, loc );
-    return yy::Parser::make_INTEGERCONST( val, loc );
+    return Parser::make_INTEGER( yytext, loc );
 }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
-    const auto val = convert_to_float( yytext, driver, loc );
-    return yy::Parser::make_FLOATINGCONST( val, loc );
+    return Parser::make_FLOATING( yytext, loc );
 }
 
 {{grammartoken}}
 
 [a-zA-Z_][a-zA-Z0-9\_]* {
-    return yy::Parser::make_IDENTIFIER( yytext, loc );
+    return Parser::make_IDENTIFIER( yytext, loc );
 }
 
-[ \t\r]+ { /* ignore spaces */
+[ \t\r]+ { // ignore spaces
     loc.step();
 }
 
-\n+ { /* ignore newlines too, but reset yycolumn */
+\n+ { // ignore newlines
     loc.lines( yyleng );
     loc.step();
 }
 
-"//" {
+"//" { // single-line comments
     BEGIN( LCOMMENT );
-    loc.lines( 1 );
     loc.step();
 }
 <LCOMMENT>.
 <LCOMMENT>\n {
     BEGIN( INITIAL );
+    loc.lines();
 }
 <LCOMMENT><<EOF>> {
     BEGIN( INITIAL );
 }
 
-"/*" { /* ignore multi line comments */
+"/*" { // multi-line comments
     BEGIN( COMMENT );
 }
 <COMMENT>"*/" {
     BEGIN( INITIAL );
 }
-<COMMENT>\n
-<COMMENT>([^*]|\n|\r)+|.
+<COMMENT>\n {
+    loc.lines();
+}
+<COMMENT>([^*\n]|\r)+|.
 <COMMENT><<EOF>> {
-    printf( "Multiline comment not terminated on line %d", yylineno );
-    exit( 2 );
+    std::cerr << loc << ": multiline comment not terminated\n"; // TODO use log
 }
 
-\" {
+\" { // strings
     BEGIN( STRING );
-    strbuf[0] = '\0';
+    strbuf.clear();
 }
 <STRING>[^\\\"\n]* { /* eat all tokens */
-    strncat( strbuf, yytext, STRBUF_LENGTH - 1 );
+    strbuf.append( yytext );
 }
-<STRING>\n
+<STRING>\n {
+    loc.lines();
+}
 <STRING>\\n {
-    strncat( strbuf, "\n", STRBUF_LENGTH - 1 );
+    strbuf.append( "\n" );
 }
 <STRING>\\t {
-    strncat( strbuf, "\t", STRBUF_LENGTH - 1 );
+    strbuf.append( "\t" );
 }
 <STRING>\\\" {
-    strncat( strbuf, "\"", STRBUF_LENGTH - 1 );
+    strbuf.append( "\"" );
 }
 <STRING>\\' {
-    strncat( strbuf, "\'", STRBUF_LENGTH - 1 );
+    strbuf.append( "\'" );
 }
 <STRING><<EOF>> {
-    global_driver->error( loc, "unclosed string",
-            libcasm_fe::Codes::SyntaxErrorUnclosedString );
-    exit( 1 );
+    std::cerr << loc << ": string not terminated\n"; // TODO use log
 }
 <STRING>\" {
     BEGIN( INITIAL );
-    return yy::Parser::make_STRCONST( strbuf, loc );
+    return Parser::make_STRING( strbuf, loc );
 }
 
 . {
-    global_driver->error( loc,
-            "unrecognized character '" + std::string( yytext ) + "'",
-            libcasm_fe::Codes::SyntaxErrorUnrecognizedCharacter );
-    exit( 1 );
+    std::cerr << loc << ": unrecognized character '" << yytext << "'\n"; // TODO use log
 }
 
 %%
+
+Lexer::Lexer( std::istream& in, std::ostream& out )
+: yyFlexLexer( in, out )
+, loc()
+, strbuf()
+{
+}
+
+void Lexer::LexerError( const char* msg )
+{
+    std::cerr << loc << ": " << msg << "\n"; // TODO use log
+}
 
 //  
 //  Local variables:

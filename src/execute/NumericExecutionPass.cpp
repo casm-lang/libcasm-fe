@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -55,11 +55,11 @@ NumericExecutionPass::~NumericExecutionPass()
     delete walker;
 }
 
-bool NumericExecutionPass::run( libpass::PassResult& pr )
+u1 NumericExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new NumericExecutionWalker( *this );
 
-    const bool dump_updates = m_dump_updates;
+    const u1 dump_updates = m_dump_updates;
 
     auto node = pr.result< TypeCheckPass >();
 
@@ -128,7 +128,7 @@ void NumericExecutionPass::dumpUpdates() const
 {
     std::cout << "{";
 
-    bool firstDump = true;
+    u1 firstDump = true;
 
     const auto updateSet = updateSetManager.currentUpdateSet();
     const auto end = updateSet->end();

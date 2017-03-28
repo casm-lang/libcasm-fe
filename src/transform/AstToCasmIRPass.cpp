@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -43,7 +43,7 @@ using namespace libcasm_fe;
 
 char AstToCasmIRPass::id = 0;
 
-static libpass::PassRegistration< AstToCasmIRPass > PASS( "AST to CASM IR",
+static libpass::PassRegistration< AstToCasmIRPass > PASS( "AstToIRPass",
     "translates the AST to the CASM intermeditate representation",
     "ast2ir",
     0 );
@@ -146,7 +146,7 @@ value_t AstToCasmIRPass::value_t_value( const libcasm_ir::Value::Ptr& value )
     }
 }
 
-bool AstToCasmIRPass::run( libpass::PassResult& pr )
+u1 AstToCasmIRPass::run( libpass::PassResult& pr )
 {
     m_specification = nullptr;
 
@@ -156,7 +156,7 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 
     auto node = pr.result< TypeCheckPass >();
 
-    AstWalker< AstToCasmIRPass, bool > walker( *this );
+    AstWalker< AstToCasmIRPass, u1 > walker( *this );
     walker.walk_specification( node->root() );
 
     auto data = libstdhl::make< Data >( m_specification );
@@ -245,7 +245,7 @@ void AstToCasmIRPass::visit_body_elements_post( AstListNode* node )
     VISIT;
 }
 
-void AstToCasmIRPass::visit_function_def_pre( FunctionDefNode* node, bool )
+void AstToCasmIRPass::visit_function_def_pre( FunctionDefNode* node, u1 )
 {
     VISIT;
 
@@ -311,7 +311,7 @@ void AstToCasmIRPass::visit_derived_def_pre( DerivedDefNode* node )
     current_scope.push_back( ir_derived );
 }
 
-void AstToCasmIRPass::visit_derived_def( DerivedDefNode* node, bool expr )
+void AstToCasmIRPass::visit_derived_def( DerivedDefNode* node, u1 expr )
 {
     VISIT;
     std::string x;
@@ -531,7 +531,7 @@ void AstToCasmIRPass::visit_iterate( UnaryNode* node )
 }
 
 void AstToCasmIRPass::visit_update(
-    UpdateNode* node, std::vector< bool >& args, bool expr )
+    UpdateNode* node, std::vector< u1 >& args, u1 expr )
 {
     VISIT;
     assert( node->func );
@@ -580,11 +580,11 @@ void AstToCasmIRPass::visit_call_pre( CallNode* node )
 {
 }
 
-void AstToCasmIRPass::visit_call_pre( CallNode* node, bool expr )
+void AstToCasmIRPass::visit_call_pre( CallNode* node, u1 expr )
 {
 }
 
-void AstToCasmIRPass::visit_call( CallNode* node, std::vector< bool >& args )
+void AstToCasmIRPass::visit_call( CallNode* node, std::vector< u1 >& args )
 {
     VISIT;
 
@@ -596,7 +596,7 @@ void AstToCasmIRPass::visit_call_post( CallNode* node )
 {
 }
 
-void AstToCasmIRPass::visit_print( PrintNode* node, bool expr )
+void AstToCasmIRPass::visit_print( PrintNode* node, u1 expr )
 {
     VISIT;
 
@@ -610,7 +610,7 @@ void AstToCasmIRPass::visit_print( PrintNode* node, bool expr )
     assert( !" TODO! no print instr, use print builtin! " );
 }
 
-void AstToCasmIRPass::visit_diedie( DiedieNode* node, bool msg )
+void AstToCasmIRPass::visit_diedie( DiedieNode* node, u1 msg )
 {
     VISIT;
     FIXME;
@@ -622,7 +622,7 @@ void AstToCasmIRPass::visit_impossible( AstNode* node )
     FIXME;
 }
 
-void AstToCasmIRPass::visit_assert( UnaryNode* node, bool expr )
+void AstToCasmIRPass::visit_assert( UnaryNode* node, u1 expr )
 {
     VISIT;
 
@@ -640,13 +640,13 @@ void AstToCasmIRPass::visit_assert( UnaryNode* node, bool expr )
     ir_stmt->add( ir_instr );
 }
 
-void AstToCasmIRPass::visit_assure( UnaryNode* node, bool expr )
+void AstToCasmIRPass::visit_assure( UnaryNode* node, u1 expr )
 {
     VISIT;
     FIXME;
 }
 
-void AstToCasmIRPass::visit_let( LetNode* node, bool var )
+void AstToCasmIRPass::visit_let( LetNode* node, u1 var )
 {
     VISIT;
 
@@ -701,19 +701,19 @@ void AstToCasmIRPass::visit_let_post( LetNode* node )
     VISIT;
 }
 
-void AstToCasmIRPass::visit_push( PushNode* node, bool expr, bool atom )
+void AstToCasmIRPass::visit_push( PushNode* node, u1 expr, u1 atom )
 {
     VISIT;
     FIXME;
 }
 
-void AstToCasmIRPass::visit_pop( PopNode* node, bool atom )
+void AstToCasmIRPass::visit_pop( PopNode* node, u1 atom )
 {
     VISIT;
     FIXME;
 }
 
-void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
+void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, u1 cond )
 {
     VISIT;
 
@@ -769,7 +769,7 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
     ir_stmt->add( ir_select );
 }
 
-void AstToCasmIRPass::visit_case_pre( CaseNode* node, bool val )
+void AstToCasmIRPass::visit_case_pre( CaseNode* node, u1 val )
 {
     VISIT;
 
@@ -783,7 +783,7 @@ void AstToCasmIRPass::visit_case_pre( CaseNode* node, bool val )
 }
 
 void AstToCasmIRPass::visit_case(
-    CaseNode* node, bool val, const std::vector< bool >& case_labels )
+    CaseNode* node, u1 val, const std::vector< u1 >& case_labels )
 {
     VISIT;
 
@@ -833,8 +833,7 @@ void AstToCasmIRPass::visit_case(
     ir_stmt->add( ir_select );
 }
 
-bool AstToCasmIRPass::visit_expression(
-    BinaryExpression* node, bool lhs, bool rhs )
+u1 AstToCasmIRPass::visit_expression( BinaryExpression* node, u1 lhs, u1 rhs )
 {
     VISIT;
 
@@ -915,7 +914,7 @@ bool AstToCasmIRPass::visit_expression(
     return 0;
 }
 
-bool AstToCasmIRPass::visit_expression_single( UnaryExpression* node, bool val )
+u1 AstToCasmIRPass::visit_expression_single( UnaryExpression* node, u1 val )
 {
     VISIT;
 
@@ -939,8 +938,8 @@ bool AstToCasmIRPass::visit_expression_single( UnaryExpression* node, bool val )
     return 0;
 }
 
-bool AstToCasmIRPass::visit_function_atom(
-    FunctionAtom* node, std::vector< bool >& args )
+u1 AstToCasmIRPass::visit_function_atom(
+    FunctionAtom* node, std::vector< u1 >& args )
 {
     VISIT;
 
@@ -980,13 +979,12 @@ bool AstToCasmIRPass::visit_function_atom(
 }
 
 void AstToCasmIRPass::visit_derived_function_atom_pre(
-    FunctionAtom* node, std::vector< bool >& args )
+    FunctionAtom* node, std::vector< u1 >& args )
 {
     VISIT;
 }
 
-bool AstToCasmIRPass::visit_derived_function_atom(
-    FunctionAtom* node, bool expr )
+u1 AstToCasmIRPass::visit_derived_function_atom( FunctionAtom* node, u1 expr )
 {
     VISIT;
     std::string x;
@@ -1011,7 +1009,7 @@ bool AstToCasmIRPass::visit_derived_function_atom(
     return 0;
 }
 
-bool AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
+u1 AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
 {
     VISIT;
     libcasm_ir::Constant::Ptr ir_const = 0;
@@ -1055,7 +1053,7 @@ bool AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
     return 0;
 }
 
-bool AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
+u1 AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
 {
     VISIT;
     const libcasm_ir::Constant::Ptr ir_const
@@ -1068,7 +1066,7 @@ bool AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
     return 0;
 }
 
-bool AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
+u1 AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
 {
     VISIT;
     const libcasm_ir::Constant::Ptr ir_const
@@ -1081,7 +1079,7 @@ bool AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
     return 0;
 }
 
-bool AstToCasmIRPass::visit_bit_atom( IntegerAtom* node )
+u1 AstToCasmIRPass::visit_bit_atom( IntegerAtom* node )
 {
     VISIT;
     const libcasm_ir::Constant::Ptr ir_const
@@ -1095,21 +1093,21 @@ bool AstToCasmIRPass::visit_bit_atom( IntegerAtom* node )
     return 0;
 }
 
-bool AstToCasmIRPass::visit_floating_atom( FloatingAtom* node )
+u1 AstToCasmIRPass::visit_floating_atom( FloatingAtom* node )
 {
     VISIT;
     FIXME;
     return 0;
 }
 
-bool AstToCasmIRPass::visit_rational_atom( RationalAtom* node )
+u1 AstToCasmIRPass::visit_rational_atom( RationalAtom* node )
 {
     VISIT;
     FIXME;
     return 0;
 }
 
-bool AstToCasmIRPass::visit_string_atom( StringAtom* node )
+u1 AstToCasmIRPass::visit_string_atom( StringAtom* node )
 {
     VISIT;
     const libcasm_ir::Constant::Ptr ir_const
@@ -1122,7 +1120,7 @@ bool AstToCasmIRPass::visit_string_atom( StringAtom* node )
     return 0;
 }
 
-bool AstToCasmIRPass::visit_self_atom( SelfAtom* node )
+u1 AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
     VISIT;
     const libcasm_ir::Constant::Ptr ir_const
@@ -1137,7 +1135,7 @@ bool AstToCasmIRPass::visit_self_atom( SelfAtom* node )
     return 0;
 }
 
-bool AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
+u1 AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
 {
     VISIT;
     auto rule = lookup< libcasm_ir::Rule >( node->rule );
@@ -1157,24 +1155,24 @@ bool AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
     return 0;
 }
 
-bool AstToCasmIRPass::visit_list_atom(
-    ListAtom* node, const std::vector< bool >& args )
+u1 AstToCasmIRPass::visit_list_atom(
+    ListAtom* node, const std::vector< u1 >& args )
 {
     VISIT;
     FIXME;
     return 0;
 }
 
-bool AstToCasmIRPass::visit_number_range_atom(
-    NumberRangeAtom* node, bool start, bool end )
+u1 AstToCasmIRPass::visit_number_range_atom(
+    NumberRangeAtom* node, u1 start, u1 end )
 {
     VISIT;
     FIXME;
     return 0;
 }
 
-bool AstToCasmIRPass::visit_builtin_atom(
-    BuiltinAtom* node, std::vector< bool >& args )
+u1 AstToCasmIRPass::visit_builtin_atom(
+    BuiltinAtom* node, std::vector< u1 >& args )
 {
     VISIT;
 
@@ -1216,7 +1214,7 @@ void AstToCasmIRPass::visit_statement( AstNode* node )
     VISIT;
 }
 
-void AstToCasmIRPass::visit_forall_iteration_pre( ForallNode* node, bool )
+void AstToCasmIRPass::visit_forall_iteration_pre( ForallNode* node, u1 )
 {
     VISIT;
 }
@@ -1226,7 +1224,7 @@ void AstToCasmIRPass::visit_forall_iteration_post( ForallNode* node )
     VISIT;
 }
 
-bool AstToCasmIRPass::visit_zero_atom( ZeroAtom* node )
+u1 AstToCasmIRPass::visit_zero_atom( ZeroAtom* node )
 {
     VISIT;
     return false;

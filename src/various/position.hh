@@ -32,7 +32,7 @@
 
 /**
  ** \file position.hh
- ** Define the yy::position class.
+ ** Define the libcasm_fe::position class.
  */
 
 #ifndef YY_YY_POSITION_HH_INCLUDED
@@ -50,8 +50,8 @@
 #  endif
 # endif
 
-
-namespace yy {
+#line 31 "../../obj/src/GrammarParser.yy" // location.cc:296
+namespace libcasm_fe {
 #line 56 "position.hh" // location.cc:296
   /// Abstract a position.
   class position
@@ -174,7 +174,7 @@ namespace yy {
     return ostr << pos.line << '.' << pos.column;
   }
 
-
-} // yy
+#line 31 "../../obj/src/GrammarParser.yy" // location.cc:296
+} // libcasm_fe
 #line 180 "position.hh" // location.cc:296
 #endif // !YY_YY_POSITION_HH_INCLUDED

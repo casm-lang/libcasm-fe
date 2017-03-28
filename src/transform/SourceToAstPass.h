@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -23,10 +23,12 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_SOURCETOASTPASS_H_
-#define _LIB_CASMFE_SOURCETOASTPASS_H_
+#ifndef _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
+#define _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
 
 #include "libpass.h"
+
+#include "../ast/Specification.h"
 
 /**
    @brief    TODO
@@ -36,37 +38,35 @@
 
 namespace libcasm_fe
 {
-    class Ast;
-
     class SourceToAstPass final : public libpass::Pass
     {
       public:
         static char id;
 
-        bool run( libpass::PassResult& pr ) override;
+        u1 run( libpass::PassResult& pr ) override;
 
         class Data : public libpass::PassData
         {
           public:
             using Ptr = std::shared_ptr< Data >;
 
-            Data( Ast* root )
-            : m_root( root )
+            Data( const Ast::Specification::Ptr& specification )
+            : m_specification( specification )
             {
             }
 
-            Ast* root( void ) const
+            Ast::Specification::Ptr specification( void ) const
             {
-                return m_root;
+                return m_specification;
             }
 
           private:
-            Ast* m_root;
+            Ast::Specification::Ptr m_specification;
         };
     };
 }
 
-#endif // _LIB_CASMFE_SOURCETOASTPASS_H_
+#endif // _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
 
 //
 //  Local variables:

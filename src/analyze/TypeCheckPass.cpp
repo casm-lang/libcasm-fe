@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -43,7 +43,7 @@ static libpass::PassRegistration< TypeCheckPass > PASS( "Type Check Pass",
 
 // PPA: TODO: dependency SourceToAstPass
 
-bool TypeCheckPass::run( libpass::PassResult& pr )
+u1 TypeCheckPass::run( libpass::PassResult& pr )
 {
     auto node = pr.result< SourceToAstPass >();
 
@@ -60,7 +60,7 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
     if( not m_specificationHasInitNode )
     {
         global_driver->error( node->root()->location, "no 'init' node defined",
-            libcasm_fe::Codes::AgentInitRuleNotDefined );
+            libcasm_fe::Code::AgentInitRuleNotDefined );
     }
 
     pr.setResult< TypeCheckPass >( node );
@@ -69,13 +69,13 @@ bool TypeCheckPass::run( libpass::PassResult& pr )
 }
 
 void TypeCheckPass::check_type_valid(
-    const yy::location& location, const Type& type )
+    const location& location, const Type& type )
 {
     if( type == TypeType::ENUM
         && !global_driver->function_table.get_enum( type.enum_name ) )
     {
         global_driver->error( location, "unknown type '" + type.enum_name + "'",
-            libcasm_fe::Codes::TypeUnknown );
+            libcasm_fe::Code::TypeUnknown );
     }
 }
 
@@ -104,7 +104,7 @@ void TypeCheckPass::visit_function_def_pre(
         global_driver->error( def->location,
             "cannot use builtin name '" + function->name
                 + "' as function identifier",
-            libcasm_fe::Codes::FunctionIdentifierIsBuiltinName );
+            libcasm_fe::Code::FunctionIdentifierIsBuiltinName );
     }
 
     check_type_valid( def->location, *function->return_type_ );
@@ -124,7 +124,7 @@ void TypeCheckPass::visit_function_def_pre(
                 + "', but should be '"
                 + function->return_type_->to_str()
                 + "'",
-            libcasm_fe::Codes::FunctionDefaultValueTypeMismatch );
+            libcasm_fe::Code::FunctionDefaultValueTypeMismatch );
     }
 
     m_declaredFunctions.emplace( function->name );
@@ -161,7 +161,7 @@ void TypeCheckPass::visit_derived_def( DerivedDefNode* def, Type* expr )
             "type of derived expression is unknown because type of expression "
             "is "
                 + expr->to_str(),
-            libcasm_fe::Codes::DerivedExpressionInvalidType );
+            libcasm_fe::Code::DerivedExpressionInvalidType );
     }
 
     if( def->sym->return_type_->t == TypeType::BIT
@@ -236,7 +236,7 @@ void TypeCheckPass::visit_ifthenelse( IfThenElseNode* node, Type* cond )
             "type of 'if' expression should be 'Boolean', found '"
                 + cond->to_str()
                 + "'",
-            libcasm_fe::Codes::TypeInferenceInvalidIfExpression );
+            libcasm_fe::Code::TypeInferenceInvalidIfExpression );
     }
 }
 
@@ -287,7 +287,7 @@ void TypeCheckPass::visit_update(
                 + "' does not match type '"
                 + rhs->to_str()
                 + "' of expression",
-            libcasm_fe::Codes::TypeBitSizeIsInvalid );
+            libcasm_fe::Code::TypeBitSizeIsInvalid );
     }
 
     if( update->func->symbol_type == FunctionAtom::SymbolType::PARAMETER )
@@ -318,7 +318,7 @@ void TypeCheckPass::visit_call_pre( CallNode* call )
     {
         global_driver->error( call->location,
             "no rule with name `" + call->rule_name + "` found",
-            libcasm_fe::Codes::RuleDoesNotExist );
+            libcasm_fe::Code::RuleDoesNotExist );
     }
 }
 
@@ -352,7 +352,7 @@ void TypeCheckPass::visit_call(
                 + " arguments but "
                 + std::to_string( args_provided )
                 + " where provided",
-            libcasm_fe::Codes::RuleArgumentsSizeInvalidAtCall );
+            libcasm_fe::Code::RuleArgumentsSizeInvalidAtCall );
     }
     else
     {
@@ -368,7 +368,7 @@ void TypeCheckPass::visit_call(
                         + "' but was '"
                         + arguments.at( i )->to_str()
                         + "'",
-                    libcasm_fe::Codes::RuleArgumentsTypeInvalidAtCall );
+                    libcasm_fe::Code::RuleArgumentsTypeInvalidAtCall );
             }
         }
     }
@@ -380,7 +380,7 @@ void TypeCheckPass::visit_print( PrintNode* node, Type* type )
     {
         global_driver->error( node->getAtom()->location,
             "unable to annotate type of print statement",
-            libcasm_fe::Codes::TypeInferenceInvalidPrint );
+            libcasm_fe::Code::TypeInferenceInvalidPrint );
     }
 }
 
@@ -449,7 +449,7 @@ void TypeCheckPass::visit_let( LetNode* node, Type* )
                     + "' does not fit into the bitsize of '"
                     + std::to_string( bitsize )
                     + "'",
-                libcasm_fe::Codes::TypeBitSizeInvalidInLetExpression );
+                libcasm_fe::Code::TypeBitSizeInvalidInLetExpression );
         }
 
         node->expr->type_.bitsize = bitsize;
@@ -471,7 +471,7 @@ void TypeCheckPass::visit_let_post( LetNode* node )
         global_driver->error( node->location,
             "unable to infer the type of let identifier '" + node->identifier
                 + "'",
-            libcasm_fe::Codes::TypeInferenceInvalidLet );
+            libcasm_fe::Code::TypeInferenceInvalidLet );
     }
     rule_binding_types.back()->pop_back();
     rule_binding_offsets.back()->erase( node->identifier );
@@ -585,7 +585,7 @@ void TypeCheckPass::visit_case(
             global_driver->error( c->second->location,
                 "found multiple 'default' labels for case, but only one is "
                 "allowed",
-                libcasm_fe::Codes::CaseLabelMultipleUseOfDefault );
+                libcasm_fe::Code::CaseLabelMultipleUseOfDefault );
         }
     }
 
@@ -654,7 +654,7 @@ void TypeCheckPass::visit_case(
 }
 
 void TypeCheckPass::check_numeric_operator(
-    const yy::location& loc, Type* type, const libcasm_ir::Value::ID op )
+    const location& loc, Type* type, const libcasm_ir::Value::ID op )
 {
     if( *type == TypeType::UNKNOWN )
     {
@@ -690,7 +690,7 @@ void TypeCheckPass::check_numeric_operator(
           + operator_to_str( op )
           + "` must be Integer, Bit, String, Floating or Rational but were "
           + type->to_str()
-        , libcasm_fe::Codes::OperatorAddInvalidOperandType
+        , libcasm_fe::Code::OperatorAddInvalidOperandType
         );
             }
         }
@@ -719,7 +719,7 @@ Type* TypeCheckPass::visit_expression( BinaryExpression* expr, Type*, Type* )
                 + " != "
                 + expr->right_->type_.get_most_general_type( expr->right_ )
                       ->to_str(),
-            libcasm_fe::Codes::TypeInferenceInvalidExpression );
+            libcasm_fe::Code::TypeInferenceInvalidExpression );
     }
 
     const Type* lhs = expr->left_->type_.get_most_general_type( expr->left_ );
@@ -732,7 +732,7 @@ Type* TypeCheckPass::visit_expression( BinaryExpression* expr, Type*, Type* )
             "size of 'Bit' types in expression did not match: " + lhs->to_str()
                 + " != "
                 + rhs->to_str(),
-            libcasm_fe::Codes::TypeBitSizeInvalidExpression );
+            libcasm_fe::Code::TypeBitSizeInvalidExpression );
     }
 
     if( expr->left_->node_type_ == NodeType::ZERO_ATOM )
@@ -902,8 +902,7 @@ Type* TypeCheckPass::visit_function_atom(
         {
             throw CompiletimeException( atom->location,
                 "use of undeclared function `" + atom->name + "` in initially",
-                libcasm_fe::Codes::
-                    TypeCheckUseOfUndeclaredFunctionInInitially );
+                libcasm_fe::Code::TypeCheckUseOfUndeclaredFunctionInInitially );
         }
     }
 
@@ -991,7 +990,7 @@ Type* TypeCheckPass::visit_builtin_atom(
             && atom->types[ 0 ]->subtypes[ 0 ]->t != TypeType::UNKNOWN )
         {
             Type first = *atom->types[ 0 ]->subtypes[ 0 ];
-            bool all_equal = true;
+            u1 all_equal = true;
             for( size_t i = 1; i < atom->types[ 0 ]->subtypes.size(); i++ )
             {
                 if( first != *atom->types[ 0 ]->subtypes[ i ] )
@@ -1116,7 +1115,7 @@ Type* TypeCheckPass::visit_rule_atom( RuleAtom* atom )
     {
         global_driver->error( atom->location,
             "no rule with name `" + atom->name + "` found",
-            libcasm_fe::Codes::RuleDoesNotExist );
+            libcasm_fe::Code::RuleDoesNotExist );
     }
     return &atom->type_;
 }
@@ -1130,8 +1129,8 @@ Type* TypeCheckPass::visit_list_atom(
     if( vals.size() > 0 )
     {
         Type first = *( vals[ 0 ] );
-        bool all_known = first.is_complete();
-        bool all_equal = true;
+        u1 all_known = first.is_complete();
+        u1 all_equal = true;
         for( size_t i = 1; i < vals.size(); i++ )
         {
             all_known = all_known && vals[ i ]->is_complete();
@@ -1159,7 +1158,7 @@ Type* TypeCheckPass::visit_number_range_atom(
             "left value of number range must be an Integer but was '"
                 + left->to_str()
                 + "'",
-            libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtLeftHandSide );
+            libcasm_fe::Code::TypeNumberRangeInvalidTypeAtLeftHandSide );
     }
     if( not right->unify( TypeType::INTEGER ) )
     {
@@ -1167,7 +1166,7 @@ Type* TypeCheckPass::visit_number_range_atom(
             "right value of number range must be an Integer but was '"
                 + right->to_str()
                 + "'",
-            libcasm_fe::Codes::TypeNumberRangeInvalidTypeAtRightHandSide );
+            libcasm_fe::Code::TypeNumberRangeInvalidTypeAtRightHandSide );
     }
     return &atom->type_;
 }
@@ -1218,7 +1217,7 @@ void AstWalker< TypeCheckPass, Type* >::walk_forall( ForallNode* node )
     {
         global_driver->error( node->location,
             "type inference for '" + node->identifier + "' failed",
-            libcasm_fe::Codes::TypeInferenceInvalidForallExpression );
+            libcasm_fe::Code::TypeInferenceInvalidForallExpression );
     }
 
     visitor.rule_binding_types.back()->pop_back();

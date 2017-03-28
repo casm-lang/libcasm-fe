@@ -2,9 +2,9 @@
 #   Copyright (c) 2014-2017 CASM Organization
 #   All rights reserved.
 #
-#   Developed by: Florian Hahn
-#                 Philipp Paulweber
+#   Developed by: Philipp Paulweber
 #                 Emmanuel Pescosta
+#                 Florian Hahn
 #                 https://github.com/casm-lang/libcasm-fe
 #
 #   This file is part of libcasm-fe.
@@ -38,11 +38,32 @@ foreach( DEPENDENCY
     )
   if( NOT TARGET ${DEPENDENCY} )
     add_subdirectory( ${LIBS}/${DEPENDENCY} lib/${DEPENDENCY} )
-  endif()  
+  endif()
 endforeach()
 
+set( CXX_SRC_FILES
+  src/Driver.cpp
+  src/Exceptions.cpp
 
-file( GLOB_RECURSE CXX_SRC_FILES "src/*.cpp" )
+  src/ast/Attribute.cpp
+  src/ast/Definition.cpp
+  src/ast/Expression.cpp
+  src/ast/Node.cpp
+  src/ast/Rule.cpp
+  src/ast/Specification.cpp
+  src/ast/Type.cpp
+  src/ast/RecursiveVisitor.cpp
+
+  src/analyze/AttributionPass.cpp
+
+  src/transform/AstDumpDotPass.cpp
+  src/transform/AstDumpSourcePass.cpp
+  src/transform/SourceToAstPass.cpp
+
+  src/various/GrammarParser.cpp
+  src/various/GrammarLexer.cpp
+)
+
 file( GLOB_RECURSE CXX_UTS_FILES "uts/*.cpp" )
 
 
@@ -52,7 +73,7 @@ project( ${TARGET} )
 
 include_directories(
   .
-  src
+  src/various
   ${LIBS}/gtest/googletest
   ${LIBS}/gtest/googletest/include
   ${LIBS}/hayai/src
@@ -74,22 +95,20 @@ string( LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CWD_LENGTH )
 
 set( DEF_GRAMMAR "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
 set( ORG_GRAMMAR "${CMAKE_CURRENT_BINARY_DIR}/src/various/Grammar.org" )
-set( GRAMMAR     "obj/src/various/Grammar.org" )
 
 add_custom_command(
   OUTPUT  ${ORG_GRAMMAR}
-  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR}
+  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${ORG_GRAMMAR}
   DEPENDS ${DEF_GRAMMAR}
   COMMENT ""
 )
 
 set( DEF_GRAMMAR_PARSER "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
 set( CXX_GRAMMAR_PARSER "${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarParser.cpp" )
-set(     GRAMMAR_PARSER "obj/src/various/GrammarParser.cpp" )
 
 add_custom_command(
   OUTPUT  ${CXX_GRAMMAR_PARSER}
-  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR_PARSER}
+  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${CXX_GRAMMAR_PARSER}
   DEPENDS ${DEF_GRAMMAR_PARSER}
   COMMENT ""
 )
@@ -97,11 +116,10 @@ add_custom_command(
 
 set( DEF_GRAMMAR_LEXER "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarLexer.l;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
 set( CXX_GRAMMAR_LEXER "${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarLexer.cpp" )
-set(     GRAMMAR_LEXER "src/various/GrammarLexer.cpp" )
 
 add_custom_command(
   OUTPUT  ${CXX_GRAMMAR_LEXER}
-  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${GRAMMAR_LEXER}
+  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${CXX_GRAMMAR_LEXER}
   DEPENDS ${DEF_GRAMMAR_LEXER}
   COMMENT ""
 )
@@ -123,7 +141,7 @@ add_library( ${TARGET}-test OBJECT
 
 add_executable( ${TARGET}-check
   ${LIBS}/gtest/googletest/src/gtest_main.cc
-  ${LIBS}/gtest/googletest/src/gtest-all.cc  
+  ${LIBS}/gtest/googletest/src/gtest-all.cc
   $<TARGET_OBJECTS:${TARGET}-test>
 )
 
@@ -139,7 +157,7 @@ target_link_libraries( ${TARGET}-check
 add_library( ${TARGET}-benchmark OBJECT
   ${LIBS}/hayai/src/hayai_posix_main.cpp
 )
-  
+
 add_executable( ${TARGET}-run
   $<TARGET_OBJECTS:${TARGET}-benchmark>
 )

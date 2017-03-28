@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -25,50 +25,40 @@
 
 #include "Exceptions.h"
 
+using namespace libcasm_fe;
+
+Exception::Exception( const std::string& msg, Code errorCode )
+: Exception( location( position( 0, 0, 0 ) ), msg, errorCode )
+{
+}
+
 Exception::Exception(
-    const std::string& msg, const libcasm_fe::Codes error_code )
-: msg_( msg )
-, error_code_( error_code )
+    const location& location, const std::string& msg, Code errorCode )
+: m_msg( msg )
+, m_locations( { location } )
+, m_errorCode( errorCode )
 {
-    addLocation( yy::location( yy::position( 0, 0, 0 ) ) );
-    fprintf( stderr, "RUNTIME_EXCEPTION_WITH_UNKNOWN_LOCATION!!!\n" );
 }
 
-Exception::Exception( const yy::location& location, const std::string& msg,
-    const libcasm_fe::Codes error_code )
-: msg_( msg )
-, error_code_( error_code )
+Exception::Exception( const std::vector< location >& locations,
+    const std::string& msg, Code errorCode )
+: m_msg( msg )
+, m_locations( locations )
+, m_errorCode( errorCode )
 {
-    addLocation( location );
 }
 
-Exception::Exception( const std::vector< const yy::location* >& location,
-    const std::string& msg, const libcasm_fe::Codes error_code )
-: msg_( msg )
-, error_code_( error_code )
+const char* Exception::what() const noexcept
 {
-    for( auto loc : location )
-    {
-        addLocation( *loc );
-    }
+    return m_msg.c_str();
 }
 
-const char* Exception::what() const throw()
+const std::vector< location >& Exception::locations( void ) const noexcept
 {
-    return msg_.c_str();
+    return m_locations;
 }
 
-void Exception::addLocation( const yy::location& location )
+Code Exception::errorCode( void ) const noexcept
 {
-    location_.push_back( &location );
-}
-
-const std::vector< const yy::location* >& Exception::getLocations( void ) const
-{
-    return location_;
-}
-
-const libcasm_fe::Codes Exception::getErrorCode( void ) const
-{
-    return error_code_;
+    return m_errorCode;
 }

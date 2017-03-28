@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -25,6 +25,8 @@
 
 #include "Driver.h"
 
+#include <cassert>
+
 using namespace libcasm_fe;
 
 #define BOLD_BLACK "\x1b[1m"
@@ -38,8 +40,6 @@ using namespace libcasm_fe;
 #define MAGENTA "\x1b[35m"
 #define RESET "\x1b[0m"
 
-extern int yylex_destroy( void );
-
 // driver must be global, because it is needed for YY_INPUT
 Driver* global_driver;
 
@@ -48,102 +48,22 @@ Driver::Driver()
 , warning_( 0 )
 , trace_parsing( false )
 , trace_scanning( false )
-, function_table()
-, function_trace_map()
 {
-    file_ = nullptr;
-    result = nullptr;
-
     lines_.push_back( "" );
 }
 
-Driver::~Driver()
-{
-    if( file_ != nullptr )
-    {
-        fclose( file_ );
-    }
-    yylex_destroy();
-}
-
-size_t Driver::get_next_chars( char buf[], size_t max_size )
-{
-    if( fgets( buf, max_size, file_ ) == NULL )
-    {
-        if( ferror( file_ ) )
-        {
-            return -1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    else
-    {
-        // lines_ must not be empty (initialized with empty string in
-        // constructor)
-        lines_.back().append( buf );
-        if( buf[ strlen( buf ) - 1 ] == '\n' )
-        {
-            lines_.push_back( "" );
-        }
-        return strlen( buf );
-    }
-}
-
-Ast* Driver::parse( const std::string& f )
-{
-    int res = -1;
-
-    if( file_ != nullptr )
-    {
-        fclose( file_ );
-    }
-
-    filename_ = f;
-    file_ = fopen( filename_.c_str(), "rt" );
-    if( file_ == NULL )
-    {
-        std::cerr << "error: could not open `" << filename_ << "´" << std::endl;
-        return nullptr;
-    }
-
-    yy::Parser parser( *this );
-    parser.set_debug_level( trace_parsing );
-
-    try
-    {
-        res = parser.parse();
-
-        // TODO check leak on parser error
-        if( res != 0 || error_ > 0 )
-        {
-            return nullptr;
-        }
-    }
-    catch( const std::exception& e )
-    {
-        std::cerr << "error: got exception: " << e.what() << " -- exiting"
-                  << std::endl;
-        return nullptr;
-    }
-
-    return result;
-}
-
 void Driver::error(
-    const yy::location& l, const std::string& m, libcasm_fe::Codes code )
+    const location& l, const std::string& m, libcasm_fe::Code code )
 {
-    error( { &l }, m, code );
+    error( { l }, m, code );
 }
 
-void Driver::error( const std::vector< const yy::location* >& locations,
-    const std::string& m, libcasm_fe::Codes code )
+void Driver::error( const std::vector< location >& locations,
+    const std::string& m, libcasm_fe::Code code )
 {
-    assert( locations.size() > 0 and locations[ 0 ] );
+    assert( locations.size() > 0 );
 
-    const yy::location& l = *locations[ 0 ];
+    const location& l = locations.at( 0 );
 
     // Set state to error!
     error_++;
@@ -153,12 +73,12 @@ void Driver::error( const std::vector< const yy::location* >& locations,
               << ": " << BOLD_RED << "error: " << RESET << BOLD_BLACK << m
               << RESET;
 
-    if( code != libcasm_fe::Codes::Unspecified )
+    if( code != libcasm_fe::Code::Unspecified )
     {
-        for( auto loc : locations )
+        for( const auto& loc : locations )
         {
             fprintf(
-                stderr, " " YELLOW "@%i{%04x}" RESET, loc->begin.line, code );
+                stderr, " " YELLOW "@%i{%04x}" RESET, loc.begin.line, code );
         }
     }
 
@@ -166,10 +86,10 @@ void Driver::error( const std::vector< const yy::location* >& locations,
 
     for( auto loc : locations )
     {
-        underline( *loc );
+        underline( loc );
     }
 
-    if( code == libcasm_fe::Codes::Unspecified )
+    if( code == libcasm_fe::Code::Unspecified )
     {
         warning( l, "unspecified error code!" );
     }
@@ -177,11 +97,10 @@ void Driver::error( const std::vector< const yy::location* >& locations,
 
 void Driver::error( const Exception& exception )
 {
-    error(
-        exception.getLocations(), exception.what(), exception.getErrorCode() );
+    error( exception.locations(), exception.what(), exception.errorCode() );
 }
 
-void Driver::warning( const yy::location& l, const std::string& m )
+void Driver::warning( const location& l, const std::string& m )
 {
     // increment warning counter
     warning_++;
@@ -194,7 +113,7 @@ void Driver::warning( const yy::location& l, const std::string& m )
     underline( l );
 }
 
-void Driver::info( const yy::location& l, const std::string& m )
+void Driver::info( const location& l, const std::string& m )
 {
     std::cerr << BOLD_BLACK << filename_ << ":" << l.begin.line << "."
               << l.begin.column << "-" << l.end.line << "." << l.end.column
@@ -204,7 +123,7 @@ void Driver::info( const yy::location& l, const std::string& m )
     underline( l );
 }
 
-void Driver::underline( const yy::location& l )
+void Driver::underline( const location& l )
 {
     if( l.begin.line == l.end.line && l.begin.line <= lines_.size() )
     {
@@ -242,58 +161,6 @@ uint64_t Driver::get_error_count() const
 uint64_t Driver::get_warning_count() const
 {
     return warning_;
-}
-
-void Driver::add( RuleNode* rule_root )
-{
-    Function* function = function_table.get_function( rule_root->name );
-
-    if( function )
-    {
-        // rules and functions can't have the same name
-        throw CompiletimeException(
-            { &rule_root->location, &function->location },
-            "redefinition of '" + rule_root->name + "'",
-            libcasm_fe::Codes::IdentifierAlreadyUsed );
-    }
-
-    const auto result = rules_map_.emplace( rule_root->name, rule_root );
-
-    if( result.second )
-    {
-        DEBUG( "Add symbol " + rule_root->name );
-        rule_root->binding_offsets = std::move( binding_offsets );
-        binding_offsets
-            .clear(); // TODO: is this necessary? move should empty map
-    }
-    else
-    {
-        const auto it = result.first;
-        RuleNode* existingRule = it->second;
-
-        throw CompiletimeException(
-            { &rule_root->location, &existingRule->location },
-            "redefinition of '" + rule_root->name + "'",
-            libcasm_fe::Codes::IdentifierAlreadyUsed );
-    }
-}
-
-void Driver::add( Function* function )
-{
-    const auto it = rules_map_.find( function->name );
-
-    if( it != rules_map_.cend() )
-    {
-        // rules and functions can't have the same name
-        RuleNode* existingRule = it->second;
-
-        throw CompiletimeException(
-            { &function->location, &existingRule->location },
-            "redefinition of '" + function->name + "'",
-            libcasm_fe::Codes::IdentifierAlreadyUsed );
-    }
-
-    function_table.add( function );
 }
 
 const std::string& Driver::get_filename()

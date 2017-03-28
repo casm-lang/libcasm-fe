@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -25,38 +25,60 @@
 
 #include "SourceToAstPass.h"
 
-#include "../Driver.h"
+#include <fstream>
+#include <iostream>
+
+#include "../Lexer.h"
+#include "../various/GrammarParser.tab.h"
 
 using namespace libcasm_fe;
 
-extern Driver* global_driver;
-
 char SourceToAstPass::id = 0;
 
-static libpass::PassRegistration< SourceToAstPass > PASS( "Source To AST Pass",
+static libpass::PassRegistration< SourceToAstPass > PASS( "SourceToAstPass",
     "parse the source code and generate an AST", "ast-parse", 0 );
 
 // PPA: TODO: dependency INPUT FILE
 
-bool SourceToAstPass::run( libpass::PassResult& pr )
+u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
-    auto load_file_pass = pr.result< libpass::LoadFilePass >();
+    const auto loadFilePass = pr.result< libpass::LoadFilePass >();
+    const auto filePath = std::string(
+        loadFilePass->filename() ); // TODO char* -> string in load pass
 
-    global_driver = new Driver;
-
-    Ast* node = global_driver->parse( load_file_pass->filename() );
-
-    if( !node )
+    std::ifstream sourceFile( filePath );
+    if( not sourceFile.is_open() )
     {
-        // TODO: FIXME: PPA: better error messages,
-        // can be improved with the new libstdhl Verbose support
-
-        std::cerr << "Error parsing file" << std::endl;
-
+        std::cerr << "error: could not open `" << filePath << "´" << std::endl;
         return false;
     }
 
-    pr.setResult< SourceToAstPass >( libstdhl::make< Data >( node ) );
+    const std::string& fileName
+        = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
+    const std::string& specificationName
+        = fileName.substr( 0, fileName.rfind( "." ) );
+
+    Ast::Specification::Ptr specification;
+
+    Lexer lexer( sourceFile, std::cout );
+    Parser parser( lexer, specificationName, specification );
+    parser.set_debug_level( false ); // TODO add flag
+
+    try
+    {
+        if( ( parser.parse() != 0 ) or not specification )
+        {
+            std::cerr << "Error parsing file" << std::endl;
+            return false;
+        }
+    }
+    catch( const std::exception& e )
+    {
+        std::cerr << "error: got exception: " << e.what() << std::endl;
+        return false;
+    }
+
+    pr.setResult< SourceToAstPass >( libstdhl::make< Data >( specification ) );
 
     return true;
 }

@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -27,52 +27,45 @@
 #define _LIB_CASMFE_EXCEPTIONS_H_
 
 #include <exception>
-#include <stdexcept>
 #include <string>
-
-#include "cpp/Type.h"
+#include <vector>
 
 #include "various/location.hh"
 
 #include "Codes.h"
 
-// TODO: namespace libcasm_fe
-
-class Exception : public std::exception
+namespace libcasm_fe
 {
-  private:
-    std::vector< const yy::location* > location_;
-    const std::string msg_;
-    const libcasm_fe::Codes error_code_;
+    class Exception : public std::exception
+    {
+      public:
+        Exception( const std::string& msg, Code errorCode );
+        Exception(
+            const location& location, const std::string& msg, Code errorCode );
+        Exception( const std::vector< location >& locations,
+            const std::string& msg, Code errorCode );
 
-  public:
-    explicit Exception( const std::string& msg,
-        const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
+        const char* what() const noexcept override;
 
-    explicit Exception( const yy::location& location, const std::string& msg,
-        const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
+        const std::vector< location >& locations( void ) const noexcept;
 
-    explicit Exception( const std::vector< const yy::location* >& location,
-        const std::string& msg,
-        const libcasm_fe::Codes error_code = libcasm_fe::Codes::Unspecified );
+        Code errorCode( void ) const noexcept;
 
-    virtual const char* what() const throw();
+      private:
+        const std::string m_msg;
+        const std::vector< location > m_locations;
+        const Code m_errorCode;
+    };
 
-    void addLocation( const yy::location& location );
+    class RuntimeException : public Exception
+    {
+        using Exception::Exception;
+    };
 
-    const std::vector< const yy::location* >& getLocations( void ) const;
-
-    const libcasm_fe::Codes getErrorCode( void ) const;
-};
-
-class RuntimeException : public Exception
-{
-    using Exception::Exception;
-};
-
-class CompiletimeException : public Exception
-{
-    using Exception::Exception;
-};
+    class CompiletimeException : public Exception
+    {
+        using Exception::Exception;
+    };
+}
 
 #endif // _LIB_CASMFE_EXCEPTIONS_H_

@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -65,7 +65,7 @@ struct Update
     libcasm_fe::value_t value; /**< The value of the update */
     const std::vector< libcasm_fe::value_t >*
         args; /**< The function arguments of the update */
-    const yy::location*
+    const location*
         location;  /**< The source-code location of the update producer */
     uint32_t func; /**< The function uid of the update */
 };
