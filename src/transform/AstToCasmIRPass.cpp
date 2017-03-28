@@ -724,13 +724,11 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, bool cond )
     ir_scope->add( ir_stmt );
 
     assert( node->condition_ );
-    auto ir_cond = lookup< libcasm_ir::Instruction >( node->condition_ );
+    auto ir_cond = lookup< libcasm_ir::Value >( node->condition_ );
 
     assert( ( libcasm_ir::isa< libcasm_ir::Instruction >( ir_cond )
                 and ir_cond->type().id() == libcasm_ir::Type::BOOLEAN )
             or libcasm_ir::isa< libcasm_ir::BooleanConstant >( ir_cond ) );
-
-    ir_stmt->add( ir_cond );
 
     auto ir_select = libstdhl::make< libcasm_ir::SelectInstruction >( ir_cond );
 
