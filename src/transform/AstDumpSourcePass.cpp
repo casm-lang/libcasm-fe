@@ -89,10 +89,6 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
     void visit( DefaultCase& node ) override;
 
   private:
-    void dumpNode( const Node& node, const std::string& name );
-    void dumpLink( Node* from, Node* to );
-
-  private:
     std::ostream& m_stream;
 };
 
