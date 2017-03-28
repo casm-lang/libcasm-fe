@@ -36,9 +36,9 @@ using namespace Ast;
 
 char AstDumpDotPass::id = 0;
 
-static libpass::PassRegistration< AstDumpDotPass > PASS( "AST Dumping Pass",
+static libpass::PassRegistration< AstDumpDotPass > PASS( "AstDumpDotPass",
     "generates a DOT graph of the AST and dumps it to './out.dot' for now",
-    "ast-dump", 0 );
+    "ast-dump-dot", 0 );
 
 class AstDumpDotVisitor final : public RecursiveVisitor
 {
@@ -72,7 +72,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
   public:
     AstDumpDotVisitor( std::ostream& stream );
 
-    void setDumpNodeLocation( bool dumpNodeLocation );
+    void setDumpNodeLocation( u1 dumpNodeLocation );
 
     void visit( Specification& node ) override;
 
@@ -126,7 +126,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
   private:
     std::ostream& m_stream;
     std::stack< Node* > m_parentNodes; /**< holds the parent nodes of DotLink */
-    bool m_dumpNodeLocation = false;   /**< dump node source code location */
+    u1 m_dumpNodeLocation = false;     /**< dump node source code location */
 };
 
 AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
@@ -136,7 +136,7 @@ AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
 {
 }
 
-void AstDumpDotVisitor::setDumpNodeLocation( bool dumpNodeLocation )
+void AstDumpDotVisitor::setDumpNodeLocation( u1 dumpNodeLocation )
 {
     m_dumpNodeLocation = dumpNodeLocation;
 }
@@ -430,7 +430,7 @@ void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
     m_stream << "\"" << from << "\" -> \"" << to << "\";\n";
 }
 
-bool AstDumpDotPass::run( libpass::PassResult& pr )
+u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
     const auto sourceToAstPass = pr.result< SourceToAstPass >();
     const auto specification = sourceToAstPass->specification();

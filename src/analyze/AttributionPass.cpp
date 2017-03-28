@@ -36,9 +36,10 @@ using namespace Ast;
 
 char AttributionPass::id = 0;
 
-static libpass::PassRegistration< AttributionPass > PASS( "AST Attribution Pass",
-    "applies the definition attributes to the AST and performs various attribution checks",
-    "ast-attribution", 0 );
+static libpass::PassRegistration< AttributionPass > PASS( "AstAttributionPass",
+    "applies the definition attributes to the AST and performs various "
+    "attribution checks",
+    "ast-attr", 0 );
 
 // attribute names (case sensitive)
 static const std::string DEPRECATED_ATTRIBUTE = "deprecated";
@@ -52,13 +53,8 @@ static const std::string VARIANT_ATTRIBUTE = "variant";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
-    DEPRECATED_ATTRIBUTE,
-    IN_ATTRIBUTE,
-    MONITORED_ATTRIBUTE,
-    CONTROLLED_ATTRIBUTE,
-    SHARED_ATTRIBUTE,
-    OUT_ATTRIBUTE,
-    STATIC_ATTRIBUTE,
+    DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE, MONITORED_ATTRIBUTE,
+    CONTROLLED_ATTRIBUTE, SHARED_ATTRIBUTE, OUT_ATTRIBUTE, STATIC_ATTRIBUTE,
 };
 
 // list of allowed expression attribute names
@@ -81,13 +77,15 @@ class DefinitionAttributionVisitor final : public RecursiveVisitor
     std::unordered_set< std::string > m_attributeNames;
 };
 
-DefinitionAttributionVisitor::DefinitionAttributionVisitor( Definition& definition )
+DefinitionAttributionVisitor::DefinitionAttributionVisitor(
+    Definition& definition )
 : m_definition( definition )
 , m_attributeNames()
 {
 }
 
-const std::unordered_set< std::string >& DefinitionAttributionVisitor::attributeNames() const
+const std::unordered_set< std::string >&
+DefinitionAttributionVisitor::attributeNames() const
 {
     return m_attributeNames;
 }
@@ -105,9 +103,10 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     }
 
     // each attribute should only be used once
-    if( m_attributeNames.count( name ) != 0 ) {
-        std::cerr << "error: " << node.sourceLocation()
-                  << ": attribute `" << name << "` has already been used\n";
+    if( m_attributeNames.count( name ) != 0 )
+    {
+        std::cerr << "error: " << node.sourceLocation() << ": attribute `"
+                  << name << "` has already been used\n";
         return;
     }
     m_attributeNames.insert( node.identifier()->identifier() );
@@ -135,9 +134,10 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     }
 
     // each attribute should only be used once
-    if( m_attributeNames.count( name ) != 0 ) {
-        std::cerr << "error: " << node.sourceLocation()
-                  << ": attribute `" << name << "` has already been used\n";
+    if( m_attributeNames.count( name ) != 0 )
+    {
+        std::cerr << "error: " << node.sourceLocation() << ": attribute `"
+                  << name << "` has already been used\n";
         return;
     }
     m_attributeNames.insert( node.identifier()->identifier() );
@@ -183,7 +183,7 @@ void DefinitionVisitor::visit( EnumerationDefinition& node )
     node.attributes()->accept( visitor );
 }
 
-bool AttributionPass::run( libpass::PassResult& pr )
+u1 AttributionPass::run( libpass::PassResult& pr )
 {
     const auto sourceToAstPass = pr.result< SourceToAstPass >();
     const auto specification = sourceToAstPass->specification();
