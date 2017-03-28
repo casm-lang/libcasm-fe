@@ -26,7 +26,6 @@
 #ifndef _LIB_CASMFE_H_
 #define _LIB_CASMFE_H_
 
-#include "src/analyze/AstDumpDotPass.h"
 #include "src/analyze/AttributionPass.h"
 //#include "src/analyze/TypeCheckPass.h"
 
@@ -35,6 +34,7 @@
 
 //#include "src/transform/AstToCasmIRPass.h"
 #include "src/transform/SourceToAstPass.h"
+#include "src/transform/AstDumpDotPass.h"
 
 namespace libcasm_fe
 {
