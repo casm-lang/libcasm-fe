@@ -31,14 +31,14 @@
 namespace libcasm_fe
 {
     /**
-     * @brief Generates CASM source of the AST
+     * @brief Translates the AST to CASM source code and dumps it
      */
     class AstDumpSourcePass final : public libpass::Pass
     {
       public:
         static char id;
 
-        u1 run( libpass::PassResult& pr ) override;
+        bool run( libpass::PassResult& pr ) override;
     };
 }
 

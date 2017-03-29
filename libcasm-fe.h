@@ -33,9 +33,9 @@
 //#include "src/execute/SymbolicExecutionPass.h"
 
 //#include "src/transform/AstToCasmIRPass.h"
-#include "src/transform/AstToSourcePass.h"
-#include "src/transform/SourceToAstPass.h"
 #include "src/transform/AstDumpDotPass.h"
+#include "src/transform/AstDumpSourcePass.h"
+#include "src/transform/SourceToAstPass.h"
 
 namespace libcasm_fe
 {
