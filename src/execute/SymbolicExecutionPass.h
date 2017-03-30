@@ -26,7 +26,7 @@
 #ifndef _LIB_CASMFE_SYMBOLIC_EXECUTION_PASS_H_
 #define _LIB_CASMFE_SYMBOLIC_EXECUTION_PASS_H_
 
-#include "libpass.h"
+#include "../analyze/TypeCheckPass.h"
 
 #include "ExecutionPassBase.h"
 
@@ -46,7 +46,9 @@ namespace libcasm_fe
 
         ~SymbolicExecutionPass() override;
 
-        u1 run( libpass::PassResult& pr ) override;
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
 
         void visit_assure( UnaryNode* node, const value_t& value ) override;
 

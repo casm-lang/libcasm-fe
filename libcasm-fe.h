@@ -27,7 +27,7 @@
 #define _LIB_CASMFE_H_
 
 #include "src/analyze/AttributionPass.h"
-//#include "src/analyze/TypeCheckPass.h"
+#include "src/analyze/TypeCheckPass.h"
 
 //#include "src/execute/NumericExecutionPass.h"
 //#include "src/execute/SymbolicExecutionPass.h"
@@ -36,6 +36,7 @@
 #include "src/transform/AstDumpDotPass.h"
 #include "src/transform/AstDumpSourcePass.h"
 #include "src/transform/SourceToAstPass.h"
+#include "src/transform/AstDumpDotPass.h"
 
 namespace libcasm_fe
 {

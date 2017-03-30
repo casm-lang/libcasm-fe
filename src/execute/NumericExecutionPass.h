@@ -26,7 +26,8 @@
 #ifndef _LIB_CASMFE_NUMERIC_EXECUTION_PASS_H_
 #define _LIB_CASMFE_NUMERIC_EXECUTION_PASS_H_
 
-#include "libpass.h"
+#include "../analyze/TypeCheckPass.h"
+//#include "../transform/AstToCasmIRPass.h"
 
 #include "ExecutionPassBase.h"
 
@@ -46,7 +47,9 @@ namespace libcasm_fe
 
         ~NumericExecutionPass() override;
 
-        u1 run( libpass::PassResult& pr ) override;
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
 
         void visit_print( PrintNode* node, const value_t& argument ) override;
 

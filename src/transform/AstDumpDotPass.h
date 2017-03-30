@@ -26,7 +26,10 @@
 #ifndef _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
 #define _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
 
-#include "libpass.h"
+#include "../analyze/TypeCheckPass.h"
+
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
 
 namespace libcasm_fe
 {
@@ -38,6 +41,8 @@ namespace libcasm_fe
       public:
         static char id;
 
+        void usage( libpass::PassUsage& pu ) override;
+        
         u1 run( libpass::PassResult& pr ) override;
     };
 }

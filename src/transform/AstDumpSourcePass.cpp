@@ -25,21 +25,14 @@
 
 #include "AstDumpSourcePass.h"
 
-#include <stack>
-
-#include "../ast/Specification.h"
-#include "../ast/Visitor.h"
-#include "../transform/SourceToAstPass.h"
-
 using namespace libcasm_fe;
 using namespace Ast;
 
 char AstDumpSourcePass::id = 0;
 
-static libpass::PassRegistration< AstDumpSourcePass > PASS(
-    "AST to CASM Source",
-    "translates the AST to the CASM source language (stored in './out.casm')",
-    "ast-source", 0 );
+static libpass::PassRegistration< AstDumpSourcePass > PASS( "AstDumpSourcePass",
+    "outputs the parsed AST as a CASM input specification to stdout",
+    "ast-dump", 0 );
 
 class Indentation
 {
@@ -637,13 +630,27 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
     node.rule()->accept( *this );
 }
 
-bool AstDumpSourcePass::run( libpass::PassResult& pr )
+void AstDumpSourcePass::usage( libpass::PassUsage& pu )
 {
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
+    pu.require< TypeCheckPass >();
+}
 
-    AstDumpSourceVisitor visitor{ std::cout };
-    specification->accept( visitor );
+u1 AstDumpSourcePass::run( libpass::PassResult& pr )
+{
+    libpass::PassLogger log( &id, stream() );
+
+    try
+    {
+        const auto data = pr.result< TypeCheckPass >();
+        const auto specification = data->specification();
+
+        AstDumpSourceVisitor visitor{ std::cout };
+        specification->accept( visitor );
+    }
+    catch( ... )
+    {
+        log.error( "unable to dump AST to CASM source" );
+    }
 
     return true;
 }

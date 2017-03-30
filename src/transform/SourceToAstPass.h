@@ -26,7 +26,7 @@
 #ifndef _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
 #define _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
 
-#include "libpass.h"
+#include "../pass/src/analyze/LoadFilePass.h"
 
 #include "../ast/Specification.h"
 
@@ -43,7 +43,9 @@ namespace libcasm_fe
       public:
         static char id;
 
-        u1 run( libpass::PassResult& pr ) override;
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
 
         class Data : public libpass::PassData
         {

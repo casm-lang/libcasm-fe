@@ -25,11 +25,8 @@
 
 #include "AttributionPass.h"
 
-#include <unordered_set>
-
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
-#include "../transform/SourceToAstPass.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -181,6 +178,11 @@ void DefinitionVisitor::visit( EnumerationDefinition& node )
 {
     DefinitionAttributionVisitor visitor{ node };
     node.attributes()->accept( visitor );
+}
+
+void AttributionPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< SourceToAstPass >();
 }
 
 u1 AttributionPass::run( libpass::PassResult& pr )

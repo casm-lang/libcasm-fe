@@ -26,7 +26,7 @@
 #ifndef _LIB_CASMFE_ATTRIBUTION_PASS_H_
 #define _LIB_CASMFE_ATTRIBUTION_PASS_H_
 
-#include "libpass.h"
+#include "../transform/SourceToAstPass.h"
 
 namespace libcasm_fe
 {
@@ -38,6 +38,8 @@ namespace libcasm_fe
     {
       public:
         static char id;
+
+        void usage( libpass::PassUsage& pu ) override;
 
         u1 run( libpass::PassResult& pr ) override;
     };

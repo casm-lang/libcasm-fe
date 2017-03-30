@@ -25,12 +25,6 @@
 
 #include "AstDumpDotPass.h"
 
-#include <stack>
-
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
-#include "../transform/SourceToAstPass.h"
-
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -430,28 +424,45 @@ void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
     m_stream << "\"" << from << "\" -> \"" << to << "\";\n";
 }
 
+void AstDumpDotPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
+}
+
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
+    libpass::PassLogger log( &id, stream() );
 
-    std::ofstream dotfile( "./out.dot" );
-    if( not dotfile.is_open() )
+    try
     {
-        std::cerr << "error: could not open `out.dot`" << std::endl;
-        return false;
+        const auto data = pr.result< TypeCheckPass >();
+        const auto specification = data->specification();
+
+        std::string dot_file_path = "./out.dot"; // TODO: desired file path
+        std::ofstream dot_file( dot_file_path );
+
+        if( not dot_file.is_open() )
+        {
+            log.error( "could not open '" + dot_file_path + "'" );
+            return false;
+        }
+
+        dot_file << "digraph \"main\" {\n";
+
+        AstDumpDotVisitor visitor{ dot_file };
+
+        visitor.setDumpNodeLocation( true ); // TODO add command-line switch
+
+        specification->accept( visitor );
+
+        dot_file << "}\n";
+
+        dot_file.close();
     }
-
-    dotfile << "digraph \"main\" {\n";
-
-    AstDumpDotVisitor visitor{ dotfile };
-    visitor.setDumpNodeLocation( true ); // TODO add command-line switch
-
-    specification->accept( visitor );
-
-    dotfile << "}\n";
-
-    dotfile.close();
+    catch( ... )
+    {
+        log.error( "unable to dump AST to DOT" );
+    }
 
     return true;
 }

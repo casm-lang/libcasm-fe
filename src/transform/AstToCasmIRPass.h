@@ -26,7 +26,7 @@
 #ifndef _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_
 #define _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_
 
-#include "libpass.h"
+#include "../analyze/TypeCheckPass.h"
 
 #include "../Visitor.h"
 
@@ -47,14 +47,17 @@ namespace libcasm_ir
 
 namespace libcasm_fe
 {
-    class AstToCasmIRPass : public libpass::Pass, public Visitor< u1, u1 >
+    class AstToCasmIRPass final : public libpass::Pass,
+                                  public Visitor< bool, bool >
     {
       public:
         using Data = libcasm_ir::ConsistencyCheckPass::Data;
 
         static char id;
 
-        u1 run( libpass::PassResult& pr ) override final;
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
 
         std::shared_ptr< libcasm_ir::Specification > getSpecification(
             void ) const;
