@@ -25,8 +25,6 @@
 
 #include "AstDumpPass.h"
 
-#include "TypeCheckPass.h"
-
 using namespace libcasm_fe;
 
 char AstDumpPass::id = 0;
@@ -34,6 +32,11 @@ char AstDumpPass::id = 0;
 static libpass::PassRegistration< AstDumpPass > PASS( "AST Dumping Pass",
     "generates a DOT graph of the AST and dumps it to './obj/out.dot' for now",
     "ast-dump", 0 );
+
+void AstDumpPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
+}
 
 bool AstDumpPass::run( libpass::PassResult& pr )
 {

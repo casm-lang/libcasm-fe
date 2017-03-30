@@ -25,8 +25,6 @@
 
 #include "TypeCheckPass.h"
 
-#include "../transform/SourceToAstPass.h"
-
 #include "../Driver.h"
 #include "../Value.h"
 
@@ -38,10 +36,13 @@ extern Driver* global_driver;
 
 char TypeCheckPass::id = 0;
 
-static libpass::PassRegistration< TypeCheckPass > PASS( "Type Check Pass",
-    "type check the AST and translate it to a typed AST", "ast-check", 0 );
+static libpass::PassRegistration< TypeCheckPass > PASS( "TypeInferencePass",
+    "type check the AST and translate it to a typed AST", "ast-typed", 0 );
 
-// PPA: TODO: dependency SourceToAstPass
+void TypeCheckPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< SourceToAstPass >();
+}
 
 bool TypeCheckPass::run( libpass::PassResult& pr )
 {

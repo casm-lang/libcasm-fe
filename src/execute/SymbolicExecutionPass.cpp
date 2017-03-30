@@ -25,8 +25,6 @@
 
 #include "SymbolicExecutionPass.h"
 
-#include "../analyze/TypeCheckPass.h"
-
 #include "../Driver.h"
 #include "../Exceptions.h"
 #include "../Symbolic.h"
@@ -51,6 +49,11 @@ static libpass::PassRegistration< SymbolicExecutionPass > PASS(
 SymbolicExecutionPass::~SymbolicExecutionPass()
 {
     delete walker;
+}
+
+void SymbolicExecutionPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
 }
 
 bool SymbolicExecutionPass::run( libpass::PassResult& pr )

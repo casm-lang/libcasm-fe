@@ -25,8 +25,6 @@
 
 #include "AstToCasmIRPass.h"
 
-#include "analyze/TypeCheckPass.h"
-
 #include "../stdhl/cpp/Default.h"
 
 #include "../casm-ir/src/Block.h"
@@ -144,6 +142,12 @@ value_t AstToCasmIRPass::value_t_value( const libcasm_ir::Value::Ptr& value )
             return value_t();
         }
     }
+}
+
+void AstToCasmIRPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
+    pu.provide< libcasm_ir::ConsistencyCheckPass >();
 }
 
 bool AstToCasmIRPass::run( libpass::PassResult& pr )

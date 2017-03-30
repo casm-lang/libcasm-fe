@@ -25,9 +25,6 @@
 
 #include "NumericExecutionPass.h"
 
-#include "../analyze/TypeCheckPass.h"
-#include "../transform/AstToCasmIRPass.h"
-
 #include "../Driver.h"
 #include "../Exceptions.h"
 #include "../Symbols.h"
@@ -53,6 +50,11 @@ static libpass::PassRegistration< NumericExecutionPass > PASS(
 NumericExecutionPass::~NumericExecutionPass()
 {
     delete walker;
+}
+
+void NumericExecutionPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
 }
 
 bool NumericExecutionPass::run( libpass::PassResult& pr )

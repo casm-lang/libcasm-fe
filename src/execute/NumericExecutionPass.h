@@ -23,10 +23,11 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_NUMERICEXECUTIONPASS_H_
-#define _LIB_CASMFE_NUMERICEXECUTIONPASS_H_
+#ifndef _LIB_CASMFE_NUMERIC_EXECUTION_PASS_H_
+#define _LIB_CASMFE_NUMERIC_EXECUTION_PASS_H_
 
-#include "libpass.h"
+#include "../analyze/TypeCheckPass.h"
+//#include "../transform/AstToCasmIRPass.h"
 
 #include "ExecutionPassBase.h"
 
@@ -45,6 +46,8 @@ namespace libcasm_fe
         static char id;
 
         ~NumericExecutionPass() override;
+
+        void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
 
@@ -88,7 +91,7 @@ namespace libcasm_fe
     void NumericExecutionWalker::walk_iterate( UnaryNode* node );
 }
 
-#endif /* _LIB_CASMFE_NUMERICEXECUTIONPASS_H_ */
+#endif // _LIB_CASMFE_NUMERIC_EXECUTION_PASS_H_
 
 //
 //  Local variables:

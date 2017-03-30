@@ -23,8 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_EXECUTIONPASSBASE_H_
-#define _LIB_CASMFE_EXECUTIONPASSBASE_H_
+#ifndef _LIB_CASMFE_EXECUTION_PASS_BASE_H_
+#define _LIB_CASMFE_EXECUTION_PASS_BASE_H_
 
 #include <set>
 
@@ -186,7 +186,7 @@ namespace libcasm_fe
     }
 }
 
-#endif /* _LIB_CASMFE_EXECUTIONPASSBASE_H_ */
+#endif // _LIB_CASMFE_EXECUTION_PASS_BASE_H_
 
 //
 //  Local variables:

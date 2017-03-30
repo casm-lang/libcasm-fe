@@ -23,10 +23,10 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_
-#define _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_
+#ifndef _LIB_CASMFE_SYMBOLIC_EXECUTION_PASS_H_
+#define _LIB_CASMFE_SYMBOLIC_EXECUTION_PASS_H_
 
-#include "libpass.h"
+#include "../analyze/TypeCheckPass.h"
 
 #include "ExecutionPassBase.h"
 
@@ -45,6 +45,8 @@ namespace libcasm_fe
         static char id;
 
         ~SymbolicExecutionPass() override;
+
+        void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
 
@@ -102,7 +104,7 @@ namespace libcasm_fe
     void SymbolicExecutionWalker::walk_iterate( UnaryNode* node );
 }
 
-#endif /* _LIB_CASMFE_SYMBOLICEXECUTIONPASS_H_ */
+#endif // _LIB_CASMFE_SYMBOLIC_EXECUTION_PASS_H_
 
 //
 //  Local variables:

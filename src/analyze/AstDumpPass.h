@@ -23,10 +23,10 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_ASTDUMPPASS_H_
-#define _LIB_CASMFE_ASTDUMPPASS_H_
+#ifndef _LIB_CASMFE_AST_DUMP_PASS_H_
+#define _LIB_CASMFE_AST_DUMP_PASS_H_
 
-#include "libpass.h"
+#include "../analyze/TypeCheckPass.h"
 
 #include "../Visitor.h"
 
@@ -38,8 +38,19 @@
 
 namespace libcasm_fe
 {
-    class AstDumpPass : public libpass::Pass, public Visitor< bool, bool >
+    class AstDumpPass final : public libpass::Pass, public Visitor< bool, bool >
     {
+      public:
+        static char id;
+
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
+
+        std::string get_dump();
+
+        LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
+
       private:
         std::stringstream dump_stream_;
 
@@ -50,19 +61,10 @@ namespace libcasm_fe
 
         void dump_arguments(
             AstNode* from, std::vector< ExpressionBase* >* arguments );
-
-      public:
-        static char id;
-
-        bool run( libpass::PassResult& pr ) override final;
-
-        std::string get_dump();
-
-        LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
     };
 }
 
-#endif /* _LIB_CASMFE_ASTDUMPPASS_H_ */
+#endif // _LIB_CASMFE_AST_DUMP_PASS_H_
 
 //
 //  Local variables:
