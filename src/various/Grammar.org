@@ -17,7 +17,7 @@ Definitions
 | AttributedDefinition
 
 FunctionDefinition
-: FUNCTION MaybeFunctionAttributes Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
+: FUNCTION Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
 | ProgramFunctionDefinition
 
 MaybeInitially
@@ -34,10 +34,6 @@ FunctionParameters
 
 MaybeFunctionParameters
 : FunctionParameters
-| %empty
-
-MaybeFunctionAttributes
-: LPAREN MaybeIdentifiers RPAREN
 | %empty
 
 ProgramFunctionDefinition
@@ -69,10 +65,6 @@ Identifier
 Identifiers
 : Identifiers COMMA Identifier
 | Identifier
-
-MaybeIdentifiers
-: Identifiers
-| %empty
 
 Variable
 : Identifier COLON Type

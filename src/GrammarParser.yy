@@ -67,93 +67,6 @@
     #undef yylex
     #define yylex lexer.nextToken
 
-    std::pair< FunctionDefinition::Classification, bool > parseFunctionAttributes(
-        const NodeList< IdentifierNode >::Ptr& attributes )
-    {
-        using Classification = FunctionDefinition::Classification;
-
-        auto functionClass = Classification::CONTROLLED;
-        bool symbolicFunction = false;
-
-        bool classAttributeAlreadyUsed = false;
-        IdentifierNode::Ptr classAttribute;
-
-        bool symbolicAttributeAlreadyUsed = false;
-        IdentifierNode::Ptr symbolicAttribute;
-
-        for( const auto& attribute : *attributes )
-        {
-            const auto& name = attribute->identifier();
-
-            if( name == "symbolic" )
-            {
-                symbolicFunction = true;
-
-                if( symbolicAttributeAlreadyUsed )
-                {
-                    /*driver.error
-                    ( { symbolicAttribute->location(), attribute->location() }
-                    , "`symbolic` attribute can only be used once per function"
-                    , libcasm_fe::Codes::FunctionAttributeMultipleUseOfSymbolic
-                    ); TODO */
-                }
-                else
-                {
-                    symbolicAttributeAlreadyUsed = true;
-                    symbolicAttribute = attribute;
-                }
-
-                continue;
-            }
-
-            if( name == "in" or name == "monitored" )
-            {
-                functionClass = Classification::IN;
-            }
-            else if( name == "controlled" )
-            {
-                functionClass = Classification::CONTROLLED;
-            }
-            else if( name == "shared" )
-            {
-                functionClass = Classification::SHARED;
-            }
-            else if( name == "out" )
-            {
-                functionClass = Classification::OUT;
-            }
-            else if( name == "static" )
-            {
-                functionClass = Classification::STATIC;
-            }
-            else
-            {
-                /*driver.error
-                ( attribute->location()
-                , "`" + name + "` is no valid function attribute, only in, monitored, "
-                + "controlled, shared, out, static and symbolic are allowed"
-                , libcasm_fe::Codes::FunctionAttributeIsInvalid
-                ); TODO */
-            }
-
-            if( classAttributeAlreadyUsed )
-            {
-                /*driver.error
-                ( { classAttribute->location(), attribute->location() }
-                , "a function classifier attribute can only be used once per function"
-                , libcasm_fe::Codes::FunctionAttributeMultipleUseOfFunctionClassifier
-                ); TODO */
-            }
-            else
-            {
-                classAttributeAlreadyUsed = true;
-                classAttribute = attribute;
-            }
-        }
-
-        return { functionClass, symbolicFunction };
-    }
-
     static BasicType::Ptr createVoidType( location& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::VoidType >();
@@ -223,7 +136,7 @@ END       0 "end of file"
 %type <Specification::Ptr> Specification
 
 %type <IdentifierNode::Ptr> Identifier
-%type <NodeList< IdentifierNode >::Ptr> Identifiers MaybeIdentifiers
+%type <NodeList< IdentifierNode >::Ptr> Identifiers
 
 // definitions
 %type <Definition::Ptr> Definition AttributedDefinition
@@ -282,7 +195,6 @@ END       0 "end of file"
 %type <Cases::Ptr> CaseLabels
 %type <UpdateRule::Ptr> Initializer
 %type <NodeList< UpdateRule >::Ptr> Initializers MaybeInitializers MaybeInitially
-%type <NodeList< IdentifierNode >::Ptr> MaybeFunctionAttributes
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <Expressions::Ptr> Arguments
@@ -378,20 +290,15 @@ Definitions
 
 
 FunctionDefinition
-: FUNCTION MaybeFunctionAttributes Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
+: FUNCTION Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
   {
-      const auto identifier = $3;
+      const auto identifier = $2;
 
-      auto function = make< FunctionDefinition >( @$, identifier, $5, $7 );
-
-      const auto attributes = parseFunctionAttributes( $2 );
-      function->setClassification( attributes.first );
-      function->setSymbolic( attributes.second );
-
-      function->setDefaultValue( $8 );
+      auto function = make< FunctionDefinition >( @$, identifier, $4, $6 );
+      function->setDefaultValue( $7 );
 
       // apply the name of the function declaration to the initializer functions
-      auto initializers = $9;
+      auto initializers = $8;
       for (auto& initializer : *initializers) {
            initializer->function()->setIdentifier( identifier );
       }
@@ -454,18 +361,6 @@ MaybeFunctionParameters
 | %empty
   {
       $$ = make< Types >( @$ );
-  }
-;
-
-
-MaybeFunctionAttributes
-: LPAREN MaybeIdentifiers RPAREN
-  {
-      $$ = $2;
-  }
-| %empty
-  {
-      $$ = make< NodeList< IdentifierNode > >( @$ );
   }
 ;
 
@@ -600,18 +495,6 @@ Identifiers
       auto identifiers = make< NodeList< IdentifierNode > >( @$ );
       identifiers->add( $1 );
       $$ = identifiers;
-  }
-;
-
-
-MaybeIdentifiers
-: Identifiers
-  {
-      $$ = $1;
-  }
-| %empty
-  {
-      $$ = make< NodeList< IdentifierNode > >( @$ );
   }
 ;
 

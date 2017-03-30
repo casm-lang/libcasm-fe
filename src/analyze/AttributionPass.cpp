@@ -49,11 +49,18 @@ static const std::string SHARED_ATTRIBUTE = "shared";
 static const std::string OUT_ATTRIBUTE = "out";
 static const std::string STATIC_ATTRIBUTE = "static";
 static const std::string VARIANT_ATTRIBUTE = "variant";
+static const std::string SYMBOLIC_ATTRIBUTE = "symbolic";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
-    DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE, MONITORED_ATTRIBUTE,
-    CONTROLLED_ATTRIBUTE, SHARED_ATTRIBUTE, OUT_ATTRIBUTE, STATIC_ATTRIBUTE,
+    DEPRECATED_ATTRIBUTE,
+    IN_ATTRIBUTE,
+    MONITORED_ATTRIBUTE,
+    CONTROLLED_ATTRIBUTE,
+    SHARED_ATTRIBUTE,
+    OUT_ATTRIBUTE,
+    STATIC_ATTRIBUTE,
+    SYMBOLIC_ATTRIBUTE,
 };
 
 // list of allowed expression attribute names
@@ -162,6 +169,38 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
 {
     DefinitionAttributionVisitor visitor{ node };
     node.attributes()->accept( visitor );
+
+    const auto& attributeNames = visitor.attributeNames();
+
+    for( const auto& name : attributeNames )
+    {
+        using Classification = FunctionDefinition::Classification;
+
+        if( name == SYMBOLIC_ATTRIBUTE )
+        {
+            node.setSymbolic( true );
+        }
+        else if( name == IN_ATTRIBUTE or name == MONITORED_ATTRIBUTE )
+        {
+            node.setClassification( Classification::IN );
+        }
+        else if( name == CONTROLLED_ATTRIBUTE )
+        {
+            node.setClassification( Classification::CONTROLLED );
+        }
+        else if( name == SHARED_ATTRIBUTE )
+        {
+            node.setClassification( Classification::SHARED );
+        }
+        else if( name == OUT_ATTRIBUTE )
+        {
+            node.setClassification( Classification::OUT );
+        }
+        else if( name == STATIC_ATTRIBUTE )
+        {
+            node.setClassification( Classification::STATIC );
+        }
+    }
 }
 
 void DefinitionVisitor::visit( DerivedDefinition& node )
