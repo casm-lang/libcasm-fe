@@ -45,6 +45,7 @@ set( CXX_SRC_FILES
   src/Driver.cpp
   src/Exceptions.cpp
 
+  src/ast/Attribute.cpp
   src/ast/Definition.cpp
   src/ast/Expression.cpp
   src/ast/Node.cpp
@@ -53,9 +54,11 @@ set( CXX_SRC_FILES
   src/ast/Type.cpp
   src/ast/RecursiveVisitor.cpp
 
-  src/analyze/AstDumpDotPass.cpp
   src/analyze/TypeCheckPass.cpp
+  src/analyze/AttributionPass.cpp
 
+  src/transform/AstDumpDotPass.cpp
+  src/transform/AstDumpSourcePass.cpp
   src/transform/SourceToAstPass.cpp
 
   src/various/GrammarParser.cpp

@@ -23,10 +23,10 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_ASTTOCASMIRPASS_H_
-#define _LIB_CASMFE_ASTTOCASMIRPASS_H_
+#ifndef _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_
+#define _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_
 
-#include "libpass.h"
+#include "../analyze/TypeCheckPass.h"
 
 #include "../Visitor.h"
 
@@ -47,19 +47,22 @@ namespace libcasm_ir
 
 namespace libcasm_fe
 {
-    class AstToCasmIRPass : public libpass::Pass, public Visitor< bool, bool >
+    class AstToCasmIRPass final : public libpass::Pass,
+                                  public Visitor< bool, bool >
     {
       public:
         using Data = libcasm_ir::ConsistencyCheckPass::Data;
 
         static char id;
 
-        bool run( libpass::PassResult& pr ) override final;
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
 
         std::shared_ptr< libcasm_ir::Specification > getSpecification(
             void ) const;
 
-        LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
+        LIB_CASMFE_VISITOR_INTERFACE( u1, u1 );
 
         libcasm_ir::Type::Ptr getType( Type* type );
 
@@ -91,7 +94,7 @@ namespace libcasm_fe
     };
 }
 
-#endif /* _LIB_CASMFE_PASSASTTOCASMIR_H_ */
+#endif // _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_
 
 //
 //  Local variables:

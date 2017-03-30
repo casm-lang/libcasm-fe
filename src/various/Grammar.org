@@ -8,9 +8,13 @@ Definition
 | RuleDefinition
 | EnumerationDefinition
 
-Definitions
-: Definitions Definition
+AttributedDefinition
+: LSQPAREN Attributes RSQPAREN Definition
 | Definition
+
+Definitions
+: Definitions AttributedDefinition
+| AttributedDefinition
 
 FunctionDefinition
 : FUNCTION MaybeFunctionAttributes Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
@@ -270,3 +274,17 @@ CallRule
 | DirectCallExpression
 | CALL IndirectCallExpression
 | IndirectCallExpression
+
+Attribute
+: BasicAttribute
+| ExpressionAttribute
+
+Attributes
+: Attributes COMMA Attribute
+| Attribute
+
+BasicAttribute
+: Identifier
+
+ExpressionAttribute
+: Identifier Term

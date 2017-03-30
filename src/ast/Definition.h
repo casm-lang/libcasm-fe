@@ -26,8 +26,8 @@
 #ifndef _LIB_CASMFE_DEFINITION_H_
 #define _LIB_CASMFE_DEFINITION_H_
 
+#include "Attribute.h"
 #include "Node.h"
-
 #include "Rule.h"
 #include "Type.h"
 
@@ -48,9 +48,13 @@ namespace libcasm_fe
                 const libcasm_ir::RelationType::Ptr& relationType );
             libcasm_ir::RelationType::Ptr relationType( void ) const;
 
+            void setAttributes( const Attributes::Ptr& attributes );
+            Attributes::Ptr attributes( void ) const;
+
           private:
             IdentifierNode::Ptr m_identifier;
             libcasm_ir::RelationType::Ptr m_relationType;
+            Attributes::Ptr m_attributes;
         };
 
         using Definitions = NodeList< Definition >;
@@ -96,8 +100,8 @@ namespace libcasm_fe
             void setClassification( Classification classification );
             Classification classification( void ) const;
 
-            void setSymbolic( bool symbolic );
-            bool symbolic( void ) const;
+            void setSymbolic( u1 symbolic );
+            u1 symbolic( void ) const;
 
             void setInitializers(
                 const NodeList< UpdateRule >::Ptr& initializers );
@@ -112,7 +116,7 @@ namespace libcasm_fe
             Classification m_classification;
             Types::Ptr m_argumentTypes;
             Type::Ptr m_returnType;
-            bool m_symbolic;
+            u1 m_symbolic;
             NodeList< UpdateRule >::Ptr m_initializers;
             Expression::Ptr m_defaultValue;
         };

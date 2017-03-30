@@ -25,9 +25,6 @@
 
 #include "NumericExecutionPass.h"
 
-#include "../analyze/TypeCheckPass.h"
-#include "../transform/AstToCasmIRPass.h"
-
 #include "../Driver.h"
 #include "../Exceptions.h"
 #include "../Symbols.h"
@@ -55,11 +52,16 @@ NumericExecutionPass::~NumericExecutionPass()
     delete walker;
 }
 
+void NumericExecutionPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
+}
+
 bool NumericExecutionPass::run( libpass::PassResult& pr )
 {
     walker = new NumericExecutionWalker( *this );
 
-    const bool dump_updates = m_dump_updates;
+    const u1 dump_updates = m_dump_updates;
 
     auto node = pr.result< TypeCheckPass >();
 
@@ -128,7 +130,7 @@ void NumericExecutionPass::dumpUpdates() const
 {
     std::cout << "{";
 
-    bool firstDump = true;
+    u1 firstDump = true;
 
     const auto updateSet = updateSetManager.currentUpdateSet();
     const auto end = updateSet->end();

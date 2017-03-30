@@ -39,7 +39,7 @@ using namespace libcasm_fe;
 
 extern Driver* global_driver;
 
-bool ExecutionPassBase::hasEmptyUpdateSet() const
+u1 ExecutionPassBase::hasEmptyUpdateSet() const
 {
     return updateSetManager.currentUpdateSet()->empty();
 }
@@ -282,7 +282,7 @@ value_t ExecutionPassBase::defaultFunctionValue(
     return functionDefaultValues[ function->id ];
 }
 
-bool ExecutionPassBase::filter_enabled( const std::string& filter )
+u1 ExecutionPassBase::filter_enabled( const std::string& filter )
 {
     return debuginfo_filters.count( "all" ) > 0
            || debuginfo_filters.count( filter ) > 0;
@@ -629,7 +629,7 @@ namespace libcasm_fe
                 return std::move( arg );
             }
 
-            return value_t( (bool)arg.value.integer );
+            return value_t( (u1)arg.value.integer );
         }
 
         static const value_t asenum( BuiltinAtom* atom, const value_t& arg )

@@ -35,12 +35,15 @@ using namespace libcasm_fe;
 
 char SourceToAstPass::id = 0;
 
-static libpass::PassRegistration< SourceToAstPass > PASS( "Source To AST Pass",
+static libpass::PassRegistration< SourceToAstPass > PASS( "SourceToAstPass",
     "parse the source code and generate an AST", "ast-parse", 0 );
 
-// PPA: TODO: dependency INPUT FILE
+void SourceToAstPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< libpass::LoadFilePass >();
+}
 
-bool SourceToAstPass::run( libpass::PassResult& pr )
+u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
     const auto loadFilePass = pr.result< libpass::LoadFilePass >();
     const auto filePath = std::string(

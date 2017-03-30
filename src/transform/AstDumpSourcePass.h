@@ -23,33 +23,31 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "TypeCheckPass.h"
+#ifndef _LIB_CASMFE_AST_DUMP_SOURCE_PASS_H_
+#define _LIB_CASMFE_AST_DUMP_SOURCE_PASS_H_
 
-using namespace libcasm_fe;
-using namespace Ast;
+#include "../analyze/TypeCheckPass.h"
 
-char TypeCheckPass::id = 0;
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
 
-static libpass::PassRegistration< TypeCheckPass > PASS( "ASTTypeInferencePass",
-    "type check the AST and translate it to a typed AST", "ast-check", 0 );
-
-void TypeCheckPass::usage( libpass::PassUsage& pu )
+namespace libcasm_fe
 {
-    pu.require< SourceToAstPass >();
+    /**
+     * @brief Generates CASM source of the AST
+     */
+    class AstDumpSourcePass final : public libpass::Pass
+    {
+      public:
+        static char id;
+
+        void usage( libpass::PassUsage& pu ) override;
+
+        u1 run( libpass::PassResult& pr ) override;
+    };
 }
 
-u1 TypeCheckPass::run( libpass::PassResult& pr )
-{
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
-
-    //TypeCheckVisitor visitor;
-    //specification->accept( visitor );
-
-    pr.setResult< TypeCheckPass >( libstdhl::make< Data >( specification ) );
-
-    return true; // TODO: return only true if this pass is correct!
-}
+#endif // _LIB_CASMFE_AST_DUMP_SOURCE_PASS_H_
 
 //
 //  Local variables:

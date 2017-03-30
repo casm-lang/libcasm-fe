@@ -25,20 +25,14 @@
 
 #include "AstDumpDotPass.h"
 
-#include <stack>
-
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
-#include "TypeCheckPass.h"
-
 using namespace libcasm_fe;
 using namespace Ast;
 
 char AstDumpDotPass::id = 0;
 
-static libpass::PassRegistration< AstDumpDotPass > PASS( "AST Dumping Pass",
+static libpass::PassRegistration< AstDumpDotPass > PASS( "AstDumpDotPass",
     "generates a DOT graph of the AST and dumps it to './out.dot' for now",
-    "ast-dump", 0 );
+    "ast-dump-dot", 0 );
 
 class AstDumpDotVisitor final : public RecursiveVisitor
 {
@@ -72,7 +66,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
   public:
     AstDumpDotVisitor( std::ostream& stream );
 
-    void setDumpNodeLocation( bool dumpNodeLocation );
+    void setDumpNodeLocation( u1 dumpNodeLocation );
 
     void visit( Specification& node ) override;
 
@@ -84,7 +78,6 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
     void visit( ValueAtom& node ) override;
     void visit( RuleReferenceAtom& node ) override;
-    void visit( ZeroAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
@@ -113,6 +106,9 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( FixedSizedType& node ) override;
     void visit( RangedType& node ) override;
 
+    void visit( BasicAttribute& node ) override;
+    void visit( ExpressionAttribute& node ) override;
+
     void visit( IdentifierNode& node ) override;
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
@@ -124,7 +120,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
   private:
     std::ostream& m_stream;
     std::stack< Node* > m_parentNodes; /**< holds the parent nodes of DotLink */
-    bool m_dumpNodeLocation = false;   /**< dump node source code location */
+    u1 m_dumpNodeLocation = false;     /**< dump node source code location */
 };
 
 AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
@@ -134,7 +130,7 @@ AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
 {
 }
 
-void AstDumpDotVisitor::setDumpNodeLocation( bool dumpNodeLocation )
+void AstDumpDotVisitor::setDumpNodeLocation( u1 dumpNodeLocation )
 {
     m_dumpNodeLocation = dumpNodeLocation;
 }
@@ -199,13 +195,6 @@ void AstDumpDotVisitor::visit( RuleReferenceAtom& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RuleReferenceAtom" );
-    RecursiveVisitor::visit( node );
-}
-
-void AstDumpDotVisitor::visit( ZeroAtom& node )
-{
-    DotLink link( this, &node );
-    dumpNode( node, "ZeroAtom" );
     RecursiveVisitor::visit( node );
 }
 
@@ -383,6 +372,20 @@ void AstDumpDotVisitor::visit( RangedType& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( BasicAttribute& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "BasicAttribute" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( ExpressionAttribute& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "ExpressionAttribute" );
+    RecursiveVisitor::visit( node );
+}
+
 void AstDumpDotVisitor::visit( IdentifierNode& node )
 {
     DotLink link( this, &node );
@@ -421,7 +424,12 @@ void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
     m_stream << "\"" << from << "\" -> \"" << to << "\";\n";
 }
 
-bool AstDumpDotPass::run( libpass::PassResult& pr )
+void AstDumpDotPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
+}
+
+u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
     const auto typeCheckPass = pr.result< TypeCheckPass >();
     const auto specification = typeCheckPass->specification();

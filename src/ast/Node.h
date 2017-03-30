@@ -28,8 +28,7 @@
 
 #include "Visitor.h"
 
-#include <memory>
-#include <vector>
+#include "../stdhl/cpp/Type.h"
 
 #include "../various/location.hh"
 
@@ -57,7 +56,6 @@ namespace libcasm_fe
                 // expressions
                 VALUE_ATOM,
                 RULE_REFERENCE_ATOM,
-                ZERO_ATOM,
                 UNDEF_ATOM,
                 DIRECT_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,
@@ -88,6 +86,10 @@ namespace libcasm_fe
                 FIXED_SIZED_TYPE,
                 RANGED_TYPE,
 
+                // attributes
+                BASIC_ATTRIBUTE,
+                EXPRESSION_ATTRIBUTE,
+
                 // other
                 NODE_LIST,
                 IDENTIFIER,
@@ -105,6 +107,8 @@ namespace libcasm_fe
 
             void setSourceLocation( const location& sourceLocation );
             location sourceLocation( void ) const;
+
+            std::string name( void ) const;
 
             virtual void accept( Visitor& visitor ) = 0;
 
@@ -162,7 +166,7 @@ namespace libcasm_fe
                 return m_elements.cend();
             }
 
-            bool empty( void ) const
+            u1 empty( void ) const
             {
                 return m_elements.empty();
             }

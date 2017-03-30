@@ -40,7 +40,6 @@ namespace libcasm_fe
 
         class ValueAtom;
         class RuleReferenceAtom;
-        class ZeroAtom;
         class UndefAtom;
         class DirectCallExpression;
         class IndirectCallExpression;
@@ -69,6 +68,9 @@ namespace libcasm_fe
         class FixedSizedType;
         class RangedType;
 
+        class BasicAttribute;
+        class ExpressionAttribute;
+
         class IdentifierNode;
         class ExpressionCase;
         class DefaultCase;
@@ -91,7 +93,6 @@ namespace libcasm_fe
 
             virtual void visit( ValueAtom& node ) = 0;
             virtual void visit( RuleReferenceAtom& node ) = 0;
-            virtual void visit( ZeroAtom& node ) = 0;
             virtual void visit( UndefAtom& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( IndirectCallExpression& node ) = 0;
@@ -119,6 +120,9 @@ namespace libcasm_fe
             virtual void visit( ComposedType& node ) = 0;
             virtual void visit( FixedSizedType& node ) = 0;
             virtual void visit( RangedType& node ) = 0;
+
+            virtual void visit( BasicAttribute& node ) = 0;
+            virtual void visit( ExpressionAttribute& node ) = 0;
 
             virtual void visit( IdentifierNode& node ) = 0;
             virtual void visit( ExpressionCase& node ) = 0;

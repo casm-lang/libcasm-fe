@@ -87,16 +87,6 @@ namespace libcasm_fe
             libcasm_ir::RuleReferenceConstant::Ptr m_ruleReference;
         };
 
-        class ZeroAtom : public Expression
-        {
-          public:
-            using Ptr = std::shared_ptr< ZeroAtom >;
-
-            ZeroAtom( void );
-
-            void accept( Visitor& visitor ) override final;
-        };
-
         class UndefAtom : public Expression
         {
           public:

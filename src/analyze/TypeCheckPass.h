@@ -26,40 +26,26 @@
 #ifndef _LIB_CASMFE_TYPE_CHECK_PASS_H_
 #define _LIB_CASMFE_TYPE_CHECK_PASS_H_
 
-#include "libpass.h"
+#include "../transform/SourceToAstPass.h"
 
+#include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 
 namespace libcasm_fe
 {
     /**
-     * @brief Generates a DOT graph of the AST
+     * @brief Type inference of AST
      */
     class TypeCheckPass final : public libpass::Pass
     {
       public:
         static char id;
 
+        void usage( libpass::PassUsage& pu ) override;
+
         bool run( libpass::PassResult& pr ) override;
 
-        class Data : public libpass::PassData
-        {
-        public:
-            using Ptr = std::shared_ptr< Data >;
-
-            Data( const Ast::Specification::Ptr& specification )
-            : m_specification( specification )
-            {
-            }
-
-            Ast::Specification::Ptr specification( void ) const
-            {
-                return m_specification;
-            }
-
-        private:
-            Ast::Specification::Ptr m_specification;
-        };
+        using Data = SourceToAstPass::Data;
     };
 }
 

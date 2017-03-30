@@ -45,7 +45,6 @@ namespace libcasm_fe
 
             void visit( ValueAtom& node ) override;
             void visit( RuleReferenceAtom& node ) override;
-            void visit( ZeroAtom& node ) override;
             void visit( UndefAtom& node ) override;
             void visit( DirectCallExpression& node ) override;
             void visit( IndirectCallExpression& node ) override;
@@ -73,6 +72,9 @@ namespace libcasm_fe
             void visit( ComposedType& node ) override;
             void visit( FixedSizedType& node ) override;
             void visit( RangedType& node ) override;
+
+            void visit( BasicAttribute& node ) override;
+            void visit( ExpressionAttribute& node ) override;
 
             void visit( IdentifierNode& node ) override;
             void visit( ExpressionCase& node ) override;

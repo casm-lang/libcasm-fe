@@ -23,40 +23,45 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "TypeCheckPass.h"
+#include "Attribute.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
 
-char TypeCheckPass::id = 0;
-
-static libpass::PassRegistration< TypeCheckPass > PASS( "ASTTypeInferencePass",
-    "type check the AST and translate it to a typed AST", "ast-check", 0 );
-
-void TypeCheckPass::usage( libpass::PassUsage& pu )
+Attribute::Attribute( Node::ID type, const IdentifierNode::Ptr& identifier )
+: Node( type )
+, m_identifier( identifier )
 {
-    pu.require< SourceToAstPass >();
 }
 
-u1 TypeCheckPass::run( libpass::PassResult& pr )
+IdentifierNode::Ptr Attribute::identifier( void ) const
 {
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
-
-    //TypeCheckVisitor visitor;
-    //specification->accept( visitor );
-
-    pr.setResult< TypeCheckPass >( libstdhl::make< Data >( specification ) );
-
-    return true; // TODO: return only true if this pass is correct!
+    return m_identifier;
 }
 
-//
-//  Local variables:
-//  mode: c++
-//  indent-tabs-mode: nil
-//  c-basic-offset: 4
-//  tab-width: 4
-//  End:
-//  vim:noexpandtab:sw=4:ts=4:
-//
+BasicAttribute::BasicAttribute( const IdentifierNode::Ptr& identifier )
+: Attribute( Node::ID::BASIC_ATTRIBUTE, identifier )
+{
+}
+
+void BasicAttribute::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+ExpressionAttribute::ExpressionAttribute(
+    const IdentifierNode::Ptr& identifier, const Expression::Ptr& expression )
+: Attribute( Node::ID::EXPRESSION_ATTRIBUTE, identifier )
+, m_expression( expression )
+{
+}
+
+Expression::Ptr ExpressionAttribute::expression( void ) const
+{
+    return m_expression;
+}
+
+void ExpressionAttribute::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}

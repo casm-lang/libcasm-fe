@@ -226,7 +226,7 @@ END       0 "end of file"
 %type <NodeList< IdentifierNode >::Ptr> Identifiers MaybeIdentifiers
 
 // definitions
-%type <Definition::Ptr> Definition
+%type <Definition::Ptr> Definition AttributedDefinition
 %type <Definitions::Ptr> Definitions
 %type <VariableDefinition::Ptr> Variable
 %type <FunctionDefinition::Ptr> FunctionDefinition
@@ -269,6 +269,12 @@ END       0 "end of file"
 %type <ComposedType::Ptr> ComposedType
 %type <FixedSizedType::Ptr> FixedSizedType
 %type <RangedType::Ptr> RangedType
+
+// types
+%type <Attribute::Ptr> Attribute
+%type <Attributes::Ptr> Attributes
+%type <BasicAttribute::Ptr> BasicAttribute
+%type <ExpressionAttribute::Ptr> ExpressionAttribute
 
 // other
 %type <FunctionDefinition::Ptr> ProgramFunctionDefinition
@@ -341,14 +347,28 @@ Definition
 ;
 
 
+AttributedDefinition
+: LSQPAREN Attributes RSQPAREN Definition
+  {
+      auto definition = $4;
+      definition->setAttributes( $2 );
+      $$ = definition;
+  }
+| Definition
+  {
+      $$ = $1;
+  }
+;
+
+
 Definitions
-: Definitions Definition
+: Definitions AttributedDefinition
   {
       auto definitions = $1;
       definitions->add( $2 );
       $$ = definitions;
   }
-| Definition
+| AttributedDefinition
   {
       auto definitions = make< Definitions >( @$ );
       definitions->add( $1 );
@@ -877,8 +897,7 @@ Expression
   }
 | MINUS Term %prec UMINUS
   {
-      const auto zero = make< ZeroAtom >( @$ );
-      $$ = make< BinaryExpression >( @$, zero, $2, libcasm_ir::Value::SUB_INSTRUCTION );
+      $$ = make< UnaryExpression >( @$, $2, libcasm_ir::Value::INV_INSTRUCTION );
   }
 | Term PLUS Term
   {
@@ -1268,6 +1287,50 @@ CallRule
           allowedCallTargetTypes{ CallExpression::TargetType::DERIVED,
                                   CallExpression::TargetType::BUILTIN };
       $$ = make< CallRule >( @$, $1, allowedCallTargetTypes );
+  }
+;
+
+
+Attribute
+: BasicAttribute
+  {
+      $$ = $1;
+  }
+| ExpressionAttribute
+  {
+      $$ = $1;
+  }
+;
+
+
+Attributes
+: Attributes COMMA Attribute
+  {
+      auto attributes = $1;
+      attributes->add( $3 );
+      $$ = attributes;
+  }
+| Attribute
+  {
+      auto attributes = make< Attributes >( @$ );
+      attributes->add( $1 );
+      $$ = attributes;
+  }
+;
+
+
+BasicAttribute
+: Identifier
+  {
+      $$ = make< BasicAttribute >( @$, $1 );
+  }
+;
+
+
+ExpressionAttribute
+: Identifier Term
+  {
+      $$ = make< ExpressionAttribute >( @$, $1, $2 );
   }
 ;
 
