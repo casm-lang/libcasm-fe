@@ -25,8 +25,6 @@
 
 #include "AstToCasmIRPass.h"
 
-#include "analyze/TypeCheckPass.h"
-
 #include "../stdhl/cpp/Default.h"
 
 #include "../casm-ir/src/Block.h"
@@ -146,7 +144,13 @@ value_t AstToCasmIRPass::value_t_value( const libcasm_ir::Value::Ptr& value )
     }
 }
 
-u1 AstToCasmIRPass::run( libpass::PassResult& pr )
+void AstToCasmIRPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
+    pu.provide< libcasm_ir::ConsistencyCheckPass >();
+}
+
+bool AstToCasmIRPass::run( libpass::PassResult& pr )
 {
     m_specification = nullptr;
 
@@ -724,13 +728,11 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, u1 cond )
     ir_scope->add( ir_stmt );
 
     assert( node->condition_ );
-    auto ir_cond = lookup< libcasm_ir::Instruction >( node->condition_ );
+    auto ir_cond = lookup< libcasm_ir::Value >( node->condition_ );
 
     assert( ( libcasm_ir::isa< libcasm_ir::Instruction >( ir_cond )
                 and ir_cond->type().id() == libcasm_ir::Type::BOOLEAN )
             or libcasm_ir::isa< libcasm_ir::BooleanConstant >( ir_cond ) );
-
-    ir_stmt->add( ir_cond );
 
     auto ir_select = libstdhl::make< libcasm_ir::SelectInstruction >( ir_cond );
 
