@@ -46,8 +46,7 @@ void SourceToAstPass::usage( libpass::PassUsage& pu )
 u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
     const auto loadFilePass = pr.result< libpass::LoadFilePass >();
-    const auto filePath = std::string(
-        loadFilePass->filename() ); // TODO char* -> string in load pass
+    const auto filePath = loadFilePass->filename();
 
     std::ifstream sourceFile( filePath );
     if( not sourceFile.is_open() )
