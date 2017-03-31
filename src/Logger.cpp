@@ -32,6 +32,9 @@ using namespace libcasm_fe;
 
 namespace Log = libstdhl::Log;
 
+/**
+ * From http://stackoverflow.com/a/26221725
+ */
 template<typename ... Args>
 std::string string_format( const std::string& format, Args... args )
 {
