@@ -639,17 +639,36 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 {
     libpass::PassLogger log( &id, stream() );
 
-    try
-    {
-        const auto data = pr.result< TypeCheckPass >();
-        const auto specification = data->specification();
+    const auto data = pr.result< TypeCheckPass >();
+    const auto specification = data->specification();
 
-        AstDumpSourceVisitor visitor{ std::cout };
-        specification->accept( visitor );
-    }
-    catch( ... )
+    std::string src_file = "stdout"; // TODO: add command-line switch
+    std::ostream* src_stream = &std::cout;
+    std::ofstream src_file_stream;
+
+    u1 src_is_file = src_file.compare( "stdout" );
+
+    if( src_is_file )
     {
-        log.error( "unable to dump AST to CASM source" );
+        src_file_stream = std::ofstream( src_file );
+
+        if( not src_file_stream.is_open() )
+        {
+            log.error( "could not open '" + src_file + "'" );
+            return false;
+        }
+
+        src_stream = &src_file_stream;
+    }
+
+    log.debug( "writing source to '" + src_file + "'" );
+
+    AstDumpSourceVisitor visitor{ *src_stream };
+    specification->accept( visitor );
+
+    if( src_is_file )
+    {
+        src_file_stream.close();
     }
 
     return true;
