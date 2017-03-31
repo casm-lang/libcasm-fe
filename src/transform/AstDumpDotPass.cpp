@@ -433,36 +433,30 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
     libpass::PassLogger log( &id, stream() );
 
-    try
+    const auto data = pr.result< TypeCheckPass >();
+    const auto specification = data->specification();
+
+    std::string dot_file = "./obj/out.dot"; // TODO: add command-line switch
+    std::ofstream dot_stream( dot_file );
+
+    if( not dot_stream.is_open() )
     {
-        const auto data = pr.result< TypeCheckPass >();
-        const auto specification = data->specification();
-
-        std::string dot_file_path = "./out.dot"; // TODO: desired file path
-        std::ofstream dot_file( dot_file_path );
-
-        if( not dot_file.is_open() )
-        {
-            log.error( "could not open '" + dot_file_path + "'" );
-            return false;
-        }
-
-        dot_file << "digraph \"main\" {\n";
-
-        AstDumpDotVisitor visitor{ dot_file };
-
-        visitor.setDumpNodeLocation( true ); // TODO add command-line switch
-
-        specification->accept( visitor );
-
-        dot_file << "}\n";
-
-        dot_file.close();
+        log.error( "could not open '" + dot_file + "'" );
+        return false;
     }
-    catch( ... )
-    {
-        log.error( "unable to dump AST to DOT" );
-    }
+
+    log.debug( "writing dot graph to '" + dot_file + "'" );
+
+    dot_stream << "digraph \"main\" {\n";
+
+    AstDumpDotVisitor visitor{ dot_stream };
+    visitor.setDumpNodeLocation( true ); // TODO: add command-line switch
+
+    specification->accept( visitor );
+
+    dot_stream << "}\n";
+
+    dot_stream.close();
 
     return true;
 }
