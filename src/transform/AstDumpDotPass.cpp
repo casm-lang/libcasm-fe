@@ -437,26 +437,39 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     std::string dot_file = "./obj/out.dot"; // TODO: add command-line switch
-    std::ofstream dot_stream( dot_file );
+    std::ostream* dot_stream = &std::cout;
+    std::ofstream dot_file_stream;
 
-    if( not dot_stream.is_open() )
+    u1 dot_is_file = dot_file.compare( "stdout" );
+
+    if( dot_is_file )
     {
-        log.error( "could not open '" + dot_file + "'" );
-        return false;
+        dot_file_stream = std::ofstream( dot_file );
+
+        if( not dot_file_stream.is_open() )
+        {
+            log.error( "could not open '" + dot_file + "'" );
+            return false;
+        }
+
+        dot_stream = &dot_file_stream;
     }
 
     log.debug( "writing dot graph to '" + dot_file + "'" );
 
-    dot_stream << "digraph \"main\" {\n";
+    *dot_stream << "digraph \"main\" {\n";
 
-    AstDumpDotVisitor visitor{ dot_stream };
+    AstDumpDotVisitor visitor{ *dot_stream };
     visitor.setDumpNodeLocation( true ); // TODO: add command-line switch
 
     specification->accept( visitor );
 
-    dot_stream << "}\n";
+    *dot_stream << "}\n";
 
-    dot_stream.close();
+    if( dot_is_file )
+    {
+        dot_file_stream.close();
+    }
 
     return true;
 }
