@@ -30,7 +30,7 @@
 
 #include "../stdhl/cpp/Type.h"
 
-#include "../various/location.hh"
+#include "../Location.h"
 
 namespace libcasm_fe
 {
@@ -105,8 +105,8 @@ namespace libcasm_fe
 
             ID id( void ) const;
 
-            void setSourceLocation( const location& sourceLocation );
-            location sourceLocation( void ) const;
+            void setSourceLocation( const Location& sourceLocation );
+            Location sourceLocation( void ) const;
 
             std::string name( void ) const;
 
@@ -114,7 +114,7 @@ namespace libcasm_fe
 
           private:
             ID m_id;
-            location m_sourceLocation;
+            Location m_sourceLocation;
         };
 
         template < typename T >
@@ -199,7 +199,7 @@ namespace libcasm_fe
         };
 
         template < typename T, typename... Args >
-        typename T::Ptr make( const location& sourceLocation, Args&&... args )
+        typename T::Ptr make( const Location& sourceLocation, Args&&... args )
         {
             auto node
                 = std::make_shared< T >( std::forward< Args >( args )... );

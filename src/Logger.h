@@ -23,39 +23,42 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_LEXER_H_
-#define _LIB_CASMFE_LEXER_H_
+#ifndef _LIB_CASMFE_LOGGER_H_
+#define _LIB_CASMFE_LOGGER_H_
 
-#include <FlexLexer.h>
+#include <vector>
 #include <string>
 
-#include "various/GrammarParser.tab.h"
+#include "../pass/src/PassLogger.h"
+
+#include "Codes.h"
 
 namespace libcasm_fe
 {
-    class Logger;
     class Location;
+    class Exception;
 
-    class Lexer : public yyFlexLexer
+    class Logger : public libpass::PassLogger
     {
       public:
-        Lexer( Logger& log, std::istream& in, std::ostream& out );
+        using libpass::PassLogger::PassLogger;
 
-        void setFileName( const std::string& fileName );
+        using libpass::PassLogger::error;
+        void error( const std::vector< Location >& locations,
+            const std::string& message, Code errorCode = Code::Unspecified );
+        void error( const Exception& exception );
 
-        Parser::symbol_type nextToken();
+        using libpass::PassLogger::warning;
+        void warning( const std::vector< Location >& locations,
+            const std::string& message );
 
-      protected:
-        void LexerError( const char* msg ) override;
-
-      private:
-        Logger& log;
-        Location loc;
-        std::string strbuf;
+        using libpass::PassLogger::info;
+        void info( const std::vector< Location >& locations,
+            const std::string& message );
     };
 }
 
-#endif // _LIB_CASMFE_LEXER_H_
+#endif // _LIB_CASMFE_LOGGER_H_
 
 //
 //  Local variables:

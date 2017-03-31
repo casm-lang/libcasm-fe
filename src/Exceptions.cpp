@@ -28,19 +28,19 @@
 using namespace libcasm_fe;
 
 Exception::Exception( const std::string& msg, Code errorCode )
-: Exception( location( position( 0, 0, 0 ) ), msg, errorCode )
+: Exception( Location(), msg, errorCode )
 {
 }
 
 Exception::Exception(
-    const location& location, const std::string& msg, Code errorCode )
+    const Location& location, const std::string& msg, Code errorCode )
 : m_msg( msg )
 , m_locations( { location } )
 , m_errorCode( errorCode )
 {
 }
 
-Exception::Exception( const std::vector< location >& locations,
+Exception::Exception( const std::vector< Location >& locations,
     const std::string& msg, Code errorCode )
 : m_msg( msg )
 , m_locations( locations )
@@ -53,7 +53,7 @@ const char* Exception::what() const noexcept
     return m_msg.c_str();
 }
 
-const std::vector< location >& Exception::locations( void ) const noexcept
+const std::vector< Location >& Exception::locations( void ) const noexcept
 {
     return m_locations;
 }
