@@ -66,17 +66,9 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     Parser parser( lexer, specificationName, specification );
     parser.set_debug_level( false ); // TODO add flag
 
-    try
+    if( ( parser.parse() != 0 ) or not specification )
     {
-        if( ( parser.parse() != 0 ) or not specification )
-        {
-            std::cerr << "Error parsing file" << std::endl;
-            return false;
-        }
-    }
-    catch( const std::exception& e )
-    {
-        std::cerr << "error: got exception: " << e.what() << std::endl;
+        std::cerr << "Error parsing file" << std::endl;
         return false;
     }
 
