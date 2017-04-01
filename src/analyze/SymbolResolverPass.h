@@ -23,25 +23,41 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_H_
-#define _LIB_CASMFE_H_
+#ifndef _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
+#define _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
 
-#include "src/analyze/AttributionPass.h"
-#include "src/analyze/SymbolResolverPass.h"
-#include "src/analyze/TypeCheckPass.h"
+#include "../analyze/AttributionPass.h"
 
-//#include "src/execute/NumericExecutionPass.h"
-//#include "src/execute/SymbolicExecutionPass.h"
-
-//#include "src/transform/AstToCasmIRPass.h"
-#include "src/transform/AstDumpDotPass.h"
-#include "src/transform/SourceToAstPass.h"
+#include "../ast/Specification.h"
 
 namespace libcasm_fe
 {
+    /**
+     * @brief Symbol resolver pass of AST identifiers
+     */
+    class SymbolResolverPass final : public libpass::Pass
+    {
+      public:
+        static char id;
+
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
+
+        class Data : public AttributionPass::Data
+        {
+          public:
+            using Ptr = std::shared_ptr< Data >;
+
+            Data( const Ast::Specification::Ptr& specification )
+            : AttributionPass::Data( specification )
+            {
+            }
+        };
+    };
 }
 
-#endif // _LIB_CASMFE_H_
+#endif // _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
 
 //
 //  Local variables:
