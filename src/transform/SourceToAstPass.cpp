@@ -28,6 +28,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "../Logger.h"
 #include "../Lexer.h"
 #include "../various/GrammarParser.tab.h"
 
@@ -45,30 +46,29 @@ void SourceToAstPass::usage( libpass::PassUsage& pu )
 
 u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
+    Logger log( &id, stream() );
+
     const auto loadFilePass = pr.result< libpass::LoadFilePass >();
     const auto filePath = loadFilePass->filename();
 
     std::ifstream sourceFile( filePath );
     if( not sourceFile.is_open() )
     {
-        std::cerr << "error: could not open `" << filePath << "´" << std::endl;
+        log.error( "could not open `" + filePath + "´" );
         return false;
     }
 
-    const std::string& fileName
-        = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
-    const std::string& specificationName
-        = fileName.substr( 0, fileName.rfind( "." ) );
-
     Ast::Specification::Ptr specification;
 
-    Lexer lexer( sourceFile, std::cout );
-    Parser parser( lexer, specificationName, specification );
+    Lexer lexer( log, sourceFile, std::cout );
+    lexer.setFileName( filePath );
+
+    Parser parser( log, lexer, filePath, specification );
     parser.set_debug_level( false ); // TODO add flag
 
     if( ( parser.parse() != 0 ) or not specification )
     {
-        std::cerr << "Error parsing file" << std::endl;
+        log.error( "could not parse `" + filePath + "´" );
         return false;
     }
 

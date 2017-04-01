@@ -42,8 +42,8 @@ foreach( DEPENDENCY
 endforeach()
 
 set( CXX_SRC_FILES
-  src/Driver.cpp
   src/Exceptions.cpp
+  src/Logger.cpp
 
   src/ast/Attribute.cpp
   src/ast/Definition.cpp

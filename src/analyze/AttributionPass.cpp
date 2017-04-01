@@ -27,6 +27,7 @@
 
 #include <unordered_set>
 
+#include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 
@@ -71,7 +72,7 @@ static const std::unordered_set< std::string > VALID_EXPRESSION_ATTRIBUTES = {
 class DefinitionAttributionVisitor final : public RecursiveVisitor
 {
   public:
-    DefinitionAttributionVisitor( Definition& definition );
+    DefinitionAttributionVisitor( Logger& log, Definition& definition );
 
     const std::unordered_set< std::string >& attributeNames() const;
 
@@ -79,13 +80,15 @@ class DefinitionAttributionVisitor final : public RecursiveVisitor
     void visit( ExpressionAttribute& node ) override;
 
   private:
+    Logger& log;
     Definition& m_definition;
     std::unordered_set< std::string > m_attributeNames;
 };
 
 DefinitionAttributionVisitor::DefinitionAttributionVisitor(
-    Definition& definition )
-: m_definition( definition )
+    Logger& log, Definition& definition )
+: log( log )
+, m_definition( definition )
 , m_attributeNames()
 {
 }
@@ -103,16 +106,16 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     // allow only basic attributes
     if( VALID_BASIC_ATTRIBUTES.count( name ) == 0 )
     {
-        std::cerr << "error: " << node.sourceLocation() << ": `" << name
-                  << "` is a unknown " << node.name() << "\n";
+        log.error( {node.sourceLocation()}, "`" + name +
+            "` is a unknown basic attribute" );
         return;
     }
 
     // each attribute should only be used once
     if( m_attributeNames.count( name ) != 0 )
     {
-        std::cerr << "error: " << node.sourceLocation() << ": attribute `"
-                  << name << "` has already been used\n";
+        log.error( {node.sourceLocation()}, "attribute `" + name +
+            "` has already been used" );
         return;
     }
     m_attributeNames.insert( node.identifier()->identifier() );
@@ -120,10 +123,9 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     if( name == DEPRECATED_ATTRIBUTE )
     {
         // definition has been deprecated
-        std::cout << "info: " << m_definition.sourceLocation() << ": "
-                  << m_definition.name() << " `"
-                  << m_definition.identifier()->identifier()
-                  << "` has been marked as deprecated\n";
+        log.info( {m_definition.sourceLocation()}, m_definition.name() + " `" +
+            m_definition.identifier()->identifier() +
+            "` has been marked as deprecated" );
     }
 }
 
@@ -134,16 +136,16 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     // allow only expression attributes
     if( VALID_EXPRESSION_ATTRIBUTES.count( name ) == 0 )
     {
-        std::cerr << "error: " << node.sourceLocation() << ": `" << name
-                  << "` is a unknown " << node.name() << "\n";
+        log.error( {node.sourceLocation()}, "`" + name +
+            "` is a unknown expression attribute" );
         return;
     }
 
     // each attribute should only be used once
     if( m_attributeNames.count( name ) != 0 )
     {
-        std::cerr << "error: " << node.sourceLocation() << ": attribute `"
-                  << name << "` has already been used\n";
+        log.error( {node.sourceLocation()}, "attribute `" + name +
+            "` has already been used" );
         return;
     }
     m_attributeNames.insert( node.identifier()->identifier() );
@@ -152,22 +154,32 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
 class DefinitionVisitor final : public RecursiveVisitor
 {
   public:
+    DefinitionVisitor( Logger& log );
+
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
+
+  private:
+    Logger& log;
 };
+
+DefinitionVisitor::DefinitionVisitor( Logger& log )
+: log( log )
+{
+}
 
 void DefinitionVisitor::visit( VariableDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ node };
+    DefinitionAttributionVisitor visitor{ log, node };
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( FunctionDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ node };
+    DefinitionAttributionVisitor visitor{ log, node };
     node.attributes()->accept( visitor );
 
     const auto& attributeNames = visitor.attributeNames();
@@ -205,19 +217,19 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
 
 void DefinitionVisitor::visit( DerivedDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ node };
+    DefinitionAttributionVisitor visitor{ log, node };
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( RuleDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ node };
+    DefinitionAttributionVisitor visitor{ log, node };
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( EnumerationDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ node };
+    DefinitionAttributionVisitor visitor{ log, node };
     node.attributes()->accept( visitor );
 }
 
@@ -228,10 +240,12 @@ void AttributionPass::usage( libpass::PassUsage& pu )
 
 u1 AttributionPass::run( libpass::PassResult& pr )
 {
+    Logger log( &id, stream() );
+
     const auto sourceToAstPass = pr.result< SourceToAstPass >();
     const auto specification = sourceToAstPass->specification();
 
-    DefinitionVisitor visitor;
+    DefinitionVisitor visitor{ log };
     specification->accept( visitor );
 
     return true;

@@ -40,11 +40,13 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 44 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+#line 45 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 
     namespace libcasm_fe
     {
         class Lexer;
+        class Logger;
+        class Location;
     }
 
     #include "src/ast/Specification.h"
@@ -52,7 +54,9 @@
     using namespace libcasm_fe;
     using namespace Ast;
 
-#line 56 "GrammarParser.tab.h" // lalr1.cc:377
+    #define YY_NULLPTR nullptr
+
+#line 60 "GrammarParser.tab.h" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -61,7 +65,7 @@
 # include <string>
 # include <vector>
 # include "stack.hh"
-# include "location.hh"
+
 #include <typeinfo>
 #ifndef YYASSERT
 # include <cassert>
@@ -129,7 +133,7 @@
 
 #line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 namespace libcasm_fe {
-#line 133 "GrammarParser.tab.h" // lalr1.cc:377
+#line 137 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
@@ -473,7 +477,7 @@ namespace libcasm_fe {
     typedef YYSTYPE semantic_type;
 #endif
     /// Symbol locations.
-    typedef location location_type;
+    typedef Location location_type;
 
     /// Syntax errors thrown from user actions.
     struct syntax_error : std::runtime_error
@@ -1071,7 +1075,7 @@ namespace libcasm_fe {
 
 
     /// Build a parser object.
-    Parser (Lexer& lexer_yyarg, const std::string& specificationName_yyarg, Specification::Ptr& result_yyarg);
+    Parser (Logger& log_yyarg, Lexer& lexer_yyarg, const std::string& filePath_yyarg, Specification::Ptr& result_yyarg);
     virtual ~Parser ();
 
     /// Parse.
@@ -1284,8 +1288,9 @@ namespace libcasm_fe {
 
 
     // User arguments.
+    Logger& log;
     Lexer& lexer;
-    const std::string& specificationName;
+    const std::string& filePath;
     Specification::Ptr& result;
   };
 
@@ -3192,7 +3197,7 @@ namespace libcasm_fe {
 
 #line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 } // libcasm_fe
-#line 3196 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3201 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

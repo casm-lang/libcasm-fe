@@ -33,6 +33,7 @@
 
 %define api.token.constructor
 %define api.value.type variant
+%define api.location.type {Location}
 
 %define parse.assert
 %define parse.trace
@@ -45,29 +46,36 @@
     namespace libcasm_fe
     {
         class Lexer;
+        class Logger;
+        class Location;
     }
 
     #include "src/ast/Specification.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
+
+    #define YY_NULLPTR nullptr
 }
 
+%parse-param { Logger& log }
 %parse-param { Lexer& lexer }
-%parse-param { const std::string& specificationName }
+%parse-param { const std::string& filePath }
 %parse-param { Specification::Ptr& result }
 
 %code
 {
+    #include "src/Location.h"
     #include "src/Lexer.h"
     #include "src/Exceptions.h"
+    #include "src/Logger.h"
 
     #include "../stdhl/cpp/Type.h"
 
     #undef yylex
     #define yylex lexer.nextToken
 
-    static BasicType::Ptr createVoidType( location& sourceLocation )
+    static BasicType::Ptr createVoidType( Location& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::VoidType >();
         const auto name = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, type->description() );
@@ -76,7 +84,7 @@
         return node;
     }
 
-    static BasicType::Ptr createRuleRefType( location& sourceLocation )
+    static BasicType::Ptr createRuleRefType( Location& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::RuleReferenceType >();
         const auto name = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, type->description() );
@@ -85,14 +93,14 @@
         return node;
     }
 
-    static BasicType::Ptr createAgentType( location& sourceLocation )
+    static BasicType::Ptr createAgentType( Location& sourceLocation )
     {
         const auto name = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, "Agent" );
         const auto node = libcasm_fe::Ast::make< BasicType >( sourceLocation, name );
         return node;
     }
 
-    static FunctionDefinition::Ptr createProgramFunction( location& sourceLocation )
+    static FunctionDefinition::Ptr createProgramFunction( Location& sourceLocation )
     {
         const auto agentType = createAgentType( sourceLocation );
         const auto ruleRefType = createRuleRefType( sourceLocation );
@@ -233,8 +241,11 @@ END       0 "end of file"
 Specification
 : CASM Definitions
   {
-      const auto name = libcasm_fe::Ast::make< IdentifierNode >( @$, specificationName );
-      result = libcasm_fe::Ast::make< Specification >( @$, name, $2 );
+      const std::string& fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
+      const std::string& name = fileName.substr( 0, fileName.rfind( "." ) );
+
+      const auto specificationName = make< IdentifierNode >( @$, name );
+      result = libcasm_fe::Ast::make< Specification >( @$, specificationName, $2 );
   }
 ;
 
@@ -1219,25 +1230,9 @@ ExpressionAttribute
 
 %%
 
-void Parser::error( const location_type& l, const std::string& m )
+void Parser::error( const Location& location, const std::string& message )
 {
-    if( m.compare( "syntax error, unexpected end of file, expecting CASM" ) == 0 )
-    {
-        i32 pos = (l.begin.line - 1);
-        pos = ( pos > 0 ? pos : 1 );
-
-        /*driver.error
-        ( location( position( 0, pos, 1 ) )
-        , m
-        , libcasm_fe::Codes::SyntaxError
-        ); TODO */
-    }
-    else
-    {
-        //driver.error( l, m, libcasm_fe::Codes::SyntaxError ); TODO
-    }
-
-    std::cerr << l << ": " << m << std::endl;
+    log.error( {location}, message, Code::SyntaxError );
 }
 
 //
