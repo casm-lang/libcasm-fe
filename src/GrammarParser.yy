@@ -70,8 +70,8 @@
     static BasicType::Ptr createVoidType( location& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::VoidType >();
-        const auto name = make< IdentifierNode >( sourceLocation, type->description() );
-        const auto node = make< BasicType >( sourceLocation, name );
+        const auto name = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, type->description() );
+        const auto node = libcasm_fe::Ast::make< BasicType >( sourceLocation, name );
         node->setType( type );
         return node;
     }
@@ -79,16 +79,16 @@
     static BasicType::Ptr createRuleRefType( location& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::RuleReferenceType >();
-        const auto name = make< IdentifierNode >( sourceLocation, type->description() );
-        const auto node = make< BasicType >( sourceLocation, name );
+        const auto name = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, type->description() );
+        const auto node = libcasm_fe::Ast::make< BasicType >( sourceLocation, name );
         node->setType( type );
         return node;
     }
 
     static BasicType::Ptr createAgentType( location& sourceLocation )
     {
-        const auto name = make< IdentifierNode >( sourceLocation, "Agent" );
-        const auto node = make< BasicType >( sourceLocation, name );
+        const auto name = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, "Agent" );
+        const auto node = libcasm_fe::Ast::make< BasicType >( sourceLocation, name );
         return node;
     }
 
@@ -97,11 +97,11 @@
         const auto agentType = createAgentType( sourceLocation );
         const auto ruleRefType = createRuleRefType( sourceLocation );
 
-        const auto argTypes = make< Types >( sourceLocation );
+        const auto argTypes = libcasm_fe::Ast::make< Types >( sourceLocation );
         argTypes->add( agentType );
 
-        const auto program = make< IdentifierNode >( sourceLocation, "program" );
-        return make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
+        const auto program = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, "program" );
+        return libcasm_fe::Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
@@ -113,9 +113,9 @@
         }
 
         const auto& sourceLocation = rule->sourceLocation();
-        const auto rules = make< Rules >( sourceLocation );
+        const auto rules = libcasm_fe::Ast::make< Rules >( sourceLocation );
         rules->add( rule );
-        return make< BlockRule >( sourceLocation, rules );
+        return libcasm_fe::Ast::make< BlockRule >( sourceLocation, rules );
     }
 }
 
@@ -233,8 +233,8 @@ END       0 "end of file"
 Specification
 : CASM Definitions
   {
-      const auto name = make< IdentifierNode >( @$, specificationName );
-      result = make< Specification >( @$, name, $2 );
+      const auto name = libcasm_fe::Ast::make< IdentifierNode >( @$, specificationName );
+      result = libcasm_fe::Ast::make< Specification >( @$, name, $2 );
   }
 ;
 
@@ -282,7 +282,7 @@ Definitions
   }
 | AttributedDefinition
   {
-      auto definitions = make< Definitions >( @$ );
+      auto definitions = libcasm_fe::Ast::make< Definitions >( @$ );
       definitions->add( $1 );
       $$ = definitions;
   }
@@ -294,7 +294,7 @@ FunctionDefinition
   {
       const auto identifier = $2;
 
-      auto function = make< FunctionDefinition >( @$, identifier, $4, $6 );
+      auto function = libcasm_fe::Ast::make< FunctionDefinition >( @$, identifier, $4, $6 );
       function->setDefaultValue( $7 );
 
       // apply the name of the function declaration to the initializer functions
@@ -320,7 +320,7 @@ MaybeInitially
   }
 | %empty
   {
-      $$ = make< NodeList< UpdateRule > >( @$ );
+      $$ = libcasm_fe::Ast::make< NodeList< UpdateRule > >( @$ );
   }
 ;
 
@@ -332,7 +332,7 @@ MaybeDefined
   }
 | %empty
   {
-      $$ = make< UndefAtom >( @$ );
+      $$ = libcasm_fe::Ast::make< UndefAtom >( @$ );
   }
 ;
 
@@ -346,7 +346,7 @@ FunctionParameters
   }
 | Type
   {
-      auto types = make< Types >( @$ );
+      auto types = libcasm_fe::Ast::make< Types >( @$ );
       types->add( $1 );
       $$ = types;
   }
@@ -360,7 +360,7 @@ MaybeFunctionParameters
   }
 | %empty
   {
-      $$ = make< Types >( @$ );
+      $$ = libcasm_fe::Ast::make< Types >( @$ );
   }
 ;
 
@@ -370,15 +370,15 @@ ProgramFunctionDefinition
   {
       auto programDefinition = createProgramFunction( @$ );
 
-      auto arguments = make< Expressions >( @$ );
+      auto arguments = libcasm_fe::Ast::make< Expressions >( @$ );
       // TODO add `default` agent to arguments
-      const auto program = make< DirectCallExpression >(
+      const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
           @$, programDefinition->identifier(), arguments );
 
-      const auto ruleReference = make< RuleReferenceAtom >( @$, $2 );
+      const auto ruleReference = libcasm_fe::Ast::make< RuleReferenceAtom >( @$, $2 );
 
-      auto initializers = make< NodeList< UpdateRule > >( @$ );
-      initializers->add( make< UpdateRule >( @$, program, ruleReference ) );
+      auto initializers = libcasm_fe::Ast::make< NodeList< UpdateRule > >( @$ );
+      initializers->add( libcasm_fe::Ast::make< UpdateRule >( @$, program, ruleReference ) );
       programDefinition->setInitializers( initializers );
 
       $$ = programDefinition;
@@ -403,30 +403,30 @@ Initializer
 : Term
   {
       // the unknown function identifier will be replaced in FunctionDefinition
-      const auto unknown = make< IdentifierNode >( @$, std::string() );
-      const auto arguments = make< Expressions >( @$ );
-      const auto function = make< DirectCallExpression >( @$, unknown, arguments );
+      const auto unknown = libcasm_fe::Ast::make< IdentifierNode >( @$, std::string() );
+      const auto arguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      const auto function = libcasm_fe::Ast::make< DirectCallExpression >( @$, unknown, arguments );
 
-      $$ = make< UpdateRule >( @$, function, $1 );
+      $$ = libcasm_fe::Ast::make< UpdateRule >( @$, function, $1 );
   }
 | Term ARROW Term
   {
-      auto arguments = make< Expressions >( @$ );
+      auto arguments = libcasm_fe::Ast::make< Expressions >( @$ );
       arguments->add( $1 );
 
       // the unknown function identifier will be replaced in FunctionDefinition
-      const auto unknown = make< IdentifierNode >( @$, std::string() );
-      const auto function = make< DirectCallExpression >( @$, unknown, arguments );
+      const auto unknown = libcasm_fe::Ast::make< IdentifierNode >( @$, std::string() );
+      const auto function = libcasm_fe::Ast::make< DirectCallExpression >( @$, unknown, arguments );
 
-      $$ = make< UpdateRule >( @$, function, $3 );
+      $$ = libcasm_fe::Ast::make< UpdateRule >( @$, function, $3 );
   }
 | Arguments ARROW Term
   {
       // the unknown function identifier will be replaced in FunctionDefinition
-      const auto unknown = make< IdentifierNode >( @$, std::string() );
-      const auto function = make< DirectCallExpression >( @$, unknown, $1 );
+      const auto unknown = libcasm_fe::Ast::make< IdentifierNode >( @$, std::string() );
+      const auto function = libcasm_fe::Ast::make< DirectCallExpression >( @$, unknown, $1 );
 
-      $$ = make< UpdateRule >( @$, function, $3 );
+      $$ = libcasm_fe::Ast::make< UpdateRule >( @$, function, $3 );
   }
 ;
 
@@ -440,7 +440,7 @@ Initializers
   }
 | Initializer
   {
-      auto initializers = make< NodeList< UpdateRule > >( @$ );
+      auto initializers = libcasm_fe::Ast::make< NodeList< UpdateRule > >( @$ );
       initializers->add( $1 );
       $$ = initializers;
   }
@@ -454,7 +454,7 @@ MaybeInitializers
   }
 | %empty
   {
-      $$ = make< NodeList< UpdateRule > >( @$ );
+      $$ = libcasm_fe::Ast::make< NodeList< UpdateRule > >( @$ );
   }
 ;
 
@@ -462,7 +462,7 @@ MaybeInitializers
 DerivedDefinition
 : DERIVED Identifier MaybeParameters ARROW Type EQUAL Term
   {
-      $$ = make< DerivedDefinition >( @$, $2, $3, $5, $7 );
+      $$ = libcasm_fe::Ast::make< DerivedDefinition >( @$, $2, $3, $5, $7 );
   }
 ;
 
@@ -470,7 +470,7 @@ DerivedDefinition
 EnumerationDefinition
 : ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
   {
-      $$ = make< EnumerationDefinition >( @$, $2, $5 );
+      $$ = libcasm_fe::Ast::make< EnumerationDefinition >( @$, $2, $5 );
   }
 ;
 
@@ -478,7 +478,7 @@ EnumerationDefinition
 Identifier
 : IDENTIFIER
   {
-      $$ = make< IdentifierNode >( @$, $1 );
+      $$ = libcasm_fe::Ast::make< IdentifierNode >( @$, $1 );
   }
 ;
 
@@ -492,7 +492,7 @@ Identifiers
   }
 | Identifier
   {
-      auto identifiers = make< NodeList< IdentifierNode > >( @$ );
+      auto identifiers = libcasm_fe::Ast::make< NodeList< IdentifierNode > >( @$ );
       identifiers->add( $1 );
       $$ = identifiers;
   }
@@ -502,12 +502,12 @@ Identifiers
 Variable
 : Identifier COLON Type
   {
-      $$ = make< VariableDefinition >( @$, $1, $3 );
+      $$ = libcasm_fe::Ast::make< VariableDefinition >( @$, $1, $3 );
   }
 | Identifier
   {
-      const auto unresolvedType = make< UnresolvedType >( @$ );
-      $$ = make< VariableDefinition >( @$, $1, unresolvedType );
+      const auto unresolvedType = libcasm_fe::Ast::make< UnresolvedType >( @$ );
+      $$ = libcasm_fe::Ast::make< VariableDefinition >( @$, $1, unresolvedType );
   }
 ;
 
@@ -521,7 +521,7 @@ Parameters
   }
 | Variable
   {
-      auto parameters = make< NodeList< VariableDefinition > >( @$ );
+      auto parameters = libcasm_fe::Ast::make< NodeList< VariableDefinition > >( @$ );
       parameters->add( $1 );
       $$ = parameters;
   }
@@ -535,7 +535,7 @@ MaybeParameters
   }
 | %empty
   {
-      $$ = make< NodeList< VariableDefinition > >( @$ );
+      $$ = libcasm_fe::Ast::make< NodeList< VariableDefinition > >( @$ );
   }
 ;
 
@@ -563,7 +563,7 @@ Type
 BasicType
 : Identifier
   {
-      $$ = make< BasicType >( @$, $1 );
+      $$ = libcasm_fe::Ast::make< BasicType >( @$, $1 );
   }
 ;
 
@@ -571,7 +571,7 @@ BasicType
 ComposedType
 : Identifier LPAREN Types RPAREN
   {
-      $$ = make< ComposedType >( @$, $1, $3 );
+      $$ = libcasm_fe::Ast::make< ComposedType >( @$, $1, $3 );
   }
 ;
 
@@ -579,7 +579,7 @@ ComposedType
 FixedSizedType
 : Identifier LESSER Term GREATER
   {
-      $$ = make< FixedSizedType >( @$, $1, $3 );
+      $$ = libcasm_fe::Ast::make< FixedSizedType >( @$, $1, $3 );
   }
 ;
 
@@ -587,7 +587,7 @@ FixedSizedType
 RangedType
 : Identifier LESSER Term DOTDOT Term GREATER
   {
-      $$ = make< RangedType >( @$, $1, $3, $5 );
+      $$ = libcasm_fe::Ast::make< RangedType >( @$, $1, $3, $5 );
   }
 ;
 
@@ -601,7 +601,7 @@ Types
   }
 | Type
   {
-      auto types = make< Types >( @$ );
+      auto types = libcasm_fe::Ast::make< Types >( @$ );
       types->add( $1 );
       $$ = types;
   }
@@ -647,7 +647,7 @@ Atom
 Undefined
 : UNDEF
   {
-      $$ = make< UndefAtom >( @$ );
+      $$ = libcasm_fe::Ast::make< UndefAtom >( @$ );
   }
 ;
 
@@ -656,12 +656,12 @@ Boolean
 : TRUE
   {
       const auto value = libstdhl::get< libcasm_ir::BooleanConstant >( true );
-      $$ = make< ValueAtom >( @$, value );
+      $$ = libcasm_fe::Ast::make< ValueAtom >( @$, value );
   }
 | FALSE
   {
       const auto value = libstdhl::get< libcasm_ir::BooleanConstant >( false );
-      $$ = make< ValueAtom >( @$, value );
+      $$ = libcasm_fe::Ast::make< ValueAtom >( @$, value );
   }
 ;
 
@@ -670,7 +670,7 @@ String
 : STRING
   {
       const auto value = libstdhl::get< libcasm_ir::StringConstant >( $1 );
-      $$ = make< ValueAtom >( @$, value );
+      $$ = libcasm_fe::Ast::make< ValueAtom >( @$, value );
   }
 ;
 
@@ -679,12 +679,12 @@ BitNumber
 : BINARY
   {
       const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::BINARY );
-      $$ = make< ValueAtom >( @$, value );
+      $$ = libcasm_fe::Ast::make< ValueAtom >( @$, value );
   }
 | HEXADECIMAL
   {
       const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::HEXADECIMAL );
-      $$ = make< ValueAtom >( @$, value );
+      $$ = libcasm_fe::Ast::make< ValueAtom >( @$, value );
   }
 ;
 
@@ -693,7 +693,7 @@ IntegerNumber
 : INTEGER
   {
       const auto value = libstdhl::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
-      $$ = make< ValueAtom >( @$, value );
+      $$ = libcasm_fe::Ast::make< ValueAtom >( @$, value );
   }
 ;
 
@@ -702,7 +702,7 @@ FloatingNumber
 : FLOATING
   {
       const auto value = libstdhl::get< libcasm_ir::FloatingConstant >( $1 );
-      $$ = make< ValueAtom >( @$, value );
+      $$ = libcasm_fe::Ast::make< ValueAtom >( @$, value );
   }
 ;
 
@@ -711,7 +711,7 @@ RationalNumber
 : RATIONAL
   {
       const auto value = libstdhl::get< libcasm_ir::RationalConstant >( $1 );
-      $$ = make< ValueAtom >( @$, value );
+      $$ = libcasm_fe::Ast::make< ValueAtom >( @$, value );
   }
 ;
 
@@ -719,8 +719,8 @@ RationalNumber
 RuleReference
 : AT IDENTIFIER
   {
-      const auto ruleName = make< IdentifierNode >( @$, $2 );
-      $$ = make< RuleReferenceAtom >( @$, ruleName );
+      const auto ruleName = libcasm_fe::Ast::make< IdentifierNode >( @$, $2 );
+      $$ = libcasm_fe::Ast::make< RuleReferenceAtom >( @$, ruleName );
   }
 ;
 
@@ -780,27 +780,27 @@ Expression
   }
 | MINUS Term %prec UMINUS
   {
-      $$ = make< UnaryExpression >( @$, $2, libcasm_ir::Value::INV_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< UnaryExpression >( @$, $2, libcasm_ir::Value::INV_INSTRUCTION );
   }
 | Term PLUS Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
   }
 | Term MINUS Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::SUB_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::SUB_INSTRUCTION );
   }
 | Term ASTERIX Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MUL_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MUL_INSTRUCTION );
   }
 | Term SLASH Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
   }
 | Term PERCENT Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
   }
 | Term CARET Term
   {
@@ -808,39 +808,39 @@ Expression
   }
 | Term NEQUAL Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
   }
 | Term EQUAL Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::EQU_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::EQU_INSTRUCTION );
   }
 | Term LESSER Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LTH_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LTH_INSTRUCTION );
   }
 | Term GREATER Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GTH_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GTH_INSTRUCTION );
   }
 | Term LESSEQ Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
   }
 | Term GREATEREQ Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
   }
 | Term OR Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::OR_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::OR_INSTRUCTION );
   }
 | Term XOR Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::XOR_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::XOR_INSTRUCTION );
   }
 | Term AND Term
   {
-      $$ = make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
   }
 | Term IMPLIES Term
   {
@@ -848,7 +848,7 @@ Expression
   }
 | NOT Term
   {
-      $$ = make< UnaryExpression >( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
+      $$ = libcasm_fe::Ast::make< UnaryExpression >( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
   }
 ;
 
@@ -857,7 +857,7 @@ Expression
 Range
 : LSQPAREN Term DOTDOT Term RSQPAREN
   {
-      $$ = make< RangeExpression >( @$, $2, $4 );
+      $$ = libcasm_fe::Ast::make< RangeExpression >( @$, $2, $4 );
   }
 ;
 
@@ -865,18 +865,18 @@ Range
 List
 : LSQPAREN RSQPAREN
   {
-      const auto expressions = make< Expressions >( @$ );
-      $$ = make< ListExpression >( @$, expressions );
+      const auto expressions = libcasm_fe::Ast::make< Expressions >( @$ );
+      $$ = libcasm_fe::Ast::make< ListExpression >( @$, expressions );
   }
 | LSQPAREN Term RSQPAREN
   {
-      auto expressions = make< Expressions >( @$ );
+      auto expressions = libcasm_fe::Ast::make< Expressions >( @$ );
       expressions->add( $2 );
-      $$ = make< ListExpression >( @$, expressions );
+      $$ = libcasm_fe::Ast::make< ListExpression >( @$, expressions );
   }
 | LSQPAREN Terms RSQPAREN
   {
-      $$ = make< ListExpression >( @$, $2 );
+      $$ = libcasm_fe::Ast::make< ListExpression >( @$, $2 );
   }
 ;
 
@@ -889,7 +889,7 @@ Terms
   }
 | Term
   {
-      const auto expressions = make< Expressions >( @$ );
+      const auto expressions = libcasm_fe::Ast::make< Expressions >( @$ );
       expressions->add( $1 );
       $$ = expressions;
   }
@@ -903,7 +903,7 @@ Arguments
   }
 | LPAREN RPAREN
   {
-      const auto expressions = make< Expressions >( @$ );
+      const auto expressions = libcasm_fe::Ast::make< Expressions >( @$ );
       $$ = expressions;
   }
 ;
@@ -912,12 +912,12 @@ Arguments
 DirectCallExpression
 : Identifier
   {
-      const auto arguments = make< Expressions >( @$ );
-      $$ = make< DirectCallExpression >( @$, $1, arguments );
+      const auto arguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      $$ = libcasm_fe::Ast::make< DirectCallExpression >( @$, $1, arguments );
   }
 | Identifier Arguments
   {
-      $$ = make< DirectCallExpression >( @$, $1, $2 );
+      $$ = libcasm_fe::Ast::make< DirectCallExpression >( @$, $1, $2 );
   }
 ;
 
@@ -925,7 +925,7 @@ DirectCallExpression
 IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
   {
-      $$ = make< IndirectCallExpression >( @$, $3, $5 );
+      $$ = libcasm_fe::Ast::make< IndirectCallExpression >( @$, $3, $5 );
   }
 ;
 
@@ -933,7 +933,7 @@ IndirectCallExpression
 ConditionalExpression
 : IF Term THEN Term ELSE Term
   {
-      $$ = make< ConditionalExpression >( @$, $2, $4, $6 );
+      $$ = libcasm_fe::Ast::make< ConditionalExpression >( @$, $2, $4, $6 );
   }
 ;
 
@@ -941,7 +941,7 @@ ConditionalExpression
 UniversalQuantifierExpression
 : FORALL Variable IN Term HOLDS Term
   {
-      $$ = make< UniversalQuantifierExpression >( @$, $2, $4, $6 );
+      $$ = libcasm_fe::Ast::make< UniversalQuantifierExpression >( @$, $2, $4, $6 );
   }
 ;
 
@@ -949,7 +949,7 @@ UniversalQuantifierExpression
 ExistentialQuantifierExpression
 : EXISTS Variable IN Term WITH Term
   {
-      $$ = make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
+      $$ = libcasm_fe::Ast::make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
   }
 ;
 
@@ -957,12 +957,12 @@ ExistentialQuantifierExpression
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
   {
-      $$ = make< RuleDefinition >( @$, $2, $3, createVoidType( @$ ),
+      $$ = libcasm_fe::Ast::make< RuleDefinition >( @$, $2, $3, createVoidType( @$ ),
                                    wrapInBlockRule( $5 ) );
   }
 | RULE Identifier MaybeParameters ARROW Type EQUAL Rule
   {
-      $$ = make< RuleDefinition >( @$, $2, $3, $5,
+      $$ = libcasm_fe::Ast::make< RuleDefinition >( @$, $2, $3, $5,
                                    wrapInBlockRule( $7 ) );
   }
 ;
@@ -1021,7 +1021,7 @@ Rules
   }
 | Rule
   {
-      auto rules = make< Rules >( @$ );
+      auto rules = libcasm_fe::Ast::make< Rules >( @$ );
       rules->add( $1 );
       $$ = rules;
   }
@@ -1031,7 +1031,7 @@ Rules
 SkipRule
 : SKIP
   {
-      $$ = make< SkipRule >( @$ );
+      $$ = libcasm_fe::Ast::make< SkipRule >( @$ );
   }
 ;
 
@@ -1039,11 +1039,11 @@ SkipRule
 ConditionalRule
 : IF Term THEN Rule
   {
-      $$ = make< ConditionalRule >( @$, $2, $4 );
+      $$ = libcasm_fe::Ast::make< ConditionalRule >( @$, $2, $4 );
   }
 | IF Term THEN Rule ELSE Rule
   {
-      $$ = make< ConditionalRule >( @$, $2, $4, $6 );
+      $$ = libcasm_fe::Ast::make< ConditionalRule >( @$, $2, $4, $6 );
   }
 ;
 
@@ -1051,7 +1051,7 @@ ConditionalRule
 CaseRule
 : CASE Term OF LCURPAREN CaseLabels RCURPAREN
   {
-      $$ = make< CaseRule >( @$, $2, $5 );
+      $$ = libcasm_fe::Ast::make< CaseRule >( @$, $2, $5 );
   }
 ;
 
@@ -1059,15 +1059,15 @@ CaseRule
 CaseLabel
 : DEFAULT COLON Rule
   {
-      $$ = make< DefaultCase >( @$, $3 );
+      $$ = libcasm_fe::Ast::make< DefaultCase >( @$, $3 );
   }
 | UNDERLINE COLON Rule
   {
-      $$ = make< DefaultCase >( @$, $3 );
+      $$ = libcasm_fe::Ast::make< DefaultCase >( @$, $3 );
   }
 | Term COLON Rule
   {
-      $$ = make< ExpressionCase >( @$, $1, $3 );
+      $$ = libcasm_fe::Ast::make< ExpressionCase >( @$, $1, $3 );
   }
 ;
 
@@ -1081,7 +1081,7 @@ CaseLabels
   }
 | CaseLabel
   {
-      auto cases = make< Cases >( @$ );
+      auto cases = libcasm_fe::Ast::make< Cases >( @$ );
       cases->add( $1 );
       $$ = cases;
   }
@@ -1091,7 +1091,7 @@ CaseLabels
 LetRule
 : LET Variable EQUAL Term IN Rule
   {
-      $$ = make< LetRule >( @$, $2, $4, $6 );
+      $$ = libcasm_fe::Ast::make< LetRule >( @$, $2, $4, $6 );
   }
 ;
 
@@ -1099,7 +1099,7 @@ LetRule
 ForallRule
 : FORALL Variable IN Term DO Rule
   {
-      $$ = make< ForallRule >( @$, $2, $4, $6 );
+      $$ = libcasm_fe::Ast::make< ForallRule >( @$, $2, $4, $6 );
   }
 ;
 
@@ -1107,7 +1107,7 @@ ForallRule
 IterateRule
 : ITERATE Rule
   {
-      $$ = make< IterateRule >( @$, $2 );
+      $$ = libcasm_fe::Ast::make< IterateRule >( @$, $2 );
   }
 ;
 
@@ -1115,11 +1115,11 @@ IterateRule
 BlockRule
 : LCURPAREN Rules RCURPAREN
   {
-      $$ = make< BlockRule >( @$, $2 );
+      $$ = libcasm_fe::Ast::make< BlockRule >( @$, $2 );
   }
 | PAR Rules ENDPAR
   {
-      $$ = make< BlockRule >( @$, $2 );
+      $$ = libcasm_fe::Ast::make< BlockRule >( @$, $2 );
   }
 ;
 
@@ -1127,11 +1127,11 @@ BlockRule
 SequenceRule
 : SEQ_BRACKET Rules ENDSEQ_BRACKET
   {
-      $$ = make< SequenceRule >( @$, $2 );
+      $$ = libcasm_fe::Ast::make< SequenceRule >( @$, $2 );
   }
 | SEQ Rules ENDSEQ
   {
-      $$ = make< SequenceRule >( @$, $2 );
+      $$ = libcasm_fe::Ast::make< SequenceRule >( @$, $2 );
   }
 ;
 
@@ -1139,7 +1139,7 @@ SequenceRule
 UpdateRule
 : DirectCallExpression UPDATE Term
   {
-      $$ = make< UpdateRule >( @$, $1, $3 );
+      $$ = libcasm_fe::Ast::make< UpdateRule >( @$, $1, $3 );
   }
 ;
 
@@ -1149,27 +1149,27 @@ CallRule
   {
       const std::set< CallExpression::TargetType >
           allowedCallTargetTypes{ CallExpression::TargetType::RULE };
-      $$ = make< CallRule >( @$, $2, allowedCallTargetTypes );
+      $$ = libcasm_fe::Ast::make< CallRule >( @$, $2, allowedCallTargetTypes );
   }
 | DirectCallExpression
   {
       const std::set< CallExpression::TargetType >
           allowedCallTargetTypes{ CallExpression::TargetType::DERIVED,
                                   CallExpression::TargetType::BUILTIN };
-      $$ = make< CallRule >( @$, $1, allowedCallTargetTypes );
+      $$ = libcasm_fe::Ast::make< CallRule >( @$, $1, allowedCallTargetTypes );
   }
 | CALL IndirectCallExpression
   {
       const std::set< CallExpression::TargetType >
           allowedCallTargetTypes{ CallExpression::TargetType::RULE };
-      $$ = make< CallRule >( @$, $2, allowedCallTargetTypes );
+      $$ = libcasm_fe::Ast::make< CallRule >( @$, $2, allowedCallTargetTypes );
   }
 | IndirectCallExpression
   {
       const std::set< CallExpression::TargetType >
           allowedCallTargetTypes{ CallExpression::TargetType::DERIVED,
                                   CallExpression::TargetType::BUILTIN };
-      $$ = make< CallRule >( @$, $1, allowedCallTargetTypes );
+      $$ = libcasm_fe::Ast::make< CallRule >( @$, $1, allowedCallTargetTypes );
   }
 ;
 
@@ -1195,7 +1195,7 @@ Attributes
   }
 | Attribute
   {
-      auto attributes = make< Attributes >( @$ );
+      auto attributes = libcasm_fe::Ast::make< Attributes >( @$ );
       attributes->add( $1 );
       $$ = attributes;
   }
@@ -1205,7 +1205,7 @@ Attributes
 BasicAttribute
 : Identifier
   {
-      $$ = make< BasicAttribute >( @$, $1 );
+      $$ = libcasm_fe::Ast::make< BasicAttribute >( @$, $1 );
   }
 ;
 
@@ -1213,7 +1213,7 @@ BasicAttribute
 ExpressionAttribute
 : Identifier Term
   {
-      $$ = make< ExpressionAttribute >( @$, $1, $2 );
+      $$ = libcasm_fe::Ast::make< ExpressionAttribute >( @$, $1, $2 );
   }
 ;
 

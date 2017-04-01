@@ -28,6 +28,7 @@
 
 #include "Visitor.h"
 
+#include "../stdhl/cpp/List.h"
 #include "../stdhl/cpp/Type.h"
 
 #include "../various/location.hh"
@@ -118,57 +119,14 @@ namespace libcasm_fe
         };
 
         template < typename T >
-        class NodeList : public Node
+        class NodeList : public Node, public libstdhl::List< T >
         {
           public:
             using Ptr = std::shared_ptr< NodeList >;
-            using iterator = typename std::vector< typename T::Ptr >::iterator;
-            using const_iterator =
-                typename std::vector< typename T::Ptr >::const_iterator;
 
             NodeList( void )
             : Node( Node::ID::NODE_LIST )
             {
-            }
-
-            void add( const typename T::Ptr& node )
-            {
-                m_elements.emplace_back( node );
-            }
-
-            iterator begin( void )
-            {
-                return m_elements.begin();
-            }
-
-            const_iterator begin( void ) const
-            {
-                return m_elements.begin();
-            }
-
-            const_iterator cbegin( void ) const
-            {
-                return m_elements.cbegin();
-            }
-
-            iterator end( void )
-            {
-                return m_elements.end();
-            }
-
-            const_iterator end( void ) const
-            {
-                return m_elements.end();
-            }
-
-            const_iterator cend( void ) const
-            {
-                return m_elements.cend();
-            }
-
-            u1 empty( void ) const
-            {
-                return m_elements.empty();
             }
 
             void accept( Visitor& visitor ) override final
@@ -178,9 +136,6 @@ namespace libcasm_fe
                     node->accept( visitor );
                 }
             }
-
-          private:
-            std::vector< typename T::Ptr > m_elements;
         };
 
         class IdentifierNode : public Node
