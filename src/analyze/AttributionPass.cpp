@@ -54,13 +54,8 @@ static const std::string SYMBOLIC_ATTRIBUTE = "symbolic";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
-    DEPRECATED_ATTRIBUTE,
-    IN_ATTRIBUTE,
-    MONITORED_ATTRIBUTE,
-    CONTROLLED_ATTRIBUTE,
-    SHARED_ATTRIBUTE,
-    OUT_ATTRIBUTE,
-    STATIC_ATTRIBUTE,
+    DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE, MONITORED_ATTRIBUTE,
+    CONTROLLED_ATTRIBUTE, SHARED_ATTRIBUTE, OUT_ATTRIBUTE, STATIC_ATTRIBUTE,
     SYMBOLIC_ATTRIBUTE,
 };
 
@@ -242,11 +237,13 @@ u1 AttributionPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
+    const auto data = pr.result< SourceToAstPass >();
+    const auto specification = data->specification();
 
     DefinitionVisitor visitor{ log };
     specification->accept( visitor );
+
+    pr.setResult< AttributionPass >( libstdhl::make< Data >( specification ) );
 
     return true;
 }
