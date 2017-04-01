@@ -25,12 +25,6 @@
 
 #include "AstDumpDotPass.h"
 
-#include <stack>
-
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
-#include "../transform/SourceToAstPass.h"
-
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -430,10 +424,15 @@ void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
     m_stream << "\"" << from << "\" -> \"" << to << "\";\n";
 }
 
+void AstDumpDotPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
+}
+
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
+    const auto typeCheckPass = pr.result< TypeCheckPass >();
+    const auto specification = typeCheckPass->specification();
 
     std::ofstream dotfile( "./out.dot" );
     if( not dotfile.is_open() )

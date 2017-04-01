@@ -25,10 +25,6 @@
 
 #include "AstDumpSourcePass.h"
 
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
-#include "../transform/SourceToAstPass.h"
-
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -328,14 +324,19 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpSourcePass::usage( libpass::PassUsage& pu )
+{
+    pu.require< TypeCheckPass >();
+}
+
 u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 {
     libpass::PassLogger log( &id, stream() );
 
     try
     {
-        const auto sourceToAstPass = pr.result< SourceToAstPass >();
-        const auto specification = sourceToAstPass->specification();
+        const auto data = pr.result< TypeCheckPass >();
+        const auto specification = data->specification();
 
         AstDumpSourceVisitor visitor{ std::cout };
         specification->accept( visitor );

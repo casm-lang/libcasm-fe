@@ -28,18 +28,15 @@
 
 #include "../transform/SourceToAstPass.h"
 
-#include "../Visitor.h"
-
-/**
-   @brief    TODO
-
-   TODO
-*/
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
 
 namespace libcasm_fe
 {
-    class TypeCheckPass final : public libpass::Pass,
-                                public Visitor< Type *, Type * >
+    /**
+     * @brief Type inference of AST
+     */
+    class TypeCheckPass final : public libpass::Pass
     {
       public:
         static char id;
@@ -48,37 +45,8 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        LIB_CASMFE_VISITOR_INTERFACE( Type*, Type* );
-
-        void check_type_valid( const location& location, const Type& type );
-
-        void check_numeric_operator(
-            const location& loc, Type* type, const libcasm_ir::Value::ID op );
-
-        std::vector< std::vector< Type* >* > rule_binding_types;
-        std::vector< std::map< std::string, size_t >* > rule_binding_offsets;
-
-        u1 forall_head;
-
-      private:
-        // type checker is in a function definition
-        u1 m_isInFunctionDefinition = false;
-        // type checker is in a rule
-        u1 m_isInRule = false;
-
-        // to simulate top-down function declaration (used during function
-        // initialization)
-        std::set< std::string > m_declaredFunctions;
-
-        // indicates if the type checker has found an init node
-        u1 m_specificationHasInitNode = false;
-
-      public:
         using Data = SourceToAstPass::Data;
     };
-
-    template <>
-    void AstWalker< TypeCheckPass, Type* >::walk_forall( ForallNode* node );
 }
 
 #endif // _LIB_CASMFE_TYPE_CHECK_PASS_H_

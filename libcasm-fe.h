@@ -27,7 +27,7 @@
 #define _LIB_CASMFE_H_
 
 #include "src/analyze/AttributionPass.h"
-//#include "src/analyze/TypeCheckPass.h"
+#include "src/analyze/TypeCheckPass.h"
 
 //#include "src/execute/NumericExecutionPass.h"
 //#include "src/execute/SymbolicExecutionPass.h"
