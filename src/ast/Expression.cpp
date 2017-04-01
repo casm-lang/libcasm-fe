@@ -113,6 +113,42 @@ CallExpression::TargetType CallExpression::targetType( void ) const
     return m_targetType;
 }
 
+std::string CallExpression::targetTypeName( void ) const
+{
+    return targetTypeString( m_targetType );
+}
+
+std::string CallExpression::targetTypeString( const TargetType targetType )
+{
+    switch( targetType )
+    {
+        case TargetType::FUNCTION:
+        {
+            return "Function";
+        }
+        case TargetType::DERIVED:
+        {
+            return "Derived";
+        }
+        case TargetType::BUILTIN:
+        {
+            return "Builtin";
+        }
+        case TargetType::RULE:
+        {
+            return "Rule";
+        }
+        case TargetType::VARIABLE:
+        {
+            return "Variable";
+        }
+        case TargetType::UNKNOWN:
+        {
+            return "Unknown";
+        }
+    }
+}
+
 DirectCallExpression::DirectCallExpression(
     const IdentifierNode::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::DIRECT_CALL_EXPRESSION )

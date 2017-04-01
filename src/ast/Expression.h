@@ -110,7 +110,6 @@ namespace libcasm_fe
                 UNKNOWN
             };
 
-          public:
             using Ptr = std::shared_ptr< CallExpression >;
 
             using Expression::Expression;
@@ -118,8 +117,13 @@ namespace libcasm_fe
             void setTargetType( TargetType targetType );
             TargetType targetType( void ) const;
 
+            std::string targetTypeName( void ) const;
+
           private:
             TargetType m_targetType = TargetType::UNKNOWN;
+
+          public:
+            static std::string targetTypeString( const TargetType targetType );
         };
 
         class DirectCallExpression : public CallExpression
