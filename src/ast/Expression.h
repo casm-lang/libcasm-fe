@@ -106,6 +106,7 @@ namespace libcasm_fe
                 DERIVED,
                 BUILTIN,
                 RULE,
+                ENUMERATION,
                 VARIABLE,
                 UNKNOWN
             };
@@ -115,6 +116,7 @@ namespace libcasm_fe
             using Expression::Expression;
 
             void setTargetType( TargetType targetType );
+
             TargetType targetType( void ) const;
 
             std::string targetTypeName( void ) const;

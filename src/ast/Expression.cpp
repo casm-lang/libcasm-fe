@@ -138,6 +138,10 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
         {
             return "Rule";
         }
+        case TargetType::ENUMERATION:
+        {
+            return "Enumeration";
+        }
         case TargetType::VARIABLE:
         {
             return "Variable";
