@@ -49,7 +49,6 @@ class SymbolResolverVisitor final : public RecursiveVisitor
 
     void visit( Specification& node ) override;
 
-    void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -57,9 +56,17 @@ class SymbolResolverVisitor final : public RecursiveVisitor
 
     void visit( DirectCallExpression& node ) override;
 
+    void visit( UniversalQuantifierExpression& node ) override;
+    void visit( ExistentialQuantifierExpression& node ) override;
+
+    void visit( LetRule& node ) override;
+    void visit( ForallRule& node ) override;
+
   private:
     void registerSymbol(
         const IdentifierNode& node, CallExpression::TargetType targetType );
+
+    void unregisterSymbol( const IdentifierNode& node );
 
     Logger& m_log;
 
@@ -109,12 +116,6 @@ void SymbolResolverVisitor::visit( Specification& node )
     }
 }
 
-void SymbolResolverVisitor::visit( VariableDefinition& node )
-{
-    registerSymbol( *node.identifier(), CallExpression::TargetType::VARIABLE );
-    RecursiveVisitor::visit( node );
-}
-
 void SymbolResolverVisitor::visit( FunctionDefinition& node )
 {
     registerSymbol( *node.identifier(), CallExpression::TargetType::FUNCTION );
@@ -124,13 +125,37 @@ void SymbolResolverVisitor::visit( FunctionDefinition& node )
 void SymbolResolverVisitor::visit( DerivedDefinition& node )
 {
     registerSymbol( *node.identifier(), CallExpression::TargetType::DERIVED );
+
+    for( auto e : *node.arguments() )
+    {
+        registerSymbol(
+            *e->identifier(), CallExpression::TargetType::VARIABLE );
+    }
+
     RecursiveVisitor::visit( node );
+
+    for( auto e : *node.arguments() )
+    {
+        unregisterSymbol( *e->identifier() );
+    }
 }
 
 void SymbolResolverVisitor::visit( RuleDefinition& node )
 {
     registerSymbol( *node.identifier(), CallExpression::TargetType::RULE );
+
+    for( auto e : *node.arguments() )
+    {
+        registerSymbol(
+            *e->identifier(), CallExpression::TargetType::VARIABLE );
+    }
+
     RecursiveVisitor::visit( node );
+
+    for( auto e : *node.arguments() )
+    {
+        unregisterSymbol( *e->identifier() );
+    }
 }
 
 void SymbolResolverVisitor::visit( EnumerationDefinition& node )
@@ -176,6 +201,42 @@ void SymbolResolverVisitor::visit( DirectCallExpression& node )
     RecursiveVisitor::visit( node );
 }
 
+void SymbolResolverVisitor::visit( UniversalQuantifierExpression& node )
+{
+    const auto& id = *node.predicateVariable()->identifier();
+
+    registerSymbol( id, CallExpression::TargetType::VARIABLE );
+    RecursiveVisitor::visit( node );
+    unregisterSymbol( id );
+}
+
+void SymbolResolverVisitor::visit( ExistentialQuantifierExpression& node )
+{
+    const auto& id = *node.predicateVariable()->identifier();
+
+    registerSymbol( id, CallExpression::TargetType::VARIABLE );
+    RecursiveVisitor::visit( node );
+    unregisterSymbol( id );
+}
+
+void SymbolResolverVisitor::visit( LetRule& node )
+{
+    const auto& id = *node.variable()->identifier();
+
+    registerSymbol( id, CallExpression::TargetType::VARIABLE );
+    RecursiveVisitor::visit( node );
+    unregisterSymbol( id );
+}
+
+void SymbolResolverVisitor::visit( ForallRule& node )
+{
+    const auto& id = *node.variable()->identifier();
+
+    registerSymbol( id, CallExpression::TargetType::VARIABLE );
+    RecursiveVisitor::visit( node );
+    unregisterSymbol( id );
+}
+
 void SymbolResolverVisitor::registerSymbol(
     const IdentifierNode& node, CallExpression::TargetType targetType )
 {
@@ -195,6 +256,19 @@ void SymbolResolverVisitor::registerSymbol(
     m_log.debug( "registered new symbol '" + result.first->first + "' as '"
                  + CallExpression::targetTypeString( result.first->second )
                  + "'" );
+}
+
+void SymbolResolverVisitor::unregisterSymbol( const IdentifierNode& node )
+{
+    const auto identifier = node.identifier();
+
+    if( m_symbolTable.erase( identifier ) != 1 )
+    {
+        throw std::domain_error(
+            "symbol '" + identifier + "' was erased more than once" );
+    }
+
+    m_log.debug( "unregistered symbol '" + identifier + "'" );
 }
 
 u64 SymbolResolverVisitor::errors( void ) const
