@@ -25,6 +25,7 @@
 
 #include "SymbolResolverPass.h"
 
+#include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
 
 #include "../casm-ir/src/Builtin.h"
@@ -42,7 +43,9 @@ static libpass::PassRegistration< SymbolResolverPass > PASS(
 class SymbolResolverVisitor final : public RecursiveVisitor
 {
   public:
-    SymbolResolverVisitor( libstdhl::Logger& log );
+    SymbolResolverVisitor( Logger& log );
+
+    u64 errors( void ) const;
 
     void visit( Specification& node ) override;
 
@@ -54,22 +57,20 @@ class SymbolResolverVisitor final : public RecursiveVisitor
 
     void visit( DirectCallExpression& node ) override;
 
-    void registerSymbol(
-        const std::string& identifier, CallExpression::TargetType targetType );
-
-    u64 errors( void ) const;
-
   private:
-    libstdhl::Logger& m_log;
+    void registerSymbol(
+        const IdentifierNode& node, CallExpression::TargetType targetType );
+
+    Logger& m_log;
+
     u64 m_err;
 
-    std::unordered_map< std::string, CallExpression::TargetType >
-        m_symbol_table;
+    std::unordered_map< std::string, CallExpression::TargetType > m_symbolTable;
 
     std::unordered_map< std::string, DirectCallExpression* > m_late_resolve;
 };
 
-SymbolResolverVisitor::SymbolResolverVisitor( libstdhl::Logger& log )
+SymbolResolverVisitor::SymbolResolverVisitor( Logger& log )
 : m_log( log )
 , m_err( 0 )
 {
@@ -80,29 +81,30 @@ void SymbolResolverVisitor::visit( Specification& node )
     RecursiveVisitor::visit( node );
 
     m_log.debug( "symbol_table:" );
-    for( auto v : m_symbol_table )
+    for( const auto& v : m_symbolTable )
     {
-        const auto identifier = v.first;
+        const auto& identifier = v.first;
         const auto targetType = v.second;
 
         m_log.debug( "    '" + identifier + "' --> "
                      + CallExpression::targetTypeString( targetType ) );
     }
 
-    for( auto v : m_late_resolve )
+    for( const auto& v : m_late_resolve )
     {
-        const auto identifier = v.first;
+        const auto& identifier = v.first;
         const auto node = v.second;
 
-        auto result = m_symbol_table.find( identifier );
-        if( result != m_symbol_table.end() )
+        auto result = m_symbolTable.find( identifier );
+        if( result != m_symbolTable.end() )
         {
             node->setTargetType( result->second );
         }
         else
         {
-            m_log.error( "symbol '" + identifier + "' cannot be resolved" );
             m_err++;
+            m_log.error( { node->sourceLocation() },
+                "symbol '" + identifier + "' cannot be resolved" );
         }
     }
 }
@@ -115,29 +117,26 @@ void SymbolResolverVisitor::visit( Specification& node )
 
 void SymbolResolverVisitor::visit( FunctionDefinition& node )
 {
-    const auto identifier = node.identifier()->identifier();
-    registerSymbol( identifier, CallExpression::TargetType::FUNCTION );
+    registerSymbol( *node.identifier(), CallExpression::TargetType::FUNCTION );
     RecursiveVisitor::visit( node );
 }
 
 void SymbolResolverVisitor::visit( DerivedDefinition& node )
 {
-    const auto identifier = node.identifier()->identifier();
-    registerSymbol( identifier, CallExpression::TargetType::DERIVED );
+    registerSymbol( *node.identifier(), CallExpression::TargetType::DERIVED );
     RecursiveVisitor::visit( node );
 }
 
 void SymbolResolverVisitor::visit( RuleDefinition& node )
 {
-    const auto identifier = node.identifier()->identifier();
-    registerSymbol( identifier, CallExpression::TargetType::RULE );
+    registerSymbol( *node.identifier(), CallExpression::TargetType::RULE );
     RecursiveVisitor::visit( node );
 }
 
 void SymbolResolverVisitor::visit( EnumerationDefinition& node )
 {
-    // const auto ident = node.identifier()->identifier();
-    // registerSymbol( ident, CallExpression::TargetType::ENUMERATION );
+    // registerSymbol( *node.identifier(),
+    // CallExpression::TargetType::ENUMERATION );
     RecursiveVisitor::visit( node );
 }
 
@@ -145,8 +144,8 @@ void SymbolResolverVisitor::visit( DirectCallExpression& node )
 {
     const auto identifier = node.identifier()->identifier();
 
-    auto result = m_symbol_table.find( identifier );
-    if( result != m_symbol_table.end() )
+    auto result = m_symbolTable.find( identifier );
+    if( result != m_symbolTable.end() )
     {
         node.setTargetType( result->second );
     }
@@ -155,7 +154,8 @@ void SymbolResolverVisitor::visit( DirectCallExpression& node )
         if( libcasm_ir::Builtin::available(
                 identifier, node.arguments()->size() ) )
         {
-            registerSymbol( identifier, CallExpression::TargetType::BUILTIN );
+            registerSymbol(
+                *node.identifier(), CallExpression::TargetType::BUILTIN );
             node.setTargetType( CallExpression::TargetType::BUILTIN );
         }
         else
@@ -165,24 +165,25 @@ void SymbolResolverVisitor::visit( DirectCallExpression& node )
         }
     }
 
-    m_log.debug( "Call: " + node.identifier()->identifier() + "{ "
-                 + node.targetTypeName()
-                 + " }" );
+    m_log.debug( "Call: " + identifier + "{ " + node.targetTypeName() + " }" );
 
     RecursiveVisitor::visit( node );
 }
 
 void SymbolResolverVisitor::registerSymbol(
-    const std::string& identifier, CallExpression::TargetType targetType )
+    const IdentifierNode& node, CallExpression::TargetType targetType )
 {
-    auto result = m_symbol_table.emplace( identifier, targetType );
+    const auto identifier = node.identifier();
+
+    auto result = m_symbolTable.emplace( identifier, targetType );
 
     if( not result.second )
     {
-        m_log.error( "symbol '" + result.first->first + "' already defined as '"
-                     + CallExpression::targetTypeString( result.first->second )
-                     + "'" );
         m_err++;
+        m_log.error( { node.sourceLocation() },
+            "symbol '" + result.first->first + "' already defined as '"
+                + CallExpression::targetTypeString( result.first->second )
+                + "'" );
     }
 
     m_log.debug( "registered new symbol '" + result.first->first + "' as '"
@@ -202,7 +203,7 @@ void SymbolResolverPass::usage( libpass::PassUsage& pu )
 
 u1 SymbolResolverPass::run( libpass::PassResult& pr )
 {
-    libpass::PassLogger log( &id, stream() );
+    Logger log( &id, stream() );
 
     const auto data = pr.result< AttributionPass >();
     const auto specification = data->specification();
