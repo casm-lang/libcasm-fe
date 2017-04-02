@@ -68,9 +68,9 @@ class SymbolResolverVisitor final : public RecursiveVisitor
 
     void unregisterSymbol( const IdentifierNode& node );
 
-    Logger& m_log;
+    Logger& log;
 
-    u64 m_err;
+    u64 err;
 
     std::unordered_map< std::string, CallExpression::TargetType > m_symbolTable;
 
@@ -78,8 +78,8 @@ class SymbolResolverVisitor final : public RecursiveVisitor
 };
 
 SymbolResolverVisitor::SymbolResolverVisitor( Logger& log )
-: m_log( log )
-, m_err( 0 )
+: log( log )
+, err( 0 )
 {
 }
 
@@ -87,14 +87,14 @@ void SymbolResolverVisitor::visit( Specification& node )
 {
     RecursiveVisitor::visit( node );
 
-    m_log.debug( "symbol_table:" );
+    log.debug( "symbol_table:" );
     for( const auto& v : m_symbolTable )
     {
         const auto& identifier = v.first;
         const auto targetType = v.second;
 
-        m_log.debug( "    '" + identifier + "' --> "
-                     + CallExpression::targetTypeString( targetType ) );
+        log.debug( "    '" + identifier + "' --> "
+                   + CallExpression::targetTypeString( targetType ) );
     }
 
     for( const auto& v : m_late_resolve )
@@ -109,8 +109,8 @@ void SymbolResolverVisitor::visit( Specification& node )
         }
         else
         {
-            m_err++;
-            m_log.error( { node->sourceLocation() },
+            err++;
+            log.error( { node->sourceLocation() },
                 "symbol '" + identifier + "' cannot be resolved" );
         }
     }
@@ -191,12 +191,12 @@ void SymbolResolverVisitor::visit( DirectCallExpression& node )
         }
         else
         {
-            m_log.debug( "memorize '" + identifier + "'" );
+            log.debug( "memorize '" + identifier + "'" );
             m_late_resolve.emplace( identifier, &node );
         }
     }
 
-    m_log.debug( "Call: " + identifier + "{ " + node.targetTypeName() + " }" );
+    log.debug( "Call: " + identifier + "{ " + node.targetTypeName() + " }" );
 
     RecursiveVisitor::visit( node );
 }
@@ -246,16 +246,16 @@ void SymbolResolverVisitor::registerSymbol(
 
     if( not result.second )
     {
-        m_err++;
-        m_log.error( { node.sourceLocation() },
+        err++;
+        log.error( { node.sourceLocation() },
             "symbol '" + result.first->first + "' already defined as '"
                 + CallExpression::targetTypeString( result.first->second )
                 + "'" );
     }
 
-    m_log.debug( "registered new symbol '" + result.first->first + "' as '"
-                 + CallExpression::targetTypeString( result.first->second )
-                 + "'" );
+    log.debug( "registered new symbol '" + result.first->first + "' as '"
+               + CallExpression::targetTypeString( result.first->second )
+               + "'" );
 }
 
 void SymbolResolverVisitor::unregisterSymbol( const IdentifierNode& node )
@@ -268,12 +268,12 @@ void SymbolResolverVisitor::unregisterSymbol( const IdentifierNode& node )
             "symbol '" + identifier + "' was erased more than once" );
     }
 
-    m_log.debug( "unregistered symbol '" + identifier + "'" );
+    log.debug( "unregistered symbol '" + identifier + "'" );
 }
 
 u64 SymbolResolverVisitor::errors( void ) const
 {
-    return m_err;
+    return err;
 }
 
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
