@@ -49,7 +49,7 @@ class SymbolResolverVisitor final : public RecursiveVisitor
 
     void visit( Specification& node ) override;
 
-    // void visit( VariableDefinition& node ) override;
+    void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -109,11 +109,11 @@ void SymbolResolverVisitor::visit( Specification& node )
     }
 }
 
-// void SymbolResolverVisitor::visit( VariableDefinition& node )
-// {
-//     TODO: PPA:
-//     RecursiveVisitor::visit( node );
-// }
+void SymbolResolverVisitor::visit( VariableDefinition& node )
+{
+    registerSymbol( *node.identifier(), CallExpression::TargetType::VARIABLE );
+    RecursiveVisitor::visit( node );
+}
 
 void SymbolResolverVisitor::visit( FunctionDefinition& node )
 {
@@ -135,8 +135,14 @@ void SymbolResolverVisitor::visit( RuleDefinition& node )
 
 void SymbolResolverVisitor::visit( EnumerationDefinition& node )
 {
-    // registerSymbol( *node.identifier(),
-    // CallExpression::TargetType::ENUMERATION );
+    registerSymbol(
+        *node.identifier(), CallExpression::TargetType::ENUMERATION );
+
+    for( auto e : *node.enumerators() )
+    {
+        registerSymbol( *e, CallExpression::TargetType::ENUMERATION );
+    }
+
     RecursiveVisitor::visit( node );
 }
 
