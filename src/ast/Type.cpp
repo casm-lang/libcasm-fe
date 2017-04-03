@@ -29,25 +29,14 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 Type::Type( Node::ID id, const IdentifierNode::Ptr& name )
-: Node( id )
+: TypedNode( id )
 , m_name( name )
-, m_type( nullptr )
 {
 }
 
 IdentifierNode::Ptr Type::name( void ) const
 {
     return m_name;
-}
-
-void Type::setType( const libcasm_ir::Type::Ptr& type )
-{
-    m_type = type;
-}
-
-libcasm_ir::Type::Ptr Type::type( void ) const
-{
-    return m_type;
 }
 
 static IdentifierNode::Ptr createUnresolvedIdentifier()

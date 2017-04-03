@@ -36,18 +36,12 @@ namespace libcasm_fe
     {
         class VariableDefinition;
 
-        class Expression : public Node
+        class Expression : public TypedNode
         {
           public:
             using Ptr = std::shared_ptr< Expression >;
 
             Expression( Node::ID id );
-
-            void setType( const libcasm_ir::Type::Ptr& type );
-            libcasm_ir::Type::Ptr type( void ) const;
-
-          private:
-            libcasm_ir::Type::Ptr m_type;
         };
 
         using Expressions = NodeList< Expression >;

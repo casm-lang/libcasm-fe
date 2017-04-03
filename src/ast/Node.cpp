@@ -134,6 +134,22 @@ std::string Node::name( void ) const
     }
 }
 
+TypedNode::TypedNode( Node::ID id )
+: Node( id )
+, m_type( nullptr )
+{
+}
+
+void TypedNode::setType( const libcasm_ir::Type::Ptr& type )
+{
+    m_type = type;
+}
+
+libcasm_ir::Type::Ptr TypedNode::type( void ) const
+{
+    return m_type;
+}
+
 IdentifierNode::IdentifierNode( const std::string& identifier )
 : Node( Node::ID::IDENTIFIER )
 , m_identifier( identifier )
