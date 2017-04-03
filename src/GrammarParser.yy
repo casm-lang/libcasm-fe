@@ -876,17 +876,12 @@ List
       const auto expressions = Ast::make< Expressions >( @$ );
       $$ = Ast::make< ListExpression >( @$, expressions );
   }
-| LSQPAREN Term RSQPAREN
-  {
-      auto expressions = Ast::make< Expressions >( @$ );
-      expressions->add( $2 );
-      $$ = Ast::make< ListExpression >( @$, expressions );
-  }
 | LSQPAREN Terms RSQPAREN
   {
       $$ = Ast::make< ListExpression >( @$, $2 );
   }
 ;
+
 
 Terms
 : Terms COMMA Term
