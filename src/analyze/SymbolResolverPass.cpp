@@ -165,7 +165,7 @@ void SymbolResolverVisitor::visit( EnumerationDefinition& node )
 
     for( auto e : *node.enumerators() )
     {
-        registerSymbol( *e, CallExpression::TargetType::ENUMERATION );
+        registerSymbol( *e, CallExpression::TargetType::CONSTANT );
     }
 
     RecursiveVisitor::visit( node );
