@@ -142,6 +142,10 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
         {
             return "Enumeration";
         }
+        case TargetType::CONSTANT:
+        {
+            return "Constant";
+        }
         case TargetType::VARIABLE:
         {
             return "Variable";

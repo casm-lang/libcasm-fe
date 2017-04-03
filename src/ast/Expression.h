@@ -107,6 +107,7 @@ namespace libcasm_fe
                 BUILTIN,
                 RULE,
                 ENUMERATION,
+                CONSTANT,
                 VARIABLE,
                 UNKNOWN
             };
