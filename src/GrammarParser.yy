@@ -112,6 +112,13 @@
         return libcasm_fe::Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
+    static DirectCallExpression::Ptr createSelfBuiltinCall( Location& sourceLocation )
+    {
+        const auto self = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, "self" );
+        const auto arguments = libcasm_fe::Ast::make< Expressions >( sourceLocation );
+        return libcasm_fe::Ast::make< DirectCallExpression >( sourceLocation, self, arguments );
+    }
+
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
     {
         if( (rule->id() == Node::ID::BLOCK_RULE )
@@ -382,7 +389,11 @@ ProgramFunctionDefinition
       auto programDefinition = createProgramFunction( @$ );
 
       auto arguments = libcasm_fe::Ast::make< Expressions >( @$ );
-      // TODO add `default` agent to arguments
+
+      // single execution agent case, use 'self' built-in!
+      const auto self = createSelfBuiltinCall( @$ );
+      arguments->add( self );
+
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
           @$, programDefinition->identifier(), arguments );
 
