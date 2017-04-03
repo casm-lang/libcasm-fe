@@ -231,9 +231,6 @@ END       0 "end of file"
 %precedence UPLUS UMINUS
 %precedence NOT
 
-%precedence LPAREN
-%precedence DIRECT_CALL_EXPR_NO_ARG
-
 %precedence HOLDS WITH
 
 %%
