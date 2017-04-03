@@ -31,11 +31,11 @@ using namespace Ast;
 char TypeCheckPass::id = 0;
 
 static libpass::PassRegistration< TypeCheckPass > PASS( "ASTTypeInferencePass",
-    "type check the AST and translate it to a typed AST", "ast-check", 0 );
+    "resolve all unknown types in the AST representation", "ast-check", 0 );
 
 void TypeCheckPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SourceToAstPass >();
+    pu.require< SymbolResolverPass >();
 }
 
 u1 TypeCheckPass::run( libpass::PassResult& pr )
@@ -43,8 +43,8 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
     const auto sourceToAstPass = pr.result< SourceToAstPass >();
     const auto specification = sourceToAstPass->specification();
 
-    //TypeCheckVisitor visitor;
-    //specification->accept( visitor );
+    // TypeCheckVisitor visitor;
+    // specification->accept( visitor );
 
     pr.setResult< TypeCheckPass >( libstdhl::make< Data >( specification ) );
 

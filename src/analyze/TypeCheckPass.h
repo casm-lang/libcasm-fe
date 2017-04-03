@@ -23,10 +23,10 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_TYPE_CHECK_PASS_H_
-#define _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#ifndef _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
+#define _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
 
-#include "../transform/SourceToAstPass.h"
+#include "../analyze/SymbolResolverPass.h"
 
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
@@ -34,7 +34,7 @@
 namespace libcasm_fe
 {
     /**
-     * @brief Type inference of AST
+     * @brief Type inference pass of AST
      */
     class TypeCheckPass final : public libpass::Pass
     {
@@ -45,11 +45,11 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        using Data = SourceToAstPass::Data;
+        using Data = SymbolResolverPass::Data;
     };
 }
 
-#endif // _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#endif // _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
 
 //
 //  Local variables:
