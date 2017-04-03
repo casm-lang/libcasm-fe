@@ -148,9 +148,8 @@ Term
 | Atom
 
 Expression
-: LPAREN Expression RPAREN
+: LPAREN Term RPAREN
 | PLUS Term %prec UPLUS
-| LPAREN Term RPAREN
 | MINUS Term %prec UMINUS
 | Term PLUS Term
 | Term MINUS Term

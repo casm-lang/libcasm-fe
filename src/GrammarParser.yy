@@ -774,15 +774,11 @@ Term
 
 
 Expression
-: LPAREN Expression RPAREN
+: LPAREN Term RPAREN
   {
       $$ = $2;
   }
 | PLUS Term %prec UPLUS
-  {
-      $$ = $2;
-  }
-| LPAREN Term RPAREN
   {
       $$ = $2;
   }
@@ -859,7 +855,6 @@ Expression
       $$ = Ast::make< UnaryExpression >( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
   }
 ;
-
 
 
 Range
