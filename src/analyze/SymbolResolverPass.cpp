@@ -63,10 +63,15 @@ class SymbolResolverVisitor final : public RecursiveVisitor
     void visit( ForallRule& node ) override;
 
   private:
-    void registerSymbol(
-        const IdentifierNode& node, CallExpression::TargetType targetType );
+    void registerSymbol( const IdentifierNode& node,
+        const CallExpression::TargetType targetType,
+        const std::size_t arity = 0 );
 
-    void unregisterSymbol( const IdentifierNode& node );
+    void unregisterSymbol(
+        const IdentifierNode& node, const std::size_t arity = 0 );
+
+    std::string key(
+        const IdentifierNode& node, const std::size_t arity ) const;
 
     Logger& log;
 
@@ -118,13 +123,15 @@ void SymbolResolverVisitor::visit( Specification& node )
 
 void SymbolResolverVisitor::visit( FunctionDefinition& node )
 {
-    registerSymbol( *node.identifier(), CallExpression::TargetType::FUNCTION );
+    registerSymbol( *node.identifier(), CallExpression::TargetType::FUNCTION,
+        node.argumentTypes()->size() );
     RecursiveVisitor::visit( node );
 }
 
 void SymbolResolverVisitor::visit( DerivedDefinition& node )
 {
-    registerSymbol( *node.identifier(), CallExpression::TargetType::DERIVED );
+    registerSymbol( *node.identifier(), CallExpression::TargetType::DERIVED,
+        node.arguments()->size() );
 
     for( auto e : *node.arguments() )
     {
@@ -142,7 +149,8 @@ void SymbolResolverVisitor::visit( DerivedDefinition& node )
 
 void SymbolResolverVisitor::visit( RuleDefinition& node )
 {
-    registerSymbol( *node.identifier(), CallExpression::TargetType::RULE );
+    registerSymbol( *node.identifier(), CallExpression::TargetType::RULE,
+        node.arguments()->size() );
 
     for( auto e : *node.arguments() )
     {
@@ -160,8 +168,8 @@ void SymbolResolverVisitor::visit( RuleDefinition& node )
 
 void SymbolResolverVisitor::visit( EnumerationDefinition& node )
 {
-    registerSymbol(
-        *node.identifier(), CallExpression::TargetType::ENUMERATION );
+    registerSymbol( *node.identifier(), CallExpression::TargetType::ENUMERATION,
+        node.enumerators()->size() );
 
     for( auto e : *node.enumerators() )
     {
@@ -173,30 +181,33 @@ void SymbolResolverVisitor::visit( EnumerationDefinition& node )
 
 void SymbolResolverVisitor::visit( DirectCallExpression& node )
 {
-    const auto identifier = node.identifier()->identifier();
+    const auto arity = node.arguments()->size();
+    const auto _key = key( *node.identifier(), arity );
 
-    auto result = m_symbolTable.find( identifier );
+    auto result = m_symbolTable.find( _key );
     if( result != m_symbolTable.end() )
     {
         node.setTargetType( result->second );
     }
     else
     {
-        if( libcasm_ir::Builtin::available(
-                identifier, node.arguments()->size() ) )
+        const auto name = node.identifier()->identifier();
+
+        if( libcasm_ir::Builtin::available( name, arity ) )
         {
-            registerSymbol(
-                *node.identifier(), CallExpression::TargetType::BUILTIN );
+            registerSymbol( *node.identifier(),
+                CallExpression::TargetType::BUILTIN, arity );
+
             node.setTargetType( CallExpression::TargetType::BUILTIN );
         }
         else
         {
-            log.debug( "memorize '" + identifier + "'" );
-            m_late_resolve.emplace( identifier, &node );
+            log.debug( "memorize '" + _key + "'" );
+            m_late_resolve.emplace( _key, &node );
         }
     }
 
-    log.debug( "Call: " + identifier + "{ " + node.targetTypeName() + " }" );
+    log.debug( "call: " + _key + "{ " + node.targetTypeName() + " }" );
 
     RecursiveVisitor::visit( node );
 }
@@ -237,12 +248,12 @@ void SymbolResolverVisitor::visit( ForallRule& node )
     unregisterSymbol( id );
 }
 
-void SymbolResolverVisitor::registerSymbol(
-    const IdentifierNode& node, CallExpression::TargetType targetType )
+void SymbolResolverVisitor::registerSymbol( const IdentifierNode& node,
+    const CallExpression::TargetType targetType, const std::size_t arity )
 {
-    const auto identifier = node.identifier();
+    const auto _key = key( node, arity );
 
-    auto result = m_symbolTable.emplace( identifier, targetType );
+    auto result = m_symbolTable.emplace( _key, targetType );
 
     if( not result.second )
     {
@@ -258,17 +269,25 @@ void SymbolResolverVisitor::registerSymbol(
                + "'" );
 }
 
-void SymbolResolverVisitor::unregisterSymbol( const IdentifierNode& node )
+void SymbolResolverVisitor::unregisterSymbol(
+    const IdentifierNode& node, const std::size_t arity )
 {
-    const auto identifier = node.identifier();
+    const auto _key = key( node, arity );
 
-    if( m_symbolTable.erase( identifier ) != 1 )
+    if( m_symbolTable.erase( _key ) != 1 )
     {
         throw std::domain_error(
-            "symbol '" + identifier + "' was erased more than once" );
+            "symbol '" + _key + "' was erased more than once" );
     }
 
-    log.debug( "unregistered symbol '" + identifier + "'" );
+    log.debug( "unregistered symbol '" + _key + "'" );
+}
+
+std::string SymbolResolverVisitor::key(
+    const IdentifierNode& node, const std::size_t arity ) const
+{
+    const auto identifier = node.identifier();
+    return std::to_string( arity ) + "@" + identifier;
 }
 
 u64 SymbolResolverVisitor::errors( void ) const
