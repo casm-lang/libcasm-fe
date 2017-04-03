@@ -168,8 +168,8 @@ void SymbolResolverVisitor::visit( RuleDefinition& node )
 
 void SymbolResolverVisitor::visit( EnumerationDefinition& node )
 {
-    registerSymbol( *node.identifier(), CallExpression::TargetType::ENUMERATION,
-        node.enumerators()->size() );
+    registerSymbol(
+        *node.identifier(), CallExpression::TargetType::ENUMERATION );
 
     for( auto e : *node.enumerators() )
     {
