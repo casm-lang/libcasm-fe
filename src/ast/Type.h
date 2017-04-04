@@ -102,25 +102,6 @@ namespace libcasm_fe
           private:
             Expression::Ptr m_size;
         };
-
-        class RangedType : public Type
-        {
-          public:
-            using Ptr = std::shared_ptr< RangedType >;
-
-            RangedType( const IdentifierNode::Ptr& identifier,
-                const Expression::Ptr& lowerBound,
-                const Expression::Ptr& upperBound );
-
-            Expression::Ptr lowerBound( void ) const;
-            Expression::Ptr upperBound( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            Expression::Ptr m_lowerBound;
-            Expression::Ptr m_upperBound;
-        };
     }
 }
 

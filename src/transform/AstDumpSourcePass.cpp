@@ -75,7 +75,6 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
     void visit( FixedSizedType& node ) override;
-    void visit( RangedType& node ) override;
 
     void visit( BasicAttribute& node ) override;
     void visit( ExpressionAttribute& node ) override;
@@ -283,12 +282,6 @@ void AstDumpSourceVisitor::visit( ComposedType& node )
 }
 
 void AstDumpSourceVisitor::visit( FixedSizedType& node )
-{
-    // TODO
-    RecursiveVisitor::visit( node );
-}
-
-void AstDumpSourceVisitor::visit( RangedType& node )
 {
     // TODO
     RecursiveVisitor::visit( node );

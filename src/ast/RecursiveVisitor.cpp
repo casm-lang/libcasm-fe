@@ -225,13 +225,6 @@ void RecursiveVisitor::visit( FixedSizedType& node )
     node.size()->accept( *this );
 }
 
-void RecursiveVisitor::visit( RangedType& node )
-{
-    node.name()->accept( *this );
-    node.lowerBound()->accept( *this );
-    node.upperBound()->accept( *this );
-}
-
 void RecursiveVisitor::visit( BasicAttribute& node )
 {
     node.identifier()->accept( *this );
