@@ -25,6 +25,12 @@
 
 #include "TypeInferencePass.h"
 
+#include "../Logger.h"
+#include "../Namespace.h"
+#include "../ast/RecursiveVisitor.h"
+
+#include "../casm-ir/src/Builtin.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -34,6 +40,142 @@ static libpass::PassRegistration< TypeInferencePass > PASS(
     "ASTTypeInferencePass",
     "resolve all unknown types in the AST representation", "ast-check", 0 );
 
+//
+// TypeCheckVisitor
+//
+
+class TypeCheckVisitor final : public RecursiveVisitor
+{
+  public:
+    TypeCheckVisitor( Logger& log );
+
+    void visit( BasicType& node ) override;
+    void visit( ComposedType& node ) override;
+    void visit( FixedSizedType& node ) override;
+    void visit( RangedType& node ) override;
+
+    u64 errors( void ) const;
+
+  private:
+    Logger& m_log;
+    u64 m_err;
+};
+
+static const std::unordered_map< std::string, libcasm_ir::Type::Ptr > basicTypes
+    = {
+        { "RuleRef", libstdhl::get< libcasm_ir::RuleReferenceType >() },
+        { "Boolean", libstdhl::get< libcasm_ir::BooleanType >() },
+        { "Integer", libstdhl::get< libcasm_ir::IntegerType >() },
+        { "Bit", libstdhl::get< libcasm_ir::BitType >( 1 ) },
+        { "String", libstdhl::get< libcasm_ir::StringType >() },
+        { "Floating", libstdhl::get< libcasm_ir::FloatingType >() },
+        // enumeration
+        // agent
+      };
+
+TypeCheckVisitor::TypeCheckVisitor( Logger& log )
+: m_log( log )
+, m_err( 0 )
+{
+}
+
+void TypeCheckVisitor::visit( BasicType& node )
+{
+    if( not node.type() )
+    {
+        const auto& name = node.name()->identifier();
+
+        auto result = basicTypes.find( name );
+        if( result == basicTypes.end() )
+        {
+            m_err++;
+            m_log.error( { node.sourceLocation() },
+                "unknown type '" + name + "' found, expect {TODO}" );
+
+            // TODO: it could be the agent domain type or a enumation etc.
+        }
+        else
+        {
+        }
+    }
+
+    RecursiveVisitor::visit( node );
+}
+
+void TypeCheckVisitor::visit( ComposedType& node )
+{
+    assert( !" TODO! " ); // TODO: List, Tuple etc.
+    RecursiveVisitor::visit( node );
+}
+
+void TypeCheckVisitor::visit( FixedSizedType& node )
+{
+    assert( !" TODO! " ); // TODO: Bit
+    RecursiveVisitor::visit( node );
+}
+
+void TypeCheckVisitor::visit( RangedType& node )
+{
+    assert( !" TODO! " ); // TODO Integer
+    RecursiveVisitor::visit( node );
+}
+
+u64 TypeCheckVisitor::errors( void ) const
+{
+    return m_err;
+}
+
+//
+// TypeInferenceVisitor
+//
+
+class TypeInferenceVisitor final : public RecursiveVisitor
+{
+  public:
+    TypeInferenceVisitor( Logger& log );
+
+    void visit( DirectCallExpression& node ) override;
+
+    u64 errors( void ) const;
+
+  private:
+    Logger& m_log;
+    u64 m_err;
+};
+
+TypeInferenceVisitor::TypeInferenceVisitor( Logger& log )
+: m_log( log )
+, m_err( 0 )
+{
+}
+
+void TypeInferenceVisitor::visit( DirectCallExpression& node )
+{
+    const auto& name = node.identifier()->identifier();
+    const auto arity = node.arguments()->size();
+
+    m_log.debug( "call: " + name + "{ " + node.targetTypeName() + " } arity="
+                 + std::to_string( arity ) );
+
+    if( node.targetType() == CallExpression::TargetType::BUILTIN )
+    {
+        m_log.debug( "builtin: " );
+
+        const auto& annotation = libcasm_ir::Annotation::find( name );
+    }
+
+    RecursiveVisitor::visit( node );
+}
+
+u64 TypeInferenceVisitor::errors( void ) const
+{
+    return m_err;
+}
+
+//
+// TypeInferencePass
+//
+
 void TypeInferencePass::usage( libpass::PassUsage& pu )
 {
     pu.require< SymbolResolverPass >();
@@ -41,16 +183,35 @@ void TypeInferencePass::usage( libpass::PassUsage& pu )
 
 u1 TypeInferencePass::run( libpass::PassResult& pr )
 {
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
+    Logger log( &id, stream() );
 
-    // TypeInferenceVisitor visitor;
-    // specification->accept( visitor );
+    const auto data = pr.result< SymbolResolverPass >();
+    const auto specification = data->specification();
+
+    TypeCheckVisitor typChkVisitor( log );
+    specification->accept( typChkVisitor );
+
+    const auto typChkErr = typChkVisitor.errors();
+    if( typChkErr )
+    {
+        log.debug( "found %lu error(s) during type checking", typChkErr );
+        return false;
+    }
+
+    TypeInferenceVisitor visitor( log );
+    specification->accept( visitor );
+
+    const auto errors = visitor.errors();
+    if( errors )
+    {
+        log.debug( "found %lu error(s) during type inference", errors );
+        return false;
+    }
 
     pr.setResult< TypeInferencePass >(
         libstdhl::make< Data >( specification ) );
 
-    return true; // TODO: return only true if this pass is correct!
+    return true;
 }
 
 //
