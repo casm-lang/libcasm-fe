@@ -66,7 +66,6 @@ namespace libcasm_fe
         class BasicType;
         class ComposedType;
         class FixedSizedType;
-        class RangedType;
 
         class BasicAttribute;
         class ExpressionAttribute;
@@ -119,7 +118,6 @@ namespace libcasm_fe
             virtual void visit( BasicType& node ) = 0;
             virtual void visit( ComposedType& node ) = 0;
             virtual void visit( FixedSizedType& node ) = 0;
-            virtual void visit( RangedType& node ) = 0;
 
             virtual void visit( BasicAttribute& node ) = 0;
             virtual void visit( ExpressionAttribute& node ) = 0;

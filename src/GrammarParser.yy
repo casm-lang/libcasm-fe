@@ -189,7 +189,6 @@ END       0 "end of file"
 %type <BasicType::Ptr> BasicType
 %type <ComposedType::Ptr> ComposedType
 %type <FixedSizedType::Ptr> FixedSizedType
-%type <RangedType::Ptr> RangedType
 
 // types
 %type <Attribute::Ptr> Attribute
@@ -233,9 +232,13 @@ END       0 "end of file"
 
 %precedence HOLDS WITH
 
-// prefer calls with args (LPAREN) over calls without args
+// prefer calls with args (starts with LPAREN) over calls without args
 %precedence CALL_WITHOUT_ARGS
 %precedence LPAREN
+
+
+// prefer fixed sized types over composed types (start with LESSER) over basic types
+%precedence MARK
 
 %%
 
@@ -565,10 +568,6 @@ Type
   {
       $$ = $1;
   }
-| RangedType
-  {
-      $$ = $1;
-  }
 ;
 
 
@@ -581,7 +580,7 @@ BasicType
 
 
 ComposedType
-: Identifier LPAREN Types RPAREN
+: Identifier LESSER Types GREATER
   {
       $$ = Ast::make< ComposedType >( @$, $1, $3 );
   }
@@ -589,17 +588,9 @@ ComposedType
 
 
 FixedSizedType
-: Identifier LESSER Term GREATER
+: Identifier MARK Term
   {
       $$ = Ast::make< FixedSizedType >( @$, $1, $3 );
-  }
-;
-
-
-RangedType
-: Identifier LESSER Term DOTDOT Term GREATER
-  {
-      $$ = Ast::make< RangedType >( @$, $1, $3, $5 );
   }
 ;
 

@@ -82,19 +82,15 @@ Type
 : BasicType
 | ComposedType
 | FixedSizedType
-| RangedType
 
 BasicType
 : Identifier
 
 ComposedType
-: Identifier LPAREN Types RPAREN
+: Identifier LESSER Types GREATER
 
 FixedSizedType
-: Identifier LESSER Term GREATER
-
-RangedType
-: Identifier LESSER Term DOTDOT Term GREATER
+: Identifier MARK Term
 
 Types
 : Types COMMA Type

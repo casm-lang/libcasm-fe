@@ -86,6 +86,7 @@ ASTERIX         "*"             { return Parser::make_ASTERIX(loc); }
 SLASH           "/"             { return Parser::make_SLASH(loc); }
 PERCENT         "%"             { return Parser::make_PERCENT(loc); }
 CARET           "^"             { return Parser::make_CARET(loc); }
+MARK            "'"             { return Parser::make_MARK(loc); }
 
 DOTDOT          ".."            { return Parser::make_DOTDOT(loc); }
 ARROW           "->"            { return Parser::make_ARROW(loc); }
