@@ -677,8 +677,15 @@ Boolean
 String
 : STRING
   {
-      const auto value = libstdhl::get< libcasm_ir::StringConstant >( $1 );
-      $$ = Ast::make< ValueAtom >( @$, value );
+      try
+      {
+          const auto value = libstdhl::get< libcasm_ir::StringConstant >( $1 );
+          $$ = Ast::make< ValueAtom >( @$, value );
+      }
+      catch( const std::domain_error& e )
+      {
+          throw syntax_error( @$, e.what() );
+      }
   }
 ;
 
@@ -686,13 +693,27 @@ String
 BitNumber
 : BINARY
   {
-      const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::BINARY );
-      $$ = Ast::make< ValueAtom >( @$, value );
+      try
+      {
+          const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::BINARY );
+          $$ = Ast::make< ValueAtom >( @$, value );
+      }
+      catch( const std::domain_error& e )
+      {
+          throw syntax_error( @$, e.what() );
+      }
   }
 | HEXADECIMAL
   {
-      const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::HEXADECIMAL );
-      $$ = Ast::make< ValueAtom >( @$, value );
+      try
+      {
+          const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::HEXADECIMAL );
+          $$ = Ast::make< ValueAtom >( @$, value );
+      }
+      catch( const std::domain_error& e )
+      {
+          throw syntax_error( @$, e.what() );
+      }
   }
 ;
 
@@ -700,8 +721,15 @@ BitNumber
 IntegerNumber
 : INTEGER
   {
-      const auto value = libstdhl::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
-      $$ = Ast::make< ValueAtom >( @$, value );
+      try
+      {
+          const auto value = libstdhl::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
+          $$ = Ast::make< ValueAtom >( @$, value );
+      }
+      catch( const std::domain_error& e )
+      {
+          throw syntax_error( @$, e.what() );
+      }
   }
 ;
 
@@ -709,8 +737,15 @@ IntegerNumber
 FloatingNumber
 : FLOATING
   {
-      const auto value = libstdhl::get< libcasm_ir::FloatingConstant >( $1 );
-      $$ = Ast::make< ValueAtom >( @$, value );
+      try
+      {
+          const auto value = libstdhl::get< libcasm_ir::FloatingConstant >( $1 );
+          $$ = Ast::make< ValueAtom >( @$, value );
+      }
+      catch( const std::domain_error& e )
+      {
+          throw syntax_error( @$, e.what() );
+      }
   }
 ;
 
@@ -718,8 +753,15 @@ FloatingNumber
 RationalNumber
 : RATIONAL
   {
-      const auto value = libstdhl::get< libcasm_ir::RationalConstant >( $1 );
-      $$ = Ast::make< ValueAtom >( @$, value );
+      try
+      {
+          const auto value = libstdhl::get< libcasm_ir::RationalConstant >( $1 );
+          $$ = Ast::make< ValueAtom >( @$, value );
+      }
+      catch( const std::domain_error& e )
+      {
+          throw syntax_error( @$, e.what() );
+      }
   }
 ;
 
