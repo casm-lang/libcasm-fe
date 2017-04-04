@@ -1,8 +1,3 @@
-Terminals unused in grammar
-
-   "option"
-
-
 State 52 conflicts: 1 shift/reduce
 State 90 conflicts: 1 shift/reduce
 State 252 conflicts: 1 shift/reduce
@@ -235,217 +230,216 @@ Terminals, with rules where they appear
 error (256)
 "CASM" (258) 1
 "init" (259) 20 21
-"option" (260)
-"derived" (261) 29
-"enum" (262) 30
-"rule" (263) 110 111
-"function" (264) 10
-"initially" (265) 12
-"defined" (266) 14
-"seq" (267) 139
-"endseq" (268) 139
-"par" (269) 137
-"endpar" (270) 137
-"skip" (271) 124
-"let" (272) 133
-"in" (273) 108 109 133 134
-"forall" (274) 108 134
-"iterate" (275) 135
-"do" (276) 134
-"call" (277) 141 143
-"if" (278) 107 125 126
-"then" (279) 107 125 126
-"else" (280) 107 126
-"case" (281) 127
-"of" (282) 127
-"default" (283) 128
-"holds" (284) 108
-"exists" (285) 109
-"with" (286) 109
-"undef" (287) 58
-"false" (288) 60
-"true" (289) 59
-"and" (290) 94
-"or" (291) 92
-"xor" (292) 93
-"implies" (293) 95
-"not" (294) 96
-"+" (295) 78 80
-"-" (296) 79 81
-"=" (297) 29 30 87 110 111 133
-"(" (298) 38 45 77 102 103 106
-")" (299) 38 45 77 102 103 106
-"[" (300) 6 97 98 99
-"]" (301) 6 97 98 99
-"{" (302) 12 14 21 30 127 136
-"}" (303) 12 14 21 30 127 136
-":" (304) 10 34 128 129 130
-"_" (305) 129
-"@" (306) 67
-"," (307) 25 32 36 48 100 147
-"<" (308) 46 47 88
-">" (309) 46 47 89
-"*" (310) 16 82 106
-"/" (311) 83
-"%" (312) 84
-"^" (313) 85
-".." (314) 47 97
-"->" (315) 10 23 24 29 111
-":=" (316) 140
-"!=" (317) 86
-"<=" (318) 90
-">=" (319) 91
-"{|" (320) 138
-"|}" (321) 138
-"binary" (322) 62
-"hexadecimal" (323) 63
-"integer" (324) 64
-"rational" (325) 66
-"floating" (326) 65
-"string" (327) 61
-"identifier" (328) 31 67
-UPLUS (329)
-UMINUS (330)
+"derived" (260) 29
+"enum" (261) 30
+"rule" (262) 110 111
+"function" (263) 10
+"initially" (264) 12
+"defined" (265) 14
+"seq" (266) 139
+"endseq" (267) 139
+"par" (268) 137
+"endpar" (269) 137
+"skip" (270) 124
+"let" (271) 133
+"in" (272) 108 109 133 134
+"forall" (273) 108 134
+"iterate" (274) 135
+"do" (275) 134
+"call" (276) 141 143
+"if" (277) 107 125 126
+"then" (278) 107 125 126
+"else" (279) 107 126
+"case" (280) 127
+"of" (281) 127
+"default" (282) 128
+"holds" (283) 108
+"exists" (284) 109
+"with" (285) 109
+"undef" (286) 58
+"false" (287) 60
+"true" (288) 59
+"and" (289) 94
+"or" (290) 92
+"xor" (291) 93
+"implies" (292) 95
+"not" (293) 96
+"+" (294) 78 80
+"-" (295) 79 81
+"=" (296) 29 30 87 110 111 133
+"(" (297) 38 45 77 102 103 106
+")" (298) 38 45 77 102 103 106
+"[" (299) 6 97 98 99
+"]" (300) 6 97 98 99
+"{" (301) 12 14 21 30 127 136
+"}" (302) 12 14 21 30 127 136
+":" (303) 10 34 128 129 130
+"_" (304) 129
+"@" (305) 67
+"," (306) 25 32 36 48 100 147
+"<" (307) 46 47 88
+">" (308) 46 47 89
+"*" (309) 16 82 106
+"/" (310) 83
+"%" (311) 84
+"^" (312) 85
+".." (313) 47 97
+"->" (314) 10 23 24 29 111
+":=" (315) 140
+"!=" (316) 86
+"<=" (317) 90
+">=" (318) 91
+"{|" (319) 138
+"|}" (320) 138
+"binary" (321) 62
+"hexadecimal" (322) 63
+"integer" (323) 64
+"rational" (324) 66
+"floating" (325) 65
+"string" (326) 61
+"identifier" (327) 31 67
+UPLUS (328)
+UMINUS (329)
 
 
 Nonterminals, with rules where they appear
 
-$accept (76)
+$accept (75)
     on left: 0
-Specification (77)
+Specification (76)
     on left: 1, on right: 0
-Definition (78)
+Definition (77)
     on left: 2 3 4 5, on right: 6 7
-AttributedDefinition (79)
+AttributedDefinition (78)
     on left: 6 7, on right: 8 9
-Definitions (80)
+Definitions (79)
     on left: 8 9, on right: 1 8
-FunctionDefinition (81)
+FunctionDefinition (80)
     on left: 10 11, on right: 2
-MaybeInitially (82)
+MaybeInitially (81)
     on left: 12 13, on right: 10
-MaybeDefined (83)
+MaybeDefined (82)
     on left: 14 15, on right: 10
-FunctionParameters (84)
+FunctionParameters (83)
     on left: 16 17, on right: 16 18
-MaybeFunctionParameters (85)
+MaybeFunctionParameters (84)
     on left: 18 19, on right: 10
-ProgramFunctionDefinition (86)
+ProgramFunctionDefinition (85)
     on left: 20 21, on right: 11
-Initializer (87)
+Initializer (86)
     on left: 22 23 24, on right: 25 26
-Initializers (88)
+Initializers (87)
     on left: 25 26, on right: 25 27
-MaybeInitializers (89)
+MaybeInitializers (88)
     on left: 27 28, on right: 12 21
-DerivedDefinition (90)
+DerivedDefinition (89)
     on left: 29, on right: 3
-EnumerationDefinition (91)
+EnumerationDefinition (90)
     on left: 30, on right: 5
-Identifier (92)
+Identifier (91)
     on left: 31, on right: 10 20 29 30 32 33 34 35 44 45 46 47 104
     105 110 111 149 150
-Identifiers (93)
+Identifiers (92)
     on left: 32 33, on right: 30 32
-Variable (94)
+Variable (93)
     on left: 34 35, on right: 36 37 108 109 133 134
-Parameters (95)
+Parameters (94)
     on left: 36 37, on right: 36 38
-MaybeParameters (96)
+MaybeParameters (95)
     on left: 38 39, on right: 29 110 111
-Type (97)
+Type (96)
     on left: 40 41 42 43, on right: 10 16 17 29 34 48 49 111
-BasicType (98)
+BasicType (97)
     on left: 44, on right: 40
-ComposedType (99)
+ComposedType (98)
     on left: 45, on right: 41
-FixedSizedType (100)
+FixedSizedType (99)
     on left: 46, on right: 42
-RangedType (101)
+RangedType (100)
     on left: 47, on right: 43
-Types (102)
+Types (101)
     on left: 48 49, on right: 45 48
-Atom (103)
+Atom (102)
     on left: 50 51 52 53 54 55 56 57, on right: 76
-Undefined (104)
+Undefined (103)
     on left: 58, on right: 56
-Boolean (105)
+Boolean (104)
     on left: 59 60, on right: 57
-String (106)
+String (105)
     on left: 61, on right: 55
-BitNumber (107)
+BitNumber (106)
     on left: 62 63, on right: 51
-IntegerNumber (108)
+IntegerNumber (107)
     on left: 64, on right: 52
-FloatingNumber (109)
+FloatingNumber (108)
     on left: 65, on right: 53
-RationalNumber (110)
+RationalNumber (109)
     on left: 66, on right: 54
-RuleReference (111)
+RuleReference (110)
     on left: 67, on right: 50
-Term (112)
+Term (111)
     on left: 68 69 70 71 72 73 74 75 76, on right: 14 22 23 24 29 46
     47 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96
     97 100 101 106 107 108 109 125 126 127 130 133 134 140 150
-Expression (113)
+Expression (112)
     on left: 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94
     95 96, on right: 73
-Range (114)
+Range (113)
     on left: 97, on right: 75
-List (115)
+List (114)
     on left: 98 99, on right: 74
-Terms (116)
+Terms (115)
     on left: 100 101, on right: 99 100 102
-Arguments (117)
+Arguments (116)
     on left: 102 103, on right: 24 105 106
-DirectCallExpression (118)
+DirectCallExpression (117)
     on left: 104 105, on right: 68 140 141 142
-IndirectCallExpression (119)
+IndirectCallExpression (118)
     on left: 106, on right: 69 143 144
-ConditionalExpression (120)
+ConditionalExpression (119)
     on left: 107, on right: 70
-UniversalQuantifierExpression (121)
+UniversalQuantifierExpression (120)
     on left: 108, on right: 71
-ExistentialQuantifierExpression (122)
+ExistentialQuantifierExpression (121)
     on left: 109, on right: 72
-RuleDefinition (123)
+RuleDefinition (122)
     on left: 110 111, on right: 4
-Rule (124)
+Rule (123)
     on left: 112 113 114 115 116 117 118 119 120 121, on right: 110
     111 122 123 125 126 128 129 130 133 134 135
-Rules (125)
+Rules (124)
     on left: 122 123, on right: 122 136 137 138 139
-SkipRule (126)
+SkipRule (125)
     on left: 124, on right: 112
-ConditionalRule (127)
+ConditionalRule (126)
     on left: 125 126, on right: 113
-CaseRule (128)
+CaseRule (127)
     on left: 127, on right: 114
-CaseLabel (129)
+CaseLabel (128)
     on left: 128 129 130, on right: 131 132
-CaseLabels (130)
+CaseLabels (129)
     on left: 131 132, on right: 127 131
-LetRule (131)
+LetRule (130)
     on left: 133, on right: 115
-ForallRule (132)
+ForallRule (131)
     on left: 134, on right: 116
-IterateRule (133)
+IterateRule (132)
     on left: 135, on right: 117
-BlockRule (134)
+BlockRule (133)
     on left: 136 137, on right: 118
-SequenceRule (135)
+SequenceRule (134)
     on left: 138 139, on right: 119
-UpdateRule (136)
+UpdateRule (135)
     on left: 140, on right: 120
-CallRule (137)
+CallRule (136)
     on left: 141 142 143 144, on right: 121
-Attribute (138)
+Attribute (137)
     on left: 145 146, on right: 147 148
-Attributes (139)
+Attributes (138)
     on left: 147 148, on right: 6 147
-BasicAttribute (140)
+BasicAttribute (139)
     on left: 149, on right: 145
-ExpressionAttribute (141)
+ExpressionAttribute (140)
     on left: 150, on right: 146
 
 
