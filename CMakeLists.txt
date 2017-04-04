@@ -44,6 +44,7 @@ endforeach()
 set( CXX_SRC_FILES
   src/Exceptions.cpp
   src/Logger.cpp
+  src/Namespace.cpp
 
   src/ast/Attribute.cpp
   src/ast/Definition.cpp
