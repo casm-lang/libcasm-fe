@@ -233,6 +233,10 @@ END       0 "end of file"
 
 %precedence HOLDS WITH
 
+// prefer calls with args (LPAREN) over calls without args
+%precedence CALL_WITHOUT_ARGS
+%precedence LPAREN
+
 %%
 
 Specification
@@ -960,7 +964,7 @@ TwoOrMoreArguments
 
 
 DirectCallExpression
-: Identifier
+: Identifier %prec CALL_WITHOUT_ARGS
   {
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );

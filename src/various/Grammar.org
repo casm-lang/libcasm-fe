@@ -188,7 +188,7 @@ TwoOrMoreArguments
 : LPAREN Term COMMA Terms RPAREN
 
 DirectCallExpression
-: Identifier
+: Identifier %prec CALL_WITHOUT_ARGS
 | Identifier Arguments
 
 IndirectCallExpression

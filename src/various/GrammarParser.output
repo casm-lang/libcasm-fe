@@ -1,4 +1,3 @@
-State 52 conflicts: 1 shift/reduce
 State 255 conflicts: 1 shift/reduce
 State 279 conflicts: 1 shift/reduce
 
@@ -301,148 +300,149 @@ error (256)
 "identifier" (327) 31 67
 UPLUS (328)
 UMINUS (329)
+CALL_WITHOUT_ARGS (330)
 
 
 Nonterminals, with rules where they appear
 
-$accept (75)
+$accept (76)
     on left: 0
-Specification (76)
+Specification (77)
     on left: 1, on right: 0
-Definition (77)
+Definition (78)
     on left: 2 3 4 5, on right: 6 7
-AttributedDefinition (78)
+AttributedDefinition (79)
     on left: 6 7, on right: 8 9
-Definitions (79)
+Definitions (80)
     on left: 8 9, on right: 1 8
-FunctionDefinition (80)
+FunctionDefinition (81)
     on left: 10 11, on right: 2
-MaybeInitially (81)
+MaybeInitially (82)
     on left: 12 13, on right: 10
-MaybeDefined (82)
+MaybeDefined (83)
     on left: 14 15, on right: 10
-FunctionParameters (83)
+FunctionParameters (84)
     on left: 16 17, on right: 16 18
-MaybeFunctionParameters (84)
+MaybeFunctionParameters (85)
     on left: 18 19, on right: 10
-ProgramFunctionDefinition (85)
+ProgramFunctionDefinition (86)
     on left: 20 21, on right: 11
-Initializer (86)
+Initializer (87)
     on left: 22 23 24, on right: 25 26
-Initializers (87)
+Initializers (88)
     on left: 25 26, on right: 25 27
-MaybeInitializers (88)
+MaybeInitializers (89)
     on left: 27 28, on right: 12 21
-DerivedDefinition (89)
+DerivedDefinition (90)
     on left: 29, on right: 3
-EnumerationDefinition (90)
+EnumerationDefinition (91)
     on left: 30, on right: 5
-Identifier (91)
+Identifier (92)
     on left: 31, on right: 10 20 29 30 32 33 34 35 44 45 46 47 105
     106 111 112 150 151
-Identifiers (92)
+Identifiers (93)
     on left: 32 33, on right: 30 32
-Variable (93)
+Variable (94)
     on left: 34 35, on right: 36 37 109 110 134 135
-Parameters (94)
+Parameters (95)
     on left: 36 37, on right: 36 38
-MaybeParameters (95)
+MaybeParameters (96)
     on left: 38 39, on right: 29 111 112
-Type (96)
+Type (97)
     on left: 40 41 42 43, on right: 10 16 17 29 34 48 49 112
-BasicType (97)
+BasicType (98)
     on left: 44, on right: 40
-ComposedType (98)
+ComposedType (99)
     on left: 45, on right: 41
-FixedSizedType (99)
+FixedSizedType (100)
     on left: 46, on right: 42
-RangedType (100)
+RangedType (101)
     on left: 47, on right: 43
-Types (101)
+Types (102)
     on left: 48 49, on right: 45 48
-Atom (102)
+Atom (103)
     on left: 50 51 52 53 54 55 56 57, on right: 76
-Undefined (103)
+Undefined (104)
     on left: 58, on right: 56
-Boolean (104)
+Boolean (105)
     on left: 59 60, on right: 57
-String (105)
+String (106)
     on left: 61, on right: 55
-BitNumber (106)
+BitNumber (107)
     on left: 62 63, on right: 51
-IntegerNumber (107)
+IntegerNumber (108)
     on left: 64, on right: 52
-FloatingNumber (108)
+FloatingNumber (109)
     on left: 65, on right: 53
-RationalNumber (109)
+RationalNumber (110)
     on left: 66, on right: 54
-RuleReference (110)
+RuleReference (111)
     on left: 67, on right: 50
-Term (111)
+Term (112)
     on left: 68 69 70 71 72 73 74 75 76, on right: 14 22 23 24 29 46
     47 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96
     97 100 101 104 107 108 109 110 126 127 128 131 134 135 141 151
-Expression (112)
+Expression (113)
     on left: 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94
     95 96, on right: 73
-Range (113)
+Range (114)
     on left: 97, on right: 75
-List (114)
+List (115)
     on left: 98 99, on right: 74
-Terms (115)
+Terms (116)
     on left: 100 101, on right: 99 100 102 104
-Arguments (116)
+Arguments (117)
     on left: 102 103, on right: 106 107
-TwoOrMoreArguments (117)
+TwoOrMoreArguments (118)
     on left: 104, on right: 24
-DirectCallExpression (118)
+DirectCallExpression (119)
     on left: 105 106, on right: 68 141 142 143
-IndirectCallExpression (119)
+IndirectCallExpression (120)
     on left: 107, on right: 69 144 145
-ConditionalExpression (120)
+ConditionalExpression (121)
     on left: 108, on right: 70
-UniversalQuantifierExpression (121)
+UniversalQuantifierExpression (122)
     on left: 109, on right: 71
-ExistentialQuantifierExpression (122)
+ExistentialQuantifierExpression (123)
     on left: 110, on right: 72
-RuleDefinition (123)
+RuleDefinition (124)
     on left: 111 112, on right: 4
-Rule (124)
+Rule (125)
     on left: 113 114 115 116 117 118 119 120 121 122, on right: 111
     112 123 124 126 127 129 130 131 134 135 136
-Rules (125)
+Rules (126)
     on left: 123 124, on right: 123 137 138 139 140
-SkipRule (126)
+SkipRule (127)
     on left: 125, on right: 113
-ConditionalRule (127)
+ConditionalRule (128)
     on left: 126 127, on right: 114
-CaseRule (128)
+CaseRule (129)
     on left: 128, on right: 115
-CaseLabel (129)
+CaseLabel (130)
     on left: 129 130 131, on right: 132 133
-CaseLabels (130)
+CaseLabels (131)
     on left: 132 133, on right: 128 132
-LetRule (131)
+LetRule (132)
     on left: 134, on right: 116
-ForallRule (132)
+ForallRule (133)
     on left: 135, on right: 117
-IterateRule (133)
+IterateRule (134)
     on left: 136, on right: 118
-BlockRule (134)
+BlockRule (135)
     on left: 137 138, on right: 119
-SequenceRule (135)
+SequenceRule (136)
     on left: 139 140, on right: 120
-UpdateRule (136)
+UpdateRule (137)
     on left: 141, on right: 121
-CallRule (137)
+CallRule (138)
     on left: 142 143 144 145, on right: 122
-Attribute (138)
+Attribute (139)
     on left: 146 147, on right: 148 149
-Attributes (139)
+Attributes (140)
     on left: 148 149, on right: 6 148
-BasicAttribute (140)
+BasicAttribute (141)
     on left: 150, on right: 146
-ExpressionAttribute (141)
+ExpressionAttribute (142)
     on left: 151, on right: 147
 
 
@@ -1208,7 +1208,6 @@ State 52
 
     "("  shift, and go to state 96
 
-    "("       [reduce using rule 105 (DirectCallExpression)]
     $default  reduce using rule 105 (DirectCallExpression)
 
     Arguments  go to state 97
