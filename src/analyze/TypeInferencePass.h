@@ -23,33 +23,33 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "TypeCheckPass.h"
+#ifndef _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
+#define _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
 
-using namespace libcasm_fe;
-using namespace Ast;
+#include "../analyze/SymbolResolverPass.h"
 
-char TypeCheckPass::id = 0;
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
 
-static libpass::PassRegistration< TypeCheckPass > PASS( "ASTTypeInferencePass",
-    "resolve all unknown types in the AST representation", "ast-check", 0 );
-
-void TypeCheckPass::usage( libpass::PassUsage& pu )
+namespace libcasm_fe
 {
-    pu.require< SymbolResolverPass >();
+    /**
+     * @brief Type inference pass of AST
+     */
+    class TypeInferencePass final : public libpass::Pass
+    {
+      public:
+        static char id;
+
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
+
+        using Data = SymbolResolverPass::Data;
+    };
 }
 
-u1 TypeCheckPass::run( libpass::PassResult& pr )
-{
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
-
-    // TypeCheckVisitor visitor;
-    // specification->accept( visitor );
-
-    pr.setResult< TypeCheckPass >( libstdhl::make< Data >( specification ) );
-
-    return true; // TODO: return only true if this pass is correct!
-}
+#endif // _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
 
 //
 //  Local variables:

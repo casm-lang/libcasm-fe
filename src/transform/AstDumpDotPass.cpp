@@ -465,13 +465,13 @@ void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
 
 void AstDumpDotPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeCheckPass >();
+    pu.require< TypeInferencePass >();
 }
 
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
-    const auto typeCheckPass = pr.result< TypeCheckPass >();
-    const auto specification = typeCheckPass->specification();
+    const auto data = pr.result< TypeInferencePass >();
+    const auto specification = data->specification();
 
     std::ofstream dotfile( "./out.dot" );
     if( not dotfile.is_open() )
