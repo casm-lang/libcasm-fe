@@ -43,7 +43,7 @@ ProgramFunctionDefinition
 Initializer
 : Term
 | Term ARROW Term
-| Arguments ARROW Term
+| TwoOrMoreArguments ARROW Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
 
 Initializers
 : Initializers COMMA Initializer
@@ -183,6 +183,9 @@ Terms
 Arguments
 : LPAREN Terms RPAREN
 | LPAREN RPAREN
+
+TwoOrMoreArguments
+: LPAREN Term COMMA Terms RPAREN
 
 DirectCallExpression
 : Identifier

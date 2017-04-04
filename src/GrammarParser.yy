@@ -205,7 +205,7 @@ END       0 "end of file"
 %type <NodeList< UpdateRule >::Ptr> Initializers MaybeInitializers MaybeInitially
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
-%type <Expressions::Ptr> Arguments
+%type <Expressions::Ptr> Arguments TwoOrMoreArguments
 %type <NodeList< VariableDefinition >::Ptr> Parameters MaybeParameters
 
 
@@ -428,7 +428,7 @@ Initializer
 
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
-| Arguments ARROW Term
+| TwoOrMoreArguments ARROW Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto unknown = Ast::make< IdentifierNode >( @$, std::string() );
@@ -944,6 +944,16 @@ Arguments
 | LPAREN RPAREN
   {
       const auto expressions = Ast::make< Expressions >( @$ );
+      $$ = expressions;
+  }
+;
+
+
+TwoOrMoreArguments
+: LPAREN Term COMMA Terms RPAREN
+  {
+      const auto expressions = $4;
+      expressions->add( $2 );
       $$ = expressions;
   }
 ;
