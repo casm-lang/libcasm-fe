@@ -97,26 +97,3 @@ void FixedSizedType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
-
-RangedType::RangedType( const IdentifierNode::Ptr& identifier,
-    const Expression::Ptr& lowerBound, const Expression::Ptr& upperBound )
-: Type( Node::ID::RANGED_TYPE, identifier )
-, m_lowerBound( lowerBound )
-, m_upperBound( upperBound )
-{
-}
-
-Expression::Ptr RangedType::lowerBound( void ) const
-{
-    return m_lowerBound;
-}
-
-Expression::Ptr RangedType::upperBound( void ) const
-{
-    return m_upperBound;
-}
-
-void RangedType::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}

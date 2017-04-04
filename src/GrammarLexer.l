@@ -119,7 +119,9 @@ using namespace libcasm_fe;
 }
 <COMMENT>([^*\n]|\r)+|.
 <COMMENT><<EOF>> {
-    log.error( {loc}, "multiline comment terminated" );
+    BEGIN( INITIAL );
+    log.error( {loc}, "multiline comment not terminated" );
+    yyterminate();
 }
 
 \" { // strings
@@ -145,7 +147,9 @@ using namespace libcasm_fe;
     strbuf.append( "\'" );
 }
 <STRING><<EOF>> {
+    BEGIN( INITIAL );
     log.error( {loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
+    yyterminate();
 }
 <STRING>\" {
     BEGIN( INITIAL );

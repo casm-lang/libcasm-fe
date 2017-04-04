@@ -117,8 +117,6 @@ std::string Node::name( void ) const
             return "composed type";
         case ID::FIXED_SIZED_TYPE:
             return "fixed sized type";
-        case ID::RANGED_TYPE:
-            return "ranged type";
         case ID::BASIC_ATTRIBUTE:
             return "basic attribute";
         case ID::EXPRESSION_ATTRIBUTE:

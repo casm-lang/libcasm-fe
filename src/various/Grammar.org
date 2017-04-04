@@ -43,7 +43,7 @@ ProgramFunctionDefinition
 Initializer
 : Term
 | Term ARROW Term
-| Arguments ARROW Term
+| TwoOrMoreArguments ARROW Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
 
 Initializers
 : Initializers COMMA Initializer
@@ -82,19 +82,15 @@ Type
 : BasicType
 | ComposedType
 | FixedSizedType
-| RangedType
 
 BasicType
 : Identifier
 
 ComposedType
-: Identifier LPAREN Types RPAREN
+: Identifier LESSER Types GREATER
 
 FixedSizedType
-: Identifier LESSER Term GREATER
-
-RangedType
-: Identifier LESSER Term DOTDOT Term GREATER
+: Identifier MARK Term
 
 Types
 : Types COMMA Type
@@ -148,9 +144,8 @@ Term
 | Atom
 
 Expression
-: LPAREN Expression RPAREN
+: LPAREN Term RPAREN
 | PLUS Term %prec UPLUS
-| LPAREN Term RPAREN
 | MINUS Term %prec UMINUS
 | Term PLUS Term
 | Term MINUS Term
@@ -175,7 +170,6 @@ Range
 
 List
 : LSQPAREN RSQPAREN
-| LSQPAREN Term RSQPAREN
 | LSQPAREN Terms RSQPAREN
 
 Terms
@@ -186,8 +180,11 @@ Arguments
 : LPAREN Terms RPAREN
 | LPAREN RPAREN
 
+TwoOrMoreArguments
+: LPAREN Term COMMA Terms RPAREN
+
 DirectCallExpression
-: Identifier
+: Identifier %prec CALL_WITHOUT_ARGS
 | Identifier Arguments
 
 IndirectCallExpression
