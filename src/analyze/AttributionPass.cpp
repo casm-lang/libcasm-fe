@@ -51,6 +51,7 @@ static const std::string OUT_ATTRIBUTE = "out";
 static const std::string STATIC_ATTRIBUTE = "static";
 static const std::string VARIANT_ATTRIBUTE = "variant";
 static const std::string SYMBOLIC_ATTRIBUTE = "symbolic";
+static const std::string DUMPS_ATTRIBUTE = "dumps";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
@@ -67,6 +68,7 @@ static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
 // list of allowed expression attribute names
 static const std::unordered_set< std::string > VALID_EXPRESSION_ATTRIBUTES = {
     VARIANT_ATTRIBUTE,
+    DUMPS_ATTRIBUTE,
 };
 
 class DefinitionAttributionVisitor final : public RecursiveVisitor
