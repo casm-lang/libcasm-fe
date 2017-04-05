@@ -26,10 +26,7 @@
 #ifndef _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
 #define _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
 
-#include "../analyze/SymbolResolverPass.h"
-
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "../transform/SourceToAstPass.h"
 
 namespace libcasm_fe
 {
@@ -45,7 +42,7 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        using Data = SymbolResolverPass::Data;
+        using Data = SourceToAstPass::Data;
     };
 }
 
