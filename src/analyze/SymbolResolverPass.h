@@ -28,6 +28,7 @@
 
 #include "../analyze/AttributionPass.h"
 
+#include "../Namespace.h"
 #include "../ast/Specification.h"
 
 namespace libcasm_fe
@@ -49,10 +50,20 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Data >;
 
-            Data( const Ast::Specification::Ptr& specification )
+            Data( const Ast::Specification::Ptr& specification,
+                const Namespace::Ptr& symboltable )
             : AttributionPass::Data( specification )
+            , m_symboltable( symboltable )
             {
             }
+
+            Namespace::Ptr symboltable( void ) const
+            {
+                return m_symboltable;
+            }
+
+          private:
+            Namespace::Ptr m_symboltable;
         };
     };
 }

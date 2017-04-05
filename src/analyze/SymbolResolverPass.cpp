@@ -26,7 +26,6 @@
 #include "SymbolResolverPass.h"
 
 #include "../Logger.h"
-#include "../Namespace.h"
 #include "../ast/RecursiveVisitor.h"
 
 #include "../casm-ir/src/Builtin.h"
@@ -286,7 +285,7 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
 #endif
 
     pr.setResult< SymbolResolverPass >(
-        libstdhl::make< Data >( specification ) );
+        libstdhl::make< Data >( specification, symTblVisitor.symboltable() ) );
 
     return true;
 }
