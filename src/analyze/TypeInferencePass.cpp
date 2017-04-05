@@ -52,7 +52,6 @@ class TypeCheckVisitor final : public RecursiveVisitor
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
     void visit( FixedSizedType& node ) override;
-    void visit( RangedType& node ) override;
 
     u64 errors( void ) const;
 
@@ -86,16 +85,22 @@ void TypeCheckVisitor::visit( BasicType& node )
         const auto& name = node.name()->identifier();
 
         auto result = basicTypes.find( name );
-        if( result == basicTypes.end() )
+        if( result != basicTypes.end() )
         {
-            m_err++;
-            m_log.error( { node.sourceLocation() },
-                "unknown type '" + name + "' found, expect {TODO}" );
-
-            // TODO: it could be the agent domain type or a enumation etc.
+            node.setType( result->second );
+        }
+        else if( name.compare( "Agent" ) == 0 )
+        {
+            // TODO: handle the agent case
         }
         else
         {
+            // m_err++; // TODO: enable this line!
+            m_log.error( { node.sourceLocation() },
+                "unknown type '" + name + "' found" );
+
+            // TODO: it could still be a enumeration type etc., check this in
+            // the symbol table!
         }
     }
 
@@ -110,13 +115,46 @@ void TypeCheckVisitor::visit( ComposedType& node )
 
 void TypeCheckVisitor::visit( FixedSizedType& node )
 {
-    assert( !" TODO! " ); // TODO: Bit
-    RecursiveVisitor::visit( node );
-}
+    if( not node.type() )
+    {
+        const auto& name = node.name()->identifier();
+        auto const& expr = *node.size();
 
-void TypeCheckVisitor::visit( RangedType& node )
-{
-    assert( !" TODO! " ); // TODO Integer
+        if( name.compare( "Bit" ) == 0 )
+        {
+            if( expr.id() == Node::ID::VALUE_ATOM and expr.type()->isInteger() )
+            {
+                // TODO: handle bit vector case, check if integer > 0 and set
+                //       the IR::Bit(n) type
+            }
+            else
+            {
+                m_log.error( { expr.sourceLocation() },
+                    "unsupported expr for 'Bit' type" );
+            }
+        }
+        else if( name.compare( "Integer" ) == 0 )
+        {
+            if( expr.id()
+                == Node::ID::RANGE_EXPRESSION /* and TODO lhs and rhs */ )
+            {
+                // TODO: handle range case, check if the range is for
+                //       Integer'[n..m] : n <= m
+            }
+            else
+            {
+                m_log.error( { expr.sourceLocation() },
+                    "unsupported expr for 'Integer' type" );
+            }
+        }
+        else
+        {
+            // m_err++;
+            m_log.error( { node.sourceLocation() },
+                "unknown type '" + name + "' found" );
+        }
+    }
+
     RecursiveVisitor::visit( node );
 }
 
