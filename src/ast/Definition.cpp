@@ -29,7 +29,7 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 Definition::Definition( Node::ID type, const IdentifierNode::Ptr& identifier )
-: Node( type )
+: TypedNode( type )
 , m_identifier( identifier )
 , m_relationType( nullptr )
 , m_attributes( std::make_shared< Attributes >() )
