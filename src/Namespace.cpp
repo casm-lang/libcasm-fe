@@ -32,56 +32,77 @@ using namespace Ast;
 
 static std::string key( const IdentifierNode& node, const std::size_t arity );
 
+//
+// Symbol
+//
+
+Namespace::Symbol::Symbol( const Ast::IdentifierNode& identifier,
+    Ast::Node& definition,
+    const Ast::CallExpression::TargetType targetType,
+    const std::size_t arity )
+: m_identifier( identifier )
+, m_definition( definition )
+, m_targetType( targetType )
+, m_arity( arity )
+{
+}
+
+const Ast::IdentifierNode& Namespace::Symbol::identifier( void ) const
+{
+    return m_identifier;
+}
+
+Ast::Node& Namespace::Symbol::definition( void )
+{
+    return m_definition;
+}
+
+Ast::CallExpression::TargetType Namespace::Symbol::targetType( void ) const
+{
+    return m_targetType;
+}
+
+std::size_t Namespace::Symbol::arity( void ) const
+{
+    return m_arity;
+}
+
+//
+// Namespace
+//
+
 Namespace::Namespace( void )
 {
 }
 
-u64 Namespace::registerSymbol( Logger& log, const IdentifierNode& node,
-    const CallExpression::TargetType targetType, const std::size_t arity )
+u64 Namespace::registerSymbol( Logger& log, const DirectCallExpression& node )
 {
-    const auto _key = key( node, arity );
-
-    auto result = m_symboltable.emplace( _key, targetType );
-
-    if( not result.second )
-    {
-        log.error( { node.sourceLocation() },
-            "symbol '" + result.first->first + "' already defined as '"
-                + CallExpression::targetTypeString( result.first->second )
-                + "'" );
-
-        return 1;
-    }
-
-    log.debug( "registered new symbol '" + result.first->first + "' as '"
-               + CallExpression::targetTypeString( result.first->second )
-               + "'" );
-
-    return 0;
+    return registerSymbol( log, *node.identifier(), node,
+        CallExpression::TargetType::FUNCTION, node.arguments()->size() );
 }
 
 u64 Namespace::registerSymbol( Logger& log, const FunctionDefinition& node )
 {
-    return registerSymbol( log, *node.identifier(),
+    return registerSymbol( log, *node.identifier(), node,
         CallExpression::TargetType::FUNCTION, node.argumentTypes()->size() );
 }
 
 u64 Namespace::registerSymbol( Logger& log, const DerivedDefinition& node )
 {
-    return registerSymbol( log, *node.identifier(),
+    return registerSymbol( log, *node.identifier(), node,
         CallExpression::TargetType::DERIVED, node.arguments()->size() );
 }
 
 u64 Namespace::registerSymbol( Logger& log, const RuleDefinition& node )
 {
-    return registerSymbol( log, *node.identifier(),
+    return registerSymbol( log, *node.identifier(), node,
         CallExpression::TargetType::RULE, node.arguments()->size() );
 }
 
 u64 Namespace::registerSymbol( Logger& log, const EnumerationDefinition& node )
 {
-    auto err = registerSymbol(
-        log, *node.identifier(), CallExpression::TargetType::ENUMERATION );
+    auto err = registerSymbol( log, *node.identifier(), node,
+        CallExpression::TargetType::ENUMERATION );
 
     auto enumerationNamespace = libstdhl::make< Namespace >();
 
@@ -99,27 +120,41 @@ u64 Namespace::registerSymbol( Logger& log, const EnumerationDefinition& node )
     for( auto e : *node.enumerators() )
     {
         err += enumerationNamespace->registerSymbol(
-            log, *e, CallExpression::TargetType::CONSTANT );
+            log, *e, node, CallExpression::TargetType::CONSTANT );
     }
 
     return err;
 }
 
-CallExpression::TargetType Namespace::find(
-    const DirectCallExpression& node ) const
+Namespace::Symbol Namespace::find( const DirectCallExpression& node ) const
 {
     const auto arity = node.arguments()->size();
     const auto _key = key( *node.identifier(), arity );
 
     auto result = m_symboltable.find( _key );
-    if( result != m_symboltable.end() )
+    if( result == m_symboltable.end() )
     {
-        return result->second;
+        throw std::domain_error( "unable to find " + std::to_string( arity )
+                                 + " symbol '"
+                                 + node.identifier()->identifier()
+                                 + "'" );
     }
-    else
+
+    return result->second;
+}
+
+Namespace::Symbol Namespace::find( const BasicType& node ) const
+{
+    const auto _key = key( *node.name(), 0 );
+
+    auto result = m_symboltable.find( _key );
+    if( result == m_symboltable.end() )
     {
-        return CallExpression::TargetType::UNKNOWN;
+        throw std::domain_error(
+            "unable to find type symbol '" + node.name()->identifier() + "'" );
     }
+
+    return result->second;
 }
 
 std::string Namespace::dump( const std::string& indention ) const
@@ -135,8 +170,8 @@ std::string Namespace::dump( const std::string& indention ) const
         const auto& name = parts[ 1 ];
 
         s << indention << name << " : "
-          << CallExpression::targetTypeString( v.second ) << "( " << arity
-          << "-ary)\n";
+          << CallExpression::targetTypeString( v.second.targetType() ) << "( "
+          << arity << "-ary)\n";
     }
 
     for( auto v : m_namespaces )
@@ -148,6 +183,34 @@ std::string Namespace::dump( const std::string& indention ) const
     }
 
     return s.str();
+}
+
+u64 Namespace::registerSymbol( Logger& log, const IdentifierNode& node,
+    const Node& definition, const CallExpression::TargetType targetType,
+    const std::size_t arity )
+{
+    const auto _key = key( node, arity );
+
+    auto result = m_symboltable.emplace( _key,
+        Symbol{ node, const_cast< Node& >( definition ), targetType, arity } );
+
+    if( not result.second )
+    {
+        log.error( { node.sourceLocation() },
+            "symbol '" + result.first->first + "' already defined as '"
+                + CallExpression::targetTypeString(
+                      result.first->second.targetType() )
+                + "'" );
+
+        return 1;
+    }
+
+    log.debug(
+        "registered new symbol '" + result.first->first + "' as '"
+        + CallExpression::targetTypeString( result.first->second.targetType() )
+        + "'" );
+
+    return 0;
 }
 
 static std::string key( const IdentifierNode& node, const std::size_t arity )

@@ -38,13 +38,33 @@ namespace libcasm_fe
     class Namespace
     {
       public:
+        class Symbol
+        {
+          public:
+            Symbol( const Ast::IdentifierNode& identifier,
+                Ast::Node& definition,
+                const Ast::CallExpression::TargetType targetType,
+                const std::size_t arity );
+
+            const Ast::IdentifierNode& identifier( void ) const;
+            Ast::Node& definition( void );
+            Ast::CallExpression::TargetType targetType( void ) const;
+            std::size_t arity( void ) const;
+
+          private:
+            const Ast::IdentifierNode& m_identifier;
+            Ast::Node& m_definition;
+            Ast::CallExpression::TargetType m_targetType;
+            std::size_t m_arity;
+        };
+
+      public:
         using Ptr = std::shared_ptr< Namespace >;
 
         Namespace( void );
 
-        u64 registerSymbol( Logger& log, const Ast::IdentifierNode& node,
-            const Ast::CallExpression::TargetType targetType,
-            const std::size_t arity = 0 );
+        u64 registerSymbol(
+            Logger& log, const Ast::DirectCallExpression& node );
 
         u64 registerSymbol( Logger& log, const Ast::FunctionDefinition& node );
 
@@ -55,14 +75,19 @@ namespace libcasm_fe
         u64 registerSymbol(
             Logger& log, const Ast::EnumerationDefinition& node );
 
-        Ast::CallExpression::TargetType find(
-            const Ast::DirectCallExpression& node ) const;
+        Symbol find( const Ast::DirectCallExpression& node ) const;
+
+        Symbol find( const Ast::BasicType& node ) const;
 
         std::string dump( const std::string& indention = "" ) const;
 
       private:
-        std::unordered_map< std::string, Ast::CallExpression::TargetType >
-            m_symboltable;
+        u64 registerSymbol( Logger& log, const Ast::IdentifierNode& node,
+            const Ast::Node& definition,
+            const Ast::CallExpression::TargetType targetType,
+            const std::size_t arity = 0 );
+
+        std::unordered_map< std::string, Symbol > m_symboltable;
 
         std::unordered_map< std::string, Namespace::Ptr > m_namespaces;
     };
