@@ -224,14 +224,14 @@ void AstDumpDotVisitor::visit( IndirectCallExpression& node )
 void AstDumpDotVisitor::visit( UnaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "Expression" ); // TODO dump operator
+    dumpNode( node, "Expression\n" + libcasm_ir::Value::token( node.op() ) );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BinaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "Expression" ); // TODO dump operator
+    dumpNode( node, "Expression\n" + libcasm_ir::Value::token( node.op() ) );
     RecursiveVisitor::visit( node );
 }
 
