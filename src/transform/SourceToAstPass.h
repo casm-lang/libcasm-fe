@@ -26,7 +26,8 @@
 #ifndef _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
 #define _LIB_CASMFE_SOURCE_TO_AST_PASS_H_
 
-#include "../pass/src/analyze/LoadFilePass.h"
+#include "../pass/src/Pass.h"
+#include "../pass/src/PassData.h"
 
 #include "../ast/Specification.h"
 

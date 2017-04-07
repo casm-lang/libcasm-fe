@@ -25,6 +25,16 @@
 
 #include "AstDumpSourcePass.h"
 
+#include "../pass/src/PassLogger.h"
+#include "../pass/src/PassRegistry.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassUsage.h"
+
+#include "../analyze/TypeCheckPass.h"
+
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -79,7 +89,7 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
     void visit( BasicAttribute& node ) override;
     void visit( ExpressionAttribute& node ) override;
 
-    void visit( IdentifierNode& node ) override;
+    void visit( Identifier& node ) override;
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
 
@@ -299,7 +309,7 @@ void AstDumpSourceVisitor::visit( ExpressionAttribute& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpSourceVisitor::visit( IdentifierNode& node )
+void AstDumpSourceVisitor::visit( Identifier& node )
 {
     // TODO
     RecursiveVisitor::visit( node );

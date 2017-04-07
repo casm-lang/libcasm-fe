@@ -28,18 +28,18 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-Attribute::Attribute( Node::ID type, const IdentifierNode::Ptr& identifier )
+Attribute::Attribute( Node::ID type, const Identifier::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
 {
 }
 
-IdentifierNode::Ptr Attribute::identifier( void ) const
+Identifier::Ptr Attribute::identifier( void ) const
 {
     return m_identifier;
 }
 
-BasicAttribute::BasicAttribute( const IdentifierNode::Ptr& identifier )
+BasicAttribute::BasicAttribute( const Identifier::Ptr& identifier )
 : Attribute( Node::ID::BASIC_ATTRIBUTE, identifier )
 {
 }
@@ -50,7 +50,7 @@ void BasicAttribute::accept( Visitor& visitor )
 }
 
 ExpressionAttribute::ExpressionAttribute(
-    const IdentifierNode::Ptr& identifier, const Expression::Ptr& expression )
+    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
 : Attribute( Node::ID::EXPRESSION_ATTRIBUTE, identifier )
 , m_expression( expression )
 {

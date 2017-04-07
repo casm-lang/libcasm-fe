@@ -93,6 +93,7 @@ namespace libcasm_fe
                 // other
                 NODE_LIST,
                 IDENTIFIER,
+                IDENTIFIER_PATH,
                 EXPRESSION_CASE,
                 DEFAULT_CASE,
             };
@@ -137,12 +138,12 @@ namespace libcasm_fe
             }
         };
 
-        class IdentifierNode : public Node
+        class Identifier : public Node
         {
           public:
-            using Ptr = std::shared_ptr< IdentifierNode >;
+            using Ptr = std::shared_ptr< Identifier >;
 
-            IdentifierNode( const std::string& identifier );
+            Identifier( const std::string& identifier );
 
             std::string identifier( void ) const;
 
@@ -150,6 +151,47 @@ namespace libcasm_fe
 
           private:
             std::string m_identifier;
+        };
+
+        using Identifiers = NodeList< Identifier >;
+
+        /**
+         * @brief An identifier path is an identifier + namespaces.
+         *
+         * The identifier path can either be absolute or relative. The string of
+         * a relative identifier path starts with a dot. All relative identifier
+         * paths will later be resolved and converted into absolute paths.
+         *
+         * An absolute path "Color.Red" will be splitted into the namespaces
+         * ["Color"] and identifier "Red". Furthermore the node will be marked
+         * as NamespaceType.ABSOLUTE.
+         *
+         * A relative path ".Red" will be splitted into the namespaces [] and
+         * identifier "Red". Furthermore the node will be marked as
+         * NamespaceType.RELATIVE.
+         */
+        class IdentifierPath : public Node
+        {
+          public:
+            enum class Type
+            {
+                ABSOLUTE, /**< absolute namespace + identifier path */
+                RELATIVE, /**< path started with a dot, needs to be resolved */
+            };
+
+          public:
+            using Ptr = std::shared_ptr< IdentifierPath >;
+
+            IdentifierPath( const Identifiers::Ptr& identifiers, Type type );
+
+            Identifiers::Ptr identifiers( void ) const;
+            Type type( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            Identifiers::Ptr m_identifiers;
+            Type m_type;
         };
 
         template < typename T, typename... Args >

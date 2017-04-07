@@ -78,7 +78,7 @@
     static BasicType::Ptr createVoidType( Location& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::VoidType >();
-        const auto name = Ast::make< IdentifierNode >( sourceLocation, type->description() );
+        const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
         const auto node = Ast::make< BasicType >( sourceLocation, name );
         node->setType( type );
         return node;
@@ -87,7 +87,7 @@
     static BasicType::Ptr createRuleRefType( Location& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::RuleReferenceType >();
-        const auto name = Ast::make< IdentifierNode >( sourceLocation, type->description() );
+        const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
         const auto node = Ast::make< BasicType >( sourceLocation, name );
         node->setType( type );
         return node;
@@ -95,7 +95,7 @@
 
     static BasicType::Ptr createAgentType( Location& sourceLocation )
     {
-        const auto name = Ast::make< IdentifierNode >( sourceLocation, "Agent" );
+        const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
         const auto node = Ast::make< BasicType >( sourceLocation, name );
         return node;
     }
@@ -108,7 +108,7 @@
         const auto argTypes = Ast::make< Types >( sourceLocation );
         argTypes->add( agentType );
 
-        const auto program = Ast::make< IdentifierNode >( sourceLocation, "program" );
+        const auto program = Ast::make< Identifier >( sourceLocation, "program" );
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
@@ -117,6 +117,15 @@
         const auto self = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, "self" );
         const auto arguments = libcasm_fe::Ast::make< Expressions >( sourceLocation );
         return libcasm_fe::Ast::make< DirectCallExpression >( sourceLocation, self, arguments );
+    }
+
+    static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
+    {
+        const auto& location = identifier->sourceLocation();
+        const auto identifiers = Ast::make< Identifiers >( location );
+        identifiers->add( identifier );
+        return Ast::make< IdentifierPath >( location, identifiers,
+                IdentifierPath::Type::ABSOLUTE );
     }
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
@@ -150,8 +159,9 @@ END       0 "end of file"
 
 %type <Specification::Ptr> Specification
 
-%type <IdentifierNode::Ptr> Identifier
-%type <NodeList< IdentifierNode >::Ptr> Identifiers
+%type <Identifier::Ptr> Identifier
+%type <Identifiers::Ptr> Identifiers DotSeparatedIdentifiers
+%type <IdentifierPath::Ptr> IdentifierPath
 
 // definitions
 %type <Definition::Ptr> Definition AttributedDefinition
@@ -217,11 +227,15 @@ END       0 "end of file"
 
 %start Specification
 
+// prefer absolute over relative paths
+%precedence ABSOLUTE_PATH
+
 %precedence THEN
 %precedence ELSE
 
 %precedence UPDATE
 
+%left DOT
 %left IMPLIES
 %left OR
 %left XOR
@@ -243,7 +257,6 @@ END       0 "end of file"
 %precedence CALL_WITHOUT_ARGS
 %precedence LPAREN
 
-
 // prefer fixed sized types over composed types (start with LESSER) over basic types
 %precedence MARK
 
@@ -255,7 +268,7 @@ Specification
       const std::string& fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
       const std::string& name = fileName.substr( 0, fileName.rfind( "." ) );
 
-      const auto specificationName = make< IdentifierNode >( @$, name );
+      const auto specificationName = make< Identifier >( @$, name );
       result = Ast::make< Specification >( @$, specificationName, $2 );
   }
 ;
@@ -322,7 +335,7 @@ FunctionDefinition
       // apply the name of the function declaration to the initializer functions
       auto initializers = $8;
       for (auto& initializer : *initializers) {
-           initializer->function()->setIdentifier( identifier );
+           initializer->function()->setIdentifier( asIdentifierPath( identifier ) );
       }
       function->setInitializers( initializers );
 
@@ -388,7 +401,7 @@ MaybeFunctionParameters
 
 
 ProgramFunctionDefinition
-: INIT Identifier
+: INIT IdentifierPath
   {
       auto programDefinition = createProgramFunction( @$ );
 
@@ -399,7 +412,7 @@ ProgramFunctionDefinition
       arguments->add( self );
 
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, programDefinition->identifier(), arguments );
+          @$, asIdentifierPath( programDefinition->identifier() ), arguments );
 
       const auto ruleReference = Ast::make< RuleReferenceAtom >( @$, $2 );
 
@@ -416,7 +429,8 @@ ProgramFunctionDefinition
       // apply the name of the program declaration to the initializer functions
       auto initializers = $3;
       for (auto& initializer : *initializers) {
-          initializer->function()->setIdentifier( programDefinition->identifier() );
+          initializer->function()->setIdentifier(
+                asIdentifierPath( programDefinition->identifier() ) );
       }
       programDefinition->setInitializers( initializers );
 
@@ -429,10 +443,8 @@ Initializer
 : Term
   {
       // the unknown function identifier will be replaced in FunctionDefinition
-      const auto unknown = Ast::make< IdentifierNode >( @$, std::string() );
       const auto arguments = Ast::make< Expressions >( @$ );
-      const auto function = Ast::make< DirectCallExpression >( @$, unknown, arguments );
-
+      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
       $$ = Ast::make< UpdateRule >( @$, function, $1 );
   }
 | Term ARROW Term
@@ -441,17 +453,13 @@ Initializer
       arguments->add( $1 );
 
       // the unknown function identifier will be replaced in FunctionDefinition
-      const auto unknown = Ast::make< IdentifierNode >( @$, std::string() );
-      const auto function = Ast::make< DirectCallExpression >( @$, unknown, arguments );
-
+      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
 | TwoOrMoreArguments ARROW Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
   {
       // the unknown function identifier will be replaced in FunctionDefinition
-      const auto unknown = Ast::make< IdentifierNode >( @$, std::string() );
-      const auto function = Ast::make< DirectCallExpression >( @$, unknown, $1 );
-
+      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1 );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
 ;
@@ -504,7 +512,7 @@ EnumerationDefinition
 Identifier
 : IDENTIFIER
   {
-      $$ = Ast::make< IdentifierNode >( @$, $1 );
+      $$ = Ast::make< Identifier >( @$, $1 );
   }
 ;
 
@@ -518,9 +526,37 @@ Identifiers
   }
 | Identifier
   {
-      auto identifiers = Ast::make< NodeList< IdentifierNode > >( @$ );
+      auto identifiers = Ast::make< Identifiers >( @$ );
       identifiers->add( $1 );
       $$ = identifiers;
+  }
+;
+
+
+DotSeparatedIdentifiers
+: DotSeparatedIdentifiers DOT Identifier
+  {
+      auto identifiers = $1;
+      identifiers->add( $3 );
+      $$ = identifiers;
+  }
+| Identifier
+  {
+      auto identifiers = Ast::make< Identifiers >( @$ );
+      identifiers->add( $1 );
+      $$ = identifiers;
+  }
+;
+
+
+IdentifierPath
+: DotSeparatedIdentifiers %prec ABSOLUTE_PATH
+  {
+      $$ = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
+  }
+| DOT DotSeparatedIdentifiers
+  {
+      $$ = Ast::make< IdentifierPath >( @$, $2, IdentifierPath::Type::RELATIVE );
   }
 ;
 
@@ -773,10 +809,9 @@ RationalNumber
 
 
 RuleReference
-: AT IDENTIFIER
+: AT IdentifierPath
   {
-      const auto ruleName = Ast::make< IdentifierNode >( @$, $2 );
-      $$ = Ast::make< RuleReferenceAtom >( @$, ruleName );
+      $$ = Ast::make< RuleReferenceAtom >( @$, $2 );
   }
 ;
 
@@ -966,12 +1001,12 @@ TwoOrMoreArguments
 
 
 DirectCallExpression
-: Identifier %prec CALL_WITHOUT_ARGS
+: IdentifierPath %prec CALL_WITHOUT_ARGS
   {
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
   }
-| Identifier Arguments
+| IdentifierPath Arguments
   {
       $$ = Ast::make< DirectCallExpression >( @$, $1, $2 );
   }

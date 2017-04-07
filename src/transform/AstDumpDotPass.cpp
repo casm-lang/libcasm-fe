@@ -25,6 +25,15 @@
 
 #include "AstDumpDotPass.h"
 
+#include "../pass/src/PassRegistry.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassUsage.h"
+
+#include "../analyze/TypeCheckPass.h"
+
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -108,7 +117,8 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( BasicAttribute& node ) override;
     void visit( ExpressionAttribute& node ) override;
 
-    void visit( IdentifierNode& node ) override;
+    void visit( Identifier& node ) override;
+    void visit( IdentifierPath& node ) override;
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
 
@@ -378,10 +388,30 @@ void AstDumpDotVisitor::visit( ExpressionAttribute& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( IdentifierNode& node )
+void AstDumpDotVisitor::visit( Identifier& node )
 {
     DotLink link( this, &node );
     dumpNode( node, node.identifier() );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( IdentifierPath& node )
+{
+    DotLink link( this, &node );
+
+    std::string name;
+    switch( node.type() )
+    {
+        case IdentifierPath::Type::ABSOLUTE:
+            name = "Absolute";
+            break;
+        case IdentifierPath::Type::RELATIVE:
+            name = "Relative";
+            break;
+    }
+    name += " IdentifierPath";
+
+    dumpNode( node, name );
     RecursiveVisitor::visit( node );
 }
 

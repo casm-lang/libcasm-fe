@@ -26,8 +26,8 @@
 #ifndef _LIB_CASMFE_LOGGER_H_
 #define _LIB_CASMFE_LOGGER_H_
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "../pass/src/PassLogger.h"
 

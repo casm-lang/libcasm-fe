@@ -63,7 +63,7 @@ void ValueAtom::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-RuleReferenceAtom::RuleReferenceAtom( const IdentifierNode::Ptr& identifier )
+RuleReferenceAtom::RuleReferenceAtom( const IdentifierPath::Ptr& identifier )
 : Expression( Node::ID::RULE_REFERENCE_ATOM )
 , m_identifier( identifier )
 , m_ruleReference( nullptr )
@@ -71,7 +71,7 @@ RuleReferenceAtom::RuleReferenceAtom( const IdentifierNode::Ptr& identifier )
     Expression::setType( libstdhl::get< libcasm_ir::RuleReferenceType >() );
 }
 
-IdentifierNode::Ptr RuleReferenceAtom::identifier() const
+IdentifierPath::Ptr RuleReferenceAtom::identifier() const
 {
     return m_identifier;
 }
@@ -158,7 +158,7 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
 }
 
 DirectCallExpression::DirectCallExpression(
-    const IdentifierNode::Ptr& identifier, const Expressions::Ptr& arguments )
+    const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::DIRECT_CALL_EXPRESSION )
 , m_identifier( identifier )
 , m_arguments( arguments )
@@ -166,12 +166,12 @@ DirectCallExpression::DirectCallExpression(
 }
 
 void DirectCallExpression::setIdentifier(
-    const IdentifierNode::Ptr& identifier )
+    const IdentifierPath::Ptr& identifier )
 {
     m_identifier = identifier;
 }
 
-IdentifierNode::Ptr DirectCallExpression::identifier( void ) const
+IdentifierPath::Ptr DirectCallExpression::identifier( void ) const
 {
     return m_identifier;
 }

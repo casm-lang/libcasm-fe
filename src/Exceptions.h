@@ -30,8 +30,8 @@
 #include <string>
 #include <vector>
 
-#include "Location.h"
 #include "Codes.h"
+#include "Location.h"
 
 namespace libcasm_fe
 {

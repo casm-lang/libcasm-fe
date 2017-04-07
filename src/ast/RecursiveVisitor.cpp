@@ -236,8 +236,13 @@ void RecursiveVisitor::visit( ExpressionAttribute& node )
     node.expression()->accept( *this );
 }
 
-void RecursiveVisitor::visit( IdentifierNode& node )
+void RecursiveVisitor::visit( Identifier& node )
 {
+}
+
+void RecursiveVisitor::visit( IdentifierPath& node )
+{
+    node.identifiers()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ExpressionCase& node )

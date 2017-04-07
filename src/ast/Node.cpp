@@ -125,6 +125,8 @@ std::string Node::name( void ) const
             return "node list";
         case ID::IDENTIFIER:
             return "identifier";
+        case ID::IDENTIFIER_PATH:
+            return "identifier path";
         case ID::EXPRESSION_CASE:
             return "expression case";
         case ID::DEFAULT_CASE:
@@ -132,18 +134,40 @@ std::string Node::name( void ) const
     }
 }
 
-IdentifierNode::IdentifierNode( const std::string& identifier )
+Identifier::Identifier( const std::string& identifier )
 : Node( Node::ID::IDENTIFIER )
 , m_identifier( identifier )
 {
 }
 
-std::string IdentifierNode::identifier( void ) const
+std::string Identifier::identifier( void ) const
 {
     return m_identifier;
 }
 
-void IdentifierNode::accept( Visitor& visitor )
+void Identifier::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+IdentifierPath::IdentifierPath( const Identifiers::Ptr& identifiers, Type type )
+: Node( Node::ID::IDENTIFIER_PATH )
+, m_identifiers( identifiers )
+, m_type( type )
+{
+}
+
+Identifiers::Ptr IdentifierPath::identifiers( void ) const
+{
+    return m_identifiers;
+}
+
+IdentifierPath::Type IdentifierPath::type( void ) const
+{
+    return m_type;
+}
+
+void IdentifierPath::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

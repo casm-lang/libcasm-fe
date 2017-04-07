@@ -28,7 +28,7 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-Definition::Definition( Node::ID type, const IdentifierNode::Ptr& identifier )
+Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
 , m_relationType( nullptr )
@@ -36,7 +36,7 @@ Definition::Definition( Node::ID type, const IdentifierNode::Ptr& identifier )
 {
 }
 
-IdentifierNode::Ptr Definition::identifier( void ) const
+Identifier::Ptr Definition::identifier( void ) const
 {
     return m_identifier;
 }
@@ -63,7 +63,7 @@ Attributes::Ptr Definition::attributes( void ) const
 }
 
 VariableDefinition::VariableDefinition(
-    const IdentifierNode::Ptr& identifier, const Type::Ptr& variableType )
+    const Identifier::Ptr& identifier, const Type::Ptr& variableType )
 : Definition( Node::ID::VARIABLE_DEFINITION, identifier )
 , m_variableType( variableType )
 {
@@ -79,7 +79,7 @@ void VariableDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-FunctionDefinition::FunctionDefinition( const IdentifierNode::Ptr& identifier,
+FunctionDefinition::FunctionDefinition( const Identifier::Ptr& identifier,
     const Types::Ptr& argumentTypes,
     const Type::Ptr& returnType )
 : Definition( Node::ID::FUNCTION_DEFINITION, identifier )
@@ -150,7 +150,7 @@ void FunctionDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-DerivedDefinition::DerivedDefinition( const IdentifierNode::Ptr& identifier,
+DerivedDefinition::DerivedDefinition( const Identifier::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Expression::Ptr& expression )
@@ -181,7 +181,7 @@ void DerivedDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-RuleDefinition::RuleDefinition( const IdentifierNode::Ptr& identifier,
+RuleDefinition::RuleDefinition( const Identifier::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Rule::Ptr& rule )
@@ -213,14 +213,13 @@ void RuleDefinition::accept( Visitor& visitor )
 }
 
 EnumerationDefinition::EnumerationDefinition(
-    const IdentifierNode::Ptr& identifier,
-    const NodeList< IdentifierNode >::Ptr& enumerators )
+    const Identifier::Ptr& identifier, const Identifiers::Ptr& enumerators )
 : Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
 }
 
-NodeList< IdentifierNode >::Ptr EnumerationDefinition::enumerators( void ) const
+Identifiers::Ptr EnumerationDefinition::enumerators( void ) const
 {
     return m_enumerators;
 }

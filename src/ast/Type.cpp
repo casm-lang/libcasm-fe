@@ -28,14 +28,14 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-Type::Type( Node::ID id, const IdentifierNode::Ptr& name )
+Type::Type( Node::ID id, const Identifier::Ptr& name )
 : Node( id )
 , m_name( name )
 , m_type( nullptr )
 {
 }
 
-IdentifierNode::Ptr Type::name( void ) const
+Identifier::Ptr Type::name( void ) const
 {
     return m_name;
 }
@@ -50,9 +50,9 @@ libcasm_ir::Type::Ptr Type::type( void ) const
     return m_type;
 }
 
-static IdentifierNode::Ptr createUnresolvedIdentifier()
+static Identifier::Ptr createUnresolvedIdentifier()
 {
-    return std::make_shared< IdentifierNode >( "$unresolved$" );
+    return std::make_shared< Identifier >( "$unresolved$" );
 }
 
 UnresolvedType::UnresolvedType( void )
@@ -65,7 +65,7 @@ void UnresolvedType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-BasicType::BasicType( const IdentifierNode::Ptr& identifier )
+BasicType::BasicType( const Identifier::Ptr& identifier )
 : Type( Node::ID::BASIC_TYPE, identifier )
 {
 }
@@ -76,7 +76,7 @@ void BasicType::accept( Visitor& visitor )
 }
 
 ComposedType::ComposedType(
-    const IdentifierNode::Ptr& identifier, const Types::Ptr& subTypes )
+    const Identifier::Ptr& identifier, const Types::Ptr& subTypes )
 : Type( Node::ID::COMPOSED_TYPE, identifier )
 , m_subTypes( subTypes )
 {
@@ -93,7 +93,7 @@ void ComposedType::accept( Visitor& visitor )
 }
 
 FixedSizedType::FixedSizedType(
-    const IdentifierNode::Ptr& identifier, const Expression::Ptr& size )
+    const Identifier::Ptr& identifier, const Expression::Ptr& size )
 : Type( Node::ID::FIXED_SIZED_TYPE, identifier )
 , m_size( size )
 {

@@ -37,15 +37,15 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Type >;
 
-            Type( Node::ID id, const IdentifierNode::Ptr& name );
+            Type( Node::ID id, const Identifier::Ptr& name );
 
-            IdentifierNode::Ptr name( void ) const;
+            Identifier::Ptr name( void ) const;
 
             void setType( const libcasm_ir::Type::Ptr& type );
             libcasm_ir::Type::Ptr type( void ) const;
 
           private:
-            IdentifierNode::Ptr m_name;
+            Identifier::Ptr m_name;
             libcasm_ir::Type::Ptr m_type;
         };
 
@@ -66,7 +66,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< BasicType >;
 
-            BasicType( const IdentifierNode::Ptr& identifier );
+            BasicType( const Identifier::Ptr& identifier );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -76,8 +76,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ComposedType >;
 
-            ComposedType( const IdentifierNode::Ptr& identifier,
-                const Types::Ptr& subTypes );
+            ComposedType(
+                const Identifier::Ptr& identifier, const Types::Ptr& subTypes );
 
             Types::Ptr subTypes( void ) const;
 
@@ -92,7 +92,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< FixedSizedType >;
 
-            FixedSizedType( const IdentifierNode::Ptr& identifier,
+            FixedSizedType( const Identifier::Ptr& identifier,
                 const Expression::Ptr& size );
 
             Expression::Ptr size( void ) const;
