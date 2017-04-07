@@ -167,6 +167,35 @@ IdentifierPath::Type IdentifierPath::type( void ) const
     return m_type;
 }
 
+std::string IdentifierPath::baseName( void ) const
+{
+    return m_identifiers->empty() ? std::string()
+                                  : m_identifiers->back()->identifier();
+}
+
+std::string IdentifierPath::path( void ) const
+{
+    std::string path;
+
+    if( m_type == Type::RELATIVE )
+    {
+        path += ".";
+    }
+
+    bool isFirstElement = true;
+    for( const auto& identifier : *m_identifiers )
+    {
+        if( not isFirstElement )
+        {
+            path += ".";
+        }
+        path += identifier->identifier();
+        isFirstElement = false;
+    }
+
+    return path;
+}
+
 void IdentifierPath::accept( Visitor& visitor )
 {
     visitor.visit( *this );

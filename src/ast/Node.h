@@ -187,6 +187,9 @@ namespace libcasm_fe
             Identifiers::Ptr identifiers( void ) const;
             Type type( void ) const;
 
+            std::string baseName( void ) const;
+            std::string path( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
