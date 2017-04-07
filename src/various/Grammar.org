@@ -66,6 +66,7 @@ Identifiers
 : Identifiers COMMA Identifier
 | Identifier
 
+DotSeparatedIdentifiers
 : DotSeparatedIdentifiers DOT Identifier
 | Identifier
 
