@@ -28,8 +28,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "../Logger.h"
 #include "../Lexer.h"
+#include "../Logger.h"
 #include "../various/GrammarParser.tab.h"
 
 using namespace libcasm_fe;

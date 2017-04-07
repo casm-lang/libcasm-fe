@@ -43,8 +43,8 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
     const auto sourceToAstPass = pr.result< SourceToAstPass >();
     const auto specification = sourceToAstPass->specification();
 
-    //TypeCheckVisitor visitor;
-    //specification->accept( visitor );
+    // TypeCheckVisitor visitor;
+    // specification->accept( visitor );
 
     pr.setResult< TypeCheckPass >( libstdhl::make< Data >( specification ) );
 

@@ -35,11 +35,11 @@ namespace Log = libstdhl::Log;
 /**
  * From http://stackoverflow.com/a/26221725
  */
-template<typename ... Args>
+template < typename... Args >
 std::string string_format( const std::string& format, Args... args )
 {
     std::size_t size = snprintf( nullptr, 0, format.c_str(), args... ) + 1;
-    std::unique_ptr<char[]> buf( new char[ size ] );
+    std::unique_ptr< char[] > buf( new char[ size ] );
     snprintf( buf.get(), size, format.c_str(), args... );
     return std::string( buf.get(), buf.get() + size - 1 );
 }
@@ -66,8 +66,8 @@ void Logger::error( const std::vector< Location >& locations,
     {
         for( const auto& location : locations )
         {
-            items.add( libstdhl::make< Log::TextItem >(
-                string_format( "@%i{%04x}", location.begin.line, errorCode) ) );
+            items.add( libstdhl::make< Log::TextItem >( string_format(
+                "@%i{%04x}", location.begin.line, errorCode ) ) );
         }
     }
 
@@ -79,16 +79,16 @@ void Logger::error( const Exception& exception )
     error( exception.locations(), exception.what(), exception.errorCode() );
 }
 
-void Logger::warning( const std::vector< Location >& locations,
-    const std::string& message )
+void Logger::warning(
+    const std::vector< Location >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::make< Log::TextItem >( message ) );
     log< Log::Level::WARNING >( items );
 }
 
-void Logger::info( const std::vector< Location >& locations,
-    const std::string& message )
+void Logger::info(
+    const std::vector< Location >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::make< Log::TextItem >( message ) );

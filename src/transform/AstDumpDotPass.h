@@ -42,7 +42,7 @@ namespace libcasm_fe
         static char id;
 
         void usage( libpass::PassUsage& pu ) override;
-        
+
         u1 run( libpass::PassResult& pr ) override;
     };
 }
