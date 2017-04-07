@@ -212,14 +212,14 @@ void RuleDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-EnumerationDefinition::EnumerationDefinition( const Identifier::Ptr& identifier,
-    const NodeList< Identifier >::Ptr& enumerators )
+EnumerationDefinition::EnumerationDefinition(
+    const Identifier::Ptr& identifier, const Identifiers::Ptr& enumerators )
 : Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
 }
 
-NodeList< Identifier >::Ptr EnumerationDefinition::enumerators( void ) const
+Identifiers::Ptr EnumerationDefinition::enumerators( void ) const
 {
     return m_enumerators;
 }

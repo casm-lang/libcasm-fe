@@ -173,14 +173,14 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< EnumerationDefinition >;
 
             EnumerationDefinition( const Identifier::Ptr& identifier,
-                const NodeList< Identifier >::Ptr& enumerators );
+                const Identifiers::Ptr& enumerators );
 
-            NodeList< Identifier >::Ptr enumerators( void ) const;
+            Identifiers::Ptr enumerators( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            NodeList< Identifier >::Ptr m_enumerators;
+            Identifiers::Ptr m_enumerators;
         };
     }
 }
