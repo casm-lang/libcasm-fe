@@ -221,10 +221,10 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
         auto result = m_namespaces.find( name );
         if( result == m_namespaces.end() )
         {
-            throw std::domain_error(
-                "unable to find namespace " + name + " from symbol '"
-                + name // TODO: PPA: change to node.path() when API is ready
-                + "'" );
+            throw std::domain_error( "unable to find namespace " + name
+                                     + " from symbol '"
+                                     + node.path()
+                                     + "'" );
         }
 
         return find( node, arity, index + 1 );
@@ -239,10 +239,10 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
         auto result = m_symboltable.find( _key );
         if( result == m_symboltable.end() )
         {
-            throw std::domain_error(
-                "unable to find symbol " + name + " symbol in namespace '"
-                + name // TODO: PPA: change to node.path() when API is ready
-                + "'" );
+            throw std::domain_error( "unable to find symbol " + name
+                                     + " symbol in namespace '"
+                                     + node.path()
+                                     + "'" );
         }
 
         return result->second;
