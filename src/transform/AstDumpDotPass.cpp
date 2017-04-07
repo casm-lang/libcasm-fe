@@ -25,9 +25,9 @@
 
 #include "AstDumpDotPass.h"
 
-#include "../pass/src/PassUsage.h"
-#include "../pass/src/PassResult.h"
 #include "../pass/src/PassRegistry.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassUsage.h"
 
 #include "../analyze/TypeCheckPass.h"
 
