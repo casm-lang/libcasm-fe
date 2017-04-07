@@ -523,7 +523,6 @@ Identifiers
 
 
 DotSeparatedIdentifiers
-
 : DotSeparatedIdentifiers DOT Identifier
   {
       auto identifiers = $1;
