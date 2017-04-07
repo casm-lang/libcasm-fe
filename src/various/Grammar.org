@@ -37,7 +37,7 @@ MaybeFunctionParameters
 | %empty
 
 ProgramFunctionDefinition
-: INIT Identifier
+: INIT IdentifierPath
 | INIT LCURPAREN MaybeInitializers RCURPAREN
 
 Initializer
@@ -65,6 +65,13 @@ Identifier
 Identifiers
 : Identifiers COMMA Identifier
 | Identifier
+
+: DotSeparatedIdentifiers DOT Identifier
+| Identifier
+
+IdentifierPath
+: DotSeparatedIdentifiers %prec ABSOLUTE_PATH
+| DOT DotSeparatedIdentifiers
 
 Variable
 : Identifier COLON Type
@@ -130,7 +137,7 @@ RationalNumber
 : RATIONAL
 
 RuleReference
-: AT IDENTIFIER
+: AT IdentifierPath
 
 Term
 : DirectCallExpression
@@ -184,8 +191,8 @@ TwoOrMoreArguments
 : LPAREN Term COMMA Terms RPAREN
 
 DirectCallExpression
-: Identifier %prec CALL_WITHOUT_ARGS
-| Identifier Arguments
+: IdentifierPath %prec CALL_WITHOUT_ARGS
+| IdentifierPath Arguments
 
 IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments

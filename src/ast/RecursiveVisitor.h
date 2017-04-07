@@ -76,6 +76,7 @@ namespace libcasm_fe
             void visit( ExpressionAttribute& node ) override;
 
             void visit( IdentifierNode& node ) override;
+            void visit( IdentifierPath& node ) override;
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
         };

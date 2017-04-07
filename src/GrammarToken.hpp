@@ -89,6 +89,7 @@ CARET           "^"             { return Parser::make_CARET(loc); }
 MARK            "'"             { return Parser::make_MARK(loc); }
 
 DOTDOT          ".."            { return Parser::make_DOTDOT(loc); }
+DOT             "."             { return Parser::make_DOT(loc); }
 ARROW           "->"            { return Parser::make_ARROW(loc); }
 UPDATE          ":="            { return Parser::make_UPDATE(loc); }
 NEQUAL          "!="            { return Parser::make_NEQUAL(loc); }

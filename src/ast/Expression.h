@@ -72,9 +72,9 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< RuleReferenceAtom >;
 
-            RuleReferenceAtom( const IdentifierNode::Ptr& identifier );
+            RuleReferenceAtom( const IdentifierPath::Ptr& identifier );
 
-            IdentifierNode::Ptr identifier( void ) const;
+            IdentifierPath::Ptr identifier( void ) const;
 
             void setRuleReference(
                 const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference );
@@ -83,7 +83,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            IdentifierNode::Ptr m_identifier;
+            IdentifierPath::Ptr m_identifier;
             libcasm_ir::RuleReferenceConstant::Ptr m_ruleReference;
         };
 
@@ -127,18 +127,18 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< DirectCallExpression >;
 
-            DirectCallExpression( const IdentifierNode::Ptr& identifier,
+            DirectCallExpression( const IdentifierPath::Ptr& identifier,
                 const Expressions::Ptr& arguments );
 
-            void setIdentifier( const IdentifierNode::Ptr& identifier );
-            IdentifierNode::Ptr identifier( void ) const;
+            void setIdentifier( const IdentifierPath::Ptr& identifier );
+            IdentifierPath::Ptr identifier( void ) const;
 
             Expressions::Ptr arguments( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            IdentifierNode::Ptr m_identifier;
+            IdentifierPath::Ptr m_identifier;
             Expressions::Ptr m_arguments;
         };
 

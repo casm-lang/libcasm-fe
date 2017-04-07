@@ -71,6 +71,7 @@ namespace libcasm_fe
         class ExpressionAttribute;
 
         class IdentifierNode;
+        class IdentifierPath;
         class ExpressionCase;
         class DefaultCase;
 
@@ -123,6 +124,7 @@ namespace libcasm_fe
             virtual void visit( ExpressionAttribute& node ) = 0;
 
             virtual void visit( IdentifierNode& node ) = 0;
+            virtual void visit( IdentifierPath& node ) = 0;
             virtual void visit( ExpressionCase& node ) = 0;
             virtual void visit( DefaultCase& node ) = 0;
         };
