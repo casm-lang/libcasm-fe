@@ -30,16 +30,16 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-static std::string key( const IdentifierNode& node, const std::size_t arity );
+static std::string key( const Identifier& node, const std::size_t arity );
 
 Namespace::Namespace( void )
 {
 }
 
-u64 Namespace::registerSymbol( Logger& log, const IdentifierNode& node,
+u64 Namespace::registerSymbol( Logger& log, const Identifier& node,
     const CallExpression::TargetType targetType, const std::size_t arity )
 {
-    const auto _key = key( node, arity );
+    const auto _key = key( node.identifier(), arity );
 
     auto result = m_symboltable.emplace( _key, targetType );
 
@@ -109,7 +109,7 @@ CallExpression::TargetType Namespace::find(
     const DirectCallExpression& node ) const
 {
     const auto arity = node.arguments()->size();
-    const auto _key = key( *node.identifier(), arity );
+    const auto _key = key( *node.identifier()->identifiers()->back(), arity );
 
     auto result = m_symboltable.find( _key );
     if( result != m_symboltable.end() )
@@ -150,7 +150,7 @@ std::string Namespace::dump( const std::string& indention ) const
     return s.str();
 }
 
-static std::string key( const IdentifierNode& node, const std::size_t arity )
+static std::string key( const Identifier& node, const std::size_t arity )
 {
     const auto identifier = node.identifier();
     return std::to_string( arity ) + "@" + identifier;

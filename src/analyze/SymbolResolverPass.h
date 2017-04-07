@@ -26,7 +26,8 @@
 #ifndef _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
 #define _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
 
-#include "../analyze/AttributionPass.h"
+#include "../pass/src/Pass.h"
+#include "../pass/src/PassData.h"
 
 #include "../Namespace.h"
 #include "../ast/Specification.h"
@@ -45,14 +46,14 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        class Data : public AttributionPass::Data
+        class Data : public libpass::PassData
         {
           public:
             using Ptr = std::shared_ptr< Data >;
 
             Data( const Ast::Specification::Ptr& specification,
                 const Namespace::Ptr& symboltable )
-            : AttributionPass::Data( specification )
+            : m_specification( specification )
             , m_symboltable( symboltable )
             {
             }
@@ -63,6 +64,7 @@ namespace libcasm_fe
             }
 
           private:
+            Ast::Specification::Ptr m_specification;
             Namespace::Ptr m_symboltable;
         };
     };

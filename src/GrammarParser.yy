@@ -112,13 +112,6 @@
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
-    static DirectCallExpression::Ptr createSelfBuiltinCall( Location& sourceLocation )
-    {
-        const auto self = libcasm_fe::Ast::make< IdentifierNode >( sourceLocation, "self" );
-        const auto arguments = libcasm_fe::Ast::make< Expressions >( sourceLocation );
-        return libcasm_fe::Ast::make< DirectCallExpression >( sourceLocation, self, arguments );
-    }
-
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
     {
         const auto& location = identifier->sourceLocation();
@@ -126,6 +119,14 @@
         identifiers->add( identifier );
         return Ast::make< IdentifierPath >( location, identifiers,
                 IdentifierPath::Type::ABSOLUTE );
+    }
+
+    static DirectCallExpression::Ptr createSelfBuiltinCall( Location& sourceLocation )
+    {
+        const auto self = libcasm_fe::Ast::make< Identifier >( sourceLocation, "self" );
+        const auto arguments = libcasm_fe::Ast::make< Expressions >( sourceLocation );
+        return libcasm_fe::Ast::make< DirectCallExpression >(
+            sourceLocation, asIdentifierPath( self ), arguments );
     }
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )

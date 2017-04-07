@@ -42,7 +42,7 @@ namespace libcasm_fe
 
         Namespace( void );
 
-        u64 registerSymbol( Logger& log, const Ast::IdentifierNode& node,
+        u64 registerSymbol( Logger& log, const Ast::Identifier& node,
             const Ast::CallExpression::TargetType targetType,
             const std::size_t arity = 0 );
 

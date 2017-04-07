@@ -25,7 +25,10 @@
 
 #include "SymbolResolverPass.h"
 
+#include "../pass/src/analyze/LoadFilePass.h"
+
 #include "../Logger.h"
+#include "../analyze/AttributionPass.h"
 #include "../ast/RecursiveVisitor.h"
 
 #include "../casm-ir/src/Builtin.h"
@@ -153,7 +156,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 {
     const auto targetType = m_symboltable.find( node );
 
-    const auto name = node.identifier()->identifier();
+    const auto name = node.identifier()->identifiers()->back()->identifier();
 
     if( targetType != CallExpression::TargetType::UNKNOWN )
     {
@@ -165,7 +168,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         if( libcasm_ir::Builtin::available( name, arity ) )
         {
-            m_err += m_symboltable.registerSymbol( m_log, *node.identifier(),
+            m_err += m_symboltable.registerSymbol( m_log,
+                *node.identifier()->identifiers()->back(),
                 CallExpression::TargetType::BUILTIN, arity );
 
             node.setTargetType( CallExpression::TargetType::BUILTIN );

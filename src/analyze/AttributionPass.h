@@ -26,7 +26,7 @@
 #ifndef _LIB_CASMFE_ATTRIBUTION_PASS_H_
 #define _LIB_CASMFE_ATTRIBUTION_PASS_H_
 
-#include "../pass/src/Pass.h"
+#include "../transform/SourceToAstPass.h"
 
 namespace libcasm_fe
 {
