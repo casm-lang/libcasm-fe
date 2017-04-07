@@ -26,9 +26,6 @@
 #ifndef _LIB_CASMFE_LOCATION_H_
 #define _LIB_CASMFE_LOCATION_H_
 
-#include <memory>
-#include <string>
-
 #include "../stdhl/cpp/Type.h"
 
 namespace libcasm_fe
