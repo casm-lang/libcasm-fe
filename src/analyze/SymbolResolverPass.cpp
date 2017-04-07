@@ -156,8 +156,6 @@ SymbolResolveVisitor::SymbolResolveVisitor(
 
 void SymbolResolveVisitor::visit( DirectCallExpression& node )
 {
-    const auto targetType = m_symboltable.find( node );
-
     const auto name = node.identifier()->identifiers()->back()->identifier();
 
     try
