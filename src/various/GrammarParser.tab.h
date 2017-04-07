@@ -380,7 +380,7 @@ namespace libcasm_fe {
       char dummy24[sizeof(FunctionDefinition::Ptr)];
 
       // Identifier
-      char dummy25[sizeof(IdentifierNode::Ptr)];
+      char dummy25[sizeof(Identifier::Ptr)];
 
       // IdentifierPath
       char dummy26[sizeof(IdentifierPath::Ptr)];
@@ -655,7 +655,7 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const FunctionDefinition::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const IdentifierNode::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Identifier::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr v, const location_type& l);
 
@@ -1482,7 +1482,7 @@ namespace libcasm_fe {
         break;
 
       case 95: // Identifier
-        value.copy< IdentifierNode::Ptr > (other.value);
+        value.copy< Identifier::Ptr > (other.value);
         break;
 
       case 98: // IdentifierPath
@@ -1720,7 +1720,7 @@ namespace libcasm_fe {
         break;
 
       case 95: // Identifier
-        value.copy< IdentifierNode::Ptr > (v);
+        value.copy< Identifier::Ptr > (v);
         break;
 
       case 98: // IdentifierPath
@@ -2021,7 +2021,7 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IdentifierNode::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Identifier::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2325,7 +2325,7 @@ namespace libcasm_fe {
         break;
 
       case 95: // Identifier
-        value.template destroy< IdentifierNode::Ptr > ();
+        value.template destroy< Identifier::Ptr > ();
         break;
 
       case 98: // IdentifierPath
@@ -2569,7 +2569,7 @@ namespace libcasm_fe {
         break;
 
       case 95: // Identifier
-        value.move< IdentifierNode::Ptr > (s.value);
+        value.move< Identifier::Ptr > (s.value);
         break;
 
       case 98: // IdentifierPath

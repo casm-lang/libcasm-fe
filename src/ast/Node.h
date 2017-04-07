@@ -138,12 +138,12 @@ namespace libcasm_fe
             }
         };
 
-        class IdentifierNode : public Node
+        class Identifier : public Node
         {
           public:
-            using Ptr = std::shared_ptr< IdentifierNode >;
+            using Ptr = std::shared_ptr< Identifier >;
 
-            IdentifierNode( const std::string& identifier );
+            Identifier( const std::string& identifier );
 
             std::string identifier( void ) const;
 
@@ -153,7 +153,7 @@ namespace libcasm_fe
             std::string m_identifier;
         };
 
-        using Identifiers = NodeList< IdentifierNode >;
+        using Identifiers = NodeList< Identifier >;
 
         /**
          * @brief An identifier path is an identifier + namespaces.

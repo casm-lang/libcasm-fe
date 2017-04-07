@@ -134,18 +134,18 @@ std::string Node::name( void ) const
     }
 }
 
-IdentifierNode::IdentifierNode( const std::string& identifier )
+Identifier::Identifier( const std::string& identifier )
 : Node( Node::ID::IDENTIFIER )
 , m_identifier( identifier )
 {
 }
 
-std::string IdentifierNode::identifier( void ) const
+std::string Identifier::identifier( void ) const
 {
     return m_identifier;
 }
 
-void IdentifierNode::accept( Visitor& visitor )
+void Identifier::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

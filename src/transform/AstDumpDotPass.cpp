@@ -117,7 +117,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( BasicAttribute& node ) override;
     void visit( ExpressionAttribute& node ) override;
 
-    void visit( IdentifierNode& node ) override;
+    void visit( Identifier& node ) override;
     void visit( IdentifierPath& node ) override;
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
@@ -388,7 +388,7 @@ void AstDumpDotVisitor::visit( ExpressionAttribute& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( IdentifierNode& node )
+void AstDumpDotVisitor::visit( Identifier& node )
 {
     DotLink link( this, &node );
     dumpNode( node, node.identifier() );

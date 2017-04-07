@@ -236,7 +236,7 @@ void RecursiveVisitor::visit( ExpressionAttribute& node )
     node.expression()->accept( *this );
 }
 
-void RecursiveVisitor::visit( IdentifierNode& node )
+void RecursiveVisitor::visit( Identifier& node )
 {
 }
 

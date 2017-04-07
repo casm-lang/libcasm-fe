@@ -78,7 +78,7 @@
     static BasicType::Ptr createVoidType( Location& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::VoidType >();
-        const auto name = Ast::make< IdentifierNode >( sourceLocation, type->description() );
+        const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
         const auto node = Ast::make< BasicType >( sourceLocation, name );
         node->setType( type );
         return node;
@@ -87,7 +87,7 @@
     static BasicType::Ptr createRuleRefType( Location& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::RuleReferenceType >();
-        const auto name = Ast::make< IdentifierNode >( sourceLocation, type->description() );
+        const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
         const auto node = Ast::make< BasicType >( sourceLocation, name );
         node->setType( type );
         return node;
@@ -95,7 +95,7 @@
 
     static BasicType::Ptr createAgentType( Location& sourceLocation )
     {
-        const auto name = Ast::make< IdentifierNode >( sourceLocation, "Agent" );
+        const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
         const auto node = Ast::make< BasicType >( sourceLocation, name );
         return node;
     }
@@ -108,11 +108,11 @@
         const auto argTypes = Ast::make< Types >( sourceLocation );
         argTypes->add( agentType );
 
-        const auto program = Ast::make< IdentifierNode >( sourceLocation, "program" );
+        const auto program = Ast::make< Identifier >( sourceLocation, "program" );
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
-    static IdentifierPath::Ptr asIdentifierPath( const IdentifierNode::Ptr& identifier )
+    static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
     {
         const auto& location = identifier->sourceLocation();
         const auto identifiers = Ast::make< Identifiers >( location );
@@ -152,7 +152,7 @@ END       0 "end of file"
 
 %type <Specification::Ptr> Specification
 
-%type <IdentifierNode::Ptr> Identifier
+%type <Identifier::Ptr> Identifier
 %type <Identifiers::Ptr> Identifiers DotSeparatedIdentifiers
 %type <IdentifierPath::Ptr> IdentifierPath
 
@@ -261,7 +261,7 @@ Specification
       const std::string& fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
       const std::string& name = fileName.substr( 0, fileName.rfind( "." ) );
 
-      const auto specificationName = make< IdentifierNode >( @$, name );
+      const auto specificationName = make< Identifier >( @$, name );
       result = Ast::make< Specification >( @$, specificationName, $2 );
   }
 ;
@@ -501,7 +501,7 @@ EnumerationDefinition
 Identifier
 : IDENTIFIER
   {
-      $$ = Ast::make< IdentifierNode >( @$, $1 );
+      $$ = Ast::make< Identifier >( @$, $1 );
   }
 ;
 
