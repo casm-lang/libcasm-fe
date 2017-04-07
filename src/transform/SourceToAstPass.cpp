@@ -28,6 +28,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "../pass/src/analyze/LoadFilePass.h"
+
 #include "../Lexer.h"
 #include "../Logger.h"
 #include "../various/GrammarParser.tab.h"

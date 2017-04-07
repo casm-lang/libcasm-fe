@@ -26,10 +26,7 @@
 #ifndef _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
 #define _LIB_CASMFE_AST_DUMP_DOT_PASS_H_
 
-#include "../analyze/TypeCheckPass.h"
-
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "../pass/src/Pass.h"
 
 namespace libcasm_fe
 {

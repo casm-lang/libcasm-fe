@@ -25,6 +25,16 @@
 
 #include "AstDumpSourcePass.h"
 
+#include "../pass/src/PassUsage.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassRegistry.h"
+#include "../pass/src/PassLogger.h"
+
+#include "../analyze/TypeCheckPass.h"
+
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 

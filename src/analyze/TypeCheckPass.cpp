@@ -25,6 +25,10 @@
 
 #include "TypeCheckPass.h"
 
+#include "../pass/src/PassUsage.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassRegistry.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 

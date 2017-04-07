@@ -27,6 +27,12 @@
 
 #include <unordered_set>
 
+#include "../pass/src/PassUsage.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassRegistry.h"
+
+#include "../transform/SourceToAstPass.h"
+
 #include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
