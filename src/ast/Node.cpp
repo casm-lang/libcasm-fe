@@ -267,6 +267,12 @@ std::string IdentifierPath::baseName( void ) const
                                   : m_identifiers->back()->identifier();
 }
 
+std::string IdentifierPath::baseDir( void ) const
+{
+    const auto& p = path();
+    return p.substr( 0, p.find_last_of( '.' ) );
+}
+
 std::string IdentifierPath::path( void ) const
 {
     std::string path;

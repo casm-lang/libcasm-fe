@@ -203,6 +203,7 @@ namespace libcasm_fe
             Type type( void ) const;
 
             std::string baseName( void ) const;
+            std::string baseDir( void ) const;
             std::string path( void ) const;
 
             void accept( Visitor& visitor ) override final;
