@@ -227,7 +227,7 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
                                      + "'" );
         }
 
-        return find( node, arity, index + 1 );
+        return result->second->find( node, arity, index + 1 );
     }
     else
     {
