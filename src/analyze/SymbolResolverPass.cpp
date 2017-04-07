@@ -156,33 +156,44 @@ SymbolResolveVisitor::SymbolResolveVisitor(
 
 void SymbolResolveVisitor::visit( DirectCallExpression& node )
 {
-    const auto name = node.identifier()->identifiers()->back()->identifier();
+    const auto& path = *node.identifier();
 
-    try
+    if( path.type() == IdentifierPath::Type::RELATIVE )
     {
-        const auto symbol = m_symboltable.find( node );
-        node.setTargetType( symbol.targetType() );
+        m_log.debug( "call: symbol '" + path.path() + "' is relative" );
     }
-    catch( const std::domain_error& e )
+    else
     {
-        if( libcasm_ir::Builtin::available( name, node.arguments()->size() ) )
+        try
         {
-            m_err += m_symboltable.registerSymbol( m_log, node );
-            node.setTargetType( CallExpression::TargetType::BUILTIN );
+            const auto symbol = m_symboltable.find( node );
+            node.setTargetType( symbol.targetType() );
         }
-        else if( m_variables.find( name ) != m_variables.end() )
+        catch( const std::domain_error& e )
         {
-            node.setTargetType( CallExpression::TargetType::VARIABLE );
-        }
-        else
-        {
-            m_err++;
-            m_log.error( { node.sourceLocation() },
-                "invalid symbol '" + name + "' found" );
-        }
-    }
+            const auto& name = path.baseName();
 
-    m_log.debug( "call: " + name + "{ " + node.targetTypeName() + " }" );
+            if( libcasm_ir::Builtin::available(
+                    name, node.arguments()->size() ) )
+            {
+                m_err += m_symboltable.registerSymbol( m_log, node );
+                node.setTargetType( CallExpression::TargetType::BUILTIN );
+            }
+            else if( m_variables.find( name ) != m_variables.end() )
+            {
+                node.setTargetType( CallExpression::TargetType::VARIABLE );
+            }
+            else
+            {
+                m_err++;
+                m_log.error( { node.sourceLocation() },
+                    "invalid symbol '" + name + "' found" );
+            }
+        }
+
+        m_log.debug(
+            "call: " + path.path() + "{ " + node.targetTypeName() + " }" );
+    }
 
     RecursiveVisitor::visit( node );
 }
