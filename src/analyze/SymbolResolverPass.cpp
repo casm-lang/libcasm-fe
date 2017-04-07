@@ -25,7 +25,9 @@
 
 #include "SymbolResolverPass.h"
 
-#include "../pass/src/analyze/LoadFilePass.h"
+#include "../pass/src/PassRegistry.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassUsage.h"
 
 #include "../Logger.h"
 #include "../analyze/AttributionPass.h"
@@ -158,20 +160,16 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
     const auto name = node.identifier()->identifiers()->back()->identifier();
 
-    if( targetType != CallExpression::TargetType::UNKNOWN )
+    try
     {
-        node.setTargetType( targetType );
+        const auto symbol = m_symboltable.find( node );
+        node.setTargetType( symbol.targetType() );
     }
-    else
+    catch( const std::domain_error& e )
     {
-        const auto arity = node.arguments()->size();
-
-        if( libcasm_ir::Builtin::available( name, arity ) )
+        if( libcasm_ir::Builtin::available( name, node.arguments()->size() ) )
         {
-            m_err += m_symboltable.registerSymbol( m_log,
-                *node.identifier()->identifiers()->back(),
-                CallExpression::TargetType::BUILTIN, arity );
-
+            m_err += m_symboltable.registerSymbol( m_log, node );
             node.setTargetType( CallExpression::TargetType::BUILTIN );
         }
         else if( m_variables.find( name ) != m_variables.end() )

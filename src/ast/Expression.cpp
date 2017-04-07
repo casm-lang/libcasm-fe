@@ -31,19 +31,8 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 Expression::Expression( Node::ID id )
-: Node( id )
-, m_type( nullptr )
+: TypedNode( id )
 {
-}
-
-void Expression::setType( const libcasm_ir::Type::Ptr& type )
-{
-    m_type = type;
-}
-
-libcasm_ir::Type::Ptr Expression::type( void ) const
-{
-    return m_type;
 }
 
 ValueAtom::ValueAtom( const libcasm_ir::Value::Ptr& value )

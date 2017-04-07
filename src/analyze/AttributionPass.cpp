@@ -25,8 +25,6 @@
 
 #include "AttributionPass.h"
 
-#include <unordered_set>
-
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"

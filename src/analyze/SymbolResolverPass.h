@@ -58,6 +58,11 @@ namespace libcasm_fe
             {
             }
 
+            Ast::Specification::Ptr specification( void ) const
+            {
+                return m_specification;
+            }
+
             Namespace::Ptr symboltable( void ) const
             {
                 return m_symboltable;
