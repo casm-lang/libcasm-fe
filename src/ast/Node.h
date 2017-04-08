@@ -146,14 +146,14 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Identifier >;
 
-            Identifier( const std::string& identifier );
+            Identifier( const std::string& name );
 
-            std::string identifier( void ) const;
+            std::string name( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            std::string m_identifier;
+            std::string m_name;
         };
 
         using Identifiers = NodeList< Identifier >;

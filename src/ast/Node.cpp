@@ -134,15 +134,15 @@ std::string Node::description( void ) const
     }
 }
 
-Identifier::Identifier( const std::string& identifier )
+Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
-, m_identifier( identifier )
+, m_name( name )
 {
 }
 
-std::string Identifier::identifier( void ) const
+std::string Identifier::name( void ) const
 {
-    return m_identifier;
+    return m_name;
 }
 
 void Identifier::accept( Visitor& visitor )
@@ -178,7 +178,7 @@ IdentifierPath::Type IdentifierPath::type( void ) const
 std::string IdentifierPath::baseName( void ) const
 {
     return m_identifiers->empty() ? std::string()
-                                  : m_identifiers->back()->identifier();
+                                  : m_identifiers->back()->name();
 }
 
 std::string IdentifierPath::baseDir( void ) const
@@ -203,7 +203,7 @@ std::string IdentifierPath::path( void ) const
         {
             path += ".";
         }
-        path += identifier->identifier();
+        path += identifier->name();
         isFirstElement = false;
     }
 
