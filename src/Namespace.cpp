@@ -148,6 +148,11 @@ Namespace::Symbol Namespace::find( const BasicType& node ) const
     return result->second;
 }
 
+Namespace::Symbol Namespace::find( const IdentifierPath& node ) const
+{
+    return find( node, 0 );
+}
+
 std::string Namespace::dump( const std::string& indention ) const
 {
     std::stringstream s;
