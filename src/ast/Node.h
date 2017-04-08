@@ -187,6 +187,11 @@ namespace libcasm_fe
 
             IdentifierPath(
                 const Identifier::Ptr& identifier, Type type = Type::ABSOLUTE );
+
+            /**
+             * @param identifiers A list of identifiers (must not be empty)
+             * @param type The type of the identifier path (default is ABSOLUTE)
+             */
             IdentifierPath( const Identifiers::Ptr& identifiers,
                 Type type = Type::ABSOLUTE );
 

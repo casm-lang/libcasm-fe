@@ -163,6 +163,7 @@ IdentifierPath::IdentifierPath( const Identifiers::Ptr& identifiers, Type type )
 , m_identifiers( identifiers )
 , m_type( type )
 {
+    assert( not identifiers->empty() && "identifiers must not be empty" );
 }
 
 Identifiers::Ptr IdentifierPath::identifiers( void ) const
@@ -177,8 +178,8 @@ IdentifierPath::Type IdentifierPath::type( void ) const
 
 std::string IdentifierPath::baseName( void ) const
 {
-    return m_identifiers->empty() ? std::string()
-                                  : m_identifiers->back()->name();
+    assert( not m_identifiers->empty() ); // see ctor precondition
+    return m_identifiers->back()->name();
 }
 
 std::string IdentifierPath::baseDir( void ) const
