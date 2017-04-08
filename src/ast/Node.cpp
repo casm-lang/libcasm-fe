@@ -49,7 +49,7 @@ Location Node::sourceLocation( void ) const
     return m_sourceLocation;
 }
 
-std::string Node::name( void ) const
+std::string Node::description( void ) const
 {
     switch( m_id )
     {

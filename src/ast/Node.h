@@ -109,7 +109,10 @@ namespace libcasm_fe
             void setSourceLocation( const Location& sourceLocation );
             Location sourceLocation( void ) const;
 
-            std::string name( void ) const;
+            /**
+             * @return A short description about the node type.
+             */
+            virtual std::string description( void ) const final;
 
             virtual void accept( Visitor& visitor ) = 0;
 

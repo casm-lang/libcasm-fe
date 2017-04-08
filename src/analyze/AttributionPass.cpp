@@ -126,7 +126,8 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     {
         // definition has been deprecated
         log.info( { m_definition.sourceLocation() },
-            m_definition.name() + " `" + m_definition.identifier()->identifier()
+            m_definition.description() + " `"
+                + m_definition.identifier()->identifier()
                 + "` has been marked as deprecated" );
     }
 }
