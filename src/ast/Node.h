@@ -182,7 +182,10 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< IdentifierPath >;
 
-            IdentifierPath( const Identifiers::Ptr& identifiers, Type type );
+            IdentifierPath(
+                const Identifier::Ptr& identifier, Type type = Type::ABSOLUTE );
+            IdentifierPath( const Identifiers::Ptr& identifiers,
+                Type type = Type::ABSOLUTE );
 
             Identifiers::Ptr identifiers( void ) const;
             Type type( void ) const;

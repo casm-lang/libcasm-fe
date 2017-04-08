@@ -92,13 +92,13 @@ Type
 | FixedSizedType
 
 BasicType
-: Identifier
+: IdentifierPath
 
 ComposedType
-: Identifier LESSER Types GREATER
+: IdentifierPath LESSER Types GREATER
 
 FixedSizedType
-: Identifier MARK Term
+: IdentifierPath MARK Term
 
 Types
 : Types COMMA Type

@@ -150,6 +150,14 @@ void Identifier::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+IdentifierPath::IdentifierPath( const Identifier::Ptr& identifier, Type type )
+: Node( Node::ID::IDENTIFIER_PATH )
+, m_identifiers( Ast::make< Identifiers >( identifier->sourceLocation() ) )
+, m_type( type )
+{
+    m_identifiers->add( identifier );
+}
+
 IdentifierPath::IdentifierPath( const Identifiers::Ptr& identifiers, Type type )
 : Node( Node::ID::IDENTIFIER_PATH )
 , m_identifiers( identifiers )

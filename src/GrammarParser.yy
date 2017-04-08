@@ -79,7 +79,8 @@
     {
         const auto type = libstdhl::get< libcasm_ir::VoidType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
-        const auto node = Ast::make< BasicType >( sourceLocation, name );
+        const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
+        const auto node = Ast::make< BasicType >( sourceLocation, path );
         node->setType( type );
         return node;
     }
@@ -88,7 +89,8 @@
     {
         const auto type = libstdhl::get< libcasm_ir::RuleReferenceType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
-        const auto node = Ast::make< BasicType >( sourceLocation, name );
+        const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
+        const auto node = Ast::make< BasicType >( sourceLocation, path );
         node->setType( type );
         return node;
     }
@@ -96,7 +98,8 @@
     static BasicType::Ptr createAgentType( Location& sourceLocation )
     {
         const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
-        const auto node = Ast::make< BasicType >( sourceLocation, name );
+        const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
+        const auto node = Ast::make< BasicType >( sourceLocation, path );
         return node;
     }
 
@@ -608,7 +611,7 @@ Type
 
 
 BasicType
-: Identifier
+: IdentifierPath
   {
       $$ = Ast::make< BasicType >( @$, $1 );
   }
@@ -616,7 +619,7 @@ BasicType
 
 
 ComposedType
-: Identifier LESSER Types GREATER
+: IdentifierPath LESSER Types GREATER
   {
       $$ = Ast::make< ComposedType >( @$, $1, $3 );
   }
@@ -624,7 +627,7 @@ ComposedType
 
 
 FixedSizedType
-: Identifier MARK Term
+: IdentifierPath MARK Term
   {
       $$ = Ast::make< FixedSizedType >( @$, $1, $3 );
   }

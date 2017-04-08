@@ -71,11 +71,11 @@ Grammar
    45     | ComposedType
    46     | FixedSizedType
 
-   47 BasicType: Identifier
+   47 BasicType: IdentifierPath
 
-   48 ComposedType: Identifier "<" Types ">"
+   48 ComposedType: IdentifierPath "<" Types ">"
 
-   49 FixedSizedType: Identifier "'" Term
+   49 FixedSizedType: IdentifierPath "'" Term
 
    50 Types: Types "," Type
    51      | Type
@@ -340,14 +340,13 @@ DerivedDefinition (93)
 EnumerationDefinition (94)
     on left: 30, on right: 5
 Identifier (95)
-    on left: 31, on right: 10 29 30 32 33 34 35 38 39 47 48 49 113
-    114 152 153
+    on left: 31, on right: 10 29 30 32 33 34 35 38 39 113 114 152 153
 Identifiers (96)
     on left: 32 33, on right: 30 32
 DotSeparatedIdentifiers (97)
     on left: 34 35, on right: 34 36 37
 IdentifierPath (98)
-    on left: 36 37, on right: 20 69 107 108
+    on left: 36 37, on right: 20 47 48 49 69 107 108
 Variable (99)
     on left: 38 39, on right: 40 41 111 112 136 137
 Parameters (100)
@@ -1499,13 +1498,16 @@ State 81
 
    10 FunctionDefinition: "function" Identifier ":" . MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
 
+    "."           shift, and go to state 19
     "identifier"  shift, and go to state 20
 
     $default  reduce using rule 19 (MaybeFunctionParameters)
 
     FunctionParameters       go to state 128
     MaybeFunctionParameters  go to state 129
-    Identifier               go to state 130
+    Identifier               go to state 21
+    DotSeparatedIdentifiers  go to state 22
+    IdentifierPath           go to state 130
     Type                     go to state 131
     BasicType                go to state 132
     ComposedType             go to state 133
@@ -2924,13 +2926,16 @@ State 124
 
    29 DerivedDefinition: "derived" Identifier MaybeParameters "->" . Type "=" Term
 
+    "."           shift, and go to state 19
     "identifier"  shift, and go to state 20
 
-    Identifier      go to state 130
-    Type            go to state 172
-    BasicType       go to state 132
-    ComposedType    go to state 133
-    FixedSizedType  go to state 134
+    Identifier               go to state 21
+    DotSeparatedIdentifiers  go to state 22
+    IdentifierPath           go to state 130
+    Type                     go to state 172
+    BasicType                go to state 132
+    ComposedType             go to state 133
+    FixedSizedType           go to state 134
 
 
 State 125
@@ -2984,13 +2989,16 @@ State 127
 
   114 RuleDefinition: "rule" Identifier MaybeParameters "->" . Type "=" Rule
 
+    "."           shift, and go to state 19
     "identifier"  shift, and go to state 20
 
-    Identifier      go to state 130
-    Type            go to state 200
-    BasicType       go to state 132
-    ComposedType    go to state 133
-    FixedSizedType  go to state 134
+    Identifier               go to state 21
+    DotSeparatedIdentifiers  go to state 22
+    IdentifierPath           go to state 130
+    Type                     go to state 200
+    BasicType                go to state 132
+    ComposedType             go to state 133
+    FixedSizedType           go to state 134
 
 
 State 128
@@ -3012,9 +3020,9 @@ State 129
 
 State 130
 
-   47 BasicType: Identifier .
-   48 ComposedType: Identifier . "<" Types ">"
-   49 FixedSizedType: Identifier . "'" Term
+   47 BasicType: IdentifierPath .
+   48 ComposedType: IdentifierPath . "<" Types ">"
+   49 FixedSizedType: IdentifierPath . "'" Term
 
     "<"  shift, and go to state 203
     "'"  shift, and go to state 204
@@ -3107,13 +3115,16 @@ State 138
 
    38 Variable: Identifier ":" . Type
 
+    "."           shift, and go to state 19
     "identifier"  shift, and go to state 20
 
-    Identifier      go to state 130
-    Type            go to state 205
-    BasicType       go to state 132
-    ComposedType    go to state 133
-    FixedSizedType  go to state 134
+    Identifier               go to state 21
+    DotSeparatedIdentifiers  go to state 22
+    IdentifierPath           go to state 130
+    Type                     go to state 205
+    BasicType                go to state 132
+    ComposedType             go to state 133
+    FixedSizedType           go to state 134
 
 
 State 139
@@ -4574,45 +4585,54 @@ State 201
 
    16 FunctionParameters: FunctionParameters "*" . Type
 
+    "."           shift, and go to state 19
     "identifier"  shift, and go to state 20
 
-    Identifier      go to state 130
-    Type            go to state 232
-    BasicType       go to state 132
-    ComposedType    go to state 133
-    FixedSizedType  go to state 134
+    Identifier               go to state 21
+    DotSeparatedIdentifiers  go to state 22
+    IdentifierPath           go to state 130
+    Type                     go to state 232
+    BasicType                go to state 132
+    ComposedType             go to state 133
+    FixedSizedType           go to state 134
 
 
 State 202
 
    10 FunctionDefinition: "function" Identifier ":" MaybeFunctionParameters "->" . Type MaybeDefined MaybeInitially
 
+    "."           shift, and go to state 19
     "identifier"  shift, and go to state 20
 
-    Identifier      go to state 130
-    Type            go to state 233
-    BasicType       go to state 132
-    ComposedType    go to state 133
-    FixedSizedType  go to state 134
+    Identifier               go to state 21
+    DotSeparatedIdentifiers  go to state 22
+    IdentifierPath           go to state 130
+    Type                     go to state 233
+    BasicType                go to state 132
+    ComposedType             go to state 133
+    FixedSizedType           go to state 134
 
 
 State 203
 
-   48 ComposedType: Identifier "<" . Types ">"
+   48 ComposedType: IdentifierPath "<" . Types ">"
 
+    "."           shift, and go to state 19
     "identifier"  shift, and go to state 20
 
-    Identifier      go to state 130
-    Type            go to state 234
-    BasicType       go to state 132
-    ComposedType    go to state 133
-    FixedSizedType  go to state 134
-    Types           go to state 235
+    Identifier               go to state 21
+    DotSeparatedIdentifiers  go to state 22
+    IdentifierPath           go to state 130
+    Type                     go to state 234
+    BasicType                go to state 132
+    ComposedType             go to state 133
+    FixedSizedType           go to state 134
+    Types                    go to state 235
 
 
 State 204
 
-   49 FixedSizedType: Identifier "'" . Term
+   49 FixedSizedType: IdentifierPath "'" . Term
 
     "forall"       shift, and go to state 34
     "if"           shift, and go to state 35
@@ -5346,7 +5366,7 @@ State 234
 
 State 235
 
-   48 ComposedType: Identifier "<" Types . ">"
+   48 ComposedType: IdentifierPath "<" Types . ">"
    50 Types: Types . "," Type
 
     ","  shift, and go to state 258
@@ -5355,7 +5375,7 @@ State 235
 
 State 236
 
-   49 FixedSizedType: Identifier "'" Term .
+   49 FixedSizedType: IdentifierPath "'" Term .
    82 Expression: Term . "+" Term
    83           | Term . "-" Term
    84           | Term . "*" Term
@@ -5847,18 +5867,21 @@ State 258
 
    50 Types: Types "," . Type
 
+    "."           shift, and go to state 19
     "identifier"  shift, and go to state 20
 
-    Identifier      go to state 130
-    Type            go to state 270
-    BasicType       go to state 132
-    ComposedType    go to state 133
-    FixedSizedType  go to state 134
+    Identifier               go to state 21
+    DotSeparatedIdentifiers  go to state 22
+    IdentifierPath           go to state 130
+    Type                     go to state 270
+    BasicType                go to state 132
+    ComposedType             go to state 133
+    FixedSizedType           go to state 134
 
 
 State 259
 
-   48 ComposedType: Identifier "<" Types ">" .
+   48 ComposedType: IdentifierPath "<" Types ">" .
 
     $default  reduce using rule 48 (ComposedType)
 
