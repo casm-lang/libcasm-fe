@@ -161,13 +161,54 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     if( path.type() == IdentifierPath::Type::RELATIVE )
     {
         m_log.debug( "call: symbol '" + path.path() + "' is relative" );
+
+        if( path.identifiers()->size() != 1 )
+        {
+            m_err++;
+            m_log.error( { node.sourceLocation() },
+                "invalid relative path '" + path.path() + "' found" );
+        }
     }
     else
     {
         try
         {
-            const auto symbol = m_symboltable.find( node );
+            auto symbol = m_symboltable.find( node );
             node.setTargetType( symbol.targetType() );
+
+            if( symbol.targetType() == CallExpression::TargetType::ENUMERATION
+                or symbol.targetType() == CallExpression::TargetType::CONSTANT )
+            {
+                auto& definition = static_cast< EnumerationDefinition& >(
+                    symbol.definition() );
+
+                if( not definition.type() )
+                {
+                    const auto& name
+                        = ( symbol.targetType()
+                              == CallExpression::TargetType::CONSTANT )
+                              ? path.baseDir()
+                              : path.path();
+
+                    m_log.debug(
+                        "creating IR enumeration type '" + name + "'" );
+
+                    auto kind
+                        = libstdhl::make< libcasm_ir::Enumeration >( name );
+
+                    for( auto e : *definition.enumerators() )
+                    {
+                        kind->add( e->identifier() );
+                    }
+
+                    const auto type
+                        = libstdhl::make< libcasm_ir::EnumerationType >( kind );
+
+                    definition.setType( type );
+                }
+
+                node.setType( definition.type() );
+            }
         }
         catch( const std::domain_error& e )
         {
