@@ -118,10 +118,7 @@
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
     {
         const auto& location = identifier->sourceLocation();
-        const auto identifiers = Ast::make< Identifiers >( location );
-        identifiers->add( identifier );
-        return Ast::make< IdentifierPath >( location, identifiers,
-                IdentifierPath::Type::ABSOLUTE );
+        return Ast::make< IdentifierPath >( location, identifier );
     }
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
