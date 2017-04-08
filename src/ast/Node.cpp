@@ -44,7 +44,7 @@ void Node::setSourceLocation( const Location& sourceLocation )
     m_sourceLocation = sourceLocation;
 }
 
-Location Node::sourceLocation( void ) const
+const Location& Node::sourceLocation( void ) const
 {
     return m_sourceLocation;
 }
@@ -140,7 +140,7 @@ Identifier::Identifier( const std::string& name )
 {
 }
 
-std::string Identifier::name( void ) const
+const std::string& Identifier::name( void ) const
 {
     return m_name;
 }

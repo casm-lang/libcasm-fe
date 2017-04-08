@@ -101,13 +101,13 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Node >;
 
-            Node( ID id );
+            explicit Node( ID id );
             virtual ~Node() = default;
 
             ID id( void ) const;
 
             void setSourceLocation( const Location& sourceLocation );
-            Location sourceLocation( void ) const;
+            const Location& sourceLocation( void ) const;
 
             /**
              * @return A short description about the node type.
@@ -127,7 +127,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< NodeList >;
 
-            NodeList( void )
+            explicit NodeList( void )
             : Node( Node::ID::NODE_LIST )
             {
             }
@@ -146,9 +146,9 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Identifier >;
 
-            Identifier( const std::string& name );
+            explicit Identifier( const std::string& name );
 
-            std::string name( void ) const;
+            const std::string& name( void ) const;
 
             void accept( Visitor& visitor ) override final;
 

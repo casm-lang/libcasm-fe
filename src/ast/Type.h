@@ -56,7 +56,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UnresolvedType >;
 
-            UnresolvedType( void );
+            explicit UnresolvedType( void );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -66,7 +66,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< BasicType >;
 
-            BasicType( const IdentifierPath::Ptr& identifier );
+            explicit BasicType( const IdentifierPath::Ptr& identifier );
 
             void accept( Visitor& visitor ) override final;
         };

@@ -41,7 +41,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Expression >;
 
-            Expression( Node::ID id );
+            explicit Expression( Node::ID id );
 
             void setType( const libcasm_ir::Type::Ptr& type );
             libcasm_ir::Type::Ptr type( void ) const;
@@ -57,7 +57,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ValueAtom >;
 
-            ValueAtom( const libcasm_ir::Value::Ptr& value );
+            explicit ValueAtom( const libcasm_ir::Value::Ptr& value );
 
             libcasm_ir::Value::Ptr value( void ) const;
 
@@ -72,7 +72,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< RuleReferenceAtom >;
 
-            RuleReferenceAtom( const IdentifierPath::Ptr& identifier );
+            explicit RuleReferenceAtom( const IdentifierPath::Ptr& identifier );
 
             IdentifierPath::Ptr identifier( void ) const;
 
@@ -92,7 +92,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UndefAtom >;
 
-            UndefAtom( void );
+            explicit UndefAtom( void );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -221,7 +221,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ListExpression >;
 
-            ListExpression( const Expressions::Ptr& expressions );
+            explicit ListExpression( const Expressions::Ptr& expressions );
 
             Expressions::Ptr expressions( void ) const;
 

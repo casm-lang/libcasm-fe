@@ -53,7 +53,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< BasicAttribute >;
 
-            BasicAttribute( const Identifier::Ptr& identifier );
+            explicit BasicAttribute( const Identifier::Ptr& identifier );
 
             void accept( Visitor& visitor ) override final;
         };
