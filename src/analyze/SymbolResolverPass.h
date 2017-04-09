@@ -23,20 +23,21 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_TYPE_CHECK_PASS_H_
-#define _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#ifndef _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
+#define _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
 
-#include "../transform/SourceToAstPass.h"
+#include "../pass/src/Pass.h"
+#include "../pass/src/PassData.h"
 
-#include "../ast/RecursiveVisitor.h"
+#include "../Namespace.h"
 #include "../ast/Specification.h"
 
 namespace libcasm_fe
 {
     /**
-     * @brief Type inference of AST
+     * @brief Symbol resolver pass of AST identifiers
      */
-    class TypeCheckPass final : public libpass::Pass
+    class SymbolResolverPass final : public libpass::Pass
     {
       public:
         static char id;
@@ -45,11 +46,36 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        using Data = SourceToAstPass::Data;
+        class Data : public libpass::PassData
+        {
+          public:
+            using Ptr = std::shared_ptr< Data >;
+
+            Data( const Ast::Specification::Ptr& specification,
+                const Namespace::Ptr& symboltable )
+            : m_specification( specification )
+            , m_symboltable( symboltable )
+            {
+            }
+
+            Ast::Specification::Ptr specification( void ) const
+            {
+                return m_specification;
+            }
+
+            Namespace::Ptr symboltable( void ) const
+            {
+                return m_symboltable;
+            }
+
+          private:
+            Ast::Specification::Ptr m_specification;
+            Namespace::Ptr m_symboltable;
+        };
     };
 }
 
-#endif // _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#endif // _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
 
 //
 //  Local variables:

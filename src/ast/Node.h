@@ -33,6 +33,8 @@
 
 #include "../Location.h"
 
+#include "../../casm-ir/src/Type.h"
+
 namespace libcasm_fe
 {
     namespace Ast
@@ -142,6 +144,19 @@ namespace libcasm_fe
             }
         };
 
+        class TypedNode : public Node
+        {
+          public:
+            TypedNode( Node::ID id );
+
+            void setType( const libcasm_ir::Type::Ptr& type );
+
+            libcasm_ir::Type::Ptr type( void ) const;
+
+          private:
+            libcasm_ir::Type::Ptr m_type;
+        };
+        
         class Identifier : public Node
         {
           public:

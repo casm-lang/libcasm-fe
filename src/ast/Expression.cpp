@@ -31,19 +31,8 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 Expression::Expression( Node::ID id )
-: Node( id )
-, m_type( nullptr )
+: TypedNode( id )
 {
-}
-
-void Expression::setType( const libcasm_ir::Type::Ptr& type )
-{
-    m_type = type;
-}
-
-libcasm_ir::Type::Ptr Expression::type( void ) const
-{
-    return m_type;
 }
 
 ValueAtom::ValueAtom( const libcasm_ir::Value::Ptr& value )
@@ -111,6 +100,50 @@ void CallExpression::setTargetType( CallExpression::TargetType targetType )
 CallExpression::TargetType CallExpression::targetType( void ) const
 {
     return m_targetType;
+}
+
+std::string CallExpression::targetTypeName( void ) const
+{
+    return targetTypeString( m_targetType );
+}
+
+std::string CallExpression::targetTypeString( const TargetType targetType )
+{
+    switch( targetType )
+    {
+        case TargetType::FUNCTION:
+        {
+            return "Function";
+        }
+        case TargetType::DERIVED:
+        {
+            return "Derived";
+        }
+        case TargetType::BUILTIN:
+        {
+            return "Builtin";
+        }
+        case TargetType::RULE:
+        {
+            return "Rule";
+        }
+        case TargetType::ENUMERATION:
+        {
+            return "Enumeration";
+        }
+        case TargetType::CONSTANT:
+        {
+            return "Constant";
+        }
+        case TargetType::VARIABLE:
+        {
+            return "Variable";
+        }
+        case TargetType::UNKNOWN:
+        {
+            return "Unknown";
+        }
+    }
 }
 
 DirectCallExpression::DirectCallExpression(

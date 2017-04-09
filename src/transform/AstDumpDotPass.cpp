@@ -25,11 +25,12 @@
 
 #include "AstDumpDotPass.h"
 
+#include "../pass/src/PassLogger.h"
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
-#include "../analyze/TypeCheckPass.h"
+#include "../analyze/TypeInferencePass.h"
 
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
@@ -125,6 +126,9 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
   private:
     void dumpNode( const Node& node, const std::string& name );
+    void dumpNode( const TypedNode& node, const std::string& name );
+    void dumpLabel( const Node& node );
+    void dumpLabel( const TypedNode& node );
     void dumpLink( Node* from, Node* to );
 
   private:
@@ -232,14 +236,14 @@ void AstDumpDotVisitor::visit( IndirectCallExpression& node )
 void AstDumpDotVisitor::visit( UnaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "Expression" ); // TODO dump operator
+    dumpNode( node, "Expression\n" + libcasm_ir::Value::token( node.op() ) );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BinaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "Expression" ); // TODO dump operator
+    dumpNode( node, "Expression\n" + libcasm_ir::Value::token( node.op() ) );
     RecursiveVisitor::visit( node );
 }
 
@@ -441,12 +445,48 @@ void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
 {
     m_stream << "\"" << &node << "\" [label=\"" << name;
 
+    dumpLabel( node );
+
+    m_stream << "\"];\n";
+}
+
+void AstDumpDotVisitor::dumpNode(
+    const TypedNode& node, const std::string& name )
+{
+    m_stream << "\"" << &node << "\" [label=\"" << name;
+
+    dumpLabel( node );
+
+    m_stream << "\"];\n";
+}
+
+void AstDumpDotVisitor::dumpLabel( const Node& node )
+{
     if( m_dumpNodeLocation )
     {
         m_stream << "\n" << node.sourceLocation();
     }
+}
 
-    m_stream << "\"];\n";
+void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
+{
+    dumpLabel( static_cast< const Node& >( node ) );
+
+    if( true ) // m_dumpType
+    {
+        m_stream << "\n{ ";
+
+        if( node.type() )
+        {
+            m_stream << node.type()->description();
+        }
+        else
+        {
+            m_stream << "unknown";
+        }
+
+        m_stream << " }";
+    }
 }
 
 void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
@@ -456,13 +496,13 @@ void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
 
 void AstDumpDotPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeCheckPass >();
+    pu.require< TypeInferencePass >();
 }
 
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
-    const auto typeCheckPass = pr.result< TypeCheckPass >();
-    const auto specification = typeCheckPass->specification();
+    const auto data = pr.result< TypeInferencePass >();
+    const auto specification = data->specification();
 
     std::ofstream dotfile( "./out.dot" );
     if( not dotfile.is_open() )

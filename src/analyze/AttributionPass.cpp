@@ -25,8 +25,6 @@
 
 #include "AttributionPass.h"
 
-#include <unordered_set>
-
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
@@ -245,11 +243,13 @@ u1 AttributionPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto sourceToAstPass = pr.result< SourceToAstPass >();
-    const auto specification = sourceToAstPass->specification();
+    const auto data = pr.result< SourceToAstPass >();
+    const auto specification = data->specification();
 
     DefinitionVisitor visitor{ log };
     specification->accept( visitor );
+
+    pr.setResult< AttributionPass >( libstdhl::make< Data >( specification ) );
 
     return true;
 }

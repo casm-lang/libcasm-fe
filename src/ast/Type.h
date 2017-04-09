@@ -32,7 +32,7 @@ namespace libcasm_fe
 {
     namespace Ast
     {
-        class Type : public Node
+        class Type : public TypedNode
         {
           public:
             using Ptr = std::shared_ptr< Type >;
@@ -41,12 +41,8 @@ namespace libcasm_fe
 
             IdentifierPath::Ptr name( void ) const;
 
-            void setType( const libcasm_ir::Type::Ptr& type );
-            libcasm_ir::Type::Ptr type( void ) const;
-
           private:
             IdentifierPath::Ptr m_name;
-            libcasm_ir::Type::Ptr m_type;
         };
 
         using Types = NodeList< Type >;

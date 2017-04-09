@@ -25,13 +25,13 @@
 
 #include "AstDumpSourcePass.h"
 
-#include "../pass/src/PassLogger.h"
+#include "../pass/src/PassLogger.h" // TODO: change to FE Logger.h
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
-#include "../analyze/TypeCheckPass.h"
-
+// #include "../Logger.h"
+#include "../analyze/TypeInferencePass.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 
@@ -329,7 +329,7 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 
 void AstDumpSourcePass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeCheckPass >();
+    pu.require< TypeInferencePass >();
 }
 
 u1 AstDumpSourcePass::run( libpass::PassResult& pr )
@@ -338,7 +338,7 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 
     try
     {
-        const auto data = pr.result< TypeCheckPass >();
+        const auto data = pr.result< TypeInferencePass >();
         const auto specification = data->specification();
 
         AstDumpSourceVisitor visitor{ std::cout };

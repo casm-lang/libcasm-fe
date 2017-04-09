@@ -35,7 +35,7 @@ namespace libcasm_fe
 {
     namespace Ast
     {
-        class Definition : public Node
+        class Definition : public TypedNode
         {
           public:
             using Ptr = std::shared_ptr< Definition >;

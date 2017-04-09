@@ -36,18 +36,12 @@ namespace libcasm_fe
     {
         class VariableDefinition;
 
-        class Expression : public Node
+        class Expression : public TypedNode
         {
           public:
             using Ptr = std::shared_ptr< Expression >;
 
             explicit Expression( Node::ID id );
-
-            void setType( const libcasm_ir::Type::Ptr& type );
-            libcasm_ir::Type::Ptr type( void ) const;
-
-          private:
-            libcasm_ir::Type::Ptr m_type;
         };
 
         using Expressions = NodeList< Expression >;
@@ -106,20 +100,27 @@ namespace libcasm_fe
                 DERIVED,
                 BUILTIN,
                 RULE,
+                ENUMERATION,
+                CONSTANT,
                 VARIABLE,
                 UNKNOWN
             };
 
-          public:
             using Ptr = std::shared_ptr< CallExpression >;
 
             using Expression::Expression;
 
             void setTargetType( TargetType targetType );
+
             TargetType targetType( void ) const;
+
+            std::string targetTypeName( void ) const;
 
           private:
             TargetType m_targetType = TargetType::UNKNOWN;
+
+          public:
+            static std::string targetTypeString( const TargetType targetType );
         };
 
         class DirectCallExpression : public CallExpression
