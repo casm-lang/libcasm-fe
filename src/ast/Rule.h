@@ -51,7 +51,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< SkipRule >;
 
-            SkipRule( void );
+            explicit SkipRule( void );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -114,7 +114,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< DefaultCase >;
 
-            DefaultCase( const Rule::Ptr& rule );
+            explicit DefaultCase( const Rule::Ptr& rule );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -182,7 +182,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< IterateRule >;
 
-            IterateRule( const Rule::Ptr& rule );
+            explicit IterateRule( const Rule::Ptr& rule );
 
             Rule::Ptr rule( void ) const;
 
@@ -197,7 +197,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< BlockRule >;
 
-            BlockRule( const Rules::Ptr& rules );
+            explicit BlockRule( const Rules::Ptr& rules );
 
             Rules::Ptr rules( void ) const;
 
@@ -212,7 +212,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< SequenceRule >;
 
-            SequenceRule( const Rules::Ptr& rules );
+            explicit SequenceRule( const Rules::Ptr& rules );
 
             Rules::Ptr rules( void ) const;
 

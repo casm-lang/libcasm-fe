@@ -150,7 +150,7 @@ void AstDumpDotVisitor::setDumpNodeLocation( u1 dumpNodeLocation )
 
 void AstDumpDotVisitor::visit( Specification& node )
 {
-    m_stream << "subgraph \"" << node.name()->identifier() << "\" {\n";
+    m_stream << "subgraph \"" << node.name()->name() << "\" {\n";
 
     { // scope for DotLink object
         DotLink link( this, &node );
@@ -395,7 +395,7 @@ void AstDumpDotVisitor::visit( ExpressionAttribute& node )
 void AstDumpDotVisitor::visit( Identifier& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, node.identifier() );
+    dumpNode( node, node.name() );
     RecursiveVisitor::visit( node );
 }
 

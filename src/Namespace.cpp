@@ -110,7 +110,7 @@ u64 Namespace::registerSymbol( Logger& log, const EnumerationDefinition& node )
     auto enumerationNamespace = libstdhl::make< Namespace >();
 
     auto result = m_namespaces.emplace(
-        node.identifier()->identifier(), enumerationNamespace );
+        node.identifier()->name(), enumerationNamespace );
 
     if( not result.second )
     {
@@ -136,16 +136,19 @@ Namespace::Symbol Namespace::find( const DirectCallExpression& node ) const
 
 Namespace::Symbol Namespace::find( const BasicType& node ) const
 {
-    const auto _key = key( *node.name(), 0 );
+    return find( *node.name(), 0 );
 
-    auto result = m_symboltable.find( _key );
-    if( result == m_symboltable.end() )
-    {
-        throw std::domain_error(
-            "unable to find type symbol '" + node.name()->identifier() + "'" );
-    }
+    // const auto _key = key( *node.name(), 0 );
 
-    return result->second;
+    // auto result = m_symboltable.find( _key );
+    // if( result == m_symboltable.end() )
+    // {
+    //     throw std::domain_error(
+    //         "unable to find type symbol '" + node.name()->identifier() + "'"
+    //         );
+    // }
+
+    // return result->second;
 }
 
 Namespace::Symbol Namespace::find( const IdentifierPath& node ) const
@@ -221,7 +224,7 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
     {
         // search in sub-namespaces
 
-        const auto& name = path[ index ]->identifier();
+        const auto& name = path[ index ]->name();
 
         auto result = m_namespaces.find( name );
         if( result == m_namespaces.end() )
@@ -238,7 +241,7 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
     {
         // search for identifier/symbol in this namespace
 
-        const auto& name = path[ index ]->identifier();
+        const auto& name = *path[ index ];
         const auto _key = key( name, arity );
 
         auto result = m_symboltable.find( _key );
@@ -254,6 +257,6 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
 
 static std::string key( const Identifier& node, const std::size_t arity )
 {
-    const auto identifier = node.identifier();
+    const auto identifier = node.name();
     return std::to_string( arity ) + "@" + identifier;
 }

@@ -86,7 +86,7 @@ void TypeCheckVisitor::visit( BasicType& node )
 {
     if( not node.type() )
     {
-        const auto& name = node.name()->identifier();
+        const auto& name = node.name()->baseName();
 
         auto result = basicTypes.find( name );
         if( result != basicTypes.end() )
@@ -117,7 +117,7 @@ void TypeCheckVisitor::visit( BasicType& node )
                         = libstdhl::make< libcasm_ir::Enumeration >( name );
                     for( auto e : *definition.enumerators() )
                     {
-                        kind->add( e->identifier() );
+                        kind->add( e->name() );
                     }
 
                     auto type
@@ -149,7 +149,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
 {
     if( not node.type() )
     {
-        const auto& name = node.name()->identifier();
+        const auto& name = node.name()->baseName();
         const auto& expr = *node.size();
 
         if( name.compare( "Bit" ) == 0 )
@@ -232,9 +232,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     const auto& name = node.identifier()
                            ->identifiers()
                            ->back()
-                           ->identifier(); // TODO: PPA:; change this to new
-                                           // path() method from IdentifierPath
-    
+                           ->name(); // TODO: PPA:; change this to new
+                                     // path() method from IdentifierPath
+
     const auto arity = node.arguments()->size();
 
     m_log.debug( "call: " + name + "{ " + node.targetTypeName() + " } arity="

@@ -103,15 +103,18 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Node >;
 
-            Node( ID id );
+            explicit Node( ID id );
             virtual ~Node() = default;
 
             ID id( void ) const;
 
             void setSourceLocation( const Location& sourceLocation );
-            Location sourceLocation( void ) const;
+            const Location& sourceLocation( void ) const;
 
-            std::string name( void ) const;
+            /**
+             * @return A short description about the node type.
+             */
+            virtual std::string description( void ) const final;
 
             virtual void accept( Visitor& visitor ) = 0;
 
@@ -126,7 +129,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< NodeList >;
 
-            NodeList( void )
+            explicit NodeList( void )
             : Node( Node::ID::NODE_LIST )
             {
             }
@@ -158,14 +161,14 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Identifier >;
 
-            Identifier( const std::string& identifier );
+            explicit Identifier( const std::string& name );
 
-            std::string identifier( void ) const;
+            const std::string& name( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            std::string m_identifier;
+            std::string m_name;
         };
 
         using Identifiers = NodeList< Identifier >;
@@ -197,7 +200,15 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< IdentifierPath >;
 
-            IdentifierPath( const Identifiers::Ptr& identifiers, Type type );
+            IdentifierPath(
+                const Identifier::Ptr& identifier, Type type = Type::ABSOLUTE );
+
+            /**
+             * @param identifiers A list of identifiers (must not be empty)
+             * @param type The type of the identifier path (default is ABSOLUTE)
+             */
+            IdentifierPath( const Identifiers::Ptr& identifiers,
+                Type type = Type::ABSOLUTE );
 
             Identifiers::Ptr identifiers( void ) const;
             Type type( void ) const;

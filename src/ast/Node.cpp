@@ -44,12 +44,12 @@ void Node::setSourceLocation( const Location& sourceLocation )
     m_sourceLocation = sourceLocation;
 }
 
-Location Node::sourceLocation( void ) const
+const Location& Node::sourceLocation( void ) const
 {
     return m_sourceLocation;
 }
 
-std::string Node::name( void ) const
+std::string Node::description( void ) const
 {
     switch( m_id )
     {
@@ -196,9 +196,9 @@ std::string Node::name( void ) const
         case ID::IDENTIFIER:
         {
             return "identifier";
-	}
+        }
         case ID::IDENTIFIER_PATH:
-	{
+        {
             return "identifier path";
         }
         case ID::EXPRESSION_CASE:
@@ -228,15 +228,15 @@ libcasm_ir::Type::Ptr TypedNode::type( void ) const
     return m_type;
 }
 
-Identifier::Identifier( const std::string& identifier )
+Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
-, m_identifier( identifier )
+, m_name( name )
 {
 }
 
-std::string Identifier::identifier( void ) const
+const std::string& Identifier::name( void ) const
 {
-    return m_identifier;
+    return m_name;
 }
 
 void Identifier::accept( Visitor& visitor )
@@ -244,11 +244,20 @@ void Identifier::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+IdentifierPath::IdentifierPath( const Identifier::Ptr& identifier, Type type )
+: Node( Node::ID::IDENTIFIER_PATH )
+, m_identifiers( Ast::make< Identifiers >( identifier->sourceLocation() ) )
+, m_type( type )
+{
+    m_identifiers->add( identifier );
+}
+
 IdentifierPath::IdentifierPath( const Identifiers::Ptr& identifiers, Type type )
 : Node( Node::ID::IDENTIFIER_PATH )
 , m_identifiers( identifiers )
 , m_type( type )
 {
+    assert( not identifiers->empty() && "identifiers must not be empty" );
 }
 
 Identifiers::Ptr IdentifierPath::identifiers( void ) const
@@ -263,8 +272,8 @@ IdentifierPath::Type IdentifierPath::type( void ) const
 
 std::string IdentifierPath::baseName( void ) const
 {
-    return m_identifiers->empty() ? std::string()
-                                  : m_identifiers->back()->identifier();
+    assert( not m_identifiers->empty() ); // see ctor precondition
+    return m_identifiers->back()->name();
 }
 
 std::string IdentifierPath::baseDir( void ) const
@@ -289,7 +298,7 @@ std::string IdentifierPath::path( void ) const
         {
             path += ".";
         }
-        path += identifier->identifier();
+        path += identifier->name();
         isFirstElement = false;
     }
 

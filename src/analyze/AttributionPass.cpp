@@ -101,7 +101,7 @@ DefinitionAttributionVisitor::attributeNames() const
 
 void DefinitionAttributionVisitor::visit( BasicAttribute& node )
 {
-    const auto& name = node.identifier()->identifier();
+    const auto& name = node.identifier()->name();
 
     // allow only basic attributes
     if( VALID_BASIC_ATTRIBUTES.count( name ) == 0 )
@@ -118,20 +118,21 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
             "attribute `" + name + "` has already been used" );
         return;
     }
-    m_attributeNames.insert( node.identifier()->identifier() );
+    m_attributeNames.insert( node.identifier()->name() );
 
     if( name == DEPRECATED_ATTRIBUTE )
     {
         // definition has been deprecated
         log.info( { m_definition.sourceLocation() },
-            m_definition.name() + " `" + m_definition.identifier()->identifier()
+            m_definition.description() + " `"
+                + m_definition.identifier()->name()
                 + "` has been marked as deprecated" );
     }
 }
 
 void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
 {
-    const auto& name = node.identifier()->identifier();
+    const auto& name = node.identifier()->name();
 
     // allow only expression attributes
     if( VALID_EXPRESSION_ATTRIBUTES.count( name ) == 0 )
@@ -148,7 +149,7 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
             "attribute `" + name + "` has already been used" );
         return;
     }
-    m_attributeNames.insert( node.identifier()->identifier() );
+    m_attributeNames.insert( node.identifier()->name() );
 }
 
 class DefinitionVisitor final : public RecursiveVisitor

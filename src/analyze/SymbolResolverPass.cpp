@@ -198,7 +198,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
                     for( auto e : *definition.enumerators() )
                     {
-                        kind->add( e->identifier() );
+                        kind->add( e->name() );
                     }
 
                     const auto type
@@ -269,7 +269,7 @@ void SymbolResolveVisitor::visit( ForallRule& node )
 
 void SymbolResolveVisitor::push( const VariableDefinition& node )
 {
-    const auto& name = node.identifier()->identifier();
+    const auto& name = node.identifier()->name();
 
     auto result = m_variables.emplace( name );
     if( not result.second )
@@ -282,7 +282,7 @@ void SymbolResolveVisitor::push( const VariableDefinition& node )
 
 void SymbolResolveVisitor::pop( const VariableDefinition& node )
 {
-    const auto& name = node.identifier()->identifier();
+    const auto& name = node.identifier()->name();
 
     if( m_variables.erase( name ) != 1 )
     {
