@@ -33,6 +33,8 @@
 #include "../analyze/SymbolResolverPass.h"
 #include "../ast/RecursiveVisitor.h"
 
+#include "../stdhl/cpp/String.h"
+
 #include "../casm-ir/src/Builtin.h"
 
 using namespace libcasm_fe;
@@ -53,26 +55,59 @@ class TypeCheckVisitor final : public RecursiveVisitor
   public:
     TypeCheckVisitor( Logger& log, Namespace& symboltable );
 
+    void visit( VariableDefinition& node ) override;
+
+    void visit( DirectCallExpression& node ) override;
+
+    void visit( CaseRule& node ) override;
+    void visit( LetRule& node ) override;
+
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
     void visit( FixedSizedType& node ) override;
 
+    void visit( ExpressionCase& node ) override;
+    void visit( DefaultCase& node ) override;
+
     u64 errors( void ) const;
 
   private:
+    void push( VariableDefinition& identifier );
+    void pop( VariableDefinition& identifier );
+
     Logger& m_log;
     u64 m_err;
     Namespace& m_symboltable;
+
+    std::unordered_map< std::string, VariableDefinition* > m_id2var;
+    std::stack< VariableDefinition* > m_stack;
+    Expression* m_caseExpr = nullptr;
 };
+
+static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
+static const auto RULEREF = libstdhl::get< libcasm_ir::RuleReferenceType >();
+static const auto BOOLEAN = libstdhl::get< libcasm_ir::BooleanType >();
+static const auto INTEGER = libstdhl::get< libcasm_ir::IntegerType >();
+static const auto BIT_1 = libstdhl::get< libcasm_ir::BitType >( 1 );
+static const auto STRING = libstdhl::get< libcasm_ir::StringType >();
+static const auto FLOATING = libstdhl::get< libcasm_ir::FloatingType >();
+static const auto RATIONAL = libstdhl::get< libcasm_ir::RationalType >();
 
 static const std::unordered_map< std::string, libcasm_ir::Type::Ptr > basicTypes
     = {
-        { "RuleRef", libstdhl::get< libcasm_ir::RuleReferenceType >() },
-        { "Boolean", libstdhl::get< libcasm_ir::BooleanType >() },
-        { "Integer", libstdhl::get< libcasm_ir::IntegerType >() },
-        { "Bit", libstdhl::get< libcasm_ir::BitType >( 1 ) },
-        { "String", libstdhl::get< libcasm_ir::StringType >() },
-        { "Floating", libstdhl::get< libcasm_ir::FloatingType >() },
+        { "RuleRef", RULEREF },
+
+        { "Boolean", BOOLEAN },
+
+        { "Integer", INTEGER },
+
+        { "Bit", BIT_1 },
+
+        { "String", STRING },
+
+        { "Floating", FLOATING },
+
+        { "Rational", RATIONAL },
       };
 
 TypeCheckVisitor::TypeCheckVisitor( Logger& log, Namespace& symboltable )
@@ -80,6 +115,171 @@ TypeCheckVisitor::TypeCheckVisitor( Logger& log, Namespace& symboltable )
 , m_err( 0 )
 , m_symboltable( symboltable )
 {
+}
+
+void TypeCheckVisitor::visit( VariableDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    if( not node.type() and node.variableType()->type() )
+    {
+        node.setType( node.variableType()->type() );
+    }
+}
+
+void TypeCheckVisitor::visit( DirectCallExpression& node )
+{
+    const auto& path = *node.identifier();
+
+    if( not node.type() )
+    {
+        auto result = m_id2var.find( path.path() );
+        if( result != m_id2var.end() )
+        {
+            node.setType( result->second->type() );
+        }
+        else
+        {
+            if( node.targetType() == CallExpression::TargetType::UNKNOWN )
+            {
+                assert( path.type() == IdentifierPath::Type::RELATIVE );
+                assert( path.identifiers()->size() == 1 );
+                // can only be a relative addressed enumeration constant
+
+                if( not m_caseExpr )
+                {
+                    // we are not in a 'case' context ... check latest
+                    // m_stack entry!
+                    if( not m_stack.empty() )
+                    {
+                        const auto variable = m_stack.top();
+
+                        const auto searchPath
+                            = Ast::make< Identifiers >( node.sourceLocation() );
+
+                        for( auto i :
+                            *variable->variableType()->name()->identifiers() )
+                        {
+                            searchPath->add( i );
+                        }
+
+                        for( auto i : *path.identifiers() )
+                        {
+                            searchPath->add( i );
+                        }
+
+                        IdentifierPath identifierSearchPath(
+                            searchPath, IdentifierPath::Type::ABSOLUTE );
+
+                        try
+                        {
+                            auto symbol
+                                = m_symboltable.find( identifierSearchPath );
+
+                            node.setTargetType( symbol.targetType() );
+
+                            assert( symbol.targetType()
+                                    == CallExpression::TargetType::CONSTANT );
+
+                            auto& definition
+                                = static_cast< EnumerationDefinition& >(
+                                    symbol.definition() );
+
+                            assert( definition.type() );
+                            node.setType( definition.type() );
+                        }
+                        catch( const std::domain_error& e )
+                        {
+                            // m_err++; // TODO: PPA: enable this
+                            m_log.error( { node.sourceLocation() },
+                                "unable to find symbol '"
+                                    + identifierSearchPath.path()
+                                    + "'" );
+                        }
+                    }
+                    else
+                    {
+                        // m_err++; // TODO: PPA: enable this
+                        m_log.error( { node.sourceLocation() },
+                            "unable to resolve symbol '" + path.path() + "'" );
+                    }
+                }
+                else if( m_caseExpr and m_caseExpr->type() )
+                {
+                    std::vector< std::string > parts;
+                    libstdhl::String::split(
+                        m_caseExpr->type()->name(), ".", parts );
+                    parts.emplace_back( node.identifier()->baseName() );
+
+                    try
+                    {
+                        auto symbol = m_symboltable.find( parts );
+
+                        node.setTargetType( symbol.targetType() );
+
+                        assert( symbol.targetType()
+                                == CallExpression::TargetType::CONSTANT );
+
+                        auto& definition
+                            = static_cast< EnumerationDefinition& >(
+                                symbol.definition() );
+
+                        assert( definition.type() );
+                        node.setType( definition.type() );
+                    }
+                    catch( const std::domain_error& e )
+                    {
+                        // m_err++; // TODO: PPA: enable this
+                        m_log.error( { node.sourceLocation() },
+                            "unknown symbol '" + node.identifier()->path()
+                                + "' found" );
+                    }
+                }
+            }
+        }
+    }
+
+    assert( node.targetType() != CallExpression::TargetType::UNKNOWN );
+
+    RecursiveVisitor::visit( node );
+}
+
+void TypeCheckVisitor::visit( LetRule& node )
+{
+    node.variable()->accept( *this );
+    push( *node.variable() );
+    node.expression()->accept( *this );
+
+    if( not node.variable()->type() and node.expression()->type() )
+    {
+        node.variable()->setType( node.expression()->type() );
+    }
+
+    node.rule()->accept( *this );
+    pop( *node.variable() );
+}
+
+void TypeCheckVisitor::visit( CaseRule& node )
+{
+    // check the case expression itself
+    node.expression()->accept( *this );
+
+    // set case expression and its type
+    assert( not m_caseExpr );
+    m_caseExpr = node.expression().get();
+
+    // iterate only over the expressions
+    node.cases()->accept( *this );
+
+    // clear case expression and its type
+    assert( m_caseExpr );
+    m_caseExpr = nullptr;
+
+    // iterate over the case expression rules
+    for( auto c : *node.cases() )
+    {
+        c->rule()->accept( *this );
+    }
 }
 
 void TypeCheckVisitor::visit( BasicType& node )
@@ -109,27 +309,13 @@ void TypeCheckVisitor::visit( BasicType& node )
                 auto& definition = static_cast< EnumerationDefinition& >(
                     symbol.definition() );
 
-                if( not definition.type() )
-                {
-                    m_log.debug( "enum IR type not set yet" );
-
-                    auto kind
-                        = libstdhl::make< libcasm_ir::Enumeration >( name );
-                    for( auto e : *definition.enumerators() )
-                    {
-                        kind->add( e->name() );
-                    }
-
-                    auto type
-                        = libstdhl::make< libcasm_ir::EnumerationType >( kind );
-                    definition.setType( type );
-                }
+                assert( definition.type() );
 
                 node.setType( definition.type() );
             }
             catch( const std::domain_error& e )
             {
-                // m_err++; // TODO: enable this line!
+                m_err++;
                 m_log.error( { node.sourceLocation() },
                     "unknown type '" + name + "' found" );
             }
@@ -141,7 +327,7 @@ void TypeCheckVisitor::visit( BasicType& node )
 
 void TypeCheckVisitor::visit( ComposedType& node )
 {
-    assert( !" TODO! " ); // TODO: List, Tuple etc.
+#warning " TODO: List, Tuple etc. "
     RecursiveVisitor::visit( node );
 }
 
@@ -150,7 +336,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
     if( not node.type() )
     {
         const auto& name = node.name()->baseName();
-        const auto& expr = *node.size();
+        auto& expr = *node.size();
 
         if( name.compare( "Bit" ) == 0 )
         {
@@ -162,34 +348,85 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                     = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
                         atom.value() );
 
-                auto type
-                    = libstdhl::get< libcasm_ir::BitType >( value->value() );
+                try
+                {
+                    auto type = libstdhl::get< libcasm_ir::BitType >( value );
 
-                node.setType( type );
+                    node.setType( type );
+                }
+                catch( const std::domain_error& e )
+                {
+                    m_err++;
+                    m_log.error( { expr.sourceLocation() }, e.what() );
+                }
             }
             else
             {
+                m_err++;
                 m_log.error( { expr.sourceLocation() },
-                    "unsupported expr for 'Bit' type" );
+                    "unsupported expr for 'Bit' type, constant Integer value "
+                    "expected" );
             }
         }
         else if( name.compare( "Integer" ) == 0 )
         {
-            if( expr.id()
-                == Node::ID::RANGE_EXPRESSION /* and TODO lhs and rhs */ )
+            if( expr.id() == Node::ID::RANGE_EXPRESSION )
             {
-                // TODO: handle range case, check if the range is for
-                //       Integer'[n..m] : n <= m
+                const auto& range_expr
+                    = static_cast< const RangeExpression& >( expr );
+
+                const auto& lhs = *range_expr.left();
+                const auto& rhs = *range_expr.right();
+
+                if( lhs.id() == Node::ID::VALUE_ATOM and lhs.type()->isInteger()
+                    and rhs.id() == Node::ID::VALUE_ATOM
+                    and rhs.type()->isInteger() )
+                {
+                    const auto& atom_lhs
+                        = static_cast< const ValueAtom& >( lhs );
+
+                    const auto& atom_rhs
+                        = static_cast< const ValueAtom& >( rhs );
+
+                    const auto ir_lhs = std::
+                        static_pointer_cast< libcasm_ir::IntegerConstant >(
+                            atom_lhs.value() );
+
+                    const auto ir_rhs = std::
+                        static_pointer_cast< libcasm_ir::IntegerConstant >(
+                            atom_rhs.value() );
+
+                    auto range_type = libstdhl::get< libcasm_ir::RangeType >(
+                        ir_lhs, ir_rhs );
+
+                    assert( not expr.type() );
+                    expr.setType( range_type );
+
+                    try
+                    {
+                        auto type = libstdhl::get< libcasm_ir::IntegerType >(
+                            range_type );
+
+                        node.setType( type );
+                    }
+                    catch( const std::domain_error& e )
+                    {
+                        m_err++;
+                        m_log.error( { expr.sourceLocation() }, e.what() );
+                    }
+                }
             }
             else
             {
+                m_err++;
                 m_log.error( { expr.sourceLocation() },
-                    "unsupported expr for 'Integer' type" );
+                    "unsupported expr for 'Integer' type, only range "
+                    "expressions are allowed, e.g. `Integer'[5..10]`" );
             }
         }
         else
         {
-            // m_err++;
+            m_err++;
             m_log.error( { node.sourceLocation() },
                 "unknown type '" + name + "' found" );
         }
@@ -198,9 +435,46 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
     RecursiveVisitor::visit( node );
 }
 
+void TypeCheckVisitor::visit( ExpressionCase& node )
+{
+    // omit redundant traversal of rule(), see visit( CaseRule& )
+    node.expression()->accept( *this );
+}
+
+void TypeCheckVisitor::visit( DefaultCase& node )
+{
+    // omit redundant traversal of rule(), see visit( CaseRule& )
+}
+
 u64 TypeCheckVisitor::errors( void ) const
 {
     return m_err;
+}
+
+void TypeCheckVisitor::push( VariableDefinition& node )
+{
+    const auto& name = node.identifier()->name();
+
+    auto result = m_id2var.emplace( name, &node );
+    if( not result.second )
+    {
+        m_err++;
+        m_log.error( { node.sourceLocation() },
+            "symbol '" + name + "' already defined" );
+    }
+    m_stack.push( &node );
+}
+
+void TypeCheckVisitor::pop( VariableDefinition& node )
+{
+    const auto& name = node.identifier()->name();
+
+    if( m_id2var.erase( name ) != 1 )
+    {
+        assert( !" internal error! " );
+    }
+    assert( m_stack.top() == &node );
+    m_stack.pop();
 }
 
 //
@@ -210,44 +484,314 @@ u64 TypeCheckVisitor::errors( void ) const
 class TypeInferenceVisitor final : public RecursiveVisitor
 {
   public:
-    TypeInferenceVisitor( Logger& log );
+    TypeInferenceVisitor( Logger& log, Namespace& symboltable );
+
+    void visit( FunctionDefinition& node ) override;
+    void visit( DerivedDefinition& node ) override;
+    void visit( RuleDefinition& node ) override;
 
     void visit( DirectCallExpression& node ) override;
+    void visit( IndirectCallExpression& node ) override;
+    void visit( UnaryExpression& node ) override;
+    void visit( BinaryExpression& node ) override;
+
+    void inference( TypedNode& node,
+        const libcasm_ir::Annotation& annotation,
+        const std::vector< Expression::Ptr >& arguments );
+
+    void inference( FunctionDefinition& node );
+    void inference( DerivedDefinition& node );
+    void inference( RuleDefinition& node );
 
     u64 errors( void ) const;
 
   private:
     Logger& m_log;
     u64 m_err;
+    Namespace& m_symboltable;
 };
 
-TypeInferenceVisitor::TypeInferenceVisitor( Logger& log )
+TypeInferenceVisitor::TypeInferenceVisitor(
+    Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_err( 0 )
+, m_symboltable( symboltable )
 {
+}
+
+void TypeInferenceVisitor::visit( FunctionDefinition& node )
+{
+    // POSTORDER
+    RecursiveVisitor::visit( node );
+    inference( node );
+}
+
+void TypeInferenceVisitor::visit( DerivedDefinition& node )
+{
+    // POSTORDER
+    RecursiveVisitor::visit( node );
+    inference( node );
+}
+
+void TypeInferenceVisitor::visit( RuleDefinition& node )
+{
+    // POSTORDER
+    RecursiveVisitor::visit( node );
+    inference( node );
 }
 
 void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
-    const auto& name = node.identifier()
-                           ->identifiers()
-                           ->back()
-                           ->name(); // TODO: PPA:; change this to new
-                                     // path() method from IdentifierPath
+    // POSTORDER
+    RecursiveVisitor::visit( node );
 
+    const auto& path = *node.identifier();
     const auto arity = node.arguments()->size();
 
-    m_log.debug( "call: " + name + "{ " + node.targetTypeName() + " } arity="
-                 + std::to_string( arity ) );
-
-    if( node.targetType() == CallExpression::TargetType::BUILTIN )
+    switch( node.targetType() )
     {
-        m_log.debug( "builtin: " );
+        case CallExpression::TargetType::VARIABLE:
+        {
+            if( not node.type() )
+            {
+            }
+            break;
+        }
+        case CallExpression::TargetType::FUNCTION:
+        {
+            assert( not node.type() );
 
-        const auto& annotation = libcasm_ir::Annotation::find( name );
+            try
+            {
+                auto symbol = m_symboltable.find( node );
+                assert( symbol.targetType()
+                        == CallExpression::TargetType::FUNCTION );
+
+                auto& definition
+                    = static_cast< FunctionDefinition& >( symbol.definition() );
+
+                inference( definition );
+
+                node.setType( definition.type() );
+            }
+            catch( const std::domain_error& e )
+            {
+                assert( !" inconsistent symbol table! " );
+            }
+            break;
+        }
+        case CallExpression::TargetType::BUILTIN:
+        {
+            const auto& name = path.baseName();
+
+            try
+            {
+                const auto& annotation = libcasm_ir::Annotation::find( name );
+                inference( node, annotation, node.arguments()->data() );
+            }
+            catch( const std::domain_error& e )
+            {
+                m_err++;
+                m_log.error( { node.sourceLocation() },
+                             "unable to resolve built-in symbol '"
+                             + path.path()
+                             + "', due to missing annotation information from 'libcasm-ir'" );
+            }
+            break;
+        }
     }
 
+    if( not node.type() )
+    {
+        m_err++;
+        m_log.error( { node.sourceLocation() },
+            "unable to resolve type of symbol '" + path.path() + "'" );
+    }
+}
+
+void TypeInferenceVisitor::visit( IndirectCallExpression& node )
+{
+    // POSTORDER
     RecursiveVisitor::visit( node );
+
+    if( not node.type() )
+    {
+        m_err++;
+        m_log.error( { node.sourceLocation() },
+            "unable to resolve type of indirect call expression" );
+    }
+}
+
+void TypeInferenceVisitor::visit( UnaryExpression& node )
+{
+    // POSTORDER
+    RecursiveVisitor::visit( node );
+
+    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
+    inference( node, annotation, { node.expression() } );
+
+    if( not node.type() )
+    {
+        m_err++;
+        m_log.error(
+            { node.sourceLocation() }, "unable to resolve type of expression" );
+    }
+}
+
+void TypeInferenceVisitor::visit( BinaryExpression& node )
+{
+    // POSTORDER
+    RecursiveVisitor::visit( node );
+
+    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
+    inference( node, annotation, { node.left(), node.right() } );
+
+    if( not node.type() )
+    {
+        m_err++;
+        m_log.error(
+            { node.sourceLocation() }, "unable to resolve type of expression" );
+    }
+}
+
+void TypeInferenceVisitor::inference( TypedNode& node,
+    const libcasm_ir::Annotation& annotation,
+    const std::vector< Expression::Ptr >& arguments )
+{
+    const auto& resTypes = annotation.resultTypes();
+
+    std::size_t pos = 0;
+    for( auto argument : arguments )
+    {
+        if( not argument->type() )
+        {
+            m_log.debug( "non-typed argument, cannot inference" );
+            return;
+        }
+
+        const auto& argTypes = annotation.argumentTypes( pos );
+        std::set< libcasm_ir::Type::ID > posTypes = { argument->type()->id() };
+        std::vector< libcasm_ir::Type::ID > infTypes;
+
+        std::set_intersection( argTypes.begin(), argTypes.end(),
+            posTypes.begin(), posTypes.end(), std::back_inserter( infTypes ) );
+
+        pos++;
+    }
+
+    assert( resTypes.size() == 1 );
+    switch( *resTypes.begin() )
+    {
+        case libcasm_ir::Type::VOID:
+        {
+            node.setType( VOID );
+            break;
+        }
+        case libcasm_ir::Type::RULE_REFERENCE:
+        {
+            node.setType( RULEREF );
+            break;
+        }
+        case libcasm_ir::Type::BOOLEAN:
+        {
+            node.setType( BOOLEAN );
+            break;
+        }
+        case libcasm_ir::Type::INTEGER:
+        {
+            node.setType( INTEGER );
+            break;
+        }
+        case libcasm_ir::Type::BIT:
+        {
+            // node.setType( Bit(n) ); // depends on other bit sizes
+            assert( 0 ); // TODO: PPA:
+            break;
+        }
+        case libcasm_ir::Type::STRING:
+        {
+            node.setType( STRING );
+            break;
+        }
+        case libcasm_ir::Type::FLOATING:
+        {
+            node.setType( FLOATING );
+            break;
+        }
+        case libcasm_ir::Type::RATIONAL:
+        {
+            node.setType( RATIONAL );
+            break;
+        }
+        default:
+        {
+            assert( 0 );
+        }
+    }
+}
+
+void TypeInferenceVisitor::inference( FunctionDefinition& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    for( auto argumentType : *node.argumentTypes() )
+    {
+        if( not argumentType->type() )
+        {
+            m_log.debug( "'" + node.identifier()->name()
+                         + "' has a non-typed argument(s)" );
+            return;
+        }
+
+        argTypeList.emplace_back( argumentType->type() );
+    }
+
+    const auto type = libstdhl::make< libcasm_ir::RelationType >(
+        node.returnType()->type(), argTypeList );
+
+    node.setType( type );
+}
+
+void TypeInferenceVisitor::inference( DerivedDefinition& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    for( auto argumentType : *node.arguments() )
+    {
+        if( not argumentType->type() )
+        {
+            m_log.debug( "'" + node.identifier()->name()
+                         + "' has a non-typed argument(s)" );
+            return;
+        }
+
+        argTypeList.emplace_back( argumentType->type() );
+    }
+
+    const auto type = libstdhl::make< libcasm_ir::RelationType >(
+        node.returnType()->type(), argTypeList );
+
+    node.setType( type );
+}
+
+void TypeInferenceVisitor::inference( RuleDefinition& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    // PPA: TODO
+
+    // node.setType( type );
 }
 
 u64 TypeInferenceVisitor::errors( void ) const
@@ -282,7 +826,7 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
         return false;
     }
 
-    TypeInferenceVisitor visitor( log );
+    TypeInferenceVisitor visitor( log, *symboltable );
     specification->accept( visitor );
 
     const auto errors = visitor.errors();
