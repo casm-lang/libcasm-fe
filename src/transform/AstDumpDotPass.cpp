@@ -114,6 +114,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
     void visit( FixedSizedType& node ) override;
+    void visit( RelationType& node ) override;
 
     void visit( BasicAttribute& node ) override;
     void visit( ExpressionAttribute& node ) override;
@@ -375,6 +376,13 @@ void AstDumpDotVisitor::visit( FixedSizedType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "FixedSizedType" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( RelationType& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "RelationType" );
     RecursiveVisitor::visit( node );
 }
 

@@ -87,6 +87,7 @@ namespace libcasm_fe
                 BASIC_TYPE,
                 COMPOSED_TYPE,
                 FIXED_SIZED_TYPE,
+                RELATION_TYPE,
 
                 // attributes
                 BASIC_ATTRIBUTE,

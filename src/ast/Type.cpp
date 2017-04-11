@@ -98,3 +98,26 @@ void FixedSizedType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+RelationType::RelationType( const IdentifierPath::Ptr& identifier,
+    const Types::Ptr& argumentTypes, const Type::Ptr& returnType )
+: Type( Node::ID::RELATION_TYPE, identifier )
+, m_argumentTypes( argumentTypes )
+, m_returnType( returnType )
+{
+}
+
+Types::Ptr RelationType::argumentTypes( void ) const
+{
+    return m_argumentTypes;
+}
+
+Type::Ptr RelationType::returnType( void ) const
+{
+    return m_returnType;
+}
+
+void RelationType::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
