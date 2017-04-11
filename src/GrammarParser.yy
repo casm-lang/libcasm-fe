@@ -206,6 +206,7 @@ END       0 "end of file"
 %type <Types::Ptr> Types
 %type <BasicType::Ptr> BasicType
 %type <ComposedType::Ptr> ComposedType
+%type <RelationType::Ptr> RelationType
 %type <FixedSizedType::Ptr> FixedSizedType
 
 // types
@@ -612,6 +613,10 @@ Type
   {
       $$ = $1;
   }
+| RelationType
+  {
+      $$ = $1;
+  }
 | FixedSizedType
   {
       $$ = $1;
@@ -631,6 +636,14 @@ ComposedType
 : IdentifierPath LESSER Types GREATER
   {
       $$ = Ast::make< ComposedType >( @$, $1, $3 );
+  }
+;
+
+
+RelationType
+: IdentifierPath LESSER MaybeFunctionParameters ARROW Type GREATER
+  {
+      $$ = Ast::make< RelationType >( @$, $1, $3, $5 );
   }
 ;
 

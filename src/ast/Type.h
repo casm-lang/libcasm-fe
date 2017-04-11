@@ -98,6 +98,25 @@ namespace libcasm_fe
           private:
             Expression::Ptr m_size;
         };
+
+        class RelationType : public Type
+        {
+          public:
+            using Ptr = std::shared_ptr< RelationType >;
+
+            RelationType( const IdentifierPath::Ptr& identifier,
+                const Types::Ptr& argumentTypes,
+                const Type::Ptr& returnType );
+
+            Types::Ptr argumentTypes( void ) const;
+            Type::Ptr returnType( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            Types::Ptr m_argumentTypes;
+            Type::Ptr m_returnType;
+        };
     }
 }
 

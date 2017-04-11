@@ -89,6 +89,7 @@ MaybeParameters
 Type
 : BasicType
 | ComposedType
+| RelationType
 | FixedSizedType
 
 BasicType
@@ -96,6 +97,9 @@ BasicType
 
 ComposedType
 : IdentifierPath LESSER Types GREATER
+
+RelationType
+: IdentifierPath LESSER MaybeFunctionParameters ARROW Type GREATER
 
 FixedSizedType
 : IdentifierPath MARK Term

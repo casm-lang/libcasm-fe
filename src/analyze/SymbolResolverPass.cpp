@@ -126,6 +126,9 @@ class SymbolResolveVisitor final : public RecursiveVisitor
   public:
     SymbolResolveVisitor( Logger& log, Namespace& symboltable );
 
+    void visit( DerivedDefinition& node ) override;
+    void visit( RuleDefinition& node ) override;
+
     void visit( DirectCallExpression& node ) override;
 
     void visit( UniversalQuantifierExpression& node ) override;
@@ -152,6 +155,36 @@ SymbolResolveVisitor::SymbolResolveVisitor(
 , m_err( 0 )
 , m_symboltable( symboltable )
 {
+}
+
+void SymbolResolveVisitor::visit( DerivedDefinition& node )
+{
+    for( const auto& argument : *node.arguments() )
+    {
+        push( *argument );
+    }
+
+    RecursiveVisitor::visit( node );
+
+    for( const auto& argument : *node.arguments() )
+    {
+        pop( *argument );
+    }
+}
+
+void SymbolResolveVisitor::visit( RuleDefinition& node )
+{
+    for( const auto& argument : *node.arguments() )
+    {
+        push( *argument );
+    }
+
+    RecursiveVisitor::visit( node );
+
+    for( const auto& argument : *node.arguments() )
+    {
+        pop( *argument );
+    }
 }
 
 void SymbolResolveVisitor::visit( DirectCallExpression& node )
