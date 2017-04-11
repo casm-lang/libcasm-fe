@@ -137,23 +137,67 @@ Namespace::Symbol Namespace::find( const DirectCallExpression& node ) const
 Namespace::Symbol Namespace::find( const BasicType& node ) const
 {
     return find( *node.name(), 0 );
-
-    // const auto _key = key( *node.name(), 0 );
-
-    // auto result = m_symboltable.find( _key );
-    // if( result == m_symboltable.end() )
-    // {
-    //     throw std::domain_error(
-    //         "unable to find type symbol '" + node.name()->identifier() + "'"
-    //         );
-    // }
-
-    // return result->second;
 }
 
 Namespace::Symbol Namespace::find( const IdentifierPath& node ) const
 {
     return find( node, 0 );
+}
+
+Namespace::Symbol Namespace::find(
+    const std::string& name, const std::size_t arity ) const
+{
+    Identifier ident( name );
+    const auto _key = key( ident, arity );
+
+    auto result = m_symboltable.find( _key );
+    if( result == m_symboltable.end() )
+    {
+        throw std::domain_error(
+            "unable to find " + std::to_string( arity ) + "-ary symbol '" + name
+            + "'" );
+    }
+
+    return result->second;
+}
+
+Namespace::Symbol Namespace::find(
+    const std::vector< std::string >& path, const std::size_t arity ) const
+{
+    assert( path.size() > 0 );
+
+    Namespace* n = const_cast< Namespace* >( this );
+    u64 pos = 0;
+
+    while( ( pos + 1 ) != path.size() )
+    {
+        const auto& name = path[ pos ];
+
+        auto result = m_namespaces.find( name );
+        if( result == m_namespaces.end() )
+        {
+            throw std::domain_error( "unable to find namespace '" + name
+                                     + "' in symbol path '"
+                                     + libstdhl::String::join( path, "." )
+                                     + "'" );
+        }
+
+        n = result->second.get();
+        pos++;
+    }
+
+    try
+    {
+        const auto symbol = n->find( path[ pos ], arity );
+        return symbol;
+    }
+    catch( const std::domain_error& e )
+    {
+        throw std::domain_error( "unable to find " + std::to_string( arity )
+                                 + "-ary symbol '"
+                                 + libstdhl::String::join( path, "." )
+                                 + "'" );
+    }
 }
 
 std::string Namespace::dump( const std::string& indention ) const

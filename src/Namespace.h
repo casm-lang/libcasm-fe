@@ -81,6 +81,12 @@ namespace libcasm_fe
 
         Symbol find( const Ast::IdentifierPath& node ) const;
 
+        Symbol find(
+            const std::string& name, const std::size_t arity = 0 ) const;
+
+        Symbol find( const std::vector< std::string >& path,
+            const std::size_t arity = 0 ) const;
+
         std::string dump( const std::string& indention = "" ) const;
 
       private:
