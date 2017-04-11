@@ -163,7 +163,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                         atom.value() );
 
                 auto type
-                    = libstdhl::get< libcasm_ir::BitType >( value->value() );
+                    = libstdhl::get< libcasm_ir::BitType >( value );
 
                 node.setType( type );
             }
