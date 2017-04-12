@@ -85,25 +85,57 @@ void SymbolTableVisitor::visit( Specification& node )
 
 void SymbolTableVisitor::visit( FunctionDefinition& node )
 {
-    m_err += m_symboltable->registerSymbol( m_log, node );
+    try
+    {
+        m_symboltable->registerSymbol( node );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_err++;
+        m_log.error( { node.sourceLocation() }, e.what() );
+    }
     RecursiveVisitor::visit( node );
 }
 
 void SymbolTableVisitor::visit( DerivedDefinition& node )
 {
-    m_err += m_symboltable->registerSymbol( m_log, node );
+    try
+    {
+        m_symboltable->registerSymbol( node );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_err++;
+        m_log.error( { node.sourceLocation() }, e.what() );
+    }
     RecursiveVisitor::visit( node );
 }
 
 void SymbolTableVisitor::visit( RuleDefinition& node )
 {
-    m_err += m_symboltable->registerSymbol( m_log, node );
+    try
+    {
+        m_symboltable->registerSymbol( node );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_err++;
+        m_log.error( { node.sourceLocation() }, e.what() );
+    }
     RecursiveVisitor::visit( node );
 }
 
 void SymbolTableVisitor::visit( EnumerationDefinition& node )
 {
-    m_err += m_symboltable->registerSymbol( m_log, node );
+    try
+    {
+        m_symboltable->registerSymbol( node );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_err++;
+        m_log.error( { node.sourceLocation() }, e.what() );
+    }
     RecursiveVisitor::visit( node );
 }
 
@@ -250,8 +282,16 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             if( libcasm_ir::Builtin::available(
                     name, node.arguments()->size() ) )
             {
-                m_err += m_symboltable.registerSymbol( m_log, node );
-                node.setTargetType( CallExpression::TargetType::BUILTIN );
+                try
+                {
+                    m_symboltable.registerSymbol( node );
+                    node.setTargetType( CallExpression::TargetType::BUILTIN );
+                }
+                catch( const std::domain_error& e )
+                {
+                    m_err++;
+                    m_log.error( { node.sourceLocation() }, e.what() );
+                }
             }
             else if( m_variables.find( name ) != m_variables.end() )
             {
