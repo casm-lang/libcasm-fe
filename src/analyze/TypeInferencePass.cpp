@@ -351,7 +351,6 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                 try
                 {
                     auto type = libstdhl::get< libcasm_ir::BitType >( value );
-
                     node.setType( type );
                 }
                 catch( const std::domain_error& e )

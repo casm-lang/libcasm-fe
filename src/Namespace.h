@@ -26,7 +26,6 @@
 #ifndef _LIB_CASMFE_NAMESPACE_H_
 #define _LIB_CASMFE_NAMESPACE_H_
 
-#include "Logger.h"
 #include "ast/Definition.h"
 #include "ast/Expression.h"
 
@@ -63,17 +62,15 @@ namespace libcasm_fe
 
         Namespace( void );
 
-        u64 registerSymbol(
-            Logger& log, const Ast::DirectCallExpression& node );
+        void registerSymbol( const Ast::DirectCallExpression& node );
 
-        u64 registerSymbol( Logger& log, const Ast::FunctionDefinition& node );
+        void registerSymbol( const Ast::FunctionDefinition& node );
 
-        u64 registerSymbol( Logger& log, const Ast::DerivedDefinition& node );
+        void registerSymbol( const Ast::DerivedDefinition& node );
 
-        u64 registerSymbol( Logger& log, const Ast::RuleDefinition& node );
+        void registerSymbol( const Ast::RuleDefinition& node );
 
-        u64 registerSymbol(
-            Logger& log, const Ast::EnumerationDefinition& node );
+        void registerSymbol( const Ast::EnumerationDefinition& node );
 
         Symbol find( const Ast::DirectCallExpression& node ) const;
 
@@ -90,7 +87,7 @@ namespace libcasm_fe
         std::string dump( const std::string& indention = "" ) const;
 
       private:
-        u64 registerSymbol( Logger& log, const Ast::Identifier& node,
+        void registerSymbol( const Ast::Identifier& node,
             const Ast::Node& definition,
             const Ast::CallExpression::TargetType targetType,
             const std::size_t arity = 0 );

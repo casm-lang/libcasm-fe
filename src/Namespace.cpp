@@ -75,37 +75,37 @@ Namespace::Namespace( void )
 {
 }
 
-u64 Namespace::registerSymbol( Logger& log, const DirectCallExpression& node )
+void Namespace::registerSymbol( const DirectCallExpression& node )
 {
     const auto path = node.identifier()->identifiers();
     assert( path->size() == 1 );
 
-    return registerSymbol( log, *path->back(), node,
-        CallExpression::TargetType::BUILTIN, node.arguments()->size() );
+    registerSymbol( *path->back(), node, CallExpression::TargetType::BUILTIN,
+        node.arguments()->size() );
 }
 
-u64 Namespace::registerSymbol( Logger& log, const FunctionDefinition& node )
+void Namespace::registerSymbol( const FunctionDefinition& node )
 {
-    return registerSymbol( log, *node.identifier(), node,
+    registerSymbol( *node.identifier(), node,
         CallExpression::TargetType::FUNCTION, node.argumentTypes()->size() );
 }
 
-u64 Namespace::registerSymbol( Logger& log, const DerivedDefinition& node )
+void Namespace::registerSymbol( const DerivedDefinition& node )
 {
-    return registerSymbol( log, *node.identifier(), node,
+    registerSymbol( *node.identifier(), node,
         CallExpression::TargetType::DERIVED, node.arguments()->size() );
 }
 
-u64 Namespace::registerSymbol( Logger& log, const RuleDefinition& node )
+void Namespace::registerSymbol( const RuleDefinition& node )
 {
-    return registerSymbol( log, *node.identifier(), node,
-        CallExpression::TargetType::RULE, node.arguments()->size() );
+    registerSymbol( *node.identifier(), node, CallExpression::TargetType::RULE,
+        node.arguments()->size() );
 }
 
-u64 Namespace::registerSymbol( Logger& log, const EnumerationDefinition& node )
+void Namespace::registerSymbol( const EnumerationDefinition& node )
 {
-    auto err = registerSymbol( log, *node.identifier(), node,
-        CallExpression::TargetType::ENUMERATION );
+    registerSymbol(
+        *node.identifier(), node, CallExpression::TargetType::ENUMERATION );
 
     auto enumerationNamespace = libstdhl::make< Namespace >();
 
@@ -114,19 +114,15 @@ u64 Namespace::registerSymbol( Logger& log, const EnumerationDefinition& node )
 
     if( not result.second )
     {
-        log.error( { node.sourceLocation() },
+        throw std::domain_error(
             "namespace '" + result.first->first + "' already defined" );
-
-        return err + 1;
     }
 
     for( auto e : *node.enumerators() )
     {
-        err += enumerationNamespace->registerSymbol(
-            log, *e, node, CallExpression::TargetType::CONSTANT );
+        enumerationNamespace->registerSymbol(
+            *e, node, CallExpression::TargetType::CONSTANT );
     }
-
-    return err;
 }
 
 Namespace::Symbol Namespace::find( const DirectCallExpression& node ) const
@@ -228,9 +224,8 @@ std::string Namespace::dump( const std::string& indention ) const
     return s.str();
 }
 
-u64 Namespace::registerSymbol( Logger& log, const Identifier& node,
-    const Node& definition, const CallExpression::TargetType targetType,
-    const std::size_t arity )
+void Namespace::registerSymbol( const Identifier& node, const Node& definition,
+    const CallExpression::TargetType targetType, const std::size_t arity )
 {
     const auto _key = key( node, arity );
 
@@ -239,21 +234,12 @@ u64 Namespace::registerSymbol( Logger& log, const Identifier& node,
 
     if( not result.second )
     {
-        log.error( { node.sourceLocation() },
-            "symbol '" + result.first->first + "' already defined as '"
-                + CallExpression::targetTypeString(
-                      result.first->second.targetType() )
-                + "'" );
-
-        return 1;
+        throw std::domain_error( "symbol '" + result.first->first
+                                 + "' already defined as '"
+                                 + CallExpression::targetTypeString(
+                                       result.first->second.targetType() )
+                                 + "'" );
     }
-
-    log.debug(
-        "registered new symbol '" + result.first->first + "' as '"
-        + CallExpression::targetTypeString( result.first->second.targetType() )
-        + "'" );
-
-    return 0;
 }
 
 Namespace::Symbol Namespace::find( const IdentifierPath& node,
