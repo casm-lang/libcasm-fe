@@ -104,6 +104,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( CaseRule& node ) override;
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
+    void visit( ChooseRule& node ) override;
     void visit( IterateRule& node ) override;
     void visit( BlockRule& node ) override;
     void visit( SequenceRule& node ) override;
@@ -314,6 +315,13 @@ void AstDumpDotVisitor::visit( ForallRule& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ForallRule" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( ChooseRule& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "ChooseRule" );
     RecursiveVisitor::visit( node );
 }
 

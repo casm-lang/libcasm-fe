@@ -222,6 +222,7 @@ Rule
 | CaseRule
 | LetRule
 | ForallRule
+| ChooseRule
 | IterateRule
 | BlockRule
 | SequenceRule
@@ -256,6 +257,9 @@ LetRule
 
 ForallRule
 : FORALL Variable IN Term DO Rule
+
+ChooseRule
+: CHOOSE Variable IN Term DO Rule
 
 IterateRule
 : ITERATE Rule

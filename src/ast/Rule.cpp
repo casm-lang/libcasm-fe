@@ -193,6 +193,35 @@ void ForallRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+ChooseRule::ChooseRule( const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& universe, const Rule::Ptr& rule )
+: Rule( Node::ID::CHOOSE_RULE )
+, m_variable( variable )
+, m_universe( universe )
+, m_rule( rule )
+{
+}
+
+VariableDefinition::Ptr ChooseRule::variable( void ) const
+{
+    return m_variable;
+}
+
+Expression::Ptr ChooseRule::universe( void ) const
+{
+    return m_universe;
+}
+
+Rule::Ptr ChooseRule::rule( void ) const
+{
+    return m_rule;
+}
+
+void ChooseRule::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 IterateRule::IterateRule( const Rule::Ptr& rule )
 : Rule( Node::ID::ITERATE_RULE )
 , m_rule( rule )

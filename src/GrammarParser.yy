@@ -195,6 +195,7 @@ END       0 "end of file"
 %type <CaseRule::Ptr> CaseRule
 %type <LetRule::Ptr> LetRule
 %type <ForallRule::Ptr> ForallRule
+%type <ChooseRule::Ptr> ChooseRule
 %type <IterateRule::Ptr> IterateRule
 %type <BlockRule::Ptr> BlockRule
 %type <SequenceRule::Ptr> SequenceRule
@@ -1098,6 +1099,10 @@ Rule
   {
       $$ = $1;
   }
+| ChooseRule
+  {
+      $$ = $1;
+  }
 | IterateRule
   {
       $$ = $1;
@@ -1209,6 +1214,14 @@ ForallRule
 : FORALL Variable IN Term DO Rule
   {
       $$ = Ast::make< ForallRule >( @$, $2, $4, $6 );
+  }
+;
+
+
+ChooseRule
+: CHOOSE Variable IN Term DO Rule
+  {
+      $$ = Ast::make< ChooseRule >( @$, $2, $4, $6 );
   }
 ;
 

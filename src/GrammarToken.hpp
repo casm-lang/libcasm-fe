@@ -44,6 +44,7 @@ SKIP            "skip"          { return Parser::make_SKIP(loc); }
 LET             "let"           { return Parser::make_LET(loc); }
 IN              "in"            { return Parser::make_IN(loc); }
 FORALL          "forall"        { return Parser::make_FORALL(loc); }
+CHOOSE          "choose"        { return Parser::make_CHOOSE(loc); }
 ITERATE         "iterate"       { return Parser::make_ITERATE(loc); }
 DO              "do"            { return Parser::make_DO(loc); }
 CALL            "call"          { return Parser::make_CALL(loc); }
