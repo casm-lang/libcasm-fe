@@ -238,7 +238,7 @@ END       0 "end of file"
 %precedence UPDATE
 
 %left DOT
-%left IMPLIES
+%left IMPLIES ARROW
 %left OR
 %left XOR
 %left AND
@@ -327,7 +327,7 @@ Definitions
 
 
 FunctionDefinition
-: FUNCTION Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
+: FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
       const auto identifier = $2;
 
@@ -449,7 +449,7 @@ Initializer
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
       $$ = Ast::make< UpdateRule >( @$, function, $1 );
   }
-| Term ARROW Term
+| Term MAPS Term
   {
       auto arguments = Ast::make< Expressions >( @$ );
       arguments->add( $1 );
@@ -458,7 +458,7 @@ Initializer
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
-| TwoOrMoreArguments ARROW Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
+| TwoOrMoreArguments MAPS Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1 );
@@ -496,7 +496,7 @@ MaybeInitializers
 
 
 DerivedDefinition
-: DERIVED Identifier MaybeParameters ARROW Type EQUAL Term
+: DERIVED Identifier MaybeParameters MAPS Type EQUAL Term
   {
       $$ = Ast::make< DerivedDefinition >( @$, $2, $3, $5, $7 );
   }
@@ -641,7 +641,7 @@ ComposedType
 
 
 RelationType
-: IdentifierPath LESSER MaybeFunctionParameters ARROW Type GREATER
+: IdentifierPath LESSER MaybeFunctionParameters MAPS Type GREATER
   {
       $$ = Ast::make< RelationType >( @$, $1, $3, $5 );
   }
@@ -943,6 +943,10 @@ Expression
   {
       $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
   }
+| Term ARROW Term
+  {
+      // TODO add implies instruction
+  }
 | Term IMPLIES Term
   {
       // TODO add implies instruction
@@ -1065,7 +1069,7 @@ RuleDefinition
       $$ = Ast::make< RuleDefinition >( @$, $2, $3, createVoidType( @$ ),
                                    wrapInBlockRule( $5 ) );
   }
-| RULE Identifier MaybeParameters ARROW Type EQUAL Rule
+| RULE Identifier MaybeParameters MAPS Type EQUAL Rule
   {
       $$ = Ast::make< RuleDefinition >( @$, $2, $3, $5,
                                    wrapInBlockRule( $7 ) );

@@ -17,7 +17,7 @@ Definitions
 | AttributedDefinition
 
 FunctionDefinition
-: FUNCTION Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
+: FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
 | ProgramFunctionDefinition
 
 MaybeInitially
@@ -42,8 +42,8 @@ ProgramFunctionDefinition
 
 Initializer
 : Term
-| Term ARROW Term
-| TwoOrMoreArguments ARROW Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
+| Term MAPS Term
+| TwoOrMoreArguments MAPS Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
 
 Initializers
 : Initializers COMMA Initializer
@@ -54,7 +54,7 @@ MaybeInitializers
 | %empty
 
 DerivedDefinition
-: DERIVED Identifier MaybeParameters ARROW Type EQUAL Term
+: DERIVED Identifier MaybeParameters MAPS Type EQUAL Term
 
 EnumerationDefinition
 : ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
@@ -99,7 +99,7 @@ ComposedType
 : IdentifierPath LESSER Types GREATER
 
 RelationType
-: IdentifierPath LESSER MaybeFunctionParameters ARROW Type GREATER
+: IdentifierPath LESSER MaybeFunctionParameters MAPS Type GREATER
 
 FixedSizedType
 : IdentifierPath MARK Term
@@ -174,6 +174,7 @@ Expression
 | Term OR Term
 | Term XOR Term
 | Term AND Term
+| Term ARROW Term
 | Term IMPLIES Term
 | NOT Term
 
@@ -213,7 +214,7 @@ ExistentialQuantifierExpression
 
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
-| RULE Identifier MaybeParameters ARROW Type EQUAL Rule
+| RULE Identifier MaybeParameters MAPS Type EQUAL Rule
 
 Rule
 : SkipRule
