@@ -946,11 +946,11 @@ Expression
   }
 | Term ARROW Term
   {
-      // TODO add implies instruction
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::IMP_INSTRUCTION );
   }
 | Term IMPLIES Term
   {
-      // TODO add implies instruction
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::IMP_INSTRUCTION );
   }
 | NOT Term
   {
