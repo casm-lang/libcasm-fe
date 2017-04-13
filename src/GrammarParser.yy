@@ -906,7 +906,7 @@ Expression
   }
 | Term CARET Term
   {
-      // TODO call power builtin
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::POW_INSTRUCTION );
   }
 | Term NEQUAL Term
   {
