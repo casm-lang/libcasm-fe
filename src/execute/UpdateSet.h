@@ -31,7 +31,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include <boost/optional.hpp>
+#include <experimental/optional>
 
 #include "ChainedHashMap.h"
 #include "ProbingHashMap.h"
@@ -223,15 +223,15 @@ class UpdateSet
      *
      * @return The update value for the \a location if an update exists.
      */
-    virtual boost::optional< Value > lookup( const Location& location ) const
-        noexcept
+    virtual std::experimental::optional< Value > lookup(
+        const Location& location ) const noexcept
     {
         if( m_parent )
         {
             return m_parent->lookup( location );
         }
 
-        return boost::none;
+        return std::experimental::nullopt;
     }
 
     /**
@@ -314,7 +314,8 @@ class UpdateSet
      *
      * @return The update value for the \a location if an update exists.
      */
-    boost::optional< Value > get( const Location& location ) const noexcept
+    std::experimental::optional< Value > get(
+        const Location& location ) const noexcept
     {
         const auto it = m_set.find( location );
         if( it != m_set.end() )
@@ -322,7 +323,7 @@ class UpdateSet
             return it.value();
         }
 
-        return boost::none;
+        return std::experimental::nullopt;
     }
 
   protected:
@@ -380,8 +381,8 @@ class SequentialUpdateSet final : public UpdateSet< Details >
      *
      * @return The update value for the \a location if an update exists.
      */
-    boost::optional< Value > lookup( const Location& location ) const
-        noexcept override
+    std::experimental::optional< Value > lookup(
+        const Location& location ) const noexcept override
     {
         const auto it = Super::m_set.find( location );
         if( it != Super::m_set.end() )
@@ -498,11 +499,12 @@ class UpdateSetManager
      *
      * @return The update value for the \a location if an update exists.
      */
-    boost::optional< Value > lookup( const Location& location ) const noexcept
+    std::experimental::optional< Value > lookup(
+        const Location& location ) const noexcept
     {
         if( m_updateSets.empty() )
         {
-            return boost::none;
+            return std::experimental::nullopt;
         }
         else
         {
