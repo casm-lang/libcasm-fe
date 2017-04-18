@@ -54,8 +54,6 @@ libcasm_ir::Type::Ptr AstToCasmIRPass::getType( Type* type )
 
     switch( type->t )
     {
-        case TypeType::AGENT:
-            return libstdhl::get< libcasm_ir::AgentType >( m_agent );
         case TypeType::RULEREF:
             return libstdhl::get< libcasm_ir::RuleReferenceType >();
         case TypeType::BOOLEAN:
@@ -303,14 +301,6 @@ void AstToCasmIRPass::visit_derived_def_pre( DerivedDefNode* node )
 
     auto ir_derived = libstdhl::make< libcasm_ir::Derived >(
         node->sym->name.c_str(), ftype );
-
-    for( i32 i = 0; i < node->sym->arguments_.size(); i++ )
-    {
-        const char* param_ident = node->sym->parameter[ i ];
-
-        // ir_derived->addParameter( // PPA: FIXME:
-        //     libcasm_ir::Identifier::create( ftype_args[ i ], param_ident ) );
-    }
 
     current_scope.push_back( ir_derived );
 }
@@ -1127,10 +1117,12 @@ u1 AstToCasmIRPass::visit_string_atom( StringAtom* node )
 u1 AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
     VISIT;
+    const auto type
+        = static_cast< const libcasm_ir::EnumerationType& >( m_agent->type() );
+
     const libcasm_ir::Constant::Ptr ir_const
-        = libstdhl::get< libcasm_ir::AgentConstant >(
-            libstdhl::get< libcasm_ir::AgentType >( m_agent ),
-            single_execution_agent );
+        = libstdhl::get< libcasm_ir::EnumerationConstant >(
+            type.ptr_kind(), single_execution_agent );
 
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
