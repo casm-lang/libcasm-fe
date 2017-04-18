@@ -26,56 +26,60 @@
 #ifndef _LIB_CASMFE_UPDATESET_H_
 #define _LIB_CASMFE_UPDATESET_H_
 
+#include <algorithm>
 #include <memory>
 #include <stdexcept>
 #include <vector>
 
-#include "../Value.h"
-#include "../various/location.hh"
+#include <boost/optional.hpp>
 
 #include "ChainedHashMap.h"
 #include "ProbingHashMap.h"
 #include "RobinHoodHashMap.h"
 
-struct LocationHash
+/*struct UpdateSetDetails
 {
-    /**
-     * Directly using a libcasm_fe::value_t pointer as hash value has the
-     * problem that the
-     * first
-     * 4 bits of the hash value are always 0, because the size of
-     * libcasm_fe::value_t is 16
-     * bytes.
-     * Some bit shifting avoids this problem.
-     *
-     * Forumla is from LLVM's DenseMapInfo<T*>
-     */
-    std::size_t operator()( const libcasm_fe::value_t* location ) const
-    {
-        return ( reinterpret_cast< std::uintptr_t >( location ) >> 4 )
-               ^ ( reinterpret_cast< std::uintptr_t >( location ) >> 9 );
-    }
-};
+    using Location = ;
+    using Value = ;
+    using LocationHash = std::hash< Location >;
+    using LocationEquals = std::equal_to< Location >;
+    using ValueEquals = std::equal_to< Value >;
+};*/
 
-/**
- * @brief Represents an update
- */
-struct Update
-{
-    libcasm_fe::value_t value; /**< The value of the update */
-    const std::vector< libcasm_fe::value_t >*
-        args; /**< The function arguments of the update */
-    const location*
-        location;  /**< The source-code location of the update producer */
-    uint32_t func; /**< The function uid of the update */
-};
+template < typename Details >
+class SequentialUpdateSet;
+
+template < typename Details >
+class ParallelUpdateSet;
 
 /**
  * @brief Base class for all types of update-sets
  */
+template < typename _Details >
 class UpdateSet
 {
   public:
+    using Details = _Details;
+    using Location = typename Details::Location;
+    using Value = typename Details::Value;
+    using Update = std::pair< Location, Value >;
+
+  private:
+    using UpdateHashMap = ChainedHashMap< Location, Value,
+        typename Details::LocationHash, typename Details::LocationEquals >;
+
+  public:
+    using const_iterator = typename UpdateHashMap::const_iterator;
+
+    /**
+     * @brief The semantics of the update-set
+     */
+    enum class Semantics
+    {
+        Sequential, /**< Update-set with sequential execution semantics */
+        Parallel    /**< Update-set with parallel execution semantics */
+    };
+
     /**
      * @brief An exception which will be thrown when updates are in conflict
      */
@@ -85,45 +89,41 @@ class UpdateSet
         /**
          * Constructs a conflict exception
          *
-         * @param msg A problem-description for the user
          * @param conflictingUpdate Update which caused the conflict
          * @param existingUpdate Existing update for the same location as the
          *                       \a conflictingUpdate
          */
-        Conflict( const std::string& msg, Update* conflictingUpdate,
-            Update* existingUpdate );
+        Conflict(
+            const Update& conflictingUpdate, const Update& existingUpdate )
+        : std::logic_error( "conflict in update set" )
+        , m_conflictingUpdate( conflictingUpdate )
+        , m_existingUpdate( existingUpdate )
+        {
+        }
 
         /**
          * @return The update which caused the conflict
          */
-        Update* conflictingUpdate() const noexcept;
+        const Update& conflictingUpdate() const noexcept
+        {
+            return m_conflictingUpdate;
+        }
 
         /**
          * @return The existing update for the same location as the conflicting
          *         update
          */
-        Update* existingUpdate() const noexcept;
+        const Update& existingUpdate() const noexcept
+        {
+            return m_existingUpdate;
+        }
 
       private:
-        Update* m_conflictingUpdate;
-        Update* m_existingUpdate;
+        Update m_conflictingUpdate;
+        Update m_existingUpdate;
     };
-
-    /**
-     * @brief The type of the update-set
-     */
-    enum class Type
-    {
-        Sequential, /**< Update-set with sequential execution semantics */
-        Parallel    /**< Update-set with parallel execution semantics */
-    };
-
-    using UpdateHashMap
-        = ChainedHashMap< const libcasm_fe::value_t*, Update*, LocationHash >;
 
   public:
-    using const_iterator = typename UpdateHashMap::const_iterator;
-
     /**
      * Constructs an empty update-set
      *
@@ -131,7 +131,11 @@ class UpdateSet
      *                    handle without resizing
      * @param parent The parent update-set (if there is any)
      */
-    explicit UpdateSet( std::size_t initialSize, UpdateSet* parent = nullptr );
+    explicit UpdateSet( std::size_t initialSize, UpdateSet* parent = nullptr )
+    : m_set( initialSize )
+    , m_parent( parent )
+    {
+    }
 
     /**
      * Destroys the update-set
@@ -139,22 +143,26 @@ class UpdateSet
     virtual ~UpdateSet() = default;
 
     /**
-     * @see UpdateSet::Type
-     *
-     * @return The type of the update-set
+     * @return The semantics of the update-set
      */
-    virtual Type type() const noexcept = 0;
+    virtual Semantics semantics() const noexcept = 0;
 
     /**
      * @return A boolean value indicating wheter the update-set is empty, i.e.
      *         wheter it doesn't contain updates
      */
-    bool empty() const noexcept;
+    bool empty() const noexcept
+    {
+        return m_set.empty();
+    }
 
     /**
      * @return The number of updates in the update-set
      */
-    std::size_t size() const noexcept;
+    std::size_t size() const noexcept
+    {
+        return m_set.size();
+    }
 
     /**
      * Request more space so that the update set can store an additional number
@@ -163,24 +171,47 @@ class UpdateSet
      * @param size The additional number of updates the update-set should be
      *             able to handle without resizing
      */
-    void reserveAdditionally( std::size_t size );
+    void reserveAdditionally( std::size_t size )
+    {
+        m_set.reserve( m_set.size() + size );
+    }
 
     /**
-     * Adds the \a update for the \a location to the update-set
+     * Adds an update for the \a location with value \a value to the update-set.
+     *
+     * The handling of multiple updates for the same location depends on the
+     * actual type of the update-set.
+     *
+     * @note The udpate-set will not take over the ownership of \a value or
+     *        \a location.
+     *
+     * @param location The location of the update
+     * @param value The value of the update
+     *
+     * @throws Conflict when the update-set is a parallel update-set, an update
+     *         for the \a location exists already and the values of both updates
+     *         are different
+     */
+    virtual void add( const Location& location, const Value& value ) = 0;
+
+    /**
+     * Adds an update \a update to the update-set.
      *
      * The handling of multiple updates for the same location depends on the
      * actual type of the update-set.
      *
      * @note The udpate-set will not take over the ownership of \a update.
      *
-     * @param location The location of the update
      * @param update The update which should be added
      *
      * @throws Conflict when the update-set is a parallel update-set, an update
      *         for the \a location exists already and the values of both updates
      *         are different
      */
-    virtual void add( const libcasm_fe::value_t* location, Update* update ) = 0;
+    void add( const Update& update )
+    {
+        add( update.first, update.second );
+    }
 
     /**
      * Searches for an update for the \a location in the update-set
@@ -190,17 +221,23 @@ class UpdateSet
      *
      * @param location The location of the update of interest
      *
-     * @return The update for the \a location or nullptr if no update for the
-     *         \a location could be found.
+     * @return The update value for the \a location if an update exists.
      */
-    virtual Update* lookup( const libcasm_fe::value_t* location ) const
-        noexcept;
+    virtual boost::optional< Value > lookup( const Location& location ) const
+        noexcept
+    {
+        if( m_parent )
+        {
+            return m_parent->lookup( location );
+        }
+
+        return boost::none;
+    }
 
     /**
      * Forks the current update-set
      *
-     * @param updateSetType The type of the forked update-set @see
-     * UpdateSet::Type
+     * @param semantics The Semantics of the forked update-set
      * @param initialSize The number of updates the update-set should be able to
      *                    handle without resizing
      *
@@ -208,7 +245,18 @@ class UpdateSet
      *         update-set as parent
      */
     std::unique_ptr< UpdateSet > fork(
-        UpdateSet::Type updateSetType, std::size_t initialSize );
+        Semantics semantics, std::size_t initialSize )
+    {
+        switch( semantics )
+        {
+            case Semantics::Sequential:
+                return std::unique_ptr< SequentialUpdateSet< Details > >(
+                    new SequentialUpdateSet< Details >( initialSize, this ) );
+            case Semantics::Parallel:
+                return std::unique_ptr< ParallelUpdateSet< Details > >(
+                    new ParallelUpdateSet< Details >( initialSize, this ) );
+        }
+    }
 
     /**
      * Merges all updates of the current update-set into its parent update-set
@@ -217,20 +265,42 @@ class UpdateSet
      *
      * @throws Conflict when the parent update-set is a parallel update-set, an
      *         update for the \a location exists already in the parent
-     * update-set
-     *         and the values of both updates are different
+     * update-set and the values of both updates are different
      */
-    void merge();
+    void merge()
+    {
+        assert( m_parent != nullptr );
+
+        if( m_parent->m_set.empty() )
+        {
+            std::swap( m_parent->m_set, m_set );
+        }
+        else
+        {
+            m_parent->reserveAdditionally( m_set.size() );
+            const auto end = m_set.end();
+            for( auto it = m_set.begin(); it != end; ++it )
+            {
+                m_parent->add( it.key(), it.value() );
+            }
+        }
+    }
 
     /**
      * @return Iterator to the beginning of the update-set
      */
-    const_iterator begin() const noexcept;
+    const_iterator begin() const noexcept
+    {
+        return m_set.begin();
+    }
 
     /**
      * @return Iterator to the end of the update-set
      */
-    const_iterator end() const noexcept;
+    const_iterator end() const noexcept
+    {
+        return m_set.end();
+    }
 
     /**
      * Searches for an update for the \a location in the current update-set
@@ -242,10 +312,18 @@ class UpdateSet
      *
      * @param location The location of the update of interest
      *
-     * @return The update for the \a location or nullptr if no update for the
-     *         \a location could be found.
+     * @return The update value for the \a location if an update exists.
      */
-    Update* get( const libcasm_fe::value_t* location ) const noexcept;
+    boost::optional< Value > get( const Location& location ) const noexcept
+    {
+        const auto it = m_set.find( location );
+        if( it != m_set.end() )
+        {
+            return it.value();
+        }
+
+        return boost::none;
+    }
 
   protected:
     UpdateHashMap m_set;
@@ -257,20 +335,27 @@ class UpdateSet
 /**
  * @brief Update-set with sequential execution semantics
  */
-class SequentialUpdateSet final : public UpdateSet
+template < typename Details >
+class SequentialUpdateSet final : public UpdateSet< Details >
 {
+    using Super = UpdateSet< Details >;
+    using Location = typename Super::Location;
+    using Value = typename Super::Value;
+    using Semantics = typename Super::Semantics;
+
   public:
-    using UpdateSet::UpdateSet;
+    using Super::UpdateSet;
 
     /**
-     * @see UpdateSet::Type::Sequential
-     *
-     * @return The type of the update-set
+     * @return The semantics of the update-set
      */
-    Type type() const noexcept override;
+    Semantics semantics() const noexcept override
+    {
+        return Semantics::Sequential;
+    }
 
     /**
-     * Adds the \a update for the \a location to the update-set.
+     * Adds an update for the \a location with value \a value to the update-set.
      *
      * If an update for the same location exists already then it will be
      * overwritten.
@@ -278,9 +363,12 @@ class SequentialUpdateSet final : public UpdateSet
      * @note The udpate-set will not take over the ownership of \a update.
      *
      * @param location The location of the update
-     * @param update The update which should be added
+     * @param value The value of the update
      */
-    void add( const libcasm_fe::value_t* location, Update* update ) override;
+    void add( const Location& location, const Value& value ) override
+    {
+        Super::m_set.insertOrAssign( location, value );
+    }
 
     /**
      * Searches for an update for the \a location in the update-set
@@ -290,55 +378,96 @@ class SequentialUpdateSet final : public UpdateSet
      *
      * @param location The location of the update of interest
      *
-     * @return The update for the \a location or nullptr if no update for the
-     *         \a location could be found.
+     * @return The update value for the \a location if an update exists.
      */
-    Update* lookup( const libcasm_fe::value_t* location ) const
-        noexcept override;
+    boost::optional< Value > lookup( const Location& location ) const
+        noexcept override
+    {
+        const auto it = Super::m_set.find( location );
+        if( it != Super::m_set.end() )
+        {
+            return it.value();
+        }
+
+        return Super::lookup( location );
+    }
 };
 
 /**
  * @brief Update-set with parallel execution semantics
  */
-class ParallelUpdateSet final : public UpdateSet
+template < typename Details >
+class ParallelUpdateSet final : public UpdateSet< Details >
 {
+    using Super = UpdateSet< Details >;
+    using Location = typename Super::Location;
+    using Value = typename Super::Value;
+    using Semantics = typename Super::Semantics;
+    using Conflict = typename Super::Conflict;
+
   public:
-    using UpdateSet::UpdateSet;
+    using Super::UpdateSet;
 
     /**
-     * @see UpdateSet::Type::Parallel
-     *
-     * @return The type of the update-set
+     * @return The semantics of the update-set
      */
-    Type type() const noexcept override;
+    Semantics semantics() const noexcept override
+    {
+        return Semantics::Parallel;
+    }
 
     /**
-     * Adds the \a update for the \a location to the update-set
+     * Adds an update for the \a location with value \a value to the update-set.
      *
      * @note The udpate-set will not take over the ownership of \a update.
      *
      * @param location The location of the update
-     * @param update The update which should be added
+     * @param value The value of the update
      *
      * @throws Conflict when an update for the \a location exists already and
      *         the values of both updates are different
      */
-    void add( const libcasm_fe::value_t* location, Update* update ) override;
+    void add( const Location& location, const Value& value ) override
+    {
+        const auto result = Super::m_set.insert( location, value );
+        if( !result.second )
+        {
+            const auto it = result.first;
+            const auto& existingValue = it.value();
+
+            static const typename Details::ValueEquals equals{};
+
+            if( not equals( value, existingValue ) )
+            {
+                throw Conflict(
+                    { location, value }, { location, existingValue } );
+            }
+        }
+    }
 };
 
 /**
  * @brief An helper for convenient forking and merging of update-sets
  */
+template < typename UpdateSet >
 class UpdateSetManager
 {
+    using Location = typename UpdateSet::Location;
+    using Value = typename UpdateSet::Value;
+
   public:
     /**
      * Constructs an empty update-set manager
      */
-    UpdateSetManager();
+    UpdateSetManager()
+    : m_updateSets()
+    , m_forked()
+    {
+    }
 
     /**
-     * Adds the \a update for the \a location to the current update-set
+     * Adds an update for the \a location with value \a value to the current
+     * update-set.
      *
      * The handling of multiple updates for the same location depends on the
      * actual type of the update-set.
@@ -348,13 +477,16 @@ class UpdateSetManager
      * @pre The update-set manager must not be empty
      *
      * @param location The location of the update
-     * @param update The update which should be added
+     * @param value The value of the update
      *
      * @throws Conflict when the update-set is a parallel update-set, an update
      *         for the \a location exists already and the values of both updates
      *         are different
      */
-    void add( const libcasm_fe::value_t* location, Update* update );
+    void add( const Location& location, const Value& value )
+    {
+        currentUpdateSet()->add( location, value );
+    }
 
     /**
      * Searches for an update for the \a location in the current update-set
@@ -364,10 +496,19 @@ class UpdateSetManager
      *
      * @param location The location of the update of interest
      *
-     * @return The update for the \a location or nullptr if no update for the
-     *         \a location could be found.
+     * @return The update value for the \a location if an update exists.
      */
-    Update* lookup( const libcasm_fe::value_t* location ) const noexcept;
+    boost::optional< Value > lookup( const Location& location ) const noexcept
+    {
+        if( m_updateSets.empty() )
+        {
+            return boost::none;
+        }
+        else
+        {
+            return currentUpdateSet()->lookup( location );
+        }
+    }
 
     /**
      * Forks the current update-set or creates a new update-set if the
@@ -376,12 +517,46 @@ class UpdateSetManager
      * @post The forked update-set is the new "current update-set" and the size
      *       of the update-set manager is increased by one
      *
-     * @param updateSetType The type of the forked update-set @see
-     * UpdateSet::Type
+     * @param semantics The semantics of the forked update-set
      * @param initialSize The number of updates the update-set should be able to
      *                    handle without resizing
      */
-    void fork( UpdateSet::Type updateSetType, std::size_t initialSize );
+    void fork(
+        typename UpdateSet::Semantics semantics, std::size_t initialSize )
+    {
+        if( m_updateSets.empty() )
+        {
+            switch( semantics )
+            {
+                case UpdateSet::Semantics::Sequential:
+                    m_updateSets.emplace_back(
+                        new SequentialUpdateSet< typename UpdateSet::Details >(
+                            initialSize ) );
+                    break;
+                case UpdateSet::Semantics::Parallel:
+                    m_updateSets.emplace_back(
+                        new ParallelUpdateSet< typename UpdateSet::Details >(
+                            initialSize ) );
+                    break;
+            }
+        }
+        else // only fork if necessary
+        {
+            const auto updateSet = currentUpdateSet();
+            if( updateSet->semantics() == semantics )
+            {
+                // no need to fork the update set, use the current one
+                updateSet->reserveAdditionally( initialSize );
+                m_forked.push_back( false );
+                return;
+            }
+
+            m_updateSets.emplace_back(
+                updateSet->fork( semantics, initialSize ) );
+        }
+
+        m_forked.push_back( true );
+    }
 
     /**
      * Merges all updates of the current update-set into its parent update-set
@@ -397,12 +572,34 @@ class UpdateSetManager
      * update-set
      *         and the values of both updates are different
      */
-    void merge();
+    void merge()
+    {
+        if( size() < 2 )
+        {
+            return;
+        }
+
+        const auto forked = m_forked.back();
+        m_forked.pop_back();
+        if( not forked )
+        {
+            // previous fork call didn't actually fork the update set
+            return;
+        }
+
+        const auto updateSet = currentUpdateSet();
+        updateSet->merge();
+        m_updateSets.pop_back();
+    }
 
     /**
      * Removes all update-sets from the update-set manager
      */
-    void clear();
+    void clear()
+    {
+        m_updateSets.clear();
+        m_forked.clear();
+    }
 
     /**
      * @pre The update-set manager must not be empty
@@ -410,12 +607,20 @@ class UpdateSetManager
      * @return The current update-set of the update-set manager, i.e. the
      *         update-set on top of the update-set stack.
      */
-    UpdateSet* currentUpdateSet() const;
+    UpdateSet* currentUpdateSet() const
+    {
+        assert( not m_updateSets.empty() );
+        return m_updateSets.back().get();
+    }
 
     /**
      * @return The number of update-sets in the update-set manager
      */
-    std::size_t size() const noexcept;
+    std::size_t size() const noexcept
+    {
+        assert( m_forked.size() >= m_updateSets.size() );
+        return m_forked.size();
+    }
 
   private:
     std::vector< std::unique_ptr< UpdateSet > > m_updateSets;
