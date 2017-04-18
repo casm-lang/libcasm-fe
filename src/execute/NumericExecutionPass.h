@@ -26,69 +26,22 @@
 #ifndef _LIB_CASMFE_NUMERIC_EXECUTION_PASS_H_
 #define _LIB_CASMFE_NUMERIC_EXECUTION_PASS_H_
 
-#include "../analyze/TypeCheckPass.h"
-//#include "../transform/AstToCasmIRPass.h"
-
-#include "ExecutionPassBase.h"
-
-/**
-   @brief    TODO
-
-   TODO
-*/
+#include "../pass/src/Pass.h"
 
 namespace libcasm_fe
 {
-    class NumericExecutionPass final : public ExecutionPassBase,
-                                       public libpass::Pass
+    /**
+     * @brief
+     */
+    class NumericExecutionPass final : public libpass::Pass
     {
       public:
         static char id;
 
-        ~NumericExecutionPass() override;
-
         void usage( libpass::PassUsage& pu ) override;
 
-        bool run( libpass::PassResult& pr ) override;
-
-        void visit_print( PrintNode* node, const value_t& argument ) override;
-
-        void visit_push(
-            PushNode* node, const value_t& expr, const value_t& atom ) override;
-        void visit_pop( PopNode* node, const value_t& val ) override;
-
-        value_t visit_expression( BinaryExpression* expr,
-            const value_t& left_val, const value_t& right_val ) override;
-        value_t visit_expression_single(
-            UnaryExpression* expr, const value_t& val ) override;
-
-        value_t visit_list_atom(
-            ListAtom* atom, const std::vector< value_t >& vals ) override;
-
-        void setDumpUpdates( u1 enabled )
-        {
-            m_dump_updates = enabled;
-        }
-
-      private:
-        void dumpUpdates() const;
-
-        AstWalker< libcasm_fe::NumericExecutionPass, value_t >* walker;
-
-        u1 m_dump_updates;
+        u1 run( libpass::PassResult& pr ) override;
     };
-
-    using NumericExecutionWalker
-        = AstWalker< libcasm_fe::NumericExecutionPass, value_t >;
-
-    template <>
-    void NumericExecutionWalker::walk_ifthenelse( IfThenElseNode* node );
-
-    template <>
-    void NumericExecutionWalker::walk_case( CaseNode* node );
-
-    template <>
-    void NumericExecutionWalker::walk_iterate( UnaryNode* node );
 }
 
 #endif // _LIB_CASMFE_NUMERIC_EXECUTION_PASS_H_

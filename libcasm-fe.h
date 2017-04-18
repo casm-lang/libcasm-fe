@@ -30,7 +30,7 @@
 #include "src/analyze/SymbolResolverPass.h"
 #include "src/analyze/TypeInferencePass.h"
 
-//#include "src/execute/NumericExecutionPass.h"
+#include "src/execute/NumericExecutionPass.h"
 //#include "src/execute/SymbolicExecutionPass.h"
 
 //#include "src/transform/AstToCasmIRPass.h"
