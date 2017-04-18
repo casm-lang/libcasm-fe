@@ -177,6 +177,26 @@ namespace libcasm_fe
             Rule::Ptr m_rule;
         };
 
+        class ChooseRule : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< ChooseRule >;
+
+            ChooseRule( const std::shared_ptr< VariableDefinition >& variable,
+                const Expression::Ptr& universe, const Rule::Ptr& rule );
+
+            std::shared_ptr< VariableDefinition > variable( void ) const;
+            Expression::Ptr universe( void ) const;
+            Rule::Ptr rule( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            std::shared_ptr< VariableDefinition > m_variable;
+            Expression::Ptr m_universe;
+            Rule::Ptr m_rule;
+        };
+
         class IterateRule : public Rule
         {
           public:

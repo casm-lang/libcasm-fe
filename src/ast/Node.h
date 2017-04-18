@@ -76,6 +76,7 @@ namespace libcasm_fe
                 CASE_RULE,
                 LET_RULE,
                 FORALL_RULE,
+                CHOOSE_RULE,
                 ITERATE_RULE,
                 BLOCK_RULE,
                 SEQUENCE_RULE,
