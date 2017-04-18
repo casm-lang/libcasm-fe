@@ -301,7 +301,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             {
                 m_err++;
                 m_log.error( { node.sourceLocation() },
-                    "invalid symbol '" + name + "' found" );
+                    "invalid symbol '" + path.path() + "' found" );
             }
         }
 
