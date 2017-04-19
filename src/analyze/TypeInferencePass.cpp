@@ -64,6 +64,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
 
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
+    void visit( RelationType& node ) override;
     void visit( FixedSizedType& node ) override;
 
     void visit( ExpressionCase& node ) override;
@@ -355,6 +356,57 @@ void TypeCheckVisitor::visit( ComposedType& node )
 {
 #warning " TODO: List, Tuple etc. "
     RecursiveVisitor::visit( node );
+}
+
+void TypeCheckVisitor::visit( RelationType& node )
+{
+    RecursiveVisitor::visit( node );
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& name = node.name()->baseName();
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    for( auto argumentType : *node.argumentTypes() )
+    {
+        if( not argumentType->type() )
+        {
+            m_log.info( { argumentType->sourceLocation() },
+                "TODO: '" + name + "' has a non-typed argument(s)" );
+            return;
+        }
+
+        argTypeList.emplace_back( argumentType->type() );
+    }
+
+    if( name.compare( "RuleRef" ) == 0 )
+    {
+        if( node.returnType()->type() )
+        {
+            const auto type = libstdhl::make< libcasm_ir::RuleReferenceType >(
+                node.returnType()->type(), argTypeList );
+            node.setType( type );
+        }
+    }
+    else if( name.compare( "FuncRef" ) == 0 )
+    {
+        if( node.returnType()->type() )
+        {
+            const auto type
+                = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                    node.returnType()->type(), argTypeList );
+            node.setType( type );
+        }
+    }
+    else
+    {
+        m_err++;
+        m_log.error( { node.sourceLocation() },
+            "unknown relation type '" + name + "' found" );
+    }
 }
 
 void TypeCheckVisitor::visit( FixedSizedType& node )
@@ -902,11 +954,6 @@ void TypeInferenceVisitor::inference(
             node.setType( VOID );
             break;
         }
-        case libcasm_ir::Type::RULE_REFERENCE:
-        {
-            node.setType( RULEREF );
-            break;
-        }
         case libcasm_ir::Type::BOOLEAN:
         {
             node.setType( BOOLEAN );
@@ -937,6 +984,20 @@ void TypeInferenceVisitor::inference(
         case libcasm_ir::Type::RATIONAL:
         {
             node.setType( RATIONAL );
+            break;
+        }
+        case libcasm_ir::Type::RULE_REFERENCE:
+        {
+            assert(
+                0 ); // TODO: PPA: retrieve relation to construct RuleRef type
+            // node.setType( ? );
+            break;
+        }
+        case libcasm_ir::Type::FUNCTION_REFERENCE:
+        {
+            assert(
+                0 ); // TODO: PPA: retrieve relation to construct FuncRef type
+            // node.setType( ? );
             break;
         }
         default:
