@@ -482,7 +482,7 @@ void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
 
     if( true ) // m_dumpType
     {
-        m_stream << "\n{ ";
+        m_stream << "\n";
 
         if( node.type() )
         {
@@ -490,10 +490,8 @@ void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
         }
         else
         {
-            m_stream << "unknown";
+            m_stream << "UNRESOLVED";
         }
-
-        m_stream << " }";
     }
 }
 
