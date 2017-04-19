@@ -64,6 +64,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
 
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
+    void visit( RelationType& node ) override;
     void visit( FixedSizedType& node ) override;
 
     void visit( ExpressionCase& node ) override;
@@ -95,6 +96,8 @@ static const auto RATIONAL = libstdhl::get< libcasm_ir::RationalType >();
 
 static const std::unordered_map< std::string, libcasm_ir::Type::Ptr > basicTypes
     = {
+        { "Void", VOID },
+
         { "RuleRef", RULEREF },
 
         { "Boolean", BOOLEAN },
@@ -300,8 +303,26 @@ void TypeCheckVisitor::visit( BasicType& node )
         }
         else if( name.compare( "Agent" ) == 0 )
         {
-            m_log.info(
-                { node.sourceLocation() }, "TODO: handle 'Agent' case!" );
+            auto symbol = m_symboltable.find( "self" );
+            assert(
+                symbol.targetType() == CallExpression::TargetType::FUNCTION );
+            auto& definition
+                = static_cast< FunctionDefinition& >( symbol.definition() );
+
+            if( not definition.returnType()->type() )
+            {
+                auto kind
+                    = libstdhl::make< libcasm_ir::Enumeration >( "Agent" );
+
+                kind->add( "default" );
+
+                const auto type
+                    = libstdhl::make< libcasm_ir::EnumerationType >( kind );
+
+                definition.returnType()->setType( type );
+            }
+
+            node.setType( definition.returnType()->type() );
         }
         else
         {
@@ -335,6 +356,57 @@ void TypeCheckVisitor::visit( ComposedType& node )
 {
 #warning " TODO: List, Tuple etc. "
     RecursiveVisitor::visit( node );
+}
+
+void TypeCheckVisitor::visit( RelationType& node )
+{
+    RecursiveVisitor::visit( node );
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& name = node.name()->baseName();
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    for( auto argumentType : *node.argumentTypes() )
+    {
+        if( not argumentType->type() )
+        {
+            m_log.info( { argumentType->sourceLocation() },
+                "TODO: '" + name + "' has a non-typed argument(s)" );
+            return;
+        }
+
+        argTypeList.emplace_back( argumentType->type() );
+    }
+
+    if( name.compare( "RuleRef" ) == 0 )
+    {
+        if( node.returnType()->type() )
+        {
+            const auto type = libstdhl::make< libcasm_ir::RuleReferenceType >(
+                node.returnType()->type(), argTypeList );
+            node.setType( type );
+        }
+    }
+    else if( name.compare( "FuncRef" ) == 0 )
+    {
+        if( node.returnType()->type() )
+        {
+            const auto type
+                = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                    node.returnType()->type(), argTypeList );
+            node.setType( type );
+        }
+    }
+    else
+    {
+        m_err++;
+        m_log.error( { node.sourceLocation() },
+            "unknown relation type '" + name + "' found" );
+    }
 }
 
 void TypeCheckVisitor::visit( FixedSizedType& node )
@@ -509,8 +581,13 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ExistentialQuantifierExpression& node ) override;
 
     void visit( LetRule& node ) override;
+    void visit( UpdateRule& node ) override;
 
-    void annotate( const libcasm_ir::Annotation& annotation, const Node& node,
+    void assignment( const Node& node, TypedNode& lhs, TypedNode& rhs,
+        const std::string& dst, const std::string& src );
+
+    void annotate( const libcasm_ir::Annotation& annotation,
+        const Node& node,
         const std::vector< Expression::Ptr >& expressions = {} );
 
     void inference(
@@ -746,15 +823,16 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
 void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 {
-    // POSTORDER
     RecursiveVisitor::visit( node );
 
-    if( not node.type() )
+    if( not node.expression()->type() )
     {
         m_err++;
         m_log.error( { node.sourceLocation() },
             "unable to resolve type of indirect call expression" );
     }
+
+    node.setType( node.expression()->type() );
 }
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
@@ -805,6 +883,59 @@ void TypeInferenceVisitor::visit( LetRule& node )
     push( *node.variable() );
     RecursiveVisitor::visit( node );
     pop( *node.variable() );
+
+    assignment( node, *node.variable(), *node.expression(),
+        "let variable '" + node.variable()->identifier()->name() + "'",
+        "binding expression" );
+}
+
+void TypeInferenceVisitor::visit( UpdateRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    assignment( node, *node.function(), *node.expression(), "updated function",
+        "updating expression" );
+}
+
+void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
+    TypedNode& rhs, const std::string& dst, const std::string& src )
+{
+    if( not rhs.type() and rhs.id() == Node::ID::UNDEF_ATOM )
+    {
+        rhs.setType( lhs.type() );
+    }
+
+    const auto error_count = m_err;
+
+    if( not lhs.type() )
+    {
+        m_err++;
+        m_log.error(
+            { lhs.sourceLocation() }, "unable to infer type of " + dst );
+    }
+
+    if( not rhs.type() )
+    {
+        m_err++;
+        m_log.error(
+            { rhs.sourceLocation() }, "unable to infer type of " + src );
+    }
+
+    if( error_count != m_err )
+    {
+        return;
+    }
+
+    if( lhs.type()->result() != rhs.type()->result() )
+    {
+        m_err++;
+        m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
+            "type of " + dst + " does not match type of " + src + ": '"
+                + lhs.type()->description()
+                + "' != '"
+                + rhs.type()->description()
+                + "'" );
+    }
 }
 
 void TypeInferenceVisitor::annotate( const libcasm_ir::Annotation& annotation,
@@ -881,11 +1012,6 @@ void TypeInferenceVisitor::inference(
             node.setType( VOID );
             break;
         }
-        case libcasm_ir::Type::RULE_REFERENCE:
-        {
-            node.setType( RULEREF );
-            break;
-        }
         case libcasm_ir::Type::BOOLEAN:
         {
             node.setType( BOOLEAN );
@@ -918,6 +1044,20 @@ void TypeInferenceVisitor::inference(
             node.setType( RATIONAL );
             break;
         }
+        case libcasm_ir::Type::RULE_REFERENCE:
+        {
+            assert(
+                0 ); // TODO: PPA: retrieve relation to construct RuleRef type
+            // node.setType( ? );
+            break;
+        }
+        case libcasm_ir::Type::FUNCTION_REFERENCE:
+        {
+            assert(
+                0 ); // TODO: PPA: retrieve relation to construct FuncRef type
+            // node.setType( ? );
+            break;
+        }
         default:
         {
             assert( 0 );
@@ -934,6 +1074,12 @@ void TypeInferenceVisitor::inference(
 
 void TypeInferenceVisitor::inference( FunctionDefinition& node )
 {
+    if( node.defaultValue()->id() == Node::ID::UNDEF_ATOM
+        and not node.defaultValue()->type() )
+    {
+        node.defaultValue()->setType( node.returnType()->type() );
+    }
+
     if( node.type() )
     {
         return;
