@@ -95,6 +95,8 @@ static const auto RATIONAL = libstdhl::get< libcasm_ir::RationalType >();
 
 static const std::unordered_map< std::string, libcasm_ir::Type::Ptr > basicTypes
     = {
+        { "Void", VOID },
+
         { "RuleRef", RULEREF },
 
         { "Boolean", BOOLEAN },
@@ -764,15 +766,16 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
 void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 {
-    // POSTORDER
     RecursiveVisitor::visit( node );
 
-    if( not node.type() )
+    if( not node.expression()->type() )
     {
         m_err++;
         m_log.error( { node.sourceLocation() },
             "unable to resolve type of indirect call expression" );
     }
+
+    node.setType( node.expression()->type() );
 }
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
