@@ -300,8 +300,26 @@ void TypeCheckVisitor::visit( BasicType& node )
         }
         else if( name.compare( "Agent" ) == 0 )
         {
-            m_log.info(
-                { node.sourceLocation() }, "TODO: handle 'Agent' case!" );
+            auto symbol = m_symboltable.find( "self" );
+            assert(
+                symbol.targetType() == CallExpression::TargetType::FUNCTION );
+            auto& definition
+                = static_cast< FunctionDefinition& >( symbol.definition() );
+
+            if( not definition.returnType()->type() )
+            {
+                auto kind
+                    = libstdhl::make< libcasm_ir::Enumeration >( "Agent" );
+
+                kind->add( "default" );
+
+                const auto type
+                    = libstdhl::make< libcasm_ir::EnumerationType >( kind );
+
+                definition.returnType()->setType( type );
+            }
+
+            node.setType( definition.returnType()->type() );
         }
         else
         {
