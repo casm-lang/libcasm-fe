@@ -926,7 +926,7 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
         return;
     }
 
-    if( *lhs.type() != *rhs.type() )
+    if( lhs.type()->result() != rhs.type()->result() )
     {
         m_err++;
         m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
