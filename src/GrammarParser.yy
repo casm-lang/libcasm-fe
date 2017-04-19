@@ -272,6 +272,9 @@ Specification
       const std::string& fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
       const std::string& name = fileName.substr( 0, fileName.rfind( "." ) );
 
+      auto selfDefinition = createSelfFunction( @$ );
+      $2->add( selfDefinition );
+
       const auto specificationName = make< Identifier >( @$, name );
       result = Ast::make< Specification >( @$, specificationName, $2 );
   }
@@ -407,10 +410,11 @@ MaybeFunctionParameters
 ProgramFunctionDefinition
 : INIT IdentifierPath
   {
-      auto selfDefinition = createSelfFunction( @$ );
+      const auto selfIdentifier = Ast::make< Identifier >( @$, "self" );
+
       auto selfArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       const auto self = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( selfDefinition->identifier() ), selfArguments );
+          @$, asIdentifierPath( selfIdentifier ), selfArguments );
 
       auto programDefinition = createProgramFunction( @$ );
       auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
