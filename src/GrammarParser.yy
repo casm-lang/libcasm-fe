@@ -115,18 +115,19 @@
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
+    static FunctionDefinition::Ptr createSelfFunction( Location& sourceLocation )
+    {
+        const auto resType = createAgentType( sourceLocation );
+        const auto argTypes = Ast::make< Types >( sourceLocation );
+
+        const auto program = Ast::make< Identifier >( sourceLocation, "self" );
+        return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, resType );
+    }
+
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
     {
         const auto& location = identifier->sourceLocation();
         return Ast::make< IdentifierPath >( location, identifier );
-    }
-
-    static DirectCallExpression::Ptr createSelfBuiltinCall( Location& sourceLocation )
-    {
-        const auto self = libcasm_fe::Ast::make< Identifier >( sourceLocation, "self" );
-        const auto arguments = libcasm_fe::Ast::make< Expressions >( sourceLocation );
-        return libcasm_fe::Ast::make< DirectCallExpression >(
-            sourceLocation, asIdentifierPath( self ), arguments );
     }
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
@@ -271,6 +272,9 @@ Specification
       const std::string& fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
       const std::string& name = fileName.substr( 0, fileName.rfind( "." ) );
 
+      auto selfDefinition = createSelfFunction( @$ );
+      $2->add( selfDefinition );
+
       const auto specificationName = make< Identifier >( @$, name );
       result = Ast::make< Specification >( @$, specificationName, $2 );
   }
@@ -406,16 +410,17 @@ MaybeFunctionParameters
 ProgramFunctionDefinition
 : INIT IdentifierPath
   {
+      const auto selfIdentifier = Ast::make< Identifier >( @$, "self" );
+
+      auto selfArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      const auto self = libcasm_fe::Ast::make< DirectCallExpression >(
+          @$, asIdentifierPath( selfIdentifier ), selfArguments );
+
       auto programDefinition = createProgramFunction( @$ );
-
-      auto arguments = libcasm_fe::Ast::make< Expressions >( @$ );
-
-      // single execution agent case, use 'self' built-in!
-      const auto self = createSelfBuiltinCall( @$ );
-      arguments->add( self );
-
+      auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      programArguments->add( self );
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( programDefinition->identifier() ), arguments );
+          @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
 
       const auto ruleReference = Ast::make< RuleReferenceAtom >( @$, $2 );
 
