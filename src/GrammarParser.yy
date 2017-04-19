@@ -115,18 +115,19 @@
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
+    static FunctionDefinition::Ptr createSelfFunction( Location& sourceLocation )
+    {
+        const auto resType = createAgentType( sourceLocation );
+        const auto argTypes = Ast::make< Types >( sourceLocation );
+
+        const auto program = Ast::make< Identifier >( sourceLocation, "self" );
+        return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, resType );
+    }
+
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
     {
         const auto& location = identifier->sourceLocation();
         return Ast::make< IdentifierPath >( location, identifier );
-    }
-
-    static DirectCallExpression::Ptr createSelfBuiltinCall( Location& sourceLocation )
-    {
-        const auto self = libcasm_fe::Ast::make< Identifier >( sourceLocation, "self" );
-        const auto arguments = libcasm_fe::Ast::make< Expressions >( sourceLocation );
-        return libcasm_fe::Ast::make< DirectCallExpression >(
-            sourceLocation, asIdentifierPath( self ), arguments );
     }
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
@@ -195,6 +196,7 @@ END       0 "end of file"
 %type <CaseRule::Ptr> CaseRule
 %type <LetRule::Ptr> LetRule
 %type <ForallRule::Ptr> ForallRule
+%type <ChooseRule::Ptr> ChooseRule
 %type <IterateRule::Ptr> IterateRule
 %type <BlockRule::Ptr> BlockRule
 %type <SequenceRule::Ptr> SequenceRule
@@ -238,7 +240,7 @@ END       0 "end of file"
 %precedence UPDATE
 
 %left DOT
-%left IMPLIES
+%left IMPLIES ARROW
 %left OR
 %left XOR
 %left AND
@@ -327,7 +329,7 @@ Definitions
 
 
 FunctionDefinition
-: FUNCTION Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
+: FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
       const auto identifier = $2;
 
@@ -405,16 +407,16 @@ MaybeFunctionParameters
 ProgramFunctionDefinition
 : INIT IdentifierPath
   {
+      auto selfDefinition = createSelfFunction( @$ );
+      auto selfArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      const auto self = libcasm_fe::Ast::make< DirectCallExpression >(
+          @$, asIdentifierPath( selfDefinition->identifier() ), selfArguments );
+
       auto programDefinition = createProgramFunction( @$ );
-
-      auto arguments = libcasm_fe::Ast::make< Expressions >( @$ );
-
-      // single execution agent case, use 'self' built-in!
-      const auto self = createSelfBuiltinCall( @$ );
-      arguments->add( self );
-
+      auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      programArguments->add( self );
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( programDefinition->identifier() ), arguments );
+          @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
 
       const auto ruleReference = Ast::make< RuleReferenceAtom >( @$, $2 );
 
@@ -449,7 +451,7 @@ Initializer
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
       $$ = Ast::make< UpdateRule >( @$, function, $1 );
   }
-| Term ARROW Term
+| Term MAPS Term
   {
       auto arguments = Ast::make< Expressions >( @$ );
       arguments->add( $1 );
@@ -458,7 +460,7 @@ Initializer
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
-| TwoOrMoreArguments ARROW Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
+| TwoOrMoreArguments MAPS Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1 );
@@ -496,7 +498,7 @@ MaybeInitializers
 
 
 DerivedDefinition
-: DERIVED Identifier MaybeParameters ARROW Type EQUAL Term
+: DERIVED Identifier MaybeParameters MAPS Type EQUAL Term
   {
       $$ = Ast::make< DerivedDefinition >( @$, $2, $3, $5, $7 );
   }
@@ -641,7 +643,7 @@ ComposedType
 
 
 RelationType
-: IdentifierPath LESSER MaybeFunctionParameters ARROW Type GREATER
+: IdentifierPath LESSER MaybeFunctionParameters MAPS Type GREATER
   {
       $$ = Ast::make< RelationType >( @$, $1, $3, $5 );
   }
@@ -905,7 +907,7 @@ Expression
   }
 | Term CARET Term
   {
-      // TODO call power builtin
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::POW_INSTRUCTION );
   }
 | Term NEQUAL Term
   {
@@ -943,9 +945,13 @@ Expression
   {
       $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
   }
+| Term ARROW Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::IMP_INSTRUCTION );
+  }
 | Term IMPLIES Term
   {
-      // TODO add implies instruction
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::IMP_INSTRUCTION );
   }
 | NOT Term
   {
@@ -1065,7 +1071,7 @@ RuleDefinition
       $$ = Ast::make< RuleDefinition >( @$, $2, $3, createVoidType( @$ ),
                                    wrapInBlockRule( $5 ) );
   }
-| RULE Identifier MaybeParameters ARROW Type EQUAL Rule
+| RULE Identifier MaybeParameters MAPS Type EQUAL Rule
   {
       $$ = Ast::make< RuleDefinition >( @$, $2, $3, $5,
                                    wrapInBlockRule( $7 ) );
@@ -1091,6 +1097,10 @@ Rule
       $$ = $1;
   }
 | ForallRule
+  {
+      $$ = $1;
+  }
+| ChooseRule
   {
       $$ = $1;
   }
@@ -1205,6 +1215,14 @@ ForallRule
 : FORALL Variable IN Term DO Rule
   {
       $$ = Ast::make< ForallRule >( @$, $2, $4, $6 );
+  }
+;
+
+
+ChooseRule
+: CHOOSE Variable IN Term DO Rule
+  {
+      $$ = Ast::make< ChooseRule >( @$, $2, $4, $6 );
   }
 ;
 

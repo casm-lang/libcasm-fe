@@ -75,6 +75,7 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
     void visit( CaseRule& node ) override;
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
+    void visit( ChooseRule& node ) override;
     void visit( IterateRule& node ) override;
     void visit( BlockRule& node ) override;
     void visit( SequenceRule& node ) override;
@@ -239,6 +240,12 @@ void AstDumpSourceVisitor::visit( LetRule& node )
 }
 
 void AstDumpSourceVisitor::visit( ForallRule& node )
+{
+    // TODO
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpSourceVisitor::visit( ChooseRule& node )
 {
     // TODO
     RecursiveVisitor::visit( node );

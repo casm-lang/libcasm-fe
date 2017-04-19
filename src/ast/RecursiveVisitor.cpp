@@ -177,6 +177,13 @@ void RecursiveVisitor::visit( ForallRule& node )
     node.rule()->accept( *this );
 }
 
+void RecursiveVisitor::visit( ChooseRule& node )
+{
+    node.variable()->accept( *this );
+    node.universe()->accept( *this );
+    node.rule()->accept( *this );
+}
+
 void RecursiveVisitor::visit( IterateRule& node )
 {
     node.rule()->accept( *this );

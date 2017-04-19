@@ -145,6 +145,10 @@ std::string Node::description( void ) const
         {
             return "forall";
         }
+        case ID::CHOOSE_RULE:
+        {
+            return "choose";
+        }
         case ID::ITERATE_RULE:
         {
             return "iterate";
