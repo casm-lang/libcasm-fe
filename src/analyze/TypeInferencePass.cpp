@@ -581,8 +581,13 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ExistentialQuantifierExpression& node ) override;
 
     void visit( LetRule& node ) override;
+    void visit( UpdateRule& node ) override;
 
-    void annotate( const libcasm_ir::Annotation& annotation, const Node& node,
+    void assignment( const Node& node, TypedNode& lhs, TypedNode& rhs,
+        const std::string& dst, const std::string& src );
+
+    void annotate( const libcasm_ir::Annotation& annotation,
+        const Node& node,
         const std::vector< Expression::Ptr >& expressions = {} );
 
     void inference(
@@ -878,6 +883,59 @@ void TypeInferenceVisitor::visit( LetRule& node )
     push( *node.variable() );
     RecursiveVisitor::visit( node );
     pop( *node.variable() );
+
+    assignment( node, *node.variable(), *node.expression(),
+        "let variable '" + node.variable()->identifier()->name() + "'",
+        "binding expression" );
+}
+
+void TypeInferenceVisitor::visit( UpdateRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    assignment( node, *node.function(), *node.expression(), "updated function",
+        "updating expression" );
+}
+
+void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
+    TypedNode& rhs, const std::string& dst, const std::string& src )
+{
+    if( not rhs.type() and rhs.id() == Node::ID::UNDEF_ATOM )
+    {
+        rhs.setType( lhs.type() );
+    }
+
+    const auto error_count = m_err;
+
+    if( not lhs.type() )
+    {
+        m_err++;
+        m_log.error(
+            { lhs.sourceLocation() }, "unable to infer type of " + dst );
+    }
+
+    if( not rhs.type() )
+    {
+        m_err++;
+        m_log.error(
+            { rhs.sourceLocation() }, "unable to infer type of " + src );
+    }
+
+    if( error_count != m_err )
+    {
+        return;
+    }
+
+    if( *lhs.type() != *rhs.type() )
+    {
+        m_err++;
+        m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
+            "type of " + dst + " does not match type of " + src + ": '"
+                + lhs.type()->description()
+                + "' != '"
+                + rhs.type()->description()
+                + "'" );
+    }
 }
 
 void TypeInferenceVisitor::annotate( const libcasm_ir::Annotation& annotation,
@@ -1016,6 +1074,12 @@ void TypeInferenceVisitor::inference(
 
 void TypeInferenceVisitor::inference( FunctionDefinition& node )
 {
+    if( node.defaultValue()->id() == Node::ID::UNDEF_ATOM
+        and not node.defaultValue()->type() )
+    {
+        node.defaultValue()->setType( node.returnType()->type() );
+    }
+
     if( node.type() )
     {
         return;
