@@ -627,6 +627,38 @@ class UpdateSetManager
     std::vector< bool > m_forked;
 };
 
+template < typename UpdateSet >
+class UpdateSetForkGuard
+{
+  public:
+    UpdateSetForkGuard( UpdateSetManager< UpdateSet >* manager,
+        typename UpdateSet::Semantics semantics, std::size_t initialSize )
+    : m_manager( manager )
+    {
+        if( manager->currentUpdateSet()->semantics() != semantics )
+        {
+            manager->fork( semantics, initialSize );
+            m_wasForked = true;
+        }
+        else
+        {
+            m_wasForked = false;
+        }
+    }
+
+    ~UpdateSetForkGuard()
+    {
+        if( m_wasForked )
+        {
+            m_manager->merge();
+        }
+    }
+
+  private:
+    UpdateSetManager< UpdateSet >* m_manager;
+    bool m_wasForked;
+};
+
 #endif // _LIB_CASMFE_UPDATESET_H_
 
 //
