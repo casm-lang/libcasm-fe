@@ -57,7 +57,6 @@ RuleReferenceAtom::RuleReferenceAtom( const IdentifierPath::Ptr& identifier )
 , m_identifier( identifier )
 , m_ruleReference( nullptr )
 {
-    Expression::setType( libstdhl::get< libcasm_ir::RuleReferenceType >() );
 }
 
 IdentifierPath::Ptr RuleReferenceAtom::identifier() const
