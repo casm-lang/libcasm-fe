@@ -30,8 +30,6 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-static std::string key( const Identifier& node, const std::size_t arity );
-
 //
 // Symbol
 //
@@ -143,10 +141,7 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node ) const
 Namespace::Symbol Namespace::find(
     const std::string& name, const std::size_t arity ) const
 {
-    Identifier ident( name );
-    const auto _key = key( ident, arity );
-
-    auto result = m_symboltable.find( _key );
+    auto result = m_symboltable.find( name );
     if( result == m_symboltable.end() )
     {
         throw std::domain_error(
@@ -154,7 +149,7 @@ Namespace::Symbol Namespace::find(
             + "'" );
     }
 
-    return result->second;
+    return result->second.front();
 }
 
 Namespace::Symbol Namespace::find(
@@ -202,15 +197,11 @@ std::string Namespace::dump( const std::string& indention ) const
 
     for( auto v : m_symboltable )
     {
-        std::vector< std::string > parts;
-        libstdhl::String::split( v.first, "@", parts );
-
-        const auto& arity = parts[ 0 ];
-        const auto& name = parts[ 1 ];
+        const auto& name = v.first;
 
         s << indention << name << " : "
-          << CallExpression::targetTypeString( v.second.targetType() ) << "( "
-          << arity << "-ary)\n";
+          << CallExpression::targetTypeString( v.second.front().targetType() )
+          << "( " << v.second.front().arity() << "-ary)\n";
     }
 
     for( auto v : m_namespaces )
@@ -227,19 +218,25 @@ std::string Namespace::dump( const std::string& indention ) const
 void Namespace::registerSymbol( const Identifier& node, const Node& definition,
     const CallExpression::TargetType targetType, const std::size_t arity )
 {
-    const auto _key = key( node, arity );
+    const auto name = node.name();
 
-    auto result = m_symboltable.emplace( _key,
-        Symbol{ node, const_cast< Node& >( definition ), targetType, arity } );
+    auto& symtbl = m_symboltable[ name ];
 
-    if( not result.second )
+    for( const auto& symbol : symtbl )
     {
-        throw std::domain_error( "symbol '" + result.first->first
-                                 + "' already defined as '"
-                                 + CallExpression::targetTypeString(
-                                       result.first->second.targetType() )
-                                 + "'" );
+        if( symbol.arity() == arity )
+        {
+            throw std::domain_error(
+                "symbol '" + name + "' already defined as "
+                + std::to_string( arity )
+                + "-ary '"
+                + CallExpression::targetTypeString( symbol.targetType() )
+                + "'" );
+        }
     }
+
+    symtbl.emplace_back(
+        Symbol{ node, const_cast< Node& >( definition ), targetType, arity } );
 }
 
 Namespace::Symbol Namespace::find( const IdentifierPath& node,
@@ -271,22 +268,31 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
     {
         // search for identifier/symbol in this namespace
 
-        const auto& name = *path[ index ];
-        const auto _key = key( name, arity );
+        const auto& name = path[ index ]->name();
 
-        auto result = m_symboltable.find( _key );
+        auto result = m_symboltable.find( name );
         if( result == m_symboltable.end() )
         {
             throw std::domain_error(
                 "unable to find symbol '" + node.path() + "'" );
         }
 
-        return result->second;
-    }
-}
+        if( result->second.size() > 1 )
+        {
+            for( const auto& symbol : result->second )
+            {
+                if( symbol.arity() == arity )
+                {
+                    return symbol;
+                }
+            }
 
-static std::string key( const Identifier& node, const std::size_t arity )
-{
-    const auto identifier = node.name();
-    return std::to_string( arity ) + "@" + identifier;
+            throw std::domain_error( "unable to find " + std::to_string( arity )
+                                     + "-ary symbol '"
+                                     + node.path()
+                                     + "'" );
+        }
+
+        return result->second.front();
+    }
 }
