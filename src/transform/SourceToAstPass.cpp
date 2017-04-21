@@ -50,19 +50,13 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto loadFilePass = pr.result< libpass::LoadFilePass >();
-    const auto filePath = loadFilePass->filename();
-
-    std::ifstream sourceFile( filePath );
-    if( not sourceFile.is_open() )
-    {
-        log.error( "could not open `" + filePath + "´" );
-        return false;
-    }
+    const auto data = pr.result< libpass::LoadFilePass >();
+    const auto filePath = data->filename();
+    auto& fileStream = data->stream();
 
     Ast::Specification::Ptr specification;
 
-    Lexer lexer( log, sourceFile, std::cout );
+    Lexer lexer( log, fileStream, std::cout );
     lexer.setFileName( filePath );
 
     Parser parser( log, lexer, filePath, specification );
