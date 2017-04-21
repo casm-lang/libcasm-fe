@@ -71,7 +71,7 @@ void Logger::error( const std::vector< Location >& locations,
         }
     }
 
-    log< Log::Level::ERROR >( items );
+    log< Log::Level::ID::ERROR >( items );
 }
 
 void Logger::error( const Exception& exception )
@@ -84,7 +84,7 @@ void Logger::warning(
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::make< Log::TextItem >( message ) );
-    log< Log::Level::WARNING >( items );
+    log< Log::Level::ID::WARNING >( items );
 }
 
 void Logger::info(
@@ -92,7 +92,7 @@ void Logger::info(
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::make< Log::TextItem >( message ) );
-    log< Log::Level::INFORMATIONAL >( items );
+    log< Log::Level::ID::INFORMATIONAL >( items );
 }
 
 //

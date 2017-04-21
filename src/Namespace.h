@@ -95,7 +95,7 @@ namespace libcasm_fe
         Symbol find( const Ast::IdentifierPath& node, const std::size_t arity,
             const std::size_t index = 0 ) const;
 
-        std::unordered_map< std::string, Symbol > m_symboltable;
+        std::unordered_map< std::string, std::vector< Symbol > > m_symboltable;
 
         std::unordered_map< std::string, Namespace::Ptr > m_namespaces;
     };
