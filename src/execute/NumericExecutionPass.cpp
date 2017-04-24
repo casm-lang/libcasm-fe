@@ -298,7 +298,11 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
 
 void ExecutionVisitor::visit( DerivedDefinition& node )
 {
-    RecursiveVisitor::visit( node );
+    node.expression()->accept( *this );
+    const auto& value = m_evaluationStack.pop();
+
+    auto* frame = m_frameStack.top();
+    frame->setReturnValue( value );
 }
 
 void ExecutionVisitor::visit( RuleDefinition& node )
