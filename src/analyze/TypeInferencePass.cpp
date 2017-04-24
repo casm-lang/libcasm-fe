@@ -98,8 +98,6 @@ static const std::unordered_map< std::string, libcasm_ir::Type::Ptr > basicTypes
     = {
         { "Void", VOID },
 
-        { "RuleRef", RULEREF },
-
         { "Boolean", BOOLEAN },
 
         { "Integer", INTEGER },
@@ -323,6 +321,13 @@ void TypeCheckVisitor::visit( BasicType& node )
             }
 
             node.setType( definition.returnType()->type() );
+        }
+        else if( name.compare( "RuleRef" ) == 0
+                 or name.compare( "FuncRef" ) == 0 )
+        {
+            m_err++;
+            m_log.error( { node.sourceLocation() },
+                "reference type '" + name + "' defined without relation" );
         }
         else
         {
@@ -675,6 +680,29 @@ void TypeInferenceVisitor::visit( ValueAtom& node )
 void TypeInferenceVisitor::visit( RuleReferenceAtom& node )
 {
     RecursiveVisitor::visit( node );
+
+    assert( not node.type() );
+    try
+    {
+        auto symbol = m_symboltable.find( *node.identifier() );
+        assert( symbol.targetType() == CallExpression::TargetType::RULE );
+
+        auto& definition
+            = static_cast< RuleDefinition& >( symbol.definition() );
+
+        inference( definition );
+        assert( definition.type()->isRelation() );
+
+        const auto type = libstdhl::make< libcasm_ir::RuleReferenceType >(
+            std::static_pointer_cast< libcasm_ir::RelationType >(
+                definition.type() ) );
+
+        node.setType( type );
+    }
+    catch( const std::domain_error& e )
+    {
+        assert( !" inconsistent symbol table! " );
+    }
 }
 
 void TypeInferenceVisitor::visit( UndefAtom& node )
