@@ -53,31 +53,48 @@ static libpass::PassRegistration< NumericExecutionPass > PASS(
     "NumericExecutionPass",
     "execute numerically over the AST input specification", "ast-exec-num", 0 );
 
-class ConstantStack
+template < typename T >
+class Stack
 {
   public:
-    void push( const ir::Constant& value )
+    Stack()
+    : m_values()
+    {
+    }
+
+    void push( const T& value )
     {
         m_values.push_back( value );
     }
 
-    ir::Constant pop()
+    T pop()
     {
         const auto& value = m_values.back();
         m_values.pop_back();
         return value;
     }
 
-    template < typename T >
-    T pop()
+    T& top()
     {
-        const auto& value = pop();
-        assert( ir::isa< T >( value ) );
-        return static_cast< const T& >( value );
+        return m_values.back();
     }
 
   private:
-    std::vector< ir::Constant > m_values;
+    std::vector< T > m_values;
+};
+
+class ConstantStack : public Stack< ir::Constant >
+{
+  public:
+    using Stack::Stack;
+
+    template < typename T >
+    T pop()
+    {
+        const auto& value = Stack::pop();
+        assert( ir::isa< T >( value ) );
+        return static_cast< const T& >( value );
+    }
 };
 
 struct LocationHash
