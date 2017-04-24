@@ -69,10 +69,19 @@ namespace libcasm_fe
 
             Type::Ptr variableType( void ) const;
 
+            /**
+             * Sets the frame local index of the variable.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setLocalIndex( std::size_t localIndex );
+            std::size_t localIndex( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             Type::Ptr m_variableType;
+            std::size_t m_localIndex;
         };
 
         class FunctionDefinition : public Definition
@@ -136,12 +145,21 @@ namespace libcasm_fe
             Type::Ptr returnType( void ) const;
             Expression::Ptr expression( void ) const;
 
+            /**
+             * Sets the number of required frame local slots.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
+            std::size_t maximumNumberOfLocals( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
             Type::Ptr m_returnType;
             Expression::Ptr m_expression;
+            std::size_t m_maxNumberOfLocals;
         };
 
         class RuleDefinition : public Definition
@@ -159,12 +177,21 @@ namespace libcasm_fe
             Type::Ptr returnType( void ) const;
             Rule::Ptr rule( void ) const;
 
+            /**
+             * Sets the number of required frame local slots.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
+            std::size_t maximumNumberOfLocals( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
             Type::Ptr m_returnType;
             Rule::Ptr m_rule;
+            std::size_t m_maxNumberOfLocals;
         };
 
         class EnumerationDefinition : public Definition

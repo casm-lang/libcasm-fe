@@ -360,11 +360,13 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             auto frame = libstdhl::make_unique< Frame >(
                 nullptr ); // TODO fetch definition
 
+            std::size_t localIndex = 0;
             for( const auto& argument : *node.arguments() )
             {
                 argument->accept( *this );
                 const auto& value = m_evaluationStack.pop();
-                frame->setLocal( 0, value ); // TODO use correct index
+                frame->setLocal( localIndex, value );
+                ++localIndex;
             }
 
             m_frameStack.push( std::move( frame ) );
@@ -390,9 +392,9 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::VARIABLE:
         {
+            const auto localIndex = node.targetId(); // calc. by SymbolResolver
             const auto* frame = m_frameStack.top();
-            m_evaluationStack.push(
-                frame->local( 0 ) ); // TODO use correct index
+            m_evaluationStack.push( frame->local( localIndex ) );
             break;
         }
         case CallExpression::TargetType::UNKNOWN:
@@ -466,10 +468,11 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     bool result = true;
 
     auto* frame = m_frameStack.top();
+    const auto variableIndex = node.predicateVariable()->localIndex();
 
     while( false /* TODO iterate over universe */ )
     {
-        // frame->setLocal( 0, ... ); // TODO use correct index and value
+        // frame->setLocal( variableIndex, ... ); // TODO assign value
 
         node.proposition()->accept( *this );
         const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
@@ -489,10 +492,11 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     bool result = false;
 
     auto* frame = m_frameStack.top();
+    const auto variableIndex = node.predicateVariable()->localIndex();
 
     while( false /* TODO iterate over universe */ )
     {
-        // frame->setLocal( 0, ... ); // TODO use correct index and value
+        // frame->setLocal( variableIndex, ... ); // TODO assign value
 
         node.proposition()->accept( *this );
         const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
@@ -542,7 +546,8 @@ void ExecutionVisitor::visit( LetRule& node )
     const auto& value = m_evaluationStack.pop();
 
     auto* frame = m_frameStack.top();
-    frame->setLocal( 0, value ); // TODO use correct index
+    const auto variableIndex = node.variable()->localIndex();
+    frame->setLocal( variableIndex, value );
 
     node.rule()->accept( *this );
 }
@@ -552,10 +557,11 @@ void ExecutionVisitor::visit( ForallRule& node )
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
 
     auto* frame = m_frameStack.top();
+    const auto variableIndex = node.variable()->localIndex();
 
     while( false /* TODO iterate over universe */ )
     {
-        // frame->setLocal( 0, ... ); // TODO use correct index and value
+        // frame->setLocal( variableIndex, ... ); // TODO assign value
         node.rule()->accept( *this );
     }
 }
@@ -565,7 +571,8 @@ void ExecutionVisitor::visit( ChooseRule& node )
     // TODO choose one value of the universe
 
     auto* frame = m_frameStack.top();
-    // frame->setLocal( 0, ... ); // TODO use correct index and value
+    const auto variableIndex = node.variable()->localIndex();
+    // frame->setLocal( variableIndex, ... ); // TODO assign value
 
     node.rule()->accept( *this );
 }

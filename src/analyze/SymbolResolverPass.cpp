@@ -178,7 +178,10 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     Logger& m_log;
     u64 m_err;
     Namespace& m_symboltable;
-    std::unordered_set< std::string > m_variables;
+    std::unordered_map< std::string, std::size_t > m_variables;
+    std::size_t m_maxNumberOfLocals; /**< Used to calculate the minimum number
+                                        of frame slots required for derived
+                                        functions and rules during execution */
 };
 
 SymbolResolveVisitor::SymbolResolveVisitor(
@@ -186,11 +189,14 @@ SymbolResolveVisitor::SymbolResolveVisitor(
 : m_log( log )
 , m_err( 0 )
 , m_symboltable( symboltable )
+, m_maxNumberOfLocals( 0 )
 {
 }
 
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
 {
+    m_maxNumberOfLocals = 0;
+
     for( const auto& argument : *node.arguments() )
     {
         push( *argument );
@@ -202,10 +208,14 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
     {
         pop( *argument );
     }
+
+    node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
 }
 
 void SymbolResolveVisitor::visit( RuleDefinition& node )
 {
+    m_maxNumberOfLocals = 0;
+
     for( const auto& argument : *node.arguments() )
     {
         push( *argument );
@@ -217,6 +227,8 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     {
         pop( *argument );
     }
+
+    node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
 }
 
 void SymbolResolveVisitor::visit( DirectCallExpression& node )
@@ -295,7 +307,9 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             }
             else if( m_variables.find( name ) != m_variables.end() )
             {
+                const auto localIndex = m_variables[ name ];
                 node.setTargetType( CallExpression::TargetType::VARIABLE );
+                node.setTargetId( localIndex ); // frame slot index
             }
             else
             {
@@ -344,13 +358,16 @@ void SymbolResolveVisitor::push( const VariableDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
-    auto result = m_variables.emplace( name );
+    const std::size_t localIndex = m_variables.size(); // used during execution
+    const auto result = m_variables.emplace( name, localIndex );
     if( not result.second )
     {
         m_err++;
         m_log.error( { node.sourceLocation() },
             "symbol '" + name + "' already defined" );
     }
+
+    m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_variables.size() );
 }
 
 void SymbolResolveVisitor::pop( const VariableDefinition& node )

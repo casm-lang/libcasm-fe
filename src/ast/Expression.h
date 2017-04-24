@@ -111,13 +111,27 @@ namespace libcasm_fe
             using Expression::Expression;
 
             void setTargetType( TargetType targetType );
-
             TargetType targetType( void ) const;
 
             std::string targetTypeName( void ) const;
 
+            /**
+             * Sets the id of the target.
+             *
+             * Functions, deriveds, builtins, rules, ... may be stored in a
+             * flat list, thus the target id may correspond to the list index.
+             *
+             * Variables may be stored in frames, thus the target id may
+             * correspond to the local index.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetId( std::size_t targetId );
+            std::size_t targetId( void ) const;
+
           private:
             TargetType m_targetType = TargetType::UNKNOWN;
+            std::size_t m_targetId = 0;
 
           public:
             static std::string targetTypeString( const TargetType targetType );
