@@ -192,6 +192,8 @@ class ExecutionVisitor final : public RecursiveVisitor
 };
 
 ExecutionVisitor::ExecutionVisitor()
+: m_updateSetManager()
+, m_evaluationStack()
 {
 }
 
