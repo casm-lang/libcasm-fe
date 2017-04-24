@@ -25,6 +25,8 @@
 
 #include "NumericExecutionPass.h"
 
+#include "../stdhl/cpp/Default.h"
+
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
@@ -69,6 +71,8 @@ class Stack
 
     T pop()
     {
+        assert( not m_values.empty() );
+
         const auto& value = m_values.back();
         m_values.pop_back();
         return value;
@@ -76,7 +80,14 @@ class Stack
 
     T& top()
     {
+        assert( not m_values.empty() );
+
         return m_values.back();
+    }
+
+    void clear()
+    {
+        m_values.clear();
     }
 
   private:
@@ -88,6 +99,8 @@ class ConstantStack : public Stack< ir::Constant >
   public:
     using Stack::Stack;
 
+    using Stack::pop;
+
     template < typename T >
     T pop()
     {
@@ -95,6 +108,80 @@ class ConstantStack : public Stack< ir::Constant >
         assert( ir::isa< T >( value ) );
         return static_cast< const T& >( value );
     }
+};
+
+class Frame
+{
+  public:
+    Frame( const Definition::Ptr& definition )
+    : m_definition( definition )
+    , m_locals()
+    , m_returnValue( ir::VoidConstant() )
+    {
+    }
+
+    Definition::Ptr definition( void ) const
+    {
+        return m_definition;
+    }
+
+    void setLocal( std::size_t index, const ir::Constant& local )
+    {
+        m_locals[ index ] = local;
+    }
+
+    ir::Constant local( std::size_t index ) const
+    {
+        return m_locals.at( index );
+    }
+
+    void setReturnValue( const ir::Constant& returnValue )
+    {
+        m_returnValue = returnValue;
+    }
+
+    ir::Constant returnValue( void ) const
+    {
+        return m_returnValue;
+    }
+
+  private:
+    Definition::Ptr m_definition;
+    std::vector< ir::Constant > m_locals;
+    ir::Constant m_returnValue;
+};
+
+class FrameStack
+{
+  public:
+    FrameStack()
+    : m_frames()
+    {
+    }
+
+    void push( std::unique_ptr< Frame >&& frame )
+    {
+        m_frames.emplace_back( std::move( frame ) );
+    }
+
+    std::unique_ptr< Frame > pop()
+    {
+        assert( not m_frames.empty() );
+
+        auto frame = std::move( m_frames.back() );
+        m_frames.pop_back();
+        return frame;
+    }
+
+    Frame* top() const
+    {
+        assert( not m_frames.empty() );
+
+        return m_frames.back().get();
+    }
+
+  private:
+    std::vector< std::unique_ptr< Frame > > m_frames;
 };
 
 struct LocationHash
@@ -189,11 +276,13 @@ class ExecutionVisitor final : public RecursiveVisitor
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 
     ConstantStack m_evaluationStack;
+    FrameStack m_frameStack;
 };
 
 ExecutionVisitor::ExecutionVisitor()
 : m_updateSetManager()
 , m_evaluationStack()
+, m_frameStack()
 {
 }
 
@@ -239,7 +328,67 @@ void ExecutionVisitor::visit( UndefAtom& node )
 
 void ExecutionVisitor::visit( DirectCallExpression& node )
 {
-    RecursiveVisitor::visit( node );
+    switch( node.targetType() )
+    {
+        case CallExpression::TargetType::FUNCTION:
+        {
+            break;
+        }
+        case CallExpression::TargetType::DERIVED:
+        {
+            break;
+        }
+        case CallExpression::TargetType::BUILTIN:
+        {
+            break;
+        }
+        case CallExpression::TargetType::RULE:
+        {
+            auto frame = libstdhl::make_unique< Frame >(
+                nullptr ); // TODO fetch definition
+
+            for( const auto& argument : *node.arguments() )
+            {
+                argument->accept( *this );
+                const auto& value = m_evaluationStack.pop();
+                frame->setLocal( 0, value ); // TODO use correct index
+            }
+
+            m_frameStack.push( std::move( frame ) );
+
+            // TODO invoke rule
+
+            frame = m_frameStack.pop();
+
+            if( false /* return value != void */ )
+            {
+                m_evaluationStack.push( frame->returnValue() );
+            }
+
+            break;
+        }
+        case CallExpression::TargetType::ENUMERATION:
+        {
+            break;
+        }
+        case CallExpression::TargetType::CONSTANT:
+        {
+            break;
+        }
+        case CallExpression::TargetType::VARIABLE:
+        {
+            const auto* frame = m_frameStack.top();
+            m_evaluationStack.push(
+                frame->local( 0 ) ); // TODO use correct index
+            break;
+        }
+        case CallExpression::TargetType::UNKNOWN:
+        {
+            throw RuntimeException( node.sourceLocation(),
+                "Cannot call an unknown target", Code::Unspecified );
+            break;
+        }
+    }
 }
 
 void ExecutionVisitor::visit( IndirectCallExpression& node )
@@ -303,8 +452,12 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
 {
     bool result = true;
 
+    auto* frame = m_frameStack.top();
+
     while( false /* TODO iterate over universe */ )
     {
+        // frame->setLocal( 0, ... ); // TODO use correct index and value
+
         node.proposition()->accept( *this );
         const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
 
@@ -322,8 +475,12 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
 {
     bool result = false;
 
+    auto* frame = m_frameStack.top();
+
     while( false /* TODO iterate over universe */ )
     {
+        // frame->setLocal( 0, ... ); // TODO use correct index and value
+
         node.proposition()->accept( *this );
         const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
 
@@ -371,7 +528,8 @@ void ExecutionVisitor::visit( LetRule& node )
     node.expression()->accept( *this );
     const auto& value = m_evaluationStack.pop();
 
-    // TODO
+    auto* frame = m_frameStack.top();
+    frame->setLocal( 0, value ); // TODO use correct index
 
     node.rule()->accept( *this );
 }
@@ -380,12 +538,23 @@ void ExecutionVisitor::visit( ForallRule& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
 
-    RecursiveVisitor::visit( node );
+    auto* frame = m_frameStack.top();
+
+    while( false /* TODO iterate over universe */ )
+    {
+        // frame->setLocal( 0, ... ); // TODO use correct index and value
+        node.rule()->accept( *this );
+    }
 }
 
 void ExecutionVisitor::visit( ChooseRule& node )
 {
-    RecursiveVisitor::visit( node );
+    // TODO choose one value of the universe
+
+    auto* frame = m_frameStack.top();
+    // frame->setLocal( 0, ... ); // TODO use correct index and value
+
+    node.rule()->accept( *this );
 }
 
 void ExecutionVisitor::visit( IterateRule& node )
@@ -426,6 +595,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 void ExecutionVisitor::visit( CallRule& node )
 {
     RecursiveVisitor::visit( node );
+    m_evaluationStack.clear(); // call may returned a value, ignore it
 }
 
 u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
