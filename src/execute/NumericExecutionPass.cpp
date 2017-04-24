@@ -307,7 +307,7 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
 
 void ExecutionVisitor::visit( RuleDefinition& node )
 {
-    RecursiveVisitor::visit( node );
+    node.rule()->accept( *this );
 }
 
 void ExecutionVisitor::visit( EnumerationDefinition& node )
