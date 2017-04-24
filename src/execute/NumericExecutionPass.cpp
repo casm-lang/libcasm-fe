@@ -308,6 +308,15 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
 void ExecutionVisitor::visit( RuleDefinition& node )
 {
     node.rule()->accept( *this );
+
+    if( false /* TODO update set contains an update for `result` */ )
+    {
+        // const auto& value = TODO get update value and REMOVE update from
+        // update set
+
+        auto* frame = m_frameStack.top();
+        // frame->setReturnValue( value );
+    }
 }
 
 void ExecutionVisitor::visit( EnumerationDefinition& node )
