@@ -268,6 +268,9 @@ class ExecutionVisitor final : public RecursiveVisitor
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
 
+    void visit( ExpressionCase& node ) override;
+    void visit( DefaultCase& node ) override;
+
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
@@ -547,7 +550,32 @@ void ExecutionVisitor::visit( CaseRule& node )
     node.expression()->accept( *this );
     const auto& value = m_evaluationStack.pop();
 
-    // TODO
+    Case::Ptr defaultCase = nullptr;
+
+    for( const auto& _case : *node.cases() )
+    {
+        if( _case->id() == Node::ID::DEFAULT_CASE )
+        {
+            assert( not defaultCase
+                    && "case rule should not contain multiple default cases" );
+            defaultCase = _case;
+            continue;
+        }
+
+        _case->accept( *this ); // only evaluates the case expression
+        const auto& caseValue = m_evaluationStack.pop();
+        if( value == caseValue )
+        {
+            // match
+            _case->rule()->accept( *this );
+            return;
+        }
+    }
+
+    if( defaultCase )
+    {
+        defaultCase->rule()->accept( *this );
+    }
 }
 
 void ExecutionVisitor::visit( LetRule& node )
@@ -626,6 +654,19 @@ void ExecutionVisitor::visit( CallRule& node )
 {
     RecursiveVisitor::visit( node );
     m_evaluationStack.clear(); // call may returned a value, ignore it
+}
+
+void ExecutionVisitor::visit( ExpressionCase& node )
+{
+    node.expression()->accept( *this );
+    // note: rule will be invoked in visit(CaseRule) if expressions match
+}
+
+void ExecutionVisitor::visit( DefaultCase& node )
+{
+    assert( !"default case should not be executed, "
+             "accept rule of default case instead!" );
+    // note: rule will be invoked in visit(CaseRule)
 }
 
 u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
