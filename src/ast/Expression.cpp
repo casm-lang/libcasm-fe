@@ -35,14 +35,14 @@ Expression::Expression( Node::ID id )
 {
 }
 
-ValueAtom::ValueAtom( const libcasm_ir::Value::Ptr& value )
+ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )
 : Expression( Node::ID::VALUE_ATOM )
 , m_value( value )
 {
     Expression::setType( value->ptr_type() );
 }
 
-libcasm_ir::Value::Ptr ValueAtom::value( void ) const
+libcasm_ir::Constant::Ptr ValueAtom::value( void ) const
 {
     return m_value;
 }
@@ -89,6 +89,17 @@ UndefAtom::UndefAtom( void )
 void UndefAtom::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
+: Expression( id )
+, m_arguments( arguments )
+{
+}
+
+Expressions::Ptr CallExpression::arguments( void ) const
+{
+    return m_arguments;
 }
 
 void CallExpression::setTargetType( CallExpression::TargetType targetType )
@@ -157,9 +168,8 @@ std::size_t CallExpression::targetId( void ) const
 
 DirectCallExpression::DirectCallExpression(
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
-: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION )
+: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
 , m_identifier( identifier )
-, m_arguments( arguments )
 {
 }
 
@@ -174,11 +184,6 @@ IdentifierPath::Ptr DirectCallExpression::identifier( void ) const
     return m_identifier;
 }
 
-Expressions::Ptr DirectCallExpression::arguments( void ) const
-{
-    return m_arguments;
-}
-
 void DirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -186,20 +191,14 @@ void DirectCallExpression::accept( Visitor& visitor )
 
 IndirectCallExpression::IndirectCallExpression(
     const Expression::Ptr& expression, const Expressions::Ptr& arguments )
-: CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION )
+: CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION, arguments )
 , m_expression( expression )
-, m_arguments( arguments )
 {
 }
 
 Expression::Ptr IndirectCallExpression::expression( void ) const
 {
     return m_expression;
-}
-
-Expressions::Ptr IndirectCallExpression::arguments( void ) const
-{
-    return m_arguments;
 }
 
 void IndirectCallExpression::accept( Visitor& visitor )

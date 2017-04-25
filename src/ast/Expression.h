@@ -51,14 +51,14 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ValueAtom >;
 
-            explicit ValueAtom( const libcasm_ir::Value::Ptr& value );
+            explicit ValueAtom( const libcasm_ir::Constant::Ptr& value );
 
-            libcasm_ir::Value::Ptr value( void ) const;
+            libcasm_ir::Constant::Ptr value( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            libcasm_ir::Value::Ptr m_value;
+            libcasm_ir::Constant::Ptr m_value;
         };
 
         class RuleReferenceAtom : public Expression
@@ -108,7 +108,9 @@ namespace libcasm_fe
 
             using Ptr = std::shared_ptr< CallExpression >;
 
-            using Expression::Expression;
+            CallExpression( Node::ID id, const Expressions::Ptr& arguments );
+
+            Expressions::Ptr arguments( void ) const;
 
             void setTargetType( TargetType targetType );
             TargetType targetType( void ) const;
@@ -130,6 +132,8 @@ namespace libcasm_fe
             std::size_t targetId( void ) const;
 
           private:
+            Expressions::Ptr m_arguments;
+
             TargetType m_targetType = TargetType::UNKNOWN;
             std::size_t m_targetId = 0;
 
@@ -148,13 +152,10 @@ namespace libcasm_fe
             void setIdentifier( const IdentifierPath::Ptr& identifier );
             IdentifierPath::Ptr identifier( void ) const;
 
-            Expressions::Ptr arguments( void ) const;
-
             void accept( Visitor& visitor ) override final;
 
           private:
             IdentifierPath::Ptr m_identifier;
-            Expressions::Ptr m_arguments;
         };
 
         class IndirectCallExpression : public CallExpression
@@ -166,13 +167,11 @@ namespace libcasm_fe
                 const Expressions::Ptr& arguments );
 
             Expression::Ptr expression( void ) const;
-            Expressions::Ptr arguments( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_expression;
-            Expressions::Ptr m_arguments;
         };
 
         class UnaryExpression : public Expression
