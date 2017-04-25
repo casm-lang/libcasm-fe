@@ -348,7 +348,7 @@ void ExecutionVisitor::visit( RuleReferenceAtom& node )
 
 void ExecutionVisitor::visit( UndefAtom& node )
 {
-    RecursiveVisitor::visit( node );
+    m_evaluationStack.push( ir::Constant::undef( node.type() ) );
 }
 
 void ExecutionVisitor::visit( DirectCallExpression& node )
