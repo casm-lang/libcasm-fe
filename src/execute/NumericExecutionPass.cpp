@@ -230,14 +230,15 @@ struct UpdateSetDetails
     using ValueEquals = UpdateEquals;
 };
 
+using ExecutionUpdateSet = UpdateSet< UpdateSetDetails >;
+using ForkGuard = UpdateSetForkGuard< ExecutionUpdateSet >;
+using Semantics = ExecutionUpdateSet::Semantics;
+
 class ExecutionVisitor final : public RecursiveVisitor
 {
-    using ExecutionUpdateSet = UpdateSet< UpdateSetDetails >;
-    using ForkGuard = UpdateSetForkGuard< ExecutionUpdateSet >;
-    using Semantics = ExecutionUpdateSet::Semantics;
-
   public:
-    ExecutionVisitor();
+    ExecutionVisitor(
+        UpdateSetManager< ExecutionUpdateSet >& updateSetManager );
 
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -277,14 +278,15 @@ class ExecutionVisitor final : public RecursiveVisitor
     std::unique_ptr< Frame > makeFrame( const CallExpression& call );
 
   private:
-    UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
+    UpdateSetManager< ExecutionUpdateSet >& m_updateSetManager;
 
     ConstantStack m_evaluationStack;
     FrameStack m_frameStack;
 };
 
-ExecutionVisitor::ExecutionVisitor()
-: m_updateSetManager()
+ExecutionVisitor::ExecutionVisitor(
+    UpdateSetManager< ExecutionUpdateSet >& updateSetManager )
+: m_updateSetManager( updateSetManager )
 , m_evaluationStack()
 , m_frameStack()
 {
@@ -692,6 +694,37 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
     return frame;
 }
 
+class StateInitializationVisitor final : public RecursiveVisitor
+{
+  public:
+    StateInitializationVisitor( /* FunctionState& */ );
+
+    void visit( Specification& node ) override;
+    void visit( FunctionDefinition& node ) override;
+
+  private:
+    UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
+};
+
+StateInitializationVisitor::StateInitializationVisitor( /* FunctionState& */ )
+: m_updateSetManager()
+{
+}
+
+void StateInitializationVisitor::visit( Specification& node )
+{
+    ForkGuard seqGuard( &m_updateSetManager, Semantics::Sequential, 100UL );
+    node.definitions()->accept( *this );
+    // TODO fire updates
+}
+
+void StateInitializationVisitor::visit( FunctionDefinition& node )
+{
+    ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
+    ExecutionVisitor executionVisitor( m_updateSetManager );
+    node.initializers()->accept( executionVisitor );
+}
+
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
     pu.require< TypeInferencePass >();
@@ -706,8 +739,10 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
 
     try
     {
-        ExecutionVisitor visitor;
-        specification->accept( visitor );
+        StateInitializationVisitor stateInitializationVisitor;
+        specification->accept( stateInitializationVisitor );
+
+        // foreach agent: program->accept( ExecutionVisitor )
     }
     catch( const RuntimeException& e )
     {
