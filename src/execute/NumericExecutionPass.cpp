@@ -289,7 +289,20 @@ ExecutionVisitor::ExecutionVisitor()
 
 void ExecutionVisitor::visit( FunctionDefinition& node )
 {
-    RecursiveVisitor::visit( node );
+    auto* frame = m_frameStack.top();
+
+    // TODO hash arguments of frame and perform a lookup
+
+    if( false /* TODO update exists or function exists in state */ )
+    {
+        // frame->setReturnValue( value );
+    }
+    else
+    {
+        node.defaultValue()->accept( *this );
+        const auto& defaultValue = m_evaluationStack.pop();
+        frame->setReturnValue( defaultValue );
+    }
 }
 
 void ExecutionVisitor::visit( DerivedDefinition& node )
