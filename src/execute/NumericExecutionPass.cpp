@@ -372,7 +372,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 
             auto frame = m_frameStack.pop();
             const auto& returnValue = frame->returnValue();
-            if( not ir::isa< ir::VoidConstant >( returnValue ) ) // TODO better use signature info
+            if( not ir::isa< ir::VoidConstant >(
+                    returnValue ) ) // TODO better use signature info
             {
                 m_evaluationStack.push( returnValue );
             }
@@ -446,7 +447,7 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
 
     if( not condition.defined() )
     {
-        throw RuntimeException( node.sourceLocation(),
+        throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
             Code::Unspecified );
     }
@@ -474,7 +475,13 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
         node.proposition()->accept( *this );
         const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
 
-        if( prop.value() == false )
+        if( not prop.defined() )
+        {
+            throw RuntimeException( node.proposition()->sourceLocation(),
+                "proposition must be true or false but was undef",
+                Code::Unspecified );
+        }
+        else if( prop.value() == false )
         {
             result = false;
             break;
@@ -498,7 +505,13 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
         node.proposition()->accept( *this );
         const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
 
-        if( prop.value() == true )
+        if( not prop.defined() )
+        {
+            throw RuntimeException( node.proposition()->sourceLocation(),
+                "proposition must be true or false but was undef",
+                Code::Unspecified );
+        }
+        else if( prop.value() == true )
         {
             result = true;
             break;
@@ -515,7 +528,7 @@ void ExecutionVisitor::visit( ConditionalRule& node )
 
     if( not condition.defined() )
     {
-        throw RuntimeException( node.sourceLocation(),
+        throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
             Code::Unspecified );
     }
@@ -620,10 +633,11 @@ u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
     return m_updateSetManager.currentUpdateSet()->empty();
 }
 
-std::unique_ptr< Frame > ExecutionVisitor::makeFrame( const CallExpression& call )
+std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
+    const CallExpression& call )
 {
-    auto frame = libstdhl::make_unique< Frame >(
-        nullptr ); // TODO fetch definition
+    auto frame
+        = libstdhl::make_unique< Frame >( nullptr ); // TODO fetch definition
 
     std::size_t localIndex = 0;
     for( const auto& argument : *call.arguments() )
