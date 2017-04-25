@@ -51,14 +51,14 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ValueAtom >;
 
-            explicit ValueAtom( const libcasm_ir::Value::Ptr& value );
+            explicit ValueAtom( const libcasm_ir::Constant::Ptr& value );
 
-            libcasm_ir::Value::Ptr value( void ) const;
+            libcasm_ir::Constant::Ptr value( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            libcasm_ir::Value::Ptr m_value;
+            libcasm_ir::Constant::Ptr m_value;
         };
 
         class RuleReferenceAtom : public Expression
