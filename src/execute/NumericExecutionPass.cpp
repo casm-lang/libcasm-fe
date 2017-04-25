@@ -281,6 +281,9 @@ class ExecutionVisitor final : public RecursiveVisitor
 
     ConstantStack m_evaluationStack;
     FrameStack m_frameStack;
+
+    std::vector< Definition::Ptr >
+        m_definitionTable; // TODO get this from symbol resolver
 };
 
 ExecutionVisitor::ExecutionVisitor(
@@ -288,6 +291,7 @@ ExecutionVisitor::ExecutionVisitor(
 : m_updateSetManager( updateSetManager )
 , m_evaluationStack()
 , m_frameStack()
+, m_definitionTable()
 {
 }
 
@@ -361,9 +365,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::RULE:
         {
             m_frameStack.push( makeFrame( node ) );
-
-            // TODO invoke derived/function/rule (by node.targetId())
-
+            const auto& definition = m_definitionTable.at( node.targetId() );
+            definition->accept( *this );
             m_frameStack.pop();
             break;
         }
@@ -419,9 +422,8 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         case CallExpression::TargetType::RULE:
         {
             m_frameStack.push( makeFrame( node ) );
-
-            // TODO invoke derived/function/rule (by targetId)
-
+            const auto& definition = m_definitionTable.at( targetId );
+            definition->accept( *this );
             m_frameStack.pop();
             break;
         }
