@@ -134,6 +134,11 @@ class Frame
         return m_locals.at( index );
     }
 
+    const std::vector< ir::Constant >& locals( void ) const
+    {
+        return m_locals;
+    }
+
   private:
     Definition::Ptr m_definition;
     std::vector< ir::Constant > m_locals;
@@ -269,6 +274,8 @@ class ExecutionVisitor final : public RecursiveVisitor
 
     std::unique_ptr< Frame > makeFrame( const CallExpression& call );
 
+    void invokeBuiltin( ir::Value::ID id, const ir::Type::Ptr& type );
+
   private:
     UpdateSetManager< ExecutionUpdateSet >& m_updateSetManager;
 
@@ -351,13 +358,21 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
     {
         case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
         case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
-        case CallExpression::TargetType::BUILTIN:  // [[fallthrough]]
         case CallExpression::TargetType::RULE:
         {
             m_frameStack.push( makeFrame( node ) );
 
-            // TODO invoke derived/function/rule/builtin (by node.targetId())
+            // TODO invoke derived/function/rule (by node.targetId())
 
+            m_frameStack.pop();
+            break;
+        }
+        case CallExpression::TargetType::BUILTIN:
+        {
+            m_frameStack.push( makeFrame( node ) );
+            const auto buildinId
+                = static_cast< ir::Value::ID >( node.targetId() );
+            invokeBuiltin( buildinId, node.type() );
             m_frameStack.pop();
             break;
         }
@@ -386,26 +401,35 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 
 void ExecutionVisitor::visit( IndirectCallExpression& node )
 {
+    node.expression()->accept( *this );
+    const auto& reference = m_evaluationStack.pop< ReferenceConstant >();
+    if( not reference.defined() )
+    {
+        throw RuntimeException( node.expression()->sourceLocation(),
+            "cannot call an undefined " + node.targetTypeName(),
+            Code::Unspecified );
+    }
+
+    const auto targetId = reference.value_i64();
+
     switch( node.targetType() )
     {
         case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
         case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
-        case CallExpression::TargetType::BUILTIN:  // [[fallthrough]]
         case CallExpression::TargetType::RULE:
         {
-            node.expression()->accept( *this );
-            const auto& targetId = m_evaluationStack.pop< ReferenceConstant >();
-            if( not targetId.defined() )
-            {
-                throw RuntimeException( node.expression()->sourceLocation(),
-                    "cannot call an undefined " + node.targetTypeName(),
-                    Code::Unspecified );
-            }
-
             m_frameStack.push( makeFrame( node ) );
 
-            // TODO invoke derived/function/rule/builtin (by targetId)
+            // TODO invoke derived/function/rule (by targetId)
 
+            m_frameStack.pop();
+            break;
+        }
+        case CallExpression::TargetType::BUILTIN:
+        {
+            m_frameStack.push( makeFrame( node ) );
+            const auto buildinId = static_cast< ir::Value::ID >( targetId );
+            invokeBuiltin( buildinId, node.type() );
             m_frameStack.pop();
             break;
         }
@@ -702,6 +726,21 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
     }
 
     return frame;
+}
+
+void ExecutionVisitor::invokeBuiltin(
+    ir::Value::ID id, const ir::Type::Ptr& type )
+{
+    auto* frame = m_frameStack.top();
+
+    // const auto result = libcasm_rt::Value::execute( id, type, frame->locals()
+    // );
+
+    const auto& returnType = type->ptr_result();
+    if( not returnType->isVoid() )
+    {
+        // m_evaluationStack.push( result );
+    }
 }
 
 class StateInitializationVisitor final : public RecursiveVisitor
