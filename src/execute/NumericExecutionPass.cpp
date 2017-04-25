@@ -326,7 +326,7 @@ void ExecutionVisitor::visit( EnumerationDefinition& node )
 
 void ExecutionVisitor::visit( ValueAtom& node )
 {
-    // m_evaluationStack.push( node.value() );
+    m_evaluationStack.push( *node.value() );
 }
 
 void ExecutionVisitor::visit( RuleReferenceAtom& node )
