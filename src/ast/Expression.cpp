@@ -156,20 +156,11 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
     }
 }
 
-void CallExpression::setTargetId( std::size_t targetId )
-{
-    m_targetId = targetId;
-}
-
-std::size_t CallExpression::targetId( void ) const
-{
-    return m_targetId;
-}
-
 DirectCallExpression::DirectCallExpression(
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
 , m_identifier( identifier )
+, m_targetId( 0 )
 {
 }
 
@@ -182,6 +173,16 @@ void DirectCallExpression::setIdentifier(
 IdentifierPath::Ptr DirectCallExpression::identifier( void ) const
 {
     return m_identifier;
+}
+
+void DirectCallExpression::setTargetId( std::size_t targetId )
+{
+    m_targetId = targetId;
+}
+
+std::size_t DirectCallExpression::targetId( void ) const
+{
+    return m_targetId;
 }
 
 void DirectCallExpression::accept( Visitor& visitor )

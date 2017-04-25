@@ -117,25 +117,9 @@ namespace libcasm_fe
 
             std::string targetTypeName( void ) const;
 
-            /**
-             * Sets the id of the target.
-             *
-             * Functions, deriveds, builtins, rules, ... may be stored in a
-             * flat list, thus the target id may correspond to the list index.
-             *
-             * Variables may be stored in frames, thus the target id may
-             * correspond to the local index.
-             *
-             * @note Assigned by SymbolResolved and used during execution
-             */
-            void setTargetId( std::size_t targetId );
-            std::size_t targetId( void ) const;
-
           private:
             Expressions::Ptr m_arguments;
-
             TargetType m_targetType = TargetType::UNKNOWN;
-            std::size_t m_targetId = 0;
 
           public:
             static std::string targetTypeString( const TargetType targetType );
@@ -152,10 +136,25 @@ namespace libcasm_fe
             void setIdentifier( const IdentifierPath::Ptr& identifier );
             IdentifierPath::Ptr identifier( void ) const;
 
+            /**
+             * Sets the id of the target.
+             *
+             * Functions, deriveds, builtins, rules, ... may be stored in a
+             * flat list, thus the target id may correspond to the list index.
+             *
+             * Variables may be stored in frames, thus the target id may
+             * correspond to the local index.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetId( std::size_t targetId );
+            std::size_t targetId( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             IdentifierPath::Ptr m_identifier;
+            std::size_t m_targetId;
         };
 
         class IndirectCallExpression : public CallExpression
