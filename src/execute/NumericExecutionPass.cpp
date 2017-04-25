@@ -323,13 +323,21 @@ void ExecutionVisitor::visit( RuleDefinition& node )
 {
     node.rule()->accept( *this );
 
-    if( false /* TODO update set contains an update for `result` */ )
+    const auto& returnType = node.relationType()->ptr_result();
+    if( not returnType->isVoid() )
     {
-        // const auto& value = TODO get update value and REMOVE update from
-        // update set
-
         auto* frame = m_frameStack.top();
-        // frame->setReturnValue( value );
+
+        if( false /* update set has result update */ )
+        {
+            // const auto& value = TODO get update value and REMOVE update from
+            // update set
+            // frame->setReturnValue( value );
+        }
+        else
+        {
+            frame->setReturnValue( ir::Constant::undef( returnType ) );
+        }
     }
 }
 
