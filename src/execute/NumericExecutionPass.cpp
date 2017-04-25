@@ -116,7 +116,6 @@ class Frame
     Frame( const Definition::Ptr& definition )
     : m_definition( definition )
     , m_locals()
-    , m_returnValue( ir::VoidConstant() )
     {
     }
 
@@ -135,20 +134,9 @@ class Frame
         return m_locals.at( index );
     }
 
-    void setReturnValue( const ir::Constant& returnValue )
-    {
-        m_returnValue = returnValue;
-    }
-
-    ir::Constant returnValue( void ) const
-    {
-        return m_returnValue;
-    }
-
   private:
     Definition::Ptr m_definition;
     std::vector< ir::Constant > m_locals;
-    ir::Constant m_returnValue;
 };
 
 class FrameStack
@@ -300,23 +288,17 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
 
     if( false /* TODO update exists or function exists in state */ )
     {
-        // frame->setReturnValue( value );
+        // m_evaluationStack.push( value );
     }
     else
     {
-        node.defaultValue()->accept( *this );
-        const auto& defaultValue = m_evaluationStack.pop();
-        frame->setReturnValue( defaultValue );
+        node.defaultValue()->accept( *this ); // return value already on stack
     }
 }
 
 void ExecutionVisitor::visit( DerivedDefinition& node )
 {
-    node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
-
-    auto* frame = m_frameStack.top();
-    frame->setReturnValue( value );
+    node.expression()->accept( *this ); // return value already on stack
 }
 
 void ExecutionVisitor::visit( RuleDefinition& node )
@@ -326,17 +308,15 @@ void ExecutionVisitor::visit( RuleDefinition& node )
     const auto& returnType = node.relationType()->ptr_result();
     if( not returnType->isVoid() )
     {
-        auto* frame = m_frameStack.top();
-
         if( false /* update set has result update */ )
         {
             // const auto& value = TODO get update value and REMOVE update from
             // update set
-            // frame->setReturnValue( value );
+            // m_evaluationStack.push( value );
         }
         else
         {
-            frame->setReturnValue( ir::Constant::undef( returnType ) );
+            m_evaluationStack.push( ir::Constant::undef( returnType ) );
         }
     }
 }
@@ -366,31 +346,15 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
     switch( node.targetType() )
     {
         case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:
-        {
-            m_frameStack.push( makeFrame( node ) );
-
-            // TODO invoke derived/function
-
-            auto frame = m_frameStack.pop();
-            m_evaluationStack.push( frame->returnValue() );
-            break;
-        }
-        case CallExpression::TargetType::BUILTIN: // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
+        case CallExpression::TargetType::BUILTIN:  // [[fallthrough]]
         case CallExpression::TargetType::RULE:
         {
             m_frameStack.push( makeFrame( node ) );
 
-            // TODO invoke rule/builtin
+            // TODO invoke derived/function/rule/builtin (by node.targetId())
 
-            auto frame = m_frameStack.pop();
-            const auto& returnValue = frame->returnValue();
-            if( not ir::isa< ir::VoidConstant >(
-                    returnValue ) ) // TODO better use signature info
-            {
-                m_evaluationStack.push( returnValue );
-            }
-
+            m_frameStack.pop();
             break;
         }
         case CallExpression::TargetType::ENUMERATION:
