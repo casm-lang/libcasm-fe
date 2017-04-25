@@ -239,7 +239,6 @@ class ExecutionVisitor final : public RecursiveVisitor
   public:
     ExecutionVisitor();
 
-    void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -286,11 +285,6 @@ ExecutionVisitor::ExecutionVisitor()
 , m_evaluationStack()
 , m_frameStack()
 {
-}
-
-void ExecutionVisitor::visit( VariableDefinition& node )
-{
-    RecursiveVisitor::visit( node );
 }
 
 void ExecutionVisitor::visit( FunctionDefinition& node )
