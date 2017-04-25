@@ -108,7 +108,9 @@ namespace libcasm_fe
 
             using Ptr = std::shared_ptr< CallExpression >;
 
-            using Expression::Expression;
+            CallExpression( Node::ID id, const Expressions::Ptr& arguments );
+
+            Expressions::Ptr arguments( void ) const;
 
             void setTargetType( TargetType targetType );
 
@@ -117,6 +119,8 @@ namespace libcasm_fe
             std::string targetTypeName( void ) const;
 
           private:
+            Expressions::Ptr m_arguments;
+
             TargetType m_targetType = TargetType::UNKNOWN;
 
           public:
@@ -134,13 +138,10 @@ namespace libcasm_fe
             void setIdentifier( const IdentifierPath::Ptr& identifier );
             IdentifierPath::Ptr identifier( void ) const;
 
-            Expressions::Ptr arguments( void ) const;
-
             void accept( Visitor& visitor ) override final;
 
           private:
             IdentifierPath::Ptr m_identifier;
-            Expressions::Ptr m_arguments;
         };
 
         class IndirectCallExpression : public CallExpression
@@ -152,13 +153,11 @@ namespace libcasm_fe
                 const Expressions::Ptr& arguments );
 
             Expression::Ptr expression( void ) const;
-            Expressions::Ptr arguments( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_expression;
-            Expressions::Ptr m_arguments;
         };
 
         class UnaryExpression : public Expression

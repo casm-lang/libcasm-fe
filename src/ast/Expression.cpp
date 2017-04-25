@@ -92,6 +92,17 @@ void UndefAtom::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
+: Expression( id )
+, m_arguments( arguments )
+{
+}
+
+Expressions::Ptr CallExpression::arguments( void ) const
+{
+    return m_arguments;
+}
+
 void CallExpression::setTargetType( CallExpression::TargetType targetType )
 {
     m_targetType = targetType;
@@ -148,9 +159,8 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
 
 DirectCallExpression::DirectCallExpression(
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
-: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION )
+: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
 , m_identifier( identifier )
-, m_arguments( arguments )
 {
 }
 
@@ -165,11 +175,6 @@ IdentifierPath::Ptr DirectCallExpression::identifier( void ) const
     return m_identifier;
 }
 
-Expressions::Ptr DirectCallExpression::arguments( void ) const
-{
-    return m_arguments;
-}
-
 void DirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -177,20 +182,14 @@ void DirectCallExpression::accept( Visitor& visitor )
 
 IndirectCallExpression::IndirectCallExpression(
     const Expression::Ptr& expression, const Expressions::Ptr& arguments )
-: CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION )
+: CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION, arguments )
 , m_expression( expression )
-, m_arguments( arguments )
 {
 }
 
 Expression::Ptr IndirectCallExpression::expression( void ) const
 {
     return m_expression;
-}
-
-Expressions::Ptr IndirectCallExpression::arguments( void ) const
-{
-    return m_arguments;
 }
 
 void IndirectCallExpression::accept( Visitor& visitor )
