@@ -157,7 +157,7 @@ namespace libcasm_fe
           private:
             libcasm_ir::Type::Ptr m_type;
         };
-        
+
         class Identifier : public Node
         {
           public:
