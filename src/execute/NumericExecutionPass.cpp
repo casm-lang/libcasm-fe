@@ -159,7 +159,7 @@ class FrameStack
     {
     }
 
-    void push( std::unique_ptr< Frame >&& frame )
+    void push( std::unique_ptr< Frame > frame )
     {
         m_frames.emplace_back( std::move( frame ) );
     }
@@ -272,6 +272,8 @@ class ExecutionVisitor final : public RecursiveVisitor
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
+    std::unique_ptr< Frame > makeFrame( const CallExpression& call );
+
   private:
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 
@@ -343,41 +345,29 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 {
     switch( node.targetType() )
     {
-        case CallExpression::TargetType::FUNCTION:
-        {
-            break;
-        }
+        case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
         case CallExpression::TargetType::DERIVED:
         {
+            m_frameStack.push( makeFrame( node ) );
+
+            // TODO invoke derived/function
+
+            auto frame = m_frameStack.pop();
+            m_evaluationStack.push( frame->returnValue() );
             break;
         }
-        case CallExpression::TargetType::BUILTIN:
-        {
-            break;
-        }
+        case CallExpression::TargetType::BUILTIN: // [[fallthrough]]
         case CallExpression::TargetType::RULE:
         {
-            auto frame = libstdhl::make_unique< Frame >(
-                nullptr ); // TODO fetch definition
+            m_frameStack.push( makeFrame( node ) );
 
-            std::size_t localIndex = 0;
-            for( const auto& argument : *node.arguments() )
+            // TODO invoke rule/builtin
+
+            auto frame = m_frameStack.pop();
+            const auto& returnValue = frame->returnValue();
+            if( not ir::isa< ir::VoidConstant >( returnValue ) ) // TODO better use signature info
             {
-                argument->accept( *this );
-                const auto& value = m_evaluationStack.pop();
-                frame->setLocal( localIndex, value );
-                ++localIndex;
-            }
-
-            m_frameStack.push( std::move( frame ) );
-
-            // TODO invoke rule
-
-            frame = m_frameStack.pop();
-
-            if( false /* return value != void */ )
-            {
-                m_evaluationStack.push( frame->returnValue() );
+                m_evaluationStack.push( returnValue );
             }
 
             break;
@@ -621,6 +611,23 @@ void ExecutionVisitor::visit( CallRule& node )
 u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
 {
     return m_updateSetManager.currentUpdateSet()->empty();
+}
+
+std::unique_ptr< Frame > ExecutionVisitor::makeFrame( const CallExpression& call )
+{
+    auto frame = libstdhl::make_unique< Frame >(
+        nullptr ); // TODO fetch definition
+
+    std::size_t localIndex = 0;
+    for( const auto& argument : *call.arguments() )
+    {
+        argument->accept( *this );
+        const auto& value = m_evaluationStack.pop();
+        frame->setLocal( localIndex, value );
+        ++localIndex;
+    }
+
+    return frame;
 }
 
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
