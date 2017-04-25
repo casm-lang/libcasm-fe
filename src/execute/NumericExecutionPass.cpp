@@ -224,6 +224,10 @@ using Semantics = ExecutionUpdateSet::Semantics;
 
 class ExecutionVisitor final : public RecursiveVisitor
 {
+    /** Use the list index of rules, functions, deriveds, ... to refer to them
+     */
+    using ReferenceConstant = ir::IntegerConstant;
+
   public:
     ExecutionVisitor(
         UpdateSetManager< ExecutionUpdateSet >& updateSetManager );
@@ -333,7 +337,7 @@ void ExecutionVisitor::visit( ValueAtom& node )
 
 void ExecutionVisitor::visit( RuleReferenceAtom& node )
 {
-    RecursiveVisitor::visit( node );
+    // m_evaluationStack.push( ReferenceConstant( node.targetId() ) ); TODO
 }
 
 void ExecutionVisitor::visit( UndefAtom& node )
@@ -374,8 +378,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::UNKNOWN:
         {
-            throw RuntimeException( node.sourceLocation(),
-                "Cannot call an unknown target", Code::Unspecified );
+            assert( !"cannot call an unknown target" );
             break;
         }
     }
@@ -383,7 +386,42 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 
 void ExecutionVisitor::visit( IndirectCallExpression& node )
 {
-    RecursiveVisitor::visit( node );
+    switch( node.targetType() )
+    {
+        case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
+        case CallExpression::TargetType::BUILTIN:  // [[fallthrough]]
+        case CallExpression::TargetType::RULE:
+        {
+            node.expression()->accept( *this );
+            const auto& targetId = m_evaluationStack.pop< ReferenceConstant >();
+            if( not targetId.defined() )
+            {
+                throw RuntimeException( node.expression()->sourceLocation(),
+                    "cannot call an undefined " + node.targetTypeName(),
+                    Code::Unspecified );
+            }
+
+            m_frameStack.push( makeFrame( node ) );
+
+            // TODO invoke derived/function/rule/builtin (by targetId)
+
+            m_frameStack.pop();
+            break;
+        }
+        case CallExpression::TargetType::ENUMERATION: // [[fallthrough]]
+        case CallExpression::TargetType::CONSTANT:    // [[fallthrough]]
+        case CallExpression::TargetType::VARIABLE:
+        {
+            assert( !"target not allowed in indirect call" );
+            break;
+        }
+        case CallExpression::TargetType::UNKNOWN:
+        {
+            assert( !"cannot call an unknown target" );
+            break;
+        }
+    }
 }
 
 void ExecutionVisitor::visit( UnaryExpression& node )
