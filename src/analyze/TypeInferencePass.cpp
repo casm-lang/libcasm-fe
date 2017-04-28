@@ -595,8 +595,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         const Node& node,
         const std::vector< Expression::Ptr >& expressions = {} );
 
-    void inference(
-        TypedNode& node, const std::vector< Expression::Ptr >& arguments = {} );
+    void inference( const libcasm_ir::Annotation* annotation, TypedNode& node,
+        const std::vector< Expression::Ptr >& arguments = {} );
 
     void inference( FunctionDefinition& node );
     void inference( DerivedDefinition& node );
@@ -714,12 +714,16 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
     const auto& path = *node.identifier();
 
+    const libcasm_ir::Annotation* annotation_ptr = 0;
+
     if( node.targetType() == CallExpression::TargetType::BUILTIN )
     {
         try
         {
             const auto& annotation
                 = libcasm_ir::Annotation::find( path.baseName() );
+
+            annotation_ptr = &annotation;
 
             annotate( annotation, node, node.arguments()->data() );
 
@@ -743,7 +747,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         {
             if( not node.type() )
             {
-                inference( node );
+                inference( annotation_ptr, node );
                 try
                 {
                     auto& definition = find( *node.identifier() );
@@ -759,7 +763,26 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::BUILTIN:
         {
             assert( not node.type() );
-            inference( node, node.arguments()->data() );
+            inference( annotation_ptr, node, node.arguments()->data() );
+
+            std::vector< libcasm_ir::Type::Ptr > argTypeList;
+            for( auto argumentType : *node.arguments() )
+            {
+                if( not argumentType->type() )
+                {
+                    m_log.info( { argumentType->sourceLocation() },
+                        "TODO: '" + path.path()
+                            + "' has a non-typed argument(s)" );
+                    return;
+                }
+
+                argTypeList.emplace_back( argumentType->type()->ptr_result() );
+            }
+
+            const auto type = libstdhl::make< libcasm_ir::RelationType >(
+                node.type(), argTypeList );
+
+            node.setType( type );
             break;
         }
         case CallExpression::TargetType::DERIVED:
@@ -873,7 +896,7 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    inference( node, { node.expression() } );
+    inference( &annotation, node, { node.expression() } );
 }
 
 void TypeInferenceVisitor::visit( BinaryExpression& node )
@@ -884,7 +907,7 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    inference( node, { node.left(), node.right() } );
+    inference( &annotation, node, { node.left(), node.right() } );
 }
 
 void TypeInferenceVisitor::visit( RangeExpression& node )
@@ -1013,7 +1036,7 @@ void TypeInferenceVisitor::annotate( const libcasm_ir::Annotation& annotation,
     }
 }
 
-void TypeInferenceVisitor::inference(
+void TypeInferenceVisitor::inference( const libcasm_ir::Annotation* annotation,
     TypedNode& node, const std::vector< Expression::Ptr >& arguments )
 {
     auto result = m_resultTypes.find( &node );
@@ -1025,7 +1048,27 @@ void TypeInferenceVisitor::inference(
         return;
     }
 
-    const auto& resTypes = result->second;
+    if( annotation )
+    {
+        std::vector< libcasm_ir::Type::ID > argTypes;
+        for( auto argument : arguments )
+        {
+            const auto tid = argument->type()->result().id();
+            argTypes.emplace_back( tid );
+        }
+
+        const auto fetch = annotation->resultTypeForRelation( argTypes );
+
+        const std::vector< libcasm_ir::Type::ID > inf = { fetch };
+        std::vector< libcasm_ir::Type::ID > tmp = {};
+
+        std::set_intersection( result->second.begin(), result->second.end(),
+            inf.begin(), inf.end(), std::back_inserter( tmp ) );
+
+        m_resultTypes[&node ] = std::move( tmp );
+    }
+
+    const auto& resTypes = m_resultTypes[&node ];
 
     if( resTypes.size() < 1 )
     {
