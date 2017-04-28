@@ -54,13 +54,23 @@ namespace libcasm_fe
                                          // to store the atom efficiently
                                          // otherwise another shared_ptr would
                                          // be required!
-              true, false, Value::ID::VALUE )
+              true, false, classid() )
         {
         }
 
         Ast::ReferenceAtom::Ptr atom( void ) const
         {
             return ( Ast::ReferenceAtom::Ptr& )m_value;
+        }
+
+        static inline Value::ID classid( void )
+        {
+            return static_cast< Value::ID >( -1 );
+        }
+
+        static u1 classof( Value const* obj )
+        {
+            return obj->id() == classid();
         }
     };
 }
