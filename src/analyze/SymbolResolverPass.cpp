@@ -172,7 +172,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     u64 errors( void ) const;
 
   private:
-    void push( const VariableDefinition& identifier );
+    void push( VariableDefinition& identifier );
     void pop( const VariableDefinition& identifier );
 
     Logger& m_log;
@@ -390,11 +390,12 @@ void SymbolResolveVisitor::visit( ForallRule& node )
     pop( *node.variable() );
 }
 
-void SymbolResolveVisitor::push( const VariableDefinition& node )
+void SymbolResolveVisitor::push( VariableDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
     const std::size_t localIndex = m_variables.size(); // used during execution
+    node.setLocalIndex( localIndex );
     const auto result
         = m_variables.emplace( name, Variable{ localIndex, node } );
     if( not result.second )
