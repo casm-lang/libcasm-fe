@@ -38,12 +38,10 @@
 
 #include "../Exceptions.h"
 #include "../Logger.h"
-
+#include "../analyze/TypeInferencePass.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
-
-#include "../analyze/TypeInferencePass.h"
-
+#include "ReferenceConstant.h"
 #include "UpdateSet.h"
 
 using namespace libcasm_fe;
@@ -274,8 +272,8 @@ class ExecutionVisitor final : public RecursiveVisitor
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
-    std::unique_ptr< Frame > makeFrame( CallExpression& call,
-                                        std::size_t numberOfLocals );
+    std::unique_ptr< Frame > makeFrame(
+        CallExpression& call, std::size_t numberOfLocals );
 
     void invokeBuiltin( ir::Value::ID id, const ir::Type::Ptr& type );
 
@@ -374,9 +372,10 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::RULE:
         {
-            const auto& rule = std::static_pointer_cast< RuleDefinition>(
-                                        m_definitionTable.at( node.targetId() ) );
-            m_frameStack.push( makeFrame( node, rule->maximumNumberOfLocals() ) );
+            const auto& rule = std::static_pointer_cast< RuleDefinition >(
+                m_definitionTable.at( node.targetId() ) );
+            m_frameStack.push(
+                makeFrame( node, rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
             break;
@@ -439,9 +438,10 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         }
         case CallExpression::TargetType::RULE:
         {
-            const auto& rule = std::static_pointer_cast< RuleDefinition>(
-                                        m_definitionTable.at( targetId ) );
-            m_frameStack.push( makeFrame( node, rule->maximumNumberOfLocals() ) );
+            const auto& rule = std::static_pointer_cast< RuleDefinition >(
+                m_definitionTable.at( targetId ) );
+            m_frameStack.push(
+                makeFrame( node, rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
             break;
@@ -474,8 +474,8 @@ void ExecutionVisitor::visit( UnaryExpression& node )
     node.expression()->accept( *this );
     const auto& value = m_evaluationStack.pop();
 
-    const auto result = libcasm_rt::Value::execute( node.op(), node.type(),
-                                                    value );
+    const auto result
+        = libcasm_rt::Value::execute( node.op(), node.type(), value );
     m_evaluationStack.push( result );
 }
 
@@ -487,8 +487,8 @@ void ExecutionVisitor::visit( BinaryExpression& node )
     node.right()->accept( *this );
     const auto& rhs = m_evaluationStack.pop();
 
-    const auto result = libcasm_rt::Value::execute( node.op(), node.type(),
-                                                    lhs, rhs );
+    const auto result
+        = libcasm_rt::Value::execute( node.op(), node.type(), lhs, rhs );
     m_evaluationStack.push( result );
 }
 
@@ -738,8 +738,8 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
 {
     assert( numberOfLocals >= call.arguments()->size() );
 
-    auto frame = libstdhl::make_unique< Frame >( call.ptr< CallExpression >(),
-                                                 numberOfLocals );
+    auto frame = libstdhl::make_unique< Frame >(
+        call.ptr< CallExpression >(), numberOfLocals );
 
     std::size_t localIndex = 0;
     for( const auto& argument : *call.arguments() )

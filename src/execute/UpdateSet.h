@@ -314,8 +314,8 @@ class UpdateSet
      *
      * @return The update value for the \a location if an update exists.
      */
-    std::experimental::optional< Value > get(
-        const Location& location ) const noexcept
+    std::experimental::optional< Value > get( const Location& location ) const
+        noexcept
     {
         const auto it = m_set.find( location );
         if( it != m_set.end() )
