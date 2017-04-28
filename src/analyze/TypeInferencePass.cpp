@@ -722,6 +722,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 = libcasm_ir::Annotation::find( path.baseName() );
 
             annotate( annotation, node, node.arguments()->data() );
+
+            node.setTargetId( annotation.id() );
         }
         catch( const std::domain_error& e )
         {
@@ -1025,11 +1027,26 @@ void TypeInferenceVisitor::inference(
 
     const auto& resTypes = result->second;
 
-    if( resTypes.size() != 1 )
+    if( resTypes.size() < 1 )
     {
         m_err++;
+        m_log.warning( { node.sourceLocation() }, "found no result type" );
+        return;
+    }
+    else if( resTypes.size() > 1 )
+    {
+        u1 first = true;
+        std::string tmp = "";
+        for( auto t : resTypes )
+        {
+            tmp += ( first ? "" : ", " );
+            tmp += "'" + libcasm_ir::Type::token( t ) + "'";
+            first = false;
+        }
+
+        m_err++;
         m_log.warning(
-            { node.sourceLocation() }, "multiple return types found!" );
+            { node.sourceLocation() }, "found multiple result types: " + tmp );
         return;
     }
 
