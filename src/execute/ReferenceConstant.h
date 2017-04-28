@@ -49,18 +49,19 @@ namespace libcasm_fe
       public:
         ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom )
         : libcasm_ir::ReferenceConstant< EmptyValue >( "",
-              libstdhl::get< libcasm_ir::VoidType >(), nullptr, false, false,
-              Value::ID::VALUE )
+              libstdhl::get< libcasm_ir::VoidType >(),
+              ( const Value::Ptr& )atom, // HACK: use the memory of Value::Ptr
+                                         // to store the atom efficiently
+                                         // otherwise another shared_ptr would
+                                         // be required!
+              true, false, Value::ID::VALUE )
         {
         }
 
         Ast::ReferenceAtom::Ptr atom( void ) const
         {
-            return m_atom;
+            return ( Ast::ReferenceAtom::Ptr& )m_value;
         }
-
-      private:
-        Ast::ReferenceAtom::Ptr m_atom;
     };
 }
 
