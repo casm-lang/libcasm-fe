@@ -387,9 +387,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::BUILTIN:
         {
             m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
-            const auto buildinId
-                = static_cast< ir::Value::ID >( node.targetId() );
-            invokeBuiltin( buildinId, node.type() );
+            invokeBuiltin( node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
         }

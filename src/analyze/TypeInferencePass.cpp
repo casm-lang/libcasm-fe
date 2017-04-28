@@ -784,7 +784,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             annotate( annotation, node, node.arguments()->data() );
 
-            node.setTargetId( annotation.id() );
+            node.setTargetBuiltinId( annotation.id() );
         }
         catch( const std::domain_error& e )
         {

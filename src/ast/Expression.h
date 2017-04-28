@@ -154,18 +154,12 @@ namespace libcasm_fe
             IdentifierPath::Ptr identifier( void ) const;
 
             /**
-             * Sets the id of the target.
-             *
-             * Functions, deriveds, builtins, rules, ... may be stored in a
-             * flat list, thus the target id may correspond to the list index.
-             *
-             * Variables may be stored in frames, thus the target id may
-             * correspond to the local index.
+             * Sets the builtin id of this call.
              *
              * @note Assigned by SymbolResolved and used during execution
              */
-            void setTargetId( std::size_t targetId );
-            std::size_t targetId( void ) const;
+            void setTargetBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
 
             /**
                Sets the definition of this call.
@@ -179,8 +173,7 @@ namespace libcasm_fe
 
           private:
             IdentifierPath::Ptr m_identifier;
-            std::size_t m_targetId;
-
+            libcasm_ir::Value::ID m_targetBuiltinId;
             TypedNode::Ptr m_targetDefinition;
         };
 

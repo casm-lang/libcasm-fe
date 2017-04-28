@@ -340,9 +340,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 if( variable != m_variables.end() )
                 {
                     node.setTargetType( CallExpression::TargetType::VARIABLE );
-                    node.setTargetId(
-                        variable->second.localIndex() ); // frame slot index
-
                     node.setTargetDefinition(
                         variable->second.definition().ptr< TypedNode >() );
                 }
