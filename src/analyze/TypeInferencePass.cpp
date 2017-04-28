@@ -30,7 +30,6 @@
 #include "../pass/src/PassUsage.h"
 
 #include "../Logger.h"
-#include "../analyze/SymbolResolverPass.h"
 #include "../ast/RecursiveVisitor.h"
 
 #include "../stdhl/cpp/String.h"
@@ -1325,7 +1324,7 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     }
 
     pr.setResult< TypeInferencePass >(
-        libstdhl::make< Data >( specification ) );
+        libstdhl::make< Data >( specification, symboltable ) );
 
     return true;
 }
