@@ -239,6 +239,7 @@ class ExecutionVisitor final : public RecursiveVisitor
     ExecutionVisitor(
         UpdateSetManager< ExecutionUpdateSet >& updateSetManager );
 
+    void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -284,9 +285,6 @@ class ExecutionVisitor final : public RecursiveVisitor
 
     ConstantStack m_evaluationStack;
     FrameStack m_frameStack;
-
-    std::vector< Definition::Ptr >
-        m_definitionTable; // TODO get this from symbol resolver
 };
 
 ExecutionVisitor::ExecutionVisitor(
@@ -294,8 +292,13 @@ ExecutionVisitor::ExecutionVisitor(
 : m_updateSetManager( updateSetManager )
 , m_evaluationStack()
 , m_frameStack()
-, m_definitionTable()
 {
+}
+
+void ExecutionVisitor::visit( VariableDefinition& node )
+{
+    const auto* frame = m_frameStack.top();
+    m_evaluationStack.push( frame->local( node.localIndex() ) );
 }
 
 void ExecutionVisitor::visit( FunctionDefinition& node )
@@ -367,7 +370,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::DERIVED:
         {
             m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
-            const auto& definition = m_definitionTable.at( node.targetId() );
+            const auto& definition = node.targetDefinition();
             definition->accept( *this );
             m_frameStack.pop();
             break;
@@ -375,7 +378,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::RULE:
         {
             const auto& rule = std::static_pointer_cast< RuleDefinition>(
-                                        m_definitionTable.at( node.targetId() ) );
+                                    node.targetDefinition() );
             m_frameStack.push( makeFrame( node, rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
@@ -400,9 +403,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::VARIABLE:
         {
-            const auto localIndex = node.targetId(); // calc. by SymbolResolver
-            const auto* frame = m_frameStack.top();
-            m_evaluationStack.push( frame->local( localIndex ) );
+            node.targetDefinition()->accept( *this );
             break;
         }
         case CallExpression::TargetType::UNKNOWN:
@@ -424,7 +425,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             Code::Unspecified );
     }
 
-    const auto targetId = reference.value_i64();
+    /* const auto targetId = reference.value_i64(); TODO
 
     switch( node.targetType() )
     {
@@ -466,7 +467,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             assert( !"cannot call an unknown target" );
             break;
         }
-    }
+    } */
 }
 
 void ExecutionVisitor::visit( UnaryExpression& node )
