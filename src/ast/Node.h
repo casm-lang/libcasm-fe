@@ -58,7 +58,7 @@ namespace libcasm_fe
 
                 // expressions
                 VALUE_ATOM,
-                RULE_REFERENCE_ATOM,
+                REFERENCE_ATOM,
                 UNDEF_ATOM,
                 DIRECT_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,

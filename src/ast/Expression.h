@@ -61,24 +61,41 @@ namespace libcasm_fe
             libcasm_ir::Constant::Ptr m_value;
         };
 
-        class RuleReferenceAtom : public Expression
+        class ReferenceAtom : public Expression
         {
           public:
-            using Ptr = std::shared_ptr< RuleReferenceAtom >;
+            enum class ReferenceType
+            {
+                FUNCTION,
+                DERIVED,
+                BUILTIN,
+                RULE,
+                VARIABLE,
+                UNKNOWN
+            };
 
-            explicit RuleReferenceAtom( const IdentifierPath::Ptr& identifier );
+            using Ptr = std::shared_ptr< ReferenceAtom >;
+
+            explicit ReferenceAtom( const IdentifierPath::Ptr& identifier );
 
             IdentifierPath::Ptr identifier( void ) const;
 
-            void setRuleReference(
-                const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference );
-            libcasm_ir::RuleReferenceConstant::Ptr ruleReference( void ) const;
+            void setReferenceType( ReferenceType referenceType );
+            ReferenceType referenceType( void ) const;
+
+            void setReference( const TypedNode::Ptr& reference );
+            TypedNode::Ptr reference( void ) const;
+
+            void setBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID builtinId( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             IdentifierPath::Ptr m_identifier;
-            libcasm_ir::RuleReferenceConstant::Ptr m_ruleReference;
+            ReferenceType m_referenceType;
+            TypedNode::Ptr m_reference;
+            libcasm_ir::Value::ID m_builtinId;
         };
 
         class UndefAtom : public Expression

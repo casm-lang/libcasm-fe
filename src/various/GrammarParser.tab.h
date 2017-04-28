@@ -416,17 +416,17 @@ namespace libcasm_fe {
       // Range
       char dummy35[sizeof(RangeExpression::Ptr)];
 
+      // Reference
+      char dummy36[sizeof(ReferenceAtom::Ptr)];
+
       // RelationType
-      char dummy36[sizeof(RelationType::Ptr)];
+      char dummy37[sizeof(RelationType::Ptr)];
 
       // Rule
-      char dummy37[sizeof(Rule::Ptr)];
+      char dummy38[sizeof(Rule::Ptr)];
 
       // RuleDefinition
-      char dummy38[sizeof(RuleDefinition::Ptr)];
-
-      // RuleReference
-      char dummy39[sizeof(RuleReferenceAtom::Ptr)];
+      char dummy39[sizeof(RuleDefinition::Ptr)];
 
       // Rules
       char dummy40[sizeof(Rules::Ptr)];
@@ -685,13 +685,13 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const RangeExpression::Ptr v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const ReferenceAtom::Ptr v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const RelationType::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Rule::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const RuleReferenceAtom::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Rules::Ptr v, const location_type& l);
 
@@ -1549,6 +1549,10 @@ namespace libcasm_fe {
         value.copy< RangeExpression::Ptr > (other.value);
         break;
 
+      case 118: // Reference
+        value.copy< ReferenceAtom::Ptr > (other.value);
+        break;
+
       case 107: // RelationType
         value.copy< RelationType::Ptr > (other.value);
         break;
@@ -1559,10 +1563,6 @@ namespace libcasm_fe {
 
       case 131: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (other.value);
-        break;
-
-      case 118: // RuleReference
-        value.copy< RuleReferenceAtom::Ptr > (other.value);
         break;
 
       case 133: // Rules
@@ -1795,6 +1795,10 @@ namespace libcasm_fe {
         value.copy< RangeExpression::Ptr > (v);
         break;
 
+      case 118: // Reference
+        value.copy< ReferenceAtom::Ptr > (v);
+        break;
+
       case 107: // RelationType
         value.copy< RelationType::Ptr > (v);
         break;
@@ -1805,10 +1809,6 @@ namespace libcasm_fe {
 
       case 131: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (v);
-        break;
-
-      case 118: // RuleReference
-        value.copy< RuleReferenceAtom::Ptr > (v);
         break;
 
       case 133: // Rules
@@ -2134,6 +2134,13 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ReferenceAtom::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RelationType::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -2149,13 +2156,6 @@ namespace libcasm_fe {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RuleReferenceAtom::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2422,6 +2422,10 @@ namespace libcasm_fe {
         value.template destroy< RangeExpression::Ptr > ();
         break;
 
+      case 118: // Reference
+        value.template destroy< ReferenceAtom::Ptr > ();
+        break;
+
       case 107: // RelationType
         value.template destroy< RelationType::Ptr > ();
         break;
@@ -2432,10 +2436,6 @@ namespace libcasm_fe {
 
       case 131: // RuleDefinition
         value.template destroy< RuleDefinition::Ptr > ();
-        break;
-
-      case 118: // RuleReference
-        value.template destroy< RuleReferenceAtom::Ptr > ();
         break;
 
       case 133: // Rules
@@ -2674,6 +2674,10 @@ namespace libcasm_fe {
         value.move< RangeExpression::Ptr > (s.value);
         break;
 
+      case 118: // Reference
+        value.move< ReferenceAtom::Ptr > (s.value);
+        break;
+
       case 107: // RelationType
         value.move< RelationType::Ptr > (s.value);
         break;
@@ -2684,10 +2688,6 @@ namespace libcasm_fe {
 
       case 131: // RuleDefinition
         value.move< RuleDefinition::Ptr > (s.value);
-        break;
-
-      case 118: // RuleReference
-        value.move< RuleReferenceAtom::Ptr > (s.value);
         break;
 
       case 133: // Rules

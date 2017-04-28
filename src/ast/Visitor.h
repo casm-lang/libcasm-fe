@@ -39,7 +39,7 @@ namespace libcasm_fe
         class EnumerationDefinition;
 
         class ValueAtom;
-        class RuleReferenceAtom;
+        class ReferenceAtom;
         class UndefAtom;
         class DirectCallExpression;
         class IndirectCallExpression;
@@ -94,7 +94,7 @@ namespace libcasm_fe
             virtual void visit( EnumerationDefinition& node ) = 0;
 
             virtual void visit( ValueAtom& node ) = 0;
-            virtual void visit( RuleReferenceAtom& node ) = 0;
+            virtual void visit( ReferenceAtom& node ) = 0;
             virtual void visit( UndefAtom& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( IndirectCallExpression& node ) = 0;

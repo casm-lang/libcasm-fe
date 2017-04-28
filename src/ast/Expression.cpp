@@ -52,31 +52,56 @@ void ValueAtom::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-RuleReferenceAtom::RuleReferenceAtom( const IdentifierPath::Ptr& identifier )
-: Expression( Node::ID::RULE_REFERENCE_ATOM )
+ReferenceAtom::ReferenceAtom( const IdentifierPath::Ptr& identifier )
+: Expression( Node::ID::REFERENCE_ATOM )
 , m_identifier( identifier )
-, m_ruleReference( nullptr )
+, m_referenceType( ReferenceType::UNKNOWN )
+, m_reference( nullptr )
+, m_builtinId( libcasm_ir::Value::ID::_SIZE_ )
 {
 }
 
-IdentifierPath::Ptr RuleReferenceAtom::identifier() const
+IdentifierPath::Ptr ReferenceAtom::identifier() const
 {
     return m_identifier;
 }
 
-void RuleReferenceAtom::setRuleReference(
-    const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference )
+void ReferenceAtom::setReferenceType( ReferenceType referenceType )
 {
-    m_ruleReference = ruleReference;
+    m_referenceType = referenceType;
 }
 
-libcasm_ir::RuleReferenceConstant::Ptr RuleReferenceAtom::ruleReference(
-    void ) const
+ReferenceAtom::ReferenceType ReferenceAtom::referenceType( void ) const
 {
-    return m_ruleReference;
+    return m_referenceType;
 }
 
-void RuleReferenceAtom::accept( Visitor& visitor )
+void ReferenceAtom::setReference( const TypedNode::Ptr& reference )
+{
+    m_reference = reference;
+}
+
+TypedNode::Ptr ReferenceAtom::reference( void ) const
+{
+    assert( ( m_referenceType != ReferenceType::BUILTIN ) and
+            ( m_referenceType != ReferenceType::UNKNOWN ) );
+
+    return m_reference;
+}
+
+void ReferenceAtom::setBuiltinId( libcasm_ir::Value::ID builtinId )
+{
+    m_builtinId = builtinId;
+}
+
+libcasm_ir::Value::ID ReferenceAtom::builtinId( void ) const
+{
+    assert( m_referenceType == ReferenceType::BUILTIN );
+
+    return m_builtinId;
+}
+
+void ReferenceAtom::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
