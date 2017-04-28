@@ -61,7 +61,7 @@ template < typename T >
 class Stack
 {
   public:
-    Stack()
+    explicit Stack( void )
     : m_values()
     {
     }
@@ -71,7 +71,7 @@ class Stack
         m_values.push_back( value );
     }
 
-    T pop()
+    T pop( void )
     {
         assert( not m_values.empty() );
 
@@ -80,14 +80,14 @@ class Stack
         return value;
     }
 
-    T& top()
+    T& top( void )
     {
         assert( not m_values.empty() );
 
         return m_values.back();
     }
 
-    void clear()
+    void clear( void )
     {
         m_values.clear();
     }
@@ -104,7 +104,7 @@ class ConstantStack : public Stack< ir::Constant >
     using Stack::pop;
 
     template < typename T >
-    T pop()
+    T pop( void )
     {
         const auto& value = Stack::pop();
         assert( ir::isa< T >( value ) );
@@ -149,7 +149,7 @@ class Frame
 class FrameStack
 {
   public:
-    FrameStack()
+    explicit FrameStack( void )
     : m_frames()
     {
     }
@@ -159,7 +159,7 @@ class FrameStack
         m_frames.emplace_back( std::move( frame ) );
     }
 
-    std::unique_ptr< Frame > pop()
+    std::unique_ptr< Frame > pop( void )
     {
         assert( not m_frames.empty() );
 
@@ -168,7 +168,7 @@ class FrameStack
         return frame;
     }
 
-    Frame* top() const
+    Frame* top( void ) const
     {
         assert( not m_frames.empty() );
 
