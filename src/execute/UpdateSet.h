@@ -601,6 +601,15 @@ class UpdateSetManager
         return m_updateSets.size();
     }
 
+    /**
+     * @return True if the update-set manager doesn't contain any update-set,
+     *         false otherwise.
+     */
+    bool empty() const noexcept
+    {
+        return m_updateSets.empty();
+    }
+
   private:
     std::vector< std::unique_ptr< UpdateSet > > m_updateSets;
 };
@@ -613,7 +622,8 @@ class UpdateSetForkGuard
         typename UpdateSet::Semantics semantics, std::size_t initialSize )
     : m_manager( manager )
     {
-        if( manager->currentUpdateSet()->semantics() != semantics )
+        if( manager->empty()
+            or ( manager->currentUpdateSet()->semantics() != semantics ) )
         {
             manager->fork( semantics, initialSize );
             m_wasForked = true;
