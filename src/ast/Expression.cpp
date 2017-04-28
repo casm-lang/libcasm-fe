@@ -185,6 +185,17 @@ std::size_t DirectCallExpression::targetId( void ) const
     return m_targetId;
 }
 
+void DirectCallExpression::setTargetDefinition(
+    const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+}
+
+TypedNode::Ptr DirectCallExpression::targetDefinition( void ) const
+{
+    return m_targetDefinition;
+}
+
 void DirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );

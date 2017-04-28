@@ -150,11 +150,21 @@ namespace libcasm_fe
             void setTargetId( std::size_t targetId );
             std::size_t targetId( void ) const;
 
+            /**
+               Sets the definition of this call.
+
+               @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetDefinition( const TypedNode::Ptr& definition );
+            TypedNode::Ptr targetDefinition( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             IdentifierPath::Ptr m_identifier;
             std::size_t m_targetId;
+
+            TypedNode::Ptr m_targetDefinition;
         };
 
         class IndirectCallExpression : public CallExpression
