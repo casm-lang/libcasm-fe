@@ -35,7 +35,7 @@ using namespace Ast;
 //
 
 Namespace::Symbol::Symbol( const Ast::Identifier& identifier,
-    Ast::Node& definition,
+    Ast::TypedNode& definition,
     const Ast::CallExpression::TargetType targetType,
     const std::size_t arity )
 : m_identifier( identifier )
@@ -50,7 +50,7 @@ const Ast::Identifier& Namespace::Symbol::identifier( void ) const
     return m_identifier;
 }
 
-Ast::Node& Namespace::Symbol::definition( void )
+Ast::TypedNode& Namespace::Symbol::definition( void )
 {
     return m_definition;
 }
@@ -215,8 +215,9 @@ std::string Namespace::dump( const std::string& indention ) const
     return s.str();
 }
 
-void Namespace::registerSymbol( const Identifier& node, const Node& definition,
-    const CallExpression::TargetType targetType, const std::size_t arity )
+void Namespace::registerSymbol( const Identifier& node,
+    const TypedNode& definition, const CallExpression::TargetType targetType,
+    const std::size_t arity )
 {
     const auto name = node.name();
 
@@ -235,8 +236,8 @@ void Namespace::registerSymbol( const Identifier& node, const Node& definition,
         }
     }
 
-    symtbl.emplace_back(
-        Symbol{ node, const_cast< Node& >( definition ), targetType, arity } );
+    symtbl.emplace_back( Symbol{
+        node, const_cast< TypedNode& >( definition ), targetType, arity } );
 }
 
 Namespace::Symbol Namespace::find( const IdentifierPath& node,

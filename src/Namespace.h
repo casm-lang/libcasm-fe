@@ -41,18 +41,18 @@ namespace libcasm_fe
         {
           public:
             Symbol( const Ast::Identifier& identifier,
-                Ast::Node& definition,
+                Ast::TypedNode& definition,
                 const Ast::CallExpression::TargetType targetType,
                 const std::size_t arity );
 
             const Ast::Identifier& identifier( void ) const;
-            Ast::Node& definition( void );
+            Ast::TypedNode& definition( void );
             Ast::CallExpression::TargetType targetType( void ) const;
             std::size_t arity( void ) const;
 
           private:
             const Ast::Identifier& m_identifier;
-            Ast::Node& m_definition;
+            Ast::TypedNode& m_definition;
             Ast::CallExpression::TargetType m_targetType;
             std::size_t m_arity;
         };
@@ -88,7 +88,7 @@ namespace libcasm_fe
 
       private:
         void registerSymbol( const Ast::Identifier& node,
-            const Ast::Node& definition,
+            const Ast::TypedNode& definition,
             const Ast::CallExpression::TargetType targetType,
             const std::size_t arity = 0 );
 
