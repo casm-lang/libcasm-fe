@@ -684,19 +684,77 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
     try
     {
         auto symbol = m_symboltable.find( *node.identifier() );
-        assert( symbol.targetType() == CallExpression::TargetType::RULE );
 
-        auto& definition
-            = static_cast< RuleDefinition& >( symbol.definition() );
+        switch( symbol.targetType() )
+        {
+            case CallExpression::TargetType::FUNCTION:
+            {
+                auto& definition
+                    = static_cast< FunctionDefinition& >( symbol.definition() );
 
-        inference( definition );
-        assert( definition.type()->isRelation() );
+                inference( definition );
+                assert( definition.type()->isRelation() );
 
-        const auto type = libstdhl::make< libcasm_ir::RuleReferenceType >(
-            std::static_pointer_cast< libcasm_ir::RelationType >(
-                definition.type() ) );
+                // node.setType( type ); TODO function reference type
 
-        node.setType( type );
+                node.setReferenceType( ReferenceAtom::ReferenceType::FUNCTION );
+                node.setReference( definition.ptr< FunctionDefinition >() );
+                break;
+            }
+            case CallExpression::TargetType::DERIVED:
+            {
+                auto& definition
+                    = static_cast< DerivedDefinition& >( symbol.definition() );
+
+                inference( definition );
+                assert( definition.type()->isRelation() );
+
+                // node.setType( type ); TODO derived reference type
+
+                node.setReferenceType( ReferenceAtom::ReferenceType::DERIVED );
+                node.setReference( definition.ptr< DerivedDefinition >() );
+                break;
+            }
+            case CallExpression::TargetType::BUILTIN:
+            {
+                // TODO
+
+                // node.setReferenceType( ReferenceAtom::ReferenceType::BUILTIN );
+                // node.setBuiltinId( annotation.id() );
+                break;
+            }
+            case CallExpression::TargetType::RULE:
+            {
+                auto& definition
+                    = static_cast< RuleDefinition& >( symbol.definition() );
+
+                inference( definition );
+                assert( definition.type()->isRelation() );
+
+                const auto type = libstdhl::make< libcasm_ir::RuleReferenceType >(
+                    std::static_pointer_cast< libcasm_ir::RelationType >(
+                        definition.type() ) );
+                node.setType( type );
+
+                node.setReferenceType( ReferenceAtom::ReferenceType::RULE );
+                node.setReference( definition.ptr< RuleDefinition >() );
+                break;
+            }
+            case CallExpression::TargetType::VARIABLE:
+            {
+                // TODO
+                break;
+            }
+            default:
+            {
+                m_err++;
+                m_log.error( { node.sourceLocation() },
+                             "cannot reference '"
+                             + CallExpression::targetTypeString(
+                                    symbol.targetType() )
+                             + "'" );
+            }
+        }
     }
     catch( const std::domain_error& e )
     {
