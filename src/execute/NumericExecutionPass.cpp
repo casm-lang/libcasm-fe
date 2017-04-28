@@ -34,6 +34,8 @@
 #include "../casm-ir/src/Instruction.h"
 #include "../casm-ir/src/Value.h"
 
+#include "../casm-rt/src/Value.h"
+
 #include "../Exceptions.h"
 #include "../Logger.h"
 
@@ -735,13 +737,12 @@ void ExecutionVisitor::invokeBuiltin(
 {
     auto* frame = m_frameStack.top();
 
-    // const auto result = libcasm_rt::Value::execute( id, type, frame->locals()
-    // );
+    const auto result = libcasm_rt::Value::execute( id, type, frame->locals() );
 
     const auto& returnType = type->ptr_result();
     if( not returnType->isVoid() )
     {
-        // m_evaluationStack.push( result );
+        m_evaluationStack.push( result );
     }
 }
 
