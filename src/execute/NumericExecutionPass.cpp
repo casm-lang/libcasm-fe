@@ -115,15 +115,15 @@ class ConstantStack : public Stack< ir::Constant >
 class Frame
 {
   public:
-    Frame( const Definition::Ptr& definition )
-    : m_definition( definition )
-    , m_locals()
+    Frame( const CallExpression::Ptr& call, std::size_t numberOfLocals )
+    : m_call( call )
+    , m_locals( numberOfLocals )
     {
     }
 
-    Definition::Ptr definition( void ) const
+    CallExpression::Ptr call( void ) const
     {
-        return m_definition;
+        return m_call;
     }
 
     void setLocal( std::size_t index, const ir::Constant& local )
@@ -142,7 +142,7 @@ class Frame
     }
 
   private:
-    Definition::Ptr m_definition;
+    CallExpression::Ptr m_call;
     std::vector< ir::Constant > m_locals;
 };
 
@@ -274,7 +274,8 @@ class ExecutionVisitor final : public RecursiveVisitor
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
-    std::unique_ptr< Frame > makeFrame( const CallExpression& call );
+    std::unique_ptr< Frame > makeFrame( CallExpression& call,
+                                        std::size_t numberOfLocals );
 
     void invokeBuiltin( ir::Value::ID id, const ir::Type::Ptr& type );
 
@@ -363,18 +364,26 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
     switch( node.targetType() )
     {
         case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
-        case CallExpression::TargetType::RULE:
+        case CallExpression::TargetType::DERIVED:
         {
-            m_frameStack.push( makeFrame( node ) );
+            m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
             const auto& definition = m_definitionTable.at( node.targetId() );
             definition->accept( *this );
             m_frameStack.pop();
             break;
         }
+        case CallExpression::TargetType::RULE:
+        {
+            const auto& rule = std::static_pointer_cast< RuleDefinition>(
+                                        m_definitionTable.at( node.targetId() ) );
+            m_frameStack.push( makeFrame( node, rule->maximumNumberOfLocals() ) );
+            rule->accept( *this );
+            m_frameStack.pop();
+            break;
+        }
         case CallExpression::TargetType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( node ) );
+            m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
             const auto buildinId
                 = static_cast< ir::Value::ID >( node.targetId() );
             invokeBuiltin( buildinId, node.type() );
@@ -420,18 +429,26 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     switch( node.targetType() )
     {
         case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
-        case CallExpression::TargetType::RULE:
+        case CallExpression::TargetType::DERIVED:
         {
-            m_frameStack.push( makeFrame( node ) );
+            m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
             const auto& definition = m_definitionTable.at( targetId );
             definition->accept( *this );
             m_frameStack.pop();
             break;
         }
+        case CallExpression::TargetType::RULE:
+        {
+            const auto& rule = std::static_pointer_cast< RuleDefinition>(
+                                        m_definitionTable.at( targetId ) );
+            m_frameStack.push( makeFrame( node, rule->maximumNumberOfLocals() ) );
+            rule->accept( *this );
+            m_frameStack.pop();
+            break;
+        }
         case CallExpression::TargetType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( node ) );
+            m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
             const auto buildinId = static_cast< ir::Value::ID >( targetId );
             invokeBuiltin( buildinId, node.type() );
             m_frameStack.pop();
@@ -717,10 +734,12 @@ u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
 }
 
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
-    const CallExpression& call )
+    CallExpression& call, std::size_t numberOfLocals )
 {
-    auto frame
-        = libstdhl::make_unique< Frame >( nullptr ); // TODO fetch definition
+    assert( numberOfLocals >= call.arguments()->size() );
+
+    auto frame = libstdhl::make_unique< Frame >( call.ptr< CallExpression >(),
+                                                 numberOfLocals );
 
     std::size_t localIndex = 0;
     for( const auto& argument : *call.arguments() )

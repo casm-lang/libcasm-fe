@@ -42,7 +42,7 @@ namespace libcasm_fe
         /**
          * @extends CasmFE
          */
-        class Node
+        class Node : public std::enable_shared_from_this< Node >
         {
           public:
             enum class ID
@@ -117,6 +117,12 @@ namespace libcasm_fe
              * @return A short description about the node type.
              */
             virtual std::string description( void ) const final;
+
+            template < typename T >
+            typename T::Ptr ptr( void )
+            {
+                return std::static_pointer_cast< T >( shared_from_this() );
+            }
 
             virtual void accept( Visitor& visitor ) = 0;
 
