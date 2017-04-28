@@ -109,7 +109,7 @@ Types
 | Type
 
 Atom
-: RuleReference
+: Reference
 | BitNumber
 | IntegerNumber
 | FloatingNumber
@@ -141,7 +141,7 @@ FloatingNumber
 RationalNumber
 : RATIONAL
 
-RuleReference
+Reference
 : AT IdentifierPath
 
 Term

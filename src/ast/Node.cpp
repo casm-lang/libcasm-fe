@@ -81,9 +81,9 @@ std::string Node::description( void ) const
         {
             return "value";
         }
-        case ID::RULE_REFERENCE_ATOM:
+        case ID::REFERENCE_ATOM:
         {
-            return "rule reference";
+            return "reference";
         }
         case ID::UNDEF_ATOM:
         {

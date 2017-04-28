@@ -83,7 +83,7 @@ Grammar
    52 Types: Types "," Type
    53      | Type
 
-   54 Atom: RuleReference
+   54 Atom: Reference
    55     | BitNumber
    56     | IntegerNumber
    57     | FloatingNumber
@@ -108,7 +108,7 @@ Grammar
 
    70 RationalNumber: "rational"
 
-   71 RuleReference: "@" IdentifierPath
+   71 Reference: "@" IdentifierPath
 
    72 Term: DirectCallExpression
    73     | IndirectCallExpression
@@ -390,7 +390,7 @@ FloatingNumber (116)
     on left: 69, on right: 57
 RationalNumber (117)
     on left: 70, on right: 58
-RuleReference (118)
+Reference (118)
     on left: 71, on right: 54
 Term (119)
     on left: 72 73 74 75 76 77 78 79 80, on right: 14 22 23 24 29 51
@@ -684,7 +684,7 @@ State 18
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 65
     Expression                       go to state 66
     Range                            go to state 67
@@ -814,7 +814,7 @@ State 28
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 83
     Expression                       go to state 66
     Range                            go to state 67
@@ -909,7 +909,7 @@ State 35
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 88
     Expression                       go to state 66
     Range                            go to state 67
@@ -988,7 +988,7 @@ State 40
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 90
     Expression                       go to state 66
     Range                            go to state 67
@@ -1036,7 +1036,7 @@ State 41
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 91
     Expression                       go to state 66
     Range                            go to state 67
@@ -1084,7 +1084,7 @@ State 42
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 92
     Expression                       go to state 66
     Range                            go to state 67
@@ -1135,7 +1135,7 @@ State 43
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 94
     Expression                       go to state 66
     Range                            go to state 67
@@ -1186,7 +1186,7 @@ State 44
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 96
     Expression                       go to state 66
     Range                            go to state 67
@@ -1201,7 +1201,7 @@ State 44
 
 State 45
 
-   71 RuleReference: "@" . IdentifierPath
+   71 Reference: "@" . IdentifierPath
 
     "."           shift, and go to state 19
     "identifier"  shift, and go to state 20
@@ -1347,7 +1347,7 @@ State 63
 
 State 64
 
-   54 Atom: RuleReference .
+   54 Atom: Reference .
 
     $default  reduce using rule 54 (Atom)
 
@@ -1569,7 +1569,7 @@ State 82
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 137
     Expression                       go to state 66
     Range                            go to state 67
@@ -1826,7 +1826,7 @@ State 93
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 144
     Expression                       go to state 66
     Range                            go to state 67
@@ -1943,9 +1943,9 @@ State 97
 
 State 98
 
-   71 RuleReference: "@" IdentifierPath .
+   71 Reference: "@" IdentifierPath .
 
-    $default  reduce using rule 71 (RuleReference)
+    $default  reduce using rule 71 (Reference)
 
 
 State 99
@@ -1985,7 +1985,7 @@ State 99
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 65
     Expression                       go to state 66
     Range                            go to state 67
@@ -2043,7 +2043,7 @@ State 101
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 152
     Expression                       go to state 66
     Range                            go to state 67
@@ -2099,7 +2099,7 @@ State 103
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 154
     Expression                       go to state 66
     Range                            go to state 67
@@ -2147,7 +2147,7 @@ State 104
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 155
     Expression                       go to state 66
     Range                            go to state 67
@@ -2195,7 +2195,7 @@ State 105
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 156
     Expression                       go to state 66
     Range                            go to state 67
@@ -2243,7 +2243,7 @@ State 106
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 157
     Expression                       go to state 66
     Range                            go to state 67
@@ -2291,7 +2291,7 @@ State 107
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 158
     Expression                       go to state 66
     Range                            go to state 67
@@ -2339,7 +2339,7 @@ State 108
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 159
     Expression                       go to state 66
     Range                            go to state 67
@@ -2387,7 +2387,7 @@ State 109
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 160
     Expression                       go to state 66
     Range                            go to state 67
@@ -2435,7 +2435,7 @@ State 110
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 161
     Expression                       go to state 66
     Range                            go to state 67
@@ -2483,7 +2483,7 @@ State 111
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 162
     Expression                       go to state 66
     Range                            go to state 67
@@ -2531,7 +2531,7 @@ State 112
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 163
     Expression                       go to state 66
     Range                            go to state 67
@@ -2579,7 +2579,7 @@ State 113
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 164
     Expression                       go to state 66
     Range                            go to state 67
@@ -2627,7 +2627,7 @@ State 114
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 165
     Expression                       go to state 66
     Range                            go to state 67
@@ -2675,7 +2675,7 @@ State 115
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 166
     Expression                       go to state 66
     Range                            go to state 67
@@ -2723,7 +2723,7 @@ State 116
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 167
     Expression                       go to state 66
     Range                            go to state 67
@@ -2771,7 +2771,7 @@ State 117
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 168
     Expression                       go to state 66
     Range                            go to state 67
@@ -2819,7 +2819,7 @@ State 118
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 169
     Expression                       go to state 66
     Range                            go to state 67
@@ -2867,7 +2867,7 @@ State 119
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 170
     Expression                       go to state 66
     Range                            go to state 67
@@ -2915,7 +2915,7 @@ State 120
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 171
     Expression                       go to state 66
     Range                            go to state 67
@@ -2963,7 +2963,7 @@ State 121
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 172
     Expression                       go to state 66
     Range                            go to state 67
@@ -3254,7 +3254,7 @@ State 141
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 211
     Expression                       go to state 66
     Range                            go to state 67
@@ -3302,7 +3302,7 @@ State 142
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 212
     Expression                       go to state 66
     Range                            go to state 67
@@ -3350,7 +3350,7 @@ State 143
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 213
     Expression                       go to state 66
     Range                            go to state 67
@@ -3446,7 +3446,7 @@ State 146
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 152
     Expression                       go to state 66
     Range                            go to state 67
@@ -3495,7 +3495,7 @@ State 147
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 216
     Expression                       go to state 66
     Range                            go to state 67
@@ -3550,7 +3550,7 @@ State 149
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 217
     Expression                       go to state 66
     Range                            go to state 67
@@ -4508,7 +4508,7 @@ State 186
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 232
     Expression                       go to state 66
     Range                            go to state 67
@@ -4556,7 +4556,7 @@ State 187
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 233
     Expression                       go to state 66
     Range                            go to state 67
@@ -4856,7 +4856,7 @@ State 209
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 243
     Expression                       go to state 66
     Range                            go to state 67
@@ -5149,7 +5149,7 @@ State 220
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 250
     Expression                       go to state 66
     Range                            go to state 67
@@ -5509,7 +5509,7 @@ State 236
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 262
     Expression                       go to state 66
     Range                            go to state 67
@@ -5679,7 +5679,7 @@ State 244
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 269
     Expression                       go to state 66
     Range                            go to state 67
@@ -5727,7 +5727,7 @@ State 245
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 270
     Expression                       go to state 66
     Range                            go to state 67
@@ -5775,7 +5775,7 @@ State 246
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 271
     Expression                       go to state 66
     Range                            go to state 67
@@ -5914,7 +5914,7 @@ State 255
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 272
     Expression                       go to state 66
     Range                            go to state 67
@@ -5962,7 +5962,7 @@ State 256
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 273
     Expression                       go to state 66
     Range                            go to state 67
@@ -6010,7 +6010,7 @@ State 257
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 274
     Expression                       go to state 66
     Range                            go to state 67
@@ -6452,7 +6452,7 @@ State 276
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 288
     Expression                       go to state 66
     Range                            go to state 67
@@ -6502,7 +6502,7 @@ State 277
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 291
     Expression                       go to state 66
     Range                            go to state 67
@@ -6794,7 +6794,7 @@ State 289
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 288
     Expression                       go to state 66
     Range                            go to state 67
@@ -6897,7 +6897,7 @@ State 292
     IntegerNumber                    go to state 61
     FloatingNumber                   go to state 62
     RationalNumber                   go to state 63
-    RuleReference                    go to state 64
+    Reference                        go to state 64
     Term                             go to state 65
     Expression                       go to state 66
     Range                            go to state 67

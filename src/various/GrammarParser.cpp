@@ -482,6 +482,10 @@ namespace libcasm_fe {
         value.move< RangeExpression::Ptr > (that.value);
         break;
 
+      case 118: // Reference
+        value.move< ReferenceAtom::Ptr > (that.value);
+        break;
+
       case 107: // RelationType
         value.move< RelationType::Ptr > (that.value);
         break;
@@ -492,10 +496,6 @@ namespace libcasm_fe {
 
       case 131: // RuleDefinition
         value.move< RuleDefinition::Ptr > (that.value);
-        break;
-
-      case 118: // RuleReference
-        value.move< RuleReferenceAtom::Ptr > (that.value);
         break;
 
       case 133: // Rules
@@ -726,6 +726,10 @@ namespace libcasm_fe {
         value.copy< RangeExpression::Ptr > (that.value);
         break;
 
+      case 118: // Reference
+        value.copy< ReferenceAtom::Ptr > (that.value);
+        break;
+
       case 107: // RelationType
         value.copy< RelationType::Ptr > (that.value);
         break;
@@ -736,10 +740,6 @@ namespace libcasm_fe {
 
       case 131: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (that.value);
-        break;
-
-      case 118: // RuleReference
-        value.copy< RuleReferenceAtom::Ptr > (that.value);
         break;
 
       case 133: // Rules
@@ -1183,6 +1183,10 @@ namespace libcasm_fe {
         yylhs.value.build< RangeExpression::Ptr > ();
         break;
 
+      case 118: // Reference
+        yylhs.value.build< ReferenceAtom::Ptr > ();
+        break;
+
       case 107: // RelationType
         yylhs.value.build< RelationType::Ptr > ();
         break;
@@ -1193,10 +1197,6 @@ namespace libcasm_fe {
 
       case 131: // RuleDefinition
         yylhs.value.build< RuleDefinition::Ptr > ();
-        break;
-
-      case 118: // RuleReference
-        yylhs.value.build< RuleReferenceAtom::Ptr > ();
         break;
 
       case 133: // Rules
@@ -1474,7 +1474,7 @@ namespace libcasm_fe {
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
           yylhs.location, asIdentifierPath( programDefinition->identifier() ), programArguments );
 
-      const auto ruleReference = Ast::make< RuleReferenceAtom >( yylhs.location, yystack_[0].value.as< IdentifierPath::Ptr > () );
+      const auto ruleReference = Ast::make< ReferenceAtom >( yylhs.location, yystack_[0].value.as< IdentifierPath::Ptr > () );
 
       auto initializers = Ast::make< NodeList< UpdateRule > >( yylhs.location );
       initializers->add( Ast::make< UpdateRule >( yylhs.location, program, ruleReference ) );
@@ -1793,7 +1793,7 @@ namespace libcasm_fe {
   case 55:
 #line 761 "../../obj/src/GrammarParser.yy" // lalr1.cc:859
     {
-      yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< RuleReferenceAtom::Ptr > ();
+      yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< ReferenceAtom::Ptr > ();
   }
 #line 1799 "GrammarParser.cpp" // lalr1.cc:859
     break;
@@ -1979,7 +1979,7 @@ namespace libcasm_fe {
   case 72:
 #line 911 "../../obj/src/GrammarParser.yy" // lalr1.cc:859
     {
-      yylhs.value.as< RuleReferenceAtom::Ptr > () = Ast::make< RuleReferenceAtom >( yylhs.location, yystack_[0].value.as< IdentifierPath::Ptr > () );
+      yylhs.value.as< ReferenceAtom::Ptr > () = Ast::make< ReferenceAtom >( yylhs.location, yystack_[0].value.as< IdentifierPath::Ptr > () );
   }
 #line 1985 "GrammarParser.cpp" // lalr1.cc:859
     break;
@@ -3494,15 +3494,14 @@ namespace libcasm_fe {
   "MaybeParameters", "Type", "BasicType", "ComposedType", "RelationType",
   "FixedSizedType", "Types", "Atom", "Undefined", "Boolean", "String",
   "BitNumber", "IntegerNumber", "FloatingNumber", "RationalNumber",
-  "RuleReference", "Term", "Expression", "Range", "List", "Terms",
-  "Arguments", "TwoOrMoreArguments", "DirectCallExpression",
-  "IndirectCallExpression", "ConditionalExpression",
-  "UniversalQuantifierExpression", "ExistentialQuantifierExpression",
-  "RuleDefinition", "Rule", "Rules", "SkipRule", "ConditionalRule",
-  "CaseRule", "CaseLabel", "CaseLabels", "LetRule", "ForallRule",
-  "ChooseRule", "IterateRule", "BlockRule", "SequenceRule", "UpdateRule",
-  "CallRule", "Attribute", "Attributes", "BasicAttribute",
-  "ExpressionAttribute", YY_NULLPTR
+  "Reference", "Term", "Expression", "Range", "List", "Terms", "Arguments",
+  "TwoOrMoreArguments", "DirectCallExpression", "IndirectCallExpression",
+  "ConditionalExpression", "UniversalQuantifierExpression",
+  "ExistentialQuantifierExpression", "RuleDefinition", "Rule", "Rules",
+  "SkipRule", "ConditionalRule", "CaseRule", "CaseLabel", "CaseLabels",
+  "LetRule", "ForallRule", "ChooseRule", "IterateRule", "BlockRule",
+  "SequenceRule", "UpdateRule", "CallRule", "Attribute", "Attributes",
+  "BasicAttribute", "ExpressionAttribute", YY_NULLPTR
   };
 
 #if YYDEBUG
@@ -3559,7 +3558,7 @@ namespace libcasm_fe {
 
 #line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:1167
 } // libcasm_fe
-#line 3563 "GrammarParser.cpp" // lalr1.cc:1167
+#line 3562 "GrammarParser.cpp" // lalr1.cc:1167
 #line 1425 "../../obj/src/GrammarParser.yy" // lalr1.cc:1168
 
 

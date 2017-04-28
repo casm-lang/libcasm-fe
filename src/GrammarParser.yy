@@ -178,7 +178,7 @@ END       0 "end of file"
 %type <Expression::Ptr> Expression Term Atom
 %type <Expressions::Ptr> Terms
 %type <ValueAtom::Ptr> Boolean String BitNumber IntegerNumber FloatingNumber RationalNumber
-%type <RuleReferenceAtom::Ptr> RuleReference
+%type <ReferenceAtom::Ptr> Reference
 %type <UndefAtom::Ptr> Undefined
 %type <RangeExpression::Ptr> Range
 %type <ListExpression::Ptr> List
@@ -422,7 +422,7 @@ ProgramFunctionDefinition
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
           @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
 
-      const auto ruleReference = Ast::make< RuleReferenceAtom >( @$, $2 );
+      const auto ruleReference = Ast::make< ReferenceAtom >( @$, $2 );
 
       auto initializers = Ast::make< NodeList< UpdateRule > >( @$ );
       initializers->add( Ast::make< UpdateRule >( @$, program, ruleReference ) );
@@ -679,7 +679,7 @@ Types
 
 
 Atom
-: RuleReference
+: Reference
   {
       $$ = $1;
   }
@@ -828,10 +828,10 @@ RationalNumber
 ;
 
 
-RuleReference
+Reference
 : AT IdentifierPath
   {
-      $$ = Ast::make< RuleReferenceAtom >( @$, $2 );
+      $$ = Ast::make< ReferenceAtom >( @$, $2 );
   }
 ;
 

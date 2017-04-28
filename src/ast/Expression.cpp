@@ -52,31 +52,29 @@ void ValueAtom::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-RuleReferenceAtom::RuleReferenceAtom( const IdentifierPath::Ptr& identifier )
-: Expression( Node::ID::RULE_REFERENCE_ATOM )
+ReferenceAtom::ReferenceAtom( const IdentifierPath::Ptr& identifier )
+: Expression( Node::ID::REFERENCE_ATOM )
 , m_identifier( identifier )
-, m_ruleReference( nullptr )
+, m_reference( nullptr )
 {
 }
 
-IdentifierPath::Ptr RuleReferenceAtom::identifier() const
+IdentifierPath::Ptr ReferenceAtom::identifier() const
 {
     return m_identifier;
 }
 
-void RuleReferenceAtom::setRuleReference(
-    const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference )
+void ReferenceAtom::setReference( const TypedNode::Ptr& reference )
 {
-    m_ruleReference = ruleReference;
+    m_reference = reference;
 }
 
-libcasm_ir::RuleReferenceConstant::Ptr RuleReferenceAtom::ruleReference(
-    void ) const
+TypedNode::Ptr ReferenceAtom::reference( void ) const
 {
-    return m_ruleReference;
+    return m_reference;
 }
 
-void RuleReferenceAtom::accept( Visitor& visitor )
+void ReferenceAtom::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
