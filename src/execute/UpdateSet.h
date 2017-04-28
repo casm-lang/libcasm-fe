@@ -462,7 +462,6 @@ class UpdateSetManager
      */
     UpdateSetManager()
     : m_updateSets()
-    , m_forked()
     {
     }
 
@@ -542,22 +541,11 @@ class UpdateSetManager
                     break;
             }
         }
-        else // only fork if necessary
+        else
         {
-            const auto updateSet = currentUpdateSet();
-            if( updateSet->semantics() == semantics )
-            {
-                // no need to fork the update set, use the current one
-                updateSet->reserveAdditionally( initialSize );
-                m_forked.push_back( false );
-                return;
-            }
-
             m_updateSets.emplace_back(
-                updateSet->fork( semantics, initialSize ) );
+                currentUpdateSet()->fork( semantics, initialSize ) );
         }
-
-        m_forked.push_back( true );
     }
 
     /**
@@ -581,16 +569,7 @@ class UpdateSetManager
             return;
         }
 
-        const auto forked = m_forked.back();
-        m_forked.pop_back();
-        if( not forked )
-        {
-            // previous fork call didn't actually fork the update set
-            return;
-        }
-
-        const auto updateSet = currentUpdateSet();
-        updateSet->merge();
+        currentUpdateSet()->merge();
         m_updateSets.pop_back();
     }
 
@@ -600,7 +579,6 @@ class UpdateSetManager
     void clear()
     {
         m_updateSets.clear();
-        m_forked.clear();
     }
 
     /**
@@ -620,13 +598,11 @@ class UpdateSetManager
      */
     std::size_t size() const noexcept
     {
-        assert( m_forked.size() >= m_updateSets.size() );
-        return m_forked.size();
+        return m_updateSets.size();
     }
 
   private:
     std::vector< std::unique_ptr< UpdateSet > > m_updateSets;
-    std::vector< bool > m_forked;
 };
 
 template < typename UpdateSet >
