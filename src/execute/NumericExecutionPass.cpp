@@ -455,10 +455,11 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
 void ExecutionVisitor::visit( UnaryExpression& node )
 {
     node.expression()->accept( *this );
-    const auto& expr = m_evaluationStack.pop();
+    const auto& value = m_evaluationStack.pop();
 
-    // TODO dispatch instruction node.op()
-    // m_evaluationStack.push( result );
+    const auto result = libcasm_rt::Value::execute( node.op(), node.type(),
+                                                    value );
+    m_evaluationStack.push( result );
 }
 
 void ExecutionVisitor::visit( BinaryExpression& node )
@@ -469,8 +470,9 @@ void ExecutionVisitor::visit( BinaryExpression& node )
     node.right()->accept( *this );
     const auto& rhs = m_evaluationStack.pop();
 
-    // TODO dispatch instruction node.op()
-    // m_evaluationStack.push( result );
+    const auto result = libcasm_rt::Value::execute( node.op(), node.type(),
+                                                    lhs, rhs );
+    m_evaluationStack.push( result );
 }
 
 void ExecutionVisitor::visit( RangeExpression& node )
