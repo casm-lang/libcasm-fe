@@ -229,10 +229,6 @@ using Semantics = ExecutionUpdateSet::Semantics;
 
 class ExecutionVisitor final : public RecursiveVisitor
 {
-    /** Use the list index of rules, functions, deriveds, ... to refer to them
-     */
-    using ReferenceConstant = ir::IntegerConstant;
-
   public:
     ExecutionVisitor(
         UpdateSetManager< ExecutionUpdateSet >& updateSetManager );
@@ -352,7 +348,7 @@ void ExecutionVisitor::visit( ValueAtom& node )
 
 void ExecutionVisitor::visit( ReferenceAtom& node )
 {
-    // m_evaluationStack.push( ReferenceConstant( node.targetId() ) ); TODO
+    m_evaluationStack.push( ReferenceConstant( node.ptr< ReferenceAtom >() ) );
 }
 
 void ExecutionVisitor::visit( UndefAtom& node )
@@ -414,58 +410,53 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 void ExecutionVisitor::visit( IndirectCallExpression& node )
 {
     node.expression()->accept( *this );
-    const auto& reference = m_evaluationStack.pop< ReferenceConstant >();
-    if( not reference.defined() )
+    const auto& value = m_evaluationStack.pop< ReferenceConstant >();
+    if( not value.defined() )
     {
         throw RuntimeException( node.expression()->sourceLocation(),
-            "cannot call an undefined " + node.targetTypeName(),
+            "cannot call an undefined target",
             Code::Unspecified );
     }
 
-    /* const auto targetId = reference.value_i64(); TODO
-
-    switch( node.targetType() )
+    const auto& atom = value.atom();
+    switch( atom->referenceType() )
     {
-        case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:
+        case ReferenceAtom::ReferenceType::FUNCTION: // [[fallthrough]]
+        case ReferenceAtom::ReferenceType::DERIVED:
         {
             m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
-            const auto& definition = m_definitionTable.at( targetId );
-            definition->accept( *this );
+            atom->reference()->accept( *this );
             m_frameStack.pop();
             break;
         }
-        case CallExpression::TargetType::RULE:
+        case ReferenceAtom::ReferenceType::RULE:
         {
             const auto& rule = std::static_pointer_cast< RuleDefinition >(
-                m_definitionTable.at( targetId ) );
+                atom->reference() );
             m_frameStack.push(
                 makeFrame( node, rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
             break;
         }
-        case CallExpression::TargetType::BUILTIN:
+        case ReferenceAtom::ReferenceType::BUILTIN:
         {
             m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
-            const auto buildinId = static_cast< ir::Value::ID >( targetId );
-            invokeBuiltin( buildinId, node.type() );
+            invokeBuiltin( atom->builtinId(), node.type() );
             m_frameStack.pop();
             break;
         }
-        case CallExpression::TargetType::ENUMERATION: // [[fallthrough]]
-        case CallExpression::TargetType::CONSTANT:    // [[fallthrough]]
-        case CallExpression::TargetType::VARIABLE:
+        case ReferenceAtom::ReferenceType::VARIABLE:
         {
-            assert( !"target not allowed in indirect call" );
+            atom->reference()->accept( *this );
             break;
         }
-        case CallExpression::TargetType::UNKNOWN:
+        case ReferenceAtom::ReferenceType::UNKNOWN:
         {
             assert( !"cannot call an unknown target" );
             break;
         }
-    } */
+    }
 }
 
 void ExecutionVisitor::visit( UnaryExpression& node )
