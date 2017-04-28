@@ -64,20 +64,38 @@ namespace libcasm_fe
         class ReferenceAtom : public Expression
         {
           public:
+            enum class ReferenceType
+            {
+                FUNCTION,
+                DERIVED,
+                BUILTIN,
+                RULE,
+                VARIABLE,
+                UNKNOWN
+            };
+
             using Ptr = std::shared_ptr< ReferenceAtom >;
 
             explicit ReferenceAtom( const IdentifierPath::Ptr& identifier );
 
             IdentifierPath::Ptr identifier( void ) const;
 
+            void setReferenceType( ReferenceType referenceType );
+            ReferenceType referenceType( void ) const;
+
             void setReference( const TypedNode::Ptr& reference );
             TypedNode::Ptr reference( void ) const;
+
+            void setBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID builtinId( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             IdentifierPath::Ptr m_identifier;
+            ReferenceType m_referenceType;
             TypedNode::Ptr m_reference;
+            libcasm_ir::Value::ID m_builtinId;
         };
 
         class UndefAtom : public Expression

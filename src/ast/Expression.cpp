@@ -55,13 +55,25 @@ void ValueAtom::accept( Visitor& visitor )
 ReferenceAtom::ReferenceAtom( const IdentifierPath::Ptr& identifier )
 : Expression( Node::ID::REFERENCE_ATOM )
 , m_identifier( identifier )
+, m_referenceType( ReferenceType::UNKNOWN )
 , m_reference( nullptr )
+, m_builtinId( libcasm_ir::Value::ID::_SIZE_ )
 {
 }
 
 IdentifierPath::Ptr ReferenceAtom::identifier() const
 {
     return m_identifier;
+}
+
+void ReferenceAtom::setReferenceType( ReferenceType referenceType )
+{
+    m_referenceType = referenceType;
+}
+
+ReferenceAtom::ReferenceType ReferenceAtom::referenceType( void ) const
+{
+    return m_referenceType;
 }
 
 void ReferenceAtom::setReference( const TypedNode::Ptr& reference )
@@ -71,7 +83,22 @@ void ReferenceAtom::setReference( const TypedNode::Ptr& reference )
 
 TypedNode::Ptr ReferenceAtom::reference( void ) const
 {
+    assert( ( m_referenceType != ReferenceType::BUILTIN ) and
+            ( m_referenceType != ReferenceType::UNKNOWN ) );
+
     return m_reference;
+}
+
+void ReferenceAtom::setBuiltinId( libcasm_ir::Value::ID builtinId )
+{
+    m_builtinId = builtinId;
+}
+
+libcasm_ir::Value::ID ReferenceAtom::builtinId( void ) const
+{
+    assert( m_referenceType == ReferenceType::BUILTIN );
+
+    return m_builtinId;
 }
 
 void ReferenceAtom::accept( Visitor& visitor )
