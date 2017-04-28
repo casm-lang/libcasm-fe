@@ -178,7 +178,33 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     Logger& m_log;
     u64 m_err;
     Namespace& m_symboltable;
-    std::unordered_map< std::string, std::size_t > m_variables;
+
+    class Variable
+    {
+      public:
+        Variable(
+            const std::size_t localIndex, const VariableDefinition& definition )
+        : m_localIndex( localIndex )
+        , m_definition( static_cast< const TypedNode& >( definition ) )
+        {
+        }
+
+        std::size_t localIndex( void ) const
+        {
+            return m_localIndex;
+        }
+
+        TypedNode& definition( void )
+        {
+            return const_cast< TypedNode& >( m_definition );
+        }
+
+      private:
+        std::size_t m_localIndex;
+        const TypedNode& m_definition;
+    };
+
+    std::unordered_map< std::string, Variable > m_variables;
     std::size_t m_maxNumberOfLocals; /**< Used to calculate the minimum number
                                         of frame slots required for derived
                                         functions and rules during execution */
@@ -286,6 +312,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
                 node.setType( definition.type() );
             }
+
+            node.setTargetDefinition( symbol.definition().ptr< TypedNode >() );
         }
         catch( const std::domain_error& e )
         {
@@ -305,17 +333,25 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                     m_log.error( { node.sourceLocation() }, e.what() );
                 }
             }
-            else if( m_variables.find( name ) != m_variables.end() )
-            {
-                const auto localIndex = m_variables[ name ];
-                node.setTargetType( CallExpression::TargetType::VARIABLE );
-                node.setTargetId( localIndex ); // frame slot index
-            }
             else
             {
-                m_err++;
-                m_log.error( { node.sourceLocation() },
-                    "invalid symbol '" + path.path() + "' found" );
+                auto variable = m_variables.find( name );
+
+                if( variable != m_variables.end() )
+                {
+                    node.setTargetType( CallExpression::TargetType::VARIABLE );
+                    node.setTargetId(
+                        variable->second.localIndex() ); // frame slot index
+
+                    node.setTargetDefinition(
+                        variable->second.definition().ptr< TypedNode >() );
+                }
+                else
+                {
+                    m_err++;
+                    m_log.error( { node.sourceLocation() },
+                        "invalid symbol '" + path.path() + "' found" );
+                }
             }
         }
 
@@ -359,7 +395,8 @@ void SymbolResolveVisitor::push( const VariableDefinition& node )
     const auto& name = node.identifier()->name();
 
     const std::size_t localIndex = m_variables.size(); // used during execution
-    const auto result = m_variables.emplace( name, localIndex );
+    const auto result
+        = m_variables.emplace( name, Variable{ localIndex, node } );
     if( not result.second )
     {
         m_err++;
