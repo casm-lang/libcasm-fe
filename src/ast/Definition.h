@@ -44,16 +44,11 @@ namespace libcasm_fe
 
             Identifier::Ptr identifier( void ) const;
 
-            void setRelationType(
-                const libcasm_ir::RelationType::Ptr& relationType );
-            libcasm_ir::RelationType::Ptr relationType( void ) const;
-
             void setAttributes( const Attributes::Ptr& attributes );
             Attributes::Ptr attributes( void ) const;
 
           private:
             Identifier::Ptr m_identifier;
-            libcasm_ir::RelationType::Ptr m_relationType;
             Attributes::Ptr m_attributes;
         };
 

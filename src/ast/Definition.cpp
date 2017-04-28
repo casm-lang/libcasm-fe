@@ -31,7 +31,6 @@ using namespace Ast;
 Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 : TypedNode( type )
 , m_identifier( identifier )
-, m_relationType( nullptr )
 , m_attributes( std::make_shared< Attributes >() )
 {
 }
@@ -39,17 +38,6 @@ Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 Identifier::Ptr Definition::identifier( void ) const
 {
     return m_identifier;
-}
-
-void Definition::setRelationType(
-    const libcasm_ir::RelationType::Ptr& relationType )
-{
-    m_relationType = relationType;
-}
-
-libcasm_ir::RelationType::Ptr Definition::relationType( void ) const
-{
-    return m_relationType;
 }
 
 void Definition::setAttributes( const Attributes::Ptr& attributes )
