@@ -324,7 +324,7 @@ void ExecutionVisitor::visit( RuleDefinition& node )
 {
     node.rule()->accept( *this );
 
-    const auto& returnType = node.relationType()->ptr_result();
+    const auto& returnType = node.type()->ptr_result();
     if( not returnType->isVoid() )
     {
         if( false /* update set has result update */ )
