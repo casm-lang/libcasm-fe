@@ -185,7 +185,7 @@ DirectCallExpression::DirectCallExpression(
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
 , m_identifier( identifier )
-, m_targetId( 0 )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 {
 }
 
@@ -200,14 +200,16 @@ IdentifierPath::Ptr DirectCallExpression::identifier( void ) const
     return m_identifier;
 }
 
-void DirectCallExpression::setTargetId( std::size_t targetId )
+void DirectCallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
 {
-    m_targetId = targetId;
+    m_targetBuiltinId = builtinId;
 }
 
-std::size_t DirectCallExpression::targetId( void ) const
+libcasm_ir::Value::ID DirectCallExpression::targetBuiltinId( void ) const
 {
-    return m_targetId;
+    assert( targetType() == TargetType::BUILTIN );
+
+    return m_targetBuiltinId;
 }
 
 void DirectCallExpression::setTargetDefinition(
@@ -218,6 +220,9 @@ void DirectCallExpression::setTargetDefinition(
 
 TypedNode::Ptr DirectCallExpression::targetDefinition( void ) const
 {
+    assert( ( targetType() != TargetType::BUILTIN ) and
+            ( targetType() != TargetType::UNKNOWN ) );
+
     return m_targetDefinition;
 }
 
