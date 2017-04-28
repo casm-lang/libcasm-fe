@@ -75,7 +75,7 @@ class Stack
     {
         assert( not m_values.empty() );
 
-        const auto& value = m_values.back();
+        const auto value = m_values.back();
         m_values.pop_back();
         return value;
     }
