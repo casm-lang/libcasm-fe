@@ -83,8 +83,8 @@ void ReferenceAtom::setReference( const TypedNode::Ptr& reference )
 
 TypedNode::Ptr ReferenceAtom::reference( void ) const
 {
-    assert( ( m_referenceType != ReferenceType::BUILTIN ) and
-            ( m_referenceType != ReferenceType::UNKNOWN ) );
+    assert( ( m_referenceType != ReferenceType::BUILTIN )
+            and ( m_referenceType != ReferenceType::UNKNOWN ) );
 
     return m_reference;
 }
@@ -220,8 +220,8 @@ void DirectCallExpression::setTargetDefinition(
 
 TypedNode::Ptr DirectCallExpression::targetDefinition( void ) const
 {
-    assert( ( targetType() != TargetType::BUILTIN ) and
-            ( targetType() != TargetType::UNKNOWN ) );
+    assert( ( targetType() != TargetType::BUILTIN )
+            and ( targetType() != TargetType::UNKNOWN ) );
 
     return m_targetDefinition;
 }
