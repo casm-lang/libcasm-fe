@@ -173,7 +173,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
 
   private:
     void push( VariableDefinition& identifier );
-    void pop( const VariableDefinition& identifier );
+    void pop( VariableDefinition& identifier );
 
     Logger& m_log;
     u64 m_err;
@@ -182,11 +182,17 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     class Variable
     {
       public:
-        Variable(
-            const std::size_t localIndex, const VariableDefinition& definition )
-        : m_localIndex( localIndex )
+        Variable( const std::string& name, const std::size_t localIndex,
+            const VariableDefinition& definition )
+        : m_name( name )
+        , m_localIndex( localIndex )
         , m_definition( static_cast< const TypedNode& >( definition ) )
         {
+        }
+
+        std::string name( void ) const
+        {
+            return m_name;
         }
 
         std::size_t localIndex( void ) const
@@ -200,11 +206,12 @@ class SymbolResolveVisitor final : public RecursiveVisitor
         }
 
       private:
+        std::string m_name;
         std::size_t m_localIndex;
         const TypedNode& m_definition;
     };
 
-    std::unordered_map< std::string, Variable > m_variables;
+    std::vector< Variable > m_variables;
     std::size_t m_maxNumberOfLocals; /**< Used to calculate the minimum number
                                         of frame slots required for derived
                                         functions and rules during execution */
@@ -230,9 +237,11 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
 
     RecursiveVisitor::visit( node );
 
-    for( const auto& argument : *node.arguments() )
+    for( auto it = ( *node.arguments() ).rbegin();
+         it != ( *node.arguments() ).rend();
+         it++ )
     {
-        pop( *argument );
+        pop( **it );
     }
 
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
@@ -249,9 +258,11 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
 
     RecursiveVisitor::visit( node );
 
-    for( const auto& argument : *node.arguments() )
+    for( auto it = ( *node.arguments() ).rbegin();
+         it != ( *node.arguments() ).rend();
+         it++ )
     {
-        pop( *argument );
+        pop( **it );
     }
 
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
@@ -335,13 +346,16 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             }
             else
             {
-                auto variable = m_variables.find( name );
+                const auto variable = std::find_if( m_variables.rbegin(),
+                    m_variables.rend(), [&name]( const Variable& v ) {
+                        return v.name().compare( name ) == 0;
+                    } );
 
-                if( variable != m_variables.end() )
+                if( variable != m_variables.rend() )
                 {
                     node.setTargetType( CallExpression::TargetType::VARIABLE );
                     node.setTargetDefinition(
-                        variable->second.definition().ptr< TypedNode >() );
+                        variable->definition().ptr< TypedNode >() );
                 }
                 else
                 {
@@ -391,28 +405,29 @@ void SymbolResolveVisitor::push( VariableDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
-    const std::size_t localIndex = m_variables.size(); // used during execution
-    node.setLocalIndex( localIndex );
-    const auto result
-        = m_variables.emplace( name, Variable{ localIndex, node } );
-    if( not result.second )
+    auto variable = std::find_if(
+        m_variables.rbegin(), m_variables.rend(), [&name]( const Variable& v ) {
+            return v.name().compare( name ) == 0;
+        } );
+
+    if( variable != m_variables.rend() )
     {
         m_err++;
         m_log.error( { node.sourceLocation() },
             "symbol '" + name + "' already defined" );
     }
 
+    const std::size_t localIndex = m_variables.size(); // used during execution
+    m_variables.emplace_back( Variable{ name, localIndex, node } );
+
+    node.setLocalIndex( localIndex );
     m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_variables.size() );
 }
 
-void SymbolResolveVisitor::pop( const VariableDefinition& node )
+void SymbolResolveVisitor::pop( VariableDefinition& node )
 {
-    const auto& name = node.identifier()->name();
-
-    if( m_variables.erase( name ) != 1 )
-    {
-        assert( !" internal error! " );
-    }
+    assert( &m_variables.back().definition() == &node );
+    m_variables.pop_back();
 }
 
 u64 SymbolResolveVisitor::errors( void ) const
