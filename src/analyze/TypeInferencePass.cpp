@@ -693,9 +693,13 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                     = static_cast< FunctionDefinition& >( symbol.definition() );
 
                 inference( definition );
-                assert( definition.type()->isRelation() );
+                assert( definition.type() and definition.type()->isRelation() );
 
-                // node.setType( type ); TODO function reference type
+                const auto type
+                    = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                        std::static_pointer_cast< libcasm_ir::RelationType >(
+                            definition.type() ) );
+                node.setType( type );
 
                 node.setReferenceType( ReferenceAtom::ReferenceType::FUNCTION );
                 node.setReference( definition.ptr< FunctionDefinition >() );
@@ -707,9 +711,13 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                     = static_cast< DerivedDefinition& >( symbol.definition() );
 
                 inference( definition );
-                assert( definition.type()->isRelation() );
+                assert( definition.type() and definition.type()->isRelation() );
 
-                // node.setType( type ); TODO derived reference type
+                const auto type
+                    = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                        std::static_pointer_cast< libcasm_ir::RelationType >(
+                            definition.type() ) );
+                node.setType( type );
 
                 node.setReferenceType( ReferenceAtom::ReferenceType::DERIVED );
                 node.setReference( definition.ptr< DerivedDefinition >() );
@@ -719,7 +727,8 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             {
                 // TODO
 
-                // node.setReferenceType( ReferenceAtom::ReferenceType::BUILTIN );
+                // node.setReferenceType( ReferenceAtom::ReferenceType::BUILTIN
+                // );
                 // node.setBuiltinId( annotation.id() );
                 break;
             }
@@ -729,11 +738,12 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                     = static_cast< RuleDefinition& >( symbol.definition() );
 
                 inference( definition );
-                assert( definition.type()->isRelation() );
+                assert( definition.type() and definition.type()->isRelation() );
 
-                const auto type = libstdhl::make< libcasm_ir::RuleReferenceType >(
-                    std::static_pointer_cast< libcasm_ir::RelationType >(
-                        definition.type() ) );
+                const auto type
+                    = libstdhl::make< libcasm_ir::RuleReferenceType >(
+                        std::static_pointer_cast< libcasm_ir::RelationType >(
+                            definition.type() ) );
                 node.setType( type );
 
                 node.setReferenceType( ReferenceAtom::ReferenceType::RULE );
@@ -749,10 +759,9 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             {
                 m_err++;
                 m_log.error( { node.sourceLocation() },
-                             "cannot reference '"
-                             + CallExpression::targetTypeString(
-                                    symbol.targetType() )
-                             + "'" );
+                    "cannot reference '" + CallExpression::targetTypeString(
+                                               symbol.targetType() )
+                        + "'" );
             }
         }
     }
@@ -802,44 +811,73 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     {
         case CallExpression::TargetType::VARIABLE:
         {
-            if( not node.type() )
+            try
             {
-                inference( annotation_ptr, node );
-                try
+                auto& definition = find( *node.identifier() );
+
+                if( definition.type() )
                 {
-                    auto& definition = find( *node.identifier() );
-                    definition.setType( node.type() );
+                    if( not node.type() )
+                    {
+                        node.setType( definition.type() );
+                    }
                 }
-                catch( const std::domain_error& e )
+                else
                 {
-                    assert( !" inconsistent symbol table! " );
+                    if( node.type() )
+                    {
+                        definition.setType( node.type() );
+                    }
+                    else
+                    {
+                        m_log.info( "'" + path.path() + "' has no IR type!!! @ "
+                                    + __FILE__
+                                    + ":"
+                                    + std::to_string( __LINE__ ) );
+                    }
                 }
+            }
+            catch( const std::domain_error& e )
+            {
+                assert( !" inconsistent symbol table! " );
             }
             break;
         }
         case CallExpression::TargetType::BUILTIN:
         {
             assert( not node.type() );
-            inference( annotation_ptr, node, node.arguments()->data() );
 
-            std::vector< libcasm_ir::Type::Ptr > argTypeList;
-            for( auto argumentType : *node.arguments() )
+            try
             {
-                if( not argumentType->type() )
+                inference( annotation_ptr, node, node.arguments()->data() );
+
+                std::vector< libcasm_ir::Type::Ptr > argTypeList;
+                for( auto argumentType : *node.arguments() )
                 {
-                    m_log.info( { argumentType->sourceLocation() },
-                        "TODO: '" + path.path()
-                            + "' has a non-typed argument(s)" );
-                    return;
+                    if( not argumentType->type() )
+                    {
+                        m_log.info( { argumentType->sourceLocation() },
+                            "TODO: '" + path.path()
+                                + "' has a non-typed argument(s)" );
+                        return;
+                    }
+
+                    argTypeList.emplace_back(
+                        argumentType->type()->ptr_result() );
                 }
 
-                argTypeList.emplace_back( argumentType->type()->ptr_result() );
+                const auto type = libstdhl::make< libcasm_ir::RelationType >(
+                    node.type(), argTypeList );
+
+                node.setType( type );
+            }
+            catch( const std::domain_error& e )
+            {
+                m_err++;
+                m_log.error( { node.sourceLocation() }, e.what() );
+                return;
             }
 
-            const auto type = libstdhl::make< libcasm_ir::RelationType >(
-                node.type(), argTypeList );
-
-            node.setType( type );
             break;
         }
         case CallExpression::TargetType::DERIVED:
@@ -929,6 +967,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             break;
         }
     }
+
+    // assert( node.type() );
 }
 
 void TypeInferenceVisitor::visit( IndirectCallExpression& node )
@@ -1110,6 +1150,13 @@ void TypeInferenceVisitor::inference( const libcasm_ir::Annotation* annotation,
         std::vector< libcasm_ir::Type::ID > argTypes;
         for( auto argument : arguments )
         {
+            if( not argument->type() )
+            {
+                m_log.warning(
+                    { node.sourceLocation() }, "found no argument type" );
+                return;
+            }
+
             const auto tid = argument->type()->result().id();
             argTypes.emplace_back( tid );
         }
@@ -1262,9 +1309,8 @@ void TypeInferenceVisitor::inference( DerivedDefinition& node )
     {
         if( not argumentType->type() )
         {
-            m_log.info( { argumentType->sourceLocation() },
-                "TODO: '" + node.identifier()->name()
-                    + "' has a non-typed argument(s)" );
+            m_log.debug( "'" + node.identifier()->name()
+                         + "' has a non-typed argument(s)" );
             return;
         }
 
@@ -1289,9 +1335,8 @@ void TypeInferenceVisitor::inference( RuleDefinition& node )
     {
         if( not argumentType->type() )
         {
-            m_log.info( { argumentType->sourceLocation() },
-                "TODO: '" + node.identifier()->name()
-                    + "' has a non-typed argument(s)" );
+            m_log.debug( "'" + node.identifier()->name()
+                         + "' has a non-typed argument(s)" );
             return;
         }
 
