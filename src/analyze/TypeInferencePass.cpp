@@ -821,20 +821,20 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                     {
                         node.setType( definition.type() );
                     }
+                    else
+                    {
+                        assert( *definition.type() == *node.type() );
+                    }
                 }
                 else
                 {
-                    if( node.type() )
+                    if( not node.type() )
                     {
-                        definition.setType( node.type() );
+                        inference( 0, node );
                     }
-                    else
-                    {
-                        m_log.info( "'" + path.path() + "' has no IR type!!! @ "
-                                    + __FILE__
-                                    + ":"
-                                    + std::to_string( __LINE__ ) );
-                    }
+
+                    assert( node.type() );
+                    definition.setType( node.type() );
                 }
             }
             catch( const std::domain_error& e )
