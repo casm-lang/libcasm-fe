@@ -23,26 +23,26 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_LOCATION_H_
-#define _LIB_CASMFE_LOCATION_H_
+#ifndef _LIB_CASMFE_SOURCE_LOCATION_H_
+#define _LIB_CASMFE_SOURCE_LOCATION_H_
 
 #include "../stdhl/cpp/Type.h"
 
 namespace libcasm_fe
 {
-    class Position
+    class SourcePosition
     {
       public:
         using value_type = u32;
         using difference_type = i32;
 
       public:
-        explicit Position()
-        : Position( nullptr, 1u, 1u )
+        explicit SourcePosition()
+        : SourcePosition( nullptr, 1u, 1u )
         {
         }
 
-        Position( const std::shared_ptr< std::string >& fileName,
+        SourcePosition( const std::shared_ptr< std::string >& fileName,
             value_type line, value_type column )
         : fileName( fileName )
         , line( line )
@@ -73,7 +73,7 @@ namespace libcasm_fe
         /**
          * Add \a width columns, in place.
          */
-        Position& operator+=( difference_type width )
+        SourcePosition& operator+=( difference_type width )
         {
             columns( width );
             return *this;
@@ -82,7 +82,8 @@ namespace libcasm_fe
         /**
          * Add \a width columns.
          */
-        friend Position operator+( Position lhs, difference_type width )
+        friend SourcePosition operator+(
+            SourcePosition lhs, difference_type width )
         {
             return lhs += width;
         }
@@ -90,7 +91,7 @@ namespace libcasm_fe
         /**
          * Subtract \a width columns, in place.
          */
-        Position& operator-=( difference_type width )
+        SourcePosition& operator-=( difference_type width )
         {
             return operator+=( -width );
         }
@@ -98,12 +99,14 @@ namespace libcasm_fe
         /**
          * Subtract \a width columns.
          */
-        friend Position operator-( Position lhs, difference_type width )
+        friend SourcePosition operator-(
+            SourcePosition lhs, difference_type width )
         {
             return lhs += -width;
         }
 
-        friend bool operator==( const Position& lhs, const Position& rhs )
+        friend bool operator==(
+            const SourcePosition& lhs, const SourcePosition& rhs )
         {
             return ( lhs.line == rhs.line ) and ( lhs.column == rhs.column )
                    and ( ( lhs.fileName == rhs.fileName )
@@ -111,13 +114,14 @@ namespace libcasm_fe
                                   and *lhs.fileName == *rhs.fileName ) );
         }
 
-        friend bool operator!=( const Position& lhs, const Position& rhs )
+        friend bool operator!=(
+            const SourcePosition& lhs, const SourcePosition& rhs )
         {
             return not( lhs == rhs );
         }
 
         friend std::ostream& operator<<(
-            std::ostream& stream, const Position& position )
+            std::ostream& stream, const SourcePosition& position )
         {
             return stream << std::to_string( position.line ) << ":"
                           << std::to_string( position.column );
@@ -142,15 +146,16 @@ namespace libcasm_fe
         value_type column; /**< Current column number. */
     };
 
-    class Location
+    class SourceLocation
     {
       public:
-        explicit Location( const Position& position = Position() )
-        : Location( position, position )
+        explicit SourceLocation(
+            const SourcePosition& position = SourcePosition() )
+        : SourceLocation( position, position )
         {
         }
 
-        Location( const Position& begin, const Position& end )
+        SourceLocation( const SourcePosition& begin, const SourcePosition& end )
         : begin( begin )
         , end( end )
         {
@@ -167,7 +172,7 @@ namespace libcasm_fe
         /**
          * Extend the current location to the COUNT next columns.
          */
-        void columns( Position::difference_type count )
+        void columns( SourcePosition::difference_type count )
         {
             end += count;
         }
@@ -175,7 +180,7 @@ namespace libcasm_fe
         /**
          * Extend the current location to the COUNT next lines.
          */
-        void lines( Position::difference_type count )
+        void lines( SourcePosition::difference_type count )
         {
             end.lines( count );
         }
@@ -188,7 +193,7 @@ namespace libcasm_fe
         /**
          * Join two locations, in place.
          */
-        Location& operator+=( const Location& rhs )
+        SourceLocation& operator+=( const SourceLocation& rhs )
         {
             end = rhs.end;
             return *this;
@@ -197,7 +202,8 @@ namespace libcasm_fe
         /**
          * Join two locations.
          */
-        friend Location operator+( Location lhs, const Location& rhs )
+        friend SourceLocation operator+(
+            SourceLocation lhs, const SourceLocation& rhs )
         {
             return lhs += rhs;
         }
@@ -205,7 +211,7 @@ namespace libcasm_fe
         /**
          * Add \a width columns to the end position, in place.
          */
-        Location& operator+=( Position::difference_type width )
+        SourceLocation& operator+=( SourcePosition::difference_type width )
         {
             columns( width );
             return *this;
@@ -214,8 +220,8 @@ namespace libcasm_fe
         /**
          * Add \a width columns to the end position.
          */
-        friend Location operator+(
-            Location lhs, Position::difference_type width )
+        friend SourceLocation operator+(
+            SourceLocation lhs, SourcePosition::difference_type width )
         {
             return lhs += width;
         }
@@ -223,7 +229,7 @@ namespace libcasm_fe
         /**
          * Subtract \a width columns from the end position, in place.
          */
-        Location& operator-=( Position::difference_type width )
+        SourceLocation& operator-=( SourcePosition::difference_type width )
         {
             return operator+=( -width );
         }
@@ -231,24 +237,26 @@ namespace libcasm_fe
         /**
          * Subtract \a width columns from the end position.
          */
-        friend Location operator-(
-            Location lhs, Position::difference_type width )
+        friend SourceLocation operator-(
+            SourceLocation lhs, SourcePosition::difference_type width )
         {
             return lhs += -width;
         }
 
-        friend bool operator==( const Location& lhs, const Location& rhs )
+        friend bool operator==(
+            const SourceLocation& lhs, const SourceLocation& rhs )
         {
             return lhs.begin == rhs.begin and lhs.end == rhs.end;
         }
 
-        friend bool operator!=( const Location& lhs, const Location& rhs )
+        friend bool operator!=(
+            const SourceLocation& lhs, const SourceLocation& rhs )
         {
             return not( lhs == rhs );
         }
 
         friend std::ostream& operator<<(
-            std::ostream& stream, const Location& location )
+            std::ostream& stream, const SourceLocation& location )
         {
             if( location.begin != location.end )
             {
@@ -261,12 +269,12 @@ namespace libcasm_fe
         }
 
       public:
-        Position begin; /**< Beginning of the located region. */
-        Position end;   /**< End of the located region. */
+        SourcePosition begin; /**< Beginning of the located region. */
+        SourcePosition end;   /**< End of the located region. */
     };
 }
 
-#endif // _LIB_CASMFE_LOCATION_H_
+#endif // _LIB_CASMFE_SOURCE_LOCATION_H_
 
 //
 //  Local variables:

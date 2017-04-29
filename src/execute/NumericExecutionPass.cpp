@@ -202,7 +202,7 @@ struct Update
     ir::Constant value; /**< The value of the update */
     const std::vector< ir::Constant >*
         args; /**< The function arguments of the update */
-    const Location*
+    const SourceLocation*
         location; /**< The source-code location of the update producer */
 };
 

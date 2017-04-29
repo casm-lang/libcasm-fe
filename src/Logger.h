@@ -35,7 +35,7 @@
 
 namespace libcasm_fe
 {
-    class Location;
+    class SourceLocation;
     class Exception;
 
     class Logger : public libpass::PassLogger
@@ -44,16 +44,16 @@ namespace libcasm_fe
         using libpass::PassLogger::PassLogger;
 
         using libpass::PassLogger::error;
-        void error( const std::vector< Location >& locations,
+        void error( const std::vector< SourceLocation >& locations,
             const std::string& message, Code errorCode = Code::Unspecified );
         void error( const Exception& exception );
 
         using libpass::PassLogger::warning;
-        void warning( const std::vector< Location >& locations,
+        void warning( const std::vector< SourceLocation >& locations,
             const std::string& message );
 
         using libpass::PassLogger::info;
-        void info( const std::vector< Location >& locations,
+        void info( const std::vector< SourceLocation >& locations,
             const std::string& message );
     };
 }

@@ -31,7 +31,7 @@
 #include "../stdhl/cpp/List.h"
 #include "../stdhl/cpp/Type.h"
 
-#include "../Location.h"
+#include "../SourceLocation.h"
 
 #include "../../casm-ir/src/Type.h"
 
@@ -110,8 +110,8 @@ namespace libcasm_fe
 
             ID id( void ) const;
 
-            void setSourceLocation( const Location& sourceLocation );
-            const Location& sourceLocation( void ) const;
+            void setSourceLocation( const SourceLocation& sourceLocation );
+            const SourceLocation& sourceLocation( void ) const;
 
             /**
              * @return A short description about the node type.
@@ -128,7 +128,7 @@ namespace libcasm_fe
 
           private:
             ID m_id;
-            Location m_sourceLocation;
+            SourceLocation m_sourceLocation;
         };
 
         template < typename T >
@@ -233,7 +233,8 @@ namespace libcasm_fe
         };
 
         template < typename T, typename... Args >
-        typename T::Ptr make( const Location& sourceLocation, Args&&... args )
+        typename T::Ptr make(
+            const SourceLocation& sourceLocation, Args&&... args )
         {
             auto node
                 = std::make_shared< T >( std::forward< Args >( args )... );

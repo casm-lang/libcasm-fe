@@ -31,7 +31,7 @@
 #include <vector>
 
 #include "Codes.h"
-#include "Location.h"
+#include "SourceLocation.h"
 
 namespace libcasm_fe
 {
@@ -39,20 +39,20 @@ namespace libcasm_fe
     {
       public:
         Exception( const std::string& msg, Code errorCode );
-        Exception(
-            const Location& location, const std::string& msg, Code errorCode );
-        Exception( const std::vector< Location >& locations,
+        Exception( const SourceLocation& location, const std::string& msg,
+            Code errorCode );
+        Exception( const std::vector< SourceLocation >& locations,
             const std::string& msg, Code errorCode );
 
         const char* what() const noexcept override;
 
-        const std::vector< Location >& locations( void ) const noexcept;
+        const std::vector< SourceLocation >& locations( void ) const noexcept;
 
         Code errorCode( void ) const noexcept;
 
       private:
         const std::string m_msg;
-        const std::vector< Location > m_locations;
+        const std::vector< SourceLocation > m_locations;
         const Code m_errorCode;
     };
 

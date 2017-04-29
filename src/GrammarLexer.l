@@ -27,7 +27,7 @@
 
 #include "src/Codes.h"
 #include "src/Logger.h"
-#include "src/Location.h"
+#include "src/SourceLocation.h"
 
 using namespace libcasm_fe;
 

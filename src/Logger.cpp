@@ -26,7 +26,7 @@
 #include "Logger.h"
 
 #include "Exceptions.h"
-#include "Location.h"
+#include "SourceLocation.h"
 
 using namespace libcasm_fe;
 
@@ -44,7 +44,8 @@ std::string string_format( const std::string& format, Args... args )
     return std::string( buf.get(), buf.get() + size - 1 );
 }
 
-static Log::Items to_location_items( const std::vector< Location >& locations )
+static Log::Items to_location_items(
+    const std::vector< SourceLocation >& locations )
 {
     Log::Items items;
     for( const auto& location : locations )
@@ -56,7 +57,7 @@ static Log::Items to_location_items( const std::vector< Location >& locations )
     return items;
 }
 
-void Logger::error( const std::vector< Location >& locations,
+void Logger::error( const std::vector< SourceLocation >& locations,
     const std::string& message, libcasm_fe::Code errorCode )
 {
     auto items = to_location_items( locations );
@@ -80,7 +81,7 @@ void Logger::error( const Exception& exception )
 }
 
 void Logger::warning(
-    const std::vector< Location >& locations, const std::string& message )
+    const std::vector< SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::make< Log::TextItem >( message ) );
@@ -88,7 +89,7 @@ void Logger::warning(
 }
 
 void Logger::info(
-    const std::vector< Location >& locations, const std::string& message )
+    const std::vector< SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::make< Log::TextItem >( message ) );

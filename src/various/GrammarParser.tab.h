@@ -46,7 +46,7 @@
     {
         class Lexer;
         class Logger;
-        class Location;
+        class SourceLocation;
     }
 
     #include "src/ast/Specification.h"
@@ -485,7 +485,7 @@ namespace libcasm_fe {
     typedef YYSTYPE semantic_type;
 #endif
     /// Symbol locations.
-    typedef Location location_type;
+    typedef SourceLocation location_type;
 
     /// Syntax errors thrown from user actions.
     struct syntax_error : std::runtime_error

@@ -33,7 +33,7 @@
 
 %define api.token.constructor
 %define api.value.type variant
-%define api.location.type {Location}
+%define api.location.type {SourceLocation}
 
 %define parse.assert
 %define parse.trace
@@ -47,7 +47,7 @@
     {
         class Lexer;
         class Logger;
-        class Location;
+        class SourceLocation;
     }
 
     #include "src/ast/Specification.h"
@@ -65,7 +65,7 @@
 
 %code
 {
-    #include "src/Location.h"
+    #include "src/SourceLocation.h"
     #include "src/Lexer.h"
     #include "src/Exceptions.h"
     #include "src/Logger.h"
@@ -75,7 +75,7 @@
     #undef yylex
     #define yylex lexer.nextToken
 
-    static BasicType::Ptr createVoidType( Location& sourceLocation )
+    static BasicType::Ptr createVoidType( SourceLocation& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::VoidType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
@@ -85,7 +85,7 @@
         return node;
     }
 
-    static BasicType::Ptr createRuleRefType( Location& sourceLocation )
+    static BasicType::Ptr createRuleRefType( SourceLocation& sourceLocation )
     {
         const auto type = libstdhl::get< libcasm_ir::RuleReferenceType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
@@ -95,7 +95,7 @@
         return node;
     }
 
-    static BasicType::Ptr createAgentType( Location& sourceLocation )
+    static BasicType::Ptr createAgentType( SourceLocation& sourceLocation )
     {
         const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
         const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
@@ -103,7 +103,7 @@
         return node;
     }
 
-    static FunctionDefinition::Ptr createProgramFunction( Location& sourceLocation )
+    static FunctionDefinition::Ptr createProgramFunction( SourceLocation& sourceLocation )
     {
         const auto agentType = createAgentType( sourceLocation );
         const auto ruleRefType = createRuleRefType( sourceLocation );
@@ -115,7 +115,7 @@
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
-    static FunctionDefinition::Ptr createSelfFunction( Location& sourceLocation )
+    static FunctionDefinition::Ptr createSelfFunction( SourceLocation& sourceLocation )
     {
         const auto resType = createAgentType( sourceLocation );
         const auto argTypes = Ast::make< Types >( sourceLocation );
@@ -1346,7 +1346,7 @@ ExpressionAttribute
 
 %%
 
-void Parser::error( const Location& location, const std::string& message )
+void Parser::error( const SourceLocation& location, const std::string& message )
 {
     log.error( {location}, message, Code::SyntaxError );
 }

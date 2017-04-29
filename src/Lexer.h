@@ -34,7 +34,7 @@
 namespace libcasm_fe
 {
     class Logger;
-    class Location;
+    class SourceLocation;
 
     class Lexer : public yyFlexLexer
     {
@@ -50,7 +50,7 @@ namespace libcasm_fe
 
       private:
         Logger& log;
-        Location loc;
+        SourceLocation loc;
         std::string strbuf;
     };
 }
