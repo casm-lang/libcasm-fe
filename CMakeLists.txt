@@ -35,6 +35,7 @@ foreach( DEPENDENCY
     stdhl
     pass
     casm-ir
+    casm-rt
     )
   if( NOT TARGET ${DEPENDENCY} )
     add_subdirectory( ${LIBS}/${DEPENDENCY} lib/${DEPENDENCY} )
@@ -86,6 +87,7 @@ include_directories(
   ${LIBS}/stdhl
   ${LIBS}/pass
   ${LIBS}/casm-ir
+  ${LIBS}/casm-rt
 )
 
 
@@ -153,6 +155,7 @@ add_executable( ${TARGET}-check
 
 target_link_libraries( ${TARGET}-check
   ${TARGET}
+  casm-rt
   casm-ir
   pass
   stdhl
@@ -161,14 +164,21 @@ target_link_libraries( ${TARGET}-check
 
 
 add_library( ${TARGET}-benchmark OBJECT
-  ${LIBS}/hayai/src/hayai_posix_main.cpp
+  uts/main.cpp
 )
 
 add_executable( ${TARGET}-run
+  ${LIBS}/hayai/src/hayai_posix_main.cpp
+  ${LIBS}/gtest/googletest/src/gtest-all.cc
   $<TARGET_OBJECTS:${TARGET}-benchmark>
 )
 
 target_link_libraries( ${TARGET}-run
+  ${TARGET}
+  casm-rt
+  casm-ir
+  pass
+  stdhl
   pthread
 )
 
