@@ -1087,7 +1087,7 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
 {
     if( not rhs.type() and rhs.id() == Node::ID::UNDEF_ATOM )
     {
-        rhs.setType( lhs.type() );
+        rhs.setType( lhs.type()->ptr_result() );
     }
 
     const auto error_count = m_err;
