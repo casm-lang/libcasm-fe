@@ -23,40 +23,40 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_REFERENCE_CONSTANT_H_
-#define _LIB_CASMFE_REFERENCE_CONSTANT_H_
+#include "ReferenceConstant.h"
 
-#include "../ast/Expression.h"
-#include "../ast/Node.h"
+using namespace libcasm_fe;
 
-#include "../casm-ir/src/Constant.h"
+static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
 
-namespace libcasm_fe
+EmptyValue::EmptyValue( void )
+: libcasm_ir::Value( "", VOID, Value::ID::VALUE )
 {
-    class EmptyValue : public libcasm_ir::Value
-    {
-      public:
-        EmptyValue( void );
-    };
-
-    class ReferenceConstant final
-        : public libcasm_ir::ReferenceConstant< EmptyValue >
-    {
-      public:
-        ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom );
-
-        Ast::ReferenceAtom::Ptr atom( void ) const;
-
-        static inline Value::ID classid( void )
-        {
-            return static_cast< Value::ID >( -1 );
-        }
-
-        static u1 classof( Value const* obj );
-    };
 }
 
-#endif // _LIB_CASMFE_REFERENCE_CONSTANT_H_
+ReferenceConstant::ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom )
+: libcasm_ir::ReferenceConstant< EmptyValue >( "", VOID,
+      (const Value::Ptr&)atom, // HACK: use the memory of Value::Ptr
+                               // to store the atom efficiently
+                               // otherwise another shared_ptr would
+                               // be required!
+      true, false, classid() )
+{
+}
+
+Ast::ReferenceAtom::Ptr ReferenceConstant::atom( void ) const
+{
+    return (Ast::ReferenceAtom::Ptr&)m_value;
+}
+
+u1 ReferenceConstant::classof( Value const* obj )
+{
+    return obj->id() == classid()
+           or libcasm_ir::RuleReferenceConstant::classof( obj )
+        // or libcasm_ir::FunctionReferenceConstant::classof( obj )
+        // TODO: enable if FuncRef constant and type is ready
+        ;
+}
 
 //
 //  Local variables:

@@ -66,6 +66,7 @@ set( CXX_SRC_FILES
 
   src/execute/NumericExecutionPass.cpp
   src/execute/HashMapBase.cpp
+  src/execute/ReferenceConstant.cpp
 
   src/various/GrammarParser.cpp
   src/various/GrammarLexer.cpp
