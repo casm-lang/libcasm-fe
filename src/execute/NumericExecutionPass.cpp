@@ -41,6 +41,7 @@
 #include "../analyze/TypeInferencePass.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
+#include "FunctionState.h"
 #include "ReferenceConstant.h"
 #include "UpdateSet.h"
 
@@ -177,20 +178,48 @@ class FrameStack
     std::vector< std::unique_ptr< Frame > > m_frames;
 };
 
+/**
+ * From Boost
+ */
+constexpr std::size_t hash_combine( std::size_t seed, std::size_t hash )
+{
+    return seed ^ ( hash + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 ) );
+}
+
+struct Location
+{
+    std::string function;
+    std::vector< ir::Constant > arguments;
+};
+
+struct ConstantHash
+{
+    std::size_t operator()( const ir::Constant& constant ) const
+    {
+        return std::hash< std::string >{}( constant.name() );
+    }
+};
+
 struct LocationHash
 {
-    /**
-     * Directly using a libcasm_fe::value_t pointer as hash value has the
-     * problem that the first 4 bits of the hash value are always 0, because the
-     * size of libcasm_fe::value_t is 16 bytes. Some bit shifting avoids this
-     * problem.
-     *
-     * Forumla is from LLVM's DenseMapInfo<T*>
-     */
-    std::size_t operator()( const ir::Constant* location ) const
+    std::size_t operator()( const Location& location ) const
     {
-        return ( reinterpret_cast< std::uintptr_t >( location ) >> 4 )
-               ^ ( reinterpret_cast< std::uintptr_t >( location ) >> 9 );
+        std::size_t hash = std::hash< std::string >{}( location.function );
+        for( const auto& argument : location.arguments )
+        {
+            hash = hash_combine( hash, ConstantHash{}( argument ) );
+        }
+        return hash;
+    }
+};
+
+struct LocationEquals
+    : public std::binary_function< const Location&, const Location&, bool >
+{
+    bool operator()( const Location& lhs, const Location& rhs ) const
+    {
+        return ( lhs.function == rhs.function )
+               and ( lhs.arguments == rhs.arguments );
     }
 };
 
@@ -200,26 +229,25 @@ struct LocationHash
 struct Update
 {
     ir::Constant value; /**< The value of the update */
-    const std::vector< ir::Constant >*
-        args; /**< The function arguments of the update */
-    const SourceLocation*
-        location; /**< The source-code location of the update producer */
+    SourceLocation
+        sourceLocation; /**< The source-code location of the update producer */
 };
 
-struct UpdateEquals : public std::binary_function< Update*, Update*, bool >
+struct UpdateEquals
+    : public std::binary_function< const Update&, const Update&, bool >
 {
-    bool operator()( Update* lhs, Update* rhs ) const
+    bool operator()( const Update& lhs, const Update& rhs ) const
     {
-        return lhs->value == rhs->value;
+        return lhs.value == rhs.value;
     }
 };
 
 struct UpdateSetDetails
 {
-    using Location = const ir::Constant*;
-    using Value = Update*;
+    using Location = Location;
+    using Value = Update;
     using LocationHash = LocationHash;
-    using LocationEquals = std::equal_to< Location >;
+    using LocationEquals = LocationEquals;
     using ValueEquals = UpdateEquals;
 };
 
@@ -227,10 +255,103 @@ using ExecutionUpdateSet = UpdateSet< UpdateSetDetails >;
 using ForkGuard = UpdateSetForkGuard< ExecutionUpdateSet >;
 using Semantics = ExecutionUpdateSet::Semantics;
 
+class Storage
+{
+    struct FunctionStateDetails
+    {
+        using Location = Location;
+        using Value = ir::Constant;
+        using LocationHash = LocationHash;
+        using LocationEquals = LocationEquals;
+    };
+
+    using ExecutionFunctionState = FunctionState< FunctionStateDetails >;
+
+  public:
+    Storage();
+
+    void fireUpdateSet( ExecutionUpdateSet* updateSet );
+
+    void set( const Location& location, const ir::Constant& value );
+    void remove( const Location& location );
+    std::experimental::optional< ir::Constant > get(
+        const Location& location ) const;
+
+    const ExecutionFunctionState& programState() const;
+
+  private:
+    /**
+     * Program function state is stored separately to allow efficient iteration
+     * over all program locations (e.g. when determining the set of runnable
+     * agents).
+     */
+    ExecutionFunctionState m_programState;
+    ExecutionFunctionState m_functionState;
+};
+
+Storage::Storage()
+: m_programState( 1 )
+, m_functionState( 100 )
+{
+}
+
+void Storage::fireUpdateSet( ExecutionUpdateSet* updateSet )
+{
+    const auto end = updateSet->end();
+    for( auto it = updateSet->begin(); it != end; ++it )
+    {
+        const auto& location = it.key();
+        const auto& update = it.value();
+        set( location, update.value );
+    }
+}
+
+void Storage::set( const Location& location, const ir::Constant& value )
+{
+    if( location.function == "program" )
+    {
+        m_programState.set( location, value );
+    }
+    else
+    {
+        m_functionState.set( location, value );
+    }
+}
+
+void Storage::remove( const Location& location )
+{
+    if( location.function == "program" )
+    {
+        m_programState.remove( location );
+    }
+    else
+    {
+        m_functionState.remove( location );
+    }
+}
+
+std::experimental::optional< ir::Constant > Storage::get(
+    const Location& location ) const
+{
+    if( location.function == "program" )
+    {
+        return m_programState.get( location );
+    }
+    else
+    {
+        return m_functionState.get( location );
+    }
+}
+
+const Storage::ExecutionFunctionState& Storage::programState() const
+{
+    return m_programState;
+}
+
 class ExecutionVisitor final : public RecursiveVisitor
 {
   public:
-    ExecutionVisitor(
+    ExecutionVisitor( const Storage& storage,
         UpdateSetManager< ExecutionUpdateSet >& updateSetManager );
 
     void visit( VariableDefinition& node ) override;
@@ -266,6 +387,8 @@ class ExecutionVisitor final : public RecursiveVisitor
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
 
+    void execute( const ReferenceConstant& value );
+
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
@@ -275,18 +398,35 @@ class ExecutionVisitor final : public RecursiveVisitor
     void invokeBuiltin( ir::Value::ID id, const ir::Type::Ptr& type );
 
   private:
+    const Storage& m_storage;
     UpdateSetManager< ExecutionUpdateSet >& m_updateSetManager;
 
     ConstantStack m_evaluationStack;
     FrameStack m_frameStack;
 };
 
-ExecutionVisitor::ExecutionVisitor(
+ExecutionVisitor::ExecutionVisitor( const Storage& storage,
     UpdateSetManager< ExecutionUpdateSet >& updateSetManager )
-: m_updateSetManager( updateSetManager )
+: m_storage( storage )
+, m_updateSetManager( updateSetManager )
 , m_evaluationStack()
 , m_frameStack()
 {
+}
+
+void ExecutionVisitor::execute( const ReferenceConstant& value )
+{
+    assert( value.defined() );
+
+    const auto& atom = value.atom();
+    assert( atom->referenceType() == ReferenceAtom::ReferenceType::RULE );
+
+    const auto& rule
+        = std::static_pointer_cast< RuleDefinition >( atom->reference() );
+    m_frameStack.push( libstdhl::make_unique< Frame >(
+        nullptr, rule->maximumNumberOfLocals() ) );
+    rule->accept( *this );
+    m_frameStack.pop();
 }
 
 void ExecutionVisitor::visit( VariableDefinition& node )
@@ -299,16 +439,23 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
 {
     auto* frame = m_frameStack.top();
 
-    // TODO hash arguments of frame and perform a lookup
+    const Location location{ node.identifier()->name(), frame->locals() };
 
-    if( false /* TODO update exists or function exists in state */ )
+    const auto update = m_updateSetManager.lookup( location );
+    if( update )
     {
-        // m_evaluationStack.push( value );
+        m_evaluationStack.push( update.value().value );
+        return;
     }
-    else
+
+    const auto state = m_storage.get( location );
+    if( state )
     {
-        node.defaultValue()->accept( *this ); // return value already on stack
+        m_evaluationStack.push( state.value() );
+        return;
     }
+
+    node.defaultValue()->accept( *this ); // return value already on stack
 }
 
 void ExecutionVisitor::visit( DerivedDefinition& node )
@@ -694,9 +841,41 @@ void ExecutionVisitor::visit( SequenceRule& node )
 void ExecutionVisitor::visit( UpdateRule& node )
 {
     node.expression()->accept( *this );
-    const auto& expr = m_evaluationStack.pop();
+    const auto& value = m_evaluationStack.pop();
 
-    // TODO
+    // reuse makeFrame for arguments evaluation (don't put the frame onto the
+    // stack)
+    const auto functionFrame
+        = makeFrame( *node.function(), node.function()->arguments()->size() );
+
+    const Location location{ node.function()->identifier()->path(),
+        functionFrame->locals() };
+    const Update update{ value, node.sourceLocation() };
+
+    try
+    {
+        m_updateSetManager.add( location, update );
+    }
+    catch( const ExecutionUpdateSet::Conflict& e )
+    {
+        const auto& conflictingUpdate = e.conflictingUpdate();
+        const auto& existingUpdate = e.existingUpdate();
+
+        const auto& existingLocation = existingUpdate.first;
+
+        const auto& conflictingValue = conflictingUpdate.second;
+        const auto& existingValue = existingUpdate.second;
+
+        const auto info
+            = "Conflict while adding update " + existingLocation.function
+              //+ to_string( existingLocation.arguments )
+              + " = " + conflictingValue.value.description()
+              + ". Update for same location  with another value '"
+              + existingValue.value.description() + "' exists already.";
+        throw RuntimeException(
+            { existingValue.sourceLocation, conflictingValue.sourceLocation },
+            info, libcasm_fe::Code::UpdateSetClash );
+    }
 }
 
 void ExecutionVisitor::visit( CallRule& node )
@@ -760,7 +939,7 @@ void ExecutionVisitor::invokeBuiltin(
 class StateInitializationVisitor final : public RecursiveVisitor
 {
   public:
-    StateInitializationVisitor( /* FunctionState& */ );
+    StateInitializationVisitor( Storage& storage );
 
     void visit( Specification& node ) override;
 
@@ -771,19 +950,25 @@ class StateInitializationVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
 
   private:
+    Storage& m_storage;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 };
 
-StateInitializationVisitor::StateInitializationVisitor( /* FunctionState& */ )
-: m_updateSetManager()
+StateInitializationVisitor::StateInitializationVisitor( Storage& storage )
+: m_storage( storage )
+, m_updateSetManager()
 {
 }
 
 void StateInitializationVisitor::visit( Specification& node )
 {
-    ForkGuard seqGuard( &m_updateSetManager, Semantics::Sequential, 100UL );
+    m_updateSetManager.fork( Semantics::Sequential, 100UL );
+
     node.definitions()->accept( *this );
-    // TODO fire updates
+
+    auto updateSet = m_updateSetManager.currentUpdateSet();
+    m_storage.fireUpdateSet( updateSet );
+    m_updateSetManager.clear();
 }
 
 void StateInitializationVisitor::visit( VariableDefinition& node )
@@ -794,7 +979,7 @@ void StateInitializationVisitor::visit( VariableDefinition& node )
 void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
-    ExecutionVisitor executionVisitor( m_updateSetManager );
+    ExecutionVisitor executionVisitor( m_storage, m_updateSetManager );
     node.initializers()->accept( executionVisitor );
 }
 
@@ -827,10 +1012,44 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
 
     try
     {
-        StateInitializationVisitor stateInitializationVisitor;
+        Storage storage;
+
+        StateInitializationVisitor stateInitializationVisitor( storage );
         specification->accept( stateInitializationVisitor );
 
-        // foreach agent: program->accept( ExecutionVisitor )
+        UpdateSetManager< ExecutionUpdateSet > updateSetManager;
+
+        while( true )
+        {
+            updateSetManager.fork( Semantics::Parallel, 100UL );
+
+            const auto& programs = storage.programState();
+            const auto end = programs.end();
+            for( auto it = programs.begin(); it != end; ++it )
+            {
+                const auto& value = it.value();
+
+                assert( ir::isa< ReferenceConstant >( value ) );
+                const auto& rule
+                    = static_cast< const ReferenceConstant& >( value );
+
+                if( rule.defined() )
+                {
+                    ExecutionVisitor executionVisitor(
+                        storage, updateSetManager );
+                    executionVisitor.execute( rule );
+                }
+            }
+
+            auto updateSet = updateSetManager.currentUpdateSet();
+            if( updateSet->empty() )
+            {
+                break;
+            }
+
+            storage.fireUpdateSet( updateSet );
+            updateSetManager.clear();
+        }
     }
     catch( const RuntimeException& e )
     {
