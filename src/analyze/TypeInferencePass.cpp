@@ -477,8 +477,11 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                         static_pointer_cast< libcasm_ir::IntegerConstant >(
                             atom_rhs.value() );
 
-                    auto range_type = libstdhl::get< libcasm_ir::RangeType >(
-                        ir_lhs, ir_rhs );
+                    auto range
+                        = libstdhl::make< libcasm_ir::Range >( ir_lhs, ir_rhs );
+
+                    auto range_type
+                        = libstdhl::get< libcasm_ir::RangeType >( range );
 
                     assert( not expr.type() );
                     expr.setType( range_type );
@@ -585,6 +588,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ExistentialQuantifierExpression& node ) override;
 
     void visit( LetRule& node ) override;
+    void visit( ForallRule& node ) override;
     void visit( UpdateRule& node ) override;
 
     void assignment( const Node& node, TypedNode& lhs, TypedNode& rhs,
@@ -1010,6 +1014,22 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 void TypeInferenceVisitor::visit( RangeExpression& node )
 {
     RecursiveVisitor::visit( node );
+
+    const auto& lhs = *node.left();
+    const auto& rhs = *node.right();
+
+    if( *lhs.type() != *rhs.type() )
+    {
+        m_err++;
+        m_log.error(
+            { node.sourceLocation() }, "types of range does not match" );
+        return;
+    }
+
+    const auto range_type
+        = libstdhl::get< libcasm_ir::RangeType >( lhs.type() );
+
+    node.setType( range_type );
 }
 void TypeInferenceVisitor::visit( ListExpression& node )
 {
@@ -1038,7 +1058,22 @@ void TypeInferenceVisitor::visit( LetRule& node )
         "let variable '" + node.variable()->identifier()->name() + "'",
         "binding expression" );
 }
+void TypeInferenceVisitor::visit( ForallRule& node )
+{
+    node.universe()->accept( *this );
 
+    if( node.universe()->type() )
+    {
+        node.variable()->setType( node.universe()->type()->ptr_result() );
+    }
+
+    push( *node.variable() );
+
+    node.variable()->accept( *this );
+    node.rule()->accept( *this );
+
+    pop( *node.variable() );
+}
 void TypeInferenceVisitor::visit( UpdateRule& node )
 {
     RecursiveVisitor::visit( node );
