@@ -840,17 +840,24 @@ void ExecutionVisitor::visit( SequenceRule& node )
 
 void ExecutionVisitor::visit( UpdateRule& node )
 {
+    // evalute update value
     node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
+    const auto& updateValue = m_evaluationStack.pop();
 
-    // reuse makeFrame for arguments evaluation (don't put the frame onto the
-    // stack)
-    const auto functionFrame
-        = makeFrame( *node.function(), node.function()->arguments()->size() );
+    // evaluate function arguments
+    const auto& arguments = node.function()->arguments();
+    std::vector< ir::Constant > argumentValues;
+    argumentValues.reserve( arguments->size() );
+    for( const auto& argument : *arguments )
+    {
+        argument->accept( *this );
+        const auto& value = m_evaluationStack.pop();
+        argumentValues.emplace_back( value );
+    }
 
     const Location location{ node.function()->identifier()->path(),
-        functionFrame->locals() };
-    const Update update{ value, node.sourceLocation() };
+        argumentValues };
+    const Update update{ updateValue, node.sourceLocation() };
 
     try
     {
