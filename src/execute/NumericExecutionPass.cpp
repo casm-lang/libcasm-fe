@@ -356,6 +356,16 @@ class ExecutionVisitor final : public RecursiveVisitor
     ExecutionVisitor( const Storage& storage,
         UpdateSetManager< ExecutionUpdateSet >& updateSetManager );
 
+    /**
+     * Executes the rule reference stored in \a value.
+     *
+     * @note It only support rules without arguments.
+     *
+     * @param value Rule reference (must be defined and the atom reference type
+     *        must be RULE)
+     */
+    void execute( const ReferenceConstant& value );
+
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -389,8 +399,6 @@ class ExecutionVisitor final : public RecursiveVisitor
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
 
-    void execute( const ReferenceConstant& value );
-
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
@@ -418,13 +426,17 @@ ExecutionVisitor::ExecutionVisitor( const Storage& storage,
 
 void ExecutionVisitor::execute( const ReferenceConstant& value )
 {
-    assert( value.defined() );
+    assert( value.defined() && "Reference must be defined" );
 
     const auto& atom = value.atom();
-    assert( atom->referenceType() == ReferenceAtom::ReferenceType::RULE );
+    assert( ( atom->referenceType() == ReferenceAtom::ReferenceType::RULE )
+            && "Must be a rule reference" );
 
     const auto& rule
         = std::static_pointer_cast< RuleDefinition >( atom->reference() );
+    assert( ( rule->arguments()->size() == 0 )
+            && "Only parameter-less rules are supported" );
+
     m_frameStack.push( libstdhl::make_unique< Frame >(
         nullptr, rule->maximumNumberOfLocals() ) );
     rule->accept( *this );
