@@ -806,12 +806,13 @@ void ExecutionVisitor::visit( ForallRule& node )
 
 void ExecutionVisitor::visit( ChooseRule& node )
 {
-    // TODO choose one value of the universe
-
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
-    // frame->setLocal( variableIndex, ... ); // TODO assign value
 
+    node.universe()->accept( *this );
+    const auto& universe = m_evaluationStack.pop();
+
+    frame->setLocal( variableIndex, universe.choose() );
     node.rule()->accept( *this );
 }
 
