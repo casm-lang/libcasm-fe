@@ -576,7 +576,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
-    void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -598,7 +597,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         const Node& node,
         const std::vector< Expression::Ptr >& expressions = {} );
 
-    void inference( const libcasm_ir::Annotation* annotation, TypedNode& node,
+    void inference( const std::string& description,
+        const libcasm_ir::Annotation* annotation, TypedNode& node,
         const std::vector< Expression::Ptr >& arguments = {} );
 
     void inference( FunctionDefinition& node );
@@ -775,11 +775,6 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
     }
 }
 
-void TypeInferenceVisitor::visit( UndefAtom& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
 void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
     const auto& path = *node.identifier();
@@ -834,10 +829,11 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 {
                     if( not node.type() )
                     {
-                        inference( 0, node );
+                        const auto description
+                            = "variable '" + path.path() + "'";
+                        inference( description, 0, node );
                     }
 
-                    assert( node.type() );
                     definition.setType( node.type() );
                 }
             }
@@ -853,14 +849,16 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             try
             {
-                inference( annotation_ptr, node, node.arguments()->data() );
+                const auto description = "built-in '" + path.path() + "'";
+                inference( description, annotation_ptr, node,
+                    node.arguments()->data() );
 
                 std::vector< libcasm_ir::Type::Ptr > argTypeList;
                 for( auto argumentType : *node.arguments() )
                 {
                     if( not argumentType->type() )
                     {
-                        m_log.info( { argumentType->sourceLocation() },
+                        m_log.debug( { argumentType->sourceLocation() },
                             "TODO: '" + path.path()
                                 + "' has a non-typed argument(s)" );
                         return;
@@ -997,7 +995,9 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    inference( &annotation, node, { node.expression() } );
+    const auto description
+        = "operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+    inference( description, &annotation, node, { node.expression() } );
 }
 
 void TypeInferenceVisitor::visit( BinaryExpression& node )
@@ -1008,7 +1008,9 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    inference( &annotation, node, { node.left(), node.right() } );
+    const auto description
+        = "operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+    inference( description, &annotation, node, { node.left(), node.right() } );
 }
 
 void TypeInferenceVisitor::visit( RangeExpression& node )
@@ -1050,8 +1052,16 @@ void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
 
 void TypeInferenceVisitor::visit( LetRule& node )
 {
+    node.variable()->accept( *this );
     push( *node.variable() );
-    RecursiveVisitor::visit( node );
+    node.expression()->accept( *this );
+
+    if( not node.variable()->type() and node.expression()->type() )
+    {
+        node.variable()->setType( node.expression()->type() );
+    }
+
+    node.rule()->accept( *this );
     pop( *node.variable() );
 
     assignment( node, *node.variable(), *node.expression(),
@@ -1133,13 +1143,22 @@ void TypeInferenceVisitor::annotate( const libcasm_ir::Annotation& annotation,
 
         for( auto t : result->second )
         {
-            for( std::size_t c = 0; c < expressions.size(); c++ )
+            try
             {
-                const auto& map_expr = map.at( t ).at( c );
+                const auto& map_result = map.at( t );
 
-                std::copy( map_expr.begin(), map_expr.end(),
-                    std::back_inserter(
-                        m_resultTypes[ expressions[ c ].get() ] ) );
+                for( std::size_t c = 0; c < expressions.size(); c++ )
+                {
+                    const auto& map_expr = map_result.at( c );
+
+                    std::copy( map_expr.begin(), map_expr.end(),
+                        std::back_inserter(
+                            m_resultTypes[ expressions[ c ].get() ] ) );
+                }
+            }
+            catch( const std::out_of_range& e )
+            {
+                continue;
             }
         }
 
@@ -1168,43 +1187,77 @@ void TypeInferenceVisitor::annotate( const libcasm_ir::Annotation& annotation,
     }
 }
 
-void TypeInferenceVisitor::inference( const libcasm_ir::Annotation* annotation,
-    TypedNode& node, const std::vector< Expression::Ptr >& arguments )
+void TypeInferenceVisitor::inference( const std::string& description,
+    const libcasm_ir::Annotation* annotation, TypedNode& node,
+    const std::vector< Expression::Ptr >& arguments )
 {
     auto result = m_resultTypes.find( &node );
     if( result == m_resultTypes.end() )
     {
         m_err++;
-        m_log.error(
-            { node.sourceLocation() }, "unable to find type annotation" );
+        m_log.error( { node.sourceLocation() },
+            "unable to find type annotation for " + description );
         return;
     }
 
     if( annotation )
     {
+        std::size_t pos = -1;
+        std::size_t idx = 0;
+
         std::vector< libcasm_ir::Type::ID > argTypes;
+
         for( auto argument : arguments )
         {
             if( not argument->type() )
             {
-                m_log.warning(
-                    { node.sourceLocation() }, "found no argument type" );
-                return;
+                auto argTy = m_resultTypes.find( argument.get() );
+                if( argTy != m_resultTypes.end() and argTy->second.size() == 1 )
+                {
+                    argTypes.emplace_back( *argTy->second.begin() );
+                }
+                else
+                {
+                    pos = idx;
+                    argTypes.emplace_back( libcasm_ir::Type::ID::_TOP_ );
+                }
             }
-
-            const auto tid = argument->type()->result().id();
-            argTypes.emplace_back( tid );
+            else
+            {
+                const auto tid = argument->type()->result().id();
+                argTypes.emplace_back( tid );
+            }
+            idx++;
         }
 
-        const auto fetch = annotation->resultTypeForRelation( argTypes );
+        try
+        {
+            const auto relation = annotation->resultTypeForRelation( argTypes );
 
-        const std::vector< libcasm_ir::Type::ID > inf = { fetch };
-        std::vector< libcasm_ir::Type::ID > tmp = {};
+            const std::vector< libcasm_ir::Type::ID > inf
+                = { relation->result };
+            std::vector< libcasm_ir::Type::ID > tmp = {};
 
-        std::set_intersection( result->second.begin(), result->second.end(),
-            inf.begin(), inf.end(), std::back_inserter( tmp ) );
+            std::set_intersection( result->second.begin(), result->second.end(),
+                inf.begin(), inf.end(), std::back_inserter( tmp ) );
 
-        m_resultTypes[&node ] = std::move( tmp );
+            m_resultTypes[&node ] = std::move( tmp );
+
+            if( pos != -1 and arguments[ pos ]->id() == Node::ID::UNDEF_ATOM )
+            {
+                auto undefAtom
+                    = static_cast< UndefAtom* >( arguments[ pos ].get() );
+
+                m_resultTypes[ undefAtom ] = { relation->argument[ pos ] };
+                inference( "undef", 0, *undefAtom );
+            }
+        }
+        catch( const std::invalid_argument& e )
+        {
+            m_err++;
+            m_log.error( { node.sourceLocation() },
+                "unable to infer result type of " + description );
+        }
     }
 
     const auto& resTypes = m_resultTypes[&node ];
@@ -1212,7 +1265,8 @@ void TypeInferenceVisitor::inference( const libcasm_ir::Annotation* annotation,
     if( resTypes.size() < 1 )
     {
         m_err++;
-        m_log.warning( { node.sourceLocation() }, "found no result type" );
+        m_log.error( { node.sourceLocation() },
+            "unable to infer result type of " + description );
         return;
     }
     else if( resTypes.size() > 1 )
@@ -1227,8 +1281,10 @@ void TypeInferenceVisitor::inference( const libcasm_ir::Annotation* annotation,
         }
 
         m_err++;
-        m_log.warning(
-            { node.sourceLocation() }, "found multiple result types: " + tmp );
+        m_log.error( { node.sourceLocation() },
+            "unable to infer result type of " + description
+                + " from multiple possible types: "
+                + tmp );
         return;
     }
 
@@ -1273,15 +1329,15 @@ void TypeInferenceVisitor::inference( const libcasm_ir::Annotation* annotation,
         }
         case libcasm_ir::Type::RULE_REFERENCE:
         {
-            assert(
-                0 ); // TODO: PPA: retrieve relation to construct RuleRef type
+            assert( 0 ); // TODO: PPA: retrieve relation to
+                         // construct RuleRef type
             // node.setType( ? );
             break;
         }
         case libcasm_ir::Type::FUNCTION_REFERENCE:
         {
-            assert(
-                0 ); // TODO: PPA: retrieve relation to construct FuncRef type
+            assert( 0 ); // TODO: PPA: retrieve relation to
+                         // construct FuncRef type
             // node.setType( ? );
             break;
         }
