@@ -1185,13 +1185,20 @@ void AgentScheduler::dispatch( std::vector< Agent >& agents )
 ExecutionUpdateSet* AgentScheduler::collectUpdates(
     const std::vector< Agent >& agents )
 {
-    m_updateSetManager.fork( Semantics::Parallel, 100UL );
-    auto* updates = m_updateSetManager.currentUpdateSet();
-    for( const auto& agent : agents )
+    if( agents.size() == 1 )
     {
-        agent.updateSet()->mergeInto( updates );
+        return agents.at( 0 ).updateSet();
     }
-    return updates;
+    else
+    {
+        m_updateSetManager.fork( Semantics::Parallel, 100UL );
+        auto* updates = m_updateSetManager.currentUpdateSet();
+        for( const auto& agent : agents )
+        {
+            agent.updateSet()->mergeInto( updates );
+        }
+        return updates;
+    }
 }
 
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
