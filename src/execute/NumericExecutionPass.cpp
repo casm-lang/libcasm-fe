@@ -25,6 +25,8 @@
 
 #include "NumericExecutionPass.h"
 
+#include <thread>
+
 #include "../stdhl/cpp/Default.h"
 
 #include "../pass/src/PassRegistry.h"
@@ -667,9 +669,11 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.predicateVariable()->localIndex();
 
-    while( false /* TODO iterate over universe */ )
-    {
-        // frame->setLocal( variableIndex, ... ); // TODO assign value
+    node.universe()->accept( *this );
+    const auto& universe = m_evaluationStack.pop();
+
+    universe.foreach( [&]( const ir::Constant& value ) {
+        frame->setLocal( variableIndex, value );
 
         node.proposition()->accept( *this );
         const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
@@ -683,9 +687,9 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
         else if( prop.value() == false )
         {
             result = false;
-            break;
+            // break; TODO optimization
         }
-    }
+    } );
 
     m_evaluationStack.push( ir::BooleanConstant( result ) );
 }
@@ -697,9 +701,11 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.predicateVariable()->localIndex();
 
-    while( false /* TODO iterate over universe */ )
-    {
-        // frame->setLocal( variableIndex, ... ); // TODO assign value
+    node.universe()->accept( *this );
+    const auto& universe = m_evaluationStack.pop();
+
+    universe.foreach( [&]( const ir::Constant& value ) {
+        frame->setLocal( variableIndex, value );
 
         node.proposition()->accept( *this );
         const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
@@ -713,9 +719,9 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
         else if( prop.value() == true )
         {
             result = true;
-            break;
+            // break; TODO optimization
         }
-    }
+    } );
 
     m_evaluationStack.push( ir::BooleanConstant( result ) );
 }
@@ -793,21 +799,24 @@ void ExecutionVisitor::visit( ForallRule& node )
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
 
-    while( false /* TODO iterate over universe */ )
-    {
-        // frame->setLocal( variableIndex, ... ); // TODO assign value
+    node.universe()->accept( *this );
+    const auto& universe = m_evaluationStack.pop();
+
+    universe.foreach( [&]( const ir::Constant& value ) {
+        frame->setLocal( variableIndex, value );
         node.rule()->accept( *this );
-    }
+    } );
 }
 
 void ExecutionVisitor::visit( ChooseRule& node )
 {
-    // TODO choose one value of the universe
-
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
-    // frame->setLocal( variableIndex, ... ); // TODO assign value
 
+    node.universe()->accept( *this );
+    const auto& universe = m_evaluationStack.pop();
+
+    frame->setLocal( variableIndex, universe.choose() );
     node.rule()->accept( *this );
 }
 
@@ -1005,6 +1014,200 @@ void StateInitializationVisitor::visit( EnumerationDefinition& node )
     // nothing to do
 }
 
+class Agent
+{
+  public:
+    Agent( const Storage& storage, const ReferenceConstant& rule );
+
+    void run();
+
+    ExecutionUpdateSet* updateSet() const;
+
+  private:
+    const Storage& m_storage;
+    const ReferenceConstant& m_rule;
+    UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
+};
+
+Agent::Agent( const Storage& storage, const ReferenceConstant& rule )
+: m_storage( storage )
+, m_rule( rule )
+, m_updateSetManager()
+{
+}
+
+void Agent::run()
+{
+    ExecutionVisitor executionVisitor( m_storage, m_updateSetManager );
+    executionVisitor.execute( m_rule );
+}
+
+ExecutionUpdateSet* Agent::updateSet() const
+{
+    return m_updateSetManager.currentUpdateSet();
+}
+
+class DispatchStrategy
+{
+  public:
+    virtual void dispatch( std::vector< Agent >& agents ) = 0;
+};
+
+class ParallelDispatchStrategy : public DispatchStrategy
+{
+  public:
+    void dispatch( std::vector< Agent >& agents ) override;
+};
+
+void ParallelDispatchStrategy::dispatch( std::vector< Agent >& agents )
+{
+    if( agents.size() == 1 )
+    {
+        agents.at( 0 ).run();
+    }
+    else
+    {
+        std::vector< std::thread > threads;
+        threads.reserve( agents.size() );
+        for( auto& agent : agents )
+        {
+            threads.emplace_back( [&] { agent.run(); } );
+        }
+        for( auto& thread : threads )
+        {
+            thread.join();
+        }
+    }
+}
+
+class SequentialDispatchStrategy : public DispatchStrategy
+{
+  public:
+    void dispatch( std::vector< Agent >& agents ) override;
+};
+
+void SequentialDispatchStrategy::dispatch( std::vector< Agent >& agents )
+{
+    for( auto& agent : agents )
+    {
+        agent.run();
+    }
+}
+
+class AgentScheduler
+{
+  public:
+    AgentScheduler( Storage& storage );
+
+    void setDispatchStrategy(
+        std::unique_ptr< DispatchStrategy > dispatchStrategy );
+
+    /**
+     * Performs an ASM step.
+     */
+    void step( void );
+
+    /**
+     * @return A boolean value indicating wheter the ASM has reached an end
+     *         state, meaning that no further steps need to be done.
+     */
+    bool done( void ) const;
+
+  private:
+    std::vector< Agent > collectAgents( void ) const;
+    void dispatch( std::vector< Agent >& agents );
+    ExecutionUpdateSet* collectUpdates( const std::vector< Agent >& agents );
+
+  private:
+    std::unique_ptr< DispatchStrategy > m_dispatchStrategy;
+    Storage& m_storage;
+    UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
+    bool m_done;
+};
+
+AgentScheduler::AgentScheduler( Storage& storage )
+: m_dispatchStrategy( libstdhl::make_unique< SequentialDispatchStrategy >() )
+, m_storage( storage )
+, m_updateSetManager()
+, m_done( false )
+{
+}
+
+void AgentScheduler::setDispatchStrategy(
+    std::unique_ptr< DispatchStrategy > dispatchStrategy )
+{
+    m_dispatchStrategy = std::move( dispatchStrategy );
+}
+
+void AgentScheduler::step( void )
+{
+    auto agents = collectAgents();
+    if( agents.empty() )
+    {
+        m_done = true;
+        return;
+    }
+
+    dispatch( agents );
+
+    auto* updates = collectUpdates( agents );
+    m_storage.fireUpdateSet( updates );
+    m_done = updates->empty();
+    m_updateSetManager.clear();
+}
+
+bool AgentScheduler::done( void ) const
+{
+    return m_done;
+}
+
+std::vector< Agent > AgentScheduler::collectAgents( void ) const
+{
+    std::vector< Agent > agents;
+
+    const auto& programs = m_storage.programState();
+    const auto end = programs.end();
+    for( auto it = programs.begin(); it != end; ++it )
+    {
+        const auto& value = it.value();
+
+        assert( ir::isa< ReferenceConstant >( value ) );
+        const auto& rule = static_cast< const ReferenceConstant& >( value );
+
+        if( rule.defined() )
+        {
+            agents.push_back( Agent( m_storage, rule ) );
+        }
+    }
+
+    return agents;
+}
+
+void AgentScheduler::dispatch( std::vector< Agent >& agents )
+{
+    assert( m_dispatchStrategy );
+    m_dispatchStrategy->dispatch( agents );
+}
+
+ExecutionUpdateSet* AgentScheduler::collectUpdates(
+    const std::vector< Agent >& agents )
+{
+    if( agents.size() == 1 )
+    {
+        return agents.at( 0 ).updateSet();
+    }
+    else
+    {
+        m_updateSetManager.fork( Semantics::Parallel, 100UL );
+        auto* updates = m_updateSetManager.currentUpdateSet();
+        for( const auto& agent : agents )
+        {
+            agent.updateSet()->mergeInto( updates );
+        }
+        return updates;
+    }
+}
+
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
     pu.require< TypeInferencePass >();
@@ -1017,45 +1220,20 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
 
+    Storage storage;
+
+    AgentScheduler scheduler( storage );
+    /*scheduler.setDispatchStrategy(
+        libstdhl::make_unique< ParallelDispatchStrategy >() );*/
+
     try
     {
-        Storage storage;
-
         StateInitializationVisitor stateInitializationVisitor( storage );
         specification->accept( stateInitializationVisitor );
 
-        UpdateSetManager< ExecutionUpdateSet > updateSetManager;
-
-        while( true )
+        while( not scheduler.done() )
         {
-            updateSetManager.fork( Semantics::Parallel, 100UL );
-
-            const auto& programs = storage.programState();
-            const auto end = programs.end();
-            for( auto it = programs.begin(); it != end; ++it )
-            {
-                const auto& value = it.value();
-
-                assert( ir::isa< ReferenceConstant >( value ) );
-                const auto& rule
-                    = static_cast< const ReferenceConstant& >( value );
-
-                if( rule.defined() )
-                {
-                    ExecutionVisitor executionVisitor(
-                        storage, updateSetManager );
-                    executionVisitor.execute( rule );
-                }
-            }
-
-            auto updateSet = updateSetManager.currentUpdateSet();
-            if( updateSet->empty() )
-            {
-                break;
-            }
-
-            storage.fireUpdateSet( updateSet );
-            updateSetManager.clear();
+            scheduler.step();
         }
     }
     catch( const RuntimeException& e )
