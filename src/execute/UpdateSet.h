@@ -265,23 +265,40 @@ class UpdateSet
      *
      * @throws Conflict when the parent update-set is a parallel update-set, an
      *         update for the \a location exists already in the parent
-     * update-set and the values of both updates are different
+     *         update-set and the values of both updates are different
      */
     void merge()
     {
         assert( m_parent != nullptr );
 
-        if( m_parent->m_set.empty() )
+        mergeInto( m_parent );
+    }
+
+    /**
+     * Merges all updates of the current update-set into the update-set \a other
+     *
+     * @param other The update-set which should receive the updates (must not
+     *        be nullptr)
+     *
+     * @throws Conflict when the other update-set is a parallel update-set, an
+     *         update for the \a location exists already in the other
+     *         update-set and the values of both updates are different
+     */
+    void mergeInto( UpdateSet* other )
+    {
+        assert( other != nullptr );
+
+        if( other->m_set.empty() )
         {
-            std::swap( m_parent->m_set, m_set );
+            std::swap( other->m_set, m_set );
         }
         else
         {
-            m_parent->reserveAdditionally( m_set.size() );
+            other->reserveAdditionally( m_set.size() );
             const auto end = m_set.end();
             for( auto it = m_set.begin(); it != end; ++it )
             {
-                m_parent->add( it.key(), it.value() );
+                other->add( it.key(), it.value() );
             }
         }
     }
