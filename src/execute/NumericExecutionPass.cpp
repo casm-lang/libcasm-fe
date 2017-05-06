@@ -669,9 +669,11 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.predicateVariable()->localIndex();
 
-    while( false /* TODO iterate over universe */ )
-    {
-        // frame->setLocal( variableIndex, ... ); // TODO assign value
+    node.universe()->accept( *this );
+    const auto& universe = m_evaluationStack.pop();
+
+    universe.foreach( [&]( const ir::Constant& value ) {
+        frame->setLocal( variableIndex, value );
 
         node.proposition()->accept( *this );
         const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
@@ -685,9 +687,9 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
         else if( prop.value() == false )
         {
             result = false;
-            break;
+            // break; TODO optimization
         }
-    }
+    } );
 
     m_evaluationStack.push( ir::BooleanConstant( result ) );
 }
