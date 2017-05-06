@@ -96,6 +96,14 @@ void Logger::info(
     log< Log::Level::ID::INFORMATIONAL >( items );
 }
 
+void Logger::debug(
+    const std::vector< SourceLocation >& locations, const std::string& message )
+{
+    auto items = to_location_items( locations );
+    items.add( libstdhl::make< Log::TextItem >( message ) );
+    log< Log::Level::ID::DEBUG >( items );
+}
+
 //
 //  Local variables:
 //  mode: c++
