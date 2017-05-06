@@ -795,11 +795,13 @@ void ExecutionVisitor::visit( ForallRule& node )
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
 
-    while( false /* TODO iterate over universe */ )
-    {
-        // frame->setLocal( variableIndex, ... ); // TODO assign value
+    node.universe()->accept( *this );
+    const auto& universe = m_evaluationStack.pop();
+
+    universe.foreach( [&]( const ir::Constant& value ) {
+        frame->setLocal( variableIndex, value );
         node.rule()->accept( *this );
-    }
+    } );
 }
 
 void ExecutionVisitor::visit( ChooseRule& node )
