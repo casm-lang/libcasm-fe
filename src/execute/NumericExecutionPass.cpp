@@ -270,7 +270,7 @@ class Storage
     using ExecutionFunctionState = FunctionState< FunctionStateDetails >;
 
   public:
-    Storage();
+    Storage( void );
 
     void fireUpdateSet( ExecutionUpdateSet* updateSet );
 
@@ -279,7 +279,7 @@ class Storage
     std::experimental::optional< ir::Constant > get(
         const Location& location ) const;
 
-    const ExecutionFunctionState& programState() const;
+    const ExecutionFunctionState& programState( void ) const;
 
   private:
     /**
@@ -291,7 +291,7 @@ class Storage
     ExecutionFunctionState m_functionState;
 };
 
-Storage::Storage()
+Storage::Storage( void )
 : m_programState( 1 )
 , m_functionState( 100 )
 {
@@ -345,7 +345,7 @@ std::experimental::optional< ir::Constant > Storage::get(
     }
 }
 
-const Storage::ExecutionFunctionState& Storage::programState() const
+const Storage::ExecutionFunctionState& Storage::programState( void ) const
 {
     return m_programState;
 }
@@ -1031,9 +1031,9 @@ class Agent
   public:
     Agent( const Storage& storage, const ReferenceConstant& rule );
 
-    void run();
+    void run( void );
 
-    ExecutionUpdateSet* updateSet() const;
+    ExecutionUpdateSet* updateSet( void ) const;
 
   private:
     const Storage& m_storage;
@@ -1048,13 +1048,13 @@ Agent::Agent( const Storage& storage, const ReferenceConstant& rule )
 {
 }
 
-void Agent::run()
+void Agent::run( void )
 {
     ExecutionVisitor executionVisitor( m_storage, m_updateSetManager );
     executionVisitor.execute( m_rule );
 }
 
-ExecutionUpdateSet* Agent::updateSet() const
+ExecutionUpdateSet* Agent::updateSet( void ) const
 {
     return m_updateSetManager.currentUpdateSet();
 }
