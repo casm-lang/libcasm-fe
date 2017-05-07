@@ -128,6 +128,11 @@ Namespace::Symbol Namespace::find( const DirectCallExpression& node ) const
     return find( *node.identifier(), node.arguments()->size() );
 }
 
+Namespace::Symbol Namespace::find( const FunctionDefinition& node ) const
+{
+    return find( node.identifier()->name(), node.argumentTypes()->size() );
+}
+
 Namespace::Symbol Namespace::find( const BasicType& node ) const
 {
     return find( *node.name(), 0 );
