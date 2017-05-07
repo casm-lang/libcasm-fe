@@ -65,10 +65,20 @@ void Logger::error( const std::vector< SourceLocation >& locations,
 
     if( errorCode != Code::Unspecified )
     {
+        std::unordered_set< std::string > usedErrorCodeStrings;
+
         for( const auto& location : locations )
         {
-            items.add( libstdhl::make< Log::TextItem >( string_format(
-                "@%i{%04x}", location.begin.line, errorCode ) ) );
+            const auto errorCodeString
+                = string_format( "@%i{%04x}", location.begin.line, errorCode );
+
+            const auto result = usedErrorCodeStrings.emplace( errorCodeString );
+            if( not result.second )
+            {
+                continue;
+            }
+
+            items.add( libstdhl::make< Log::TextItem >( errorCodeString ) );
         }
     }
 
