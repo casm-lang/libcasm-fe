@@ -25,13 +25,12 @@
 
 #include "AstDumpSourcePass.h"
 
-#include "../pass/src/PassLogger.h" // TODO: change to FE Logger.h
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
-// #include "../Logger.h"
-#include "../analyze/TypeInferencePass.h"
+#include "../Logger.h"
+#include "../analyze/ConsistencyCheckPass.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 
@@ -336,25 +335,18 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 
 void AstDumpSourcePass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeInferencePass >();
+    pu.require< ConsistencyCheckPass >();
 }
 
 u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 {
-    libpass::PassLogger log( &id, stream() );
+    // Logger log( &id, stream() );
 
-    try
-    {
-        const auto data = pr.result< TypeInferencePass >();
-        const auto specification = data->specification();
+    const auto data = pr.result< ConsistencyCheckPass >();
+    const auto specification = data->specification();
 
-        AstDumpSourceVisitor visitor{ std::cout };
-        specification->accept( visitor );
-    }
-    catch( ... )
-    {
-        log.error( "unable to dump CASM specification" );
-    }
+    AstDumpSourceVisitor visitor{ std::cout };
+    specification->accept( visitor );
 
     return true;
 }
