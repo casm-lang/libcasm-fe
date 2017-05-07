@@ -43,7 +43,7 @@ char TypeInferencePass::id = 0;
 
 static libpass::PassRegistration< TypeInferencePass > PASS(
     "ASTTypeInferencePass",
-    "resolve all unknown types in the AST representation", "ast-check", 0 );
+    "type inference of all types in the AST representation", "ast-infer", 0 );
 
 //
 // TypeCheckVisitor
@@ -615,6 +615,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     Logger& m_log;
     u64 m_err;
     Namespace& m_symboltable;
+    u1 m_functionInitially;
 
     std::unordered_map< std::string, VariableDefinition* > m_id2var;
 
@@ -627,12 +628,17 @@ TypeInferenceVisitor::TypeInferenceVisitor(
 : m_log( log )
 , m_err( 0 )
 , m_symboltable( symboltable )
+, m_functionInitially( false )
 {
 }
 
 void TypeInferenceVisitor::visit( FunctionDefinition& node )
 {
+    m_functionInitially = true;
+
     RecursiveVisitor::visit( node );
+
+    m_functionInitially = false;
 
     inference( node );
 }
@@ -771,7 +777,10 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
     }
     catch( const std::domain_error& e )
     {
-        assert( !" inconsistent symbol table! " );
+        if( not m_functionInitially )
+        {
+            assert( !" inconsistent symbol table! " );
+        }
     }
 }
 
@@ -1088,8 +1097,11 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    assignment( node, *node.function(), *node.expression(), "updated function",
-        "updating expression" );
+    if( not m_functionInitially )
+    {
+        assignment( node, *node.function(), *node.expression(),
+            "updated function", "updating expression" );
+    }
 }
 
 void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
@@ -1514,7 +1526,7 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     if( typInfErr )
     {
         log.debug( "found %lu error(s) during type inference", typInfErr );
-        return false;
+        // return false;
     }
 
     pr.setResult< TypeInferencePass >(
