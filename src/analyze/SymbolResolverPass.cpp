@@ -61,19 +61,15 @@ class SymbolTableVisitor final : public RecursiveVisitor
     void visit( RuleDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
-    u64 errors( void ) const;
-
     Namespace::Ptr symboltable( void ) const;
 
   private:
     Logger& m_log;
-    u64 m_err;
     Namespace::Ptr m_symboltable;
 };
 
 SymbolTableVisitor::SymbolTableVisitor( Logger& log )
 : m_log( log )
-, m_err( 0 )
 {
 }
 
@@ -94,7 +90,6 @@ void SymbolTableVisitor::visit( FunctionDefinition& node )
         auto symbol = m_symboltable->find( node );
         const auto name = node.identifier()->name();
 
-        m_err++;
         if( name.compare( "program" ) == 0 )
         {
             m_log.error(
@@ -121,7 +116,6 @@ void SymbolTableVisitor::visit( DerivedDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() }, e.what() );
     }
     RecursiveVisitor::visit( node );
@@ -135,7 +129,6 @@ void SymbolTableVisitor::visit( RuleDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() }, e.what() );
     }
     RecursiveVisitor::visit( node );
@@ -149,7 +142,6 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() }, e.what() );
     }
     RecursiveVisitor::visit( node );
@@ -158,11 +150,6 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
 Namespace::Ptr SymbolTableVisitor::symboltable( void ) const
 {
     return m_symboltable;
-}
-
-u64 SymbolTableVisitor::errors( void ) const
-{
-    return m_err;
 }
 
 //
@@ -185,14 +172,11 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
 
-    u64 errors( void ) const;
-
   private:
     void push( VariableDefinition& identifier );
     void pop( VariableDefinition& identifier );
 
     Logger& m_log;
-    u64 m_err;
     Namespace& m_symboltable;
 
     class Variable
@@ -236,7 +220,6 @@ class SymbolResolveVisitor final : public RecursiveVisitor
 SymbolResolveVisitor::SymbolResolveVisitor(
     Logger& log, Namespace& symboltable )
 : m_log( log )
-, m_err( 0 )
 , m_symboltable( symboltable )
 , m_maxNumberOfLocals( 0 )
 {
@@ -294,7 +277,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         if( path.identifiers()->size() != 1 )
         {
-            m_err++;
             m_log.error( { node.sourceLocation() },
                 "invalid relative path '" + path.path() + "' found" );
         }
@@ -356,7 +338,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 }
                 catch( const std::domain_error& e )
                 {
-                    m_err++;
                     m_log.error( { node.sourceLocation() }, e.what() );
                 }
             }
@@ -375,7 +356,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 }
                 else
                 {
-                    m_err++;
                     m_log.error( { node.sourceLocation() },
                         "invalid symbol '" + path.path() + "' found" );
                 }
@@ -428,7 +408,6 @@ void SymbolResolveVisitor::push( VariableDefinition& node )
 
     if( variable != m_variables.rend() )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() },
             "symbol '" + name + "' already defined" );
     }
@@ -444,11 +423,6 @@ void SymbolResolveVisitor::pop( VariableDefinition& node )
 {
     assert( &m_variables.back().definition() == &node );
     m_variables.pop_back();
-}
-
-u64 SymbolResolveVisitor::errors( void ) const
-{
-    return m_err;
 }
 
 //
@@ -470,7 +444,7 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
     SymbolTableVisitor symTblVisitor( log );
     specification->accept( symTblVisitor );
 
-    const auto symTblErr = symTblVisitor.errors();
+    const auto symTblErr = log.errors();
     if( symTblErr )
     {
         log.debug(
@@ -481,7 +455,7 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
     SymbolResolveVisitor symResVisitor( log, *symTblVisitor.symboltable() );
     specification->accept( symResVisitor );
 
-    const auto symResErr = symResVisitor.errors();
+    const auto symResErr = log.errors();
     if( symResErr )
     {
         log.debug( "found %lu error(s) during symbol resolving", symResErr );
