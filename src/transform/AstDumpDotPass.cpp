@@ -30,8 +30,8 @@
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
+#include "../Logger.h"
 #include "../analyze/TypeInferencePass.h"
-
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 
@@ -507,13 +507,15 @@ void AstDumpDotPass::usage( libpass::PassUsage& pu )
 
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
+    Logger log( &id, stream() );
+
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
 
     std::ofstream dotfile( "./out.dot" );
     if( not dotfile.is_open() )
     {
-        std::cerr << "error: could not open `out.dot`" << std::endl;
+        log.error( "could not open 'out.dot'" );
         return false;
     }
 
