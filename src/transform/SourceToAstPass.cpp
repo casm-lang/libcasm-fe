@@ -60,7 +60,7 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     lexer.setFileName( filePath );
 
     Parser parser( log, lexer, filePath, specification );
-    parser.set_debug_level( false ); // TODO add flag
+    parser.set_debug_level( m_debug );
 
     if( ( parser.parse() != 0 ) or not specification )
     {
@@ -71,6 +71,11 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     pr.setResult< SourceToAstPass >( libstdhl::make< Data >( specification ) );
 
     return true;
+}
+
+void SourceToAstPass::setDebug( u1 enable )
+{
+    m_debug = enable;
 }
 
 //

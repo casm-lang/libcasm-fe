@@ -46,8 +46,14 @@ namespace libcasm_fe
 
         void usage( libpass::PassUsage& pu ) override;
 
-        bool run( libpass::PassResult& pr ) override;
+        u1 run( libpass::PassResult& pr ) override;
 
+        void setDebug( u1 enable );
+
+      private:
+        u1 m_debug = false;
+
+      public:
         class Data : public libpass::PassData
         {
           public:
