@@ -40,7 +40,7 @@
 
 #include "../Exceptions.h"
 #include "../Logger.h"
-#include "../analyze/TypeInferencePass.h"
+#include "../analyze/ConsistencyCheckPass.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 #include "FunctionState.h"
@@ -1222,14 +1222,14 @@ ExecutionUpdateSet* AgentScheduler::collectUpdates(
 
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeInferencePass >();
+    pu.require< ConsistencyCheckPass >();
 }
 
 u1 NumericExecutionPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto data = pr.result< TypeInferencePass >();
+    const auto data = pr.result< ConsistencyCheckPass >();
     const auto specification = data->specification();
 
     Storage storage;

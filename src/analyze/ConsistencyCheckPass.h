@@ -23,26 +23,50 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_H_
-#define _LIB_CASMFE_H_
+#ifndef _LIB_CASMFE_CONSISTENCY_CHECK_PASS_H_
+#define _LIB_CASMFE_CONSISTENCY_CHECK_PASS_H_
 
-#include "src/analyze/AttributionPass.h"
-#include "src/analyze/ConsistencyCheckPass.h"
-#include "src/analyze/SymbolResolverPass.h"
-#include "src/analyze/TypeInferencePass.h"
+#include "../pass/src/Pass.h"
+#include "../pass/src/PassData.h"
 
-#include "src/execute/NumericExecutionPass.h"
-//#include "src/execute/SymbolicExecutionPass.h"
-
-//#include "src/transform/AstToCasmIRPass.h"
-#include "src/transform/AstDumpDotPass.h"
-#include "src/transform/SourceToAstPass.h"
+#include "../ast/Specification.h"
 
 namespace libcasm_fe
 {
+    /**
+     * @brief checks the consistency and certain properties of the parsed AST
+     */
+    class ConsistencyCheckPass final : public libpass::Pass
+    {
+      public:
+        static char id;
+
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
+
+        class Data : public libpass::PassData
+        {
+          public:
+            using Ptr = std::shared_ptr< Data >;
+
+            Data( const Ast::Specification::Ptr& specification )
+            : m_specification( specification )
+            {
+            }
+
+            Ast::Specification::Ptr specification( void ) const
+            {
+                return m_specification;
+            }
+
+          private:
+            Ast::Specification::Ptr m_specification;
+        };
+    };
 }
 
-#endif // _LIB_CASMFE_H_
+#endif // _LIB_CASMFE_CONSISTENCY_CHECK_PASS_H_
 
 //
 //  Local variables:

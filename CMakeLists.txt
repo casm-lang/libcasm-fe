@@ -56,6 +56,7 @@ set( CXX_SRC_FILES
   src/ast/Type.cpp
   src/ast/RecursiveVisitor.cpp
 
+  src/analyze/ConsistencyCheckPass.cpp
   src/analyze/TypeInferencePass.cpp
   src/analyze/AttributionPass.cpp
   src/analyze/SymbolResolverPass.cpp
