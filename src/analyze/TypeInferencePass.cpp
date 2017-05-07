@@ -69,14 +69,11 @@ class TypeCheckVisitor final : public RecursiveVisitor
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
 
-    u64 errors( void ) const;
-
   private:
     void push( VariableDefinition& identifier );
     void pop( VariableDefinition& identifier );
 
     Logger& m_log;
-    u64 m_err;
     Namespace& m_symboltable;
 
     std::unordered_map< std::string, VariableDefinition* > m_id2var;
@@ -112,7 +109,6 @@ static const std::unordered_map< std::string, libcasm_ir::Type::Ptr > basicTypes
 
 TypeCheckVisitor::TypeCheckVisitor( Logger& log, Namespace& symboltable )
 : m_log( log )
-, m_err( 0 )
 , m_symboltable( symboltable )
 {
 }
@@ -190,7 +186,6 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                         }
                         catch( const std::domain_error& e )
                         {
-                            // m_err++; // TODO: PPA: enable this
                             m_log.error( { node.sourceLocation() },
                                 "unable to find symbol '"
                                     + identifierSearchPath.path()
@@ -199,7 +194,6 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                     }
                     else
                     {
-                        // m_err++; // TODO: PPA: enable this
                         m_log.error( { node.sourceLocation() },
                             "unable to resolve symbol '" + path.path() + "'" );
                     }
@@ -229,14 +223,12 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                     }
                     catch( const std::domain_error& e )
                     {
-                        // m_err++; // TODO: PPA: enable this
                         m_log.error( { node.sourceLocation() },
                             "unknown symbol '" + path.path() + "' found" );
                     }
                 }
                 else
                 {
-                    // m_err++; // TODO: PPA: enable this
                     m_log.error( { node.sourceLocation() },
                         "unknown symbol '" + path.path() + "' found" );
                 }
@@ -324,7 +316,6 @@ void TypeCheckVisitor::visit( BasicType& node )
         else if( name.compare( "RuleRef" ) == 0
                  or name.compare( "FuncRef" ) == 0 )
         {
-            m_err++;
             m_log.error( { node.sourceLocation() },
                 "reference type '" + name + "' defined without relation" );
         }
@@ -346,7 +337,6 @@ void TypeCheckVisitor::visit( BasicType& node )
             }
             catch( const std::domain_error& e )
             {
-                m_err++;
                 m_log.error( { node.sourceLocation() },
                     "unknown type '" + name + "' found" );
             }
@@ -407,7 +397,6 @@ void TypeCheckVisitor::visit( RelationType& node )
     }
     else
     {
-        m_err++;
         m_log.error( { node.sourceLocation() },
             "unknown relation type '" + name + "' found" );
     }
@@ -437,13 +426,11 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                 }
                 catch( const std::domain_error& e )
                 {
-                    m_err++;
                     m_log.error( { expr.sourceLocation() }, e.what() );
                 }
             }
             else
             {
-                m_err++;
                 m_log.error( { expr.sourceLocation() },
                     "unsupported expr for 'Bit' type, constant Integer value "
                     "expected" );
@@ -495,14 +482,12 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                     }
                     catch( const std::domain_error& e )
                     {
-                        m_err++;
                         m_log.error( { expr.sourceLocation() }, e.what() );
                     }
                 }
             }
             else
             {
-                m_err++;
                 m_log.error( { expr.sourceLocation() },
                     "unsupported expr for 'Integer' type, only range "
                     "expressions are allowed, e.g. `Integer'[5..10]`" );
@@ -510,7 +495,6 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
         }
         else
         {
-            m_err++;
             m_log.error( { node.sourceLocation() },
                 "unknown type '" + name + "' found" );
         }
@@ -530,11 +514,6 @@ void TypeCheckVisitor::visit( DefaultCase& node )
     // omit redundant traversal of rule(), see visit( CaseRule& )
 }
 
-u64 TypeCheckVisitor::errors( void ) const
-{
-    return m_err;
-}
-
 void TypeCheckVisitor::push( VariableDefinition& node )
 {
     const auto& name = node.identifier()->name();
@@ -542,7 +521,6 @@ void TypeCheckVisitor::push( VariableDefinition& node )
     auto result = m_id2var.emplace( name, &node );
     if( not result.second )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() },
             "symbol '" + name + "' already defined" );
     }
@@ -609,11 +587,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void pop( VariableDefinition& node );
     VariableDefinition& find( const IdentifierPath& node );
 
-    u64 errors( void ) const;
-
   private:
     Logger& m_log;
-    u64 m_err;
     Namespace& m_symboltable;
     u1 m_functionInitially;
 
@@ -626,7 +601,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 TypeInferenceVisitor::TypeInferenceVisitor(
     Logger& log, Namespace& symboltable )
 : m_log( log )
-, m_err( 0 )
 , m_symboltable( symboltable )
 , m_functionInitially( false )
 {
@@ -767,7 +741,6 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             }
             default:
             {
-                m_err++;
                 m_log.error( { node.sourceLocation() },
                     "cannot reference '" + CallExpression::targetTypeString(
                                                symbol.targetType() )
@@ -805,7 +778,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         catch( const std::domain_error& e )
         {
-            m_err++;
             m_log.error( { node.sourceLocation() },
                              "unable to resolve built-in symbol '"
                              + path.path()
@@ -884,7 +856,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
             catch( const std::domain_error& e )
             {
-                m_err++;
                 m_log.error( { node.sourceLocation() }, e.what() );
                 return;
             }
@@ -958,7 +929,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         {
             if( not node.type() )
             {
-                m_err++;
                 m_log.error( { node.sourceLocation() }, "TODO: ENUMERATION" );
             }
             break;
@@ -967,7 +937,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         {
             if( not node.type() )
             {
-                m_err++;
                 m_log.error( { node.sourceLocation() }, "TODO: CONSTANT" );
             }
             break;
@@ -988,7 +957,6 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 
     if( not node.expression()->type() )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() },
             "unable to resolve type of indirect call expression" );
     }
@@ -1031,7 +999,6 @@ void TypeInferenceVisitor::visit( RangeExpression& node )
 
     if( *lhs.type() != *rhs.type() )
     {
-        m_err++;
         m_log.error(
             { node.sourceLocation() }, "types of range does not match" );
         return;
@@ -1112,30 +1079,27 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
         rhs.setType( lhs.type()->ptr_result() );
     }
 
-    const auto error_count = m_err;
+    const auto error_count = m_log.errors();
 
     if( not lhs.type() )
     {
-        m_err++;
         m_log.error(
             { lhs.sourceLocation() }, "unable to infer type of " + dst );
     }
 
     if( not rhs.type() )
     {
-        m_err++;
         m_log.error(
             { rhs.sourceLocation() }, "unable to infer type of " + src );
     }
 
-    if( error_count != m_err )
+    if( error_count != m_log.errors() )
     {
         return;
     }
 
     if( lhs.type()->result() != rhs.type()->result() )
     {
-        m_err++;
         m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
             "type of " + dst + " does not match type of " + src + ": '"
                 + lhs.type()->description()
@@ -1206,7 +1170,6 @@ void TypeInferenceVisitor::inference( const std::string& description,
     auto result = m_resultTypes.find( &node );
     if( result == m_resultTypes.end() )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() },
             "unable to find type annotation for " + description );
         return;
@@ -1266,7 +1229,6 @@ void TypeInferenceVisitor::inference( const std::string& description,
         }
         catch( const std::invalid_argument& e )
         {
-            m_err++;
             m_log.error( { node.sourceLocation() },
                 "unable to infer result type of " + description );
         }
@@ -1276,7 +1238,6 @@ void TypeInferenceVisitor::inference( const std::string& description,
 
     if( resTypes.size() < 1 )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() },
             "unable to infer result type of " + description );
         return;
@@ -1292,7 +1253,6 @@ void TypeInferenceVisitor::inference( const std::string& description,
             first = false;
         }
 
-        m_err++;
         m_log.error( { node.sourceLocation() },
             "unable to infer result type of " + description
                 + " from multiple possible types: "
@@ -1361,7 +1321,6 @@ void TypeInferenceVisitor::inference( const std::string& description,
 
     if( not node.type() )
     {
-        m_err++;
         m_log.error(
             { node.sourceLocation() }, "unable to resolve type of expression" );
     }
@@ -1459,7 +1418,6 @@ void TypeInferenceVisitor::push( VariableDefinition& node )
     auto result = m_id2var.emplace( name, &node );
     if( not result.second )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() },
             "symbol '" + name + "' already defined" );
     }
@@ -1487,11 +1445,6 @@ VariableDefinition& TypeInferenceVisitor::find( const IdentifierPath& node )
     return *result->second;
 }
 
-u64 TypeInferenceVisitor::errors( void ) const
-{
-    return m_err;
-}
-
 //
 // TypeInferencePass
 //
@@ -1512,7 +1465,7 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     TypeCheckVisitor typeCheck( log, *symboltable );
     specification->accept( typeCheck );
 
-    const auto typChkErr = typeCheck.errors();
+    const auto typChkErr = log.errors();
     if( typChkErr )
     {
         log.debug( "found %lu error(s) during type checking", typChkErr );
@@ -1522,11 +1475,11 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     TypeInferenceVisitor typeInfer( log, *symboltable );
     specification->accept( typeInfer );
 
-    const auto typInfErr = typeInfer.errors();
+    const auto typInfErr = log.errors();
     if( typInfErr )
     {
         log.debug( "found %lu error(s) during type inference", typInfErr );
-        // return false;
+        return false;
     }
 
     pr.setResult< TypeInferencePass >(
