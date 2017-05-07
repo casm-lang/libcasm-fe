@@ -80,14 +80,14 @@ class DefinitionAttributionVisitor final : public RecursiveVisitor
     void visit( ExpressionAttribute& node ) override;
 
   private:
-    Logger& log;
+    Logger& m_log;
     Definition& m_definition;
     std::unordered_set< std::string > m_attributeNames;
 };
 
 DefinitionAttributionVisitor::DefinitionAttributionVisitor(
     Logger& log, Definition& definition )
-: log( log )
+: m_log( log )
 , m_definition( definition )
 , m_attributeNames()
 {
@@ -106,7 +106,7 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     // allow only basic attributes
     if( VALID_BASIC_ATTRIBUTES.count( name ) == 0 )
     {
-        log.error( { node.sourceLocation() },
+        m_log.error( { node.sourceLocation() },
             "`" + name + "` is a unknown basic attribute" );
         return;
     }
@@ -114,7 +114,7 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     // each attribute should only be used once
     if( m_attributeNames.count( name ) != 0 )
     {
-        log.error( { node.sourceLocation() },
+        m_log.error( { node.sourceLocation() },
             "attribute `" + name + "` has already been used" );
         return;
     }
@@ -123,7 +123,7 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     if( name == DEPRECATED_ATTRIBUTE )
     {
         // definition has been deprecated
-        log.info( { m_definition.sourceLocation() },
+        m_log.info( { m_definition.sourceLocation() },
             m_definition.description() + " `"
                 + m_definition.identifier()->name()
                 + "` has been marked as deprecated" );
@@ -137,7 +137,7 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     // allow only expression attributes
     if( VALID_EXPRESSION_ATTRIBUTES.count( name ) == 0 )
     {
-        log.error( { node.sourceLocation() },
+        m_log.error( { node.sourceLocation() },
             "`" + name + "` is a unknown expression attribute" );
         return;
     }
@@ -145,7 +145,7 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     // each attribute should only be used once
     if( m_attributeNames.count( name ) != 0 )
     {
-        log.error( { node.sourceLocation() },
+        m_log.error( { node.sourceLocation() },
             "attribute `" + name + "` has already been used" );
         return;
     }
@@ -164,23 +164,23 @@ class DefinitionVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
 
   private:
-    Logger& log;
+    Logger& m_log;
 };
 
 DefinitionVisitor::DefinitionVisitor( Logger& log )
-: log( log )
+: m_log( log )
 {
 }
 
 void DefinitionVisitor::visit( VariableDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ log, node };
+    DefinitionAttributionVisitor visitor{ m_log, node };
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( FunctionDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ log, node };
+    DefinitionAttributionVisitor visitor{ m_log, node };
     node.attributes()->accept( visitor );
 
     const auto& attributeNames = visitor.attributeNames();
@@ -218,19 +218,19 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
 
 void DefinitionVisitor::visit( DerivedDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ log, node };
+    DefinitionAttributionVisitor visitor{ m_log, node };
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( RuleDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ log, node };
+    DefinitionAttributionVisitor visitor{ m_log, node };
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( EnumerationDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ log, node };
+    DefinitionAttributionVisitor visitor{ m_log, node };
     node.attributes()->accept( visitor );
 }
 
@@ -248,6 +248,13 @@ u1 AttributionPass::run( libpass::PassResult& pr )
 
     DefinitionVisitor visitor{ log };
     specification->accept( visitor );
+
+    const auto errors = log.errors();
+    if( errors )
+    {
+        log.debug( "found %lu error(s) during attribution", errors );
+        return false;
+    }
 
     pr.setResult< AttributionPass >( libstdhl::make< Data >( specification ) );
 
