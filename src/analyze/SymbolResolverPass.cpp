@@ -91,8 +91,24 @@ void SymbolTableVisitor::visit( FunctionDefinition& node )
     }
     catch( const std::domain_error& e )
     {
+        auto symbol = m_symboltable->find( node );
+        const auto name = node.identifier()->name();
+
         m_err++;
-        m_log.error( { node.sourceLocation() }, e.what() );
+        if( name.compare( "program" ) == 0 )
+        {
+            m_log.error(
+                { node.sourceLocation(), symbol.definition().sourceLocation() },
+                "init already defined",
+                Code::AgentInitRuleMultipleDefinitions );
+        }
+        else
+        {
+            m_log.error(
+                { node.sourceLocation(), symbol.definition().sourceLocation() },
+                "function '" + name + "' already defined",
+                Code::FunctionDefinitionAlreadyUsed );
+        }
     }
     RecursiveVisitor::visit( node );
 }

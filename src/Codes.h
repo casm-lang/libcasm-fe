@@ -44,6 +44,9 @@ namespace libcasm_fe
         // --------------------------------------------------------- f*** ...
         // function errors
         ,
+        FunctionDefinitionAlreadyUsed = 0xf010
+
+        ,
         FunctionAttributeIsInvalid = 0xfa00 // fa** ... function attribute
         ,
         FunctionAttributeMultipleUseOfFunctionClassifier = 0xfa01,
@@ -99,7 +102,7 @@ namespace libcasm_fe
         // --------------------------------------------------------- a*** ...
         // agent errors
         ,
-        RuleDoesNotExist = 0xa000,
+        AgentInitRuleDoesNotExist = 0xa000,
         AgentInitRuleMultipleDefinitions = 0xa001,
         AgentInitRuleNotDefined = 0xa002
 
