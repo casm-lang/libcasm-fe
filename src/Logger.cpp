@@ -73,6 +73,11 @@ void Logger::error( const std::vector< SourceLocation >& locations,
     }
 
     log< Log::Level::ID::ERROR >( items );
+
+    if( errorCode == Code::Unspecified )
+    {
+        warning( locations, "unspecified error code" );
+    }
 }
 
 void Logger::error( const Exception& exception )
