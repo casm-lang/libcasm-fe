@@ -63,11 +63,8 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
     void visit( ReferenceAtom& node ) override;
 
-    u64 errors( void ) const;
-
   private:
     Logger& m_log;
-    u64 m_err;
     const Namespace& m_symboltable;
     u1 m_functionInitially;
 };
@@ -75,7 +72,6 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 ConsistencyCheckVisitor::ConsistencyCheckVisitor(
     Logger& log, const Namespace& symboltable )
 : m_log( log )
-, m_err( 0 )
 , m_symboltable( symboltable )
 , m_functionInitially( false )
 {
@@ -89,7 +85,6 @@ void ConsistencyCheckVisitor::visit( Specification& node )
     }
     catch( const std::domain_error& e )
     {
-        m_err++;
         m_log.error( { node.sourceLocation() },
             "no init definition found in the specification",
             Code::AgentInitRuleNotDefined );
@@ -109,8 +104,6 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     catch( const CompiletimeException& e )
     {
         const auto name = node.identifier()->name();
-
-        m_err++;
 
         if( name.compare( PROGRAM ) == 0 )
         {
@@ -148,11 +141,6 @@ void ConsistencyCheckVisitor::visit( ReferenceAtom& node )
     }
 }
 
-u64 ConsistencyCheckVisitor::errors( void ) const
-{
-    return m_err;
-}
-
 //
 // ConsistencyCheckPass
 //
@@ -173,7 +161,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     ConsistencyCheckVisitor visitor( log, symboltable );
     specification->accept( visitor );
 
-    const auto errors = visitor.errors();
+    const auto errors = log.errors();
     if( errors )
     {
         log.debug( "found %lu error(s) during consistency checking", errors );
