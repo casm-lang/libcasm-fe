@@ -630,8 +630,8 @@ void AstToCasmIRPass::visit_assert( UnaryNode* node, bool expr )
     auto ir_cond = lookup< libcasm_ir::Value >( node->child_ );
     assert( ir_cond );
 
-    auto ir_instr = libstdhl::make< libcasm_ir::AssertInstruction >( ir_cond );
-    ir_stmt->add( ir_instr );
+    // auto ir_instr = libstdhl::make< libcasm_ir::AssertInstruction >( ir_cond );
+    // ir_stmt->add( ir_instr );
 }
 
 void AstToCasmIRPass::visit_assure( UnaryNode* node, bool expr )
@@ -1014,7 +1014,7 @@ bool AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
     {
         case TypeType::RULEREF:
         {
-            ir_const = libstdhl::get< libcasm_ir::RuleReferenceConstant >();
+            // ir_const = libstdhl::get< libcasm_ir::RuleReferenceConstant >();
             break;
         }
         case TypeType::BOOLEAN:
