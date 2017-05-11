@@ -953,9 +953,10 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
 void ExecutionVisitor::invokeBuiltin(
     ir::Value::ID id, const ir::Type::Ptr& type )
 {
-    auto* frame = m_frameStack.top();
+    const auto& locals = m_frameStack.top()->locals();
 
-    const auto result = libcasm_rt::Value::execute( id, type, frame->locals() );
+    const auto result
+        = libcasm_rt::Value::execute( id, type, locals.data(), locals.size() );
 
     const auto& returnType = type->ptr_result();
     if( not returnType->isVoid() )
