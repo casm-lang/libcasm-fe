@@ -638,7 +638,13 @@ void ExecutionVisitor::visit( BinaryExpression& node )
 
 void ExecutionVisitor::visit( RangeExpression& node )
 {
-    RecursiveVisitor::visit( node );
+    node.left()->accept( *this );
+    const auto& lhs = m_evaluationStack.pop();
+
+    node.right()->accept( *this );
+    const auto& rhs = m_evaluationStack.pop();
+
+    m_evaluationStack.push( ir::RangeConstant( node.type(), lhs, rhs ) );
 }
 
 void ExecutionVisitor::visit( ListExpression& node )
