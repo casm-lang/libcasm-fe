@@ -1125,6 +1125,8 @@ class AgentScheduler
      */
     bool done( void ) const;
 
+    std::size_t numberOfSteps( void ) const;
+
   private:
     std::vector< Agent > collectAgents( void ) const;
     void dispatch( std::vector< Agent >& agents );
@@ -1135,6 +1137,7 @@ class AgentScheduler
     Storage& m_storage;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
     bool m_done;
+    std::size_t m_stepCounter;
 };
 
 AgentScheduler::AgentScheduler( Storage& storage )
@@ -1142,6 +1145,7 @@ AgentScheduler::AgentScheduler( Storage& storage )
 , m_storage( storage )
 , m_updateSetManager()
 , m_done( false )
+, m_stepCounter( 0UL )
 {
 }
 
@@ -1153,6 +1157,8 @@ void AgentScheduler::setDispatchStrategy(
 
 void AgentScheduler::step( void )
 {
+    ++m_stepCounter;
+
     auto agents = collectAgents();
     if( agents.empty() )
     {
@@ -1171,6 +1177,11 @@ void AgentScheduler::step( void )
 bool AgentScheduler::done( void ) const
 {
     return m_done;
+}
+
+std::size_t AgentScheduler::numberOfSteps( void ) const
+{
+    return m_stepCounter;
 }
 
 std::vector< Agent > AgentScheduler::collectAgents( void ) const
@@ -1247,6 +1258,9 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
         {
             scheduler.step();
         }
+
+        log.debug( "Finished execution after "
+            + std::to_string( scheduler.numberOfSteps() ) + " steps" );
     }
     catch( const RuntimeException& e )
     {
