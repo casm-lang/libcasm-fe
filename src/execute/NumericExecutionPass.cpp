@@ -28,6 +28,7 @@
 #include <thread>
 
 #include "../stdhl/cpp/Default.h"
+#include "../stdhl/cpp/Hash.h"
 
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
@@ -180,14 +181,6 @@ class FrameStack
     std::vector< std::unique_ptr< Frame > > m_frames;
 };
 
-/**
- * From Boost
- */
-constexpr std::size_t hash_combine( std::size_t seed, std::size_t hash )
-{
-    return seed ^ ( hash + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 ) );
-}
-
 struct Location
 {
     std::string function;
@@ -209,7 +202,7 @@ struct LocationHash
         std::size_t hash = std::hash< std::string >{}( location.function );
         for( const auto& argument : location.arguments )
         {
-            hash = hash_combine( hash, ConstantHash{}( argument ) );
+            hash = libstdhl::Hash::combine( hash, ConstantHash{}( argument ) );
         }
         return hash;
     }
