@@ -43,6 +43,7 @@
 #include "../Logger.h"
 #include "../analyze/ConsistencyCheckPass.h"
 #include "../ast/RecursiveVisitor.h"
+#include "../ast/EmptyVisitor.h"
 #include "../ast/Specification.h"
 #include "FunctionState.h"
 #include "ReferenceConstant.h"
@@ -969,18 +970,14 @@ void ExecutionVisitor::invokeBuiltin(
     }
 }
 
-class StateInitializationVisitor final : public RecursiveVisitor
+class StateInitializationVisitor final : public EmptyVisitor
 {
   public:
     StateInitializationVisitor( Storage& storage );
 
     void visit( Specification& node ) override;
 
-    void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
 
   private:
     Storage& m_storage;
@@ -988,7 +985,8 @@ class StateInitializationVisitor final : public RecursiveVisitor
 };
 
 StateInitializationVisitor::StateInitializationVisitor( Storage& storage )
-: m_storage( storage )
+: EmptyVisitor()
+, m_storage( storage )
 , m_updateSetManager()
 {
 }
@@ -1004,31 +1002,11 @@ void StateInitializationVisitor::visit( Specification& node )
     m_updateSetManager.clear();
 }
 
-void StateInitializationVisitor::visit( VariableDefinition& node )
-{
-    // nothing to do
-}
-
 void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
     ExecutionVisitor executionVisitor( m_storage, m_updateSetManager );
     node.initializers()->accept( executionVisitor );
-}
-
-void StateInitializationVisitor::visit( DerivedDefinition& node )
-{
-    // nothing to do
-}
-
-void StateInitializationVisitor::visit( RuleDefinition& node )
-{
-    // nothing to do
-}
-
-void StateInitializationVisitor::visit( EnumerationDefinition& node )
-{
-    // nothing to do
 }
 
 class Agent

@@ -55,6 +55,7 @@ set( CXX_SRC_FILES
   src/ast/Specification.cpp
   src/ast/Type.cpp
   src/ast/RecursiveVisitor.cpp
+  src/ast/EmptyVisitor.cpp
 
   src/analyze/ConsistencyCheckPass.cpp
   src/analyze/TypeInferencePass.cpp
