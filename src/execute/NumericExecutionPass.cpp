@@ -1242,7 +1242,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
             scheduler.step();
         }
 
-        log.debug( "Finished execution after "
+        log.info( "Finished execution after "
             + std::to_string( scheduler.numberOfSteps() ) + " steps" );
     }
     catch( const RuntimeException& e )
