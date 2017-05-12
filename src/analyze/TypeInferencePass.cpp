@@ -249,7 +249,7 @@ void TypeCheckVisitor::visit( LetRule& node )
 
     if( not node.variable()->type() and node.expression()->type() )
     {
-        node.variable()->setType( node.expression()->type() );
+        node.variable()->setType( node.expression()->type()->ptr_result() );
     }
 
     node.rule()->accept( *this );
@@ -1034,7 +1034,7 @@ void TypeInferenceVisitor::visit( LetRule& node )
 
     if( not node.variable()->type() and node.expression()->type() )
     {
-        node.variable()->setType( node.expression()->type() );
+        node.variable()->setType( node.expression()->type()->ptr_result() );
     }
 
     node.rule()->accept( *this );
