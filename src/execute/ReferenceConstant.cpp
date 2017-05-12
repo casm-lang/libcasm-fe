@@ -28,14 +28,15 @@
 using namespace libcasm_fe;
 
 static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
+static const std::string EMPTY = "";
 
 EmptyValue::EmptyValue( void )
-: libcasm_ir::Value( "", VOID, Value::ID::VALUE )
+: libcasm_ir::Value( EMPTY, VOID, Value::ID::VALUE )
 {
 }
 
 ReferenceConstant::ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom )
-: libcasm_ir::ReferenceConstant< EmptyValue >( "", VOID,
+: libcasm_ir::ReferenceConstant< EmptyValue >( VOID,
       (const Value::Ptr&)atom, // HACK: use the memory of Value::Ptr
                                // to store the atom efficiently
                                // otherwise another shared_ptr would
