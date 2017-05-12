@@ -908,7 +908,12 @@ void ExecutionVisitor::visit( UpdateRule& node )
 void ExecutionVisitor::visit( CallRule& node )
 {
     RecursiveVisitor::visit( node );
-    m_evaluationStack.clear(); // call may returned a value, ignore it
+
+    const auto& returnType = node.call()->type()->ptr_result();
+    if( not returnType->isVoid() )
+    {
+        m_evaluationStack.pop(); // drop return value
+    }
 }
 
 void ExecutionVisitor::visit( ExpressionCase& node )
