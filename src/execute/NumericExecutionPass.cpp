@@ -42,8 +42,8 @@
 #include "../Exceptions.h"
 #include "../Logger.h"
 #include "../analyze/ConsistencyCheckPass.h"
-#include "../ast/RecursiveVisitor.h"
 #include "../ast/EmptyVisitor.h"
+#include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 #include "FunctionState.h"
 #include "ReferenceConstant.h"
@@ -620,7 +620,7 @@ void ExecutionVisitor::visit( UnaryExpression& node )
     const auto& value = m_evaluationStack.pop();
 
     const auto result
-        = libcasm_rt::Value::execute( node.op(), node.type(), value );
+        = libcasm_rt::Value::execute_( node.op(), node.type(), &value, 1 );
     m_evaluationStack.push( result );
 }
 
@@ -961,7 +961,7 @@ void ExecutionVisitor::invokeBuiltin(
     const auto& locals = m_frameStack.top()->locals();
 
     const auto result
-        = libcasm_rt::Value::execute( id, type, locals.data(), locals.size() );
+        = libcasm_rt::Value::execute_( id, type, locals.data(), locals.size() );
 
     const auto& returnType = type->ptr_result();
     if( not returnType->isVoid() )
@@ -1243,7 +1243,8 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
         }
 
         log.info( "Finished execution after "
-            + std::to_string( scheduler.numberOfSteps() ) + " steps" );
+                  + std::to_string( scheduler.numberOfSteps() )
+                  + " steps" );
     }
     catch( const RuntimeException& e )
     {
