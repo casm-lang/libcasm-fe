@@ -28,21 +28,11 @@
 #include "Exceptions.h"
 #include "SourceLocation.h"
 
+#include "../stdhl/cpp/String.h"
+
 using namespace libcasm_fe;
 
 namespace Log = libstdhl::Log;
-
-/**
- * From http://stackoverflow.com/a/26221725
- */
-template < typename... Args >
-std::string string_format( const std::string& format, Args... args )
-{
-    std::size_t size = snprintf( nullptr, 0, format.c_str(), args... ) + 1;
-    std::unique_ptr< char[] > buf( new char[ size ] );
-    snprintf( buf.get(), size, format.c_str(), args... );
-    return std::string( buf.get(), buf.get() + size - 1 );
-}
 
 static Log::Items to_location_items(
     const std::vector< SourceLocation >& locations )
@@ -69,8 +59,8 @@ void Logger::error( const std::vector< SourceLocation >& locations,
 
         for( const auto& location : locations )
         {
-            const auto errorCodeString
-                = string_format( "@%i{%04x}", location.begin.line, errorCode );
+            const auto errorCodeString = libstdhl::String::format(
+                "@%i{%04x}", location.begin.line, errorCode );
 
             const auto result = usedErrorCodeStrings.emplace( errorCodeString );
             if( not result.second )
@@ -93,6 +83,8 @@ void Logger::error( const std::vector< SourceLocation >& locations,
 void Logger::error( const Exception& exception )
 {
     error( exception.locations(), exception.what(), exception.errorCode() );
+    info( "Backtrace:\n"
+          + libstdhl::String::join( exception.backtrace(), "\n" ) );
 }
 
 void Logger::warning(

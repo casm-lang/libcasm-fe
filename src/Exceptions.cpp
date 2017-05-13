@@ -34,16 +34,31 @@ Exception::Exception( const std::string& msg, Code errorCode )
 
 Exception::Exception(
     const SourceLocation& location, const std::string& msg, Code errorCode )
+: Exception( location, msg, {}, errorCode )
+{
+}
+
+Exception::Exception( const SourceLocation& location, const std::string& msg,
+    const std::vector< std::string >& backtrace, Code errorCode )
 : m_msg( msg )
 , m_locations( { location } )
+, m_backtrace( backtrace )
 , m_errorCode( errorCode )
 {
 }
 
 Exception::Exception( const std::vector< SourceLocation >& locations,
     const std::string& msg, Code errorCode )
+: Exception( locations, msg, {}, errorCode )
+{
+}
+
+Exception::Exception( const std::vector< SourceLocation >& locations,
+    const std::string& msg, const std::vector< std::string >& backtrace,
+    Code errorCode )
 : m_msg( msg )
 , m_locations( locations )
+, m_backtrace( backtrace )
 , m_errorCode( errorCode )
 {
 }
@@ -56,6 +71,11 @@ const char* Exception::what() const noexcept
 const std::vector< SourceLocation >& Exception::locations( void ) const noexcept
 {
     return m_locations;
+}
+
+const std::vector< std::string >& Exception::backtrace( void ) const noexcept
+{
+    return m_backtrace;
 }
 
 Code Exception::errorCode( void ) const noexcept

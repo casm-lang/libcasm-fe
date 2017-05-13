@@ -29,6 +29,7 @@
 
 #include "../stdhl/cpp/Default.h"
 #include "../stdhl/cpp/Hash.h"
+#include "../stdhl/cpp/String.h"
 
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
@@ -118,8 +119,10 @@ class ConstantStack : public Stack< ir::Constant >
 class Frame
 {
   public:
-    Frame( const CallExpression::Ptr& call, std::size_t numberOfLocals )
+    Frame( const CallExpression::Ptr& call, const Node::Ptr& callee,
+        std::size_t numberOfLocals )
     : m_call( call )
+    , m_callee( callee )
     , m_locals( numberOfLocals )
     {
     }
@@ -127,6 +130,11 @@ class Frame
     CallExpression::Ptr call( void ) const
     {
         return m_call;
+    }
+
+    Node::Ptr callee( void ) const
+    {
+        return m_callee;
     }
 
     void setLocal( std::size_t index, const ir::Constant& local )
@@ -146,6 +154,7 @@ class Frame
 
   private:
     CallExpression::Ptr m_call;
+    Node::Ptr m_callee;
     std::vector< ir::Constant > m_locals;
 };
 
@@ -176,6 +185,158 @@ class FrameStack
         assert( not m_frames.empty() );
 
         return m_frames.back().get();
+    }
+
+    std::vector< std::string > generateBacktrace(
+        SourceLocation problemLocation ) const
+    {
+        std::vector< std::string > backtrace;
+        backtrace.reserve( m_frames.size() );
+
+        std::size_t frameCounter = 0;
+
+        const auto end = m_frames.rend();
+        for( auto it = m_frames.rbegin(); it != end; ++it )
+        {
+            const auto& frame = *it;
+
+            const auto call = frame->call();
+            const auto callee = frame->callee();
+
+            // callee can only be nullptr when calling builtins
+            const auto traceLine
+                = ( callee == nullptr )
+                      ? generateBuiltinTraceLine( frame.get() )
+                      : generateCalleeTraceLine( frame.get(), problemLocation );
+            backtrace.emplace_back(
+                "#" + std::to_string( frameCounter ) + " in " + traceLine );
+
+            ++frameCounter;
+
+            if( call != nullptr )
+            {
+                problemLocation = call->sourceLocation();
+            }
+        }
+
+        return backtrace;
+    }
+
+  private:
+    static std::string generateBuiltinTraceLine( Frame* frame )
+    {
+        const auto call = frame->call();
+        assert( call != nullptr );
+        assert( call->targetType() == CallExpression::TargetType::BUILTIN );
+
+        std::string args;
+        const auto numberOfArguments = call->arguments()->size();
+        for( std::size_t i = 0; i < numberOfArguments; i++ )
+        {
+            if( i > 0 )
+            {
+                args += ", ";
+            }
+            args += frame->local( i ).description();
+        }
+
+        std::string name;
+        if( call->id() == Node::ID::DIRECT_CALL_EXPRESSION )
+        {
+            name = call->ptr< DirectCallExpression >()->identifier()->path();
+        }
+        else
+        {
+            name = "UNKNOWN";
+        }
+
+        return libstdhl::String::format(
+            "Builtin %s(%s)", name.c_str(), args.c_str() );
+    }
+
+    static std::string generateCalleeTraceLine(
+        Frame* frame, const SourceLocation& problemLocation )
+    {
+        const auto callee = frame->callee();
+        assert( callee != nullptr );
+
+        std::string type;
+        std::string name;
+        std::string args;
+
+        switch( callee->id() )
+        {
+            case Node::ID::RULE_DEFINITION:
+            {
+                const auto rule = callee->ptr< RuleDefinition >();
+                type = "Rule";
+                name = rule->identifier()->name();
+
+                bool isFirstArg = true;
+                for( const auto& arg : *rule->arguments() )
+                {
+                    if( not isFirstArg )
+                    {
+                        args += ", ";
+                    }
+                    isFirstArg = false;
+
+                    args += arg->identifier()->name() + "="
+                            + frame->local( arg->localIndex() ).description();
+                }
+                break;
+            }
+            case Node::ID::DERIVED_DEFINITION:
+            {
+                const auto derived = callee->ptr< DerivedDefinition >();
+                type = "Derived";
+                name = derived->identifier()->name();
+
+                bool isFirstArg = true;
+                for( const auto& arg : *derived->arguments() )
+                {
+                    if( not isFirstArg )
+                    {
+                        args += ", ";
+                    }
+                    isFirstArg = false;
+
+                    args += arg->identifier()->name() + "="
+                            + frame->local( arg->localIndex() ).description();
+                }
+                break;
+            }
+            case Node::ID::FUNCTION_DEFINITION:
+            {
+                const auto function = callee->ptr< FunctionDefinition >();
+                type = "Function";
+                name = function->identifier()->name();
+
+                const auto numberOfArguments
+                    = function->argumentTypes()->size();
+                for( std::size_t i = 0; i < numberOfArguments; i++ )
+                {
+                    if( i > 0 )
+                    {
+                        args += ", ";
+                    }
+                    args += frame->local( i ).description();
+                }
+                break;
+            }
+            default:
+            {
+                type = callee->description();
+                name = "UNKNOWN";
+            }
+        }
+
+        return libstdhl::String::format( "%s %s(%s) at %s:%u",
+            type.c_str(),
+            name.c_str(),
+            args.c_str(),
+            problemLocation.fileName()->c_str(),
+            problemLocation.begin.line );
     }
 
   private:
@@ -396,8 +557,8 @@ class ExecutionVisitor final : public RecursiveVisitor
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
-    std::unique_ptr< Frame > makeFrame(
-        CallExpression& call, std::size_t numberOfLocals );
+    std::unique_ptr< Frame > makeFrame( const CallExpression::Ptr& call,
+        const Node::Ptr& callee, std::size_t numberOfLocals );
 
     void invokeBuiltin( ir::Value::ID id, const ir::Type::Ptr& type );
 
@@ -431,8 +592,8 @@ void ExecutionVisitor::execute( const ReferenceConstant& value )
     assert( ( rule->arguments()->size() == 0 )
             && "Only parameter-less rules are supported" );
 
-    m_frameStack.push( libstdhl::make_unique< Frame >(
-        nullptr, rule->maximumNumberOfLocals() ) );
+    m_frameStack.push(
+        makeFrame( nullptr, rule, rule->maximumNumberOfLocals() ) );
     rule->accept( *this );
     m_frameStack.pop();
 }
@@ -518,8 +679,9 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
         case CallExpression::TargetType::DERIVED:
         {
-            m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
             const auto& definition = node.targetDefinition();
+            m_frameStack.push( makeFrame( node.ptr< CallExpression >(),
+                definition, node.arguments()->size() ) );
             definition->accept( *this );
             m_frameStack.pop();
             break;
@@ -528,16 +690,28 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         {
             const auto& rule = std::static_pointer_cast< RuleDefinition >(
                 node.targetDefinition() );
-            m_frameStack.push(
-                makeFrame( node, rule->maximumNumberOfLocals() ) );
+            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), rule,
+                rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
             break;
         }
         case CallExpression::TargetType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
-            invokeBuiltin( node.targetBuiltinId(), node.type() );
+            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), nullptr,
+                node.arguments()->size() ) );
+            try
+            {
+                invokeBuiltin( node.targetBuiltinId(), node.type() );
+            }
+            catch( const std::exception& e )
+            {
+                throw RuntimeException( node.sourceLocation(),
+                    "builtin has thrown an exception: "
+                        + std::string( e.what() ),
+                    m_frameStack.generateBacktrace( node.sourceLocation() ),
+                    Code::Unspecified );
+            }
             m_frameStack.pop();
             break;
         }
@@ -570,6 +744,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     {
         throw RuntimeException( node.expression()->sourceLocation(),
             "cannot call an undefined target",
+            m_frameStack.generateBacktrace( node.sourceLocation() ),
             Code::Unspecified );
     }
 
@@ -579,7 +754,8 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         case ReferenceAtom::ReferenceType::FUNCTION: // [[fallthrough]]
         case ReferenceAtom::ReferenceType::DERIVED:
         {
-            m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
+            m_frameStack.push( makeFrame( node.ptr< CallExpression >(),
+                atom->reference(), node.arguments()->size() ) );
             atom->reference()->accept( *this );
             m_frameStack.pop();
             break;
@@ -588,16 +764,28 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         {
             const auto& rule = std::static_pointer_cast< RuleDefinition >(
                 atom->reference() );
-            m_frameStack.push(
-                makeFrame( node, rule->maximumNumberOfLocals() ) );
+            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), rule,
+                rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
             break;
         }
         case ReferenceAtom::ReferenceType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( node, node.arguments()->size() ) );
-            invokeBuiltin( atom->builtinId(), node.type() );
+            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), nullptr,
+                node.arguments()->size() ) );
+            try
+            {
+                invokeBuiltin( atom->builtinId(), node.type() );
+            }
+            catch( const std::exception& e )
+            {
+                throw RuntimeException( node.sourceLocation(),
+                    "builtin has thrown an exception: "
+                        + std::string( e.what() ),
+                    m_frameStack.generateBacktrace( node.sourceLocation() ),
+                    Code::Unspecified );
+            }
             m_frameStack.pop();
             break;
         }
@@ -619,9 +807,20 @@ void ExecutionVisitor::visit( UnaryExpression& node )
     node.expression()->accept( *this );
     const auto& value = m_evaluationStack.pop();
 
-    const auto result
-        = libcasm_rt::Value::execute_( node.op(), node.type(), &value, 1 );
-    m_evaluationStack.push( result );
+    try
+    {
+        const auto result
+            = libcasm_rt::Value::execute_( node.op(), node.type(), &value, 1 );
+        m_evaluationStack.push( result );
+    }
+    catch( const std::exception& e )
+    {
+        throw RuntimeException( node.sourceLocation(),
+            "unary expression has thrown an exception: "
+                + std::string( e.what() ),
+            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            Code::Unspecified );
+    }
 }
 
 void ExecutionVisitor::visit( BinaryExpression& node )
@@ -632,9 +831,20 @@ void ExecutionVisitor::visit( BinaryExpression& node )
     node.right()->accept( *this );
     const auto& rhs = m_evaluationStack.pop();
 
-    const auto result
-        = libcasm_rt::Value::execute( node.op(), node.type(), lhs, rhs );
-    m_evaluationStack.push( result );
+    try
+    {
+        const auto result
+            = libcasm_rt::Value::execute( node.op(), node.type(), lhs, rhs );
+        m_evaluationStack.push( result );
+    }
+    catch( const std::exception& e )
+    {
+        throw RuntimeException( node.sourceLocation(),
+            "binary expression has thrown an exception: "
+                + std::string( e.what() ),
+            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            Code::Unspecified );
+    }
 }
 
 void ExecutionVisitor::visit( RangeExpression& node )
@@ -662,6 +872,7 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
+            m_frameStack.generateBacktrace( node.sourceLocation() ),
             Code::Unspecified );
     }
     else if( condition.value() == true )
@@ -694,6 +905,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
         {
             throw RuntimeException( node.proposition()->sourceLocation(),
                 "proposition must be true or false but was undef",
+                m_frameStack.generateBacktrace( node.sourceLocation() ),
                 Code::Unspecified );
         }
         else if( prop.value() == false )
@@ -726,6 +938,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
         {
             throw RuntimeException( node.proposition()->sourceLocation(),
                 "proposition must be true or false but was undef",
+                m_frameStack.generateBacktrace( node.sourceLocation() ),
                 Code::Unspecified );
         }
         else if( prop.value() == true )
@@ -747,6 +960,7 @@ void ExecutionVisitor::visit( ConditionalRule& node )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
+            m_frameStack.generateBacktrace( node.sourceLocation() ),
             Code::Unspecified );
     }
     else if( condition.value() == true )
@@ -902,7 +1116,8 @@ void ExecutionVisitor::visit( UpdateRule& node )
               + existingValue.value.description() + "' exists already.";
         throw RuntimeException(
             { existingValue.sourceLocation, conflictingValue.sourceLocation },
-            info, libcasm_fe::Code::UpdateSetClash );
+            info, m_frameStack.generateBacktrace( node.sourceLocation() ),
+            libcasm_fe::Code::UpdateSetClash );
     }
 }
 
@@ -936,20 +1151,23 @@ u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
 }
 
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
-    CallExpression& call, std::size_t numberOfLocals )
+    const CallExpression::Ptr& call, const Node::Ptr& callee,
+    std::size_t numberOfLocals )
 {
-    assert( numberOfLocals >= call.arguments()->size() );
+    auto frame = libstdhl::make_unique< Frame >( call, callee, numberOfLocals );
 
-    auto frame = libstdhl::make_unique< Frame >(
-        call.ptr< CallExpression >(), numberOfLocals );
-
-    std::size_t localIndex = 0;
-    for( const auto& argument : *call.arguments() )
+    if( call != nullptr )
     {
-        argument->accept( *this );
-        const auto& value = m_evaluationStack.pop();
-        frame->setLocal( localIndex, value );
-        ++localIndex;
+        assert( numberOfLocals >= call->arguments()->size() );
+
+        std::size_t localIndex = 0;
+        for( const auto& argument : *call->arguments() )
+        {
+            argument->accept( *this );
+            const auto& value = m_evaluationStack.pop();
+            frame->setLocal( localIndex, value );
+            ++localIndex;
+        }
     }
 
     return frame;
