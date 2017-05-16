@@ -571,9 +571,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void assignment( const Node& node, TypedNode& lhs, TypedNode& rhs,
         const std::string& dst, const std::string& src );
 
-    void annotate( const libcasm_ir::Annotation& annotation,
-        const Node& node,
-        const std::vector< Expression::Ptr >& expressions = {} );
+    const libcasm_ir::Annotation* annotate(
+        Node& node, const std::vector< Expression::Ptr >& expressions = {} );
 
     void inference( const std::string& description,
         const libcasm_ir::Annotation* annotation, TypedNode& node,
@@ -761,29 +760,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
     const auto& path = *node.identifier();
 
-    const libcasm_ir::Annotation* annotation_ptr = 0;
-
-    if( node.targetType() == CallExpression::TargetType::BUILTIN )
-    {
-        try
-        {
-            const auto& annotation
-                = libcasm_ir::Annotation::find( path.baseName() );
-
-            annotation_ptr = &annotation;
-
-            annotate( annotation, node, node.arguments()->data() );
-
-            node.setTargetBuiltinId( annotation.id() );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error( { node.sourceLocation() },
-                             "unable to resolve built-in symbol '"
-                             + path.path()
-                             + "', due to missing annotation information from 'libcasm-ir'" );
-        }
-    }
+    const libcasm_ir::Annotation* annotation
+        = annotate( node, node.arguments()->data() );
 
     RecursiveVisitor::visit( node );
 
@@ -831,8 +809,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             try
             {
                 const auto description = "built-in '" + path.path() + "'";
-                inference( description, annotation_ptr, node,
-                    node.arguments()->data() );
+                inference(
+                    description, annotation, node, node.arguments()->data() );
 
                 std::vector< libcasm_ir::Type::Ptr > argTypeList;
                 for( auto argumentType : *node.arguments() )
@@ -966,28 +944,24 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
 {
-    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
-
-    annotate( annotation, node, { node.expression() } );
+    const auto* annotation = annotate( node, { node.expression() } );
 
     RecursiveVisitor::visit( node );
 
     const auto description
         = "operator '" + libcasm_ir::Value::token( node.op() ) + "'";
-    inference( description, &annotation, node, { node.expression() } );
+    inference( description, annotation, node, { node.expression() } );
 }
 
 void TypeInferenceVisitor::visit( BinaryExpression& node )
 {
-    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
-
-    annotate( annotation, node, { node.left(), node.right() } );
+    const auto* annotation = annotate( node, { node.left(), node.right() } );
 
     RecursiveVisitor::visit( node );
 
     const auto description
         = "operator '" + libcasm_ir::Value::token( node.op() ) + "'";
-    inference( description, &annotation, node, { node.left(), node.right() } );
+    inference( description, annotation, node, { node.left(), node.right() } );
 }
 
 void TypeInferenceVisitor::visit( RangeExpression& node )
@@ -1109,58 +1083,170 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
     }
 }
 
-void TypeInferenceVisitor::annotate( const libcasm_ir::Annotation& annotation,
-    const Node& node, const std::vector< Expression::Ptr >& expressions )
+const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
+    Node& node, const std::vector< Expression::Ptr >& expressions )
 {
+    const libcasm_ir::Annotation* annotation = nullptr;
+
     auto result = m_resultTypes.find( &node );
-    if( result != m_resultTypes.end() )
+
+    if( node.id() == Type::ID::UNARY_EXPRESSION )
     {
-        const auto& map = annotation.map();
+        annotation = &libcasm_ir::Annotation::find(
+            static_cast< const UnaryExpression& >( node ).op() );
+    }
+    else if( node.id() == Type::ID::BINARY_EXPRESSION )
+    {
+        annotation = &libcasm_ir::Annotation::find(
+            static_cast< const UnaryExpression& >( node ).op() );
+    }
+    else if( node.id() == Type::ID::DIRECT_CALL_EXPRESSION )
+    {
 
-        for( auto t : result->second )
+        auto& directCall = static_cast< DirectCallExpression& >( node );
+        const auto& path = *directCall.identifier();
+
+        switch( directCall.targetType() )
         {
-            try
+            case CallExpression::TargetType::VARIABLE:
             {
-                const auto& map_result = map.at( t );
-
-                for( std::size_t c = 0; c < expressions.size(); c++ )
+                break;
+            }
+            case CallExpression::TargetType::BUILTIN:
+            {
+                try
                 {
-                    const auto& map_expr = map_result.at( c );
+                    const auto& builtin_annotation
+                        = libcasm_ir::Annotation::find( path.baseName() );
 
-                    std::copy( map_expr.begin(), map_expr.end(),
-                        std::back_inserter(
-                            m_resultTypes[ expressions[ c ].get() ] ) );
+                    annotation = &builtin_annotation;
+                    directCall.setTargetBuiltinId( builtin_annotation.id() );
+                }
+                catch( const std::domain_error& e )
+                {
+                    m_log.error( { directCall.sourceLocation() },
+                             "unable to resolve built-in symbol '"
+                             + path.path()
+                             + "', due to missing annotation information from 'libcasm-ir'" );
+                }
+                break;
+            }
+            case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
+            case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
+            case CallExpression::TargetType::RULE:
+            {
+                try
+                {
+                    auto symbol = m_symboltable.find( path );
+                    auto& definition = symbol.definition();
+
+                    if( definition.type() )
+                    {
+                        for( std::size_t c = 0; c < expressions.size(); c++ )
+                        {
+                            std::vector< libcasm_ir::Type::ID > ty
+                                = { definition.type()->arguments()[ c ]->id() };
+                            std::vector< libcasm_ir::Type::ID > tmp = {};
+
+                            std::copy( ty.begin(), ty.end(),
+                                std::back_inserter(
+                                    m_resultTypes[ expressions[ c ].get() ] ) );
+                        }
+
+                        std::vector< libcasm_ir::Type::ID > ty
+                            = { definition.type()->result().id() };
+                        std::vector< libcasm_ir::Type::ID > tmp = {};
+
+                        if( result != m_resultTypes.end() )
+                        {
+                            std::set_intersection( result->second.begin(),
+                                result->second.end(), ty.begin(), ty.end(),
+                                std::back_inserter( tmp ) );
+                        }
+                        else
+                        {
+                            std::set_intersection( tmp.begin(), tmp.end(),
+                                ty.begin(), ty.end(),
+                                std::back_inserter( tmp ) );
+                        }
+
+                        m_resultTypes[&node ] = std::move( tmp );
+                    }
+                }
+                catch( const std::domain_error& e )
+                {
+                    assert( !" inconsistent symbol table! " );
+                }
+
+                break;
+            }
+            case CallExpression::TargetType::ENUMERATION: // [[fallthrough]]
+            case CallExpression::TargetType::CONSTANT:
+            {
+                break;
+            }
+            case CallExpression::TargetType::UNKNOWN:
+            {
+                assert( !" internal error" );
+                break;
+            }
+        }
+    }
+
+    if( annotation )
+    {
+        if( result != m_resultTypes.end() )
+        {
+            const auto& map = annotation->map();
+
+            for( auto t : result->second )
+            {
+                try
+                {
+                    const auto& map_result = map.at( t );
+
+                    for( std::size_t c = 0; c < expressions.size(); c++ )
+                    {
+                        const auto& map_expr = map_result.at( c );
+
+                        std::copy( map_expr.begin(), map_expr.end(),
+                            std::back_inserter(
+                                m_resultTypes[ expressions[ c ].get() ] ) );
+                    }
+                }
+                catch( const std::out_of_range& e )
+                {
+                    continue;
                 }
             }
-            catch( const std::out_of_range& e )
-            {
-                continue;
-            }
+
+            const auto& map_res = annotation->resultTypes();
+            std::vector< libcasm_ir::Type::ID > tmp = {};
+
+            std::set_intersection( result->second.begin(), result->second.end(),
+                map_res.begin(), map_res.end(), std::back_inserter( tmp ) );
+
+            m_resultTypes[&node ] = std::move( tmp );
         }
-
-        const auto& map_res = annotation.resultTypes();
-        std::vector< libcasm_ir::Type::ID > tmp = {};
-
-        std::set_intersection( result->second.begin(), result->second.end(),
-            map_res.begin(), map_res.end(), std::back_inserter( tmp ) );
-
-        m_resultTypes[&node ] = std::move( tmp );
-    }
-    else
-    {
-        for( std::size_t c = 0; c < expressions.size(); c++ )
+        else
         {
-            const auto& map_expr = annotation.argumentTypes( c );
+            for( std::size_t c = 0; c < expressions.size(); c++ )
+            {
+                const auto& map_expr = annotation->argumentTypes( c );
 
-            std::copy( map_expr.begin(), map_expr.end(),
-                std::back_inserter( m_resultTypes[ expressions[ c ].get() ] ) );
+                std::copy( map_expr.begin(), map_expr.end(),
+                    std::back_inserter(
+                        m_resultTypes[ expressions[ c ].get() ] ) );
+            }
+
+            const auto& map_res = annotation->resultTypes();
+
+            std::copy( map_res.begin(), map_res.end(),
+                std::back_inserter( m_resultTypes[&node ] ) );
         }
-
-        const auto& map_res = annotation.resultTypes();
-
-        std::copy( map_res.begin(), map_res.end(),
-            std::back_inserter( m_resultTypes[&node ] ) );
     }
+
+    return annotation;
 }
 
 void TypeInferenceVisitor::inference( const std::string& description,
