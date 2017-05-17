@@ -812,25 +812,29 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 inference(
                     description, annotation, node, node.arguments()->data() );
 
-                std::vector< libcasm_ir::Type::Ptr > argTypeList;
-                for( auto argumentType : *node.arguments() )
+                if( node.type() )
                 {
-                    if( not argumentType->type() )
+                    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+                    for( auto argumentType : *node.arguments() )
                     {
-                        m_log.debug( { argumentType->sourceLocation() },
-                            "TODO: '" + path.path()
-                                + "' has a non-typed argument(s)" );
-                        return;
+                        if( not argumentType->type() )
+                        {
+                            m_log.debug( { argumentType->sourceLocation() },
+                                "TODO: '" + path.path()
+                                    + "' has a non-typed argument(s)" );
+                            return;
+                        }
+
+                        argTypeList.emplace_back(
+                            argumentType->type()->ptr_result() );
                     }
 
-                    argTypeList.emplace_back(
-                        argumentType->type()->ptr_result() );
+                    const auto type
+                        = libstdhl::make< libcasm_ir::RelationType >(
+                            node.type(), argTypeList );
+
+                    node.setType( type );
                 }
-
-                const auto type = libstdhl::make< libcasm_ir::RelationType >(
-                    node.type(), argTypeList );
-
-                node.setType( type );
             }
             catch( const std::domain_error& e )
             {
@@ -1048,7 +1052,7 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
 void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
     TypedNode& rhs, const std::string& dst, const std::string& src )
 {
-    if( not rhs.type() and rhs.id() == Node::ID::UNDEF_ATOM )
+    if( not rhs.type() and rhs.id() == Node::ID::UNDEF_ATOM and lhs.type() )
     {
         rhs.setType( lhs.type()->ptr_result() );
     }
@@ -1322,16 +1326,10 @@ void TypeInferenceVisitor::inference( const std::string& description,
 
     const auto& resTypes = m_resultTypes[&node ];
 
-    if( resTypes.size() < 1 )
-    {
-        m_log.error( { node.sourceLocation() },
-            "unable to infer result type of " + description );
-        return;
-    }
-    else if( resTypes.size() > 1 )
+    if( resTypes.size() != 1 )
     {
         u1 first = true;
-        std::string tmp = "";
+        std::string tmp = " from multiple possible types: ";
         for( auto t : resTypes )
         {
             tmp += ( first ? "" : ", " );
@@ -1341,9 +1339,41 @@ void TypeInferenceVisitor::inference( const std::string& description,
 
         m_log.error( { node.sourceLocation() },
             "unable to infer result type of " + description
-                + " from multiple possible types: "
-                + tmp );
+                + ( resTypes.size() > 0 ? tmp : "" ) );
         return;
+    }
+
+    if( arguments.size() > 0 )
+    {
+        u1 invalid = false;
+
+        for( auto argument : arguments )
+        {
+            const auto argTypes = m_resultTypes[&( *argument ) ];
+            if( argTypes.size() != 1 )
+            {
+                invalid = true;
+
+                u1 first = true;
+                std::string tmp = " from multiple possible types: ";
+                for( auto t : resTypes )
+                {
+                    tmp += ( first ? "" : ", " );
+                    tmp += "'" + libcasm_ir::Type::token( t ) + "'";
+                    first = false;
+                }
+
+                m_log.error( { node.sourceLocation() },
+                    "unable to infer result type of " + description
+                        + ( resTypes.size() > 0 ? tmp : "" ) );
+            }
+        }
+
+        if( invalid )
+        {
+            m_resultTypes[&node ].clear();
+            return;
+        }
     }
 
     switch( *resTypes.begin() )
