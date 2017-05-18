@@ -62,6 +62,10 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( FunctionDefinition& node ) override;
 
     void visit( ReferenceAtom& node ) override;
+    void visit( ValueAtom& node ) override;
+    void visit( UndefAtom& node ) override;
+
+    void verify( const TypedNode& node ) const;
 
   private:
     Logger& m_log;
@@ -135,9 +139,28 @@ void ConsistencyCheckVisitor::visit( ReferenceAtom& node )
         throw CompiletimeException( node.identifier()->sourceLocation(),
             node.identifier()->path(), Code::Unspecified );
     }
-    else
+
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( ValueAtom& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( UndefAtom& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::verify( const TypedNode& node ) const
+{
+    if( not node.type() )
     {
-        assert( node.type() );
+        m_log.error( { node.sourceLocation() }, "found node without a type",
+            Code::Unspecified );
     }
 }
 

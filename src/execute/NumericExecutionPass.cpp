@@ -710,7 +710,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
                     "builtin has thrown an exception: "
                         + std::string( e.what() ),
                     m_frameStack.generateBacktrace( node.sourceLocation() ),
-                    Code::Unspecified );
+                    Code::AssertInvalidExpression );
             }
             m_frameStack.pop();
             break;
@@ -873,7 +873,7 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
         throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
             m_frameStack.generateBacktrace( node.sourceLocation() ),
-            Code::Unspecified );
+            Code::ConditionalExpressionInvalidCondition );
     }
     else if( condition.value() == true )
     {

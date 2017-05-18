@@ -552,6 +552,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
 
+    void visit( UndefAtom& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
@@ -652,6 +653,11 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
     {
         pop( *argument );
     }
+}
+
+void TypeInferenceVisitor::visit( UndefAtom& node )
+{
+    RecursiveVisitor::visit( node );
 }
 
 void TypeInferenceVisitor::visit( ValueAtom& node )
@@ -936,8 +942,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             break;
         }
     }
-
-    // assert( node.type() );
 }
 
 void TypeInferenceVisitor::visit( IndirectCallExpression& node )
@@ -1000,8 +1004,78 @@ void TypeInferenceVisitor::visit( ListExpression& node )
 }
 void TypeInferenceVisitor::visit( ConditionalExpression& node )
 {
+    const auto& resTypes = m_resultTypes[&node ];
+    for( auto type : resTypes )
+    {
+        m_resultTypes[ node.thenExpression().get() ].emplace_back( type );
+        m_resultTypes[ node.elseExpression().get() ].emplace_back( type );
+    }
+
     RecursiveVisitor::visit( node );
+
+    const auto& condExpr = *node.condition();
+    auto& thenExpr = *node.thenExpression();
+    auto& elseExpr = *node.elseExpression();
+
+    if( condExpr.type() )
+    {
+        if( *condExpr.type() != *BOOLEAN )
+        {
+            m_log.error( { condExpr.sourceLocation() },
+                "condition type of conditional expression is not of type "
+                "'Boolean', "
+                "found type '"
+                    + condExpr.type()->description()
+                    + "'",
+                Code::TypeInferenceInvalidConditionalExpressionCondition );
+        }
+    }
+
+    if( resTypes.size() > 0 )
+    {
+        inference( "conditional expression", 0, node );
+    }
+
+    if( thenExpr.type() and elseExpr.type() )
+    {
+        if( *thenExpr.type() != *elseExpr.type() )
+        {
+            m_log.error(
+                { thenExpr.sourceLocation(), elseExpr.sourceLocation() },
+                "types of conditional expression paths does not match, "
+                "found'"
+                    + thenExpr.type()->description()
+                    + "' at 'then' path, and '"
+                    + elseExpr.type()->description()
+                    + "' at 'else' path",
+                Code::TypeInferenceInvalidConditionalExpressionPaths );
+            return;
+        }
+    }
+
+    if( thenExpr.type() and elseExpr.id() == Node::ID::UNDEF_ATOM )
+    {
+        elseExpr.setType( thenExpr.type() );
+    }
+
+    if( thenExpr.id() == Node::ID::UNDEF_ATOM and elseExpr.type() )
+    {
+        thenExpr.setType( elseExpr.type() );
+    }
+
+    if( node.type() and thenExpr.id() == Node::ID::UNDEF_ATOM
+        and elseExpr.id() == Node::ID::UNDEF_ATOM )
+    {
+        thenExpr.setType( node.type() );
+        elseExpr.setType( node.type() );
+    }
+
+    if( not node.type() )
+    {
+        node.setType( thenExpr.type() );
+    }
 }
+
 void TypeInferenceVisitor::visit( UniversalQuantifierExpression& node )
 {
     RecursiveVisitor::visit( node );
@@ -1014,6 +1088,13 @@ void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
 void TypeInferenceVisitor::visit( LetRule& node )
 {
     node.variable()->accept( *this );
+
+    if( node.variable()->type() )
+    {
+        m_resultTypes[ node.expression().get() ].emplace_back(
+            node.variable()->type()->id() );
+    }
+
     push( *node.variable() );
     node.expression()->accept( *this );
 
@@ -1059,7 +1140,8 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
 void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
     TypedNode& rhs, const std::string& dst, const std::string& src )
 {
-    if( not rhs.type() and rhs.id() == Node::ID::UNDEF_ATOM and lhs.type() )
+    if( lhs.type()
+        and not rhs.type() ) // and rhs.id() == Node::ID::UNDEF_ATOM and  )
     {
         rhs.setType( lhs.type()->ptr_result() );
     }

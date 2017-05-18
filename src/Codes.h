@@ -118,6 +118,10 @@ namespace libcasm_fe
         TypeInferenceInvalidForallExpression = 0x1004
 
         ,
+        TypeInferenceInvalidConditionalExpressionCondition = 0x1005,
+        TypeInferenceInvalidConditionalExpressionPaths = 0x1006
+
+        ,
         TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000
 
         ,
@@ -152,6 +156,12 @@ namespace libcasm_fe
         ,
         UpdateSetClash = 0x7000,
         UpdateSetMergeConflict = 0x7001
+
+        // --------------------------------------------------------- 9*** ...
+        // unsorted run-time errors
+        ,
+        ConditionalRuleInvalidCondition = 0x9000,
+        ConditionalExpressionInvalidCondition = 0x9001
 
         // --------------------------------------------------------- fff* ...
         // not categorized errors
