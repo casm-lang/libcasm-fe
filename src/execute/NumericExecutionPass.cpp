@@ -428,7 +428,9 @@ void ExecutionVisitor::visit( RuleDefinition& node )
 
 void ExecutionVisitor::visit( EnumerationDefinition& node )
 {
-    // TODO
+    assert( node.type()->isEnumeration() );
+    const auto& enumType = std::static_pointer_cast< ir::EnumerationType >( node.type() );
+    m_evaluationStack.push( ir::EnumerationConstant( enumType ) );
 }
 
 void ExecutionVisitor::visit( ValueAtom& node )
@@ -491,10 +493,14 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::ENUMERATION:
         {
+            node.targetDefinition()->accept( *this );
             break;
         }
         case CallExpression::TargetType::CONSTANT:
         {
+            assert( node.type()->isEnumeration() );
+            const auto& enumType = std::static_pointer_cast< ir::EnumerationType >( node.type() );
+            m_evaluationStack.push( ir::EnumerationConstant( enumType, node.identifier()->baseName() ) );
             break;
         }
         case CallExpression::TargetType::VARIABLE:
