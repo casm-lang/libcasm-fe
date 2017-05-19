@@ -1082,9 +1082,9 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
             m_log.error(
                 { thenExpr.sourceLocation(), elseExpr.sourceLocation() },
                 "types of conditional expression paths does not match, "
-                "found'"
+                "found type '"
                     + thenExpr.type()->description()
-                    + "' at 'then' path, and '"
+                    + "' at 'then' path, and type '"
                     + elseExpr.type()->description()
                     + "' at 'else' path",
                 Code::TypeInferenceInvalidConditionalExpressionPaths );
@@ -1148,7 +1148,7 @@ void TypeInferenceVisitor::visit( LetRule& node )
 
     assignment( node, *node.variable(), *node.expression(),
         "let variable '" + node.variable()->identifier()->name() + "'",
-        "binding expression", Code::TypeInferenceInvalidLetRuleVariableType,
+        "let expression", Code::TypeInferenceInvalidLetRuleVariableType,
         Code::TypeInferenceInvalidLetRuleExpressionType,
         Code::TypeInferenceLetRuleTypesMismatch );
 }
