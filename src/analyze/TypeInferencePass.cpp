@@ -570,7 +570,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( UpdateRule& node ) override;
 
     void assignment( const Node& node, TypedNode& lhs, TypedNode& rhs,
-        const std::string& dst, const std::string& src );
+        const std::string& dst, const std::string& src, const Code& dstErr,
+        const Code& srcErr, const Code& assignmentErr );
 
     const libcasm_ir::Annotation* annotate(
         Node& node, const std::vector< Expression::Ptr >& expressions = {} );
@@ -1108,7 +1109,9 @@ void TypeInferenceVisitor::visit( LetRule& node )
 
     assignment( node, *node.variable(), *node.expression(),
         "let variable '" + node.variable()->identifier()->name() + "'",
-        "binding expression" );
+        "binding expression", Code::TypeInferenceInvalidLetRuleVariableType,
+        Code::TypeInferenceInvalidLetRuleExpressionType,
+        Code::TypeInferenceLetRuleTypesMismatch );
 }
 void TypeInferenceVisitor::visit( ForallRule& node )
 {
@@ -1133,12 +1136,16 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
     if( not m_functionInitially )
     {
         assignment( node, *node.function(), *node.expression(),
-            "updated function", "updating expression" );
+            "updated function", "updating expression",
+            Code::TypeInferenceInvalidUpdateRuleFunctionType,
+            Code::TypeInferenceInvalidUpdateRuleExpressionType,
+            Code::TypeInferenceUpdateRuleTypesMismatch );
     }
 }
 
 void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
-    TypedNode& rhs, const std::string& dst, const std::string& src )
+    TypedNode& rhs, const std::string& dst, const std::string& src,
+    const Code& dstErr, const Code& srcErr, const Code& assignmentErr )
 {
     if( lhs.type()
         and not rhs.type() ) // and rhs.id() == Node::ID::UNDEF_ATOM and  )
@@ -1150,14 +1157,14 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
 
     if( not lhs.type() )
     {
-        m_log.error(
-            { lhs.sourceLocation() }, "unable to infer type of " + dst );
+        m_log.error( { lhs.sourceLocation() }, "unable to infer type of " + dst,
+            dstErr );
     }
 
     if( not rhs.type() )
     {
-        m_log.error(
-            { rhs.sourceLocation() }, "unable to infer type of " + src );
+        m_log.error( { rhs.sourceLocation() }, "unable to infer type of " + src,
+            srcErr );
     }
 
     if( error_count != m_log.errors() )
@@ -1172,7 +1179,8 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
                 + lhs.type()->description()
                 + "' != '"
                 + rhs.type()->description()
-                + "'" );
+                + "'",
+            assignmentErr );
     }
 }
 
@@ -1242,7 +1250,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                             m_log.error( { directCall.arguments()->data()[ 1 ]->sourceLocation() },
                              "2nd argument of built-in '"
                              + path.path()
-                             + "' is required to be a compile time 'Integer' constant value" );
+                                         + "' is required to be a compile time 'Integer' constant value", Code::TypeInferenceBuiltinAsBitInvalid2ndArgumentType );
                         }
                     }
                 }
@@ -1464,8 +1472,43 @@ void TypeInferenceVisitor::inference( const std::string& description,
 
         m_log.error( { node.sourceLocation() },
             "unable to infer result type of " + description
-                + ( resTypes.size() > 0 ? tmp : "" ) );
+                + ( resTypes.size() > 0 ? tmp : "" ),
+            ( resTypes.size() > 0 ? Code::TypeInferenceFoundMultipleResultTypes
+                                  : Code::TypeInferenceFoundNoResultType ) );
         return;
+    }
+
+    libcasm_ir::Type::Ptr inferedType = nullptr;
+    if( annotation and arguments.size() > 0 )
+    {
+        std::vector< libcasm_ir::Type::Ptr > argTypes = {};
+
+        for( auto argument : arguments )
+        {
+            if( not argument->type() )
+            {
+                return;
+            }
+            argTypes.emplace_back( argument->type()->ptr_result() );
+        }
+
+        try
+        {
+            inferedType = annotation->inference( argTypes, {} );
+        }
+        catch( const std::invalid_argument& e )
+        {
+            m_log.debug( { node.sourceLocation() },
+                "INFERENCE: " + description + ": " + e.what() );
+            return;
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.error( { node.sourceLocation() },
+                "unable to infer result type of " + description + ": "
+                    + e.what(),
+                Code::TypeInferenceNotDefinedForExpression );
+        }
     }
 
     switch( *resTypes.begin() )
@@ -1492,27 +1535,7 @@ void TypeInferenceVisitor::inference( const std::string& description,
                 return;
             }
 
-            assert( arguments.size() > 0 );
-            assert( annotation );
-
-            std::vector< libcasm_ir::Type::Ptr > argTypes = {};
-
-            for( auto argument : arguments )
-            {
-                argTypes.emplace_back( argument->type() );
-            }
-
-            try
-            {
-                const auto type = annotation->inference( argTypes );
-                node.setType( type );
-            }
-            catch( const std::domain_error& e )
-            {
-                m_log.error( { node.sourceLocation() },
-                    "unable to infer result type of " + description + ": "
-                        + e.what() );
-            }
+            node.setType( inferedType );
             break;
         }
         case libcasm_ir::Type::STRING:

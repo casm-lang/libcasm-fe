@@ -109,7 +109,22 @@ namespace libcasm_fe
         // --------------------------------------------------------- 1*** ...
         // type check errors
         ,
-        TypeInferenceInvalidLet = 0x1000,
+        TypeInferenceFoundNoResultType = 0x1100,
+        TypeInferenceFoundMultipleResultTypes = 0x1101,
+        TypeInferenceFoundNoArgumentType = 0x1102,
+
+        TypeInferenceInvalidLetRuleVariableType = 0x1200,
+        TypeInferenceInvalidLetRuleExpressionType = 0x1201,
+        TypeInferenceLetRuleTypesMismatch = 0x1202,
+
+        TypeInferenceInvalidUpdateRuleFunctionType = 0x1200,
+        TypeInferenceInvalidUpdateRuleExpressionType = 0x1201,
+        TypeInferenceUpdateRuleTypesMismatch = 0x1202,
+
+        TypeInferenceBuiltinAsBitInvalid2ndArgumentType = 0x1b00,
+
+        TypeInferenceNotDefinedForExpression = 0x1300,
+
         TypeInferenceInvalidExpression = 0x1001,
         TypeInferenceInvalidPrint = 0x1002
 

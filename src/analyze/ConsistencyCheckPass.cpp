@@ -65,7 +65,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( ValueAtom& node ) override;
     void visit( UndefAtom& node ) override;
 
-    void verify( const TypedNode& node ) const;
+    void verify( const TypedNode& node );
 
   private:
     Logger& m_log;
@@ -155,7 +155,7 @@ void ConsistencyCheckVisitor::visit( UndefAtom& node )
     verify( node );
 }
 
-void ConsistencyCheckVisitor::verify( const TypedNode& node ) const
+void ConsistencyCheckVisitor::verify( const TypedNode& node )
 {
     if( not node.type() )
     {
