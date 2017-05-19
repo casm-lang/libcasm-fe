@@ -1003,7 +1003,7 @@ void ExecutionVisitor::visit( ConditionalRule& node )
         throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
             m_frameStack.generateBacktrace( node.sourceLocation() ),
-            Code::Unspecified );
+            Code::ConditionalRuleInvalidCondition );
     }
     else if( condition.value() == true )
     {
