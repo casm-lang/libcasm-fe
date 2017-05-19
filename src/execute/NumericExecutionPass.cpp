@@ -1174,8 +1174,6 @@ void AgentScheduler::setDispatchStrategy(
 
 void AgentScheduler::step( void )
 {
-    ++m_stepCounter;
-
     auto agents = collectAgents();
     if( agents.empty() )
     {
@@ -1189,6 +1187,8 @@ void AgentScheduler::step( void )
     m_storage.fireUpdateSet( updates );
     m_done = updates->empty();
     m_updateSetManager.clear();
+
+    ++m_stepCounter;
 }
 
 bool AgentScheduler::done( void ) const
