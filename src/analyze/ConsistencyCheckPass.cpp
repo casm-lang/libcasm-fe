@@ -111,7 +111,7 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 
         if( name.compare( PROGRAM ) == 0 )
         {
-            m_log.error( { node.sourceLocation(), *e.locations().begin() },
+            m_log.error( { *e.locations().begin(), node.sourceLocation() },
                 "unknown init rule reference '" + std::string( e.what() ) + "'",
                 Code::AgentInitRuleDoesNotExist );
         }
@@ -134,10 +134,25 @@ void ConsistencyCheckVisitor::visit( ReferenceAtom& node )
 {
     RecursiveVisitor::visit( node );
 
-    if( m_functionInitially and not node.type() )
+    if( m_functionInitially )
     {
-        throw CompiletimeException( node.identifier()->sourceLocation(),
-            node.identifier()->path(), Code::Unspecified );
+        if( not node.type() )
+        {
+            throw CompiletimeException( node.identifier()->sourceLocation(),
+                node.identifier()->path(), Code::Unspecified );
+        }
+        else
+        {
+            try
+            {
+                m_symboltable.find( *node.identifier() );
+            }
+            catch( const std::domain_error& e )
+            {
+                throw CompiletimeException( node.identifier()->sourceLocation(),
+                    node.identifier()->path(), Code::Unspecified );
+            }
+        }
     }
 
     verify( node );

@@ -616,7 +616,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void inference( FunctionDefinition& node );
     void inference( DerivedDefinition& node,
         const std::vector< Expression::Ptr >& arguments );
-    void inference( RuleDefinition& node );
+    void inference(
+        RuleDefinition& node, const std::vector< Expression::Ptr >& arguments );
 
     void inference( QuantifierExpression& node );
 
@@ -680,9 +681,7 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
         push( *argument );
     }
 
-    RecursiveVisitor::visit( node );
-
-    inference( node );
+    inference( node, {} );
 
     for( const auto& argument : *node.arguments() )
     {
@@ -787,7 +786,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 auto& definition
                     = static_cast< RuleDefinition& >( symbol.definition() );
 
-                inference( definition );
+                inference( definition, {} );
                 assert( definition.type() and definition.type()->isRelation() );
 
                 const auto type
@@ -952,7 +951,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto& definition
                     = static_cast< RuleDefinition& >( symbol.definition() );
 
-                inference( definition );
+                inference( definition, node.arguments()->data() );
                 node.setType( definition.type() );
             }
             catch( const std::domain_error& e )
@@ -1133,12 +1132,18 @@ void TypeInferenceVisitor::visit( ConditionalRule& node )
 
     const auto& condExpr = *node.condition();
 
-    if( condExpr.type()->result() != *BOOLEAN )
+    if( condExpr.type() )
     {
-        m_log.error( { condExpr.sourceLocation() },
-            "invalid condition type '" + condExpr.type()->result().description()
-                + ", shall be '" + BOOLEAN->description() + "'",
-            Code::TypeInferenceConditionalRuleInvalidConditionType );
+        if( condExpr.type()->result() != *BOOLEAN )
+        {
+            m_log.error( { condExpr.sourceLocation() },
+                "invalid condition type '"
+                    + condExpr.type()->result().description()
+                    + ", shall be '"
+                    + BOOLEAN->description()
+                    + "'",
+                Code::TypeInferenceConditionalRuleInvalidConditionType );
+        }
     }
 }
 
@@ -1192,16 +1197,20 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 }
 void TypeInferenceVisitor::visit( UpdateRule& node )
 {
-    RecursiveVisitor::visit( node );
+    node.function()->accept( *this );
 
-    if( not m_functionInitially )
+    if( node.function()->type() )
     {
-        assignment( node, *node.function(), *node.expression(),
-            "updated function", "updating expression",
-            Code::TypeInferenceInvalidUpdateRuleFunctionType,
-            Code::TypeInferenceInvalidUpdateRuleExpressionType,
-            Code::TypeInferenceUpdateRuleTypesMismatch );
+        m_resultTypes[ node.expression().get() ].emplace_back(
+            node.function()->type()->result().id() );
     }
+
+    node.expression()->accept( *this );
+
+    assignment( node, *node.function(), *node.expression(), "updated function",
+        "updating expression", Code::TypeInferenceInvalidUpdateRuleFunctionType,
+        Code::TypeInferenceInvalidUpdateRuleExpressionType,
+        Code::TypeInferenceUpdateRuleTypesMismatch );
 }
 
 void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
@@ -1616,9 +1625,6 @@ void TypeInferenceVisitor::inference( const std::string& description,
         }
         case libcasm_ir::Type::RULE_REFERENCE:
         {
-            assert( 0 ); // TODO: PPA: retrieve relation to
-                         // construct RuleRef type
-            // node.setType( ? );
             break;
         }
         case libcasm_ir::Type::FUNCTION_REFERENCE:
@@ -1709,25 +1715,40 @@ void TypeInferenceVisitor::inference(
     node.setType( type );
 }
 
-void TypeInferenceVisitor::inference( RuleDefinition& node )
+void TypeInferenceVisitor::inference(
+    RuleDefinition& node, const std::vector< Expression::Ptr >& arguments )
 {
     if( node.type() )
     {
         return;
     }
 
+    std::size_t pos = 0;
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     for( auto argumentType : *node.arguments() )
     {
         if( not argumentType->type() )
         {
-            m_log.debug( "'" + node.identifier()->name()
-                         + "' has a non-typed argument(s)" );
-            return;
+            if( arguments.size() > 0 and arguments[ pos ]->type() )
+            {
+                argTypeList.emplace_back( arguments[ pos ]->type() );
+                argumentType->setType( arguments[ pos ]->type() );
+            }
+            else
+            {
+                m_log.debug( "'" + node.identifier()->name()
+                             + "' has a non-typed argument(s)" );
+                return;
+            }
         }
-
-        argTypeList.emplace_back( argumentType->type() );
+        else
+        {
+            argTypeList.emplace_back( argumentType->type() );
+        }
+        pos++;
     }
+
+    RecursiveVisitor::visit( node );
 
     const auto type = libstdhl::make< libcasm_ir::RelationType >(
         node.returnType()->type(), argTypeList );
