@@ -596,6 +596,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
+    void visit( ConditionalRule& node ) override;
+    void visit( CaseRule& node ) override;
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
     void visit( UpdateRule& node ) override;
@@ -1123,6 +1125,26 @@ void TypeInferenceVisitor::visit( UniversalQuantifierExpression& node )
 void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
 {
     inference( node );
+}
+
+void TypeInferenceVisitor::visit( ConditionalRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& condExpr = *node.condition();
+
+    if( condExpr.type()->result() != *BOOLEAN )
+    {
+        m_log.error( { condExpr.sourceLocation() },
+            "invalid condition type '" + condExpr.type()->result().description()
+                + ", shall be '" + BOOLEAN->description() + "'",
+            Code::TypeInferenceConditionalRuleInvalidConditionType );
+    }
+}
+
+void TypeInferenceVisitor::visit( CaseRule& node )
+{
+    RecursiveVisitor::visit( node );
 }
 
 void TypeInferenceVisitor::visit( LetRule& node )

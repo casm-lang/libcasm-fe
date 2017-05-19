@@ -131,6 +131,8 @@ namespace libcasm_fe
         TypeInferenceQuantifierExistentialPropositionTypeMismatch = 0x1410,
         TypeInferenceQuantifierExistentialPredicateTypeMismatch = 0x1411,
 
+        TypeInferenceConditionalRuleInvalidConditionType = 0x1500,
+
         TypeInferenceInvalidExpression = 0x1001,
         TypeInferenceInvalidPrint = 0x1002
 
