@@ -888,6 +888,7 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
 void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
 {
     bool result = true;
+    bool defined = true;
 
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.predicateVariable()->localIndex();
@@ -911,10 +912,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
 
         if( not prop.defined() )
         {
-            throw RuntimeException( node.proposition()->sourceLocation(),
-                "proposition must be true or false but was undef",
-                m_frameStack.generateBacktrace( node.sourceLocation() ),
-                Code::Unspecified );
+            defined = false;
         }
         else if( prop.value() == false )
         {
@@ -923,12 +921,28 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
         }
     } );
 
-    m_evaluationStack.push( ir::BooleanConstant( result ) );
+    if( defined )
+    {
+        m_evaluationStack.push( ir::BooleanConstant( result ) );
+
+    }
+    else
+    {
+        if( result == false )
+        {
+            m_evaluationStack.push( ir::BooleanConstant( false ) );
+        }
+        else
+        {
+            m_evaluationStack.push( ir::BooleanConstant() );
+        }
+    }
 }
 
 void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
 {
     bool result = false;
+    bool defined = true;
 
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.predicateVariable()->localIndex();
@@ -952,10 +966,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
 
         if( not prop.defined() )
         {
-            throw RuntimeException( node.proposition()->sourceLocation(),
-                "proposition must be true or false but was undef",
-                m_frameStack.generateBacktrace( node.sourceLocation() ),
-                Code::Unspecified );
+            defined = false;
         }
         else if( prop.value() == true )
         {
@@ -964,7 +975,22 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
         }
     } );
 
-    m_evaluationStack.push( ir::BooleanConstant( result ) );
+    if( defined )
+    {
+        m_evaluationStack.push( ir::BooleanConstant( result ) );
+
+    }
+    else
+    {
+        if( result == true )
+        {
+            m_evaluationStack.push( ir::BooleanConstant( true ) );
+        }
+        else
+        {
+            m_evaluationStack.push( ir::BooleanConstant() );
+        }
+    }
 }
 
 void ExecutionVisitor::visit( ConditionalRule& node )
