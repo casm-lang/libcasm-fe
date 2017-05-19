@@ -505,7 +505,7 @@ const Storage::ExecutionFunctionState& Storage::programState( void ) const
     return m_programState;
 }
 
-class ExecutionVisitor final : public RecursiveVisitor
+class ExecutionVisitor final : public EmptyVisitor
 {
   public:
     ExecutionVisitor( const Storage& storage,
@@ -654,7 +654,7 @@ void ExecutionVisitor::visit( RuleDefinition& node )
 
 void ExecutionVisitor::visit( EnumerationDefinition& node )
 {
-    RecursiveVisitor::visit( node );
+    // TODO
 }
 
 void ExecutionVisitor::visit( ValueAtom& node )
@@ -860,7 +860,7 @@ void ExecutionVisitor::visit( RangeExpression& node )
 
 void ExecutionVisitor::visit( ListExpression& node )
 {
-    RecursiveVisitor::visit( node );
+    // TODO
 }
 
 void ExecutionVisitor::visit( ConditionalExpression& node )
@@ -1095,7 +1095,7 @@ void ExecutionVisitor::visit( IterateRule& node )
     while( true )
     {
         ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
-        RecursiveVisitor::visit( node );
+        node.rule()->accept( *this );
         if( hasEmptyUpdateSet() )
         {
             break;
@@ -1106,13 +1106,13 @@ void ExecutionVisitor::visit( IterateRule& node )
 void ExecutionVisitor::visit( BlockRule& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
-    RecursiveVisitor::visit( node );
+    node.rules()->accept( *this );
 }
 
 void ExecutionVisitor::visit( SequenceRule& node )
 {
     ForkGuard seqGuard( &m_updateSetManager, Semantics::Sequential, 100UL );
-    RecursiveVisitor::visit( node );
+    node.rules()->accept( *this );
 }
 
 void ExecutionVisitor::visit( UpdateRule& node )
@@ -1165,7 +1165,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
 void ExecutionVisitor::visit( CallRule& node )
 {
-    RecursiveVisitor::visit( node );
+    node.call()->accept( *this );
 
     const auto& returnType = node.call()->type()->ptr_result();
     if( not returnType->isVoid() )
