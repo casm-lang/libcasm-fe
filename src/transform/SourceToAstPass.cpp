@@ -62,7 +62,7 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     Parser parser( log, lexer, filePath, specification );
     parser.set_debug_level( m_debug );
 
-    if( ( parser.parse() != 0 ) or not specification )
+    if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )
     {
         log.error( "could not parse `" + filePath + "´" );
         return false;

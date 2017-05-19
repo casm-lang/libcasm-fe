@@ -36,7 +36,8 @@ namespace libcasm_fe
         ,
         SyntaxErrorUnrecognizedCharacter = 0x0001,
         SyntaxErrorUnclosedString = 0x0002,
-        SyntaxErrorInvalidStatement = 0x0003
+        SyntaxErrorInvalidStatement = 0x0003,
+        SyntaxErrorUnclosedComment = 0x0004
 
         ,
         IdentifierAlreadyUsed = 0x0010

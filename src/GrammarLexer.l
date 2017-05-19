@@ -120,7 +120,7 @@ using namespace libcasm_fe;
 <COMMENT>([^*\n]|\r)+|.
 <COMMENT><<EOF>> {
     BEGIN( INITIAL );
-    log.error( {loc}, "multiline comment not terminated" );
+    log.error( {loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
     yyterminate();
 }
 
@@ -178,7 +178,7 @@ void Lexer::setFileName( const std::string& fileName )
 
 void Lexer::LexerError( const char* msg )
 {
-    log.error( {loc}, msg );
+    log.error( {loc}, msg, Code::SyntaxError );
 }
 
 //  
