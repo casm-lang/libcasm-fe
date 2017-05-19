@@ -348,8 +348,39 @@ void TypeCheckVisitor::visit( BasicType& node )
 
 void TypeCheckVisitor::visit( ComposedType& node )
 {
-#warning " TODO: List, Tuple etc. "
     RecursiveVisitor::visit( node );
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& name = node.name()->baseName();
+
+    std::vector< libcasm_ir::Type::Ptr > subTypeList;
+    for( auto subType : *node.subTypes() )
+    {
+        if( not subType->type() )
+        {
+            m_log.info( { subType->sourceLocation() },
+                "TODO: '" + name + "' has a non-typed sub type" );
+            return;
+        }
+
+        subTypeList.emplace_back( subType->type() );
+    }
+
+    // if( name.compare( "Tuple" ) == 0 )
+    // {
+    // }
+    // else if( name.compare( "List" ) == 0 )
+    // {
+    // }
+    // else
+    {
+        m_log.error( { node.sourceLocation() },
+            "unknown composed type '" + name + "' found" );
+    }
 }
 
 void TypeCheckVisitor::visit( RelationType& node )
@@ -581,8 +612,11 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         const std::vector< Expression::Ptr >& arguments = {} );
 
     void inference( FunctionDefinition& node );
-    void inference( DerivedDefinition& node );
+    void inference( DerivedDefinition& node,
+        const std::vector< Expression::Ptr >& arguments );
     void inference( RuleDefinition& node );
+
+    void inference( QuantifierExpression& node );
 
     void push( VariableDefinition& node );
     void pop( VariableDefinition& node );
@@ -629,9 +663,7 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
     assert( type );
     m_resultTypes[ node.expression().get() ].emplace_back( type->id() );
 
-    RecursiveVisitor::visit( node );
-
-    inference( node );
+    inference( node, {} );
 
     for( const auto& argument : *node.arguments() )
     {
@@ -659,6 +691,12 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
 void TypeInferenceVisitor::visit( UndefAtom& node )
 {
     RecursiveVisitor::visit( node );
+
+    auto result = m_resultTypes.find( &node );
+    if( result != m_resultTypes.end() and result->second.size() == 1 )
+    {
+        inference( "undef atom", 0, node );
+    }
 }
 
 void TypeInferenceVisitor::visit( ValueAtom& node )
@@ -719,11 +757,11 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 auto& definition
                     = static_cast< DerivedDefinition& >( symbol.definition() );
 
-                inference( definition );
+                inference( definition, {} );
                 assert( definition.type() and definition.type()->isRelation() );
 
                 const auto type
-                    = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                    = libstdhl::make< libcasm_ir::RuleReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
                             definition.type() ) );
                 node.setType( type );
@@ -870,7 +908,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto& definition
                     = static_cast< DerivedDefinition& >( symbol.definition() );
 
-                inference( definition );
+                inference( definition, node.arguments()->data() );
                 node.setType( definition.type() );
             }
             catch( const std::domain_error& e )
@@ -1079,11 +1117,12 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
 void TypeInferenceVisitor::visit( UniversalQuantifierExpression& node )
 {
-    RecursiveVisitor::visit( node );
+    inference( node );
 }
+
 void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
 {
-    RecursiveVisitor::visit( node );
+    inference( node );
 }
 
 void TypeInferenceVisitor::visit( LetRule& node )
@@ -1607,25 +1646,40 @@ void TypeInferenceVisitor::inference( FunctionDefinition& node )
     node.setType( type );
 }
 
-void TypeInferenceVisitor::inference( DerivedDefinition& node )
+void TypeInferenceVisitor::inference(
+    DerivedDefinition& node, const std::vector< Expression::Ptr >& arguments )
 {
     if( node.type() )
     {
         return;
     }
 
+    std::size_t pos = 0;
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     for( auto argumentType : *node.arguments() )
     {
         if( not argumentType->type() )
         {
-            m_log.debug( "'" + node.identifier()->name()
-                         + "' has a non-typed argument(s)" );
-            return;
+            if( arguments.size() > 0 and arguments[ pos ]->type() )
+            {
+                argTypeList.emplace_back( arguments[ pos ]->type() );
+                argumentType->setType( arguments[ pos ]->type() );
+            }
+            else
+            {
+                m_log.debug( "'" + node.identifier()->name()
+                             + "' has a non-typed argument(s)" );
+                return;
+            }
         }
-
-        argTypeList.emplace_back( argumentType->type() );
+        else
+        {
+            argTypeList.emplace_back( argumentType->type() );
+        }
+        pos++;
     }
+
+    RecursiveVisitor::visit( node );
 
     const auto type = libstdhl::make< libcasm_ir::RelationType >(
         node.returnType()->type(), argTypeList );
@@ -1657,6 +1711,93 @@ void TypeInferenceVisitor::inference( RuleDefinition& node )
         node.returnType()->type(), argTypeList );
 
     node.setType( type );
+}
+
+void TypeInferenceVisitor::inference( QuantifierExpression& node )
+{
+    node.setType( BOOLEAN );
+
+    node.predicateVariable()->accept( *this );
+
+    if( node.predicateVariable()->type() )
+    {
+        m_resultTypes[ node.universe().get() ].emplace_back(
+            node.predicateVariable()->type()->id() );
+    }
+
+    push( *node.predicateVariable() );
+    node.universe()->accept( *this );
+
+    if( not node.predicateVariable()->type() and node.universe()->type() )
+    {
+        node.predicateVariable()->setType(
+            node.universe()->type()->ptr_result() );
+    }
+
+    m_resultTypes[ node.proposition().get() ].emplace_back( node.type()->id() );
+
+    node.proposition()->accept( *this );
+    pop( *node.predicateVariable() );
+
+    if( not node.predicateVariable()->type() )
+    {
+        m_log.error( { node.predicateVariable()->sourceLocation() },
+            "no type found", Code::TypeInferenceInvalidExpression );
+    }
+    else if( not node.universe()->type() )
+    {
+        m_log.error( { node.universe()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else
+    {
+        if( *node.predicateVariable()->type()
+            != node.universe()->type()->result() )
+        {
+            m_log.error( { node.predicateVariable()->sourceLocation(),
+                             node.universe()->sourceLocation() },
+                node.description() + " predicate variable '"
+                    + node.predicateVariable()->identifier()->name()
+                    + "' of type '"
+                    + node.predicateVariable()->type()->description()
+                    + "' does not match the universe of type '"
+                    + node.universe()->type()->result().description()
+                    + "'",
+
+                ( node.id() == Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION )
+                    ? Code::
+                          TypeInferenceQuantifierExistentialPredicateTypeMismatch
+                    : Code::
+                          TypeInferenceQuantifierUniversalPredicateTypeMismatch );
+        }
+    }
+
+    if( not node.proposition()->type() )
+    {
+        m_log.error( { node.proposition()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else
+    {
+        const auto& propType = node.proposition()->type()->result();
+        if( *node.type() != propType )
+        {
+            m_log.error(
+                { node.sourceLocation(), node.proposition()->sourceLocation() },
+
+                node.description() + " has invalid proposition type '"
+                    + propType.description()
+                    + "' shall be '"
+                    + node.type()->description()
+                    + "'",
+
+                ( node.id() == Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION )
+                    ? Code::
+                          TypeInferenceQuantifierExistentialPropositionTypeMismatch
+                    : Code::
+                          TypeInferenceQuantifierUniversalPropositionTypeMismatch );
+        }
+    }
 }
 
 void TypeInferenceVisitor::push( VariableDefinition& node )

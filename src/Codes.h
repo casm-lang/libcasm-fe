@@ -126,6 +126,11 @@ namespace libcasm_fe
 
         TypeInferenceNotDefinedForExpression = 0x1300,
 
+        TypeInferenceQuantifierUniversalPropositionTypeMismatch = 0x1400,
+        TypeInferenceQuantifierUniversalPredicateTypeMismatch = 0x1401,
+        TypeInferenceQuantifierExistentialPropositionTypeMismatch = 0x1410,
+        TypeInferenceQuantifierExistentialPredicateTypeMismatch = 0x1411,
+
         TypeInferenceInvalidExpression = 0x1001,
         TypeInferenceInvalidPrint = 0x1002
 
