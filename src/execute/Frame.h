@@ -33,8 +33,8 @@ namespace libcasm_fe
     class Frame
     {
       public:
-        Frame( const Ast::CallExpression::Ptr& call, const Ast::Node::Ptr& callee,
-            std::size_t numberOfLocals );
+        Frame( const Ast::CallExpression::Ptr& call,
+            const Ast::Node::Ptr& callee, std::size_t numberOfLocals );
 
         Ast::CallExpression::Ptr call( void ) const;
 

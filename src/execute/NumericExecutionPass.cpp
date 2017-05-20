@@ -429,7 +429,8 @@ void ExecutionVisitor::visit( RuleDefinition& node )
 void ExecutionVisitor::visit( EnumerationDefinition& node )
 {
     assert( node.type()->isEnumeration() );
-    const auto& enumType = std::static_pointer_cast< ir::EnumerationType >( node.type() );
+    const auto& enumType
+        = std::static_pointer_cast< ir::EnumerationType >( node.type() );
     m_evaluationStack.push( ir::EnumerationConstant( enumType ) );
 }
 
@@ -499,8 +500,11 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::CONSTANT:
         {
             assert( node.type()->isEnumeration() );
-            const auto& enumType = std::static_pointer_cast< ir::EnumerationType >( node.type() );
-            m_evaluationStack.push( ir::EnumerationConstant( enumType, node.identifier()->baseName() ) );
+            const auto& enumType
+                = std::static_pointer_cast< ir::EnumerationType >(
+                    node.type() );
+            m_evaluationStack.push( ir::EnumerationConstant(
+                enumType, node.identifier()->baseName() ) );
             break;
         }
         case CallExpression::TargetType::VARIABLE:
@@ -704,7 +708,6 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     if( defined )
     {
         m_evaluationStack.push( ir::BooleanConstant( result ) );
-
     }
     else
     {
@@ -758,7 +761,6 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     if( defined )
     {
         m_evaluationStack.push( ir::BooleanConstant( result ) );
-
     }
     else
     {
