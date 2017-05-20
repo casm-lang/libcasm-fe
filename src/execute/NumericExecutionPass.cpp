@@ -282,7 +282,8 @@ const Storage::ExecutionFunctionState& Storage::programState( void ) const
 class ExecutionVisitor final : public EmptyVisitor
 {
   public:
-    ExecutionVisitor( const Storage& storage,
+    ExecutionVisitor( const Storage& globalState,
+        const Storage& agentLocalState,
         UpdateSetManager< ExecutionUpdateSet >& updateSetManager );
 
     /**
@@ -337,16 +338,19 @@ class ExecutionVisitor final : public EmptyVisitor
     void invokeBuiltin( ir::Value::ID id, const ir::Type::Ptr& type );
 
   private:
-    const Storage& m_storage;
+    const Storage& m_globalState;
+    const Storage& m_agentLocalState;
     UpdateSetManager< ExecutionUpdateSet >& m_updateSetManager;
 
     ConstantStack m_evaluationStack;
     FrameStack m_frameStack;
 };
 
-ExecutionVisitor::ExecutionVisitor( const Storage& storage,
+ExecutionVisitor::ExecutionVisitor( const Storage& globalState,
+    const Storage& agentLocalState,
     UpdateSetManager< ExecutionUpdateSet >& updateSetManager )
-: m_storage( storage )
+: m_globalState( globalState )
+, m_agentLocalState( agentLocalState )
 , m_updateSetManager( updateSetManager )
 , m_evaluationStack()
 , m_frameStack()
@@ -391,10 +395,17 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
         return;
     }
 
-    const auto state = m_storage.get( location );
-    if( state )
+    const auto agentLocalFunction = m_agentLocalState.get( location );
+    if( agentLocalFunction )
     {
-        m_evaluationStack.push( state.value() );
+        m_evaluationStack.push( agentLocalFunction.value() );
+        return;
+    }
+
+    const auto globalFunction = m_globalState.get( location );
+    if( globalFunction )
+    {
+        m_evaluationStack.push( globalFunction.value() );
         return;
     }
 
@@ -1015,20 +1026,22 @@ void ExecutionVisitor::invokeBuiltin(
 class StateInitializationVisitor final : public EmptyVisitor
 {
   public:
-    StateInitializationVisitor( Storage& storage );
+    StateInitializationVisitor( Storage& globalState );
 
     void visit( Specification& node ) override;
 
     void visit( FunctionDefinition& node ) override;
 
   private:
-    Storage& m_storage;
+    Storage& m_globalState;
+    const Storage m_localState;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 };
 
-StateInitializationVisitor::StateInitializationVisitor( Storage& storage )
+StateInitializationVisitor::StateInitializationVisitor( Storage& globalState )
 : EmptyVisitor()
-, m_storage( storage )
+, m_globalState( globalState )
+, m_localState()
 , m_updateSetManager()
 {
 }
@@ -1040,34 +1053,39 @@ void StateInitializationVisitor::visit( Specification& node )
     node.definitions()->accept( *this );
 
     auto updateSet = m_updateSetManager.currentUpdateSet();
-    m_storage.fireUpdateSet( updateSet );
+    m_globalState.fireUpdateSet( updateSet );
     m_updateSetManager.clear();
 }
 
 void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
-    ExecutionVisitor executionVisitor( m_storage, m_updateSetManager );
+    ExecutionVisitor executionVisitor(
+        m_globalState, m_localState, m_updateSetManager );
     node.initializers()->accept( executionVisitor );
 }
 
 class Agent
 {
   public:
-    Agent( const Storage& storage, const ReferenceConstant& rule );
+    Agent( const Storage& globalState, const ir::Constant& agentId,
+        const ReferenceConstant& rule );
 
     void run( void );
 
     ExecutionUpdateSet* updateSet( void ) const;
 
   private:
-    const Storage& m_storage;
+    const Storage& m_globalState;
+    const ir::Constant& m_agentId;
     const ReferenceConstant& m_rule;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 };
 
-Agent::Agent( const Storage& storage, const ReferenceConstant& rule )
-: m_storage( storage )
+Agent::Agent( const Storage& globalState, const ir::Constant& agentId,
+    const ReferenceConstant& rule )
+: m_globalState( globalState )
+, m_agentId( agentId )
 , m_rule( rule )
 , m_updateSetManager()
 {
@@ -1075,7 +1093,12 @@ Agent::Agent( const Storage& storage, const ReferenceConstant& rule )
 
 void Agent::run( void )
 {
-    ExecutionVisitor executionVisitor( m_storage, m_updateSetManager );
+    Storage agentLocalState;
+    const Location self{ "self", {} };
+    agentLocalState.set( self, m_agentId );
+
+    ExecutionVisitor executionVisitor(
+        m_globalState, agentLocalState, m_updateSetManager );
     executionVisitor.execute( m_rule );
 }
 
@@ -1134,7 +1157,7 @@ void SequentialDispatchStrategy::dispatch( std::vector< Agent >& agents )
 class AgentScheduler
 {
   public:
-    AgentScheduler( Storage& storage );
+    AgentScheduler( Storage& globalState );
 
     void setDispatchStrategy(
         std::unique_ptr< DispatchStrategy > dispatchStrategy );
@@ -1159,15 +1182,15 @@ class AgentScheduler
 
   private:
     std::unique_ptr< DispatchStrategy > m_dispatchStrategy;
-    Storage& m_storage;
+    Storage& m_globalState;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
     bool m_done;
     std::size_t m_stepCounter;
 };
 
-AgentScheduler::AgentScheduler( Storage& storage )
+AgentScheduler::AgentScheduler( Storage& globalState )
 : m_dispatchStrategy( libstdhl::make_unique< SequentialDispatchStrategy >() )
-, m_storage( storage )
+, m_globalState( globalState )
 , m_updateSetManager()
 , m_done( false )
 , m_stepCounter( 0UL )
@@ -1192,7 +1215,7 @@ void AgentScheduler::step( void )
     dispatch( agents );
 
     auto* updates = collectUpdates( agents );
-    m_storage.fireUpdateSet( updates );
+    m_globalState.fireUpdateSet( updates );
     m_done = updates->empty();
     m_updateSetManager.clear();
 
@@ -1213,18 +1236,21 @@ std::vector< Agent > AgentScheduler::collectAgents( void ) const
 {
     std::vector< Agent > agents;
 
-    const auto& programs = m_storage.programState();
+    const auto& programs = m_globalState.programState();
     const auto end = programs.end();
     for( auto it = programs.begin(); it != end; ++it )
     {
+        const auto& location = it.key();
         const auto& value = it.value();
+
+        const auto& agentId = location.arguments.at( 0 );
 
         assert( ir::isa< ReferenceConstant >( value ) );
         const auto& rule = static_cast< const ReferenceConstant& >( value );
 
         if( rule.defined() )
         {
-            agents.push_back( Agent( m_storage, rule ) );
+            agents.emplace_back( Agent( m_globalState, agentId, rule ) );
         }
     }
 
@@ -1268,15 +1294,15 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     const auto data = pr.result< ConsistencyCheckPass >();
     const auto specification = data->specification();
 
-    Storage storage;
+    Storage globalState;
 
-    AgentScheduler scheduler( storage );
+    AgentScheduler scheduler( globalState );
     /*scheduler.setDispatchStrategy(
         libstdhl::make_unique< ParallelDispatchStrategy >() );*/
 
     try
     {
-        StateInitializationVisitor stateInitializationVisitor( storage );
+        StateInitializationVisitor stateInitializationVisitor( globalState );
         specification->accept( stateInitializationVisitor );
 
         while( not scheduler.done() )
