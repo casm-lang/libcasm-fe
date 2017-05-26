@@ -48,6 +48,7 @@
 
 #include "Frame.h"
 #include "FunctionState.h"
+#include "LocationRegistry.h"
 #include "ReferenceConstant.h"
 #include "UpdateSet.h"
 
@@ -117,12 +118,6 @@ class ConstantStack : public Stack< ir::Constant >
     }
 };
 
-struct Location
-{
-    std::string function;
-    std::vector< ir::Constant > arguments;
-};
-
 struct ConstantHash
 {
     std::size_t operator()( const ir::Constant& constant ) const
@@ -131,26 +126,16 @@ struct ConstantHash
     }
 };
 
-struct LocationHash
+struct ConstantsHash
 {
-    std::size_t operator()( const Location& location ) const
+    std::size_t operator()( const std::vector< ir::Constant >& constants ) const
     {
-        std::size_t hash = std::hash< std::string >{}( location.function );
-        for( const auto& argument : location.arguments )
+        std::size_t hash = constants.size();
+        for( const auto& constant : constants )
         {
-            hash = libstdhl::Hash::combine( hash, ConstantHash{}( argument ) );
+            hash = libstdhl::Hash::combine( hash, ConstantHash{}( constant ) );
         }
         return hash;
-    }
-};
-
-struct LocationEquals
-    : public std::binary_function< const Location&, const Location&, bool >
-{
-    bool operator()( const Location& lhs, const Location& rhs ) const
-    {
-        return ( lhs.function == rhs.function )
-               and ( lhs.arguments == rhs.arguments );
     }
 };
 
@@ -173,12 +158,24 @@ struct UpdateEquals
     }
 };
 
+struct LocationRegistryDetails
+{
+    using Function = std::string;
+    using FunctionHash = std::hash< Function >;
+    using FunctionEquals = std::equal_to< Function >;
+    using Arguments = std::vector< ir::Constant >;
+    using ArgumentsHash = ConstantsHash;
+    using ArgumentsEquals = std::equal_to< Arguments >;
+};
+
+using ExecutionLocationRegistry = LocationRegistry< LocationRegistryDetails >;
+
 struct UpdateSetDetails
 {
-    using Location = Location;
+    using Location = ExecutionLocationRegistry::Location;
     using Value = Update;
-    using LocationHash = LocationHash;
-    using LocationEquals = LocationEquals;
+    using LocationHash = ExecutionLocationRegistry::LocationHash;
+    using LocationEquals = ExecutionLocationRegistry::LocationEquals;
     using ValueEquals = UpdateEquals;
 };
 
@@ -188,12 +185,15 @@ using Semantics = ExecutionUpdateSet::Semantics;
 
 class Storage
 {
+    using Location = ExecutionLocationRegistry::Location;
+    using Value = ir::Constant;
+
     struct FunctionStateDetails
     {
         using Location = Location;
-        using Value = ir::Constant;
-        using LocationHash = LocationHash;
-        using LocationEquals = LocationEquals;
+        using Value = Value;
+        using LocationHash = ExecutionLocationRegistry::LocationHash;
+        using LocationEquals = ExecutionLocationRegistry::LocationEquals;
     };
 
     using ExecutionFunctionState = FunctionState< FunctionStateDetails >;
@@ -203,10 +203,9 @@ class Storage
 
     void fireUpdateSet( ExecutionUpdateSet* updateSet );
 
-    void set( const Location& location, const ir::Constant& value );
+    void set( const Location& location, const Value& value );
     void remove( const Location& location );
-    std::experimental::optional< ir::Constant > get(
-        const Location& location ) const;
+    std::experimental::optional< Value > get( const Location& location ) const;
 
     const ExecutionFunctionState& programState( void ) const;
 
@@ -237,9 +236,9 @@ void Storage::fireUpdateSet( ExecutionUpdateSet* updateSet )
     }
 }
 
-void Storage::set( const Location& location, const ir::Constant& value )
+void Storage::set( const Location& location, const Value& value )
 {
-    if( location.function == "program" )
+    if( location.function() == "program" )
     {
         m_programState.set( location, value );
     }
@@ -251,7 +250,7 @@ void Storage::set( const Location& location, const ir::Constant& value )
 
 void Storage::remove( const Location& location )
 {
-    if( location.function == "program" )
+    if( location.function() == "program" )
     {
         m_programState.remove( location );
     }
@@ -261,10 +260,10 @@ void Storage::remove( const Location& location )
     }
 }
 
-std::experimental::optional< ir::Constant > Storage::get(
+std::experimental::optional< Storage::Value > Storage::get(
     const Location& location ) const
 {
-    if( location.function == "program" )
+    if( location.function() == "program" )
     {
         return m_programState.get( location );
     }
@@ -282,8 +281,8 @@ const Storage::ExecutionFunctionState& Storage::programState( void ) const
 class ExecutionVisitor final : public EmptyVisitor
 {
   public:
-    ExecutionVisitor( const Storage& globalState,
-        const Storage& agentLocalState,
+    ExecutionVisitor( ExecutionLocationRegistry& locationRegistry,
+        const Storage& globalState, const Storage& agentLocalState,
         UpdateSetManager< ExecutionUpdateSet >& updateSetManager );
 
     /**
@@ -340,17 +339,19 @@ class ExecutionVisitor final : public EmptyVisitor
   private:
     const Storage& m_globalState;
     const Storage& m_agentLocalState;
+    ExecutionLocationRegistry& m_locationRegistry;
     UpdateSetManager< ExecutionUpdateSet >& m_updateSetManager;
 
     ConstantStack m_evaluationStack;
     FrameStack m_frameStack;
 };
 
-ExecutionVisitor::ExecutionVisitor( const Storage& globalState,
-    const Storage& agentLocalState,
+ExecutionVisitor::ExecutionVisitor( ExecutionLocationRegistry& locationRegistry,
+    const Storage& globalState, const Storage& agentLocalState,
     UpdateSetManager< ExecutionUpdateSet >& updateSetManager )
 : m_globalState( globalState )
 , m_agentLocalState( agentLocalState )
+, m_locationRegistry( locationRegistry )
 , m_updateSetManager( updateSetManager )
 , m_evaluationStack()
 , m_frameStack()
@@ -386,23 +387,29 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
 {
     auto* frame = m_frameStack.top();
 
-    const Location location{ node.identifier()->name(), frame->locals() };
+    const auto location = m_locationRegistry.lookup( node.identifier()->name(), frame->locals() );
+    if( not location )
+    {
+        // location is not registered -> no update and no state
+        node.defaultValue()->accept( *this ); // return value already on stack
+        return;
+    }
 
-    const auto update = m_updateSetManager.lookup( location );
+    const auto update = m_updateSetManager.lookup( *location );
     if( update )
     {
         m_evaluationStack.push( update.value().value );
         return;
     }
 
-    const auto agentLocalFunction = m_agentLocalState.get( location );
+    const auto agentLocalFunction = m_agentLocalState.get( *location );
     if( agentLocalFunction )
     {
         m_evaluationStack.push( agentLocalFunction.value() );
         return;
     }
 
-    const auto globalFunction = m_globalState.get( location );
+    const auto globalFunction = m_globalState.get( *location );
     if( globalFunction )
     {
         m_evaluationStack.push( globalFunction.value() );
@@ -925,8 +932,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
         argumentValues.emplace_back( value );
     }
 
-    const Location location{ node.function()->identifier()->path(),
-        argumentValues };
+    const auto location = m_locationRegistry.get( node.function()->identifier()->path(), argumentValues );
     const Update update{ updateValue, node.sourceLocation() };
 
     try
@@ -944,7 +950,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
         const auto& existingValue = existingUpdate.second;
 
         const auto info
-            = "Conflict while adding update " + existingLocation.function
+            = "Conflict while adding update " + existingLocation.function()
               //+ to_string( existingLocation.arguments )
               + " = " + conflictingValue.value.description()
               + ". Update for same location  with another value '"
@@ -1026,7 +1032,8 @@ void ExecutionVisitor::invokeBuiltin(
 class StateInitializationVisitor final : public EmptyVisitor
 {
   public:
-    StateInitializationVisitor( Storage& globalState );
+    StateInitializationVisitor(
+        ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
     void visit( Specification& node ) override;
 
@@ -1034,13 +1041,16 @@ class StateInitializationVisitor final : public EmptyVisitor
 
   private:
     Storage& m_globalState;
+    ExecutionLocationRegistry& m_locationRegistry;
     const Storage m_localState;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 };
 
-StateInitializationVisitor::StateInitializationVisitor( Storage& globalState )
+StateInitializationVisitor::StateInitializationVisitor(
+    ExecutionLocationRegistry& locationRegistry, Storage& globalState )
 : EmptyVisitor()
 , m_globalState( globalState )
+, m_locationRegistry( locationRegistry )
 , m_localState()
 , m_updateSetManager()
 {
@@ -1061,14 +1071,15 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
     ExecutionVisitor executionVisitor(
-        m_globalState, m_localState, m_updateSetManager );
+        m_locationRegistry, m_globalState, m_localState, m_updateSetManager );
     node.initializers()->accept( executionVisitor );
 }
 
 class Agent
 {
   public:
-    Agent( const Storage& globalState, const ir::Constant& agentId,
+    Agent( ExecutionLocationRegistry& locationRegistry,
+           const Storage& globalState, const ir::Constant& agentId,
         const ReferenceConstant& rule );
 
     void run( void );
@@ -1077,14 +1088,16 @@ class Agent
 
   private:
     const Storage& m_globalState;
+    ExecutionLocationRegistry& m_locationRegistry;
     const ir::Constant& m_agentId;
     const ReferenceConstant& m_rule;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 };
 
-Agent::Agent( const Storage& globalState, const ir::Constant& agentId,
+Agent::Agent( ExecutionLocationRegistry& locationRegistry, const Storage& globalState, const ir::Constant& agentId,
     const ReferenceConstant& rule )
 : m_globalState( globalState )
+, m_locationRegistry( locationRegistry )
 , m_agentId( agentId )
 , m_rule( rule )
 , m_updateSetManager()
@@ -1094,10 +1107,10 @@ Agent::Agent( const Storage& globalState, const ir::Constant& agentId,
 void Agent::run( void )
 {
     Storage agentLocalState;
-    const Location self{ "self", {} };
+    const auto self = m_locationRegistry.get( "self", {} );
     agentLocalState.set( self, m_agentId );
 
-    ExecutionVisitor executionVisitor(
+    ExecutionVisitor executionVisitor( m_locationRegistry,
         m_globalState, agentLocalState, m_updateSetManager );
     executionVisitor.execute( m_rule );
 }
@@ -1157,7 +1170,8 @@ void SequentialDispatchStrategy::dispatch( std::vector< Agent >& agents )
 class AgentScheduler
 {
   public:
-    AgentScheduler( Storage& globalState );
+    AgentScheduler(
+        ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
     void setDispatchStrategy(
         std::unique_ptr< DispatchStrategy > dispatchStrategy );
@@ -1183,14 +1197,17 @@ class AgentScheduler
   private:
     std::unique_ptr< DispatchStrategy > m_dispatchStrategy;
     Storage& m_globalState;
+    ExecutionLocationRegistry& m_locationRegistry;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
     bool m_done;
     std::size_t m_stepCounter;
 };
 
-AgentScheduler::AgentScheduler( Storage& globalState )
+AgentScheduler::AgentScheduler(
+    ExecutionLocationRegistry& locationRegistry, Storage& globalState )
 : m_dispatchStrategy( libstdhl::make_unique< SequentialDispatchStrategy >() )
 , m_globalState( globalState )
+, m_locationRegistry( locationRegistry )
 , m_updateSetManager()
 , m_done( false )
 , m_stepCounter( 0UL )
@@ -1243,14 +1260,15 @@ std::vector< Agent > AgentScheduler::collectAgents( void ) const
         const auto& location = it.key();
         const auto& value = it.value();
 
-        const auto& agentId = location.arguments.at( 0 );
+        const auto& agentId = location.arguments().at( 0 );
 
         assert( ir::isa< ReferenceConstant >( value ) );
         const auto& rule = static_cast< const ReferenceConstant& >( value );
 
         if( rule.defined() )
         {
-            agents.emplace_back( Agent( m_globalState, agentId, rule ) );
+            agents.emplace_back(
+                Agent( m_locationRegistry, m_globalState, agentId, rule ) );
         }
     }
 
@@ -1294,15 +1312,17 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     const auto data = pr.result< ConsistencyCheckPass >();
     const auto specification = data->specification();
 
+    ExecutionLocationRegistry locationRegistry;
     Storage globalState;
 
-    AgentScheduler scheduler( globalState );
+    AgentScheduler scheduler( locationRegistry, globalState );
     /*scheduler.setDispatchStrategy(
         libstdhl::make_unique< ParallelDispatchStrategy >() );*/
 
     try
     {
-        StateInitializationVisitor stateInitializationVisitor( globalState );
+        StateInitializationVisitor stateInitializationVisitor(
+            locationRegistry, globalState );
         specification->accept( stateInitializationVisitor );
 
         while( not scheduler.done() )
