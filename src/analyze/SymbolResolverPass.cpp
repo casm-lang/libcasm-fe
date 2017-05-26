@@ -281,10 +281,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 "invalid relative path '" + path.path() + "' found" );
         }
     }
-    else if( path.path() == "self" )
-    {
-        node.setTargetType( CallExpression::TargetType::SELF );
-    }
     else
     {
         try

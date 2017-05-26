@@ -918,14 +918,14 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
             break;
         }
+        case CallExpression::TargetType::SELF: // [[fallthrough]]
         case CallExpression::TargetType::FUNCTION:
         {
             assert( not node.type() );
             try
             {
                 auto symbol = m_symboltable.find( node );
-                assert( symbol.targetType()
-                        == CallExpression::TargetType::FUNCTION );
+                assert( symbol.targetType() == node.targetType());
 
                 auto& definition
                     = static_cast< FunctionDefinition& >( symbol.definition() );
@@ -1335,6 +1335,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
             }
             case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
             case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
+            case CallExpression::TargetType::SELF: // [[fallthrough]]
             case CallExpression::TargetType::RULE:
             {
                 try
