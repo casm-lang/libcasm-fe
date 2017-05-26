@@ -282,8 +282,9 @@ class ExecutionVisitor final : public EmptyVisitor
 {
   public:
     ExecutionVisitor( ExecutionLocationRegistry& locationRegistry,
-        const Storage& globalState, const Storage& agentLocalState,
-        UpdateSetManager< ExecutionUpdateSet >& updateSetManager );
+        const Storage& globalState,
+        UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
+        const ir::Constant& agentId );
 
     /**
      * Executes the rule reference stored in \a value.
@@ -338,21 +339,21 @@ class ExecutionVisitor final : public EmptyVisitor
 
   private:
     const Storage& m_globalState;
-    const Storage& m_agentLocalState;
     ExecutionLocationRegistry& m_locationRegistry;
     UpdateSetManager< ExecutionUpdateSet >& m_updateSetManager;
+    const ir::Constant& m_agentId;
 
     ConstantStack m_evaluationStack;
     FrameStack m_frameStack;
 };
 
 ExecutionVisitor::ExecutionVisitor( ExecutionLocationRegistry& locationRegistry,
-    const Storage& globalState, const Storage& agentLocalState,
-    UpdateSetManager< ExecutionUpdateSet >& updateSetManager )
+    const Storage& globalState, UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
+    const ir::Constant& agentId )
 : m_globalState( globalState )
-, m_agentLocalState( agentLocalState )
 , m_locationRegistry( locationRegistry )
 , m_updateSetManager( updateSetManager )
+, m_agentId( agentId )
 , m_evaluationStack()
 , m_frameStack()
 {
@@ -399,13 +400,6 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
     if( update )
     {
         m_evaluationStack.push( update.value().value );
-        return;
-    }
-
-    const auto agentLocalFunction = m_agentLocalState.get( *location );
-    if( agentLocalFunction )
-    {
-        m_evaluationStack.push( agentLocalFunction.value() );
         return;
     }
 
@@ -528,6 +522,11 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::VARIABLE:
         {
             node.targetDefinition()->accept( *this );
+            break;
+        }
+        case CallExpression::TargetType::SELF:
+        {
+            m_evaluationStack.push( m_agentId );
             break;
         }
         case CallExpression::TargetType::UNKNOWN:
@@ -1042,7 +1041,6 @@ class StateInitializationVisitor final : public EmptyVisitor
   private:
     Storage& m_globalState;
     ExecutionLocationRegistry& m_locationRegistry;
-    const Storage m_localState;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 };
 
@@ -1051,7 +1049,6 @@ StateInitializationVisitor::StateInitializationVisitor(
 : EmptyVisitor()
 , m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
-, m_localState()
 , m_updateSetManager()
 {
 }
@@ -1071,7 +1068,7 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
     ExecutionVisitor executionVisitor(
-        m_locationRegistry, m_globalState, m_localState, m_updateSetManager );
+        m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );
     node.initializers()->accept( executionVisitor );
 }
 
@@ -1106,12 +1103,8 @@ Agent::Agent( ExecutionLocationRegistry& locationRegistry, const Storage& global
 
 void Agent::run( void )
 {
-    Storage agentLocalState;
-    const auto self = m_locationRegistry.get( "self", {} );
-    agentLocalState.set( self, m_agentId );
-
     ExecutionVisitor executionVisitor( m_locationRegistry,
-        m_globalState, agentLocalState, m_updateSetManager );
+        m_globalState, m_updateSetManager, m_agentId );
     executionVisitor.execute( m_rule );
 }
 

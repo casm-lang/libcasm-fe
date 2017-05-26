@@ -174,6 +174,10 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
         {
             return "Variable";
         }
+        case TargetType::SELF:
+        {
+            return "Self";
+        }
         case TargetType::UNKNOWN:
         {
             return "Unknown";

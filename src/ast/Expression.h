@@ -120,6 +120,7 @@ namespace libcasm_fe
                 ENUMERATION,
                 CONSTANT,
                 VARIABLE,
+                SELF,
                 UNKNOWN
             };
 
