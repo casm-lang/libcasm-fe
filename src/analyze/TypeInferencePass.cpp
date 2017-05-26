@@ -294,7 +294,7 @@ void TypeCheckVisitor::visit( BasicType& node )
         {
             auto symbol = m_symboltable.find( "self" );
             assert(
-                symbol.targetType() == CallExpression::TargetType::FUNCTION );
+                symbol.targetType() == CallExpression::TargetType::SELF );
             auto& definition
                 = static_cast< FunctionDefinition& >( symbol.definition() );
 
