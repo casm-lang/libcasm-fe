@@ -47,6 +47,7 @@
 #include "../ast/Specification.h"
 
 #include "Frame.h"
+#include "Stack.h"
 #include "FunctionState.h"
 #include "LocationRegistry.h"
 #include "ReferenceConstant.h"
@@ -62,45 +63,6 @@ char NumericExecutionPass::id = 0;
 static libpass::PassRegistration< NumericExecutionPass > PASS(
     "NumericExecutionPass",
     "execute numerically over the AST input specification", "ast-exec-num", 0 );
-
-template < typename T >
-class Stack
-{
-  public:
-    explicit Stack( void )
-    : m_values()
-    {
-    }
-
-    void push( const T& value )
-    {
-        m_values.push_back( value );
-    }
-
-    T pop( void )
-    {
-        assert( not m_values.empty() );
-
-        const auto value = m_values.back();
-        m_values.pop_back();
-        return value;
-    }
-
-    T& top( void )
-    {
-        assert( not m_values.empty() );
-
-        return m_values.back();
-    }
-
-    void clear( void )
-    {
-        m_values.clear();
-    }
-
-  private:
-    std::vector< T > m_values;
-};
 
 class ConstantStack : public Stack< ir::Constant >
 {
