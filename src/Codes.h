@@ -98,18 +98,25 @@ namespace libcasm_fe
         CaseLabelMultipleUseOfDefault = 0x5c00 // 5c** ... case errors
 
         ,
-        AssertInvalidExpression = 0x5a00 // 5a** ... assert errors
+        AssertInvalidExpression = 0x5a00, // 5a** ... assert errors
 
         // --------------------------------------------------------- a*** ...
         // agent errors
-        ,
+
         AgentInitRuleDoesNotExist = 0xa000,
         AgentInitRuleMultipleDefinitions = 0xa001,
-        AgentInitRuleNotDefined = 0xa002
+        AgentInitRuleNotDefined = 0xa002,
+
+        // --------------------------------------------------------- 01** ...
+        // type annotation errors
+
+        TypeAnnotationInvalidComposedTypeName = 0x0100,
 
         // --------------------------------------------------------- 1*** ...
-        // type check errors
-        ,
+        // type inference errors
+
+        TypeInferenceFoundNoTypeAnnotation = 0x1000,
+
         TypeInferenceFoundNoResultType = 0x1100,
         TypeInferenceFoundMultipleResultTypes = 0x1101,
         TypeInferenceFoundNoArgumentType = 0x1102,

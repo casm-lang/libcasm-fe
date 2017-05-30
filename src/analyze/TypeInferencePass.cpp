@@ -77,7 +77,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
     Namespace& m_symboltable;
 
     std::unordered_map< std::string, VariableDefinition* > m_id2var;
-    std::stack< VariableDefinition* > m_stack;
+    std::vector< VariableDefinition* > m_stack;
     Expression* m_caseExpr = nullptr;
 };
 
@@ -146,31 +146,18 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                 {
                     // we are not in a 'case' context ... check latest
                     // m_stack entry!
-                    if( not m_stack.empty() )
+                    if( not m_stack.empty() and m_stack.back()->type() )
                     {
-                        const auto variable = m_stack.top();
+                        const auto variable = m_stack.back();
 
-                        const auto searchPath
-                            = Ast::make< Identifiers >( node.sourceLocation() );
-
-                        for( auto i :
-                            *variable->variableType()->name()->identifiers() )
-                        {
-                            searchPath->add( i );
-                        }
-
-                        for( auto i : *path.identifiers() )
-                        {
-                            searchPath->add( i );
-                        }
-
-                        IdentifierPath identifierSearchPath(
-                            searchPath, IdentifierPath::Type::ABSOLUTE );
+                        std::vector< std::string > parts;
+                        libstdhl::String::split(
+                            variable->type()->name(), ".", parts );
+                        parts.emplace_back( path.baseName() );
 
                         try
                         {
-                            auto symbol
-                                = m_symboltable.find( identifierSearchPath );
+                            auto symbol = m_symboltable.find( parts );
 
                             node.setTargetType( symbol.targetType() );
 
@@ -187,9 +174,7 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                         catch( const std::domain_error& e )
                         {
                             m_log.error( { node.sourceLocation() },
-                                "unable to find symbol '"
-                                    + identifierSearchPath.path()
-                                    + "'" );
+                                "unknown symbol '" + path.path() + "' found" );
                         }
                     }
                     else
@@ -379,7 +364,8 @@ void TypeCheckVisitor::visit( ComposedType& node )
     // else
     {
         m_log.error( { node.sourceLocation() },
-            "unknown composed type '" + name + "' found" );
+            "unknown composed type '" + name + "' found",
+            Code::TypeAnnotationInvalidComposedTypeName );
     }
 }
 
@@ -555,7 +541,7 @@ void TypeCheckVisitor::push( VariableDefinition& node )
         m_log.error( { node.sourceLocation() },
             "symbol '" + name + "' already defined" );
     }
-    m_stack.push( &node );
+    m_stack.push_back( &node );
 }
 
 void TypeCheckVisitor::pop( VariableDefinition& node )
@@ -566,8 +552,8 @@ void TypeCheckVisitor::pop( VariableDefinition& node )
     {
         assert( !" internal error! " );
     }
-    assert( m_stack.top() == &node );
-    m_stack.pop();
+    assert( m_stack.back() == &node );
+    m_stack.pop_back();
 }
 
 //
@@ -578,6 +564,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 {
   public:
     TypeInferenceVisitor( Logger& log, Namespace& symboltable );
+
+    void visit( Specification& node ) override;
 
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -597,7 +585,11 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ExistentialQuantifierExpression& node ) override;
 
     void visit( ConditionalRule& node ) override;
+
     void visit( CaseRule& node ) override;
+    void visit( ExpressionCase& node ) override;
+    void visit( DefaultCase& node ) override;
+
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
     void visit( UpdateRule& node ) override;
@@ -644,6 +636,11 @@ TypeInferenceVisitor::TypeInferenceVisitor(
 {
 }
 
+void TypeInferenceVisitor::visit( Specification& node )
+{
+    RecursiveVisitor::visit( node );
+}
+
 void TypeInferenceVisitor::visit( FunctionDefinition& node )
 {
     m_functionInitially = true;
@@ -657,21 +654,11 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
 {
-    for( const auto& argument : *node.arguments() )
-    {
-        push( *argument );
-    }
-
     const auto type = node.returnType()->type();
     assert( type );
     m_resultTypes[ node.expression().get() ].emplace_back( type->id() );
 
     inference( node, {} );
-
-    for( const auto& argument : *node.arguments() )
-    {
-        pop( *argument );
-    }
 }
 
 void TypeInferenceVisitor::visit( RuleDefinition& node )
@@ -1149,6 +1136,29 @@ void TypeInferenceVisitor::visit( ConditionalRule& node )
 
 void TypeInferenceVisitor::visit( CaseRule& node )
 {
+    node.expression()->accept( *this );
+
+    if( node.expression()->type() )
+    {
+        for( auto caseExpr : *node.cases() )
+        {
+            m_resultTypes[ caseExpr.get() ].emplace_back(
+                node.expression()->type()->id() );
+        }
+    }
+
+    node.cases()->accept( *this );
+}
+
+void TypeInferenceVisitor::visit( ExpressionCase& node )
+{
+    m_resultTypes[ node.expression().get() ] = m_resultTypes[&node ];
+
+    RecursiveVisitor::visit( node );
+}
+
+void TypeInferenceVisitor::visit( DefaultCase& node )
+{
     RecursiveVisitor::visit( node );
 }
 
@@ -1279,10 +1289,6 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
 
         switch( directCall.targetType() )
         {
-            case CallExpression::TargetType::VARIABLE:
-            {
-                break;
-            }
             case CallExpression::TargetType::BUILTIN:
             {
                 try
@@ -1383,7 +1389,8 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                 break;
             }
             case CallExpression::TargetType::ENUMERATION: // [[fallthrough]]
-            case CallExpression::TargetType::CONSTANT:
+            case CallExpression::TargetType::CONSTANT:    // [[fallthrough]]
+            case CallExpression::TargetType::VARIABLE:
             {
                 break;
             }
@@ -1459,7 +1466,8 @@ void TypeInferenceVisitor::inference( const std::string& description,
     if( result == m_resultTypes.end() )
     {
         m_log.error( { node.sourceLocation() },
-            "unable to find type annotation for " + description );
+            "unable to find type annotation for " + description,
+            Code::TypeInferenceFoundNoTypeAnnotation );
         return;
     }
 
@@ -1682,6 +1690,11 @@ void TypeInferenceVisitor::inference(
         return;
     }
 
+    for( const auto& argument : *node.arguments() )
+    {
+        push( *argument );
+    }
+
     std::size_t pos = 0;
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     for( auto argumentType : *node.arguments() )
@@ -1713,6 +1726,11 @@ void TypeInferenceVisitor::inference(
         node.returnType()->type(), argTypeList );
 
     node.setType( type );
+
+    for( const auto& argument : *node.arguments() )
+    {
+        pop( *argument );
+    }
 }
 
 void TypeInferenceVisitor::inference(
