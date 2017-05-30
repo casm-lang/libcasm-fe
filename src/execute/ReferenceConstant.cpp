@@ -35,6 +35,12 @@ EmptyValue::EmptyValue( void )
 {
 }
 
+ReferenceConstant::ReferenceConstant( void )
+: libcasm_ir::ReferenceConstant< EmptyValue >(
+        VOID, nullptr, false, false, classid() )
+{
+}
+
 ReferenceConstant::ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom )
 : libcasm_ir::ReferenceConstant< EmptyValue >( VOID,
       (const Value::Ptr&)atom, // HACK: use the memory of Value::Ptr

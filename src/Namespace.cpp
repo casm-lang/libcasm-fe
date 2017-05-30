@@ -84,8 +84,16 @@ void Namespace::registerSymbol( const DirectCallExpression& node )
 
 void Namespace::registerSymbol( const FunctionDefinition& node )
 {
-    registerSymbol( *node.identifier(), node,
-        CallExpression::TargetType::FUNCTION, node.argumentTypes()->size() );
+    if( node.identifier()->name() == "self" )
+    {
+        registerSymbol( *node.identifier(), node,
+            CallExpression::TargetType::SELF, 0 );
+    }
+    else
+    {
+        registerSymbol( *node.identifier(), node,
+            CallExpression::TargetType::FUNCTION, node.argumentTypes()->size() );
+    }
 }
 
 void Namespace::registerSymbol( const DerivedDefinition& node )

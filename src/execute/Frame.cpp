@@ -35,7 +35,7 @@ using namespace Ast;
 namespace ir = libcasm_ir;
 
 Frame::Frame( const CallExpression::Ptr& call, const Node::Ptr& callee,
-        std::size_t numberOfLocals )
+    std::size_t numberOfLocals )
 : m_call( call )
 , m_callee( callee )
 , m_locals( numberOfLocals )
@@ -182,8 +182,7 @@ static std::string generateCalleeTraceLine(
             type = "Function";
             name = function->identifier()->name();
 
-            const auto numberOfArguments
-                = function->argumentTypes()->size();
+            const auto numberOfArguments = function->argumentTypes()->size();
             for( std::size_t i = 0; i < numberOfArguments; i++ )
             {
                 if( i > 0 )
@@ -228,8 +227,8 @@ std::vector< std::string > FrameStack::generateBacktrace(
         // callee can only be nullptr when calling builtins
         const auto traceLine
             = ( callee == nullptr )
-                    ? generateBuiltinTraceLine( frame.get() )
-                    : generateCalleeTraceLine( frame.get(), problemLocation );
+                  ? generateBuiltinTraceLine( frame.get() )
+                  : generateCalleeTraceLine( frame.get(), problemLocation );
         backtrace.emplace_back(
             "#" + std::to_string( frameCounter ) + " in " + traceLine );
 

@@ -23,52 +23,54 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_FRAME_H_
-#define _LIB_CASMFE_FRAME_H_
+#ifndef _LIB_CASMFE_STACK_H_
+#define _LIB_CASMFE_STACK_H_
 
-#include "../ast/Expression.h"
+#include <vector>
 
 namespace libcasm_fe
 {
-    class Frame
+    template < typename T >
+    class Stack
     {
       public:
-        Frame( const Ast::CallExpression::Ptr& call,
-            const Ast::Node::Ptr& callee, std::size_t numberOfLocals );
+        explicit Stack( void )
+        : m_values()
+        {
+        }
 
-        Ast::CallExpression::Ptr call( void ) const;
+        void push( const T& value )
+        {
+            m_values.push_back( value );
+        }
 
-        Ast::Node::Ptr callee( void ) const;
+        T pop( void )
+        {
+            assert( not m_values.empty() );
 
-        void setLocal( std::size_t index, const libcasm_ir::Constant& local );
-        libcasm_ir::Constant local( std::size_t index ) const;
-        const std::vector< libcasm_ir::Constant >& locals( void ) const;
+            const auto value = m_values.back();
+            m_values.pop_back();
+            return value;
+        }
+
+        T& top( void )
+        {
+            assert( not m_values.empty() );
+
+            return m_values.back();
+        }
+
+        void clear( void )
+        {
+            m_values.clear();
+        }
 
       private:
-        Ast::CallExpression::Ptr m_call;
-        Ast::Node::Ptr m_callee;
-        std::vector< libcasm_ir::Constant > m_locals;
-    };
-
-    class FrameStack
-    {
-      public:
-        explicit FrameStack( void );
-
-        void push( std::unique_ptr< Frame > frame );
-        std::unique_ptr< Frame > pop( void );
-
-        Frame* top( void ) const;
-
-        std::vector< std::string > generateBacktrace(
-            SourceLocation problemLocation ) const;
-
-      private:
-        std::vector< std::unique_ptr< Frame > > m_frames;
+        std::vector< T > m_values;
     };
 }
 
-#endif // _LIB_CASMFE_FRAME_H_
+#endif // _LIB_CASMFE_STACK_H_
 
 //
 //  Local variables:

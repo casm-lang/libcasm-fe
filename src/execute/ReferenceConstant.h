@@ -43,7 +43,8 @@ namespace libcasm_fe
         : public libcasm_ir::ReferenceConstant< EmptyValue >
     {
       public:
-        ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom );
+        explicit ReferenceConstant( void );
+        explicit ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom );
 
         Ast::ReferenceAtom::Ptr atom( void ) const;
 
