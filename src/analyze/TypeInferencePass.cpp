@@ -980,19 +980,22 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             std::size_t pos = 0;
             for( auto argument : node.arguments()->data() )
             {
-                if( *call_type_args[ pos ] != argument->type()->result() )
+                if( argument->type() )
                 {
-                    m_log.error( { argument->sourceLocation() },
-                        "type mismatch: " + node.targetTypeName()
-                            + " argument type at position "
-                            + std::to_string( pos + 1 )
-                            + " was '"
-                            + argument->type()->description()
-                            + "', "
-                            + node.targetTypeName()
-                            + " definition expects '"
-                            + call_type_args[ pos ]->description()
-                            + "'" );
+                    if( *call_type_args[ pos ] != argument->type()->result() )
+                    {
+                        m_log.error( { argument->sourceLocation() },
+                            "type mismatch: " + node.targetTypeName()
+                                + " argument type at position "
+                                + std::to_string( pos + 1 )
+                                + " was '"
+                                + argument->type()->description()
+                                + "', "
+                                + node.targetTypeName()
+                                + " definition expects '"
+                                + call_type_args[ pos ]->description()
+                                + "'" );
+                    }
                 }
                 pos++;
             }
