@@ -42,8 +42,16 @@ namespace libcasm_fe
         ,
         IdentifierAlreadyUsed = 0x0010
 
+        // --------------------------------------------------------- 05** ...
+        // symbol resolver errors
+        ,
+        SymbolIsUnknown = 0x0500
+
         // --------------------------------------------------------- f*** ...
         // function errors
+        ,
+        FunctionSymbolIsUnknown = 0xf000
+
         ,
         FunctionDefinitionAlreadyUsed = 0xf010
 
