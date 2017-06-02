@@ -148,41 +148,44 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
     {
         case TargetType::FUNCTION:
         {
-            return "Function";
+            return "function";
         }
         case TargetType::DERIVED:
         {
-            return "Derived";
+            return "derived";
         }
         case TargetType::BUILTIN:
         {
-            return "Builtin";
+            return "built-in";
         }
         case TargetType::RULE:
         {
-            return "Rule";
+            return "rule";
         }
         case TargetType::ENUMERATION:
         {
-            return "Enumeration";
+            return "enumeration";
         }
         case TargetType::CONSTANT:
         {
-            return "Constant";
+            return "constant";
         }
         case TargetType::VARIABLE:
         {
-            return "Variable";
+            return "variable";
         }
         case TargetType::SELF:
         {
-            return "Self";
+            return "self";
         }
         case TargetType::UNKNOWN:
         {
-            return "Unknown";
+            return "unknown";
         }
     }
+
+    assert( !" internal error! " );
+    return "";
 }
 
 DirectCallExpression::DirectCallExpression(
