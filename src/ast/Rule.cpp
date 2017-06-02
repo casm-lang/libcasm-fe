@@ -306,7 +306,7 @@ CallExpression::Ptr CallRule::call( void ) const
     return m_call;
 }
 
-std::set< CallExpression::TargetType > CallRule::allowedCallTargetTypes(
+const std::set< CallExpression::TargetType >& CallRule::allowedCallTargetTypes(
     void ) const
 {
     return m_allowedCallTargetTypes;

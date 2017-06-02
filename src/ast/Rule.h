@@ -270,7 +270,7 @@ namespace libcasm_fe
                     allowedCallTargetTypes );
 
             CallExpression::Ptr call( void ) const;
-            std::set< CallExpression::TargetType > allowedCallTargetTypes(
+            const std::set< CallExpression::TargetType >& allowedCallTargetTypes(
                 void ) const;
 
             void accept( Visitor& visitor ) override final;
