@@ -612,7 +612,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         const libcasm_ir::Annotation* annotation, TypedNode& node,
         const std::vector< Expression::Ptr >& arguments = {} );
 
-    void inference( FunctionDefinition& node );
+    void inference( FunctionDefinition& node,
+        const std::vector< Expression::Ptr >& arguments );
     void inference( DerivedDefinition& node,
         const std::vector< Expression::Ptr >& arguments );
     void inference(
@@ -651,7 +652,7 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
 
     m_functionInitially = false;
 
-    inference( node );
+    inference( node, {} );
 }
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
@@ -739,7 +740,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 auto& definition
                     = static_cast< FunctionDefinition& >( symbol.definition() );
 
-                inference( definition );
+                inference( definition, {} );
                 assert( definition.type() and definition.type()->isRelation() );
 
                 const auto type
@@ -929,7 +930,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto& definition
                     = static_cast< FunctionDefinition& >( symbol.definition() );
 
-                inference( definition );
+                inference( definition, node.arguments()->data() );
                 node.setType( definition.type() );
             }
             catch( const std::domain_error& e )
@@ -979,6 +980,60 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         {
             assert( !" internal error" );
             break;
+        }
+    }
+
+    if( node.type() )
+    {
+        const auto& call_type_args = node.type()->arguments();
+        const auto& call_expr_args = node.arguments()->data();
+
+        if( call_type_args.size() == call_expr_args.size() )
+        {
+            std::size_t pos = 0;
+            for( auto argument : node.arguments()->data() )
+            {
+                if( *call_type_args[ pos ] != argument->type()->result() )
+                {
+                    m_log.error( { argument->sourceLocation() },
+                        "type mismatch: " + node.targetTypeName()
+                            + " argument type at position "
+                            + std::to_string( pos + 1 )
+                            + " was '"
+                            + argument->type()->description()
+                            + "', "
+                            + node.targetTypeName()
+                            + " definition expects '"
+                            + call_type_args[ pos ]->description()
+                            + "'" );
+                }
+                pos++;
+            }
+        }
+        else
+        {
+            m_log.error( { node.sourceLocation() },
+                "invalid argument size: " + node.targetTypeName() + " '"
+                    + path.path()
+                    + "' expects "
+                    + std::to_string( call_type_args.size() )
+                    + " arguments" );
+
+            try
+            {
+                auto symbol = m_symboltable.find( node );
+                assert( symbol.targetType() == node.targetType() );
+                m_log.info( { symbol.definition().sourceLocation() },
+                    node.targetTypeName() + " '" + path.path()
+                        + "' is defined as a relation '"
+                        + node.type()->description()
+                        + "', incorrect usage in line "
+                        + std::to_string( node.sourceLocation().begin.line ) );
+            }
+            catch( const std::domain_error& e )
+            {
+                assert( !" inconsistent symbol table! " );
+            }
         }
     }
 }
@@ -1643,7 +1698,8 @@ void TypeInferenceVisitor::inference( const std::string& description,
     }
 }
 
-void TypeInferenceVisitor::inference( FunctionDefinition& node )
+void TypeInferenceVisitor::inference(
+    FunctionDefinition& node, const std::vector< Expression::Ptr >& arguments )
 {
     if( node.defaultValue()->id() == Node::ID::UNDEF_ATOM
         and not node.defaultValue()->type() )
