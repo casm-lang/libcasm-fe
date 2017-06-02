@@ -30,6 +30,7 @@
 
 #include "../stdhl/cpp/Default.h"
 #include "../stdhl/cpp/Hash.h"
+#include "../stdhl/cpp/Enum.h"
 
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
@@ -300,19 +301,25 @@ class ExecutionVisitor final : public EmptyVisitor
 
     void invokeBuiltin( ir::Value::ID id, const ir::Type::Ptr& type );
 
+    enum class ValidationFlag
+    {
+        ValueMustBeDefined,
+    };
+    using ValidationFlags = libstdhl::Enum::Flags< ValidationFlag >;
+
     /**
      * Checks if the \a value is correct, i.e. if it complies to the \a type
      * specification.
      *
      * @param value The value whose correcteness should be checked
      * @param type The specified type
-     * @param allowUndef Controlls wheter undef values are allowed or should be
-     * handled as invalid value
+     * @param flags Disables or enables various validation properties
      *
      * @throws std::domain_error in case of an invalid value
      */
     void validateValue( const ir::Constant& value,
-        const libcasm_ir::Type::Ptr& type, bool allowUndef = true );
+        const libcasm_ir::Type::Ptr& type,
+        ValidationFlags flags = ValidationFlags() );
 
   private:
     const Storage& m_globalState;
@@ -914,7 +921,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
         try
         {
-            validateValue( value, argumentType, false );
+            validateValue( value, argumentType, ValidationFlag::ValueMustBeDefined );
         }
         catch( const std::domain_error& e )
         {
@@ -1025,10 +1032,9 @@ void ExecutionVisitor::invokeBuiltin(
 }
 
 void ExecutionVisitor::validateValue( const ir::Constant& value,
-    const libcasm_ir::Type::Ptr& type,
-    bool allowUndef )
+    const libcasm_ir::Type::Ptr& type, ValidationFlags flags )
 {
-    if( not allowUndef and not value.defined() )
+    if( flags.isSet( ValidationFlag::ValueMustBeDefined ) and not value.defined() )
     {
         throw std::domain_error(
             "value isn't defined, but undef isn't allowed" );
