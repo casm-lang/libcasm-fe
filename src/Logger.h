@@ -56,6 +56,10 @@ namespace libcasm_fe
         void info( const std::vector< SourceLocation >& locations,
             const std::string& message );
 
+        using libpass::PassLogger::hint;
+        void hint( const std::vector< SourceLocation >& locations,
+            const std::string& message );
+
         using libpass::PassLogger::debug;
         void debug( const std::vector< SourceLocation >& locations,
             const std::string& message );
