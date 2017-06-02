@@ -421,6 +421,7 @@ ProgramFunctionDefinition
       programArguments->add( self );
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
           @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
+      program->setTargetType( CallExpression::TargetType::FUNCTION );
 
       const auto ruleReference = Ast::make< ReferenceAtom >( @$, $2 );
 
@@ -453,6 +454,7 @@ Initializer
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto arguments = Ast::make< Expressions >( @$ );
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
+      function->setTargetType( CallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $1 );
   }
 | Term MAPS Term
@@ -462,12 +464,14 @@ Initializer
 
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
+      function->setTargetType( CallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
 | TwoOrMoreArguments MAPS Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1 );
+      function->setTargetType( CallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
 ;
@@ -1266,7 +1270,9 @@ SequenceRule
 UpdateRule
 : DirectCallExpression UPDATE Term
   {
-      $$ = Ast::make< UpdateRule >( @$, $1, $3 );
+      const auto function = $1;
+      function->setTargetType( CallExpression::TargetType::FUNCTION );
+      $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
 ;
 
