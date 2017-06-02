@@ -70,7 +70,8 @@ namespace libcasm_fe
         = 0xfe00 // fe** ... function argument
         ,
         FunctionArgumentsInvalidRangeAtUpdate = 0xfe01,
-        FunctionArgumentsInvalidRangeAtInitially = 0xfe02
+        FunctionArgumentsInvalidRangeAtInitially = 0xfe02,
+        FunctionArgumentsInvalidValue = 0xfe03
 
         ,
         FunctionValueInvalidRangeAtUpdate = 0xfd00 // fd** ... function value
