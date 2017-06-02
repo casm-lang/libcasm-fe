@@ -47,10 +47,10 @@
 #include "../ast/Specification.h"
 
 #include "Frame.h"
-#include "Stack.h"
 #include "FunctionState.h"
 #include "LocationRegistry.h"
 #include "ReferenceConstant.h"
+#include "Stack.h"
 #include "UpdateSet.h"
 
 using namespace libcasm_fe;
@@ -310,7 +310,8 @@ class ExecutionVisitor final : public EmptyVisitor
 };
 
 ExecutionVisitor::ExecutionVisitor( ExecutionLocationRegistry& locationRegistry,
-    const Storage& globalState, UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
+    const Storage& globalState,
+    UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
     const ir::Constant& agentId )
 : m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
@@ -350,7 +351,8 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
 {
     auto* frame = m_frameStack.top();
 
-    const auto location = m_locationRegistry.lookup( node.identifier()->name(), frame->locals() );
+    const auto location = m_locationRegistry.lookup(
+        node.identifier()->name(), frame->locals() );
     if( not location )
     {
         // location is not registered -> no update and no state
@@ -893,7 +895,8 @@ void ExecutionVisitor::visit( UpdateRule& node )
         argumentValues.emplace_back( value );
     }
 
-    const auto location = m_locationRegistry.get( node.function()->identifier()->path(), argumentValues );
+    const auto location = m_locationRegistry.get(
+        node.function()->identifier()->path(), argumentValues );
     const Update update{ updateValue, node.sourceLocation() };
 
     try
@@ -1029,8 +1032,8 @@ void StateInitializationVisitor::visit( Specification& node )
 void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
-    ExecutionVisitor executionVisitor(
-        m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );
+    ExecutionVisitor executionVisitor( m_locationRegistry, m_globalState,
+        m_updateSetManager, ReferenceConstant() );
     node.initializers()->accept( executionVisitor );
 }
 
@@ -1038,7 +1041,7 @@ class Agent
 {
   public:
     Agent( ExecutionLocationRegistry& locationRegistry,
-           const Storage& globalState, const ir::Constant& agentId,
+        const Storage& globalState, const ir::Constant& agentId,
         const ReferenceConstant& rule );
 
     void run( void );
@@ -1053,7 +1056,8 @@ class Agent
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 };
 
-Agent::Agent( ExecutionLocationRegistry& locationRegistry, const Storage& globalState, const ir::Constant& agentId,
+Agent::Agent( ExecutionLocationRegistry& locationRegistry,
+    const Storage& globalState, const ir::Constant& agentId,
     const ReferenceConstant& rule )
 : m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
@@ -1065,8 +1069,8 @@ Agent::Agent( ExecutionLocationRegistry& locationRegistry, const Storage& global
 
 void Agent::run( void )
 {
-    ExecutionVisitor executionVisitor( m_locationRegistry,
-        m_globalState, m_updateSetManager, m_agentId );
+    ExecutionVisitor executionVisitor(
+        m_locationRegistry, m_globalState, m_updateSetManager, m_agentId );
     executionVisitor.execute( m_rule );
 }
 

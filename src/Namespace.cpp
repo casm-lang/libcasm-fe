@@ -86,13 +86,14 @@ void Namespace::registerSymbol( const FunctionDefinition& node )
 {
     if( node.identifier()->name() == "self" )
     {
-        registerSymbol( *node.identifier(), node,
-            CallExpression::TargetType::SELF, 0 );
+        registerSymbol(
+            *node.identifier(), node, CallExpression::TargetType::SELF, 0 );
     }
     else
     {
         registerSymbol( *node.identifier(), node,
-            CallExpression::TargetType::FUNCTION, node.argumentTypes()->size() );
+            CallExpression::TargetType::FUNCTION,
+            node.argumentTypes()->size() );
     }
 }
 

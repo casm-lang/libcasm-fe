@@ -60,21 +60,24 @@ class LocationRegistry
         std::size_t operator()( const LocationData& location ) const
         {
             return libstdhl::Hash::combine( FunctionHash{}( location.first ),
-                                            ArgumentsHash{}( location.second ) );
+                ArgumentsHash{}( location.second ) );
         }
     };
 
     struct LocationDataEquals
-        : public std::binary_function< const LocationData&, const LocationData&, bool >
+        : public std::
+              binary_function< const LocationData&, const LocationData&, bool >
     {
-        bool operator()( const LocationData& lhs, const LocationData& rhs ) const
+        bool operator()(
+            const LocationData& lhs, const LocationData& rhs ) const
         {
-            return FunctionEquals{}( lhs.first, rhs.first ) and
-                   ArgumentsEquals{}( lhs.second, rhs.second );
+            return FunctionEquals{}( lhs.first, rhs.first )
+                   and ArgumentsEquals{}( lhs.second, rhs.second );
         }
     };
 
-    using LocationDataSet = std::unordered_set< LocationData, LocationDataHash, LocationDataEquals >;
+    using LocationDataSet = std::
+        unordered_set< LocationData, LocationDataHash, LocationDataEquals >;
 
   public:
     struct LocationHash;
@@ -82,7 +85,7 @@ class LocationRegistry
 
     class Location
     {
-    public:
+      public:
         explicit Location( const LocationData* data )
         : m_data( data )
         {
@@ -102,7 +105,7 @@ class LocationRegistry
         friend struct LocationHash;
         friend struct LocationEquals;
 
-    private:
+      private:
         const LocationData* m_data;
     };
 
@@ -115,7 +118,8 @@ class LocationRegistry
         }
     };
 
-    struct LocationEquals : public std::binary_function< const Location&, const Location&, bool >
+    struct LocationEquals
+        : public std::binary_function< const Location&, const Location&, bool >
     {
         bool operator()( const Location& lhs, const Location& rhs ) const
         {
