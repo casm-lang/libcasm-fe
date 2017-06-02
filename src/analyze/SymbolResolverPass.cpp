@@ -356,8 +356,18 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 }
                 else
                 {
+                    auto code = Code::SymbolIsUnknown;
+                    if( node.targetType()
+                        == CallExpression::TargetType::FUNCTION )
+                    {
+                        code = Code::FunctionSymbolIsUnknown;
+                    }
+
                     m_log.error( { node.sourceLocation() },
-                        "invalid symbol '" + path.path() + "' found" );
+                        "unknown " + node.targetTypeName() + " symbol '"
+                            + path.path()
+                            + "' found",
+                        code );
                 }
             }
         }
