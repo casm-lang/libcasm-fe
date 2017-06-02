@@ -223,7 +223,7 @@ void AstDumpDotVisitor::visit( UndefAtom& node )
 void AstDumpDotVisitor::visit( DirectCallExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "DirectCallExpression" );
+    dumpNode( node, "DirectCallExpression\nTarget type: " + node.targetTypeName() );
     RecursiveVisitor::visit( node );
 }
 
