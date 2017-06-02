@@ -293,8 +293,7 @@ void TypeCheckVisitor::visit( BasicType& node )
         else if( name.compare( "Agent" ) == 0 )
         {
             auto symbol = m_symboltable.find( "self" );
-            assert(
-                symbol.targetType() == CallExpression::TargetType::SELF );
+            assert( symbol.targetType() == CallExpression::TargetType::SELF );
             auto& definition
                 = static_cast< FunctionDefinition& >( symbol.definition() );
 
@@ -925,7 +924,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             try
             {
                 auto symbol = m_symboltable.find( node );
-                assert( symbol.targetType() == node.targetType());
+                assert( symbol.targetType() == node.targetType() );
 
                 auto& definition
                     = static_cast< FunctionDefinition& >( symbol.definition() );
@@ -1245,10 +1244,11 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
     if( lhs.type()->result() != rhs.type()->result() )
     {
         m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
-            "type of " + dst + " does not match type of " + src + ": '"
-                + lhs.type()->description()
-                + "' != '"
-                + rhs.type()->description()
+            "type of " + dst + " does not match type of " + src
+                + ": expression was '"
+                + rhs.type()->result().description()
+                + "', but destination requires '"
+                + lhs.type()->result().description()
                 + "'",
             assignmentErr );
     }
@@ -1335,7 +1335,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
             }
             case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
             case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-            case CallExpression::TargetType::SELF: // [[fallthrough]]
+            case CallExpression::TargetType::SELF:     // [[fallthrough]]
             case CallExpression::TargetType::RULE:
             {
                 try
