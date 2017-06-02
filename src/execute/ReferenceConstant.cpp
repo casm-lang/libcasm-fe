@@ -37,7 +37,7 @@ EmptyValue::EmptyValue( void )
 
 ReferenceConstant::ReferenceConstant( void )
 : libcasm_ir::ReferenceConstant< EmptyValue >(
-        VOID, nullptr, false, false, classid() )
+      VOID, nullptr, false, false, classid() )
 {
 }
 
