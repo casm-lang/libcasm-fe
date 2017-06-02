@@ -25,6 +25,7 @@
 
 #include "NumericExecutionPass.h"
 
+#include <stdexcept>
 #include <thread>
 
 #include "../stdhl/cpp/Default.h"
@@ -298,6 +299,20 @@ class ExecutionVisitor final : public EmptyVisitor
         const Node::Ptr& callee, std::size_t numberOfLocals );
 
     void invokeBuiltin( ir::Value::ID id, const ir::Type::Ptr& type );
+
+    /**
+     * Checks if the \a value is correct, i.e. if it complies to the \a type
+     * specification.
+     *
+     * @param value The value whose correcteness should be checked
+     * @param type The specified type
+     * @param allowUndef Controlls wheter undef values are allowed or should be
+     * handled as invalid value
+     *
+     * @throws std::domain_error in case of an invalid value
+     */
+    void validateValue( const ir::Constant& value,
+        const libcasm_ir::Type::Ptr& type, bool allowUndef = true );
 
   private:
     const Storage& m_globalState;
@@ -886,12 +901,28 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
     // evaluate function arguments
     const auto& arguments = node.function()->arguments();
+    const auto& argumentTypes = node.function()->type()->arguments();
     std::vector< ir::Constant > argumentValues;
     argumentValues.reserve( arguments->size() );
-    for( const auto& argument : *arguments )
+    for( std::size_t i = 0; i < arguments->size(); ++i )
     {
+        const auto& argument = arguments->at( i );
+        const auto& argumentType = argumentTypes.at( i );
+
         argument->accept( *this );
         const auto& value = m_evaluationStack.pop();
+
+        try
+        {
+            validateValue( value, argumentType, false );
+        }
+        catch( const std::domain_error& e )
+        {
+            throw RuntimeException( { argument->sourceLocation() }, e.what(),
+                m_frameStack.generateBacktrace( node.sourceLocation() ),
+                Code::FunctionArgumentsInvalidValue );
+        }
+
         argumentValues.emplace_back( value );
     }
 
@@ -991,6 +1022,19 @@ void ExecutionVisitor::invokeBuiltin(
     {
         m_evaluationStack.push( result );
     }
+}
+
+void ExecutionVisitor::validateValue( const ir::Constant& value,
+    const libcasm_ir::Type::Ptr& type,
+    bool allowUndef )
+{
+    if( not allowUndef and not value.defined() )
+    {
+        throw std::domain_error(
+            "value isn't defined, but undef isn't allowed" );
+    }
+
+    // TODO type->isValid( value );
 }
 
 class StateInitializationVisitor final : public EmptyVisitor
