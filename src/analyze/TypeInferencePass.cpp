@@ -1244,10 +1244,11 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
     if( lhs.type()->result() != rhs.type()->result() )
     {
         m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
-            "type of " + dst + " does not match type of " + src
-                + ": expression was '"
+            "type mismatch: " + src + " was '"
                 + rhs.type()->result().description()
-                + "', but destination requires '"
+                + "', but "
+                + dst
+                + " expects '"
                 + lhs.type()->result().description()
                 + "'",
             assignmentErr );
