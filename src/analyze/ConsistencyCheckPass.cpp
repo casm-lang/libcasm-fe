@@ -65,6 +65,8 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( ValueAtom& node ) override;
     void visit( UndefAtom& node ) override;
 
+    void visit( CallRule& node ) override;
+
     void verify( const TypedNode& node );
 
   private:
@@ -168,6 +170,21 @@ void ConsistencyCheckVisitor::visit( UndefAtom& node )
 {
     RecursiveVisitor::visit( node );
     verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( CallRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& call = *node.call();
+    const auto& kind = node.allowedCallTargetTypes();
+
+    if( kind.find( call.targetType() ) == kind.end() )
+    {
+        m_log.error( { node.sourceLocation() },
+            call.targetTypeName() + " is not allowed to be called",
+            Code::Unspecified );
+    }
 }
 
 void ConsistencyCheckVisitor::verify( const TypedNode& node )
