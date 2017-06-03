@@ -117,7 +117,7 @@ namespace libcasm_fe
                 DERIVED,
                 BUILTIN,
                 RULE,
-                ENUMERATION,
+                TYPE_DOMAIN,
                 CONSTANT,
                 VARIABLE,
                 SELF,

@@ -288,38 +288,54 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             auto symbol = m_symboltable.find( node );
             node.setTargetType( symbol.targetType() );
 
-            if( symbol.targetType() == CallExpression::TargetType::ENUMERATION
+            if( symbol.targetType() == CallExpression::TargetType::TYPE_DOMAIN
                 or symbol.targetType() == CallExpression::TargetType::CONSTANT )
             {
-                auto& definition = static_cast< EnumerationDefinition& >(
-                    symbol.definition() );
+                const auto& type = symbol.definition().type();
 
-                if( not definition.type() )
+                if( not type )
                 {
-                    const auto& name
-                        = ( symbol.targetType()
-                              == CallExpression::TargetType::CONSTANT )
-                              ? path.baseDir()
-                              : path.path();
-
-                    m_log.debug(
-                        "creating IR enumeration type '" + name + "'" );
-
-                    auto kind
-                        = libstdhl::make< libcasm_ir::Enumeration >( name );
-
-                    for( auto e : *definition.enumerators() )
+                    if( symbol.definition().id()
+                        == Node::ID::ENUMERATION_DEFINITION )
                     {
-                        kind->add( e->name() );
+                        auto& definition
+                            = static_cast< EnumerationDefinition& >(
+                                symbol.definition() );
+
+                        const auto& name
+                            = ( symbol.targetType()
+                                  == CallExpression::TargetType::CONSTANT )
+                                  ? path.baseDir()
+                                  : path.path();
+
+                        m_log.debug(
+                            "creating IR enumeration type '" + name + "'" );
+
+                        auto kind
+                            = libstdhl::make< libcasm_ir::Enumeration >( name );
+
+                        for( auto e : *definition.enumerators() )
+                        {
+                            kind->add( e->name() );
+                        }
+
+                        const auto type
+                            = libstdhl::make< libcasm_ir::EnumerationType >(
+                                kind );
+
+                        definition.setType( type );
+
+                        node.setType( definition.type() );
                     }
-
-                    const auto type
-                        = libstdhl::make< libcasm_ir::EnumerationType >( kind );
-
-                    definition.setType( type );
+                    else
+                    {
+                        assert( 0 );
+                    }
                 }
-
-                node.setType( definition.type() );
+                else
+                {
+                    node.setType( type );
+                }
             }
 
             node.setTargetDefinition( symbol.definition().ptr< TypedNode >() );
@@ -357,17 +373,22 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 }
                 else if( name.compare( "self" ) == 0 )
                 {
-                    assert(
-                        node.targetType() == CallExpression::TargetType::SELF );
+                    assert( node.targetType()
+                            == CallExpression::TargetType::UNKNOWN );
+                    node.setTargetType( CallExpression::TargetType::SELF );
                 }
-                // single agent execution notation --> agent type domain == Enumeration!
+                // single agent execution notation --> agent type domain ==
+                // Enumeration!
                 else if( name.compare( "$" ) == 0 )
                 {
                     assert( node.targetType()
                             == CallExpression::TargetType::CONSTANT );
 
-                    auto kind
-                        = libstdhl::make< libcasm_ir::Enumeration >( "Agent" );
+                    const auto agentTypeIdentifier
+                        = libstdhl::make< Identifier >( "Agent" );
+
+                    auto kind = libstdhl::make< libcasm_ir::Enumeration >(
+                        agentTypeIdentifier->name() );
 
                     kind->add( "$" );
 
@@ -375,6 +396,9 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                         = libstdhl::make< libcasm_ir::EnumerationType >( kind );
 
                     node.setType( type );
+
+                    m_symboltable.registerSymbol( *agentTypeIdentifier, node,
+                        CallExpression::TargetType::TYPE_DOMAIN );
 
                     m_symboltable.registerSymbol(
                         node, CallExpression::TargetType::CONSTANT );

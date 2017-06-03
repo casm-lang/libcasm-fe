@@ -162,9 +162,9 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
         {
             return "rule";
         }
-        case TargetType::ENUMERATION:
+        case TargetType::TYPE_DOMAIN:
         {
-            return "enumeration";
+            return "type domain";
         }
         case TargetType::CONSTANT:
         {

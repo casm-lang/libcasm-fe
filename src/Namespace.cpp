@@ -82,6 +82,12 @@ void Namespace::registerSymbol( const DirectCallExpression& node,
     registerSymbol( *path->back(), node, targetType, node.arguments()->size() );
 }
 
+void Namespace::registerSymbol( const Identifier& identifier,
+    const TypedNode& definition, const CallExpression::TargetType targetType )
+{
+    registerSymbol( identifier, definition, targetType, 0 );
+}
+
 void Namespace::registerSymbol( const FunctionDefinition& node )
 {
     registerSymbol( *node.identifier(), node,
@@ -103,7 +109,7 @@ void Namespace::registerSymbol( const RuleDefinition& node )
 void Namespace::registerSymbol( const EnumerationDefinition& node )
 {
     registerSymbol(
-        *node.identifier(), node, CallExpression::TargetType::ENUMERATION );
+        *node.identifier(), node, CallExpression::TargetType::TYPE_DOMAIN );
 
     auto enumerationNamespace = libstdhl::make< Namespace >();
 
@@ -203,10 +209,15 @@ std::string Namespace::dump( const std::string& indention ) const
     for( auto v : m_symboltable )
     {
         const auto& name = v.first;
+        auto& symbol = v.second.front();
 
         s << indention << name << " : "
-          << CallExpression::targetTypeString( v.second.front().targetType() )
-          << "( " << v.second.front().arity() << "-ary)\n";
+          << CallExpression::targetTypeString( symbol.targetType() ) << " ("
+          << symbol.arity() << "-ary)"
+          << " " << ( symbol.definition().type()
+                            ? symbol.definition().type()->description()
+                            : "$unresolved$" )
+          << "\n";
     }
 
     for( auto v : m_namespaces )

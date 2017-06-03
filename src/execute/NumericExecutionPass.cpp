@@ -29,8 +29,8 @@
 #include <thread>
 
 #include "../stdhl/cpp/Default.h"
-#include "../stdhl/cpp/Hash.h"
 #include "../stdhl/cpp/Enum.h"
+#include "../stdhl/cpp/Hash.h"
 
 #include "../pass/src/PassRegistry.h"
 #include "../pass/src/PassResult.h"
@@ -490,7 +490,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             m_frameStack.pop();
             break;
         }
-        case CallExpression::TargetType::ENUMERATION:
+        case CallExpression::TargetType::TYPE_DOMAIN:
         {
             node.targetDefinition()->accept( *this );
             break;
@@ -921,7 +921,8 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
         try
         {
-            validateValue( value, argumentType, ValidationFlag::ValueMustBeDefined );
+            validateValue(
+                value, argumentType, ValidationFlag::ValueMustBeDefined );
         }
         catch( const std::domain_error& e )
         {
@@ -1034,7 +1035,8 @@ void ExecutionVisitor::invokeBuiltin(
 void ExecutionVisitor::validateValue( const ir::Constant& value,
     const libcasm_ir::Type::Ptr& type, ValidationFlags flags )
 {
-    if( flags.isSet( ValidationFlag::ValueMustBeDefined ) and not value.defined() )
+    if( flags.isSet( ValidationFlag::ValueMustBeDefined )
+        and not value.defined() )
     {
         throw std::domain_error(
             "value isn't defined, but undef isn't allowed" );

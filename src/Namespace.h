@@ -65,6 +65,10 @@ namespace libcasm_fe
         void registerSymbol( const Ast::DirectCallExpression& node,
             const Ast::CallExpression::TargetType targetType );
 
+        void registerSymbol( const Ast::Identifier& identifier,
+            const Ast::TypedNode& definition,
+            const Ast::CallExpression::TargetType targetType );
+
         void registerSymbol( const Ast::FunctionDefinition& node );
 
         void registerSymbol( const Ast::DerivedDefinition& node );
@@ -93,7 +97,7 @@ namespace libcasm_fe
         void registerSymbol( const Ast::Identifier& node,
             const Ast::TypedNode& definition,
             const Ast::CallExpression::TargetType targetType,
-            const std::size_t arity = 0 );
+            const std::size_t arity );
 
         Symbol find( const Ast::IdentifierPath& node, const std::size_t arity,
             const std::size_t index = 0 ) const;
