@@ -333,7 +333,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             {
                 try
                 {
-                    m_symboltable.registerSymbol( node );
+                    m_symboltable.registerSymbol(
+                        node, CallExpression::TargetType::BUILTIN );
                     node.setTargetType( CallExpression::TargetType::BUILTIN );
                 }
                 catch( const std::domain_error& e )
@@ -353,6 +354,31 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                     node.setTargetType( CallExpression::TargetType::VARIABLE );
                     node.setTargetDefinition(
                         variable->definition().ptr< TypedNode >() );
+                }
+                else if( name.compare( "self" ) == 0 )
+                {
+                    assert(
+                        node.targetType() == CallExpression::TargetType::SELF );
+                }
+                // single agent execution notation --> agent type domain == Enumeration!
+                else if( name.compare( "$" ) == 0 )
+                {
+                    assert( node.targetType()
+                            == CallExpression::TargetType::CONSTANT );
+
+                    auto kind
+                        = libstdhl::make< libcasm_ir::Enumeration >( "Agent" );
+
+                    kind->add( "$" );
+
+                    const auto type
+                        = libstdhl::make< libcasm_ir::EnumerationType >( kind );
+
+                    node.setType( type );
+
+                    m_symboltable.registerSymbol(
+                        node, CallExpression::TargetType::CONSTANT );
+                    node.setTargetType( CallExpression::TargetType::CONSTANT );
                 }
                 else
                 {

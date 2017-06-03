@@ -73,28 +73,19 @@ Namespace::Namespace( void )
 {
 }
 
-void Namespace::registerSymbol( const DirectCallExpression& node )
+void Namespace::registerSymbol( const DirectCallExpression& node,
+    const CallExpression::TargetType targetType )
 {
     const auto path = node.identifier()->identifiers();
     assert( path->size() == 1 );
 
-    registerSymbol( *path->back(), node, CallExpression::TargetType::BUILTIN,
-        node.arguments()->size() );
+    registerSymbol( *path->back(), node, targetType, node.arguments()->size() );
 }
 
 void Namespace::registerSymbol( const FunctionDefinition& node )
 {
-    if( node.identifier()->name() == "self" )
-    {
-        registerSymbol(
-            *node.identifier(), node, CallExpression::TargetType::SELF, 0 );
-    }
-    else
-    {
-        registerSymbol( *node.identifier(), node,
-            CallExpression::TargetType::FUNCTION,
-            node.argumentTypes()->size() );
-    }
+    registerSymbol( *node.identifier(), node,
+        CallExpression::TargetType::FUNCTION, node.argumentTypes()->size() );
 }
 
 void Namespace::registerSymbol( const DerivedDefinition& node )

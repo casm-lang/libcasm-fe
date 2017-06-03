@@ -115,15 +115,6 @@
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
-    static FunctionDefinition::Ptr createSelfFunction( SourceLocation& sourceLocation )
-    {
-        const auto resType = createAgentType( sourceLocation );
-        const auto argTypes = Ast::make< Types >( sourceLocation );
-
-        const auto program = Ast::make< Identifier >( sourceLocation, "self" );
-        return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, resType );
-    }
-
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
     {
         const auto& location = identifier->sourceLocation();
@@ -272,9 +263,6 @@ Specification
       const std::string& fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
       const std::string& name = fileName.substr( 0, fileName.rfind( "." ) );
 
-      auto selfDefinition = createSelfFunction( @$ );
-      $2->add( selfDefinition );
-
       const auto specificationName = make< Identifier >( @$, name );
       result = Ast::make< Specification >( @$, specificationName, $2 );
   }
@@ -410,15 +398,15 @@ MaybeFunctionParameters
 ProgramFunctionDefinition
 : INIT IdentifierPath
   {
-      const auto selfIdentifier = Ast::make< Identifier >( @$, "self" );
-
-      auto selfArguments = libcasm_fe::Ast::make< Expressions >( @$ );
-      const auto self = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( selfIdentifier ), selfArguments );
+      const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
+      auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
+          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
+      singleAgent->setTargetType( CallExpression::TargetType::CONSTANT );
 
       auto programDefinition = createProgramFunction( @$ );
       auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
-      programArguments->add( self );
+      programArguments->add( singleAgent );
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
           @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
       program->setTargetType( CallExpression::TargetType::FUNCTION );

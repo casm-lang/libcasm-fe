@@ -69,6 +69,8 @@ class TypeCheckVisitor final : public RecursiveVisitor
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
 
+    libcasm_ir::Type::Ptr agentDomain( void ) const;
+
   private:
     void push( VariableDefinition& identifier );
     void pop( VariableDefinition& identifier );
@@ -79,6 +81,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
     std::unordered_map< std::string, VariableDefinition* > m_id2var;
     std::vector< VariableDefinition* > m_stack;
     Expression* m_caseExpr = nullptr;
+    libcasm_ir::Type::Ptr m_agentDomain;
 };
 
 static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
@@ -277,12 +280,7 @@ void TypeCheckVisitor::visit( BasicType& node )
         }
         else if( name.compare( "Agent" ) == 0 )
         {
-            auto symbol = m_symboltable.find( "self" );
-            assert( symbol.targetType() == CallExpression::TargetType::SELF );
-            auto& definition
-                = static_cast< FunctionDefinition& >( symbol.definition() );
-
-            if( not definition.returnType()->type() )
+            if( not agentDomain() )
             {
                 auto kind
                     = libstdhl::make< libcasm_ir::Enumeration >( "Agent" );
@@ -292,10 +290,10 @@ void TypeCheckVisitor::visit( BasicType& node )
                 const auto type
                     = libstdhl::make< libcasm_ir::EnumerationType >( kind );
 
-                definition.returnType()->setType( type );
+                m_agentDomain = type;
             }
 
-            node.setType( definition.returnType()->type() );
+            node.setType( agentDomain() );
         }
         else if( name.compare( "RuleRef" ) == 0
                  or name.compare( "FuncRef" ) == 0 )
@@ -555,6 +553,11 @@ void TypeCheckVisitor::pop( VariableDefinition& node )
     m_stack.pop_back();
 }
 
+libcasm_ir::Type::Ptr TypeCheckVisitor::agentDomain( void ) const
+{
+    return m_agentDomain;
+}
+
 //
 // TypeInferenceVisitor
 //
@@ -562,7 +565,8 @@ void TypeCheckVisitor::pop( VariableDefinition& node )
 class TypeInferenceVisitor final : public RecursiveVisitor
 {
   public:
-    TypeInferenceVisitor( Logger& log, Namespace& symboltable );
+    TypeInferenceVisitor( Logger& log, Namespace& symboltable,
+        const libcasm_ir::Type::Ptr& agentDomain );
 
     void visit( Specification& node ) override;
 
@@ -626,10 +630,12 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
     std::unordered_map< const Node*, std::vector< libcasm_ir::Type::ID > >
         m_resultTypes;
+
+    const libcasm_ir::Type::Ptr m_agentDomain;
 };
 
-TypeInferenceVisitor::TypeInferenceVisitor(
-    Logger& log, Namespace& symboltable )
+TypeInferenceVisitor::TypeInferenceVisitor( Logger& log, Namespace& symboltable,
+    const libcasm_ir::Type::Ptr& agentDomain )
 : m_log( log )
 , m_symboltable( symboltable )
 , m_functionInitially( false )
@@ -905,7 +911,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
             break;
         }
-        case CallExpression::TargetType::SELF: // [[fallthrough]]
         case CallExpression::TargetType::FUNCTION:
         {
             assert( not node.type() );
@@ -945,6 +950,11 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             {
                 assert( !" inconsistent symbol table! " );
             }
+            break;
+        }
+        case CallExpression::TargetType::SELF:
+        {
+            node.setType( m_agentDomain );
             break;
         }
         case CallExpression::TargetType::ENUMERATION:
@@ -1400,7 +1410,6 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
             }
             case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
             case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-            case CallExpression::TargetType::SELF:     // [[fallthrough]]
             case CallExpression::TargetType::RULE:
             {
                 try
@@ -1446,6 +1455,11 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                     assert( !" inconsistent symbol table! " );
                 }
 
+                break;
+            }
+            case CallExpression::TargetType::SELF:
+            {
+                // CONT
                 break;
             }
             case CallExpression::TargetType::ENUMERATION: // [[fallthrough]]
@@ -1983,7 +1997,8 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
         return false;
     }
 
-    TypeInferenceVisitor typeInfer( log, *symboltable );
+    TypeInferenceVisitor typeInfer(
+        log, *symboltable, typeCheck.agentDomain() );
     specification->accept( typeInfer );
 
     const auto typInfErr = log.errors();
