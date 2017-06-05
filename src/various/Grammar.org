@@ -7,6 +7,7 @@ Definition
 | DerivedDefinition
 | RuleDefinition
 | EnumerationDefinition
+| error
 
 AttributedDefinition
 : LSQPAREN Attributes RSQPAREN Definition

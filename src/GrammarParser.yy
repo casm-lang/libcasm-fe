@@ -292,6 +292,10 @@ Definition
   {
       $$ = $1;
   }
+| error
+  {
+      $$ = nullptr;
+  }
 ;
 
 
