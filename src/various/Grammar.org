@@ -191,6 +191,7 @@ Terms
 
 Arguments
 : LPAREN Terms RPAREN
+| LPAREN error RPAREN
 | LPAREN RPAREN
 
 TwoOrMoreArguments

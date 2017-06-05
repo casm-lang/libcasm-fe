@@ -1004,6 +1004,10 @@ Arguments
   {
       $$ = $2;
   }
+| LPAREN error RPAREN
+  {
+      $$ = nullptr;
+  }
 | LPAREN RPAREN
   {
       const auto expressions = Ast::make< Expressions >( @$ );
