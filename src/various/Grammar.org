@@ -187,6 +187,7 @@ Range
 List
 : LSQPAREN RSQPAREN
 | LSQPAREN Terms RSQPAREN
+| LSQPAREN error RSQPAREN
 
 Terms
 : Terms COMMA Term

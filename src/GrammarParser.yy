@@ -992,6 +992,10 @@ List
   {
       $$ = Ast::make< ListExpression >( @$, $2 );
   }
+| LSQPAREN error RSQPAREN
+  {
+      $$ = nullptr;
+  }
 ;
 
 
