@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -42,7 +42,7 @@ extern Driver* global_driver;
 char SymbolicExecutionPass::id = 0;
 
 static libpass::PassRegistration< SymbolicExecutionPass > PASS(
-    "Symbolic Execution Pass",
+    "SymbolicExecutionPass",
     "execute symbolically over the AST input specification", "ast-exec-sym",
     0 );
 
@@ -268,7 +268,7 @@ namespace libcasm_fe
 
         static void dump_pathcond_match( std::vector< std::string >& trace,
             const std::string& filename, size_t lineno,
-            const symbolic_condition_t* cond, bool status )
+            const symbolic_condition_t* cond, u1 status )
         {
             std::stringstream ss;
             ss << "% " << filename << ":" << lineno << " PC-LOOKUP ("
@@ -853,7 +853,7 @@ void SymbolicExecutionPass::dumpUpdates()
             const auto update = updateSet->get( &value );
             if( update )
             {
-                ::symbolic::dump_update( trace, function, update );
+                ::symbolic::dump_update( trace, function, update.value() );
             }
             else
             {
@@ -1085,11 +1085,11 @@ void SymbolicExecutionWalker::walk_case( CaseNode* node )
 template <>
 void SymbolicExecutionWalker::walk_iterate( UnaryNode* node )
 {
-    visitor.fork( UpdateSet::Type::Sequential );
+    visitor.fork( ExecutionUpdateSet::Semantics::Sequential );
 
     while( true )
     {
-        visitor.fork( UpdateSet::Type::Parallel );
+        visitor.fork( ExecutionUpdateSet::Semantics::Parallel );
         walk_statement( node->child_ );
         if( visitor.hasEmptyUpdateSet() )
         {

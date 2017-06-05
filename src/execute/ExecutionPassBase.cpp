@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -39,14 +39,14 @@ using namespace libcasm_fe;
 
 extern Driver* global_driver;
 
-bool ExecutionPassBase::hasEmptyUpdateSet() const
+u1 ExecutionPassBase::hasEmptyUpdateSet() const
 {
     return updateSetManager.currentUpdateSet()->empty();
 }
 
 Update* ExecutionPassBase::addUpdate( Function* function,
     const std::vector< value_t >& arguments, const value_t& value,
-    const yy::location& location )
+    const location& location )
 {
     if( function->checkArguments )
     {
@@ -57,7 +57,7 @@ Update* ExecutionPassBase::addUpdate( Function* function,
         catch( const std::domain_error& e )
         {
             throw RuntimeException( location, e.what(),
-                libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtUpdate );
+                libcasm_fe::Code::FunctionArgumentsInvalidRangeAtUpdate );
         }
     }
 
@@ -71,7 +71,7 @@ Update* ExecutionPassBase::addUpdate( Function* function,
         {
             throw RuntimeException( location,
                 std::string( e.what() ) + " of `" + function->name + "`",
-                libcasm_fe::Codes::FunctionValueInvalidRangeAtUpdate );
+                libcasm_fe::Code::FunctionValueInvalidRangeAtUpdate );
         }
     }
 
@@ -96,29 +96,33 @@ Update* ExecutionPassBase::addUpdate( Function* function,
     {
         updateSetManager.add( &it.value(), up );
     }
-    catch( const UpdateSet::Conflict& e )
+    catch( const ExecutionUpdateSet::Conflict& e )
     {
-        const auto conflictingUpdate = e.conflictingUpdate();
-        const auto existingUpdate = e.existingUpdate();
+        const auto& conflictingUpdate = e.conflictingUpdate();
+        const auto& existingUpdate = e.existingUpdate();
+
+        const auto& conflictingValue = conflictingUpdate.second;
+        const auto& existingValue = existingUpdate.second;
 
         const auto info
             = "Conflict while adding update " + function->name
-              + to_string( *conflictingUpdate->args ) + " = " + value.to_str()
-              + " at line " + std::to_string( up->location->begin.line )
+              + to_string( *conflictingValue->args ) + " = " + value.to_str()
+              + " at line "
+              + std::to_string( conflictingValue->location->begin.line )
               + ", conflicting with line "
-              + std::to_string( existingUpdate->location->begin.line )
-              + " with value '" + existingUpdate->value.to_str() + "'";
+              + std::to_string( existingValue->location->begin.line )
+              + " with value '" + existingValue->value.to_str() + "'";
         throw RuntimeException(
-            { existingUpdate->location, conflictingUpdate->location }, info,
+            { existingValue->location, conflictingValue->location }, info,
             libcasm_fe::Codes::UpdateSetClash );
     }
 
     return up;
 }
 
-void ExecutionPassBase::fork( const UpdateSet::Type updateSetType )
+void ExecutionPassBase::fork( ExecutionUpdateSet::Semantics semantics )
 {
-    updateSetManager.fork( updateSetType, 100UL );
+    updateSetManager.fork( semantics, 100UL );
 }
 
 void ExecutionPassBase::merge()
@@ -127,25 +131,28 @@ void ExecutionPassBase::merge()
     {
         updateSetManager.merge();
     }
-    catch( const UpdateSet::Conflict& e )
+    catch( const ExecutionUpdateSet::Conflict& e )
     {
-        const auto conflictingUpdate = e.conflictingUpdate();
-        const auto existingUpdate = e.existingUpdate();
+        const auto& conflictingUpdate = e.conflictingUpdate();
+        const auto& existingUpdate = e.existingUpdate();
 
-        const auto function = function_symbols[ conflictingUpdate->func ];
+        const auto& conflictingValue = conflictingUpdate.second;
+        const auto& existingValue = existingUpdate.second;
+
+        const auto function = function_symbols[ conflictingValue->func ];
         const auto functionLocation
-            = function->name + to_string( *conflictingUpdate->args );
+            = function->name + to_string( *conflictingValue->args );
 
         const auto info
             = "Conflict while merging updateset " + functionLocation
               + " at line "
-              + std::to_string( conflictingUpdate->location->begin.line )
-              + " with value '" + conflictingUpdate->value.to_str() + "'"
+              + std::to_string( conflictingValue->location->begin.line )
+              + " with value '" + conflictingValue->value.to_str() + "'"
               + " and at line "
-              + std::to_string( existingUpdate->location->begin.line )
-              + " with value '" + existingUpdate->value.to_str() + "'";
+              + std::to_string( existingValue->location->begin.line )
+              + " with value '" + existingValue->value.to_str() + "'";
         throw RuntimeException(
-            { existingUpdate->location, conflictingUpdate->location }, info,
+            { existingValue->location, conflictingValue->location }, info,
             libcasm_fe::Codes::UpdateSetMergeConflict );
     }
 }
@@ -249,7 +256,7 @@ value_t ExecutionPassBase::functionValue(
         catch( const std::domain_error& e )
         {
             throw RuntimeException( function->location, e.what(),
-                libcasm_fe::Codes::FunctionArgumentsInvalidRangeAtLookup );
+                libcasm_fe::Code::FunctionArgumentsInvalidRangeAtLookup );
         }
     }
 
@@ -263,7 +270,7 @@ value_t ExecutionPassBase::functionValue(
 
         if( update )
         {
-            return update->value;
+            return update.value()->value;
         }
         else
         {
@@ -282,7 +289,7 @@ value_t ExecutionPassBase::defaultFunctionValue(
     return functionDefaultValues[ function->id ];
 }
 
-bool ExecutionPassBase::filter_enabled( const std::string& filter )
+u1 ExecutionPassBase::filter_enabled( const std::string& filter )
 {
     return debuginfo_filters.count( "all" ) > 0
            || debuginfo_filters.count( filter ) > 0;
@@ -290,7 +297,7 @@ bool ExecutionPassBase::filter_enabled( const std::string& filter )
 
 void ExecutionPassBase::visit_body_elements_pre( AstListNode* )
 {
-    fork( UpdateSet::Type::Sequential );
+    fork( ExecutionUpdateSet::Semantics::Sequential );
 }
 
 void ExecutionPassBase::visit_body_elements_post( AstListNode* )
@@ -311,7 +318,7 @@ void ExecutionPassBase::visit_function_def_pre(
     {
         throw RuntimeException( node->defaultValue()->location,
             std::string( e.what() ) + " of `" + function->name + "`",
-            libcasm_fe::Codes::FunctionDefaultValueInvalidRange );
+            libcasm_fe::Code::FunctionDefaultValueInvalidRange );
     }
 
     function_states[ function->id ]
@@ -319,7 +326,7 @@ void ExecutionPassBase::visit_function_def_pre(
     function_symbols[ function->id ] = function;
     functionDefaultValues[ function->id ] = defaultValue;
 
-    fork( UpdateSet::Type::Parallel );
+    fork( ExecutionUpdateSet::Semantics::Parallel );
 }
 
 void ExecutionPassBase::visit_function_def_post( FunctionDefNode* )
@@ -329,7 +336,7 @@ void ExecutionPassBase::visit_function_def_post( FunctionDefNode* )
 
 void ExecutionPassBase::visit_seqblock_pre( UnaryNode* )
 {
-    fork( UpdateSet::Type::Sequential );
+    fork( ExecutionUpdateSet::Semantics::Sequential );
 }
 
 void ExecutionPassBase::visit_seqblock_post( UnaryNode* )
@@ -339,7 +346,7 @@ void ExecutionPassBase::visit_seqblock_post( UnaryNode* )
 
 void ExecutionPassBase::visit_parblock_pre( UnaryNode* )
 {
-    fork( UpdateSet::Type::Parallel );
+    fork( ExecutionUpdateSet::Semantics::Parallel );
 }
 
 void ExecutionPassBase::visit_parblock_post( UnaryNode* )
@@ -349,7 +356,7 @@ void ExecutionPassBase::visit_parblock_post( UnaryNode* )
 
 void ExecutionPassBase::visit_forall_pre( ForallNode* )
 {
-    fork( UpdateSet::Type::Parallel );
+    fork( ExecutionUpdateSet::Semantics::Parallel );
 }
 
 void ExecutionPassBase::visit_forall_post( ForallNode* )
@@ -629,7 +636,7 @@ namespace libcasm_fe
                 return std::move( arg );
             }
 
-            return value_t( (bool)arg.value.integer );
+            return value_t( (u1)arg.value.integer );
         }
 
         static const value_t asenum( BuiltinAtom* atom, const value_t& arg )
@@ -851,7 +858,7 @@ void ExecutionPassBase::visit_assert( UnaryNode* node, const value_t& value )
     if( not value.value.boolean )
     {
         throw RuntimeException( node->location, "assertion failed",
-            libcasm_fe::Codes::AssertInvalidExpression );
+            libcasm_fe::Code::AssertInvalidExpression );
     }
 }
 
@@ -912,7 +919,7 @@ void ExecutionPassBase::visit_call(
                     + " arguments but "
                     + std::to_string( args_provided )
                     + " were provided",
-                libcasm_fe::Codes::RuleArgumentsSizeInvalidAtIndirectCall );
+                libcasm_fe::Code::RuleArgumentsSizeInvalidAtIndirectCall );
         }
         else
         {
@@ -935,7 +942,7 @@ void ExecutionPassBase::visit_call(
                             + "` but was `"
                             + argType.to_str()
                             + "`",
-                        libcasm_fe::Codes::
+                        libcasm_fe::Code::
                             RuleArgumentsTypeInvalidAtIndirectCall );
                 }
             }
@@ -955,7 +962,7 @@ void ExecutionPassBase::visit_call(
             std::string( e.what() ) + " of rule '"
                 + ( call->ruleref ? call->rule->name : call->rule_name )
                 + "'",
-            libcasm_fe::Codes::RuleArgumentsInvalidRangeAtCall );
+            libcasm_fe::Code::RuleArgumentsInvalidRangeAtCall );
     }
 
     rule_bindings.push_back( &arguments );
@@ -1159,7 +1166,7 @@ void ExecutionPassBase::visit_derived_function_atom_pre(
                 std::string( e.what() ) + " of derived '"
                     + function->symbol->name
                     + "'",
-                libcasm_fe::Codes::DerivedArgumentsInvalidRangeAtLookup );
+                libcasm_fe::Code::DerivedArgumentsInvalidRangeAtLookup );
         }
     }
 
@@ -1183,7 +1190,7 @@ value_t ExecutionPassBase::visit_derived_function_atom(
                 std::string( e.what() ) + " of the return value of derived `"
                     + function->symbol->name
                     + "`",
-                libcasm_fe::Codes::DerivedReturnValueInvalidRange );
+                libcasm_fe::Code::DerivedReturnValueInvalidRange );
         }
     }
 

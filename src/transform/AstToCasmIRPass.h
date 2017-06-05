@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -62,7 +62,7 @@ namespace libcasm_fe
         std::shared_ptr< libcasm_ir::Specification > getSpecification(
             void ) const;
 
-        LIB_CASMFE_VISITOR_INTERFACE( bool, bool );
+        LIB_CASMFE_VISITOR_INTERFACE( u1, u1 );
 
         libcasm_ir::Type::Ptr getType( Type* type );
 

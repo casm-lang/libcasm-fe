@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -33,9 +33,62 @@
 #include "../allocator/BlockAllocator.h"
 #include "UpdateSet.h"
 
+#include "../Value.h"
+#include "../various/location.hh"
+
 #include "ChainedHashMap.h"
 #include "ProbingHashMap.h"
 #include "RobinHoodHashMap.h"
+
+struct LocationHash
+{
+    /**
+     * Directly using a libcasm_fe::value_t pointer as hash value has the
+     * problem that the
+     * first
+     * 4 bits of the hash value are always 0, because the size of
+     * libcasm_fe::value_t is 16
+     * bytes.
+     * Some bit shifting avoids this problem.
+     *
+     * Forumla is from LLVM's DenseMapInfo<T*>
+     */
+    std::size_t operator()( const libcasm_fe::value_t* location ) const
+    {
+        return ( reinterpret_cast< std::uintptr_t >( location ) >> 4 )
+               ^ ( reinterpret_cast< std::uintptr_t >( location ) >> 9 );
+    }
+};
+
+/**
+ * @brief Represents an update
+ */
+struct Update
+{
+    libcasm_fe::value_t value; /**< The value of the update */
+    const std::vector< libcasm_fe::value_t >*
+        args; /**< The function arguments of the update */
+    const yy::location*
+        location;  /**< The source-code location of the update producer */
+    uint32_t func; /**< The function uid of the update */
+};
+
+struct UpdateEquals : public std::binary_function< Update*, Update*, bool >
+{
+    bool operator()( Update* lhs, Update* rhs ) const
+    {
+        return lhs->value == rhs->value;
+    }
+};
+
+struct UpdateSetDetails
+{
+    using Location = const libcasm_fe::value_t*;
+    using Value = Update*;
+    using LocationHash = LocationHash;
+    using LocationEquals = std::equal_to< Location >;
+    using ValueEquals = UpdateEquals;
+};
 
 /**
    @brief    TODO
@@ -46,19 +99,20 @@
 namespace libcasm_fe
 {
     using FunctionState = ProbingHashMap< std::vector< value_t >, value_t >;
+    using ExecutionUpdateSet = UpdateSet< UpdateSetDetails >;
 
     class ExecutionPassBase : public Visitor< value_t >
     {
       public:
         static char id;
 
-        bool hasEmptyUpdateSet() const;
+        u1 hasEmptyUpdateSet() const;
         Update* addUpdate( Function* function,
             const std::vector< value_t >& arguments, const value_t& value,
-            const yy::location& location );
+            const location& location );
         void applyUpdates();
 
-        void fork( const UpdateSet::Type updateSetType );
+        void fork( ExecutionUpdateSet::Semantics semantics );
         void merge();
 
         value_t functionValue(
@@ -156,13 +210,13 @@ namespace libcasm_fe
         virtual value_t defaultFunctionValue(
             Function* function, const std::vector< value_t >& arguments );
 
-        bool filter_enabled( const std::string& filter );
+        u1 filter_enabled( const std::string& filter );
 
       protected:
         std::vector< value_t > main_bindings;
         std::vector< std::vector< value_t >* > rule_bindings;
 
-        UpdateSetManager updateSetManager;
+        UpdateSetManager< ExecutionUpdateSet > updateSetManager;
 
         std::vector< FunctionState > function_states;
         std::vector< const Function* > function_symbols;
@@ -171,7 +225,7 @@ namespace libcasm_fe
         std::vector< List* > temp_lists;
 
       private:
-        std::map< const std::string, bool > debuginfo_filters;
+        std::map< const std::string, u1 > debuginfo_filters;
 
         BlockAllocator< 4096 > stack;
     };

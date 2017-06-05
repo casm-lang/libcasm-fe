@@ -1,160 +1,138 @@
-//  
+//
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
-//  
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
-//  
+//
 //  This file is part of libcasm-fe.
-//  
+//
 //  libcasm-fe is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  libcasm-fe is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
-//  
+//
 
-%skeleton "lalr1.cc" /* -*- C++ -*- */
+%skeleton "lalr1.cc"
+%require "3.0"
+//%debug
+
 %defines
+%define api.namespace {libcasm_fe}
 %define parser_class_name {Parser}
 
 %define api.token.constructor
 %define api.value.type variant
+%define api.location.type {SourceLocation}
+
 %define parse.assert
-
-
-%code requires
-{
-    #include "cpp/Type.h"
-    
-    #include "src/Ast.h"
-    #include "src/Types.h"
-    #include "src/Driver.h"
-    #include "src/Codes.h"
-
-    #include "../casm-ir/src/Value.h"
-
-    using namespace libcasm_fe;
-}
-
-// The parsing context.
-%parse-param { Driver& driver }
-%lex-param   { Driver& driver }
-
-%locations
-%initial-action
-{
-  // Initialize the initial location.
-  // Error messages are printed in Driver, I guess location does not
-  // need to know about the filename
-  // @$.begin.filename = @$.end.filename = driver.get_filename_ptr();
-};
-
 %define parse.trace
 %define parse.error verbose
 
+%locations
+
+%code requires
+{
+    namespace libcasm_fe
+    {
+        class Lexer;
+        class Logger;
+        class SourceLocation;
+    }
+
+    #include "src/ast/Specification.h"
+
+    using namespace libcasm_fe;
+    using namespace Ast;
+
+    #define YY_NULLPTR nullptr
+}
+
+%parse-param { Logger& log }
+%parse-param { Lexer& lexer }
+%parse-param { const std::string& filePath }
+%parse-param { Specification::Ptr& result }
 
 %code
 {
-    yy::Parser::symbol_type yylex( libcasm_fe::Driver& driver );
-        
-    void parse_function_attributes
-    ( Driver& driver
-    , const yy::location& loc
-    , const std::vector<std::string>& attribute_names
-    , Function* function
-    )
+    #include "src/SourceLocation.h"
+    #include "src/Lexer.h"
+    #include "src/Exceptions.h"
+    #include "src/Logger.h"
+
+    #include "../stdhl/cpp/Type.h"
+
+    #undef yylex
+    #define yylex lexer.nextToken
+
+    static BasicType::Ptr createVoidType( SourceLocation& sourceLocation )
     {
-        bool is_static = false;
-        bool is_symbolic = false;
-        bool is_controlled = false;
-        
-        for( const auto& attribute_name : attribute_names )
-        {
-            if( attribute_name == "static" )
-            {
-                if( is_static )
-                {
-                    driver.error
-                    ( loc
-                    , "`static` attribute can only be used once per function"
-                    , libcasm_fe::Codes::FunctionAttributeMultipleUseOfStatic
-                    );
-                    break;
-                }
-                else
-                {
-                    is_static = true;
-                }
-            }
-            else if( attribute_name == "symbolic" )
-            {
-                if( is_symbolic )
-                {
-                    driver.error
-                    ( loc
-                    , "`symbolic` attribute can only be used once per function"
-                    , libcasm_fe::Codes::FunctionAttributeMultipleUseOfSymbolic
-                    );
-                    break;
-                }
-                else
-                {
-                    is_symbolic = true;
-                }
-            }
-            else if( attribute_name == "controlled" )
-            {
-                if( is_controlled )
-                {
-                    driver.error
-                    ( loc
-                    , "`controlled` attribute can only be used once per function"
-                      , libcasm_fe::Codes::FunctionAttributeMultipleUseOfControlled
-                    );
-                    break;
-                }
-                else
-                {
-                    is_controlled = true;
-                }
-            }
-            else
-            {
-                driver.error
-                ( loc
-                , "`"+attribute_name+"` is no valid function attribute, only static, symbolic and controlled are allowed"
-                , libcasm_fe::Codes::FunctionAttributeIsInvalid
-                );
-            }
-        }
-        if( is_static && is_controlled )
-        {
-            driver.error
-            ( loc
-            , "attributes `controlled` and `static` are mutually exclusive"
-            , libcasm_fe::Codes::FunctionAttributeControlledAndStaticIsInvalid
-            );
-        }
-        
-        function->is_static = is_static;
-        function->is_symbolic = is_symbolic;
+        const auto type = libstdhl::get< libcasm_ir::VoidType >();
+        const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
+        const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
+        const auto node = Ast::make< BasicType >( sourceLocation, path );
+        node->setType( type );
+        return node;
     }
 
-    static Function* createProgramFunction( yy::location& location )
+    static BasicType::Ptr createRuleRefType( SourceLocation& sourceLocation )
     {
-        auto argTypes = { new Type( TypeType::AGENT ) };
-        auto retType = new Type( TypeType::RULEREF );
-        return new Function( "program", location, argTypes, retType );
+        const auto type = libstdhl::get< libcasm_ir::RuleReferenceType >();
+        const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
+        const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
+        const auto node = Ast::make< BasicType >( sourceLocation, path );
+        node->setType( type );
+        return node;
+    }
+
+    static BasicType::Ptr createAgentType( SourceLocation& sourceLocation )
+    {
+        const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
+        const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
+        const auto node = Ast::make< BasicType >( sourceLocation, path );
+        return node;
+    }
+
+    static FunctionDefinition::Ptr createProgramFunction( SourceLocation& sourceLocation )
+    {
+        const auto agentType = createAgentType( sourceLocation );
+        const auto ruleRefType = createRuleRefType( sourceLocation );
+
+        const auto argTypes = Ast::make< Types >( sourceLocation );
+        argTypes->add( agentType );
+
+        const auto program = Ast::make< Identifier >( sourceLocation, "program" );
+        return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
+    }
+
+    static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
+    {
+        const auto& location = identifier->sourceLocation();
+        return Ast::make< IdentifierPath >( location, identifier );
+    }
+
+    static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
+    {
+        if( (rule->id() == Node::ID::BLOCK_RULE )
+                or (rule->id() == Node::ID::SEQUENCE_RULE ) )
+        {
+            return rule; // no need to wrap it
+        }
+
+        const auto& sourceLocation = rule->sourceLocation();
+        const auto rules = Ast::make< Rules >( sourceLocation );
+        rules->add( rule );
+        return Ast::make< BlockRule >( sourceLocation, rules );
     }
 }
 
@@ -164,1444 +142,1210 @@ END       0 "end of file"
 {{grammartoken}}
 ;
 
-%token FLOATINGCONST "floating"
-%token INTEGERCONST  "integer"
-%token RATIONALCONST "rational"
-%token STRCONST      "string"
-%token <std::string> IDENTIFIER "identifier"
+%token <std::string> BINARY      "binary"
+%token <std::string> HEXADECIMAL "hexadecimal"
+%token <std::string> INTEGER     "integer"
+%token <std::string> RATIONAL    "rational"
+%token <std::string> FLOATING    "floating"
+%token <std::string> STRING      "string"
+%token <std::string> IDENTIFIER  "identifier"
+
+%type <Specification::Ptr> Specification
+
+%type <Identifier::Ptr> Identifier
+%type <Identifiers::Ptr> Identifiers DotSeparatedIdentifiers
+%type <IdentifierPath::Ptr> IdentifierPath
+
+// definitions
+%type <Definition::Ptr> Definition AttributedDefinition
+%type <Definitions::Ptr> Definitions
+%type <VariableDefinition::Ptr> Variable
+%type <FunctionDefinition::Ptr> FunctionDefinition
+%type <DerivedDefinition::Ptr> DerivedDefinition
+%type <RuleDefinition::Ptr> RuleDefinition
+%type <EnumerationDefinition::Ptr> EnumerationDefinition
+
+// expressions
+%type <Expression::Ptr> Expression Term Atom
+%type <Expressions::Ptr> Terms
+%type <ValueAtom::Ptr> Boolean String BitNumber IntegerNumber FloatingNumber RationalNumber
+%type <ReferenceAtom::Ptr> Reference
+%type <UndefAtom::Ptr> Undefined
+%type <RangeExpression::Ptr> Range
+%type <ListExpression::Ptr> List
+%type <DirectCallExpression::Ptr> DirectCallExpression
+%type <IndirectCallExpression::Ptr> IndirectCallExpression
+%type <ConditionalExpression::Ptr> ConditionalExpression
+%type <UniversalQuantifierExpression::Ptr> UniversalQuantifierExpression
+%type <ExistentialQuantifierExpression::Ptr> ExistentialQuantifierExpression
+
+// rules
+%type <Rule::Ptr> Rule
+%type <Rules::Ptr> Rules
+%type <SkipRule::Ptr> SkipRule
+%type <ConditionalRule::Ptr> ConditionalRule
+%type <CaseRule::Ptr> CaseRule
+%type <LetRule::Ptr> LetRule
+%type <ForallRule::Ptr> ForallRule
+%type <ChooseRule::Ptr> ChooseRule
+%type <IterateRule::Ptr> IterateRule
+%type <BlockRule::Ptr> BlockRule
+%type <SequenceRule::Ptr> SequenceRule
+%type <UpdateRule::Ptr> UpdateRule
+%type <CallRule::Ptr> CallRule
+
+// types
+%type <Type::Ptr> Type
+%type <Types::Ptr> Types
+%type <BasicType::Ptr> BasicType
+%type <ComposedType::Ptr> ComposedType
+%type <RelationType::Ptr> RelationType
+%type <FixedSizedType::Ptr> FixedSizedType
+
+// types
+%type <Attribute::Ptr> Attribute
+%type <Attributes::Ptr> Attributes
+%type <BasicAttribute::Ptr> BasicAttribute
+%type <ExpressionAttribute::Ptr> ExpressionAttribute
+
+// other
+%type <FunctionDefinition::Ptr> ProgramFunctionDefinition
+%type <Case::Ptr> CaseLabel
+%type <Cases::Ptr> CaseLabels
+%type <UpdateRule::Ptr> Initializer
+%type <NodeList< UpdateRule >::Ptr> Initializers MaybeInitializers MaybeInitially
+%type <Expression::Ptr> MaybeDefined
+%type <Types::Ptr> FunctionParameters MaybeFunctionParameters
+%type <Expressions::Ptr> Arguments TwoOrMoreArguments
+%type <NodeList< VariableDefinition >::Ptr> Parameters MaybeParameters
 
 
-%type <Ast*> SPECIFICATION
-%type <SpecificationNode*> HEADER
-%type <InitNode*> INIT_SYNTAX
-%type <AstNode*> BODY_ELEMENT RULE_SYNTAX STATEMENT IMPOSSIBLE_SYNTAX RULE_STMT SIMPLE_STMT SCOPE
-%type <UnaryNode*> PAR_SYNTAX SEQ_SYNTAX ASSERT_SYNTAX ASSURE_SYNTAX ITERATE_SYNTAX
-%type <AstListNode*> BODY_ELEMENTS STATEMENTS
-%type <AtomNode*> UNDEFINED BOOLEAN NUMBER VALUE NUMBER_RANGE
-%type <IntegerAtom*> INTEGER_NUMBER 
-%type <FloatingAtom*> FLOATING_NUMBER 
-%type <RationalAtom*> RATIONAL_NUMBER 
-%type <UpdateNode*> INITIALIZER
-%type <std::vector<UpdateNode*>> INITIALIZER_LIST INITIALIZER_LIST_NO_COMMA
-%type <ExpressionBase*> EXPRESSION ATOM
-%type <std::vector<ExpressionBase*>*> EXPRESSION_LIST EXPRESSION_LIST_NO_COMMA LISTCONST
-%type <UpdateNode*> UPDATE_SYNTAX
-%type <INTEGER_T> INTEGERCONST
-%type <FLOATING_T> FLOATINGCONST
-%type <std::string> STRCONST
-%type <rational_t> RATIONALCONST
-%type <Function*> FUNCTION_DEFINITION DERIVED_SYNTAX
-%type <BaseFunctionAtom*> FUNCTION_SYNTAX
-%type <std::pair<std::vector<Type*>, Type*>> FUNCTION_SIGNATURE
-%type <Type*> TYPE_SYNTAX
-%type <Type*> PARAM
-%type <std::vector<Type*>> PARAM_LIST_NO_COMMA PARAM_LIST
-%type <std::vector<Type*>> TYPE_IDENTIFIER_STARLIST
-%type <std::string> RULEREF
-%type <IfThenElseNode*> IFTHENELSE
-%type <CallNode*> CALL_SYNTAX
-%type <PrintNode*> PRINT_SYNTAX DEBUG_SYNTAX
-%type <LetNode*> LET_SYNTAX
-%type<std::vector<Type*>> TYPE_SYNTAX_LIST
-%type <PushNode*> PUSH_SYNTAX
-%type <PopNode*> POP_SYNTAX
-%type <AtomNode*> CASE_VALUE
-%type <std::pair<AtomNode*, AstNode*>> CASE_LABEL
-%type <std::vector<std::pair<AtomNode*, AstNode*>>> CASE_LABEL_LIST
-%type <CaseNode*> CASE_SYNTAX
-%type <ForallNode*> FORALL_SYNTAX
-%type <std::vector<std::string>> IDENTIFIER_LIST IDENTIFIER_LIST_NO_COMMA
-%type <Enum*> ENUM_SYNTAX;
-%type <std::vector<std::pair<std::string, std::vector<std::string>>>> DUMPSPEC_LIST
-%type <std::pair<std::string, std::vector<std::string>>> DUMPSPEC
-%type <DiedieNode*> DIEDIE_SYNTAX
+%start Specification
 
+// prefer absolute over relative paths
+%precedence ABSOLUTE_PATH
 
-%start SPECIFICATION
-     
 %precedence THEN
 %precedence ELSE
 
-//%precedence UPDATE ASSERT ASSURE DIEDIE
-// %precedence IDENTIFIER
-//%precedence INTEGERCONST STRCONST FLOATINGCONST RATIONALCONST 
-// %precedence UNDEF
-// %precedence TRUE
-// %precedence FALSE
+%precedence UPDATE
 
-%left AND
-%left XOR
+%left DOT
+%left IMPLIES ARROW
 %left OR
-     
-%left EQUAL     
-%left NEQUAL 
-     
-%left GREATEREQ
-%left LESSEQ
-     
-%left GREATER
-%left LESSER
-     
-%left PLUS
-%left MINUS
-%left PERCENT
-%left SLASH
-%left STAR
+%left XOR
+%left AND
 
+%left EQUAL NEQUAL
+%left GREATEREQ LESSEQ GREATER LESSER
+
+%left PLUS MINUS
+%left PERCENT SLASH ASTERIX
+%left CARET
+
+%precedence UPLUS UMINUS
 %precedence NOT
 
-%nonassoc UPLUS
-%nonassoc UMINUS
-     
+%precedence HOLDS WITH
+
+// prefer calls with args (starts with LPAREN) over calls without args
+%precedence CALL_WITHOUT_ARGS
+%precedence LPAREN
+
+// prefer fixed sized types over composed types (start with LESSER) over basic types
+%precedence MARK
+
 %%
 
-     
-SPECIFICATION
-: HEADER BODY_ELEMENTS
+Specification
+: CASM Definitions
   {
-      driver.result = new Ast( @$, $1, $2 );
+      const std::string& fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
+      const std::string& name = fileName.substr( 0, fileName.rfind( "." ) );
+
+      const auto specificationName = make< Identifier >( @$, name );
+      result = Ast::make< Specification >( @$, specificationName, $2 );
   }
 ;
 
 
-HEADER
-: CASM
+Definition
+: FunctionDefinition
   {
-      const std::string& filepath = driver.get_filename();
-      
-      const std::string& filename
-          = filepath.substr( filepath.find_last_of( "/\\" ) + 1 );
-      
-      const std::string& filename_without_extension
-          = filename.substr( 0, filename.rfind( "." ) );
-      
-      $$ = new SpecificationNode( @$, filename_without_extension );
-  }
-;
-
-BODY_ELEMENTS
-: BODY_ELEMENTS BODY_ELEMENT
-  {
-      $1->add($2);
       $$ = $1;
   }
-| BODY_ELEMENT
+| DerivedDefinition
   {
-      $$ = new AstListNode(@$, NodeType::BODY_ELEMENTS);
-      $$->add($1);
+      $$ = $1;
+  }
+| RuleDefinition
+  {
+      $$ = $1;
+  }
+| EnumerationDefinition
+  {
+      $$ = $1;
   }
 ;
 
 
-BODY_ELEMENT
-: OPTION_SYNTAX
+AttributedDefinition
+: LSQPAREN Attributes RSQPAREN Definition
   {
-      $$ = new AstNode( NodeType::OPTION );
+      auto definition = $4;
+      definition->setAttributes( $2 );
+      $$ = definition;
   }
-| ENUM_SYNTAX
+| Definition
   {
-      $$ = new EnumDefNode( @$, $1 );
+      $$ = $1;
   }
-| FUNCTION_DEFINITION
-  {
-      $$ = new FunctionDefNode( @$, $1 );
+;
 
-      try
-      {
-          driver.add( $1 );
-      }
-      catch( const Exception& e )
-      {
-          driver.error( e );
-          delete $1;
-      }
+
+Definitions
+: Definitions AttributedDefinition
+  {
+      auto definitions = $1;
+      definitions->add( $2 );
+      $$ = definitions;
   }
-| FUNCTION_DEFINITION INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
+| AttributedDefinition
   {
-      auto node = new FunctionDefNode( @$, $1 );
-
-      auto initializers = $4;
-      for (auto initializer : initializers) {
-          initializer->func->name = $1->name;
-      }
-      node->setInitializers( initializers );
-
-      try
-      {
-          driver.add( $1 );
-      }
-      catch( const Exception& e )
-      {
-          driver.error( e );
-          delete $1;
-      }
-
-      $$ = node;
+      auto definitions = Ast::make< Definitions >( @$ );
+      definitions->add( $1 );
+      $$ = definitions;
   }
-| FUNCTION_DEFINITION DEFINED LCURPAREN VALUE RCURPAREN
+;
+
+
+FunctionDefinition
+: FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
-      auto node = new FunctionDefNode( @$, $1 );
-      node->setDefaultValue( $4 );
+      const auto identifier = $2;
 
-      try
-      {
-          driver.add( $1 );
-      }
-      catch( const Exception& e )
-      {
-          driver.error( e );
-          delete $1;
-      }
+      auto function = Ast::make< FunctionDefinition >( @$, identifier, $4, $6 );
+      function->setDefaultValue( $7 );
 
-      $$ = node;
-  }
-| FUNCTION_DEFINITION DEFINED LCURPAREN VALUE RCURPAREN INITIALLY LCURPAREN INITIALIZER_LIST RCURPAREN
-  {
-      auto node = new FunctionDefNode( @$, $1 );
-      node->setDefaultValue( $4 );
-
+      // apply the name of the function declaration to the initializer functions
       auto initializers = $8;
-      for (auto initializer : initializers) {
-          initializer->func->name = $1->name;
+      for (auto& initializer : *initializers) {
+           initializer->function()->setIdentifier( asIdentifierPath( identifier ) );
       }
-      node->setInitializers( initializers );
+      function->setInitializers( initializers );
 
-      try
-      {
-          driver.add( $1 );
-      }
-      catch( const Exception& e )
-      {
-          driver.error( e );
-          delete $1;
-      }
-
-      $$ = node;
-  }
-| DERIVED_SYNTAX
-  {
-      $1->binding_offsets = std::move( driver.binding_offsets );
-      driver.binding_offsets.clear();
-      
-      $$ = new DerivedDefNode( @$, $1 );
-      try
-      {
-          driver.add( $1 );
-      }
-      catch( const Exception& e )
-      {
-          driver.error( e );
-          delete $1;
-      }
-  }
-| INIT_SYNTAX
-  {
-      $$ = $1;
-  }
-| RULE_SYNTAX
-  {
-      $$ = $1;
-      // TODO: check, we trust bison to pass only RuleNodes up
-      
-      try
-      {
-          driver.add( reinterpret_cast< RuleNode* >( $1 ) );
-      }
-      catch( const Exception& e )
-      {
-          driver.error( e );
-          
-          // we do not need to delete $1 here, because it's already in
-          // the AST, so it will be deleted later
-      }
-  }
-;
-
-
-INIT_SYNTAX
-: INIT IDENTIFIER
-  {
-    auto program = createProgramFunction( @$ );
-    try
-    {
-        driver.add( program );
-    }
-    catch( const Exception& e )
-    {
-        driver.error
-        ( e.getLocations()
-        , "multiple definitions of 'init' node"
-        , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
-        );
-    }
-
-    // create initial update: program(self) := @identifier
-    auto args = new std::vector< ExpressionBase* >;
-    args->push_back( new SelfAtom( @$ ) );
-    auto programAtom = new FunctionAtom( @$, program->name, args );
-    auto update = new UpdateNode( @$, programAtom, new RuleAtom( @$ , $2 ) );
-
-    auto programDef = new FunctionDefNode( @$, program );
-    programDef->setInitializers( { update } );
-    $$ = new InitNode( @$, programDef );
-  }
-| INIT LCURPAREN INITIALIZER_LIST RCURPAREN
-  {
-    auto program = createProgramFunction( @$ );
-    try
-    {
-        driver.add( program );
-    }
-    catch( const Exception& e )
-    {
-        driver.error
-        ( e.getLocations()
-        , "multiple definitions of 'init' node"
-        , libcasm_fe::Codes::AgentInitRuleMultipleDefinitions
-        );
-    }
-
-    // initializer updates don't have function names -> apply the correct name
-    auto initializers = $3;
-    for (auto initializer : initializers) {
-        initializer->func->name = program->name;
-    }
-
-    auto programDef = new FunctionDefNode( @$, program );
-    programDef->setInitializers( initializers );
-    $$ = new InitNode( @$, programDef );
-  }
-;
-
-
-OPTION_SYNTAX
-: OPTION IDENTIFIER DOT IDENTIFIER IDENTIFIER
-;
-
-
-ENUM_SYNTAX
-: ENUM IDENTIFIER EQUAL LCURPAREN IDENTIFIER_LIST RCURPAREN
-  {
-      $$ = new Enum($2, @$);
-      try
-      {
-          driver.function_table.add($$);
-      }
-      catch( const Exception& e )
-      {
-          driver.error( e );
-      }
-      for( const std::string& name : $5 )
-      {
-          if( $$->add_enum_element(name) )
-          {
-              try
-              {
-                  driver.function_table.add_enum_element( name, $$ );
-              }
-              catch( const Exception& e )
-              {
-                  driver.error( e );
-              }
-          }
-          else
-          {
-              driver.error
-              ( @$
-              , "name '"
-                + name
-                + "' already used in enum"
-              );
-          }
-      }
-  }
-;
-
-
-DERIVED_SYNTAX
-: DERIVED IDENTIFIER LPAREN PARAM_LIST RPAREN EQUAL EXPRESSION
-  {
-      // TODO: 2nd argument should be a reference
-      $$ = new Function($2, @$, $4, $7, new Type(TypeType::UNKNOWN));
-  }
-| DERIVED IDENTIFIER EQUAL EXPRESSION
-  {
-      $$ = new Function($2, @$, $4, new Type(TypeType::UNKNOWN));
-  }
-| DERIVED IDENTIFIER LPAREN RPAREN EQUAL EXPRESSION
-  {
-      $$ = new Function($2, @$, $6, new Type(TypeType::UNKNOWN));
-  }
-| DERIVED IDENTIFIER LPAREN PARAM_LIST RPAREN COLON TYPE_SYNTAX EQUAL EXPRESSION
-  {
-      $$ = new Function($2, @$, $4, $9, $7);
-  }
-| DERIVED IDENTIFIER COLON TYPE_SYNTAX EQUAL EXPRESSION
-  {
-      $$ = new Function($2, @$, $6, $4);
-  }
-| DERIVED IDENTIFIER LPAREN RPAREN COLON TYPE_SYNTAX EQUAL EXPRESSION
-  {
-      $$ = new Function($2, @$, $8, $6);
-  }
-;
-
-
-FUNCTION_DEFINITION
-: FUNCTION LPAREN IDENTIFIER_LIST RPAREN IDENTIFIER FUNCTION_SIGNATURE
-  {
-      auto function = new Function($5, @$, $6.first, $6.second);
-      parse_function_attributes(driver, @$, $3, function);
       $$ = function;
   }
-| FUNCTION IDENTIFIER FUNCTION_SIGNATURE
+| ProgramFunctionDefinition
   {
-      $$ = new Function($2, @$, $3.first, $3.second);
-  }
-;
-
-IDENTIFIER_LIST
-: IDENTIFIER_LIST_NO_COMMA COMMA
-  {
-      $$ = std::move($1);
-  }
-| IDENTIFIER_LIST_NO_COMMA
-  {
-      $$ = std::move($1);
+      $$ = $1; // `init` special case
   }
 ;
 
 
-IDENTIFIER_LIST_NO_COMMA
-: IDENTIFIER_LIST_NO_COMMA COMMA IDENTIFIER
+MaybeInitially
+: INITIALLY LCURPAREN MaybeInitializers RCURPAREN
   {
-      $$ = std::move( $1 );
-      $$.push_back( $3 );
-  }
-| IDENTIFIER
-  {
-      $$ = std::vector<std::string>();
-      $$.push_back($1);
-  }
-;
-
-
-FUNCTION_SIGNATURE
-: COLON ARROW TYPE_SYNTAX
-  {
-      /* this constructor is implementation dependant! */
-      std::vector<Type*> foo;
-      $$ = std::pair<std::vector<Type*>, Type*>(foo, $3);
-  }
-| COLON TYPE_IDENTIFIER_STARLIST ARROW TYPE_SYNTAX
-  {
-      $$ = std::pair<std::vector<Type*>, Type*>($2, $4);
-  }
-;
-
-
-PARAM
-: IDENTIFIER COLON TYPE_SYNTAX
-  {
-      size_t size = driver.binding_offsets.size();
-      driver.binding_offsets[$1] = size;
       $$ = $3;
   }
-| IDENTIFIER
+| %empty
   {
-      size_t size = driver.binding_offsets.size();
-      driver.binding_offsets[$1] = size;
-      // TODO: fail for rules without types and print warnings
-      $$ = new Type(TypeType::INTEGER);
+      $$ = Ast::make< NodeList< UpdateRule > >( @$ );
   }
 ;
 
 
-PARAM_LIST
-: PARAM_LIST_NO_COMMA
+MaybeDefined
+: DEFINED LCURPAREN Term RCURPAREN
   {
-      $$ = std::move($1);
+      $$ = $3;
   }
-| PARAM_LIST_NO_COMMA COMMA
+| %empty
   {
-      $$ = std::move($1);
-  }
-;
-
-
-PARAM_LIST_NO_COMMA
-: PARAM_LIST_NO_COMMA COMMA PARAM
-  {
-      $$ = std::move($1);
-      $$.push_back($3);
-  }
-| PARAM
-  {
-      $$.push_back($1);
+      $$ = Ast::make< UndefAtom >( @$ );
   }
 ;
 
 
-TYPE_IDENTIFIER_STARLIST
-: TYPE_SYNTAX STAR TYPE_IDENTIFIER_STARLIST
+FunctionParameters
+: FunctionParameters ASTERIX Type
   {
-      $3.insert($3.begin(), $1);
-      $$ = std::move($3);
+      auto types = $1;
+      types->add( $3 );
+      $$ = types;
   }
-| TYPE_SYNTAX STAR
+| Type
   {
-      // TODO: limit memory size
-      $$.push_back($1);
-  }
-| TYPE_SYNTAX
-  {
-      $$.push_back($1);
+      auto types = Ast::make< Types >( @$ );
+      types->add( $1 );
+      $$ = types;
   }
 ;
 
 
-TYPE_SYNTAX
+MaybeFunctionParameters
+: FunctionParameters
+  {
+      $$ = $1;
+  }
+| %empty
+  {
+      $$ = Ast::make< Types >( @$ );
+  }
+;
+
+
+ProgramFunctionDefinition
+: INIT IdentifierPath
+  {
+      const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
+      auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
+          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
+      singleAgent->setTargetType( CallExpression::TargetType::CONSTANT );
+
+      auto programDefinition = createProgramFunction( @$ );
+      auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      programArguments->add( singleAgent );
+      const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
+          @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
+      program->setTargetType( CallExpression::TargetType::FUNCTION );
+
+      const auto ruleReference = Ast::make< ReferenceAtom >( @$, $2 );
+
+      auto initializers = Ast::make< NodeList< UpdateRule > >( @$ );
+      initializers->add( Ast::make< UpdateRule >( @$, program, ruleReference ) );
+      programDefinition->setInitializers( initializers );
+
+      $$ = programDefinition;
+  }
+| INIT LCURPAREN MaybeInitializers RCURPAREN
+  {
+      auto programDefinition = createProgramFunction( @$ );
+
+      // apply the name of the program declaration to the initializer functions
+      auto initializers = $3;
+      for (auto& initializer : *initializers) {
+          initializer->function()->setIdentifier(
+                asIdentifierPath( programDefinition->identifier() ) );
+      }
+      programDefinition->setInitializers( initializers );
+
+      $$ = programDefinition;
+  }
+;
+
+
+Initializer
+: Term
+  {
+      // the unknown function identifier will be replaced in FunctionDefinition
+      const auto arguments = Ast::make< Expressions >( @$ );
+      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
+      function->setTargetType( CallExpression::TargetType::FUNCTION );
+      $$ = Ast::make< UpdateRule >( @$, function, $1 );
+  }
+| Term MAPS Term
+  {
+      auto arguments = Ast::make< Expressions >( @$ );
+      arguments->add( $1 );
+
+      // the unknown function identifier will be replaced in FunctionDefinition
+      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
+      function->setTargetType( CallExpression::TargetType::FUNCTION );
+      $$ = Ast::make< UpdateRule >( @$, function, $3 );
+  }
+| TwoOrMoreArguments MAPS Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
+  {
+      // the unknown function identifier will be replaced in FunctionDefinition
+      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1 );
+      function->setTargetType( CallExpression::TargetType::FUNCTION );
+      $$ = Ast::make< UpdateRule >( @$, function, $3 );
+  }
+;
+
+
+Initializers
+: Initializers COMMA Initializer
+  {
+      auto initializers = $1;
+      initializers->add( $3 );
+      $$ = initializers;
+  }
+| Initializer
+  {
+      auto initializers = Ast::make< NodeList< UpdateRule > >( @$ );
+      initializers->add( $1 );
+      $$ = initializers;
+  }
+;
+
+
+MaybeInitializers
+: Initializers
+  {
+      $$ = $1;
+  }
+| %empty
+  {
+      $$ = Ast::make< NodeList< UpdateRule > >( @$ );
+  }
+;
+
+
+DerivedDefinition
+: DERIVED Identifier MaybeParameters MAPS Type EQUAL Term
+  {
+      $$ = Ast::make< DerivedDefinition >( @$, $2, $3, $5, $7 );
+  }
+;
+
+
+EnumerationDefinition
+: ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
+  {
+      $$ = Ast::make< EnumerationDefinition >( @$, $2, $5 );
+  }
+;
+
+
+Identifier
 : IDENTIFIER
   {
-      $$ = new Type( $1 );
-      
-      // TODO: FUTURE: integrate the IR-based type-list here to perform checks!,
-      //               or maybe we should check everything in the typecheckpass?
-      if( $1.compare( "Bit" ) == 0 )
-      {
-          driver.error
-          ( @$
-          , "missing bit-size for Bit type 'Bit(<bitsize>)'"
-          , libcasm_fe::Codes::TypeBitSyntaxError
-          );
-      }
-      else if( $1.compare( "List" ) == 0 )
-      {
-          driver.error
-          ( @$
-          , "unsupported type '" + $1 + "'"
-          , libcasm_fe::Codes::TypeUnsupported
-          );
-      }      
-  }
-| IDENTIFIER LPAREN INTEGER_NUMBER RPAREN
-  {
-      $$ = new Type( $1 );
-      $$->bitsize = $3->val_;
-      if( $$->bitsize <= 0 || $$->bitsize > 256 )
-      {
-          driver.error
-          ( @$
-          , "invalid bit-size for Bit type, must between 1 <= x <= 256"
-          , libcasm_fe::Codes::TypeBitSizeIsInvalid
-          );
-      }
-  }
-| IDENTIFIER LPAREN TYPE_SYNTAX_LIST RPAREN
-  {
-      $$ = new Type( $1, $3 );
-
-      if( $1.compare( "List" ) == 0 )
-      {
-          driver.error
-          ( @$
-          , "unsupported type '" + $1 + "'"
-          , libcasm_fe::Codes::TypeUnsupported
-          );
-      }
-      // TODO: FUTURE: PPA: better and generic type checking in the type check pass
-      else if( $1.compare( "Tuple" ) != 0 )
-      {
-          driver.error
-          ( @$
-          , "unknown type '" + $1 + "'"
-          , libcasm_fe::Codes::TypeUnknown
-          );
-      }      
-  }
-| IDENTIFIER LPAREN INTEGER_NUMBER DOTDOT INTEGER_NUMBER RPAREN
-  {
-      $$ = new Type( $1 );
-      $$->subrange_start = $3->val_;
-      $$->subrange_end = $5->val_;
-      if( $$->subrange_start >= $$->subrange_end )
-      {
-          driver.error
-          ( @$
-          , "start of subrange must be smaller than the end"
-          , libcasm_fe::Codes::TypeIntegerRangedInvalidInterval
-          );
-      }
+      $$ = Ast::make< Identifier >( @$, $1 );
   }
 ;
 
 
-TYPE_SYNTAX_LIST
-: TYPE_SYNTAX COMMA TYPE_SYNTAX_LIST
+Identifiers
+: Identifiers COMMA Identifier
   {
-      $3.push_back( $1 );
-      $$ = std::move( $3 );
+      auto identifiers = $1;
+      identifiers->add( $3 );
+      $$ = identifiers;
   }
-| TYPE_SYNTAX COMMA
+| Identifier
   {
-      $$.push_back( $1 );
-  }
-| TYPE_SYNTAX
-  {
-      $$.push_back( $1 );
-  }
-;
-
-
-INITIALIZER_LIST
-: INITIALIZER_LIST_NO_COMMA
-  {
-      $$ = std::move($1);
-  }
-| INITIALIZER_LIST_NO_COMMA COMMA
-  {
-      $$ = std::move($1);
+      auto identifiers = Ast::make< Identifiers >( @$ );
+      identifiers->add( $1 );
+      $$ = identifiers;
   }
 ;
 
 
-INITIALIZER_LIST_NO_COMMA
-: INITIALIZER_LIST_NO_COMMA COMMA INITIALIZER
+DotSeparatedIdentifiers
+: DotSeparatedIdentifiers DOT Identifier
   {
-      $$ = std::move($1);
-      $$.push_back($3);
+      auto identifiers = $1;
+      identifiers->add( $3 );
+      $$ = identifiers;
   }
-| INITIALIZER
+| Identifier
   {
-      $$ = { $1 };
-  }
-;
-
-
-INITIALIZER
-: ATOM
-  {
-      auto function = new FunctionAtom( @$, "" );
-      $$ = new UpdateNode( @$, function, $1 );
-  }
-| EXPRESSION ARROW ATOM
-  {
-      auto args = new std::vector< ExpressionBase* >;
-      args->push_back($1);
-
-      auto function = new FunctionAtom( @$, "", args );
-      $$ = new UpdateNode( @$, function, $3 );
-  }
-| LPAREN EXPRESSION_LIST RPAREN ARROW ATOM
-  {
-      auto function = new FunctionAtom( @$, "", $2 );
-      $$ = new UpdateNode( @$, function, $5 );
+      auto identifiers = Ast::make< Identifiers >( @$ );
+      identifiers->add( $1 );
+      $$ = identifiers;
   }
 ;
 
 
-ATOM
-: FUNCTION_SYNTAX
+IdentifierPath
+: DotSeparatedIdentifiers %prec ABSOLUTE_PATH
   {
-      $$ = $1;
+      $$ = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
   }
-| VALUE
+| DOT DotSeparatedIdentifiers
   {
-      $$ = $1;
+      $$ = Ast::make< IdentifierPath >( @$, $2, IdentifierPath::Type::RELATIVE );
   }
-| LPAREN EXPRESSION RPAREN
+;
+
+
+Variable
+: Identifier COLON Type
+  {
+      $$ = Ast::make< VariableDefinition >( @$, $1, $3 );
+  }
+| Identifier
+  {
+      const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
+      $$ = Ast::make< VariableDefinition >( @$, $1, unresolvedType );
+  }
+;
+
+
+Parameters
+: Parameters COMMA Variable
+  {
+      auto parameters = $1;
+      parameters->add( $3 );
+      $$ = parameters;
+  }
+| Variable
+  {
+      auto parameters = Ast::make< NodeList< VariableDefinition > >( @$ );
+      parameters->add( $1 );
+      $$ = parameters;
+  }
+;
+
+
+MaybeParameters
+: LPAREN Parameters RPAREN
   {
       $$ = $2;
   }
-| PLUS LPAREN EXPRESSION RPAREN %prec UPLUS
+| %empty
   {
-      $$ = $3;
-  }
-| MINUS LPAREN EXPRESSION RPAREN %prec UMINUS
-  {
-      $$ = new BinaryExpression( @$, new ZeroAtom( @$, $3 ), $3,
-                                 libcasm_ir::Value::SUB_INSTRUCTION );
+      $$ = Ast::make< NodeList< VariableDefinition > >( @$ );
   }
 ;
 
 
-VALUE
-: RULEREF
-  {
-      $$ = new RuleAtom( @$, std::move( $1 ) );
-  }
-| NUMBER
+Type
+: BasicType
   {
       $$ = $1;
   }
-| STRCONST
-  {
-      $$ = new StringAtom( @$, std::move( $1 ) );
-  }
-| LISTCONST
-  {
-      $$ = new ListAtom( @$, $1 );
-  }
-| NUMBER_RANGE
+| ComposedType
   {
       $$ = $1;
   }
-| SELF
+| RelationType
   {
-      $$ = new SelfAtom( @$ );
+      $$ = $1;
   }
-| UNDEFINED
-  {
-      $$ = $1; 
-  }
-| BOOLEAN
+| FixedSizedType
   {
       $$ = $1;
   }
 ;
 
 
-UNDEFINED
+BasicType
+: IdentifierPath
+  {
+      $$ = Ast::make< BasicType >( @$, $1 );
+  }
+;
+
+
+ComposedType
+: IdentifierPath LESSER Types GREATER
+  {
+      $$ = Ast::make< ComposedType >( @$, $1, $3 );
+  }
+;
+
+
+RelationType
+: IdentifierPath LESSER MaybeFunctionParameters MAPS Type GREATER
+  {
+      $$ = Ast::make< RelationType >( @$, $1, $3, $5 );
+  }
+;
+
+
+FixedSizedType
+: IdentifierPath MARK Term
+  {
+      $$ = Ast::make< FixedSizedType >( @$, $1, $3 );
+  }
+;
+
+
+Types
+: Types COMMA Type
+  {
+      auto types = $1;
+      types->add( $3 );
+      $$ = types;
+  }
+| Type
+  {
+      auto types = Ast::make< Types >( @$ );
+      types->add( $1 );
+      $$ = types;
+  }
+;
+
+
+Atom
+: Reference
+  {
+      $$ = $1;
+  }
+| BitNumber
+  {
+      $$ = $1;
+  }
+| IntegerNumber
+  {
+      $$ = $1;
+  }
+| FloatingNumber
+  {
+      $$ = $1;
+  }
+| RationalNumber
+  {
+      $$ = $1;
+  }
+| String
+  {
+      $$ = $1;
+  }
+| Undefined
+  {
+      $$ = $1;
+  }
+| Boolean
+  {
+      $$ = $1;
+  }
+;
+
+
+Undefined
 : UNDEF
   {
-      $$ = new UndefAtom( @$ );
+      $$ = Ast::make< UndefAtom >( @$ );
   }
 ;
 
 
-BOOLEAN
+Boolean
 : TRUE
   {
-      $$ = new BooleanAtom( @$, true );
+      const auto value = libstdhl::get< libcasm_ir::BooleanConstant >( true );
+      $$ = Ast::make< ValueAtom >( @$, value );
   }
 | FALSE
   {
-      $$ = new BooleanAtom( @$, false );
-  }
-; 
-
-
-NUMBER
-: INTEGER_NUMBER
-  {
-      $$ = $1;
-  }
-| FLOATING_NUMBER
-  {
-      $$ = $1;
-  }
-| RATIONAL_NUMBER
-  {
-      $$ = $1;
+      const auto value = libstdhl::get< libcasm_ir::BooleanConstant >( false );
+      $$ = Ast::make< ValueAtom >( @$, value );
   }
 ;
 
 
-INTEGER_NUMBER
-: INTEGERCONST
+String
+: STRING
   {
-      $$ = new IntegerAtom( @$, $1 );
-  }
-| PLUS INTEGER_NUMBER %prec UPLUS
-  {
-      $$ = $2;
-  }
-| MINUS INTEGER_NUMBER %prec UMINUS
-  {
-      $$ = $2;
-      $2->val_ *= (-1);
-  }
-;
-
-
-FLOATING_NUMBER
-: FLOATINGCONST
-  {
-      $$ = new FloatingAtom( @$, $1 );
-  }
-| PLUS FLOATING_NUMBER %prec UPLUS
-  {
-      $$ = $2;
-  }
-| MINUS FLOATING_NUMBER %prec UMINUS
-  {
-      $$ = $2;
-      $2->val_ *= (-1);
-  }
-;
-
-
-RATIONAL_NUMBER
-: RATIONALCONST
-  {
-      $$ = new RationalAtom( @$, $1 );
-  }
-| PLUS RATIONAL_NUMBER %prec UPLUS
-  {
-      $$ = $2;
-  }
-| MINUS RATIONALCONST %prec UMINUS
-  {
-      $2.numerator *= -1;
-      $$ = new RationalAtom( @$, $2 );
-  }
-;
-
-
-RULEREF
-: AT IDENTIFIER
-  {
-      $$ = $2;
-  }
-;
-
-
-NUMBER_RANGE
-: LSQPAREN EXPRESSION DOTDOT EXPRESSION RSQPAREN
-  {
-      $$ = new NumberRangeAtom( @$, $2, $4 );
-  }
-;
-
-
-LISTCONST
-: LSQPAREN EXPRESSION_LIST RSQPAREN
-  {
-      $$ = $2;
-  }
-| LSQPAREN RSQPAREN
-  {
-      $$ = new std::vector< ExpressionBase* >();
-  }
-;
-
-
-EXPRESSION_LIST
-: EXPRESSION_LIST_NO_COMMA
-  {
-      $$ = $1;
-  }
-| EXPRESSION_LIST_NO_COMMA COMMA
-  {
-      $$ = $1;
-  }
-;
-
-
-EXPRESSION_LIST_NO_COMMA
-: EXPRESSION_LIST_NO_COMMA COMMA EXPRESSION
-  {
-      $$ = $1;
-      $$->push_back( $3 );
-  }
-| EXPRESSION
-  {
-      $$ = new std::vector< ExpressionBase* >;
-      $$->push_back( $1 );
-  }
-;
-
-
-EXPRESSION
-: EXPRESSION PLUS EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
-  }
-| EXPRESSION MINUS EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::SUB_INSTRUCTION );
-  }
-| EXPRESSION STAR EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::MUL_INSTRUCTION );
-  }
-| EXPRESSION SLASH EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
-  }
-| EXPRESSION PERCENT EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
-  }
-| EXPRESSION NEQUAL EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
-  }
-| EXPRESSION EQUAL EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::EQU_INSTRUCTION );
-  }
-| EXPRESSION LESSER EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::LTH_INSTRUCTION );
-  }
-| EXPRESSION GREATER EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::GTH_INSTRUCTION );
-  }
-| EXPRESSION LESSEQ EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
-  }
-| EXPRESSION GREATEREQ EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
-  }
-| EXPRESSION OR EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::OR_INSTRUCTION );
-  }
-| EXPRESSION XOR EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::XOR_INSTRUCTION );
-  }
-| EXPRESSION AND EXPRESSION
-  {
-      $$ = new BinaryExpression( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
-  }
-| NOT EXPRESSION
-  {
-      $$ = new UnaryExpression( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
-  }
-| ATOM
-  {
-      $$ = $1;
-  }
-;
-
-
-FUNCTION_SYNTAX
-: IDENTIFIER
-  {
-      $$ = new FunctionAtom( @$, $1 );
-  }
-| IDENTIFIER LPAREN RPAREN
-  {
-      $$ = new FunctionAtom( @$, $1 );
-  }
-| IDENTIFIER LPAREN EXPRESSION_LIST RPAREN
-  {
-      if( Builtin::isBuiltin( $1 ) )
-      {
-          $$ = new BuiltinAtom( @$, $1, $3 );
-      }
-      else
-      {
-          $$ = new FunctionAtom( @$, $1, $3 );
-      }
-  }
-;
-
-
-SCOPE
-: SEQ_SYNTAX
-  {
-      $$ = $1;
-  }
-| PAR_SYNTAX
-  {
-      $$ = $1;
-  }
-; 
-
-
-RULE_STMT
-: SCOPE
-  {
-      $$ = $1;
-  }
-| SIMPLE_STMT
-  {
-      auto stmts = new AstListNode( @$, NodeType::STATEMENTS );
-      stmts->add( $1 );
-      $$ = new UnaryNode( @$, NodeType::PARBLOCK, stmts );
-  }
-;
-
-
-RULE_SYNTAX
-: RULE IDENTIFIER EQUAL RULE_STMT
-  {
-      $$ = new RuleNode( @$, $4, $2 );
-  }
-| RULE IDENTIFIER LPAREN RPAREN EQUAL RULE_STMT
-  {
-      $$ = new RuleNode( @$, $6, $2 );
-  }
-| RULE IDENTIFIER LPAREN PARAM_LIST RPAREN EQUAL RULE_STMT
-  {
-      $$ = new RuleNode( @$, $7, $2, $4 );
-  }
-| RULE IDENTIFIER DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
-  {
-      std::vector< Type* > tmp;
-      $$ = new RuleNode( @$, $6, $2, tmp, $4 );
-  }
-| RULE IDENTIFIER LPAREN RPAREN DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
-  {
-      std::vector< Type* > tmp;
-      $$ = new RuleNode( @$, $8, $2, tmp, $6 );
-  }
-| RULE IDENTIFIER LPAREN PARAM_LIST RPAREN DUMPS DUMPSPEC_LIST EQUAL RULE_STMT
-  {
-      std::vector< Type* > tmp;
-      $$ = new RuleNode( @$, $9, $2, tmp, $7 );
-  }
-;
-
-
-DUMPSPEC_LIST
-: DUMPSPEC_LIST COMMA DUMPSPEC
-  {
-      $$ = std::move( $1 );
-      $$.push_back( $3 );
-  }
-| DUMPSPEC
-  {
-      $$ = std::vector< std::pair< std::string, std::vector<std::string> > >();
-      $$.push_back( std::move( $1 ) );
-  }
-;
-
-
-DUMPSPEC
-: LPAREN IDENTIFIER_LIST RPAREN ARROW IDENTIFIER
-  {
-      $$ = std::pair< std::string, std::vector< std::string > >( $5, $2 );
-  }
-;
-
-
-SIMPLE_STMT
-: ASSERT_SYNTAX
-  {
-      $$ = $1;
-  }
-| ASSURE_SYNTAX
-  {
-      $$ = $1;
-  }
-| DIEDIE_SYNTAX
-  {
-      $$ = $1;
-  }
-| IMPOSSIBLE_SYNTAX
-  {
-      $$ = $1;
-  }
-| DEBUG_SYNTAX
-  {
-      $$ = $1;
-  }
-| PRINT_SYNTAX
-  {
-      $$ = $1;
-  }
-| UPDATE_SYNTAX
-  {
-      $$ = $1;
-  }
-| CASE_SYNTAX
-  {
-      $$ = $1;
-  }
-| CALL_SYNTAX
-  {
-      $$ = $1;
-  }
-| IFTHENELSE
-  {
-      $$ = $1;
-  }
-| LET_SYNTAX
-  {
-      $$ = $1;
-  }
-| PUSH_SYNTAX
-  {
-      $$ = $1;
-  }
-| POP_SYNTAX
-  {
-      $$ = $1;
-  }
-| FORALL_SYNTAX
-  {
-      $$ = $1;
-  }
-| ITERATE_SYNTAX
-  {
-      $$ = $1;
-  }
-| SKIP
-  {
-      $$ = new AstNode( NodeType::SKIP );
-  }
-| IDENTIFIER
-  {
-      driver.error
-      ( @$
-      , "invalid statement '" + $1 + "' found"
-      , libcasm_fe::Codes::SyntaxErrorInvalidStatement
-      );
-  }
-//   INTERN EXPRESSION_LIST
-//   {
-//       $$ = new AstNode( NodeType::STATEMENT );
-//   }
-//   OBJDUMP "(" IDENTIFIER ")"
-//   {
-//       $$ = new AstNode( NodeType::STATEMENT );
-//   }
-;
-
-
-STATEMENT
-: SCOPE
-  {
-      $$ = $1;
-  }
-| SIMPLE_STMT
-  {
-      $$ = $1;
-  }
-;
-
-
-ASSERT_SYNTAX
-: ASSERT EXPRESSION
-  {
-      $$ = new UnaryNode( @$, NodeType::ASSERT, $2 );
-  }
-;
-
-
-ASSURE_SYNTAX
-: ASSURE EXPRESSION
-  {
-      $$ = new UnaryNode( @$, NodeType::ASSURE, $2 );
-  }
-;
-
-
-DIEDIE_SYNTAX
-: DIEDIE EXPRESSION
-  {
-      $$ = new DiedieNode( @$, $2 );
-  }
-| DIEDIE
-  {
-      $$ = new DiedieNode( @$, nullptr );
-  }
-;
-
-
-/* when symbolic execution:
-    * abort trace
-    * do not write it
-    * no error
-  in concrete mode:
-    * an error like diedie
-*/
-
-IMPOSSIBLE_SYNTAX
-: IMPOSSIBLE
-  {
-      $$ = new AstNode( @$, NodeType::IMPOSSIBLE );
-  }
-;
-
-
-PRINT_SYNTAX
-: PRINT EXPRESSION
-  {
-      $$ = new PrintNode( @$, $2 );
-  }
-;
-
-
-DEBUG_SYNTAX
-: DEBUG IDENTIFIER EXPRESSION
-  {
-      $$ = new PrintNode( @$, $3, $2 );
-  }
-;
-
-
-UPDATE_SYNTAX
-: FUNCTION_SYNTAX UPDATE EXPRESSION
-  {
-      if( $1->node_type_ == NodeType::FUNCTION_ATOM )
-      {
-          $$ = new UpdateNode( @$, reinterpret_cast< FunctionAtom* >( $1 ), $3 );
-      }
-      else
-      {
-          driver.error
-          ( @$
-          , "can only use functions for updates but '"
-            + $1->to_str()
-            + "` is a '"
-            + type_to_str( $1->node_type_ )
-          );
-      }
-  }
-;
-
-
-CASE_SYNTAX
-: CASE EXPRESSION OF LCURPAREN CASE_LABEL_LIST RCURPAREN
-  {
-      $$ = new CaseNode( @$, $2, $5 );
-  }
-;
-
-
-CASE_LABEL_LIST
-: CASE_LABEL CASE_LABEL_LIST
-  {
-      $$ = std::move( $2 );
-      $$.push_back( $1 );
-  }
-| CASE_LABEL
-  {
-      $$ = std::vector< std::pair< AtomNode*, AstNode* > >();
-      $$.push_back( $1 );
-  }
-;
-
-
-CASE_LABEL
-: CASE_VALUE COLON STATEMENT
-  {
-      $$ = std::pair< AtomNode*, AstNode* >( $1, $3 );
-  }
-;
-
-
-CASE_VALUE
-: DEFAULT
-  {
-      $$ = nullptr;
-  }
-| UNDERLINE
-  {
-      // equivalent to 'default' 
-      $$ = nullptr;
-  }
-| UNDEFINED
-  {
-      $$ = $1;
-  }
-| BOOLEAN
-  {
-      $$ = $1;
-  }
-| NUMBER
-  {
-      $$ = $1;
-  }
-| STRCONST
-  {
-      $$ = new StringAtom( @$, std::move( $1 ) );
-  }
-| FUNCTION_SYNTAX
-  {
-      $$ = $1;
-  }
-;
-
-
-CALL_SYNTAX
-: CALL LPAREN EXPRESSION RPAREN LPAREN EXPRESSION_LIST RPAREN
-  {
-      $$ = new CallNode( @$, "", $3, $6 );
-  }
-| CALL LPAREN EXPRESSION RPAREN
-  {
-      $$ = new CallNode( @$, "", $3 );
-  }
-| CALL IDENTIFIER LPAREN EXPRESSION_LIST RPAREN
-  {
-      $$ = new CallNode( @$, $2, nullptr, $4 );
-  }
-| CALL IDENTIFIER
-  {
-      $$ = new CallNode( @$, $2, nullptr );
-  }
-;
-
-
-SEQ_SYNTAX
-: SEQ_BRACKET STATEMENTS ENDSEQ_BRACKET
-  {
-      $$ = new UnaryNode( @$, NodeType::SEQBLOCK, $2 );
-  }
-| SEQ STATEMENTS ENDSEQ
-  {
-      $$ = new UnaryNode( @$, NodeType::SEQBLOCK, $2 );
-  }
-;
-
-
-PAR_SYNTAX
-: LCURPAREN STATEMENTS RCURPAREN
-  {
-      $$ = new UnaryNode( @$, NodeType::PARBLOCK, $2 );
-  }
-| PAR STATEMENTS ENDPAR
-  {
-      $$ = new UnaryNode( @$, NodeType::PARBLOCK, $2 );
-  }
-;
-
-
-STATEMENTS
-: STATEMENTS STATEMENT
-  {
-      $1->add( $2 );
-      $$ = $1;
-  }
-| STATEMENT
-  {
-      $$ = new AstListNode( @$, NodeType::STATEMENTS );
-      $$->add( $1 );
-  }
-;
-
-
-IFTHENELSE
-: IF EXPRESSION THEN STATEMENT
-  {
-      $$ = new IfThenElseNode( @$, $2, $4, nullptr );
-  }
-| IF EXPRESSION THEN STATEMENT ELSE STATEMENT
-  {
-      $$ = new IfThenElseNode( @$, $2, $4, $6 );
-  }
-;
-
-
-
-LET_SYNTAX
-: LET IDENTIFIER EQUAL
-  {
-      auto var = Symbol( $2, @$, Symbol::SymbolType::LET );
       try
       {
-          driver.function_table.add( &var );      
+          const auto value = libstdhl::get< libcasm_ir::StringConstant >( $1 );
+          $$ = Ast::make< ValueAtom >( @$, value );
       }
-      catch( const Exception& e)
+      catch( const std::domain_error& e )
       {
-          driver.error( e );
+          throw syntax_error( @$, e.what() );
       }
   }
-  EXPRESSION IN STATEMENT
+;
+
+
+BitNumber
+: BINARY
   {
-      driver.function_table.remove( $2 );
-      $$ = new LetNode( @$, Type( TypeType::UNKNOWN ), $2, $5, $7 );
-  }
-| LET IDENTIFIER COLON TYPE_SYNTAX EQUAL
-  {
-      auto var = Symbol( $2, @$, Symbol::SymbolType::LET );
       try
       {
-          driver.function_table.add( &var );
+          const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::BINARY );
+          $$ = Ast::make< ValueAtom >( @$, value );
       }
-      catch( const Exception& e)
+      catch( const std::domain_error& e )
       {
-          driver.error( e );
+          throw syntax_error( @$, e.what() );
       }
   }
-  EXPRESSION IN STATEMENT
+| HEXADECIMAL
   {
-      driver.function_table.remove( $2 );
-      $$ = new LetNode( @$, $4, $2, $7, $9 );
-  }
-;
-
-
-PUSH_SYNTAX
-: PUSH EXPRESSION INTO FUNCTION_SYNTAX
-  {
-      if( $4->node_type_ == NodeType::BUILTIN_ATOM )
+      try
       {
-          driver.error( @$, "cannot push to builtin '" + $4->to_str() + "'" );
+          const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::HEXADECIMAL );
+          $$ = Ast::make< ValueAtom >( @$, value );
       }
-      else
+      catch( const std::domain_error& e )
       {
-          $$ = new PushNode( @$, $2, reinterpret_cast< FunctionAtom* >( $4 ) );
+          throw syntax_error( @$, e.what() );
       }
   }
 ;
 
 
-POP_SYNTAX
-: POP FUNCTION_SYNTAX FROM FUNCTION_SYNTAX
+IntegerNumber
+: INTEGER
   {
-      if( $2->node_type_ == NodeType::BUILTIN_ATOM )
+      try
       {
-          driver.error( @$, "cannot pop to builtin '" + $2->to_str() + "'" );
+          const auto value = libstdhl::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
+          $$ = Ast::make< ValueAtom >( @$, value );
       }
-      else if( $4->node_type_ == NodeType::BUILTIN_ATOM )
+      catch( const std::domain_error& e )
       {
-          driver.error( @$, "cannot pop from builtin '" + $4->to_str() + "'" );
-      }
-      else
-      {
-          $$ = new PopNode
-          ( @$
-          , reinterpret_cast< FunctionAtom* >( $2 )
-          , reinterpret_cast< FunctionAtom* >( $4 )
-          );
+          throw syntax_error( @$, e.what() );
       }
   }
 ;
 
 
-FORALL_SYNTAX
-: FORALL IDENTIFIER IN EXPRESSION DO STATEMENT
+FloatingNumber
+: FLOATING
   {
-      $$ = new ForallNode( @$, $2, $4, $6 );
+      try
+      {
+          const auto value = libstdhl::get< libcasm_ir::FloatingConstant >( $1 );
+          $$ = Ast::make< ValueAtom >( @$, value );
+      }
+      catch( const std::domain_error& e )
+      {
+          throw syntax_error( @$, e.what() );
+      }
   }
 ;
 
 
-
-
-ITERATE_SYNTAX
-: ITERATE STATEMENT
+RationalNumber
+: RATIONAL
   {
-      $$ = new UnaryNode( @$, NodeType::ITERATE, $2 );
+      try
+      {
+          const auto value = libstdhl::get< libcasm_ir::RationalConstant >( $1 );
+          $$ = Ast::make< ValueAtom >( @$, value );
+      }
+      catch( const std::domain_error& e )
+      {
+          throw syntax_error( @$, e.what() );
+      }
+  }
+;
+
+
+Reference
+: AT IdentifierPath
+  {
+      $$ = Ast::make< ReferenceAtom >( @$, $2 );
+  }
+;
+
+
+Term
+: DirectCallExpression
+  {
+      $$ = $1;
+  }
+| IndirectCallExpression
+  {
+      $$ = $1;
+  }
+| ConditionalExpression
+  {
+      $$ = $1;
+  }
+| UniversalQuantifierExpression
+  {
+      $$ = $1;
+  }
+| ExistentialQuantifierExpression
+  {
+      $$ = $1;
+  }
+| Expression
+  {
+      $$ = $1;
+  }
+| List
+  {
+      $$ = $1;
+  }
+| Range
+  {
+      $$ = $1;
+  }
+| Atom
+  {
+      $$ = $1;
+  }
+;
+
+
+Expression
+: LPAREN Term RPAREN
+  {
+      $$ = $2;
+  }
+| PLUS Term %prec UPLUS
+  {
+      $$ = $2;
+  }
+| MINUS Term %prec UMINUS
+  {
+      $$ = Ast::make< UnaryExpression >( @$, $2, libcasm_ir::Value::INV_INSTRUCTION );
+  }
+| Term PLUS Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
+  }
+| Term MINUS Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::SUB_INSTRUCTION );
+  }
+| Term ASTERIX Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MUL_INSTRUCTION );
+  }
+| Term SLASH Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
+  }
+| Term PERCENT Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
+  }
+| Term CARET Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::POW_INSTRUCTION );
+  }
+| Term NEQUAL Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
+  }
+| Term EQUAL Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::EQU_INSTRUCTION );
+  }
+| Term LESSER Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LTH_INSTRUCTION );
+  }
+| Term GREATER Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GTH_INSTRUCTION );
+  }
+| Term LESSEQ Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
+  }
+| Term GREATEREQ Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
+  }
+| Term OR Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::OR_INSTRUCTION );
+  }
+| Term XOR Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::XOR_INSTRUCTION );
+  }
+| Term AND Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
+  }
+| Term ARROW Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::IMP_INSTRUCTION );
+  }
+| Term IMPLIES Term
+  {
+      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::IMP_INSTRUCTION );
+  }
+| NOT Term
+  {
+      $$ = Ast::make< UnaryExpression >( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
+  }
+;
+
+
+Range
+: LSQPAREN Term DOTDOT Term RSQPAREN
+  {
+      $$ = Ast::make< RangeExpression >( @$, $2, $4 );
+  }
+;
+
+
+List
+: LSQPAREN RSQPAREN
+  {
+      const auto expressions = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< ListExpression >( @$, expressions );
+  }
+| LSQPAREN Terms RSQPAREN
+  {
+      $$ = Ast::make< ListExpression >( @$, $2 );
+  }
+;
+
+
+Terms
+: Terms COMMA Term
+  {
+      auto expressions = $1;
+      expressions->add( $3 );
+      $$ = expressions;
+  }
+| Term
+  {
+      const auto expressions = Ast::make< Expressions >( @$ );
+      expressions->add( $1 );
+      $$ = expressions;
+  }
+;
+
+
+Arguments
+: LPAREN Terms RPAREN
+  {
+      $$ = $2;
+  }
+| LPAREN RPAREN
+  {
+      const auto expressions = Ast::make< Expressions >( @$ );
+      $$ = expressions;
+  }
+;
+
+
+TwoOrMoreArguments
+: LPAREN Term COMMA Terms RPAREN
+  {
+      const auto expressions = $4;
+      expressions->add( $2 );
+      $$ = expressions;
+  }
+;
+
+
+DirectCallExpression
+: IdentifierPath %prec CALL_WITHOUT_ARGS
+  {
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
+  }
+| IdentifierPath Arguments
+  {
+      $$ = Ast::make< DirectCallExpression >( @$, $1, $2 );
+  }
+;
+
+
+IndirectCallExpression
+: LPAREN ASTERIX Term RPAREN Arguments
+  {
+      $$ = Ast::make< IndirectCallExpression >( @$, $3, $5 );
+  }
+;
+
+
+ConditionalExpression
+: IF Term THEN Term ELSE Term
+  {
+      $$ = Ast::make< ConditionalExpression >( @$, $2, $4, $6 );
+  }
+;
+
+
+UniversalQuantifierExpression
+: FORALL Variable IN Term HOLDS Term
+  {
+      $$ = Ast::make< UniversalQuantifierExpression >( @$, $2, $4, $6 );
+  }
+;
+
+
+ExistentialQuantifierExpression
+: EXISTS Variable IN Term WITH Term
+  {
+      $$ = Ast::make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
+  }
+;
+
+
+RuleDefinition
+: RULE Identifier MaybeParameters EQUAL Rule
+  {
+      $$ = Ast::make< RuleDefinition >( @$, $2, $3, createVoidType( @$ ),
+                                   wrapInBlockRule( $5 ) );
+  }
+| RULE Identifier MaybeParameters MAPS Type EQUAL Rule
+  {
+      $$ = Ast::make< RuleDefinition >( @$, $2, $3, $5,
+                                   wrapInBlockRule( $7 ) );
+  }
+;
+
+
+Rule
+: SkipRule
+  {
+      $$ = $1;
+  }
+| ConditionalRule
+  {
+      $$ = $1;
+  }
+| CaseRule
+  {
+      $$ = $1;
+  }
+| LetRule
+  {
+      $$ = $1;
+  }
+| ForallRule
+  {
+      $$ = $1;
+  }
+| ChooseRule
+  {
+      $$ = $1;
+  }
+| IterateRule
+  {
+      $$ = $1;
+  }
+| BlockRule
+  {
+      $$ = $1;
+  }
+| SequenceRule
+  {
+      $$ = $1;
+  }
+| UpdateRule
+  {
+      $$ = $1;
+  }
+| CallRule
+  {
+      $$ = $1;
+  }
+;
+
+
+Rules
+: Rules Rule
+  {
+      auto rules = $1;
+      rules->add( $2 );
+      $$ = rules;
+  }
+| Rule
+  {
+      auto rules = Ast::make< Rules >( @$ );
+      rules->add( $1 );
+      $$ = rules;
+  }
+;
+
+
+SkipRule
+: SKIP
+  {
+      $$ = Ast::make< SkipRule >( @$ );
+  }
+;
+
+
+ConditionalRule
+: IF Term THEN Rule
+  {
+      $$ = Ast::make< ConditionalRule >( @$, $2, $4 );
+  }
+| IF Term THEN Rule ELSE Rule
+  {
+      $$ = Ast::make< ConditionalRule >( @$, $2, $4, $6 );
+  }
+;
+
+
+CaseRule
+: CASE Term OF LCURPAREN CaseLabels RCURPAREN
+  {
+      $$ = Ast::make< CaseRule >( @$, $2, $5 );
+  }
+;
+
+
+CaseLabel
+: DEFAULT COLON Rule
+  {
+      $$ = Ast::make< DefaultCase >( @$, $3 );
+  }
+| UNDERLINE COLON Rule
+  {
+      $$ = Ast::make< DefaultCase >( @$, $3 );
+  }
+| Term COLON Rule
+  {
+      $$ = Ast::make< ExpressionCase >( @$, $1, $3 );
+  }
+;
+
+
+CaseLabels
+: CaseLabel CaseLabels
+  {
+      auto cases = $2;
+      cases->add( $1 );
+      $$ = cases;
+  }
+| CaseLabel
+  {
+      auto cases = Ast::make< Cases >( @$ );
+      cases->add( $1 );
+      $$ = cases;
+  }
+;
+
+
+LetRule
+: LET Variable EQUAL Term IN Rule
+  {
+      $$ = Ast::make< LetRule >( @$, $2, $4, $6 );
+  }
+;
+
+
+ForallRule
+: FORALL Variable IN Term DO Rule
+  {
+      $$ = Ast::make< ForallRule >( @$, $2, $4, $6 );
+  }
+;
+
+
+ChooseRule
+: CHOOSE Variable IN Term DO Rule
+  {
+      $$ = Ast::make< ChooseRule >( @$, $2, $4, $6 );
+  }
+;
+
+
+IterateRule
+: ITERATE Rule
+  {
+      $$ = Ast::make< IterateRule >( @$, $2 );
+  }
+;
+
+
+BlockRule
+: LCURPAREN Rules RCURPAREN
+  {
+      $$ = Ast::make< BlockRule >( @$, $2 );
+  }
+| PAR Rules ENDPAR
+  {
+      $$ = Ast::make< BlockRule >( @$, $2 );
+  }
+;
+
+
+SequenceRule
+: SEQ_BRACKET Rules ENDSEQ_BRACKET
+  {
+      $$ = Ast::make< SequenceRule >( @$, $2 );
+  }
+| SEQ Rules ENDSEQ
+  {
+      $$ = Ast::make< SequenceRule >( @$, $2 );
+  }
+;
+
+
+UpdateRule
+: DirectCallExpression UPDATE Term
+  {
+      const auto function = $1;
+      function->setTargetType( CallExpression::TargetType::FUNCTION );
+      $$ = Ast::make< UpdateRule >( @$, function, $3 );
+  }
+;
+
+
+CallRule
+: CALL DirectCallExpression
+  {
+      const std::set< CallExpression::TargetType >
+          allowedCallTargetTypes{ CallExpression::TargetType::RULE };
+      $$ = Ast::make< CallRule >( @$, $2, allowedCallTargetTypes );
+  }
+| DirectCallExpression
+  {
+      const std::set< CallExpression::TargetType >
+          allowedCallTargetTypes{ CallExpression::TargetType::DERIVED,
+                                  CallExpression::TargetType::BUILTIN };
+      $$ = Ast::make< CallRule >( @$, $1, allowedCallTargetTypes );
+  }
+| CALL IndirectCallExpression
+  {
+      const std::set< CallExpression::TargetType >
+          allowedCallTargetTypes{ CallExpression::TargetType::RULE };
+      $$ = Ast::make< CallRule >( @$, $2, allowedCallTargetTypes );
+  }
+| IndirectCallExpression
+  {
+      const std::set< CallExpression::TargetType >
+          allowedCallTargetTypes{ CallExpression::TargetType::DERIVED,
+                                  CallExpression::TargetType::BUILTIN };
+      $$ = Ast::make< CallRule >( @$, $1, allowedCallTargetTypes );
+  }
+;
+
+
+Attribute
+: BasicAttribute
+  {
+      $$ = $1;
+  }
+| ExpressionAttribute
+  {
+      $$ = $1;
+  }
+;
+
+
+Attributes
+: Attributes COMMA Attribute
+  {
+      auto attributes = $1;
+      attributes->add( $3 );
+      $$ = attributes;
+  }
+| Attribute
+  {
+      auto attributes = Ast::make< Attributes >( @$ );
+      attributes->add( $1 );
+      $$ = attributes;
+  }
+;
+
+
+BasicAttribute
+: Identifier
+  {
+      $$ = Ast::make< BasicAttribute >( @$, $1 );
+  }
+;
+
+
+ExpressionAttribute
+: Identifier Term
+  {
+      $$ = Ast::make< ExpressionAttribute >( @$, $1, $2 );
   }
 ;
 
 %%
 
-void yy::Parser::error
-( const location_type& l
-, const std::string& m
-)
+void Parser::error( const SourceLocation& location, const std::string& message )
 {
-    if( m.compare( "syntax error, unexpected end of file, expecting CASM" ) == 0 )
-    {
-        i32 pos = (l.begin.line - 1);
-        pos = ( pos > 0 ? pos : 1 );
-        
-        driver.error
-        ( yy::location( yy::position( 0, pos, 1 ) )
-        , m
-        , libcasm_fe::Codes::SyntaxError
-        );
-    }
-    else
-    {
-        driver.error( l, m, libcasm_fe::Codes::SyntaxError );
-    }
+    log.error( {location}, message, Code::SyntaxError );
 }
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -1609,4 +1353,4 @@ void yy::Parser::error
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//

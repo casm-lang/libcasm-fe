@@ -32,7 +32,7 @@
 
 /**
  ** \file GrammarParser.tab.h
- ** Define the yy::parser class.
+ ** Define the libcasm_fe::parser class.
  */
 
 // C++ LALR(1) parser skeleton written by Akim Demaille.
@@ -40,20 +40,23 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 36 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+#line 45 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 
-    #include "cpp/Type.h"
-    
-    #include "src/Ast.h"
-    #include "src/Types.h"
-    #include "src/Driver.h"
-    #include "src/Codes.h"
+    namespace libcasm_fe
+    {
+        class Lexer;
+        class Logger;
+        class SourceLocation;
+    }
 
-    #include "../casm-ir/src/Value.h"
+    #include "src/ast/Specification.h"
 
     using namespace libcasm_fe;
+    using namespace Ast;
 
-#line 57 "GrammarParser.tab.h" // lalr1.cc:377
+    #define YY_NULLPTR nullptr
+
+#line 60 "GrammarParser.tab.h" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -62,7 +65,7 @@
 # include <string>
 # include <vector>
 # include "stack.hh"
-# include "location.hh"
+
 #include <typeinfo>
 #ifndef YYASSERT
 # include <cassert>
@@ -128,9 +131,9 @@
 # define YYDEBUG 1
 #endif
 
-
-namespace yy {
-#line 134 "GrammarParser.tab.h" // lalr1.cc:377
+#line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+namespace libcasm_fe {
+#line 137 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
@@ -297,149 +300,183 @@ namespace yy {
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
-      // SPECIFICATION
-      char dummy1[sizeof(Ast*)];
+      // Attribute
+      char dummy1[sizeof(Attribute::Ptr)];
 
-      // BODY_ELEMENTS
-      // STATEMENTS
-      char dummy2[sizeof(AstListNode*)];
+      // Attributes
+      char dummy2[sizeof(Attributes::Ptr)];
 
-      // BODY_ELEMENT
-      // SCOPE
-      // RULE_STMT
-      // RULE_SYNTAX
-      // SIMPLE_STMT
-      // STATEMENT
-      // IMPOSSIBLE_SYNTAX
-      char dummy3[sizeof(AstNode*)];
+      // BasicAttribute
+      char dummy3[sizeof(BasicAttribute::Ptr)];
 
-      // VALUE
-      // UNDEFINED
-      // BOOLEAN
-      // NUMBER
-      // NUMBER_RANGE
-      // CASE_VALUE
-      char dummy4[sizeof(AtomNode*)];
+      // BasicType
+      char dummy4[sizeof(BasicType::Ptr)];
 
-      // FUNCTION_SYNTAX
-      char dummy5[sizeof(BaseFunctionAtom*)];
+      // BlockRule
+      char dummy5[sizeof(BlockRule::Ptr)];
 
-      // CALL_SYNTAX
-      char dummy6[sizeof(CallNode*)];
+      // CallRule
+      char dummy6[sizeof(CallRule::Ptr)];
 
-      // CASE_SYNTAX
-      char dummy7[sizeof(CaseNode*)];
+      // CaseLabel
+      char dummy7[sizeof(Case::Ptr)];
 
-      // DIEDIE_SYNTAX
-      char dummy8[sizeof(DiedieNode*)];
+      // CaseRule
+      char dummy8[sizeof(CaseRule::Ptr)];
 
-      // ENUM_SYNTAX
-      char dummy9[sizeof(Enum*)];
+      // CaseLabels
+      char dummy9[sizeof(Cases::Ptr)];
 
-      // ATOM
-      // EXPRESSION
-      char dummy10[sizeof(ExpressionBase*)];
+      // ChooseRule
+      char dummy10[sizeof(ChooseRule::Ptr)];
 
-      // "floating"
-      char dummy11[sizeof(FLOATING_T)];
+      // ComposedType
+      char dummy11[sizeof(ComposedType::Ptr)];
 
-      // FLOATING_NUMBER
-      char dummy12[sizeof(FloatingAtom*)];
+      // ConditionalExpression
+      char dummy12[sizeof(ConditionalExpression::Ptr)];
 
-      // FORALL_SYNTAX
-      char dummy13[sizeof(ForallNode*)];
+      // ConditionalRule
+      char dummy13[sizeof(ConditionalRule::Ptr)];
 
-      // DERIVED_SYNTAX
-      // FUNCTION_DEFINITION
-      char dummy14[sizeof(Function*)];
+      // Definition
+      // AttributedDefinition
+      char dummy14[sizeof(Definition::Ptr)];
 
+      // Definitions
+      char dummy15[sizeof(Definitions::Ptr)];
+
+      // DerivedDefinition
+      char dummy16[sizeof(DerivedDefinition::Ptr)];
+
+      // DirectCallExpression
+      char dummy17[sizeof(DirectCallExpression::Ptr)];
+
+      // EnumerationDefinition
+      char dummy18[sizeof(EnumerationDefinition::Ptr)];
+
+      // ExistentialQuantifierExpression
+      char dummy19[sizeof(ExistentialQuantifierExpression::Ptr)];
+
+      // MaybeDefined
+      // Atom
+      // Term
+      // Expression
+      char dummy20[sizeof(Expression::Ptr)];
+
+      // ExpressionAttribute
+      char dummy21[sizeof(ExpressionAttribute::Ptr)];
+
+      // Terms
+      // Arguments
+      // TwoOrMoreArguments
+      char dummy22[sizeof(Expressions::Ptr)];
+
+      // FixedSizedType
+      char dummy23[sizeof(FixedSizedType::Ptr)];
+
+      // ForallRule
+      char dummy24[sizeof(ForallRule::Ptr)];
+
+      // FunctionDefinition
+      // ProgramFunctionDefinition
+      char dummy25[sizeof(FunctionDefinition::Ptr)];
+
+      // Identifier
+      char dummy26[sizeof(Identifier::Ptr)];
+
+      // IdentifierPath
+      char dummy27[sizeof(IdentifierPath::Ptr)];
+
+      // Identifiers
+      // DotSeparatedIdentifiers
+      char dummy28[sizeof(Identifiers::Ptr)];
+
+      // IndirectCallExpression
+      char dummy29[sizeof(IndirectCallExpression::Ptr)];
+
+      // IterateRule
+      char dummy30[sizeof(IterateRule::Ptr)];
+
+      // LetRule
+      char dummy31[sizeof(LetRule::Ptr)];
+
+      // List
+      char dummy32[sizeof(ListExpression::Ptr)];
+
+      // MaybeInitially
+      // Initializers
+      // MaybeInitializers
+      char dummy33[sizeof(NodeList< UpdateRule >::Ptr)];
+
+      // Parameters
+      // MaybeParameters
+      char dummy34[sizeof(NodeList< VariableDefinition >::Ptr)];
+
+      // Range
+      char dummy35[sizeof(RangeExpression::Ptr)];
+
+      // Reference
+      char dummy36[sizeof(ReferenceAtom::Ptr)];
+
+      // RelationType
+      char dummy37[sizeof(RelationType::Ptr)];
+
+      // Rule
+      char dummy38[sizeof(Rule::Ptr)];
+
+      // RuleDefinition
+      char dummy39[sizeof(RuleDefinition::Ptr)];
+
+      // Rules
+      char dummy40[sizeof(Rules::Ptr)];
+
+      // SequenceRule
+      char dummy41[sizeof(SequenceRule::Ptr)];
+
+      // SkipRule
+      char dummy42[sizeof(SkipRule::Ptr)];
+
+      // Specification
+      char dummy43[sizeof(Specification::Ptr)];
+
+      // Type
+      char dummy44[sizeof(Type::Ptr)];
+
+      // FunctionParameters
+      // MaybeFunctionParameters
+      // Types
+      char dummy45[sizeof(Types::Ptr)];
+
+      // Undefined
+      char dummy46[sizeof(UndefAtom::Ptr)];
+
+      // UniversalQuantifierExpression
+      char dummy47[sizeof(UniversalQuantifierExpression::Ptr)];
+
+      // Initializer
+      // UpdateRule
+      char dummy48[sizeof(UpdateRule::Ptr)];
+
+      // Boolean
+      // String
+      // BitNumber
+      // IntegerNumber
+      // FloatingNumber
+      // RationalNumber
+      char dummy49[sizeof(ValueAtom::Ptr)];
+
+      // Variable
+      char dummy50[sizeof(VariableDefinition::Ptr)];
+
+      // "binary"
+      // "hexadecimal"
       // "integer"
-      char dummy15[sizeof(INTEGER_T)];
-
-      // IFTHENELSE
-      char dummy16[sizeof(IfThenElseNode*)];
-
-      // INIT_SYNTAX
-      char dummy17[sizeof(InitNode*)];
-
-      // INTEGER_NUMBER
-      char dummy18[sizeof(IntegerAtom*)];
-
-      // LET_SYNTAX
-      char dummy19[sizeof(LetNode*)];
-
-      // POP_SYNTAX
-      char dummy20[sizeof(PopNode*)];
-
-      // PRINT_SYNTAX
-      // DEBUG_SYNTAX
-      char dummy21[sizeof(PrintNode*)];
-
-      // PUSH_SYNTAX
-      char dummy22[sizeof(PushNode*)];
-
-      // RATIONAL_NUMBER
-      char dummy23[sizeof(RationalAtom*)];
-
-      // HEADER
-      char dummy24[sizeof(SpecificationNode*)];
-
-      // PARAM
-      // TYPE_SYNTAX
-      char dummy25[sizeof(Type*)];
-
-      // ASSERT_SYNTAX
-      // ASSURE_SYNTAX
-      // SEQ_SYNTAX
-      // PAR_SYNTAX
-      // ITERATE_SYNTAX
-      char dummy26[sizeof(UnaryNode*)];
-
-      // INITIALIZER
-      // UPDATE_SYNTAX
-      char dummy27[sizeof(UpdateNode*)];
-
       // "rational"
-      char dummy28[sizeof(rational_t)];
-
-      // CASE_LABEL
-      char dummy29[sizeof(std::pair<AtomNode*, AstNode*>)];
-
-      // DUMPSPEC
-      char dummy30[sizeof(std::pair<std::string, std::vector<std::string>>)];
-
-      // FUNCTION_SIGNATURE
-      char dummy31[sizeof(std::pair<std::vector<Type*>, Type*>)];
-
+      // "floating"
       // "string"
       // "identifier"
-      // RULEREF
-      char dummy32[sizeof(std::string)];
-
-      // LISTCONST
-      // EXPRESSION_LIST
-      // EXPRESSION_LIST_NO_COMMA
-      char dummy33[sizeof(std::vector<ExpressionBase*>*)];
-
-      // PARAM_LIST
-      // PARAM_LIST_NO_COMMA
-      // TYPE_IDENTIFIER_STARLIST
-      // TYPE_SYNTAX_LIST
-      char dummy34[sizeof(std::vector<Type*>)];
-
-      // INITIALIZER_LIST
-      // INITIALIZER_LIST_NO_COMMA
-      char dummy35[sizeof(std::vector<UpdateNode*>)];
-
-      // CASE_LABEL_LIST
-      char dummy36[sizeof(std::vector<std::pair<AtomNode*, AstNode*>>)];
-
-      // DUMPSPEC_LIST
-      char dummy37[sizeof(std::vector<std::pair<std::string, std::vector<std::string>>>)];
-
-      // IDENTIFIER_LIST
-      // IDENTIFIER_LIST_NO_COMMA
-      char dummy38[sizeof(std::vector<std::string>)];
+      char dummy51[sizeof(std::string)];
 };
 
     /// Symbol semantic values.
@@ -448,7 +485,7 @@ namespace yy {
     typedef YYSTYPE semantic_type;
 #endif
     /// Symbol locations.
-    typedef location location_type;
+    typedef SourceLocation location_type;
 
     /// Syntax errors thrown from user actions.
     struct syntax_error : std::runtime_error
@@ -465,84 +502,82 @@ namespace yy {
         END = 0,
         CASM = 258,
         INIT = 259,
-        OPTION = 260,
-        DERIVED = 261,
-        ENUM = 262,
-        RULE = 263,
-        DUMPS = 264,
-        FUNCTION = 265,
-        INITIALLY = 266,
-        DEFINED = 267,
-        SEQ = 268,
-        ENDSEQ = 269,
-        PAR = 270,
-        ENDPAR = 271,
-        ASSERT = 272,
-        ASSURE = 273,
-        DIEDIE = 274,
-        IMPOSSIBLE = 275,
-        SKIP = 276,
-        LET = 277,
-        IN = 278,
-        FORALL = 279,
-        ITERATE = 280,
-        DO = 281,
-        CALL = 282,
-        IF = 283,
-        THEN = 284,
-        ELSE = 285,
-        CASE = 286,
-        OF = 287,
-        DEFAULT = 288,
-        ENDCASE = 289,
-        PRINT = 290,
-        DEBUG = 291,
-        PUSH = 292,
-        INTO = 293,
-        POP = 294,
-        FROM = 295,
-        SELF = 296,
-        UNDEF = 297,
-        FALSE = 298,
-        TRUE = 299,
-        AND = 300,
-        OR = 301,
-        XOR = 302,
-        NOT = 303,
-        PLUS = 304,
-        MINUS = 305,
-        EQUAL = 306,
-        LPAREN = 307,
-        RPAREN = 308,
-        LSQPAREN = 309,
-        RSQPAREN = 310,
-        LCURPAREN = 311,
-        RCURPAREN = 312,
-        DOT = 313,
-        COLON = 314,
-        UNDERLINE = 315,
-        AT = 316,
-        COMMA = 317,
-        LESSER = 318,
-        GREATER = 319,
-        STAR = 320,
-        SLASH = 321,
-        PERCENT = 322,
-        DOTDOT = 323,
-        ARROW = 324,
-        UPDATE = 325,
-        NEQUAL = 326,
-        LESSEQ = 327,
-        GREATEREQ = 328,
-        SEQ_BRACKET = 329,
-        ENDSEQ_BRACKET = 330,
-        FLOATINGCONST = 331,
-        INTEGERCONST = 332,
-        RATIONALCONST = 333,
-        STRCONST = 334,
-        IDENTIFIER = 335,
-        UPLUS = 336,
-        UMINUS = 337
+        DERIVED = 260,
+        ENUM = 261,
+        RULE = 262,
+        FUNCTION = 263,
+        INITIALLY = 264,
+        DEFINED = 265,
+        SEQ = 266,
+        ENDSEQ = 267,
+        PAR = 268,
+        ENDPAR = 269,
+        SKIP = 270,
+        LET = 271,
+        IN = 272,
+        FORALL = 273,
+        CHOOSE = 274,
+        ITERATE = 275,
+        DO = 276,
+        CALL = 277,
+        IF = 278,
+        THEN = 279,
+        ELSE = 280,
+        CASE = 281,
+        OF = 282,
+        DEFAULT = 283,
+        HOLDS = 284,
+        EXISTS = 285,
+        WITH = 286,
+        UNDEF = 287,
+        FALSE = 288,
+        TRUE = 289,
+        AND = 290,
+        OR = 291,
+        XOR = 292,
+        IMPLIES = 293,
+        NOT = 294,
+        PLUS = 295,
+        MINUS = 296,
+        EQUAL = 297,
+        LPAREN = 298,
+        RPAREN = 299,
+        LSQPAREN = 300,
+        RSQPAREN = 301,
+        LCURPAREN = 302,
+        RCURPAREN = 303,
+        COLON = 304,
+        UNDERLINE = 305,
+        AT = 306,
+        COMMA = 307,
+        LESSER = 308,
+        GREATER = 309,
+        ASTERIX = 310,
+        SLASH = 311,
+        PERCENT = 312,
+        CARET = 313,
+        MARK = 314,
+        DOTDOT = 315,
+        DOT = 316,
+        MAPS = 317,
+        ARROW = 318,
+        UPDATE = 319,
+        NEQUAL = 320,
+        LESSEQ = 321,
+        GREATEREQ = 322,
+        SEQ_BRACKET = 323,
+        ENDSEQ_BRACKET = 324,
+        BINARY = 325,
+        HEXADECIMAL = 326,
+        INTEGER = 327,
+        RATIONAL = 328,
+        FLOATING = 329,
+        STRING = 330,
+        IDENTIFIER = 331,
+        ABSOLUTE_PATH = 332,
+        UPLUS = 333,
+        UMINUS = 334,
+        CALL_WITHOUT_ARGS = 335
       };
     };
 
@@ -580,81 +615,107 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Ast* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Attribute::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const AstListNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Attributes::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const AstNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const BasicAttribute::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const AtomNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const BasicType::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const BaseFunctionAtom* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const BlockRule::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const CallNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const CallRule::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const CaseNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Case::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const DiedieNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const CaseRule::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Enum* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Cases::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ExpressionBase* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const FLOATING_T v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ComposedType::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const FloatingAtom* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ForallNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Function* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Definition::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const INTEGER_T v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Definitions::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const IfThenElseNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const DerivedDefinition::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const InitNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const DirectCallExpression::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const IntegerAtom* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const EnumerationDefinition::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const LetNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ExistentialQuantifierExpression::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const PopNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Expression::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const PrintNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ExpressionAttribute::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const PushNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Expressions::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const RationalAtom* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const FixedSizedType::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const SpecificationNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ForallRule::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Type* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const FunctionDefinition::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const UnaryNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Identifier::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const UpdateNode* v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const rational_t v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Identifiers::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::pair<AtomNode*, AstNode*> v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const IndirectCallExpression::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::pair<std::string, std::vector<std::string>> v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const IterateRule::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::pair<std::vector<Type*>, Type*> v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const LetRule::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const ListExpression::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const NodeList< UpdateRule >::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const NodeList< VariableDefinition >::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const RangeExpression::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const ReferenceAtom::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const RelationType::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const Rule::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const Rules::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const SequenceRule::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const SkipRule::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const Specification::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const Type::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const Types::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const UndefAtom::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const ValueAtom::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const std::vector<ExpressionBase*>* v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const std::vector<Type*> v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const std::vector<UpdateNode*> v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const std::vector<std::pair<AtomNode*, AstNode*>> v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const std::vector<std::pair<std::string, std::vector<std::string>>> v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const std::vector<std::string> v, const location_type& l);
 
 
       /// Constructor for symbols with semantic value.
@@ -737,10 +798,6 @@ namespace yy {
 
     static inline
     symbol_type
-    make_OPTION (const location_type& l);
-
-    static inline
-    symbol_type
     make_DERIVED (const location_type& l);
 
     static inline
@@ -750,10 +807,6 @@ namespace yy {
     static inline
     symbol_type
     make_RULE (const location_type& l);
-
-    static inline
-    symbol_type
-    make_DUMPS (const location_type& l);
 
     static inline
     symbol_type
@@ -785,22 +838,6 @@ namespace yy {
 
     static inline
     symbol_type
-    make_ASSERT (const location_type& l);
-
-    static inline
-    symbol_type
-    make_ASSURE (const location_type& l);
-
-    static inline
-    symbol_type
-    make_DIEDIE (const location_type& l);
-
-    static inline
-    symbol_type
-    make_IMPOSSIBLE (const location_type& l);
-
-    static inline
-    symbol_type
     make_SKIP (const location_type& l);
 
     static inline
@@ -814,6 +851,10 @@ namespace yy {
     static inline
     symbol_type
     make_FORALL (const location_type& l);
+
+    static inline
+    symbol_type
+    make_CHOOSE (const location_type& l);
 
     static inline
     symbol_type
@@ -853,35 +894,15 @@ namespace yy {
 
     static inline
     symbol_type
-    make_ENDCASE (const location_type& l);
+    make_HOLDS (const location_type& l);
 
     static inline
     symbol_type
-    make_PRINT (const location_type& l);
+    make_EXISTS (const location_type& l);
 
     static inline
     symbol_type
-    make_DEBUG (const location_type& l);
-
-    static inline
-    symbol_type
-    make_PUSH (const location_type& l);
-
-    static inline
-    symbol_type
-    make_INTO (const location_type& l);
-
-    static inline
-    symbol_type
-    make_POP (const location_type& l);
-
-    static inline
-    symbol_type
-    make_FROM (const location_type& l);
-
-    static inline
-    symbol_type
-    make_SELF (const location_type& l);
+    make_WITH (const location_type& l);
 
     static inline
     symbol_type
@@ -906,6 +927,10 @@ namespace yy {
     static inline
     symbol_type
     make_XOR (const location_type& l);
+
+    static inline
+    symbol_type
+    make_IMPLIES (const location_type& l);
 
     static inline
     symbol_type
@@ -949,10 +974,6 @@ namespace yy {
 
     static inline
     symbol_type
-    make_DOT (const location_type& l);
-
-    static inline
-    symbol_type
     make_COLON (const location_type& l);
 
     static inline
@@ -977,7 +998,7 @@ namespace yy {
 
     static inline
     symbol_type
-    make_STAR (const location_type& l);
+    make_ASTERIX (const location_type& l);
 
     static inline
     symbol_type
@@ -989,7 +1010,23 @@ namespace yy {
 
     static inline
     symbol_type
+    make_CARET (const location_type& l);
+
+    static inline
+    symbol_type
+    make_MARK (const location_type& l);
+
+    static inline
+    symbol_type
     make_DOTDOT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_DOT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_MAPS (const location_type& l);
 
     static inline
     symbol_type
@@ -1021,23 +1058,35 @@ namespace yy {
 
     static inline
     symbol_type
-    make_FLOATINGCONST (const FLOATING_T& v, const location_type& l);
+    make_BINARY (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
-    make_INTEGERCONST (const INTEGER_T& v, const location_type& l);
+    make_HEXADECIMAL (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
-    make_RATIONALCONST (const rational_t& v, const location_type& l);
+    make_INTEGER (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
-    make_STRCONST (const std::string& v, const location_type& l);
+    make_RATIONAL (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_FLOATING (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_STRING (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
     make_IDENTIFIER (const std::string& v, const location_type& l);
+
+    static inline
+    symbol_type
+    make_ABSOLUTE_PATH (const location_type& l);
 
     static inline
     symbol_type
@@ -1047,9 +1096,13 @@ namespace yy {
     symbol_type
     make_UMINUS (const location_type& l);
 
+    static inline
+    symbol_type
+    make_CALL_WITHOUT_ARGS (const location_type& l);
+
 
     /// Build a parser object.
-    Parser (Driver& driver_yyarg);
+    Parser (Logger& log_yyarg, Lexer& lexer_yyarg, const std::string& filePath_yyarg, Specification::Ptr& result_yyarg);
     virtual ~Parser ();
 
     /// Parse.
@@ -1252,17 +1305,20 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1025,     ///< Last index in yytable_.
-      yynnts_ = 67,  ///< Number of nonterminal symbols.
-      yyfinal_ = 4, ///< Termination state number.
+      yylast_ = 1529,     ///< Last index in yytable_.
+      yynnts_ = 70,  ///< Number of nonterminal symbols.
+      yyfinal_ = 17, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 83  ///< Number of tokens.
+      yyntokens_ = 81  ///< Number of tokens.
     };
 
 
     // User arguments.
-    Driver& driver;
+    Logger& log;
+    Lexer& lexer;
+    const std::string& filePath;
+    Specification::Ptr& result;
   };
 
   // Symbol number corresponding to token number t.
@@ -1307,9 +1363,9 @@ namespace yy {
       45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
-      75,    76,    77,    78,    79,    80,    81,    82
+      75,    76,    77,    78,    79,    80
     };
-    const unsigned int user_token_number_max_ = 337;
+    const unsigned int user_token_number_max_ = 335;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -1342,186 +1398,233 @@ namespace yy {
   {
       switch (other.type_get ())
     {
-      case 84: // SPECIFICATION
-        value.copy< Ast* > (other.value);
+      case 147: // Attribute
+        value.copy< Attribute::Ptr > (other.value);
         break;
 
-      case 86: // BODY_ELEMENTS
-      case 141: // STATEMENTS
-        value.copy< AstListNode* > (other.value);
+      case 148: // Attributes
+        value.copy< Attributes::Ptr > (other.value);
         break;
 
-      case 87: // BODY_ELEMENT
-      case 120: // SCOPE
-      case 121: // RULE_STMT
-      case 122: // RULE_SYNTAX
-      case 125: // SIMPLE_STMT
-      case 126: // STATEMENT
-      case 130: // IMPOSSIBLE_SYNTAX
-        value.copy< AstNode* > (other.value);
+      case 149: // BasicAttribute
+        value.copy< BasicAttribute::Ptr > (other.value);
         break;
 
-      case 106: // VALUE
-      case 107: // UNDEFINED
-      case 108: // BOOLEAN
-      case 109: // NUMBER
-      case 114: // NUMBER_RANGE
-      case 137: // CASE_VALUE
-        value.copy< AtomNode* > (other.value);
+      case 105: // BasicType
+        value.copy< BasicType::Ptr > (other.value);
         break;
 
-      case 119: // FUNCTION_SYNTAX
-        value.copy< BaseFunctionAtom* > (other.value);
+      case 143: // BlockRule
+        value.copy< BlockRule::Ptr > (other.value);
         break;
 
-      case 138: // CALL_SYNTAX
-        value.copy< CallNode* > (other.value);
+      case 146: // CallRule
+        value.copy< CallRule::Ptr > (other.value);
         break;
 
-      case 134: // CASE_SYNTAX
-        value.copy< CaseNode* > (other.value);
+      case 137: // CaseLabel
+        value.copy< Case::Ptr > (other.value);
         break;
 
-      case 129: // DIEDIE_SYNTAX
-        value.copy< DiedieNode* > (other.value);
+      case 136: // CaseRule
+        value.copy< CaseRule::Ptr > (other.value);
         break;
 
-      case 90: // ENUM_SYNTAX
-        value.copy< Enum* > (other.value);
+      case 138: // CaseLabels
+        value.copy< Cases::Ptr > (other.value);
         break;
 
-      case 105: // ATOM
-      case 118: // EXPRESSION
-        value.copy< ExpressionBase* > (other.value);
+      case 141: // ChooseRule
+        value.copy< ChooseRule::Ptr > (other.value);
         break;
 
-      case 76: // "floating"
-        value.copy< FLOATING_T > (other.value);
+      case 106: // ComposedType
+        value.copy< ComposedType::Ptr > (other.value);
         break;
 
-      case 111: // FLOATING_NUMBER
-        value.copy< FloatingAtom* > (other.value);
+      case 128: // ConditionalExpression
+        value.copy< ConditionalExpression::Ptr > (other.value);
         break;
 
-      case 148: // FORALL_SYNTAX
-        value.copy< ForallNode* > (other.value);
+      case 135: // ConditionalRule
+        value.copy< ConditionalRule::Ptr > (other.value);
         break;
 
-      case 91: // DERIVED_SYNTAX
-      case 92: // FUNCTION_DEFINITION
-        value.copy< Function* > (other.value);
+      case 83: // Definition
+      case 84: // AttributedDefinition
+        value.copy< Definition::Ptr > (other.value);
         break;
 
-      case 77: // "integer"
-        value.copy< INTEGER_T > (other.value);
+      case 85: // Definitions
+        value.copy< Definitions::Ptr > (other.value);
         break;
 
-      case 142: // IFTHENELSE
-        value.copy< IfThenElseNode* > (other.value);
+      case 95: // DerivedDefinition
+        value.copy< DerivedDefinition::Ptr > (other.value);
         break;
 
-      case 88: // INIT_SYNTAX
-        value.copy< InitNode* > (other.value);
+      case 126: // DirectCallExpression
+        value.copy< DirectCallExpression::Ptr > (other.value);
         break;
 
-      case 110: // INTEGER_NUMBER
-        value.copy< IntegerAtom* > (other.value);
+      case 96: // EnumerationDefinition
+        value.copy< EnumerationDefinition::Ptr > (other.value);
         break;
 
-      case 143: // LET_SYNTAX
-        value.copy< LetNode* > (other.value);
+      case 130: // ExistentialQuantifierExpression
+        value.copy< ExistentialQuantifierExpression::Ptr > (other.value);
         break;
 
-      case 147: // POP_SYNTAX
-        value.copy< PopNode* > (other.value);
+      case 88: // MaybeDefined
+      case 110: // Atom
+      case 119: // Term
+      case 120: // Expression
+        value.copy< Expression::Ptr > (other.value);
         break;
 
-      case 131: // PRINT_SYNTAX
-      case 132: // DEBUG_SYNTAX
-        value.copy< PrintNode* > (other.value);
+      case 150: // ExpressionAttribute
+        value.copy< ExpressionAttribute::Ptr > (other.value);
         break;
 
-      case 146: // PUSH_SYNTAX
-        value.copy< PushNode* > (other.value);
+      case 123: // Terms
+      case 124: // Arguments
+      case 125: // TwoOrMoreArguments
+        value.copy< Expressions::Ptr > (other.value);
         break;
 
-      case 112: // RATIONAL_NUMBER
-        value.copy< RationalAtom* > (other.value);
+      case 108: // FixedSizedType
+        value.copy< FixedSizedType::Ptr > (other.value);
         break;
 
-      case 85: // HEADER
-        value.copy< SpecificationNode* > (other.value);
+      case 140: // ForallRule
+        value.copy< ForallRule::Ptr > (other.value);
         break;
 
-      case 96: // PARAM
-      case 100: // TYPE_SYNTAX
-        value.copy< Type* > (other.value);
+      case 86: // FunctionDefinition
+      case 91: // ProgramFunctionDefinition
+        value.copy< FunctionDefinition::Ptr > (other.value);
         break;
 
-      case 127: // ASSERT_SYNTAX
-      case 128: // ASSURE_SYNTAX
-      case 139: // SEQ_SYNTAX
-      case 140: // PAR_SYNTAX
-      case 149: // ITERATE_SYNTAX
-        value.copy< UnaryNode* > (other.value);
+      case 97: // Identifier
+        value.copy< Identifier::Ptr > (other.value);
         break;
 
-      case 104: // INITIALIZER
-      case 133: // UPDATE_SYNTAX
-        value.copy< UpdateNode* > (other.value);
+      case 100: // IdentifierPath
+        value.copy< IdentifierPath::Ptr > (other.value);
         break;
 
-      case 78: // "rational"
-        value.copy< rational_t > (other.value);
+      case 98: // Identifiers
+      case 99: // DotSeparatedIdentifiers
+        value.copy< Identifiers::Ptr > (other.value);
         break;
 
-      case 136: // CASE_LABEL
-        value.copy< std::pair<AtomNode*, AstNode*> > (other.value);
+      case 127: // IndirectCallExpression
+        value.copy< IndirectCallExpression::Ptr > (other.value);
         break;
 
-      case 124: // DUMPSPEC
-        value.copy< std::pair<std::string, std::vector<std::string>> > (other.value);
+      case 142: // IterateRule
+        value.copy< IterateRule::Ptr > (other.value);
         break;
 
-      case 95: // FUNCTION_SIGNATURE
-        value.copy< std::pair<std::vector<Type*>, Type*> > (other.value);
+      case 139: // LetRule
+        value.copy< LetRule::Ptr > (other.value);
         break;
 
-      case 79: // "string"
-      case 80: // "identifier"
-      case 113: // RULEREF
+      case 122: // List
+        value.copy< ListExpression::Ptr > (other.value);
+        break;
+
+      case 87: // MaybeInitially
+      case 93: // Initializers
+      case 94: // MaybeInitializers
+        value.copy< NodeList< UpdateRule >::Ptr > (other.value);
+        break;
+
+      case 102: // Parameters
+      case 103: // MaybeParameters
+        value.copy< NodeList< VariableDefinition >::Ptr > (other.value);
+        break;
+
+      case 121: // Range
+        value.copy< RangeExpression::Ptr > (other.value);
+        break;
+
+      case 118: // Reference
+        value.copy< ReferenceAtom::Ptr > (other.value);
+        break;
+
+      case 107: // RelationType
+        value.copy< RelationType::Ptr > (other.value);
+        break;
+
+      case 132: // Rule
+        value.copy< Rule::Ptr > (other.value);
+        break;
+
+      case 131: // RuleDefinition
+        value.copy< RuleDefinition::Ptr > (other.value);
+        break;
+
+      case 133: // Rules
+        value.copy< Rules::Ptr > (other.value);
+        break;
+
+      case 144: // SequenceRule
+        value.copy< SequenceRule::Ptr > (other.value);
+        break;
+
+      case 134: // SkipRule
+        value.copy< SkipRule::Ptr > (other.value);
+        break;
+
+      case 82: // Specification
+        value.copy< Specification::Ptr > (other.value);
+        break;
+
+      case 104: // Type
+        value.copy< Type::Ptr > (other.value);
+        break;
+
+      case 89: // FunctionParameters
+      case 90: // MaybeFunctionParameters
+      case 109: // Types
+        value.copy< Types::Ptr > (other.value);
+        break;
+
+      case 111: // Undefined
+        value.copy< UndefAtom::Ptr > (other.value);
+        break;
+
+      case 129: // UniversalQuantifierExpression
+        value.copy< UniversalQuantifierExpression::Ptr > (other.value);
+        break;
+
+      case 92: // Initializer
+      case 145: // UpdateRule
+        value.copy< UpdateRule::Ptr > (other.value);
+        break;
+
+      case 112: // Boolean
+      case 113: // String
+      case 114: // BitNumber
+      case 115: // IntegerNumber
+      case 116: // FloatingNumber
+      case 117: // RationalNumber
+        value.copy< ValueAtom::Ptr > (other.value);
+        break;
+
+      case 101: // Variable
+        value.copy< VariableDefinition::Ptr > (other.value);
+        break;
+
+      case 70: // "binary"
+      case 71: // "hexadecimal"
+      case 72: // "integer"
+      case 73: // "rational"
+      case 74: // "floating"
+      case 75: // "string"
+      case 76: // "identifier"
         value.copy< std::string > (other.value);
-        break;
-
-      case 115: // LISTCONST
-      case 116: // EXPRESSION_LIST
-      case 117: // EXPRESSION_LIST_NO_COMMA
-        value.copy< std::vector<ExpressionBase*>* > (other.value);
-        break;
-
-      case 97: // PARAM_LIST
-      case 98: // PARAM_LIST_NO_COMMA
-      case 99: // TYPE_IDENTIFIER_STARLIST
-      case 101: // TYPE_SYNTAX_LIST
-        value.copy< std::vector<Type*> > (other.value);
-        break;
-
-      case 102: // INITIALIZER_LIST
-      case 103: // INITIALIZER_LIST_NO_COMMA
-        value.copy< std::vector<UpdateNode*> > (other.value);
-        break;
-
-      case 135: // CASE_LABEL_LIST
-        value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (other.value);
-        break;
-
-      case 123: // DUMPSPEC_LIST
-        value.copy< std::vector<std::pair<std::string, std::vector<std::string>>> > (other.value);
-        break;
-
-      case 93: // IDENTIFIER_LIST
-      case 94: // IDENTIFIER_LIST_NO_COMMA
-        value.copy< std::vector<std::string> > (other.value);
         break;
 
       default:
@@ -1541,186 +1644,233 @@ namespace yy {
     (void) v;
       switch (this->type_get ())
     {
-      case 84: // SPECIFICATION
-        value.copy< Ast* > (v);
+      case 147: // Attribute
+        value.copy< Attribute::Ptr > (v);
         break;
 
-      case 86: // BODY_ELEMENTS
-      case 141: // STATEMENTS
-        value.copy< AstListNode* > (v);
+      case 148: // Attributes
+        value.copy< Attributes::Ptr > (v);
         break;
 
-      case 87: // BODY_ELEMENT
-      case 120: // SCOPE
-      case 121: // RULE_STMT
-      case 122: // RULE_SYNTAX
-      case 125: // SIMPLE_STMT
-      case 126: // STATEMENT
-      case 130: // IMPOSSIBLE_SYNTAX
-        value.copy< AstNode* > (v);
+      case 149: // BasicAttribute
+        value.copy< BasicAttribute::Ptr > (v);
         break;
 
-      case 106: // VALUE
-      case 107: // UNDEFINED
-      case 108: // BOOLEAN
-      case 109: // NUMBER
-      case 114: // NUMBER_RANGE
-      case 137: // CASE_VALUE
-        value.copy< AtomNode* > (v);
+      case 105: // BasicType
+        value.copy< BasicType::Ptr > (v);
         break;
 
-      case 119: // FUNCTION_SYNTAX
-        value.copy< BaseFunctionAtom* > (v);
+      case 143: // BlockRule
+        value.copy< BlockRule::Ptr > (v);
         break;
 
-      case 138: // CALL_SYNTAX
-        value.copy< CallNode* > (v);
+      case 146: // CallRule
+        value.copy< CallRule::Ptr > (v);
         break;
 
-      case 134: // CASE_SYNTAX
-        value.copy< CaseNode* > (v);
+      case 137: // CaseLabel
+        value.copy< Case::Ptr > (v);
         break;
 
-      case 129: // DIEDIE_SYNTAX
-        value.copy< DiedieNode* > (v);
+      case 136: // CaseRule
+        value.copy< CaseRule::Ptr > (v);
         break;
 
-      case 90: // ENUM_SYNTAX
-        value.copy< Enum* > (v);
+      case 138: // CaseLabels
+        value.copy< Cases::Ptr > (v);
         break;
 
-      case 105: // ATOM
-      case 118: // EXPRESSION
-        value.copy< ExpressionBase* > (v);
+      case 141: // ChooseRule
+        value.copy< ChooseRule::Ptr > (v);
         break;
 
-      case 76: // "floating"
-        value.copy< FLOATING_T > (v);
+      case 106: // ComposedType
+        value.copy< ComposedType::Ptr > (v);
         break;
 
-      case 111: // FLOATING_NUMBER
-        value.copy< FloatingAtom* > (v);
+      case 128: // ConditionalExpression
+        value.copy< ConditionalExpression::Ptr > (v);
         break;
 
-      case 148: // FORALL_SYNTAX
-        value.copy< ForallNode* > (v);
+      case 135: // ConditionalRule
+        value.copy< ConditionalRule::Ptr > (v);
         break;
 
-      case 91: // DERIVED_SYNTAX
-      case 92: // FUNCTION_DEFINITION
-        value.copy< Function* > (v);
+      case 83: // Definition
+      case 84: // AttributedDefinition
+        value.copy< Definition::Ptr > (v);
         break;
 
-      case 77: // "integer"
-        value.copy< INTEGER_T > (v);
+      case 85: // Definitions
+        value.copy< Definitions::Ptr > (v);
         break;
 
-      case 142: // IFTHENELSE
-        value.copy< IfThenElseNode* > (v);
+      case 95: // DerivedDefinition
+        value.copy< DerivedDefinition::Ptr > (v);
         break;
 
-      case 88: // INIT_SYNTAX
-        value.copy< InitNode* > (v);
+      case 126: // DirectCallExpression
+        value.copy< DirectCallExpression::Ptr > (v);
         break;
 
-      case 110: // INTEGER_NUMBER
-        value.copy< IntegerAtom* > (v);
+      case 96: // EnumerationDefinition
+        value.copy< EnumerationDefinition::Ptr > (v);
         break;
 
-      case 143: // LET_SYNTAX
-        value.copy< LetNode* > (v);
+      case 130: // ExistentialQuantifierExpression
+        value.copy< ExistentialQuantifierExpression::Ptr > (v);
         break;
 
-      case 147: // POP_SYNTAX
-        value.copy< PopNode* > (v);
+      case 88: // MaybeDefined
+      case 110: // Atom
+      case 119: // Term
+      case 120: // Expression
+        value.copy< Expression::Ptr > (v);
         break;
 
-      case 131: // PRINT_SYNTAX
-      case 132: // DEBUG_SYNTAX
-        value.copy< PrintNode* > (v);
+      case 150: // ExpressionAttribute
+        value.copy< ExpressionAttribute::Ptr > (v);
         break;
 
-      case 146: // PUSH_SYNTAX
-        value.copy< PushNode* > (v);
+      case 123: // Terms
+      case 124: // Arguments
+      case 125: // TwoOrMoreArguments
+        value.copy< Expressions::Ptr > (v);
         break;
 
-      case 112: // RATIONAL_NUMBER
-        value.copy< RationalAtom* > (v);
+      case 108: // FixedSizedType
+        value.copy< FixedSizedType::Ptr > (v);
         break;
 
-      case 85: // HEADER
-        value.copy< SpecificationNode* > (v);
+      case 140: // ForallRule
+        value.copy< ForallRule::Ptr > (v);
         break;
 
-      case 96: // PARAM
-      case 100: // TYPE_SYNTAX
-        value.copy< Type* > (v);
+      case 86: // FunctionDefinition
+      case 91: // ProgramFunctionDefinition
+        value.copy< FunctionDefinition::Ptr > (v);
         break;
 
-      case 127: // ASSERT_SYNTAX
-      case 128: // ASSURE_SYNTAX
-      case 139: // SEQ_SYNTAX
-      case 140: // PAR_SYNTAX
-      case 149: // ITERATE_SYNTAX
-        value.copy< UnaryNode* > (v);
+      case 97: // Identifier
+        value.copy< Identifier::Ptr > (v);
         break;
 
-      case 104: // INITIALIZER
-      case 133: // UPDATE_SYNTAX
-        value.copy< UpdateNode* > (v);
+      case 100: // IdentifierPath
+        value.copy< IdentifierPath::Ptr > (v);
         break;
 
-      case 78: // "rational"
-        value.copy< rational_t > (v);
+      case 98: // Identifiers
+      case 99: // DotSeparatedIdentifiers
+        value.copy< Identifiers::Ptr > (v);
         break;
 
-      case 136: // CASE_LABEL
-        value.copy< std::pair<AtomNode*, AstNode*> > (v);
+      case 127: // IndirectCallExpression
+        value.copy< IndirectCallExpression::Ptr > (v);
         break;
 
-      case 124: // DUMPSPEC
-        value.copy< std::pair<std::string, std::vector<std::string>> > (v);
+      case 142: // IterateRule
+        value.copy< IterateRule::Ptr > (v);
         break;
 
-      case 95: // FUNCTION_SIGNATURE
-        value.copy< std::pair<std::vector<Type*>, Type*> > (v);
+      case 139: // LetRule
+        value.copy< LetRule::Ptr > (v);
         break;
 
-      case 79: // "string"
-      case 80: // "identifier"
-      case 113: // RULEREF
+      case 122: // List
+        value.copy< ListExpression::Ptr > (v);
+        break;
+
+      case 87: // MaybeInitially
+      case 93: // Initializers
+      case 94: // MaybeInitializers
+        value.copy< NodeList< UpdateRule >::Ptr > (v);
+        break;
+
+      case 102: // Parameters
+      case 103: // MaybeParameters
+        value.copy< NodeList< VariableDefinition >::Ptr > (v);
+        break;
+
+      case 121: // Range
+        value.copy< RangeExpression::Ptr > (v);
+        break;
+
+      case 118: // Reference
+        value.copy< ReferenceAtom::Ptr > (v);
+        break;
+
+      case 107: // RelationType
+        value.copy< RelationType::Ptr > (v);
+        break;
+
+      case 132: // Rule
+        value.copy< Rule::Ptr > (v);
+        break;
+
+      case 131: // RuleDefinition
+        value.copy< RuleDefinition::Ptr > (v);
+        break;
+
+      case 133: // Rules
+        value.copy< Rules::Ptr > (v);
+        break;
+
+      case 144: // SequenceRule
+        value.copy< SequenceRule::Ptr > (v);
+        break;
+
+      case 134: // SkipRule
+        value.copy< SkipRule::Ptr > (v);
+        break;
+
+      case 82: // Specification
+        value.copy< Specification::Ptr > (v);
+        break;
+
+      case 104: // Type
+        value.copy< Type::Ptr > (v);
+        break;
+
+      case 89: // FunctionParameters
+      case 90: // MaybeFunctionParameters
+      case 109: // Types
+        value.copy< Types::Ptr > (v);
+        break;
+
+      case 111: // Undefined
+        value.copy< UndefAtom::Ptr > (v);
+        break;
+
+      case 129: // UniversalQuantifierExpression
+        value.copy< UniversalQuantifierExpression::Ptr > (v);
+        break;
+
+      case 92: // Initializer
+      case 145: // UpdateRule
+        value.copy< UpdateRule::Ptr > (v);
+        break;
+
+      case 112: // Boolean
+      case 113: // String
+      case 114: // BitNumber
+      case 115: // IntegerNumber
+      case 116: // FloatingNumber
+      case 117: // RationalNumber
+        value.copy< ValueAtom::Ptr > (v);
+        break;
+
+      case 101: // Variable
+        value.copy< VariableDefinition::Ptr > (v);
+        break;
+
+      case 70: // "binary"
+      case 71: // "hexadecimal"
+      case 72: // "integer"
+      case 73: // "rational"
+      case 74: // "floating"
+      case 75: // "string"
+      case 76: // "identifier"
         value.copy< std::string > (v);
-        break;
-
-      case 115: // LISTCONST
-      case 116: // EXPRESSION_LIST
-      case 117: // EXPRESSION_LIST_NO_COMMA
-        value.copy< std::vector<ExpressionBase*>* > (v);
-        break;
-
-      case 97: // PARAM_LIST
-      case 98: // PARAM_LIST_NO_COMMA
-      case 99: // TYPE_IDENTIFIER_STARLIST
-      case 101: // TYPE_SYNTAX_LIST
-        value.copy< std::vector<Type*> > (v);
-        break;
-
-      case 102: // INITIALIZER_LIST
-      case 103: // INITIALIZER_LIST_NO_COMMA
-        value.copy< std::vector<UpdateNode*> > (v);
-        break;
-
-      case 135: // CASE_LABEL_LIST
-        value.copy< std::vector<std::pair<AtomNode*, AstNode*>> > (v);
-        break;
-
-      case 123: // DUMPSPEC_LIST
-        value.copy< std::vector<std::pair<std::string, std::vector<std::string>>> > (v);
-        break;
-
-      case 93: // IDENTIFIER_LIST
-      case 94: // IDENTIFIER_LIST_NO_COMMA
-        value.copy< std::vector<std::string> > (v);
         break;
 
       default:
@@ -1739,217 +1889,350 @@ namespace yy {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Ast* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Attribute::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const AstListNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Attributes::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const AstNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BasicAttribute::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const AtomNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BasicType::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BaseFunctionAtom* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BlockRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CallNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CallRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CaseNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Case::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const DiedieNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CaseRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Enum* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Cases::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExpressionBase* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FLOATING_T v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ComposedType::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FloatingAtom* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ForallNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Function* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Definition::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const INTEGER_T v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Definitions::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IfThenElseNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const DerivedDefinition::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const DirectCallExpression::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IntegerAtom* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const EnumerationDefinition::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LetNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExistentialQuantifierExpression::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PopNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Expression::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PrintNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExpressionAttribute::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const PushNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Expressions::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RationalAtom* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FixedSizedType::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SpecificationNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ForallRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Type* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FunctionDefinition::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UnaryNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Identifier::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UpdateNode* v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const rational_t v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Identifiers::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<AtomNode*, AstNode*> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IndirectCallExpression::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<std::string, std::vector<std::string>> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IterateRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::pair<std::vector<Type*>, Type*> v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LetRule::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ListExpression::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const NodeList< UpdateRule >::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const NodeList< VariableDefinition >::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RangeExpression::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ReferenceAtom::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RelationType::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Rule::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Rules::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SequenceRule::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SkipRule::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Specification::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Type::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Types::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UndefAtom::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ValueAtom::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -1957,48 +2240,6 @@ namespace yy {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<ExpressionBase*>* v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<Type*> v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<UpdateNode*> v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<AtomNode*, AstNode*>> v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::pair<std::string, std::vector<std::string>>> v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::vector<std::string> v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2030,186 +2271,233 @@ namespace yy {
     // Type destructor.
     switch (yytype)
     {
-      case 84: // SPECIFICATION
-        value.template destroy< Ast* > ();
+      case 147: // Attribute
+        value.template destroy< Attribute::Ptr > ();
         break;
 
-      case 86: // BODY_ELEMENTS
-      case 141: // STATEMENTS
-        value.template destroy< AstListNode* > ();
+      case 148: // Attributes
+        value.template destroy< Attributes::Ptr > ();
         break;
 
-      case 87: // BODY_ELEMENT
-      case 120: // SCOPE
-      case 121: // RULE_STMT
-      case 122: // RULE_SYNTAX
-      case 125: // SIMPLE_STMT
-      case 126: // STATEMENT
-      case 130: // IMPOSSIBLE_SYNTAX
-        value.template destroy< AstNode* > ();
+      case 149: // BasicAttribute
+        value.template destroy< BasicAttribute::Ptr > ();
         break;
 
-      case 106: // VALUE
-      case 107: // UNDEFINED
-      case 108: // BOOLEAN
-      case 109: // NUMBER
-      case 114: // NUMBER_RANGE
-      case 137: // CASE_VALUE
-        value.template destroy< AtomNode* > ();
+      case 105: // BasicType
+        value.template destroy< BasicType::Ptr > ();
         break;
 
-      case 119: // FUNCTION_SYNTAX
-        value.template destroy< BaseFunctionAtom* > ();
+      case 143: // BlockRule
+        value.template destroy< BlockRule::Ptr > ();
         break;
 
-      case 138: // CALL_SYNTAX
-        value.template destroy< CallNode* > ();
+      case 146: // CallRule
+        value.template destroy< CallRule::Ptr > ();
         break;
 
-      case 134: // CASE_SYNTAX
-        value.template destroy< CaseNode* > ();
+      case 137: // CaseLabel
+        value.template destroy< Case::Ptr > ();
         break;
 
-      case 129: // DIEDIE_SYNTAX
-        value.template destroy< DiedieNode* > ();
+      case 136: // CaseRule
+        value.template destroy< CaseRule::Ptr > ();
         break;
 
-      case 90: // ENUM_SYNTAX
-        value.template destroy< Enum* > ();
+      case 138: // CaseLabels
+        value.template destroy< Cases::Ptr > ();
         break;
 
-      case 105: // ATOM
-      case 118: // EXPRESSION
-        value.template destroy< ExpressionBase* > ();
+      case 141: // ChooseRule
+        value.template destroy< ChooseRule::Ptr > ();
         break;
 
-      case 76: // "floating"
-        value.template destroy< FLOATING_T > ();
+      case 106: // ComposedType
+        value.template destroy< ComposedType::Ptr > ();
         break;
 
-      case 111: // FLOATING_NUMBER
-        value.template destroy< FloatingAtom* > ();
+      case 128: // ConditionalExpression
+        value.template destroy< ConditionalExpression::Ptr > ();
         break;
 
-      case 148: // FORALL_SYNTAX
-        value.template destroy< ForallNode* > ();
+      case 135: // ConditionalRule
+        value.template destroy< ConditionalRule::Ptr > ();
         break;
 
-      case 91: // DERIVED_SYNTAX
-      case 92: // FUNCTION_DEFINITION
-        value.template destroy< Function* > ();
+      case 83: // Definition
+      case 84: // AttributedDefinition
+        value.template destroy< Definition::Ptr > ();
         break;
 
-      case 77: // "integer"
-        value.template destroy< INTEGER_T > ();
+      case 85: // Definitions
+        value.template destroy< Definitions::Ptr > ();
         break;
 
-      case 142: // IFTHENELSE
-        value.template destroy< IfThenElseNode* > ();
+      case 95: // DerivedDefinition
+        value.template destroy< DerivedDefinition::Ptr > ();
         break;
 
-      case 88: // INIT_SYNTAX
-        value.template destroy< InitNode* > ();
+      case 126: // DirectCallExpression
+        value.template destroy< DirectCallExpression::Ptr > ();
         break;
 
-      case 110: // INTEGER_NUMBER
-        value.template destroy< IntegerAtom* > ();
+      case 96: // EnumerationDefinition
+        value.template destroy< EnumerationDefinition::Ptr > ();
         break;
 
-      case 143: // LET_SYNTAX
-        value.template destroy< LetNode* > ();
+      case 130: // ExistentialQuantifierExpression
+        value.template destroy< ExistentialQuantifierExpression::Ptr > ();
         break;
 
-      case 147: // POP_SYNTAX
-        value.template destroy< PopNode* > ();
+      case 88: // MaybeDefined
+      case 110: // Atom
+      case 119: // Term
+      case 120: // Expression
+        value.template destroy< Expression::Ptr > ();
         break;
 
-      case 131: // PRINT_SYNTAX
-      case 132: // DEBUG_SYNTAX
-        value.template destroy< PrintNode* > ();
+      case 150: // ExpressionAttribute
+        value.template destroy< ExpressionAttribute::Ptr > ();
         break;
 
-      case 146: // PUSH_SYNTAX
-        value.template destroy< PushNode* > ();
+      case 123: // Terms
+      case 124: // Arguments
+      case 125: // TwoOrMoreArguments
+        value.template destroy< Expressions::Ptr > ();
         break;
 
-      case 112: // RATIONAL_NUMBER
-        value.template destroy< RationalAtom* > ();
+      case 108: // FixedSizedType
+        value.template destroy< FixedSizedType::Ptr > ();
         break;
 
-      case 85: // HEADER
-        value.template destroy< SpecificationNode* > ();
+      case 140: // ForallRule
+        value.template destroy< ForallRule::Ptr > ();
         break;
 
-      case 96: // PARAM
-      case 100: // TYPE_SYNTAX
-        value.template destroy< Type* > ();
+      case 86: // FunctionDefinition
+      case 91: // ProgramFunctionDefinition
+        value.template destroy< FunctionDefinition::Ptr > ();
         break;
 
-      case 127: // ASSERT_SYNTAX
-      case 128: // ASSURE_SYNTAX
-      case 139: // SEQ_SYNTAX
-      case 140: // PAR_SYNTAX
-      case 149: // ITERATE_SYNTAX
-        value.template destroy< UnaryNode* > ();
+      case 97: // Identifier
+        value.template destroy< Identifier::Ptr > ();
         break;
 
-      case 104: // INITIALIZER
-      case 133: // UPDATE_SYNTAX
-        value.template destroy< UpdateNode* > ();
+      case 100: // IdentifierPath
+        value.template destroy< IdentifierPath::Ptr > ();
         break;
 
-      case 78: // "rational"
-        value.template destroy< rational_t > ();
+      case 98: // Identifiers
+      case 99: // DotSeparatedIdentifiers
+        value.template destroy< Identifiers::Ptr > ();
         break;
 
-      case 136: // CASE_LABEL
-        value.template destroy< std::pair<AtomNode*, AstNode*> > ();
+      case 127: // IndirectCallExpression
+        value.template destroy< IndirectCallExpression::Ptr > ();
         break;
 
-      case 124: // DUMPSPEC
-        value.template destroy< std::pair<std::string, std::vector<std::string>> > ();
+      case 142: // IterateRule
+        value.template destroy< IterateRule::Ptr > ();
         break;
 
-      case 95: // FUNCTION_SIGNATURE
-        value.template destroy< std::pair<std::vector<Type*>, Type*> > ();
+      case 139: // LetRule
+        value.template destroy< LetRule::Ptr > ();
         break;
 
-      case 79: // "string"
-      case 80: // "identifier"
-      case 113: // RULEREF
+      case 122: // List
+        value.template destroy< ListExpression::Ptr > ();
+        break;
+
+      case 87: // MaybeInitially
+      case 93: // Initializers
+      case 94: // MaybeInitializers
+        value.template destroy< NodeList< UpdateRule >::Ptr > ();
+        break;
+
+      case 102: // Parameters
+      case 103: // MaybeParameters
+        value.template destroy< NodeList< VariableDefinition >::Ptr > ();
+        break;
+
+      case 121: // Range
+        value.template destroy< RangeExpression::Ptr > ();
+        break;
+
+      case 118: // Reference
+        value.template destroy< ReferenceAtom::Ptr > ();
+        break;
+
+      case 107: // RelationType
+        value.template destroy< RelationType::Ptr > ();
+        break;
+
+      case 132: // Rule
+        value.template destroy< Rule::Ptr > ();
+        break;
+
+      case 131: // RuleDefinition
+        value.template destroy< RuleDefinition::Ptr > ();
+        break;
+
+      case 133: // Rules
+        value.template destroy< Rules::Ptr > ();
+        break;
+
+      case 144: // SequenceRule
+        value.template destroy< SequenceRule::Ptr > ();
+        break;
+
+      case 134: // SkipRule
+        value.template destroy< SkipRule::Ptr > ();
+        break;
+
+      case 82: // Specification
+        value.template destroy< Specification::Ptr > ();
+        break;
+
+      case 104: // Type
+        value.template destroy< Type::Ptr > ();
+        break;
+
+      case 89: // FunctionParameters
+      case 90: // MaybeFunctionParameters
+      case 109: // Types
+        value.template destroy< Types::Ptr > ();
+        break;
+
+      case 111: // Undefined
+        value.template destroy< UndefAtom::Ptr > ();
+        break;
+
+      case 129: // UniversalQuantifierExpression
+        value.template destroy< UniversalQuantifierExpression::Ptr > ();
+        break;
+
+      case 92: // Initializer
+      case 145: // UpdateRule
+        value.template destroy< UpdateRule::Ptr > ();
+        break;
+
+      case 112: // Boolean
+      case 113: // String
+      case 114: // BitNumber
+      case 115: // IntegerNumber
+      case 116: // FloatingNumber
+      case 117: // RationalNumber
+        value.template destroy< ValueAtom::Ptr > ();
+        break;
+
+      case 101: // Variable
+        value.template destroy< VariableDefinition::Ptr > ();
+        break;
+
+      case 70: // "binary"
+      case 71: // "hexadecimal"
+      case 72: // "integer"
+      case 73: // "rational"
+      case 74: // "floating"
+      case 75: // "string"
+      case 76: // "identifier"
         value.template destroy< std::string > ();
-        break;
-
-      case 115: // LISTCONST
-      case 116: // EXPRESSION_LIST
-      case 117: // EXPRESSION_LIST_NO_COMMA
-        value.template destroy< std::vector<ExpressionBase*>* > ();
-        break;
-
-      case 97: // PARAM_LIST
-      case 98: // PARAM_LIST_NO_COMMA
-      case 99: // TYPE_IDENTIFIER_STARLIST
-      case 101: // TYPE_SYNTAX_LIST
-        value.template destroy< std::vector<Type*> > ();
-        break;
-
-      case 102: // INITIALIZER_LIST
-      case 103: // INITIALIZER_LIST_NO_COMMA
-        value.template destroy< std::vector<UpdateNode*> > ();
-        break;
-
-      case 135: // CASE_LABEL_LIST
-        value.template destroy< std::vector<std::pair<AtomNode*, AstNode*>> > ();
-        break;
-
-      case 123: // DUMPSPEC_LIST
-        value.template destroy< std::vector<std::pair<std::string, std::vector<std::string>>> > ();
-        break;
-
-      case 93: // IDENTIFIER_LIST
-      case 94: // IDENTIFIER_LIST_NO_COMMA
-        value.template destroy< std::vector<std::string> > ();
         break;
 
       default:
@@ -2235,186 +2523,233 @@ namespace yy {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 84: // SPECIFICATION
-        value.move< Ast* > (s.value);
+      case 147: // Attribute
+        value.move< Attribute::Ptr > (s.value);
         break;
 
-      case 86: // BODY_ELEMENTS
-      case 141: // STATEMENTS
-        value.move< AstListNode* > (s.value);
+      case 148: // Attributes
+        value.move< Attributes::Ptr > (s.value);
         break;
 
-      case 87: // BODY_ELEMENT
-      case 120: // SCOPE
-      case 121: // RULE_STMT
-      case 122: // RULE_SYNTAX
-      case 125: // SIMPLE_STMT
-      case 126: // STATEMENT
-      case 130: // IMPOSSIBLE_SYNTAX
-        value.move< AstNode* > (s.value);
+      case 149: // BasicAttribute
+        value.move< BasicAttribute::Ptr > (s.value);
         break;
 
-      case 106: // VALUE
-      case 107: // UNDEFINED
-      case 108: // BOOLEAN
-      case 109: // NUMBER
-      case 114: // NUMBER_RANGE
-      case 137: // CASE_VALUE
-        value.move< AtomNode* > (s.value);
+      case 105: // BasicType
+        value.move< BasicType::Ptr > (s.value);
         break;
 
-      case 119: // FUNCTION_SYNTAX
-        value.move< BaseFunctionAtom* > (s.value);
+      case 143: // BlockRule
+        value.move< BlockRule::Ptr > (s.value);
         break;
 
-      case 138: // CALL_SYNTAX
-        value.move< CallNode* > (s.value);
+      case 146: // CallRule
+        value.move< CallRule::Ptr > (s.value);
         break;
 
-      case 134: // CASE_SYNTAX
-        value.move< CaseNode* > (s.value);
+      case 137: // CaseLabel
+        value.move< Case::Ptr > (s.value);
         break;
 
-      case 129: // DIEDIE_SYNTAX
-        value.move< DiedieNode* > (s.value);
+      case 136: // CaseRule
+        value.move< CaseRule::Ptr > (s.value);
         break;
 
-      case 90: // ENUM_SYNTAX
-        value.move< Enum* > (s.value);
+      case 138: // CaseLabels
+        value.move< Cases::Ptr > (s.value);
         break;
 
-      case 105: // ATOM
-      case 118: // EXPRESSION
-        value.move< ExpressionBase* > (s.value);
+      case 141: // ChooseRule
+        value.move< ChooseRule::Ptr > (s.value);
         break;
 
-      case 76: // "floating"
-        value.move< FLOATING_T > (s.value);
+      case 106: // ComposedType
+        value.move< ComposedType::Ptr > (s.value);
         break;
 
-      case 111: // FLOATING_NUMBER
-        value.move< FloatingAtom* > (s.value);
+      case 128: // ConditionalExpression
+        value.move< ConditionalExpression::Ptr > (s.value);
         break;
 
-      case 148: // FORALL_SYNTAX
-        value.move< ForallNode* > (s.value);
+      case 135: // ConditionalRule
+        value.move< ConditionalRule::Ptr > (s.value);
         break;
 
-      case 91: // DERIVED_SYNTAX
-      case 92: // FUNCTION_DEFINITION
-        value.move< Function* > (s.value);
+      case 83: // Definition
+      case 84: // AttributedDefinition
+        value.move< Definition::Ptr > (s.value);
         break;
 
-      case 77: // "integer"
-        value.move< INTEGER_T > (s.value);
+      case 85: // Definitions
+        value.move< Definitions::Ptr > (s.value);
         break;
 
-      case 142: // IFTHENELSE
-        value.move< IfThenElseNode* > (s.value);
+      case 95: // DerivedDefinition
+        value.move< DerivedDefinition::Ptr > (s.value);
         break;
 
-      case 88: // INIT_SYNTAX
-        value.move< InitNode* > (s.value);
+      case 126: // DirectCallExpression
+        value.move< DirectCallExpression::Ptr > (s.value);
         break;
 
-      case 110: // INTEGER_NUMBER
-        value.move< IntegerAtom* > (s.value);
+      case 96: // EnumerationDefinition
+        value.move< EnumerationDefinition::Ptr > (s.value);
         break;
 
-      case 143: // LET_SYNTAX
-        value.move< LetNode* > (s.value);
+      case 130: // ExistentialQuantifierExpression
+        value.move< ExistentialQuantifierExpression::Ptr > (s.value);
         break;
 
-      case 147: // POP_SYNTAX
-        value.move< PopNode* > (s.value);
+      case 88: // MaybeDefined
+      case 110: // Atom
+      case 119: // Term
+      case 120: // Expression
+        value.move< Expression::Ptr > (s.value);
         break;
 
-      case 131: // PRINT_SYNTAX
-      case 132: // DEBUG_SYNTAX
-        value.move< PrintNode* > (s.value);
+      case 150: // ExpressionAttribute
+        value.move< ExpressionAttribute::Ptr > (s.value);
         break;
 
-      case 146: // PUSH_SYNTAX
-        value.move< PushNode* > (s.value);
+      case 123: // Terms
+      case 124: // Arguments
+      case 125: // TwoOrMoreArguments
+        value.move< Expressions::Ptr > (s.value);
         break;
 
-      case 112: // RATIONAL_NUMBER
-        value.move< RationalAtom* > (s.value);
+      case 108: // FixedSizedType
+        value.move< FixedSizedType::Ptr > (s.value);
         break;
 
-      case 85: // HEADER
-        value.move< SpecificationNode* > (s.value);
+      case 140: // ForallRule
+        value.move< ForallRule::Ptr > (s.value);
         break;
 
-      case 96: // PARAM
-      case 100: // TYPE_SYNTAX
-        value.move< Type* > (s.value);
+      case 86: // FunctionDefinition
+      case 91: // ProgramFunctionDefinition
+        value.move< FunctionDefinition::Ptr > (s.value);
         break;
 
-      case 127: // ASSERT_SYNTAX
-      case 128: // ASSURE_SYNTAX
-      case 139: // SEQ_SYNTAX
-      case 140: // PAR_SYNTAX
-      case 149: // ITERATE_SYNTAX
-        value.move< UnaryNode* > (s.value);
+      case 97: // Identifier
+        value.move< Identifier::Ptr > (s.value);
         break;
 
-      case 104: // INITIALIZER
-      case 133: // UPDATE_SYNTAX
-        value.move< UpdateNode* > (s.value);
+      case 100: // IdentifierPath
+        value.move< IdentifierPath::Ptr > (s.value);
         break;
 
-      case 78: // "rational"
-        value.move< rational_t > (s.value);
+      case 98: // Identifiers
+      case 99: // DotSeparatedIdentifiers
+        value.move< Identifiers::Ptr > (s.value);
         break;
 
-      case 136: // CASE_LABEL
-        value.move< std::pair<AtomNode*, AstNode*> > (s.value);
+      case 127: // IndirectCallExpression
+        value.move< IndirectCallExpression::Ptr > (s.value);
         break;
 
-      case 124: // DUMPSPEC
-        value.move< std::pair<std::string, std::vector<std::string>> > (s.value);
+      case 142: // IterateRule
+        value.move< IterateRule::Ptr > (s.value);
         break;
 
-      case 95: // FUNCTION_SIGNATURE
-        value.move< std::pair<std::vector<Type*>, Type*> > (s.value);
+      case 139: // LetRule
+        value.move< LetRule::Ptr > (s.value);
         break;
 
-      case 79: // "string"
-      case 80: // "identifier"
-      case 113: // RULEREF
+      case 122: // List
+        value.move< ListExpression::Ptr > (s.value);
+        break;
+
+      case 87: // MaybeInitially
+      case 93: // Initializers
+      case 94: // MaybeInitializers
+        value.move< NodeList< UpdateRule >::Ptr > (s.value);
+        break;
+
+      case 102: // Parameters
+      case 103: // MaybeParameters
+        value.move< NodeList< VariableDefinition >::Ptr > (s.value);
+        break;
+
+      case 121: // Range
+        value.move< RangeExpression::Ptr > (s.value);
+        break;
+
+      case 118: // Reference
+        value.move< ReferenceAtom::Ptr > (s.value);
+        break;
+
+      case 107: // RelationType
+        value.move< RelationType::Ptr > (s.value);
+        break;
+
+      case 132: // Rule
+        value.move< Rule::Ptr > (s.value);
+        break;
+
+      case 131: // RuleDefinition
+        value.move< RuleDefinition::Ptr > (s.value);
+        break;
+
+      case 133: // Rules
+        value.move< Rules::Ptr > (s.value);
+        break;
+
+      case 144: // SequenceRule
+        value.move< SequenceRule::Ptr > (s.value);
+        break;
+
+      case 134: // SkipRule
+        value.move< SkipRule::Ptr > (s.value);
+        break;
+
+      case 82: // Specification
+        value.move< Specification::Ptr > (s.value);
+        break;
+
+      case 104: // Type
+        value.move< Type::Ptr > (s.value);
+        break;
+
+      case 89: // FunctionParameters
+      case 90: // MaybeFunctionParameters
+      case 109: // Types
+        value.move< Types::Ptr > (s.value);
+        break;
+
+      case 111: // Undefined
+        value.move< UndefAtom::Ptr > (s.value);
+        break;
+
+      case 129: // UniversalQuantifierExpression
+        value.move< UniversalQuantifierExpression::Ptr > (s.value);
+        break;
+
+      case 92: // Initializer
+      case 145: // UpdateRule
+        value.move< UpdateRule::Ptr > (s.value);
+        break;
+
+      case 112: // Boolean
+      case 113: // String
+      case 114: // BitNumber
+      case 115: // IntegerNumber
+      case 116: // FloatingNumber
+      case 117: // RationalNumber
+        value.move< ValueAtom::Ptr > (s.value);
+        break;
+
+      case 101: // Variable
+        value.move< VariableDefinition::Ptr > (s.value);
+        break;
+
+      case 70: // "binary"
+      case 71: // "hexadecimal"
+      case 72: // "integer"
+      case 73: // "rational"
+      case 74: // "floating"
+      case 75: // "string"
+      case 76: // "identifier"
         value.move< std::string > (s.value);
-        break;
-
-      case 115: // LISTCONST
-      case 116: // EXPRESSION_LIST
-      case 117: // EXPRESSION_LIST_NO_COMMA
-        value.move< std::vector<ExpressionBase*>* > (s.value);
-        break;
-
-      case 97: // PARAM_LIST
-      case 98: // PARAM_LIST_NO_COMMA
-      case 99: // TYPE_IDENTIFIER_STARLIST
-      case 101: // TYPE_SYNTAX_LIST
-        value.move< std::vector<Type*> > (s.value);
-        break;
-
-      case 102: // INITIALIZER_LIST
-      case 103: // INITIALIZER_LIST_NO_COMMA
-        value.move< std::vector<UpdateNode*> > (s.value);
-        break;
-
-      case 135: // CASE_LABEL_LIST
-        value.move< std::vector<std::pair<AtomNode*, AstNode*>> > (s.value);
-        break;
-
-      case 123: // DUMPSPEC_LIST
-        value.move< std::vector<std::pair<std::string, std::vector<std::string>>> > (s.value);
-        break;
-
-      case 93: // IDENTIFIER_LIST
-      case 94: // IDENTIFIER_LIST_NO_COMMA
-        value.move< std::vector<std::string> > (s.value);
         break;
 
       default:
@@ -2480,7 +2815,7 @@ namespace yy {
      305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
      315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
      325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-     335,   336,   337
+     335
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -2504,12 +2839,6 @@ namespace yy {
   }
 
   Parser::symbol_type
-  Parser::make_OPTION (const location_type& l)
-  {
-    return symbol_type (token::OPTION, l);
-  }
-
-  Parser::symbol_type
   Parser::make_DERIVED (const location_type& l)
   {
     return symbol_type (token::DERIVED, l);
@@ -2525,12 +2854,6 @@ namespace yy {
   Parser::make_RULE (const location_type& l)
   {
     return symbol_type (token::RULE, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_DUMPS (const location_type& l)
-  {
-    return symbol_type (token::DUMPS, l);
   }
 
   Parser::symbol_type
@@ -2576,30 +2899,6 @@ namespace yy {
   }
 
   Parser::symbol_type
-  Parser::make_ASSERT (const location_type& l)
-  {
-    return symbol_type (token::ASSERT, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_ASSURE (const location_type& l)
-  {
-    return symbol_type (token::ASSURE, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_DIEDIE (const location_type& l)
-  {
-    return symbol_type (token::DIEDIE, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_IMPOSSIBLE (const location_type& l)
-  {
-    return symbol_type (token::IMPOSSIBLE, l);
-  }
-
-  Parser::symbol_type
   Parser::make_SKIP (const location_type& l)
   {
     return symbol_type (token::SKIP, l);
@@ -2621,6 +2920,12 @@ namespace yy {
   Parser::make_FORALL (const location_type& l)
   {
     return symbol_type (token::FORALL, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_CHOOSE (const location_type& l)
+  {
+    return symbol_type (token::CHOOSE, l);
   }
 
   Parser::symbol_type
@@ -2678,51 +2983,21 @@ namespace yy {
   }
 
   Parser::symbol_type
-  Parser::make_ENDCASE (const location_type& l)
+  Parser::make_HOLDS (const location_type& l)
   {
-    return symbol_type (token::ENDCASE, l);
+    return symbol_type (token::HOLDS, l);
   }
 
   Parser::symbol_type
-  Parser::make_PRINT (const location_type& l)
+  Parser::make_EXISTS (const location_type& l)
   {
-    return symbol_type (token::PRINT, l);
+    return symbol_type (token::EXISTS, l);
   }
 
   Parser::symbol_type
-  Parser::make_DEBUG (const location_type& l)
+  Parser::make_WITH (const location_type& l)
   {
-    return symbol_type (token::DEBUG, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_PUSH (const location_type& l)
-  {
-    return symbol_type (token::PUSH, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_INTO (const location_type& l)
-  {
-    return symbol_type (token::INTO, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_POP (const location_type& l)
-  {
-    return symbol_type (token::POP, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_FROM (const location_type& l)
-  {
-    return symbol_type (token::FROM, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_SELF (const location_type& l)
-  {
-    return symbol_type (token::SELF, l);
+    return symbol_type (token::WITH, l);
   }
 
   Parser::symbol_type
@@ -2759,6 +3034,12 @@ namespace yy {
   Parser::make_XOR (const location_type& l)
   {
     return symbol_type (token::XOR, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_IMPLIES (const location_type& l)
+  {
+    return symbol_type (token::IMPLIES, l);
   }
 
   Parser::symbol_type
@@ -2822,12 +3103,6 @@ namespace yy {
   }
 
   Parser::symbol_type
-  Parser::make_DOT (const location_type& l)
-  {
-    return symbol_type (token::DOT, l);
-  }
-
-  Parser::symbol_type
   Parser::make_COLON (const location_type& l)
   {
     return symbol_type (token::COLON, l);
@@ -2864,9 +3139,9 @@ namespace yy {
   }
 
   Parser::symbol_type
-  Parser::make_STAR (const location_type& l)
+  Parser::make_ASTERIX (const location_type& l)
   {
-    return symbol_type (token::STAR, l);
+    return symbol_type (token::ASTERIX, l);
   }
 
   Parser::symbol_type
@@ -2882,9 +3157,33 @@ namespace yy {
   }
 
   Parser::symbol_type
+  Parser::make_CARET (const location_type& l)
+  {
+    return symbol_type (token::CARET, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_MARK (const location_type& l)
+  {
+    return symbol_type (token::MARK, l);
+  }
+
+  Parser::symbol_type
   Parser::make_DOTDOT (const location_type& l)
   {
     return symbol_type (token::DOTDOT, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_DOT (const location_type& l)
+  {
+    return symbol_type (token::DOT, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_MAPS (const location_type& l)
+  {
+    return symbol_type (token::MAPS, l);
   }
 
   Parser::symbol_type
@@ -2930,33 +3229,51 @@ namespace yy {
   }
 
   Parser::symbol_type
-  Parser::make_FLOATINGCONST (const FLOATING_T& v, const location_type& l)
+  Parser::make_BINARY (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::FLOATINGCONST, v, l);
+    return symbol_type (token::BINARY, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_INTEGERCONST (const INTEGER_T& v, const location_type& l)
+  Parser::make_HEXADECIMAL (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::INTEGERCONST, v, l);
+    return symbol_type (token::HEXADECIMAL, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_RATIONALCONST (const rational_t& v, const location_type& l)
+  Parser::make_INTEGER (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::RATIONALCONST, v, l);
+    return symbol_type (token::INTEGER, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_STRCONST (const std::string& v, const location_type& l)
+  Parser::make_RATIONAL (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::STRCONST, v, l);
+    return symbol_type (token::RATIONAL, v, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_FLOATING (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::FLOATING, v, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_STRING (const std::string& v, const location_type& l)
+  {
+    return symbol_type (token::STRING, v, l);
   }
 
   Parser::symbol_type
   Parser::make_IDENTIFIER (const std::string& v, const location_type& l)
   {
     return symbol_type (token::IDENTIFIER, v, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_ABSOLUTE_PATH (const location_type& l)
+  {
+    return symbol_type (token::ABSOLUTE_PATH, l);
   }
 
   Parser::symbol_type
@@ -2971,10 +3288,16 @@ namespace yy {
     return symbol_type (token::UMINUS, l);
   }
 
+  Parser::symbol_type
+  Parser::make_CALL_WITHOUT_ARGS (const location_type& l)
+  {
+    return symbol_type (token::CALL_WITHOUT_ARGS, l);
+  }
 
 
-} // yy
-#line 2978 "GrammarParser.tab.h" // lalr1.cc:377
+#line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+} // libcasm_fe
+#line 3301 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

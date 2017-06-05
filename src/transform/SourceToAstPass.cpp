@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -25,15 +25,20 @@
 
 #include "SourceToAstPass.h"
 
-#include "../Driver.h"
+#include "../pass/src/PassRegistry.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassUsage.h"
+#include "../pass/src/analyze/LoadFilePass.h"
+
+#include "../Lexer.h"
+#include "../Logger.h"
+#include "../various/GrammarParser.tab.h"
 
 using namespace libcasm_fe;
 
-extern Driver* global_driver;
-
 char SourceToAstPass::id = 0;
 
-static libpass::PassRegistration< SourceToAstPass > PASS( "Source To AST Pass",
+static libpass::PassRegistration< SourceToAstPass > PASS( "SourceToAstPass",
     "parse the source code and generate an AST", "ast-parse", 0 );
 
 void SourceToAstPass::usage( libpass::PassUsage& pu )
@@ -41,27 +46,36 @@ void SourceToAstPass::usage( libpass::PassUsage& pu )
     pu.require< libpass::LoadFilePass >();
 }
 
-bool SourceToAstPass::run( libpass::PassResult& pr )
+u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
-    auto load_file_pass = pr.result< libpass::LoadFilePass >();
+    Logger log( &id, stream() );
 
-    global_driver = new Driver;
+    const auto data = pr.result< libpass::LoadFilePass >();
+    const auto filePath = data->filename();
+    auto& fileStream = data->stream();
 
-    Ast* node = global_driver->parse( load_file_pass->filename() );
+    Ast::Specification::Ptr specification;
 
-    if( !node )
+    Lexer lexer( log, fileStream, std::cout );
+    lexer.setFileName( filePath );
+
+    Parser parser( log, lexer, filePath, specification );
+    parser.set_debug_level( m_debug );
+
+    if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )
     {
-        // TODO: FIXME: PPA: better error messages,
-        // can be improved with the new libstdhl Verbose support
-
-        std::cerr << "Error parsing file" << std::endl;
-
+        log.error( "could not parse `" + filePath + "´" );
         return false;
     }
 
-    pr.setResult< SourceToAstPass >( libstdhl::make< Data >( node ) );
+    pr.setResult< SourceToAstPass >( libstdhl::make< Data >( specification ) );
 
     return true;
+}
+
+void SourceToAstPass::setDebug( u1 enable )
+{
+    m_debug = enable;
 }
 
 //

@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -28,7 +28,7 @@
 
 namespace libcasm_fe
 {
-    enum class Codes
+    enum class Code
     // --------------------------------------------------------- 0*** ...
     // generic syntax error
     {
@@ -36,20 +36,30 @@ namespace libcasm_fe
         ,
         SyntaxErrorUnrecognizedCharacter = 0x0001,
         SyntaxErrorUnclosedString = 0x0002,
-        SyntaxErrorInvalidStatement = 0x0003
+        SyntaxErrorInvalidStatement = 0x0003,
+        SyntaxErrorUnclosedComment = 0x0004
 
         ,
         IdentifierAlreadyUsed = 0x0010
 
+        // --------------------------------------------------------- 05** ...
+        // symbol resolver errors
+        ,
+        SymbolIsUnknown = 0x0500
+
         // --------------------------------------------------------- f*** ...
         // function errors
         ,
+        FunctionSymbolIsUnknown = 0xf000
+
+        ,
+        FunctionDefinitionAlreadyUsed = 0xf010
+
+        ,
         FunctionAttributeIsInvalid = 0xfa00 // fa** ... function attribute
         ,
-        FunctionAttributeMultipleUseOfStatic = 0xfa01,
-        FunctionAttributeMultipleUseOfSymbolic = 0xfa02,
-        FunctionAttributeMultipleUseOfControlled = 0xfa03,
-        FunctionAttributeControlledAndStaticIsInvalid = 0xfa04
+        FunctionAttributeMultipleUseOfFunctionClassifier = 0xfa01,
+        FunctionAttributeMultipleUseOfSymbolic = 0xfa02
 
         ,
         FunctionDefaultValueInvalidRange = 0xfb01,
@@ -60,7 +70,8 @@ namespace libcasm_fe
         = 0xfe00 // fe** ... function argument
         ,
         FunctionArgumentsInvalidRangeAtUpdate = 0xfe01,
-        FunctionArgumentsInvalidRangeAtInitially = 0xfe02
+        FunctionArgumentsInvalidRangeAtInitially = 0xfe02,
+        FunctionArgumentsInvalidValue = 0xfe03
 
         ,
         FunctionValueInvalidRangeAtUpdate = 0xfd00 // fd** ... function value
@@ -96,25 +107,58 @@ namespace libcasm_fe
         CaseLabelMultipleUseOfDefault = 0x5c00 // 5c** ... case errors
 
         ,
-        AssertInvalidExpression = 0x5a00 // 5a** ... assert errors
+        AssertInvalidExpression = 0x5a00, // 5a** ... assert errors
 
         // --------------------------------------------------------- a*** ...
         // agent errors
-        ,
-        RuleDoesNotExist = 0xa000,
+
+        AgentInitRuleDoesNotExist = 0xa000,
         AgentInitRuleMultipleDefinitions = 0xa001,
-        AgentInitRuleNotDefined = 0xa002
+        AgentInitRuleNotDefined = 0xa002,
+
+        // --------------------------------------------------------- 01** ...
+        // type annotation errors
+
+        TypeAnnotationInvalidComposedTypeName = 0x0100,
 
         // --------------------------------------------------------- 1*** ...
-        // type check errors
-        ,
-        TypeInferenceInvalidLet = 0x1000,
+        // type inference errors
+
+        TypeInferenceFoundNoTypeAnnotation = 0x1000,
+
+        TypeInferenceFoundNoResultType = 0x1100,
+        TypeInferenceFoundMultipleResultTypes = 0x1101,
+        TypeInferenceFoundNoArgumentType = 0x1102,
+
+        TypeInferenceInvalidLetRuleVariableType = 0x1200,
+        TypeInferenceInvalidLetRuleExpressionType = 0x1201,
+        TypeInferenceLetRuleTypesMismatch = 0x1202,
+
+        TypeInferenceInvalidUpdateRuleFunctionType = 0x1200,
+        TypeInferenceInvalidUpdateRuleExpressionType = 0x1201,
+        TypeInferenceUpdateRuleTypesMismatch = 0x1202,
+
+        TypeInferenceBuiltinAsBitInvalid2ndArgumentType = 0x1b00,
+
+        TypeInferenceNotDefinedForExpression = 0x1300,
+
+        TypeInferenceQuantifierUniversalPropositionTypeMismatch = 0x1400,
+        TypeInferenceQuantifierUniversalPredicateTypeMismatch = 0x1401,
+        TypeInferenceQuantifierExistentialPropositionTypeMismatch = 0x1410,
+        TypeInferenceQuantifierExistentialPredicateTypeMismatch = 0x1411,
+
+        TypeInferenceConditionalRuleInvalidConditionType = 0x1500,
+
         TypeInferenceInvalidExpression = 0x1001,
         TypeInferenceInvalidPrint = 0x1002
 
         ,
         TypeInferenceInvalidIfExpression = 0x1003,
         TypeInferenceInvalidForallExpression = 0x1004
+
+        ,
+        TypeInferenceInvalidConditionalExpressionCondition = 0x1005,
+        TypeInferenceInvalidConditionalExpressionPaths = 0x1006
 
         ,
         TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000
@@ -151,6 +195,13 @@ namespace libcasm_fe
         ,
         UpdateSetClash = 0x7000,
         UpdateSetMergeConflict = 0x7001
+
+        // --------------------------------------------------------- 9*** ...
+        // unsorted run-time errors
+        ,
+        ConditionalRuleInvalidCondition = 0x9000,
+        ConditionalExpressionInvalidCondition = 0x9001,
+        QuantifierExpressionInvalidUniverse = 0x9002
 
         // --------------------------------------------------------- fff* ...
         // not categorized errors

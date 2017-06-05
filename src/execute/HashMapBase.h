@@ -2,9 +2,9 @@
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
 //
 //  This file is part of libcasm-fe.
@@ -268,6 +268,12 @@ class HashMapBase
     {
         if( m_buckets )
         {
+            for( auto entry = m_lastEntry; entry != nullptr;
+                 entry = entry->prev )
+            {
+                entry->~Entry();
+            }
+
             delete[] m_buckets;
         }
     }

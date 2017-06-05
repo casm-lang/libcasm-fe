@@ -2,9 +2,9 @@
 #   Copyright (c) 2014-2017 CASM Organization
 #   All rights reserved.
 #
-#   Developed by: Florian Hahn
-#                 Philipp Paulweber
+#   Developed by: Philipp Paulweber
 #                 Emmanuel Pescosta
+#                 Florian Hahn
 #                 https://github.com/casm-lang/libcasm-fe
 #
 #   This file is part of libcasm-fe.
@@ -30,20 +30,24 @@ include .config.mk
 
 LX  = flex
 YC  = bison
-YF  = -Wall
+YF  = -Wall -v
 
-$(OBJ)/src/various/Grammar.org: src/various/Grammar.org
+grammar: $(OBJ)/src/various/GrammarParser.cpp $(OBJ)/src/various/GrammarLexer.cpp
+.PHONY: grammar
+
+%/src/various/Grammar.org: src/various/Grammar.org
 	mkdir -p `dirname $@`
 	cp -f $< $@
 
 src/various/Grammar.org: src/GrammarParser.yy src/GrammarToken.hpp
-	grep -e "^[:|] [alpha]*" $< -B 2 -A 1 | \
+	grep -e "^[:|] [alpha]*" $< -B 1 | \
 		sed "/^  {/d" | \
 		sed "/^  }/d" | \
 		sed "/^--/d"  | \
-		sed "/^\t/d"  > $@
+		sed "/^\t/d"  | \
+		sed "s/^[^:|]/\n&/" > $@
 
-$(OBJ)/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp
+%/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp
 	mkdir -p `dirname $@`
 	cp -f $< $@
 
@@ -55,7 +59,7 @@ src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hpp
 	sed -i "/^{{grammartoken}}/d" obj/$<
 	cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
 
-$(OBJ)/src/various/GrammarLexer.cpp: src/various/GrammarLexer.cpp
+%/src/various/GrammarLexer.cpp: src/various/GrammarLexer.cpp
 	mkdir -p `dirname $@`
 	cp -f $< $@
 
@@ -66,3 +70,4 @@ src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
 	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
 	sed -i "/^{{grammartoken}}/d" obj/$<
 	$(LX) $(LFLAGS) -o $@ obj/$<
+	sed -i "s/#define yyFlexLexer yyFlexLexer//g" $@
