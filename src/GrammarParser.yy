@@ -1273,10 +1273,12 @@ BlockRule
 | LCURPAREN error RCURPAREN // error recovery
   {
       $$ = nullptr;
+      yyerrok;
   }
 | PAR error ENDPAR // error recovery
   {
       $$ = nullptr;
+      yyerrok;
   }
 ;
 
@@ -1293,10 +1295,12 @@ SequenceRule
 | SEQ_BRACKET error ENDSEQ_BRACKET // error recovery
   {
       $$ = nullptr;
+      yyerrok;
   }
 | SEQ error ENDSEQ // error recovery
   {
       $$ = nullptr;
+      yyerrok;
   }
 ;
 
