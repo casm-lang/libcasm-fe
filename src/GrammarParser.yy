@@ -123,6 +123,12 @@
 
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
     {
+        if( rule == nullptr )
+        {
+            // this can happen while recovering from a syntax error
+            return nullptr;
+        }
+
         if( (rule->id() == Node::ID::BLOCK_RULE )
                 or (rule->id() == Node::ID::SEQUENCE_RULE ) )
         {
@@ -1240,6 +1246,14 @@ BlockRule
   {
       $$ = Ast::make< BlockRule >( @$, $2 );
   }
+| LCURPAREN error RCURPAREN
+  {
+      $$ = nullptr;
+  }
+| PAR error ENDPAR
+  {
+      $$ = nullptr;
+  }
 ;
 
 
@@ -1251,6 +1265,14 @@ SequenceRule
 | SEQ Rules ENDSEQ
   {
       $$ = Ast::make< SequenceRule >( @$, $2 );
+  }
+| SEQ_BRACKET error ENDSEQ_BRACKET
+  {
+      $$ = nullptr;
+  }
+| SEQ error ENDSEQ
+  {
+      $$ = nullptr;
   }
 ;
 

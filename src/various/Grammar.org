@@ -267,10 +267,14 @@ IterateRule
 BlockRule
 : LCURPAREN Rules RCURPAREN
 | PAR Rules ENDPAR
+| LCURPAREN error RCURPAREN
+| PAR error ENDPAR
 
 SequenceRule
 : SEQ_BRACKET Rules ENDSEQ_BRACKET
 | SEQ Rules ENDSEQ
+| SEQ_BRACKET error ENDSEQ_BRACKET
+| SEQ error ENDSEQ
 
 UpdateRule
 : DirectCallExpression UPDATE Term
