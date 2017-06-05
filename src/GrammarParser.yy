@@ -887,6 +887,10 @@ Expression
   {
       $$ = $2;
   }
+| LPAREN error RPAREN
+  {
+      $$ = nullptr;
+  }
 | PLUS Term %prec UPLUS
   {
       $$ = $2;

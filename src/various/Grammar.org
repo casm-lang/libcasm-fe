@@ -159,6 +159,7 @@ Term
 
 Expression
 : LPAREN Term RPAREN
+| LPAREN error RPAREN
 | PLUS Term %prec UPLUS
 | MINUS Term %prec UMINUS
 | Term PLUS Term
