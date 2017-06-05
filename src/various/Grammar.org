@@ -242,6 +242,7 @@ ConditionalRule
 
 CaseRule
 : CASE Term OF LCURPAREN CaseLabels RCURPAREN
+| CASE Term OF LCURPAREN error RCURPAREN
 
 CaseLabel
 : DEFAULT COLON Rule

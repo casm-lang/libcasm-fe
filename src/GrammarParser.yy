@@ -1170,6 +1170,10 @@ CaseRule
   {
       $$ = Ast::make< CaseRule >( @$, $2, $5 );
   }
+| CASE Term OF LCURPAREN error RCURPAREN
+  {
+      $$ = nullptr;
+  }
 ;
 
 
