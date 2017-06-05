@@ -292,7 +292,7 @@ Definition
   {
       $$ = $1;
   }
-| error
+| error // error recovery
   {
       $$ = nullptr;
   }
@@ -605,7 +605,7 @@ MaybeParameters
   {
       $$ = $2;
   }
-| LPAREN error RPAREN
+| LPAREN error RPAREN // error recovery
   {
       $$ = nullptr;
   }
@@ -887,7 +887,7 @@ Expression
   {
       $$ = $2;
   }
-| LPAREN error RPAREN
+| LPAREN error RPAREN // error recovery
   {
       $$ = nullptr;
   }
@@ -992,7 +992,7 @@ List
   {
       $$ = Ast::make< ListExpression >( @$, $2 );
   }
-| LSQPAREN error RSQPAREN
+| LSQPAREN error RSQPAREN // error recovery
   {
       $$ = nullptr;
   }
@@ -1020,7 +1020,7 @@ Arguments
   {
       $$ = $2;
   }
-| LPAREN error RPAREN
+| LPAREN error RPAREN // error recovery
   {
       $$ = nullptr;
   }
@@ -1190,7 +1190,7 @@ CaseRule
   {
       $$ = Ast::make< CaseRule >( @$, $2, $5 );
   }
-| CASE Term OF LCURPAREN error RCURPAREN
+| CASE Term OF LCURPAREN error RCURPAREN // error recovery
   {
       $$ = nullptr;
   }
@@ -1270,11 +1270,11 @@ BlockRule
   {
       $$ = Ast::make< BlockRule >( @$, $2 );
   }
-| LCURPAREN error RCURPAREN
+| LCURPAREN error RCURPAREN // error recovery
   {
       $$ = nullptr;
   }
-| PAR error ENDPAR
+| PAR error ENDPAR // error recovery
   {
       $$ = nullptr;
   }
@@ -1290,11 +1290,11 @@ SequenceRule
   {
       $$ = Ast::make< SequenceRule >( @$, $2 );
   }
-| SEQ_BRACKET error ENDSEQ_BRACKET
+| SEQ_BRACKET error ENDSEQ_BRACKET // error recovery
   {
       $$ = nullptr;
   }
-| SEQ error ENDSEQ
+| SEQ error ENDSEQ // error recovery
   {
       $$ = nullptr;
   }

@@ -7,7 +7,7 @@ Definition
 | DerivedDefinition
 | RuleDefinition
 | EnumerationDefinition
-| error
+| error // error recovery
 
 AttributedDefinition
 : LSQPAREN Attributes RSQPAREN Definition
@@ -85,7 +85,7 @@ Parameters
 
 MaybeParameters
 : LPAREN Parameters RPAREN
-| LPAREN error RPAREN
+| LPAREN error RPAREN // error recovery
 | %empty
 
 Type
@@ -159,7 +159,7 @@ Term
 
 Expression
 : LPAREN Term RPAREN
-| LPAREN error RPAREN
+| LPAREN error RPAREN // error recovery
 | PLUS Term %prec UPLUS
 | MINUS Term %prec UMINUS
 | Term PLUS Term
@@ -187,7 +187,7 @@ Range
 List
 : LSQPAREN RSQPAREN
 | LSQPAREN Terms RSQPAREN
-| LSQPAREN error RSQPAREN
+| LSQPAREN error RSQPAREN // error recovery
 
 Terms
 : Terms COMMA Term
@@ -195,7 +195,7 @@ Terms
 
 Arguments
 : LPAREN Terms RPAREN
-| LPAREN error RPAREN
+| LPAREN error RPAREN // error recovery
 | LPAREN RPAREN
 
 TwoOrMoreArguments
@@ -247,7 +247,7 @@ ConditionalRule
 
 CaseRule
 : CASE Term OF LCURPAREN CaseLabels RCURPAREN
-| CASE Term OF LCURPAREN error RCURPAREN
+| CASE Term OF LCURPAREN error RCURPAREN // error recovery
 
 CaseLabel
 : DEFAULT COLON Rule
@@ -273,14 +273,14 @@ IterateRule
 BlockRule
 : LCURPAREN Rules RCURPAREN
 | PAR Rules ENDPAR
-| LCURPAREN error RCURPAREN
-| PAR error ENDPAR
+| LCURPAREN error RCURPAREN // error recovery
+| PAR error ENDPAR // error recovery
 
 SequenceRule
 : SEQ_BRACKET Rules ENDSEQ_BRACKET
 | SEQ Rules ENDSEQ
-| SEQ_BRACKET error ENDSEQ_BRACKET
-| SEQ error ENDSEQ
+| SEQ_BRACKET error ENDSEQ_BRACKET // error recovery
+| SEQ error ENDSEQ // error recovery
 
 UpdateRule
 : DirectCallExpression UPDATE Term
