@@ -605,6 +605,10 @@ MaybeParameters
   {
       $$ = $2;
   }
+| LPAREN error RPAREN
+  {
+      $$ = nullptr;
+  }
 | %empty
   {
       $$ = Ast::make< NodeList< VariableDefinition > >( @$ );

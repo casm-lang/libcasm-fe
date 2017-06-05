@@ -85,6 +85,7 @@ Parameters
 
 MaybeParameters
 : LPAREN Parameters RPAREN
+| LPAREN error RPAREN
 | %empty
 
 Type
