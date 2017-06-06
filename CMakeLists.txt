@@ -80,6 +80,7 @@ set( CXX_UTS_FILES
   #uts/numeric/expression_evaluation.cpp
   #uts/symbolic/expression_evaluation.cpp
   uts/updateset/manager.cpp
+  uts/updateset/updateset.cpp
 )
 
 
