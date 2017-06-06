@@ -75,7 +75,12 @@ set( CXX_SRC_FILES
   src/various/GrammarLexer.cpp
 )
 
-file( GLOB_RECURSE CXX_UTS_FILES "uts/*.cpp" )
+set( CXX_UTS_FILES
+  uts/main.cpp
+  uts/numeric/expression_evaluation.cpp
+  uts/symbolic/expression_evaluation.cpp
+  uts/updateset/manager.cpp
+)
 
 
 set( TARGET casm-fe )
