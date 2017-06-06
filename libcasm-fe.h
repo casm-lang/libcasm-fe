@@ -36,6 +36,7 @@
 
 #include "src/transform/AstToCasmIRPass.h"
 #include "src/transform/AstDumpDotPass.h"
+#include "src/transform/AstDumpSourcePass.h"
 #include "src/transform/SourceToAstPass.h"
 
 namespace libcasm_fe
