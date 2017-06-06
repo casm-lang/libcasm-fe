@@ -79,8 +79,8 @@ set( CXX_UTS_FILES
   uts/main.cpp
   #uts/numeric/expression_evaluation.cpp
   #uts/symbolic/expression_evaluation.cpp
-  uts/updateset/manager.cpp
-  uts/updateset/updateset.cpp
+  uts/updateset/UpdateSetManagerTest.cpp
+  uts/updateset/UpdateSetTest.cpp
 )
 
 
