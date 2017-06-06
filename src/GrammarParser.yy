@@ -50,7 +50,7 @@
         class SourceLocation;
     }
 
-    #include "src/ast/Specification.h"
+    #include "ast/Specification.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
@@ -65,10 +65,10 @@
 
 %code
 {
-    #include "src/SourceLocation.h"
-    #include "src/Lexer.h"
-    #include "src/Exceptions.h"
-    #include "src/Logger.h"
+    #include "SourceLocation.h"
+    #include "Lexer.h"
+    #include "Exceptions.h"
+    #include "Logger.h"
 
     #include "../stdhl/cpp/Type.h"
 

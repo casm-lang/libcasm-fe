@@ -88,7 +88,7 @@ project( ${TARGET} )
 
 
 include_directories(
-  .
+  src
   src/various
   ${LIBS}/gtest/googletest
   ${LIBS}/gtest/googletest/include

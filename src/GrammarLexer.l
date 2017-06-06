@@ -23,11 +23,11 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#include "src/Lexer.h"
+#include "Lexer.h"
 
-#include "src/Codes.h"
-#include "src/Logger.h"
-#include "src/SourceLocation.h"
+#include "Codes.h"
+#include "Logger.h"
+#include "SourceLocation.h"
 
 using namespace libcasm_fe;
 

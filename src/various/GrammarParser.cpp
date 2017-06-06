@@ -51,10 +51,10 @@
 // Unqualified %code blocks.
 #line 67 "../../obj/src/GrammarParser.yy" // lalr1.cc:413
 
-    #include "src/SourceLocation.h"
-    #include "src/Lexer.h"
-    #include "src/Exceptions.h"
-    #include "src/Logger.h"
+    #include "SourceLocation.h"
+    #include "Lexer.h"
+    #include "Exceptions.h"
+    #include "Logger.h"
 
     #include "../stdhl/cpp/Type.h"
 

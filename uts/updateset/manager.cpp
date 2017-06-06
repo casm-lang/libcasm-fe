@@ -27,7 +27,7 @@
 
 #include <memory>
 
-#include "../src/execute/UpdateSet.h"
+#include "execute/UpdateSet.h"
 
 using namespace libcasm_fe;
 

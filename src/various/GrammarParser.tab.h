@@ -49,7 +49,7 @@
         class SourceLocation;
     }
 
-    #include "src/ast/Specification.h"
+    #include "ast/Specification.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
