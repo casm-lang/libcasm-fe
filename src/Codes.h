@@ -45,7 +45,8 @@ namespace libcasm_fe
         // --------------------------------------------------------- 05** ...
         // symbol resolver errors
         ,
-        SymbolIsUnknown = 0x0500
+        SymbolIsUnknown = 0x0500,
+        UpdateRuleFunctionSymbolIsInvalid = 0x0501
 
         // --------------------------------------------------------- f*** ...
         // function errors
