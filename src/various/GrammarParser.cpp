@@ -53,7 +53,7 @@
 
     #include "SourceLocation.h"
     #include "Lexer.h"
-    #include "Exceptions.h"
+    #include "Exception.h"
     #include "Logger.h"
 
     #include "../stdhl/cpp/Type.h"

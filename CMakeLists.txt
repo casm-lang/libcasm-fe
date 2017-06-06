@@ -43,7 +43,7 @@ foreach( DEPENDENCY
 endforeach()
 
 set( CXX_SRC_FILES
-  src/Exceptions.cpp
+  src/Exception.cpp
   src/Logger.cpp
   src/Namespace.cpp
 

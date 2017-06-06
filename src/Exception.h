@@ -23,8 +23,8 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_EXCEPTIONS_H_
-#define _LIB_CASMFE_EXCEPTIONS_H_
+#ifndef _LIB_CASMFE_EXCEPTION_H_
+#define _LIB_CASMFE_EXCEPTION_H_
 
 #include <exception>
 #include <string>
@@ -75,7 +75,7 @@ namespace libcasm_fe
     };
 }
 
-#endif // _LIB_CASMFE_EXCEPTIONS_H_
+#endif // _LIB_CASMFE_EXCEPTION_H_
 
 //
 //  Local variables:

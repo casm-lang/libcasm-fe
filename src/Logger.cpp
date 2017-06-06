@@ -25,7 +25,7 @@
 
 #include "Logger.h"
 
-#include "Exceptions.h"
+#include "Exception.h"
 #include "SourceLocation.h"
 
 #include "../stdhl/cpp/String.h"

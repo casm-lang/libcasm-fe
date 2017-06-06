@@ -23,7 +23,7 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "Exceptions.h"
+#include "Exception.h"
 
 using namespace libcasm_fe;
 

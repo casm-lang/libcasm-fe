@@ -41,7 +41,7 @@
 
 #include "../casm-rt/src/Value.h"
 
-#include "../Exceptions.h"
+#include "../Exception.h"
 #include "../Logger.h"
 #include "../analyze/ConsistencyCheckPass.h"
 #include "../ast/EmptyVisitor.h"

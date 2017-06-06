@@ -29,7 +29,7 @@
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
-#include "../Exceptions.h"
+#include "../Exception.h"
 #include "../Logger.h"
 #include "../Namespace.h"
 #include "../analyze/TypeInferencePass.h"
