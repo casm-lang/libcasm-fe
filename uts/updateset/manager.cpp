@@ -56,7 +56,7 @@ protected:
 TEST_F( UpdateSetManagerTest,
     lookupShouldReturnEmptyOptionalWhenNoUpdateSetExists )
 {
-    // EXPECT_FALSE( manager->lookup( 42UL ).has_value() );
+    EXPECT_THROW( manager->lookup( 42UL ).value(), std::experimental::bad_optional_access );
 }
 
 TEST_F( UpdateSetManagerTest, forkAndMerge )
