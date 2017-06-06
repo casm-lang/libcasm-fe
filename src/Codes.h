@@ -141,6 +141,7 @@ namespace libcasm_fe
         TypeInferenceBuiltinAsBitInvalid2ndArgumentType = 0x1b00,
 
         TypeInferenceNotDefinedForExpression = 0x1300,
+        TypeInferenceArgumentTypeMismatch = 0x1301,
 
         TypeInferenceQuantifierUniversalPropositionTypeMismatch = 0x1400,
         TypeInferenceQuantifierUniversalPredicateTypeMismatch = 0x1401,

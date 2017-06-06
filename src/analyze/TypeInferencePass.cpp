@@ -35,6 +35,7 @@
 #include "../stdhl/cpp/String.h"
 
 #include "../casm-ir/src/Builtin.h"
+#include "../casm-ir/src/Exception.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -858,6 +859,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
                 node.setType( type );
             }
+
             break;
         }
         case CallExpression::TargetType::DERIVED:
@@ -973,6 +975,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             {
                 if( argument->type() )
                 {
+                    if( call_type_args[ pos ]->isInteger()
+                        and argument->type()->result().isInteger() )
+                    {
+                        continue;
+                    }
+
                     if( *call_type_args[ pos ] != argument->type()->result() )
                     {
                         m_log.error( { argument->sourceLocation() },
@@ -1629,10 +1637,14 @@ void TypeInferenceVisitor::inference( const std::string& description,
         {
             inferedType = annotation->inference( argTypes, {} );
         }
-        catch( const std::invalid_argument& e )
+        catch( const libcasm_ir::TypeArgumentException& e )
         {
-            m_log.debug( { node.sourceLocation() },
-                "INFERENCE: " + description + ": " + e.what() );
+            m_log.error( { arguments[ e.position() ]->sourceLocation() },
+                "type mismatch: " + description + " argument type at position "
+                    + std::to_string( e.position() + 1 )
+                    + ": "
+                    + e.what(),
+                Code::TypeInferenceArgumentTypeMismatch );
             return;
         }
         catch( const std::domain_error& e )
