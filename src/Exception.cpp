@@ -63,7 +63,7 @@ Exception::Exception( const std::vector< SourceLocation >& locations,
 {
 }
 
-const char* Exception::what() const noexcept
+const char* Exception::what( void ) const noexcept
 {
     return m_msg.c_str();
 }

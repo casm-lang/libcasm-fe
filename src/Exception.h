@@ -49,7 +49,7 @@ namespace libcasm_fe
             const std::string& msg, const std::vector< std::string >& backtrace,
             Code errorCode );
 
-        const char* what() const noexcept override;
+        const char* what( void ) const noexcept override;
 
         const std::vector< SourceLocation >& locations( void ) const noexcept;
 
