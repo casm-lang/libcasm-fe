@@ -23,17 +23,30 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_CASMFE_H_
-#define _LIB_CASMFE_CASMFE_H_
+#ifndef _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
+#define _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
+
+#include "../analyze/SymbolResolverPass.h"
 
 namespace libcasm_fe
 {
-    class CasmFE
+    /**
+     * @brief Type inference pass of AST
+     */
+    class TypeInferencePass final : public libpass::Pass
     {
+      public:
+        static char id;
+
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
+
+        using Data = SymbolResolverPass::Data;
     };
 }
 
-#endif // _LIB_CASMFE_CASMFE_H_
+#endif // _LIB_CASMFE_TYPE_INFERENCE_PASS_H_
 
 //
 //  Local variables:

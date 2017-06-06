@@ -39,7 +39,7 @@ namespace libcasm_fe
         class EnumerationDefinition;
 
         class ValueAtom;
-        class RuleReferenceAtom;
+        class ReferenceAtom;
         class UndefAtom;
         class DirectCallExpression;
         class IndirectCallExpression;
@@ -56,6 +56,7 @@ namespace libcasm_fe
         class CaseRule;
         class LetRule;
         class ForallRule;
+        class ChooseRule;
         class IterateRule;
         class BlockRule;
         class SequenceRule;
@@ -66,12 +67,13 @@ namespace libcasm_fe
         class BasicType;
         class ComposedType;
         class FixedSizedType;
-        class RangedType;
+        class RelationType;
 
         class BasicAttribute;
         class ExpressionAttribute;
 
-        class IdentifierNode;
+        class Identifier;
+        class IdentifierPath;
         class ExpressionCase;
         class DefaultCase;
 
@@ -92,7 +94,7 @@ namespace libcasm_fe
             virtual void visit( EnumerationDefinition& node ) = 0;
 
             virtual void visit( ValueAtom& node ) = 0;
-            virtual void visit( RuleReferenceAtom& node ) = 0;
+            virtual void visit( ReferenceAtom& node ) = 0;
             virtual void visit( UndefAtom& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( IndirectCallExpression& node ) = 0;
@@ -109,6 +111,7 @@ namespace libcasm_fe
             virtual void visit( CaseRule& node ) = 0;
             virtual void visit( LetRule& node ) = 0;
             virtual void visit( ForallRule& node ) = 0;
+            virtual void visit( ChooseRule& node ) = 0;
             virtual void visit( IterateRule& node ) = 0;
             virtual void visit( BlockRule& node ) = 0;
             virtual void visit( SequenceRule& node ) = 0;
@@ -119,12 +122,13 @@ namespace libcasm_fe
             virtual void visit( BasicType& node ) = 0;
             virtual void visit( ComposedType& node ) = 0;
             virtual void visit( FixedSizedType& node ) = 0;
-            virtual void visit( RangedType& node ) = 0;
+            virtual void visit( RelationType& node ) = 0;
 
             virtual void visit( BasicAttribute& node ) = 0;
             virtual void visit( ExpressionAttribute& node ) = 0;
 
-            virtual void visit( IdentifierNode& node ) = 0;
+            virtual void visit( Identifier& node ) = 0;
+            virtual void visit( IdentifierPath& node ) = 0;
             virtual void visit( ExpressionCase& node ) = 0;
             virtual void visit( DefaultCase& node ) = 0;
         };

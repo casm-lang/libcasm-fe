@@ -7,6 +7,7 @@ Definition
 | DerivedDefinition
 | RuleDefinition
 | EnumerationDefinition
+| error // error recovery
 
 AttributedDefinition
 : LSQPAREN Attributes RSQPAREN Definition
@@ -17,7 +18,7 @@ Definitions
 | AttributedDefinition
 
 FunctionDefinition
-: FUNCTION MaybeFunctionAttributes Identifier COLON MaybeFunctionParameters ARROW Type MaybeDefined MaybeInitially
+: FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
 | ProgramFunctionDefinition
 
 MaybeInitially
@@ -36,18 +37,14 @@ MaybeFunctionParameters
 : FunctionParameters
 | %empty
 
-MaybeFunctionAttributes
-: LPAREN MaybeIdentifiers RPAREN
-| %empty
-
 ProgramFunctionDefinition
-: INIT Identifier
+: INIT IdentifierPath
 | INIT LCURPAREN MaybeInitializers RCURPAREN
 
 Initializer
 : Term
-| Term ARROW Term
-| Arguments ARROW Term
+| Term MAPS Term
+| TwoOrMoreArguments MAPS Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
 
 Initializers
 : Initializers COMMA Initializer
@@ -58,7 +55,7 @@ MaybeInitializers
 | %empty
 
 DerivedDefinition
-: DERIVED Identifier MaybeParameters ARROW Type EQUAL Term
+: DERIVED Identifier MaybeParameters MAPS Type EQUAL Term
 
 EnumerationDefinition
 : ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
@@ -70,9 +67,13 @@ Identifiers
 : Identifiers COMMA Identifier
 | Identifier
 
-MaybeIdentifiers
-: Identifiers
-| %empty
+DotSeparatedIdentifiers
+: DotSeparatedIdentifiers DOT Identifier
+| Identifier
+
+IdentifierPath
+: DotSeparatedIdentifiers %prec ABSOLUTE_PATH
+| DOT DotSeparatedIdentifiers
 
 Variable
 : Identifier COLON Type
@@ -84,32 +85,33 @@ Parameters
 
 MaybeParameters
 : LPAREN Parameters RPAREN
+| LPAREN error RPAREN // error recovery
 | %empty
 
 Type
 : BasicType
 | ComposedType
+| RelationType
 | FixedSizedType
-| RangedType
 
 BasicType
-: Identifier
+: IdentifierPath
 
 ComposedType
-: Identifier LPAREN Types RPAREN
+: IdentifierPath LESSER Types GREATER
+
+RelationType
+: IdentifierPath LESSER MaybeFunctionParameters MAPS Type GREATER
 
 FixedSizedType
-: Identifier LESSER Term GREATER
-
-RangedType
-: Identifier LESSER Term DOTDOT Term GREATER
+: IdentifierPath MARK Term
 
 Types
 : Types COMMA Type
 | Type
 
 Atom
-: RuleReference
+: Reference
 | BitNumber
 | IntegerNumber
 | FloatingNumber
@@ -141,8 +143,8 @@ FloatingNumber
 RationalNumber
 : RATIONAL
 
-RuleReference
-: AT IDENTIFIER
+Reference
+: AT IdentifierPath
 
 Term
 : DirectCallExpression
@@ -156,9 +158,9 @@ Term
 | Atom
 
 Expression
-: LPAREN Expression RPAREN
+: LPAREN Term RPAREN
+| LPAREN error RPAREN // error recovery
 | PLUS Term %prec UPLUS
-| LPAREN Term RPAREN
 | MINUS Term %prec UMINUS
 | Term PLUS Term
 | Term MINUS Term
@@ -175,6 +177,7 @@ Expression
 | Term OR Term
 | Term XOR Term
 | Term AND Term
+| Term ARROW Term
 | Term IMPLIES Term
 | NOT Term
 
@@ -183,8 +186,8 @@ Range
 
 List
 : LSQPAREN RSQPAREN
-| LSQPAREN Term RSQPAREN
 | LSQPAREN Terms RSQPAREN
+| LSQPAREN error RSQPAREN // error recovery
 
 Terms
 : Terms COMMA Term
@@ -192,11 +195,15 @@ Terms
 
 Arguments
 : LPAREN Terms RPAREN
+| LPAREN error RPAREN // error recovery
 | LPAREN RPAREN
 
+TwoOrMoreArguments
+: LPAREN Term COMMA Terms RPAREN
+
 DirectCallExpression
-: Identifier
-| Identifier Arguments
+: IdentifierPath %prec CALL_WITHOUT_ARGS
+| IdentifierPath Arguments
 
 IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
@@ -212,7 +219,7 @@ ExistentialQuantifierExpression
 
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
-| RULE Identifier MaybeParameters ARROW Type EQUAL Rule
+| RULE Identifier MaybeParameters MAPS Type EQUAL Rule
 
 Rule
 : SkipRule
@@ -220,6 +227,7 @@ Rule
 | CaseRule
 | LetRule
 | ForallRule
+| ChooseRule
 | IterateRule
 | BlockRule
 | SequenceRule
@@ -239,6 +247,7 @@ ConditionalRule
 
 CaseRule
 : CASE Term OF LCURPAREN CaseLabels RCURPAREN
+| CASE Term OF LCURPAREN error RCURPAREN // error recovery
 
 CaseLabel
 : DEFAULT COLON Rule
@@ -255,16 +264,23 @@ LetRule
 ForallRule
 : FORALL Variable IN Term DO Rule
 
+ChooseRule
+: CHOOSE Variable IN Term DO Rule
+
 IterateRule
 : ITERATE Rule
 
 BlockRule
 : LCURPAREN Rules RCURPAREN
 | PAR Rules ENDPAR
+| LCURPAREN error RCURPAREN // error recovery
+| PAR error ENDPAR // error recovery
 
 SequenceRule
 : SEQ_BRACKET Rules ENDSEQ_BRACKET
 | SEQ Rules ENDSEQ
+| SEQ_BRACKET error ENDSEQ_BRACKET // error recovery
+| SEQ error ENDSEQ // error recovery
 
 UpdateRule
 : DirectCallExpression UPDATE Term

@@ -31,29 +31,18 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 Expression::Expression( Node::ID id )
-: Node( id )
-, m_type( nullptr )
+: TypedNode( id )
 {
 }
 
-void Expression::setType( const libcasm_ir::Type::Ptr& type )
-{
-    m_type = type;
-}
-
-libcasm_ir::Type::Ptr Expression::type( void ) const
-{
-    return m_type;
-}
-
-ValueAtom::ValueAtom( const libcasm_ir::Value::Ptr& value )
+ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )
 : Expression( Node::ID::VALUE_ATOM )
 , m_value( value )
 {
     Expression::setType( value->ptr_type() );
 }
 
-libcasm_ir::Value::Ptr ValueAtom::value( void ) const
+libcasm_ir::Constant::Ptr ValueAtom::value( void ) const
 {
     return m_value;
 }
@@ -63,32 +52,56 @@ void ValueAtom::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-RuleReferenceAtom::RuleReferenceAtom( const IdentifierNode::Ptr& identifier )
-: Expression( Node::ID::RULE_REFERENCE_ATOM )
+ReferenceAtom::ReferenceAtom( const IdentifierPath::Ptr& identifier )
+: Expression( Node::ID::REFERENCE_ATOM )
 , m_identifier( identifier )
-, m_ruleReference( nullptr )
+, m_referenceType( ReferenceType::UNKNOWN )
+, m_reference( nullptr )
+, m_builtinId( libcasm_ir::Value::ID::_SIZE_ )
 {
-    Expression::setType( libstdhl::get< libcasm_ir::RuleReferenceType >() );
 }
 
-IdentifierNode::Ptr RuleReferenceAtom::identifier() const
+IdentifierPath::Ptr ReferenceAtom::identifier() const
 {
     return m_identifier;
 }
 
-void RuleReferenceAtom::setRuleReference(
-    const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference )
+void ReferenceAtom::setReferenceType( ReferenceType referenceType )
 {
-    m_ruleReference = ruleReference;
+    m_referenceType = referenceType;
 }
 
-libcasm_ir::RuleReferenceConstant::Ptr RuleReferenceAtom::ruleReference(
-    void ) const
+ReferenceAtom::ReferenceType ReferenceAtom::referenceType( void ) const
 {
-    return m_ruleReference;
+    return m_referenceType;
 }
 
-void RuleReferenceAtom::accept( Visitor& visitor )
+void ReferenceAtom::setReference( const TypedNode::Ptr& reference )
+{
+    m_reference = reference;
+}
+
+TypedNode::Ptr ReferenceAtom::reference( void ) const
+{
+    assert( ( m_referenceType != ReferenceType::BUILTIN )
+            and ( m_referenceType != ReferenceType::UNKNOWN ) );
+
+    return m_reference;
+}
+
+void ReferenceAtom::setBuiltinId( libcasm_ir::Value::ID builtinId )
+{
+    m_builtinId = builtinId;
+}
+
+libcasm_ir::Value::ID ReferenceAtom::builtinId( void ) const
+{
+    assert( m_referenceType == ReferenceType::BUILTIN );
+
+    return m_builtinId;
+}
+
+void ReferenceAtom::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
@@ -103,6 +116,17 @@ void UndefAtom::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
+: Expression( id )
+, m_arguments( arguments )
+{
+}
+
+Expressions::Ptr CallExpression::arguments( void ) const
+{
+    return m_arguments;
+}
+
 void CallExpression::setTargetType( CallExpression::TargetType targetType )
 {
     m_targetType = targetType;
@@ -113,28 +137,100 @@ CallExpression::TargetType CallExpression::targetType( void ) const
     return m_targetType;
 }
 
+std::string CallExpression::targetTypeName( void ) const
+{
+    return targetTypeString( m_targetType );
+}
+
+std::string CallExpression::targetTypeString( const TargetType targetType )
+{
+    switch( targetType )
+    {
+        case TargetType::FUNCTION:
+        {
+            return "function";
+        }
+        case TargetType::DERIVED:
+        {
+            return "derived";
+        }
+        case TargetType::BUILTIN:
+        {
+            return "built-in";
+        }
+        case TargetType::RULE:
+        {
+            return "rule";
+        }
+        case TargetType::TYPE_DOMAIN:
+        {
+            return "type domain";
+        }
+        case TargetType::CONSTANT:
+        {
+            return "constant";
+        }
+        case TargetType::VARIABLE:
+        {
+            return "variable";
+        }
+        case TargetType::SELF:
+        {
+            return "self";
+        }
+        case TargetType::UNKNOWN:
+        {
+            return "unknown";
+        }
+    }
+
+    assert( !" internal error! " );
+    return "";
+}
+
 DirectCallExpression::DirectCallExpression(
-    const IdentifierNode::Ptr& identifier, const Expressions::Ptr& arguments )
-: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION )
+    const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
+: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
 , m_identifier( identifier )
-, m_arguments( arguments )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 {
 }
 
 void DirectCallExpression::setIdentifier(
-    const IdentifierNode::Ptr& identifier )
+    const IdentifierPath::Ptr& identifier )
 {
     m_identifier = identifier;
 }
 
-IdentifierNode::Ptr DirectCallExpression::identifier( void ) const
+IdentifierPath::Ptr DirectCallExpression::identifier( void ) const
 {
     return m_identifier;
 }
 
-Expressions::Ptr DirectCallExpression::arguments( void ) const
+void DirectCallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
 {
-    return m_arguments;
+    m_targetBuiltinId = builtinId;
+}
+
+libcasm_ir::Value::ID DirectCallExpression::targetBuiltinId( void ) const
+{
+    assert( targetType() == TargetType::BUILTIN );
+
+    return m_targetBuiltinId;
+}
+
+void DirectCallExpression::setTargetDefinition(
+    const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+}
+
+TypedNode::Ptr DirectCallExpression::targetDefinition( void ) const
+{
+    assert( ( targetType() != TargetType::BUILTIN )
+            and ( targetType() != TargetType::UNKNOWN ) );
+
+    return m_targetDefinition;
 }
 
 void DirectCallExpression::accept( Visitor& visitor )
@@ -144,20 +240,14 @@ void DirectCallExpression::accept( Visitor& visitor )
 
 IndirectCallExpression::IndirectCallExpression(
     const Expression::Ptr& expression, const Expressions::Ptr& arguments )
-: CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION )
+: CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION, arguments )
 , m_expression( expression )
-, m_arguments( arguments )
 {
 }
 
 Expression::Ptr IndirectCallExpression::expression( void ) const
 {
     return m_expression;
-}
-
-Expressions::Ptr IndirectCallExpression::arguments( void ) const
-{
-    return m_arguments;
 }
 
 void IndirectCallExpression::accept( Visitor& visitor )

@@ -96,29 +96,33 @@ Update* ExecutionPassBase::addUpdate( Function* function,
     {
         updateSetManager.add( &it.value(), up );
     }
-    catch( const UpdateSet::Conflict& e )
+    catch( const ExecutionUpdateSet::Conflict& e )
     {
-        const auto conflictingUpdate = e.conflictingUpdate();
-        const auto existingUpdate = e.existingUpdate();
+        const auto& conflictingUpdate = e.conflictingUpdate();
+        const auto& existingUpdate = e.existingUpdate();
+
+        const auto& conflictingValue = conflictingUpdate.second;
+        const auto& existingValue = existingUpdate.second;
 
         const auto info
             = "Conflict while adding update " + function->name
-              + to_string( *conflictingUpdate->args ) + " = " + value.to_str()
-              + " at line " + std::to_string( up->location->begin.line )
+              + to_string( *conflictingValue->args ) + " = " + value.to_str()
+              + " at line "
+              + std::to_string( conflictingValue->location->begin.line )
               + ", conflicting with line "
-              + std::to_string( existingUpdate->location->begin.line )
-              + " with value '" + existingUpdate->value.to_str() + "'";
+              + std::to_string( existingValue->location->begin.line )
+              + " with value '" + existingValue->value.to_str() + "'";
         throw RuntimeException(
-            { existingUpdate->location, conflictingUpdate->location }, info,
-            libcasm_fe::Code::UpdateSetClash );
+            { existingValue->location, conflictingValue->location }, info,
+            libcasm_fe::Codes::UpdateSetClash );
     }
 
     return up;
 }
 
-void ExecutionPassBase::fork( const UpdateSet::Type updateSetType )
+void ExecutionPassBase::fork( ExecutionUpdateSet::Semantics semantics )
 {
-    updateSetManager.fork( updateSetType, 100UL );
+    updateSetManager.fork( semantics, 100UL );
 }
 
 void ExecutionPassBase::merge()
@@ -127,26 +131,29 @@ void ExecutionPassBase::merge()
     {
         updateSetManager.merge();
     }
-    catch( const UpdateSet::Conflict& e )
+    catch( const ExecutionUpdateSet::Conflict& e )
     {
-        const auto conflictingUpdate = e.conflictingUpdate();
-        const auto existingUpdate = e.existingUpdate();
+        const auto& conflictingUpdate = e.conflictingUpdate();
+        const auto& existingUpdate = e.existingUpdate();
 
-        const auto function = function_symbols[ conflictingUpdate->func ];
+        const auto& conflictingValue = conflictingUpdate.second;
+        const auto& existingValue = existingUpdate.second;
+
+        const auto function = function_symbols[ conflictingValue->func ];
         const auto functionLocation
-            = function->name + to_string( *conflictingUpdate->args );
+            = function->name + to_string( *conflictingValue->args );
 
         const auto info
             = "Conflict while merging updateset " + functionLocation
               + " at line "
-              + std::to_string( conflictingUpdate->location->begin.line )
-              + " with value '" + conflictingUpdate->value.to_str() + "'"
+              + std::to_string( conflictingValue->location->begin.line )
+              + " with value '" + conflictingValue->value.to_str() + "'"
               + " and at line "
-              + std::to_string( existingUpdate->location->begin.line )
-              + " with value '" + existingUpdate->value.to_str() + "'";
+              + std::to_string( existingValue->location->begin.line )
+              + " with value '" + existingValue->value.to_str() + "'";
         throw RuntimeException(
-            { existingUpdate->location, conflictingUpdate->location }, info,
-            libcasm_fe::Code::UpdateSetMergeConflict );
+            { existingValue->location, conflictingValue->location }, info,
+            libcasm_fe::Codes::UpdateSetMergeConflict );
     }
 }
 
@@ -263,7 +270,7 @@ value_t ExecutionPassBase::functionValue(
 
         if( update )
         {
-            return update->value;
+            return update.value()->value;
         }
         else
         {
@@ -290,7 +297,7 @@ u1 ExecutionPassBase::filter_enabled( const std::string& filter )
 
 void ExecutionPassBase::visit_body_elements_pre( AstListNode* )
 {
-    fork( UpdateSet::Type::Sequential );
+    fork( ExecutionUpdateSet::Semantics::Sequential );
 }
 
 void ExecutionPassBase::visit_body_elements_post( AstListNode* )
@@ -319,7 +326,7 @@ void ExecutionPassBase::visit_function_def_pre(
     function_symbols[ function->id ] = function;
     functionDefaultValues[ function->id ] = defaultValue;
 
-    fork( UpdateSet::Type::Parallel );
+    fork( ExecutionUpdateSet::Semantics::Parallel );
 }
 
 void ExecutionPassBase::visit_function_def_post( FunctionDefNode* )
@@ -329,7 +336,7 @@ void ExecutionPassBase::visit_function_def_post( FunctionDefNode* )
 
 void ExecutionPassBase::visit_seqblock_pre( UnaryNode* )
 {
-    fork( UpdateSet::Type::Sequential );
+    fork( ExecutionUpdateSet::Semantics::Sequential );
 }
 
 void ExecutionPassBase::visit_seqblock_post( UnaryNode* )
@@ -339,7 +346,7 @@ void ExecutionPassBase::visit_seqblock_post( UnaryNode* )
 
 void ExecutionPassBase::visit_parblock_pre( UnaryNode* )
 {
-    fork( UpdateSet::Type::Parallel );
+    fork( ExecutionUpdateSet::Semantics::Parallel );
 }
 
 void ExecutionPassBase::visit_parblock_post( UnaryNode* )
@@ -349,7 +356,7 @@ void ExecutionPassBase::visit_parblock_post( UnaryNode* )
 
 void ExecutionPassBase::visit_forall_pre( ForallNode* )
 {
-    fork( UpdateSet::Type::Parallel );
+    fork( ExecutionUpdateSet::Semantics::Parallel );
 }
 
 void ExecutionPassBase::visit_forall_post( ForallNode* )

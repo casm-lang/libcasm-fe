@@ -27,41 +27,54 @@
 
 #include <memory>
 
-#include "../src/execute/UpdateSet.h"
+#include "../stdhl/cpp/Default.h"
 
-using namespace libcasm_fe;
+#include "execute/UpdateSet.h"
 
-TEST( libcasm_fe__updateset_manager,
-    lookupShouldReturnNullptrWhenNoUpdateSetExists )
+struct UpdateSetDetails
 {
-    const value_t location;
+    using Location = std::size_t;
+    using Value = std::string;
+    using LocationHash = std::hash< std::size_t >;
+    using LocationEquals = std::equal_to< std::size_t >;
+    using ValueEquals = std::equal_to< std::string >;
+};
 
-    auto manager
-        = std::unique_ptr< UpdateSetManager >( new UpdateSetManager() );
+using TestUpdateSet = UpdateSet< UpdateSetDetails >;
 
-    EXPECT_EQ( nullptr, manager->lookup( &location ) );
+class UpdateSetManagerTest : public ::testing::Test
+{
+  protected:
+    void SetUp() override
+    {
+        manager = libstdhl::make_unique< UpdateSetManager< TestUpdateSet > >();
+    }
+
+    std::unique_ptr< UpdateSetManager< TestUpdateSet > > manager;
+};
+
+TEST_F(
+    UpdateSetManagerTest, lookupShouldReturnEmptyOptionalWhenNoUpdateSetExists )
+{
+    EXPECT_THROW( manager->lookup( 42UL ).value(),
+        std::experimental::bad_optional_access );
 }
 
-TEST( libcasm_fe__updateset_manager, forkAndMerge )
+TEST_F( UpdateSetManagerTest, forkAndMerge )
 {
-    const value_t location1, location2, location3, location4;
+    manager->fork( TestUpdateSet::Semantics::Parallel, 10UL );
 
-    auto manager
-        = std::unique_ptr< UpdateSetManager >( new UpdateSetManager() );
-
-    manager->fork( UpdateSet::Type::Parallel, 10UL );
-
-    manager->add( &location1, new Update );
-    manager->add( &location2, new Update );
+    manager->add( 1UL, "update 1" );
+    manager->add( 2UL, "update 2" );
 
     EXPECT_EQ( manager->currentUpdateSet()->size(), 2 );
     EXPECT_EQ( manager->size(), 1 );
 
     {
-        manager->fork( UpdateSet::Type::Sequential, 10UL );
+        manager->fork( TestUpdateSet::Semantics::Sequential, 10UL );
 
-        manager->add( &location3, new Update );
-        manager->add( &location4, new Update );
+        manager->add( 3UL, "update 3" );
+        manager->add( 4UL, "update 4" );
 
         EXPECT_EQ( manager->currentUpdateSet()->size(), 2 );
         EXPECT_EQ( manager->size(), 2 );

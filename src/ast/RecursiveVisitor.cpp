@@ -82,7 +82,7 @@ void RecursiveVisitor::visit( ValueAtom& node )
 {
 }
 
-void RecursiveVisitor::visit( RuleReferenceAtom& node )
+void RecursiveVisitor::visit( ReferenceAtom& node )
 {
     node.identifier()->accept( *this );
 }
@@ -177,6 +177,13 @@ void RecursiveVisitor::visit( ForallRule& node )
     node.rule()->accept( *this );
 }
 
+void RecursiveVisitor::visit( ChooseRule& node )
+{
+    node.variable()->accept( *this );
+    node.universe()->accept( *this );
+    node.rule()->accept( *this );
+}
+
 void RecursiveVisitor::visit( IterateRule& node )
 {
     node.rule()->accept( *this );
@@ -225,11 +232,11 @@ void RecursiveVisitor::visit( FixedSizedType& node )
     node.size()->accept( *this );
 }
 
-void RecursiveVisitor::visit( RangedType& node )
+void RecursiveVisitor::visit( RelationType& node )
 {
     node.name()->accept( *this );
-    node.lowerBound()->accept( *this );
-    node.upperBound()->accept( *this );
+    node.argumentTypes()->accept( *this );
+    node.returnType()->accept( *this );
 }
 
 void RecursiveVisitor::visit( BasicAttribute& node )
@@ -243,8 +250,13 @@ void RecursiveVisitor::visit( ExpressionAttribute& node )
     node.expression()->accept( *this );
 }
 
-void RecursiveVisitor::visit( IdentifierNode& node )
+void RecursiveVisitor::visit( Identifier& node )
 {
+}
+
+void RecursiveVisitor::visit( IdentifierPath& node )
+{
+    node.identifiers()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ExpressionCase& node )

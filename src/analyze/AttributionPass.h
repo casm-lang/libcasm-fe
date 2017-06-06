@@ -42,6 +42,8 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         u1 run( libpass::PassResult& pr ) override;
+
+        using Data = SourceToAstPass::Data;
     };
 }
 

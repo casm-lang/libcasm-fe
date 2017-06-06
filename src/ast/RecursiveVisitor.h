@@ -44,7 +44,7 @@ namespace libcasm_fe
             void visit( EnumerationDefinition& node ) override;
 
             void visit( ValueAtom& node ) override;
-            void visit( RuleReferenceAtom& node ) override;
+            void visit( ReferenceAtom& node ) override;
             void visit( UndefAtom& node ) override;
             void visit( DirectCallExpression& node ) override;
             void visit( IndirectCallExpression& node ) override;
@@ -61,6 +61,7 @@ namespace libcasm_fe
             void visit( CaseRule& node ) override;
             void visit( LetRule& node ) override;
             void visit( ForallRule& node ) override;
+            void visit( ChooseRule& node ) override;
             void visit( IterateRule& node ) override;
             void visit( BlockRule& node ) override;
             void visit( SequenceRule& node ) override;
@@ -71,12 +72,13 @@ namespace libcasm_fe
             void visit( BasicType& node ) override;
             void visit( ComposedType& node ) override;
             void visit( FixedSizedType& node ) override;
-            void visit( RangedType& node ) override;
+            void visit( RelationType& node ) override;
 
             void visit( BasicAttribute& node ) override;
             void visit( ExpressionAttribute& node ) override;
 
-            void visit( IdentifierNode& node ) override;
+            void visit( Identifier& node ) override;
+            void visit( IdentifierPath& node ) override;
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
         };

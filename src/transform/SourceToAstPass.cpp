@@ -25,10 +25,13 @@
 
 #include "SourceToAstPass.h"
 
-#include <fstream>
-#include <iostream>
+#include "../pass/src/PassRegistry.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassUsage.h"
+#include "../pass/src/analyze/LoadFilePass.h"
 
 #include "../Lexer.h"
+#include "../Logger.h"
 #include "../various/GrammarParser.tab.h"
 
 using namespace libcasm_fe;
@@ -45,45 +48,34 @@ void SourceToAstPass::usage( libpass::PassUsage& pu )
 
 u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
-    const auto loadFilePass = pr.result< libpass::LoadFilePass >();
-    const auto filePath = std::string(
-        loadFilePass->filename() ); // TODO char* -> string in load pass
+    Logger log( &id, stream() );
 
-    std::ifstream sourceFile( filePath );
-    if( not sourceFile.is_open() )
-    {
-        std::cerr << "error: could not open `" << filePath << "´" << std::endl;
-        return false;
-    }
-
-    const std::string& fileName
-        = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
-    const std::string& specificationName
-        = fileName.substr( 0, fileName.rfind( "." ) );
+    const auto data = pr.result< libpass::LoadFilePass >();
+    const auto filePath = data->filename();
+    auto& fileStream = data->stream();
 
     Ast::Specification::Ptr specification;
 
-    Lexer lexer( sourceFile, std::cout );
-    Parser parser( lexer, specificationName, specification );
-    parser.set_debug_level( false ); // TODO add flag
+    Lexer lexer( log, fileStream, std::cout );
+    lexer.setFileName( filePath );
 
-    try
+    Parser parser( log, lexer, filePath, specification );
+    parser.set_debug_level( m_debug );
+
+    if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )
     {
-        if( ( parser.parse() != 0 ) or not specification )
-        {
-            std::cerr << "Error parsing file" << std::endl;
-            return false;
-        }
-    }
-    catch( const std::exception& e )
-    {
-        std::cerr << "error: got exception: " << e.what() << std::endl;
+        log.error( "could not parse `" + filePath + "´" );
         return false;
     }
 
     pr.setResult< SourceToAstPass >( libstdhl::make< Data >( specification ) );
 
     return true;
+}
+
+void SourceToAstPass::setDebug( u1 enable )
+{
+    m_debug = enable;
 }
 
 //

@@ -23,33 +23,52 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_TYPE_CHECK_PASS_H_
-#define _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#ifndef _LIB_CASMFE_FRAME_H_
+#define _LIB_CASMFE_FRAME_H_
 
-#include "../transform/SourceToAstPass.h"
-
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "../ast/Expression.h"
 
 namespace libcasm_fe
 {
-    /**
-     * @brief Type inference of AST
-     */
-    class TypeCheckPass final : public libpass::Pass
+    class Frame
     {
       public:
-        static char id;
+        Frame( const Ast::CallExpression::Ptr& call,
+            const Ast::Node::Ptr& callee, std::size_t numberOfLocals );
 
-        void usage( libpass::PassUsage& pu ) override;
+        Ast::CallExpression::Ptr call( void ) const;
 
-        bool run( libpass::PassResult& pr ) override;
+        Ast::Node::Ptr callee( void ) const;
 
-        using Data = SourceToAstPass::Data;
+        void setLocal( std::size_t index, const libcasm_ir::Constant& local );
+        libcasm_ir::Constant local( std::size_t index ) const;
+        const std::vector< libcasm_ir::Constant >& locals( void ) const;
+
+      private:
+        Ast::CallExpression::Ptr m_call;
+        Ast::Node::Ptr m_callee;
+        std::vector< libcasm_ir::Constant > m_locals;
+    };
+
+    class FrameStack
+    {
+      public:
+        explicit FrameStack( void );
+
+        void push( std::unique_ptr< Frame > frame );
+        std::unique_ptr< Frame > pop( void );
+
+        Frame* top( void ) const;
+
+        std::vector< std::string > generateBacktrace(
+            SourceLocation problemLocation ) const;
+
+      private:
+        std::vector< std::unique_ptr< Frame > > m_frames;
     };
 }
 
-#endif // _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#endif // _LIB_CASMFE_FRAME_H_
 
 //
 //  Local variables:

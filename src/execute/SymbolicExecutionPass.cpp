@@ -853,7 +853,7 @@ void SymbolicExecutionPass::dumpUpdates()
             const auto update = updateSet->get( &value );
             if( update )
             {
-                ::symbolic::dump_update( trace, function, update );
+                ::symbolic::dump_update( trace, function, update.value() );
             }
             else
             {
@@ -1085,11 +1085,11 @@ void SymbolicExecutionWalker::walk_case( CaseNode* node )
 template <>
 void SymbolicExecutionWalker::walk_iterate( UnaryNode* node )
 {
-    visitor.fork( UpdateSet::Type::Sequential );
+    visitor.fork( ExecutionUpdateSet::Semantics::Sequential );
 
     while( true )
     {
-        visitor.fork( UpdateSet::Type::Parallel );
+        visitor.fork( ExecutionUpdateSet::Semantics::Parallel );
         walk_statement( node->child_ );
         if( visitor.hasEmptyUpdateSet() )
         {

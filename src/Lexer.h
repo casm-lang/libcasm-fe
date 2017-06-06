@@ -33,10 +33,15 @@
 
 namespace libcasm_fe
 {
+    class Logger;
+    class SourceLocation;
+
     class Lexer : public yyFlexLexer
     {
       public:
-        Lexer( std::istream& in, std::ostream& out );
+        Lexer( Logger& log, std::istream& in, std::ostream& out );
+
+        void setFileName( const std::string& fileName );
 
         Parser::symbol_type nextToken();
 
@@ -44,7 +49,8 @@ namespace libcasm_fe
         void LexerError( const char* msg ) override;
 
       private:
-        Parser::location_type loc;
+        Logger& log;
+        SourceLocation loc;
         std::string strbuf;
     };
 }

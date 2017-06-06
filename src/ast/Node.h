@@ -28,9 +28,12 @@
 
 #include "Visitor.h"
 
+#include "../stdhl/cpp/List.h"
 #include "../stdhl/cpp/Type.h"
 
-#include "../various/location.hh"
+#include "../SourceLocation.h"
+
+#include "../../casm-ir/src/Type.h"
 
 namespace libcasm_fe
 {
@@ -39,7 +42,7 @@ namespace libcasm_fe
         /**
          * @extends CasmFE
          */
-        class Node
+        class Node : public std::enable_shared_from_this< Node >
         {
           public:
             enum class ID
@@ -55,7 +58,7 @@ namespace libcasm_fe
 
                 // expressions
                 VALUE_ATOM,
-                RULE_REFERENCE_ATOM,
+                REFERENCE_ATOM,
                 UNDEF_ATOM,
                 DIRECT_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,
@@ -73,6 +76,7 @@ namespace libcasm_fe
                 CASE_RULE,
                 LET_RULE,
                 FORALL_RULE,
+                CHOOSE_RULE,
                 ITERATE_RULE,
                 BLOCK_RULE,
                 SEQUENCE_RULE,
@@ -84,7 +88,7 @@ namespace libcasm_fe
                 BASIC_TYPE,
                 COMPOSED_TYPE,
                 FIXED_SIZED_TYPE,
-                RANGED_TYPE,
+                RELATION_TYPE,
 
                 // attributes
                 BASIC_ATTRIBUTE,
@@ -93,6 +97,7 @@ namespace libcasm_fe
                 // other
                 NODE_LIST,
                 IDENTIFIER,
+                IDENTIFIER_PATH,
                 EXPRESSION_CASE,
                 DEFAULT_CASE,
             };
@@ -100,75 +105,41 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Node >;
 
-            Node( ID id );
+            explicit Node( ID id );
             virtual ~Node() = default;
 
             ID id( void ) const;
 
-            void setSourceLocation( const location& sourceLocation );
-            location sourceLocation( void ) const;
+            void setSourceLocation( const SourceLocation& sourceLocation );
+            const SourceLocation& sourceLocation( void ) const;
 
-            std::string name( void ) const;
+            /**
+             * @return A short description about the node type.
+             */
+            virtual std::string description( void ) const final;
+
+            template < typename T >
+            typename T::Ptr ptr( void )
+            {
+                return std::static_pointer_cast< T >( shared_from_this() );
+            }
 
             virtual void accept( Visitor& visitor ) = 0;
 
           private:
             ID m_id;
-            location m_sourceLocation;
+            SourceLocation m_sourceLocation;
         };
 
         template < typename T >
-        class NodeList : public Node
+        class NodeList : public Node, public libstdhl::List< T >
         {
           public:
             using Ptr = std::shared_ptr< NodeList >;
-            using iterator = typename std::vector< typename T::Ptr >::iterator;
-            using const_iterator =
-                typename std::vector< typename T::Ptr >::const_iterator;
 
-            NodeList( void )
+            explicit NodeList( void )
             : Node( Node::ID::NODE_LIST )
             {
-            }
-
-            void add( const typename T::Ptr& node )
-            {
-                m_elements.emplace_back( node );
-            }
-
-            iterator begin( void )
-            {
-                return m_elements.begin();
-            }
-
-            const_iterator begin( void ) const
-            {
-                return m_elements.begin();
-            }
-
-            const_iterator cbegin( void ) const
-            {
-                return m_elements.cbegin();
-            }
-
-            iterator end( void )
-            {
-                return m_elements.end();
-            }
-
-            const_iterator end( void ) const
-            {
-                return m_elements.end();
-            }
-
-            const_iterator cend( void ) const
-            {
-                return m_elements.cend();
-            }
-
-            u1 empty( void ) const
-            {
-                return m_elements.empty();
             }
 
             void accept( Visitor& visitor ) override final
@@ -178,28 +149,92 @@ namespace libcasm_fe
                     node->accept( visitor );
                 }
             }
-
-          private:
-            std::vector< typename T::Ptr > m_elements;
         };
 
-        class IdentifierNode : public Node
+        class TypedNode : public Node
         {
           public:
-            using Ptr = std::shared_ptr< IdentifierNode >;
+            TypedNode( Node::ID id );
 
-            IdentifierNode( const std::string& identifier );
+            void setType( const libcasm_ir::Type::Ptr& type );
 
-            std::string identifier( void ) const;
+            libcasm_ir::Type::Ptr type( void ) const;
+
+          private:
+            libcasm_ir::Type::Ptr m_type;
+        };
+
+        class Identifier : public Node
+        {
+          public:
+            using Ptr = std::shared_ptr< Identifier >;
+
+            explicit Identifier( const std::string& name );
+
+            const std::string& name( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            std::string m_identifier;
+            std::string m_name;
+        };
+
+        using Identifiers = NodeList< Identifier >;
+
+        /**
+         * @brief An identifier path is an identifier + namespaces.
+         *
+         * The identifier path can either be absolute or relative. The string of
+         * a relative identifier path starts with a dot. All relative identifier
+         * paths will later be resolved and converted into absolute paths.
+         *
+         * An absolute path "Color.Red" will be splitted into the namespaces
+         * ["Color"] and identifier "Red". Furthermore the node will be marked
+         * as NamespaceType.ABSOLUTE.
+         *
+         * A relative path ".Red" will be splitted into the namespaces [] and
+         * identifier "Red". Furthermore the node will be marked as
+         * NamespaceType.RELATIVE.
+         */
+        class IdentifierPath : public Node
+        {
+          public:
+            enum class Type
+            {
+                ABSOLUTE, /**< absolute namespace + identifier path */
+                RELATIVE, /**< path started with a dot, needs to be resolved */
+            };
+
+          public:
+            using Ptr = std::shared_ptr< IdentifierPath >;
+
+            IdentifierPath(
+                const Identifier::Ptr& identifier, Type type = Type::ABSOLUTE );
+
+            /**
+             * @param identifiers A list of identifiers (must not be empty)
+             * @param type The type of the identifier path (default is ABSOLUTE)
+             */
+            IdentifierPath( const Identifiers::Ptr& identifiers,
+                Type type = Type::ABSOLUTE );
+
+            Identifiers::Ptr identifiers( void ) const;
+            Type type( void ) const;
+
+            std::string baseName( void ) const;
+            std::string baseDir( void ) const;
+            std::string path( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            Identifiers::Ptr m_identifiers;
+            Type m_type;
         };
 
         template < typename T, typename... Args >
-        typename T::Ptr make( const location& sourceLocation, Args&&... args )
+        typename T::Ptr make(
+            const SourceLocation& sourceLocation, Args&&... args )
         {
             auto node
                 = std::make_shared< T >( std::forward< Args >( args )... );

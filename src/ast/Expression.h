@@ -36,18 +36,12 @@ namespace libcasm_fe
     {
         class VariableDefinition;
 
-        class Expression : public Node
+        class Expression : public TypedNode
         {
           public:
             using Ptr = std::shared_ptr< Expression >;
 
-            Expression( Node::ID id );
-
-            void setType( const libcasm_ir::Type::Ptr& type );
-            libcasm_ir::Type::Ptr type( void ) const;
-
-          private:
-            libcasm_ir::Type::Ptr m_type;
+            explicit Expression( Node::ID id );
         };
 
         using Expressions = NodeList< Expression >;
@@ -57,34 +51,51 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ValueAtom >;
 
-            ValueAtom( const libcasm_ir::Value::Ptr& value );
+            explicit ValueAtom( const libcasm_ir::Constant::Ptr& value );
 
-            libcasm_ir::Value::Ptr value( void ) const;
+            libcasm_ir::Constant::Ptr value( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            libcasm_ir::Value::Ptr m_value;
+            libcasm_ir::Constant::Ptr m_value;
         };
 
-        class RuleReferenceAtom : public Expression
+        class ReferenceAtom : public Expression
         {
           public:
-            using Ptr = std::shared_ptr< RuleReferenceAtom >;
+            enum class ReferenceType
+            {
+                FUNCTION,
+                DERIVED,
+                BUILTIN,
+                RULE,
+                VARIABLE,
+                UNKNOWN
+            };
 
-            RuleReferenceAtom( const IdentifierNode::Ptr& identifier );
+            using Ptr = std::shared_ptr< ReferenceAtom >;
 
-            IdentifierNode::Ptr identifier( void ) const;
+            explicit ReferenceAtom( const IdentifierPath::Ptr& identifier );
 
-            void setRuleReference(
-                const libcasm_ir::RuleReferenceConstant::Ptr& ruleReference );
-            libcasm_ir::RuleReferenceConstant::Ptr ruleReference( void ) const;
+            IdentifierPath::Ptr identifier( void ) const;
+
+            void setReferenceType( ReferenceType referenceType );
+            ReferenceType referenceType( void ) const;
+
+            void setReference( const TypedNode::Ptr& reference );
+            TypedNode::Ptr reference( void ) const;
+
+            void setBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID builtinId( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            IdentifierNode::Ptr m_identifier;
-            libcasm_ir::RuleReferenceConstant::Ptr m_ruleReference;
+            IdentifierPath::Ptr m_identifier;
+            ReferenceType m_referenceType;
+            TypedNode::Ptr m_reference;
+            libcasm_ir::Value::ID m_builtinId;
         };
 
         class UndefAtom : public Expression
@@ -92,7 +103,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UndefAtom >;
 
-            UndefAtom( void );
+            explicit UndefAtom( void );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -106,20 +117,30 @@ namespace libcasm_fe
                 DERIVED,
                 BUILTIN,
                 RULE,
+                TYPE_DOMAIN,
+                CONSTANT,
                 VARIABLE,
+                SELF,
                 UNKNOWN
             };
 
-          public:
             using Ptr = std::shared_ptr< CallExpression >;
 
-            using Expression::Expression;
+            CallExpression( Node::ID id, const Expressions::Ptr& arguments );
+
+            Expressions::Ptr arguments( void ) const;
 
             void setTargetType( TargetType targetType );
             TargetType targetType( void ) const;
 
+            std::string targetTypeName( void ) const;
+
           private:
+            Expressions::Ptr m_arguments;
             TargetType m_targetType = TargetType::UNKNOWN;
+
+          public:
+            static std::string targetTypeString( const TargetType targetType );
         };
 
         class DirectCallExpression : public CallExpression
@@ -127,19 +148,34 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< DirectCallExpression >;
 
-            DirectCallExpression( const IdentifierNode::Ptr& identifier,
+            DirectCallExpression( const IdentifierPath::Ptr& identifier,
                 const Expressions::Ptr& arguments );
 
-            void setIdentifier( const IdentifierNode::Ptr& identifier );
-            IdentifierNode::Ptr identifier( void ) const;
+            void setIdentifier( const IdentifierPath::Ptr& identifier );
+            IdentifierPath::Ptr identifier( void ) const;
 
-            Expressions::Ptr arguments( void ) const;
+            /**
+             * Sets the builtin id of this call.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
+
+            /**
+               Sets the definition of this call.
+
+               @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetDefinition( const TypedNode::Ptr& definition );
+            TypedNode::Ptr targetDefinition( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            IdentifierNode::Ptr m_identifier;
-            Expressions::Ptr m_arguments;
+            IdentifierPath::Ptr m_identifier;
+            libcasm_ir::Value::ID m_targetBuiltinId;
+            TypedNode::Ptr m_targetDefinition;
         };
 
         class IndirectCallExpression : public CallExpression
@@ -151,13 +187,11 @@ namespace libcasm_fe
                 const Expressions::Ptr& arguments );
 
             Expression::Ptr expression( void ) const;
-            Expressions::Ptr arguments( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             Expression::Ptr m_expression;
-            Expressions::Ptr m_arguments;
         };
 
         class UnaryExpression : public Expression
@@ -221,7 +255,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ListExpression >;
 
-            ListExpression( const Expressions::Ptr& expressions );
+            explicit ListExpression( const Expressions::Ptr& expressions );
 
             Expressions::Ptr expressions( void ) const;
 

@@ -30,9 +30,8 @@
 #include <string>
 #include <vector>
 
-#include "various/location.hh"
-
 #include "Codes.h"
+#include "SourceLocation.h"
 
 namespace libcasm_fe
 {
@@ -40,20 +39,28 @@ namespace libcasm_fe
     {
       public:
         Exception( const std::string& msg, Code errorCode );
-        Exception(
-            const location& location, const std::string& msg, Code errorCode );
-        Exception( const std::vector< location >& locations,
+        Exception( const SourceLocation& location, const std::string& msg,
+            const std::vector< std::string >& backtrace, Code errorCode );
+        Exception( const SourceLocation& location, const std::string& msg,
+            Code errorCode );
+        Exception( const std::vector< SourceLocation >& locations,
             const std::string& msg, Code errorCode );
+        Exception( const std::vector< SourceLocation >& locations,
+            const std::string& msg, const std::vector< std::string >& backtrace,
+            Code errorCode );
 
         const char* what() const noexcept override;
 
-        const std::vector< location >& locations( void ) const noexcept;
+        const std::vector< SourceLocation >& locations( void ) const noexcept;
+
+        const std::vector< std::string >& backtrace( void ) const noexcept;
 
         Code errorCode( void ) const noexcept;
 
       private:
         const std::string m_msg;
-        const std::vector< location > m_locations;
+        const std::vector< SourceLocation > m_locations;
+        const std::vector< std::string > m_backtrace;
         const Code m_errorCode;
     };
 

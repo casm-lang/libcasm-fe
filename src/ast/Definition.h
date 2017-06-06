@@ -35,25 +35,20 @@ namespace libcasm_fe
 {
     namespace Ast
     {
-        class Definition : public Node
+        class Definition : public TypedNode
         {
           public:
             using Ptr = std::shared_ptr< Definition >;
 
-            Definition( Node::ID id, const IdentifierNode::Ptr& identifier );
+            Definition( Node::ID id, const Identifier::Ptr& identifier );
 
-            IdentifierNode::Ptr identifier( void ) const;
-
-            void setRelationType(
-                const libcasm_ir::RelationType::Ptr& relationType );
-            libcasm_ir::RelationType::Ptr relationType( void ) const;
+            Identifier::Ptr identifier( void ) const;
 
             void setAttributes( const Attributes::Ptr& attributes );
             Attributes::Ptr attributes( void ) const;
 
           private:
-            IdentifierNode::Ptr m_identifier;
-            libcasm_ir::RelationType::Ptr m_relationType;
+            Identifier::Ptr m_identifier;
             Attributes::Ptr m_attributes;
         };
 
@@ -64,15 +59,24 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< VariableDefinition >;
 
-            VariableDefinition( const IdentifierNode::Ptr& identifier,
+            VariableDefinition( const Identifier::Ptr& identifier,
                 const Type::Ptr& variableType );
 
             Type::Ptr variableType( void ) const;
+
+            /**
+             * Sets the frame local index of the variable.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setLocalIndex( std::size_t localIndex );
+            std::size_t localIndex( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             Type::Ptr m_variableType;
+            std::size_t m_localIndex;
         };
 
         class FunctionDefinition : public Definition
@@ -90,7 +94,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< FunctionDefinition >;
 
-            FunctionDefinition( const IdentifierNode::Ptr& identifier,
+            FunctionDefinition( const Identifier::Ptr& identifier,
                 const Types::Ptr& argumentTypes,
                 const Type::Ptr& returnType );
 
@@ -126,7 +130,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< DerivedDefinition >;
 
-            DerivedDefinition( const IdentifierNode::Ptr& identifier,
+            DerivedDefinition( const Identifier::Ptr& identifier,
                 const NodeList< VariableDefinition >::Ptr& arguments,
                 const Type::Ptr& returnType,
                 const Expression::Ptr& expression );
@@ -136,12 +140,21 @@ namespace libcasm_fe
             Type::Ptr returnType( void ) const;
             Expression::Ptr expression( void ) const;
 
+            /**
+             * Sets the number of required frame local slots.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
+            std::size_t maximumNumberOfLocals( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
             Type::Ptr m_returnType;
             Expression::Ptr m_expression;
+            std::size_t m_maxNumberOfLocals;
         };
 
         class RuleDefinition : public Definition
@@ -149,7 +162,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< RuleDefinition >;
 
-            RuleDefinition( const IdentifierNode::Ptr& identifier,
+            RuleDefinition( const Identifier::Ptr& identifier,
                 const NodeList< VariableDefinition >::Ptr& arguments,
                 const Type::Ptr& returnType,
                 const Rule::Ptr& rule );
@@ -159,12 +172,21 @@ namespace libcasm_fe
             Type::Ptr returnType( void ) const;
             Rule::Ptr rule( void ) const;
 
+            /**
+             * Sets the number of required frame local slots.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
+            std::size_t maximumNumberOfLocals( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             NodeList< VariableDefinition >::Ptr m_arguments;
             Type::Ptr m_returnType;
             Rule::Ptr m_rule;
+            std::size_t m_maxNumberOfLocals;
         };
 
         class EnumerationDefinition : public Definition
@@ -172,15 +194,15 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< EnumerationDefinition >;
 
-            EnumerationDefinition( const IdentifierNode::Ptr& identifier,
-                const NodeList< IdentifierNode >::Ptr& enumerators );
+            EnumerationDefinition( const Identifier::Ptr& identifier,
+                const Identifiers::Ptr& enumerators );
 
-            NodeList< IdentifierNode >::Ptr enumerators( void ) const;
+            Identifiers::Ptr enumerators( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            NodeList< IdentifierNode >::Ptr m_enumerators;
+            Identifiers::Ptr m_enumerators;
         };
     }
 }

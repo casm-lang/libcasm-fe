@@ -268,6 +268,12 @@ class HashMapBase
     {
         if( m_buckets )
         {
+            for( auto entry = m_lastEntry; entry != nullptr;
+                 entry = entry->prev )
+            {
+                entry->~Entry();
+            }
+
             delete[] m_buckets;
         }
     }

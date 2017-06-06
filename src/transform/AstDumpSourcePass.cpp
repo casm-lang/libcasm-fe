@@ -25,6 +25,15 @@
 
 #include "AstDumpSourcePass.h"
 
+#include "../pass/src/PassRegistry.h"
+#include "../pass/src/PassResult.h"
+#include "../pass/src/PassUsage.h"
+
+#include "../Logger.h"
+#include "../analyze/ConsistencyCheckPass.h"
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -121,7 +130,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( EnumerationDefinition& node ) override;
 
     void visit( ValueAtom& node ) override;
-    void visit( RuleReferenceAtom& node ) override;
+    void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
@@ -138,6 +147,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( CaseRule& node ) override;
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
+    void visit( ChooseRule& node ) override;
     void visit( IterateRule& node ) override;
     void visit( BlockRule& node ) override;
     void visit( SequenceRule& node ) override;
@@ -148,12 +158,13 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
     void visit( FixedSizedType& node ) override;
-    void visit( RangedType& node ) override;
+    void visit( RelationType& node ) override;
 
     void visit( BasicAttribute& node ) override;
     void visit( ExpressionAttribute& node ) override;
 
-    void visit( IdentifierNode& node ) override;
+    void visit( Identifier& node ) override;
+    void visit( IdentifierPath& node ) override;
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
 
@@ -313,7 +324,7 @@ void AstDumpSourceVisitor::visit( ValueAtom& node )
     m_stream << node.value()->name();
 }
 
-void AstDumpSourceVisitor::visit( RuleReferenceAtom& node )
+void AstDumpSourceVisitor::visit( ReferenceAtom& node )
 {
     m_stream << "@";
     node.identifier()->accept( *this );
@@ -491,6 +502,11 @@ void AstDumpSourceVisitor::visit( ForallRule& node )
     }
 }
 
+void AstDumpSourceVisitor::visit( ChooseRule& node )
+{
+    // TODO
+}
+
 void AstDumpSourceVisitor::visit( IterateRule& node )
 {
     m_stream << "iterate\n";
@@ -583,13 +599,22 @@ void AstDumpSourceVisitor::visit( FixedSizedType& node )
     m_stream << ">";
 }
 
-void AstDumpSourceVisitor::visit( RangedType& node )
+void AstDumpSourceVisitor::visit( RelationType& node )
 {
-    node.name()->accept( *this );
     m_stream << "<";
-    node.lowerBound()->accept( *this );
-    m_stream << "..";
-    node.upperBound()->accept( *this );
+
+    u1 first = true;
+    for( auto& s : *node.argumentTypes() )
+    {
+        m_stream << ( first ? "" : " * " );
+        s->accept( *this );
+        first = false;
+    }
+    
+    m_stream << " -> ";
+    
+    node.returnType()->accept( *this );
+
     m_stream << ">";
 }
 
@@ -609,9 +634,14 @@ void AstDumpSourceVisitor::visit( ExpressionAttribute& node )
     m_stream << " ]\n";
 }
 
-void AstDumpSourceVisitor::visit( IdentifierNode& node )
+void AstDumpSourceVisitor::visit( Identifier& node )
 {
-    m_stream << node.identifier();
+    m_stream << node.name();
+}
+
+void AstDumpSourceVisitor::visit( IdentifierPath& node )
+{
+    m_stream << node.path();
 }
 
 void AstDumpSourceVisitor::visit( ExpressionCase& node )
@@ -632,44 +662,18 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 
 void AstDumpSourcePass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeCheckPass >();
+    pu.require< ConsistencyCheckPass >();
 }
 
 u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 {
-    libpass::PassLogger log( &id, stream() );
+    Logger log( &id, stream() );
 
-    const auto data = pr.result< TypeCheckPass >();
+    const auto data = pr.result< ConsistencyCheckPass >();
     const auto specification = data->specification();
 
-    std::string src_file = "stdout"; // TODO: add command-line switch
-    std::ostream* src_stream = &std::cout;
-    std::ofstream src_file_stream;
-
-    u1 src_is_file = src_file.compare( "stdout" );
-
-    if( src_is_file )
-    {
-        src_file_stream = std::ofstream( src_file );
-
-        if( not src_file_stream.is_open() )
-        {
-            log.error( "could not open '" + src_file + "'" );
-            return false;
-        }
-
-        src_stream = &src_file_stream;
-    }
-
-    log.debug( "writing source to '" + src_file + "'" );
-
-    AstDumpSourceVisitor visitor{ *src_stream };
+    AstDumpSourceVisitor visitor{ std::cout };
     specification->accept( visitor );
-
-    if( src_is_file )
-    {
-        src_file_stream.close();
-    }
 
     return true;
 }

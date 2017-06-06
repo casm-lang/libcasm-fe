@@ -23,7 +23,11 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-#include "src/Lexer.h"
+#include "Lexer.h"
+
+#include "Codes.h"
+#include "Logger.h"
+#include "SourceLocation.h"
 
 using namespace libcasm_fe;
 
@@ -98,7 +102,7 @@ using namespace libcasm_fe;
 <LCOMMENT>.
 <LCOMMENT>\n {
     BEGIN( INITIAL );
-    loc.lines();
+    loc.lines( 1 );
 }
 <LCOMMENT><<EOF>> {
     BEGIN( INITIAL );
@@ -111,11 +115,13 @@ using namespace libcasm_fe;
     BEGIN( INITIAL );
 }
 <COMMENT>\n {
-    loc.lines();
+    loc.lines( 1 );
 }
 <COMMENT>([^*\n]|\r)+|.
 <COMMENT><<EOF>> {
-    std::cerr << loc << ": multiline comment not terminated\n"; // TODO use log
+    BEGIN( INITIAL );
+    log.error( {loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
+    yyterminate();
 }
 
 \" { // strings
@@ -126,7 +132,7 @@ using namespace libcasm_fe;
     strbuf.append( yytext );
 }
 <STRING>\n {
-    loc.lines();
+    loc.lines( 1 );
 }
 <STRING>\\n {
     strbuf.append( "\n" );
@@ -141,7 +147,9 @@ using namespace libcasm_fe;
     strbuf.append( "\'" );
 }
 <STRING><<EOF>> {
-    std::cerr << loc << ": string not terminated\n"; // TODO use log
+    BEGIN( INITIAL );
+    log.error( {loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
+    yyterminate();
 }
 <STRING>\" {
     BEGIN( INITIAL );
@@ -149,21 +157,28 @@ using namespace libcasm_fe;
 }
 
 . {
-    std::cerr << loc << ": unrecognized character '" << yytext << "'\n"; // TODO use log
+    log.error( {loc}, "unrecognized character `" + std::string( yytext ) + "`",
+        Code::SyntaxErrorUnrecognizedCharacter );
 }
 
 %%
 
-Lexer::Lexer( std::istream& in, std::ostream& out )
+Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
 : yyFlexLexer( in, out )
+, log(log)
 , loc()
 , strbuf()
 {
 }
 
+void Lexer::setFileName( const std::string& fileName )
+{
+    loc.begin.fileName = loc.end.fileName = std::make_shared< std::string >( fileName );
+}
+
 void Lexer::LexerError( const char* msg )
 {
-    std::cerr << loc << ": " << msg << "\n"; // TODO use log
+    log.error( {loc}, msg, Code::SyntaxError );
 }
 
 //  

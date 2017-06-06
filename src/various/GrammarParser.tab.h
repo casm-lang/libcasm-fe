@@ -40,19 +40,23 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 44 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+#line 45 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 
     namespace libcasm_fe
     {
         class Lexer;
+        class Logger;
+        class SourceLocation;
     }
 
-    #include "src/ast/Specification.h"
+    #include "ast/Specification.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
 
-#line 56 "GrammarParser.tab.h" // lalr1.cc:377
+    #define YY_NULLPTR nullptr
+
+#line 60 "GrammarParser.tab.h" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -61,7 +65,7 @@
 # include <string>
 # include <vector>
 # include "stack.hh"
-# include "location.hh"
+
 #include <typeinfo>
 #ifndef YYASSERT
 # include <cassert>
@@ -129,7 +133,7 @@
 
 #line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 namespace libcasm_fe {
-#line 133 "GrammarParser.tab.h" // lalr1.cc:377
+#line 137 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
@@ -323,130 +327,136 @@ namespace libcasm_fe {
       // CaseLabels
       char dummy9[sizeof(Cases::Ptr)];
 
+      // ChooseRule
+      char dummy10[sizeof(ChooseRule::Ptr)];
+
       // ComposedType
-      char dummy10[sizeof(ComposedType::Ptr)];
+      char dummy11[sizeof(ComposedType::Ptr)];
 
       // ConditionalExpression
-      char dummy11[sizeof(ConditionalExpression::Ptr)];
+      char dummy12[sizeof(ConditionalExpression::Ptr)];
 
       // ConditionalRule
-      char dummy12[sizeof(ConditionalRule::Ptr)];
+      char dummy13[sizeof(ConditionalRule::Ptr)];
 
       // Definition
       // AttributedDefinition
-      char dummy13[sizeof(Definition::Ptr)];
+      char dummy14[sizeof(Definition::Ptr)];
 
       // Definitions
-      char dummy14[sizeof(Definitions::Ptr)];
+      char dummy15[sizeof(Definitions::Ptr)];
 
       // DerivedDefinition
-      char dummy15[sizeof(DerivedDefinition::Ptr)];
+      char dummy16[sizeof(DerivedDefinition::Ptr)];
 
       // DirectCallExpression
-      char dummy16[sizeof(DirectCallExpression::Ptr)];
+      char dummy17[sizeof(DirectCallExpression::Ptr)];
 
       // EnumerationDefinition
-      char dummy17[sizeof(EnumerationDefinition::Ptr)];
+      char dummy18[sizeof(EnumerationDefinition::Ptr)];
 
       // ExistentialQuantifierExpression
-      char dummy18[sizeof(ExistentialQuantifierExpression::Ptr)];
+      char dummy19[sizeof(ExistentialQuantifierExpression::Ptr)];
 
       // MaybeDefined
       // Atom
       // Term
       // Expression
-      char dummy19[sizeof(Expression::Ptr)];
+      char dummy20[sizeof(Expression::Ptr)];
 
       // ExpressionAttribute
-      char dummy20[sizeof(ExpressionAttribute::Ptr)];
+      char dummy21[sizeof(ExpressionAttribute::Ptr)];
 
       // Terms
       // Arguments
-      char dummy21[sizeof(Expressions::Ptr)];
+      // TwoOrMoreArguments
+      char dummy22[sizeof(Expressions::Ptr)];
 
       // FixedSizedType
-      char dummy22[sizeof(FixedSizedType::Ptr)];
+      char dummy23[sizeof(FixedSizedType::Ptr)];
 
       // ForallRule
-      char dummy23[sizeof(ForallRule::Ptr)];
+      char dummy24[sizeof(ForallRule::Ptr)];
 
       // FunctionDefinition
       // ProgramFunctionDefinition
-      char dummy24[sizeof(FunctionDefinition::Ptr)];
+      char dummy25[sizeof(FunctionDefinition::Ptr)];
 
       // Identifier
-      char dummy25[sizeof(IdentifierNode::Ptr)];
+      char dummy26[sizeof(Identifier::Ptr)];
+
+      // IdentifierPath
+      char dummy27[sizeof(IdentifierPath::Ptr)];
+
+      // Identifiers
+      // DotSeparatedIdentifiers
+      char dummy28[sizeof(Identifiers::Ptr)];
 
       // IndirectCallExpression
-      char dummy26[sizeof(IndirectCallExpression::Ptr)];
+      char dummy29[sizeof(IndirectCallExpression::Ptr)];
 
       // IterateRule
-      char dummy27[sizeof(IterateRule::Ptr)];
+      char dummy30[sizeof(IterateRule::Ptr)];
 
       // LetRule
-      char dummy28[sizeof(LetRule::Ptr)];
+      char dummy31[sizeof(LetRule::Ptr)];
 
       // List
-      char dummy29[sizeof(ListExpression::Ptr)];
-
-      // MaybeFunctionAttributes
-      // Identifiers
-      // MaybeIdentifiers
-      char dummy30[sizeof(NodeList< IdentifierNode >::Ptr)];
+      char dummy32[sizeof(ListExpression::Ptr)];
 
       // MaybeInitially
       // Initializers
       // MaybeInitializers
-      char dummy31[sizeof(NodeList< UpdateRule >::Ptr)];
+      char dummy33[sizeof(NodeList< UpdateRule >::Ptr)];
 
       // Parameters
       // MaybeParameters
-      char dummy32[sizeof(NodeList< VariableDefinition >::Ptr)];
+      char dummy34[sizeof(NodeList< VariableDefinition >::Ptr)];
 
       // Range
-      char dummy33[sizeof(RangeExpression::Ptr)];
+      char dummy35[sizeof(RangeExpression::Ptr)];
 
-      // RangedType
-      char dummy34[sizeof(RangedType::Ptr)];
+      // Reference
+      char dummy36[sizeof(ReferenceAtom::Ptr)];
+
+      // RelationType
+      char dummy37[sizeof(RelationType::Ptr)];
 
       // Rule
-      char dummy35[sizeof(Rule::Ptr)];
+      char dummy38[sizeof(Rule::Ptr)];
 
       // RuleDefinition
-      char dummy36[sizeof(RuleDefinition::Ptr)];
-
-      // RuleReference
-      char dummy37[sizeof(RuleReferenceAtom::Ptr)];
+      char dummy39[sizeof(RuleDefinition::Ptr)];
 
       // Rules
-      char dummy38[sizeof(Rules::Ptr)];
+      char dummy40[sizeof(Rules::Ptr)];
 
       // SequenceRule
-      char dummy39[sizeof(SequenceRule::Ptr)];
+      char dummy41[sizeof(SequenceRule::Ptr)];
 
       // SkipRule
-      char dummy40[sizeof(SkipRule::Ptr)];
+      char dummy42[sizeof(SkipRule::Ptr)];
 
       // Specification
-      char dummy41[sizeof(Specification::Ptr)];
+      char dummy43[sizeof(Specification::Ptr)];
 
       // Type
-      char dummy42[sizeof(Type::Ptr)];
+      char dummy44[sizeof(Type::Ptr)];
 
       // FunctionParameters
       // MaybeFunctionParameters
       // Types
-      char dummy43[sizeof(Types::Ptr)];
+      char dummy45[sizeof(Types::Ptr)];
 
       // Undefined
-      char dummy44[sizeof(UndefAtom::Ptr)];
+      char dummy46[sizeof(UndefAtom::Ptr)];
 
       // UniversalQuantifierExpression
-      char dummy45[sizeof(UniversalQuantifierExpression::Ptr)];
+      char dummy47[sizeof(UniversalQuantifierExpression::Ptr)];
 
       // Initializer
       // UpdateRule
-      char dummy46[sizeof(UpdateRule::Ptr)];
+      char dummy48[sizeof(UpdateRule::Ptr)];
 
       // Boolean
       // String
@@ -454,10 +464,10 @@ namespace libcasm_fe {
       // IntegerNumber
       // FloatingNumber
       // RationalNumber
-      char dummy47[sizeof(ValueAtom::Ptr)];
+      char dummy49[sizeof(ValueAtom::Ptr)];
 
       // Variable
-      char dummy48[sizeof(VariableDefinition::Ptr)];
+      char dummy50[sizeof(VariableDefinition::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -466,7 +476,7 @@ namespace libcasm_fe {
       // "floating"
       // "string"
       // "identifier"
-      char dummy49[sizeof(std::string)];
+      char dummy51[sizeof(std::string)];
 };
 
     /// Symbol semantic values.
@@ -475,7 +485,7 @@ namespace libcasm_fe {
     typedef YYSTYPE semantic_type;
 #endif
     /// Symbol locations.
-    typedef location location_type;
+    typedef SourceLocation location_type;
 
     /// Syntax errors thrown from user actions.
     struct syntax_error : std::runtime_error
@@ -492,79 +502,82 @@ namespace libcasm_fe {
         END = 0,
         CASM = 258,
         INIT = 259,
-        OPTION = 260,
-        DERIVED = 261,
-        ENUM = 262,
-        RULE = 263,
-        DUMPS = 264,
-        FUNCTION = 265,
-        INITIALLY = 266,
-        DEFINED = 267,
-        SEQ = 268,
-        ENDSEQ = 269,
-        PAR = 270,
-        ENDPAR = 271,
-        SKIP = 272,
-        LET = 273,
-        IN = 274,
-        FORALL = 275,
-        ITERATE = 276,
-        DO = 277,
-        CALL = 278,
-        IF = 279,
-        THEN = 280,
-        ELSE = 281,
-        CASE = 282,
-        OF = 283,
-        DEFAULT = 284,
-        HOLDS = 285,
-        EXISTS = 286,
-        WITH = 287,
-        UNDEF = 288,
-        FALSE = 289,
-        TRUE = 290,
-        AND = 291,
-        OR = 292,
-        XOR = 293,
-        IMPLIES = 294,
-        NOT = 295,
-        PLUS = 296,
-        MINUS = 297,
-        EQUAL = 298,
-        LPAREN = 299,
-        RPAREN = 300,
-        LSQPAREN = 301,
-        RSQPAREN = 302,
-        LCURPAREN = 303,
-        RCURPAREN = 304,
-        COLON = 305,
-        UNDERLINE = 306,
-        AT = 307,
-        COMMA = 308,
-        LESSER = 309,
-        GREATER = 310,
-        ASTERIX = 311,
-        SLASH = 312,
-        PERCENT = 313,
-        CARET = 314,
+        DERIVED = 260,
+        ENUM = 261,
+        RULE = 262,
+        FUNCTION = 263,
+        INITIALLY = 264,
+        DEFINED = 265,
+        SEQ = 266,
+        ENDSEQ = 267,
+        PAR = 268,
+        ENDPAR = 269,
+        SKIP = 270,
+        LET = 271,
+        IN = 272,
+        FORALL = 273,
+        CHOOSE = 274,
+        ITERATE = 275,
+        DO = 276,
+        CALL = 277,
+        IF = 278,
+        THEN = 279,
+        ELSE = 280,
+        CASE = 281,
+        OF = 282,
+        DEFAULT = 283,
+        HOLDS = 284,
+        EXISTS = 285,
+        WITH = 286,
+        UNDEF = 287,
+        FALSE = 288,
+        TRUE = 289,
+        AND = 290,
+        OR = 291,
+        XOR = 292,
+        IMPLIES = 293,
+        NOT = 294,
+        PLUS = 295,
+        MINUS = 296,
+        EQUAL = 297,
+        LPAREN = 298,
+        RPAREN = 299,
+        LSQPAREN = 300,
+        RSQPAREN = 301,
+        LCURPAREN = 302,
+        RCURPAREN = 303,
+        COLON = 304,
+        UNDERLINE = 305,
+        AT = 306,
+        COMMA = 307,
+        LESSER = 308,
+        GREATER = 309,
+        ASTERIX = 310,
+        SLASH = 311,
+        PERCENT = 312,
+        CARET = 313,
+        MARK = 314,
         DOTDOT = 315,
-        ARROW = 316,
-        UPDATE = 317,
-        NEQUAL = 318,
-        LESSEQ = 319,
-        GREATEREQ = 320,
-        SEQ_BRACKET = 321,
-        ENDSEQ_BRACKET = 322,
-        BINARY = 323,
-        HEXADECIMAL = 324,
-        INTEGER = 325,
-        RATIONAL = 326,
-        FLOATING = 327,
-        STRING = 328,
-        IDENTIFIER = 329,
-        UPLUS = 330,
-        UMINUS = 331,
-        DIRECT_CALL_EXPR_NO_ARG = 332
+        DOT = 316,
+        MAPS = 317,
+        ARROW = 318,
+        UPDATE = 319,
+        NEQUAL = 320,
+        LESSEQ = 321,
+        GREATEREQ = 322,
+        SEQ_BRACKET = 323,
+        ENDSEQ_BRACKET = 324,
+        BINARY = 325,
+        HEXADECIMAL = 326,
+        INTEGER = 327,
+        RATIONAL = 328,
+        FLOATING = 329,
+        STRING = 330,
+        IDENTIFIER = 331,
+        ABSOLUTE_PATH = 332,
+        UPLUS = 333,
+        UMINUS = 334,
+        CALL_WITHOUT_ARGS = 335
       };
     };
 
@@ -620,6 +633,8 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const Cases::Ptr v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const ComposedType::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr v, const location_type& l);
@@ -650,7 +665,11 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const FunctionDefinition::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const IdentifierNode::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Identifier::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const Identifiers::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const IndirectCallExpression::Ptr v, const location_type& l);
 
@@ -660,21 +679,19 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const ListExpression::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const NodeList< IdentifierNode >::Ptr v, const location_type& l);
-
   basic_symbol (typename Base::kind_type t, const NodeList< UpdateRule >::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const NodeList< VariableDefinition >::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const RangeExpression::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const RangedType::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ReferenceAtom::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const RelationType::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Rule::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const RuleReferenceAtom::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Rules::Ptr v, const location_type& l);
 
@@ -781,10 +798,6 @@ namespace libcasm_fe {
 
     static inline
     symbol_type
-    make_OPTION (const location_type& l);
-
-    static inline
-    symbol_type
     make_DERIVED (const location_type& l);
 
     static inline
@@ -794,10 +807,6 @@ namespace libcasm_fe {
     static inline
     symbol_type
     make_RULE (const location_type& l);
-
-    static inline
-    symbol_type
-    make_DUMPS (const location_type& l);
 
     static inline
     symbol_type
@@ -842,6 +851,10 @@ namespace libcasm_fe {
     static inline
     symbol_type
     make_FORALL (const location_type& l);
+
+    static inline
+    symbol_type
+    make_CHOOSE (const location_type& l);
 
     static inline
     symbol_type
@@ -1001,7 +1014,19 @@ namespace libcasm_fe {
 
     static inline
     symbol_type
+    make_MARK (const location_type& l);
+
+    static inline
+    symbol_type
     make_DOTDOT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_DOT (const location_type& l);
+
+    static inline
+    symbol_type
+    make_MAPS (const location_type& l);
 
     static inline
     symbol_type
@@ -1061,6 +1086,10 @@ namespace libcasm_fe {
 
     static inline
     symbol_type
+    make_ABSOLUTE_PATH (const location_type& l);
+
+    static inline
+    symbol_type
     make_UPLUS (const location_type& l);
 
     static inline
@@ -1069,11 +1098,11 @@ namespace libcasm_fe {
 
     static inline
     symbol_type
-    make_DIRECT_CALL_EXPR_NO_ARG (const location_type& l);
+    make_CALL_WITHOUT_ARGS (const location_type& l);
 
 
     /// Build a parser object.
-    Parser (Lexer& lexer_yyarg, const std::string& specificationName_yyarg, Specification::Ptr& result_yyarg);
+    Parser (Logger& log_yyarg, Lexer& lexer_yyarg, const std::string& filePath_yyarg, Specification::Ptr& result_yyarg);
     virtual ~Parser ();
 
     /// Parse.
@@ -1154,7 +1183,7 @@ namespace libcasm_fe {
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
   // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const unsigned short int yytable_[];
+  static const short int yytable_[];
 
   static const short int yycheck_[];
 
@@ -1276,18 +1305,19 @@ namespace libcasm_fe {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1470,     ///< Last index in yytable_.
-      yynnts_ = 68,  ///< Number of nonterminal symbols.
-      yyfinal_ = 17, ///< Termination state number.
+      yylast_ = 1732,     ///< Last index in yytable_.
+      yynnts_ = 70,  ///< Number of nonterminal symbols.
+      yyfinal_ = 18, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 78  ///< Number of tokens.
+      yyntokens_ = 81  ///< Number of tokens.
     };
 
 
     // User arguments.
+    Logger& log;
     Lexer& lexer;
-    const std::string& specificationName;
+    const std::string& filePath;
     Specification::Ptr& result;
   };
 
@@ -1333,9 +1363,9 @@ namespace libcasm_fe {
       45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
-      75,    76,    77
+      75,    76,    77,    78,    79,    80
     };
-    const unsigned int user_token_number_max_ = 332;
+    const unsigned int user_token_number_max_ = 335;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -1368,224 +1398,232 @@ namespace libcasm_fe {
   {
       switch (other.type_get ())
     {
-      case 142: // Attribute
+      case 147: // Attribute
         value.copy< Attribute::Ptr > (other.value);
         break;
 
-      case 143: // Attributes
+      case 148: // Attributes
         value.copy< Attributes::Ptr > (other.value);
         break;
 
-      case 144: // BasicAttribute
+      case 149: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (other.value);
         break;
 
-      case 102: // BasicType
+      case 105: // BasicType
         value.copy< BasicType::Ptr > (other.value);
         break;
 
-      case 138: // BlockRule
+      case 143: // BlockRule
         value.copy< BlockRule::Ptr > (other.value);
         break;
 
-      case 141: // CallRule
+      case 146: // CallRule
         value.copy< CallRule::Ptr > (other.value);
         break;
 
-      case 133: // CaseLabel
+      case 137: // CaseLabel
         value.copy< Case::Ptr > (other.value);
         break;
 
-      case 132: // CaseRule
+      case 136: // CaseRule
         value.copy< CaseRule::Ptr > (other.value);
         break;
 
-      case 134: // CaseLabels
+      case 138: // CaseLabels
         value.copy< Cases::Ptr > (other.value);
         break;
 
-      case 103: // ComposedType
+      case 141: // ChooseRule
+        value.copy< ChooseRule::Ptr > (other.value);
+        break;
+
+      case 106: // ComposedType
         value.copy< ComposedType::Ptr > (other.value);
         break;
 
-      case 124: // ConditionalExpression
+      case 128: // ConditionalExpression
         value.copy< ConditionalExpression::Ptr > (other.value);
         break;
 
-      case 131: // ConditionalRule
+      case 135: // ConditionalRule
         value.copy< ConditionalRule::Ptr > (other.value);
         break;
 
-      case 80: // Definition
-      case 81: // AttributedDefinition
+      case 83: // Definition
+      case 84: // AttributedDefinition
         value.copy< Definition::Ptr > (other.value);
         break;
 
-      case 82: // Definitions
+      case 85: // Definitions
         value.copy< Definitions::Ptr > (other.value);
         break;
 
-      case 93: // DerivedDefinition
+      case 95: // DerivedDefinition
         value.copy< DerivedDefinition::Ptr > (other.value);
         break;
 
-      case 122: // DirectCallExpression
+      case 126: // DirectCallExpression
         value.copy< DirectCallExpression::Ptr > (other.value);
         break;
 
-      case 94: // EnumerationDefinition
+      case 96: // EnumerationDefinition
         value.copy< EnumerationDefinition::Ptr > (other.value);
         break;
 
-      case 126: // ExistentialQuantifierExpression
+      case 130: // ExistentialQuantifierExpression
         value.copy< ExistentialQuantifierExpression::Ptr > (other.value);
         break;
 
-      case 85: // MaybeDefined
-      case 107: // Atom
-      case 116: // Term
-      case 117: // Expression
+      case 88: // MaybeDefined
+      case 110: // Atom
+      case 119: // Term
+      case 120: // Expression
         value.copy< Expression::Ptr > (other.value);
         break;
 
-      case 145: // ExpressionAttribute
+      case 150: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (other.value);
         break;
 
-      case 120: // Terms
-      case 121: // Arguments
+      case 123: // Terms
+      case 124: // Arguments
+      case 125: // TwoOrMoreArguments
         value.copy< Expressions::Ptr > (other.value);
         break;
 
-      case 104: // FixedSizedType
+      case 108: // FixedSizedType
         value.copy< FixedSizedType::Ptr > (other.value);
         break;
 
-      case 136: // ForallRule
+      case 140: // ForallRule
         value.copy< ForallRule::Ptr > (other.value);
         break;
 
-      case 83: // FunctionDefinition
-      case 89: // ProgramFunctionDefinition
+      case 86: // FunctionDefinition
+      case 91: // ProgramFunctionDefinition
         value.copy< FunctionDefinition::Ptr > (other.value);
         break;
 
-      case 95: // Identifier
-        value.copy< IdentifierNode::Ptr > (other.value);
+      case 97: // Identifier
+        value.copy< Identifier::Ptr > (other.value);
         break;
 
-      case 123: // IndirectCallExpression
+      case 100: // IdentifierPath
+        value.copy< IdentifierPath::Ptr > (other.value);
+        break;
+
+      case 98: // Identifiers
+      case 99: // DotSeparatedIdentifiers
+        value.copy< Identifiers::Ptr > (other.value);
+        break;
+
+      case 127: // IndirectCallExpression
         value.copy< IndirectCallExpression::Ptr > (other.value);
         break;
 
-      case 137: // IterateRule
+      case 142: // IterateRule
         value.copy< IterateRule::Ptr > (other.value);
         break;
 
-      case 135: // LetRule
+      case 139: // LetRule
         value.copy< LetRule::Ptr > (other.value);
         break;
 
-      case 119: // List
+      case 122: // List
         value.copy< ListExpression::Ptr > (other.value);
         break;
 
-      case 88: // MaybeFunctionAttributes
-      case 96: // Identifiers
-      case 97: // MaybeIdentifiers
-        value.copy< NodeList< IdentifierNode >::Ptr > (other.value);
-        break;
-
-      case 84: // MaybeInitially
-      case 91: // Initializers
-      case 92: // MaybeInitializers
+      case 87: // MaybeInitially
+      case 93: // Initializers
+      case 94: // MaybeInitializers
         value.copy< NodeList< UpdateRule >::Ptr > (other.value);
         break;
 
-      case 99: // Parameters
-      case 100: // MaybeParameters
+      case 102: // Parameters
+      case 103: // MaybeParameters
         value.copy< NodeList< VariableDefinition >::Ptr > (other.value);
         break;
 
-      case 118: // Range
+      case 121: // Range
         value.copy< RangeExpression::Ptr > (other.value);
         break;
 
-      case 105: // RangedType
-        value.copy< RangedType::Ptr > (other.value);
+      case 118: // Reference
+        value.copy< ReferenceAtom::Ptr > (other.value);
         break;
 
-      case 128: // Rule
+      case 107: // RelationType
+        value.copy< RelationType::Ptr > (other.value);
+        break;
+
+      case 132: // Rule
         value.copy< Rule::Ptr > (other.value);
         break;
 
-      case 127: // RuleDefinition
+      case 131: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (other.value);
         break;
 
-      case 115: // RuleReference
-        value.copy< RuleReferenceAtom::Ptr > (other.value);
-        break;
-
-      case 129: // Rules
+      case 133: // Rules
         value.copy< Rules::Ptr > (other.value);
         break;
 
-      case 139: // SequenceRule
+      case 144: // SequenceRule
         value.copy< SequenceRule::Ptr > (other.value);
         break;
 
-      case 130: // SkipRule
+      case 134: // SkipRule
         value.copy< SkipRule::Ptr > (other.value);
         break;
 
-      case 79: // Specification
+      case 82: // Specification
         value.copy< Specification::Ptr > (other.value);
         break;
 
-      case 101: // Type
+      case 104: // Type
         value.copy< Type::Ptr > (other.value);
         break;
 
-      case 86: // FunctionParameters
-      case 87: // MaybeFunctionParameters
-      case 106: // Types
+      case 89: // FunctionParameters
+      case 90: // MaybeFunctionParameters
+      case 109: // Types
         value.copy< Types::Ptr > (other.value);
         break;
 
-      case 108: // Undefined
+      case 111: // Undefined
         value.copy< UndefAtom::Ptr > (other.value);
         break;
 
-      case 125: // UniversalQuantifierExpression
+      case 129: // UniversalQuantifierExpression
         value.copy< UniversalQuantifierExpression::Ptr > (other.value);
         break;
 
-      case 90: // Initializer
-      case 140: // UpdateRule
+      case 92: // Initializer
+      case 145: // UpdateRule
         value.copy< UpdateRule::Ptr > (other.value);
         break;
 
-      case 109: // Boolean
-      case 110: // String
-      case 111: // BitNumber
-      case 112: // IntegerNumber
-      case 113: // FloatingNumber
-      case 114: // RationalNumber
+      case 112: // Boolean
+      case 113: // String
+      case 114: // BitNumber
+      case 115: // IntegerNumber
+      case 116: // FloatingNumber
+      case 117: // RationalNumber
         value.copy< ValueAtom::Ptr > (other.value);
         break;
 
-      case 98: // Variable
+      case 101: // Variable
         value.copy< VariableDefinition::Ptr > (other.value);
         break;
 
-      case 68: // "binary"
-      case 69: // "hexadecimal"
-      case 70: // "integer"
-      case 71: // "rational"
-      case 72: // "floating"
-      case 73: // "string"
-      case 74: // "identifier"
+      case 70: // "binary"
+      case 71: // "hexadecimal"
+      case 72: // "integer"
+      case 73: // "rational"
+      case 74: // "floating"
+      case 75: // "string"
+      case 76: // "identifier"
         value.copy< std::string > (other.value);
         break;
 
@@ -1606,224 +1644,232 @@ namespace libcasm_fe {
     (void) v;
       switch (this->type_get ())
     {
-      case 142: // Attribute
+      case 147: // Attribute
         value.copy< Attribute::Ptr > (v);
         break;
 
-      case 143: // Attributes
+      case 148: // Attributes
         value.copy< Attributes::Ptr > (v);
         break;
 
-      case 144: // BasicAttribute
+      case 149: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (v);
         break;
 
-      case 102: // BasicType
+      case 105: // BasicType
         value.copy< BasicType::Ptr > (v);
         break;
 
-      case 138: // BlockRule
+      case 143: // BlockRule
         value.copy< BlockRule::Ptr > (v);
         break;
 
-      case 141: // CallRule
+      case 146: // CallRule
         value.copy< CallRule::Ptr > (v);
         break;
 
-      case 133: // CaseLabel
+      case 137: // CaseLabel
         value.copy< Case::Ptr > (v);
         break;
 
-      case 132: // CaseRule
+      case 136: // CaseRule
         value.copy< CaseRule::Ptr > (v);
         break;
 
-      case 134: // CaseLabels
+      case 138: // CaseLabels
         value.copy< Cases::Ptr > (v);
         break;
 
-      case 103: // ComposedType
+      case 141: // ChooseRule
+        value.copy< ChooseRule::Ptr > (v);
+        break;
+
+      case 106: // ComposedType
         value.copy< ComposedType::Ptr > (v);
         break;
 
-      case 124: // ConditionalExpression
+      case 128: // ConditionalExpression
         value.copy< ConditionalExpression::Ptr > (v);
         break;
 
-      case 131: // ConditionalRule
+      case 135: // ConditionalRule
         value.copy< ConditionalRule::Ptr > (v);
         break;
 
-      case 80: // Definition
-      case 81: // AttributedDefinition
+      case 83: // Definition
+      case 84: // AttributedDefinition
         value.copy< Definition::Ptr > (v);
         break;
 
-      case 82: // Definitions
+      case 85: // Definitions
         value.copy< Definitions::Ptr > (v);
         break;
 
-      case 93: // DerivedDefinition
+      case 95: // DerivedDefinition
         value.copy< DerivedDefinition::Ptr > (v);
         break;
 
-      case 122: // DirectCallExpression
+      case 126: // DirectCallExpression
         value.copy< DirectCallExpression::Ptr > (v);
         break;
 
-      case 94: // EnumerationDefinition
+      case 96: // EnumerationDefinition
         value.copy< EnumerationDefinition::Ptr > (v);
         break;
 
-      case 126: // ExistentialQuantifierExpression
+      case 130: // ExistentialQuantifierExpression
         value.copy< ExistentialQuantifierExpression::Ptr > (v);
         break;
 
-      case 85: // MaybeDefined
-      case 107: // Atom
-      case 116: // Term
-      case 117: // Expression
+      case 88: // MaybeDefined
+      case 110: // Atom
+      case 119: // Term
+      case 120: // Expression
         value.copy< Expression::Ptr > (v);
         break;
 
-      case 145: // ExpressionAttribute
+      case 150: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (v);
         break;
 
-      case 120: // Terms
-      case 121: // Arguments
+      case 123: // Terms
+      case 124: // Arguments
+      case 125: // TwoOrMoreArguments
         value.copy< Expressions::Ptr > (v);
         break;
 
-      case 104: // FixedSizedType
+      case 108: // FixedSizedType
         value.copy< FixedSizedType::Ptr > (v);
         break;
 
-      case 136: // ForallRule
+      case 140: // ForallRule
         value.copy< ForallRule::Ptr > (v);
         break;
 
-      case 83: // FunctionDefinition
-      case 89: // ProgramFunctionDefinition
+      case 86: // FunctionDefinition
+      case 91: // ProgramFunctionDefinition
         value.copy< FunctionDefinition::Ptr > (v);
         break;
 
-      case 95: // Identifier
-        value.copy< IdentifierNode::Ptr > (v);
+      case 97: // Identifier
+        value.copy< Identifier::Ptr > (v);
         break;
 
-      case 123: // IndirectCallExpression
+      case 100: // IdentifierPath
+        value.copy< IdentifierPath::Ptr > (v);
+        break;
+
+      case 98: // Identifiers
+      case 99: // DotSeparatedIdentifiers
+        value.copy< Identifiers::Ptr > (v);
+        break;
+
+      case 127: // IndirectCallExpression
         value.copy< IndirectCallExpression::Ptr > (v);
         break;
 
-      case 137: // IterateRule
+      case 142: // IterateRule
         value.copy< IterateRule::Ptr > (v);
         break;
 
-      case 135: // LetRule
+      case 139: // LetRule
         value.copy< LetRule::Ptr > (v);
         break;
 
-      case 119: // List
+      case 122: // List
         value.copy< ListExpression::Ptr > (v);
         break;
 
-      case 88: // MaybeFunctionAttributes
-      case 96: // Identifiers
-      case 97: // MaybeIdentifiers
-        value.copy< NodeList< IdentifierNode >::Ptr > (v);
-        break;
-
-      case 84: // MaybeInitially
-      case 91: // Initializers
-      case 92: // MaybeInitializers
+      case 87: // MaybeInitially
+      case 93: // Initializers
+      case 94: // MaybeInitializers
         value.copy< NodeList< UpdateRule >::Ptr > (v);
         break;
 
-      case 99: // Parameters
-      case 100: // MaybeParameters
+      case 102: // Parameters
+      case 103: // MaybeParameters
         value.copy< NodeList< VariableDefinition >::Ptr > (v);
         break;
 
-      case 118: // Range
+      case 121: // Range
         value.copy< RangeExpression::Ptr > (v);
         break;
 
-      case 105: // RangedType
-        value.copy< RangedType::Ptr > (v);
+      case 118: // Reference
+        value.copy< ReferenceAtom::Ptr > (v);
         break;
 
-      case 128: // Rule
+      case 107: // RelationType
+        value.copy< RelationType::Ptr > (v);
+        break;
+
+      case 132: // Rule
         value.copy< Rule::Ptr > (v);
         break;
 
-      case 127: // RuleDefinition
+      case 131: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (v);
         break;
 
-      case 115: // RuleReference
-        value.copy< RuleReferenceAtom::Ptr > (v);
-        break;
-
-      case 129: // Rules
+      case 133: // Rules
         value.copy< Rules::Ptr > (v);
         break;
 
-      case 139: // SequenceRule
+      case 144: // SequenceRule
         value.copy< SequenceRule::Ptr > (v);
         break;
 
-      case 130: // SkipRule
+      case 134: // SkipRule
         value.copy< SkipRule::Ptr > (v);
         break;
 
-      case 79: // Specification
+      case 82: // Specification
         value.copy< Specification::Ptr > (v);
         break;
 
-      case 101: // Type
+      case 104: // Type
         value.copy< Type::Ptr > (v);
         break;
 
-      case 86: // FunctionParameters
-      case 87: // MaybeFunctionParameters
-      case 106: // Types
+      case 89: // FunctionParameters
+      case 90: // MaybeFunctionParameters
+      case 109: // Types
         value.copy< Types::Ptr > (v);
         break;
 
-      case 108: // Undefined
+      case 111: // Undefined
         value.copy< UndefAtom::Ptr > (v);
         break;
 
-      case 125: // UniversalQuantifierExpression
+      case 129: // UniversalQuantifierExpression
         value.copy< UniversalQuantifierExpression::Ptr > (v);
         break;
 
-      case 90: // Initializer
-      case 140: // UpdateRule
+      case 92: // Initializer
+      case 145: // UpdateRule
         value.copy< UpdateRule::Ptr > (v);
         break;
 
-      case 109: // Boolean
-      case 110: // String
-      case 111: // BitNumber
-      case 112: // IntegerNumber
-      case 113: // FloatingNumber
-      case 114: // RationalNumber
+      case 112: // Boolean
+      case 113: // String
+      case 114: // BitNumber
+      case 115: // IntegerNumber
+      case 116: // FloatingNumber
+      case 117: // RationalNumber
         value.copy< ValueAtom::Ptr > (v);
         break;
 
-      case 98: // Variable
+      case 101: // Variable
         value.copy< VariableDefinition::Ptr > (v);
         break;
 
-      case 68: // "binary"
-      case 69: // "hexadecimal"
-      case 70: // "integer"
-      case 71: // "rational"
-      case 72: // "floating"
-      case 73: // "string"
-      case 74: // "identifier"
+      case 70: // "binary"
+      case 71: // "hexadecimal"
+      case 72: // "integer"
+      case 73: // "rational"
+      case 74: // "floating"
+      case 75: // "string"
+      case 76: // "identifier"
         value.copy< std::string > (v);
         break;
 
@@ -1900,6 +1946,13 @@ namespace libcasm_fe {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Cases::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2011,7 +2064,21 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IdentifierNode::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Identifier::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Identifiers::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2046,13 +2113,6 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const NodeList< IdentifierNode >::Ptr v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const NodeList< UpdateRule >::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -2074,7 +2134,14 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RangedType::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ReferenceAtom::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RelationType::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2089,13 +2156,6 @@ namespace libcasm_fe {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RuleReferenceAtom::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2211,224 +2271,232 @@ namespace libcasm_fe {
     // Type destructor.
     switch (yytype)
     {
-      case 142: // Attribute
+      case 147: // Attribute
         value.template destroy< Attribute::Ptr > ();
         break;
 
-      case 143: // Attributes
+      case 148: // Attributes
         value.template destroy< Attributes::Ptr > ();
         break;
 
-      case 144: // BasicAttribute
+      case 149: // BasicAttribute
         value.template destroy< BasicAttribute::Ptr > ();
         break;
 
-      case 102: // BasicType
+      case 105: // BasicType
         value.template destroy< BasicType::Ptr > ();
         break;
 
-      case 138: // BlockRule
+      case 143: // BlockRule
         value.template destroy< BlockRule::Ptr > ();
         break;
 
-      case 141: // CallRule
+      case 146: // CallRule
         value.template destroy< CallRule::Ptr > ();
         break;
 
-      case 133: // CaseLabel
+      case 137: // CaseLabel
         value.template destroy< Case::Ptr > ();
         break;
 
-      case 132: // CaseRule
+      case 136: // CaseRule
         value.template destroy< CaseRule::Ptr > ();
         break;
 
-      case 134: // CaseLabels
+      case 138: // CaseLabels
         value.template destroy< Cases::Ptr > ();
         break;
 
-      case 103: // ComposedType
+      case 141: // ChooseRule
+        value.template destroy< ChooseRule::Ptr > ();
+        break;
+
+      case 106: // ComposedType
         value.template destroy< ComposedType::Ptr > ();
         break;
 
-      case 124: // ConditionalExpression
+      case 128: // ConditionalExpression
         value.template destroy< ConditionalExpression::Ptr > ();
         break;
 
-      case 131: // ConditionalRule
+      case 135: // ConditionalRule
         value.template destroy< ConditionalRule::Ptr > ();
         break;
 
-      case 80: // Definition
-      case 81: // AttributedDefinition
+      case 83: // Definition
+      case 84: // AttributedDefinition
         value.template destroy< Definition::Ptr > ();
         break;
 
-      case 82: // Definitions
+      case 85: // Definitions
         value.template destroy< Definitions::Ptr > ();
         break;
 
-      case 93: // DerivedDefinition
+      case 95: // DerivedDefinition
         value.template destroy< DerivedDefinition::Ptr > ();
         break;
 
-      case 122: // DirectCallExpression
+      case 126: // DirectCallExpression
         value.template destroy< DirectCallExpression::Ptr > ();
         break;
 
-      case 94: // EnumerationDefinition
+      case 96: // EnumerationDefinition
         value.template destroy< EnumerationDefinition::Ptr > ();
         break;
 
-      case 126: // ExistentialQuantifierExpression
+      case 130: // ExistentialQuantifierExpression
         value.template destroy< ExistentialQuantifierExpression::Ptr > ();
         break;
 
-      case 85: // MaybeDefined
-      case 107: // Atom
-      case 116: // Term
-      case 117: // Expression
+      case 88: // MaybeDefined
+      case 110: // Atom
+      case 119: // Term
+      case 120: // Expression
         value.template destroy< Expression::Ptr > ();
         break;
 
-      case 145: // ExpressionAttribute
+      case 150: // ExpressionAttribute
         value.template destroy< ExpressionAttribute::Ptr > ();
         break;
 
-      case 120: // Terms
-      case 121: // Arguments
+      case 123: // Terms
+      case 124: // Arguments
+      case 125: // TwoOrMoreArguments
         value.template destroy< Expressions::Ptr > ();
         break;
 
-      case 104: // FixedSizedType
+      case 108: // FixedSizedType
         value.template destroy< FixedSizedType::Ptr > ();
         break;
 
-      case 136: // ForallRule
+      case 140: // ForallRule
         value.template destroy< ForallRule::Ptr > ();
         break;
 
-      case 83: // FunctionDefinition
-      case 89: // ProgramFunctionDefinition
+      case 86: // FunctionDefinition
+      case 91: // ProgramFunctionDefinition
         value.template destroy< FunctionDefinition::Ptr > ();
         break;
 
-      case 95: // Identifier
-        value.template destroy< IdentifierNode::Ptr > ();
+      case 97: // Identifier
+        value.template destroy< Identifier::Ptr > ();
         break;
 
-      case 123: // IndirectCallExpression
+      case 100: // IdentifierPath
+        value.template destroy< IdentifierPath::Ptr > ();
+        break;
+
+      case 98: // Identifiers
+      case 99: // DotSeparatedIdentifiers
+        value.template destroy< Identifiers::Ptr > ();
+        break;
+
+      case 127: // IndirectCallExpression
         value.template destroy< IndirectCallExpression::Ptr > ();
         break;
 
-      case 137: // IterateRule
+      case 142: // IterateRule
         value.template destroy< IterateRule::Ptr > ();
         break;
 
-      case 135: // LetRule
+      case 139: // LetRule
         value.template destroy< LetRule::Ptr > ();
         break;
 
-      case 119: // List
+      case 122: // List
         value.template destroy< ListExpression::Ptr > ();
         break;
 
-      case 88: // MaybeFunctionAttributes
-      case 96: // Identifiers
-      case 97: // MaybeIdentifiers
-        value.template destroy< NodeList< IdentifierNode >::Ptr > ();
-        break;
-
-      case 84: // MaybeInitially
-      case 91: // Initializers
-      case 92: // MaybeInitializers
+      case 87: // MaybeInitially
+      case 93: // Initializers
+      case 94: // MaybeInitializers
         value.template destroy< NodeList< UpdateRule >::Ptr > ();
         break;
 
-      case 99: // Parameters
-      case 100: // MaybeParameters
+      case 102: // Parameters
+      case 103: // MaybeParameters
         value.template destroy< NodeList< VariableDefinition >::Ptr > ();
         break;
 
-      case 118: // Range
+      case 121: // Range
         value.template destroy< RangeExpression::Ptr > ();
         break;
 
-      case 105: // RangedType
-        value.template destroy< RangedType::Ptr > ();
+      case 118: // Reference
+        value.template destroy< ReferenceAtom::Ptr > ();
         break;
 
-      case 128: // Rule
+      case 107: // RelationType
+        value.template destroy< RelationType::Ptr > ();
+        break;
+
+      case 132: // Rule
         value.template destroy< Rule::Ptr > ();
         break;
 
-      case 127: // RuleDefinition
+      case 131: // RuleDefinition
         value.template destroy< RuleDefinition::Ptr > ();
         break;
 
-      case 115: // RuleReference
-        value.template destroy< RuleReferenceAtom::Ptr > ();
-        break;
-
-      case 129: // Rules
+      case 133: // Rules
         value.template destroy< Rules::Ptr > ();
         break;
 
-      case 139: // SequenceRule
+      case 144: // SequenceRule
         value.template destroy< SequenceRule::Ptr > ();
         break;
 
-      case 130: // SkipRule
+      case 134: // SkipRule
         value.template destroy< SkipRule::Ptr > ();
         break;
 
-      case 79: // Specification
+      case 82: // Specification
         value.template destroy< Specification::Ptr > ();
         break;
 
-      case 101: // Type
+      case 104: // Type
         value.template destroy< Type::Ptr > ();
         break;
 
-      case 86: // FunctionParameters
-      case 87: // MaybeFunctionParameters
-      case 106: // Types
+      case 89: // FunctionParameters
+      case 90: // MaybeFunctionParameters
+      case 109: // Types
         value.template destroy< Types::Ptr > ();
         break;
 
-      case 108: // Undefined
+      case 111: // Undefined
         value.template destroy< UndefAtom::Ptr > ();
         break;
 
-      case 125: // UniversalQuantifierExpression
+      case 129: // UniversalQuantifierExpression
         value.template destroy< UniversalQuantifierExpression::Ptr > ();
         break;
 
-      case 90: // Initializer
-      case 140: // UpdateRule
+      case 92: // Initializer
+      case 145: // UpdateRule
         value.template destroy< UpdateRule::Ptr > ();
         break;
 
-      case 109: // Boolean
-      case 110: // String
-      case 111: // BitNumber
-      case 112: // IntegerNumber
-      case 113: // FloatingNumber
-      case 114: // RationalNumber
+      case 112: // Boolean
+      case 113: // String
+      case 114: // BitNumber
+      case 115: // IntegerNumber
+      case 116: // FloatingNumber
+      case 117: // RationalNumber
         value.template destroy< ValueAtom::Ptr > ();
         break;
 
-      case 98: // Variable
+      case 101: // Variable
         value.template destroy< VariableDefinition::Ptr > ();
         break;
 
-      case 68: // "binary"
-      case 69: // "hexadecimal"
-      case 70: // "integer"
-      case 71: // "rational"
-      case 72: // "floating"
-      case 73: // "string"
-      case 74: // "identifier"
+      case 70: // "binary"
+      case 71: // "hexadecimal"
+      case 72: // "integer"
+      case 73: // "rational"
+      case 74: // "floating"
+      case 75: // "string"
+      case 76: // "identifier"
         value.template destroy< std::string > ();
         break;
 
@@ -2455,224 +2523,232 @@ namespace libcasm_fe {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 142: // Attribute
+      case 147: // Attribute
         value.move< Attribute::Ptr > (s.value);
         break;
 
-      case 143: // Attributes
+      case 148: // Attributes
         value.move< Attributes::Ptr > (s.value);
         break;
 
-      case 144: // BasicAttribute
+      case 149: // BasicAttribute
         value.move< BasicAttribute::Ptr > (s.value);
         break;
 
-      case 102: // BasicType
+      case 105: // BasicType
         value.move< BasicType::Ptr > (s.value);
         break;
 
-      case 138: // BlockRule
+      case 143: // BlockRule
         value.move< BlockRule::Ptr > (s.value);
         break;
 
-      case 141: // CallRule
+      case 146: // CallRule
         value.move< CallRule::Ptr > (s.value);
         break;
 
-      case 133: // CaseLabel
+      case 137: // CaseLabel
         value.move< Case::Ptr > (s.value);
         break;
 
-      case 132: // CaseRule
+      case 136: // CaseRule
         value.move< CaseRule::Ptr > (s.value);
         break;
 
-      case 134: // CaseLabels
+      case 138: // CaseLabels
         value.move< Cases::Ptr > (s.value);
         break;
 
-      case 103: // ComposedType
+      case 141: // ChooseRule
+        value.move< ChooseRule::Ptr > (s.value);
+        break;
+
+      case 106: // ComposedType
         value.move< ComposedType::Ptr > (s.value);
         break;
 
-      case 124: // ConditionalExpression
+      case 128: // ConditionalExpression
         value.move< ConditionalExpression::Ptr > (s.value);
         break;
 
-      case 131: // ConditionalRule
+      case 135: // ConditionalRule
         value.move< ConditionalRule::Ptr > (s.value);
         break;
 
-      case 80: // Definition
-      case 81: // AttributedDefinition
+      case 83: // Definition
+      case 84: // AttributedDefinition
         value.move< Definition::Ptr > (s.value);
         break;
 
-      case 82: // Definitions
+      case 85: // Definitions
         value.move< Definitions::Ptr > (s.value);
         break;
 
-      case 93: // DerivedDefinition
+      case 95: // DerivedDefinition
         value.move< DerivedDefinition::Ptr > (s.value);
         break;
 
-      case 122: // DirectCallExpression
+      case 126: // DirectCallExpression
         value.move< DirectCallExpression::Ptr > (s.value);
         break;
 
-      case 94: // EnumerationDefinition
+      case 96: // EnumerationDefinition
         value.move< EnumerationDefinition::Ptr > (s.value);
         break;
 
-      case 126: // ExistentialQuantifierExpression
+      case 130: // ExistentialQuantifierExpression
         value.move< ExistentialQuantifierExpression::Ptr > (s.value);
         break;
 
-      case 85: // MaybeDefined
-      case 107: // Atom
-      case 116: // Term
-      case 117: // Expression
+      case 88: // MaybeDefined
+      case 110: // Atom
+      case 119: // Term
+      case 120: // Expression
         value.move< Expression::Ptr > (s.value);
         break;
 
-      case 145: // ExpressionAttribute
+      case 150: // ExpressionAttribute
         value.move< ExpressionAttribute::Ptr > (s.value);
         break;
 
-      case 120: // Terms
-      case 121: // Arguments
+      case 123: // Terms
+      case 124: // Arguments
+      case 125: // TwoOrMoreArguments
         value.move< Expressions::Ptr > (s.value);
         break;
 
-      case 104: // FixedSizedType
+      case 108: // FixedSizedType
         value.move< FixedSizedType::Ptr > (s.value);
         break;
 
-      case 136: // ForallRule
+      case 140: // ForallRule
         value.move< ForallRule::Ptr > (s.value);
         break;
 
-      case 83: // FunctionDefinition
-      case 89: // ProgramFunctionDefinition
+      case 86: // FunctionDefinition
+      case 91: // ProgramFunctionDefinition
         value.move< FunctionDefinition::Ptr > (s.value);
         break;
 
-      case 95: // Identifier
-        value.move< IdentifierNode::Ptr > (s.value);
+      case 97: // Identifier
+        value.move< Identifier::Ptr > (s.value);
         break;
 
-      case 123: // IndirectCallExpression
+      case 100: // IdentifierPath
+        value.move< IdentifierPath::Ptr > (s.value);
+        break;
+
+      case 98: // Identifiers
+      case 99: // DotSeparatedIdentifiers
+        value.move< Identifiers::Ptr > (s.value);
+        break;
+
+      case 127: // IndirectCallExpression
         value.move< IndirectCallExpression::Ptr > (s.value);
         break;
 
-      case 137: // IterateRule
+      case 142: // IterateRule
         value.move< IterateRule::Ptr > (s.value);
         break;
 
-      case 135: // LetRule
+      case 139: // LetRule
         value.move< LetRule::Ptr > (s.value);
         break;
 
-      case 119: // List
+      case 122: // List
         value.move< ListExpression::Ptr > (s.value);
         break;
 
-      case 88: // MaybeFunctionAttributes
-      case 96: // Identifiers
-      case 97: // MaybeIdentifiers
-        value.move< NodeList< IdentifierNode >::Ptr > (s.value);
-        break;
-
-      case 84: // MaybeInitially
-      case 91: // Initializers
-      case 92: // MaybeInitializers
+      case 87: // MaybeInitially
+      case 93: // Initializers
+      case 94: // MaybeInitializers
         value.move< NodeList< UpdateRule >::Ptr > (s.value);
         break;
 
-      case 99: // Parameters
-      case 100: // MaybeParameters
+      case 102: // Parameters
+      case 103: // MaybeParameters
         value.move< NodeList< VariableDefinition >::Ptr > (s.value);
         break;
 
-      case 118: // Range
+      case 121: // Range
         value.move< RangeExpression::Ptr > (s.value);
         break;
 
-      case 105: // RangedType
-        value.move< RangedType::Ptr > (s.value);
+      case 118: // Reference
+        value.move< ReferenceAtom::Ptr > (s.value);
         break;
 
-      case 128: // Rule
+      case 107: // RelationType
+        value.move< RelationType::Ptr > (s.value);
+        break;
+
+      case 132: // Rule
         value.move< Rule::Ptr > (s.value);
         break;
 
-      case 127: // RuleDefinition
+      case 131: // RuleDefinition
         value.move< RuleDefinition::Ptr > (s.value);
         break;
 
-      case 115: // RuleReference
-        value.move< RuleReferenceAtom::Ptr > (s.value);
-        break;
-
-      case 129: // Rules
+      case 133: // Rules
         value.move< Rules::Ptr > (s.value);
         break;
 
-      case 139: // SequenceRule
+      case 144: // SequenceRule
         value.move< SequenceRule::Ptr > (s.value);
         break;
 
-      case 130: // SkipRule
+      case 134: // SkipRule
         value.move< SkipRule::Ptr > (s.value);
         break;
 
-      case 79: // Specification
+      case 82: // Specification
         value.move< Specification::Ptr > (s.value);
         break;
 
-      case 101: // Type
+      case 104: // Type
         value.move< Type::Ptr > (s.value);
         break;
 
-      case 86: // FunctionParameters
-      case 87: // MaybeFunctionParameters
-      case 106: // Types
+      case 89: // FunctionParameters
+      case 90: // MaybeFunctionParameters
+      case 109: // Types
         value.move< Types::Ptr > (s.value);
         break;
 
-      case 108: // Undefined
+      case 111: // Undefined
         value.move< UndefAtom::Ptr > (s.value);
         break;
 
-      case 125: // UniversalQuantifierExpression
+      case 129: // UniversalQuantifierExpression
         value.move< UniversalQuantifierExpression::Ptr > (s.value);
         break;
 
-      case 90: // Initializer
-      case 140: // UpdateRule
+      case 92: // Initializer
+      case 145: // UpdateRule
         value.move< UpdateRule::Ptr > (s.value);
         break;
 
-      case 109: // Boolean
-      case 110: // String
-      case 111: // BitNumber
-      case 112: // IntegerNumber
-      case 113: // FloatingNumber
-      case 114: // RationalNumber
+      case 112: // Boolean
+      case 113: // String
+      case 114: // BitNumber
+      case 115: // IntegerNumber
+      case 116: // FloatingNumber
+      case 117: // RationalNumber
         value.move< ValueAtom::Ptr > (s.value);
         break;
 
-      case 98: // Variable
+      case 101: // Variable
         value.move< VariableDefinition::Ptr > (s.value);
         break;
 
-      case 68: // "binary"
-      case 69: // "hexadecimal"
-      case 70: // "integer"
-      case 71: // "rational"
-      case 72: // "floating"
-      case 73: // "string"
-      case 74: // "identifier"
+      case 70: // "binary"
+      case 71: // "hexadecimal"
+      case 72: // "integer"
+      case 73: // "rational"
+      case 74: // "floating"
+      case 75: // "string"
+      case 76: // "identifier"
         value.move< std::string > (s.value);
         break;
 
@@ -2738,7 +2814,8 @@ namespace libcasm_fe {
      295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
      305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
      315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
-     325,   326,   327,   328,   329,   330,   331,   332
+     325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
+     335
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -2762,12 +2839,6 @@ namespace libcasm_fe {
   }
 
   Parser::symbol_type
-  Parser::make_OPTION (const location_type& l)
-  {
-    return symbol_type (token::OPTION, l);
-  }
-
-  Parser::symbol_type
   Parser::make_DERIVED (const location_type& l)
   {
     return symbol_type (token::DERIVED, l);
@@ -2783,12 +2854,6 @@ namespace libcasm_fe {
   Parser::make_RULE (const location_type& l)
   {
     return symbol_type (token::RULE, l);
-  }
-
-  Parser::symbol_type
-  Parser::make_DUMPS (const location_type& l)
-  {
-    return symbol_type (token::DUMPS, l);
   }
 
   Parser::symbol_type
@@ -2855,6 +2920,12 @@ namespace libcasm_fe {
   Parser::make_FORALL (const location_type& l)
   {
     return symbol_type (token::FORALL, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_CHOOSE (const location_type& l)
+  {
+    return symbol_type (token::CHOOSE, l);
   }
 
   Parser::symbol_type
@@ -3092,9 +3163,27 @@ namespace libcasm_fe {
   }
 
   Parser::symbol_type
+  Parser::make_MARK (const location_type& l)
+  {
+    return symbol_type (token::MARK, l);
+  }
+
+  Parser::symbol_type
   Parser::make_DOTDOT (const location_type& l)
   {
     return symbol_type (token::DOTDOT, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_DOT (const location_type& l)
+  {
+    return symbol_type (token::DOT, l);
+  }
+
+  Parser::symbol_type
+  Parser::make_MAPS (const location_type& l)
+  {
+    return symbol_type (token::MAPS, l);
   }
 
   Parser::symbol_type
@@ -3182,6 +3271,12 @@ namespace libcasm_fe {
   }
 
   Parser::symbol_type
+  Parser::make_ABSOLUTE_PATH (const location_type& l)
+  {
+    return symbol_type (token::ABSOLUTE_PATH, l);
+  }
+
+  Parser::symbol_type
   Parser::make_UPLUS (const location_type& l)
   {
     return symbol_type (token::UPLUS, l);
@@ -3194,15 +3289,15 @@ namespace libcasm_fe {
   }
 
   Parser::symbol_type
-  Parser::make_DIRECT_CALL_EXPR_NO_ARG (const location_type& l)
+  Parser::make_CALL_WITHOUT_ARGS (const location_type& l)
   {
-    return symbol_type (token::DIRECT_CALL_EXPR_NO_ARG, l);
+    return symbol_type (token::CALL_WITHOUT_ARGS, l);
   }
 
 
 #line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 } // libcasm_fe
-#line 3206 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3301 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

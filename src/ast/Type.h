@@ -32,21 +32,17 @@ namespace libcasm_fe
 {
     namespace Ast
     {
-        class Type : public Node
+        class Type : public TypedNode
         {
           public:
             using Ptr = std::shared_ptr< Type >;
 
-            Type( Node::ID id, const IdentifierNode::Ptr& name );
+            Type( Node::ID id, const IdentifierPath::Ptr& name );
 
-            IdentifierNode::Ptr name( void ) const;
-
-            void setType( const libcasm_ir::Type::Ptr& type );
-            libcasm_ir::Type::Ptr type( void ) const;
+            IdentifierPath::Ptr name( void ) const;
 
           private:
-            IdentifierNode::Ptr m_name;
-            libcasm_ir::Type::Ptr m_type;
+            IdentifierPath::Ptr m_name;
         };
 
         using Types = NodeList< Type >;
@@ -56,7 +52,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UnresolvedType >;
 
-            UnresolvedType( void );
+            explicit UnresolvedType( void );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -66,7 +62,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< BasicType >;
 
-            BasicType( const IdentifierNode::Ptr& identifier );
+            explicit BasicType( const IdentifierPath::Ptr& identifier );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -76,7 +72,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ComposedType >;
 
-            ComposedType( const IdentifierNode::Ptr& identifier,
+            ComposedType( const IdentifierPath::Ptr& identifier,
                 const Types::Ptr& subTypes );
 
             Types::Ptr subTypes( void ) const;
@@ -92,7 +88,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< FixedSizedType >;
 
-            FixedSizedType( const IdentifierNode::Ptr& identifier,
+            FixedSizedType( const IdentifierPath::Ptr& identifier,
                 const Expression::Ptr& size );
 
             Expression::Ptr size( void ) const;
@@ -103,23 +99,23 @@ namespace libcasm_fe
             Expression::Ptr m_size;
         };
 
-        class RangedType : public Type
+        class RelationType : public Type
         {
           public:
-            using Ptr = std::shared_ptr< RangedType >;
+            using Ptr = std::shared_ptr< RelationType >;
 
-            RangedType( const IdentifierNode::Ptr& identifier,
-                const Expression::Ptr& lowerBound,
-                const Expression::Ptr& upperBound );
+            RelationType( const IdentifierPath::Ptr& identifier,
+                const Types::Ptr& argumentTypes,
+                const Type::Ptr& returnType );
 
-            Expression::Ptr lowerBound( void ) const;
-            Expression::Ptr upperBound( void ) const;
+            Types::Ptr argumentTypes( void ) const;
+            Type::Ptr returnType( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            Expression::Ptr m_lowerBound;
-            Expression::Ptr m_upperBound;
+            Types::Ptr m_argumentTypes;
+            Type::Ptr m_returnType;
         };
     }
 }

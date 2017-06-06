@@ -26,8 +26,8 @@
 #ifndef _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_
 #define _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_
 
-#include "../analyze/TypeCheckPass.h"
-#include "../casm-ir/src/analyze/ConsistencyCheckPass.h"
+#include "../pass/src/Pass.h"
+#include "../pass/src/PassData.h"
 
 /**
    @brief    TODO
@@ -53,41 +53,6 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
     };
-
-    //     std::shared_ptr< libcasm_ir::Specification > getSpecification(
-    //         void ) const;
-
-    //     LIB_CASMFE_VISITOR_INTERFACE( u1, u1 );
-
-    //     libcasm_ir::Type::Ptr getType( Type* type );
-
-    //     libcasm_ir::Value::Ptr constant(
-    //         const value_t& value, const Type& type, libcasm_ir::Type& hint );
-    //     value_t value_t_value( const libcasm_ir::Value::Ptr& value );
-
-    //   private:
-    //     template < typename C >
-    //     typename C::Ptr lookupParent( AstNode* node );
-
-    //     template < typename C >
-    //     typename C::Ptr lookup( AstNode* node );
-
-    //     std::unordered_map< AstNode*, std::shared_ptr< libcasm_ir::Value > >
-    //         ast2casmir;
-    //     std::unordered_map< AstNode*, AstNode* > ast2parent;
-
-    //     std::vector< libcasm_ir::Value::Ptr > current_scope;
-
-    //     std::shared_ptr< libcasm_ir::Specification > m_specification;
-    //     std::shared_ptr< libcasm_ir::Agent > m_agent;
-
-    //     std::shared_ptr< libcasm_ir::ExecutionSemanticsBlock >
-    //     initially_scope;
-    //     std::shared_ptr< libcasm_ir::ExecutionSemanticsBlock >
-    //         initially_update_scope;
-
-    //     u1 is_initially;
-    // };
 }
 
 #endif // _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_

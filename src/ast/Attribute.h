@@ -38,12 +38,12 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Attribute >;
 
-            Attribute( Node::ID id, const IdentifierNode::Ptr& identifier );
+            Attribute( Node::ID id, const Identifier::Ptr& identifier );
 
-            IdentifierNode::Ptr identifier( void ) const;
+            Identifier::Ptr identifier( void ) const;
 
           private:
-            IdentifierNode::Ptr m_identifier;
+            Identifier::Ptr m_identifier;
         };
 
         using Attributes = NodeList< Attribute >;
@@ -53,7 +53,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< BasicAttribute >;
 
-            BasicAttribute( const IdentifierNode::Ptr& identifier );
+            explicit BasicAttribute( const Identifier::Ptr& identifier );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -63,7 +63,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ExpressionAttribute >;
 
-            ExpressionAttribute( const IdentifierNode::Ptr& identifier,
+            ExpressionAttribute( const Identifier::Ptr& identifier,
                 const Expression::Ptr& expression );
 
             Expression::Ptr expression( void ) const;

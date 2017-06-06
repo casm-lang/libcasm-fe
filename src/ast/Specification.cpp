@@ -29,14 +29,14 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 Specification::Specification(
-    const IdentifierNode::Ptr& name, const Definitions::Ptr& definitions )
+    const Identifier::Ptr& name, const Definitions::Ptr& definitions )
 : Node( Node::ID::SPECIFICATION )
 , m_name( name )
 , m_definitions( definitions )
 {
 }
 
-IdentifierNode::Ptr Specification::name( void ) const
+Identifier::Ptr Specification::name( void ) const
 {
     return m_name;
 }

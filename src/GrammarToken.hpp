@@ -27,13 +27,9 @@
 CASM            "CASM"          { return Parser::make_CASM(loc); }
 INIT            "init"          { return Parser::make_INIT(loc); }
 
-OPTION          "option"        { return Parser::make_OPTION(loc); }
-
 DERIVED         "derived"       { return Parser::make_DERIVED(loc); }
 ENUM            "enum"          { return Parser::make_ENUM(loc); }
-
 RULE            "rule"          { return Parser::make_RULE(loc); }
-DUMPS           "dumps"         { return Parser::make_DUMPS(loc); }
 
 FUNCTION        "function"      { return Parser::make_FUNCTION(loc); }
 INITIALLY       "initially"     { return Parser::make_INITIALLY(loc); }
@@ -48,6 +44,7 @@ SKIP            "skip"          { return Parser::make_SKIP(loc); }
 LET             "let"           { return Parser::make_LET(loc); }
 IN              "in"            { return Parser::make_IN(loc); }
 FORALL          "forall"        { return Parser::make_FORALL(loc); }
+CHOOSE          "choose"        { return Parser::make_CHOOSE(loc); }
 ITERATE         "iterate"       { return Parser::make_ITERATE(loc); }
 DO              "do"            { return Parser::make_DO(loc); }
 CALL            "call"          { return Parser::make_CALL(loc); }
@@ -90,9 +87,12 @@ ASTERIX         "*"             { return Parser::make_ASTERIX(loc); }
 SLASH           "/"             { return Parser::make_SLASH(loc); }
 PERCENT         "%"             { return Parser::make_PERCENT(loc); }
 CARET           "^"             { return Parser::make_CARET(loc); }
+MARK            "'"             { return Parser::make_MARK(loc); }
 
 DOTDOT          ".."            { return Parser::make_DOTDOT(loc); }
-ARROW           "->"            { return Parser::make_ARROW(loc); }
+DOT             "."             { return Parser::make_DOT(loc); }
+MAPS            "->"            { return Parser::make_MAPS(loc); }
+ARROW           "=>"            { return Parser::make_ARROW(loc); }
 UPDATE          ":="            { return Parser::make_UPDATE(loc); }
 NEQUAL          "!="            { return Parser::make_NEQUAL(loc); }
 LESSEQ          "<="            { return Parser::make_LESSEQ(loc); }

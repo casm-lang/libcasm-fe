@@ -23,42 +23,30 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef CASMI_LIBINTERPRETER_SYMBOLIC_H
-#define CASMI_LIBINTERPRETER_SYMBOLIC_H
+#include "uts/main.h"
 
-#include "Ast.h"
-#include "Value.h"
-
-namespace libcasm_fe
+void libcasm_fe_main_dummy( void )
 {
-    struct symbol_t
-    {
-        const uint32_t id;
-        symbolic_condition_t* condition;
-        bool type_dumped;
-        bool update_dumped;
-        List* list; // used for symbolic lists
-        // The distinction between concrete lists and symbolic lists can be
-        // fuzzy,
-        // because fcons formulas are generated for all list constants by the
-        // legacy
-        // interpreter
+    const auto source = libstdhl::make< libstdhl::Log::Source >(
+        "libcasm-fe", "CASM FE Library" );
 
-        symbol_t( uint32_t id );
-        symbol_t( uint32_t id, symbolic_condition_t* cond );
-    };
-
-    struct symbolic_condition_t
-    {
-        value_t* lhs;
-        value_t* rhs;
-
-        libcasm_ir::Value::ID op;
-
-        symbolic_condition_t(
-            value_t* lhs, value_t* rhs, libcasm_ir::Value::ID op );
-        std::string to_str() const;
-    };
+    libstdhl::Log::defaultSource( source );
 }
 
-#endif
+TEST( libcasm_fe_main, empty )
+{
+}
+
+BENCHMARK( libcasm_fe_main, empty, 10, 10 )
+{
+}
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

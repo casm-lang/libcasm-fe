@@ -35,6 +35,7 @@ foreach( DEPENDENCY
     stdhl
     pass
     casm-ir
+    casm-rt
     )
   if( NOT TARGET ${DEPENDENCY} )
     add_subdirectory( ${LIBS}/${DEPENDENCY} lib/${DEPENDENCY} )
@@ -42,8 +43,9 @@ foreach( DEPENDENCY
 endforeach()
 
 set( CXX_SRC_FILES
-  src/Driver.cpp
   src/Exceptions.cpp
+  src/Logger.cpp
+  src/Namespace.cpp
 
   src/ast/Attribute.cpp
   src/ast/Definition.cpp
@@ -53,20 +55,34 @@ set( CXX_SRC_FILES
   src/ast/Specification.cpp
   src/ast/Type.cpp
   src/ast/RecursiveVisitor.cpp
+  src/ast/EmptyVisitor.cpp
 
-  src/analyze/TypeCheckPass.cpp
+  src/analyze/ConsistencyCheckPass.cpp
+  src/analyze/TypeInferencePass.cpp
   src/analyze/AttributionPass.cpp
+  src/analyze/SymbolResolverPass.cpp
 
   src/transform/AstDumpDotPass.cpp
   src/transform/AstDumpSourcePass.cpp
   src/transform/AstToCasmIRPass.cpp
   src/transform/SourceToAstPass.cpp
 
+  src/execute/NumericExecutionPass.cpp
+  src/execute/HashMapBase.cpp
+  src/execute/ReferenceConstant.cpp
+  src/execute/Frame.cpp
+
   src/various/GrammarParser.cpp
   src/various/GrammarLexer.cpp
 )
 
-file( GLOB_RECURSE CXX_UTS_FILES "uts/*.cpp" )
+set( CXX_UTS_FILES
+  uts/main.cpp
+  #uts/numeric/expression_evaluation.cpp
+  #uts/symbolic/expression_evaluation.cpp
+  uts/updateset/UpdateSetManagerTest.cpp
+  uts/updateset/UpdateSetTest.cpp
+)
 
 
 set( TARGET casm-fe )
@@ -74,7 +90,7 @@ project( ${TARGET} )
 
 
 include_directories(
-  .
+  src
   src/various
   ${LIBS}/gtest/googletest
   ${LIBS}/gtest/googletest/include
@@ -82,10 +98,11 @@ include_directories(
   ${LIBS}/stdhl
   ${LIBS}/pass
   ${LIBS}/casm-ir
+  ${LIBS}/casm-rt
 )
 
 
-set( CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11 -Wall" )
+set( CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++1y -Wall" )
 
 set( CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -O0" )
 set( CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -O3" )
@@ -149,6 +166,7 @@ add_executable( ${TARGET}-check
 
 target_link_libraries( ${TARGET}-check
   ${TARGET}
+  casm-rt
   casm-ir
   pass
   stdhl
@@ -157,14 +175,21 @@ target_link_libraries( ${TARGET}-check
 
 
 add_library( ${TARGET}-benchmark OBJECT
-  ${LIBS}/hayai/src/hayai_posix_main.cpp
+  uts/main.cpp
 )
 
 add_executable( ${TARGET}-run
+  ${LIBS}/hayai/src/hayai_posix_main.cpp
+  ${LIBS}/gtest/googletest/src/gtest-all.cc
   $<TARGET_OBJECTS:${TARGET}-benchmark>
 )
 
 target_link_libraries( ${TARGET}-run
+  ${TARGET}
+  casm-rt
+  casm-ir
+  pass
+  stdhl
   pthread
 )
 

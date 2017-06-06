@@ -51,7 +51,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< SkipRule >;
 
-            SkipRule( void );
+            explicit SkipRule( void );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -114,7 +114,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< DefaultCase >;
 
-            DefaultCase( const Rule::Ptr& rule );
+            explicit DefaultCase( const Rule::Ptr& rule );
 
             void accept( Visitor& visitor ) override final;
         };
@@ -177,12 +177,32 @@ namespace libcasm_fe
             Rule::Ptr m_rule;
         };
 
+        class ChooseRule : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< ChooseRule >;
+
+            ChooseRule( const std::shared_ptr< VariableDefinition >& variable,
+                const Expression::Ptr& universe, const Rule::Ptr& rule );
+
+            std::shared_ptr< VariableDefinition > variable( void ) const;
+            Expression::Ptr universe( void ) const;
+            Rule::Ptr rule( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            std::shared_ptr< VariableDefinition > m_variable;
+            Expression::Ptr m_universe;
+            Rule::Ptr m_rule;
+        };
+
         class IterateRule : public Rule
         {
           public:
             using Ptr = std::shared_ptr< IterateRule >;
 
-            IterateRule( const Rule::Ptr& rule );
+            explicit IterateRule( const Rule::Ptr& rule );
 
             Rule::Ptr rule( void ) const;
 
@@ -197,7 +217,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< BlockRule >;
 
-            BlockRule( const Rules::Ptr& rules );
+            explicit BlockRule( const Rules::Ptr& rules );
 
             Rules::Ptr rules( void ) const;
 
@@ -212,7 +232,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< SequenceRule >;
 
-            SequenceRule( const Rules::Ptr& rules );
+            explicit SequenceRule( const Rules::Ptr& rules );
 
             Rules::Ptr rules( void ) const;
 
@@ -250,7 +270,7 @@ namespace libcasm_fe
                     allowedCallTargetTypes );
 
             CallExpression::Ptr call( void ) const;
-            std::set< CallExpression::TargetType > allowedCallTargetTypes(
+            const std::set< CallExpression::TargetType >& allowedCallTargetTypes(
                 void ) const;
 
             void accept( Visitor& visitor ) override final;

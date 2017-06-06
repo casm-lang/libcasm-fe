@@ -28,35 +28,25 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-Type::Type( Node::ID id, const IdentifierNode::Ptr& name )
-: Node( id )
+Type::Type( Node::ID id, const IdentifierPath::Ptr& name )
+: TypedNode( id )
 , m_name( name )
-, m_type( nullptr )
 {
 }
 
-IdentifierNode::Ptr Type::name( void ) const
+IdentifierPath::Ptr Type::name( void ) const
 {
     return m_name;
 }
 
-void Type::setType( const libcasm_ir::Type::Ptr& type )
+static IdentifierPath::Ptr createUnresolvedIdentifierPath( void )
 {
-    m_type = type;
-}
-
-libcasm_ir::Type::Ptr Type::type( void ) const
-{
-    return m_type;
-}
-
-static IdentifierNode::Ptr createUnresolvedIdentifier()
-{
-    return std::make_shared< IdentifierNode >( "$unresolved$" );
+    return std::make_shared< IdentifierPath >(
+        std::make_shared< Identifier >( "$unresolved$" ) );
 }
 
 UnresolvedType::UnresolvedType( void )
-: Type( Node::ID::UNRESOLVED_TYPE, createUnresolvedIdentifier() )
+: Type( Node::ID::UNRESOLVED_TYPE, createUnresolvedIdentifierPath() )
 {
 }
 
@@ -65,7 +55,7 @@ void UnresolvedType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-BasicType::BasicType( const IdentifierNode::Ptr& identifier )
+BasicType::BasicType( const IdentifierPath::Ptr& identifier )
 : Type( Node::ID::BASIC_TYPE, identifier )
 {
 }
@@ -76,7 +66,7 @@ void BasicType::accept( Visitor& visitor )
 }
 
 ComposedType::ComposedType(
-    const IdentifierNode::Ptr& identifier, const Types::Ptr& subTypes )
+    const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
 : Type( Node::ID::COMPOSED_TYPE, identifier )
 , m_subTypes( subTypes )
 {
@@ -93,7 +83,7 @@ void ComposedType::accept( Visitor& visitor )
 }
 
 FixedSizedType::FixedSizedType(
-    const IdentifierNode::Ptr& identifier, const Expression::Ptr& size )
+    const IdentifierPath::Ptr& identifier, const Expression::Ptr& size )
 : Type( Node::ID::FIXED_SIZED_TYPE, identifier )
 , m_size( size )
 {
@@ -109,25 +99,25 @@ void FixedSizedType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-RangedType::RangedType( const IdentifierNode::Ptr& identifier,
-    const Expression::Ptr& lowerBound, const Expression::Ptr& upperBound )
-: Type( Node::ID::RANGED_TYPE, identifier )
-, m_lowerBound( lowerBound )
-, m_upperBound( upperBound )
+RelationType::RelationType( const IdentifierPath::Ptr& identifier,
+    const Types::Ptr& argumentTypes, const Type::Ptr& returnType )
+: Type( Node::ID::RELATION_TYPE, identifier )
+, m_argumentTypes( argumentTypes )
+, m_returnType( returnType )
 {
 }
 
-Expression::Ptr RangedType::lowerBound( void ) const
+Types::Ptr RelationType::argumentTypes( void ) const
 {
-    return m_lowerBound;
+    return m_argumentTypes;
 }
 
-Expression::Ptr RangedType::upperBound( void ) const
+Type::Ptr RelationType::returnType( void ) const
 {
-    return m_upperBound;
+    return m_returnType;
 }
 
-void RangedType::accept( Visitor& visitor )
+void RelationType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

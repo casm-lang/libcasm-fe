@@ -28,28 +28,16 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-Definition::Definition( Node::ID type, const IdentifierNode::Ptr& identifier )
-: Node( type )
+Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
+: TypedNode( type )
 , m_identifier( identifier )
-, m_relationType( nullptr )
 , m_attributes( std::make_shared< Attributes >() )
 {
 }
 
-IdentifierNode::Ptr Definition::identifier( void ) const
+Identifier::Ptr Definition::identifier( void ) const
 {
     return m_identifier;
-}
-
-void Definition::setRelationType(
-    const libcasm_ir::RelationType::Ptr& relationType )
-{
-    m_relationType = relationType;
-}
-
-libcasm_ir::RelationType::Ptr Definition::relationType( void ) const
-{
-    return m_relationType;
 }
 
 void Definition::setAttributes( const Attributes::Ptr& attributes )
@@ -63,9 +51,10 @@ Attributes::Ptr Definition::attributes( void ) const
 }
 
 VariableDefinition::VariableDefinition(
-    const IdentifierNode::Ptr& identifier, const Type::Ptr& variableType )
+    const Identifier::Ptr& identifier, const Type::Ptr& variableType )
 : Definition( Node::ID::VARIABLE_DEFINITION, identifier )
 , m_variableType( variableType )
+, m_localIndex( 0 )
 {
 }
 
@@ -74,12 +63,22 @@ Type::Ptr VariableDefinition::variableType( void ) const
     return m_variableType;
 }
 
+void VariableDefinition::setLocalIndex( std::size_t localIndex )
+{
+    m_localIndex = localIndex;
+}
+
+std::size_t VariableDefinition::localIndex( void ) const
+{
+    return m_localIndex;
+}
+
 void VariableDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-FunctionDefinition::FunctionDefinition( const IdentifierNode::Ptr& identifier,
+FunctionDefinition::FunctionDefinition( const Identifier::Ptr& identifier,
     const Types::Ptr& argumentTypes,
     const Type::Ptr& returnType )
 : Definition( Node::ID::FUNCTION_DEFINITION, identifier )
@@ -150,7 +149,7 @@ void FunctionDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-DerivedDefinition::DerivedDefinition( const IdentifierNode::Ptr& identifier,
+DerivedDefinition::DerivedDefinition( const Identifier::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Expression::Ptr& expression )
@@ -158,6 +157,7 @@ DerivedDefinition::DerivedDefinition( const IdentifierNode::Ptr& identifier,
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_expression( expression )
+, m_maxNumberOfLocals( 0 )
 {
 }
 
@@ -176,12 +176,23 @@ Expression::Ptr DerivedDefinition::expression( void ) const
     return m_expression;
 }
 
+void DerivedDefinition::setMaximumNumberOfLocals(
+    std::size_t maxNumberOfLocals )
+{
+    m_maxNumberOfLocals = maxNumberOfLocals;
+}
+
+std::size_t DerivedDefinition::maximumNumberOfLocals( void ) const
+{
+    return m_maxNumberOfLocals;
+}
+
 void DerivedDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-RuleDefinition::RuleDefinition( const IdentifierNode::Ptr& identifier,
+RuleDefinition::RuleDefinition( const Identifier::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Rule::Ptr& rule )
@@ -189,6 +200,7 @@ RuleDefinition::RuleDefinition( const IdentifierNode::Ptr& identifier,
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_rule( rule )
+, m_maxNumberOfLocals( 0 )
 {
 }
 
@@ -207,20 +219,29 @@ Rule::Ptr RuleDefinition::rule( void ) const
     return m_rule;
 }
 
+void RuleDefinition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )
+{
+    m_maxNumberOfLocals = maxNumberOfLocals;
+}
+
+std::size_t RuleDefinition::maximumNumberOfLocals( void ) const
+{
+    return m_maxNumberOfLocals;
+}
+
 void RuleDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
 EnumerationDefinition::EnumerationDefinition(
-    const IdentifierNode::Ptr& identifier,
-    const NodeList< IdentifierNode >::Ptr& enumerators )
+    const Identifier::Ptr& identifier, const Identifiers::Ptr& enumerators )
 : Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
 }
 
-NodeList< IdentifierNode >::Ptr EnumerationDefinition::enumerators( void ) const
+Identifiers::Ptr EnumerationDefinition::enumerators( void ) const
 {
     return m_enumerators;
 }

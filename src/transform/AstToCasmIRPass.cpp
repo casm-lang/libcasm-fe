@@ -25,9 +25,12 @@
 
 #include "AstToCasmIRPass.h"
 
-#include "../ast/RecursiveVisitor.h"
-
 #include "../stdhl/cpp/Default.h"
+
+#include "../Logger.h"
+#include "../analyze/ConsistencyCheckPass.h"
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
 
 #include "../casm-ir/src/Block.h"
 #include "../casm-ir/src/Builtin.h"
@@ -38,6 +41,7 @@
 #include "../casm-ir/src/Specification.h"
 #include "../casm-ir/src/Statement.h"
 #include "../casm-ir/src/Type.h"
+#include "../casm-ir/src/analyze/ConsistencyCheckPass.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -63,7 +67,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
 
     void visit( ValueAtom& node ) override;
-    void visit( RuleReferenceAtom& node ) override;
+    void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
@@ -90,12 +94,13 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
     void visit( FixedSizedType& node ) override;
-    void visit( RangedType& node ) override;
+    void visit( RelationType& node ) override;
 
     void visit( BasicAttribute& node ) override;
     void visit( ExpressionAttribute& node ) override;
 
-    void visit( IdentifierNode& node ) override;
+    void visit( Identifier& node ) override;
+    void visit( IdentifierPath& node ) override;
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
 
@@ -151,7 +156,7 @@ void AstToCasmIRVisitor::visit( ValueAtom& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstToCasmIRVisitor::visit( RuleReferenceAtom& node )
+void AstToCasmIRVisitor::visit( ReferenceAtom& node )
 {
     // TODO
     RecursiveVisitor::visit( node );
@@ -280,6 +285,7 @@ void AstToCasmIRVisitor::visit( CallRule& node )
 void AstToCasmIRVisitor::visit( UnresolvedType& node )
 {
     // TODO
+    RecursiveVisitor::visit( node );
 }
 
 void AstToCasmIRVisitor::visit( BasicType& node )
@@ -300,7 +306,7 @@ void AstToCasmIRVisitor::visit( FixedSizedType& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstToCasmIRVisitor::visit( RangedType& node )
+void AstToCasmIRVisitor::visit( RelationType& node )
 {
     // TODO
     RecursiveVisitor::visit( node );
@@ -318,7 +324,13 @@ void AstToCasmIRVisitor::visit( ExpressionAttribute& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstToCasmIRVisitor::visit( IdentifierNode& node )
+void AstToCasmIRVisitor::visit( Identifier& node )
+{
+    // TODO
+    RecursiveVisitor::visit( node );
+}
+
+void AstToCasmIRVisitor::visit( IdentifierPath& node )
 {
     // TODO
     RecursiveVisitor::visit( node );
@@ -343,25 +355,19 @@ libcasm_ir::Specification::Ptr AstToCasmIRVisitor::specification( void ) const
 
 void AstToCasmIRPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeCheckPass >();
+    pu.require< ConsistencyCheckPass >();
     pu.provide< libcasm_ir::ConsistencyCheckPass >();
 }
 
 bool AstToCasmIRPass::run( libpass::PassResult& pr )
 {
-    libpass::PassLogger log( &id, stream() );
+    Logger log( &id, stream() );
 
-    // m_specification = nullptr;
-
-    // initially_scope = 0;
-    // initially_update_scope = 0;
-    // is_initially = false;
-
-    auto data = pr.result< TypeCheckPass >();
-    auto specification = data->specification();
+    const auto data = pr.result< ConsistencyCheckPass >();
+    const auto specification = data->specification();
 
     log.debug( "transforming AST specification '"
-               + specification->name()->identifier()
+               + specification->name()->name()
                + "'" );
 
     AstToCasmIRVisitor visitor;
