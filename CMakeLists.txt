@@ -77,9 +77,9 @@ set( CXX_SRC_FILES
 
 set( CXX_UTS_FILES
   uts/main.cpp
-  uts/numeric/expression_evaluation.cpp
-  uts/symbolic/expression_evaluation.cpp
-  uts/updateset/manager.cpp
+  #uts/numeric/expression_evaluation.cpp
+  #uts/symbolic/expression_evaluation.cpp
+  #uts/updateset/manager.cpp
 )
 
 
