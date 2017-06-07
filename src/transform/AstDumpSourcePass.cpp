@@ -669,8 +669,8 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto data = pr.result< ConsistencyCheckPass >();
-    const auto specification = data->specification();
+    const auto& data = pr.result< ConsistencyCheckPass >();
+    const auto& specification = data->specification();
 
     AstDumpSourceVisitor visitor{ std::cout };
     specification->accept( visitor );
