@@ -26,8 +26,7 @@
 #ifndef _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_
 #define _LIB_CASMFE_AST_TO_CASM_IR_PASS_H_
 
-#include "../pass/src/Pass.h"
-#include "../pass/src/PassData.h"
+#include "../analyze/ConsistencyCheckPass.h"
 
 /**
    @brief    TODO
@@ -52,6 +51,8 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
+
+        using Data = ConsistencyCheckPass::Data;
     };
 }
 

@@ -28,19 +28,10 @@
 #include "../stdhl/cpp/Default.h"
 
 #include "../Logger.h"
-#include "../analyze/ConsistencyCheckPass.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 
-#include "../casm-ir/src/Block.h"
-#include "../casm-ir/src/Builtin.h"
-#include "../casm-ir/src/Constant.h"
-#include "../casm-ir/src/Derived.h"
-#include "../casm-ir/src/Function.h"
-#include "../casm-ir/src/Instruction.h"
 #include "../casm-ir/src/Specification.h"
-#include "../casm-ir/src/Statement.h"
-#include "../casm-ir/src/Type.h"
 #include "../casm-ir/src/analyze/ConsistencyCheckPass.h"
 
 using namespace libcasm_fe;
@@ -56,7 +47,7 @@ static libpass::PassRegistration< AstToCasmIRPass > PASS( "AstToIRPass",
 class AstToCasmIRVisitor final : public RecursiveVisitor
 {
   public:
-    AstToCasmIRVisitor( void );
+    AstToCasmIRVisitor( Logger& log );
 
     void visit( Specification& node ) override;
 
@@ -84,6 +75,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( CaseRule& node ) override;
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
+    void visit( ChooseRule& node ) override;
     void visit( IterateRule& node ) override;
     void visit( BlockRule& node ) override;
     void visit( SequenceRule& node ) override;
@@ -107,245 +99,583 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     libcasm_ir::Specification::Ptr specification( void ) const;
 
   private:
+    Logger& m_log;
+
     libcasm_ir::Specification::Ptr m_specification;
+    u1 m_declaration;
+    u1 m_init_flag;
+    libcasm_ir::SequentialBlock::Ptr m_init_block;
+    libcasm_ir::Statement::Ptr m_statement;
+    u1 m_update_flag;
+    std::vector< libcasm_ir::ExecutionSemanticsBlock::Ptr > m_blocks;
+    std::unordered_map< RuleDefinition*, libcasm_ir::Rule::Ptr > m_def2rule;
+    std::unordered_map< FunctionDefinition*, libcasm_ir::Function::Ptr >
+        m_def2func;
+    std::unordered_map< Node*, libcasm_ir::Value::Ptr > m_ast2ir;
 };
 
-AstToCasmIRVisitor::AstToCasmIRVisitor( void )
+AstToCasmIRVisitor::AstToCasmIRVisitor( Logger& log )
+: m_log( log )
+, m_specification( nullptr )
+, m_declaration( false )
+, m_init_flag( false )
+, m_init_block( nullptr )
+, m_statement( nullptr )
+, m_update_flag( false )
+, m_blocks()
+, m_def2rule()
+, m_def2func()
+, m_ast2ir()
 {
 }
 
+static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
+
 void AstToCasmIRVisitor::visit( Specification& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_specification
+        = libstdhl::make< libcasm_ir::Specification >( node.name()->name() );
+
+    const auto rule_init_type
+        = libstdhl::make< libcasm_ir::RelationType >( VOID );
+    auto rule_init
+        = libstdhl::make< libcasm_ir::Rule >( ".init", rule_init_type );
+    m_specification->add( rule_init );
+
+    auto rule_init_block = libcasm_ir::ParallelBlock::create();
+    rule_init->setContext( rule_init_block );
+    auto rule_init_inner_block = libcasm_ir::SequentialBlock::create();
+    rule_init_block->add( rule_init_inner_block );
+    m_init_block = rule_init_inner_block;
+
+    // declaration phase
+    m_declaration = true;
+    node.definitions()->accept( *this );
+    m_declaration = false;
+
+    // definition phase
+    node.definitions()->accept( *this );
 }
 
 void AstToCasmIRVisitor::visit( VariableDefinition& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( FunctionDefinition& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    const auto& name = node.identifier()->name();
+    const auto& type = node.type();
+
+    if( m_declaration )
+    {
+        if( name.compare( "program" ) == 0 )
+        {
+            m_specification->set< libcasm_ir::Agent >(
+                node.type()->arguments().front() );
+        }
+
+        auto func = libstdhl::make< libcasm_ir::Function >( name, type );
+
+        auto result = m_def2func.emplace( &node, func );
+        assert( result.second and " multiple declaration " );
+
+        m_specification->add( func );
+
+        m_log.debug( { node.sourceLocation() },
+            "declared " + node.description() + " '" + name + "'" );
+    }
+    else
+    {
+        auto result = m_def2func.find( &node );
+        assert( result != m_def2func.end() and " undeclared function found " );
+
+        auto& func = result->second;
+        assert( func->type() == *node.type()
+                and " inconsistent declared function found " );
+
+        // node.defaultValue()->accept( *this ); // TODO
+        // node.attributes()->accept( *this ); // TODO
+
+        m_init_flag = true;
+        node.initializers()->accept( *this );
+        m_init_flag = false;
+    }
 }
 
 void AstToCasmIRVisitor::visit( DerivedDefinition& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( RuleDefinition& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    const auto& name = node.identifier()->name();
+    const auto& type = node.type();
+
+    if( m_declaration )
+    {
+        auto rule = libstdhl::make< libcasm_ir::Rule >( name, type );
+
+        auto result = m_def2rule.emplace( &node, rule );
+        assert( result.second and " multiple declaration " );
+
+        m_specification->add( rule );
+
+        m_log.debug( { node.sourceLocation() },
+            "declared " + node.description() + " '" + name + "'" );
+    }
+    else
+    {
+
+        auto result = m_def2rule.find( &node );
+        assert( result != m_def2rule.end() and " undeclared rule found " );
+
+        auto& rule = result->second;
+        assert( rule->type() == *node.type()
+                and " inconsistent declared rule found " );
+
+        // node.arguments()->accept( *this ); // TODO
+        // node.attributes()->accept( *this ); // TODO
+
+        auto rule_block = libcasm_ir::ParallelBlock::create();
+        rule->setContext( rule_block );
+
+        m_blocks.push_back( rule_block );
+
+        node.rule()->accept( *this );
+
+        assert( m_blocks.back().get() == rule_block.get() );
+        m_blocks.pop_back();
+
+        assert( m_blocks.size() == 0 );
+    }
 }
 
 void AstToCasmIRVisitor::visit( EnumerationDefinition& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( ValueAtom& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    assert( node.type() );
+    assert( node.value() );
+
+    const libcasm_ir::Constant::Ptr& constant = node.value();
+
+    auto result = m_ast2ir.emplace( &node, constant );
+    assert( result.second and " reference already exists " );
+    m_specification->add( constant );
 }
 
 void AstToCasmIRVisitor::visit( ReferenceAtom& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    libcasm_ir::Constant::Ptr constant = nullptr;
+
+    switch( node.referenceType() )
+    {
+        case ReferenceAtom::ReferenceType::FUNCTION:
+        {
+            m_log.error( { node.sourceLocation() }, "TODO" );
+            break;
+        }
+        case ReferenceAtom::ReferenceType::DERIVED:
+        {
+            m_log.error( { node.sourceLocation() }, "TODO" );
+            break;
+        }
+        case ReferenceAtom::ReferenceType::BUILTIN:
+        {
+            m_log.error( { node.sourceLocation() }, "TODO" );
+            break;
+        }
+        case ReferenceAtom::ReferenceType::RULE:
+        {
+            assert( node.reference() );
+            const auto def
+                = static_cast< RuleDefinition* >( node.reference().get() );
+
+            auto result = m_def2rule.find( def );
+            assert(
+                result != m_def2rule.end() and " non-registered rule found " );
+
+            const auto& rule = result->second;
+            assert( rule->type() == *def->type()
+                    and " inconsistent registered typed rule " );
+
+            constant
+                = libstdhl::make< libcasm_ir::RuleReferenceConstant >( rule );
+            break;
+        }
+        case ReferenceAtom::ReferenceType::VARIABLE:
+        {
+            m_log.error( { node.sourceLocation() }, "TODO" );
+            break;
+        }
+        case ReferenceAtom::ReferenceType::UNKNOWN:
+        {
+            m_log.error( { node.sourceLocation() }, "TODO" );
+            break;
+        }
+    }
+
+    assert( constant and " unimplemented reference atom " );
+    m_specification->add( constant );
+    auto result = m_ast2ir.emplace( &node, constant );
+    assert( result.second and " reference already exists " );
 }
 
 void AstToCasmIRVisitor::visit( UndefAtom& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( DirectCallExpression& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    assert( m_statement and " target statement not set " );
+
+    const auto& identifier = *node.identifier();
+    const auto& name = identifier.path();
+    const auto& type = node.type();
+
+    std::vector< libcasm_ir::Value::Ptr > args;
+    for( auto argument : *node.arguments() )
+    {
+        const auto size = m_statement->instructions().size();
+        argument->accept( *this );
+
+        if( size == m_statement->instructions().size() )
+        {
+            // argument is a constant
+            args.emplace_back( m_ast2ir.at( argument.get() ) );
+        }
+        else
+        {
+            // argument is a register/instruction
+            args.emplace_back( m_statement->instructions().back() );
+        }
+    }
+
+    switch( node.targetType() )
+    {
+        case CallExpression::TargetType::FUNCTION:
+        {
+            const auto def = static_cast< FunctionDefinition* >(
+                node.targetDefinition().get() );
+
+            auto result = m_def2func.find( def );
+            assert( result != m_def2func.end() );
+
+            const auto& func = result->second;
+            m_statement->add< libcasm_ir::LocationInstruction >( func, args );
+
+            if( not m_update_flag )
+            {
+                // perform lookup as well
+                assert( not" unimplemented function lookup " );
+            }
+            break;
+        }
+        case CallExpression::TargetType::DERIVED:
+        {
+            assert( not" unimplemented direct expr call " );
+            break;
+        }
+        case CallExpression::TargetType::BUILTIN:
+        {
+            const auto id = node.targetBuiltinId();
+            const auto builtin = libcasm_ir::Builtin::create( id, type );
+            m_statement->add< libcasm_ir::CallInstruction >( builtin, args );
+            m_specification->add( builtin );
+            break;
+        }
+        case CallExpression::TargetType::RULE:
+        {
+            assert( not" unimplemented direct expr call " );
+            break;
+        }
+        case CallExpression::TargetType::TYPE_DOMAIN:
+        {
+            assert( not" unimplemented direct expr call " );
+            break;
+        }
+        case CallExpression::TargetType::CONSTANT:
+        {
+            assert( node.type()->isEnumeration() );
+
+            const auto& type
+                = std::static_pointer_cast< libcasm_ir::EnumerationType >(
+                    node.type() );
+
+            m_specification->add( type );
+
+            const libcasm_ir::Constant::Ptr constant
+                = libstdhl::make< libcasm_ir::EnumerationConstant >(
+                    type, identifier.baseName() );
+
+            m_specification->add( constant );
+            m_ast2ir.emplace( &node, constant );
+            break;
+        }
+        case CallExpression::TargetType::VARIABLE:
+        {
+            assert( not" unimplemented direct expr call " );
+            break;
+        }
+        case CallExpression::TargetType::SELF:
+        {
+            assert( not" unimplemented direct expr call " );
+            break;
+        }
+        case CallExpression::TargetType::UNKNOWN:
+        {
+            assert( not" unimplemented direct expr call " );
+            break;
+        }
+    }
 }
 
 void AstToCasmIRVisitor::visit( IndirectCallExpression& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( UnaryExpression& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( BinaryExpression& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( RangeExpression& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( ListExpression& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( ConditionalExpression& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( UniversalQuantifierExpression& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( ExistentialQuantifierExpression& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( SkipRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    assert( m_blocks.size() > 0 );
+    auto& block = m_blocks.back();
+
+    auto stmt = libstdhl::make< libcasm_ir::TrivialStatement >();
+    block->add( stmt );
+    stmt->add< libcasm_ir::SkipInstruction >();
 }
 
 void AstToCasmIRVisitor::visit( ConditionalRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( CaseRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( LetRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( ForallRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
+}
+
+void AstToCasmIRVisitor::visit( ChooseRule& node )
+{
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( IterateRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( BlockRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    assert( m_blocks.size() > 0 );
+    auto& parent = m_blocks.back();
+
+    auto block = libcasm_ir::ParallelBlock::create();
+    parent->add( block );
+    m_blocks.push_back( block );
+
+    node.rules()->accept( *this );
+
+    assert( m_blocks.back().get() == block.get() );
+    m_blocks.pop_back();
 }
 
 void AstToCasmIRVisitor::visit( SequenceRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    assert( m_blocks.size() > 0 );
+    auto& parent = m_blocks.back();
+
+    auto block = libcasm_ir::SequentialBlock::create();
+    parent->add( block );
+    m_blocks.push_back( block );
+
+    node.rules()->accept( *this );
+
+    assert( m_blocks.back().get() == block.get() );
+    m_blocks.pop_back();
 }
 
 void AstToCasmIRVisitor::visit( UpdateRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    libcasm_ir::ExecutionSemanticsBlock::Ptr block = nullptr;
+    if( m_init_flag )
+    {
+        block = m_init_block;
+    }
+    else
+    {
+        block = m_blocks.back();
+    }
+    assert( block
+            and " unable to determine the surrounding block for this update " );
+
+    auto stmt = libstdhl::make< libcasm_ir::TrivialStatement >();
+    block->add( stmt );
+
+    m_statement = stmt;
+
+    node.expression()->accept( *this );
+    const auto& value = ( stmt->instructions().size() == 0
+                              ? m_ast2ir.at( node.expression().get() )
+                              : stmt->instructions().back() );
+
+    m_update_flag = true;
+    node.function()->accept( *this );
+    m_update_flag = false;
+
+    const auto& location = stmt->instructions().back();
+    stmt->add< libcasm_ir::UpdateInstruction >( value, location );
+
+    m_statement = nullptr;
 }
 
 void AstToCasmIRVisitor::visit( CallRule& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    assert( m_blocks.size() > 0 );
+    auto& block = m_blocks.back();
+
+    auto stmt = libstdhl::make< libcasm_ir::TrivialStatement >();
+    block->add( stmt );
+    m_statement = stmt;
+
+    node.call()->accept( *this );
+
+    m_statement = nullptr;
 }
 
 void AstToCasmIRVisitor::visit( UnresolvedType& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( BasicType& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( ComposedType& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( FixedSizedType& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( RelationType& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( BasicAttribute& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( ExpressionAttribute& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( Identifier& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( IdentifierPath& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( ExpressionCase& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( DefaultCase& node )
 {
-    // TODO
-    RecursiveVisitor::visit( node );
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 libcasm_ir::Specification::Ptr AstToCasmIRVisitor::specification( void ) const
@@ -363,14 +693,10 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto data = pr.result< ConsistencyCheckPass >();
-    const auto specification = data->specification();
+    const auto& data = pr.result< ConsistencyCheckPass >();
+    const auto& specification = data->specification();
 
-    log.debug( "transforming AST specification '"
-               + specification->name()->name()
-               + "'" );
-
-    AstToCasmIRVisitor visitor;
+    AstToCasmIRVisitor visitor{ log };
     specification->accept( visitor );
 
     if( not visitor.specification() )
