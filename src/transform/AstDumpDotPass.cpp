@@ -223,7 +223,8 @@ void AstDumpDotVisitor::visit( UndefAtom& node )
 void AstDumpDotVisitor::visit( DirectCallExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "DirectCallExpression\nTarget type: " + node.targetTypeName() );
+    dumpNode(
+        node, "DirectCallExpression\nTarget type: " + node.targetTypeName() );
     RecursiveVisitor::visit( node );
 }
 
@@ -509,19 +510,25 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto data = pr.result< TypeInferencePass >();
-    const auto specification = data->specification();
+    const auto& data = pr.result< TypeInferencePass >();
+    const auto& specification = data->specification();
 
     std::string dot_file = "./obj/out.dot"; // TODO: add command-line switch
-    std::ostream* dot_stream = &std::cout;
+    std::ostream* dot_stream = nullptr;
     std::ofstream dot_file_stream;
 
-    u1 dot_is_file = dot_file.compare( "stdout" );
+    u1 dot_is_file = ( dot_file.compare( "stdout" ) != 0 );
 
-    if( dot_is_file )
+    if( not dot_is_file )
     {
-        log.error( "could not open 'out.dot'" );
-        return false;
+        dot_stream = &std::cout;
+    }
+    else
+    {
+        dot_file_stream.open( dot_file );
+        // log.error( "could not open 'out.dot'" );
+        // return false;
+        dot_stream = &dot_file_stream;
     }
 
     log.debug( "writing dot graph to '" + dot_file + "'" );
