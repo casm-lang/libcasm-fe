@@ -64,6 +64,7 @@ set( CXX_SRC_FILES
 
   src/transform/AstDumpDotPass.cpp
   src/transform/AstDumpSourcePass.cpp
+  src/transform/AstToCasmIRPass.cpp
   src/transform/SourceToAstPass.cpp
 
   src/execute/NumericExecutionPass.cpp

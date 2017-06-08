@@ -31,7 +31,7 @@
 namespace libcasm_fe
 {
     /**
-     * @brief Generates CASM source of the AST
+     * @brief Translates the AST to CASM source code and dumps it
      */
     class AstDumpSourcePass final : public libpass::Pass
     {
