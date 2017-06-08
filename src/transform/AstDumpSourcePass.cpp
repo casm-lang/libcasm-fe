@@ -610,9 +610,9 @@ void AstDumpSourceVisitor::visit( RelationType& node )
         s->accept( *this );
         first = false;
     }
-    
+
     m_stream << " -> ";
-    
+
     node.returnType()->accept( *this );
 
     m_stream << ">";
