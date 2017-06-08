@@ -513,38 +513,36 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     const auto& data = pr.result< TypeInferencePass >();
     const auto& specification = data->specification();
 
-    std::string dot_file = "./obj/out.dot"; // TODO: add command-line switch
-    std::ostream* dot_stream = nullptr;
-    std::ofstream dot_file_stream;
+    const std::string outputFilePath = "./obj/out.dot"; // TODO: add command-line switch
+    const u1 dumpNodeLocation = true; // TODO: add command-line switch
 
-    u1 dot_is_file = ( dot_file.compare( "stdout" ) != 0 );
+    const auto printDotGraph = [&]( std::ostream& out ) {
+        out << "digraph \"main\" {\n";
 
-    if( not dot_is_file )
+        AstDumpDotVisitor visitor{ out };
+        visitor.setDumpNodeLocation( dumpNodeLocation );
+
+        specification->accept( visitor );
+
+        out << "}\n";
+    };
+
+    if( outputFilePath == "stdout" )
     {
-        dot_stream = &std::cout;
+        printDotGraph( std::cout );
     }
     else
     {
-        dot_file_stream.open( dot_file );
-        // log.error( "could not open 'out.dot'" );
-        // return false;
-        dot_stream = &dot_file_stream;
-    }
+        log.debug( "writing dot graph to '" + outputFilePath + "'" );
 
-    log.debug( "writing dot graph to '" + dot_file + "'" );
+        std::ofstream dotFile( outputFilePath );
+        if( not dotFile.is_open() )
+        {
+            log.error( "could not open '" + outputFilePath + "'" );
+            return false;
+        }
 
-    *dot_stream << "digraph \"main\" {\n";
-
-    AstDumpDotVisitor visitor{ *dot_stream };
-    visitor.setDumpNodeLocation( true ); // TODO: add command-line switch
-
-    specification->accept( visitor );
-
-    *dot_stream << "}\n";
-
-    if( dot_is_file )
-    {
-        dot_file_stream.close();
+        printDotGraph( dotFile );
     }
 
     return true;
