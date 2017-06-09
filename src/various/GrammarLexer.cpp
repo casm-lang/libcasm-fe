@@ -1213,21 +1213,21 @@ YY_RULE_SETUP
 #line 177 "obj/src/GrammarLexer.l"
 { // single-line comments
     BEGIN( LCOMMENT );
-    loc.step();
 }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 181 "obj/src/GrammarLexer.l"
+#line 180 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case 78:
 /* rule 78 can match eol */
 YY_RULE_SETUP
-#line 182 "obj/src/GrammarLexer.l"
+#line 181 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     loc.lines( 1 );
+    loc.step();
 }
 	YY_BREAK
 case YY_STATE_EOF(LCOMMENT):

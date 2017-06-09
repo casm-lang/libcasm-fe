@@ -97,12 +97,12 @@ using namespace libcasm_fe;
 
 "//" { // single-line comments
     BEGIN( LCOMMENT );
-    loc.step();
 }
 <LCOMMENT>.
 <LCOMMENT>\n {
     BEGIN( INITIAL );
     loc.lines( 1 );
+    loc.step();
 }
 <LCOMMENT><<EOF>> {
     BEGIN( INITIAL );
