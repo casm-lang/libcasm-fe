@@ -103,6 +103,7 @@ namespace libcasm_fe
 
             void setClassification( Classification classification );
             Classification classification( void ) const;
+            std::string classificationName( void ) const;
 
             void setSymbolic( u1 symbolic );
             u1 symbolic( void ) const;

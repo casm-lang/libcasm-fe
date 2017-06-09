@@ -144,6 +144,15 @@ namespace libcasm_fe
         TypeInferenceNotDefinedForExpression = 0x1300,
         TypeInferenceArgumentTypeMismatch = 0x1301,
 
+        TypeInferenceFunctionArgumentTypeMismatch = 0x1302,
+        TypeInferenceFunctionArgumentSizeMismatch = 0x1312,
+        TypeInferenceDerivedArgumentTypeMismatch = 0x1303,
+        TypeInferenceDerivedArgumentSizeMismatch = 0x1313,
+        TypeInferenceBuiltinArgumentTypeMismatch = 0x1304,
+        TypeInferenceBuiltinArgumentSizeMismatch = 0x1314,
+        TypeInferenceRuleArgumentTypeMismatch = 0x1305,
+        TypeInferenceRuleArgumentSizeMismatch = 0x1315,
+
         TypeInferenceQuantifierUniversalPropositionTypeMismatch = 0x1400,
         TypeInferenceQuantifierUniversalPredicateTypeMismatch = 0x1401,
         TypeInferenceQuantifierExistentialPropositionTypeMismatch = 0x1410,
@@ -174,6 +183,11 @@ namespace libcasm_fe
         ,
         TypeNumberRangeInvalidTypeAtRightHandSide
         = 0x3001 // 3*** ... Number range type error
+
+        // --------------------------------------------------------- cc** ...
+        // consistency check errors
+        ,
+        UpdateRuleInvalidClassifier = 0xcc00
 
         // --------------------------------------------------------- 8*** ...
         // operator errors

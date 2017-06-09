@@ -958,7 +958,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::UNKNOWN:
         {
-            assert( !" internal error" );
+            assert( not" internal error" );
             break;
         }
     }
@@ -970,9 +970,10 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
         if( call_type_args.size() == call_expr_args.size() )
         {
-            std::size_t pos = 0;
+            std::size_t pos = -1;
             for( auto argument : node.arguments()->data() )
             {
+                pos++;
                 if( argument->type() )
                 {
                     if( call_type_args[ pos ]->isInteger()
@@ -983,6 +984,27 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
                     if( *call_type_args[ pos ] != argument->type()->result() )
                     {
+                        const std::unordered_map< CallExpression::TargetType,
+                            Code >
+                            codes = {
+                                { CallExpression::TargetType::FUNCTION,
+                                    Code::
+                                        TypeInferenceFunctionArgumentTypeMismatch },
+                                { CallExpression::TargetType::DERIVED,
+                                    Code::
+                                        TypeInferenceDerivedArgumentTypeMismatch },
+                                { CallExpression::TargetType::BUILTIN,
+                                    Code::
+                                        TypeInferenceBuiltinArgumentTypeMismatch },
+                                { CallExpression::TargetType::RULE,
+                                    Code::
+                                        TypeInferenceRuleArgumentTypeMismatch },
+                            };
+
+                        const auto code = codes.find( node.targetType() );
+                        assert( code != codes.end()
+                                and " invalid target type with arguments " );
+
                         m_log.error( { argument->sourceLocation() },
                             "type mismatch: " + node.targetTypeName()
                                 + " argument type at position "
@@ -993,20 +1015,37 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                                 + node.targetTypeName()
                                 + " definition expects '"
                                 + call_type_args[ pos ]->description()
-                                + "'" );
+                                + "'",
+                            code->second );
                     }
                 }
-                pos++;
             }
         }
         else
         {
+            const std::unordered_map< CallExpression::TargetType, Code > codes
+                = {
+                    { CallExpression::TargetType::FUNCTION,
+                        Code::TypeInferenceFunctionArgumentSizeMismatch },
+                    { CallExpression::TargetType::DERIVED,
+                        Code::TypeInferenceDerivedArgumentSizeMismatch },
+                    { CallExpression::TargetType::BUILTIN,
+                        Code::TypeInferenceBuiltinArgumentSizeMismatch },
+                    { CallExpression::TargetType::RULE,
+                        Code::TypeInferenceRuleArgumentSizeMismatch },
+                  };
+
+            const auto code = codes.find( node.targetType() );
+            assert( code != codes.end()
+                    and " invalid target type with arguments " );
+
             m_log.error( { node.sourceLocation() },
                 "invalid argument size: " + node.targetTypeName() + " '"
                     + path.path()
                     + "' expects "
                     + std::to_string( call_type_args.size() )
-                    + " arguments" );
+                    + " arguments",
+                code->second );
 
             try
             {
@@ -1263,18 +1302,20 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 }
 void TypeInferenceVisitor::visit( UpdateRule& node )
 {
-    node.function()->accept( *this );
+    auto& func = *node.function();
+    auto& expr = *node.expression();
 
-    if( node.function()->type() )
+    func.accept( *this );
+
+    if( func.type() )
     {
-        m_resultTypes[ node.expression().get() ].emplace_back(
-            node.function()->type()->result().id() );
+        m_resultTypes[&expr ].emplace_back( func.type()->result().id() );
     }
 
     node.expression()->accept( *this );
 
-    assignment( node, *node.function(), *node.expression(), "updated function",
-        "updating expression", Code::TypeInferenceInvalidUpdateRuleFunctionType,
+    assignment( node, func, expr, "updated function", "updating expression",
+        Code::TypeInferenceInvalidUpdateRuleFunctionType,
         Code::TypeInferenceInvalidUpdateRuleExpressionType,
         Code::TypeInferenceUpdateRuleTypesMismatch );
 }
@@ -1308,17 +1349,26 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
         return;
     }
 
-    if( lhs.type()->result() != rhs.type()->result() )
+    const auto& tyLhs = lhs.type()->result();
+    const auto& tyRhs = rhs.type()->result();
+
+    if( tyLhs != tyRhs )
     {
-        m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
-            "type mismatch: " + src + " was '"
-                + rhs.type()->result().description()
-                + "', but "
-                + dst
-                + " expects '"
-                + lhs.type()->result().description()
-                + "'",
-            assignmentErr );
+        if( tyLhs.isInteger() and tyRhs.isInteger() )
+        {
+            // mixed integer with range properties are checked at run-time
+        }
+        else
+        {
+            m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
+                "type mismatch: " + src + " was '" + tyRhs.description()
+                    + "', but "
+                    + dst
+                    + " expects '"
+                    + tyLhs.description()
+                    + "'",
+                assignmentErr );
+        }
     }
 }
 

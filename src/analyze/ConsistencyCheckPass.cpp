@@ -65,6 +65,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( ValueAtom& node ) override;
     void visit( UndefAtom& node ) override;
 
+    void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
 
     void verify( const TypedNode& node );
@@ -170,6 +171,37 @@ void ConsistencyCheckVisitor::visit( UndefAtom& node )
 {
     RecursiveVisitor::visit( node );
     verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( UpdateRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    auto& func = *node.function();
+    auto& expr = *node.expression();
+
+    assert( func.targetType() == CallExpression::TargetType::FUNCTION );
+    const auto& def = static_cast< const FunctionDefinition& >(
+        *func.targetDefinition().get() );
+
+    if( def.classification() == FunctionDefinition::Classification::IN
+        or def.classification() == FunctionDefinition::Classification::STATIC )
+    {
+        m_log.error( { func.sourceLocation() },
+            "updating " + func.targetTypeName() + " '"
+                + func.identifier()->path()
+                + "' is not allowed, it is classified as '"
+                + def.classificationName()
+                + "' ",
+            Code::UpdateRuleInvalidClassifier );
+
+        m_log.info( { def.sourceLocation() },
+            func.targetTypeName() + " '" + func.identifier()->path()
+                + "' is classified as '"
+                + def.classificationName()
+                + "', incorrect usage in line "
+                + std::to_string( func.sourceLocation().begin.line ) );
+    }
 }
 
 void ConsistencyCheckVisitor::visit( CallRule& node )

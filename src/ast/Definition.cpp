@@ -113,6 +113,36 @@ FunctionDefinition::Classification FunctionDefinition::classification(
     return m_classification;
 }
 
+std::string FunctionDefinition::classificationName( void ) const
+{
+    switch( classification() )
+    {
+        case FunctionDefinition::Classification::IN:
+        {
+            return "in";
+        }
+        case FunctionDefinition::Classification::CONTROLLED:
+        {
+            return "controlled";
+        }
+        case FunctionDefinition::Classification::SHARED:
+        {
+            return "shared";
+        }
+        case FunctionDefinition::Classification::OUT:
+        {
+            return "out";
+        }
+        case FunctionDefinition::Classification::STATIC:
+        {
+            return "static";
+        }
+    }
+
+    assert( !" internal error " );
+    return "";
+}
+
 void FunctionDefinition::setSymbolic( u1 symbolic )
 {
     m_symbolic = symbolic;
