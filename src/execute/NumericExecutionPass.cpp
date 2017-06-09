@@ -902,13 +902,26 @@ void ExecutionVisitor::visit( SequenceRule& node )
 
 void ExecutionVisitor::visit( UpdateRule& node )
 {
+    const auto& expression = node.expression();
+    const auto& function = node.function();
+
     // evalute update value
-    node.expression()->accept( *this );
+    expression->accept( *this );
     const auto& updateValue = m_evaluationStack.pop();
+    try
+    {
+        validateValue( updateValue, function->type()->ptr_result() );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw RuntimeException( { expression->sourceLocation() }, e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            Code::FunctionUpdateInvalidValue );
+    }
 
     // evaluate function arguments
-    const auto& arguments = node.function()->arguments();
-    const auto& argumentTypes = node.function()->type()->arguments();
+    const auto& arguments = function->arguments();
+    const auto& argumentTypes = function->type()->arguments();
     std::vector< ir::Constant > argumentValues;
     argumentValues.reserve( arguments->size() );
     for( std::size_t i = 0; i < arguments->size(); ++i )
@@ -935,7 +948,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     }
 
     const auto location = m_locationRegistry.get(
-        node.function()->identifier()->path(), argumentValues );
+        function->identifier()->path(), argumentValues );
     const Update update{ updateValue, node.sourceLocation() };
 
     try

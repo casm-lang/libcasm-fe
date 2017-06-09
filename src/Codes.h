@@ -75,7 +75,7 @@ namespace libcasm_fe
         FunctionArgumentsInvalidValue = 0xfe03
 
         ,
-        FunctionValueInvalidRangeAtUpdate = 0xfd00 // fd** ... function value
+        FunctionUpdateInvalidValue = 0xfd00 // fd** ... function value
         ,
         FunctionValueInvalidRangeAtInitially = 0xfd01,
         FunctionValueAlreadyInitializedAtInitially = 0xfd02
