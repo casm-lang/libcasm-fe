@@ -200,33 +200,16 @@ void AstDumpSourceVisitor::visit( VariableDefinition& node )
 void AstDumpSourceVisitor::visit( FunctionDefinition& node )
 {
     m_stream << "function ";
-    std::string classification;
-    switch( node.classification() )
-    {
-        case FunctionDefinition::Classification::IN:
-            classification = "in";
-            break;
-        case FunctionDefinition::Classification::CONTROLLED:
-            classification = "controlled";
-            break;
-        case FunctionDefinition::Classification::SHARED:
-            classification = "shared";
-            break;
-        case FunctionDefinition::Classification::OUT:
-            classification = "out";
-            break;
-        case FunctionDefinition::Classification::STATIC:
-            classification = "static";
-            break;
-    }
+
     if( node.symbolic() )
     {
-        m_stream << "(symbolic, " + classification + ") ";
+        m_stream << "(symbolic, " + node.classificationName() + ") ";
     }
     else
     {
-        m_stream << "(" + classification + ") ";
+        m_stream << "(" + node.classificationName() + ") ";
     }
+
     node.identifier()->accept( *this );
     m_stream << " : ";
     bool firstArgType = true;

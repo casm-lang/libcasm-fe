@@ -184,7 +184,7 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     const auto& def = static_cast< const FunctionDefinition& >(
         *func.targetDefinition().get() );
 
-    if( def.classification() == FunctionDefinition::Classification::IN
+    if( def.classification() == FunctionDefinition::Classification::INPUT
         or def.classification() == FunctionDefinition::Classification::STATIC )
     {
         m_log.error( { func.sourceLocation() },
