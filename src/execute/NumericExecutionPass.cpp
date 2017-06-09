@@ -82,24 +82,11 @@ class ConstantStack : public Stack< ir::Constant >
     }
 };
 
-struct ConstantHash
-{
-    std::size_t operator()( const ir::Constant& constant ) const
-    {
-        return std::hash< std::string >{}( constant.name() );
-    }
-};
-
 struct ConstantsHash
 {
-    std::size_t operator()( const std::vector< ir::Constant >& constants ) const
+    inline std::size_t operator()( const std::vector< ir::Constant >& constants ) const
     {
-        std::size_t hash = constants.size();
-        for( const auto& constant : constants )
-        {
-            hash = libstdhl::Hash::combine( hash, ConstantHash{}( constant ) );
-        }
-        return hash;
+        return libstdhl::Hash::value( constants );
     }
 };
 
