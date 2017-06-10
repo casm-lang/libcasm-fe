@@ -141,8 +141,8 @@ class Storage
 
     struct FunctionStateDetails
     {
-        using Location = Location;
-        using Value = Value;
+        using Location = Storage::Location;
+        using Value = Storage::Value;
         using LocationHash = ExecutionLocationRegistry::LocationHash;
         using LocationEquals = ExecutionLocationRegistry::LocationEquals;
     };
