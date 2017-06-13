@@ -634,6 +634,13 @@ class UpdateSetManager
 template < typename UpdateSet >
 class UpdateSetForkGuard
 {
+    enum class State
+    {
+        FORKED,
+        MERGED,
+        REVERTED
+    };
+
   public:
     UpdateSetForkGuard( UpdateSetManager< UpdateSet >* manager,
         typename UpdateSet::Semantics semantics, std::size_t initialSize )
@@ -643,25 +650,43 @@ class UpdateSetForkGuard
             or ( manager->currentUpdateSet()->semantics() != semantics ) )
         {
             manager->fork( semantics, initialSize );
-            m_wasForked = true;
+            m_state = State::FORKED;
         }
         else
         {
-            m_wasForked = false;
+            m_state = State::MERGED;
+        }
+    }
+
+    void merge( void )
+    {
+        if( m_state == State::FORKED )
+        {
+            m_manager->merge();
+            m_state = State::MERGED;
+        }
+    }
+
+    void rollback( void )
+    {
+        if( m_state == State::FORKED )
+        {
+            // m_manager->rollback();
+            m_state = State::REVERTED;
         }
     }
 
     ~UpdateSetForkGuard()
     {
-        if( m_wasForked )
+        if( m_state != State::MERGED )
         {
-            m_manager->merge();
+            rollback();
         }
     }
 
   private:
     UpdateSetManager< UpdateSet >* m_manager;
-    bool m_wasForked;
+    State m_state;
 };
 
 #endif // _LIB_CASMFE_UPDATESET_H_

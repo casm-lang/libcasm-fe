@@ -84,7 +84,8 @@ class ConstantStack : public Stack< ir::Constant >
 
 struct ConstantsHash
 {
-    inline std::size_t operator()( const std::vector< ir::Constant >& constants ) const
+    inline std::size_t operator()(
+        const std::vector< ir::Constant >& constants ) const
     {
         return libstdhl::Hash::value( constants );
     }
@@ -846,6 +847,8 @@ void ExecutionVisitor::visit( ForallRule& node )
         frame->setLocal( variableIndex, value );
         node.rule()->accept( *this );
     } );
+
+    parGuard.merge();
 }
 
 void ExecutionVisitor::visit( ChooseRule& node )
@@ -872,19 +875,24 @@ void ExecutionVisitor::visit( IterateRule& node )
         {
             break;
         }
+        parGuard.merge();
     }
+
+    seqGuard.merge();
 }
 
 void ExecutionVisitor::visit( BlockRule& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
     node.rules()->accept( *this );
+    parGuard.merge();
 }
 
 void ExecutionVisitor::visit( SequenceRule& node )
 {
     ForkGuard seqGuard( &m_updateSetManager, Semantics::Sequential, 100UL );
     node.rules()->accept( *this );
+    seqGuard.merge();
 }
 
 void ExecutionVisitor::visit( UpdateRule& node )
@@ -1087,6 +1095,7 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
     ExecutionVisitor executionVisitor( m_locationRegistry, m_globalState,
         m_updateSetManager, ReferenceConstant() );
     node.initializers()->accept( executionVisitor );
+    parGuard.merge();
 }
 
 class Agent
