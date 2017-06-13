@@ -851,7 +851,14 @@ void ExecutionVisitor::visit( ForallRule& node )
         node.rule()->accept( *this );
     } );
 
-    parGuard.merge();
+    try
+    {
+        parGuard.merge();
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        handleMergeConflict( node, conflict );
+    }
 }
 
 void ExecutionVisitor::visit( ChooseRule& node )
