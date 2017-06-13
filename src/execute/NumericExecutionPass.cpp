@@ -309,6 +309,9 @@ class ExecutionVisitor final : public EmptyVisitor
         const libcasm_ir::Type::Ptr& type,
         ValidationFlags flags = ValidationFlags() );
 
+    void handleMergeConflict(
+        const Node& node, const ExecutionUpdateSet::Conflict& conflict ) const;
+
   private:
     const Storage& m_globalState;
     ExecutionLocationRegistry& m_locationRegistry;
@@ -885,14 +888,30 @@ void ExecutionVisitor::visit( BlockRule& node )
 {
     ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
     node.rules()->accept( *this );
-    parGuard.merge();
+
+    try
+    {
+        parGuard.merge();
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        handleMergeConflict( node, conflict );
+    }
 }
 
 void ExecutionVisitor::visit( SequenceRule& node )
 {
     ForkGuard seqGuard( &m_updateSetManager, Semantics::Sequential, 100UL );
     node.rules()->accept( *this );
-    seqGuard.merge();
+
+    try
+    {
+        seqGuard.merge();
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        handleMergeConflict( node, conflict );
+    }
 }
 
 void ExecutionVisitor::visit( UpdateRule& node )
@@ -1051,6 +1070,31 @@ void ExecutionVisitor::validateValue( const ir::Constant& value,
     }
 
     // TODO type->isValid( value );
+}
+
+void ExecutionVisitor::handleMergeConflict(
+    const Node& node, const ExecutionUpdateSet::Conflict& conflict ) const
+{
+    const auto& conflictingUpdate = conflict.conflictingUpdate();
+    const auto& existingUpdate = conflict.existingUpdate();
+
+    const auto& existingLocation = existingUpdate.first;
+
+    const auto& conflictingValue = conflictingUpdate.second;
+    const auto& existingValue = existingUpdate.second;
+
+    const auto info
+        = "Conflict while merging updateset " + existingLocation.function()
+          + " at line "
+          + std::to_string( conflictingValue.sourceLocation.begin.line )
+          + " with value '" + conflictingValue.value.description() + "'"
+          + " and at line "
+          + std::to_string( existingValue.sourceLocation.begin.line )
+          + " with value '" + existingValue.value.description() + "'";
+    throw RuntimeException(
+        { existingValue.sourceLocation, conflictingValue.sourceLocation }, info,
+        m_frameStack.generateBacktrace( node.sourceLocation() ),
+        libcasm_fe::Code::UpdateSetMergeConflict );
 }
 
 class StateInitializationVisitor final : public EmptyVisitor
