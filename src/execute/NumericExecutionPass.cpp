@@ -872,16 +872,28 @@ void ExecutionVisitor::visit( IterateRule& node )
 
     while( true )
     {
+        // uses a new parallel update set on each iteration only to check if the
+        // current iteration actually produced any updates
         ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
         node.rule()->accept( *this );
         if( hasEmptyUpdateSet() )
         {
+            // the current iteration hasn't produced any updates -> done
             break;
         }
-        parGuard.merge();
+        parGuard.merge(); // should not throw a merge conflict because of the
+                          // surrounding sequential block, thus no conflict
+                          // handling required
     }
 
-    seqGuard.merge();
+    try
+    {
+        seqGuard.merge();
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        handleMergeConflict( node, conflict );
+    }
 }
 
 void ExecutionVisitor::visit( BlockRule& node )
