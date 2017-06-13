@@ -331,8 +331,15 @@ void AstToCasmIRVisitor::visit( ReferenceAtom& node )
 
 void AstToCasmIRVisitor::visit( UndefAtom& node )
 {
-    m_log.info(
-        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
+    assert( node.type() );
+
+    const libcasm_ir::Constant::Ptr& constant
+        = libstdhl::make< libcasm_ir::Constant >(
+            libcasm_ir::Constant::undef( node.type() ) );
+
+    auto result = m_ast2ir.emplace( &node, constant );
+    assert( result.second and " reference already exists " );
+    m_specification->add( constant );
 }
 
 void AstToCasmIRVisitor::visit( DirectCallExpression& node )
@@ -372,12 +379,13 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             assert( result != m_def2func.end() );
 
             const auto& func = result->second;
-            m_statement->add< libcasm_ir::LocationInstruction >( func, args );
+            const auto loc
+                = m_statement->add< libcasm_ir::LocationInstruction >(
+                    func, args );
 
             if( not m_update_flag )
             {
-                // perform lookup as well
-                assert( not" unimplemented function lookup " );
+                m_statement->add< libcasm_ir::LookupInstruction >( loc );
             }
             break;
         }
@@ -429,7 +437,16 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::SELF:
         {
-            assert( not" unimplemented direct expr call " );
+            const auto& type
+                = std::static_pointer_cast< libcasm_ir::EnumerationType >(
+                    m_specification->agent()->ptr_type() );
+
+            const libcasm_ir::Constant::Ptr constant
+                = libstdhl::make< libcasm_ir::EnumerationConstant >(
+                    type, "$" );
+
+            m_specification->add( constant );
+            m_ast2ir.emplace( &node, constant );
             break;
         }
         case CallExpression::TargetType::UNKNOWN:
@@ -539,14 +556,23 @@ void AstToCasmIRVisitor::visit( BlockRule& node )
     assert( m_blocks.size() > 0 );
     auto& parent = m_blocks.back();
 
-    auto block = libcasm_ir::ParallelBlock::create();
-    parent->add( block );
-    m_blocks.push_back( block );
+    if( parent->parallel() )
+    {
+        m_log.debug( "omitting redundant parallel block" );
 
-    node.rules()->accept( *this );
+        node.rules()->accept( *this );
+    }
+    else
+    {
+        auto block = libcasm_ir::ParallelBlock::create();
+        parent->add( block );
+        m_blocks.push_back( block );
 
-    assert( m_blocks.back().get() == block.get() );
-    m_blocks.pop_back();
+        node.rules()->accept( *this );
+
+        assert( m_blocks.back().get() == block.get() );
+        m_blocks.pop_back();
+    }
 }
 
 void AstToCasmIRVisitor::visit( SequenceRule& node )
@@ -554,14 +580,23 @@ void AstToCasmIRVisitor::visit( SequenceRule& node )
     assert( m_blocks.size() > 0 );
     auto& parent = m_blocks.back();
 
-    auto block = libcasm_ir::SequentialBlock::create();
-    parent->add( block );
-    m_blocks.push_back( block );
+    if( not parent->parallel() )
+    {
+        m_log.debug( "omitting redundant sequential block" );
 
-    node.rules()->accept( *this );
+        node.rules()->accept( *this );
+    }
+    else
+    {
+        auto block = libcasm_ir::SequentialBlock::create();
+        parent->add( block );
+        m_blocks.push_back( block );
 
-    assert( m_blocks.back().get() == block.get() );
-    m_blocks.pop_back();
+        node.rules()->accept( *this );
+
+        assert( m_blocks.back().get() == block.get() );
+        m_blocks.pop_back();
+    }
 }
 
 void AstToCasmIRVisitor::visit( UpdateRule& node )
@@ -593,7 +628,7 @@ void AstToCasmIRVisitor::visit( UpdateRule& node )
     m_update_flag = false;
 
     const auto& location = stmt->instructions().back();
-    stmt->add< libcasm_ir::UpdateInstruction >( value, location );
+    stmt->add< libcasm_ir::UpdateInstruction >( location, value );
 
     m_statement = nullptr;
 }
