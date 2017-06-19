@@ -177,30 +177,28 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    auto& func = *node.function();
-    auto& expr = *node.expression();
+    const auto& func = node.function();
 
-    assert( func.targetType() == CallExpression::TargetType::FUNCTION );
-    const auto& def = static_cast< const FunctionDefinition& >(
-        *func.targetDefinition().get() );
+    assert( func->targetType() == CallExpression::TargetType::FUNCTION );
+    const auto& def = func->targetDefinition()->ptr< FunctionDefinition >();
 
-    if( def.classification() == FunctionDefinition::Classification::INPUT
-        or def.classification() == FunctionDefinition::Classification::STATIC )
+    if( def->classification() == FunctionDefinition::Classification::INPUT
+        or def->classification() == FunctionDefinition::Classification::STATIC )
     {
-        m_log.error( { func.sourceLocation() },
-            "updating " + func.targetTypeName() + " '"
-                + func.identifier()->path()
+        m_log.error( { func->sourceLocation() },
+            "updating " + func->targetTypeName() + " '"
+                + func->identifier()->path()
                 + "' is not allowed, it is classified as '"
-                + def.classificationName()
+                + def->classificationName()
                 + "' ",
             Code::UpdateRuleInvalidClassifier );
 
-        m_log.info( { def.sourceLocation() },
-            func.targetTypeName() + " '" + func.identifier()->path()
+        m_log.info( { def->sourceLocation() },
+            func->targetTypeName() + " '" + func->identifier()->path()
                 + "' is classified as '"
-                + def.classificationName()
+                + def->classificationName()
                 + "', incorrect usage in line "
-                + std::to_string( func.sourceLocation().begin.line ) );
+                + std::to_string( func->sourceLocation().begin.line ) );
     }
 }
 
@@ -208,13 +206,13 @@ void ConsistencyCheckVisitor::visit( CallRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& call = *node.call();
+    const auto& call = node.call();
     const auto& kind = node.allowedCallTargetTypes();
 
-    if( kind.find( call.targetType() ) == kind.end() )
+    if( kind.find( call->targetType() ) == kind.end() )
     {
         m_log.error( { node.sourceLocation() },
-            call.targetTypeName() + " is not allowed to be called",
+            call->targetTypeName() + " is not allowed to be called",
             Code::Unspecified );
     }
 }
