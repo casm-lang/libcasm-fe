@@ -110,9 +110,9 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     }
     catch( const CompiletimeException& e )
     {
-        const auto name = node.identifier()->name();
+        const auto& name = node.identifier()->name();
 
-        if( name.compare( PROGRAM ) == 0 )
+        if( name == PROGRAM )
         {
             m_log.error( { *e.locations().begin(), node.sourceLocation() },
                 "unknown init rule reference '" + std::string( e.what() ) + "'",
@@ -243,13 +243,13 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
 
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
-    const auto& symboltable = *data->symboltable();
+    const auto symboltable = data->symboltable();
 
-    ConsistencyCheckVisitor visitor( log, symboltable );
+    ConsistencyCheckVisitor visitor( log, *symboltable );
     specification->accept( visitor );
 
     const auto errors = log.errors();
-    if( errors )
+    if( errors > 0 )
     {
         log.debug( "found %lu error(s) during consistency checking", errors );
         return false;
