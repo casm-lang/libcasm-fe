@@ -50,7 +50,7 @@ const Ast::Identifier& Namespace::Symbol::identifier( void ) const
     return m_identifier;
 }
 
-Ast::TypedNode& Namespace::Symbol::definition( void )
+Ast::TypedNode& Namespace::Symbol::definition( void ) const
 {
     return m_definition;
 }

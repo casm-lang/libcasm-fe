@@ -46,7 +46,7 @@ namespace libcasm_fe
                 const std::size_t arity );
 
             const Ast::Identifier& identifier( void ) const;
-            Ast::TypedNode& definition( void );
+            Ast::TypedNode& definition( void ) const;
             Ast::CallExpression::TargetType targetType( void ) const;
             std::size_t arity( void ) const;
 

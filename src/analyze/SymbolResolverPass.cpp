@@ -52,45 +52,36 @@ static libpass::PassRegistration< SymbolResolverPass > PASS(
 class SymbolTableVisitor final : public RecursiveVisitor
 {
   public:
-    SymbolTableVisitor( Logger& m_log );
-
-    void visit( Specification& node ) override;
+    SymbolTableVisitor( Logger& m_log, Namespace& symboltable );
 
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
-    Namespace::Ptr symboltable( void ) const;
-
   private:
     Logger& m_log;
-    Namespace::Ptr m_symboltable;
+    Namespace& m_symboltable;
 };
 
-SymbolTableVisitor::SymbolTableVisitor( Logger& log )
+SymbolTableVisitor::SymbolTableVisitor( Logger& log, Namespace& symboltable )
 : m_log( log )
+, m_symboltable( symboltable )
 {
-}
-
-void SymbolTableVisitor::visit( Specification& node )
-{
-    m_symboltable = libstdhl::make< Namespace >();
-    RecursiveVisitor::visit( node );
 }
 
 void SymbolTableVisitor::visit( FunctionDefinition& node )
 {
     try
     {
-        m_symboltable->registerSymbol( node );
+        m_symboltable.registerSymbol( node );
     }
     catch( const std::domain_error& e )
     {
-        auto symbol = m_symboltable->find( node );
-        const auto name = node.identifier()->name();
+        const auto& symbol = m_symboltable.find( node );
+        const auto& name = node.identifier()->name();
 
-        if( name.compare( "program" ) == 0 )
+        if( name == "program" )
         {
             m_log.error(
                 { node.sourceLocation(), symbol.definition().sourceLocation() },
@@ -112,12 +103,13 @@ void SymbolTableVisitor::visit( DerivedDefinition& node )
 {
     try
     {
-        m_symboltable->registerSymbol( node );
+        m_symboltable.registerSymbol( node );
     }
     catch( const std::domain_error& e )
     {
         m_log.error( { node.sourceLocation() }, e.what() );
     }
+
     RecursiveVisitor::visit( node );
 }
 
@@ -125,12 +117,13 @@ void SymbolTableVisitor::visit( RuleDefinition& node )
 {
     try
     {
-        m_symboltable->registerSymbol( node );
+        m_symboltable.registerSymbol( node );
     }
     catch( const std::domain_error& e )
     {
         m_log.error( { node.sourceLocation() }, e.what() );
     }
+
     RecursiveVisitor::visit( node );
 }
 
@@ -138,18 +131,14 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
 {
     try
     {
-        m_symboltable->registerSymbol( node );
+        m_symboltable.registerSymbol( node );
     }
     catch( const std::domain_error& e )
     {
         m_log.error( { node.sourceLocation() }, e.what() );
     }
-    RecursiveVisitor::visit( node );
-}
 
-Namespace::Ptr SymbolTableVisitor::symboltable( void ) const
-{
-    return m_symboltable;
+    RecursiveVisitor::visit( node );
 }
 
 //
@@ -258,9 +247,8 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
 
     RecursiveVisitor::visit( node );
 
-    for( auto it = ( *node.arguments() ).rbegin();
-         it != ( *node.arguments() ).rend();
-         it++ )
+    const auto end = node.arguments()->rend();
+    for( auto it = node.arguments()->rbegin(); it != end; it++ )
     {
         pop( **it );
     }
@@ -361,10 +349,9 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             }
             else
             {
-                const auto variable = std::find_if( m_variables.rbegin(),
-                    m_variables.rend(), [&name]( const Variable& v ) {
-                        return v.name().compare( name ) == 0;
-                    } );
+                const auto variable
+                    = std::find_if( m_variables.rbegin(), m_variables.rend(),
+                        [&]( const Variable& v ) { return v.name() == name; } );
 
                 if( variable != m_variables.rend() )
                 {
@@ -372,7 +359,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                     node.setTargetDefinition(
                         variable->definition().ptr< TypedNode >() );
                 }
-                else if( name.compare( "self" ) == 0 )
+                else if( name == "self" )
                 {
                     assert( node.targetType()
                             == CallExpression::TargetType::UNKNOWN );
@@ -380,7 +367,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 }
                 // single agent execution notation --> agent type domain ==
                 // Enumeration!
-                else if( name.compare( "$" ) == 0 )
+                else if( name == "$" )
                 {
                     assert( node.targetType()
                             == CallExpression::TargetType::CONSTANT );
@@ -479,10 +466,9 @@ void SymbolResolveVisitor::push( VariableDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
-    auto variable = std::find_if(
-        m_variables.rbegin(), m_variables.rend(), [&name]( const Variable& v ) {
-            return v.name().compare( name ) == 0;
-        } );
+    const auto variable
+        = std::find_if( m_variables.rbegin(), m_variables.rend(),
+            [&]( const Variable& v ) { return v.name() == name; } );
 
     if( variable != m_variables.rend() )
     {
@@ -519,33 +505,35 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
     const auto data = pr.result< AttributionPass >();
     const auto specification = data->specification();
 
-    SymbolTableVisitor symTblVisitor( log );
-    specification->accept( symTblVisitor );
+    const auto symboltable = std::make_shared< Namespace >();
+
+    SymbolTableVisitor symbolTableGenerator( log, *symboltable );
+    specification->accept( symbolTableGenerator );
 
     const auto symTblErr = log.errors();
-    if( symTblErr )
+    if( symTblErr > 0 )
     {
         log.debug(
             "found %lu error(s) during symbol table creation", symTblErr );
         return false;
     }
 
-    SymbolResolveVisitor symResVisitor( log, *symTblVisitor.symboltable() );
-    specification->accept( symResVisitor );
+    SymbolResolveVisitor symbolResolver( log, *symboltable );
+    specification->accept( symbolResolver );
 
     const auto symResErr = log.errors();
-    if( symResErr )
+    if( symResErr > 0 )
     {
         log.debug( "found %lu error(s) during symbol resolving", symResErr );
         return false;
     }
 
 #ifndef NDEBUG
-    log.debug( "symbol table = \n" + symTblVisitor.symboltable()->dump() );
+    log.debug( "symbol table = \n" + symboltable->dump() );
 #endif
 
     pr.setResult< SymbolResolverPass >(
-        libstdhl::make< Data >( specification, symTblVisitor.symboltable() ) );
+        libstdhl::make< Data >( specification, symboltable ) );
 
     return true;
 }
