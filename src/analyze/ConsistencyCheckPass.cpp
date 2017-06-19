@@ -182,8 +182,27 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     assert( func->targetType() == CallExpression::TargetType::FUNCTION );
     const auto& def = func->targetDefinition()->ptr< FunctionDefinition >();
 
-    if( def->classification() == FunctionDefinition::Classification::INPUT
-        or def->classification() == FunctionDefinition::Classification::STATIC )
+    bool updatesAllowed;
+    switch( def->classification() )
+    {
+        case FunctionDefinition::Classification::INPUT:
+        {
+            updatesAllowed = false;
+            break;
+        }
+        case FunctionDefinition::Classification::STATIC:
+        {
+            // static function updates are only allowed during initialisation
+            updatesAllowed = m_functionInitially;
+            break;
+        }
+        default:
+        {
+            updatesAllowed = true;
+        }
+    }
+
+    if( not updatesAllowed )
     {
         m_log.error( { func->sourceLocation() },
             "updating " + func->targetTypeName() + " '"
