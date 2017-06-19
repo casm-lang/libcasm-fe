@@ -401,14 +401,14 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
     const auto update = m_updateSetManager.lookup( *location );
     if( update )
     {
-        m_evaluationStack.push( update.value().value );
+        m_evaluationStack.push( update->value );
         return;
     }
 
-    const auto globalFunction = m_globalState.get( *location );
-    if( globalFunction )
+    const auto function = m_globalState.get( *location );
+    if( function )
     {
-        m_evaluationStack.push( globalFunction.value() );
+        m_evaluationStack.push( function.value() );
         return;
     }
 
