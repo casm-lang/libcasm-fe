@@ -226,9 +226,8 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
 
     RecursiveVisitor::visit( node );
 
-    for( auto it = ( *node.arguments() ).rbegin();
-         it != ( *node.arguments() ).rend();
-         it++ )
+    const auto end = node.arguments()->rend();
+    for( auto it = node.arguments()->rbegin(); it != end; ++it )
     {
         pop( **it );
     }
@@ -248,7 +247,7 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     RecursiveVisitor::visit( node );
 
     const auto end = node.arguments()->rend();
-    for( auto it = node.arguments()->rbegin(); it != end; it++ )
+    for( auto it = node.arguments()->rbegin(); it != end; ++it )
     {
         pop( **it );
     }
