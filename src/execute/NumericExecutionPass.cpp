@@ -364,6 +364,31 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
 {
     auto* frame = m_frameStack.top();
 
+    // validate arguments
+    const auto& argumentTypes = node.type()->arguments();
+    for( std::size_t i = 0; i < argumentTypes.size(); ++i )
+    {
+        const auto& argumentType = argumentTypes.at( i );
+        const auto& argumentValue = frame->local( i );
+
+        try
+        {
+            validateValue( argumentValue, argumentType,
+                ValidationFlag::ValueMustBeDefined );
+        }
+        catch( const std::domain_error& e )
+        {
+            const auto& argumentDefinition = node.argumentTypes()->at( i );
+            const auto& callArgument = frame->call()->arguments()->at( i );
+
+            throw RuntimeException( { callArgument->sourceLocation(),
+                                        argumentDefinition->sourceLocation() },
+                e.what(),
+                m_frameStack.generateBacktrace( node.sourceLocation() ),
+                Code::FunctionArgumentInvalidValueAtLookup );
+        }
+    }
+
     const auto location = m_locationRegistry.lookup(
         node.identifier()->name(), frame->locals() );
     if( not location )

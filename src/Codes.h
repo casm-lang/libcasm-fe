@@ -67,7 +67,7 @@ namespace libcasm_fe
         FunctionDefaultValueTypeMismatch = 0xfb02
 
         ,
-        FunctionArgumentsInvalidRangeAtLookup
+        FunctionArgumentInvalidValueAtLookup
         = 0xfe00 // fe** ... function argument
         ,
         FunctionArgumentsInvalidRangeAtUpdate = 0xfe01,
