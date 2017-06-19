@@ -173,10 +173,10 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     {
       public:
         Variable( const std::string& name, const std::size_t localIndex,
-            const VariableDefinition& definition )
+            const VariableDefinition::Ptr& definition )
         : m_name( name )
         , m_localIndex( localIndex )
-        , m_definition( static_cast< const TypedNode& >( definition ) )
+        , m_definition( definition )
         {
         }
 
@@ -190,15 +190,15 @@ class SymbolResolveVisitor final : public RecursiveVisitor
             return m_localIndex;
         }
 
-        TypedNode& definition( void )
+        const VariableDefinition::Ptr& definition( void ) const
         {
-            return const_cast< TypedNode& >( m_definition );
+            return m_definition;
         }
 
       private:
         std::string m_name;
         std::size_t m_localIndex;
-        const TypedNode& m_definition;
+        const VariableDefinition::Ptr m_definition;
     };
 
     std::vector< Variable > m_variables;
@@ -356,8 +356,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 if( variable != m_variables.rend() )
                 {
                     node.setTargetType( CallExpression::TargetType::VARIABLE );
-                    node.setTargetDefinition(
-                        variable->definition().ptr< TypedNode >() );
+                    node.setTargetDefinition( variable->definition() );
                 }
                 else if( name == "self" )
                 {
@@ -477,7 +476,8 @@ void SymbolResolveVisitor::push( VariableDefinition& node )
     }
 
     const std::size_t localIndex = m_variables.size(); // used during execution
-    m_variables.emplace_back( Variable{ name, localIndex, node } );
+    m_variables.emplace_back(
+        name, localIndex, node.ptr< VariableDefinition >() );
 
     node.setLocalIndex( localIndex );
     m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_variables.size() );
@@ -485,7 +485,8 @@ void SymbolResolveVisitor::push( VariableDefinition& node )
 
 void SymbolResolveVisitor::pop( VariableDefinition& node )
 {
-    assert( &m_variables.back().definition() == &node );
+    assert(
+        m_variables.back().definition() == node.ptr< VariableDefinition >() );
     m_variables.pop_back();
 }
 
