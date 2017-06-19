@@ -392,7 +392,47 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
 
 void ExecutionVisitor::visit( DerivedDefinition& node )
 {
+    auto* frame = m_frameStack.top();
+
+    // validate arguments
+    const auto& argumentTypes = node.type()->arguments();
+    for( std::size_t i = 0; i < argumentTypes.size(); ++i )
+    {
+        const auto& argumentType = argumentTypes.at( i );
+        const auto& argumentValue = frame->local( i );
+
+        try
+        {
+            validateValue( argumentValue, argumentType );
+        }
+        catch( const std::domain_error& e )
+        {
+            const auto& argumentDefinition = node.arguments()->at( i );
+            const auto& callArgument = frame->call()->arguments()->at( i );
+
+            throw RuntimeException( { callArgument->sourceLocation(),
+                                        argumentDefinition->sourceLocation() },
+                e.what(),
+                m_frameStack.generateBacktrace( node.sourceLocation() ),
+                Code::DerivedArgumentValueInvalid );
+        }
+    }
+
     node.expression()->accept( *this ); // return value already on stack
+
+    // validate return value
+    const auto& returnType = node.type()->ptr_result();
+    const auto& returnValue = m_evaluationStack.top(); // keep it on stack
+    try
+    {
+        validateValue( returnValue, returnType );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw RuntimeException( { node.expression()->sourceLocation() },
+            e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
+            Code::DerivedReturnValueInvalid );
+    }
 }
 
 void ExecutionVisitor::visit( RuleDefinition& node )
