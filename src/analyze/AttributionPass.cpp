@@ -50,7 +50,9 @@ static libpass::PassRegistration< AttributionPass > PASS( "AstAttributionPass",
 static const std::string DEPRECATED_ATTRIBUTE = "deprecated";
 static const std::string IN_ATTRIBUTE = "in";
 static const std::string MONITORED_ATTRIBUTE = "monitored";
+static const std::string EXTERNAL_ATTRIBUTE = "external";
 static const std::string CONTROLLED_ATTRIBUTE = "controlled";
+static const std::string INTERNAL_ATTRIBUTE = "internal";
 static const std::string SHARED_ATTRIBUTE = "shared";
 static const std::string OUT_ATTRIBUTE = "out";
 static const std::string STATIC_ATTRIBUTE = "static";
@@ -60,9 +62,9 @@ static const std::string DUMPS_ATTRIBUTE = "dumps";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
-    DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE, MONITORED_ATTRIBUTE,
-    CONTROLLED_ATTRIBUTE, SHARED_ATTRIBUTE, OUT_ATTRIBUTE, STATIC_ATTRIBUTE,
-    SYMBOLIC_ATTRIBUTE,
+    DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE, MONITORED_ATTRIBUTE, EXTERNAL_ATTRIBUTE,
+    CONTROLLED_ATTRIBUTE, INTERNAL_ATTRIBUTE, SHARED_ATTRIBUTE, OUT_ATTRIBUTE,
+    STATIC_ATTRIBUTE, SYMBOLIC_ATTRIBUTE,
 };
 
 // list of allowed expression attribute names
@@ -194,11 +196,12 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
         {
             node.setSymbolic( true );
         }
-        else if( name == IN_ATTRIBUTE or name == MONITORED_ATTRIBUTE )
+        else if( name == IN_ATTRIBUTE or name == MONITORED_ATTRIBUTE
+                 or name == EXTERNAL_ATTRIBUTE )
         {
             node.setClassification( Classification::IN );
         }
-        else if( name == CONTROLLED_ATTRIBUTE )
+        else if( name == CONTROLLED_ATTRIBUTE or name == INTERNAL_ATTRIBUTE )
         {
             node.setClassification( Classification::CONTROLLED );
         }
