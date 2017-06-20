@@ -191,16 +191,14 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
     {
         // calling an out function isn't allowed (write-only)
         m_log.error( { node.sourceLocation() },
-            "calling " + node.targetTypeName() + " '"
-                + node.identifier()->path()
+            "calling function '" + node.identifier()->path()
                 + "' is not allowed, it is classified as '"
                 + function->classificationName()
                 + "' ",
             Code::DirectCallExpressionInvalidClassifier );
 
         m_log.info( { function->sourceLocation() },
-            node.targetTypeName() + " '" + node.identifier()->path()
-                + "' is classified as '"
+            "function '" + node.identifier()->path() + "' is classified as '"
                 + function->classificationName()
                 + "', incorrect usage in line "
                 + std::to_string( node.sourceLocation().begin.line ) );
@@ -239,16 +237,14 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     if( not updatesAllowed )
     {
         m_log.error( { func->sourceLocation() },
-            "updating " + func->targetTypeName() + " '"
-                + func->identifier()->path()
+            "updating function '" + func->identifier()->path()
                 + "' is not allowed, it is classified as '"
                 + def->classificationName()
                 + "' ",
             Code::UpdateRuleInvalidClassifier );
 
         m_log.info( { def->sourceLocation() },
-            func->targetTypeName() + " '" + func->identifier()->path()
-                + "' is classified as '"
+            "function '" + func->identifier()->path() + "' is classified as '"
                 + def->classificationName()
                 + "', incorrect usage in line "
                 + std::to_string( func->sourceLocation().begin.line ) );
