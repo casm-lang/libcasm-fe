@@ -186,7 +186,8 @@ namespace libcasm_fe
         // --------------------------------------------------------- cc** ...
         // consistency check errors
         ,
-        UpdateRuleInvalidClassifier = 0xcc00
+        UpdateRuleInvalidClassifier = 0xcc00,
+        DirectCallExpressionInvalidClassifier = 0xcc01
 
         // --------------------------------------------------------- 8*** ...
         // operator errors

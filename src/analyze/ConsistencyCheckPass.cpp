@@ -64,6 +64,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( ReferenceAtom& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( UndefAtom& node ) override;
+    void visit( DirectCallExpression& node ) override;
 
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
@@ -171,6 +172,39 @@ void ConsistencyCheckVisitor::visit( UndefAtom& node )
 {
     RecursiveVisitor::visit( node );
     verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
+{
+    assert( node.targetType() != CallExpression::TargetType::UNKNOWN
+            && "all calls should have been resolved by previous passes" );
+
+    RecursiveVisitor::visit( node );
+
+    if( node.targetType() != CallExpression::TargetType::FUNCTION )
+    {
+        return;
+    }
+
+    const auto& function = node.targetDefinition()->ptr< FunctionDefinition >();
+    if( function->classification() == FunctionDefinition::Classification::OUT )
+    {
+        // calling an out function isn't allowed (write-only)
+        m_log.error( { node.sourceLocation() },
+            "calling " + node.targetTypeName() + " '"
+                + node.identifier()->path()
+                + "' is not allowed, it is classified as '"
+                + function->classificationName()
+                + "' ",
+            Code::DirectCallExpressionInvalidClassifier );
+
+        m_log.info( { function->sourceLocation() },
+            node.targetTypeName() + " '" + node.identifier()->path()
+                + "' is classified as '"
+                + function->classificationName()
+                + "', incorrect usage in line "
+                + std::to_string( node.sourceLocation().begin.line ) );
+    }
 }
 
 void ConsistencyCheckVisitor::visit( UpdateRule& node )
