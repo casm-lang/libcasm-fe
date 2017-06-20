@@ -117,9 +117,9 @@ std::string FunctionDefinition::classificationName( void ) const
 {
     switch( classification() )
     {
-        case FunctionDefinition::Classification::INPUT:
+        case FunctionDefinition::Classification::IN:
         {
-            return "input";
+            return "in";
         }
         case FunctionDefinition::Classification::CONTROLLED:
         {
@@ -129,9 +129,9 @@ std::string FunctionDefinition::classificationName( void ) const
         {
             return "shared";
         }
-        case FunctionDefinition::Classification::OUTPUT:
+        case FunctionDefinition::Classification::OUT:
         {
-            return "output";
+            return "out";
         }
         case FunctionDefinition::Classification::STATIC:
         {

@@ -47,10 +47,11 @@ static libpass::PassRegistration< AttributionPass > PASS( "AstAttributionPass",
 
 // attribute names (case sensitive)
 static const std::string DEPRECATED_ATTRIBUTE = "deprecated";
-static const std::string INPUT_ATTRIBUTE = "input";
+static const std::string IN_ATTRIBUTE = "in";
+static const std::string MONITORED_ATTRIBUTE = "monitored";
 static const std::string CONTROLLED_ATTRIBUTE = "controlled";
 static const std::string SHARED_ATTRIBUTE = "shared";
-static const std::string OUTPUT_ATTRIBUTE = "output";
+static const std::string OUT_ATTRIBUTE = "out";
 static const std::string STATIC_ATTRIBUTE = "static";
 static const std::string VARIANT_ATTRIBUTE = "variant";
 static const std::string SYMBOLIC_ATTRIBUTE = "symbolic";
@@ -58,25 +59,15 @@ static const std::string DUMPS_ATTRIBUTE = "dumps";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
-    DEPRECATED_ATTRIBUTE, INPUT_ATTRIBUTE, CONTROLLED_ATTRIBUTE,
-    SHARED_ATTRIBUTE, OUTPUT_ATTRIBUTE, STATIC_ATTRIBUTE, SYMBOLIC_ATTRIBUTE,
+    DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE, MONITORED_ATTRIBUTE,
+    CONTROLLED_ATTRIBUTE, SHARED_ATTRIBUTE, OUT_ATTRIBUTE, STATIC_ATTRIBUTE,
+    SYMBOLIC_ATTRIBUTE,
 };
 
 // list of allowed expression attribute names
 static const std::unordered_set< std::string > VALID_EXPRESSION_ATTRIBUTES = {
     VARIANT_ATTRIBUTE, DUMPS_ATTRIBUTE,
 };
-
-static const std::unordered_map< std::string,
-    FunctionDefinition::Classification >
-    VALID_FUNCTION_CLASSIFIERS = {
-        { INPUT_ATTRIBUTE, FunctionDefinition::Classification::INPUT },
-        { CONTROLLED_ATTRIBUTE,
-            FunctionDefinition::Classification::CONTROLLED },
-        { SHARED_ATTRIBUTE, FunctionDefinition::Classification::SHARED },
-        { OUTPUT_ATTRIBUTE, FunctionDefinition::Classification::OUTPUT },
-        { STATIC_ATTRIBUTE, FunctionDefinition::Classification::STATIC },
-    };
 
 class DefinitionAttributionVisitor final : public RecursiveVisitor
 {
@@ -196,22 +187,31 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
 
     for( const auto& name : attributeNames )
     {
+        using Classification = FunctionDefinition::Classification;
+
         if( name == SYMBOLIC_ATTRIBUTE )
         {
             node.setSymbolic( true );
         }
-        else
+        else if( name == IN_ATTRIBUTE or name == MONITORED_ATTRIBUTE )
         {
-            auto result = VALID_FUNCTION_CLASSIFIERS.find( name );
-            if( result != VALID_FUNCTION_CLASSIFIERS.end() )
-            {
-                node.setClassification( result->second );
-            }
-            else
-            {
-                m_log.error( { node.sourceLocation() },
-                    "invalid function attribute '" + name + "'" );
-            }
+            node.setClassification( Classification::IN );
+        }
+        else if( name == CONTROLLED_ATTRIBUTE )
+        {
+            node.setClassification( Classification::CONTROLLED );
+        }
+        else if( name == SHARED_ATTRIBUTE )
+        {
+            node.setClassification( Classification::SHARED );
+        }
+        else if( name == OUT_ATTRIBUTE )
+        {
+            node.setClassification( Classification::OUT );
+        }
+        else if( name == STATIC_ATTRIBUTE )
+        {
+            node.setClassification( Classification::STATIC );
         }
     }
 }

@@ -84,11 +84,10 @@ namespace libcasm_fe
           public:
             enum class Classification
             {
-                INPUT, /**< only read by an ASM, only written by its env., aka.
-                          monitored */
+                IN, /**< only read by an ASM, only written by its env. */
                 CONTROLLED, /**< read and written by an ASM */
                 SHARED,     /**< read and written by an ASM and its env. */
-                OUTPUT, /**< only written by an ASM, only read by its env. */
+                OUT, /**< only written by an ASM, only read by its env. */
                 STATIC
             };
 

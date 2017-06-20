@@ -185,7 +185,7 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     bool updatesAllowed;
     switch( def->classification() )
     {
-        case FunctionDefinition::Classification::INPUT:
+        case FunctionDefinition::Classification::IN:
         {
             updatesAllowed = false;
             break;
