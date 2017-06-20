@@ -29,11 +29,12 @@
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
-#include "../transform/SourceToAstPass.h"
+#include "Logger.h"
 
-#include "../Logger.h"
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "transform/SourceToAstPass.h"
+
+#include "ast/RecursiveVisitor.h"
+#include "ast/Specification.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -218,19 +219,19 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
 
 void DefinitionVisitor::visit( DerivedDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ m_log, node };
+    DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( RuleDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ m_log, node };
+    DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( EnumerationDefinition& node )
 {
-    DefinitionAttributionVisitor visitor{ m_log, node };
+    DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
 }
 
@@ -246,11 +247,11 @@ u1 AttributionPass::run( libpass::PassResult& pr )
     const auto data = pr.result< SourceToAstPass >();
     const auto specification = data->specification();
 
-    DefinitionVisitor visitor{ log };
+    DefinitionVisitor visitor( log );
     specification->accept( visitor );
 
     const auto errors = log.errors();
-    if( errors )
+    if( errors > 0 )
     {
         log.debug( "found %lu error(s) during attribution", errors );
         return false;
