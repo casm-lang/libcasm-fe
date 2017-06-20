@@ -524,6 +524,10 @@ Identifier
   {
       $$ = Ast::make< Identifier >( @$, $1 );
   }
+| IN // allow in keyword as identifier
+  {
+      $$ = Ast::make< Identifier >( @$, "in" );
+  }
 ;
 
 

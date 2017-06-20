@@ -62,6 +62,7 @@ EnumerationDefinition
 
 Identifier
 : IDENTIFIER
+| IN // allow in keyword as identifier
 
 Identifiers
 : Identifiers COMMA Identifier
