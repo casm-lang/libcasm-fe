@@ -1416,7 +1416,7 @@ std::vector< Agent > AgentScheduler::collectAgents( void ) const
         if( rule.defined() )
         {
             agents.emplace_back(
-                Agent( m_locationRegistry, m_globalState, agentId, rule ) );
+                m_locationRegistry, m_globalState, agentId, rule );
         }
     }
 
