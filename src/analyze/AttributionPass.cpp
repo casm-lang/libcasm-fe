@@ -177,12 +177,16 @@ DefinitionVisitor::DefinitionVisitor( Logger& log )
 
 void DefinitionVisitor::visit( VariableDefinition& node )
 {
+    RecursiveVisitor::visit(node);
+
     DefinitionAttributionVisitor visitor{ m_log, node };
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( FunctionDefinition& node )
 {
+    RecursiveVisitor::visit(node);
+
     DefinitionAttributionVisitor visitor{ m_log, node };
     node.attributes()->accept( visitor );
 
@@ -222,18 +226,24 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
 
 void DefinitionVisitor::visit( DerivedDefinition& node )
 {
+    RecursiveVisitor::visit(node);
+
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( RuleDefinition& node )
 {
+    RecursiveVisitor::visit(node);
+
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
 }
 
 void DefinitionVisitor::visit( EnumerationDefinition& node )
 {
+    RecursiveVisitor::visit(node);
+
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
 }

@@ -80,9 +80,13 @@ Variable
 : Identifier COLON Type
 | Identifier
 
-Parameters
-: Parameters COMMA Variable
+AttributedVariable
+: LSQPAREN Attributes RSQPAREN Variable
 | Variable
+
+Parameters
+: Parameters COMMA AttributedVariable
+| AttributedVariable
 
 MaybeParameters
 : LPAREN Parameters RPAREN
@@ -213,10 +217,10 @@ ConditionalExpression
 : IF Term THEN Term ELSE Term
 
 UniversalQuantifierExpression
-: FORALL Variable IN Term HOLDS Term
+: FORALL AttributedVariable IN Term HOLDS Term
 
 ExistentialQuantifierExpression
-: EXISTS Variable IN Term WITH Term
+: EXISTS AttributedVariable IN Term WITH Term
 
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
@@ -260,13 +264,13 @@ CaseLabels
 | CaseLabel
 
 LetRule
-: LET Variable EQUAL Term IN Rule
+: LET AttributedVariable EQUAL Term IN Rule
 
 ForallRule
-: FORALL Variable IN Term DO Rule
+: FORALL AttributedVariable IN Term DO Rule
 
 ChooseRule
-: CHOOSE Variable IN Term DO Rule
+: CHOOSE AttributedVariable IN Term DO Rule
 
 IterateRule
 : ITERATE Rule

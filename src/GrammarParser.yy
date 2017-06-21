@@ -165,7 +165,7 @@ END       0 "end of file"
 // definitions
 %type <Definition::Ptr> Definition AttributedDefinition
 %type <Definitions::Ptr> Definitions
-%type <VariableDefinition::Ptr> Variable
+%type <VariableDefinition::Ptr> Variable AttributedVariable
 %type <FunctionDefinition::Ptr> FunctionDefinition
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
@@ -588,14 +588,28 @@ Variable
 ;
 
 
+AttributedVariable
+: LSQPAREN Attributes RSQPAREN Variable
+  {
+      auto variable = $4;
+      variable->setAttributes( $2 );
+      $$ = variable;
+  }
+| Variable
+  {
+      $$ = $1;
+  }
+;
+
+
 Parameters
-: Parameters COMMA Variable
+: Parameters COMMA AttributedVariable
   {
       auto parameters = $1;
       parameters->add( $3 );
       $$ = parameters;
   }
-| Variable
+| AttributedVariable
   {
       auto parameters = Ast::make< NodeList< VariableDefinition > >( @$ );
       parameters->add( $1 );
@@ -1076,7 +1090,7 @@ ConditionalExpression
 
 
 UniversalQuantifierExpression
-: FORALL Variable IN Term HOLDS Term
+: FORALL AttributedVariable IN Term HOLDS Term
   {
       $$ = Ast::make< UniversalQuantifierExpression >( @$, $2, $4, $6 );
   }
@@ -1084,7 +1098,7 @@ UniversalQuantifierExpression
 
 
 ExistentialQuantifierExpression
-: EXISTS Variable IN Term WITH Term
+: EXISTS AttributedVariable IN Term WITH Term
   {
       $$ = Ast::make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
   }
@@ -1234,7 +1248,7 @@ CaseLabels
 
 
 LetRule
-: LET Variable EQUAL Term IN Rule
+: LET AttributedVariable EQUAL Term IN Rule
   {
       $$ = Ast::make< LetRule >( @$, $2, $4, $6 );
   }
@@ -1242,7 +1256,7 @@ LetRule
 
 
 ForallRule
-: FORALL Variable IN Term DO Rule
+: FORALL AttributedVariable IN Term DO Rule
   {
       $$ = Ast::make< ForallRule >( @$, $2, $4, $6 );
   }
@@ -1250,7 +1264,7 @@ ForallRule
 
 
 ChooseRule
-: CHOOSE Variable IN Term DO Rule
+: CHOOSE AttributedVariable IN Term DO Rule
   {
       $$ = Ast::make< ChooseRule >( @$, $2, $4, $6 );
   }
