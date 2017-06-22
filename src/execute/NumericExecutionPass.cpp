@@ -38,6 +38,7 @@
 
 #include "../casm-ir/src/Instruction.h"
 #include "../casm-ir/src/Value.h"
+#include "../casm-ir/src/Exception.h"
 
 #include "../casm-rt/src/Value.h"
 
@@ -303,7 +304,7 @@ class ExecutionVisitor final : public EmptyVisitor
      * @param type The specified type
      * @param flags Disables or enables various validation properties
      *
-     * @throws std::domain_error in case of an invalid value
+     * @throws libcasm_ir::ValidationException in case of an invalid value
      */
     void validateValue( const ir::Constant& value,
         const libcasm_ir::Type::Ptr& type,
@@ -376,7 +377,7 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
             validateValue( argumentValue, argumentType,
                 ValidationFlag::ValueMustBeDefined );
         }
-        catch( const std::domain_error& e )
+        catch( const libcasm_ir::ValidationException& e )
         {
             const auto& argumentDefinition = node.argumentTypes()->at( i );
             const auto& callArgument = frame->call()->arguments()->at( i );
@@ -430,7 +431,7 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
         {
             validateValue( argumentValue, argumentType );
         }
-        catch( const std::domain_error& e )
+        catch( const libcasm_ir::ValidationException& e )
         {
             const auto& argumentDefinition = node.arguments()->at( i );
             const auto& callArgument = frame->call()->arguments()->at( i );
@@ -452,7 +453,7 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
     {
         validateValue( returnValue, returnType );
     }
-    catch( const std::domain_error& e )
+    catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { node.expression()->sourceLocation() },
             e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
@@ -1010,7 +1011,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     {
         validateValue( updateValue, function->type()->ptr_result() );
     }
-    catch( const std::domain_error& e )
+    catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { expression->sourceLocation() }, e.what(),
             m_frameStack.generateBacktrace( node.sourceLocation() ),
@@ -1035,7 +1036,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
             validateValue(
                 value, argumentType, ValidationFlag::ValueMustBeDefined );
         }
-        catch( const std::domain_error& e )
+        catch( const libcasm_ir::ValidationException& e )
         {
             throw RuntimeException( { argument->sourceLocation() }, e.what(),
                 m_frameStack.generateBacktrace( node.sourceLocation() ),
@@ -1149,11 +1150,11 @@ void ExecutionVisitor::validateValue( const ir::Constant& value,
     if( flags.isSet( ValidationFlag::ValueMustBeDefined )
         and not value.defined() )
     {
-        throw std::domain_error(
+        throw libcasm_ir::ValidationException(
             "value isn't defined, but undef isn't allowed" );
     }
 
-    // TODO type->isValid( value );
+    type->validate( value );
 }
 
 void ExecutionVisitor::handleMergeConflict(
