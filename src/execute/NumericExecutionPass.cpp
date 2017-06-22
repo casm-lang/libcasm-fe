@@ -1015,7 +1015,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     {
         throw RuntimeException( { expression->sourceLocation() }, e.what(),
             m_frameStack.generateBacktrace( node.sourceLocation() ),
-            Code::FunctionUpdateInvalidValue );
+            Code::FunctionUpdateInvalidValueAtUpdate );
     }
 
     // evaluate function arguments
@@ -1040,7 +1040,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
         {
             throw RuntimeException( { argument->sourceLocation() }, e.what(),
                 m_frameStack.generateBacktrace( node.sourceLocation() ),
-                Code::FunctionArgumentsInvalidValue );
+                Code::FunctionArgumentInvalidValueAtUpdate );
         }
 
         argumentValues.emplace_back( value );
