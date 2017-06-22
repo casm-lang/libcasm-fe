@@ -36,9 +36,9 @@
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
+#include "../casm-ir/src/Exception.h"
 #include "../casm-ir/src/Instruction.h"
 #include "../casm-ir/src/Value.h"
-#include "../casm-ir/src/Exception.h"
 
 #include "../casm-rt/src/Value.h"
 
@@ -379,11 +379,9 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
         }
         catch( const libcasm_ir::ValidationException& e )
         {
-            const auto& argumentDefinition = node.argumentTypes()->at( i );
             const auto& callArgument = frame->call()->arguments()->at( i );
 
-            throw RuntimeException( { callArgument->sourceLocation(),
-                                        argumentDefinition->sourceLocation() },
+            throw RuntimeException( { callArgument->sourceLocation() },
                 e.what(),
                 m_frameStack.generateBacktrace( node.sourceLocation() ),
                 Code::FunctionArgumentInvalidValueAtLookup );
