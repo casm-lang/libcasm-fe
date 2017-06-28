@@ -288,7 +288,20 @@ class ExecutionVisitor final : public EmptyVisitor
     std::unique_ptr< Frame > makeFrame( const CallExpression::Ptr& call,
         const Node::Ptr& callee, std::size_t numberOfLocals );
 
-    void invokeBuiltin( ir::Value::ID id, const ir::Type::Ptr& type );
+    /**
+     * Calls the builtin with id \a id.
+     *
+     * It uses the locals of the current frame as argument values.
+     *
+     * @param node The AST node in whose context the invocation is performed
+     *             (used for the error location and stack trace generation)
+     * @param id ID of the builtin
+     * @param type Relation type of the builtin
+     *
+     * @throws RuntimeException in case of an error
+     */
+    void invokeBuiltin(
+        const Node& node, ir::Value::ID id, const ir::Type::Ptr& type );
 
     enum class ValidationFlag
     {
@@ -502,18 +515,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         {
             m_frameStack.push( makeFrame( node.ptr< CallExpression >(), nullptr,
                 node.arguments()->size() ) );
-            try
-            {
-                invokeBuiltin( node.targetBuiltinId(), node.type() );
-            }
-            catch( const std::exception& e )
-            {
-                throw RuntimeException( node.sourceLocation(),
-                    "builtin has thrown an exception: "
-                        + std::string( e.what() ),
-                    m_frameStack.generateBacktrace( node.sourceLocation() ),
-                    Code::AssertInvalidExpression );
-            }
+            invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
         }
@@ -588,18 +590,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         {
             m_frameStack.push( makeFrame( node.ptr< CallExpression >(), nullptr,
                 node.arguments()->size() ) );
-            try
-            {
-                invokeBuiltin( atom->builtinId(), node.type() );
-            }
-            catch( const std::exception& e )
-            {
-                throw RuntimeException( node.sourceLocation(),
-                    "builtin has thrown an exception: "
-                        + std::string( e.what() ),
-                    m_frameStack.generateBacktrace( node.sourceLocation() ),
-                    Code::Unspecified );
-            }
+            invokeBuiltin( node, atom->builtinId(), node.type() );
             m_frameStack.pop();
             break;
         }
@@ -1100,17 +1091,28 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
 }
 
 void ExecutionVisitor::invokeBuiltin(
-    ir::Value::ID id, const ir::Type::Ptr& type )
+    const Node& node, ir::Value::ID id, const ir::Type::Ptr& type )
 {
     const auto& locals = m_frameStack.top()->locals();
 
-    const auto result
-        = libcasm_rt::Value::execute_( id, type, locals.data(), locals.size() );
+    libcasm_ir::Constant returnValue;
+    try
+    {
+        returnValue = libcasm_rt::Value::execute_(
+            id, type, locals.data(), locals.size() );
+    }
+    catch( const std::exception& e )
+    {
+        throw RuntimeException( node.sourceLocation(),
+            "builtin has thrown an exception: " + std::string( e.what() ),
+            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            Code::AssertInvalidExpression );
+    }
 
     const auto& returnType = type->ptr_result();
     if( not returnType->isVoid() )
     {
-        m_evaluationStack.push( result );
+        m_evaluationStack.push( returnValue );
     }
 }
 
