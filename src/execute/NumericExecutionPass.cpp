@@ -389,25 +389,21 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
 
     const auto location = m_locationRegistry.lookup(
         node.identifier()->name(), m_frameStack.top()->locals() );
-    if( not location )
+    if( location )
     {
-        // location is not registered -> no update and no state
-        node.defaultValue()->accept( *this ); // return value already on stack
-        return;
-    }
+        const auto update = m_updateSetManager.lookup( *location );
+        if( update )
+        {
+            m_evaluationStack.push( update->value );
+            return;
+        }
 
-    const auto update = m_updateSetManager.lookup( *location );
-    if( update )
-    {
-        m_evaluationStack.push( update->value );
-        return;
-    }
-
-    const auto function = m_globalState.get( *location );
-    if( function )
-    {
-        m_evaluationStack.push( function.value() );
-        return;
+        const auto function = m_globalState.get( *location );
+        if( function )
+        {
+            m_evaluationStack.push( function.value() );
+            return;
+        }
     }
 
     node.defaultValue()->accept( *this ); // return value already on stack
