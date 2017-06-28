@@ -308,7 +308,27 @@ class ExecutionVisitor final : public EmptyVisitor
      */
     void validateValue( const ir::Constant& value,
         const libcasm_ir::Type::Ptr& type,
-        ValidationFlags flags = ValidationFlags() );
+        ValidationFlags flags = {} ) const;
+
+    /**
+     * Validates the arguments, i.e. if the values comply to the argument types
+     * \a argumentTypes.
+     *
+     * It uses the locals of the current frame as argument values.
+     *
+     * @param node The AST node in whose context the validation is performed
+     *             (used for the error location and stack trace generation)
+     * @param argumentTypes A list of arguments types used for the validation
+     * @param flags Disables or enables various validation properties
+     * @param errorCode Defines the error code which should be applied to the
+     *                  exception in case of a validation error
+     *
+     * @throws RuntimeException in case of an invalid argument value with proper
+     *                          error and location information
+     */
+    void validateArguments( const Node& node,
+        const libcasm_ir::Types& argumentTypes, ValidationFlags flags,
+        Code errorCode ) const;
 
     void handleMergeConflict(
         const Node& node, const ExecutionUpdateSet::Conflict& conflict ) const;
@@ -363,33 +383,12 @@ void ExecutionVisitor::visit( VariableDefinition& node )
 
 void ExecutionVisitor::visit( FunctionDefinition& node )
 {
-    auto* frame = m_frameStack.top();
-
-    // validate arguments
-    const auto& argumentTypes = node.type()->arguments();
-    for( std::size_t i = 0; i < argumentTypes.size(); ++i )
-    {
-        const auto& argumentType = argumentTypes.at( i );
-        const auto& argumentValue = frame->local( i );
-
-        try
-        {
-            validateValue( argumentValue, argumentType,
-                ValidationFlag::ValueMustBeDefined );
-        }
-        catch( const libcasm_ir::ValidationException& e )
-        {
-            const auto& callArgument = frame->call()->arguments()->at( i );
-
-            throw RuntimeException( { callArgument->sourceLocation() },
-                e.what(),
-                m_frameStack.generateBacktrace( node.sourceLocation() ),
-                Code::FunctionArgumentInvalidValueAtLookup );
-        }
-    }
+    validateArguments( node, node.type()->arguments(),
+        ValidationFlag::ValueMustBeDefined,
+        Code::FunctionArgumentInvalidValueAtLookup );
 
     const auto location = m_locationRegistry.lookup(
-        node.identifier()->name(), frame->locals() );
+        node.identifier()->name(), m_frameStack.top()->locals() );
     if( not location )
     {
         // location is not registered -> no update and no state
@@ -416,29 +415,8 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
 
 void ExecutionVisitor::visit( DerivedDefinition& node )
 {
-    auto* frame = m_frameStack.top();
-
-    // validate arguments
-    const auto& argumentTypes = node.type()->arguments();
-    for( std::size_t i = 0; i < argumentTypes.size(); ++i )
-    {
-        const auto& argumentType = argumentTypes.at( i );
-        const auto& argumentValue = frame->local( i );
-
-        try
-        {
-            validateValue( argumentValue, argumentType );
-        }
-        catch( const libcasm_ir::ValidationException& e )
-        {
-            const auto& callArgument = frame->call()->arguments()->at( i );
-
-            throw RuntimeException( { callArgument->sourceLocation() },
-                e.what(),
-                m_frameStack.generateBacktrace( node.sourceLocation() ),
-                Code::DerivedArgumentValueInvalid );
-        }
-    }
+    validateArguments(
+        node, node.type()->arguments(), {}, Code::DerivedArgumentValueInvalid );
 
     node.expression()->accept( *this ); // return value already on stack
 
@@ -1141,7 +1119,7 @@ void ExecutionVisitor::invokeBuiltin(
 }
 
 void ExecutionVisitor::validateValue( const ir::Constant& value,
-    const libcasm_ir::Type::Ptr& type, ValidationFlags flags )
+    const libcasm_ir::Type::Ptr& type, ValidationFlags flags ) const
 {
     if( flags.isSet( ValidationFlag::ValueMustBeDefined )
         and not value.defined() )
@@ -1151,6 +1129,35 @@ void ExecutionVisitor::validateValue( const ir::Constant& value,
     }
 
     type->validate( value );
+}
+
+void ExecutionVisitor::validateArguments( const Node& node,
+    const libcasm_ir::Types& argumentTypes, ValidationFlags flags,
+    Code errorCode ) const
+{
+    const auto* frame = m_frameStack.top();
+
+    const auto size = argumentTypes.size();
+    assert( frame->locals().size() >= size );
+
+    for( std::size_t i = 0; i < size; ++i )
+    {
+        const auto& argumentType = argumentTypes.at( i );
+        const auto& argumentValue = frame->local( i );
+
+        try
+        {
+            validateValue( argumentValue, argumentType, flags );
+        }
+        catch( const libcasm_ir::ValidationException& e )
+        {
+            const auto& callArgument = frame->call()->arguments()->at( i );
+            throw RuntimeException( { callArgument->sourceLocation() },
+                e.what(),
+                m_frameStack.generateBacktrace( node.sourceLocation() ),
+                errorCode );
+        }
+    }
 }
 
 void ExecutionVisitor::handleMergeConflict(
