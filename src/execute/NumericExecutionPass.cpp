@@ -856,6 +856,19 @@ void ExecutionVisitor::visit( LetRule& node )
     node.expression()->accept( *this );
     const auto& value = m_evaluationStack.pop();
 
+    // validate value
+    const auto& variableType = node.variable()->type()->result();
+    try
+    {
+        validateValue( value, variableType );
+    }
+    catch( const libcasm_ir::ValidationException& e )
+    {
+        throw RuntimeException( { node.expression()->sourceLocation() },
+            e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
+            Code::LetAssignedValueInvalid );
+    }
+
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
     frame->setLocal( variableIndex, value );

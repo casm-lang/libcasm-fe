@@ -105,7 +105,10 @@ namespace libcasm_fe
         CaseLabelMultipleUseOfDefault = 0x5c00 // 5c** ... case errors
 
         ,
-        AssertInvalidExpression = 0x5a00, // 5a** ... assert errors
+        AssertInvalidExpression = 0x5a00 // 5a** ... assert errors
+
+        ,
+        LetAssignedValueInvalid = 0x5d00,
 
         // --------------------------------------------------------- a*** ...
         // agent errors
