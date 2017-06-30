@@ -93,6 +93,8 @@ namespace libcasm_fe
         ,
         RuleDefinitionAlreadyUsed = 0x5000,
 
+        NotSideEffectFreeRuleCall = 0x5100,
+
         RuleArgumentValueInvalid = 0x5e00 // 5e** ... rule argument
         ,
         RuleArgumentsSizeInvalidAtCall = 0x5e01,
@@ -130,6 +132,7 @@ namespace libcasm_fe
         // type inference errors
 
         TypeInferenceFoundNoTypeAnnotation = 0x1000,
+        TypeInferenceUnableToInferType = 0x1eee,
 
         TypeInferenceFoundNoResultType = 0x1100,
         TypeInferenceFoundMultipleResultTypes = 0x1101,

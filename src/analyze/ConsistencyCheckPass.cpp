@@ -60,6 +60,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( Specification& node ) override;
 
     void visit( FunctionDefinition& node ) override;
+    void visit( DerivedDefinition& node ) override;
 
     void visit( ReferenceAtom& node ) override;
     void visit( ValueAtom& node ) override;
@@ -75,6 +76,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     Logger& m_log;
     const Namespace& m_symboltable;
     u1 m_functionInitially;
+    u1 m_sideEffectFree;
 };
 
 ConsistencyCheckVisitor::ConsistencyCheckVisitor(
@@ -82,6 +84,7 @@ ConsistencyCheckVisitor::ConsistencyCheckVisitor(
 : m_log( log )
 , m_symboltable( symboltable )
 , m_functionInitially( false )
+, m_sideEffectFree( false )
 {
 }
 
@@ -103,6 +106,13 @@ void ConsistencyCheckVisitor::visit( Specification& node )
 
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 {
+    verify( *node.returnType() );
+
+    for( auto arg : *node.argumentTypes() )
+    {
+        verify( *arg );
+    }
+
     m_functionInitially = true;
 
     try
@@ -132,6 +142,20 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     node.returnType()->accept( *this );
     node.defaultValue()->accept( *this );
     node.attributes()->accept( *this );
+}
+
+void ConsistencyCheckVisitor::visit( DerivedDefinition& node )
+{
+    for( auto arg : *node.arguments() )
+    {
+        verify( *arg );
+    }
+
+    m_sideEffectFree = true;
+
+    RecursiveVisitor::visit( node );
+
+    m_sideEffectFree = false;
 }
 
 void ConsistencyCheckVisitor::visit( ReferenceAtom& node )
@@ -181,27 +205,39 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    if( node.targetType() != CallExpression::TargetType::FUNCTION )
+    if( node.targetType() == CallExpression::TargetType::FUNCTION )
     {
-        return;
+        const auto& function
+            = node.targetDefinition()->ptr< FunctionDefinition >();
+        if( function->classification()
+            == FunctionDefinition::Classification::OUT )
+        {
+            // calling an out function isn't allowed (write-only)
+            m_log.error( { node.sourceLocation() },
+                "calling function '" + node.identifier()->path()
+                    + "' is not allowed, it is classified as '"
+                    + function->classificationName()
+                    + "' ",
+                Code::DirectCallExpressionInvalidClassifier );
+
+            m_log.info( { function->sourceLocation() },
+                "function '" + node.identifier()->path()
+                    + "' is classified as '"
+                    + function->classificationName()
+                    + "', incorrect usage in line "
+                    + std::to_string( node.sourceLocation().begin.line ) );
+        }
     }
 
-    const auto& function = node.targetDefinition()->ptr< FunctionDefinition >();
-    if( function->classification() == FunctionDefinition::Classification::OUT )
+    if( node.targetType() == CallExpression::TargetType::RULE )
     {
-        // calling an out function isn't allowed (write-only)
-        m_log.error( { node.sourceLocation() },
-            "calling function '" + node.identifier()->path()
-                + "' is not allowed, it is classified as '"
-                + function->classificationName()
-                + "' ",
-            Code::DirectCallExpressionInvalidClassifier );
-
-        m_log.info( { function->sourceLocation() },
-            "function '" + node.identifier()->path() + "' is classified as '"
-                + function->classificationName()
-                + "', incorrect usage in line "
-                + std::to_string( node.sourceLocation().begin.line ) );
+        if( m_sideEffectFree )
+        {
+            m_log.error( { node.sourceLocation() },
+                "calling rule '" + node.identifier()->path()
+                    + "' is not allowed inside a derived definition",
+                Code::NotSideEffectFreeRuleCall );
+        }
     }
 }
 
@@ -270,8 +306,8 @@ void ConsistencyCheckVisitor::verify( const TypedNode& node )
 {
     if( not node.type() )
     {
-        m_log.error( { node.sourceLocation() }, "found node without a type",
-            Code::Unspecified );
+        m_log.error( { node.sourceLocation() }, "unable to infer type",
+            Code::TypeInferenceUnableToInferType );
     }
 }
 
