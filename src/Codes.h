@@ -108,7 +108,10 @@ namespace libcasm_fe
         AssertInvalidExpression = 0x5a00 // 5a** ... assert errors
 
         ,
-        LetAssignedValueInvalid = 0x5d00,
+        LetAssignedValueInvalid = 0x5d00
+
+        ,
+        BuiltinArgumentValueInvalid = 0x5f00,
 
         // --------------------------------------------------------- a*** ...
         // agent errors

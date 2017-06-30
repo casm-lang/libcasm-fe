@@ -1106,11 +1106,13 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
 void ExecutionVisitor::invokeBuiltin(
     const Node& node, ir::Value::ID id, const ir::Type::Ptr& type )
 {
-    const auto& arguments = m_frameStack.top()->locals();
+    validateArguments(
+        node, type->arguments(), {}, Code::BuiltinArgumentValueInvalid );
 
     libcasm_ir::Constant returnValue;
     try
     {
+        const auto& arguments = m_frameStack.top()->locals();
         returnValue = libcasm_rt::Value::execute_(
             id, type, arguments.data(), arguments.size() );
     }
