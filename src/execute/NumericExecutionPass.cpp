@@ -320,7 +320,7 @@ class ExecutionVisitor final : public EmptyVisitor
      * @throws libcasm_ir::ValidationException in case of an invalid value
      */
     void validateValue( const ir::Constant& value,
-        const libcasm_ir::Type::Ptr& type,
+        const libcasm_ir::Type& type,
         ValidationFlags flags = {} ) const;
 
     /**
@@ -430,7 +430,7 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
     node.expression()->accept( *this ); // return value already on stack
 
     // validate return value
-    const auto& returnType = node.type()->ptr_result();
+    const auto& returnType = node.type()->result();
     const auto& returnValue = m_evaluationStack.top(); // keep it on stack
     try
     {
@@ -970,7 +970,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     const auto& updateValue = m_evaluationStack.pop();
     try
     {
-        validateValue( updateValue, function->type()->ptr_result() );
+        validateValue( updateValue, function->type()->result() );
     }
     catch( const libcasm_ir::ValidationException& e )
     {
@@ -995,7 +995,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
         try
         {
             validateValue(
-                value, argumentType, ValidationFlag::ValueMustBeDefined );
+                value, *argumentType, ValidationFlag::ValueMustBeDefined );
         }
         catch( const libcasm_ir::ValidationException& e )
         {
@@ -1093,13 +1093,13 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
 void ExecutionVisitor::invokeBuiltin(
     const Node& node, ir::Value::ID id, const ir::Type::Ptr& type )
 {
-    const auto& locals = m_frameStack.top()->locals();
+    const auto& arguments = m_frameStack.top()->locals();
 
     libcasm_ir::Constant returnValue;
     try
     {
         returnValue = libcasm_rt::Value::execute_(
-            id, type, locals.data(), locals.size() );
+            id, type, arguments.data(), arguments.size() );
     }
     catch( const std::exception& e )
     {
@@ -1109,15 +1109,15 @@ void ExecutionVisitor::invokeBuiltin(
             Code::AssertInvalidExpression );
     }
 
-    const auto& returnType = type->ptr_result();
-    if( not returnType->isVoid() )
+    const auto& returnType = type->result();
+    if( not returnType.isVoid() )
     {
         m_evaluationStack.push( returnValue );
     }
 }
 
 void ExecutionVisitor::validateValue( const ir::Constant& value,
-    const libcasm_ir::Type::Ptr& type, ValidationFlags flags ) const
+    const libcasm_ir::Type& type, ValidationFlags flags ) const
 {
     if( flags.isSet( ValidationFlag::ValueMustBeDefined )
         and not value.defined() )
@@ -1126,7 +1126,7 @@ void ExecutionVisitor::validateValue( const ir::Constant& value,
             "value isn't defined, but undef isn't allowed" );
     }
 
-    type->validate( value );
+    type.validate( value );
 }
 
 void ExecutionVisitor::validateArguments( const Node& node,
@@ -1145,7 +1145,7 @@ void ExecutionVisitor::validateArguments( const Node& node,
 
         try
         {
-            validateValue( argumentValue, argumentType, flags );
+            validateValue( argumentValue, *argumentType, flags );
         }
         catch( const libcasm_ir::ValidationException& e )
         {
