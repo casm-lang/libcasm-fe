@@ -51,12 +51,10 @@ namespace libcasm_fe
         // --------------------------------------------------------- f*** ...
         // function errors
         ,
-        FunctionSymbolIsUnknown = 0xf000
+        FunctionSymbolIsUnknown = 0xf000,
 
-        ,
-        FunctionDefinitionAlreadyUsed = 0xf010
+        FunctionDefinitionAlreadyUsed = 0xf010,
 
-        ,
         FunctionAttributeIsInvalid = 0xfa00 // fa** ... function attribute
         ,
         FunctionAttributeMultipleUseOfFunctionClassifier = 0xfa01,
@@ -84,13 +82,17 @@ namespace libcasm_fe
         // --------------------------------------------------------- d*** ...
         // derived errors
         ,
+        DerivedDefinitionAlreadyUsed = 0xd000,
+
         DerivedArgumentValueInvalid = 0xda00, // da** ... derived argment
         DerivedReturnValueInvalid = 0xda01,
         DerivedExpressionInvalidType = 0xde00 // de** ... derived expression
 
         // --------------------------------------------------------- 5*** ...
-        // statement errors
+        // rule errors
         ,
+        RuleDefinitionAlreadyUsed = 0x5000,
+
         RuleArgumentValueInvalid = 0x5e00 // 5e** ... rule argument
         ,
         RuleArgumentsSizeInvalidAtCall = 0x5e01,
@@ -150,6 +152,7 @@ namespace libcasm_fe
         TypeInferenceFunctionArgumentSizeMismatch = 0x1312,
         TypeInferenceDerivedArgumentTypeMismatch = 0x1303,
         TypeInferenceDerivedArgumentSizeMismatch = 0x1313,
+        TypeInferenceDerivedReturnTypeMismatch = 0x1323,
         TypeInferenceBuiltinArgumentTypeMismatch = 0x1304,
         TypeInferenceBuiltinArgumentSizeMismatch = 0x1314,
         TypeInferenceRuleArgumentTypeMismatch = 0x1305,

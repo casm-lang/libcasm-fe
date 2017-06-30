@@ -107,7 +107,11 @@ void SymbolTableVisitor::visit( DerivedDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.sourceLocation() }, e.what() );
+        auto symbol = m_symboltable.find( node );
+
+        m_log.error(
+            { node.sourceLocation(), symbol.definition().sourceLocation() },
+            e.what(), Code::DerivedDefinitionAlreadyUsed );
     }
 
     RecursiveVisitor::visit( node );
@@ -121,7 +125,8 @@ void SymbolTableVisitor::visit( RuleDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.sourceLocation() }, e.what() );
+        m_log.error( { node.sourceLocation() }, e.what(),
+            Code::RuleDefinitionAlreadyUsed );
     }
 
     RecursiveVisitor::visit( node );

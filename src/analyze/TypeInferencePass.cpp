@@ -652,6 +652,27 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
     }
 
     inference( node, {} );
+
+    if( node.type() and node.expression()->type() )
+    {
+        const auto& expTy = node.expression()->type()->result();
+        const auto& resTy = node.type()->result();
+
+        if( resTy != expTy )
+        {
+            if( expTy.isInteger() and resTy.isInteger() )
+            {
+                return;
+            }
+
+            m_log.error( { node.expression()->sourceLocation() },
+                "type mismatch: result type was '" + expTy.description()
+                    + "', derived expects '"
+                    + resTy.description()
+                    + "'",
+                Code::TypeInferenceDerivedReturnTypeMismatch );
+        }
+    }
 }
 
 void TypeInferenceVisitor::visit( RuleDefinition& node )
