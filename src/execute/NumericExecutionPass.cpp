@@ -635,19 +635,20 @@ void ExecutionVisitor::visit( UnaryExpression& node )
 void ExecutionVisitor::visit( BinaryExpression& node )
 {
     node.left()->accept( *this );
-    const auto& lhs = m_evaluationStack.pop();
-
     node.right()->accept( *this );
-    const auto& rhs = m_evaluationStack.pop();
+
+    const auto* operands = m_evaluationStack.top_ptr( 2 );
 
     try
     {
         const auto result
-            = libcasm_rt::Value::execute( node.op(), node.type(), lhs, rhs );
+            = libcasm_rt::Value::execute_( node.op(), node.type(), operands, 2 );
+        m_evaluationStack.drop( 2 );
         m_evaluationStack.push( result );
     }
     catch( const ir::Exception& e )
     {
+        m_evaluationStack.drop( 2 );
         throw RuntimeException( node.sourceLocation(),
             "binary expression has thrown an exception: "
                 + std::string( e.what() ),
