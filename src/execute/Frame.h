@@ -41,7 +41,7 @@ namespace libcasm_fe
         Ast::Node::Ptr callee( void ) const;
 
         void setLocal( std::size_t index, const libcasm_ir::Constant& local );
-        libcasm_ir::Constant local( std::size_t index ) const;
+        const libcasm_ir::Constant& local( std::size_t index ) const;
         const std::vector< libcasm_ir::Constant >& locals( void ) const;
 
       private:

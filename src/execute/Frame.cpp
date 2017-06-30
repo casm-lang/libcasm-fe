@@ -57,7 +57,7 @@ void Frame::setLocal( std::size_t index, const ir::Constant& local )
     m_locals[ index ] = local;
 }
 
-ir::Constant Frame::local( std::size_t index ) const
+const ir::Constant& Frame::local( std::size_t index ) const
 {
     return m_locals.at( index );
 }
