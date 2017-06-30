@@ -446,6 +446,9 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
 
 void ExecutionVisitor::visit( RuleDefinition& node )
 {
+    validateArguments(
+        node, node.type()->arguments(), {}, Code::RuleArgumentValueInvalid );
+
     node.rule()->accept( *this );
 
     const auto& returnType = node.type()->ptr_result();
@@ -455,6 +458,7 @@ void ExecutionVisitor::visit( RuleDefinition& node )
         {
             // const auto& value = TODO get update value and REMOVE update from
             // update set
+            // TODO validate return value
             // m_evaluationStack.push( value );
         }
         else

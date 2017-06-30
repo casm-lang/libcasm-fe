@@ -91,13 +91,12 @@ namespace libcasm_fe
         // --------------------------------------------------------- 5*** ...
         // statement errors
         ,
-        RuleArgumentsInvalidRangeAtCall = 0x5e00 // 5e** ... rule argument
+        RuleArgumentValueInvalid = 0x5e00 // 5e** ... rule argument
         ,
         RuleArgumentsSizeInvalidAtCall = 0x5e01,
         RuleArgumentsTypeInvalidAtCall = 0x5e02
 
         ,
-        RuleArgumentsInvalidRangeAtIndirectCall = 0x5e03,
         RuleArgumentsSizeInvalidAtIndirectCall = 0x5e04,
         RuleArgumentsTypeInvalidAtIndirectCall = 0x5e05
 
