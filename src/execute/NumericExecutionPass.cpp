@@ -1042,8 +1042,8 @@ void ExecutionVisitor::visit( CallRule& node )
 {
     node.call()->accept( *this );
 
-    const auto& returnType = node.call()->type()->ptr_result();
-    if( not returnType->isVoid() )
+    const auto& returnType = node.call()->type()->result();
+    if( not returnType.isVoid() )
     {
         m_evaluationStack.pop(); // drop return value
     }
