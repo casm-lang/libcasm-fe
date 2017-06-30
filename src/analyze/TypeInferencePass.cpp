@@ -619,6 +619,8 @@ void TypeInferenceVisitor::visit( Specification& node )
 
 void TypeInferenceVisitor::visit( FunctionDefinition& node )
 {
+    inference( node, {} );
+
     m_functionInitially = true;
 
     RecursiveVisitor::visit( node );
@@ -630,26 +632,44 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
 {
+    inference( node, {} );
+
+    for( const auto& argument : *node.arguments() )
+    {
+        push( *argument );
+    }
+
     const auto type = node.returnType()->type();
     assert( type );
     m_resultTypes[ node.expression().get() ].emplace_back( type->id() );
+
+    RecursiveVisitor::visit( node );
+
+    for( const auto& argument : *node.arguments() )
+    {
+        pop( *argument );
+    }
 
     inference( node, {} );
 }
 
 void TypeInferenceVisitor::visit( RuleDefinition& node )
 {
+    inference( node, {} );
+
     for( const auto& argument : *node.arguments() )
     {
         push( *argument );
     }
 
-    inference( node, {} );
+    RecursiveVisitor::visit( node );
 
     for( const auto& argument : *node.arguments() )
     {
         pop( *argument );
     }
+
+    inference( node, {} );
 }
 
 void TypeInferenceVisitor::visit( UndefAtom& node )
@@ -1808,11 +1828,6 @@ void TypeInferenceVisitor::inference(
         return;
     }
 
-    for( const auto& argument : *node.arguments() )
-    {
-        push( *argument );
-    }
-
     std::size_t pos = 0;
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     for( auto argumentType : *node.arguments() )
@@ -1838,17 +1853,10 @@ void TypeInferenceVisitor::inference(
         pos++;
     }
 
-    RecursiveVisitor::visit( node );
-
     const auto type = libstdhl::make< libcasm_ir::RelationType >(
         node.returnType()->type(), argTypeList );
 
     node.setType( type );
-
-    for( const auto& argument : *node.arguments() )
-    {
-        pop( *argument );
-    }
 }
 
 void TypeInferenceVisitor::inference(
@@ -1883,8 +1891,6 @@ void TypeInferenceVisitor::inference(
         }
         pos++;
     }
-
-    RecursiveVisitor::visit( node );
 
     const auto type = libstdhl::make< libcasm_ir::RelationType >(
         node.returnType()->type(), argTypeList );
