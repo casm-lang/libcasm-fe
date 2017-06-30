@@ -646,7 +646,7 @@ void ExecutionVisitor::visit( BinaryExpression& node )
             = libcasm_rt::Value::execute( node.op(), node.type(), lhs, rhs );
         m_evaluationStack.push( result );
     }
-    catch( const std::exception& e )
+    catch( const ir::Exception& e )
     {
         throw RuntimeException( node.sourceLocation(),
             "binary expression has thrown an exception: "
