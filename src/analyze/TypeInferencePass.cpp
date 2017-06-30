@@ -567,6 +567,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
+    void visit( ChooseRule& node ) override;
     void visit( UpdateRule& node ) override;
 
     void assignment( const Node& node, TypedNode& lhs, TypedNode& rhs,
@@ -1304,6 +1305,7 @@ void TypeInferenceVisitor::visit( LetRule& node )
         Code::TypeInferenceInvalidLetRuleExpressionType,
         Code::TypeInferenceLetRuleTypesMismatch );
 }
+
 void TypeInferenceVisitor::visit( ForallRule& node )
 {
     node.universe()->accept( *this );
@@ -1320,6 +1322,24 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 
     pop( *node.variable() );
 }
+
+void TypeInferenceVisitor::visit( ChooseRule& node )
+{
+    node.universe()->accept( *this );
+
+    if( node.universe()->type() )
+    {
+        node.variable()->setType( node.universe()->type()->ptr_result() );
+    }
+
+    push( *node.variable() );
+
+    node.variable()->accept( *this );
+    node.rule()->accept( *this );
+
+    pop( *node.variable() );
+}
+
 void TypeInferenceVisitor::visit( UpdateRule& node )
 {
     auto& func = *node.function();

@@ -161,6 +161,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( UpdateRule& node ) override;
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
+    void visit( ChooseRule& node ) override;
 
   private:
     void push( VariableDefinition& identifier );
@@ -454,6 +455,13 @@ void SymbolResolveVisitor::visit( LetRule& node )
 }
 
 void SymbolResolveVisitor::visit( ForallRule& node )
+{
+    push( *node.variable() );
+    RecursiveVisitor::visit( node );
+    pop( *node.variable() );
+}
+
+void SymbolResolveVisitor::visit( ChooseRule& node )
 {
     push( *node.variable() );
     RecursiveVisitor::visit( node );
