@@ -641,8 +641,8 @@ void ExecutionVisitor::visit( BinaryExpression& node )
 
     try
     {
-        const auto result
-            = libcasm_rt::Value::execute_( node.op(), node.type(), operands, 2 );
+        const auto result = libcasm_rt::Value::execute_(
+            node.op(), node.type(), operands, 2 );
         m_evaluationStack.drop( 2 );
         m_evaluationStack.push( result );
     }

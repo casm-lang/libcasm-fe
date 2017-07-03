@@ -56,7 +56,7 @@ namespace libcasm_fe
         void drop( std::size_t amount = 1 )
         {
             assert( amount <= m_values.size() );
-            for ( std::size_t i = 0; i < amount; ++i )
+            for( std::size_t i = 0; i < amount; ++i )
             {
                 m_values.pop_back();
             }
