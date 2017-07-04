@@ -97,9 +97,8 @@ struct ConstantsHash
  */
 struct Update
 {
-    ir::Constant value; /**< The value of the update */
-    SourceLocation
-        sourceLocation; /**< The source-code location of the update producer */
+    ir::Constant value;       /**< The value of the update */
+    UpdateRule::Ptr producer; /**< The update producer */
 };
 
 struct UpdateEquals
@@ -113,7 +112,7 @@ struct UpdateEquals
 
 struct LocationRegistryDetails
 {
-    using Function = std::string;
+    using Function = FunctionDefinition::UID;
     using FunctionHash = std::hash< Function >;
     using FunctionEquals = std::equal_to< Function >;
     using Arguments = std::vector< ir::Constant >;
@@ -191,7 +190,7 @@ void Storage::fireUpdateSet( ExecutionUpdateSet* updateSet )
 
 void Storage::set( const Location& location, const Value& value )
 {
-    if( location.function() == "program" )
+    if( location.function() == FunctionDefinition::UID::PROGRAM )
     {
         m_programState.set( location, value );
     }
@@ -203,7 +202,7 @@ void Storage::set( const Location& location, const Value& value )
 
 void Storage::remove( const Location& location )
 {
-    if( location.function() == "program" )
+    if( location.function() == FunctionDefinition::UID::PROGRAM )
     {
         m_programState.remove( location );
     }
@@ -216,7 +215,7 @@ void Storage::remove( const Location& location )
 std::experimental::optional< Storage::Value > Storage::get(
     const Location& location ) const
 {
-    if( location.function() == "program" )
+    if( location.function() == FunctionDefinition::UID::PROGRAM )
     {
         return m_programState.get( location );
     }
@@ -400,8 +399,8 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
         ValidationFlag::ValueMustBeDefined,
         Code::FunctionArgumentInvalidValueAtLookup );
 
-    const auto location = m_locationRegistry.lookup(
-        node.identifier()->name(), m_frameStack.top()->locals() );
+    const auto location
+        = m_locationRegistry.lookup( node.uid(), m_frameStack.top()->locals() );
     if( location )
     {
         const auto update = m_updateSetManager.lookup( *location );
@@ -1025,9 +1024,15 @@ void ExecutionVisitor::visit( UpdateRule& node )
         argumentValues.emplace_back( value );
     }
 
-    const auto location = m_locationRegistry.get(
-        function->identifier()->path(), argumentValues );
-    const Update update{ updateValue, node.sourceLocation() };
+    assert(
+        node.function()->targetType() == CallExpression::TargetType::FUNCTION );
+    const auto& functionDefintion
+        = std::static_pointer_cast< FunctionDefinition >(
+            node.function()->targetDefinition() );
+
+    const auto location
+        = m_locationRegistry.get( functionDefintion->uid(), argumentValues );
+    const Update update{ updateValue, node.ptr< UpdateRule >() };
 
     try
     {
@@ -1043,14 +1048,16 @@ void ExecutionVisitor::visit( UpdateRule& node )
         const auto& conflictingValue = conflictingUpdate.second;
         const auto& existingValue = existingUpdate.second;
 
-        const auto info
-            = "Conflict while adding update " + existingLocation.function()
-              //+ to_string( existingLocation.arguments )
-              + " = " + conflictingValue.value.description()
-              + ". Update for same location  with another value '"
-              + existingValue.value.description() + "' exists already.";
+        const auto info = "Conflict while adding update "
+                          + node.function()->identifier()->path()
+                          //+ to_string( existingLocation.arguments )
+                          + " = " + conflictingValue.value.description()
+                          + ". Update for same location  with another value '"
+                          + existingValue.value.description()
+                          + "' exists already.";
         throw RuntimeException(
-            { existingValue.sourceLocation, conflictingValue.sourceLocation },
+            { existingValue.producer->sourceLocation(),
+                conflictingValue.producer->sourceLocation() },
             info, m_frameStack.generateBacktrace( node.sourceLocation() ),
             libcasm_fe::Code::UpdateSetClash );
     }
@@ -1184,22 +1191,23 @@ void ExecutionVisitor::handleMergeConflict(
     const auto& conflictingUpdate = conflict.conflictingUpdate();
     const auto& existingUpdate = conflict.existingUpdate();
 
-    const auto& existingLocation = existingUpdate.first;
-
     const auto& conflictingValue = conflictingUpdate.second;
     const auto& existingValue = existingUpdate.second;
 
     const auto info
-        = "Conflict while merging updateset " + existingLocation.function()
+        = "Conflict while merging updateset "
+          + conflictingValue.producer->function()->identifier()->path()
           + " at line "
-          + std::to_string( conflictingValue.sourceLocation.begin.line )
+          + std::to_string(
+                conflictingValue.producer->sourceLocation().begin.line )
           + " with value '" + conflictingValue.value.description() + "'"
           + " and at line "
-          + std::to_string( existingValue.sourceLocation.begin.line )
+          + std::to_string(
+                existingValue.producer->sourceLocation().begin.line )
           + " with value '" + existingValue.value.description() + "'";
-    throw RuntimeException(
-        { existingValue.sourceLocation, conflictingValue.sourceLocation }, info,
-        m_frameStack.generateBacktrace( node.sourceLocation() ),
+    throw RuntimeException( { existingValue.producer->sourceLocation(),
+                                conflictingValue.producer->sourceLocation() },
+        info, m_frameStack.generateBacktrace( node.sourceLocation() ),
         libcasm_fe::Code::UpdateSetMergeConflict );
 }
 

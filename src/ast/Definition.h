@@ -91,12 +91,22 @@ namespace libcasm_fe
                 STATIC
             };
 
+            enum class UID
+            {
+                SELF = 1,
+                PROGRAM = 2,
+                RESULT = 3,
+                OTHER
+            };
+
           public:
             using Ptr = std::shared_ptr< FunctionDefinition >;
 
             FunctionDefinition( const Identifier::Ptr& identifier,
                 const Types::Ptr& argumentTypes,
                 const Type::Ptr& returnType );
+
+            UID uid() const;
 
             Types::Ptr argumentTypes( void ) const;
             Type::Ptr returnType( void ) const;
@@ -124,6 +134,7 @@ namespace libcasm_fe
             u1 m_symbolic;
             NodeList< UpdateRule >::Ptr m_initializers;
             Expression::Ptr m_defaultValue;
+            UID m_uid;
         };
 
         class DerivedDefinition : public Definition

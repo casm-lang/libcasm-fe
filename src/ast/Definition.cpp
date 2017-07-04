@@ -89,6 +89,29 @@ FunctionDefinition::FunctionDefinition( const Identifier::Ptr& identifier,
 , m_initializers( std::make_shared< NodeList< UpdateRule > >() )
 , m_defaultValue( std::make_shared< UndefAtom >() )
 {
+    const auto& name = identifier->name();
+    if( name == "self" )
+    {
+        m_uid = UID::SELF;
+    }
+    else if( name == "program" )
+    {
+        m_uid = UID::PROGRAM;
+    }
+    else if( name == "result" )
+    {
+        m_uid = UID::RESULT;
+    }
+    else
+    {
+        static auto uidGenerator = static_cast< std::size_t >( UID::OTHER );
+        m_uid = static_cast< UID >( uidGenerator++ );
+    }
+}
+
+FunctionDefinition::UID FunctionDefinition::uid( void ) const
+{
+    return m_uid;
 }
 
 Types::Ptr FunctionDefinition::argumentTypes( void ) const
