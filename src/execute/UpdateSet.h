@@ -576,8 +576,7 @@ class UpdateSetManager
      *
      * @throws Conflict when the parent update-set is a parallel update-set, an
      *         update for the \a location exists already in the parent
-     * update-set
-     *         and the values of both updates are different
+     *         update-set and the values of both updates are different
      */
     void merge()
     {
@@ -587,6 +586,17 @@ class UpdateSetManager
         }
 
         currentUpdateSet()->merge();
+        m_updateSets.pop_back();
+    }
+
+    /**
+     * Removes all updates of the current update-set
+     *
+     * @post If a rollback has been performed the size of the update-set manager
+     *       is decreased by one
+     */
+    void rollback()
+    {
         m_updateSets.pop_back();
     }
 
@@ -671,7 +681,7 @@ class UpdateSetForkGuard
     {
         if( m_state == State::FORKED )
         {
-            // m_manager->rollback();
+            m_manager->rollback();
             m_state = State::REVERTED;
         }
     }
