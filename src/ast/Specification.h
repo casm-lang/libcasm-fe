@@ -42,8 +42,8 @@ namespace libcasm_fe
             Specification( const Identifier::Ptr& name,
                 const Definitions::Ptr& definitions );
 
-            Identifier::Ptr name( void ) const;
-            Definitions::Ptr definitions( void ) const;
+            const Identifier::Ptr& name( void ) const;
+            const Definitions::Ptr& definitions( void ) const;
 
             void accept( Visitor& visitor ) override final;
 

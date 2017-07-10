@@ -39,7 +39,7 @@ namespace libcasm_fe
 
             Type( Node::ID id, const IdentifierPath::Ptr& name );
 
-            IdentifierPath::Ptr name( void ) const;
+            const IdentifierPath::Ptr& name( void ) const;
 
           private:
             const IdentifierPath::Ptr m_name;
@@ -75,7 +75,7 @@ namespace libcasm_fe
             ComposedType( const IdentifierPath::Ptr& identifier,
                 const Types::Ptr& subTypes );
 
-            Types::Ptr subTypes( void ) const;
+            const Types::Ptr& subTypes( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -91,7 +91,7 @@ namespace libcasm_fe
             FixedSizedType( const IdentifierPath::Ptr& identifier,
                 const Expression::Ptr& size );
 
-            Expression::Ptr size( void ) const;
+            const Expression::Ptr& size( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -108,8 +108,8 @@ namespace libcasm_fe
                 const Types::Ptr& argumentTypes,
                 const Type::Ptr& returnType );
 
-            Types::Ptr argumentTypes( void ) const;
-            Type::Ptr returnType( void ) const;
+            const Types::Ptr& argumentTypes( void ) const;
+            const Type::Ptr& returnType( void ) const;
 
             void accept( Visitor& visitor ) override final;
 

@@ -36,12 +36,12 @@ Specification::Specification(
 {
 }
 
-Identifier::Ptr Specification::name( void ) const
+const Identifier::Ptr& Specification::name( void ) const
 {
     return m_name;
 }
 
-Definitions::Ptr Specification::definitions( void ) const
+const Definitions::Ptr& Specification::definitions( void ) const
 {
     return m_definitions;
 }

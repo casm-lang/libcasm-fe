@@ -231,7 +231,7 @@ void TypedNode::setType( const libcasm_ir::Type::Ptr& type )
     m_type = type;
 }
 
-libcasm_ir::Type::Ptr TypedNode::type( void ) const
+const libcasm_ir::Type::Ptr& TypedNode::type( void ) const
 {
     return m_type;
 }
@@ -278,7 +278,7 @@ IdentifierPath::Type IdentifierPath::type( void ) const
     return m_type;
 }
 
-std::string IdentifierPath::baseName( void ) const
+const std::string& IdentifierPath::baseName( void ) const
 {
     assert( not m_identifiers->empty() ); // see ctor precondition
     return m_identifiers->back()->name();

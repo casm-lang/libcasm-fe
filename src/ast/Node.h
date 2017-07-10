@@ -157,7 +157,7 @@ namespace libcasm_fe
             TypedNode( Node::ID id );
 
             void setType( const libcasm_ir::Type::Ptr& type );
-            libcasm_ir::Type::Ptr type( void ) const;
+            const libcasm_ir::Type::Ptr& type( void ) const;
 
           private:
             libcasm_ir::Type::Ptr m_type;
@@ -220,7 +220,7 @@ namespace libcasm_fe
             Identifiers::Ptr identifiers( void ) const;
             Type type( void ) const;
 
-            std::string baseName( void ) const;
+            const std::string& baseName( void ) const;
             std::string baseDir( void ) const;
             std::string path( void ) const;
 

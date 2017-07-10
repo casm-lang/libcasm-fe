@@ -34,7 +34,7 @@ Attribute::Attribute( Node::ID type, const Identifier::Ptr& identifier )
 {
 }
 
-Identifier::Ptr Attribute::identifier( void ) const
+const Identifier::Ptr& Attribute::identifier( void ) const
 {
     return m_identifier;
 }
@@ -56,7 +56,7 @@ ExpressionAttribute::ExpressionAttribute(
 {
 }
 
-Expression::Ptr ExpressionAttribute::expression( void ) const
+const Expression::Ptr& ExpressionAttribute::expression( void ) const
 {
     return m_expression;
 }

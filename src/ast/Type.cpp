@@ -34,7 +34,7 @@ Type::Type( Node::ID id, const IdentifierPath::Ptr& name )
 {
 }
 
-IdentifierPath::Ptr Type::name( void ) const
+const IdentifierPath::Ptr& Type::name( void ) const
 {
     return m_name;
 }
@@ -72,7 +72,7 @@ ComposedType::ComposedType(
 {
 }
 
-Types::Ptr ComposedType::subTypes( void ) const
+const Types::Ptr& ComposedType::subTypes( void ) const
 {
     return m_subTypes;
 }
@@ -89,7 +89,7 @@ FixedSizedType::FixedSizedType(
 {
 }
 
-Expression::Ptr FixedSizedType::size( void ) const
+const Expression::Ptr& FixedSizedType::size( void ) const
 {
     return m_size;
 }
@@ -107,12 +107,12 @@ RelationType::RelationType( const IdentifierPath::Ptr& identifier,
 {
 }
 
-Types::Ptr RelationType::argumentTypes( void ) const
+const Types::Ptr& RelationType::argumentTypes( void ) const
 {
     return m_argumentTypes;
 }
 
-Type::Ptr RelationType::returnType( void ) const
+const Type::Ptr& RelationType::returnType( void ) const
 {
     return m_returnType;
 }

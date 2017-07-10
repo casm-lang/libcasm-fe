@@ -42,10 +42,10 @@ namespace libcasm_fe
 
             Definition( Node::ID id, const Identifier::Ptr& identifier );
 
-            Identifier::Ptr identifier( void ) const;
+            const Identifier::Ptr& identifier( void ) const;
 
             void setAttributes( const Attributes::Ptr& attributes );
-            Attributes::Ptr attributes( void ) const;
+            const Attributes::Ptr& attributes( void ) const;
 
           private:
             const Identifier::Ptr m_identifier;
@@ -62,7 +62,7 @@ namespace libcasm_fe
             VariableDefinition( const Identifier::Ptr& identifier,
                 const Type::Ptr& variableType );
 
-            Type::Ptr variableType( void ) const;
+            const Type::Ptr& variableType( void ) const;
 
             /**
              * Sets the frame local index of the variable.
@@ -108,8 +108,8 @@ namespace libcasm_fe
 
             UID uid() const;
 
-            Types::Ptr argumentTypes( void ) const;
-            Type::Ptr returnType( void ) const;
+            const Types::Ptr& argumentTypes( void ) const;
+            const Type::Ptr& returnType( void ) const;
 
             void setClassification( Classification classification );
             Classification classification( void ) const;
@@ -120,10 +120,10 @@ namespace libcasm_fe
 
             void setInitializers(
                 const NodeList< UpdateRule >::Ptr& initializers );
-            NodeList< UpdateRule >::Ptr initializers( void ) const;
+            const NodeList< UpdateRule >::Ptr& initializers( void ) const;
 
             void setDefaultValue( const Expression::Ptr& defaultValue );
-            Expression::Ptr defaultValue( void ) const;
+            const Expression::Ptr& defaultValue( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -147,10 +147,10 @@ namespace libcasm_fe
                 const Type::Ptr& returnType,
                 const Expression::Ptr& expression );
 
-            NodeList< VariableDefinition >::Ptr arguments( void ) const;
+            const NodeList< VariableDefinition >::Ptr& arguments( void ) const;
 
-            Type::Ptr returnType( void ) const;
-            Expression::Ptr expression( void ) const;
+            const Type::Ptr& returnType( void ) const;
+            const Expression::Ptr& expression( void ) const;
 
             /**
              * Sets the number of required frame local slots.
@@ -179,10 +179,10 @@ namespace libcasm_fe
                 const Type::Ptr& returnType,
                 const Rule::Ptr& rule );
 
-            NodeList< VariableDefinition >::Ptr arguments( void ) const;
+            const NodeList< VariableDefinition >::Ptr& arguments( void ) const;
 
-            Type::Ptr returnType( void ) const;
-            Rule::Ptr rule( void ) const;
+            const Type::Ptr& returnType( void ) const;
+            const Rule::Ptr& rule( void ) const;
 
             /**
              * Sets the number of required frame local slots.
@@ -209,7 +209,7 @@ namespace libcasm_fe
             EnumerationDefinition( const Identifier::Ptr& identifier,
                 const Identifiers::Ptr& enumerators );
 
-            Identifiers::Ptr enumerators( void ) const;
+            const Identifiers::Ptr& enumerators( void ) const;
 
             void accept( Visitor& visitor ) override final;
 

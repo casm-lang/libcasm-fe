@@ -53,7 +53,7 @@ namespace libcasm_fe
 
             explicit ValueAtom( const libcasm_ir::Constant::Ptr& value );
 
-            libcasm_ir::Constant::Ptr value( void ) const;
+            const libcasm_ir::Constant::Ptr& value( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -78,13 +78,13 @@ namespace libcasm_fe
 
             explicit ReferenceAtom( const IdentifierPath::Ptr& identifier );
 
-            IdentifierPath::Ptr identifier( void ) const;
+            const IdentifierPath::Ptr& identifier( void ) const;
 
             void setReferenceType( ReferenceType referenceType );
             ReferenceType referenceType( void ) const;
 
             void setReference( const TypedNode::Ptr& reference );
-            TypedNode::Ptr reference( void ) const;
+            const TypedNode::Ptr& reference( void ) const;
 
             void setBuiltinId( libcasm_ir::Value::ID builtinId );
             libcasm_ir::Value::ID builtinId( void ) const;
@@ -128,7 +128,7 @@ namespace libcasm_fe
 
             CallExpression( Node::ID id, const Expressions::Ptr& arguments );
 
-            Expressions::Ptr arguments( void ) const;
+            const Expressions::Ptr& arguments( void ) const;
 
             void setTargetType( TargetType targetType );
             TargetType targetType( void ) const;
@@ -152,7 +152,7 @@ namespace libcasm_fe
                 const Expressions::Ptr& arguments );
 
             void setIdentifier( const IdentifierPath::Ptr& identifier );
-            IdentifierPath::Ptr identifier( void ) const;
+            const IdentifierPath::Ptr& identifier( void ) const;
 
             /**
              * Sets the builtin id of this call.
@@ -168,7 +168,7 @@ namespace libcasm_fe
                @note Assigned by SymbolResolved and used during execution
              */
             void setTargetDefinition( const TypedNode::Ptr& definition );
-            TypedNode::Ptr targetDefinition( void ) const;
+            const TypedNode::Ptr& targetDefinition( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -186,7 +186,7 @@ namespace libcasm_fe
             IndirectCallExpression( const Expression::Ptr& expression,
                 const Expressions::Ptr& arguments );
 
-            Expression::Ptr expression( void ) const;
+            const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -203,7 +203,7 @@ namespace libcasm_fe
                 const Expression::Ptr& expression, libcasm_ir::Value::ID op );
 
             libcasm_ir::Value::ID op( void ) const;
-            Expression::Ptr expression( void ) const;
+            const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -221,8 +221,8 @@ namespace libcasm_fe
                 const Expression::Ptr& right, libcasm_ir::Value::ID op );
 
             libcasm_ir::Value::ID op( void ) const;
-            Expression::Ptr left( void ) const;
-            Expression::Ptr right( void ) const;
+            const Expression::Ptr& left( void ) const;
+            const Expression::Ptr& right( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -240,8 +240,8 @@ namespace libcasm_fe
             RangeExpression(
                 const Expression::Ptr& left, const Expression::Ptr& right );
 
-            Expression::Ptr left( void ) const;
-            Expression::Ptr right( void ) const;
+            const Expression::Ptr& left( void ) const;
+            const Expression::Ptr& right( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -257,7 +257,7 @@ namespace libcasm_fe
 
             explicit ListExpression( const Expressions::Ptr& expressions );
 
-            Expressions::Ptr expressions( void ) const;
+            const Expressions::Ptr& expressions( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -274,9 +274,9 @@ namespace libcasm_fe
                 const Expression::Ptr& thenExpression,
                 const Expression::Ptr& elseExpression );
 
-            Expression::Ptr condition( void ) const;
-            Expression::Ptr thenExpression( void ) const;
-            Expression::Ptr elseExpression( void ) const;
+            const Expression::Ptr& condition( void ) const;
+            const Expression::Ptr& thenExpression( void ) const;
+            const Expression::Ptr& elseExpression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -296,10 +296,10 @@ namespace libcasm_fe
                 const Expression::Ptr& universe,
                 const Expression::Ptr& proposition );
 
-            std::shared_ptr< VariableDefinition > predicateVariable(
+            const std::shared_ptr< VariableDefinition >& predicateVariable(
                 void ) const;
-            Expression::Ptr universe( void ) const;
-            Expression::Ptr proposition( void ) const;
+            const Expression::Ptr& universe( void ) const;
+            const Expression::Ptr& proposition( void ) const;
 
           private:
             const std::shared_ptr< VariableDefinition > m_predicateVariable;

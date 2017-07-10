@@ -66,9 +66,9 @@ namespace libcasm_fe
             ConditionalRule(
                 const Expression::Ptr& condition, const Rule::Ptr& thenRule );
 
-            Expression::Ptr condition( void ) const;
-            Rule::Ptr thenRule( void ) const;
-            Rule::Ptr elseRule( void ) const;
+            const Expression::Ptr& condition( void ) const;
+            const Rule::Ptr& thenRule( void ) const;
+            const Rule::Ptr& elseRule( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -85,7 +85,7 @@ namespace libcasm_fe
 
             Case( Node::ID id, const Rule::Ptr& rule );
 
-            Rule::Ptr rule( void ) const;
+            const Rule::Ptr& rule( void ) const;
 
           private:
             const Rule::Ptr m_rule;
@@ -101,7 +101,7 @@ namespace libcasm_fe
             ExpressionCase(
                 const Expression::Ptr& expression, const Rule::Ptr& rule );
 
-            Expression::Ptr expression( void ) const;
+            const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -127,8 +127,8 @@ namespace libcasm_fe
             CaseRule(
                 const Expression::Ptr& expression, const Cases::Ptr& cases );
 
-            Expression::Ptr expression( void ) const;
-            Cases::Ptr cases( void ) const;
+            const Expression::Ptr& expression( void ) const;
+            const Cases::Ptr& cases( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -145,9 +145,9 @@ namespace libcasm_fe
             LetRule( const std::shared_ptr< VariableDefinition >& variable,
                 const Expression::Ptr& expression, const Rule::Ptr& rule );
 
-            std::shared_ptr< VariableDefinition > variable( void ) const;
-            Expression::Ptr expression( void ) const;
-            Rule::Ptr rule( void ) const;
+            const std::shared_ptr< VariableDefinition >& variable( void ) const;
+            const Expression::Ptr& expression( void ) const;
+            const Rule::Ptr& rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -165,9 +165,9 @@ namespace libcasm_fe
             ForallRule( const std::shared_ptr< VariableDefinition >& variable,
                 const Expression::Ptr& universe, const Rule::Ptr& rule );
 
-            std::shared_ptr< VariableDefinition > variable( void ) const;
-            Expression::Ptr universe( void ) const;
-            Rule::Ptr rule( void ) const;
+            const std::shared_ptr< VariableDefinition >& variable( void ) const;
+            const Expression::Ptr& universe( void ) const;
+            const Rule::Ptr& rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -185,9 +185,9 @@ namespace libcasm_fe
             ChooseRule( const std::shared_ptr< VariableDefinition >& variable,
                 const Expression::Ptr& universe, const Rule::Ptr& rule );
 
-            std::shared_ptr< VariableDefinition > variable( void ) const;
-            Expression::Ptr universe( void ) const;
-            Rule::Ptr rule( void ) const;
+            const std::shared_ptr< VariableDefinition >& variable( void ) const;
+            const Expression::Ptr& universe( void ) const;
+            const Rule::Ptr& rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -204,7 +204,7 @@ namespace libcasm_fe
 
             explicit IterateRule( const Rule::Ptr& rule );
 
-            Rule::Ptr rule( void ) const;
+            const Rule::Ptr& rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -219,7 +219,7 @@ namespace libcasm_fe
 
             explicit BlockRule( const Rules::Ptr& rules );
 
-            Rules::Ptr rules( void ) const;
+            const Rules::Ptr& rules( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -234,7 +234,7 @@ namespace libcasm_fe
 
             explicit SequenceRule( const Rules::Ptr& rules );
 
-            Rules::Ptr rules( void ) const;
+            const Rules::Ptr& rules( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -250,8 +250,8 @@ namespace libcasm_fe
             UpdateRule( const DirectCallExpression::Ptr& function,
                 const Expression::Ptr& expression );
 
-            DirectCallExpression::Ptr function( void ) const;
-            Expression::Ptr expression( void ) const;
+            const DirectCallExpression::Ptr& function( void ) const;
+            const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -269,7 +269,7 @@ namespace libcasm_fe
                 const std::set< CallExpression::TargetType >&
                     allowedCallTargetTypes );
 
-            CallExpression::Ptr call( void ) const;
+            const CallExpression::Ptr& call( void ) const;
             const std::set< CallExpression::TargetType >&
             allowedCallTargetTypes( void ) const;
 

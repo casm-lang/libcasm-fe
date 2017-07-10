@@ -40,7 +40,7 @@ namespace libcasm_fe
 
             Attribute( Node::ID id, const Identifier::Ptr& identifier );
 
-            Identifier::Ptr identifier( void ) const;
+            const Identifier::Ptr& identifier( void ) const;
 
           private:
             const Identifier::Ptr m_identifier;
@@ -66,7 +66,7 @@ namespace libcasm_fe
             ExpressionAttribute( const Identifier::Ptr& identifier,
                 const Expression::Ptr& expression );
 
-            Expression::Ptr expression( void ) const;
+            const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 

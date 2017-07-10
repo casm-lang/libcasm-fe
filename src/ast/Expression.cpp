@@ -42,7 +42,7 @@ ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )
     Expression::setType( value->ptr_type() );
 }
 
-libcasm_ir::Constant::Ptr ValueAtom::value( void ) const
+const libcasm_ir::Constant::Ptr& ValueAtom::value( void ) const
 {
     return m_value;
 }
@@ -61,7 +61,7 @@ ReferenceAtom::ReferenceAtom( const IdentifierPath::Ptr& identifier )
 {
 }
 
-IdentifierPath::Ptr ReferenceAtom::identifier() const
+const IdentifierPath::Ptr& ReferenceAtom::identifier() const
 {
     return m_identifier;
 }
@@ -81,7 +81,7 @@ void ReferenceAtom::setReference( const TypedNode::Ptr& reference )
     m_reference = reference;
 }
 
-TypedNode::Ptr ReferenceAtom::reference( void ) const
+const TypedNode::Ptr& ReferenceAtom::reference( void ) const
 {
     assert( ( m_referenceType != ReferenceType::BUILTIN )
             and ( m_referenceType != ReferenceType::UNKNOWN ) );
@@ -122,7 +122,7 @@ CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 {
 }
 
-Expressions::Ptr CallExpression::arguments( void ) const
+const Expressions::Ptr& CallExpression::arguments( void ) const
 {
     return m_arguments;
 }
@@ -202,7 +202,7 @@ void DirectCallExpression::setIdentifier(
     m_identifier = identifier;
 }
 
-IdentifierPath::Ptr DirectCallExpression::identifier( void ) const
+const IdentifierPath::Ptr& DirectCallExpression::identifier( void ) const
 {
     return m_identifier;
 }
@@ -225,7 +225,7 @@ void DirectCallExpression::setTargetDefinition(
     m_targetDefinition = definition;
 }
 
-TypedNode::Ptr DirectCallExpression::targetDefinition( void ) const
+const TypedNode::Ptr& DirectCallExpression::targetDefinition( void ) const
 {
     assert( ( targetType() != TargetType::BUILTIN )
             and ( targetType() != TargetType::UNKNOWN ) );
@@ -245,7 +245,7 @@ IndirectCallExpression::IndirectCallExpression(
 {
 }
 
-Expression::Ptr IndirectCallExpression::expression( void ) const
+const Expression::Ptr& IndirectCallExpression::expression( void ) const
 {
     return m_expression;
 }
@@ -268,7 +268,7 @@ libcasm_ir::Value::ID UnaryExpression::op( void ) const
     return m_op;
 }
 
-Expression::Ptr UnaryExpression::expression( void ) const
+const Expression::Ptr& UnaryExpression::expression( void ) const
 {
     return m_expression;
 }
@@ -292,12 +292,12 @@ libcasm_ir::Value::ID BinaryExpression::op( void ) const
     return m_op;
 }
 
-Expression::Ptr BinaryExpression::left( void ) const
+const Expression::Ptr& BinaryExpression::left( void ) const
 {
     return m_left;
 }
 
-Expression::Ptr BinaryExpression::right( void ) const
+const Expression::Ptr& BinaryExpression::right( void ) const
 {
     return m_right;
 }
@@ -315,12 +315,12 @@ RangeExpression::RangeExpression(
 {
 }
 
-Expression::Ptr RangeExpression::left( void ) const
+const Expression::Ptr& RangeExpression::left( void ) const
 {
     return m_left;
 }
 
-Expression::Ptr RangeExpression::right( void ) const
+const Expression::Ptr& RangeExpression::right( void ) const
 {
     return m_right;
 }
@@ -336,7 +336,7 @@ ListExpression::ListExpression( const Expressions::Ptr& expressions )
 {
 }
 
-Expressions::Ptr ListExpression::expressions( void ) const
+const Expressions::Ptr& ListExpression::expressions( void ) const
 {
     return m_expressions;
 }
@@ -356,17 +356,17 @@ ConditionalExpression::ConditionalExpression( const Expression::Ptr& condition,
 {
 }
 
-Expression::Ptr ConditionalExpression::condition( void ) const
+const Expression::Ptr& ConditionalExpression::condition( void ) const
 {
     return m_condition;
 }
 
-Expression::Ptr ConditionalExpression::thenExpression( void ) const
+const Expression::Ptr& ConditionalExpression::thenExpression( void ) const
 {
     return m_thenExpression;
 }
 
-Expression::Ptr ConditionalExpression::elseExpression( void ) const
+const Expression::Ptr& ConditionalExpression::elseExpression( void ) const
 {
     return m_elseExpression;
 }
@@ -387,17 +387,17 @@ QuantifierExpression::QuantifierExpression( Node::ID id,
 {
 }
 
-VariableDefinition::Ptr QuantifierExpression::predicateVariable( void ) const
+const VariableDefinition::Ptr& QuantifierExpression::predicateVariable( void ) const
 {
     return m_predicateVariable;
 }
 
-Expression::Ptr QuantifierExpression::universe( void ) const
+const Expression::Ptr& QuantifierExpression::universe( void ) const
 {
     return m_universe;
 }
 
-Expression::Ptr QuantifierExpression::proposition( void ) const
+const Expression::Ptr& QuantifierExpression::proposition( void ) const
 {
     return m_proposition;
 }

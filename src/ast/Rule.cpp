@@ -55,17 +55,17 @@ ConditionalRule::ConditionalRule(
 {
 }
 
-Expression::Ptr ConditionalRule::condition( void ) const
+const Expression::Ptr& ConditionalRule::condition( void ) const
 {
     return m_condition;
 }
 
-Rule::Ptr ConditionalRule::thenRule( void ) const
+const Rule::Ptr& ConditionalRule::thenRule( void ) const
 {
     return m_thenRule;
 }
 
-Rule::Ptr ConditionalRule::elseRule( void ) const
+const Rule::Ptr& ConditionalRule::elseRule( void ) const
 {
     return m_elseRule;
 }
@@ -81,7 +81,7 @@ Case::Case( Node::ID id, const Rule::Ptr& rule )
 {
 }
 
-Rule::Ptr Case::rule() const
+const Rule::Ptr& Case::rule() const
 {
     return m_rule;
 }
@@ -93,7 +93,7 @@ ExpressionCase::ExpressionCase(
 {
 }
 
-Expression::Ptr ExpressionCase::expression() const
+const Expression::Ptr& ExpressionCase::expression() const
 {
     return m_expression;
 }
@@ -120,12 +120,12 @@ CaseRule::CaseRule( const Expression::Ptr& expression, const Cases::Ptr& cases )
 {
 }
 
-Expression::Ptr CaseRule::expression( void ) const
+const Expression::Ptr& CaseRule::expression( void ) const
 {
     return m_expression;
 }
 
-Cases::Ptr CaseRule::cases( void ) const
+const Cases::Ptr& CaseRule::cases( void ) const
 {
     return m_cases;
 }
@@ -144,17 +144,17 @@ LetRule::LetRule( const VariableDefinition::Ptr& variable,
 {
 }
 
-VariableDefinition::Ptr LetRule::variable( void ) const
+const VariableDefinition::Ptr& LetRule::variable( void ) const
 {
     return m_variable;
 }
 
-Expression::Ptr LetRule::expression( void ) const
+const Expression::Ptr& LetRule::expression( void ) const
 {
     return m_expression;
 }
 
-Rule::Ptr LetRule::rule( void ) const
+const Rule::Ptr& LetRule::rule( void ) const
 {
     return m_rule;
 }
@@ -173,17 +173,17 @@ ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
 {
 }
 
-VariableDefinition::Ptr ForallRule::variable( void ) const
+const VariableDefinition::Ptr& ForallRule::variable( void ) const
 {
     return m_variable;
 }
 
-Expression::Ptr ForallRule::universe( void ) const
+const Expression::Ptr& ForallRule::universe( void ) const
 {
     return m_universe;
 }
 
-Rule::Ptr ForallRule::rule( void ) const
+const Rule::Ptr& ForallRule::rule( void ) const
 {
     return m_rule;
 }
@@ -202,17 +202,17 @@ ChooseRule::ChooseRule( const VariableDefinition::Ptr& variable,
 {
 }
 
-VariableDefinition::Ptr ChooseRule::variable( void ) const
+const VariableDefinition::Ptr& ChooseRule::variable( void ) const
 {
     return m_variable;
 }
 
-Expression::Ptr ChooseRule::universe( void ) const
+const Expression::Ptr& ChooseRule::universe( void ) const
 {
     return m_universe;
 }
 
-Rule::Ptr ChooseRule::rule( void ) const
+const Rule::Ptr& ChooseRule::rule( void ) const
 {
     return m_rule;
 }
@@ -228,7 +228,7 @@ IterateRule::IterateRule( const Rule::Ptr& rule )
 {
 }
 
-Rule::Ptr IterateRule::rule( void ) const
+const Rule::Ptr& IterateRule::rule( void ) const
 {
     return m_rule;
 }
@@ -244,7 +244,7 @@ BlockRule::BlockRule( const Rules::Ptr& rules )
 {
 }
 
-Rules::Ptr BlockRule::rules( void ) const
+const Rules::Ptr& BlockRule::rules( void ) const
 {
     return m_rules;
 }
@@ -260,7 +260,7 @@ SequenceRule::SequenceRule( const Rules::Ptr& rules )
 {
 }
 
-Rules::Ptr SequenceRule::rules( void ) const
+const Rules::Ptr& SequenceRule::rules( void ) const
 {
     return m_rules;
 }
@@ -278,12 +278,12 @@ UpdateRule::UpdateRule( const DirectCallExpression::Ptr& function,
 {
 }
 
-DirectCallExpression::Ptr UpdateRule::function( void ) const
+const DirectCallExpression::Ptr& UpdateRule::function( void ) const
 {
     return m_function;
 }
 
-Expression::Ptr UpdateRule::expression( void ) const
+const Expression::Ptr& UpdateRule::expression( void ) const
 {
     return m_expression;
 }
@@ -301,7 +301,7 @@ CallRule::CallRule( const CallExpression::Ptr& call,
 {
 }
 
-CallExpression::Ptr CallRule::call( void ) const
+const CallExpression::Ptr& CallRule::call( void ) const
 {
     return m_call;
 }

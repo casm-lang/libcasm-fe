@@ -35,7 +35,7 @@ Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 {
 }
 
-Identifier::Ptr Definition::identifier( void ) const
+const Identifier::Ptr& Definition::identifier( void ) const
 {
     return m_identifier;
 }
@@ -45,7 +45,7 @@ void Definition::setAttributes( const Attributes::Ptr& attributes )
     m_attributes = attributes;
 }
 
-Attributes::Ptr Definition::attributes( void ) const
+const Attributes::Ptr& Definition::attributes( void ) const
 {
     return m_attributes;
 }
@@ -58,7 +58,7 @@ VariableDefinition::VariableDefinition(
 {
 }
 
-Type::Ptr VariableDefinition::variableType( void ) const
+const Type::Ptr& VariableDefinition::variableType( void ) const
 {
     return m_variableType;
 }
@@ -114,12 +114,12 @@ FunctionDefinition::UID FunctionDefinition::uid( void ) const
     return m_uid;
 }
 
-Types::Ptr FunctionDefinition::argumentTypes( void ) const
+const Types::Ptr& FunctionDefinition::argumentTypes( void ) const
 {
     return m_argumentTypes;
 }
 
-Type::Ptr FunctionDefinition::returnType( void ) const
+const Type::Ptr& FunctionDefinition::returnType( void ) const
 {
     return m_returnType;
 }
@@ -182,7 +182,7 @@ void FunctionDefinition::setInitializers(
     m_initializers = initializers;
 }
 
-NodeList< UpdateRule >::Ptr FunctionDefinition::initializers( void ) const
+const NodeList< UpdateRule >::Ptr& FunctionDefinition::initializers( void ) const
 {
     return m_initializers;
 }
@@ -192,7 +192,7 @@ void FunctionDefinition::setDefaultValue( const Expression::Ptr& defaultValue )
     m_defaultValue = defaultValue;
 }
 
-Expression::Ptr FunctionDefinition::defaultValue( void ) const
+const Expression::Ptr& FunctionDefinition::defaultValue( void ) const
 {
     return m_defaultValue;
 }
@@ -214,17 +214,17 @@ DerivedDefinition::DerivedDefinition( const Identifier::Ptr& identifier,
 {
 }
 
-NodeList< VariableDefinition >::Ptr DerivedDefinition::arguments( void ) const
+const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments( void ) const
 {
     return m_arguments;
 }
 
-Type::Ptr DerivedDefinition::returnType( void ) const
+const Type::Ptr& DerivedDefinition::returnType( void ) const
 {
     return m_returnType;
 }
 
-Expression::Ptr DerivedDefinition::expression( void ) const
+const Expression::Ptr& DerivedDefinition::expression( void ) const
 {
     return m_expression;
 }
@@ -257,17 +257,17 @@ RuleDefinition::RuleDefinition( const Identifier::Ptr& identifier,
 {
 }
 
-NodeList< VariableDefinition >::Ptr RuleDefinition::arguments( void ) const
+const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments( void ) const
 {
     return m_arguments;
 }
 
-Type::Ptr RuleDefinition::returnType( void ) const
+const Type::Ptr& RuleDefinition::returnType( void ) const
 {
     return m_returnType;
 }
 
-Rule::Ptr RuleDefinition::rule( void ) const
+const Rule::Ptr& RuleDefinition::rule( void ) const
 {
     return m_rule;
 }
@@ -294,7 +294,7 @@ EnumerationDefinition::EnumerationDefinition(
 {
 }
 
-Identifiers::Ptr EnumerationDefinition::enumerators( void ) const
+const Identifiers::Ptr& EnumerationDefinition::enumerators( void ) const
 {
     return m_enumerators;
 }
