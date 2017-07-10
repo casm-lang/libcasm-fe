@@ -1688,8 +1688,8 @@ void TypeInferenceVisitor::inference( const std::string& description,
 
     if( annotation )
     {
-        std::size_t pos = -1;
-        std::size_t idx = 0;
+        int pos = -1;
+        int idx = 0;
 
         std::vector< libcasm_ir::Type::ID > argTypes;
 
