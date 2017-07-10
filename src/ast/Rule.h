@@ -73,9 +73,9 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Expression::Ptr m_condition;
-            Rule::Ptr m_thenRule;
-            Rule::Ptr m_elseRule;
+            const Expression::Ptr m_condition;
+            const Rule::Ptr m_thenRule;
+            const Rule::Ptr m_elseRule;
         };
 
         class Case : public Node
@@ -88,7 +88,7 @@ namespace libcasm_fe
             Rule::Ptr rule( void ) const;
 
           private:
-            Rule::Ptr m_rule;
+            const Rule::Ptr m_rule;
         };
 
         using Cases = NodeList< Case >;
@@ -106,7 +106,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Expression::Ptr m_expression;
+            const Expression::Ptr m_expression;
         };
 
         class DefaultCase : public Case
@@ -133,8 +133,8 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Expression::Ptr m_expression;
-            Cases::Ptr m_cases;
+            const Expression::Ptr m_expression;
+            const Cases::Ptr m_cases;
         };
 
         class LetRule : public Rule
@@ -152,9 +152,9 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            std::shared_ptr< VariableDefinition > m_variable;
-            Expression::Ptr m_expression;
-            Rule::Ptr m_rule;
+            const std::shared_ptr< VariableDefinition > m_variable;
+            const Expression::Ptr m_expression;
+            const Rule::Ptr m_rule;
         };
 
         class ForallRule : public Rule
@@ -172,9 +172,9 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            std::shared_ptr< VariableDefinition > m_variable;
-            Expression::Ptr m_universe;
-            Rule::Ptr m_rule;
+            const std::shared_ptr< VariableDefinition > m_variable;
+            const Expression::Ptr m_universe;
+            const Rule::Ptr m_rule;
         };
 
         class ChooseRule : public Rule
@@ -192,9 +192,9 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            std::shared_ptr< VariableDefinition > m_variable;
-            Expression::Ptr m_universe;
-            Rule::Ptr m_rule;
+            const std::shared_ptr< VariableDefinition > m_variable;
+            const Expression::Ptr m_universe;
+            const Rule::Ptr m_rule;
         };
 
         class IterateRule : public Rule
@@ -209,7 +209,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Rule::Ptr m_rule;
+            const Rule::Ptr m_rule;
         };
 
         class BlockRule : public Rule
@@ -224,7 +224,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Rules::Ptr m_rules;
+            const Rules::Ptr m_rules;
         };
 
         class SequenceRule : public Rule
@@ -239,7 +239,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Rules::Ptr m_rules;
+            const Rules::Ptr m_rules;
         };
 
         class UpdateRule : public Rule
@@ -256,8 +256,8 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            DirectCallExpression::Ptr m_function;
-            Expression::Ptr m_expression;
+            const DirectCallExpression::Ptr m_function;
+            const Expression::Ptr m_expression;
         };
 
         class CallRule : public Rule
@@ -276,8 +276,8 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            CallExpression::Ptr m_call;
-            std::set< CallExpression::TargetType > m_allowedCallTargetTypes;
+            const CallExpression::Ptr m_call;
+            const std::set< CallExpression::TargetType > m_allowedCallTargetTypes;
         };
     }
 }

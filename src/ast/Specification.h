@@ -48,8 +48,8 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Identifier::Ptr m_name;
-            Definitions::Ptr m_definitions;
+            const Identifier::Ptr m_name;
+            const Definitions::Ptr m_definitions;
         };
     }
 }

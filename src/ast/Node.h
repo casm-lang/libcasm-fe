@@ -127,7 +127,7 @@ namespace libcasm_fe
             virtual void accept( Visitor& visitor ) = 0;
 
           private:
-            ID m_id;
+            const ID m_id;
             SourceLocation m_sourceLocation;
         };
 
@@ -157,7 +157,6 @@ namespace libcasm_fe
             TypedNode( Node::ID id );
 
             void setType( const libcasm_ir::Type::Ptr& type );
-
             libcasm_ir::Type::Ptr type( void ) const;
 
           private:
@@ -228,8 +227,8 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Identifiers::Ptr m_identifiers;
-            Type m_type;
+            const Identifiers::Ptr m_identifiers;
+            const Type m_type;
         };
 
         template < typename T, typename... Args >

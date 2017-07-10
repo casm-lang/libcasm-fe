@@ -42,7 +42,7 @@ namespace libcasm_fe
             IdentifierPath::Ptr name( void ) const;
 
           private:
-            IdentifierPath::Ptr m_name;
+            const IdentifierPath::Ptr m_name;
         };
 
         using Types = NodeList< Type >;
@@ -80,7 +80,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Types::Ptr m_subTypes;
+            const Types::Ptr m_subTypes;
         };
 
         class FixedSizedType : public Type
@@ -96,7 +96,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Expression::Ptr m_size;
+            const Expression::Ptr m_size;
         };
 
         class RelationType : public Type
@@ -114,8 +114,8 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Types::Ptr m_argumentTypes;
-            Type::Ptr m_returnType;
+            const Types::Ptr m_argumentTypes;
+            const Type::Ptr m_returnType;
         };
     }
 }

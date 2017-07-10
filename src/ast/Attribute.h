@@ -43,7 +43,7 @@ namespace libcasm_fe
             Identifier::Ptr identifier( void ) const;
 
           private:
-            Identifier::Ptr m_identifier;
+            const Identifier::Ptr m_identifier;
         };
 
         using Attributes = NodeList< Attribute >;
@@ -71,7 +71,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Expression::Ptr m_expression;
+            const Expression::Ptr m_expression;
         };
     }
 }

@@ -48,7 +48,7 @@ namespace libcasm_fe
             Attributes::Ptr attributes( void ) const;
 
           private:
-            Identifier::Ptr m_identifier;
+            const Identifier::Ptr m_identifier;
             Attributes::Ptr m_attributes;
         };
 
@@ -75,7 +75,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Type::Ptr m_variableType;
+            const Type::Ptr m_variableType;
             std::size_t m_localIndex;
         };
 
@@ -129,8 +129,8 @@ namespace libcasm_fe
 
           private:
             Classification m_classification;
-            Types::Ptr m_argumentTypes;
-            Type::Ptr m_returnType;
+            const Types::Ptr m_argumentTypes;
+            const Type::Ptr m_returnType;
             u1 m_symbolic;
             NodeList< UpdateRule >::Ptr m_initializers;
             Expression::Ptr m_defaultValue;
@@ -163,9 +163,9 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            NodeList< VariableDefinition >::Ptr m_arguments;
-            Type::Ptr m_returnType;
-            Expression::Ptr m_expression;
+            const NodeList< VariableDefinition >::Ptr m_arguments;
+            const Type::Ptr m_returnType;
+            const Expression::Ptr m_expression;
             std::size_t m_maxNumberOfLocals;
         };
 
@@ -195,9 +195,9 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            NodeList< VariableDefinition >::Ptr m_arguments;
-            Type::Ptr m_returnType;
-            Rule::Ptr m_rule;
+            const NodeList< VariableDefinition >::Ptr m_arguments;
+            const Type::Ptr m_returnType;
+            const Rule::Ptr m_rule;
             std::size_t m_maxNumberOfLocals;
         };
 
@@ -214,7 +214,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            Identifiers::Ptr m_enumerators;
+            const Identifiers::Ptr m_enumerators;
         };
     }
 }
