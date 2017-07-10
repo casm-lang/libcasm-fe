@@ -1119,12 +1119,17 @@ void ExecutionVisitor::invokeBuiltin(
     validateArguments(
         node, type->arguments(), {}, Code::BuiltinArgumentValueInvalid );
 
-    libcasm_ir::Constant returnValue;
     try
     {
         const auto& arguments = m_frameStack.top()->locals();
-        returnValue = libcasm_rt::Value::execute_(
+        const auto& returnValue = libcasm_rt::Value::execute_(
             id, type, arguments.data(), arguments.size() );
+
+        const auto& returnType = type->result();
+        if( not returnType.isVoid() )
+        {
+            m_evaluationStack.push( returnValue );
+        }
     }
     catch( const std::exception& e )
     {
@@ -1132,12 +1137,6 @@ void ExecutionVisitor::invokeBuiltin(
             "builtin has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation() ),
             Code::AssertInvalidExpression );
-    }
-
-    const auto& returnType = type->result();
-    if( not returnType.isVoid() )
-    {
-        m_evaluationStack.push( returnValue );
     }
 }
 
