@@ -42,12 +42,12 @@ Frame::Frame( const CallExpression::Ptr& call, const Node::Ptr& callee,
 {
 }
 
-CallExpression::Ptr Frame::call( void ) const
+const CallExpression::Ptr& Frame::call( void ) const
 {
     return m_call;
 }
 
-Node::Ptr Frame::callee( void ) const
+const Node::Ptr& Frame::callee( void ) const
 {
     return m_callee;
 }

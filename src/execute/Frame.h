@@ -36,17 +36,17 @@ namespace libcasm_fe
         Frame( const Ast::CallExpression::Ptr& call,
             const Ast::Node::Ptr& callee, std::size_t numberOfLocals );
 
-        Ast::CallExpression::Ptr call( void ) const;
+        const Ast::CallExpression::Ptr& call( void ) const;
 
-        Ast::Node::Ptr callee( void ) const;
+        const Ast::Node::Ptr& callee( void ) const;
 
         void setLocal( std::size_t index, const libcasm_ir::Constant& local );
         const libcasm_ir::Constant& local( std::size_t index ) const;
         const std::vector< libcasm_ir::Constant >& locals( void ) const;
 
       private:
-        Ast::CallExpression::Ptr m_call;
-        Ast::Node::Ptr m_callee;
+        const Ast::CallExpression::Ptr m_call;
+        const Ast::Node::Ptr m_callee;
         std::vector< libcasm_ir::Constant > m_locals;
     };
 
