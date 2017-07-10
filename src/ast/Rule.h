@@ -46,7 +46,7 @@ namespace libcasm_fe
 
         using Rules = NodeList< Rule >;
 
-        class SkipRule : public Rule
+        class SkipRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< SkipRule >;
@@ -56,7 +56,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class ConditionalRule : public Rule
+        class ConditionalRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< ConditionalRule >;
@@ -93,7 +93,7 @@ namespace libcasm_fe
 
         using Cases = NodeList< Case >;
 
-        class ExpressionCase : public Case
+        class ExpressionCase final : public Case
         {
           public:
             using Ptr = std::shared_ptr< ExpressionCase >;
@@ -109,7 +109,7 @@ namespace libcasm_fe
             const Expression::Ptr m_expression;
         };
 
-        class DefaultCase : public Case
+        class DefaultCase final : public Case
         {
           public:
             using Ptr = std::shared_ptr< DefaultCase >;
@@ -119,7 +119,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class CaseRule : public Rule
+        class CaseRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< CaseRule >;
@@ -137,7 +137,7 @@ namespace libcasm_fe
             const Cases::Ptr m_cases;
         };
 
-        class LetRule : public Rule
+        class LetRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< LetRule >;
@@ -157,7 +157,7 @@ namespace libcasm_fe
             const Rule::Ptr m_rule;
         };
 
-        class ForallRule : public Rule
+        class ForallRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< ForallRule >;
@@ -177,7 +177,7 @@ namespace libcasm_fe
             const Rule::Ptr m_rule;
         };
 
-        class ChooseRule : public Rule
+        class ChooseRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< ChooseRule >;
@@ -197,7 +197,7 @@ namespace libcasm_fe
             const Rule::Ptr m_rule;
         };
 
-        class IterateRule : public Rule
+        class IterateRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< IterateRule >;
@@ -212,7 +212,7 @@ namespace libcasm_fe
             const Rule::Ptr m_rule;
         };
 
-        class BlockRule : public Rule
+        class BlockRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< BlockRule >;
@@ -227,7 +227,7 @@ namespace libcasm_fe
             const Rules::Ptr m_rules;
         };
 
-        class SequenceRule : public Rule
+        class SequenceRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< SequenceRule >;
@@ -242,7 +242,7 @@ namespace libcasm_fe
             const Rules::Ptr m_rules;
         };
 
-        class UpdateRule : public Rule
+        class UpdateRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< UpdateRule >;
@@ -260,7 +260,7 @@ namespace libcasm_fe
             const Expression::Ptr m_expression;
         };
 
-        class CallRule : public Rule
+        class CallRule final : public Rule
         {
           public:
             using Ptr = std::shared_ptr< CallRule >;

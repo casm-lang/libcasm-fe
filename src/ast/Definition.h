@@ -54,7 +54,7 @@ namespace libcasm_fe
 
         using Definitions = NodeList< Definition >;
 
-        class VariableDefinition : public Definition
+        class VariableDefinition final : public Definition
         {
           public:
             using Ptr = std::shared_ptr< VariableDefinition >;
@@ -79,7 +79,7 @@ namespace libcasm_fe
             std::size_t m_localIndex;
         };
 
-        class FunctionDefinition : public Definition
+        class FunctionDefinition final : public Definition
         {
           public:
             enum class Classification
@@ -137,7 +137,7 @@ namespace libcasm_fe
             UID m_uid;
         };
 
-        class DerivedDefinition : public Definition
+        class DerivedDefinition final : public Definition
         {
           public:
             using Ptr = std::shared_ptr< DerivedDefinition >;
@@ -169,7 +169,7 @@ namespace libcasm_fe
             std::size_t m_maxNumberOfLocals;
         };
 
-        class RuleDefinition : public Definition
+        class RuleDefinition final : public Definition
         {
           public:
             using Ptr = std::shared_ptr< RuleDefinition >;
@@ -201,7 +201,7 @@ namespace libcasm_fe
             std::size_t m_maxNumberOfLocals;
         };
 
-        class EnumerationDefinition : public Definition
+        class EnumerationDefinition final : public Definition
         {
           public:
             using Ptr = std::shared_ptr< EnumerationDefinition >;

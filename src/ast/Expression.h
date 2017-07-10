@@ -46,7 +46,7 @@ namespace libcasm_fe
 
         using Expressions = NodeList< Expression >;
 
-        class ValueAtom : public Expression
+        class ValueAtom final : public Expression
         {
           public:
             using Ptr = std::shared_ptr< ValueAtom >;
@@ -61,7 +61,7 @@ namespace libcasm_fe
             const libcasm_ir::Constant::Ptr m_value;
         };
 
-        class ReferenceAtom : public Expression
+        class ReferenceAtom final : public Expression
         {
           public:
             enum class ReferenceType
@@ -98,7 +98,7 @@ namespace libcasm_fe
             libcasm_ir::Value::ID m_builtinId;
         };
 
-        class UndefAtom : public Expression
+        class UndefAtom final : public Expression
         {
           public:
             using Ptr = std::shared_ptr< UndefAtom >;
@@ -143,7 +143,7 @@ namespace libcasm_fe
             static std::string targetTypeString( const TargetType targetType );
         };
 
-        class DirectCallExpression : public CallExpression
+        class DirectCallExpression final : public CallExpression
         {
           public:
             using Ptr = std::shared_ptr< DirectCallExpression >;
@@ -178,7 +178,7 @@ namespace libcasm_fe
             TypedNode::Ptr m_targetDefinition;
         };
 
-        class IndirectCallExpression : public CallExpression
+        class IndirectCallExpression final : public CallExpression
         {
           public:
             using Ptr = std::shared_ptr< IndirectCallExpression >;
@@ -194,7 +194,7 @@ namespace libcasm_fe
             const Expression::Ptr m_expression;
         };
 
-        class UnaryExpression : public Expression
+        class UnaryExpression final : public Expression
         {
           public:
             using Ptr = std::shared_ptr< UnaryExpression >;
@@ -212,7 +212,7 @@ namespace libcasm_fe
             const Expression::Ptr m_expression;
         };
 
-        class BinaryExpression : public Expression
+        class BinaryExpression final : public Expression
         {
           public:
             using Ptr = std::shared_ptr< BinaryExpression >;
@@ -232,7 +232,7 @@ namespace libcasm_fe
             const Expression::Ptr m_right;
         };
 
-        class RangeExpression : public Expression
+        class RangeExpression final : public Expression
         {
           public:
             using Ptr = std::shared_ptr< RangeExpression >;
@@ -250,7 +250,7 @@ namespace libcasm_fe
             const Expression::Ptr m_right;
         };
 
-        class ListExpression : public Expression
+        class ListExpression final : public Expression
         {
           public:
             using Ptr = std::shared_ptr< ListExpression >;
@@ -265,7 +265,7 @@ namespace libcasm_fe
             const Expressions::Ptr m_expressions;
         };
 
-        class ConditionalExpression : public Expression
+        class ConditionalExpression final : public Expression
         {
           public:
             using Ptr = std::shared_ptr< ConditionalExpression >;
@@ -307,7 +307,7 @@ namespace libcasm_fe
             const Expression::Ptr m_proposition;
         };
 
-        class UniversalQuantifierExpression : public QuantifierExpression
+        class UniversalQuantifierExpression final : public QuantifierExpression
         {
           public:
             using Ptr = std::shared_ptr< UniversalQuantifierExpression >;
@@ -320,7 +320,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class ExistentialQuantifierExpression : public QuantifierExpression
+        class ExistentialQuantifierExpression final : public QuantifierExpression
         {
           public:
             using Ptr = std::shared_ptr< ExistentialQuantifierExpression >;

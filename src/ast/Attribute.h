@@ -48,7 +48,7 @@ namespace libcasm_fe
 
         using Attributes = NodeList< Attribute >;
 
-        class BasicAttribute : public Attribute
+        class BasicAttribute final : public Attribute
         {
           public:
             using Ptr = std::shared_ptr< BasicAttribute >;
@@ -58,7 +58,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class ExpressionAttribute : public Attribute
+        class ExpressionAttribute final : public Attribute
         {
           public:
             using Ptr = std::shared_ptr< ExpressionAttribute >;

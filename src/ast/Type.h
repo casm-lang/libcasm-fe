@@ -47,7 +47,7 @@ namespace libcasm_fe
 
         using Types = NodeList< Type >;
 
-        class UnresolvedType : public Type
+        class UnresolvedType final : public Type
         {
           public:
             using Ptr = std::shared_ptr< UnresolvedType >;
@@ -57,7 +57,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class BasicType : public Type
+        class BasicType final : public Type
         {
           public:
             using Ptr = std::shared_ptr< BasicType >;
@@ -67,7 +67,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class ComposedType : public Type
+        class ComposedType final : public Type
         {
           public:
             using Ptr = std::shared_ptr< ComposedType >;
@@ -83,7 +83,7 @@ namespace libcasm_fe
             const Types::Ptr m_subTypes;
         };
 
-        class FixedSizedType : public Type
+        class FixedSizedType final : public Type
         {
           public:
             using Ptr = std::shared_ptr< FixedSizedType >;
@@ -99,7 +99,7 @@ namespace libcasm_fe
             const Expression::Ptr m_size;
         };
 
-        class RelationType : public Type
+        class RelationType final : public Type
         {
           public:
             using Ptr = std::shared_ptr< RelationType >;

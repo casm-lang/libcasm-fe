@@ -132,7 +132,7 @@ namespace libcasm_fe
         };
 
         template < typename T >
-        class NodeList : public Node, public libstdhl::List< T >
+        class NodeList final : public Node, public libstdhl::List< T >
         {
           public:
             using Ptr = std::shared_ptr< NodeList >;
@@ -163,7 +163,7 @@ namespace libcasm_fe
             libcasm_ir::Type::Ptr m_type;
         };
 
-        class Identifier : public Node
+        class Identifier final : public Node
         {
           public:
             using Ptr = std::shared_ptr< Identifier >;
@@ -195,7 +195,7 @@ namespace libcasm_fe
          * identifier "Red". Furthermore the node will be marked as
          * NamespaceType.RELATIVE.
          */
-        class IdentifierPath : public Node
+        class IdentifierPath final : public Node
         {
           public:
             enum class Type
