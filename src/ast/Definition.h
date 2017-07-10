@@ -219,6 +219,18 @@ namespace libcasm_fe
     }
 }
 
+namespace std
+{
+    template <>
+    struct hash< libcasm_fe::Ast::FunctionDefinition::UID >
+    {
+        std::size_t operator()( libcasm_fe::Ast::FunctionDefinition::UID uid ) const
+        {
+            return static_cast< std::size_t >( uid );
+        }
+    };
+}
+
 #endif // _LIB_CASMFE_DEFINITION_H_
 
 //
