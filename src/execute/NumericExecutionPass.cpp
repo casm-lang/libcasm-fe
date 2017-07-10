@@ -1043,8 +1043,6 @@ void ExecutionVisitor::visit( UpdateRule& node )
         const auto& conflictingUpdate = e.conflictingUpdate();
         const auto& existingUpdate = e.existingUpdate();
 
-        const auto& existingLocation = existingUpdate.first;
-
         const auto& conflictingValue = conflictingUpdate.second;
         const auto& existingValue = existingUpdate.second;
 
