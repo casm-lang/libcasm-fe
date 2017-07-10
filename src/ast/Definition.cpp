@@ -162,8 +162,8 @@ std::string FunctionDefinition::classificationName( void ) const
         }
     }
 
-    assert( !" internal error " );
-    return "";
+    assert( !" internal error! " );
+    return std::string();
 }
 
 void FunctionDefinition::setSymbolic( u1 symbolic )

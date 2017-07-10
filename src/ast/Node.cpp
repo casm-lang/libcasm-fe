@@ -218,6 +218,9 @@ std::string Node::description( void ) const
             return "default case";
         }
     }
+
+    assert( !" internal error! " );
+    return std::string();
 }
 
 TypedNode::TypedNode( Node::ID id )

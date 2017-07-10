@@ -185,7 +185,7 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
     }
 
     assert( !" internal error! " );
-    return "";
+    return std::string();
 }
 
 DirectCallExpression::DirectCallExpression(
