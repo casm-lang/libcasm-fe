@@ -376,6 +376,35 @@ void ConditionalExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+ChooseExpression::ChooseExpression( const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& universe, const Expression::Ptr& expression )
+: Expression( Node::ID::CHOOSE_EXPRESSION )
+, m_variable( variable )
+, m_universe( universe )
+, m_expression( expression )
+{
+}
+
+const VariableDefinition::Ptr& ChooseExpression::variable( void ) const
+{
+    return m_variable;
+}
+
+const Expression::Ptr& ChooseExpression::universe( void ) const
+{
+    return m_universe;
+}
+
+const Expression::Ptr& ChooseExpression::expression( void ) const
+{
+    return m_expression;
+}
+
+void ChooseExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 QuantifierExpression::QuantifierExpression( Node::ID id,
     const VariableDefinition::Ptr& predicateVariable,
     const Expression::Ptr& universe,

@@ -53,6 +53,7 @@ namespace libcasm_fe
             void visit( RangeExpression& node ) override;
             void visit( ListExpression& node ) override;
             void visit( ConditionalExpression& node ) override;
+            void visit( ChooseExpression& node ) override;
             void visit( UniversalQuantifierExpression& node ) override;
             void visit( ExistentialQuantifierExpression& node ) override;
 

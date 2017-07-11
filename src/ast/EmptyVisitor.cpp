@@ -94,6 +94,10 @@ void EmptyVisitor::visit( ConditionalExpression& )
 {
 }
 
+void EmptyVisitor::visit( ChooseExpression& )
+{
+}
+
 void EmptyVisitor::visit( UniversalQuantifierExpression& )
 {
 }

@@ -286,6 +286,28 @@ namespace libcasm_fe
             const Expression::Ptr m_elseExpression;
         };
 
+        class ChooseExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< ChooseExpression >;
+
+            ChooseExpression(
+                const std::shared_ptr< VariableDefinition >& variable,
+                const Expression::Ptr& universe,
+                const Expression::Ptr& expression );
+
+            const std::shared_ptr< VariableDefinition >& variable( void ) const;
+            const Expression::Ptr& universe( void ) const;
+            const Expression::Ptr& expression( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const std::shared_ptr< VariableDefinition > m_variable;
+            const Expression::Ptr m_universe;
+            const Expression::Ptr m_expression;
+        };
+
         class QuantifierExpression : public Expression
         {
           public:

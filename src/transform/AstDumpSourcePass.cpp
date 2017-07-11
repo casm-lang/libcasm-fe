@@ -139,6 +139,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( RangeExpression& node ) override;
     void visit( ListExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
+    void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
@@ -419,6 +420,16 @@ void AstDumpSourceVisitor::visit( ConditionalExpression& node )
     node.thenExpression()->accept( *this );
     m_stream << " else ";
     node.elseExpression()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( ChooseExpression& node )
+{
+    m_stream << "choose ";
+    node.variable()->accept( *this );
+    m_stream << " in ";
+    node.universe()->accept( *this );
+    m_stream << " do ";
+    node.expression()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( UniversalQuantifierExpression& node )
