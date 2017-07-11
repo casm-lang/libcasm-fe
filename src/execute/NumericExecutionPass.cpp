@@ -264,6 +264,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( RangeExpression& node ) override;
     void visit( ListExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
+    void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
@@ -710,6 +711,18 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
     {
         node.elseExpression()->accept( *this );
     }
+}
+
+void ExecutionVisitor::visit( ChooseExpression& node )
+{
+    auto* frame = m_frameStack.top();
+    const auto variableIndex = node.variable()->localIndex();
+
+    node.universe()->accept( *this );
+    const auto& universe = m_evaluationStack.pop();
+
+    frame->setLocal( variableIndex, universe.choose() );
+    node.expression()->accept( *this );
 }
 
 void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
