@@ -320,7 +320,8 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class ExistentialQuantifierExpression final : public QuantifierExpression
+        class ExistentialQuantifierExpression final
+            : public QuantifierExpression
         {
           public:
             using Ptr = std::shared_ptr< ExistentialQuantifierExpression >;

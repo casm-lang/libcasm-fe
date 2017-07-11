@@ -277,7 +277,8 @@ namespace libcasm_fe
 
           private:
             const CallExpression::Ptr m_call;
-            const std::set< CallExpression::TargetType > m_allowedCallTargetTypes;
+            const std::set< CallExpression::TargetType >
+                m_allowedCallTargetTypes;
         };
     }
 }

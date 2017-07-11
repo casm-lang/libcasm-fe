@@ -182,7 +182,8 @@ void FunctionDefinition::setInitializers(
     m_initializers = initializers;
 }
 
-const NodeList< UpdateRule >::Ptr& FunctionDefinition::initializers( void ) const
+const NodeList< UpdateRule >::Ptr& FunctionDefinition::initializers(
+    void ) const
 {
     return m_initializers;
 }
@@ -214,7 +215,8 @@ DerivedDefinition::DerivedDefinition( const Identifier::Ptr& identifier,
 {
 }
 
-const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments( void ) const
+const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments(
+    void ) const
 {
     return m_arguments;
 }
@@ -257,7 +259,8 @@ RuleDefinition::RuleDefinition( const Identifier::Ptr& identifier,
 {
 }
 
-const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments( void ) const
+const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments(
+    void ) const
 {
     return m_arguments;
 }

@@ -387,7 +387,8 @@ QuantifierExpression::QuantifierExpression( Node::ID id,
 {
 }
 
-const VariableDefinition::Ptr& QuantifierExpression::predicateVariable( void ) const
+const VariableDefinition::Ptr& QuantifierExpression::predicateVariable(
+    void ) const
 {
     return m_predicateVariable;
 }
