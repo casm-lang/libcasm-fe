@@ -494,13 +494,22 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 {
     switch( node.targetType() )
     {
-        case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:
+        case CallExpression::TargetType::FUNCTION:
         {
             const auto& definition = node.targetDefinition();
             m_frameStack.push( makeFrame( node.ptr< CallExpression >(),
                 definition, node.arguments()->size() ) );
             definition->accept( *this );
+            m_frameStack.pop();
+            break;
+        }
+        case CallExpression::TargetType::DERIVED:
+        {
+            const auto& derived = std::static_pointer_cast< DerivedDefinition >(
+                node.targetDefinition() );
+            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), derived,
+                derived->maximumNumberOfLocals() ) );
+            derived->accept( *this );
             m_frameStack.pop();
             break;
         }
@@ -570,12 +579,21 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     const auto& atom = value.atom();
     switch( atom->referenceType() )
     {
-        case ReferenceAtom::ReferenceType::FUNCTION: // [[fallthrough]]
-        case ReferenceAtom::ReferenceType::DERIVED:
+        case ReferenceAtom::ReferenceType::FUNCTION:
         {
             m_frameStack.push( makeFrame( node.ptr< CallExpression >(),
                 atom->reference(), node.arguments()->size() ) );
             atom->reference()->accept( *this );
+            m_frameStack.pop();
+            break;
+        }
+        case ReferenceAtom::ReferenceType::DERIVED:
+        {
+            const auto& derived = std::static_pointer_cast< DerivedDefinition >(
+                atom->reference() );
+            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), derived,
+                derived->maximumNumberOfLocals() ) );
+            derived->accept( *this );
             m_frameStack.pop();
             break;
         }

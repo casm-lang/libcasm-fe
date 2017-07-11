@@ -54,12 +54,16 @@ const Node::Ptr& Frame::callee( void ) const
 
 void Frame::setLocal( std::size_t index, const ir::Constant& local )
 {
+    assert( index < m_locals.size() );
+
     m_locals[ index ] = local;
 }
 
 const ir::Constant& Frame::local( std::size_t index ) const
 {
-    return m_locals.at( index );
+    assert( index < m_locals.size() );
+
+    return m_locals[ index ];
 }
 
 const std::vector< ir::Constant >& Frame::locals( void ) const
