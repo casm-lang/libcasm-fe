@@ -230,7 +230,7 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
         push( *argument );
     }
 
-    RecursiveVisitor::visit( node );
+    node.expression()->accept( *this );
 
     const auto end = node.arguments()->rend();
     for( auto it = node.arguments()->rbegin(); it != end; ++it )
@@ -250,7 +250,7 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
         push( *argument );
     }
 
-    RecursiveVisitor::visit( node );
+    node.rule()->accept( *this );
 
     const auto end = node.arguments()->rend();
     for( auto it = node.arguments()->rbegin(); it != end; ++it )
@@ -423,15 +423,19 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
 void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )
 {
+    node.universe()->accept( *this );
+
     push( *node.predicateVariable() );
-    RecursiveVisitor::visit( node );
+    node.proposition()->accept( *this );
     pop( *node.predicateVariable() );
 }
 
 void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
 {
+    node.universe()->accept( *this );
+
     push( *node.predicateVariable() );
-    RecursiveVisitor::visit( node );
+    node.proposition()->accept( *this );
     pop( *node.predicateVariable() );
 }
 
@@ -454,22 +458,28 @@ void SymbolResolveVisitor::visit( UpdateRule& node )
 
 void SymbolResolveVisitor::visit( LetRule& node )
 {
+    node.expression()->accept( *this );
+
     push( *node.variable() );
-    RecursiveVisitor::visit( node );
+    node.rule()->accept( *this );
     pop( *node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ForallRule& node )
 {
+    node.universe()->accept( *this );
+
     push( *node.variable() );
-    RecursiveVisitor::visit( node );
+    node.rule()->accept( *this );
     pop( *node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ChooseRule& node )
 {
+    node.universe()->accept( *this );
+
     push( *node.variable() );
-    RecursiveVisitor::visit( node );
+    node.rule()->accept( *this );
     pop( *node.variable() );
 }
 
