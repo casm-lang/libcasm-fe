@@ -160,6 +160,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
 
     void visit( DirectCallExpression& node ) override;
 
+    void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
@@ -419,6 +420,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     }
 
     RecursiveVisitor::visit( node );
+}
+
+void SymbolResolveVisitor::visit( ChooseExpression& node )
+{
+    push( *node.variable() );
+    RecursiveVisitor::visit( node );
+    pop( *node.variable() );
 }
 
 void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )
