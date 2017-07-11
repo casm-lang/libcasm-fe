@@ -155,6 +155,7 @@ Term
 : DirectCallExpression
 | IndirectCallExpression
 | ConditionalExpression
+| ChooseExpression
 | UniversalQuantifierExpression
 | ExistentialQuantifierExpression
 | Expression
@@ -215,6 +216,9 @@ IndirectCallExpression
 
 ConditionalExpression
 : IF Term THEN Term ELSE Term
+
+ChooseExpression
+: CHOOSE AttributedVariable IN Term DO Term
 
 UniversalQuantifierExpression
 : FORALL AttributedVariable IN Term HOLDS Term
