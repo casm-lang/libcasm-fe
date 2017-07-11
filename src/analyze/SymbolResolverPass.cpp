@@ -424,7 +424,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
 void SymbolResolveVisitor::visit( ChooseExpression& node )
 {
-    node.variable()->accept( *this );
     node.universe()->accept( *this );
 
     push( *node.variable() );
