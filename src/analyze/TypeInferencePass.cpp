@@ -1243,32 +1243,11 @@ void TypeInferenceVisitor::visit( LetExpression& node )
         node.setType( node.expression()->type() );
     }
 
-    if( not node.variable()->type() )
-    {
-        m_log.error( { node.variable()->sourceLocation() }, "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-    else if( not node.initializer()->type() )
-    {
-        m_log.error( { node.initializer()->sourceLocation() }, "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-    else
-    {
-        if( *node.variable()->type() != node.initializer()->type()->result() )
-        {
-            m_log.error( { node.variable()->sourceLocation(),
-                             node.initializer()->sourceLocation() },
-                node.description() + " variable '"
-                    + node.variable()->identifier()->name()
-                    + "' of type '"
-                    + node.variable()->type()->description()
-                    + "' does not match the initializer of type '"
-                    + node.initializer()->type()->result().description()
-                    + "'",
-                Code::TypeInferenceInvalidLetExpressionVariableTypeMismatch );
-        }
-    }
+    assignment( node, *node.variable(), *node.initializer(),
+        "let variable '" + node.variable()->identifier()->name() + "'",
+        "let initializer", Code::TypeInferenceInvalidLetExpressionVariableType,
+        Code::TypeInferenceInvalidLetExpressionInitializerType,
+        Code::TypeInferenceInvalidLetExpressionTypeMismatch );
 
     if( not node.expression()->type() )
     {
