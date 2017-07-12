@@ -721,6 +721,14 @@ void ExecutionVisitor::visit( ChooseExpression& node )
     node.universe()->accept( *this );
     const auto& universe = m_evaluationStack.pop();
 
+    if( not universe.defined() )
+    {
+        throw RuntimeException( node.universe()->sourceLocation(),
+            "universe must not be undef",
+            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            Code::ChooseExpressionInvalidUniverse );
+    }
+
     frame->setLocal( variableIndex, universe.choose() );
     node.expression()->accept( *this );
 }
