@@ -181,6 +181,7 @@ END       0 "end of file"
 %type <ListExpression::Ptr> List
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
+%type <LetExpression::Ptr> LetExpression
 %type <ConditionalExpression::Ptr> ConditionalExpression
 %type <ChooseExpression::Ptr> ChooseExpression
 %type <UniversalQuantifierExpression::Ptr> UniversalQuantifierExpression
@@ -232,6 +233,7 @@ END       0 "end of file"
 // prefer absolute over relative paths
 %precedence ABSOLUTE_PATH
 
+%precedence IN
 %precedence DO
 
 %precedence THEN
@@ -872,6 +874,10 @@ Term
   {
       $$ = $1;
   }
+| LetExpression
+  {
+      $$ = $1;
+  }
 | ConditionalExpression
   {
       $$ = $1;
@@ -1084,6 +1090,14 @@ IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
   {
       $$ = Ast::make< IndirectCallExpression >( @$, $3, $5 );
+  }
+;
+
+
+LetExpression
+: LET AttributedVariable EQUAL Term IN Term
+  {
+      $$ = Ast::make< LetExpression >( @$, $2, $4, $6 );
   }
 ;
 
