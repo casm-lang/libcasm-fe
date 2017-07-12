@@ -37,6 +37,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+namespace ir = libcasm_ir;
+
 char AstDumpSourcePass::id = 0;
 
 static libpass::PassRegistration< AstDumpSourcePass > PASS( "AstDumpSourcePass",
@@ -375,14 +377,14 @@ void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
 
 void AstDumpSourceVisitor::visit( UnaryExpression& node )
 {
+    m_stream << ir::Value::token( node.op() );
     node.expression()->accept( *this );
-    // TODO
 }
 
 void AstDumpSourceVisitor::visit( BinaryExpression& node )
 {
     node.left()->accept( *this );
-    m_stream << " + "; // TODO
+    m_stream << " " << ir::Value::token( node.op() ) << " ";
     node.right()->accept( *this );
 }
 
@@ -504,7 +506,15 @@ void AstDumpSourceVisitor::visit( ForallRule& node )
 
 void AstDumpSourceVisitor::visit( ChooseRule& node )
 {
-    // TODO
+    m_stream << m_indentation << "choose ";
+    node.variable()->accept( *this );
+    m_stream << " in ";
+    node.universe()->accept( *this );
+    m_stream << " do\n";
+    {
+        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        node.rule()->accept( *this );
+    }
 }
 
 void AstDumpSourceVisitor::visit( IterateRule& node )
