@@ -188,6 +188,10 @@ namespace libcasm_fe
         TypeInferenceInvalidChooseRuleVariableTypeMismatch = 0x1009
 
         ,
+        TypeInferenceInvalidLetExpressionVariableTypeMismatch = 0x1010,
+        TypeInferenceInvalidLetExpressionTypeMismatch = 0x1011
+
+        ,
         TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000
 
         ,
