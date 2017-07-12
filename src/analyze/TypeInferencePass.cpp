@@ -1337,7 +1337,8 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
                     + "' does not match the universe of type '"
                     + node.universe()->type()->result().description()
                     + "'",
-                Code::TypeInferenceQuantifierUniversalPredicateTypeMismatch );
+                Code::
+                    TypeInferenceInvalidChooseExpressionVariableTypeMismatch );
         }
     }
 
