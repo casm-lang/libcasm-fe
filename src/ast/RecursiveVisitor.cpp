@@ -125,6 +125,13 @@ void RecursiveVisitor::visit( ListExpression& node )
     node.expressions()->accept( *this );
 }
 
+void RecursiveVisitor::visit( LetExpression& node )
+{
+    node.variable()->accept( *this );
+    node.initializer()->accept( *this );
+    node.expression()->accept( *this );
+}
+
 void RecursiveVisitor::visit( ConditionalExpression& node )
 {
     node.condition()->accept( *this );

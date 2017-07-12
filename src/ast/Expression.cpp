@@ -346,6 +346,35 @@ void ListExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+LetExpression::LetExpression( const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& initializer, const Expression::Ptr& expression )
+: Expression( Node::ID::LET_EXPRESSION )
+, m_variable( variable )
+, m_initializer( initializer )
+, m_expression( expression )
+{
+}
+
+const VariableDefinition::Ptr& LetExpression::variable( void ) const
+{
+    return m_variable;
+}
+
+const Expression::Ptr& LetExpression::initializer( void ) const
+{
+    return m_initializer;
+}
+
+const Expression::Ptr& LetExpression::expression( void ) const
+{
+    return m_expression;
+}
+
+void LetExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 ConditionalExpression::ConditionalExpression( const Expression::Ptr& condition,
     const Expression::Ptr& thenExpression,
     const Expression::Ptr& elseExpression )
