@@ -494,7 +494,11 @@ void SymbolResolveVisitor::push( VariableDefinition& node )
     if( variable != m_variables.rend() )
     {
         m_log.error( { node.sourceLocation() },
-            "symbol '" + name + "' already defined" );
+            "redefinition of symbol '" + name + "'",
+            Code::SymbolAlreadyDefined );
+
+        m_log.info( { variable->definition()->sourceLocation() },
+            "previous definition of '" + name + "' is here" );
     }
 
     const std::size_t localIndex = m_variables.size(); // used during execution
