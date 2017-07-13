@@ -67,6 +67,7 @@ namespace libcasm_fe
                 RANGE_EXPRESSION,
                 LIST_EXPRESSION,
                 CONDITIONAL_EXPRESSION,
+                CHOOSE_EXPRESSION,
                 UNIVERSAL_QUANTIFIER_EXPRESSION,
                 EXISTENTIAL_QUANTIFIER_EXPRESSION,
 

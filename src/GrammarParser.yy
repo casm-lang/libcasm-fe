@@ -182,6 +182,7 @@ END       0 "end of file"
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
 %type <ConditionalExpression::Ptr> ConditionalExpression
+%type <ChooseExpression::Ptr> ChooseExpression
 %type <UniversalQuantifierExpression::Ptr> UniversalQuantifierExpression
 %type <ExistentialQuantifierExpression::Ptr> ExistentialQuantifierExpression
 
@@ -230,6 +231,8 @@ END       0 "end of file"
 
 // prefer absolute over relative paths
 %precedence ABSOLUTE_PATH
+
+%precedence DO
 
 %precedence THEN
 %precedence ELSE
@@ -873,6 +876,10 @@ Term
   {
       $$ = $1;
   }
+| ChooseExpression
+  {
+      $$ = $1;
+  }
 | UniversalQuantifierExpression
   {
       $$ = $1;
@@ -1085,6 +1092,14 @@ ConditionalExpression
 : IF Term THEN Term ELSE Term
   {
       $$ = Ast::make< ConditionalExpression >( @$, $2, $4, $6 );
+  }
+;
+
+
+ChooseExpression
+: CHOOSE AttributedVariable IN Term DO Term
+  {
+      $$ = Ast::make< ChooseExpression >( @$, $2, $4, $6 );
   }
 ;
 

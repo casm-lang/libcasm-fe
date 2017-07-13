@@ -48,6 +48,7 @@ namespace libcasm_fe
         class RangeExpression;
         class ListExpression;
         class ConditionalExpression;
+        class ChooseExpression;
         class UniversalQuantifierExpression;
         class ExistentialQuantifierExpression;
 
@@ -103,6 +104,7 @@ namespace libcasm_fe
             virtual void visit( RangeExpression& node ) = 0;
             virtual void visit( ListExpression& node ) = 0;
             virtual void visit( ConditionalExpression& node ) = 0;
+            virtual void visit( ChooseExpression& node ) = 0;
             virtual void visit( UniversalQuantifierExpression& node ) = 0;
             virtual void visit( ExistentialQuantifierExpression& node ) = 0;
 

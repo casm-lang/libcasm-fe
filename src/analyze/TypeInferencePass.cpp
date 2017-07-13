@@ -597,6 +597,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( RangeExpression& node ) override;
     void visit( ListExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
+    void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
@@ -1278,6 +1279,88 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
     if( not node.type() )
     {
         node.setType( thenExpr.type() );
+    }
+}
+
+void TypeInferenceVisitor::visit( ChooseExpression& node )
+{
+    node.variable()->accept( *this );
+
+    if( node.variable()->type() )
+    {
+        m_resultTypes[ node.universe().get() ].emplace_back(
+            node.variable()->type()->id() );
+    }
+
+    push( *node.variable() );
+    node.universe()->accept( *this );
+
+    if( not node.variable()->type() and node.universe()->type() )
+    {
+        node.variable()->setType( node.universe()->type()->ptr_result() );
+    }
+
+    if( node.type() )
+    {
+        m_resultTypes[ node.expression().get() ].emplace_back(
+            node.type()->id() );
+    }
+
+    node.expression()->accept( *this );
+    pop( *node.variable() );
+
+    if( not node.type() )
+    {
+        node.setType( node.expression()->type() );
+    }
+
+    if( not node.variable()->type() )
+    {
+        m_log.error( { node.variable()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else if( not node.universe()->type() )
+    {
+        m_log.error( { node.universe()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else
+    {
+        if( *node.variable()->type() != node.universe()->type()->result() )
+        {
+            m_log.error( { node.variable()->sourceLocation(),
+                             node.universe()->sourceLocation() },
+                node.description() + " variable '"
+                    + node.variable()->identifier()->name()
+                    + "' of type '"
+                    + node.variable()->type()->description()
+                    + "' does not match the universe of type '"
+                    + node.universe()->type()->result().description()
+                    + "'",
+                Code::
+                    TypeInferenceInvalidChooseExpressionVariableTypeMismatch );
+        }
+    }
+
+    if( not node.expression()->type() )
+    {
+        m_log.error( { node.expression()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else
+    {
+        const auto& exprType = node.expression()->type()->result();
+        if( *node.type() != exprType )
+        {
+            m_log.error(
+                { node.sourceLocation(), node.expression()->sourceLocation() },
+                node.description() + " has invalid expression type '"
+                    + exprType.description()
+                    + "' shall be '"
+                    + node.type()->description()
+                    + "'",
+                Code::TypeInferenceInvalidChooseExpressionTypeMismatch );
+        }
     }
 }
 

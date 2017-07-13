@@ -117,6 +117,10 @@ std::string Node::description( void ) const
         {
             return "conditional expression";
         }
+        case ID::CHOOSE_EXPRESSION:
+        {
+            return "choose expression";
+        }
         case ID::UNIVERSAL_QUANTIFIER_EXPRESSION:
         {
             return "universal quantifier";

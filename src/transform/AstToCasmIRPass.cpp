@@ -67,6 +67,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( RangeExpression& node ) override;
     void visit( ListExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
+    void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
@@ -488,6 +489,12 @@ void AstToCasmIRVisitor::visit( ListExpression& node )
 }
 
 void AstToCasmIRVisitor::visit( ConditionalExpression& node )
+{
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
+}
+
+void AstToCasmIRVisitor::visit( ChooseExpression& node )
 {
     m_log.info(
         "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );

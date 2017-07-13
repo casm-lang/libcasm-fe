@@ -132,6 +132,13 @@ void RecursiveVisitor::visit( ConditionalExpression& node )
     node.elseExpression()->accept( *this );
 }
 
+void RecursiveVisitor::visit( ChooseExpression& node )
+{
+    node.variable()->accept( *this );
+    node.universe()->accept( *this );
+    node.expression()->accept( *this );
+}
+
 void RecursiveVisitor::visit( UniversalQuantifierExpression& node )
 {
     node.predicateVariable()->accept( *this );
