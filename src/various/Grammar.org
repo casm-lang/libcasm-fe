@@ -154,6 +154,7 @@ Reference
 Term
 : DirectCallExpression
 | IndirectCallExpression
+| LetExpression
 | ConditionalExpression
 | ChooseExpression
 | UniversalQuantifierExpression
@@ -213,6 +214,9 @@ DirectCallExpression
 
 IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
+
+LetExpression
+: LET AttributedVariable EQUAL Term IN Term
 
 ConditionalExpression
 : IF Term THEN Term ELSE Term

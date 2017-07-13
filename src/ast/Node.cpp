@@ -113,6 +113,10 @@ std::string Node::description( void ) const
         {
             return "list";
         }
+        case ID::LET_EXPRESSION:
+        {
+            return "let expression";
+        }
         case ID::CONDITIONAL_EXPRESSION:
         {
             return "conditional expression";

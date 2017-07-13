@@ -596,6 +596,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
     void visit( ListExpression& node ) override;
+    void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
@@ -1204,10 +1205,72 @@ void TypeInferenceVisitor::visit( RangeExpression& node )
 
     node.setType( range_type );
 }
+
 void TypeInferenceVisitor::visit( ListExpression& node )
 {
     RecursiveVisitor::visit( node );
 }
+
+void TypeInferenceVisitor::visit( LetExpression& node )
+{
+    node.variable()->accept( *this );
+
+    if( node.variable()->type() )
+    {
+        m_resultTypes[ node.initializer().get() ].emplace_back(
+            node.variable()->type()->id() );
+    }
+
+    push( *node.variable() );
+    node.initializer()->accept( *this );
+
+    if( not node.variable()->type() and node.initializer()->type() )
+    {
+        node.variable()->setType( node.initializer()->type()->ptr_result() );
+    }
+
+    if( node.type() )
+    {
+        m_resultTypes[ node.expression().get() ].emplace_back(
+            node.type()->id() );
+    }
+
+    node.expression()->accept( *this );
+    pop( *node.variable() );
+
+    if( not node.type() )
+    {
+        node.setType( node.expression()->type() );
+    }
+
+    assignment( node, *node.variable(), *node.initializer(),
+        "let variable '" + node.variable()->identifier()->name() + "'",
+        "let initializer", Code::TypeInferenceInvalidLetExpressionVariableType,
+        Code::TypeInferenceInvalidLetExpressionInitializerType,
+        Code::TypeInferenceInvalidLetExpressionTypeMismatch );
+
+    if( not node.expression()->type() )
+    {
+        m_log.error( { node.expression()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else
+    {
+        const auto& exprType = node.expression()->type()->result();
+        if( *node.type() != exprType )
+        {
+            m_log.error(
+                { node.sourceLocation(), node.expression()->sourceLocation() },
+                node.description() + " has invalid expression type '"
+                    + exprType.description()
+                    + "' shall be '"
+                    + node.type()->description()
+                    + "'",
+                Code::TypeInferenceInvalidLetExpressionTypeMismatch );
+        }
+    }
+}
+
 void TypeInferenceVisitor::visit( ConditionalExpression& node )
 {
     const auto& resTypes = m_resultTypes[&node ];

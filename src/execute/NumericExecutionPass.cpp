@@ -263,6 +263,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
     void visit( ListExpression& node ) override;
+    void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
@@ -689,6 +690,31 @@ void ExecutionVisitor::visit( RangeExpression& node )
 void ExecutionVisitor::visit( ListExpression& node )
 {
     // TODO
+}
+
+void ExecutionVisitor::visit( LetExpression& node )
+{
+    node.initializer()->accept( *this );
+    const auto& value = m_evaluationStack.pop();
+
+    // validate value
+    const auto& variableType = node.variable()->type()->result();
+    try
+    {
+        validateValue( value, variableType );
+    }
+    catch( const libcasm_ir::ValidationException& e )
+    {
+        throw RuntimeException( { node.initializer()->sourceLocation() },
+            e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
+            Code::LetAssignedValueInvalid );
+    }
+
+    auto* frame = m_frameStack.top();
+    const auto variableIndex = node.variable()->localIndex();
+    frame->setLocal( variableIndex, value );
+
+    node.expression()->accept( *this );
 }
 
 void ExecutionVisitor::visit( ConditionalExpression& node )

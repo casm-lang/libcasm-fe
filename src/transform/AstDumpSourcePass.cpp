@@ -140,6 +140,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
     void visit( ListExpression& node ) override;
+    void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
@@ -412,6 +413,16 @@ void AstDumpSourceVisitor::visit( ListExpression& node )
         firstExpr = false;
     }
     m_stream << "]";
+}
+
+void AstDumpSourceVisitor::visit( LetExpression& node )
+{
+    m_stream << "let ";
+    node.variable()->accept( *this );
+    m_stream << " = ";
+    node.initializer()->accept( *this );
+    m_stream << " in ";
+    node.expression()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( ConditionalExpression& node )

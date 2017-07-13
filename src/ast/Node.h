@@ -66,6 +66,7 @@ namespace libcasm_fe
                 BINARY_EXPRESSION,
                 RANGE_EXPRESSION,
                 LIST_EXPRESSION,
+                LET_EXPRESSION,
                 CONDITIONAL_EXPRESSION,
                 CHOOSE_EXPRESSION,
                 UNIVERSAL_QUANTIFIER_EXPRESSION,

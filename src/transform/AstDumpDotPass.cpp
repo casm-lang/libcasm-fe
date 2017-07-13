@@ -95,6 +95,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
     void visit( ListExpression& node ) override;
+    void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
@@ -261,6 +262,13 @@ void AstDumpDotVisitor::visit( ListExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ListExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( LetExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "LetExpression" );
     RecursiveVisitor::visit( node );
 }
 

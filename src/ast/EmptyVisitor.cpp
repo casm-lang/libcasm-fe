@@ -90,6 +90,10 @@ void EmptyVisitor::visit( ListExpression& )
 {
 }
 
+void EmptyVisitor::visit( LetExpression& )
+{
+}
+
 void EmptyVisitor::visit( ConditionalExpression& )
 {
 }
