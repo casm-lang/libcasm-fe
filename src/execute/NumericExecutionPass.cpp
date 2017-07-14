@@ -633,13 +633,12 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
 void ExecutionVisitor::visit( UnaryExpression& node )
 {
     node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
+
+    auto& value = m_evaluationStack.top();
 
     try
     {
-        const auto result
-            = libcasm_rt::Value::execute_( node.op(), node.type(), &value, 1 );
-        m_evaluationStack.push( result );
+        libcasm_rt::Value::execute( node.op(), node.type(), value, value );
     }
     catch( const std::exception& e )
     {
@@ -654,20 +653,17 @@ void ExecutionVisitor::visit( UnaryExpression& node )
 void ExecutionVisitor::visit( BinaryExpression& node )
 {
     node.left()->accept( *this );
-    node.right()->accept( *this );
+    const auto& lhs = m_evaluationStack.pop();
 
-    const auto* operands = m_evaluationStack.top_ptr( 2 );
+    node.right()->accept( *this );
+    auto& rhs = m_evaluationStack.top();
 
     try
     {
-        const auto result = libcasm_rt::Value::execute_(
-            node.op(), node.type(), operands, 2 );
-        m_evaluationStack.drop( 2 );
-        m_evaluationStack.push( result );
+        libcasm_rt::Value::execute( node.op(), node.type(), rhs, lhs, rhs );
     }
     catch( const ir::Exception& e )
     {
-        m_evaluationStack.drop( 2 );
         throw RuntimeException( node.sourceLocation(),
             "binary expression has thrown an exception: "
                 + std::string( e.what() ),
@@ -1195,8 +1191,10 @@ void ExecutionVisitor::invokeBuiltin(
     try
     {
         const auto& arguments = m_frameStack.top()->locals();
-        const auto& returnValue = libcasm_rt::Value::execute_(
-            id, type, arguments.data(), arguments.size() );
+        ir::Constant returnValue;
+
+        libcasm_rt::Value::execute(
+            id, type, returnValue, arguments.data(), arguments.size() );
 
         const auto& returnType = type->result();
         if( not returnType.isVoid() )
