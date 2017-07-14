@@ -99,6 +99,8 @@ struct Update
 {
     ir::Constant value;       /**< The value of the update */
     UpdateRule::Ptr producer; /**< The update producer */
+    ir::Constant agent;       /**< The contributing agent */
+                              // TODO maybe a list of agents (multi-agent case)?
 };
 
 struct UpdateEquals
@@ -1050,6 +1052,30 @@ void ExecutionVisitor::visit( SequenceRule& node )
     }
 }
 
+static std::string toLocationString( const UpdateRule::Ptr& update,
+    const std::vector< ir::Constant >& arguments )
+{
+    std::string location = update->function()->identifier()->path();
+
+    if( not arguments.empty() )
+    {
+        location += "(";
+        bool isFirst = true;
+        for( const auto& arg : arguments )
+        {
+            if( not isFirst )
+            {
+                location += ", ";
+            }
+            location += arg.name();
+            isFirst = false;
+        }
+        location += ")";
+    }
+
+    return location;
+}
+
 void ExecutionVisitor::visit( UpdateRule& node )
 {
     const auto& expression = node.expression();
@@ -1105,7 +1131,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
     const auto location
         = m_locationRegistry.get( functionDefintion->uid(), argumentValues );
-    const Update update{ updateValue, node.ptr< UpdateRule >() };
+    const Update update{ updateValue, node.ptr< UpdateRule >(), m_agentId };
 
     try
     {
@@ -1542,7 +1568,39 @@ ExecutionUpdateSet* AgentScheduler::collectUpdates(
         auto* updates = m_updateSetManager.currentUpdateSet();
         for( const auto& agent : agents )
         {
-            agent.updateSet()->mergeInto( updates );
+            try
+            {
+                agent.updateSet()->mergeInto( updates );
+            }
+            catch( const ExecutionUpdateSet::Conflict& conflict )
+            {
+                const auto& conflictingUpdate = conflict.conflictingUpdate();
+                const auto& existingUpdate = conflict.existingUpdate();
+
+                const auto& conflictValue = conflictingUpdate.second;
+                const auto& agentA = conflictValue.agent.name();
+                const auto& srcLocA = conflictValue.producer->sourceLocation();
+                const auto& valA = conflictValue.value.name();
+
+                const auto& existingValue = existingUpdate.second;
+                const auto& agentB = existingValue.agent.name();
+                const auto& srcLocB = existingValue.producer->sourceLocation();
+                const auto& valB = existingValue.value.name();
+
+                const auto location = toLocationString( conflictValue.producer,
+                    conflictingUpdate.first.arguments() );
+
+                const auto info
+                    = "Conflict while collection updates from agent " + agentA
+                      + ". Update '" + location + " := " + valA
+                      + "' produced by agent " + agentA + " at line "
+                      + std::to_string( srcLocA.begin.line )
+                      + " clashed with update '" + location + " := " + valB
+                      + "' produced by agent " + agentB + " at line "
+                      + std::to_string( srcLocB.begin.line );
+                throw RuntimeException( { srcLocA, srcLocB }, info,
+                    libcasm_fe::Code::UpdateSetMergeConflict );
+            }
         }
         return updates;
     }
