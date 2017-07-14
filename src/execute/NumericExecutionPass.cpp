@@ -1052,10 +1052,10 @@ void ExecutionVisitor::visit( SequenceRule& node )
     }
 }
 
-static std::string toLocationString( const UpdateRule::Ptr& update,
-    const std::vector< ir::Constant >& arguments )
+static std::string toLocationString(
+    const UpdateRule& update, const std::vector< ir::Constant >& arguments )
 {
-    std::string location = update->function()->identifier()->path();
+    std::string location = update.function()->identifier()->path();
 
     if( not arguments.empty() )
     {
@@ -1137,25 +1137,25 @@ void ExecutionVisitor::visit( UpdateRule& node )
     {
         m_updateSetManager.add( location, update );
     }
-    catch( const ExecutionUpdateSet::Conflict& e )
+    catch( const ExecutionUpdateSet::Conflict& conflict )
     {
-        const auto& conflictingUpdate = e.conflictingUpdate();
-        const auto& existingUpdate = e.existingUpdate();
+        const auto& srcLocA = node.sourceLocation();
+        const auto& valA = updateValue.name();
 
-        const auto& conflictingValue = conflictingUpdate.second;
-        const auto& existingValue = existingUpdate.second;
+        const auto& existingValue = conflict.existingUpdate().second;
+        const auto& srcLocB = existingValue.producer->sourceLocation();
+        const auto& valB = existingValue.value.name();
 
-        const auto info = "Conflict while adding update "
-                          + node.function()->identifier()->path()
-                          //+ to_string( existingLocation.arguments )
-                          + " = " + conflictingValue.value.description()
-                          + ". Update for same location  with another value '"
-                          + existingValue.value.description()
-                          + "' exists already.";
-        throw RuntimeException(
-            { existingValue.producer->sourceLocation(),
-                conflictingValue.producer->sourceLocation() },
-            info, m_frameStack.generateBacktrace( node.sourceLocation() ),
+        const auto location = toLocationString( node, argumentValues );
+
+        const auto info = "Conflict while adding an update in agent "
+                          + m_agentId.name() + ". Update '" + location
+                          + " := " + valA + " at line "
+                          + std::to_string( srcLocA.begin.line )
+                          + " clashed with update '" + location + " := " + valB
+                          + "' at line " + std::to_string( srcLocB.begin.line );
+        throw RuntimeException( { srcLocA, srcLocB }, info,
+            m_frameStack.generateBacktrace( node.sourceLocation() ),
             libcasm_fe::Code::UpdateSetClash );
     }
 }
@@ -1587,7 +1587,7 @@ ExecutionUpdateSet* AgentScheduler::collectUpdates(
                 const auto& srcLocB = existingValue.producer->sourceLocation();
                 const auto& valB = existingValue.value.name();
 
-                const auto location = toLocationString( conflictValue.producer,
+                const auto location = toLocationString( *conflictValue.producer,
                     conflictingUpdate.first.arguments() );
 
                 const auto info
