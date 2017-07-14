@@ -29,9 +29,9 @@
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
-#include "../Logger.h"
-#include "../analyze/AttributionPass.h"
-#include "../ast/RecursiveVisitor.h"
+#include "Logger.h"
+#include "analyze/AttributionPass.h"
+#include "ast/RecursiveVisitor.h"
 
 #include "../casm-ir/src/Builtin.h"
 
@@ -52,7 +52,7 @@ static libpass::PassRegistration< SymbolResolverPass > PASS(
 class SymbolTableVisitor final : public RecursiveVisitor
 {
   public:
-    SymbolTableVisitor( Logger& m_log, Namespace& symboltable );
+    SymbolTableVisitor( Logger& log, Namespace& symboltable );
 
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -79,9 +79,8 @@ void SymbolTableVisitor::visit( FunctionDefinition& node )
     catch( const std::domain_error& e )
     {
         const auto& symbol = m_symboltable.find( node );
-        const auto& name = node.identifier()->name();
 
-        if( name == "program" )
+        if( node.uid() == FunctionDefinition::UID::PROGRAM )
         {
             m_log.error( { node.sourceLocation(),
                              symbol.definition()->sourceLocation() },
@@ -92,10 +91,11 @@ void SymbolTableVisitor::visit( FunctionDefinition& node )
         {
             m_log.error( { node.sourceLocation(),
                              symbol.definition()->sourceLocation() },
-                "function '" + name + "' already defined",
+                e.what(),
                 Code::FunctionDefinitionAlreadyUsed );
         }
     }
+
     RecursiveVisitor::visit( node );
 }
 
@@ -107,7 +107,7 @@ void SymbolTableVisitor::visit( DerivedDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        auto symbol = m_symboltable.find( node );
+        const auto& symbol = m_symboltable.find( node );
 
         m_log.error(
             { node.sourceLocation(), symbol.definition()->sourceLocation() },
@@ -125,8 +125,11 @@ void SymbolTableVisitor::visit( RuleDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.sourceLocation() }, e.what(),
-            Code::RuleDefinitionAlreadyUsed );
+        const auto& symbol = m_symboltable.find( node );
+
+        m_log.error(
+            { node.sourceLocation(), symbol.definition()->sourceLocation() },
+            e.what(), Code::RuleDefinitionAlreadyUsed );
     }
 
     RecursiveVisitor::visit( node );
@@ -140,7 +143,11 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.sourceLocation() }, e.what() );
+        const auto& symbol = m_symboltable.find( node );
+
+        m_log.error(
+            { node.sourceLocation(), symbol.definition()->sourceLocation() },
+            e.what() );
     }
 
     RecursiveVisitor::visit( node );
@@ -281,15 +288,15 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     {
         try
         {
-            auto symbol = m_symboltable.find( node );
+            const auto& symbol = m_symboltable.find( node );
+
             node.setTargetType( symbol.targetType() );
+            node.setTargetDefinition( symbol.definition() );
 
             if( symbol.targetType() == CallExpression::TargetType::TYPE_DOMAIN
                 or symbol.targetType() == CallExpression::TargetType::CONSTANT )
             {
-                const auto& type = symbol.definition()->type();
-
-                if( not type )
+                if( not symbol.definition()->type() )
                 {
                     if( symbol.definition()->id()
                         == Node::ID::ENUMERATION_DEFINITION )
@@ -307,9 +314,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                         m_log.debug(
                             "creating IR enumeration type '" + name + "'" );
 
-                        auto kind
+                        const auto kind
                             = libstdhl::make< libcasm_ir::Enumeration >( name );
-
                         for( auto e : *definition->enumerators() )
                         {
                             kind->add( e->name() );
@@ -318,23 +324,16 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                         const auto type
                             = libstdhl::make< libcasm_ir::EnumerationType >(
                                 kind );
-
                         definition->setType( type );
-
-                        node.setType( definition->type() );
                     }
                     else
                     {
                         assert( 0 );
                     }
                 }
-                else
-                {
-                    node.setType( type );
-                }
-            }
 
-            node.setTargetDefinition( symbol.definition() );
+                node.setType( symbol.definition()->type() );
+            }
         }
         catch( const std::domain_error& e )
         {
@@ -379,13 +378,12 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                     assert( node.targetType()
                             == CallExpression::TargetType::CONSTANT );
 
-                    auto kind
+                    const auto kind
                         = libstdhl::make< libcasm_ir::Enumeration >( "Agent" );
                     kind->add( "$" );
 
                     const auto type
                         = libstdhl::make< libcasm_ir::EnumerationType >( kind );
-
                     node.setType( type );
 
                     m_symboltable.registerSymbol( "Agent",
@@ -399,18 +397,14 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 }
                 else
                 {
-                    auto code = Code::SymbolIsUnknown;
-                    if( node.targetType()
-                        == CallExpression::TargetType::FUNCTION )
-                    {
-                        code = Code::FunctionSymbolIsUnknown;
-                    }
-
                     m_log.error( { node.sourceLocation() },
                         "unknown " + node.targetTypeName() + " symbol '"
                             + path.path()
                             + "' found",
-                        code );
+                        ( node.targetType()
+                            == CallExpression::TargetType::FUNCTION )
+                            ? Code::FunctionSymbolIsUnknown
+                            : Code::SymbolIsUnknown );
                 }
             }
         }
@@ -462,14 +456,12 @@ void SymbolResolveVisitor::visit( UpdateRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    assert( node.function() );
-    const auto& function = *node.function();
-    const auto& path = *function.identifier();
-
-    if( function.targetType() != CallExpression::TargetType::FUNCTION )
+    const auto& function = node.function();
+    if( function->targetType() != CallExpression::TargetType::FUNCTION )
     {
-        m_log.error( { function.sourceLocation() },
-            "updating " + function.targetTypeName() + " '" + path.path()
+        m_log.error( { function->sourceLocation() },
+            "updating " + function->targetTypeName() + " '"
+                + function->identifier()->path()
                 + "' is not allowed, only function symbols are valid",
             Code::UpdateRuleFunctionSymbolIsInvalid );
     }

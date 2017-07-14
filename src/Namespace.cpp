@@ -143,6 +143,16 @@ Namespace::Symbol Namespace::find( const DerivedDefinition& node ) const
     return find( node.identifier()->name(), node.arguments()->size() );
 }
 
+Namespace::Symbol Namespace::find( const RuleDefinition& node ) const
+{
+    return find( node.identifier()->name(), node.arguments()->size() );
+}
+
+Namespace::Symbol Namespace::find( const EnumerationDefinition& node ) const
+{
+    return find( node.identifier()->name() );
+}
+
 Namespace::Symbol Namespace::find( const BasicType& node ) const
 {
     return find( *node.name(), 0 );

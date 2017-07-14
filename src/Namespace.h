@@ -77,6 +77,8 @@ namespace libcasm_fe
         Symbol find( const Ast::DirectCallExpression& node ) const;
         Symbol find( const Ast::FunctionDefinition& node ) const;
         Symbol find( const Ast::DerivedDefinition& node ) const;
+        Symbol find( const Ast::RuleDefinition& node ) const;
+        Symbol find( const Ast::EnumerationDefinition& node ) const;
         Symbol find( const Ast::BasicType& node ) const;
 
         Symbol find( const Ast::IdentifierPath& node ) const;
