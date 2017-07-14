@@ -1287,23 +1287,25 @@ void ExecutionVisitor::handleMergeConflict(
     const auto& conflictingUpdate = conflict.conflictingUpdate();
     const auto& existingUpdate = conflict.existingUpdate();
 
-    const auto& conflictingValue = conflictingUpdate.second;
-    const auto& existingValue = existingUpdate.second;
+    const auto& conflictValue = conflictingUpdate.second;
+    const auto& srcLocA = conflictValue.producer->sourceLocation();
+    const auto& valA = conflictValue.value.name();
 
-    const auto info
-        = "Conflict while merging updateset "
-          + conflictingValue.producer->function()->identifier()->path()
-          + " at line "
-          + std::to_string(
-                conflictingValue.producer->sourceLocation().begin.line )
-          + " with value '" + conflictingValue.value.description() + "'"
-          + " and at line "
-          + std::to_string(
-                existingValue.producer->sourceLocation().begin.line )
-          + " with value '" + existingValue.value.description() + "'";
-    throw RuntimeException( { existingValue.producer->sourceLocation(),
-                                conflictingValue.producer->sourceLocation() },
-        info, m_frameStack.generateBacktrace( node.sourceLocation() ),
+    const auto& existingValue = existingUpdate.second;
+    const auto& srcLocB = existingValue.producer->sourceLocation();
+    const auto& valB = existingValue.value.name();
+
+    const auto location = toLocationString(
+        *conflictValue.producer, conflictingUpdate.first.arguments() );
+
+    const auto info = "Conflict while merging update sets in agent "
+                      + m_agentId.name() + ". Update '" + location
+                      + " := " + valA + " at line "
+                      + std::to_string( srcLocA.begin.line )
+                      + " clashed with update '" + location + " := " + valB
+                      + "' at line " + std::to_string( srcLocB.begin.line );
+    throw RuntimeException( { srcLocA, srcLocB }, info,
+        m_frameStack.generateBacktrace( node.sourceLocation() ),
         libcasm_fe::Code::UpdateSetMergeConflict );
 }
 
