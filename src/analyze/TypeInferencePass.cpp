@@ -165,12 +165,12 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                             assert( symbol.targetType()
                                     == CallExpression::TargetType::CONSTANT );
 
-                            auto& definition
-                                = static_cast< EnumerationDefinition& >(
+                            const auto& definition = std::
+                                static_pointer_cast< EnumerationDefinition >(
                                     symbol.definition() );
 
-                            assert( definition.type() );
-                            node.setType( definition.type() );
+                            assert( definition->type() );
+                            node.setType( definition->type() );
                         }
                         catch( const std::domain_error& e )
                         {
@@ -200,12 +200,9 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                         assert( symbol.targetType()
                                 == CallExpression::TargetType::CONSTANT );
 
-                        auto& definition
-                            = static_cast< EnumerationDefinition& >(
-                                symbol.definition() );
-
-                        assert( definition.type() );
-                        node.setType( definition.type() );
+                        const auto& type = symbol.definition()->type();
+                        assert( type );
+                        node.setType( type );
                     }
                     catch( const std::domain_error& e )
                     {
@@ -332,7 +329,7 @@ void TypeCheckVisitor::visit( BasicType& node )
                 assert( symbol.targetType()
                         == CallExpression::TargetType::TYPE_DOMAIN );
 
-                const auto& type = symbol.definition().type();
+                const auto& type = symbol.definition()->type();
                 assert( type );
                 node.setType( type );
             }
@@ -785,38 +782,42 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
         {
             case CallExpression::TargetType::FUNCTION:
             {
-                auto& definition
-                    = static_cast< FunctionDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< FunctionDefinition >(
+                        symbol.definition() );
 
-                inference( definition, {} );
-                assert( definition.type() and definition.type()->isRelation() );
+                inference( *definition, {} );
+                assert(
+                    definition->type() and definition->type()->isRelation() );
 
                 const auto type
                     = libstdhl::make< libcasm_ir::FunctionReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
-                            definition.type() ) );
+                            definition->type() ) );
                 node.setType( type );
 
                 node.setReferenceType( ReferenceAtom::ReferenceType::FUNCTION );
-                node.setReference( definition.ptr< FunctionDefinition >() );
+                node.setReference( definition );
                 break;
             }
             case CallExpression::TargetType::DERIVED:
             {
-                auto& definition
-                    = static_cast< DerivedDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< DerivedDefinition >(
+                        symbol.definition() );
 
-                inference( definition, {} );
-                assert( definition.type() and definition.type()->isRelation() );
+                inference( *definition, {} );
+                assert(
+                    definition->type() and definition->type()->isRelation() );
 
                 const auto type
-                    = libstdhl::make< libcasm_ir::RuleReferenceType >(
+                    = libstdhl::make< libcasm_ir::FunctionReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
-                            definition.type() ) );
+                            definition->type() ) );
                 node.setType( type );
 
                 node.setReferenceType( ReferenceAtom::ReferenceType::DERIVED );
-                node.setReference( definition.ptr< DerivedDefinition >() );
+                node.setReference( definition );
                 break;
             }
             case CallExpression::TargetType::BUILTIN:
@@ -831,20 +832,22 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             }
             case CallExpression::TargetType::RULE:
             {
-                auto& definition
-                    = static_cast< RuleDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< RuleDefinition >(
+                        symbol.definition() );
 
-                inference( definition, {} );
-                assert( definition.type() and definition.type()->isRelation() );
+                inference( *definition, {} );
+                assert(
+                    definition->type() and definition->type()->isRelation() );
 
                 const auto type
                     = libstdhl::make< libcasm_ir::RuleReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
-                            definition.type() ) );
+                            definition->type() ) );
                 node.setType( type );
 
                 node.setReferenceType( ReferenceAtom::ReferenceType::RULE );
-                node.setReference( definition.ptr< RuleDefinition >() );
+                node.setReference( definition );
                 break;
             }
             case CallExpression::TargetType::VARIABLE:
@@ -955,11 +958,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto symbol = m_symboltable.find( node );
                 assert( symbol.targetType() == node.targetType() );
 
-                auto& definition
-                    = static_cast< DerivedDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< DerivedDefinition >(
+                        symbol.definition() );
 
-                inference( definition, node.arguments()->data() );
-                node.setType( definition.type() );
+                inference( *definition, node.arguments()->data() );
+                node.setType( definition->type() );
             }
             catch( const std::domain_error& e )
             {
@@ -975,11 +979,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto symbol = m_symboltable.find( node );
                 assert( symbol.targetType() == node.targetType() );
 
-                auto& definition
-                    = static_cast< FunctionDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< FunctionDefinition >(
+                        symbol.definition() );
 
-                inference( definition, node.arguments()->data() );
-                node.setType( definition.type() );
+                inference( *definition, node.arguments()->data() );
+                node.setType( definition->type() );
             }
             catch( const std::domain_error& e )
             {
@@ -995,11 +1000,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto symbol = m_symboltable.find( node );
                 assert( symbol.targetType() == node.targetType() );
 
-                auto& definition
-                    = static_cast< RuleDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< RuleDefinition >(
+                        symbol.definition() );
 
-                inference( definition, node.arguments()->data() );
-                node.setType( definition.type() );
+                inference( *definition, node.arguments()->data() );
+                node.setType( definition->type() );
             }
             catch( const std::domain_error& e )
             {
@@ -1015,7 +1021,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto symbol = m_symboltable.find( "Agent" );
                 assert( symbol.targetType()
                         == CallExpression::TargetType::TYPE_DOMAIN );
-                const auto& type = symbol.definition().type();
+                const auto& type = symbol.definition()->type();
                 assert( type );
                 node.setType( type );
             }
@@ -1136,7 +1142,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             {
                 auto symbol = m_symboltable.find( node );
                 assert( symbol.targetType() == node.targetType() );
-                m_log.info( { symbol.definition().sourceLocation() },
+                m_log.info( { symbol.definition()->sourceLocation() },
                     node.targetTypeName() + " '" + path.path()
                         + "' is defined as a relation '"
                         + node.type()->description()
@@ -1736,12 +1742,13 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                     auto symbol = m_symboltable.find( path );
                     auto& definition = symbol.definition();
 
-                    if( definition.type() )
+                    if( definition->type() )
                     {
                         for( std::size_t c = 0; c < expressions.size(); c++ )
                         {
-                            std::vector< libcasm_ir::Type::ID > ty
-                                = { definition.type()->arguments()[ c ]->id() };
+                            std::vector< libcasm_ir::Type::ID > ty = {
+                                definition->type()->arguments()[ c ]->id()
+                            };
                             std::vector< libcasm_ir::Type::ID > tmp = {};
 
                             std::copy( ty.begin(), ty.end(),
@@ -1750,7 +1757,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                         }
 
                         std::vector< libcasm_ir::Type::ID > ty
-                            = { definition.type()->result().id() };
+                            = { definition->type()->result().id() };
                         std::vector< libcasm_ir::Type::ID > tmp = {};
 
                         if( result != m_resultTypes.end() )

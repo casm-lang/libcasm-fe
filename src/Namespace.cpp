@@ -34,8 +34,8 @@ using namespace Ast;
 // Symbol
 //
 
-Namespace::Symbol::Symbol( const Ast::Identifier& identifier,
-    Ast::TypedNode& definition,
+Namespace::Symbol::Symbol( const std::string& identifier,
+    const Ast::TypedNode::Ptr& definition,
     const Ast::CallExpression::TargetType targetType,
     const std::size_t arity )
 : m_identifier( identifier )
@@ -45,12 +45,12 @@ Namespace::Symbol::Symbol( const Ast::Identifier& identifier,
 {
 }
 
-const Ast::Identifier& Namespace::Symbol::identifier( void ) const
+const std::string& Namespace::Symbol::identifier( void ) const
 {
     return m_identifier;
 }
 
-Ast::TypedNode& Namespace::Symbol::definition( void ) const
+const Ast::TypedNode::Ptr& Namespace::Symbol::definition( void ) const
 {
     return m_definition;
 }
@@ -73,48 +73,47 @@ Namespace::Namespace( void )
 {
 }
 
-void Namespace::registerSymbol( const DirectCallExpression& node,
+void Namespace::registerSymbol( const DirectCallExpression::Ptr& node,
     const CallExpression::TargetType targetType )
 {
-    const auto path = node.identifier()->identifiers();
-    assert( path->size() == 1 );
-
-    registerSymbol( *path->back(), node, targetType, node.arguments()->size() );
+    registerSymbol( node->identifier()->baseName(), node, targetType,
+        node->arguments()->size() );
 }
 
-void Namespace::registerSymbol( const Identifier& identifier,
-    const TypedNode& definition, const CallExpression::TargetType targetType )
+void Namespace::registerSymbol( const std::string& identifier,
+    const TypedNode::Ptr& definition,
+    const CallExpression::TargetType targetType )
 {
     registerSymbol( identifier, definition, targetType, 0 );
 }
 
-void Namespace::registerSymbol( const FunctionDefinition& node )
+void Namespace::registerSymbol( const FunctionDefinition::Ptr& node )
 {
-    registerSymbol( *node.identifier(), node,
-        CallExpression::TargetType::FUNCTION, node.argumentTypes()->size() );
+    registerSymbol( node->identifier()->name(), node,
+        CallExpression::TargetType::FUNCTION, node->argumentTypes()->size() );
 }
 
-void Namespace::registerSymbol( const DerivedDefinition& node )
+void Namespace::registerSymbol( const DerivedDefinition::Ptr& node )
 {
-    registerSymbol( *node.identifier(), node,
-        CallExpression::TargetType::DERIVED, node.arguments()->size() );
+    registerSymbol( node->identifier()->name(), node,
+        CallExpression::TargetType::DERIVED, node->arguments()->size() );
 }
 
-void Namespace::registerSymbol( const RuleDefinition& node )
+void Namespace::registerSymbol( const RuleDefinition::Ptr& node )
 {
-    registerSymbol( *node.identifier(), node, CallExpression::TargetType::RULE,
-        node.arguments()->size() );
+    registerSymbol( node->identifier()->name(), node,
+        CallExpression::TargetType::RULE, node->arguments()->size() );
 }
 
-void Namespace::registerSymbol( const EnumerationDefinition& node )
+void Namespace::registerSymbol( const EnumerationDefinition::Ptr& node )
 {
-    registerSymbol(
-        *node.identifier(), node, CallExpression::TargetType::TYPE_DOMAIN );
+    registerSymbol( node->identifier()->name(), node,
+        CallExpression::TargetType::TYPE_DOMAIN );
 
     auto enumerationNamespace = libstdhl::make< Namespace >();
 
     auto result = m_namespaces.emplace(
-        node.identifier()->name(), enumerationNamespace );
+        node->identifier()->name(), enumerationNamespace );
 
     if( not result.second )
     {
@@ -122,10 +121,10 @@ void Namespace::registerSymbol( const EnumerationDefinition& node )
             "namespace '" + result.first->first + "' already defined" );
     }
 
-    for( auto e : *node.enumerators() )
+    for( auto e : *node->enumerators() )
     {
         enumerationNamespace->registerSymbol(
-            *e, node, CallExpression::TargetType::CONSTANT );
+            e->name(), node, CallExpression::TargetType::CONSTANT );
     }
 }
 
@@ -211,24 +210,23 @@ std::string Namespace::dump( const std::string& indention ) const
 {
     std::stringstream s;
 
-    for( auto v : m_symboltable )
+    for( const auto& v : m_symboltable )
     {
         const auto& name = v.first;
-        auto& symbol = v.second.front();
+        const auto& symbol = v.second.front();
+
+        const auto& type = symbol.definition()->type();
 
         s << indention << name << " : "
           << CallExpression::targetTypeString( symbol.targetType() ) << " ("
           << symbol.arity() << "-ary)"
-          << " " << ( symbol.definition().type()
-                            ? symbol.definition().type()->description()
-                            : "$unresolved$" )
-          << "\n";
+          << " " << ( type ? type->description() : "$unresolved$" ) << "\n";
     }
 
-    for( auto v : m_namespaces )
+    for( const auto& v : m_namespaces )
     {
         const auto& name = v.first;
-        const auto space = v.second;
+        const auto& space = v.second;
 
         s << space->dump( name + "." );
     }
@@ -236,12 +234,10 @@ std::string Namespace::dump( const std::string& indention ) const
     return s.str();
 }
 
-void Namespace::registerSymbol( const Identifier& node,
-    const TypedNode& definition, const CallExpression::TargetType targetType,
-    const std::size_t arity )
+void Namespace::registerSymbol( const std::string& name,
+    const TypedNode::Ptr& definition,
+    const CallExpression::TargetType targetType, const std::size_t arity )
 {
-    const auto name = node.name();
-
     auto& symtbl = m_symboltable[ name ];
 
     for( const auto& symbol : symtbl )
@@ -257,8 +253,7 @@ void Namespace::registerSymbol( const Identifier& node,
         }
     }
 
-    symtbl.emplace_back( Symbol{
-        node, const_cast< TypedNode& >( definition ), targetType, arity } );
+    symtbl.emplace_back( name, definition, targetType, arity );
 }
 
 Namespace::Symbol Namespace::find( const IdentifierPath& node,

@@ -74,7 +74,7 @@ void SymbolTableVisitor::visit( FunctionDefinition& node )
 {
     try
     {
-        m_symboltable.registerSymbol( node );
+        m_symboltable.registerSymbol( node.ptr< FunctionDefinition >() );
     }
     catch( const std::domain_error& e )
     {
@@ -83,15 +83,15 @@ void SymbolTableVisitor::visit( FunctionDefinition& node )
 
         if( name == "program" )
         {
-            m_log.error(
-                { node.sourceLocation(), symbol.definition().sourceLocation() },
+            m_log.error( { node.sourceLocation(),
+                             symbol.definition()->sourceLocation() },
                 "init already defined",
                 Code::AgentInitRuleMultipleDefinitions );
         }
         else
         {
-            m_log.error(
-                { node.sourceLocation(), symbol.definition().sourceLocation() },
+            m_log.error( { node.sourceLocation(),
+                             symbol.definition()->sourceLocation() },
                 "function '" + name + "' already defined",
                 Code::FunctionDefinitionAlreadyUsed );
         }
@@ -103,14 +103,14 @@ void SymbolTableVisitor::visit( DerivedDefinition& node )
 {
     try
     {
-        m_symboltable.registerSymbol( node );
+        m_symboltable.registerSymbol( node.ptr< DerivedDefinition >() );
     }
     catch( const std::domain_error& e )
     {
         auto symbol = m_symboltable.find( node );
 
         m_log.error(
-            { node.sourceLocation(), symbol.definition().sourceLocation() },
+            { node.sourceLocation(), symbol.definition()->sourceLocation() },
             e.what(), Code::DerivedDefinitionAlreadyUsed );
     }
 
@@ -121,7 +121,7 @@ void SymbolTableVisitor::visit( RuleDefinition& node )
 {
     try
     {
-        m_symboltable.registerSymbol( node );
+        m_symboltable.registerSymbol( node.ptr< RuleDefinition >() );
     }
     catch( const std::domain_error& e )
     {
@@ -136,7 +136,7 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
 {
     try
     {
-        m_symboltable.registerSymbol( node );
+        m_symboltable.registerSymbol( node.ptr< EnumerationDefinition >() );
     }
     catch( const std::domain_error& e )
     {
@@ -287,15 +287,15 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             if( symbol.targetType() == CallExpression::TargetType::TYPE_DOMAIN
                 or symbol.targetType() == CallExpression::TargetType::CONSTANT )
             {
-                const auto& type = symbol.definition().type();
+                const auto& type = symbol.definition()->type();
 
                 if( not type )
                 {
-                    if( symbol.definition().id()
+                    if( symbol.definition()->id()
                         == Node::ID::ENUMERATION_DEFINITION )
                     {
-                        auto& definition
-                            = static_cast< EnumerationDefinition& >(
+                        const auto& definition
+                            = std::static_pointer_cast< EnumerationDefinition >(
                                 symbol.definition() );
 
                         const auto& name
@@ -310,7 +310,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                         auto kind
                             = libstdhl::make< libcasm_ir::Enumeration >( name );
 
-                        for( auto e : *definition.enumerators() )
+                        for( auto e : *definition->enumerators() )
                         {
                             kind->add( e->name() );
                         }
@@ -319,9 +319,9 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                             = libstdhl::make< libcasm_ir::EnumerationType >(
                                 kind );
 
-                        definition.setType( type );
+                        definition->setType( type );
 
-                        node.setType( definition.type() );
+                        node.setType( definition->type() );
                     }
                     else
                     {
@@ -334,7 +334,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 }
             }
 
-            node.setTargetDefinition( symbol.definition().ptr< TypedNode >() );
+            node.setTargetDefinition( symbol.definition() );
         }
         catch( const std::domain_error& e )
         {
@@ -346,7 +346,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 try
                 {
                     m_symboltable.registerSymbol(
-                        node, CallExpression::TargetType::BUILTIN );
+                        node.ptr< DirectCallExpression >(),
+                        CallExpression::TargetType::BUILTIN );
                     node.setTargetType( CallExpression::TargetType::BUILTIN );
                 }
                 catch( const std::domain_error& e )
@@ -378,12 +379,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                     assert( node.targetType()
                             == CallExpression::TargetType::CONSTANT );
 
-                    const auto agentTypeIdentifier
-                        = libstdhl::make< Identifier >( "Agent" );
-
-                    auto kind = libstdhl::make< libcasm_ir::Enumeration >(
-                        agentTypeIdentifier->name() );
-
+                    auto kind
+                        = libstdhl::make< libcasm_ir::Enumeration >( "Agent" );
                     kind->add( "$" );
 
                     const auto type
@@ -391,11 +388,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
                     node.setType( type );
 
-                    m_symboltable.registerSymbol( *agentTypeIdentifier, node,
+                    m_symboltable.registerSymbol( "Agent",
+                        node.ptr< DirectCallExpression >(),
                         CallExpression::TargetType::TYPE_DOMAIN );
 
                     m_symboltable.registerSymbol(
-                        node, CallExpression::TargetType::CONSTANT );
+                        node.ptr< DirectCallExpression >(),
+                        CallExpression::TargetType::CONSTANT );
                     node.setTargetType( CallExpression::TargetType::CONSTANT );
                 }
                 else

@@ -156,6 +156,8 @@ namespace libcasm_fe
         class TypedNode : public Node
         {
           public:
+            using Ptr = std::shared_ptr< TypedNode >;
+
             TypedNode( Node::ID id );
 
             void setType( const libcasm_ir::Type::Ptr& type );
