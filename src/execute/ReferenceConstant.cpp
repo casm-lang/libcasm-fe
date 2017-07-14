@@ -34,25 +34,24 @@ EmptyValue::EmptyValue( void )
 {
 }
 
-ReferenceConstant::ReferenceConstant( void )
-: libcasm_ir::ReferenceConstant< EmptyValue >(
-      VOID, nullptr, false, false, classid() )
-{
-}
-
 ReferenceConstant::ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom )
 : libcasm_ir::ReferenceConstant< EmptyValue >( VOID,
       (const Value::Ptr&)atom, // HACK: use the memory of Value::Ptr
                                // to store the atom efficiently
                                // otherwise another shared_ptr would
                                // be required!
-      true, false, classid() )
+      classid() )
 {
 }
 
-Ast::ReferenceAtom::Ptr ReferenceConstant::atom( void ) const
+ReferenceConstant::ReferenceConstant( void )
+: libcasm_ir::ReferenceConstant< EmptyValue >( VOID, classid() )
 {
-    return (Ast::ReferenceAtom::Ptr&)m_value;
+}
+
+Ast::ReferenceAtom* ReferenceConstant::atom( void ) const
+{
+    return (Ast::ReferenceAtom*)value();
 }
 
 u1 ReferenceConstant::classof( Value const* obj )
