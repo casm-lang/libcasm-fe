@@ -61,7 +61,8 @@ namespace libcasm_fe
         Frame* top( void ) const;
 
         std::vector< std::string > generateBacktrace(
-            SourceLocation problemLocation ) const;
+            SourceLocation problemLocation,
+            const libcasm_ir::Constant& agentId ) const;
 
       private:
         std::vector< std::unique_ptr< Frame > > m_frames;

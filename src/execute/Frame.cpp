@@ -213,10 +213,12 @@ static std::string generateCalleeTraceLine(
 }
 
 std::vector< std::string > FrameStack::generateBacktrace(
-    SourceLocation problemLocation ) const
+    SourceLocation problemLocation, const libcasm_ir::Constant& agentId ) const
 {
     std::vector< std::string > backtrace;
     backtrace.reserve( m_frames.size() );
+
+    backtrace.emplace_back( "# Agent " + agentId.name() + ":" );
 
     std::size_t frameCounter = 0;
 

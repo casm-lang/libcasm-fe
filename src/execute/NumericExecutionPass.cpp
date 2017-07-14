@@ -442,7 +442,8 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
     catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { node.expression()->sourceLocation() },
-            e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::DerivedReturnValueInvalid );
     }
 }
@@ -576,7 +577,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     {
         throw RuntimeException( node.expression()->sourceLocation(),
             "cannot call an undefined target",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
     }
 
@@ -648,7 +649,7 @@ void ExecutionVisitor::visit( UnaryExpression& node )
         throw RuntimeException( node.sourceLocation(),
             "unary expression has thrown an exception: "
                 + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
     }
 }
@@ -673,7 +674,7 @@ void ExecutionVisitor::visit( BinaryExpression& node )
         throw RuntimeException( node.sourceLocation(),
             "binary expression has thrown an exception: "
                 + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
     }
 }
@@ -708,7 +709,8 @@ void ExecutionVisitor::visit( LetExpression& node )
     catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { node.initializer()->sourceLocation() },
-            e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::LetAssignedValueInvalid );
     }
 
@@ -728,7 +730,7 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalExpressionInvalidCondition );
     }
     else if( condition.value() == true )
@@ -753,7 +755,7 @@ void ExecutionVisitor::visit( ChooseExpression& node )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
             "universe must not be undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseExpressionInvalidUniverse );
     }
 
@@ -776,7 +778,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
             "universe must not be undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
     }
 
@@ -829,7 +831,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
             "universe must not be undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
     }
 
@@ -876,7 +878,7 @@ void ExecutionVisitor::visit( ConditionalRule& node )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalRuleInvalidCondition );
     }
     else if( condition.value() == true )
@@ -936,7 +938,8 @@ void ExecutionVisitor::visit( LetRule& node )
     catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { node.expression()->sourceLocation() },
-            e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::LetAssignedValueInvalid );
     }
 
@@ -984,7 +987,7 @@ void ExecutionVisitor::visit( ChooseRule& node )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
             "universe must not be undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseRuleInvalidUniverse );
     }
 
@@ -1091,7 +1094,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { expression->sourceLocation() }, e.what(),
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::FunctionUpdateInvalidValueAtUpdate );
     }
 
@@ -1116,7 +1119,8 @@ void ExecutionVisitor::visit( UpdateRule& node )
         catch( const libcasm_ir::ValidationException& e )
         {
             throw RuntimeException( { argument->sourceLocation() }, e.what(),
-                m_frameStack.generateBacktrace( node.sourceLocation() ),
+                m_frameStack.generateBacktrace(
+                    node.sourceLocation(), m_agentId ),
                 Code::FunctionArgumentInvalidValueAtUpdate );
         }
 
@@ -1155,7 +1159,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
                           + " clashed with update '" + location + " := " + valB
                           + "' at line " + std::to_string( srcLocB.begin.line );
         throw RuntimeException( { srcLocA, srcLocB }, info,
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             libcasm_fe::Code::UpdateSetClash );
     }
 }
@@ -1234,7 +1238,7 @@ void ExecutionVisitor::invokeBuiltin(
     {
         throw RuntimeException( node.sourceLocation(),
             "builtin has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::AssertInvalidExpression );
     }
 }
@@ -1275,7 +1279,8 @@ void ExecutionVisitor::validateArguments( const Node& node,
             const auto& callArgument = frame->call()->arguments()->at( i );
             throw RuntimeException( { callArgument->sourceLocation() },
                 e.what(),
-                m_frameStack.generateBacktrace( node.sourceLocation() ),
+                m_frameStack.generateBacktrace(
+                    node.sourceLocation(), m_agentId ),
                 errorCode );
         }
     }
@@ -1305,7 +1310,7 @@ void ExecutionVisitor::handleMergeConflict(
                       + " clashed with update '" + location + " := " + valB
                       + "' at line " + std::to_string( srcLocB.begin.line );
     throw RuntimeException( { srcLocA, srcLocB }, info,
-        m_frameStack.generateBacktrace( node.sourceLocation() ),
+        m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
         libcasm_fe::Code::UpdateSetMergeConflict );
 }
 
