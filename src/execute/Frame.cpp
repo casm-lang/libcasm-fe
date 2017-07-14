@@ -111,7 +111,7 @@ static std::string generateBuiltinTraceLine( Frame* frame )
         {
             args += ", ";
         }
-        args += frame->local( i ).description();
+        args += frame->local( i ).name();
     }
 
     std::string name;
@@ -156,7 +156,7 @@ static std::string generateCalleeTraceLine(
                 isFirstArg = false;
 
                 args += arg->identifier()->name() + "="
-                        + frame->local( arg->localIndex() ).description();
+                        + frame->local( arg->localIndex() ).name();
             }
             break;
         }
@@ -176,7 +176,7 @@ static std::string generateCalleeTraceLine(
                 isFirstArg = false;
 
                 args += arg->identifier()->name() + "="
-                        + frame->local( arg->localIndex() ).description();
+                        + frame->local( arg->localIndex() ).name();
             }
             break;
         }
@@ -193,7 +193,7 @@ static std::string generateCalleeTraceLine(
                 {
                     args += ", ";
                 }
-                args += frame->local( i ).description();
+                args += frame->local( i ).name();
             }
             break;
         }
