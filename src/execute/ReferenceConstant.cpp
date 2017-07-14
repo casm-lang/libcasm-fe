@@ -28,10 +28,9 @@
 using namespace libcasm_fe;
 
 static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
-static const std::string EMPTY = "";
 
 EmptyValue::EmptyValue( void )
-: libcasm_ir::Value( EMPTY, VOID, Value::ID::VALUE )
+: libcasm_ir::Value( VOID, Value::ID::VALUE )
 {
 }
 

@@ -441,7 +441,7 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
         {
             const auto& type
                 = std::static_pointer_cast< libcasm_ir::EnumerationType >(
-                    m_specification->agent()->ptr_type() );
+                    m_specification->agent()->type().ptr_type() );
 
             const libcasm_ir::Constant::Ptr constant
                 = libstdhl::make< libcasm_ir::EnumerationConstant >(

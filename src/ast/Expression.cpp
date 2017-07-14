@@ -39,7 +39,7 @@ ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )
 : Expression( Node::ID::VALUE_ATOM )
 , m_value( value )
 {
-    Expression::setType( value->ptr_type() );
+    Expression::setType( value->type().ptr_type() );
 }
 
 const libcasm_ir::Constant::Ptr& ValueAtom::value( void ) const
