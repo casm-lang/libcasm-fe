@@ -40,18 +40,15 @@ namespace libcasm_fe
         class Symbol
         {
           public:
-            Symbol( const std::string& identifier,
-                const Ast::TypedNode::Ptr& definition,
+            Symbol( const Ast::TypedNode::Ptr& definition,
                 const Ast::CallExpression::TargetType targetType,
                 const std::size_t arity );
 
-            const std::string& identifier( void ) const;
             const Ast::TypedNode::Ptr& definition( void ) const;
             Ast::CallExpression::TargetType targetType( void ) const;
             std::size_t arity( void ) const;
 
           private:
-            const std::string m_identifier;
             const Ast::TypedNode::Ptr m_definition;
             const Ast::CallExpression::TargetType m_targetType;
             const std::size_t m_arity;

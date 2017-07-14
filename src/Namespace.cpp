@@ -34,20 +34,13 @@ using namespace Ast;
 // Symbol
 //
 
-Namespace::Symbol::Symbol( const std::string& identifier,
-    const Ast::TypedNode::Ptr& definition,
+Namespace::Symbol::Symbol( const Ast::TypedNode::Ptr& definition,
     const Ast::CallExpression::TargetType targetType,
     const std::size_t arity )
-: m_identifier( identifier )
-, m_definition( definition )
+: m_definition( definition )
 , m_targetType( targetType )
 , m_arity( arity )
 {
-}
-
-const std::string& Namespace::Symbol::identifier( void ) const
-{
-    return m_identifier;
 }
 
 const Ast::TypedNode::Ptr& Namespace::Symbol::definition( void ) const
@@ -263,7 +256,7 @@ void Namespace::registerSymbol( const std::string& name,
         }
     }
 
-    symtbl.emplace_back( name, definition, targetType, arity );
+    symtbl.emplace_back( definition, targetType, arity );
 }
 
 Namespace::Symbol Namespace::find( const IdentifierPath& node,
