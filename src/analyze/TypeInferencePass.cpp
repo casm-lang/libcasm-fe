@@ -82,32 +82,6 @@ class TypeCheckVisitor final : public RecursiveVisitor
     Expression* m_caseExpr = nullptr;
 };
 
-static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
-static const auto RULEREF = libstdhl::get< libcasm_ir::RuleReferenceType >();
-static const auto BOOLEAN = libstdhl::get< libcasm_ir::BooleanType >();
-static const auto INTEGER = libstdhl::get< libcasm_ir::IntegerType >();
-static const auto BIT_1 = libstdhl::get< libcasm_ir::BitType >( 1 );
-static const auto STRING = libstdhl::get< libcasm_ir::StringType >();
-static const auto FLOATING = libstdhl::get< libcasm_ir::FloatingType >();
-static const auto RATIONAL = libstdhl::get< libcasm_ir::RationalType >();
-
-static const std::unordered_map< std::string, libcasm_ir::Type::Ptr > basicTypes
-    = {
-        { "Void", VOID },
-
-        { "Boolean", BOOLEAN },
-
-        { "Integer", INTEGER },
-
-        { "Bit", BIT_1 },
-
-        { "String", STRING },
-
-        { "Floating", FLOATING },
-
-        { "Rational", RATIONAL },
-      };
-
 TypeCheckVisitor::TypeCheckVisitor( Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
@@ -309,13 +283,7 @@ void TypeCheckVisitor::visit( BasicType& node )
     {
         const auto& name = node.name()->baseName();
 
-        auto result = basicTypes.find( name );
-        if( result != basicTypes.end() )
-        {
-            node.setType( result->second );
-        }
-        else if( name.compare( "RuleRef" ) == 0
-                 or name.compare( "FuncRef" ) == 0 )
+        if( name.compare( "RuleRef" ) == 0 or name.compare( "FuncRef" ) == 0 )
         {
             m_log.error( { node.sourceLocation() },
                 "reference type '" + name + "' defined without relation" );
@@ -1294,7 +1262,7 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
     if( condExpr.type() )
     {
-        if( *condExpr.type() != *BOOLEAN )
+        if( condExpr.type()->id() != libcasm_ir::Type::BOOLEAN )
         {
             m_log.error( { condExpr.sourceLocation() },
                 "condition type of conditional expression is not of type "
@@ -1451,13 +1419,13 @@ void TypeInferenceVisitor::visit( ConditionalRule& node )
 
     if( condExpr.type() )
     {
-        if( condExpr.type()->result() != *BOOLEAN )
+        if( condExpr.type()->result().id() != libcasm_ir::Type::BOOLEAN )
         {
             m_log.error( { condExpr.sourceLocation() },
                 "invalid condition type '"
                     + condExpr.type()->result().description()
                     + ", shall be '"
-                    + BOOLEAN->description()
+                    + libcasm_ir::Type::token( libcasm_ir::Type::BOOLEAN )
                     + "'",
                 Code::TypeInferenceConditionalRuleInvalidConditionType );
         }
@@ -1997,17 +1965,20 @@ void TypeInferenceVisitor::inference( const std::string& description,
     {
         case libcasm_ir::Type::VOID:
         {
-            node.setType( VOID );
+            node.setType( libstdhl::get< libcasm_ir::VoidType >() );
             break;
         }
         case libcasm_ir::Type::BOOLEAN:
         {
-            node.setType( BOOLEAN );
+            node.setType( libstdhl::get< libcasm_ir::BooleanType >() );
             break;
         }
         case libcasm_ir::Type::INTEGER:
         {
-            node.setType( INTEGER ); // TODO: PPA: check for ranged integers
+            node.setType(
+                libstdhl::get< libcasm_ir::IntegerType >() ); // TODO: PPA:
+                                                              // check for
+                                                              // ranged integers
             break;
         }
         case libcasm_ir::Type::BIT:
@@ -2022,17 +1993,17 @@ void TypeInferenceVisitor::inference( const std::string& description,
         }
         case libcasm_ir::Type::STRING:
         {
-            node.setType( STRING );
+            node.setType( libstdhl::get< libcasm_ir::StringType >() );
             break;
         }
         case libcasm_ir::Type::FLOATING:
         {
-            node.setType( FLOATING );
+            node.setType( libstdhl::get< libcasm_ir::FloatingType >() );
             break;
         }
         case libcasm_ir::Type::RATIONAL:
         {
-            node.setType( RATIONAL );
+            node.setType( libstdhl::get< libcasm_ir::RationalType >() );
             break;
         }
         case libcasm_ir::Type::RULE_REFERENCE:
@@ -2168,7 +2139,7 @@ void TypeInferenceVisitor::inference(
 
 void TypeInferenceVisitor::inference( QuantifierExpression& node )
 {
-    node.setType( BOOLEAN );
+    node.setType( libstdhl::get< libcasm_ir::BooleanType >() );
 
     node.predicateVariable()->accept( *this );
 
