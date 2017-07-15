@@ -259,6 +259,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
+    void visit( BasicType& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -493,6 +494,13 @@ void ExecutionVisitor::visit( ReferenceAtom& node )
 void ExecutionVisitor::visit( UndefAtom& node )
 {
     m_evaluationStack.push( ir::Constant::undef( node.type() ) );
+}
+
+void ExecutionVisitor::visit( BasicType& node )
+{
+    const auto rangeType = std::make_shared< ir::RangeType >( node.type() );
+    const auto range = std::make_shared< ir::Range >( rangeType );
+    m_evaluationStack.push( ir::RangeConstant( rangeType, range ) );
 }
 
 void ExecutionVisitor::visit( DirectCallExpression& node )
