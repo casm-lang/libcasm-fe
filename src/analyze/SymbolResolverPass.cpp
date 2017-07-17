@@ -152,7 +152,6 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
 
         const auto type = libstdhl::make< libcasm_ir::EnumerationType >( kind );
         node.setType( type );
-
     }
     catch( const std::domain_error& e )
     {
