@@ -54,6 +54,10 @@ void EmptyVisitor::visit( EnumerationDefinition& )
 {
 }
 
+void EmptyVisitor::visit( TypeDefinition& )
+{
+}
+
 void EmptyVisitor::visit( ValueAtom& )
 {
 }

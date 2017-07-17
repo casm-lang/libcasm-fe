@@ -130,6 +130,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
+    void visit( TypeDefinition& node ) override;
 
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
@@ -321,6 +322,14 @@ void AstDumpSourceVisitor::visit( EnumerationDefinition& node )
         firstEnumerator = false;
     }
     m_stream << "}";
+}
+
+void AstDumpSourceVisitor::visit( TypeDefinition& node )
+{
+    m_stream << "type ";
+    node.identifier()->accept( *this );
+    m_stream << " = ";
+    node.type()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( ValueAtom& node )

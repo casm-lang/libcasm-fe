@@ -37,6 +37,7 @@ namespace libcasm_fe
         class DerivedDefinition;
         class RuleDefinition;
         class EnumerationDefinition;
+        class TypeDefinition;
 
         class ValueAtom;
         class ReferenceAtom;
@@ -94,6 +95,7 @@ namespace libcasm_fe
             virtual void visit( DerivedDefinition& node ) = 0;
             virtual void visit( RuleDefinition& node ) = 0;
             virtual void visit( EnumerationDefinition& node ) = 0;
+            virtual void visit( TypeDefinition& node ) = 0;
 
             virtual void visit( ValueAtom& node ) = 0;
             virtual void visit( ReferenceAtom& node ) = 0;

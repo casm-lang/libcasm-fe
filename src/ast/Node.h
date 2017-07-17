@@ -55,6 +55,7 @@ namespace libcasm_fe
                 DERIVED_DEFINITION,
                 RULE_DEFINITION,
                 ENUMERATION_DEFINITION,
+                TYPE_DEFINITION,
 
                 // expressions
                 VALUE_ATOM,

@@ -30,6 +30,7 @@ INIT            "init"          { return Parser::make_INIT(loc); }
 DERIVED         "derived"       { return Parser::make_DERIVED(loc); }
 ENUM            "enum"          { return Parser::make_ENUM(loc); }
 RULE            "rule"          { return Parser::make_RULE(loc); }
+TYPE            "type"          { return Parser::make_TYPE(loc); }
 
 FUNCTION        "function"      { return Parser::make_FUNCTION(loc); }
 INITIALLY       "initially"     { return Parser::make_INITIALLY(loc); }

@@ -306,3 +306,20 @@ void EnumerationDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+TypeDefinition::TypeDefinition(
+    const Identifier::Ptr& identifier, const Type::Ptr& type )
+: Definition( Node::ID::TYPE_DEFINITION, identifier )
+, m_type( type )
+{
+}
+
+const Type::Ptr& TypeDefinition::type( void ) const
+{
+    return m_type;
+}
+
+void TypeDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}

@@ -78,6 +78,13 @@ void RecursiveVisitor::visit( EnumerationDefinition& node )
     node.attributes()->accept( *this );
 }
 
+void RecursiveVisitor::visit( TypeDefinition& node )
+{
+    node.identifier()->accept( *this );
+    node.type()->accept( *this );
+    node.attributes()->accept( *this );
+}
+
 void RecursiveVisitor::visit( ValueAtom& node )
 {
 }

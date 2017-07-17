@@ -77,6 +77,10 @@ std::string Node::description( void ) const
         {
             return "enumeration";
         }
+        case ID::TYPE_DEFINITION:
+        {
+            return "type";
+        }
         case ID::VALUE_ATOM:
         {
             return "value";

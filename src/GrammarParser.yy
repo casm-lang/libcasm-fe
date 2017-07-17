@@ -170,6 +170,7 @@ END       0 "end of file"
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
 %type <EnumerationDefinition::Ptr> EnumerationDefinition
+%type <TypeDefinition::Ptr> TypeDefinition
 
 // expressions
 %type <Expression::Ptr> Expression Term Atom
@@ -294,6 +295,10 @@ Definition
       $$ = $1;
   }
 | EnumerationDefinition
+  {
+      $$ = $1;
+  }
+| TypeDefinition
   {
       $$ = $1;
   }
@@ -520,6 +525,14 @@ EnumerationDefinition
 : ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
   {
       $$ = Ast::make< EnumerationDefinition >( @$, $2, $5 );
+  }
+;
+
+
+TypeDefinition
+: TYPE Identifier EQUAL Type
+  {
+      $$ = Ast::make< TypeDefinition >( @$, $2, $4 );
   }
 ;
 
