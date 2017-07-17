@@ -121,6 +121,12 @@ void Namespace::registerSymbol( const EnumerationDefinition::Ptr& node )
     }
 }
 
+void Namespace::registerSymbol( const TypeDefinition::Ptr& node )
+{
+    registerSymbol( node->identifier()->name(), node,
+        CallExpression::TargetType::TYPE_DOMAIN );
+}
+
 void Namespace::registerSymbol( const BasicType::Ptr& node )
 {
     registerSymbol( node->name()->baseName(), node,
@@ -148,6 +154,11 @@ Namespace::Symbol Namespace::find( const RuleDefinition& node ) const
 }
 
 Namespace::Symbol Namespace::find( const EnumerationDefinition& node ) const
+{
+    return find( node.identifier()->name() );
+}
+
+Namespace::Symbol Namespace::find( const TypeDefinition& node ) const
 {
     return find( node.identifier()->name() );
 }

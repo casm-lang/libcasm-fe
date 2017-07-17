@@ -70,6 +70,7 @@ namespace libcasm_fe
         void registerSymbol( const Ast::DerivedDefinition::Ptr& node );
         void registerSymbol( const Ast::RuleDefinition::Ptr& node );
         void registerSymbol( const Ast::EnumerationDefinition::Ptr& node );
+        void registerSymbol( const Ast::TypeDefinition::Ptr& node );
         void registerSymbol( const Ast::BasicType::Ptr& node );
 
         Symbol find( const Ast::DirectCallExpression& node ) const;
@@ -77,6 +78,7 @@ namespace libcasm_fe
         Symbol find( const Ast::DerivedDefinition& node ) const;
         Symbol find( const Ast::RuleDefinition& node ) const;
         Symbol find( const Ast::EnumerationDefinition& node ) const;
+        Symbol find( const Ast::TypeDefinition& node ) const;
         Symbol find( const Ast::BasicType& node ) const;
 
         Symbol find( const Ast::IdentifierPath& node ) const;

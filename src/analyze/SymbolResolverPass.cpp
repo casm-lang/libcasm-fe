@@ -58,6 +58,7 @@ class SymbolTableVisitor final : public RecursiveVisitor
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
+    void visit( TypeDefinition& node ) override;
 
   private:
     Logger& m_log;
@@ -160,6 +161,36 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
         m_log.error(
             { node.sourceLocation(), symbol.definition()->sourceLocation() },
             e.what() );
+    }
+
+    RecursiveVisitor::visit( node );
+}
+
+void SymbolTableVisitor::visit( TypeDefinition& node )
+{
+    // assign type before registering the alias
+    try
+    {
+        const auto& symbol = m_symboltable.find( *node.type()->name() );
+        node.setType( symbol.definition()->type() );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error( { node.type()->sourceLocation() }, e.what(),
+            Code::SymbolIsUnknown );
+    }
+
+    try
+    {
+        m_symboltable.registerSymbol( node.ptr< TypeDefinition >() );
+    }
+    catch( const std::domain_error& e )
+    {
+        const auto& symbol = m_symboltable.find( node );
+
+        m_log.error(
+            { node.sourceLocation(), symbol.definition()->sourceLocation() },
+            e.what(), Code::SymbolAlreadyDefined );
     }
 
     RecursiveVisitor::visit( node );
