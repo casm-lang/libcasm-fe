@@ -968,6 +968,14 @@ void ExecutionVisitor::visit( ForallRule& node )
     node.universe()->accept( *this );
     const auto& universe = m_evaluationStack.pop();
 
+    if( not universe.defined() )
+    {
+        throw RuntimeException( node.universe()->sourceLocation(),
+            "universe must not be undef",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::ForallRuleInvalidUniverse );
+    }
+
     universe.foreach( [&]( const ir::Constant& value ) {
         frame->setLocal( variableIndex, value );
         node.rule()->accept( *this );
