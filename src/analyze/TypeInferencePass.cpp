@@ -1490,19 +1490,51 @@ void TypeInferenceVisitor::visit( LetRule& node )
 
 void TypeInferenceVisitor::visit( ForallRule& node )
 {
+    node.variable()->accept( *this );
+
+    if( node.variable()->type() )
+    {
+        m_resultTypes[ node.universe().get() ].emplace_back(
+            node.variable()->type()->id() );
+    }
+
+    push( *node.variable() );
     node.universe()->accept( *this );
 
-    if( node.universe()->type() )
+    if( not node.variable()->type() and node.universe()->type() )
     {
         node.variable()->setType( node.universe()->type()->ptr_result() );
     }
 
-    push( *node.variable() );
-
-    node.variable()->accept( *this );
     node.rule()->accept( *this );
-
     pop( *node.variable() );
+
+    if( not node.variable()->type() )
+    {
+        m_log.error( { node.variable()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else if( not node.universe()->type() )
+    {
+        m_log.error( { node.universe()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else
+    {
+        if( *node.variable()->type() != node.universe()->type()->result() )
+        {
+            m_log.error( { node.variable()->sourceLocation(),
+                             node.universe()->sourceLocation() },
+                node.description() + " variable '"
+                    + node.variable()->identifier()->name()
+                    + "' of type '"
+                    + node.variable()->type()->description()
+                    + "' does not match the universe of type '"
+                    + node.universe()->type()->result().description()
+                    + "'",
+                Code::TypeInferenceInvalidForallExpression );
+        }
+    }
 }
 
 void TypeInferenceVisitor::visit( ChooseRule& node )
