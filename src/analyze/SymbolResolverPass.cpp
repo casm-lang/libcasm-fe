@@ -140,6 +140,19 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
     try
     {
         m_symboltable.registerSymbol( node.ptr< EnumerationDefinition >() );
+
+        const auto& name = node.identifier()->name();
+
+        m_log.debug( "creating IR enumeration type '" + name + "'" );
+        const auto kind = libstdhl::make< libcasm_ir::Enumeration >( name );
+        for( const auto& enumerator : *node.enumerators() )
+        {
+            kind->add( enumerator->name() );
+        }
+
+        const auto type = libstdhl::make< libcasm_ir::EnumerationType >( kind );
+        node.setType( type );
+
     }
     catch( const std::domain_error& e )
     {
@@ -296,42 +309,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             if( symbol.targetType() == CallExpression::TargetType::TYPE_DOMAIN
                 or symbol.targetType() == CallExpression::TargetType::CONSTANT )
             {
-                if( not symbol.definition()->type() )
-                {
-                    if( symbol.definition()->id()
-                        == Node::ID::ENUMERATION_DEFINITION )
-                    {
-                        const auto& definition
-                            = std::static_pointer_cast< EnumerationDefinition >(
-                                symbol.definition() );
-
-                        const auto& name
-                            = ( symbol.targetType()
-                                  == CallExpression::TargetType::CONSTANT )
-                                  ? path.baseDir()
-                                  : path.path();
-
-                        m_log.debug(
-                            "creating IR enumeration type '" + name + "'" );
-
-                        const auto kind
-                            = libstdhl::make< libcasm_ir::Enumeration >( name );
-                        for( auto e : *definition->enumerators() )
-                        {
-                            kind->add( e->name() );
-                        }
-
-                        const auto type
-                            = libstdhl::make< libcasm_ir::EnumerationType >(
-                                kind );
-                        definition->setType( type );
-                    }
-                    else
-                    {
-                        assert( 0 );
-                    }
-                }
-
                 node.setType( symbol.definition()->type() );
             }
         }
