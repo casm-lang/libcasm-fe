@@ -1064,10 +1064,10 @@ Arguments
 
 
 TwoOrMoreArguments
-: LPAREN Term COMMA Terms RPAREN
+: LPAREN Terms COMMA Term RPAREN
   {
-      const auto expressions = $4;
-      expressions->add( $2 );
+      const auto expressions = $2;
+      expressions->add( $4 );
       $$ = expressions;
   }
 ;
