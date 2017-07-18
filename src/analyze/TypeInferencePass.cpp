@@ -1025,58 +1025,58 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     if( node.type() )
     {
         const auto& call_type_args = node.type()->arguments();
-        const auto& call_expr_args = node.arguments()->data();
+        const auto& call_expr_args = *node.arguments();
 
         if( call_type_args.size() == call_expr_args.size() )
         {
-            std::size_t pos = -1;
-            for( auto argument : node.arguments()->data() )
+            for( std::size_t pos = 0; pos < call_type_args.size(); pos++ )
             {
-                pos++;
-                if( argument->type() )
+                const auto& exprArg = call_expr_args.at( pos );
+                if( not exprArg->type() )
                 {
-                    if( call_type_args[ pos ]->isInteger()
-                        and argument->type()->result().isInteger() )
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    if( *call_type_args[ pos ] != argument->type()->result() )
-                    {
-                        const std::unordered_map< CallExpression::TargetType,
-                            Code >
-                            codes = {
-                                { CallExpression::TargetType::FUNCTION,
-                                    Code::
-                                        TypeInferenceFunctionArgumentTypeMismatch },
-                                { CallExpression::TargetType::DERIVED,
-                                    Code::
-                                        TypeInferenceDerivedArgumentTypeMismatch },
-                                { CallExpression::TargetType::BUILTIN,
-                                    Code::
-                                        TypeInferenceBuiltinArgumentTypeMismatch },
-                                { CallExpression::TargetType::RULE,
-                                    Code::
-                                        TypeInferenceRuleArgumentTypeMismatch },
-                            };
+                const auto& callArgType = call_type_args.at( pos );
+                if( callArgType->isInteger()
+                    and exprArg->type()->result().isInteger() )
+                {
+                    continue;
+                }
 
-                        const auto code = codes.find( node.targetType() );
-                        assert( code != codes.end()
-                                and " invalid target type with arguments " );
+                if( *callArgType != exprArg->type()->result() )
+                {
+                    const std::unordered_map< CallExpression::TargetType, Code >
+                        codes = {
+                            { CallExpression::TargetType::FUNCTION,
+                                Code::
+                                    TypeInferenceFunctionArgumentTypeMismatch },
+                            { CallExpression::TargetType::DERIVED,
+                                Code::
+                                    TypeInferenceDerivedArgumentTypeMismatch },
+                            { CallExpression::TargetType::BUILTIN,
+                                Code::
+                                    TypeInferenceBuiltinArgumentTypeMismatch },
+                            { CallExpression::TargetType::RULE,
+                                Code::TypeInferenceRuleArgumentTypeMismatch },
+                        };
 
-                        m_log.error( { argument->sourceLocation() },
-                            "type mismatch: " + node.targetTypeName()
-                                + " argument type at position "
-                                + std::to_string( pos + 1 )
-                                + " was '"
-                                + argument->type()->description()
-                                + "', "
-                                + node.targetTypeName()
-                                + " definition expects '"
-                                + call_type_args[ pos ]->description()
-                                + "'",
-                            code->second );
-                    }
+                    const auto code = codes.find( node.targetType() );
+                    assert( code != codes.end()
+                            and " invalid target type with arguments " );
+
+                    m_log.error( { exprArg->sourceLocation() },
+                        "type mismatch: " + node.targetTypeName()
+                            + " argument type at position "
+                            + std::to_string( pos + 1 )
+                            + " was '"
+                            + exprArg->type()->description()
+                            + "', "
+                            + node.targetTypeName()
+                            + " definition expects '"
+                            + callArgType->description()
+                            + "'",
+                        code->second );
                 }
             }
         }
@@ -1878,12 +1878,13 @@ void TypeInferenceVisitor::inference( const std::string& description,
 
         std::vector< libcasm_ir::Type::ID > argTypes;
 
-        for( auto argument : arguments )
+        for( const auto& argument : arguments )
         {
             if( not argument->type() )
             {
                 auto argTy = m_resultTypes.find( argument.get() );
-                if( argTy != m_resultTypes.end() and argTy->second.size() == 1 )
+                if( argTy != m_resultTypes.cend()
+                    and argTy->second.size() == 1 )
                 {
                     argTypes.emplace_back( *argTy->second.begin() );
                 }
