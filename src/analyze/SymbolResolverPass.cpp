@@ -184,7 +184,6 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
-    void visit( UpdateRule& node ) override;
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
     void visit( ChooseRule& node ) override;
@@ -426,21 +425,6 @@ void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
     push( *node.predicateVariable() );
     node.proposition()->accept( *this );
     pop( *node.predicateVariable() );
-}
-
-void SymbolResolveVisitor::visit( UpdateRule& node )
-{
-    RecursiveVisitor::visit( node );
-
-    const auto& function = node.function();
-    if( function->targetType() != CallExpression::TargetType::FUNCTION )
-    {
-        m_log.error( { function->sourceLocation() },
-            "updating " + function->targetTypeName() + " '"
-                + function->identifier()->path()
-                + "' is not allowed, only function symbols are valid",
-            Code::UpdateRuleFunctionSymbolIsInvalid );
-    }
 }
 
 void SymbolResolveVisitor::visit( LetRule& node )
