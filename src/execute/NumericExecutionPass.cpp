@@ -99,6 +99,8 @@ struct Update
 {
     ir::Constant value;       /**< The value of the update */
     UpdateRule::Ptr producer; /**< The update producer */
+    ir::Constant agent;       /**< The contributing agent */
+                              // TODO maybe a list of agents (multi-agent case)?
 };
 
 struct UpdateEquals
@@ -257,6 +259,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
+    void visit( BasicType& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -440,7 +443,8 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
     catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { node.expression()->sourceLocation() },
-            e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::DerivedReturnValueInvalid );
     }
 }
@@ -490,6 +494,13 @@ void ExecutionVisitor::visit( ReferenceAtom& node )
 void ExecutionVisitor::visit( UndefAtom& node )
 {
     m_evaluationStack.push( ir::Constant::undef( node.type() ) );
+}
+
+void ExecutionVisitor::visit( BasicType& node )
+{
+    const auto rangeType = std::make_shared< ir::RangeType >( node.type() );
+    const auto range = std::make_shared< ir::Range >( rangeType );
+    m_evaluationStack.push( ir::RangeConstant( rangeType, range ) );
 }
 
 void ExecutionVisitor::visit( DirectCallExpression& node )
@@ -574,7 +585,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     {
         throw RuntimeException( node.expression()->sourceLocation(),
             "cannot call an undefined target",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
     }
 
@@ -646,7 +657,7 @@ void ExecutionVisitor::visit( UnaryExpression& node )
         throw RuntimeException( node.sourceLocation(),
             "unary expression has thrown an exception: "
                 + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
     }
 }
@@ -671,7 +682,7 @@ void ExecutionVisitor::visit( BinaryExpression& node )
         throw RuntimeException( node.sourceLocation(),
             "binary expression has thrown an exception: "
                 + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
     }
 }
@@ -706,7 +717,8 @@ void ExecutionVisitor::visit( LetExpression& node )
     catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { node.initializer()->sourceLocation() },
-            e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::LetAssignedValueInvalid );
     }
 
@@ -726,7 +738,7 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalExpressionInvalidCondition );
     }
     else if( condition.value() == true )
@@ -751,7 +763,7 @@ void ExecutionVisitor::visit( ChooseExpression& node )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
             "universe must not be undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseExpressionInvalidUniverse );
     }
 
@@ -774,7 +786,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
             "universe must not be undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
     }
 
@@ -827,7 +839,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
             "universe must not be undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
     }
 
@@ -874,7 +886,7 @@ void ExecutionVisitor::visit( ConditionalRule& node )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
             "condition must be true or false but was undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalRuleInvalidCondition );
     }
     else if( condition.value() == true )
@@ -934,7 +946,8 @@ void ExecutionVisitor::visit( LetRule& node )
     catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { node.expression()->sourceLocation() },
-            e.what(), m_frameStack.generateBacktrace( node.sourceLocation() ),
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::LetAssignedValueInvalid );
     }
 
@@ -954,6 +967,14 @@ void ExecutionVisitor::visit( ForallRule& node )
 
     node.universe()->accept( *this );
     const auto& universe = m_evaluationStack.pop();
+
+    if( not universe.defined() )
+    {
+        throw RuntimeException( node.universe()->sourceLocation(),
+            "universe must not be undef",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::ForallRuleInvalidUniverse );
+    }
 
     universe.foreach( [&]( const ir::Constant& value ) {
         frame->setLocal( variableIndex, value );
@@ -982,7 +1003,7 @@ void ExecutionVisitor::visit( ChooseRule& node )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
             "universe must not be undef",
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseRuleInvalidUniverse );
     }
 
@@ -1050,6 +1071,30 @@ void ExecutionVisitor::visit( SequenceRule& node )
     }
 }
 
+static std::string toLocationString(
+    const UpdateRule& update, const std::vector< ir::Constant >& arguments )
+{
+    std::string location = update.function()->identifier()->path();
+
+    if( not arguments.empty() )
+    {
+        location += "(";
+        bool isFirst = true;
+        for( const auto& arg : arguments )
+        {
+            if( not isFirst )
+            {
+                location += ", ";
+            }
+            location += arg.name();
+            isFirst = false;
+        }
+        location += ")";
+    }
+
+    return location;
+}
+
 void ExecutionVisitor::visit( UpdateRule& node )
 {
     const auto& expression = node.expression();
@@ -1065,7 +1110,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     catch( const libcasm_ir::ValidationException& e )
     {
         throw RuntimeException( { expression->sourceLocation() }, e.what(),
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::FunctionUpdateInvalidValueAtUpdate );
     }
 
@@ -1090,7 +1135,8 @@ void ExecutionVisitor::visit( UpdateRule& node )
         catch( const libcasm_ir::ValidationException& e )
         {
             throw RuntimeException( { argument->sourceLocation() }, e.what(),
-                m_frameStack.generateBacktrace( node.sourceLocation() ),
+                m_frameStack.generateBacktrace(
+                    node.sourceLocation(), m_agentId ),
                 Code::FunctionArgumentInvalidValueAtUpdate );
         }
 
@@ -1105,31 +1151,31 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
     const auto location
         = m_locationRegistry.get( functionDefintion->uid(), argumentValues );
-    const Update update{ updateValue, node.ptr< UpdateRule >() };
+    const Update update{ updateValue, node.ptr< UpdateRule >(), m_agentId };
 
     try
     {
         m_updateSetManager.add( location, update );
     }
-    catch( const ExecutionUpdateSet::Conflict& e )
+    catch( const ExecutionUpdateSet::Conflict& conflict )
     {
-        const auto& conflictingUpdate = e.conflictingUpdate();
-        const auto& existingUpdate = e.existingUpdate();
+        const auto& srcLocA = node.sourceLocation();
+        const auto& valA = updateValue.name();
 
-        const auto& conflictingValue = conflictingUpdate.second;
-        const auto& existingValue = existingUpdate.second;
+        const auto& existingValue = conflict.existingUpdate().second;
+        const auto& srcLocB = existingValue.producer->sourceLocation();
+        const auto& valB = existingValue.value.name();
 
-        const auto info = "Conflict while adding update "
-                          + node.function()->identifier()->path()
-                          //+ to_string( existingLocation.arguments )
-                          + " = " + conflictingValue.value.description()
-                          + ". Update for same location  with another value '"
-                          + existingValue.value.description()
-                          + "' exists already.";
-        throw RuntimeException(
-            { existingValue.producer->sourceLocation(),
-                conflictingValue.producer->sourceLocation() },
-            info, m_frameStack.generateBacktrace( node.sourceLocation() ),
+        const auto location = toLocationString( node, argumentValues );
+
+        const auto info = "Conflict while adding an update in agent "
+                          + m_agentId.name() + ". Update '" + location
+                          + " := " + valA + " at line "
+                          + std::to_string( srcLocA.begin.line )
+                          + " clashed with update '" + location + " := " + valB
+                          + "' at line " + std::to_string( srcLocB.begin.line );
+        throw RuntimeException( { srcLocA, srcLocB }, info,
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             libcasm_fe::Code::UpdateSetClash );
     }
 }
@@ -1208,7 +1254,7 @@ void ExecutionVisitor::invokeBuiltin(
     {
         throw RuntimeException( node.sourceLocation(),
             "builtin has thrown an exception: " + std::string( e.what() ),
-            m_frameStack.generateBacktrace( node.sourceLocation() ),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::AssertInvalidExpression );
     }
 }
@@ -1249,7 +1295,8 @@ void ExecutionVisitor::validateArguments( const Node& node,
             const auto& callArgument = frame->call()->arguments()->at( i );
             throw RuntimeException( { callArgument->sourceLocation() },
                 e.what(),
-                m_frameStack.generateBacktrace( node.sourceLocation() ),
+                m_frameStack.generateBacktrace(
+                    node.sourceLocation(), m_agentId ),
                 errorCode );
         }
     }
@@ -1261,23 +1308,25 @@ void ExecutionVisitor::handleMergeConflict(
     const auto& conflictingUpdate = conflict.conflictingUpdate();
     const auto& existingUpdate = conflict.existingUpdate();
 
-    const auto& conflictingValue = conflictingUpdate.second;
-    const auto& existingValue = existingUpdate.second;
+    const auto& conflictValue = conflictingUpdate.second;
+    const auto& srcLocA = conflictValue.producer->sourceLocation();
+    const auto& valA = conflictValue.value.name();
 
-    const auto info
-        = "Conflict while merging updateset "
-          + conflictingValue.producer->function()->identifier()->path()
-          + " at line "
-          + std::to_string(
-                conflictingValue.producer->sourceLocation().begin.line )
-          + " with value '" + conflictingValue.value.description() + "'"
-          + " and at line "
-          + std::to_string(
-                existingValue.producer->sourceLocation().begin.line )
-          + " with value '" + existingValue.value.description() + "'";
-    throw RuntimeException( { existingValue.producer->sourceLocation(),
-                                conflictingValue.producer->sourceLocation() },
-        info, m_frameStack.generateBacktrace( node.sourceLocation() ),
+    const auto& existingValue = existingUpdate.second;
+    const auto& srcLocB = existingValue.producer->sourceLocation();
+    const auto& valB = existingValue.value.name();
+
+    const auto location = toLocationString(
+        *conflictValue.producer, conflictingUpdate.first.arguments() );
+
+    const auto info = "Conflict while merging update sets in agent "
+                      + m_agentId.name() + ". Update '" + location
+                      + " := " + valA + " at line "
+                      + std::to_string( srcLocA.begin.line )
+                      + " clashed with update '" + location + " := " + valB
+                      + "' at line " + std::to_string( srcLocB.begin.line );
+    throw RuntimeException( { srcLocA, srcLocB }, info,
+        m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
         libcasm_fe::Code::UpdateSetMergeConflict );
 }
 
@@ -1542,7 +1591,39 @@ ExecutionUpdateSet* AgentScheduler::collectUpdates(
         auto* updates = m_updateSetManager.currentUpdateSet();
         for( const auto& agent : agents )
         {
-            agent.updateSet()->mergeInto( updates );
+            try
+            {
+                agent.updateSet()->mergeInto( updates );
+            }
+            catch( const ExecutionUpdateSet::Conflict& conflict )
+            {
+                const auto& conflictingUpdate = conflict.conflictingUpdate();
+                const auto& existingUpdate = conflict.existingUpdate();
+
+                const auto& conflictValue = conflictingUpdate.second;
+                const auto& agentA = conflictValue.agent.name();
+                const auto& srcLocA = conflictValue.producer->sourceLocation();
+                const auto& valA = conflictValue.value.name();
+
+                const auto& existingValue = existingUpdate.second;
+                const auto& agentB = existingValue.agent.name();
+                const auto& srcLocB = existingValue.producer->sourceLocation();
+                const auto& valB = existingValue.value.name();
+
+                const auto location = toLocationString( *conflictValue.producer,
+                    conflictingUpdate.first.arguments() );
+
+                const auto info
+                    = "Conflict while collection updates from agent " + agentA
+                      + ". Update '" + location + " := " + valA
+                      + "' produced by agent " + agentA + " at line "
+                      + std::to_string( srcLocA.begin.line )
+                      + " clashed with update '" + location + " := " + valB
+                      + "' produced by agent " + agentB + " at line "
+                      + std::to_string( srcLocB.begin.line );
+                throw RuntimeException( { srcLocA, srcLocB }, info,
+                    libcasm_fe::Code::UpdateSetMergeConflict );
+            }
         }
         return updates;
     }

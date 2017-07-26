@@ -241,7 +241,8 @@ namespace libcasm_fe
         ConditionalExpressionInvalidCondition = 0x9001,
         QuantifierExpressionInvalidUniverse = 0x9002,
         ChooseExpressionInvalidUniverse = 0x9003,
-        ChooseRuleInvalidUniverse = 0x9004
+        ChooseRuleInvalidUniverse = 0x9004,
+        ForallRuleInvalidUniverse = 0x9005
 
         // --------------------------------------------------------- fff* ...
         // not categorized errors
