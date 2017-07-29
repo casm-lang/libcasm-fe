@@ -112,6 +112,14 @@ void EmptyVisitor::visit( StructureDefinition& )
 {
 }
 
+void EmptyVisitor::visit( FeatureDefinition& )
+{
+}
+
+void EmptyVisitor::visit( DeclarationDefinition& )
+{
+}
+
 void EmptyVisitor::visit( UndefLiteral& )
 {
 }

@@ -145,6 +145,10 @@ END       0 "end of file"
 %type <InvariantDefinition::Ptr> InvariantDefinition
 %type <ImportDefinition::Ptr> ImportDefinition
 %type <StructureDefinition::Ptr> StructureDefinition
+%type <FeatureDefinition::Ptr> FeatureDefinition
+%type <Definition::Ptr> FeatureDeclarationOrDefinition
+%type <Definitions::Ptr> FeatureDeclarationsAndDefinitions
+%type <DeclarationDefinition::Ptr> DeclarationDefinition
 
 // literals
 %type <Literal::Ptr> Literal
@@ -538,6 +542,66 @@ StructureDefinition
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, $4, and $6
       // $$ = Ast::make< StructureDefinition >( @$, $2, $5 );
+  }
+;
+
+
+FeatureDefinition
+: FEATURE Identifier EQUAL LCURPAREN FeatureDeclarationsAndDefinitions RCURPAREN
+  {
+      // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, $4, and $6
+      $$ = Ast::make< FeatureDefinition >( @$, $2, $5 );
+  }
+;
+
+
+FeatureDeclarationOrDefinition
+: DeclarationDefinition
+  {
+      $$ = $1;
+  }
+| DerivedDefinition
+  {
+      $$ = $1;
+  }
+| RuleDefinition
+  {
+      $$ = $1;
+  }
+;
+
+
+FeatureDeclarationsAndDefinitions
+: FeatureDeclarationsAndDefinitions COMMA FeatureDeclarationOrDefinition
+  {
+      // TODO: FIXME: @ppaulweber: handle AST keyword tokens $2
+      auto definitions = $1;
+      definitions->add( $3 );
+      $$ = definitions;
+  }
+| FeatureDeclarationOrDefinition
+  {
+      auto definitions = Ast::make< Definitions >( @$ );
+      definitions->add( $1 );
+      $$ = definitions;
+  }
+;
+
+
+DeclarationDefinition
+: DERIVED Identifier COLON MaybeFunctionParameters MAPS Type
+  {
+      // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
+      auto declaration = Ast::make< DeclarationDefinition >( @$, $2, $4, $6 );
+      declaration->setKind( DeclarationDefinition::Kind::DERIVED );
+      $$ = declaration;
+  }
+| RULE Identifier COLON MaybeFunctionParameters MAPS Type
+  {
+      // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
+      auto declaration = Ast::make< DeclarationDefinition >( @$, $2, $4, $6 );
+      declaration->setKind( DeclarationDefinition::Kind::RULE );
+      $$ = declaration;
   }
 ;
 

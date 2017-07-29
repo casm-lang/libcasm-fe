@@ -131,7 +131,14 @@ std::string Node::description( void ) const
         {
             return "structure";
         }
-
+        case ID::FEATURE_DEFINITION:
+        {
+            return "feature";
+        }
+        case ID::DECLARATION_DEFINITION:
+        {
+            return "declaration";
+        }
         // literals
         case ID::UNDEF_LITERAL:
         {

@@ -445,6 +445,58 @@ namespace libcasm_fe
             const NodeList< FunctionDefinition >::Ptr m_functions;
         };
 
+        class FeatureDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< FeatureDefinition >;
+
+            FeatureDefinition(
+                const Identifier::Ptr& identifier, const Definitions::Ptr& definitions );
+
+            const Definitions::Ptr& definitions( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Definitions::Ptr m_definitions;
+        };
+
+        class DeclarationDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< DeclarationDefinition >;
+
+            enum class Kind
+            {
+                DERIVED = 1,
+                RULE
+            };
+
+            DeclarationDefinition(
+                const Identifier::Ptr& identifier,
+                const Types::Ptr& argumentTypes,
+                const Type::Ptr& returnType );
+
+            const Types::Ptr& argumentTypes( void ) const;
+
+            const Type::Ptr& returnType( void ) const;
+
+            void setKind( const Kind kind );
+
+            Kind kind( void ) const;
+
+            std::string kindName( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Types::Ptr m_argumentTypes;
+            const Type::Ptr m_returnType;
+            Kind m_kind;
+        };
+
+        using DeclarationDefinitions = NodeList< DeclarationDefinition >;
+
         class InitDefinition final : public Definition
         {
           public:

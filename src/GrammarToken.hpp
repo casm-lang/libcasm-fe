@@ -54,6 +54,7 @@ USING           "using"
 INVARIANT       "invariant"
 IMPORT          "import"
 STRUCTURE       "structure"
+FEATURE         "feature"
 
 FUNCTION        "function"
 DEFINED         "defined"

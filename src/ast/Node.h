@@ -82,6 +82,8 @@ namespace libcasm_fe
                 INVARIANT_DEFINITION,
                 IMPORT_DEFINITION,
                 STRUCTURE_DEFINITION,
+                FEATURE_DEFINITION,
+                DECLARATION_DEFINITION,
 
                 // literals
                 UNDEF_LITERAL,

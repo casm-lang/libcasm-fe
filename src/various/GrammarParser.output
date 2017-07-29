@@ -1,6 +1,30 @@
 Nonterminals useless in grammar
 
     FunctionDefinitions
+    FeatureDefinition
+    FeatureDeclarationOrDefinition
+    FeatureDeclarationsAndDefinitions
+    DeclarationDefinition
+
+
+Terminals unused in grammar
+
+    "feature"
+
+
+Rules useless in grammar
+
+  235 FeatureDefinition: "feature" Identifier "=" "{" FeatureDeclarationsAndDefinitions "}"
+
+  236 FeatureDeclarationOrDefinition: DeclarationDefinition
+  237                               | DerivedDefinition
+  238                               | RuleDefinition
+
+  239 FeatureDeclarationsAndDefinitions: FeatureDeclarationsAndDefinitions "," FeatureDeclarationOrDefinition
+  240                                  | FeatureDeclarationOrDefinition
+
+  241 DeclarationDefinition: "derived" Identifier ":" MaybeFunctionParameters "->" Type
+  242                      | "rule" Identifier ":" MaybeFunctionParameters "->" Type
 
 
 Grammar
@@ -352,378 +376,379 @@ Terminals, with rules where they appear
     "invariant" <Ast::Token::Ptr> (264) 40
     "import" <Ast::Token::Ptr> (265) 41 42
     "structure" <Ast::Token::Ptr> (266) 43
-    "function" <Ast::Token::Ptr> (267) 31
-    "defined" <Ast::Token::Ptr> (268) 195
-    "seq" <Ast::Token::Ptr> (269) 80 82
-    "endseq" <Ast::Token::Ptr> (270) 80 82
-    "par" <Ast::Token::Ptr> (271) 76 78
-    "endpar" <Ast::Token::Ptr> (272) 76 78
-    "skip" <Ast::Token::Ptr> (273) 59
-    "let" <Ast::Token::Ptr> (274) 69 138
-    "local" <Ast::Token::Ptr> (275) 70
-    "in" <Ast::Token::Ptr> (276) 69 70 71 72 73 138 140 141 142 205
-    "forall" <Ast::Token::Ptr> (277) 71 72 141
-    "choose" <Ast::Token::Ptr> (278) 73 140
-    "iterate" <Ast::Token::Ptr> (279) 74
-    "do" <Ast::Token::Ptr> (280) 71 72 73 85 140
-    "if" <Ast::Token::Ptr> (281) 60 61 139
-    "then" <Ast::Token::Ptr> (282) 60 61 139
-    "else" <Ast::Token::Ptr> (283) 61 139
-    "case" <Ast::Token::Ptr> (284) 62 63
-    "of" <Ast::Token::Ptr> (285) 62 63
-    "default" <Ast::Token::Ptr> (286) 66
-    "holds" <Ast::Token::Ptr> (287) 141
-    "exists" <Ast::Token::Ptr> (288) 142
-    "with" <Ast::Token::Ptr> (289) 72 142
-    "as" <Ast::Token::Ptr> (290) 42 137
-    "while" <Ast::Token::Ptr> (291) 85
-    "undef" <Ast::Token::Ptr> (292) 156
-    "false" <Ast::Token::Ptr> (293) 158
-    "true" <Ast::Token::Ptr> (294) 157
-    "and" <Ast::Token::Ptr> (295) 118
-    "or" <Ast::Token::Ptr> (296) 116
-    "xor" <Ast::Token::Ptr> (297) 117
-    "implies" <Ast::Token::Ptr> (298) 120
-    "not" <Ast::Token::Ptr> (299) 121
-    "+" <Ast::Token::Ptr> (300) 102 104
-    "-" <Ast::Token::Ptr> (301) 103 105
-    "=" <Ast::Token::Ptr> (302) 21 22 23 24 25 26 27 28 29 30 37 40 43 111 197 221
-    "(" <Ast::Token::Ptr> (303) 23 24 27 28 29 30 97 98 126 127 128 130 131 132 134 135 136 170 171 184 185 202
-    ")" <Ast::Token::Ptr> (304) 23 24 27 28 29 30 97 98 126 127 128 130 131 132 134 135 136 170 171 184 185 202
-    "[" <Ast::Token::Ptr> (305) 166 167 168 169 230 231 232
-    "]" <Ast::Token::Ptr> (306) 166 167 168 169 230 231 232
-    "{" <Ast::Token::Ptr> (307) 20 21 43 62 63 75 77 195 197
-    "}" <Ast::Token::Ptr> (308) 20 21 43 62 63 75 77 195 197
-    ":" <Ast::Token::Ptr> (309) 31 66 67 68 174 214 227
-    "::" <Ast::Token::Ptr> (310) 39 206
-    "_" <Ast::Token::Ptr> (311) 67
-    "|" <Ast::Token::Ptr> (312) 143
-    "@" <Ast::Token::Ptr> (313) 165
-    "," <Ast::Token::Ptr> (314) 35 86 170 172 175 184 185 193 199 210 212 219 222
-    "<" <Ast::Token::Ptr> (315) 112 186 187
-    ">" <Ast::Token::Ptr> (316) 113 186 187
-    "*" <Ast::Token::Ptr> (317) 39 106 189
-    "/" <Ast::Token::Ptr> (318) 107
-    "%" <Ast::Token::Ptr> (319) 108
-    "^" <Ast::Token::Ptr> (320) 109
-    "'" <Ast::Token::Ptr> (321) 188
-    ".." <Ast::Token::Ptr> (322) 169
-    "." <Ast::Token::Ptr> (323) 129 130 131 132 133
-    "->" <Ast::Token::Ptr> (324) 22 23 24 26 28 30 31 187 202 203 227
-    "=>" <Ast::Token::Ptr> (325) 119
-    ":=" <Ast::Token::Ptr> (326) 83
-    "!=" <Ast::Token::Ptr> (327) 110
-    "<=" <Ast::Token::Ptr> (328) 114
-    ">=" <Ast::Token::Ptr> (329) 115
-    "{|" <Ast::Token::Ptr> (330) 79 81
-    "|}" <Ast::Token::Ptr> (331) 79 81
-    "binary" <ValueLiteral::Ptr> (332) 162
-    "hexadecimal" <ValueLiteral::Ptr> (333) 163
-    "integer" <ValueLiteral::Ptr> (334) 159
-    "rational" <ValueLiteral::Ptr> (335) 160
-    "decimal" <ValueLiteral::Ptr> (336) 161
-    "string" <ValueLiteral::Ptr> (337) 164
-    "identifier" <Identifier::Ptr> (338) 204
-    BASIC_TYPE (339)
-    CALL (340)
-    UPLUS (341)
-    UMINUS (342)
-    CALL_WITHOUT_ARGS (343)
+    "feature" <Ast::Token::Ptr> (267)
+    "function" <Ast::Token::Ptr> (268) 31
+    "defined" <Ast::Token::Ptr> (269) 195
+    "seq" <Ast::Token::Ptr> (270) 80 82
+    "endseq" <Ast::Token::Ptr> (271) 80 82
+    "par" <Ast::Token::Ptr> (272) 76 78
+    "endpar" <Ast::Token::Ptr> (273) 76 78
+    "skip" <Ast::Token::Ptr> (274) 59
+    "let" <Ast::Token::Ptr> (275) 69 138
+    "local" <Ast::Token::Ptr> (276) 70
+    "in" <Ast::Token::Ptr> (277) 69 70 71 72 73 138 140 141 142 205
+    "forall" <Ast::Token::Ptr> (278) 71 72 141
+    "choose" <Ast::Token::Ptr> (279) 73 140
+    "iterate" <Ast::Token::Ptr> (280) 74
+    "do" <Ast::Token::Ptr> (281) 71 72 73 85 140
+    "if" <Ast::Token::Ptr> (282) 60 61 139
+    "then" <Ast::Token::Ptr> (283) 60 61 139
+    "else" <Ast::Token::Ptr> (284) 61 139
+    "case" <Ast::Token::Ptr> (285) 62 63
+    "of" <Ast::Token::Ptr> (286) 62 63
+    "default" <Ast::Token::Ptr> (287) 66
+    "holds" <Ast::Token::Ptr> (288) 141
+    "exists" <Ast::Token::Ptr> (289) 142
+    "with" <Ast::Token::Ptr> (290) 72 142
+    "as" <Ast::Token::Ptr> (291) 42 137
+    "while" <Ast::Token::Ptr> (292) 85
+    "undef" <Ast::Token::Ptr> (293) 156
+    "false" <Ast::Token::Ptr> (294) 158
+    "true" <Ast::Token::Ptr> (295) 157
+    "and" <Ast::Token::Ptr> (296) 118
+    "or" <Ast::Token::Ptr> (297) 116
+    "xor" <Ast::Token::Ptr> (298) 117
+    "implies" <Ast::Token::Ptr> (299) 120
+    "not" <Ast::Token::Ptr> (300) 121
+    "+" <Ast::Token::Ptr> (301) 102 104
+    "-" <Ast::Token::Ptr> (302) 103 105
+    "=" <Ast::Token::Ptr> (303) 21 22 23 24 25 26 27 28 29 30 37 40 43 111 197 221
+    "(" <Ast::Token::Ptr> (304) 23 24 27 28 29 30 97 98 126 127 128 130 131 132 134 135 136 170 171 184 185 202
+    ")" <Ast::Token::Ptr> (305) 23 24 27 28 29 30 97 98 126 127 128 130 131 132 134 135 136 170 171 184 185 202
+    "[" <Ast::Token::Ptr> (306) 166 167 168 169 230 231 232
+    "]" <Ast::Token::Ptr> (307) 166 167 168 169 230 231 232
+    "{" <Ast::Token::Ptr> (308) 20 21 43 62 63 75 77 195 197
+    "}" <Ast::Token::Ptr> (309) 20 21 43 62 63 75 77 195 197
+    ":" <Ast::Token::Ptr> (310) 31 66 67 68 174 214 227
+    "::" <Ast::Token::Ptr> (311) 39 206
+    "_" <Ast::Token::Ptr> (312) 67
+    "|" <Ast::Token::Ptr> (313) 143
+    "@" <Ast::Token::Ptr> (314) 165
+    "," <Ast::Token::Ptr> (315) 35 86 170 172 175 184 185 193 199 210 212 219 222
+    "<" <Ast::Token::Ptr> (316) 112 186 187
+    ">" <Ast::Token::Ptr> (317) 113 186 187
+    "*" <Ast::Token::Ptr> (318) 39 106 189
+    "/" <Ast::Token::Ptr> (319) 107
+    "%" <Ast::Token::Ptr> (320) 108
+    "^" <Ast::Token::Ptr> (321) 109
+    "'" <Ast::Token::Ptr> (322) 188
+    ".." <Ast::Token::Ptr> (323) 169
+    "." <Ast::Token::Ptr> (324) 129 130 131 132 133
+    "->" <Ast::Token::Ptr> (325) 22 23 24 26 28 30 31 187 202 203 227
+    "=>" <Ast::Token::Ptr> (326) 119
+    ":=" <Ast::Token::Ptr> (327) 83
+    "!=" <Ast::Token::Ptr> (328) 110
+    "<=" <Ast::Token::Ptr> (329) 114
+    ">=" <Ast::Token::Ptr> (330) 115
+    "{|" <Ast::Token::Ptr> (331) 79 81
+    "|}" <Ast::Token::Ptr> (332) 79 81
+    "binary" <ValueLiteral::Ptr> (333) 162
+    "hexadecimal" <ValueLiteral::Ptr> (334) 163
+    "integer" <ValueLiteral::Ptr> (335) 159
+    "rational" <ValueLiteral::Ptr> (336) 160
+    "decimal" <ValueLiteral::Ptr> (337) 161
+    "string" <ValueLiteral::Ptr> (338) 164
+    "identifier" <Identifier::Ptr> (339) 204
+    BASIC_TYPE (340)
+    CALL (341)
+    UPLUS (342)
+    UMINUS (343)
+    CALL_WITHOUT_ARGS (344)
 
 
 Nonterminals, with rules where they appear
 
-    $accept (89)
+    $accept (90)
         on left: 0
-    Specification <Specification::Ptr> (90)
+    Specification <Specification::Ptr> (91)
         on left: 1
         on right: 0
-    Header <HeaderDefinition::Ptr> (91)
+    Header <HeaderDefinition::Ptr> (92)
         on left: 2 3
         on right: 1
-    Definitions <Definitions::Ptr> (92)
+    Definitions <Definitions::Ptr> (93)
         on left: 4 5
         on right: 1 4
-    AttributedDefinition <Definition::Ptr> (93)
+    AttributedDefinition <Definition::Ptr> (94)
         on left: 6 7 8
         on right: 4 5
-    Definition <Definition::Ptr> (94)
+    Definition <Definition::Ptr> (95)
         on left: 9 10 11 12 13 14 15 16 17 18
         on right: 6 7
-    InitDefinition <InitDefinition::Ptr> (95)
+    InitDefinition <InitDefinition::Ptr> (96)
         on left: 19 20
         on right: 9
-    EnumerationDefinition <EnumerationDefinition::Ptr> (96)
+    EnumerationDefinition <EnumerationDefinition::Ptr> (97)
         on left: 21
         on right: 10
-    DerivedDefinition <DerivedDefinition::Ptr> (97)
+    DerivedDefinition <DerivedDefinition::Ptr> (98)
         on left: 22 23 24
         on right: 11
-    RuleDefinition <RuleDefinition::Ptr> (98)
+    RuleDefinition <RuleDefinition::Ptr> (99)
         on left: 25 26 27 28 29 30
         on right: 12
-    FunctionDefinition <FunctionDefinition::Ptr> (99)
+    FunctionDefinition <FunctionDefinition::Ptr> (100)
         on left: 31
         on right: 13 43
-    EnumeratorDefinition <EnumeratorDefinition::Ptr> (100)
+    EnumeratorDefinition <EnumeratorDefinition::Ptr> (101)
         on left: 32 33 34
         on right: 35 36
-    Enumerators <Enumerators::Ptr> (101)
+    Enumerators <Enumerators::Ptr> (102)
         on left: 35 36
         on right: 21 35
-    UsingDefinition <UsingDefinition::Ptr> (102)
+    UsingDefinition <UsingDefinition::Ptr> (103)
         on left: 37
         on right: 14
-    UsingPathDefinition <UsingPathDefinition::Ptr> (103)
+    UsingPathDefinition <UsingPathDefinition::Ptr> (104)
         on left: 38 39
         on right: 15
-    InvariantDefinition <InvariantDefinition::Ptr> (104)
+    InvariantDefinition <InvariantDefinition::Ptr> (105)
         on left: 40
         on right: 16
-    ImportDefinition <ImportDefinition::Ptr> (105)
+    ImportDefinition <ImportDefinition::Ptr> (106)
         on left: 41 42
         on right: 17
-    StructureDefinition <StructureDefinition::Ptr> (106)
+    StructureDefinition <StructureDefinition::Ptr> (107)
         on left: 43
         on right: 18
-    Rules <Rules::Ptr> (107)
+    Rules <Rules::Ptr> (108)
         on left: 44 45
         on right: 44 75 76 79 80
-    Rule <Rule::Ptr> (108)
+    Rule <Rule::Ptr> (109)
         on left: 46 47 48 49 50 51 52 53 54 55 56 57 58
         on right: 25 26 27 28 29 30 44 45 60 61 66 67 68 69 70 71 72 73 74 85
-    SkipRule <SkipRule::Ptr> (109)
+    SkipRule <SkipRule::Ptr> (110)
         on left: 59
         on right: 46
-    ConditionalRule <ConditionalRule::Ptr> (110)
+    ConditionalRule <ConditionalRule::Ptr> (111)
         on left: 60 61
         on right: 47
-    CaseRule <CaseRule::Ptr> (111)
+    CaseRule <CaseRule::Ptr> (112)
         on left: 62 63
         on right: 48
-    CaseLabels <Cases::Ptr> (112)
+    CaseLabels <Cases::Ptr> (113)
         on left: 64 65
         on right: 62 64
-    CaseLabel <Case::Ptr> (113)
+    CaseLabel <Case::Ptr> (114)
         on left: 66 67 68
         on right: 64 65
-    LetRule <LetRule::Ptr> (114)
+    LetRule <LetRule::Ptr> (115)
         on left: 69
         on right: 49
-    LocalRule <LocalRule::Ptr> (115)
+    LocalRule <LocalRule::Ptr> (116)
         on left: 70
         on right: 50
-    ForallRule <ForallRule::Ptr> (116)
+    ForallRule <ForallRule::Ptr> (117)
         on left: 71 72
         on right: 51
-    ChooseRule <ChooseRule::Ptr> (117)
+    ChooseRule <ChooseRule::Ptr> (118)
         on left: 73
         on right: 52
-    IterateRule <IterateRule::Ptr> (118)
+    IterateRule <IterateRule::Ptr> (119)
         on left: 74
         on right: 53
-    BlockRule <BlockRule::Ptr> (119)
+    BlockRule <BlockRule::Ptr> (120)
         on left: 75 76 77 78
         on right: 54
-    SequenceRule <SequenceRule::Ptr> (120)
+    SequenceRule <SequenceRule::Ptr> (121)
         on left: 79 80 81 82
         on right: 55
-    UpdateRule <UpdateRule::Ptr> (121)
+    UpdateRule <UpdateRule::Ptr> (122)
         on left: 83
         on right: 56
-    CallRule <CallRule::Ptr> (122)
+    CallRule <CallRule::Ptr> (123)
         on left: 84
         on right: 57
-    WhileRule <WhileRule::Ptr> (123)
+    WhileRule <WhileRule::Ptr> (124)
         on left: 85
         on right: 58
-    Terms <Expressions::Ptr> (124)
+    Terms <Expressions::Ptr> (125)
         on left: 86 87
         on right: 86 127 131 135 167 170
-    Term <Expression::Ptr> (125)
+    Term <Expression::Ptr> (126)
         on left: 88 89 90 91 92 93 94 95 96
         on right: 22 23 24 40 60 61 62 63 68 71 72 73 83 85 86 87 97 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 138 139 140 141 142 169 170 174 188 195 201 202 203 221 234
-    SimpleOrClaspedTerm <Expression::Ptr> (126)
+    SimpleOrClaspedTerm <Expression::Ptr> (127)
         on left: 97 98 99 100 101 102 103
         on right: 88 102 103 129 130 131 132 133 137 143
-    OperatorExpression <Expression::Ptr> (127)
+    OperatorExpression <Expression::Ptr> (128)
         on left: 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121
         on right: 90
-    CallExpression <CallExpression::Ptr> (128)
+    CallExpression <CallExpression::Ptr> (129)
         on left: 122 123 124
         on right: 84 99 134 135 136
-    DirectCallExpression <DirectCallExpression::Ptr> (129)
+    DirectCallExpression <DirectCallExpression::Ptr> (130)
         on left: 125 126 127 128
         on right: 83 122
-    MethodCallExpression <MethodCallExpression::Ptr> (130)
+    MethodCallExpression <MethodCallExpression::Ptr> (131)
         on left: 129 130 131 132
         on right: 123
-    LiteralCallExpression <LiteralCallExpression::Ptr> (131)
+    LiteralCallExpression <LiteralCallExpression::Ptr> (132)
         on left: 133
         on right: 100
-    IndirectCallExpression <IndirectCallExpression::Ptr> (132)
+    IndirectCallExpression <IndirectCallExpression::Ptr> (133)
         on left: 134 135 136
         on right: 124
-    TypeCastingExpression <TypeCastingExpression::Ptr> (133)
+    TypeCastingExpression <TypeCastingExpression::Ptr> (134)
         on left: 137
         on right: 89
-    LetExpression <LetExpression::Ptr> (134)
+    LetExpression <LetExpression::Ptr> (135)
         on left: 138
         on right: 91
-    ConditionalExpression <ConditionalExpression::Ptr> (135)
+    ConditionalExpression <ConditionalExpression::Ptr> (136)
         on left: 139
         on right: 92
-    ChooseExpression <ChooseExpression::Ptr> (136)
+    ChooseExpression <ChooseExpression::Ptr> (137)
         on left: 140
         on right: 93
-    UniversalQuantifierExpression <UniversalQuantifierExpression::Ptr> (137)
+    UniversalQuantifierExpression <UniversalQuantifierExpression::Ptr> (138)
         on left: 141
         on right: 94
-    ExistentialQuantifierExpression <ExistentialQuantifierExpression::Ptr> (138)
+    ExistentialQuantifierExpression <ExistentialQuantifierExpression::Ptr> (139)
         on left: 142
         on right: 95
-    CardinalityExpression <CardinalityExpression::Ptr> (139)
+    CardinalityExpression <CardinalityExpression::Ptr> (140)
         on left: 143
         on right: 96
-    Literal <Literal::Ptr> (140)
+    Literal <Literal::Ptr> (141)
         on left: 144 145 146 147 148 149 150 151 152 153 154 155
         on right: 101
-    UndefinedLiteral <UndefLiteral::Ptr> (141)
+    UndefinedLiteral <UndefLiteral::Ptr> (142)
         on left: 156
         on right: 144
-    BooleanLiteral <ValueLiteral::Ptr> (142)
+    BooleanLiteral <ValueLiteral::Ptr> (143)
         on left: 157 158
         on right: 145
-    IntegerLiteral <ValueLiteral::Ptr> (143)
+    IntegerLiteral <ValueLiteral::Ptr> (144)
         on left: 159
         on right: 133 146
-    RationalLiteral <ValueLiteral::Ptr> (144)
+    RationalLiteral <ValueLiteral::Ptr> (145)
         on left: 160
         on right: 147
-    DecimalLiteral <ValueLiteral::Ptr> (145)
+    DecimalLiteral <ValueLiteral::Ptr> (146)
         on left: 161
         on right: 148
-    BinaryLiteral <ValueLiteral::Ptr> (146)
+    BinaryLiteral <ValueLiteral::Ptr> (147)
         on left: 162 163
         on right: 149
-    StringLiteral <ValueLiteral::Ptr> (147)
+    StringLiteral <ValueLiteral::Ptr> (148)
         on left: 164
         on right: 150
-    ReferenceLiteral <ReferenceLiteral::Ptr> (148)
+    ReferenceLiteral <ReferenceLiteral::Ptr> (149)
         on left: 165
         on right: 151
-    ListLiteral <ListLiteral::Ptr> (149)
+    ListLiteral <ListLiteral::Ptr> (150)
         on left: 166 167 168
         on right: 152
-    RangeLiteral <RangeLiteral::Ptr> (150)
+    RangeLiteral <RangeLiteral::Ptr> (151)
         on left: 169
         on right: 153
-    TupleLiteral <TupleLiteral::Ptr> (151)
+    TupleLiteral <TupleLiteral::Ptr> (152)
         on left: 170
         on right: 154 203
-    RecordLiteral <RecordLiteral::Ptr> (152)
+    RecordLiteral <RecordLiteral::Ptr> (153)
         on left: 171
         on right: 155
-    Assignments <NamedExpressions::Ptr> (153)
+    Assignments <NamedExpressions::Ptr> (154)
         on left: 172 173
         on right: 171 172
-    Assignment <NamedExpression::Ptr> (154)
+    Assignment <NamedExpression::Ptr> (155)
         on left: 174
         on right: 172 173
-    Types <Types::Ptr> (155)
+    Types <Types::Ptr> (156)
         on left: 175 176
         on right: 175 184 186
-    Type <libcasm_fe::Ast::Type::Ptr> (156)
+    Type <libcasm_fe::Ast::Type::Ptr> (157)
         on left: 177 178 179 180 181 182
         on right: 22 23 24 26 28 30 31 37 137 175 176 184 187 189 190 214 227
-    BasicType <BasicType::Ptr> (157)
+    BasicType <BasicType::Ptr> (158)
         on left: 183
         on right: 177
-    TupleType <TupleType::Ptr> (158)
+    TupleType <TupleType::Ptr> (159)
         on left: 184
         on right: 178
-    RecordType <RecordType::Ptr> (159)
+    RecordType <RecordType::Ptr> (160)
         on left: 185
         on right: 179
-    TemplateType <TemplateType::Ptr> (160)
+    TemplateType <TemplateType::Ptr> (161)
         on left: 186
         on right: 180
-    RelationType <RelationType::Ptr> (161)
+    RelationType <RelationType::Ptr> (162)
         on left: 187
         on right: 181
-    FixedSizedType <FixedSizedType::Ptr> (162)
+    FixedSizedType <FixedSizedType::Ptr> (163)
         on left: 188
         on right: 182
-    FunctionParameters <Types::Ptr> (163)
+    FunctionParameters <Types::Ptr> (164)
         on left: 189 190
         on right: 189 191
-    MaybeFunctionParameters <Types::Ptr> (164)
+    MaybeFunctionParameters <Types::Ptr> (165)
         on left: 191 192
         on right: 31 187 227
-    Parameters <VariableDefinitions::Ptr> (165)
+    Parameters <VariableDefinitions::Ptr> (166)
         on left: 193 194
         on right: 23 27 28 193
-    MaybeDefined <Defined::Ptr> (166)
+    MaybeDefined <Defined::Ptr> (167)
         on left: 195 196
         on right: 31 227
-    MaybeInitially <Initially::Ptr> (167)
+    MaybeInitially <Initially::Ptr> (168)
         on left: 197 198
         on right: 31 227
-    Initializers <Initializers::Ptr> (168)
+    Initializers <Initializers::Ptr> (169)
         on left: 199 200
         on right: 20 197 199
-    Initializer <Initializer::Ptr> (169)
+    Initializer <Initializer::Ptr> (170)
         on left: 201 202 203
         on right: 199 200
-    Identifier <Identifier::Ptr> (170)
+    Identifier <Identifier::Ptr> (171)
         on left: 204 205
         on right: 21 22 23 24 25 26 27 28 29 30 31 32 33 37 40 42 43 129 130 131 132 174 206 207 209 214 227 233 234
-    IdentifierPath <IdentifierPath::Ptr> (171)
+    IdentifierPath <IdentifierPath::Ptr> (172)
         on left: 206 207
         on right: 19 38 39 41 42 125 126 127 128 165 183 186 187 188 206
-    Variable <VariableDefinition::Ptr> (172)
+    Variable <VariableDefinition::Ptr> (173)
         on left: 208 209
         on right: 215 216
-    AttributedVariables <VariableDefinitions::Ptr> (173)
+    AttributedVariables <VariableDefinitions::Ptr> (174)
         on left: 210 211
         on right: 71 72 73 140 141 142 210
-    TypedVariables <VariableDefinitions::Ptr> (174)
+    TypedVariables <VariableDefinitions::Ptr> (175)
         on left: 212 213
         on right: 185 212
-    TypedVariable <VariableDefinition::Ptr> (175)
+    TypedVariable <VariableDefinition::Ptr> (176)
         on left: 214
         on right: 185 208 212 213 217 218
-    AttributedVariable <VariableDefinition::Ptr> (176)
+    AttributedVariable <VariableDefinition::Ptr> (177)
         on left: 215 216
         on right: 210 211 221
-    TypedAttributedVariable <VariableDefinition::Ptr> (177)
+    TypedAttributedVariable <VariableDefinition::Ptr> (178)
         on left: 217 218
         on right: 193 194
-    VariableBindings <VariableBindings::Ptr> (178)
+    VariableBindings <VariableBindings::Ptr> (179)
         on left: 219 220
         on right: 69 138 219
-    VariableBinding <VariableBinding::Ptr> (179)
+    VariableBinding <VariableBinding::Ptr> (180)
         on left: 221
         on right: 219 220
-    LocalFunctionDefinitions <FunctionDefinitions::Ptr> (180)
+    LocalFunctionDefinitions <FunctionDefinitions::Ptr> (181)
         on left: 222 223
         on right: 70 222
-    AttributedLocalFunctionDefinition <FunctionDefinition::Ptr> (181)
+    AttributedLocalFunctionDefinition <FunctionDefinition::Ptr> (182)
         on left: 224 225 226
         on right: 222 223
-    LocalFunctionDefinition <FunctionDefinition::Ptr> (182)
+    LocalFunctionDefinition <FunctionDefinition::Ptr> (183)
         on left: 227
         on right: 224 225
-    Attributes <Attributes::Ptr> (183)
+    Attributes <Attributes::Ptr> (184)
         on left: 228 229
         on right: 2 6 33 215 217 224 228
-    Attribute <Attribute::Ptr> (184)
+    Attribute <Attribute::Ptr> (185)
         on left: 230 231 232
         on right: 228 229
-    BasicAttribute <BasicAttribute::Ptr> (185)
+    BasicAttribute <BasicAttribute::Ptr> (186)
         on left: 233
         on right: 230
-    ExpressionAttribute <ExpressionAttribute::Ptr> (186)
+    ExpressionAttribute <ExpressionAttribute::Ptr> (187)
         on left: 234
         on right: 231
 

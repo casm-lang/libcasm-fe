@@ -1780,6 +1780,71 @@
           <symbol>Term</symbol>
         </rhs>
       </rule>
+      <rule number="235" usefulness="useless-in-grammar">
+        <lhs>FeatureDefinition</lhs>
+        <rhs>
+          <symbol>&quot;feature&quot;</symbol>
+          <symbol>Identifier</symbol>
+          <symbol>&quot;=&quot;</symbol>
+          <symbol>&quot;{&quot;</symbol>
+          <symbol>FeatureDeclarationsAndDefinitions</symbol>
+          <symbol>&quot;}&quot;</symbol>
+        </rhs>
+      </rule>
+      <rule number="236" usefulness="useless-in-grammar">
+        <lhs>FeatureDeclarationOrDefinition</lhs>
+        <rhs>
+          <symbol>DeclarationDefinition</symbol>
+        </rhs>
+      </rule>
+      <rule number="237" usefulness="useless-in-grammar">
+        <lhs>FeatureDeclarationOrDefinition</lhs>
+        <rhs>
+          <symbol>DerivedDefinition</symbol>
+        </rhs>
+      </rule>
+      <rule number="238" usefulness="useless-in-grammar">
+        <lhs>FeatureDeclarationOrDefinition</lhs>
+        <rhs>
+          <symbol>RuleDefinition</symbol>
+        </rhs>
+      </rule>
+      <rule number="239" usefulness="useless-in-grammar">
+        <lhs>FeatureDeclarationsAndDefinitions</lhs>
+        <rhs>
+          <symbol>FeatureDeclarationsAndDefinitions</symbol>
+          <symbol>&quot;,&quot;</symbol>
+          <symbol>FeatureDeclarationOrDefinition</symbol>
+        </rhs>
+      </rule>
+      <rule number="240" usefulness="useless-in-grammar">
+        <lhs>FeatureDeclarationsAndDefinitions</lhs>
+        <rhs>
+          <symbol>FeatureDeclarationOrDefinition</symbol>
+        </rhs>
+      </rule>
+      <rule number="241" usefulness="useless-in-grammar">
+        <lhs>DeclarationDefinition</lhs>
+        <rhs>
+          <symbol>&quot;derived&quot;</symbol>
+          <symbol>Identifier</symbol>
+          <symbol>&quot;:&quot;</symbol>
+          <symbol>MaybeFunctionParameters</symbol>
+          <symbol>&quot;-&gt;&quot;</symbol>
+          <symbol>Type</symbol>
+        </rhs>
+      </rule>
+      <rule number="242" usefulness="useless-in-grammar">
+        <lhs>DeclarationDefinition</lhs>
+        <rhs>
+          <symbol>&quot;rule&quot;</symbol>
+          <symbol>Identifier</symbol>
+          <symbol>&quot;:&quot;</symbol>
+          <symbol>MaybeFunctionParameters</symbol>
+          <symbol>&quot;-&gt;&quot;</symbol>
+          <symbol>Type</symbol>
+        </rhs>
+      </rule>
     </rules>
     <terminals>
       <terminal symbol-number="0" token-number="0" name="&quot;end of file&quot;" type="" usefulness="useful"/>
@@ -1793,184 +1858,189 @@
       <terminal symbol-number="9" token-number="264" name="&quot;invariant&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
       <terminal symbol-number="10" token-number="265" name="&quot;import&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
       <terminal symbol-number="11" token-number="266" name="&quot;structure&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="12" token-number="267" name="&quot;function&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="13" token-number="268" name="&quot;defined&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="14" token-number="269" name="&quot;seq&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="15" token-number="270" name="&quot;endseq&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="16" token-number="271" name="&quot;par&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="17" token-number="272" name="&quot;endpar&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="18" token-number="273" name="&quot;skip&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="19" token-number="274" name="&quot;let&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="20" token-number="275" name="&quot;local&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="21" token-number="276" name="&quot;in&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="2" assoc="precedence"/>
-      <terminal symbol-number="22" token-number="277" name="&quot;forall&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="23" token-number="278" name="&quot;choose&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="24" token-number="279" name="&quot;iterate&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="25" token-number="280" name="&quot;do&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="3" assoc="precedence"/>
-      <terminal symbol-number="26" token-number="281" name="&quot;if&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="27" token-number="282" name="&quot;then&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="4" assoc="precedence"/>
-      <terminal symbol-number="28" token-number="283" name="&quot;else&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="5" assoc="precedence"/>
-      <terminal symbol-number="29" token-number="284" name="&quot;case&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="30" token-number="285" name="&quot;of&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="31" token-number="286" name="&quot;default&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="32" token-number="287" name="&quot;holds&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="6" assoc="precedence"/>
-      <terminal symbol-number="33" token-number="288" name="&quot;exists&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="34" token-number="289" name="&quot;with&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="6" assoc="precedence"/>
-      <terminal symbol-number="35" token-number="290" name="&quot;as&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="36" token-number="291" name="&quot;while&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="37" token-number="292" name="&quot;undef&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="38" token-number="293" name="&quot;false&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="39" token-number="294" name="&quot;true&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="40" token-number="295" name="&quot;and&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="12" assoc="left"/>
-      <terminal symbol-number="41" token-number="296" name="&quot;or&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="10" assoc="left"/>
-      <terminal symbol-number="42" token-number="297" name="&quot;xor&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="11" assoc="left"/>
-      <terminal symbol-number="43" token-number="298" name="&quot;implies&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="9" assoc="left"/>
-      <terminal symbol-number="44" token-number="299" name="&quot;not&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="20" assoc="precedence"/>
-      <terminal symbol-number="45" token-number="300" name="&quot;+&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="46" token-number="301" name="&quot;-&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="47" token-number="302" name="&quot;=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="13" assoc="left"/>
-      <terminal symbol-number="48" token-number="303" name="&quot;(&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="22" assoc="precedence"/>
-      <terminal symbol-number="49" token-number="304" name="&quot;)&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="50" token-number="305" name="&quot;[&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="51" token-number="306" name="&quot;]&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="52" token-number="307" name="&quot;{&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="53" token-number="308" name="&quot;}&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="54" token-number="309" name="&quot;:&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="55" token-number="310" name="&quot;::&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="56" token-number="311" name="&quot;_&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="57" token-number="312" name="&quot;|&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="58" token-number="313" name="&quot;@&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="59" token-number="314" name="&quot;,&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="60" token-number="315" name="&quot;&lt;&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="61" token-number="316" name="&quot;&gt;&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="62" token-number="317" name="&quot;*&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="63" token-number="318" name="&quot;/&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="64" token-number="319" name="&quot;%&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="65" token-number="320" name="&quot;^&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="17" assoc="left"/>
-      <terminal symbol-number="66" token-number="321" name="&quot;'&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="23" assoc="precedence"/>
-      <terminal symbol-number="67" token-number="322" name="&quot;..&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="68" token-number="323" name="&quot;.&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="18" assoc="precedence"/>
-      <terminal symbol-number="69" token-number="324" name="&quot;-&gt;&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="70" token-number="325" name="&quot;=&gt;&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="9" assoc="left"/>
-      <terminal symbol-number="71" token-number="326" name="&quot;:=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="8" assoc="precedence"/>
-      <terminal symbol-number="72" token-number="327" name="&quot;!=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="13" assoc="left"/>
-      <terminal symbol-number="73" token-number="328" name="&quot;&lt;=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="74" token-number="329" name="&quot;&gt;=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="75" token-number="330" name="&quot;{|&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="76" token-number="331" name="&quot;|}&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="77" token-number="332" name="&quot;binary&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <terminal symbol-number="78" token-number="333" name="&quot;hexadecimal&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <terminal symbol-number="79" token-number="334" name="&quot;integer&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <terminal symbol-number="80" token-number="335" name="&quot;rational&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <terminal symbol-number="81" token-number="336" name="&quot;decimal&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <terminal symbol-number="82" token-number="337" name="&quot;string&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <terminal symbol-number="83" token-number="338" name="&quot;identifier&quot;" type="Identifier::Ptr" usefulness="useful"/>
-      <terminal symbol-number="84" token-number="339" name="BASIC_TYPE" type="" usefulness="useful" prec="1" assoc="precedence"/>
-      <terminal symbol-number="85" token-number="340" name="CALL" type="" usefulness="useful" prec="7" assoc="precedence"/>
-      <terminal symbol-number="86" token-number="341" name="UPLUS" type="" usefulness="useful" prec="19" assoc="precedence"/>
-      <terminal symbol-number="87" token-number="342" name="UMINUS" type="" usefulness="useful" prec="19" assoc="precedence"/>
-      <terminal symbol-number="88" token-number="343" name="CALL_WITHOUT_ARGS" type="" usefulness="useful" prec="21" assoc="precedence"/>
+      <terminal symbol-number="12" token-number="267" name="&quot;feature&quot;" type="Ast::Token::Ptr" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="13" token-number="268" name="&quot;function&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="14" token-number="269" name="&quot;defined&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="15" token-number="270" name="&quot;seq&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="16" token-number="271" name="&quot;endseq&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="17" token-number="272" name="&quot;par&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="18" token-number="273" name="&quot;endpar&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="19" token-number="274" name="&quot;skip&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="20" token-number="275" name="&quot;let&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="21" token-number="276" name="&quot;local&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="22" token-number="277" name="&quot;in&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="2" assoc="precedence"/>
+      <terminal symbol-number="23" token-number="278" name="&quot;forall&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="24" token-number="279" name="&quot;choose&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="25" token-number="280" name="&quot;iterate&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="26" token-number="281" name="&quot;do&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="3" assoc="precedence"/>
+      <terminal symbol-number="27" token-number="282" name="&quot;if&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="28" token-number="283" name="&quot;then&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="4" assoc="precedence"/>
+      <terminal symbol-number="29" token-number="284" name="&quot;else&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="5" assoc="precedence"/>
+      <terminal symbol-number="30" token-number="285" name="&quot;case&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="31" token-number="286" name="&quot;of&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="32" token-number="287" name="&quot;default&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="33" token-number="288" name="&quot;holds&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="6" assoc="precedence"/>
+      <terminal symbol-number="34" token-number="289" name="&quot;exists&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="35" token-number="290" name="&quot;with&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="6" assoc="precedence"/>
+      <terminal symbol-number="36" token-number="291" name="&quot;as&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="37" token-number="292" name="&quot;while&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="38" token-number="293" name="&quot;undef&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="39" token-number="294" name="&quot;false&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="40" token-number="295" name="&quot;true&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="41" token-number="296" name="&quot;and&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="12" assoc="left"/>
+      <terminal symbol-number="42" token-number="297" name="&quot;or&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="10" assoc="left"/>
+      <terminal symbol-number="43" token-number="298" name="&quot;xor&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="11" assoc="left"/>
+      <terminal symbol-number="44" token-number="299" name="&quot;implies&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="9" assoc="left"/>
+      <terminal symbol-number="45" token-number="300" name="&quot;not&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="20" assoc="precedence"/>
+      <terminal symbol-number="46" token-number="301" name="&quot;+&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="47" token-number="302" name="&quot;-&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="48" token-number="303" name="&quot;=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="13" assoc="left"/>
+      <terminal symbol-number="49" token-number="304" name="&quot;(&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="22" assoc="precedence"/>
+      <terminal symbol-number="50" token-number="305" name="&quot;)&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="51" token-number="306" name="&quot;[&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="52" token-number="307" name="&quot;]&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="53" token-number="308" name="&quot;{&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="54" token-number="309" name="&quot;}&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="55" token-number="310" name="&quot;:&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="56" token-number="311" name="&quot;::&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="57" token-number="312" name="&quot;_&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="58" token-number="313" name="&quot;|&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="59" token-number="314" name="&quot;@&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="60" token-number="315" name="&quot;,&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="61" token-number="316" name="&quot;&lt;&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="62" token-number="317" name="&quot;&gt;&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="63" token-number="318" name="&quot;*&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="64" token-number="319" name="&quot;/&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="65" token-number="320" name="&quot;%&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="66" token-number="321" name="&quot;^&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="17" assoc="left"/>
+      <terminal symbol-number="67" token-number="322" name="&quot;'&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="23" assoc="precedence"/>
+      <terminal symbol-number="68" token-number="323" name="&quot;..&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="69" token-number="324" name="&quot;.&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="18" assoc="precedence"/>
+      <terminal symbol-number="70" token-number="325" name="&quot;-&gt;&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="71" token-number="326" name="&quot;=&gt;&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="9" assoc="left"/>
+      <terminal symbol-number="72" token-number="327" name="&quot;:=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="8" assoc="precedence"/>
+      <terminal symbol-number="73" token-number="328" name="&quot;!=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="13" assoc="left"/>
+      <terminal symbol-number="74" token-number="329" name="&quot;&lt;=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="75" token-number="330" name="&quot;&gt;=&quot;" type="Ast::Token::Ptr" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="76" token-number="331" name="&quot;{|&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="77" token-number="332" name="&quot;|}&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="78" token-number="333" name="&quot;binary&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <terminal symbol-number="79" token-number="334" name="&quot;hexadecimal&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <terminal symbol-number="80" token-number="335" name="&quot;integer&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <terminal symbol-number="81" token-number="336" name="&quot;rational&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <terminal symbol-number="82" token-number="337" name="&quot;decimal&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <terminal symbol-number="83" token-number="338" name="&quot;string&quot;" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <terminal symbol-number="84" token-number="339" name="&quot;identifier&quot;" type="Identifier::Ptr" usefulness="useful"/>
+      <terminal symbol-number="85" token-number="340" name="BASIC_TYPE" type="" usefulness="useful" prec="1" assoc="precedence"/>
+      <terminal symbol-number="86" token-number="341" name="CALL" type="" usefulness="useful" prec="7" assoc="precedence"/>
+      <terminal symbol-number="87" token-number="342" name="UPLUS" type="" usefulness="useful" prec="19" assoc="precedence"/>
+      <terminal symbol-number="88" token-number="343" name="UMINUS" type="" usefulness="useful" prec="19" assoc="precedence"/>
+      <terminal symbol-number="89" token-number="344" name="CALL_WITHOUT_ARGS" type="" usefulness="useful" prec="21" assoc="precedence"/>
     </terminals>
     <nonterminals>
-      <nonterminal symbol-number="89" name="$accept" type="" usefulness="useful"/>
-      <nonterminal symbol-number="90" name="Specification" type="Specification::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="91" name="Header" type="HeaderDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="92" name="Definitions" type="Definitions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="93" name="AttributedDefinition" type="Definition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="94" name="Definition" type="Definition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="95" name="InitDefinition" type="InitDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="96" name="EnumerationDefinition" type="EnumerationDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="97" name="DerivedDefinition" type="DerivedDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="98" name="RuleDefinition" type="RuleDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="99" name="FunctionDefinition" type="FunctionDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="100" name="EnumeratorDefinition" type="EnumeratorDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="101" name="Enumerators" type="Enumerators::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="102" name="UsingDefinition" type="UsingDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="103" name="UsingPathDefinition" type="UsingPathDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="104" name="InvariantDefinition" type="InvariantDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="105" name="ImportDefinition" type="ImportDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="106" name="StructureDefinition" type="StructureDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="107" name="Rules" type="Rules::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="108" name="Rule" type="Rule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="109" name="SkipRule" type="SkipRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="110" name="ConditionalRule" type="ConditionalRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="111" name="CaseRule" type="CaseRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="112" name="CaseLabels" type="Cases::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="113" name="CaseLabel" type="Case::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="114" name="LetRule" type="LetRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="115" name="LocalRule" type="LocalRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="116" name="ForallRule" type="ForallRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="117" name="ChooseRule" type="ChooseRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="118" name="IterateRule" type="IterateRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="119" name="BlockRule" type="BlockRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="120" name="SequenceRule" type="SequenceRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="121" name="UpdateRule" type="UpdateRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="122" name="CallRule" type="CallRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="123" name="WhileRule" type="WhileRule::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="124" name="Terms" type="Expressions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="125" name="Term" type="Expression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="126" name="SimpleOrClaspedTerm" type="Expression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="127" name="OperatorExpression" type="Expression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="128" name="CallExpression" type="CallExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="129" name="DirectCallExpression" type="DirectCallExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="130" name="MethodCallExpression" type="MethodCallExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="131" name="LiteralCallExpression" type="LiteralCallExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="132" name="IndirectCallExpression" type="IndirectCallExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="133" name="TypeCastingExpression" type="TypeCastingExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="134" name="LetExpression" type="LetExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="135" name="ConditionalExpression" type="ConditionalExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="136" name="ChooseExpression" type="ChooseExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="137" name="UniversalQuantifierExpression" type="UniversalQuantifierExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="138" name="ExistentialQuantifierExpression" type="ExistentialQuantifierExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="139" name="CardinalityExpression" type="CardinalityExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="140" name="Literal" type="Literal::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="141" name="UndefinedLiteral" type="UndefLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="142" name="BooleanLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="143" name="IntegerLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="144" name="RationalLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="145" name="DecimalLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="146" name="BinaryLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="147" name="StringLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="148" name="ReferenceLiteral" type="ReferenceLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="149" name="ListLiteral" type="ListLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="150" name="RangeLiteral" type="RangeLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="151" name="TupleLiteral" type="TupleLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="152" name="RecordLiteral" type="RecordLiteral::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="153" name="Assignments" type="NamedExpressions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="154" name="Assignment" type="NamedExpression::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="155" name="Types" type="Types::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="156" name="Type" type="libcasm_fe::Ast::Type::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="157" name="BasicType" type="BasicType::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="158" name="TupleType" type="TupleType::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="159" name="RecordType" type="RecordType::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="160" name="TemplateType" type="TemplateType::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="161" name="RelationType" type="RelationType::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="162" name="FixedSizedType" type="FixedSizedType::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="163" name="FunctionParameters" type="Types::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="164" name="MaybeFunctionParameters" type="Types::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="165" name="Parameters" type="VariableDefinitions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="166" name="MaybeDefined" type="Defined::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="167" name="MaybeInitially" type="Initially::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="168" name="Initializers" type="Initializers::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="169" name="Initializer" type="Initializer::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="170" name="Identifier" type="Identifier::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="171" name="IdentifierPath" type="IdentifierPath::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="172" name="Variable" type="VariableDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="173" name="AttributedVariables" type="VariableDefinitions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="174" name="TypedVariables" type="VariableDefinitions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="175" name="TypedVariable" type="VariableDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="176" name="AttributedVariable" type="VariableDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="177" name="TypedAttributedVariable" type="VariableDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="178" name="VariableBindings" type="VariableBindings::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="179" name="VariableBinding" type="VariableBinding::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="180" name="LocalFunctionDefinitions" type="FunctionDefinitions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="181" name="AttributedLocalFunctionDefinition" type="FunctionDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="182" name="LocalFunctionDefinition" type="FunctionDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="183" name="Attributes" type="Attributes::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="184" name="Attribute" type="Attribute::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="185" name="BasicAttribute" type="BasicAttribute::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="186" name="ExpressionAttribute" type="ExpressionAttribute::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="187" name="FunctionDefinitions" type="FunctionDefinitions::Ptr" usefulness="useless-in-grammar"/>
+      <nonterminal symbol-number="90" name="$accept" type="" usefulness="useful"/>
+      <nonterminal symbol-number="91" name="Specification" type="Specification::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="92" name="Header" type="HeaderDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="93" name="Definitions" type="Definitions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="94" name="AttributedDefinition" type="Definition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="95" name="Definition" type="Definition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="96" name="InitDefinition" type="InitDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="97" name="EnumerationDefinition" type="EnumerationDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="98" name="DerivedDefinition" type="DerivedDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="99" name="RuleDefinition" type="RuleDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="100" name="FunctionDefinition" type="FunctionDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="101" name="EnumeratorDefinition" type="EnumeratorDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="102" name="Enumerators" type="Enumerators::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="103" name="UsingDefinition" type="UsingDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="104" name="UsingPathDefinition" type="UsingPathDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="105" name="InvariantDefinition" type="InvariantDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="106" name="ImportDefinition" type="ImportDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="107" name="StructureDefinition" type="StructureDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="108" name="Rules" type="Rules::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="109" name="Rule" type="Rule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="110" name="SkipRule" type="SkipRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="111" name="ConditionalRule" type="ConditionalRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="112" name="CaseRule" type="CaseRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="113" name="CaseLabels" type="Cases::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="114" name="CaseLabel" type="Case::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="115" name="LetRule" type="LetRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="116" name="LocalRule" type="LocalRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="117" name="ForallRule" type="ForallRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="118" name="ChooseRule" type="ChooseRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="119" name="IterateRule" type="IterateRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="120" name="BlockRule" type="BlockRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="121" name="SequenceRule" type="SequenceRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="122" name="UpdateRule" type="UpdateRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="123" name="CallRule" type="CallRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="124" name="WhileRule" type="WhileRule::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="125" name="Terms" type="Expressions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="126" name="Term" type="Expression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="127" name="SimpleOrClaspedTerm" type="Expression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="128" name="OperatorExpression" type="Expression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="129" name="CallExpression" type="CallExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="130" name="DirectCallExpression" type="DirectCallExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="131" name="MethodCallExpression" type="MethodCallExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="132" name="LiteralCallExpression" type="LiteralCallExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="133" name="IndirectCallExpression" type="IndirectCallExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="134" name="TypeCastingExpression" type="TypeCastingExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="135" name="LetExpression" type="LetExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="136" name="ConditionalExpression" type="ConditionalExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="137" name="ChooseExpression" type="ChooseExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="138" name="UniversalQuantifierExpression" type="UniversalQuantifierExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="139" name="ExistentialQuantifierExpression" type="ExistentialQuantifierExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="140" name="CardinalityExpression" type="CardinalityExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="141" name="Literal" type="Literal::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="142" name="UndefinedLiteral" type="UndefLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="143" name="BooleanLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="144" name="IntegerLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="145" name="RationalLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="146" name="DecimalLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="147" name="BinaryLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="148" name="StringLiteral" type="ValueLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="149" name="ReferenceLiteral" type="ReferenceLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="150" name="ListLiteral" type="ListLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="151" name="RangeLiteral" type="RangeLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="152" name="TupleLiteral" type="TupleLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="153" name="RecordLiteral" type="RecordLiteral::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="154" name="Assignments" type="NamedExpressions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="155" name="Assignment" type="NamedExpression::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="156" name="Types" type="Types::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="157" name="Type" type="libcasm_fe::Ast::Type::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="158" name="BasicType" type="BasicType::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="159" name="TupleType" type="TupleType::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="160" name="RecordType" type="RecordType::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="161" name="TemplateType" type="TemplateType::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="162" name="RelationType" type="RelationType::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="163" name="FixedSizedType" type="FixedSizedType::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="164" name="FunctionParameters" type="Types::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="165" name="MaybeFunctionParameters" type="Types::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="166" name="Parameters" type="VariableDefinitions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="167" name="MaybeDefined" type="Defined::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="168" name="MaybeInitially" type="Initially::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="169" name="Initializers" type="Initializers::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="170" name="Initializer" type="Initializer::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="171" name="Identifier" type="Identifier::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="172" name="IdentifierPath" type="IdentifierPath::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="173" name="Variable" type="VariableDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="174" name="AttributedVariables" type="VariableDefinitions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="175" name="TypedVariables" type="VariableDefinitions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="176" name="TypedVariable" type="VariableDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="177" name="AttributedVariable" type="VariableDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="178" name="TypedAttributedVariable" type="VariableDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="179" name="VariableBindings" type="VariableBindings::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="180" name="VariableBinding" type="VariableBinding::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="181" name="LocalFunctionDefinitions" type="FunctionDefinitions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="182" name="AttributedLocalFunctionDefinition" type="FunctionDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="183" name="LocalFunctionDefinition" type="FunctionDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="184" name="Attributes" type="Attributes::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="185" name="Attribute" type="Attribute::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="186" name="BasicAttribute" type="BasicAttribute::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="187" name="ExpressionAttribute" type="ExpressionAttribute::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="188" name="FunctionDefinitions" type="FunctionDefinitions::Ptr" usefulness="useless-in-grammar"/>
+      <nonterminal symbol-number="189" name="FeatureDefinition" type="FeatureDefinition::Ptr" usefulness="useless-in-grammar"/>
+      <nonterminal symbol-number="190" name="FeatureDeclarationOrDefinition" type="Definition::Ptr" usefulness="useless-in-grammar"/>
+      <nonterminal symbol-number="191" name="FeatureDeclarationsAndDefinitions" type="Definitions::Ptr" usefulness="useless-in-grammar"/>
+      <nonterminal symbol-number="192" name="DeclarationDefinition" type="DeclarationDefinition::Ptr" usefulness="useless-in-grammar"/>
     </nonterminals>
   </grammar>
 

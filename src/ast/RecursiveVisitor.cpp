@@ -214,10 +214,26 @@ void RecursiveVisitor::visit( StructureDefinition& node )
     node.functions()->accept( *this );
 }
 
+void RecursiveVisitor::visit( FeatureDefinition& node )
+{
+    // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
+    node.identifier()->accept( *this );
+    node.definitions()->accept( *this );
+}
+
+void RecursiveVisitor::visit( DeclarationDefinition& node )
+{
+    // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
+    node.identifier()->accept( *this );
+    node.argumentTypes()->accept( *this );
+    node.returnType()->accept( *this );
+}
+
 //
 //
 // Literals
 //
+
 void RecursiveVisitor::visit( UndefLiteral& node )
 {
     node.delimiterToken()->accept( *this );

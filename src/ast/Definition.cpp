@@ -710,6 +710,86 @@ void StructureDefinition::accept( Visitor& visitor )
 
 //
 //
+// FeatureDefinition
+//
+
+FeatureDefinition::FeatureDefinition(
+    const Identifier::Ptr& identifier, const Definitions::Ptr& definitions )
+: Definition( Node::ID::FEATURE_DEFINITION, identifier )
+, m_definitions( definitions )
+{
+}
+
+const Definitions::Ptr& FeatureDefinition::definitions( void ) const
+{
+    return m_definitions;
+}
+
+void FeatureDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
+// DeclarationDefinition
+//
+
+DeclarationDefinition::DeclarationDefinition(
+    const Identifier::Ptr& identifier,
+    const Types::Ptr& argumentTypes,
+    const Type::Ptr& returnType )
+: Definition( Node::ID::DECLARATION_DEFINITION, identifier )
+, m_argumentTypes( argumentTypes )
+, m_returnType( returnType )
+{
+}
+
+const Types::Ptr& DeclarationDefinition::argumentTypes( void ) const
+{
+    return m_argumentTypes;
+}
+
+const Type::Ptr& DeclarationDefinition::returnType( void ) const
+{
+    return m_returnType;
+}
+
+void DeclarationDefinition::setKind( const Kind kind )
+{
+    m_kind = kind;
+}
+
+DeclarationDefinition::Kind DeclarationDefinition::kind( void ) const
+{
+    return m_kind;
+}
+
+std::string DeclarationDefinition::kindName( void ) const
+{
+    switch( kind() )
+    {
+        case DeclarationDefinition::Kind::DERIVED:
+        {
+            return "derived";
+        }
+        case DeclarationDefinition::Kind::RULE:
+        {
+            return "rule";
+        }
+    }
+
+    assert( !" internal error! " );
+    return std::string();
+}
+
+void DeclarationDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
 // InitDefinition
 //
 

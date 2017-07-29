@@ -426,6 +426,7 @@ namespace libcasm_fe {
       // "invariant"
       // "import"
       // "structure"
+      // "feature"
       // "function"
       // "defined"
       // "seq"
@@ -816,83 +817,84 @@ namespace libcasm_fe {
     INVARIANT = 264,               // "invariant"
     IMPORT = 265,                  // "import"
     STRUCTURE = 266,               // "structure"
-    FUNCTION = 267,                // "function"
-    DEFINED = 268,                 // "defined"
-    SEQ = 269,                     // "seq"
-    ENDSEQ = 270,                  // "endseq"
-    PAR = 271,                     // "par"
-    ENDPAR = 272,                  // "endpar"
-    SKIP = 273,                    // "skip"
-    LET = 274,                     // "let"
-    LOCAL = 275,                   // "local"
-    IN = 276,                      // "in"
-    FORALL = 277,                  // "forall"
-    CHOOSE = 278,                  // "choose"
-    ITERATE = 279,                 // "iterate"
-    DO = 280,                      // "do"
-    IF = 281,                      // "if"
-    THEN = 282,                    // "then"
-    ELSE = 283,                    // "else"
-    CASE = 284,                    // "case"
-    OF = 285,                      // "of"
-    DEFAULT = 286,                 // "default"
-    HOLDS = 287,                   // "holds"
-    EXISTS = 288,                  // "exists"
-    WITH = 289,                    // "with"
-    AS = 290,                      // "as"
-    WHILE = 291,                   // "while"
-    UNDEF = 292,                   // "undef"
-    FALSE = 293,                   // "false"
-    TRUE = 294,                    // "true"
-    AND = 295,                     // "and"
-    OR = 296,                      // "or"
-    XOR = 297,                     // "xor"
-    IMPLIES = 298,                 // "implies"
-    NOT = 299,                     // "not"
-    PLUS = 300,                    // "+"
-    MINUS = 301,                   // "-"
-    EQUAL = 302,                   // "="
-    LPAREN = 303,                  // "("
-    RPAREN = 304,                  // ")"
-    LSQPAREN = 305,                // "["
-    RSQPAREN = 306,                // "]"
-    LCURPAREN = 307,               // "{"
-    RCURPAREN = 308,               // "}"
-    COLON = 309,                   // ":"
-    DOUBLECOLON = 310,             // "::"
-    UNDERLINE = 311,               // "_"
-    VERTICAL_BAR = 312,            // "|"
-    AT = 313,                      // "@"
-    COMMA = 314,                   // ","
-    LESSER = 315,                  // "<"
-    GREATER = 316,                 // ">"
-    ASTERIX = 317,                 // "*"
-    SLASH = 318,                   // "/"
-    PERCENT = 319,                 // "%"
-    CARET = 320,                   // "^"
-    MARK = 321,                    // "'"
-    DOTDOT = 322,                  // ".."
-    DOT = 323,                     // "."
-    MAPS = 324,                    // "->"
-    ARROW = 325,                   // "=>"
-    UPDATE = 326,                  // ":="
-    NEQUAL = 327,                  // "!="
-    LESSEQ = 328,                  // "<="
-    GREATEREQ = 329,               // ">="
-    SEQ_BRACKET = 330,             // "{|"
-    ENDSEQ_BRACKET = 331,          // "|}"
-    BINARY = 332,                  // "binary"
-    HEXADECIMAL = 333,             // "hexadecimal"
-    INTEGER = 334,                 // "integer"
-    RATIONAL = 335,                // "rational"
-    DECIMAL = 336,                 // "decimal"
-    STRING = 337,                  // "string"
-    IDENTIFIER = 338,              // "identifier"
-    BASIC_TYPE = 339,              // BASIC_TYPE
-    CALL = 340,                    // CALL
-    UPLUS = 341,                   // UPLUS
-    UMINUS = 342,                  // UMINUS
-    CALL_WITHOUT_ARGS = 343        // CALL_WITHOUT_ARGS
+    FEATURE = 267,                 // "feature"
+    FUNCTION = 268,                // "function"
+    DEFINED = 269,                 // "defined"
+    SEQ = 270,                     // "seq"
+    ENDSEQ = 271,                  // "endseq"
+    PAR = 272,                     // "par"
+    ENDPAR = 273,                  // "endpar"
+    SKIP = 274,                    // "skip"
+    LET = 275,                     // "let"
+    LOCAL = 276,                   // "local"
+    IN = 277,                      // "in"
+    FORALL = 278,                  // "forall"
+    CHOOSE = 279,                  // "choose"
+    ITERATE = 280,                 // "iterate"
+    DO = 281,                      // "do"
+    IF = 282,                      // "if"
+    THEN = 283,                    // "then"
+    ELSE = 284,                    // "else"
+    CASE = 285,                    // "case"
+    OF = 286,                      // "of"
+    DEFAULT = 287,                 // "default"
+    HOLDS = 288,                   // "holds"
+    EXISTS = 289,                  // "exists"
+    WITH = 290,                    // "with"
+    AS = 291,                      // "as"
+    WHILE = 292,                   // "while"
+    UNDEF = 293,                   // "undef"
+    FALSE = 294,                   // "false"
+    TRUE = 295,                    // "true"
+    AND = 296,                     // "and"
+    OR = 297,                      // "or"
+    XOR = 298,                     // "xor"
+    IMPLIES = 299,                 // "implies"
+    NOT = 300,                     // "not"
+    PLUS = 301,                    // "+"
+    MINUS = 302,                   // "-"
+    EQUAL = 303,                   // "="
+    LPAREN = 304,                  // "("
+    RPAREN = 305,                  // ")"
+    LSQPAREN = 306,                // "["
+    RSQPAREN = 307,                // "]"
+    LCURPAREN = 308,               // "{"
+    RCURPAREN = 309,               // "}"
+    COLON = 310,                   // ":"
+    DOUBLECOLON = 311,             // "::"
+    UNDERLINE = 312,               // "_"
+    VERTICAL_BAR = 313,            // "|"
+    AT = 314,                      // "@"
+    COMMA = 315,                   // ","
+    LESSER = 316,                  // "<"
+    GREATER = 317,                 // ">"
+    ASTERIX = 318,                 // "*"
+    SLASH = 319,                   // "/"
+    PERCENT = 320,                 // "%"
+    CARET = 321,                   // "^"
+    MARK = 322,                    // "'"
+    DOTDOT = 323,                  // ".."
+    DOT = 324,                     // "."
+    MAPS = 325,                    // "->"
+    ARROW = 326,                   // "=>"
+    UPDATE = 327,                  // ":="
+    NEQUAL = 328,                  // "!="
+    LESSEQ = 329,                  // "<="
+    GREATEREQ = 330,               // ">="
+    SEQ_BRACKET = 331,             // "{|"
+    ENDSEQ_BRACKET = 332,          // "|}"
+    BINARY = 333,                  // "binary"
+    HEXADECIMAL = 334,             // "hexadecimal"
+    INTEGER = 335,                 // "integer"
+    RATIONAL = 336,                // "rational"
+    DECIMAL = 337,                 // "decimal"
+    STRING = 338,                  // "string"
+    IDENTIFIER = 339,              // "identifier"
+    BASIC_TYPE = 340,              // BASIC_TYPE
+    CALL = 341,                    // CALL
+    UPLUS = 342,                   // UPLUS
+    UMINUS = 343,                  // UMINUS
+    CALL_WITHOUT_ARGS = 344        // CALL_WITHOUT_ARGS
       };
       /// Backward compatibility alias (Bison 3.6).
       typedef token_kind_type yytokentype;
@@ -909,7 +911,7 @@ namespace libcasm_fe {
     {
       enum symbol_kind_type
       {
-        YYNTOKENS = 89, ///< Number of tokens.
+        YYNTOKENS = 90, ///< Number of tokens.
         S_YYEMPTY = -2,
         S_YYEOF = 0,                             // "end of file"
         S_YYerror = 1,                           // error
@@ -923,181 +925,182 @@ namespace libcasm_fe {
         S_INVARIANT = 9,                         // "invariant"
         S_IMPORT = 10,                           // "import"
         S_STRUCTURE = 11,                        // "structure"
-        S_FUNCTION = 12,                         // "function"
-        S_DEFINED = 13,                          // "defined"
-        S_SEQ = 14,                              // "seq"
-        S_ENDSEQ = 15,                           // "endseq"
-        S_PAR = 16,                              // "par"
-        S_ENDPAR = 17,                           // "endpar"
-        S_SKIP = 18,                             // "skip"
-        S_LET = 19,                              // "let"
-        S_LOCAL = 20,                            // "local"
-        S_IN = 21,                               // "in"
-        S_FORALL = 22,                           // "forall"
-        S_CHOOSE = 23,                           // "choose"
-        S_ITERATE = 24,                          // "iterate"
-        S_DO = 25,                               // "do"
-        S_IF = 26,                               // "if"
-        S_THEN = 27,                             // "then"
-        S_ELSE = 28,                             // "else"
-        S_CASE = 29,                             // "case"
-        S_OF = 30,                               // "of"
-        S_DEFAULT = 31,                          // "default"
-        S_HOLDS = 32,                            // "holds"
-        S_EXISTS = 33,                           // "exists"
-        S_WITH = 34,                             // "with"
-        S_AS = 35,                               // "as"
-        S_WHILE = 36,                            // "while"
-        S_UNDEF = 37,                            // "undef"
-        S_FALSE = 38,                            // "false"
-        S_TRUE = 39,                             // "true"
-        S_AND = 40,                              // "and"
-        S_OR = 41,                               // "or"
-        S_XOR = 42,                              // "xor"
-        S_IMPLIES = 43,                          // "implies"
-        S_NOT = 44,                              // "not"
-        S_PLUS = 45,                             // "+"
-        S_MINUS = 46,                            // "-"
-        S_EQUAL = 47,                            // "="
-        S_LPAREN = 48,                           // "("
-        S_RPAREN = 49,                           // ")"
-        S_LSQPAREN = 50,                         // "["
-        S_RSQPAREN = 51,                         // "]"
-        S_LCURPAREN = 52,                        // "{"
-        S_RCURPAREN = 53,                        // "}"
-        S_COLON = 54,                            // ":"
-        S_DOUBLECOLON = 55,                      // "::"
-        S_UNDERLINE = 56,                        // "_"
-        S_VERTICAL_BAR = 57,                     // "|"
-        S_AT = 58,                               // "@"
-        S_COMMA = 59,                            // ","
-        S_LESSER = 60,                           // "<"
-        S_GREATER = 61,                          // ">"
-        S_ASTERIX = 62,                          // "*"
-        S_SLASH = 63,                            // "/"
-        S_PERCENT = 64,                          // "%"
-        S_CARET = 65,                            // "^"
-        S_MARK = 66,                             // "'"
-        S_DOTDOT = 67,                           // ".."
-        S_DOT = 68,                              // "."
-        S_MAPS = 69,                             // "->"
-        S_ARROW = 70,                            // "=>"
-        S_UPDATE = 71,                           // ":="
-        S_NEQUAL = 72,                           // "!="
-        S_LESSEQ = 73,                           // "<="
-        S_GREATEREQ = 74,                        // ">="
-        S_SEQ_BRACKET = 75,                      // "{|"
-        S_ENDSEQ_BRACKET = 76,                   // "|}"
-        S_BINARY = 77,                           // "binary"
-        S_HEXADECIMAL = 78,                      // "hexadecimal"
-        S_INTEGER = 79,                          // "integer"
-        S_RATIONAL = 80,                         // "rational"
-        S_DECIMAL = 81,                          // "decimal"
-        S_STRING = 82,                           // "string"
-        S_IDENTIFIER = 83,                       // "identifier"
-        S_BASIC_TYPE = 84,                       // BASIC_TYPE
-        S_CALL = 85,                             // CALL
-        S_UPLUS = 86,                            // UPLUS
-        S_UMINUS = 87,                           // UMINUS
-        S_CALL_WITHOUT_ARGS = 88,                // CALL_WITHOUT_ARGS
-        S_YYACCEPT = 89,                         // $accept
-        S_Specification = 90,                    // Specification
-        S_Header = 91,                           // Header
-        S_Definitions = 92,                      // Definitions
-        S_AttributedDefinition = 93,             // AttributedDefinition
-        S_Definition = 94,                       // Definition
-        S_InitDefinition = 95,                   // InitDefinition
-        S_EnumerationDefinition = 96,            // EnumerationDefinition
-        S_DerivedDefinition = 97,                // DerivedDefinition
-        S_RuleDefinition = 98,                   // RuleDefinition
-        S_FunctionDefinition = 99,               // FunctionDefinition
-        S_EnumeratorDefinition = 100,            // EnumeratorDefinition
-        S_Enumerators = 101,                     // Enumerators
-        S_UsingDefinition = 102,                 // UsingDefinition
-        S_UsingPathDefinition = 103,             // UsingPathDefinition
-        S_InvariantDefinition = 104,             // InvariantDefinition
-        S_ImportDefinition = 105,                // ImportDefinition
-        S_StructureDefinition = 106,             // StructureDefinition
-        S_Rules = 107,                           // Rules
-        S_Rule = 108,                            // Rule
-        S_SkipRule = 109,                        // SkipRule
-        S_ConditionalRule = 110,                 // ConditionalRule
-        S_CaseRule = 111,                        // CaseRule
-        S_CaseLabels = 112,                      // CaseLabels
-        S_CaseLabel = 113,                       // CaseLabel
-        S_LetRule = 114,                         // LetRule
-        S_LocalRule = 115,                       // LocalRule
-        S_ForallRule = 116,                      // ForallRule
-        S_ChooseRule = 117,                      // ChooseRule
-        S_IterateRule = 118,                     // IterateRule
-        S_BlockRule = 119,                       // BlockRule
-        S_SequenceRule = 120,                    // SequenceRule
-        S_UpdateRule = 121,                      // UpdateRule
-        S_CallRule = 122,                        // CallRule
-        S_WhileRule = 123,                       // WhileRule
-        S_Terms = 124,                           // Terms
-        S_Term = 125,                            // Term
-        S_SimpleOrClaspedTerm = 126,             // SimpleOrClaspedTerm
-        S_OperatorExpression = 127,              // OperatorExpression
-        S_CallExpression = 128,                  // CallExpression
-        S_DirectCallExpression = 129,            // DirectCallExpression
-        S_MethodCallExpression = 130,            // MethodCallExpression
-        S_LiteralCallExpression = 131,           // LiteralCallExpression
-        S_IndirectCallExpression = 132,          // IndirectCallExpression
-        S_TypeCastingExpression = 133,           // TypeCastingExpression
-        S_LetExpression = 134,                   // LetExpression
-        S_ConditionalExpression = 135,           // ConditionalExpression
-        S_ChooseExpression = 136,                // ChooseExpression
-        S_UniversalQuantifierExpression = 137,   // UniversalQuantifierExpression
-        S_ExistentialQuantifierExpression = 138, // ExistentialQuantifierExpression
-        S_CardinalityExpression = 139,           // CardinalityExpression
-        S_Literal = 140,                         // Literal
-        S_UndefinedLiteral = 141,                // UndefinedLiteral
-        S_BooleanLiteral = 142,                  // BooleanLiteral
-        S_IntegerLiteral = 143,                  // IntegerLiteral
-        S_RationalLiteral = 144,                 // RationalLiteral
-        S_DecimalLiteral = 145,                  // DecimalLiteral
-        S_BinaryLiteral = 146,                   // BinaryLiteral
-        S_StringLiteral = 147,                   // StringLiteral
-        S_ReferenceLiteral = 148,                // ReferenceLiteral
-        S_ListLiteral = 149,                     // ListLiteral
-        S_RangeLiteral = 150,                    // RangeLiteral
-        S_TupleLiteral = 151,                    // TupleLiteral
-        S_RecordLiteral = 152,                   // RecordLiteral
-        S_Assignments = 153,                     // Assignments
-        S_Assignment = 154,                      // Assignment
-        S_Types = 155,                           // Types
-        S_Type = 156,                            // Type
-        S_BasicType = 157,                       // BasicType
-        S_TupleType = 158,                       // TupleType
-        S_RecordType = 159,                      // RecordType
-        S_TemplateType = 160,                    // TemplateType
-        S_RelationType = 161,                    // RelationType
-        S_FixedSizedType = 162,                  // FixedSizedType
-        S_FunctionParameters = 163,              // FunctionParameters
-        S_MaybeFunctionParameters = 164,         // MaybeFunctionParameters
-        S_Parameters = 165,                      // Parameters
-        S_MaybeDefined = 166,                    // MaybeDefined
-        S_MaybeInitially = 167,                  // MaybeInitially
-        S_Initializers = 168,                    // Initializers
-        S_Initializer = 169,                     // Initializer
-        S_Identifier = 170,                      // Identifier
-        S_IdentifierPath = 171,                  // IdentifierPath
-        S_Variable = 172,                        // Variable
-        S_AttributedVariables = 173,             // AttributedVariables
-        S_TypedVariables = 174,                  // TypedVariables
-        S_TypedVariable = 175,                   // TypedVariable
-        S_AttributedVariable = 176,              // AttributedVariable
-        S_TypedAttributedVariable = 177,         // TypedAttributedVariable
-        S_VariableBindings = 178,                // VariableBindings
-        S_VariableBinding = 179,                 // VariableBinding
-        S_LocalFunctionDefinitions = 180,        // LocalFunctionDefinitions
-        S_AttributedLocalFunctionDefinition = 181, // AttributedLocalFunctionDefinition
-        S_LocalFunctionDefinition = 182,         // LocalFunctionDefinition
-        S_Attributes = 183,                      // Attributes
-        S_Attribute = 184,                       // Attribute
-        S_BasicAttribute = 185,                  // BasicAttribute
-        S_ExpressionAttribute = 186              // ExpressionAttribute
+        S_FEATURE = 12,                          // "feature"
+        S_FUNCTION = 13,                         // "function"
+        S_DEFINED = 14,                          // "defined"
+        S_SEQ = 15,                              // "seq"
+        S_ENDSEQ = 16,                           // "endseq"
+        S_PAR = 17,                              // "par"
+        S_ENDPAR = 18,                           // "endpar"
+        S_SKIP = 19,                             // "skip"
+        S_LET = 20,                              // "let"
+        S_LOCAL = 21,                            // "local"
+        S_IN = 22,                               // "in"
+        S_FORALL = 23,                           // "forall"
+        S_CHOOSE = 24,                           // "choose"
+        S_ITERATE = 25,                          // "iterate"
+        S_DO = 26,                               // "do"
+        S_IF = 27,                               // "if"
+        S_THEN = 28,                             // "then"
+        S_ELSE = 29,                             // "else"
+        S_CASE = 30,                             // "case"
+        S_OF = 31,                               // "of"
+        S_DEFAULT = 32,                          // "default"
+        S_HOLDS = 33,                            // "holds"
+        S_EXISTS = 34,                           // "exists"
+        S_WITH = 35,                             // "with"
+        S_AS = 36,                               // "as"
+        S_WHILE = 37,                            // "while"
+        S_UNDEF = 38,                            // "undef"
+        S_FALSE = 39,                            // "false"
+        S_TRUE = 40,                             // "true"
+        S_AND = 41,                              // "and"
+        S_OR = 42,                               // "or"
+        S_XOR = 43,                              // "xor"
+        S_IMPLIES = 44,                          // "implies"
+        S_NOT = 45,                              // "not"
+        S_PLUS = 46,                             // "+"
+        S_MINUS = 47,                            // "-"
+        S_EQUAL = 48,                            // "="
+        S_LPAREN = 49,                           // "("
+        S_RPAREN = 50,                           // ")"
+        S_LSQPAREN = 51,                         // "["
+        S_RSQPAREN = 52,                         // "]"
+        S_LCURPAREN = 53,                        // "{"
+        S_RCURPAREN = 54,                        // "}"
+        S_COLON = 55,                            // ":"
+        S_DOUBLECOLON = 56,                      // "::"
+        S_UNDERLINE = 57,                        // "_"
+        S_VERTICAL_BAR = 58,                     // "|"
+        S_AT = 59,                               // "@"
+        S_COMMA = 60,                            // ","
+        S_LESSER = 61,                           // "<"
+        S_GREATER = 62,                          // ">"
+        S_ASTERIX = 63,                          // "*"
+        S_SLASH = 64,                            // "/"
+        S_PERCENT = 65,                          // "%"
+        S_CARET = 66,                            // "^"
+        S_MARK = 67,                             // "'"
+        S_DOTDOT = 68,                           // ".."
+        S_DOT = 69,                              // "."
+        S_MAPS = 70,                             // "->"
+        S_ARROW = 71,                            // "=>"
+        S_UPDATE = 72,                           // ":="
+        S_NEQUAL = 73,                           // "!="
+        S_LESSEQ = 74,                           // "<="
+        S_GREATEREQ = 75,                        // ">="
+        S_SEQ_BRACKET = 76,                      // "{|"
+        S_ENDSEQ_BRACKET = 77,                   // "|}"
+        S_BINARY = 78,                           // "binary"
+        S_HEXADECIMAL = 79,                      // "hexadecimal"
+        S_INTEGER = 80,                          // "integer"
+        S_RATIONAL = 81,                         // "rational"
+        S_DECIMAL = 82,                          // "decimal"
+        S_STRING = 83,                           // "string"
+        S_IDENTIFIER = 84,                       // "identifier"
+        S_BASIC_TYPE = 85,                       // BASIC_TYPE
+        S_CALL = 86,                             // CALL
+        S_UPLUS = 87,                            // UPLUS
+        S_UMINUS = 88,                           // UMINUS
+        S_CALL_WITHOUT_ARGS = 89,                // CALL_WITHOUT_ARGS
+        S_YYACCEPT = 90,                         // $accept
+        S_Specification = 91,                    // Specification
+        S_Header = 92,                           // Header
+        S_Definitions = 93,                      // Definitions
+        S_AttributedDefinition = 94,             // AttributedDefinition
+        S_Definition = 95,                       // Definition
+        S_InitDefinition = 96,                   // InitDefinition
+        S_EnumerationDefinition = 97,            // EnumerationDefinition
+        S_DerivedDefinition = 98,                // DerivedDefinition
+        S_RuleDefinition = 99,                   // RuleDefinition
+        S_FunctionDefinition = 100,              // FunctionDefinition
+        S_EnumeratorDefinition = 101,            // EnumeratorDefinition
+        S_Enumerators = 102,                     // Enumerators
+        S_UsingDefinition = 103,                 // UsingDefinition
+        S_UsingPathDefinition = 104,             // UsingPathDefinition
+        S_InvariantDefinition = 105,             // InvariantDefinition
+        S_ImportDefinition = 106,                // ImportDefinition
+        S_StructureDefinition = 107,             // StructureDefinition
+        S_Rules = 108,                           // Rules
+        S_Rule = 109,                            // Rule
+        S_SkipRule = 110,                        // SkipRule
+        S_ConditionalRule = 111,                 // ConditionalRule
+        S_CaseRule = 112,                        // CaseRule
+        S_CaseLabels = 113,                      // CaseLabels
+        S_CaseLabel = 114,                       // CaseLabel
+        S_LetRule = 115,                         // LetRule
+        S_LocalRule = 116,                       // LocalRule
+        S_ForallRule = 117,                      // ForallRule
+        S_ChooseRule = 118,                      // ChooseRule
+        S_IterateRule = 119,                     // IterateRule
+        S_BlockRule = 120,                       // BlockRule
+        S_SequenceRule = 121,                    // SequenceRule
+        S_UpdateRule = 122,                      // UpdateRule
+        S_CallRule = 123,                        // CallRule
+        S_WhileRule = 124,                       // WhileRule
+        S_Terms = 125,                           // Terms
+        S_Term = 126,                            // Term
+        S_SimpleOrClaspedTerm = 127,             // SimpleOrClaspedTerm
+        S_OperatorExpression = 128,              // OperatorExpression
+        S_CallExpression = 129,                  // CallExpression
+        S_DirectCallExpression = 130,            // DirectCallExpression
+        S_MethodCallExpression = 131,            // MethodCallExpression
+        S_LiteralCallExpression = 132,           // LiteralCallExpression
+        S_IndirectCallExpression = 133,          // IndirectCallExpression
+        S_TypeCastingExpression = 134,           // TypeCastingExpression
+        S_LetExpression = 135,                   // LetExpression
+        S_ConditionalExpression = 136,           // ConditionalExpression
+        S_ChooseExpression = 137,                // ChooseExpression
+        S_UniversalQuantifierExpression = 138,   // UniversalQuantifierExpression
+        S_ExistentialQuantifierExpression = 139, // ExistentialQuantifierExpression
+        S_CardinalityExpression = 140,           // CardinalityExpression
+        S_Literal = 141,                         // Literal
+        S_UndefinedLiteral = 142,                // UndefinedLiteral
+        S_BooleanLiteral = 143,                  // BooleanLiteral
+        S_IntegerLiteral = 144,                  // IntegerLiteral
+        S_RationalLiteral = 145,                 // RationalLiteral
+        S_DecimalLiteral = 146,                  // DecimalLiteral
+        S_BinaryLiteral = 147,                   // BinaryLiteral
+        S_StringLiteral = 148,                   // StringLiteral
+        S_ReferenceLiteral = 149,                // ReferenceLiteral
+        S_ListLiteral = 150,                     // ListLiteral
+        S_RangeLiteral = 151,                    // RangeLiteral
+        S_TupleLiteral = 152,                    // TupleLiteral
+        S_RecordLiteral = 153,                   // RecordLiteral
+        S_Assignments = 154,                     // Assignments
+        S_Assignment = 155,                      // Assignment
+        S_Types = 156,                           // Types
+        S_Type = 157,                            // Type
+        S_BasicType = 158,                       // BasicType
+        S_TupleType = 159,                       // TupleType
+        S_RecordType = 160,                      // RecordType
+        S_TemplateType = 161,                    // TemplateType
+        S_RelationType = 162,                    // RelationType
+        S_FixedSizedType = 163,                  // FixedSizedType
+        S_FunctionParameters = 164,              // FunctionParameters
+        S_MaybeFunctionParameters = 165,         // MaybeFunctionParameters
+        S_Parameters = 166,                      // Parameters
+        S_MaybeDefined = 167,                    // MaybeDefined
+        S_MaybeInitially = 168,                  // MaybeInitially
+        S_Initializers = 169,                    // Initializers
+        S_Initializer = 170,                     // Initializer
+        S_Identifier = 171,                      // Identifier
+        S_IdentifierPath = 172,                  // IdentifierPath
+        S_Variable = 173,                        // Variable
+        S_AttributedVariables = 174,             // AttributedVariables
+        S_TypedVariables = 175,                  // TypedVariables
+        S_TypedVariable = 176,                   // TypedVariable
+        S_AttributedVariable = 177,              // AttributedVariable
+        S_TypedAttributedVariable = 178,         // TypedAttributedVariable
+        S_VariableBindings = 179,                // VariableBindings
+        S_VariableBinding = 180,                 // VariableBinding
+        S_LocalFunctionDefinitions = 181,        // LocalFunctionDefinitions
+        S_AttributedLocalFunctionDefinition = 182, // AttributedLocalFunctionDefinition
+        S_LocalFunctionDefinition = 183,         // LocalFunctionDefinition
+        S_Attributes = 184,                      // Attributes
+        S_Attribute = 185,                       // Attribute
+        S_BasicAttribute = 186,                  // BasicAttribute
+        S_ExpressionAttribute = 187              // ExpressionAttribute
       };
     };
 
@@ -1143,6 +1146,7 @@ namespace libcasm_fe {
       case symbol_kind::S_INVARIANT: // "invariant"
       case symbol_kind::S_IMPORT: // "import"
       case symbol_kind::S_STRUCTURE: // "structure"
+      case symbol_kind::S_FEATURE: // "feature"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -2743,6 +2747,7 @@ switch (yykind)
       case symbol_kind::S_INVARIANT: // "invariant"
       case symbol_kind::S_IMPORT: // "import"
       case symbol_kind::S_STRUCTURE: // "structure"
+      case symbol_kind::S_FEATURE: // "feature"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -3509,6 +3514,21 @@ switch (yykind)
       make_STRUCTURE (const Ast::Token::Ptr& v, const location_type& l)
       {
         return symbol_type (token::STRUCTURE, v, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_FEATURE (Ast::Token::Ptr v, location_type l)
+      {
+        return symbol_type (token::FEATURE, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_FEATURE (const Ast::Token::Ptr& v, const location_type& l)
+      {
+        return symbol_type (token::FEATURE, v, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -4996,7 +5016,7 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 2756,     ///< Last index in yytable_.
+      yylast_ = 2725,     ///< Last index in yytable_.
       yynnts_ = 98,  ///< Number of nonterminal symbols.
       yyfinal_ = 13 ///< Termination state number.
     };
@@ -5053,10 +5073,10 @@ switch (yykind)
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
       75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86,    87,    88
+      85,    86,    87,    88,    89
     };
     // Last valid token kind.
-    const int code_max = 343;
+    const int code_max = 344;
 
     if (t <= 0)
       return symbol_kind::S_YYEOF;
@@ -5084,6 +5104,7 @@ switch (yykind)
       case symbol_kind::S_INVARIANT: // "invariant"
       case symbol_kind::S_IMPORT: // "import"
       case symbol_kind::S_STRUCTURE: // "structure"
+      case symbol_kind::S_FEATURE: // "feature"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -5534,6 +5555,7 @@ switch (yykind)
       case symbol_kind::S_INVARIANT: // "invariant"
       case symbol_kind::S_IMPORT: // "import"
       case symbol_kind::S_STRUCTURE: // "structure"
+      case symbol_kind::S_FEATURE: // "feature"
       case symbol_kind::S_FUNCTION: // "function"
       case symbol_kind::S_DEFINED: // "defined"
       case symbol_kind::S_SEQ: // "seq"
@@ -6009,7 +6031,7 @@ switch (yykind)
 
 #line 51 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 6013 "GrammarParser.tab.h"
+#line 6035 "GrammarParser.tab.h"
 
 
 
