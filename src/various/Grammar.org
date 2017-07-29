@@ -56,6 +56,7 @@ Definition ::= InitDefinition
              | UsingPathDefinition
              | InvariantDefinition
              | ImportDefinition
+             | StructureDefinition
 #+end_src
 
 #+html: {{page>.:grammar:Definition&noheader&nofooter}}
@@ -167,6 +168,15 @@ ImportDefinition ::= "import" IdentifierPath
 #+end_src
 
 #+html: {{page>.:grammar:ImportDefinition&noheader&nofooter}}
+
+
+** StructureDefinition
+
+#+begin_src
+StructureDefinition ::= "structure" Identifier "=" "{" FunctionDefinition "}"
+#+end_src
+
+#+html: {{page>.:grammar:StructureDefinition&noheader&nofooter}}
 
 
 ** Rules

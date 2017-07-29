@@ -134,6 +134,7 @@ END       0 "end of file"
 %type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
 %type <VariableDefinitions::Ptr> TypedVariables
 %type <FunctionDefinition::Ptr> FunctionDefinition
+%type <FunctionDefinitions::Ptr> FunctionDefinitions
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
 %type <EnumeratorDefinition::Ptr> EnumeratorDefinition
@@ -143,6 +144,7 @@ END       0 "end of file"
 %type <UsingPathDefinition::Ptr> UsingPathDefinition
 %type <InvariantDefinition::Ptr> InvariantDefinition
 %type <ImportDefinition::Ptr> ImportDefinition
+%type <StructureDefinition::Ptr> StructureDefinition
 
 // literals
 %type <Literal::Ptr> Literal
@@ -359,6 +361,10 @@ Definition
   {
       $$ = $1;
   }
+| StructureDefinition
+  {
+      $$ = $1;
+  }
 ;
 
 
@@ -523,6 +529,15 @@ ImportDefinition
 | IMPORT IdentifierPath AS Identifier
   {
       $$ = Ast::make< ImportDefinition >( @$, $1, $2, $3, $4 );
+  }
+;
+
+
+StructureDefinition
+: STRUCTURE Identifier EQUAL LCURPAREN FunctionDefinition RCURPAREN
+  {
+      // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, $4, and $6
+      // $$ = Ast::make< StructureDefinition >( @$, $2, $5 );
   }
 ;
 

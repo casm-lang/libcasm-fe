@@ -53,6 +53,7 @@ RULE            "rule"
 USING           "using"
 INVARIANT       "invariant"
 IMPORT          "import"
+STRUCTURE       "structure"
 
 FUNCTION        "function"
 DEFINED         "defined"

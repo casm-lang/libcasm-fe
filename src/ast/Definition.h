@@ -428,6 +428,23 @@ namespace libcasm_fe
             const Token::Ptr m_assignmentToken;
         };
 
+        class StructureDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< StructureDefinition >;
+
+            StructureDefinition(
+                const Identifier::Ptr& identifier,
+                const NodeList< FunctionDefinition >::Ptr& functions );
+
+            const NodeList< FunctionDefinition >::Ptr& functions( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const NodeList< FunctionDefinition >::Ptr m_functions;
+        };
+
         class InitDefinition final : public Definition
         {
           public:

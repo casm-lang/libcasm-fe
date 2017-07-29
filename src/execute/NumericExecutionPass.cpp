@@ -46,13 +46,10 @@
 #include "NumericExecutionPass.h"
 
 #include <libcasm-fe/Logger>
+#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
+#include <libcasm-fe/execute/ExecutionVisitor>
 #include <libcasm-fe/execute/RuntimeException>
 #include <libcasm-fe/execute/UpdateException>
-
-#include <libcasm-fe/execute/Agent>
-#include <libcasm-fe/execute/ExecutionVisitor>
-
-#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/import/SpecificationMergerPass>
 
 #include <libpass/PassRegistry>

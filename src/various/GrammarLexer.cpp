@@ -338,8 +338,8 @@ int yyFlexLexer::yylex()
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 108
-#define YY_END_OF_BUFFER 109
+#define YY_NUM_RULES 109
+#define YY_END_OF_BUFFER 110
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -347,41 +347,42 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[295] =
+static const flex_int16_t yy_accept[303] =
     {   0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-      109,  107,   81,   82,   80,   79,  107,   98,   66,   68,
-       50,   51,   64,   47,   61,   48,   70,   65,    4,    4,
-       56,   62,   49,   63,   60,   83,   83,   52,   53,   67,
-       58,   83,   83,   83,   83,   83,   83,   83,   83,   83,
-       83,   83,   83,   83,   83,   83,   83,   83,   54,   59,
-       55,   84,   88,   87,   86,   88,   88,   88,  108,   90,
-       92,  108,  108,  108,   96,   95,   96,  108,  108,  108,
-      102,  100,   99,  100,  108,  108,  108,   81,   82,   80,
-       79,   74,   71,   69,   93,   89,    4,    0,    4,    0,
+      110,  108,   82,   83,   81,   80,  108,   99,   67,   69,
+       51,   52,   65,   48,   62,   49,   71,   66,    4,    4,
+       57,   63,   50,   64,   61,   84,   84,   53,   54,   68,
+       59,   84,   84,   84,   84,   84,   84,   84,   84,   84,
+       84,   84,   84,   84,   84,   84,   84,   84,   55,   60,
+       56,   85,   89,   88,   87,   89,   89,   89,  109,   91,
+       93,  109,  109,  109,   97,   96,   97,  109,  109,  109,
+      103,  101,  100,  101,  109,  109,  109,   82,   83,   81,
+       80,   75,   72,   70,   94,   90,    4,    0,    4,    0,
 
-        0,    0,   57,   73,   75,   72,   76,   83,   83,   83,
-       37,   83,   83,   83,   27,   83,   83,   83,   83,   83,
-       83,   83,   28,   83,   23,   83,   83,   83,   83,   32,
-       43,   83,   83,   83,   83,   83,   83,   83,   83,   83,
-       83,   83,   77,   78,   85,    0,    0,   91,    0,    0,
-       94,   97,    0,    0,  106,  105,  103,  104,  101,    0,
-        0,    4,    5,    1,    3,    2,   83,   42,   83,   83,
-       83,   83,   83,   83,   83,   83,   83,   83,   83,   83,
-       83,   83,   83,   83,   21,   83,   46,   18,   83,   16,
-       83,   83,   83,   83,   83,   83,   83,   44,    0,    0,
+        0,    0,   58,   74,   76,   73,   77,   84,   84,   84,
+       38,   84,   84,   84,   28,   84,   84,   84,   84,   84,
+       84,   84,   29,   84,   24,   84,   84,   84,   84,   33,
+       44,   84,   84,   84,   84,   84,   84,   84,   84,   84,
+       84,   84,   84,   78,   79,   86,    0,    0,   92,    0,
+        0,   95,   98,    0,    0,  107,  106,  104,  105,  102,
+        0,    0,    4,    5,    1,    3,    2,   84,   43,   84,
+       84,   84,   84,   84,   84,   84,   84,   84,   84,   84,
+       84,   84,   84,   84,   84,   22,   84,   47,   19,   84,
+       17,   84,   84,   84,   84,   84,   84,   84,   84,   45,
 
-        0,    0,    0,    1,    1,    3,    0,    3,    2,    2,
-        6,   31,   83,   83,   83,   83,   30,   83,   83,   83,
-       83,   83,   83,   83,   83,   83,   83,    7,   83,   83,
-       83,   10,   20,   29,   41,   83,   83,   83,   36,    0,
-        5,    3,   83,   83,   83,   83,   83,   83,   83,   83,
-       40,   83,   83,   34,   83,   83,   83,   83,   22,   39,
-       11,   38,    3,    3,   25,   83,   83,   83,   19,   17,
-       83,   35,   24,   83,   83,   13,   83,   83,   33,   15,
-        8,   83,   83,   45,   83,   26,   83,   14,   83,   83,
-       12,   83,    9,    0
+        0,    0,    0,    0,    0,    1,    1,    3,    0,    3,
+        2,    2,    6,   32,   84,   84,   84,   84,   31,   84,
+       84,   84,   84,   84,   84,   84,   84,   84,   84,    7,
+       84,   84,   84,   10,   21,   84,   30,   42,   84,   84,
+       84,   37,    0,    5,    3,   84,   84,   84,   84,   84,
+       84,   84,   84,   41,   84,   84,   35,   84,   84,   84,
+       84,   23,   84,   40,   11,   39,    3,    3,   26,   84,
+       84,   84,   20,   18,   84,   36,   25,   84,   84,   13,
+       84,   84,   84,   34,   16,    8,   84,   84,   46,   84,
+       27,   84,   84,   15,   84,   84,   84,   12,   14,   84,
 
+        9,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -427,83 +428,83 @@ static const YY_CHAR yy_meta[71] =
         5,    5,    5,    1,    1,    1,    1,    1,    1,    1
     } ;
 
-static const flex_int16_t yy_base[302] =
+static const flex_int16_t yy_base[310] =
     {   0,
         0,    0,   70,    0,  140,  143,  146,  149,  153,  162,
-      492,  493,  489,  487,  485,  483,  463,  493,  493,  493,
-      493,  493,  493,  493,  493,  461,  468,  135,  216,  151,
-      151,  460,  458,  458,  493,    0,  454,  493,  493,  493,
-        0,  121,  103,  113,  125,  135,  426,  134,  136,  425,
-      137,  436,  417,  147,  148,  145,  136,  422,  410,  408,
-      493,  493,  493,  493,  493,  406,  405,  404,  493,  493,
-      493,  403,  402,  401,  493,  493,  449,  399,  398,  397,
-      493,  493,  493,  200,  396,  395,  394,  458,  456,  454,
-      452,  493,  493,  493,  493,  493,  235,  208,  241,  182,
+      500,  501,  497,  495,  493,  491,  471,  501,  501,  501,
+      501,  501,  501,  501,  501,  469,  476,  135,  216,  151,
+      151,  468,  466,  466,  501,    0,  462,  501,  501,  501,
+        0,  121,  103,  113,  125,  135,  434,  134,  136,  433,
+      137,  444,  425,  147,  148,  145,  136,  430,  418,  416,
+      501,  501,  501,  501,  501,  414,  413,  412,  501,  501,
+      501,  411,  410,  409,  501,  501,  457,  407,  406,  405,
+      501,  501,  501,  200,  404,  403,  402,  466,  464,  462,
+      460,  501,  501,  501,  501,  501,  235,  208,  241,  182,
 
-      220,    0,  493,  493,  493,  493,  493,    0,  421,  411,
-        0,  396,  399,  200,    0,  394,  160,  402,  399,  392,
-      395,  396,    0,  391,  214,  400,  385,  400,  383,    0,
-        0,  384,  389,  383,  389,  392,  376,  391,  385,  384,
-      373,  374,  493,  493,  493,  363,  362,  493,  361,  360,
-      493,  493,  359,  358,  493,  493,  493,  493,  493,  357,
-      356,  257,  249,  262,  277,  412,  388,    0,  375,  365,
-      157,  369,  372,  216,  364,  357,  356,  371,  369,  367,
-      232,  351,  367,  351,    0,  365,    0,    0,  361,    0,
-      350,  351,  358,  357,  348,  349,  351,    0,  331,  330,
+      220,    0,  501,  501,  501,  501,  501,    0,  429,  419,
+        0,  404,  407,  200,    0,  402,  160,  410,  407,  400,
+      403,  404,    0,  399,  214,  408,  393,  408,  391,    0,
+        0,  392,  397,  391,  397,  388,  399,  383,  398,  392,
+      391,  380,  381,  501,  501,  501,  370,  369,  501,  368,
+      367,  501,  501,  366,  365,  501,  501,  501,  501,  501,
+      364,  363,  257,  249,  262,  277,  419,  395,    0,  382,
+      372,  200,  376,  379,  216,  371,  364,  363,  378,  376,
+      374,  232,  358,  374,  358,    0,  372,    0,    0,  368,
+        0,  357,  351,  357,  364,  363,  354,  355,  357,    0,
 
-      329,  328,  285,  283,  290,  297,  228,  301,  384,  383,
-        0,    0,  334,  331,  337,  328,    0,  346,  342,  341,
-      326,  339,  332,  323,  323,  331,  322,    0,  321,  335,
-      325,    0,    0,    0,    0,  329,  327,  328,    0,  245,
-      269,  304,  327,  320,  325,  324,  311,  311,  309,  307,
-        0,  308,  285,    0,  288,  273,  282,  271,    0,    0,
-        0,    0,  316,  319,    0,  269,  283,  269,    0,    0,
-      270,    0,    0,  254,  234,    0,  249,  240,    0,    0,
-        0,  225,  190,    0,  189,    0,  185,    0,  166,  170,
-        0,  129,    0,  493,  340,  345,  350,  352,  357,  138,
+      337,  336,  335,  334,  285,  283,  290,  297,  245,  301,
+      390,  389,    0,    0,  340,  337,  343,  334,    0,  352,
+      348,  347,  332,  345,  338,  329,  329,  337,  328,    0,
+      327,  341,  331,    0,    0,  338,    0,    0,  334,  332,
+      333,    0,  269,  293,  313,  332,  325,  330,  329,  316,
+      316,  314,  312,    0,  318,  319,    0,  322,  307,  316,
+      300,    0,  272,    0,    0,    0,  316,  319,    0,  271,
+      284,  283,    0,    0,  283,    0,    0,  270,  250,    0,
+      250,  246,  225,    0,    0,    0,  225,  195,    0,  194,
+        0,  186,  185,    0,  166,  179,  145,    0,    0,  129,
 
-      360
+        0,  501,  340,  345,  350,  352,  357,  138,  360
     } ;
 
-static const flex_int16_t yy_def[302] =
+static const flex_int16_t yy_def[310] =
     {   0,
-      294,    1,  294,    3,  295,  295,  296,  296,  297,  297,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  298,  298,  294,  294,  294,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  299,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
+      302,    1,  302,    3,  303,  303,  304,  304,  305,  305,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  306,  306,  302,  302,  302,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  307,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
 
-      294,  300,  294,  294,  294,  294,  294,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  301,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  294,  294,
+      302,  308,  302,  302,  302,  302,  302,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  309,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
 
-      294,  294,  294,  294,  294,  294,  294,  294,  301,  301,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  294,
-      294,  294,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  294,  294,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,  298,  298,  298,  298,  298,  298,  298,
-      298,  298,  298,    0,  294,  294,  294,  294,  294,  294,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      309,  309,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  302,  302,  302,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  302,  302,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
+      306,  306,  306,  306,  306,  306,  306,  306,  306,  306,
 
-      294
+      306,    0,  302,  302,  302,  302,  302,  302,  302
     } ;
 
-static const flex_int16_t yy_nxt[564] =
+static const flex_int16_t yy_nxt[572] =
     {   0,
        12,   13,   14,   15,   16,   17,   18,   12,   19,   20,
        21,   22,   23,   24,   25,   26,   27,   28,   29,   30,
@@ -520,56 +521,57 @@ static const flex_int16_t yy_nxt[564] =
        65,   65,   65,   65,   65,   65,   65,   65,   65,   65,
        65,   65,   65,   65,   65,   65,   65,   65,   65,   65,
        65,   65,   65,   63,   63,   63,   63,   66,   67,   68,
-       69,  166,   71,   69,  112,   71,   69,   95,   76,   69,
+       69,  167,   71,   69,  112,   71,   69,   95,   76,   69,
       113,   76,   96,   69,   69,   81,   69,  114,   77,   83,
        97,   77,   69,   69,   81,   69,  115,   98,   83,   99,
        99,   99,  103,  110,  104,  116,  119,  117,  111,  123,
-      127,  293,  130,  140,  141,  124,  125,  118,  120,  128,
-       84,  134,  126,  131,  121,  136,  135,  138,  214,   84,
+      127,  301,  130,  141,  142,  124,  125,  118,  120,  128,
+       84,  134,  126,  131,  121,  137,  135,  139,  300,   84,
 
-      164,  164,  139,  174,  137,  215,  156,   72,   73,   74,
-       72,   73,   74,   78,   79,   80,   78,   79,   80,  175,
-       85,   86,   87,  292,  291,   97,  163,  163,  163,   85,
-       86,   87,   98,  290,   99,   99,   99,  156,  165,  165,
-      165,  289,  288,  100,   97,  171,  242,  242,  242,  101,
-       97,  102,  157,  162,  162,  162,  172,   98,  158,   99,
-       99,   99,  182,  241,  241,  241,   97,  163,  163,  163,
-      218,  204,  101,  219,  183,  162,  162,  162,  102,  203,
-      205,  205,  226,  287,  286,  227,  206,  241,  241,  241,
-      285,  284,  204,  203,  207,  208,  208,  208,  240,  204,
+      165,  165,  140,  175,  138,  136,  157,   72,   73,   74,
+       72,   73,   74,   78,   79,   80,   78,   79,   80,  176,
+       85,   86,   87,  299,  298,   97,  164,  164,  164,   85,
+       86,   87,   98,  297,   99,   99,   99,  157,  166,  166,
+      166,  216,  296,  100,   97,  172,  295,  294,  217,  101,
+       97,  102,  158,  163,  163,  163,  173,   98,  159,   99,
+       99,   99,  183,  245,  245,  245,   97,  164,  164,  164,
+      220,  206,  101,  221,  184,  163,  163,  163,  102,  205,
+      207,  207,  228,  293,  292,  229,  208,  244,  244,  244,
+      291,  290,  206,  205,  209,  210,  210,  210,  243,  206,
 
-      240,  205,  205,  241,  241,  241,  206,  283,  205,  205,
-      206,  282,  281,  263,  207,  208,  208,  208,  207,  208,
-      208,  208,  264,  264,  264,  263,  280,  279,  263,  278,
-      277,  276,  275,  274,  264,  264,  264,  264,  264,  264,
+      243,  207,  207,  244,  244,  244,  208,  289,  207,  207,
+      208,  244,  244,  244,  209,  210,  210,  210,  209,  210,
+      210,  210,  267,  288,  287,  267,  286,  285,  267,  284,
+      283,  268,  268,  268,  268,  268,  268,  268,  268,  268,
        70,   70,   70,   70,   70,   75,   75,   75,   75,   75,
-       82,   82,   82,   82,   82,  108,  108,  155,  273,  155,
-      155,  155,  210,  210,  272,  271,  270,  269,  268,  267,
-      266,  265,  262,  261,  260,  259,  258,  257,  256,  255,
-      254,  253,  252,  251,  250,  249,  248,  247,  246,  245,
-      244,  243,  209,  209,  159,  152,  148,  145,  239,  238,
+       82,   82,   82,   82,   82,  108,  108,  156,  282,  156,
+      156,  156,  212,  212,  281,  280,  279,  278,  277,  276,
+      275,  274,  273,  272,  271,  270,  269,  266,  265,  264,
+      263,  262,  261,  260,  259,  258,  257,  256,  255,  254,
+      253,  252,  251,  250,  249,  248,  247,  246,  211,  211,
 
-      237,  236,  235,  234,  233,  232,  231,  230,  229,  228,
-      225,  224,  223,  222,  221,  220,  217,  216,  213,  212,
-      211,  209,  202,  159,  201,  152,  200,  148,  199,  145,
-      198,  197,  196,  195,  194,  193,  192,  191,  190,  189,
-      188,  187,  186,  185,  184,  181,  180,  179,  178,  177,
-      176,  173,  170,  169,  168,  167,   91,   90,   89,   88,
-      161,  160,  159,  154,  153,  152,  151,  150,  149,  148,
-      147,  146,  145,  144,  143,  142,  133,  132,  129,  122,
-      109,  107,  106,  105,   94,   93,   92,   91,   90,   89,
-       88,  294,   11,  294,  294,  294,  294,  294,  294,  294,
+      160,  153,  149,  146,  242,  241,  240,  239,  238,  237,
+      236,  235,  234,  233,  232,  231,  230,  227,  226,  225,
+      224,  223,  222,  219,  218,  215,  214,  213,  211,  204,
+      160,  203,  153,  202,  149,  201,  146,  200,  199,  198,
+      197,  196,  195,  194,  193,  192,  191,  190,  189,  188,
+      187,  186,  185,  182,  181,  180,  179,  178,  177,  174,
+      171,  170,  169,  168,   91,   90,   89,   88,  162,  161,
+      160,  155,  154,  153,  152,  151,  150,  149,  148,  147,
+      146,  145,  144,  143,  133,  132,  129,  122,  109,  107,
+      106,  105,   94,   93,   92,   91,   90,   89,   88,  302,
 
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294
+       11,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302
     } ;
 
-static const flex_int16_t yy_chk[564] =
+static const flex_int16_t yy_chk[572] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -586,53 +588,54 @@ static const flex_int16_t yy_chk[564] =
         3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
         3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
         3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
-        5,  300,    5,    6,   43,    6,    7,   28,    7,    8,
+        5,  308,    5,    6,   43,    6,    7,   28,    7,    8,
        43,    8,   28,    9,    9,    9,    9,   44,    7,    9,
        30,    8,   10,   10,   10,   10,   44,   30,   10,   30,
        30,   30,   31,   42,   31,   45,   46,   45,   42,   48,
-       49,  292,   51,   57,   57,   48,   48,   45,   46,   49,
-        9,   54,   48,   51,   46,   55,   54,   56,  171,   10,
+       49,  300,   51,   57,   57,   48,   48,   45,   46,   49,
+        9,   54,   48,   51,   46,   55,   54,   56,  297,   10,
 
-      100,  100,   56,  117,   55,  171,   84,    5,    5,    5,
+      100,  100,   56,  117,   55,   54,   84,    5,    5,    5,
         6,    6,    6,    7,    7,    7,    8,    8,    8,  117,
-        9,    9,    9,  290,  289,   29,   98,   98,   98,   10,
-       10,   10,   29,  287,   29,   29,   29,   84,  101,  101,
-      101,  285,  283,   29,   97,  114,  207,  207,  207,   29,
+        9,    9,    9,  296,  295,   29,   98,   98,   98,   10,
+       10,   10,   29,  293,   29,   29,   29,   84,  101,  101,
+      101,  172,  292,   29,   97,  114,  290,  288,  172,   29,
        99,   29,   84,   97,   97,   97,  114,   99,   84,   99,
-       99,   99,  125,  240,  240,  240,  162,  163,  163,  163,
-      174,  164,   29,  174,  125,  162,  162,  162,   29,  163,
-      164,  164,  181,  282,  278,  181,  165,  241,  241,  241,
-      277,  275,  204,  163,  165,  165,  165,  165,  203,  205,
+       99,   99,  125,  209,  209,  209,  163,  164,  164,  164,
+      175,  165,   29,  175,  125,  163,  163,  163,   29,  164,
+      165,  165,  182,  287,  283,  182,  166,  243,  243,  243,
+      282,  281,  206,  164,  166,  166,  166,  166,  205,  207,
 
-      203,  204,  204,  203,  203,  203,  206,  274,  205,  205,
-      208,  271,  268,  242,  206,  206,  206,  206,  208,  208,
-      208,  208,  242,  242,  242,  263,  267,  266,  264,  258,
-      257,  256,  255,  253,  263,  263,  263,  264,  264,  264,
-      295,  295,  295,  295,  295,  296,  296,  296,  296,  296,
-      297,  297,  297,  297,  297,  298,  298,  299,  252,  299,
-      299,  299,  301,  301,  250,  249,  248,  247,  246,  245,
-      244,  243,  238,  237,  236,  231,  230,  229,  227,  226,
-      225,  224,  223,  222,  221,  220,  219,  218,  216,  215,
-      214,  213,  210,  209,  202,  201,  200,  199,  197,  196,
+      205,  206,  206,  205,  205,  205,  208,  279,  207,  207,
+      210,  244,  244,  244,  208,  208,  208,  208,  210,  210,
+      210,  210,  245,  278,  275,  267,  272,  271,  268,  270,
+      263,  245,  245,  245,  267,  267,  267,  268,  268,  268,
+      303,  303,  303,  303,  303,  304,  304,  304,  304,  304,
+      305,  305,  305,  305,  305,  306,  306,  307,  261,  307,
+      307,  307,  309,  309,  260,  259,  258,  256,  255,  253,
+      252,  251,  250,  249,  248,  247,  246,  241,  240,  239,
+      236,  233,  232,  231,  229,  228,  227,  226,  225,  224,
+      223,  222,  221,  220,  218,  217,  216,  215,  212,  211,
 
-      195,  194,  193,  192,  191,  189,  186,  184,  183,  182,
-      180,  179,  178,  177,  176,  175,  173,  172,  170,  169,
-      167,  166,  161,  160,  154,  153,  150,  149,  147,  146,
-      142,  141,  140,  139,  138,  137,  136,  135,  134,  133,
-      132,  129,  128,  127,  126,  124,  122,  121,  120,  119,
-      118,  116,  113,  112,  110,  109,   91,   90,   89,   88,
-       87,   86,   85,   80,   79,   78,   77,   74,   73,   72,
-       68,   67,   66,   60,   59,   58,   53,   52,   50,   47,
-       37,   34,   33,   32,   27,   26,   17,   16,   15,   14,
-       13,   11,  294,  294,  294,  294,  294,  294,  294,  294,
+      204,  203,  202,  201,  199,  198,  197,  196,  195,  194,
+      193,  192,  190,  187,  185,  184,  183,  181,  180,  179,
+      178,  177,  176,  174,  173,  171,  170,  168,  167,  162,
+      161,  155,  154,  151,  150,  148,  147,  143,  142,  141,
+      140,  139,  138,  137,  136,  135,  134,  133,  132,  129,
+      128,  127,  126,  124,  122,  121,  120,  119,  118,  116,
+      113,  112,  110,  109,   91,   90,   89,   88,   87,   86,
+       85,   80,   79,   78,   77,   74,   73,   72,   68,   67,
+       66,   60,   59,   58,   53,   52,   50,   47,   37,   34,
+       33,   32,   27,   26,   17,   16,   15,   14,   13,   11,
 
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294,  294,  294,  294,  294,  294,  294,  294,
-      294,  294,  294
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302,  302,  302,  302,  302,  302,  302,  302,  302,  302,
+      302
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -650,6 +653,7 @@ static const flex_int16_t yy_chk[564] =
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
+//                Jakob Moosbrugger
 //                Florian Hahn
 //                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
@@ -713,11 +717,11 @@ using namespace libcasm_fe;
     token->setSpans( fetchSpansAndReset() ); \
     return Parser::make_##TOKEN( token, m_loc );
 
-#line 716 "src/various/GrammarLexer.cpp"
+#line 720 "src/various/GrammarLexer.cpp"
 #define YY_NO_INPUT 1
 /* %option debug */
 
-#line 720 "src/various/GrammarLexer.cpp"
+#line 724 "src/various/GrammarLexer.cpp"
 
 #define INITIAL 0
 #define YY_IDENTIFIER 1
@@ -853,15 +857,15 @@ YY_DECL
 		}
 
 	{
-#line 88 "obj/src/GrammarLexer.l"
+#line 89 "obj/src/GrammarLexer.l"
 
 
-#line 91 "obj/src/GrammarLexer.l"
+#line 92 "obj/src/GrammarLexer.l"
     // Code run each time yylex is called.
     m_loc.step();
 
 
-#line 864 "src/various/GrammarLexer.cpp"
+#line 868 "src/various/GrammarLexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -888,13 +892,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 295 )
+				if ( yy_current_state >= 303 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_current_state != 294 );
+		while ( yy_current_state != 302 );
 		yy_cp = (yy_last_accepting_cpos);
 		yy_current_state = (yy_last_accepting_state);
 
@@ -916,7 +920,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 95 "obj/src/GrammarLexer.l"
+#line 96 "obj/src/GrammarLexer.l"
 {
     // BINARY
     ValueLiteral::Ptr valueLiteral = nullptr;
@@ -936,7 +940,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 112 "obj/src/GrammarLexer.l"
+#line 113 "obj/src/GrammarLexer.l"
 {
     // HEXADECIMAL
     ValueLiteral::Ptr valueLiteral = nullptr;
@@ -956,7 +960,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 129 "obj/src/GrammarLexer.l"
+#line 130 "obj/src/GrammarLexer.l"
 {
     // RATIONAL
     ValueLiteral::Ptr valueLiteral = nullptr;
@@ -976,7 +980,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 146 "obj/src/GrammarLexer.l"
+#line 147 "obj/src/GrammarLexer.l"
 {
     // INTEGER
     ValueLiteral::Ptr valueLiteral = nullptr;
@@ -995,7 +999,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 162 "obj/src/GrammarLexer.l"
+#line 163 "obj/src/GrammarLexer.l"
 {
     // DECIMAL
     ValueLiteral::Ptr valueLiteral = nullptr;
@@ -1015,398 +1019,403 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 179 "obj/src/GrammarLexer.l"
+#line 180 "obj/src/GrammarLexer.l"
 { YY_TOKEN_ACTION( CASM ) }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 180 "obj/src/GrammarLexer.l"
+#line 181 "obj/src/GrammarLexer.l"
 { YY_TOKEN_ACTION( INIT ) }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 181 "obj/src/GrammarLexer.l"
+#line 182 "obj/src/GrammarLexer.l"
 { YY_TOKEN_ACTION( DERIVED ) }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 182 "obj/src/GrammarLexer.l"
+#line 183 "obj/src/GrammarLexer.l"
 { YY_TOKEN_ACTION( ENUMERATION ) }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 183 "obj/src/GrammarLexer.l"
+#line 184 "obj/src/GrammarLexer.l"
 { YY_TOKEN_ACTION( RULE ) }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 184 "obj/src/GrammarLexer.l"
+#line 185 "obj/src/GrammarLexer.l"
 { YY_TOKEN_ACTION( USING ) }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 185 "obj/src/GrammarLexer.l"
+#line 186 "obj/src/GrammarLexer.l"
 { YY_TOKEN_ACTION( INVARIANT ) }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 186 "obj/src/GrammarLexer.l"
+#line 187 "obj/src/GrammarLexer.l"
 { YY_TOKEN_ACTION( IMPORT ) }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 187 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( FUNCTION ) }
+#line 188 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( STRUCTURE ) }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 188 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( DEFINED ) }
+#line 189 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( FUNCTION ) }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 189 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( SEQ ) }
+#line 190 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( DEFINED ) }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 190 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( ENDSEQ ) }
+#line 191 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( SEQ ) }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 191 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( PAR ) }
+#line 192 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( ENDSEQ ) }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 192 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( ENDPAR ) }
+#line 193 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( PAR ) }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 193 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( SKIP ) }
+#line 194 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( ENDPAR ) }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 194 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( LET ) }
+#line 195 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( SKIP ) }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 195 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( LOCAL ) }
+#line 196 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( LET ) }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 196 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( IN ) }
+#line 197 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( LOCAL ) }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 197 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( FORALL ) }
+#line 198 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( IN ) }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 198 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( CHOOSE ) }
+#line 199 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( FORALL ) }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 199 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( ITERATE ) }
+#line 200 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( CHOOSE ) }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 200 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( DO ) }
+#line 201 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( ITERATE ) }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 201 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( IF ) }
+#line 202 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( DO ) }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 202 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( THEN ) }
+#line 203 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( IF ) }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 203 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( ELSE ) }
+#line 204 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( THEN ) }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 204 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( CASE ) }
+#line 205 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( ELSE ) }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 205 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( OF ) }
+#line 206 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( CASE ) }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 206 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( DEFAULT ) }
+#line 207 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( OF ) }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 207 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( HOLDS ) }
+#line 208 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( DEFAULT ) }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 208 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( EXISTS ) }
+#line 209 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( HOLDS ) }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 209 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( WITH ) }
+#line 210 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( EXISTS ) }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 210 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( AS ) }
+#line 211 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( WITH ) }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 211 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( WHILE ) }
+#line 212 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( AS ) }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 212 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( UNDEF ) }
+#line 213 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( WHILE ) }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 213 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( FALSE ) }
+#line 214 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( UNDEF ) }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 214 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( TRUE ) }
+#line 215 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( FALSE ) }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 215 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( AND ) }
+#line 216 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( TRUE ) }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 216 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( OR ) }
+#line 217 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( AND ) }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 217 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( XOR ) }
+#line 218 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( OR ) }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 218 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( IMPLIES ) }
+#line 219 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( XOR ) }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 219 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( NOT ) }
+#line 220 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( IMPLIES ) }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 220 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( PLUS ) }
+#line 221 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( NOT ) }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 221 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( MINUS ) }
+#line 222 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( PLUS ) }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 222 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( EQUAL ) }
+#line 223 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( MINUS ) }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 223 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( LPAREN ) }
+#line 224 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( EQUAL ) }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 224 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( RPAREN ) }
+#line 225 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( LPAREN ) }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 225 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( LSQPAREN ) }
+#line 226 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( RPAREN ) }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 226 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( RSQPAREN ) }
+#line 227 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( LSQPAREN ) }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 227 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( LCURPAREN ) }
+#line 228 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( RSQPAREN ) }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 228 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( RCURPAREN ) }
+#line 229 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( LCURPAREN ) }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 229 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( COLON ) }
+#line 230 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( RCURPAREN ) }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 230 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( DOUBLECOLON ) }
+#line 231 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( COLON ) }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 231 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( UNDERLINE ) }
+#line 232 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( DOUBLECOLON ) }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 232 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( VERTICAL_BAR ) }
+#line 233 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( UNDERLINE ) }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 233 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( AT ) }
+#line 234 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( VERTICAL_BAR ) }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 234 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( COMMA ) }
+#line 235 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( AT ) }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 235 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( LESSER ) }
+#line 236 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( COMMA ) }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 236 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( GREATER ) }
+#line 237 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( LESSER ) }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 237 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( ASTERIX ) }
+#line 238 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( GREATER ) }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 238 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( SLASH ) }
+#line 239 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( ASTERIX ) }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 239 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( PERCENT ) }
+#line 240 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( SLASH ) }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 240 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( CARET ) }
+#line 241 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( PERCENT ) }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 241 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( MARK ) }
+#line 242 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( CARET ) }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 242 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( DOTDOT ) }
+#line 243 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( MARK ) }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 243 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( DOT ) }
+#line 244 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( DOTDOT ) }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 244 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( MAPS ) }
+#line 245 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( DOT ) }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 245 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( ARROW ) }
+#line 246 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( MAPS ) }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 246 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( UPDATE ) }
+#line 247 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( ARROW ) }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 247 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( NEQUAL ) }
+#line 248 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( UPDATE ) }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 248 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( LESSEQ ) }
+#line 249 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( NEQUAL ) }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 249 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( GREATEREQ ) }
+#line 250 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( LESSEQ ) }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 250 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( SEQ_BRACKET ) }
+#line 251 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( GREATEREQ ) }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 251 "obj/src/GrammarLexer.l"
-{ YY_TOKEN_ACTION( ENDSEQ_BRACKET ) }
+#line 252 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( SEQ_BRACKET ) }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
 #line 253 "obj/src/GrammarLexer.l"
+{ YY_TOKEN_ACTION( ENDSEQ_BRACKET ) }
+	YY_BREAK
+case 80:
+YY_RULE_SETUP
+#line 255 "obj/src/GrammarLexer.l"
 { // space
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::SPACE, yyleng);
     m_spans->add(span);
     m_loc.step();
 }
 	YY_BREAK
-case 80:
+case 81:
 YY_RULE_SETUP
-#line 259 "obj/src/GrammarLexer.l"
+#line 261 "obj/src/GrammarLexer.l"
 { // carriage return
     m_loc.step();
 }
 	YY_BREAK
-case 81:
+case 82:
 YY_RULE_SETUP
-#line 263 "obj/src/GrammarLexer.l"
+#line 265 "obj/src/GrammarLexer.l"
 { // tabulator
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::TABULATOR, yyleng );
     m_spans->add(span);
     m_loc.step();
 }
 	YY_BREAK
-case 82:
-/* rule 82 can match eol */
+case 83:
+/* rule 83 can match eol */
 YY_RULE_SETUP
-#line 269 "obj/src/GrammarLexer.l"
+#line 271 "obj/src/GrammarLexer.l"
 { // newline
     m_loc.lines( yyleng );
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::NEWLINE, yyleng );
@@ -1414,9 +1423,9 @@ YY_RULE_SETUP
     m_loc.step();
 }
 	YY_BREAK
-case 83:
+case 84:
 YY_RULE_SETUP
-#line 276 "obj/src/GrammarLexer.l"
+#line 278 "obj/src/GrammarLexer.l"
 {
     // ASCII identifier characters START
     m_strbuf.clear();
@@ -1440,9 +1449,9 @@ YY_RULE_SETUP
     }
 }
 	YY_BREAK
-case 84:
+case 85:
 YY_RULE_SETUP
-#line 299 "obj/src/GrammarLexer.l"
+#line 301 "obj/src/GrammarLexer.l"
 {
     // UTF-8 identifier character START
     m_strbuf.clear();
@@ -1451,9 +1460,9 @@ YY_RULE_SETUP
     BEGIN( YY_IDENTIFIER );
 }
 	YY_BREAK
-case 85:
+case 86:
 YY_RULE_SETUP
-#line 307 "obj/src/GrammarLexer.l"
+#line 309 "obj/src/GrammarLexer.l"
 {
     // UTF-8 (byte length 2, 3, and 4) character
     m_loc.columns( -yyleng+1 );
@@ -1469,18 +1478,18 @@ YY_RULE_SETUP
     m_strbuf.append( yytext );
 }
 	YY_BREAK
-case 86:
+case 87:
 YY_RULE_SETUP
-#line 322 "obj/src/GrammarLexer.l"
+#line 324 "obj/src/GrammarLexer.l"
 {
     // ASCII characters
     m_strbuf.append( yytext );
 }
 	YY_BREAK
-case 87:
-/* rule 87 can match eol */
+case 88:
+/* rule 88 can match eol */
 YY_RULE_SETUP
-#line 327 "obj/src/GrammarLexer.l"
+#line 329 "obj/src/GrammarLexer.l"
 {
     const auto identifier = Ast::make< Identifier >( m_loc, m_strbuf );
     identifier->setSpans( fetchSpansAndReset() );
@@ -1490,9 +1499,9 @@ YY_RULE_SETUP
     return token;
 }
 	YY_BREAK
-case 88:
+case 89:
 YY_RULE_SETUP
-#line 336 "obj/src/GrammarLexer.l"
+#line 338 "obj/src/GrammarLexer.l"
 {
     // invalid identifier character detected, unput and return identifier token
     m_loc.columns( -yyleng );
@@ -1503,36 +1512,36 @@ YY_RULE_SETUP
     return Parser::make_IDENTIFIER( identifier, m_loc );
 }
 	YY_BREAK
-case 89:
+case 90:
 YY_RULE_SETUP
-#line 346 "obj/src/GrammarLexer.l"
+#line 348 "obj/src/GrammarLexer.l"
 { // single-line comments
     m_strbuf.clear();
     m_strbuf.append( yytext );
     BEGIN( YY_INLINE_COMMENT );
 }
 	YY_BREAK
-case 90:
+case 91:
 YY_RULE_SETUP
-#line 352 "obj/src/GrammarLexer.l"
+#line 354 "obj/src/GrammarLexer.l"
 {
     // restricted extended ASCII or UTF-8 (byte length 1) character
     m_strbuf.append( yytext );
 }
 	YY_BREAK
-case 91:
+case 92:
 YY_RULE_SETUP
-#line 357 "obj/src/GrammarLexer.l"
+#line 359 "obj/src/GrammarLexer.l"
 {
     // UTF-8 (byte length 2, 3, and 4) character
     m_loc.columns( -yyleng+1 );
     m_strbuf.append( yytext );
 }
 	YY_BREAK
-case 92:
-/* rule 92 can match eol */
+case 93:
+/* rule 93 can match eol */
 YY_RULE_SETUP
-#line 363 "obj/src/GrammarLexer.l"
+#line 365 "obj/src/GrammarLexer.l"
 {
     m_loc.lines( yyleng );
     m_strbuf.append( yytext );
@@ -1570,25 +1579,25 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(YY_INLINE_COMMENT):
-#line 399 "obj/src/GrammarLexer.l"
+#line 401 "obj/src/GrammarLexer.l"
 {
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
     m_spans->add(span);
     BEGIN( INITIAL );
 }
 	YY_BREAK
-case 93:
+case 94:
 YY_RULE_SETUP
-#line 405 "obj/src/GrammarLexer.l"
+#line 407 "obj/src/GrammarLexer.l"
 { // block comments
     m_strbuf.clear();
     m_strbuf.append( yytext );
     BEGIN( YY_BLOCK_COMMENT );
 }
 	YY_BREAK
-case 94:
+case 95:
 YY_RULE_SETUP
-#line 411 "obj/src/GrammarLexer.l"
+#line 413 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( yytext );
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
@@ -1597,26 +1606,26 @@ YY_RULE_SETUP
     BEGIN( INITIAL );
 }
 	YY_BREAK
-case 95:
-/* rule 95 can match eol */
+case 96:
+/* rule 96 can match eol */
 YY_RULE_SETUP
-#line 419 "obj/src/GrammarLexer.l"
+#line 421 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( yytext );
     m_loc.lines( yyleng );
 }
 	YY_BREAK
-case 96:
+case 97:
 YY_RULE_SETUP
-#line 424 "obj/src/GrammarLexer.l"
+#line 426 "obj/src/GrammarLexer.l"
 {
     // restricted extended ASCII or UTF-8 (byte length 1) character
     m_strbuf.append( yytext );
 }
 	YY_BREAK
-case 97:
+case 98:
 YY_RULE_SETUP
-#line 429 "obj/src/GrammarLexer.l"
+#line 431 "obj/src/GrammarLexer.l"
 {
     // UTF-8 (byte length 2, 3, and 4) character
     m_loc.columns( -yyleng+1 );
@@ -1624,24 +1633,24 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(YY_BLOCK_COMMENT):
-#line 435 "obj/src/GrammarLexer.l"
+#line 437 "obj/src/GrammarLexer.l"
 {
     m_log.error( {m_loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
     BEGIN( INITIAL );
     yyterminate();
 }
 	YY_BREAK
-case 98:
+case 99:
 YY_RULE_SETUP
-#line 441 "obj/src/GrammarLexer.l"
+#line 443 "obj/src/GrammarLexer.l"
 { // strings
     m_strbuf.clear();
     BEGIN( YY_STRING );
 }
 	YY_BREAK
-case 99:
+case 100:
 YY_RULE_SETUP
-#line 446 "obj/src/GrammarLexer.l"
+#line 448 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     ValueLiteral::Ptr valueLiteral = nullptr;
@@ -1658,82 +1667,82 @@ YY_RULE_SETUP
     return Parser::make_STRING( valueLiteral, m_loc );
 }
 	YY_BREAK
-case 100:
+case 101:
 YY_RULE_SETUP
-#line 462 "obj/src/GrammarLexer.l"
+#line 464 "obj/src/GrammarLexer.l"
 {
     // restricted extended ASCII or UTF-8 (byte length 1) character without '"' (0x22)
     m_strbuf.append( yytext );
 }
 	YY_BREAK
-case 101:
+case 102:
 YY_RULE_SETUP
-#line 467 "obj/src/GrammarLexer.l"
+#line 469 "obj/src/GrammarLexer.l"
 {
     // UTF-8 (byte length 2, 3, and 4) character
     m_loc.columns( -yyleng+1 );
     m_strbuf.append( yytext );
 }
 	YY_BREAK
-case 102:
-/* rule 102 can match eol */
+case 103:
+/* rule 103 can match eol */
 YY_RULE_SETUP
-#line 473 "obj/src/GrammarLexer.l"
+#line 475 "obj/src/GrammarLexer.l"
 {
     m_loc.lines( yyleng );
 }
 	YY_BREAK
-case 103:
+case 104:
 YY_RULE_SETUP
-#line 477 "obj/src/GrammarLexer.l"
+#line 479 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( "\n" );
 }
 	YY_BREAK
-case 104:
+case 105:
 YY_RULE_SETUP
-#line 481 "obj/src/GrammarLexer.l"
+#line 483 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( "\t" );
 }
 	YY_BREAK
-case 105:
+case 106:
 YY_RULE_SETUP
-#line 485 "obj/src/GrammarLexer.l"
+#line 487 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( yytext + 1 );
 }
 	YY_BREAK
-case 106:
+case 107:
 YY_RULE_SETUP
-#line 489 "obj/src/GrammarLexer.l"
+#line 491 "obj/src/GrammarLexer.l"
 {
     m_log.error( {m_loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
 }
 	YY_BREAK
 case YY_STATE_EOF(YY_STRING):
-#line 493 "obj/src/GrammarLexer.l"
+#line 495 "obj/src/GrammarLexer.l"
 {
     m_log.error( {m_loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
     BEGIN( INITIAL );
     yyterminate();
 }
 	YY_BREAK
-case 107:
+case 108:
 YY_RULE_SETUP
-#line 499 "obj/src/GrammarLexer.l"
+#line 501 "obj/src/GrammarLexer.l"
 {
     m_log.error( {m_loc}, "unrecognized character '" + std::string( yytext ) + "'",
         Code::SyntaxErrorUnrecognizedCharacter );
     m_loc.step();
 }
 	YY_BREAK
-case 108:
+case 109:
 YY_RULE_SETUP
-#line 505 "obj/src/GrammarLexer.l"
+#line 507 "obj/src/GrammarLexer.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1736 "src/various/GrammarLexer.cpp"
+#line 1745 "src/various/GrammarLexer.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(YY_IDENTIFIER):
 	yyterminate();
@@ -2152,7 +2161,7 @@ int yyFlexLexer::yy_get_next_buffer()
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 295 )
+			if ( yy_current_state >= 303 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -2180,11 +2189,11 @@ int yyFlexLexer::yy_get_next_buffer()
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 295 )
+		if ( yy_current_state >= 303 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 294);
+	yy_is_jam = (yy_current_state == 302);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2698,7 +2707,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 505 "obj/src/GrammarLexer.l"
+#line 507 "obj/src/GrammarLexer.l"
 
 
 //  

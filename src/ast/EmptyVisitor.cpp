@@ -108,6 +108,10 @@ void EmptyVisitor::visit( ImportDefinition& )
 {
 }
 
+void EmptyVisitor::visit( StructureDefinition& )
+{
+}
+
 void EmptyVisitor::visit( UndefLiteral& )
 {
 }

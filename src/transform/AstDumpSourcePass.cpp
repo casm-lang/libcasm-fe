@@ -81,6 +81,7 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
 
     void visit( RuleDefinition& node ) override;
     void visit( EmbracedExpression& node ) override;
+
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
     void visit( UnresolvedType& node ) override;

@@ -207,11 +207,17 @@ void RecursiveVisitor::visit( ImportDefinition& node )
     }
 }
 
+void RecursiveVisitor::visit( StructureDefinition& node )
+{
+    // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
+    node.identifier()->accept( *this );
+    node.functions()->accept( *this );
+}
+
 //
 //
 // Literals
 //
-
 void RecursiveVisitor::visit( UndefLiteral& node )
 {
     node.delimiterToken()->accept( *this );

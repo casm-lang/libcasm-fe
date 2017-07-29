@@ -127,7 +127,12 @@ std::string Node::description( void ) const
         {
             return "import";
         }
-            // literals
+        case ID::STRUCTURE_DEFINITION:
+        {
+            return "structure";
+        }
+
+        // literals
         case ID::UNDEF_LITERAL:
         {
             return "undef";

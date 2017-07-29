@@ -688,6 +688,28 @@ void InvariantDefinition::accept( Visitor& visitor )
 
 //
 //
+// StructureDefinition
+//
+
+StructureDefinition::StructureDefinition(
+    const Identifier::Ptr& identifier, const NodeList< FunctionDefinition >::Ptr& functions )
+: Definition( Node::ID::STRUCTURE_DEFINITION, identifier )
+, m_functions( functions )
+{
+}
+
+const NodeList< FunctionDefinition >::Ptr& StructureDefinition::functions( void ) const
+{
+    return m_functions;
+}
+
+void StructureDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
 // InitDefinition
 //
 
