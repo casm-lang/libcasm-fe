@@ -732,6 +732,40 @@ void FeatureDefinition::accept( Visitor& visitor )
 
 //
 //
+// ImplementationDefinition
+//
+
+ImplementationDefinition::ImplementationDefinition(
+    const IdentifierPath::Ptr& path, const Type::Ptr& type, const Definitions::Ptr& definitions )
+: Definition( Node::ID::IMPLEMENTATION_DEFINITION, *path->identifiers()->end() )
+, m_path( path )
+, m_type( type )
+, m_definitions( definitions )
+{
+}
+
+const IdentifierPath::Ptr& ImplementationDefinition::path( void ) const
+{
+    return m_path;
+}
+
+const Type::Ptr& ImplementationDefinition::type( void ) const
+{
+    return m_type;
+}
+
+const Definitions::Ptr& ImplementationDefinition::definitions( void ) const
+{
+    return m_definitions;
+}
+
+void ImplementationDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
 // DeclarationDefinition
 //
 

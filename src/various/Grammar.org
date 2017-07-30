@@ -57,6 +57,8 @@ Definition ::= InitDefinition
              | InvariantDefinition
              | ImportDefinition
              | StructureDefinition
+             | FeatureDefinition
+             | ImplementationDefinition
 #+end_src
 
 #+html: {{page>.:grammar:Definition&noheader&nofooter}}
@@ -177,6 +179,76 @@ StructureDefinition ::= "structure" Identifier "=" "{" FunctionDefinition "}"
 #+end_src
 
 #+html: {{page>.:grammar:StructureDefinition&noheader&nofooter}}
+
+
+** FeatureDefinition
+
+#+begin_src
+FeatureDefinition ::= "feature" Identifier "=" "{" FeatureDeclarationsAndDefinitions "}"
+#+end_src
+
+#+html: {{page>.:grammar:FeatureDefinition&noheader&nofooter}}
+
+
+** FeatureDeclarationOrDefinition
+
+#+begin_src
+FeatureDeclarationOrDefinition ::= DeclarationDefinition
+                                 | DerivedDefinition
+                                 | RuleDefinition
+#+end_src
+
+#+html: {{page>.:grammar:FeatureDeclarationOrDefinition&noheader&nofooter}}
+
+
+** FeatureDeclarationsAndDefinitions
+
+#+begin_src
+FeatureDeclarationsAndDefinitions ::= FeatureDeclarationsAndDefinitions FeatureDeclarationOrDefinition
+                                    | FeatureDeclarationOrDefinition
+#+end_src
+
+#+html: {{page>.:grammar:FeatureDeclarationsAndDefinitions&noheader&nofooter}}
+
+
+** ImplementationDefinition
+
+#+begin_src
+ImplementationDefinition ::= "implements" IdentifierPath "for" Type "=" "{" ImplementationDefinitionDefinitions "}"
+                           | "implements" Type "=" "{" ImplementationDefinitionDefinitions "}"
+#+end_src
+
+#+html: {{page>.:grammar:ImplementationDefinition&noheader&nofooter}}
+
+
+** ImplementationDefinitionDefinition
+
+#+begin_src
+ImplementationDefinitionDefinition ::= DerivedDefinition
+                                     | RuleDefinition
+#+end_src
+
+#+html: {{page>.:grammar:ImplementationDefinitionDefinition&noheader&nofooter}}
+
+
+** ImplementationDefinitionDefinitions
+
+#+begin_src
+ImplementationDefinitionDefinitions ::= ImplementationDefinitionDefinitions ImplementationDefinitionDefinition
+                                      | ImplementationDefinitionDefinition
+#+end_src
+
+#+html: {{page>.:grammar:ImplementationDefinitionDefinitions&noheader&nofooter}}
+
+
+** DeclarationDefinition
+
+#+begin_src
+DeclarationDefinition ::= "derived" Identifier ":" MaybeFunctionParameters "->" Type
+                        | "rule" Identifier ":" MaybeFunctionParameters "->" Type
+#+end_src
+
+#+html: {{page>.:grammar:DeclarationDefinition&noheader&nofooter}}
 
 
 ** Rules

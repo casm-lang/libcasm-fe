@@ -135,6 +135,10 @@ std::string Node::description( void ) const
         {
             return "feature";
         }
+        case ID::IMPLEMENTATION_DEFINITION:
+        {
+            return "implementation";
+        }
         case ID::DECLARATION_DEFINITION:
         {
             return "declaration";

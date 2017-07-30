@@ -461,6 +461,30 @@ namespace libcasm_fe
             const Definitions::Ptr m_definitions;
         };
 
+        class ImplementationDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< ImplementationDefinition >;
+
+            ImplementationDefinition(
+                const IdentifierPath::Ptr& path,
+                const Type::Ptr& type,
+                const Definitions::Ptr& definitions );
+
+            const IdentifierPath::Ptr& path( void ) const;
+
+            const Type::Ptr& type( void ) const;
+
+            const Definitions::Ptr& definitions( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const IdentifierPath::Ptr m_path;
+            const Type::Ptr m_type;
+            const Definitions::Ptr m_definitions;
+        };
+
         class DeclarationDefinition final : public Definition
         {
           public:

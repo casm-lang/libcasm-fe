@@ -221,6 +221,13 @@ void RecursiveVisitor::visit( FeatureDefinition& node )
     node.definitions()->accept( *this );
 }
 
+void RecursiveVisitor::visit( ImplementationDefinition& node )
+{
+    node.identifier()->accept( *this );
+    node.type()->accept( *this );
+    node.definitions()->accept( *this );
+}
+
 void RecursiveVisitor::visit( DeclarationDefinition& node )
 {
     // TODO: FIXME: @ppaulweber: call token methods to accept this visitor

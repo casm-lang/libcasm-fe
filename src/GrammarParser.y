@@ -134,7 +134,6 @@ END       0 "end of file"
 %type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
 %type <VariableDefinitions::Ptr> TypedVariables
 %type <FunctionDefinition::Ptr> FunctionDefinition
-%type <FunctionDefinitions::Ptr> FunctionDefinitions
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
 %type <EnumeratorDefinition::Ptr> EnumeratorDefinition
@@ -148,6 +147,9 @@ END       0 "end of file"
 %type <FeatureDefinition::Ptr> FeatureDefinition
 %type <Definition::Ptr> FeatureDeclarationOrDefinition
 %type <Definitions::Ptr> FeatureDeclarationsAndDefinitions
+%type <ImplementationDefinition::Ptr> ImplementationDefinition
+%type <Definition::Ptr> ImplementationDefinitionDefinition
+%type <Definitions::Ptr> ImplementationDefinitionDefinitions
 %type <DeclarationDefinition::Ptr> DeclarationDefinition
 
 // literals
@@ -369,6 +371,14 @@ Definition
   {
       $$ = $1;
   }
+| FeatureDefinition
+  {
+      $$ = $1;
+  }
+| ImplementationDefinition
+  {
+      $$ = $1;
+  }
 ;
 
 
@@ -572,14 +582,55 @@ FeatureDeclarationOrDefinition
 
 
 FeatureDeclarationsAndDefinitions
-: FeatureDeclarationsAndDefinitions COMMA FeatureDeclarationOrDefinition
+: FeatureDeclarationsAndDefinitions FeatureDeclarationOrDefinition
   {
-      // TODO: FIXME: @ppaulweber: handle AST keyword tokens $2
       auto definitions = $1;
-      definitions->add( $3 );
+      definitions->add( $2 );
       $$ = definitions;
   }
 | FeatureDeclarationOrDefinition
+  {
+      auto definitions = Ast::make< Definitions >( @$ );
+      definitions->add( $1 );
+      $$ = definitions;
+  }
+;
+
+
+ImplementationDefinition
+: IMPLEMENTS IdentifierPath FOR Type EQUAL LCURPAREN ImplementationDefinitionDefinitions RCURPAREN
+  {
+      $$ = Ast::make< ImplementationDefinition >( @$, $2, $4, $7 );
+  }
+| IMPLEMENTS Type EQUAL LCURPAREN ImplementationDefinitionDefinitions RCURPAREN
+  {
+      const auto name = Ast::make< Identifier >( @$, "" );
+      const auto path = asIdentifierPath( name );
+      $$ = Ast::make< ImplementationDefinition >( @$, path, $2, $5 );
+  }
+;
+
+
+ImplementationDefinitionDefinition
+: DerivedDefinition
+  {
+      $$ = $1;
+  }
+| RuleDefinition
+  {
+      $$ = $1;
+  }
+;
+
+
+ImplementationDefinitionDefinitions
+: ImplementationDefinitionDefinitions ImplementationDefinitionDefinition
+  {
+      auto definitions = $1;
+      definitions->add( $2 );
+      $$ = definitions;
+  }
+| ImplementationDefinitionDefinition
   {
       auto definitions = Ast::make< Definitions >( @$ );
       definitions->add( $1 );

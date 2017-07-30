@@ -116,6 +116,10 @@ void EmptyVisitor::visit( FeatureDefinition& )
 {
 }
 
+void EmptyVisitor::visit( ImplementationDefinition& )
+{
+}
+
 void EmptyVisitor::visit( DeclarationDefinition& )
 {
 }
