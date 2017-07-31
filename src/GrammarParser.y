@@ -134,6 +134,7 @@ END       0 "end of file"
 %type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
 %type <VariableDefinitions::Ptr> TypedVariables
 %type <FunctionDefinition::Ptr> FunctionDefinition
+%type <FunctionDefinitions::Ptr> FunctionDefinitions
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
 %type <EnumeratorDefinition::Ptr> EnumeratorDefinition
@@ -457,6 +458,22 @@ RuleDefinition
 ;
 
 
+FunctionDefinitions
+: FunctionDefinitions FunctionDefinition
+  {
+      auto functions = $1;
+      functions->add( $2 );
+      $$ = functions;
+  }
+| FunctionDefinition
+  {
+      auto functions = Ast::make< FunctionDefinitions >( @$ );
+      functions->add( $1 );
+      $$ = functions;
+  }
+;
+
+
 FunctionDefinition
 : FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
@@ -548,7 +565,7 @@ ImportDefinition
 
 
 StructureDefinition
-: STRUCTURE Identifier EQUAL LCURPAREN FunctionDefinition RCURPAREN
+: STRUCTURE Identifier EQUAL LCURPAREN FunctionDefinitions RCURPAREN
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, $4, and $6
       // $$ = Ast::make< StructureDefinition >( @$, $2, $5 );
@@ -624,10 +641,10 @@ ImplementationDefinitionDefinition
 
 
 ImplementationDefinitionDefinitions
-: ImplementationDefinitionDefinitions ImplementationDefinitionDefinition
+: ImplementationDefinitionDefinition ImplementationDefinitionDefinitions
   {
-      auto definitions = $1;
-      definitions->add( $2 );
+      auto definitions = $2;
+      definitions->add( $1 );
       $$ = definitions;
   }
 | ImplementationDefinitionDefinition
