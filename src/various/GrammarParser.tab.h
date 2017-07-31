@@ -550,12 +550,12 @@ namespace libcasm_fe {
 
       // AttributedDefinition
       // Definition
-      // FeatureDeclarationOrDefinition
+      // FeatureDefinitionElement
       // ImplementationDefinitionDefinition
       char dummy19[sizeof (Definition::Ptr)];
 
       // Definitions
-      // FeatureDeclarationsAndDefinitions
+      // FeatureDefinitionList
       // ImplementationDefinitionDefinitions
       char dummy20[sizeof (Definitions::Ptr)];
 
@@ -1048,8 +1048,8 @@ namespace libcasm_fe {
         S_StructureDefinitionElement = 111,      // StructureDefinitionElement
         S_StructureDefinitionList = 112,         // StructureDefinitionList
         S_FeatureDefinition = 113,               // FeatureDefinition
-        S_FeatureDeclarationOrDefinition = 114,  // FeatureDeclarationOrDefinition
-        S_FeatureDeclarationsAndDefinitions = 115, // FeatureDeclarationsAndDefinitions
+        S_FeatureDefinitionElement = 114,        // FeatureDefinitionElement
+        S_FeatureDefinitionList = 115,           // FeatureDefinitionList
         S_ImplementationDefinition = 116,        // ImplementationDefinition
         S_ImplementationDefinitionDefinition = 117, // ImplementationDefinitionDefinition
         S_ImplementationDefinitionDefinitions = 118, // ImplementationDefinitionDefinitions
@@ -1321,13 +1321,13 @@ namespace libcasm_fe {
 
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
-      case symbol_kind::S_FeatureDeclarationOrDefinition: // FeatureDeclarationOrDefinition
+      case symbol_kind::S_FeatureDefinitionElement: // FeatureDefinitionElement
       case symbol_kind::S_ImplementationDefinitionDefinition: // ImplementationDefinitionDefinition
         value.move< Definition::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_Definitions: // Definitions
-      case symbol_kind::S_FeatureDeclarationsAndDefinitions: // FeatureDeclarationsAndDefinitions
+      case symbol_kind::S_FeatureDefinitionList: // FeatureDefinitionList
       case symbol_kind::S_ImplementationDefinitionDefinitions: // ImplementationDefinitionDefinitions
         value.move< Definitions::Ptr > (std::move (that.value));
         break;
@@ -2985,13 +2985,13 @@ switch (yykind)
 
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
-      case symbol_kind::S_FeatureDeclarationOrDefinition: // FeatureDeclarationOrDefinition
+      case symbol_kind::S_FeatureDefinitionElement: // FeatureDefinitionElement
       case symbol_kind::S_ImplementationDefinitionDefinition: // ImplementationDefinitionDefinition
         value.template destroy< Definition::Ptr > ();
         break;
 
       case symbol_kind::S_Definitions: // Definitions
-      case symbol_kind::S_FeatureDeclarationsAndDefinitions: // FeatureDeclarationsAndDefinitions
+      case symbol_kind::S_FeatureDefinitionList: // FeatureDefinitionList
       case symbol_kind::S_ImplementationDefinitionDefinitions: // ImplementationDefinitionDefinitions
         value.template destroy< Definitions::Ptr > ();
         break;
@@ -4923,7 +4923,7 @@ switch (yykind)
     // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
     // Performed when YYTABLE does not specify something else to do.  Zero
     // means the default is an error.
-    static const unsigned char yydefact_[];
+    static const short yydefact_[];
 
     // YYPGOTO[NTERM-NUM].
     static const short yypgoto_[];
@@ -5178,7 +5178,7 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 2781,     ///< Last index in yytable_.
+      yylast_ = 2852,     ///< Last index in yytable_.
       yynnts_ = 107,  ///< Number of nonterminal symbols.
       yyfinal_ = 13 ///< Termination state number.
     };
@@ -5408,13 +5408,13 @@ switch (yykind)
 
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
-      case symbol_kind::S_FeatureDeclarationOrDefinition: // FeatureDeclarationOrDefinition
+      case symbol_kind::S_FeatureDefinitionElement: // FeatureDefinitionElement
       case symbol_kind::S_ImplementationDefinitionDefinition: // ImplementationDefinitionDefinition
         value.copy< Definition::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_Definitions: // Definitions
-      case symbol_kind::S_FeatureDeclarationsAndDefinitions: // FeatureDeclarationsAndDefinitions
+      case symbol_kind::S_FeatureDefinitionList: // FeatureDefinitionList
       case symbol_kind::S_ImplementationDefinitionDefinitions: // ImplementationDefinitionDefinitions
         value.copy< Definitions::Ptr > (YY_MOVE (that.value));
         break;
@@ -5880,13 +5880,13 @@ switch (yykind)
 
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
-      case symbol_kind::S_FeatureDeclarationOrDefinition: // FeatureDeclarationOrDefinition
+      case symbol_kind::S_FeatureDefinitionElement: // FeatureDefinitionElement
       case symbol_kind::S_ImplementationDefinitionDefinition: // ImplementationDefinitionDefinition
         value.move< Definition::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_Definitions: // Definitions
-      case symbol_kind::S_FeatureDeclarationsAndDefinitions: // FeatureDeclarationsAndDefinitions
+      case symbol_kind::S_FeatureDefinitionList: // FeatureDefinitionList
       case symbol_kind::S_ImplementationDefinitionDefinitions: // ImplementationDefinitionDefinitions
         value.move< Definitions::Ptr > (YY_MOVE (s.value));
         break;

@@ -204,31 +204,34 @@ StructureDefinitionList ::= StructureDefinitionList StructureDefinitionElement
 ** FeatureDefinition
 
 #+begin_src
-FeatureDefinition ::= "feature" Identifier "=" "{" FeatureDeclarationsAndDefinitions "}"
+FeatureDefinition ::= "feature" Identifier "=" "{" FeatureDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:FeatureDefinition&noheader&nofooter}}
 
 
-** FeatureDeclarationOrDefinition
+** FeatureDefinitionElement
 
 #+begin_src
-FeatureDeclarationOrDefinition ::= DeclarationDefinition
-                                 | DerivedDefinition
-                                 | RuleDefinition
+FeatureDefinitionElement ::= "[" Attributes "]" DeclarationDefinition
+                           | DeclarationDefinition
+                           | "[" Attributes "]" DerivedDefinition
+                           | DerivedDefinition
+                           | "[" Attributes "]" RuleDefinition
+                           | RuleDefinition
 #+end_src
 
-#+html: {{page>.:grammar:FeatureDeclarationOrDefinition&noheader&nofooter}}
+#+html: {{page>.:grammar:FeatureDefinitionElement&noheader&nofooter}}
 
 
-** FeatureDeclarationsAndDefinitions
+** FeatureDefinitionList
 
 #+begin_src
-FeatureDeclarationsAndDefinitions ::= FeatureDeclarationsAndDefinitions FeatureDeclarationOrDefinition
-                                    | FeatureDeclarationOrDefinition
+FeatureDefinitionList ::= FeatureDefinitionList FeatureDefinitionElement
+                        | FeatureDefinitionElement
 #+end_src
 
-#+html: {{page>.:grammar:FeatureDeclarationsAndDefinitions&noheader&nofooter}}
+#+html: {{page>.:grammar:FeatureDefinitionList&noheader&nofooter}}
 
 
 ** ImplementationDefinition

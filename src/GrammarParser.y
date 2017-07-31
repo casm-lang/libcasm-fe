@@ -148,8 +148,8 @@ END       0 "end of file"
 %type <FunctionDefinition::Ptr> StructureDefinitionElement
 %type <FunctionDefinitions::Ptr> StructureDefinitionList
 %type <FeatureDefinition::Ptr> FeatureDefinition
-%type <Definition::Ptr> FeatureDeclarationOrDefinition
-%type <Definitions::Ptr> FeatureDeclarationsAndDefinitions
+%type <Definition::Ptr> FeatureDefinitionElement
+%type <Definitions::Ptr> FeatureDefinitionList
 %type <ImplementationDefinition::Ptr> ImplementationDefinition
 %type <Definition::Ptr> ImplementationDefinitionDefinition
 %type <Definitions::Ptr> ImplementationDefinitionDefinitions
@@ -614,7 +614,7 @@ StructureDefinitionList
 //
 
 FeatureDefinition
-: FEATURE Identifier EQUAL LCURPAREN FeatureDeclarationsAndDefinitions RCURPAREN
+: FEATURE Identifier EQUAL LCURPAREN FeatureDefinitionList RCURPAREN
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, $4, and $6
       $$ = Ast::make< FeatureDefinition >( @$, $2, $5 );
@@ -622,14 +622,32 @@ FeatureDefinition
 ;
 
 
-FeatureDeclarationOrDefinition
-: DeclarationDefinition
+FeatureDefinitionElement
+: LSQPAREN Attributes RSQPAREN DeclarationDefinition
+  {
+      auto definition = $4;
+      definition->setAttributes( $2 );
+      $$ = definition;
+  }
+| DeclarationDefinition
   {
       $$ = $1;
+  }
+| LSQPAREN Attributes RSQPAREN DerivedDefinition
+  {
+      auto definition = $4;
+      definition->setAttributes( $2 );
+      $$ = definition;
   }
 | DerivedDefinition
   {
       $$ = $1;
+  }
+| LSQPAREN Attributes RSQPAREN RuleDefinition
+  {
+      auto definition = $4;
+      definition->setAttributes( $2 );
+      $$ = definition;
   }
 | RuleDefinition
   {
@@ -638,14 +656,14 @@ FeatureDeclarationOrDefinition
 ;
 
 
-FeatureDeclarationsAndDefinitions
-: FeatureDeclarationsAndDefinitions FeatureDeclarationOrDefinition
+FeatureDefinitionList
+: FeatureDefinitionList FeatureDefinitionElement
   {
       auto definitions = $1;
       definitions->add( $2 );
       $$ = definitions;
   }
-| FeatureDeclarationOrDefinition
+| FeatureDefinitionElement
   {
       auto definitions = Ast::make< Definitions >( @$ );
       definitions->add( $1 );
