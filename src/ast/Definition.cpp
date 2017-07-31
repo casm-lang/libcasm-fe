@@ -692,13 +692,13 @@ void InvariantDefinition::accept( Visitor& visitor )
 //
 
 StructureDefinition::StructureDefinition(
-    const Identifier::Ptr& identifier, const NodeList< FunctionDefinition >::Ptr& functions )
+    const Identifier::Ptr& identifier, const FunctionDefinitions::Ptr& functions )
 : Definition( Node::ID::STRUCTURE_DEFINITION, identifier )
 , m_functions( functions )
 {
 }
 
-const NodeList< FunctionDefinition >::Ptr& StructureDefinition::functions( void ) const
+const FunctionDefinitions::Ptr& StructureDefinition::functions( void ) const
 {
     return m_functions;
 }

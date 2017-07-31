@@ -434,15 +434,14 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< StructureDefinition >;
 
             StructureDefinition(
-                const Identifier::Ptr& identifier,
-                const NodeList< FunctionDefinition >::Ptr& functions );
+                const Identifier::Ptr& identifier, const FunctionDefinitions::Ptr& functions );
 
-            const NodeList< FunctionDefinition >::Ptr& functions( void ) const;
+            const FunctionDefinitions::Ptr& functions( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const NodeList< FunctionDefinition >::Ptr m_functions;
+            const FunctionDefinitions::Ptr m_functions;
         };
 
         class FeatureDefinition final : public Definition
