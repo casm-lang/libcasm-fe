@@ -212,6 +212,7 @@ void RecursiveVisitor::visit( StructureDefinition& node )
     // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
     node.identifier()->accept( *this );
     node.functions()->accept( *this );
+    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( FeatureDefinition& node )
@@ -219,6 +220,7 @@ void RecursiveVisitor::visit( FeatureDefinition& node )
     // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
     node.identifier()->accept( *this );
     node.definitions()->accept( *this );
+    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ImplementationDefinition& node )
@@ -226,6 +228,7 @@ void RecursiveVisitor::visit( ImplementationDefinition& node )
     node.identifier()->accept( *this );
     node.type()->accept( *this );
     node.definitions()->accept( *this );
+    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DeclarationDefinition& node )
@@ -234,6 +237,7 @@ void RecursiveVisitor::visit( DeclarationDefinition& node )
     node.identifier()->accept( *this );
     node.argumentTypes()->accept( *this );
     node.returnType()->accept( *this );
+    node.attributes()->accept( *this );
 }
 
 //
