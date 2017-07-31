@@ -427,13 +427,13 @@
           <symbol>&quot;[&quot;</symbol>
           <symbol>Attributes</symbol>
           <symbol>&quot;]&quot;</symbol>
-          <symbol>DeclarationDefinition</symbol>
+          <symbol>Declaration</symbol>
         </rhs>
       </rule>
       <rule number="52" usefulness="useful">
         <lhs>FeatureDefinitionElement</lhs>
         <rhs>
-          <symbol>DeclarationDefinition</symbol>
+          <symbol>Declaration</symbol>
         </rhs>
       </rule>
       <rule number="53" usefulness="useful">
@@ -529,7 +529,7 @@
         </rhs>
       </rule>
       <rule number="65" usefulness="useful">
-        <lhs>DeclarationDefinition</lhs>
+        <lhs>Declaration</lhs>
         <rhs>
           <symbol>&quot;derived&quot;</symbol>
           <symbol>Identifier</symbol>
@@ -540,7 +540,7 @@
         </rhs>
       </rule>
       <rule number="66" usefulness="useful">
-        <lhs>DeclarationDefinition</lhs>
+        <lhs>Declaration</lhs>
         <rhs>
           <symbol>&quot;rule&quot;</symbol>
           <symbol>Identifier</symbol>
@@ -2095,7 +2095,7 @@
       <nonterminal symbol-number="116" name="ImplementationDefinition" type="ImplementationDefinition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="117" name="ImplementationDefinitionDefinition" type="Definition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="118" name="ImplementationDefinitionDefinitions" type="Definitions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="119" name="DeclarationDefinition" type="DeclarationDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="119" name="Declaration" type="DeclarationDefinition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="120" name="Rules" type="Rules::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="121" name="Rule" type="Rule::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="122" name="SkipRule" type="SkipRule::Ptr" usefulness="useful"/>
@@ -18169,7 +18169,7 @@
           <transition type="goto" symbol="RuleDefinition" state="376"/>
           <transition type="goto" symbol="FeatureDefinitionElement" state="377"/>
           <transition type="goto" symbol="FeatureDefinitionList" state="378"/>
-          <transition type="goto" symbol="DeclarationDefinition" state="379"/>
+          <transition type="goto" symbol="Declaration" state="379"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21431,7 +21431,7 @@
           <transition type="goto" symbol="DerivedDefinition" state="375"/>
           <transition type="goto" symbol="RuleDefinition" state="376"/>
           <transition type="goto" symbol="FeatureDefinitionElement" state="441"/>
-          <transition type="goto" symbol="DeclarationDefinition" state="379"/>
+          <transition type="goto" symbol="Declaration" state="379"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -26147,7 +26147,7 @@
           <transition type="shift" symbol="&quot;rule&quot;" state="373"/>
           <transition type="goto" symbol="DerivedDefinition" state="500"/>
           <transition type="goto" symbol="RuleDefinition" state="501"/>
-          <transition type="goto" symbol="DeclarationDefinition" state="502"/>
+          <transition type="goto" symbol="Declaration" state="502"/>
         </transitions>
         <errors/>
         <reductions/>

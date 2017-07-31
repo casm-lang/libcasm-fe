@@ -491,20 +491,19 @@ namespace libcasm_fe
 
             enum class Kind
             {
-                DERIVED = 1,
+                DERIVED,
                 RULE
             };
 
             DeclarationDefinition(
                 const Identifier::Ptr& identifier,
                 const Types::Ptr& argumentTypes,
-                const Type::Ptr& returnType );
+                const Type::Ptr& returnType,
+                const Kind kind );
 
             const Types::Ptr& argumentTypes( void ) const;
 
             const Type::Ptr& returnType( void ) const;
-
-            void setKind( const Kind kind );
 
             Kind kind( void ) const;
 
@@ -515,7 +514,7 @@ namespace libcasm_fe
           private:
             const Types::Ptr m_argumentTypes;
             const Type::Ptr m_returnType;
-            Kind m_kind;
+            const Kind m_kind;
         };
 
         using DeclarationDefinitions = NodeList< DeclarationDefinition >;

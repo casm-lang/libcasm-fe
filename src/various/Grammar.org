@@ -213,8 +213,8 @@ FeatureDefinition ::= "feature" Identifier "=" "{" FeatureDefinitionList "}"
 ** FeatureDefinitionElement
 
 #+begin_src
-FeatureDefinitionElement ::= "[" Attributes "]" DeclarationDefinition
-                           | DeclarationDefinition
+FeatureDefinitionElement ::= "[" Attributes "]" Declaration
+                           | Declaration
                            | "[" Attributes "]" DerivedDefinition
                            | DerivedDefinition
                            | "[" Attributes "]" RuleDefinition
@@ -264,14 +264,14 @@ ImplementationDefinitionDefinitions ::= ImplementationDefinitionDefinition Imple
 #+html: {{page>.:grammar:ImplementationDefinitionDefinitions&noheader&nofooter}}
 
 
-** DeclarationDefinition
+** Declaration
 
 #+begin_src
-DeclarationDefinition ::= "derived" Identifier ":" MaybeFunctionParameters "->" Type
-                        | "rule" Identifier ":" MaybeFunctionParameters "->" Type
+Declaration ::= "derived" Identifier ":" MaybeFunctionParameters "->" Type
+              | "rule" Identifier ":" MaybeFunctionParameters "->" Type
 #+end_src
 
-#+html: {{page>.:grammar:DeclarationDefinition&noheader&nofooter}}
+#+html: {{page>.:grammar:Declaration&noheader&nofooter}}
 
 
 ** Rules

@@ -153,7 +153,7 @@ END       0 "end of file"
 %type <ImplementationDefinition::Ptr> ImplementationDefinition
 %type <Definition::Ptr> ImplementationDefinitionDefinition
 %type <Definitions::Ptr> ImplementationDefinitionDefinitions
-%type <DeclarationDefinition::Ptr> DeclarationDefinition
+%type <DeclarationDefinition::Ptr> Declaration
 
 // literals
 %type <Literal::Ptr> Literal
@@ -623,13 +623,13 @@ FeatureDefinition
 
 
 FeatureDefinitionElement
-: LSQPAREN Attributes RSQPAREN DeclarationDefinition
+: LSQPAREN Attributes RSQPAREN Declaration
   {
       auto definition = $4;
       definition->setAttributes( $2 );
       $$ = definition;
   }
-| DeclarationDefinition
+| Declaration
   {
       $$ = $1;
   }
@@ -722,20 +722,18 @@ ImplementationDefinitionDefinitions
 // DeclarationDefinition
 //
 
-DeclarationDefinition
+Declaration
 : DERIVED Identifier COLON MaybeFunctionParameters MAPS Type
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
-      auto declaration = Ast::make< DeclarationDefinition >( @$, $2, $4, $6 );
-      declaration->setKind( DeclarationDefinition::Kind::DERIVED );
-      $$ = declaration;
+      $$ = Ast::make< DeclarationDefinition >
+          ( @$, $2, $4, $6, DeclarationDefinition::Kind::DERIVED );
   }
 | RULE Identifier COLON MaybeFunctionParameters MAPS Type
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
-      auto declaration = Ast::make< DeclarationDefinition >( @$, $2, $4, $6 );
-      declaration->setKind( DeclarationDefinition::Kind::RULE );
-      $$ = declaration;
+      $$ = Ast::make< DeclarationDefinition >
+          ( @$, $2, $4, $6, DeclarationDefinition::Kind::RULE );
   }
 ;
 

@@ -542,7 +542,7 @@ namespace libcasm_fe {
       // ConditionalRule
       char dummy16[sizeof (ConditionalRule::Ptr)];
 
-      // DeclarationDefinition
+      // Declaration
       char dummy17[sizeof (DeclarationDefinition::Ptr)];
 
       // MaybeDefined
@@ -1053,7 +1053,7 @@ namespace libcasm_fe {
         S_ImplementationDefinition = 116,        // ImplementationDefinition
         S_ImplementationDefinitionDefinition = 117, // ImplementationDefinitionDefinition
         S_ImplementationDefinitionDefinitions = 118, // ImplementationDefinitionDefinitions
-        S_DeclarationDefinition = 119,           // DeclarationDefinition
+        S_Declaration = 119,                     // Declaration
         S_Rules = 120,                           // Rules
         S_Rule = 121,                            // Rule
         S_SkipRule = 122,                        // SkipRule
@@ -1311,7 +1311,7 @@ namespace libcasm_fe {
         value.move< ConditionalRule::Ptr > (std::move (that.value));
         break;
 
-      case symbol_kind::S_DeclarationDefinition: // DeclarationDefinition
+      case symbol_kind::S_Declaration: // Declaration
         value.move< DeclarationDefinition::Ptr > (std::move (that.value));
         break;
 
@@ -2975,7 +2975,7 @@ switch (yykind)
         value.template destroy< ConditionalRule::Ptr > ();
         break;
 
-      case symbol_kind::S_DeclarationDefinition: // DeclarationDefinition
+      case symbol_kind::S_Declaration: // Declaration
         value.template destroy< DeclarationDefinition::Ptr > ();
         break;
 
@@ -5398,7 +5398,7 @@ switch (yykind)
         value.copy< ConditionalRule::Ptr > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_DeclarationDefinition: // DeclarationDefinition
+      case symbol_kind::S_Declaration: // Declaration
         value.copy< DeclarationDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -5870,7 +5870,7 @@ switch (yykind)
         value.move< ConditionalRule::Ptr > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_DeclarationDefinition: // DeclarationDefinition
+      case symbol_kind::S_Declaration: // Declaration
         value.move< DeclarationDefinition::Ptr > (YY_MOVE (s.value));
         break;
 

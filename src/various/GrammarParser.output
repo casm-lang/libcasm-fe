@@ -88,8 +88,8 @@ Grammar
 
    50 FeatureDefinition: "feature" Identifier "=" "{" FeatureDefinitionList "}"
 
-   51 FeatureDefinitionElement: "[" Attributes "]" DeclarationDefinition
-   52                         | DeclarationDefinition
+   51 FeatureDefinitionElement: "[" Attributes "]" Declaration
+   52                         | Declaration
    53                         | "[" Attributes "]" DerivedDefinition
    54                         | DerivedDefinition
    55                         | "[" Attributes "]" RuleDefinition
@@ -107,8 +107,8 @@ Grammar
    63 ImplementationDefinitionDefinitions: ImplementationDefinitionDefinition ImplementationDefinitionDefinitions
    64                                    | ImplementationDefinitionDefinition
 
-   65 DeclarationDefinition: "derived" Identifier ":" MaybeFunctionParameters "->" Type
-   66                      | "rule" Identifier ":" MaybeFunctionParameters "->" Type
+   65 Declaration: "derived" Identifier ":" MaybeFunctionParameters "->" Type
+   66            | "rule" Identifier ":" MaybeFunctionParameters "->" Type
 
    67 Rules: Rules Rule
    68      | Rule
@@ -557,7 +557,7 @@ Nonterminals, with rules where they appear
     ImplementationDefinitionDefinitions <Definitions::Ptr> (118)
         on left: 63 64
         on right: 59 60 63
-    DeclarationDefinition <DeclarationDefinition::Ptr> (119)
+    Declaration <DeclarationDefinition::Ptr> (119)
         on left: 65 66
         on right: 51 52
     Rules <Rules::Ptr> (120)
@@ -7062,7 +7062,7 @@ State 297
     RuleDefinition            go to state 376
     FeatureDefinitionElement  go to state 377
     FeatureDefinitionList     go to state 378
-    DeclarationDefinition     go to state 379
+    Declaration               go to state 379
 
 
 State 298
@@ -8663,7 +8663,7 @@ State 372
    24 DerivedDefinition: "derived" • Identifier "->" Type "=" Term
    25                  | "derived" • Identifier "(" Parameters ")" "->" Type "=" Term
    26                  | "derived" • Identifier "(" error ")" "->" Type "=" Term
-   65 DeclarationDefinition: "derived" • Identifier ":" MaybeFunctionParameters "->" Type
+   65 Declaration: "derived" • Identifier ":" MaybeFunctionParameters "->" Type
 
     "in"          shift, and go to state 8
     "identifier"  shift, and go to state 9
@@ -8679,7 +8679,7 @@ State 373
    30               | "rule" • Identifier "(" Parameters ")" "->" Type "=" Rule
    31               | "rule" • Identifier "(" error ")" "=" Rule
    32               | "rule" • Identifier "(" error ")" "->" Type "=" Rule
-   66 DeclarationDefinition: "rule" • Identifier ":" MaybeFunctionParameters "->" Type
+   66 Declaration: "rule" • Identifier ":" MaybeFunctionParameters "->" Type
 
     "in"          shift, and go to state 8
     "identifier"  shift, and go to state 9
@@ -8689,7 +8689,7 @@ State 373
 
 State 374
 
-   51 FeatureDefinitionElement: "[" • Attributes "]" DeclarationDefinition
+   51 FeatureDefinitionElement: "[" • Attributes "]" Declaration
    53                         | "[" • Attributes "]" DerivedDefinition
    55                         | "[" • Attributes "]" RuleDefinition
 
@@ -8733,12 +8733,12 @@ State 378
     DerivedDefinition         go to state 375
     RuleDefinition            go to state 376
     FeatureDefinitionElement  go to state 441
-    DeclarationDefinition     go to state 379
+    Declaration               go to state 379
 
 
 State 379
 
-   52 FeatureDefinitionElement: DeclarationDefinition •
+   52 FeatureDefinitionElement: Declaration •
 
     $default  reduce using rule 52 (FeatureDefinitionElement)
 
@@ -10125,7 +10125,7 @@ State 437
    24 DerivedDefinition: "derived" Identifier • "->" Type "=" Term
    25                  | "derived" Identifier • "(" Parameters ")" "->" Type "=" Term
    26                  | "derived" Identifier • "(" error ")" "->" Type "=" Term
-   65 DeclarationDefinition: "derived" Identifier • ":" MaybeFunctionParameters "->" Type
+   65 Declaration: "derived" Identifier • ":" MaybeFunctionParameters "->" Type
 
     "("   shift, and go to state 175
     ":"   shift, and go to state 475
@@ -10140,7 +10140,7 @@ State 438
    30               | "rule" Identifier • "(" Parameters ")" "->" Type "=" Rule
    31               | "rule" Identifier • "(" error ")" "=" Rule
    32               | "rule" Identifier • "(" error ")" "->" Type "=" Rule
-   66 DeclarationDefinition: "rule" Identifier • ":" MaybeFunctionParameters "->" Type
+   66 Declaration: "rule" Identifier • ":" MaybeFunctionParameters "->" Type
 
     "="   shift, and go to state 178
     "("   shift, and go to state 179
@@ -10150,7 +10150,7 @@ State 438
 
 State 439
 
-   51 FeatureDefinitionElement: "[" Attributes • "]" DeclarationDefinition
+   51 FeatureDefinitionElement: "[" Attributes • "]" Declaration
    53                         | "[" Attributes • "]" DerivedDefinition
    55                         | "[" Attributes • "]" RuleDefinition
   251 Attributes: Attributes • Attribute
@@ -10727,7 +10727,7 @@ State 474
 
 State 475
 
-   65 DeclarationDefinition: "derived" Identifier ":" • MaybeFunctionParameters "->" Type
+   65 Declaration: "derived" Identifier ":" • MaybeFunctionParameters "->" Type
 
     "in"          shift, and go to state 8
     "("           shift, and go to state 109
@@ -10750,7 +10750,7 @@ State 475
 
 State 476
 
-   66 DeclarationDefinition: "rule" Identifier ":" • MaybeFunctionParameters "->" Type
+   66 Declaration: "rule" Identifier ":" • MaybeFunctionParameters "->" Type
 
     "in"          shift, and go to state 8
     "("           shift, and go to state 109
@@ -10773,16 +10773,16 @@ State 476
 
 State 477
 
-   51 FeatureDefinitionElement: "[" Attributes "]" • DeclarationDefinition
+   51 FeatureDefinitionElement: "[" Attributes "]" • Declaration
    53                         | "[" Attributes "]" • DerivedDefinition
    55                         | "[" Attributes "]" • RuleDefinition
 
     "derived"  shift, and go to state 372
     "rule"     shift, and go to state 373
 
-    DerivedDefinition      go to state 500
-    RuleDefinition         go to state 501
-    DeclarationDefinition  go to state 502
+    DerivedDefinition  go to state 500
+    RuleDefinition     go to state 501
+    Declaration        go to state 502
 
 
 State 478
@@ -11514,14 +11514,14 @@ State 497
 
 State 498
 
-   65 DeclarationDefinition: "derived" Identifier ":" MaybeFunctionParameters • "->" Type
+   65 Declaration: "derived" Identifier ":" MaybeFunctionParameters • "->" Type
 
     "->"  shift, and go to state 522
 
 
 State 499
 
-   66 DeclarationDefinition: "rule" Identifier ":" MaybeFunctionParameters • "->" Type
+   66 Declaration: "rule" Identifier ":" MaybeFunctionParameters • "->" Type
 
     "->"  shift, and go to state 523
 
@@ -11542,7 +11542,7 @@ State 501
 
 State 502
 
-   51 FeatureDefinitionElement: "[" Attributes "]" DeclarationDefinition •
+   51 FeatureDefinitionElement: "[" Attributes "]" Declaration •
 
     $default  reduce using rule 51 (FeatureDefinitionElement)
 
@@ -12035,7 +12035,7 @@ State 521
 
 State 522
 
-   65 DeclarationDefinition: "derived" Identifier ":" MaybeFunctionParameters "->" • Type
+   65 Declaration: "derived" Identifier ":" MaybeFunctionParameters "->" • Type
 
     "in"          shift, and go to state 8
     "("           shift, and go to state 109
@@ -12054,7 +12054,7 @@ State 522
 
 State 523
 
-   66 DeclarationDefinition: "rule" Identifier ":" MaybeFunctionParameters "->" • Type
+   66 Declaration: "rule" Identifier ":" MaybeFunctionParameters "->" • Type
 
     "in"          shift, and go to state 8
     "("           shift, and go to state 109
@@ -12279,16 +12279,16 @@ State 530
 
 State 531
 
-   65 DeclarationDefinition: "derived" Identifier ":" MaybeFunctionParameters "->" Type •
+   65 Declaration: "derived" Identifier ":" MaybeFunctionParameters "->" Type •
 
-    $default  reduce using rule 65 (DeclarationDefinition)
+    $default  reduce using rule 65 (Declaration)
 
 
 State 532
 
-   66 DeclarationDefinition: "rule" Identifier ":" MaybeFunctionParameters "->" Type •
+   66 Declaration: "rule" Identifier ":" MaybeFunctionParameters "->" Type •
 
-    $default  reduce using rule 66 (DeclarationDefinition)
+    $default  reduce using rule 66 (Declaration)
 
 
 State 533

@@ -772,10 +772,12 @@ void ImplementationDefinition::accept( Visitor& visitor )
 DeclarationDefinition::DeclarationDefinition(
     const Identifier::Ptr& identifier,
     const Types::Ptr& argumentTypes,
-    const Type::Ptr& returnType )
+    const Type::Ptr& returnType,
+    const DeclarationDefinition::Kind kind )
 : Definition( Node::ID::DECLARATION_DEFINITION, identifier )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
+, m_kind( kind )
 {
 }
 
@@ -787,11 +789,6 @@ const Types::Ptr& DeclarationDefinition::argumentTypes( void ) const
 const Type::Ptr& DeclarationDefinition::returnType( void ) const
 {
     return m_returnType;
-}
-
-void DeclarationDefinition::setKind( const Kind kind )
-{
-    m_kind = kind;
 }
 
 DeclarationDefinition::Kind DeclarationDefinition::kind( void ) const
