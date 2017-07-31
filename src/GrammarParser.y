@@ -151,8 +151,8 @@ END       0 "end of file"
 %type <Definition::Ptr> FeatureDefinitionElement
 %type <Definitions::Ptr> FeatureDefinitionList
 %type <ImplementationDefinition::Ptr> ImplementationDefinition
-%type <Definition::Ptr> ImplementationDefinitionDefinition
-%type <Definitions::Ptr> ImplementationDefinitionDefinitions
+%type <Definition::Ptr> ImplementationDefinitionElement
+%type <Definitions::Ptr> ImplementationDefinitionList
 %type <DeclarationDefinition::Ptr> Declaration
 
 // literals
@@ -677,11 +677,11 @@ FeatureDefinitionList
 //
 
 ImplementationDefinition
-: IMPLEMENTS IdentifierPath FOR Type EQUAL LCURPAREN ImplementationDefinitionDefinitions RCURPAREN
+: IMPLEMENTS IdentifierPath FOR Type EQUAL LCURPAREN ImplementationDefinitionList RCURPAREN
   {
       $$ = Ast::make< ImplementationDefinition >( @$, $2, $4, $7 );
   }
-| IMPLEMENTS Type EQUAL LCURPAREN ImplementationDefinitionDefinitions RCURPAREN
+| IMPLEMENTS Type EQUAL LCURPAREN ImplementationDefinitionList RCURPAREN
   {
       const auto name = Ast::make< Identifier >( @$, "" );
       const auto path = asIdentifierPath( name );
@@ -690,10 +690,22 @@ ImplementationDefinition
 ;
 
 
-ImplementationDefinitionDefinition
-: DerivedDefinition
+ImplementationDefinitionElement
+: LSQPAREN Attributes RSQPAREN DerivedDefinition
+  {
+      auto definition = $4;
+      definition->setAttributes( $2 );
+      $$ = definition;
+  }
+| DerivedDefinition
   {
       $$ = $1;
+  }
+| LSQPAREN Attributes RSQPAREN RuleDefinition
+  {
+      auto definition = $4;
+      definition->setAttributes( $2 );
+      $$ = definition;
   }
 | RuleDefinition
   {
@@ -702,14 +714,14 @@ ImplementationDefinitionDefinition
 ;
 
 
-ImplementationDefinitionDefinitions
-: ImplementationDefinitionDefinition ImplementationDefinitionDefinitions
+ImplementationDefinitionList
+: ImplementationDefinitionList ImplementationDefinitionElement
   {
-      auto definitions = $2;
-      definitions->add( $1 );
+      auto definitions = $1;
+      definitions->add( $2 );
       $$ = definitions;
   }
-| ImplementationDefinitionDefinition
+| ImplementationDefinitionElement
   {
       auto definitions = Ast::make< Definitions >( @$ );
       definitions->add( $1 );

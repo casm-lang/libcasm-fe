@@ -237,31 +237,33 @@ FeatureDefinitionList ::= FeatureDefinitionList FeatureDefinitionElement
 ** ImplementationDefinition
 
 #+begin_src
-ImplementationDefinition ::= "implements" IdentifierPath "for" Type "=" "{" ImplementationDefinitionDefinitions "}"
-                           | "implements" Type "=" "{" ImplementationDefinitionDefinitions "}"
+ImplementationDefinition ::= "implements" IdentifierPath "for" Type "=" "{" ImplementationDefinitionList "}"
+                           | "implements" Type "=" "{" ImplementationDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:ImplementationDefinition&noheader&nofooter}}
 
 
-** ImplementationDefinitionDefinition
+** ImplementationDefinitionElement
 
 #+begin_src
-ImplementationDefinitionDefinition ::= DerivedDefinition
-                                     | RuleDefinition
+ImplementationDefinitionElement ::= "[" Attributes "]" DerivedDefinition
+                                  | DerivedDefinition
+                                  | "[" Attributes "]" RuleDefinition
+                                  | RuleDefinition
 #+end_src
 
-#+html: {{page>.:grammar:ImplementationDefinitionDefinition&noheader&nofooter}}
+#+html: {{page>.:grammar:ImplementationDefinitionElement&noheader&nofooter}}
 
 
-** ImplementationDefinitionDefinitions
+** ImplementationDefinitionList
 
 #+begin_src
-ImplementationDefinitionDefinitions ::= ImplementationDefinitionDefinition ImplementationDefinitionDefinitions
-                                      | ImplementationDefinitionDefinition
+ImplementationDefinitionList ::= ImplementationDefinitionList ImplementationDefinitionElement
+                               | ImplementationDefinitionElement
 #+end_src
 
-#+html: {{page>.:grammar:ImplementationDefinitionDefinitions&noheader&nofooter}}
+#+html: {{page>.:grammar:ImplementationDefinitionList&noheader&nofooter}}
 
 
 ** Declaration
