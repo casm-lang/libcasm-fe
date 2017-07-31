@@ -105,16 +105,6 @@ RuleDefinition ::= "rule" Identifier "=" Rule
 #+html: {{page>.:grammar:RuleDefinition&noheader&nofooter}}
 
 
-** FunctionDefinitions
-
-#+begin_src
-FunctionDefinitions ::= FunctionDefinitions FunctionDefinition
-                      | FunctionDefinition
-#+end_src
-
-#+html: {{page>.:grammar:FunctionDefinitions&noheader&nofooter}}
-
-
 ** FunctionDefinition
 
 #+begin_src
@@ -185,10 +175,30 @@ ImportDefinition ::= "import" IdentifierPath
 ** StructureDefinition
 
 #+begin_src
-StructureDefinition ::= "structure" Identifier "=" "{" FunctionDefinitions "}"
+StructureDefinition ::= "structure" Identifier "=" "{" StructureDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:StructureDefinition&noheader&nofooter}}
+
+
+** StructureDefinitionElement
+
+#+begin_src
+StructureDefinitionElement ::= "[" Attributes "]" FunctionDefinition
+                             | FunctionDefinition
+#+end_src
+
+#+html: {{page>.:grammar:StructureDefinitionElement&noheader&nofooter}}
+
+
+** StructureDefinitionList
+
+#+begin_src
+StructureDefinitionList ::= StructureDefinitionList StructureDefinitionElement
+                          | StructureDefinitionElement
+#+end_src
+
+#+html: {{page>.:grammar:StructureDefinitionList&noheader&nofooter}}
 
 
 ** FeatureDefinition

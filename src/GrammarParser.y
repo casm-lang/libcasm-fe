@@ -145,6 +145,8 @@ END       0 "end of file"
 %type <InvariantDefinition::Ptr> InvariantDefinition
 %type <ImportDefinition::Ptr> ImportDefinition
 %type <StructureDefinition::Ptr> StructureDefinition
+%type <FunctionDefinition::Ptr> StructureDefinitionElement
+%type <FunctionDefinitions::Ptr> StructureDefinitionList
 %type <FeatureDefinition::Ptr> FeatureDefinition
 %type <Definition::Ptr> FeatureDeclarationOrDefinition
 %type <Definitions::Ptr> FeatureDeclarationsAndDefinitions
@@ -551,6 +553,10 @@ InvariantDefinition
   }
 ;
 
+//
+//
+// StructureDefinition
+//
 
 ImportDefinition
 : IMPORT IdentifierPath
@@ -565,13 +571,47 @@ ImportDefinition
 
 
 StructureDefinition
-: STRUCTURE Identifier EQUAL LCURPAREN FunctionDefinitions RCURPAREN
+: STRUCTURE Identifier EQUAL LCURPAREN StructureDefinitionList RCURPAREN
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, $4, and $6
       // $$ = Ast::make< StructureDefinition >( @$, $2, $5 );
   }
 ;
 
+
+StructureDefinitionElement
+: LSQPAREN Attributes RSQPAREN FunctionDefinition
+  {
+      auto definition = $4;
+      definition->setAttributes( $2 );
+      $$ = definition;
+  }
+| FunctionDefinition
+  {
+      $$ = $1;
+  }
+;
+
+
+StructureDefinitionList
+: StructureDefinitionList StructureDefinitionElement
+  {
+      auto functions = $1;
+      functions->add( $2 );
+      $$ = functions;
+  }
+| StructureDefinitionElement
+  {
+      auto functions = Ast::make< FunctionDefinitions >( @$ );
+      functions->add( $1 );
+      $$ = functions;
+  }
+;
+
+//
+//
+// FeatureDefinition
+//
 
 FeatureDefinition
 : FEATURE Identifier EQUAL LCURPAREN FeatureDeclarationsAndDefinitions RCURPAREN
@@ -613,6 +653,10 @@ FeatureDeclarationsAndDefinitions
   }
 ;
 
+//
+//
+// ImplementationDefinition
+//
 
 ImplementationDefinition
 : IMPLEMENTS IdentifierPath FOR Type EQUAL LCURPAREN ImplementationDefinitionDefinitions RCURPAREN
@@ -655,6 +699,10 @@ ImplementationDefinitionDefinitions
   }
 ;
 
+//
+//
+// DeclarationDefinition
+//
 
 DeclarationDefinition
 : DERIVED Identifier COLON MaybeFunctionParameters MAPS Type
@@ -673,7 +721,7 @@ DeclarationDefinition
   }
 ;
 
-
+//
 //
 // Rules
 //
