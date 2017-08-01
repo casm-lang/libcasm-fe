@@ -82,32 +82,6 @@ class TypeCheckVisitor final : public RecursiveVisitor
     Expression* m_caseExpr = nullptr;
 };
 
-static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
-static const auto RULEREF = libstdhl::get< libcasm_ir::RuleReferenceType >();
-static const auto BOOLEAN = libstdhl::get< libcasm_ir::BooleanType >();
-static const auto INTEGER = libstdhl::get< libcasm_ir::IntegerType >();
-static const auto BIT_1 = libstdhl::get< libcasm_ir::BitType >( 1 );
-static const auto STRING = libstdhl::get< libcasm_ir::StringType >();
-static const auto FLOATING = libstdhl::get< libcasm_ir::FloatingType >();
-static const auto RATIONAL = libstdhl::get< libcasm_ir::RationalType >();
-
-static const std::unordered_map< std::string, libcasm_ir::Type::Ptr > basicTypes
-    = {
-        { "Void", VOID },
-
-        { "Boolean", BOOLEAN },
-
-        { "Integer", INTEGER },
-
-        { "Bit", BIT_1 },
-
-        { "String", STRING },
-
-        { "Floating", FLOATING },
-
-        { "Rational", RATIONAL },
-      };
-
 TypeCheckVisitor::TypeCheckVisitor( Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
@@ -165,12 +139,12 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                             assert( symbol.targetType()
                                     == CallExpression::TargetType::CONSTANT );
 
-                            auto& definition
-                                = static_cast< EnumerationDefinition& >(
+                            const auto& definition = std::
+                                static_pointer_cast< EnumerationDefinition >(
                                     symbol.definition() );
 
-                            assert( definition.type() );
-                            node.setType( definition.type() );
+                            assert( definition->type() );
+                            node.setType( definition->type() );
                         }
                         catch( const std::domain_error& e )
                         {
@@ -200,12 +174,9 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                         assert( symbol.targetType()
                                 == CallExpression::TargetType::CONSTANT );
 
-                        auto& definition
-                            = static_cast< EnumerationDefinition& >(
-                                symbol.definition() );
-
-                        assert( definition.type() );
-                        node.setType( definition.type() );
+                        const auto& type = symbol.definition()->type();
+                        assert( type );
+                        node.setType( type );
                     }
                     catch( const std::domain_error& e )
                     {
@@ -312,13 +283,7 @@ void TypeCheckVisitor::visit( BasicType& node )
     {
         const auto& name = node.name()->baseName();
 
-        auto result = basicTypes.find( name );
-        if( result != basicTypes.end() )
-        {
-            node.setType( result->second );
-        }
-        else if( name.compare( "RuleRef" ) == 0
-                 or name.compare( "FuncRef" ) == 0 )
+        if( name.compare( "RuleRef" ) == 0 or name.compare( "FuncRef" ) == 0 )
         {
             m_log.error( { node.sourceLocation() },
                 "reference type '" + name + "' defined without relation" );
@@ -332,7 +297,7 @@ void TypeCheckVisitor::visit( BasicType& node )
                 assert( symbol.targetType()
                         == CallExpression::TargetType::TYPE_DOMAIN );
 
-                const auto& type = symbol.definition().type();
+                const auto& type = symbol.definition()->type();
                 assert( type );
                 node.setType( type );
             }
@@ -785,38 +750,42 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
         {
             case CallExpression::TargetType::FUNCTION:
             {
-                auto& definition
-                    = static_cast< FunctionDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< FunctionDefinition >(
+                        symbol.definition() );
 
-                inference( definition, {} );
-                assert( definition.type() and definition.type()->isRelation() );
+                inference( *definition, {} );
+                assert(
+                    definition->type() and definition->type()->isRelation() );
 
                 const auto type
                     = libstdhl::make< libcasm_ir::FunctionReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
-                            definition.type() ) );
+                            definition->type() ) );
                 node.setType( type );
 
                 node.setReferenceType( ReferenceAtom::ReferenceType::FUNCTION );
-                node.setReference( definition.ptr< FunctionDefinition >() );
+                node.setReference( definition );
                 break;
             }
             case CallExpression::TargetType::DERIVED:
             {
-                auto& definition
-                    = static_cast< DerivedDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< DerivedDefinition >(
+                        symbol.definition() );
 
-                inference( definition, {} );
-                assert( definition.type() and definition.type()->isRelation() );
+                inference( *definition, {} );
+                assert(
+                    definition->type() and definition->type()->isRelation() );
 
                 const auto type
-                    = libstdhl::make< libcasm_ir::RuleReferenceType >(
+                    = libstdhl::make< libcasm_ir::FunctionReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
-                            definition.type() ) );
+                            definition->type() ) );
                 node.setType( type );
 
                 node.setReferenceType( ReferenceAtom::ReferenceType::DERIVED );
-                node.setReference( definition.ptr< DerivedDefinition >() );
+                node.setReference( definition );
                 break;
             }
             case CallExpression::TargetType::BUILTIN:
@@ -831,20 +800,22 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             }
             case CallExpression::TargetType::RULE:
             {
-                auto& definition
-                    = static_cast< RuleDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< RuleDefinition >(
+                        symbol.definition() );
 
-                inference( definition, {} );
-                assert( definition.type() and definition.type()->isRelation() );
+                inference( *definition, {} );
+                assert(
+                    definition->type() and definition->type()->isRelation() );
 
                 const auto type
                     = libstdhl::make< libcasm_ir::RuleReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
-                            definition.type() ) );
+                            definition->type() ) );
                 node.setType( type );
 
                 node.setReferenceType( ReferenceAtom::ReferenceType::RULE );
-                node.setReference( definition.ptr< RuleDefinition >() );
+                node.setReference( definition );
                 break;
             }
             case CallExpression::TargetType::VARIABLE:
@@ -955,11 +926,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto symbol = m_symboltable.find( node );
                 assert( symbol.targetType() == node.targetType() );
 
-                auto& definition
-                    = static_cast< DerivedDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< DerivedDefinition >(
+                        symbol.definition() );
 
-                inference( definition, node.arguments()->data() );
-                node.setType( definition.type() );
+                inference( *definition, node.arguments()->data() );
+                node.setType( definition->type() );
             }
             catch( const std::domain_error& e )
             {
@@ -975,11 +947,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto symbol = m_symboltable.find( node );
                 assert( symbol.targetType() == node.targetType() );
 
-                auto& definition
-                    = static_cast< FunctionDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< FunctionDefinition >(
+                        symbol.definition() );
 
-                inference( definition, node.arguments()->data() );
-                node.setType( definition.type() );
+                inference( *definition, node.arguments()->data() );
+                node.setType( definition->type() );
             }
             catch( const std::domain_error& e )
             {
@@ -995,11 +968,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto symbol = m_symboltable.find( node );
                 assert( symbol.targetType() == node.targetType() );
 
-                auto& definition
-                    = static_cast< RuleDefinition& >( symbol.definition() );
+                const auto& definition
+                    = std::static_pointer_cast< RuleDefinition >(
+                        symbol.definition() );
 
-                inference( definition, node.arguments()->data() );
-                node.setType( definition.type() );
+                inference( *definition, node.arguments()->data() );
+                node.setType( definition->type() );
             }
             catch( const std::domain_error& e )
             {
@@ -1015,7 +989,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 auto symbol = m_symboltable.find( "Agent" );
                 assert( symbol.targetType()
                         == CallExpression::TargetType::TYPE_DOMAIN );
-                const auto& type = symbol.definition().type();
+                const auto& type = symbol.definition()->type();
                 assert( type );
                 node.setType( type );
             }
@@ -1051,58 +1025,58 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     if( node.type() )
     {
         const auto& call_type_args = node.type()->arguments();
-        const auto& call_expr_args = node.arguments()->data();
+        const auto& call_expr_args = *node.arguments();
 
         if( call_type_args.size() == call_expr_args.size() )
         {
-            std::size_t pos = -1;
-            for( auto argument : node.arguments()->data() )
+            for( std::size_t pos = 0; pos < call_type_args.size(); pos++ )
             {
-                pos++;
-                if( argument->type() )
+                const auto& exprArg = call_expr_args.at( pos );
+                if( not exprArg->type() )
                 {
-                    if( call_type_args[ pos ]->isInteger()
-                        and argument->type()->result().isInteger() )
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    if( *call_type_args[ pos ] != argument->type()->result() )
-                    {
-                        const std::unordered_map< CallExpression::TargetType,
-                            Code >
-                            codes = {
-                                { CallExpression::TargetType::FUNCTION,
-                                    Code::
-                                        TypeInferenceFunctionArgumentTypeMismatch },
-                                { CallExpression::TargetType::DERIVED,
-                                    Code::
-                                        TypeInferenceDerivedArgumentTypeMismatch },
-                                { CallExpression::TargetType::BUILTIN,
-                                    Code::
-                                        TypeInferenceBuiltinArgumentTypeMismatch },
-                                { CallExpression::TargetType::RULE,
-                                    Code::
-                                        TypeInferenceRuleArgumentTypeMismatch },
-                            };
+                const auto& callArgType = call_type_args.at( pos );
+                if( callArgType->isInteger()
+                    and exprArg->type()->result().isInteger() )
+                {
+                    continue;
+                }
 
-                        const auto code = codes.find( node.targetType() );
-                        assert( code != codes.end()
-                                and " invalid target type with arguments " );
+                if( *callArgType != exprArg->type()->result() )
+                {
+                    const std::unordered_map< CallExpression::TargetType, Code >
+                        codes = {
+                            { CallExpression::TargetType::FUNCTION,
+                                Code::
+                                    TypeInferenceFunctionArgumentTypeMismatch },
+                            { CallExpression::TargetType::DERIVED,
+                                Code::
+                                    TypeInferenceDerivedArgumentTypeMismatch },
+                            { CallExpression::TargetType::BUILTIN,
+                                Code::
+                                    TypeInferenceBuiltinArgumentTypeMismatch },
+                            { CallExpression::TargetType::RULE,
+                                Code::TypeInferenceRuleArgumentTypeMismatch },
+                        };
 
-                        m_log.error( { argument->sourceLocation() },
-                            "type mismatch: " + node.targetTypeName()
-                                + " argument type at position "
-                                + std::to_string( pos + 1 )
-                                + " was '"
-                                + argument->type()->description()
-                                + "', "
-                                + node.targetTypeName()
-                                + " definition expects '"
-                                + call_type_args[ pos ]->description()
-                                + "'",
-                            code->second );
-                    }
+                    const auto code = codes.find( node.targetType() );
+                    assert( code != codes.end()
+                            and " invalid target type with arguments " );
+
+                    m_log.error( { exprArg->sourceLocation() },
+                        "type mismatch: " + node.targetTypeName()
+                            + " argument type at position "
+                            + std::to_string( pos + 1 )
+                            + " was '"
+                            + exprArg->type()->description()
+                            + "', "
+                            + node.targetTypeName()
+                            + " definition expects '"
+                            + callArgType->description()
+                            + "'",
+                        code->second );
                 }
             }
         }
@@ -1136,7 +1110,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             {
                 auto symbol = m_symboltable.find( node );
                 assert( symbol.targetType() == node.targetType() );
-                m_log.info( { symbol.definition().sourceLocation() },
+                m_log.info( { symbol.definition()->sourceLocation() },
                     node.targetTypeName() + " '" + path.path()
                         + "' is defined as a relation '"
                         + node.type()->description()
@@ -1288,7 +1262,7 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
     if( condExpr.type() )
     {
-        if( *condExpr.type() != *BOOLEAN )
+        if( condExpr.type()->id() != libcasm_ir::Type::BOOLEAN )
         {
             m_log.error( { condExpr.sourceLocation() },
                 "condition type of conditional expression is not of type "
@@ -1445,13 +1419,13 @@ void TypeInferenceVisitor::visit( ConditionalRule& node )
 
     if( condExpr.type() )
     {
-        if( condExpr.type()->result() != *BOOLEAN )
+        if( condExpr.type()->result().id() != libcasm_ir::Type::BOOLEAN )
         {
             m_log.error( { condExpr.sourceLocation() },
                 "invalid condition type '"
                     + condExpr.type()->result().description()
                     + ", shall be '"
-                    + BOOLEAN->description()
+                    + libcasm_ir::Type::token( libcasm_ir::Type::BOOLEAN )
                     + "'",
                 Code::TypeInferenceConditionalRuleInvalidConditionType );
         }
@@ -1516,19 +1490,51 @@ void TypeInferenceVisitor::visit( LetRule& node )
 
 void TypeInferenceVisitor::visit( ForallRule& node )
 {
+    node.variable()->accept( *this );
+
+    if( node.variable()->type() )
+    {
+        m_resultTypes[ node.universe().get() ].emplace_back(
+            node.variable()->type()->id() );
+    }
+
+    push( *node.variable() );
     node.universe()->accept( *this );
 
-    if( node.universe()->type() )
+    if( not node.variable()->type() and node.universe()->type() )
     {
         node.variable()->setType( node.universe()->type()->ptr_result() );
     }
 
-    push( *node.variable() );
-
-    node.variable()->accept( *this );
     node.rule()->accept( *this );
-
     pop( *node.variable() );
+
+    if( not node.variable()->type() )
+    {
+        m_log.error( { node.variable()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else if( not node.universe()->type() )
+    {
+        m_log.error( { node.universe()->sourceLocation() }, "no type found",
+            Code::TypeInferenceInvalidExpression );
+    }
+    else
+    {
+        if( *node.variable()->type() != node.universe()->type()->result() )
+        {
+            m_log.error( { node.variable()->sourceLocation(),
+                             node.universe()->sourceLocation() },
+                node.description() + " variable '"
+                    + node.variable()->identifier()->name()
+                    + "' of type '"
+                    + node.variable()->type()->description()
+                    + "' does not match the universe of type '"
+                    + node.universe()->type()->result().description()
+                    + "'",
+                Code::TypeInferenceInvalidForallExpression );
+        }
+    }
 }
 
 void TypeInferenceVisitor::visit( ChooseRule& node )
@@ -1736,12 +1742,13 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                     auto symbol = m_symboltable.find( path );
                     auto& definition = symbol.definition();
 
-                    if( definition.type() )
+                    if( definition->type() )
                     {
                         for( std::size_t c = 0; c < expressions.size(); c++ )
                         {
-                            std::vector< libcasm_ir::Type::ID > ty
-                                = { definition.type()->arguments()[ c ]->id() };
+                            std::vector< libcasm_ir::Type::ID > ty = {
+                                definition->type()->arguments()[ c ]->id()
+                            };
                             std::vector< libcasm_ir::Type::ID > tmp = {};
 
                             std::copy( ty.begin(), ty.end(),
@@ -1750,7 +1757,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                         }
 
                         std::vector< libcasm_ir::Type::ID > ty
-                            = { definition.type()->result().id() };
+                            = { definition->type()->result().id() };
                         std::vector< libcasm_ir::Type::ID > tmp = {};
 
                         if( result != m_resultTypes.end() )
@@ -1871,12 +1878,13 @@ void TypeInferenceVisitor::inference( const std::string& description,
 
         std::vector< libcasm_ir::Type::ID > argTypes;
 
-        for( auto argument : arguments )
+        for( const auto& argument : arguments )
         {
             if( not argument->type() )
             {
                 auto argTy = m_resultTypes.find( argument.get() );
-                if( argTy != m_resultTypes.end() and argTy->second.size() == 1 )
+                if( argTy != m_resultTypes.cend()
+                    and argTy->second.size() == 1 )
                 {
                     argTypes.emplace_back( *argTy->second.begin() );
                 }
@@ -1990,17 +1998,20 @@ void TypeInferenceVisitor::inference( const std::string& description,
     {
         case libcasm_ir::Type::VOID:
         {
-            node.setType( VOID );
+            node.setType( libstdhl::get< libcasm_ir::VoidType >() );
             break;
         }
         case libcasm_ir::Type::BOOLEAN:
         {
-            node.setType( BOOLEAN );
+            node.setType( libstdhl::get< libcasm_ir::BooleanType >() );
             break;
         }
         case libcasm_ir::Type::INTEGER:
         {
-            node.setType( INTEGER ); // TODO: PPA: check for ranged integers
+            node.setType(
+                libstdhl::get< libcasm_ir::IntegerType >() ); // TODO: PPA:
+                                                              // check for
+                                                              // ranged integers
             break;
         }
         case libcasm_ir::Type::BIT:
@@ -2015,17 +2026,17 @@ void TypeInferenceVisitor::inference( const std::string& description,
         }
         case libcasm_ir::Type::STRING:
         {
-            node.setType( STRING );
+            node.setType( libstdhl::get< libcasm_ir::StringType >() );
             break;
         }
         case libcasm_ir::Type::FLOATING:
         {
-            node.setType( FLOATING );
+            node.setType( libstdhl::get< libcasm_ir::FloatingType >() );
             break;
         }
         case libcasm_ir::Type::RATIONAL:
         {
-            node.setType( RATIONAL );
+            node.setType( libstdhl::get< libcasm_ir::RationalType >() );
             break;
         }
         case libcasm_ir::Type::RULE_REFERENCE:
@@ -2161,7 +2172,7 @@ void TypeInferenceVisitor::inference(
 
 void TypeInferenceVisitor::inference( QuantifierExpression& node )
 {
-    node.setType( BOOLEAN );
+    node.setType( libstdhl::get< libcasm_ir::BooleanType >() );
 
     node.predicateVariable()->accept( *this );
 

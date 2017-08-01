@@ -40,21 +40,18 @@ namespace libcasm_fe
         class Symbol
         {
           public:
-            Symbol( const Ast::Identifier& identifier,
-                Ast::TypedNode& definition,
+            Symbol( const Ast::TypedNode::Ptr& definition,
                 const Ast::CallExpression::TargetType targetType,
                 const std::size_t arity );
 
-            const Ast::Identifier& identifier( void ) const;
-            Ast::TypedNode& definition( void ) const;
+            const Ast::TypedNode::Ptr& definition( void ) const;
             Ast::CallExpression::TargetType targetType( void ) const;
             std::size_t arity( void ) const;
 
           private:
-            const Ast::Identifier& m_identifier;
-            Ast::TypedNode& m_definition;
-            Ast::CallExpression::TargetType m_targetType;
-            std::size_t m_arity;
+            const Ast::TypedNode::Ptr m_definition;
+            const Ast::CallExpression::TargetType m_targetType;
+            const std::size_t m_arity;
         };
 
       public:
@@ -62,27 +59,24 @@ namespace libcasm_fe
 
         Namespace( void );
 
-        void registerSymbol( const Ast::DirectCallExpression& node,
+        void registerSymbol( const Ast::DirectCallExpression::Ptr& node,
             const Ast::CallExpression::TargetType targetType );
 
-        void registerSymbol( const Ast::Identifier& identifier,
-            const Ast::TypedNode& definition,
+        void registerSymbol( const std::string& name,
+            const Ast::TypedNode::Ptr& definition,
             const Ast::CallExpression::TargetType targetType );
 
-        void registerSymbol( const Ast::FunctionDefinition& node );
-
-        void registerSymbol( const Ast::DerivedDefinition& node );
-
-        void registerSymbol( const Ast::RuleDefinition& node );
-
-        void registerSymbol( const Ast::EnumerationDefinition& node );
+        void registerSymbol( const Ast::FunctionDefinition::Ptr& node );
+        void registerSymbol( const Ast::DerivedDefinition::Ptr& node );
+        void registerSymbol( const Ast::RuleDefinition::Ptr& node );
+        void registerSymbol( const Ast::EnumerationDefinition::Ptr& node );
+        void registerSymbol( const Ast::BasicType::Ptr& node );
 
         Symbol find( const Ast::DirectCallExpression& node ) const;
-
         Symbol find( const Ast::FunctionDefinition& node ) const;
-
         Symbol find( const Ast::DerivedDefinition& node ) const;
-
+        Symbol find( const Ast::RuleDefinition& node ) const;
+        Symbol find( const Ast::EnumerationDefinition& node ) const;
         Symbol find( const Ast::BasicType& node ) const;
 
         Symbol find( const Ast::IdentifierPath& node ) const;
@@ -96,8 +90,8 @@ namespace libcasm_fe
         std::string dump( const std::string& indention = "" ) const;
 
       private:
-        void registerSymbol( const Ast::Identifier& node,
-            const Ast::TypedNode& definition,
+        void registerSymbol( const std::string& name,
+            const Ast::TypedNode::Ptr& definition,
             const Ast::CallExpression::TargetType targetType,
             const std::size_t arity );
 

@@ -206,7 +206,7 @@ Arguments
 | LPAREN RPAREN
 
 TwoOrMoreArguments
-: LPAREN Term COMMA Terms RPAREN
+: LPAREN Terms COMMA Term RPAREN
 
 DirectCallExpression
 : IdentifierPath %prec CALL_WITHOUT_ARGS

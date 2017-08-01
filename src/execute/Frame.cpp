@@ -111,7 +111,7 @@ static std::string generateBuiltinTraceLine( Frame* frame )
         {
             args += ", ";
         }
-        args += frame->local( i ).description();
+        args += frame->local( i ).name();
     }
 
     std::string name;
@@ -156,7 +156,7 @@ static std::string generateCalleeTraceLine(
                 isFirstArg = false;
 
                 args += arg->identifier()->name() + "="
-                        + frame->local( arg->localIndex() ).description();
+                        + frame->local( arg->localIndex() ).name();
             }
             break;
         }
@@ -176,7 +176,7 @@ static std::string generateCalleeTraceLine(
                 isFirstArg = false;
 
                 args += arg->identifier()->name() + "="
-                        + frame->local( arg->localIndex() ).description();
+                        + frame->local( arg->localIndex() ).name();
             }
             break;
         }
@@ -193,7 +193,7 @@ static std::string generateCalleeTraceLine(
                 {
                     args += ", ";
                 }
-                args += frame->local( i ).description();
+                args += frame->local( i ).name();
             }
             break;
         }
@@ -213,10 +213,12 @@ static std::string generateCalleeTraceLine(
 }
 
 std::vector< std::string > FrameStack::generateBacktrace(
-    SourceLocation problemLocation ) const
+    SourceLocation problemLocation, const libcasm_ir::Constant& agentId ) const
 {
     std::vector< std::string > backtrace;
     backtrace.reserve( m_frames.size() );
+
+    backtrace.emplace_back( "# Agent " + agentId.name() + ":" );
 
     std::size_t frameCounter = 0;
 

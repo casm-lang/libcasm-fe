@@ -246,8 +246,16 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     RecursiveVisitor::visit( node );
 
     const auto& func = node.function();
+    if( func->targetType() != CallExpression::TargetType::FUNCTION )
+    {
+        m_log.error( { func->sourceLocation() },
+            "updating " + func->targetTypeName() + " '"
+                + func->identifier()->path()
+                + "' is not allowed, only function symbols are allowed",
+            Code::UpdateRuleFunctionSymbolIsInvalid );
+        return;
+    }
 
-    assert( func->targetType() == CallExpression::TargetType::FUNCTION );
     const auto& def = func->targetDefinition()->ptr< FunctionDefinition >();
 
     bool updatesAllowed;
