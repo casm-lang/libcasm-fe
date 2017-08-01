@@ -27,6 +27,9 @@
 
 using namespace libcasm_fe;
 
+static const auto registration
+    = libcasm_ir::Constant::registerConstant< ReferenceConstant >();
+
 static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
 
 ReferenceConstant::ReferenceConstant( const Ast::ReferenceAtom* atom )
