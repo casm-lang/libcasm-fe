@@ -736,22 +736,18 @@ void FeatureDefinition::accept( Visitor& visitor )
 //
 
 ImplementationDefinition::ImplementationDefinition(
-    const IdentifierPath::Ptr& path, const Type::Ptr& type, const Definitions::Ptr& definitions )
-: Definition( Node::ID::IMPLEMENTATION_DEFINITION, *path->identifiers()->end() )
-, m_path( path )
-, m_type( type )
+    const IdentifierPath::Ptr& feature,
+    const Identifier::Ptr& identifier,
+    const Definitions::Ptr& definitions )
+: Definition( Node::ID::IMPLEMENTATION_DEFINITION, identifier )
+, m_feature( feature )
 , m_definitions( definitions )
 {
 }
 
-const IdentifierPath::Ptr& ImplementationDefinition::path( void ) const
+const IdentifierPath::Ptr& ImplementationDefinition::feature( void ) const
 {
-    return m_path;
-}
-
-const Type::Ptr& ImplementationDefinition::type( void ) const
-{
-    return m_type;
+    return m_feature;
 }
 
 const Definitions::Ptr& ImplementationDefinition::definitions( void ) const

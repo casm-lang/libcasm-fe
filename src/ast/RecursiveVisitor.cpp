@@ -226,7 +226,7 @@ void RecursiveVisitor::visit( FeatureDefinition& node )
 void RecursiveVisitor::visit( ImplementationDefinition& node )
 {
     node.identifier()->accept( *this );
-    node.type()->accept( *this );
+    node.feature()->accept( *this );
     node.definitions()->accept( *this );
     node.attributes()->accept( *this );
 }

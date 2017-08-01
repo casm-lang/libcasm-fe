@@ -237,8 +237,8 @@ FeatureDefinitionList ::= FeatureDefinitionList FeatureDefinitionElement
 ** ImplementationDefinition
 
 #+begin_src
-ImplementationDefinition ::= "implements" IdentifierPath "for" Type "=" "{" ImplementationDefinitionList "}"
-                           | "implements" Type "=" "{" ImplementationDefinitionList "}"
+ImplementationDefinition ::= "implements" IdentifierPath "for" Identifier "=" "{" ImplementationDefinitionList "}"
+                           | "implements" Identifier "=" "{" ImplementationDefinitionList "}"
 #+end_src
 
 #+html: {{page>.:grammar:ImplementationDefinition&noheader&nofooter}}
