@@ -33,21 +33,17 @@
 
 namespace libcasm_fe
 {
-    class EmptyValue : public libcasm_ir::Value
-    {
-      public:
-        EmptyValue( void );
-    };
-
     class ReferenceConstant final
-        : public libcasm_ir::ReferenceConstant< EmptyValue >
+        : public libcasm_ir::ReferenceConstant< Ast::ReferenceAtom >
     {
       public:
-        explicit ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom );
+        explicit ReferenceConstant( const Ast::ReferenceAtom* atom );
 
         explicit ReferenceConstant( void );
 
         Ast::ReferenceAtom* atom( void ) const;
+
+        std::string name( void ) const override;
 
         static inline Value::ID classid( void )
         {

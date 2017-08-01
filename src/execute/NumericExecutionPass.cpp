@@ -488,7 +488,7 @@ void ExecutionVisitor::visit( ValueAtom& node )
 
 void ExecutionVisitor::visit( ReferenceAtom& node )
 {
-    m_evaluationStack.push( ReferenceConstant( node.ptr< ReferenceAtom >() ) );
+    m_evaluationStack.push( ReferenceConstant( &node ) );
 }
 
 void ExecutionVisitor::visit( UndefAtom& node )

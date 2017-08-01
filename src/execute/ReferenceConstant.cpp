@@ -29,29 +29,31 @@ using namespace libcasm_fe;
 
 static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
 
-EmptyValue::EmptyValue( void )
-: libcasm_ir::Value( VOID, Value::ID::VALUE )
-{
-}
-
-ReferenceConstant::ReferenceConstant( const Ast::ReferenceAtom::Ptr& atom )
-: libcasm_ir::ReferenceConstant< EmptyValue >( VOID,
-      (const Value::Ptr&)atom, // HACK: use the memory of Value::Ptr
-                               // to store the atom efficiently
-                               // otherwise another shared_ptr would
-                               // be required!
-      classid() )
+ReferenceConstant::ReferenceConstant( const Ast::ReferenceAtom* atom )
+: libcasm_ir::ReferenceConstant< Ast::ReferenceAtom >( VOID, atom, classid() )
 {
 }
 
 ReferenceConstant::ReferenceConstant( void )
-: libcasm_ir::ReferenceConstant< EmptyValue >( VOID, classid() )
+: libcasm_ir::ReferenceConstant< Ast::ReferenceAtom >( VOID, classid() )
 {
 }
 
 Ast::ReferenceAtom* ReferenceConstant::atom( void ) const
 {
-    return (Ast::ReferenceAtom*)value();
+    return value();
+}
+
+std::string ReferenceConstant::name( void ) const
+{
+    if( defined() )
+    {
+        return "@" + atom()->identifier()->path();
+    }
+    else
+    {
+        return "undef";
+    }
 }
 
 u1 ReferenceConstant::classof( Value const* obj )
