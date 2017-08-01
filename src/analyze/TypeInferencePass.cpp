@@ -304,7 +304,8 @@ void TypeCheckVisitor::visit( BasicType& node )
             catch( const std::domain_error& e )
             {
                 m_log.error( { node.sourceLocation() },
-                    "unknown type '" + name + "' found" );
+                    "unknown type '" + name + "' found",
+                    Code::TypeAnnotationInvalidBasicTypeName );
             }
         }
     }
@@ -336,13 +337,15 @@ void TypeCheckVisitor::visit( ComposedType& node )
         subTypeList.emplace_back( subType->type() );
     }
 
-    // if( name.compare( "Tuple" ) == 0 )
-    // {
-    // }
-    // else if( name.compare( "List" ) == 0 )
-    // {
-    // }
-    // else
+    if( name.compare( "Tuple" ) == 0 )
+    {
+        // TODO: PPA: FIXME: CONT
+    }
+    else if( name.compare( "List" ) == 0 )
+    {
+        // TODO: PPA: FIXME: CONT
+    }
+    else
     {
         m_log.error( { node.sourceLocation() },
             "unknown composed type '" + name + "' found",
@@ -396,7 +399,8 @@ void TypeCheckVisitor::visit( RelationType& node )
     else
     {
         m_log.error( { node.sourceLocation() },
-            "unknown relation type '" + name + "' found" );
+            "unknown relation type '" + name + "' found",
+            Code::TypeAnnotationInvalidRelationTypeName );
     }
 }
 
@@ -494,7 +498,8 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
         else
         {
             m_log.error( { node.sourceLocation() },
-                "unknown type '" + name + "' found" );
+                "unknown type '" + name + "' found",
+                Code::TypeAnnotationInvalidFixedSizeTypeName );
         }
     }
 

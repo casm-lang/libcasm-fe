@@ -127,7 +127,10 @@ namespace libcasm_fe
         // --------------------------------------------------------- 01** ...
         // type annotation errors
 
-        TypeAnnotationInvalidComposedTypeName = 0x0100,
+        TypeAnnotationInvalidBasicTypeName = 0x0100,
+        TypeAnnotationInvalidFixedSizeTypeName = 0x0101,
+        TypeAnnotationInvalidComposedTypeName = 0x0102,
+        TypeAnnotationInvalidRelationTypeName = 0x0103,
 
         // --------------------------------------------------------- 1*** ...
         // type inference errors
