@@ -279,6 +279,8 @@ void TypeCheckVisitor::visit( CaseRule& node )
 
 void TypeCheckVisitor::visit( BasicType& node )
 {
+    RecursiveVisitor::visit( node );
+
     if( not node.type() )
     {
         const auto& name = node.name()->baseName();
@@ -309,8 +311,6 @@ void TypeCheckVisitor::visit( BasicType& node )
             }
         }
     }
-
-    RecursiveVisitor::visit( node );
 }
 
 void TypeCheckVisitor::visit( ComposedType& node )
@@ -324,7 +324,7 @@ void TypeCheckVisitor::visit( ComposedType& node )
 
     const auto& name = node.name()->baseName();
 
-    std::vector< libcasm_ir::Type::Ptr > subTypeList;
+    libcasm_ir::Types subTypeList;
     for( auto subType : *node.subTypes() )
     {
         if( not subType->type() )
@@ -334,16 +334,28 @@ void TypeCheckVisitor::visit( ComposedType& node )
             return;
         }
 
-        subTypeList.emplace_back( subType->type() );
+        subTypeList.add( subType->type() );
     }
 
     if( name.compare( "Tuple" ) == 0 )
     {
-        // TODO: PPA: FIXME: CONT
+        const auto type
+            = libstdhl::make< libcasm_ir::TupleType >( subTypeList );
+        node.setType( type );
     }
     else if( name.compare( "List" ) == 0 )
     {
-        // TODO: PPA: FIXME: CONT
+        if( subTypeList.size() == 1 )
+        {
+            const auto type
+                = libstdhl::make< libcasm_ir::ListType >( subTypeList[ 0 ] );
+            node.setType( type );
+        }
+        else
+        {
+            m_log.error( { node.sourceLocation() },
+                "composed type '" + name + "' can only have one sub-type" );
+        }
     }
     else
     {
@@ -406,6 +418,8 @@ void TypeCheckVisitor::visit( RelationType& node )
 
 void TypeCheckVisitor::visit( FixedSizedType& node )
 {
+    RecursiveVisitor::visit( node );
+
     if( not node.type() )
     {
         const auto& name = node.name()->baseName();
@@ -448,43 +462,91 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                 const auto& lhs = *range_expr.left();
                 const auto& rhs = *range_expr.right();
 
-                if( lhs.id() == Node::ID::VALUE_ATOM and lhs.type()->isInteger()
-                    and rhs.id() == Node::ID::VALUE_ATOM
-                    and rhs.type()->isInteger() )
+                if( ( ( lhs.id() == Node::ID::VALUE_ATOM
+                          and lhs.type()->isInteger() )
+                        or lhs.id() == Node::ID::UNARY_EXPRESSION )
+                    and ( ( rhs.id() == Node::ID::VALUE_ATOM
+                              and rhs.type()->isInteger() )
+                            or rhs.id() == Node::ID::UNARY_EXPRESSION ) )
                 {
-                    const auto& atom_lhs
-                        = static_cast< const ValueAtom& >( lhs );
+                    libcasm_ir::IntegerConstant::Ptr ir_lhs;
+                    libcasm_ir::IntegerConstant::Ptr ir_rhs;
 
-                    const auto& atom_rhs
-                        = static_cast< const ValueAtom& >( rhs );
-
-                    const auto ir_lhs = std::
-                        static_pointer_cast< libcasm_ir::IntegerConstant >(
-                            atom_lhs.value() );
-
-                    const auto ir_rhs = std::
-                        static_pointer_cast< libcasm_ir::IntegerConstant >(
-                            atom_rhs.value() );
-
-                    auto range
-                        = libstdhl::make< libcasm_ir::Range >( ir_lhs, ir_rhs );
-
-                    auto range_type
-                        = libstdhl::get< libcasm_ir::RangeType >( range );
-
-                    assert( not expr.type() );
-                    expr.setType( range_type );
-
-                    try
+                    if( lhs.id() == Node::ID::VALUE_ATOM )
                     {
-                        auto type = libstdhl::get< libcasm_ir::IntegerType >(
-                            range_type );
-
-                        node.setType( type );
+                        ir_lhs = std::
+                            static_pointer_cast< libcasm_ir::IntegerConstant >(
+                                static_cast< const ValueAtom& >( lhs )
+                                    .value() );
                     }
-                    catch( const std::domain_error& e )
+                    else
                     {
-                        m_log.error( { expr.sourceLocation() }, e.what() );
+                        assert( lhs.id() == Node::ID::UNARY_EXPRESSION );
+                        const auto& unaryExpr
+                            = static_cast< const UnaryExpression& >( lhs );
+                        if( unaryExpr.op() == libcasm_ir::Value::INV_INSTRUCTION
+                            and unaryExpr.expression()
+                            and unaryExpr.expression()->id()
+                                    == Node::ID::VALUE_ATOM
+                            and unaryExpr.expression()->type()->isInteger() )
+                        {
+                            ir_lhs = std::static_pointer_cast< libcasm_ir::
+                                    IntegerConstant >(
+                                -static_cast< const ValueAtom& >(
+                                    *unaryExpr.expression() )
+                                     .value() );
+                        }
+                    }
+
+                    if( rhs.id() == Node::ID::VALUE_ATOM )
+                    {
+                        ir_rhs = std::
+                            static_pointer_cast< libcasm_ir::IntegerConstant >(
+                                static_cast< const ValueAtom& >( rhs )
+                                    .value() );
+                    }
+                    else
+                    {
+                        assert( rhs.id() == Node::ID::UNARY_EXPRESSION );
+                        const auto& unaryExpr
+                            = static_cast< const UnaryExpression& >( rhs );
+                        if( unaryExpr.op() == libcasm_ir::Value::INV_INSTRUCTION
+                            and unaryExpr.expression()
+                            and unaryExpr.expression()->id()
+                                    == Node::ID::VALUE_ATOM
+                            and unaryExpr.expression()->type()->isInteger() )
+                        {
+                            ir_rhs = std::static_pointer_cast< libcasm_ir::
+                                    IntegerConstant >(
+                                -static_cast< const ValueAtom& >(
+                                    *unaryExpr.expression() )
+                                     .value() );
+                        }
+                    }
+
+                    if( ir_lhs->defined() and ir_rhs->defined() )
+                    {
+                        auto range = libstdhl::make< libcasm_ir::Range >(
+                            ir_lhs, ir_rhs );
+
+                        auto range_type
+                            = libstdhl::get< libcasm_ir::RangeType >( range );
+
+                        assert( not expr.type() );
+                        expr.setType( range_type );
+
+                        try
+                        {
+                            auto type
+                                = libstdhl::get< libcasm_ir::IntegerType >(
+                                    range_type );
+
+                            node.setType( type );
+                        }
+                        catch( const std::domain_error& e )
+                        {
+                            m_log.error( { expr.sourceLocation() }, e.what() );
+                        }
                     }
                 }
             }
@@ -502,8 +564,6 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                 Code::TypeAnnotationInvalidFixedSizeTypeName );
         }
     }
-
-    RecursiveVisitor::visit( node );
 }
 
 void TypeCheckVisitor::visit( ExpressionCase& node )
@@ -2088,6 +2148,13 @@ void TypeInferenceVisitor::inference(
         }
 
         argTypeList.emplace_back( argumentType->type() );
+    }
+
+    if( not node.returnType()->type() )
+    {
+        m_log.info( { node.returnType()->sourceLocation() },
+            "TODO: '" + node.identifier()->name() + "' has a no return type" );
+        return;
     }
 
     const auto type = libstdhl::make< libcasm_ir::RelationType >(
