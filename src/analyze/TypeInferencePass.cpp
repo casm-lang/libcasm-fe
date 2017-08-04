@@ -462,85 +462,37 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                 const auto& lhs = *range_expr.left();
                 const auto& rhs = *range_expr.right();
 
-                if( ( ( lhs.id() == Node::ID::VALUE_ATOM
-                          and lhs.type()->isInteger() )
-                        or lhs.id() == Node::ID::UNARY_EXPRESSION )
-                    and ( ( rhs.id() == Node::ID::VALUE_ATOM
-                              and rhs.type()->isInteger() )
-                            or rhs.id() == Node::ID::UNARY_EXPRESSION ) )
+                if( lhs.id() == Node::ID::VALUE_ATOM and lhs.type()->isInteger()
+                    and rhs.id() == Node::ID::VALUE_ATOM
+                    and rhs.type()->isInteger() )
                 {
-                    libcasm_ir::IntegerConstant::Ptr ir_lhs;
-                    libcasm_ir::IntegerConstant::Ptr ir_rhs;
+                    const auto ir_lhs = std::
+                        static_pointer_cast< libcasm_ir::IntegerConstant >(
+                            static_cast< const ValueAtom& >( lhs ).value() );
 
-                    if( lhs.id() == Node::ID::VALUE_ATOM )
+                    const auto ir_rhs = std::
+                        static_pointer_cast< libcasm_ir::IntegerConstant >(
+                            static_cast< const ValueAtom& >( rhs ).value() );
+
+                    auto range
+                        = libstdhl::make< libcasm_ir::Range >( ir_lhs, ir_rhs );
+
+                    auto range_type
+                        = libstdhl::get< libcasm_ir::RangeType >( range );
+
+                    assert( not expr.type() );
+                    expr.setType( range_type );
+
+                    try
                     {
-                        ir_lhs = std::
-                            static_pointer_cast< libcasm_ir::IntegerConstant >(
-                                static_cast< const ValueAtom& >( lhs )
-                                    .value() );
+                        auto type = libstdhl::get< libcasm_ir::IntegerType >(
+                            range_type );
+
+                        node.setType( type );
                     }
-                    else
+                    catch( const std::domain_error& e )
                     {
-                        assert( lhs.id() == Node::ID::UNARY_EXPRESSION );
-                        const auto& unaryExpr
-                            = static_cast< const UnaryExpression& >( lhs );
-                        if( unaryExpr.op() == libcasm_ir::Value::INV_INSTRUCTION
-                            and unaryExpr.expression()
-                            and unaryExpr.expression()->id()
-                                    == Node::ID::VALUE_ATOM
-                            and unaryExpr.expression()->type()->isInteger() )
-                        {
-                            // ir_rhs = ...
-                            // TODO: PPA: FIXME:
-                        }
-                    }
-
-                    if( rhs.id() == Node::ID::VALUE_ATOM )
-                    {
-                        ir_rhs = std::
-                            static_pointer_cast< libcasm_ir::IntegerConstant >(
-                                static_cast< const ValueAtom& >( rhs )
-                                    .value() );
-                    }
-                    else
-                    {
-                        assert( rhs.id() == Node::ID::UNARY_EXPRESSION );
-                        const auto& unaryExpr
-                            = static_cast< const UnaryExpression& >( rhs );
-                        if( unaryExpr.op() == libcasm_ir::Value::INV_INSTRUCTION
-                            and unaryExpr.expression()
-                            and unaryExpr.expression()->id()
-                                    == Node::ID::VALUE_ATOM
-                            and unaryExpr.expression()->type()->isInteger() )
-                        {
-                            // ir_rhs = ...
-                            // TODO: PPA: FIXME:
-                        }
-                    }
-
-                    if( ir_lhs->defined() and ir_rhs->defined() )
-                    {
-                        auto range = libstdhl::make< libcasm_ir::Range >(
-                            ir_lhs, ir_rhs );
-
-                        auto range_type
-                            = libstdhl::get< libcasm_ir::RangeType >( range );
-
-                        assert( not expr.type() );
-                        expr.setType( range_type );
-
-                        try
-                        {
-                            auto type
-                                = libstdhl::get< libcasm_ir::IntegerType >(
-                                    range_type );
-
-                            node.setType( type );
-                        }
-                        catch( const std::domain_error& e )
-                        {
-                            m_log.error( { expr.sourceLocation() }, e.what() );
-                        }
+                        m_log.error( { expr.sourceLocation() }, e.what() );
                     }
                 }
             }
