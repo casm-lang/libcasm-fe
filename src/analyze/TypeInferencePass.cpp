@@ -303,14 +303,16 @@ void TypeCheckVisitor::visit( BasicType& node )
                 "reference type '" + name
                     + "' defined without a relation, use '"
                     + name
-                    + "< /* relation type */  >'" );
+                    + "< /* relation type */  >'",
+                Code::TypeAnnotationRelationTypeHasNoSubType );
         }
         else if( TYPE_STRINGS_FOR_COMPOSED_TYPES.count( name ) )
         {
             m_log.error( { node.sourceLocation() },
                 "composed type '" + name + "' defined without sub-types, use '"
                     + name
-                    + "< /* sub-type(s) */  >'" );
+                    + "< /* sub-type(s) */  >'",
+                Code::TypeAnnotationComposedTypeHasNoSubType );
         }
         else
         {
@@ -464,7 +466,8 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                 }
                 catch( const std::domain_error& e )
                 {
-                    m_log.error( { expr.sourceLocation() }, e.what() );
+                    m_log.error( { expr.sourceLocation() }, e.what(),
+                        Code::TypeBitSizeIsInvalid );
                 }
             }
             else
