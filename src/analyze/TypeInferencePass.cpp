@@ -490,11 +490,8 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                                     == Node::ID::VALUE_ATOM
                             and unaryExpr.expression()->type()->isInteger() )
                         {
-                            ir_lhs = std::static_pointer_cast< libcasm_ir::
-                                    IntegerConstant >(
-                                -static_cast< const ValueAtom& >(
-                                    *unaryExpr.expression() )
-                                     .value() );
+                            // ir_rhs = ...
+                            // TODO: PPA: FIXME:
                         }
                     }
 
@@ -516,11 +513,8 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                                     == Node::ID::VALUE_ATOM
                             and unaryExpr.expression()->type()->isInteger() )
                         {
-                            ir_rhs = std::static_pointer_cast< libcasm_ir::
-                                    IntegerConstant >(
-                                -static_cast< const ValueAtom& >(
-                                    *unaryExpr.expression() )
-                                     .value() );
+                            // ir_rhs = ...
+                            // TODO: PPA: FIXME:
                         }
                     }
 
