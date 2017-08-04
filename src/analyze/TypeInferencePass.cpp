@@ -277,6 +277,18 @@ void TypeCheckVisitor::visit( CaseRule& node )
     }
 }
 
+static const std::string TYPE_STRING_RULEREF = "RuleRef";
+static const std::string TYPE_STRING_FUNCREF = "FuncRef";
+
+static const std::unordered_set< std::string > TYPE_STRINGS_FOR_REFERENCE_TYPES
+    = { TYPE_STRING_RULEREF, TYPE_STRING_FUNCREF };
+
+static const std::string TYPE_STRING_TUPLE = "Tuple";
+static const std::string TYPE_STRING_LIST = "List";
+
+static const std::unordered_set< std::string > TYPE_STRINGS_FOR_COMPOSED_TYPES
+    = { TYPE_STRING_TUPLE, TYPE_STRING_LIST };
+
 void TypeCheckVisitor::visit( BasicType& node )
 {
     RecursiveVisitor::visit( node );
@@ -285,10 +297,20 @@ void TypeCheckVisitor::visit( BasicType& node )
     {
         const auto& name = node.name()->baseName();
 
-        if( name.compare( "RuleRef" ) == 0 or name.compare( "FuncRef" ) == 0 )
+        if( TYPE_STRINGS_FOR_REFERENCE_TYPES.count( name ) )
         {
             m_log.error( { node.sourceLocation() },
-                "reference type '" + name + "' defined without relation" );
+                "reference type '" + name
+                    + "' defined without a relation, use '"
+                    + name
+                    + "< /* relation type */  >'" );
+        }
+        else if( TYPE_STRINGS_FOR_COMPOSED_TYPES.count( name ) )
+        {
+            m_log.error( { node.sourceLocation() },
+                "composed type '" + name + "' defined without sub-types, use '"
+                    + name
+                    + "< /* sub-type(s) */  >'" );
         }
         else
         {
@@ -337,13 +359,13 @@ void TypeCheckVisitor::visit( ComposedType& node )
         subTypeList.add( subType->type() );
     }
 
-    if( name.compare( "Tuple" ) == 0 )
+    if( name == TYPE_STRING_TUPLE )
     {
         const auto type
             = libstdhl::make< libcasm_ir::TupleType >( subTypeList );
         node.setType( type );
     }
-    else if( name.compare( "List" ) == 0 )
+    else if( name == TYPE_STRING_LIST )
     {
         if( subTypeList.size() == 1 )
         {
@@ -389,7 +411,7 @@ void TypeCheckVisitor::visit( RelationType& node )
         argTypeList.emplace_back( argumentType->type() );
     }
 
-    if( name.compare( "RuleRef" ) == 0 )
+    if( name == TYPE_STRING_RULEREF )
     {
         if( node.returnType()->type() )
         {
@@ -398,7 +420,7 @@ void TypeCheckVisitor::visit( RelationType& node )
             node.setType( type );
         }
     }
-    else if( name.compare( "FuncRef" ) == 0 )
+    else if( name == TYPE_STRING_FUNCREF )
     {
         if( node.returnType()->type() )
         {
