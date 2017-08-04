@@ -47,6 +47,22 @@ const libcasm_ir::Constant::Ptr& ValueAtom::value( void ) const
     return m_value;
 }
 
+void ValueAtom::changeIntegerConstantToBitConstant(
+    const libcasm_ir::Type::Ptr& type )
+{
+    assert( libcasm_ir::isa< libcasm_ir::IntegerConstant >( m_value ) );
+
+    auto constant
+        = std::static_pointer_cast< libcasm_ir::IntegerConstant >( m_value );
+
+    assert( type->isBit() );
+
+    m_value = libstdhl::get< libcasm_ir::BitConstant >( type,
+        static_cast< const libstdhl::Type::Natural& >( constant->value() ) );
+
+    Expression::setType( m_value->type().ptr_type() );
+}
+
 void ValueAtom::accept( Visitor& visitor )
 {
     visitor.visit( *this );

@@ -55,10 +55,13 @@ namespace libcasm_fe
 
             const libcasm_ir::Constant::Ptr& value( void ) const;
 
+            void changeIntegerConstantToBitConstant(
+                const libcasm_ir::Type::Ptr& type );
+
             void accept( Visitor& visitor ) override final;
 
           private:
-            const libcasm_ir::Constant::Ptr m_value;
+            libcasm_ir::Constant::Ptr m_value;
         };
 
         class ReferenceAtom final : public Expression

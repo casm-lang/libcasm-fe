@@ -1701,7 +1701,42 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
     {
         if( tyLhs.isInteger() and tyRhs.isInteger() )
         {
-            // mixed integer with range properties are checked at run-time
+            // relaxation: mixed integer with range properties are checked
+            //             at run-time
+        }
+        else if( tyLhs.isBit() and tyRhs.isBit()
+                 and static_cast< const libcasm_ir::BitType& >( tyLhs )
+                             .bitsize()
+                         >= static_cast< const libcasm_ir::BitType& >( tyRhs )
+                                .bitsize() )
+        {
+            // relaxation: mixed bit types are OK as long as
+            //             bitsize(lhs) >= bitsize(rhs)
+        }
+        else if( tyLhs.isBit() and tyRhs.isInteger()
+                 and rhs.id() == Node::ID::VALUE_ATOM )
+        {
+            // relaxation: lhs bit and rhs integer are OK as long as rhs is a
+            //             integer constant with bitsize(lhs) >= bitsize(rhs)
+
+            try
+            {
+                static_cast< ValueAtom& >( rhs )
+                    .changeIntegerConstantToBitConstant(
+                        lhs.type()->ptr_result() );
+            }
+            catch( const std::exception& e )
+            {
+                m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
+                    "type mismatch: " + src + " was '" + tyRhs.description()
+                        + "', but "
+                        + dst
+                        + " expects '"
+                        + tyLhs.description()
+                        + "', "
+                        + e.what(),
+                    assignmentErr );
+            }
         }
         else
         {
