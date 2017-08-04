@@ -1147,6 +1147,29 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
     }
 
     node.setType( node.expression()->type() );
+
+    assert( node.type()->isReference() );
+
+    if( node.type()->isRuleReference() )
+    {
+        node.setTargetType( CallExpression::TargetType::RULE );
+    }
+    else if( node.type()->isFunctionReference() )
+    {
+        node.setTargetType( CallExpression::TargetType::FUNCTION );
+    }
+    else
+    {
+        m_log.debug( { node.expression()->sourceLocation() },
+            "unable to set indirect call expression target type for expression "
+            "kind of '"
+                + node.expression()->description()
+                + "'" );
+    }
+
+    const auto& refType
+        = std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
+    node.setType( refType->dereference() );
 }
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
