@@ -1223,18 +1223,20 @@ void TypeInferenceVisitor::visit( RangeExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& lhs = *node.left();
-    const auto& rhs = *node.right();
+    const auto& lhs = node.left()->type()->result();
+    const auto& rhs = node.right()->type()->result();
 
-    if( *lhs.type() != *rhs.type() )
+    if( lhs != rhs )
     {
-        m_log.error(
-            { node.sourceLocation() }, "types of range does not match" );
+        m_log.error( { node.sourceLocation() },
+            "types of range does not match, " + lhs.description() + " != "
+                + rhs.description(),
+            Code::TypeInferenceRangeExpressionTypeMismatch );
         return;
     }
 
-    const auto range_type
-        = libstdhl::get< libcasm_ir::RangeType >( lhs.type() );
+    const auto range_type = libstdhl::get< libcasm_ir::RangeType >(
+        node.left()->type()->ptr_result() );
 
     node.setType( range_type );
 }
@@ -1570,15 +1572,19 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 
     if( not node.variable()->type() )
     {
-        m_log.error( { node.variable()->sourceLocation() }, "no type found",
-            Code::TypeInferenceInvalidExpression );
+        m_log.error( { node.variable()->sourceLocation() },
+            "no type found for 'forall' variable",
+            Code::TypeInferenceForallVariableHasNoType );
     }
-    else if( not node.universe()->type() )
+
+    if( not node.universe()->type() )
     {
-        m_log.error( { node.universe()->sourceLocation() }, "no type found",
-            Code::TypeInferenceInvalidExpression );
+        m_log.error( { node.universe()->sourceLocation() },
+            "no type found for 'forall' universe",
+            Code::TypeInferenceForallUniverseHasNoType );
     }
-    else
+
+    if( node.variable()->type() and node.universe()->type() )
     {
         if( *node.variable()->type() != node.universe()->type()->result() )
         {
@@ -1591,7 +1597,7 @@ void TypeInferenceVisitor::visit( ForallRule& node )
                     + "' does not match the universe of type '"
                     + node.universe()->type()->result().description()
                     + "'",
-                Code::TypeInferenceInvalidForallExpression );
+                Code::TypeInferenceForallRuleTypeMismatch );
         }
     }
 }

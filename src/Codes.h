@@ -180,9 +180,11 @@ namespace libcasm_fe
 
         ,
         TypeInferenceInvalidIfExpression = 0x1003,
-        TypeInferenceInvalidForallExpression = 0x1004
 
-        ,
+        TypeInferenceForallVariableHasNoType = 0x1004,
+        TypeInferenceForallUniverseHasNoType = 0x1014,
+        TypeInferenceForallRuleTypeMismatch = 0x1024,
+
         TypeInferenceInvalidConditionalExpressionCondition = 0x1005,
         TypeInferenceInvalidConditionalExpressionPaths = 0x1006
 
@@ -196,24 +198,18 @@ namespace libcasm_fe
         ,
         TypeInferenceInvalidLetExpressionVariableType = 0x1010,
         TypeInferenceInvalidLetExpressionInitializerType = 0x1011,
-        TypeInferenceInvalidLetExpressionTypeMismatch = 0x1012
+        TypeInferenceInvalidLetExpressionTypeMismatch = 0x1012,
 
-        ,
-        TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000
+        TypeInferenceRangeExpressionTypeMismatch = 0x1600,
 
-        ,
-        TypeIntegerRangedInvalidInterval = 0x2000 // 2*** ... Integer type error
+        TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000,
 
-        ,
-        TypeNumberRangeInvalidTypeAtLeftHandSide
-        = 0x3000 // 3*** ... Number range type error
-        ,
-        TypeNumberRangeInvalidTypeAtRightHandSide
-        = 0x3001 // 3*** ... Number range type error
+        TypeIntegerRangedInvalidInterval
+        = 0x2000, // 2*** ... Integer type error
 
         // --------------------------------------------------------- cc** ...
         // consistency check errors
-        ,
+
         UpdateRuleInvalidClassifier = 0xcc00,
         DirectCallExpressionInvalidClassifier = 0xcc01
 
