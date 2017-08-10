@@ -377,7 +377,7 @@ void ExecutionVisitor::execute( const ReferenceConstant& value )
 {
     assert( value.defined() && "Reference must be defined" );
 
-    const auto& atom = value.atom();
+    const auto& atom = value.value();
     assert( ( atom->referenceType() == ReferenceAtom::ReferenceType::RULE )
             && "Must be a rule reference" );
 
@@ -589,7 +589,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             Code::Unspecified );
     }
 
-    const auto& atom = value.atom();
+    const auto& atom = value.value();
     switch( atom->referenceType() )
     {
         case ReferenceAtom::ReferenceType::FUNCTION:

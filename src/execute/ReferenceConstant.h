@@ -41,8 +41,6 @@ namespace libcasm_fe
 
         explicit ReferenceConstant( void );
 
-        Ast::ReferenceAtom* atom( void ) const;
-
         std::string name( void ) const override;
 
         static inline Value::ID classid( void )

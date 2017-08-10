@@ -42,16 +42,11 @@ ReferenceConstant::ReferenceConstant( void )
 {
 }
 
-Ast::ReferenceAtom* ReferenceConstant::atom( void ) const
-{
-    return value();
-}
-
 std::string ReferenceConstant::name( void ) const
 {
     if( defined() )
     {
-        return "@" + atom()->identifier()->path();
+        return "@" + value()->identifier()->path();
     }
     else
     {
