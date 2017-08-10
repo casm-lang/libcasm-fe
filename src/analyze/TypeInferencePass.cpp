@@ -1727,9 +1727,19 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
 
             try
             {
-                static_cast< ValueAtom& >( rhs )
-                    .changeIntegerConstantToBitConstant(
-                        lhs.type()->ptr_result() );
+                auto& valueAtom = static_cast< ValueAtom& >( rhs );
+                assert( libcasm_ir::isa< libcasm_ir::IntegerConstant >(
+                    valueAtom.value() ) );
+                auto constant
+                    = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
+                        valueAtom.value() );
+
+                const auto value = libstdhl::get< libcasm_ir::BitConstant >(
+                    lhs.type()->ptr_result(),
+                    static_cast< const libstdhl::Type::Natural& >(
+                        constant->value() ) );
+
+                valueAtom.setValue( value );
             }
             catch( const std::exception& e )
             {

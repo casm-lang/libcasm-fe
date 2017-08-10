@@ -55,8 +55,7 @@ namespace libcasm_fe
 
             const libcasm_ir::Constant::Ptr& value( void ) const;
 
-            void changeIntegerConstantToBitConstant(
-                const libcasm_ir::Type::Ptr& type );
+            void setValue( const libcasm_ir::Constant::Ptr& value );
 
             void accept( Visitor& visitor ) override final;
 
