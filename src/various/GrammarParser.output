@@ -7167,6 +7167,24 @@ State 306
   108           | Term . "implies" Term
   126 UniversalQuantifierExpression: "forall" AttributedVariable "in" Term "holds" Term .
 
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 130
+    "!="       shift, and go to state 131
+    "<="       shift, and go to state 132
+    ">="       shift, and go to state 133
+
     $default  reduce using rule 126 (UniversalQuantifierExpression)
 
 
@@ -7274,6 +7292,24 @@ State 309
   107           | Term . "=>" Term
   108           | Term . "implies" Term
   127 ExistentialQuantifierExpression: "exists" AttributedVariable "in" Term "with" Term .
+
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 130
+    "!="       shift, and go to state 131
+    "<="       shift, and go to state 132
+    ">="       shift, and go to state 133
 
     $default  reduce using rule 127 (ExistentialQuantifierExpression)
 
