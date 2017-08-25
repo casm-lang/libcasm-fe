@@ -2291,7 +2291,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
 {
     node.setType( libstdhl::get< libcasm_ir::BooleanType >() );
 
-    node.predicateVariable()->accept( *this );
+    m_resultTypes[ node.proposition().get() ].emplace_back( node.type()->id() );
 
     if( node.predicateVariable()->type() )
     {
@@ -2299,8 +2299,9 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
             node.predicateVariable()->type()->id() );
     }
 
-    push( *node.predicateVariable() );
     node.universe()->accept( *this );
+
+    node.predicateVariable()->accept( *this );
 
     if( not node.predicateVariable()->type() and node.universe()->type() )
     {
@@ -2308,8 +2309,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
             node.universe()->type()->ptr_result() );
     }
 
-    m_resultTypes[ node.proposition().get() ].emplace_back( node.type()->id() );
-
+    push( *node.predicateVariable() );
     node.proposition()->accept( *this );
     pop( *node.predicateVariable() );
 
@@ -2356,8 +2356,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
         const auto& propType = node.proposition()->type()->result();
         if( *node.type() != propType )
         {
-            m_log.error(
-                { node.sourceLocation(), node.proposition()->sourceLocation() },
+            m_log.error( { node.proposition()->sourceLocation() },
 
                 node.description() + " has invalid proposition type '"
                     + propType.description()
