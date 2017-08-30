@@ -759,7 +759,7 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
     if( not condition.defined() )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
-            "condition must be true or false but was undef",
+            "condition must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalExpressionInvalidCondition );
     }
@@ -784,7 +784,7 @@ void ExecutionVisitor::visit( ChooseExpression& node )
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseExpressionInvalidUniverse );
     }
@@ -807,7 +807,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
     }
@@ -860,7 +860,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
     }
@@ -907,7 +907,7 @@ void ExecutionVisitor::visit( ConditionalRule& node )
     if( not condition.defined() )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
-            "condition must be true or false but was undef",
+            "condition must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalRuleInvalidCondition );
     }
@@ -993,7 +993,7 @@ void ExecutionVisitor::visit( ForallRule& node )
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ForallRuleInvalidUniverse );
     }
@@ -1024,7 +1024,7 @@ void ExecutionVisitor::visit( ChooseRule& node )
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseRuleInvalidUniverse );
     }
@@ -1263,8 +1263,7 @@ void ExecutionVisitor::validateValue( const ir::Constant& value,
     if( flags.isSet( ValidationFlag::ValueMustBeDefined )
         and not value.defined() )
     {
-        throw libcasm_ir::ValidationException(
-            "value isn't defined, but undef isn't allowed" );
+        throw libcasm_ir::ValidationException( "value must be defined" );
     }
 
     type.validate( value );
