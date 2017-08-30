@@ -62,7 +62,12 @@ class UpdateSet
     using Details = _Details;
     using Location = typename Details::Location;
     using Value = typename Details::Value;
-    using Update = std::pair< Location, Value >;
+
+    struct Update
+    {
+        Location location;
+        Value value;
+    };
 
   private:
     using UpdateHashMap = ChainedHashMap< Location, Value,
