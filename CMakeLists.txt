@@ -82,6 +82,7 @@ set( CXX_UTS_FILES
   #uts/symbolic/expression_evaluation.cpp
   uts/updateset/UpdateSetManagerTest.cpp
   uts/updateset/UpdateSetTest.cpp
+  uts/ast/NodeTest.cpp
 )
 
 

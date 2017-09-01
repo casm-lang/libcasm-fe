@@ -298,7 +298,15 @@ const std::string& IdentifierPath::baseName( void ) const
 std::string IdentifierPath::baseDir( void ) const
 {
     const auto& p = path();
-    return p.substr( 0, p.find_last_of( '.' ) );
+    const size_t lastDotPos = p.find_last_of( '.' );
+    if( lastDotPos != std::string::npos )
+    {
+        return p.substr( 0, lastDotPos );
+    }
+    else
+    {
+        return std::string();
+    }
 }
 
 std::string IdentifierPath::path( void ) const
