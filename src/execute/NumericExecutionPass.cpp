@@ -78,7 +78,7 @@ class ConstantStack : public Stack< IR::Constant >
     template < typename T >
     T pop( void )
     {
-        const auto& value = Stack::pop();
+        const auto value = Stack::pop();
         assert( IR::isa< T >( value ) );
         return static_cast< const T& >( value );
     }
@@ -604,7 +604,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 void ExecutionVisitor::visit( IndirectCallExpression& node )
 {
     node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop< ReferenceConstant >();
+    const auto value = m_evaluationStack.pop< ReferenceConstant >();
     if( not value.defined() )
     {
         throw RuntimeException( node.expression()->sourceLocation(),
@@ -687,7 +687,7 @@ void ExecutionVisitor::visit( UnaryExpression& node )
 void ExecutionVisitor::visit( BinaryExpression& node )
 {
     node.left()->accept( *this );
-    const auto& lhs = m_evaluationStack.pop();
+    const auto lhs = m_evaluationStack.pop();
 
     node.right()->accept( *this );
     auto& rhs = m_evaluationStack.top();
@@ -709,10 +709,10 @@ void ExecutionVisitor::visit( BinaryExpression& node )
 void ExecutionVisitor::visit( RangeExpression& node )
 {
     node.left()->accept( *this );
-    const auto& lhs = m_evaluationStack.pop();
+    const auto lhs = m_evaluationStack.pop();
 
     node.right()->accept( *this );
-    const auto& rhs = m_evaluationStack.pop();
+    const auto rhs = m_evaluationStack.pop();
 
     m_evaluationStack.push( IR::RangeConstant( node.type(), lhs, rhs ) );
 }
@@ -725,7 +725,7 @@ void ExecutionVisitor::visit( ListExpression& node )
 void ExecutionVisitor::visit( LetExpression& node )
 {
     node.initializer()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
+    const auto value = m_evaluationStack.pop();
 
     // validate value
     const auto& variableType = node.variable()->type()->result();
@@ -751,7 +751,7 @@ void ExecutionVisitor::visit( LetExpression& node )
 void ExecutionVisitor::visit( ConditionalExpression& node )
 {
     node.condition()->accept( *this );
-    const auto& condition = m_evaluationStack.pop< IR::BooleanConstant >();
+    const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
 
     if( not condition.defined() )
     {
@@ -776,7 +776,7 @@ void ExecutionVisitor::visit( ChooseExpression& node )
     const auto variableIndex = node.variable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
@@ -799,7 +799,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     const auto variableIndex = node.predicateVariable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
@@ -813,7 +813,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
         frame->setLocal( variableIndex, value );
 
         node.proposition()->accept( *this );
-        const auto& prop = m_evaluationStack.pop< IR::BooleanConstant >();
+        const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
         if( not prop.defined() )
         {
@@ -852,7 +852,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     const auto variableIndex = node.predicateVariable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
@@ -866,7 +866,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
         frame->setLocal( variableIndex, value );
 
         node.proposition()->accept( *this );
-        const auto& prop = m_evaluationStack.pop< IR::BooleanConstant >();
+        const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
         if( not prop.defined() )
         {
@@ -899,7 +899,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
 void ExecutionVisitor::visit( ConditionalRule& node )
 {
     node.condition()->accept( *this );
-    const auto& condition = m_evaluationStack.pop< IR::BooleanConstant >();
+    const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
 
     if( not condition.defined() )
     {
@@ -921,7 +921,7 @@ void ExecutionVisitor::visit( ConditionalRule& node )
 void ExecutionVisitor::visit( CaseRule& node )
 {
     node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
+    const auto value = m_evaluationStack.pop();
 
     Case* defaultCase = nullptr;
 
@@ -941,7 +941,7 @@ void ExecutionVisitor::visit( CaseRule& node )
                 const auto& exprCase
                     = std::static_pointer_cast< ExpressionCase >( _case );
                 exprCase->expression()->accept( *this );
-                const auto& caseValue = m_evaluationStack.pop();
+                const auto caseValue = m_evaluationStack.pop();
                 if( value == caseValue )
                 {
                     // match
@@ -967,7 +967,7 @@ void ExecutionVisitor::visit( CaseRule& node )
 void ExecutionVisitor::visit( LetRule& node )
 {
     node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
+    const auto value = m_evaluationStack.pop();
 
     // validate value
     const auto& variableType = node.variable()->type()->result();
@@ -998,7 +998,7 @@ void ExecutionVisitor::visit( ForallRule& node )
     const auto variableIndex = node.variable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
@@ -1029,7 +1029,7 @@ void ExecutionVisitor::visit( ChooseRule& node )
     const auto variableIndex = node.variable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
@@ -1110,7 +1110,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
     // evalute update value
     expression->accept( *this );
-    const auto& updateValue = m_evaluationStack.pop();
+    const auto updateValue = m_evaluationStack.pop();
     try
     {
         validateValue( updateValue, function->type()->result() );
@@ -1133,7 +1133,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
         const auto& argumentType = argumentTypes.at( i );
 
         argument->accept( *this );
-        const auto& value = m_evaluationStack.pop();
+        const auto value = m_evaluationStack.pop();
 
         try
         {
@@ -1215,7 +1215,7 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
         for( const auto& argument : *call->arguments() )
         {
             argument->accept( *this );
-            const auto& value = m_evaluationStack.pop();
+            const auto value = m_evaluationStack.pop();
             frame->setLocal( localIndex, value );
             ++localIndex;
         }
