@@ -53,20 +53,6 @@ namespace libcasm_fe
             return value;
         }
 
-        void drop( std::size_t amount = 1 )
-        {
-            assert( amount <= m_values.size() );
-            for( std::size_t i = 0; i < amount; ++i )
-            {
-                m_values.pop_back();
-            }
-        }
-
-        T* top_ptr( std::size_t amount = 1 )
-        {
-            return &top() - amount + 1;
-        }
-
         T& top( void )
         {
             assert( not m_values.empty() );
