@@ -98,10 +98,10 @@ struct ConstantsHash
  */
 struct Update
 {
-    IR::Constant value;       /**< The value of the update */
-    UpdateRule::Ptr producer; /**< The update producer */
-    IR::Constant agent;       /**< The contributing agent */
-                              // TODO maybe a list of agents (multi-agent case)?
+    IR::Constant value;   /**< The value of the update */
+    UpdateRule* producer; /**< The update producer */
+    IR::Constant agent;   /**< The contributing agent */
+                          // TODO maybe a list of agents (multi-agent case)?
 };
 
 struct UpdateEquals
@@ -1149,7 +1149,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
     const auto location
         = m_locationRegistry.get( functionDefintion->uid(), argumentValues );
-    const Update update{ updateValue, node.ptr< UpdateRule >(), m_agentId };
+    const Update update{ updateValue, &node, m_agentId };
 
     try
     {
