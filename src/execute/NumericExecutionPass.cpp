@@ -926,15 +926,15 @@ void ExecutionVisitor::visit( CaseRule& node )
     node.expression()->accept( *this );
     const auto& value = m_evaluationStack.pop();
 
-    Case::Ptr defaultCase = nullptr;
+    Case* defaultCase = nullptr;
 
     for( const auto& _case : *node.cases() )
     {
         if( _case->id() == Node::ID::DEFAULT_CASE )
         {
-            assert( not defaultCase
+            assert( defaultCase == nullptr
                     && "case rule should not contain multiple default cases" );
-            defaultCase = _case;
+            defaultCase = _case.get();
             continue;
         }
 
