@@ -310,9 +310,6 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
 
-    void visit( ExpressionCase& node ) override;
-    void visit( DefaultCase& node ) override;
-
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
@@ -930,21 +927,34 @@ void ExecutionVisitor::visit( CaseRule& node )
 
     for( const auto& _case : *node.cases() )
     {
-        if( _case->id() == Node::ID::DEFAULT_CASE )
+        switch( _case->id() )
         {
-            assert( defaultCase == nullptr
+            case Node::ID::DEFAULT_CASE:
+            {
+                assert( defaultCase == nullptr
                     && "case rule should not contain multiple default cases" );
-            defaultCase = _case.get();
-            continue;
-        }
-
-        _case->accept( *this ); // only evaluates the case expression
-        const auto& caseValue = m_evaluationStack.pop();
-        if( value == caseValue )
-        {
-            // match
-            _case->rule()->accept( *this );
-            return;
+                defaultCase = _case.get();
+                break;
+            }
+            case Node::ID::EXPRESSION_CASE:
+            {
+                const auto& exprCase
+                    = std::static_pointer_cast< ExpressionCase >( _case );
+                exprCase->expression()->accept( *this );
+                const auto& caseValue = m_evaluationStack.pop();
+                if( value == caseValue )
+                {
+                    // match
+                    _case->rule()->accept( *this );
+                    return;
+                }
+                break;
+            }
+            default:
+            {
+                assert( !"unknown case" );
+                break;
+            }
         }
     }
 
@@ -1185,19 +1195,6 @@ void ExecutionVisitor::visit( CallRule& node )
     {
         m_evaluationStack.pop(); // drop return value
     }
-}
-
-void ExecutionVisitor::visit( ExpressionCase& node )
-{
-    node.expression()->accept( *this );
-    // note: rule will be invoked in visit(CaseRule) if expressions match
-}
-
-void ExecutionVisitor::visit( DefaultCase& node )
-{
-    assert( !"default case should not be executed, "
-             "accept rule of default case instead!" );
-    // note: rule will be invoked in visit(CaseRule)
 }
 
 u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
