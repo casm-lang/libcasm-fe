@@ -315,8 +315,8 @@ class ExecutionVisitor final : public EmptyVisitor
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
-    std::unique_ptr< Frame > makeFrame( const CallExpression::Ptr& call,
-        const Node::Ptr& callee, std::size_t numberOfLocals );
+    std::unique_ptr< Frame > makeFrame( CallExpression* call,
+        Node* callee, std::size_t numberOfLocals );
 
     /**
      * Calls the builtin with id \a id.
@@ -413,7 +413,7 @@ void ExecutionVisitor::execute( const ReferenceConstant& value )
             && "Only parameter-less rules are supported" );
 
     m_frameStack.push(
-        makeFrame( nullptr, rule, rule->maximumNumberOfLocals() ) );
+        makeFrame( nullptr, rule.get(), rule->maximumNumberOfLocals() ) );
     rule->accept( *this );
     m_frameStack.pop();
 }
@@ -536,8 +536,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::FUNCTION:
         {
             const auto& definition = node.targetDefinition();
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(),
-                definition, node.arguments()->size() ) );
+            m_frameStack.push( makeFrame( &node, definition.get(),
+                node.arguments()->size() ) );
             definition->accept( *this );
             m_frameStack.pop();
             break;
@@ -546,7 +546,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         {
             const auto& derived = std::static_pointer_cast< DerivedDefinition >(
                 node.targetDefinition() );
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), derived,
+            m_frameStack.push( makeFrame( &node, derived.get(),
                 derived->maximumNumberOfLocals() ) );
             derived->accept( *this );
             m_frameStack.pop();
@@ -556,7 +556,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         {
             const auto& rule = std::static_pointer_cast< RuleDefinition >(
                 node.targetDefinition() );
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), rule,
+            m_frameStack.push( makeFrame( &node, rule.get(),
                 rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
@@ -564,7 +564,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), nullptr,
+            m_frameStack.push( makeFrame( &node, nullptr,
                 node.arguments()->size() ) );
             invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
@@ -620,8 +620,8 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     {
         case ReferenceAtom::ReferenceType::FUNCTION:
         {
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(),
-                atom->reference(), node.arguments()->size() ) );
+            m_frameStack.push( makeFrame( &node, atom->reference().get(),
+                node.arguments()->size() ) );
             atom->reference()->accept( *this );
             m_frameStack.pop();
             break;
@@ -630,7 +630,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         {
             const auto& derived = std::static_pointer_cast< DerivedDefinition >(
                 atom->reference() );
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), derived,
+            m_frameStack.push( makeFrame( &node, derived.get(),
                 derived->maximumNumberOfLocals() ) );
             derived->accept( *this );
             m_frameStack.pop();
@@ -640,7 +640,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         {
             const auto& rule = std::static_pointer_cast< RuleDefinition >(
                 atom->reference() );
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), rule,
+            m_frameStack.push( makeFrame( &node, rule.get(),
                 rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
@@ -648,7 +648,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         }
         case ReferenceAtom::ReferenceType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), nullptr,
+            m_frameStack.push( makeFrame( &node, nullptr,
                 node.arguments()->size() ) );
             invokeBuiltin( node, atom->builtinId(), node.type() );
             m_frameStack.pop();
@@ -1206,8 +1206,7 @@ u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
 }
 
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
-    const CallExpression::Ptr& call, const Node::Ptr& callee,
-    std::size_t numberOfLocals )
+    CallExpression* call, Node* callee, std::size_t numberOfLocals )
 {
     auto frame = libstdhl::make_unique< Frame >( call, callee, numberOfLocals );
 

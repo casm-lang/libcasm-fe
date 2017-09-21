@@ -34,20 +34,19 @@ using namespace Ast;
 
 namespace ir = libcasm_ir;
 
-Frame::Frame( const CallExpression::Ptr& call, const Node::Ptr& callee,
-    std::size_t numberOfLocals )
+Frame::Frame( CallExpression* call, Node* callee, std::size_t numberOfLocals )
 : m_call( call )
 , m_callee( callee )
 , m_locals( numberOfLocals )
 {
 }
 
-const CallExpression::Ptr& Frame::call( void ) const
+CallExpression* Frame::call( void ) const
 {
     return m_call;
 }
 
-const Node::Ptr& Frame::callee( void ) const
+Node* Frame::callee( void ) const
 {
     return m_callee;
 }
