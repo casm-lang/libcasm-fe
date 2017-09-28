@@ -1,5 +1,4 @@
 [[https://github.com/casm-lang/casm-lang.logo/raw/master/etc/headline.png]]
-[[https://github.com/casm-lang/casm-lang.logo/raw/master/etc/headline.png]]
 
 * libcasm-fe
 
@@ -10,8 +9,8 @@ To build `libcasm-fe` you'll need
 
 ** Copyright and License
 
-The copyright holder of libstdhl is the CASM organization (@casm-lang) 
-and the used license of libstdhl is a [[https://www.gnu.org/licenses/gpl-3.0.html][GNU GPLv3+]]
+The copyright holder of libcasm-fe is the CASM organization (@casm-lang) 
+and the used license of libcasm-fe is a [[https://www.gnu.org/licenses/gpl-3.0.html][GNU GPLv3+]]
 with an additional permission ("GPL Linking Exception").
 
 *** Notice
