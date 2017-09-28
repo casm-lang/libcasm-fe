@@ -553,11 +553,7 @@ void TypeCheckVisitor::push( VariableDefinition& node )
     const auto& name = node.identifier()->name();
 
     auto result = m_id2var.emplace( name, &node );
-    if( not result.second )
-    {
-        m_log.error( { node.sourceLocation() },
-            "symbol '" + name + "' already defined" );
-    }
+    assert( result.second && "symbol already defined!" );
     m_stack.push_back( &node );
 }
 
