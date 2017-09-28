@@ -53,8 +53,8 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
 
+    void visit( ReferenceAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
-
     void visit( LetExpression& node ) override;
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
@@ -155,6 +155,67 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     }
 
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
+}
+
+void SymbolResolveVisitor::visit( ReferenceAtom& node )
+{
+    RecursiveVisitor::visit( node );
+
+    try
+    {
+        const auto symbol = m_symboltable.find( *node.identifier() );
+
+        switch( symbol.targetType() )
+        {
+            case CallExpression::TargetType::FUNCTION:
+            {
+                node.setReferenceType( ReferenceAtom::ReferenceType::FUNCTION );
+                node.setReference( symbol.definition() );
+                break;
+            }
+            case CallExpression::TargetType::DERIVED:
+            {
+                node.setReferenceType( ReferenceAtom::ReferenceType::DERIVED );
+                node.setReference( symbol.definition() );
+                break;
+            }
+            case CallExpression::TargetType::BUILTIN:
+            {
+                // TODO
+
+                // node.setReferenceType(
+                // ReferenceAtom::ReferenceType::BUILTIN
+                // );
+                // node.setBuiltinId( annotation.id() );
+                break;
+            }
+            case CallExpression::TargetType::RULE:
+            {
+                node.setReferenceType( ReferenceAtom::ReferenceType::RULE );
+                node.setReference( symbol.definition() );
+                break;
+            }
+            case CallExpression::TargetType::VARIABLE:
+            {
+                node.setReferenceType( ReferenceAtom::ReferenceType::VARIABLE );
+                node.setReference( symbol.definition() );
+                break;
+            }
+            default:
+            {
+                m_log.error( { node.identifier()->sourceLocation() },
+                    "cannot reference '" + CallExpression::targetTypeString(
+                                               symbol.targetType() )
+                        + "'" );
+            }
+        }
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error( { node.identifier()->sourceLocation() },
+            "'" + node.identifier()->path() + "' has not been defined",
+            Code::SymbolIsUnknown );
+    }
 }
 
 void SymbolResolveVisitor::visit( DirectCallExpression& node )

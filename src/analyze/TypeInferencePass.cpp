@@ -245,101 +245,73 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
     RecursiveVisitor::visit( node );
 
     assert( not node.type() );
-    try
+
+    switch( node.referenceType() )
     {
-        auto symbol = m_symboltable.find( *node.identifier() );
-
-        switch( symbol.targetType() )
+        case ReferenceAtom::ReferenceType::FUNCTION:
         {
-            case CallExpression::TargetType::FUNCTION:
-            {
-                const auto& definition
-                    = std::static_pointer_cast< FunctionDefinition >(
-                        symbol.definition() );
+            const auto& definition
+                = std::static_pointer_cast< FunctionDefinition >(
+                    node.reference() );
 
-                inference( *definition, {} );
-                assert(
-                    definition->type() and definition->type()->isRelation() );
+            inference( *definition, {} );
+            assert(
+                definition->type() and definition->type()->isRelation() );
 
-                const auto type
-                    = libstdhl::make< libcasm_ir::FunctionReferenceType >(
-                        std::static_pointer_cast< libcasm_ir::RelationType >(
-                            definition->type() ) );
-                node.setType( type );
-
-                node.setReferenceType( ReferenceAtom::ReferenceType::FUNCTION );
-                node.setReference( definition );
-                break;
-            }
-            case CallExpression::TargetType::DERIVED:
-            {
-                const auto& definition
-                    = std::static_pointer_cast< DerivedDefinition >(
-                        symbol.definition() );
-
-                inference( *definition, {} );
-                assert(
-                    definition->type() and definition->type()->isRelation() );
-
-                const auto type
-                    = libstdhl::make< libcasm_ir::FunctionReferenceType >(
-                        std::static_pointer_cast< libcasm_ir::RelationType >(
-                            definition->type() ) );
-                node.setType( type );
-
-                node.setReferenceType( ReferenceAtom::ReferenceType::DERIVED );
-                node.setReference( definition );
-                break;
-            }
-            case CallExpression::TargetType::BUILTIN:
-            {
-                // TODO
-
-                // node.setReferenceType(
-                // ReferenceAtom::ReferenceType::BUILTIN
-                // );
-                // node.setBuiltinId( annotation.id() );
-                break;
-            }
-            case CallExpression::TargetType::RULE:
-            {
-                const auto& definition
-                    = std::static_pointer_cast< RuleDefinition >(
-                        symbol.definition() );
-
-                inference( *definition, {} );
-                assert(
-                    definition->type() and definition->type()->isRelation() );
-
-                const auto type
-                    = libstdhl::make< libcasm_ir::RuleReferenceType >(
-                        std::static_pointer_cast< libcasm_ir::RelationType >(
-                            definition->type() ) );
-                node.setType( type );
-
-                node.setReferenceType( ReferenceAtom::ReferenceType::RULE );
-                node.setReference( definition );
-                break;
-            }
-            case CallExpression::TargetType::VARIABLE:
-            {
-                // TODO
-                break;
-            }
-            default:
-            {
-                m_log.error( { node.sourceLocation() },
-                    "cannot reference '" + CallExpression::targetTypeString(
-                                               symbol.targetType() )
-                        + "'" );
-            }
+            const auto type
+                = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                    std::static_pointer_cast< libcasm_ir::RelationType >(
+                        definition->type() ) );
+            node.setType( type );
+            break;
         }
-    }
-    catch( const std::domain_error& e )
-    {
-        if( not m_functionInitially )
+        case ReferenceAtom::ReferenceType::DERIVED:
         {
-            assert( !" inconsistent symbol table! " );
+            const auto& definition
+                = std::static_pointer_cast< DerivedDefinition >(
+                    node.reference() );
+
+            inference( *definition, {} );
+            assert(
+                definition->type() and definition->type()->isRelation() );
+
+            const auto type
+                = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                    std::static_pointer_cast< libcasm_ir::RelationType >(
+                        definition->type() ) );
+            node.setType( type );
+            break;
+        }
+        case ReferenceAtom::ReferenceType::BUILTIN:
+        {
+            // TODO
+            break;
+        }
+        case ReferenceAtom::ReferenceType::RULE:
+        {
+            const auto& definition
+                = std::static_pointer_cast< RuleDefinition >(
+                    node.reference() );
+
+            inference( *definition, {} );
+            assert(
+                definition->type() and definition->type()->isRelation() );
+
+            const auto type
+                = libstdhl::make< libcasm_ir::RuleReferenceType >(
+                    std::static_pointer_cast< libcasm_ir::RelationType >(
+                        definition->type() ) );
+            node.setType( type );
+            break;
+        }
+        case ReferenceAtom::ReferenceType::VARIABLE:
+        {
+            // TODO
+            break;
+        }
+        default:
+        {
+            assert( !" unknown reference type! " );
         }
     }
 }
