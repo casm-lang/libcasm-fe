@@ -30,7 +30,7 @@
 #include "../pass/src/PassUsage.h"
 
 #include "Logger.h"
-#include "analyze/AttributionPass.h"
+#include "analyze/SymbolRegistrationPass.h"
 #include "ast/RecursiveVisitor.h"
 
 #include "../casm-ir/src/Builtin.h"
@@ -42,132 +42,8 @@ char SymbolResolverPass::id = 0;
 
 static libpass::PassRegistration< SymbolResolverPass > PASS(
     "ASTSymbolResolverPass",
-    "resolves all AST identifiers and creates a symbol table", "ast-symtbl",
+    "resolves AST identifiers of type-, call-, ... nodes", "ast-sym-resolve",
     0 );
-
-//
-// SymbolTableVisitor
-//
-
-class SymbolTableVisitor final : public RecursiveVisitor
-{
-  public:
-    SymbolTableVisitor( Logger& log, Namespace& symboltable );
-
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
-
-  private:
-    Logger& m_log;
-    Namespace& m_symboltable;
-};
-
-SymbolTableVisitor::SymbolTableVisitor( Logger& log, Namespace& symboltable )
-: m_log( log )
-, m_symboltable( symboltable )
-{
-}
-
-void SymbolTableVisitor::visit( FunctionDefinition& node )
-{
-    try
-    {
-        m_symboltable.registerSymbol( node.ptr< FunctionDefinition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( node );
-
-        if( node.uid() == FunctionDefinition::UID::PROGRAM )
-        {
-            m_log.error( { node.sourceLocation(),
-                             symbol.definition()->sourceLocation() },
-                "init already defined",
-                Code::AgentInitRuleMultipleDefinitions );
-        }
-        else
-        {
-            m_log.error( { node.sourceLocation(),
-                             symbol.definition()->sourceLocation() },
-                e.what(),
-                Code::FunctionDefinitionAlreadyUsed );
-        }
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-void SymbolTableVisitor::visit( DerivedDefinition& node )
-{
-    try
-    {
-        m_symboltable.registerSymbol( node.ptr< DerivedDefinition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( node );
-
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what(), Code::DerivedDefinitionAlreadyUsed );
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-void SymbolTableVisitor::visit( RuleDefinition& node )
-{
-    try
-    {
-        m_symboltable.registerSymbol( node.ptr< RuleDefinition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( node );
-
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what(), Code::RuleDefinitionAlreadyUsed );
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-void SymbolTableVisitor::visit( EnumerationDefinition& node )
-{
-    try
-    {
-        m_symboltable.registerSymbol( node.ptr< EnumerationDefinition >() );
-
-        const auto& name = node.identifier()->name();
-
-        m_log.debug( "creating IR enumeration type '" + name + "'" );
-        const auto kind = libstdhl::make< libcasm_ir::Enumeration >( name );
-        for( const auto& enumerator : *node.enumerators() )
-        {
-            kind->add( enumerator->name() );
-        }
-
-        const auto type = libstdhl::make< libcasm_ir::EnumerationType >( kind );
-        node.setType( type );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( node );
-
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what() );
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-//
-// SymbolResolveVisitor
-//
 
 class SymbolResolveVisitor final : public RecursiveVisitor
 {
@@ -507,44 +383,28 @@ static void registerBasicTypes( Namespace& symboltable )
     registerType( "Rational", libstdhl::get< libcasm_ir::RationalType >() );
 }
 
-//
-// SymbolResolverPass
-//
-
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< AttributionPass >();
+    pu.require< SymbolRegistrationPass >();
 }
 
 u1 SymbolResolverPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto data = pr.result< AttributionPass >();
+    const auto data = pr.result< SymbolRegistrationPass >();
     const auto specification = data->specification();
-
-    const auto symboltable = std::make_shared< Namespace >();
+    const auto symboltable = data->symboltable();
 
     registerBasicTypes( *symboltable );
 
-    SymbolTableVisitor symbolTableGenerator( log, *symboltable );
-    specification->accept( symbolTableGenerator );
+    SymbolResolveVisitor visitor( log, *symboltable );
+    specification->accept( visitor );
 
-    const auto symTblErr = log.errors();
-    if( symTblErr > 0 )
+    const auto errors = log.errors();
+    if( errors > 0 )
     {
-        log.debug(
-            "found %lu error(s) during symbol table creation", symTblErr );
-        return false;
-    }
-
-    SymbolResolveVisitor symbolResolver( log, *symboltable );
-    specification->accept( symbolResolver );
-
-    const auto symResErr = log.errors();
-    if( symResErr > 0 )
-    {
-        log.debug( "found %lu error(s) during symbol resolving", symResErr );
+        log.debug( "found %lu error(s) during symbol resolving", errors );
         return false;
     }
 

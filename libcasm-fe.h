@@ -28,6 +28,7 @@
 
 #include "src/analyze/AttributionPass.h"
 #include "src/analyze/ConsistencyCheckPass.h"
+#include "src/analyze/SymbolRegistrationPass.h"
 #include "src/analyze/SymbolResolverPass.h"
 #include "src/analyze/TypeInferencePass.h"
 

@@ -60,6 +60,7 @@ set( CXX_SRC_FILES
   src/analyze/ConsistencyCheckPass.cpp
   src/analyze/TypeInferencePass.cpp
   src/analyze/AttributionPass.cpp
+  src/analyze/SymbolRegistrationPass.cpp
   src/analyze/SymbolResolverPass.cpp
 
   src/transform/AstDumpDotPass.cpp
