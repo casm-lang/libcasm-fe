@@ -177,16 +177,16 @@ u1 SymbolRegistrationPass::run( libpass::PassResult& pr )
     SymbolRegistrationVisitor visitor( log, *symboltable );
     specification->accept( visitor );
 
+#ifndef NDEBUG
+    log.debug( "symbol table = \n" + symboltable->dump() );
+#endif
+
     const auto errors = log.errors();
     if( errors > 0 )
     {
         log.debug( "found %lu error(s) during symbol table creation", errors );
         return false;
     }
-
-#ifndef NDEBUG
-    log.debug( "symbol table = \n" + symboltable->dump() );
-#endif
 
     pr.setResult< SymbolRegistrationPass >(
         libstdhl::make< Data >( specification, symboltable ) );

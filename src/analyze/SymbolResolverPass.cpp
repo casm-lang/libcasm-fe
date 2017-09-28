@@ -401,16 +401,16 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
     SymbolResolveVisitor visitor( log, *symboltable );
     specification->accept( visitor );
 
+#ifndef NDEBUG
+    log.debug( "symbol table = \n" + symboltable->dump() );
+#endif
+
     const auto errors = log.errors();
     if( errors > 0 )
     {
         log.debug( "found %lu error(s) during symbol resolving", errors );
         return false;
     }
-
-#ifndef NDEBUG
-    log.debug( "symbol table = \n" + symboltable->dump() );
-#endif
 
     pr.setResult< SymbolResolverPass >(
         libstdhl::make< Data >( specification, symboltable ) );
