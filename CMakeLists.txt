@@ -58,6 +58,7 @@ set( CXX_SRC_FILES
   src/ast/EmptyVisitor.cpp
 
   src/analyze/ConsistencyCheckPass.cpp
+  src/analyze/TypeCheckPass.cpp
   src/analyze/TypeInferencePass.cpp
   src/analyze/AttributionPass.cpp
   src/analyze/SymbolRegistrationPass.cpp
