@@ -22,17 +22,33 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "AstToCasmIRPass.h"
-
-#include "../stdhl/cpp/Default.h"
 
 #include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
 
-#include "../casm-ir/src/Specification.h"
-#include "../casm-ir/src/analyze/ConsistencyCheckPass.h"
+#include <libcasm-ir/Specification>
+#include <libcasm-ir/analyze/ConsistencyCheckPass>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -47,7 +63,7 @@ static libpass::PassRegistration< AstToCasmIRPass > PASS( "AstToIRPass",
 class AstToCasmIRVisitor final : public RecursiveVisitor
 {
   public:
-    AstToCasmIRVisitor( Logger& log );
+    AstToCasmIRVisitor( libcasm_fe::Logger& log );
 
     void visit( Specification& node ) override;
 
@@ -101,7 +117,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     libcasm_ir::Specification::Ptr specification( void ) const;
 
   private:
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
 
     libcasm_ir::Specification::Ptr m_specification;
     u1 m_declaration;
@@ -116,7 +132,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     std::unordered_map< Node*, libcasm_ir::Value::Ptr > m_ast2ir;
 };
 
-AstToCasmIRVisitor::AstToCasmIRVisitor( Logger& log )
+AstToCasmIRVisitor::AstToCasmIRVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 , m_specification( nullptr )
 , m_declaration( false )
@@ -131,17 +147,17 @@ AstToCasmIRVisitor::AstToCasmIRVisitor( Logger& log )
 {
 }
 
-static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
+static const auto VOID = libstdhl::Memory::get< libcasm_ir::VoidType >();
 
 void AstToCasmIRVisitor::visit( Specification& node )
 {
-    m_specification
-        = libstdhl::make< libcasm_ir::Specification >( node.name()->name() );
+    m_specification = libstdhl::Memory::make< libcasm_ir::Specification >(
+        node.name()->name() );
 
     const auto rule_init_type
-        = libstdhl::make< libcasm_ir::RelationType >( VOID );
+        = libstdhl::Memory::make< libcasm_ir::RelationType >( VOID );
     auto rule_init
-        = libstdhl::make< libcasm_ir::Rule >( ".init", rule_init_type );
+        = libstdhl::Memory::make< libcasm_ir::Rule >( ".init", rule_init_type );
     m_specification->add( rule_init );
 
     auto rule_init_block = libcasm_ir::ParallelBlock::create();
@@ -178,7 +194,8 @@ void AstToCasmIRVisitor::visit( FunctionDefinition& node )
                 node.type()->arguments().front() );
         }
 
-        auto func = libstdhl::make< libcasm_ir::Function >( name, type );
+        auto func
+            = libstdhl::Memory::make< libcasm_ir::Function >( name, type );
 
         auto result = m_def2func.emplace( &node, func );
         assert( result.second and " multiple declaration " );
@@ -219,7 +236,7 @@ void AstToCasmIRVisitor::visit( RuleDefinition& node )
 
     if( m_declaration )
     {
-        auto rule = libstdhl::make< libcasm_ir::Rule >( name, type );
+        auto rule = libstdhl::Memory::make< libcasm_ir::Rule >( name, type );
 
         auto result = m_def2rule.emplace( &node, rule );
         assert( result.second and " multiple declaration " );
@@ -310,7 +327,8 @@ void AstToCasmIRVisitor::visit( ReferenceAtom& node )
                     and " inconsistent registered typed rule " );
 
             constant
-                = libstdhl::make< libcasm_ir::RuleReferenceConstant >( rule );
+                = libstdhl::Memory::make< libcasm_ir::RuleReferenceConstant >(
+                    rule );
             break;
         }
         case ReferenceAtom::ReferenceType::VARIABLE:
@@ -336,7 +354,7 @@ void AstToCasmIRVisitor::visit( UndefAtom& node )
     assert( node.type() );
 
     const libcasm_ir::Constant::Ptr& constant
-        = libstdhl::make< libcasm_ir::Constant >(
+        = libstdhl::Memory::make< libcasm_ir::Constant >(
             libcasm_ir::Constant::undef( node.type() ) );
 
     auto result = m_ast2ir.emplace( &node, constant );
@@ -425,7 +443,7 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             m_specification->add( type );
 
             const libcasm_ir::Constant::Ptr constant
-                = libstdhl::make< libcasm_ir::EnumerationConstant >(
+                = libstdhl::Memory::make< libcasm_ir::EnumerationConstant >(
                     type, identifier.baseName() );
 
             m_specification->add( constant );
@@ -444,7 +462,7 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
                     m_specification->agent()->type().ptr_type() );
 
             const libcasm_ir::Constant::Ptr constant
-                = libstdhl::make< libcasm_ir::EnumerationConstant >(
+                = libstdhl::Memory::make< libcasm_ir::EnumerationConstant >(
                     type, "$" );
 
             m_specification->add( constant );
@@ -524,7 +542,7 @@ void AstToCasmIRVisitor::visit( SkipRule& node )
     assert( m_blocks.size() > 0 );
     auto& block = m_blocks.back();
 
-    auto stmt = libstdhl::make< libcasm_ir::TrivialStatement >();
+    auto stmt = libstdhl::Memory::make< libcasm_ir::TrivialStatement >();
     block->add( stmt );
     stmt->add< libcasm_ir::SkipInstruction >();
 }
@@ -627,7 +645,7 @@ void AstToCasmIRVisitor::visit( UpdateRule& node )
     assert( block
             and " unable to determine the surrounding block for this update " );
 
-    auto stmt = libstdhl::make< libcasm_ir::TrivialStatement >();
+    auto stmt = libstdhl::Memory::make< libcasm_ir::TrivialStatement >();
     block->add( stmt );
 
     m_statement = stmt;
@@ -652,7 +670,7 @@ void AstToCasmIRVisitor::visit( CallRule& node )
     assert( m_blocks.size() > 0 );
     auto& block = m_blocks.back();
 
-    auto stmt = libstdhl::make< libcasm_ir::TrivialStatement >();
+    auto stmt = libstdhl::Memory::make< libcasm_ir::TrivialStatement >();
     block->add( stmt );
     m_statement = stmt;
 
@@ -740,7 +758,7 @@ void AstToCasmIRPass::usage( libpass::PassUsage& pu )
 
 bool AstToCasmIRPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
     const auto& data = pr.result< ConsistencyCheckPass >();
     const auto& specification = data->specification();
@@ -755,7 +773,7 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
     }
 
     pr.setResult< libcasm_ir::ConsistencyCheckPass >(
-        libstdhl::make< libcasm_ir::ConsistencyCheckPass::Data >(
+        libstdhl::Memory::make< libcasm_ir::ConsistencyCheckPass::Data >(
             visitor.specification() ) );
 
     return true;

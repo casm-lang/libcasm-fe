@@ -22,19 +22,35 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "AttributionPass.h"
 
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
+#include "../Logger.h"
+#include "../ast/RecursiveVisitor.h"
+#include "../ast/Specification.h"
+#include "../transform/SourceToAstPass.h"
 
-#include "Logger.h"
-
-#include "transform/SourceToAstPass.h"
-
-#include "ast/RecursiveVisitor.h"
-#include "ast/Specification.h"
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -75,7 +91,8 @@ static const std::unordered_set< std::string > VALID_EXPRESSION_ATTRIBUTES = {
 class DefinitionAttributionVisitor final : public RecursiveVisitor
 {
   public:
-    DefinitionAttributionVisitor( Logger& log, Definition& definition );
+    DefinitionAttributionVisitor(
+        libcasm_fe::Logger& log, Definition& definition );
 
     const std::unordered_set< std::string >& attributeNames() const;
 
@@ -83,13 +100,13 @@ class DefinitionAttributionVisitor final : public RecursiveVisitor
     void visit( ExpressionAttribute& node ) override;
 
   private:
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
     Definition& m_definition;
     std::unordered_set< std::string > m_attributeNames;
 };
 
 DefinitionAttributionVisitor::DefinitionAttributionVisitor(
-    Logger& log, Definition& definition )
+    libcasm_fe::Logger& log, Definition& definition )
 : m_log( log )
 , m_definition( definition )
 , m_attributeNames()
@@ -158,7 +175,7 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
 class DefinitionVisitor final : public RecursiveVisitor
 {
   public:
-    DefinitionVisitor( Logger& log );
+    DefinitionVisitor( libcasm_fe::Logger& log );
 
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
@@ -167,10 +184,10 @@ class DefinitionVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
 
   private:
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
 };
 
-DefinitionVisitor::DefinitionVisitor( Logger& log )
+DefinitionVisitor::DefinitionVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 {
 }
@@ -255,7 +272,7 @@ void AttributionPass::usage( libpass::PassUsage& pu )
 
 u1 AttributionPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
     const auto data = pr.result< SourceToAstPass >();
     const auto specification = data->specification();
@@ -270,7 +287,8 @@ u1 AttributionPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< AttributionPass >( libstdhl::make< Data >( specification ) );
+    pr.setResult< AttributionPass >(
+        libstdhl::Memory::make< Data >( specification ) );
 
     return true;
 }

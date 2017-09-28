@@ -22,18 +22,36 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "SymbolResolverPass.h"
 
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
+#include "../Logger.h"
+#include "../analyze/AttributionPass.h"
+#include "../ast/RecursiveVisitor.h"
 
-#include "Logger.h"
-#include "analyze/AttributionPass.h"
-#include "ast/RecursiveVisitor.h"
+#include <libcasm-ir/Builtin>
 
-#include "../casm-ir/src/Builtin.h"
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -52,7 +70,7 @@ static libpass::PassRegistration< SymbolResolverPass > PASS(
 class SymbolTableVisitor final : public RecursiveVisitor
 {
   public:
-    SymbolTableVisitor( Logger& log, Namespace& symboltable );
+    SymbolTableVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -60,11 +78,12 @@ class SymbolTableVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
 
   private:
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 };
 
-SymbolTableVisitor::SymbolTableVisitor( Logger& log, Namespace& symboltable )
+SymbolTableVisitor::SymbolTableVisitor(
+    libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 {
@@ -144,13 +163,15 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
         const auto& name = node.identifier()->name();
 
         m_log.debug( "creating IR enumeration type '" + name + "'" );
-        const auto kind = libstdhl::make< libcasm_ir::Enumeration >( name );
+        const auto kind
+            = libstdhl::Memory::make< libcasm_ir::Enumeration >( name );
         for( const auto& enumerator : *node.enumerators() )
         {
             kind->add( enumerator->name() );
         }
 
-        const auto type = libstdhl::make< libcasm_ir::EnumerationType >( kind );
+        const auto type
+            = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
         node.setType( type );
     }
     catch( const std::domain_error& e )
@@ -172,7 +193,7 @@ void SymbolTableVisitor::visit( EnumerationDefinition& node )
 class SymbolResolveVisitor final : public RecursiveVisitor
 {
   public:
-    SymbolResolveVisitor( Logger& log, Namespace& symboltable );
+    SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -192,7 +213,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void push( VariableDefinition& identifier );
     void pop( VariableDefinition& identifier );
 
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 
     class Variable
@@ -234,7 +255,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
 };
 
 SymbolResolveVisitor::SymbolResolveVisitor(
-    Logger& log, Namespace& symboltable )
+    libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 , m_maxNumberOfLocals( 0 )
@@ -354,11 +375,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                             == CallExpression::TargetType::CONSTANT );
 
                     const auto kind
-                        = libstdhl::make< libcasm_ir::Enumeration >( "Agent" );
+                        = libstdhl::Memory::make< libcasm_ir::Enumeration >(
+                            "Agent" );
                     kind->add( "$" );
 
                     const auto type
-                        = libstdhl::make< libcasm_ir::EnumerationType >( kind );
+                        = libstdhl::Memory::make< libcasm_ir::EnumerationType >(
+                            kind );
                     node.setType( type );
 
                     m_symboltable.registerSymbol( "Agent",
@@ -498,13 +521,17 @@ static void registerBasicTypes( Namespace& symboltable )
               symboltable.registerSymbol( typeNode );
           };
 
-    registerType( "Void", libstdhl::get< libcasm_ir::VoidType >() );
-    registerType( "Boolean", libstdhl::get< libcasm_ir::BooleanType >() );
-    registerType( "Integer", libstdhl::get< libcasm_ir::IntegerType >() );
-    registerType( "Bit", libstdhl::get< libcasm_ir::BitType >( 1 ) );
-    registerType( "String", libstdhl::get< libcasm_ir::StringType >() );
-    registerType( "Floating", libstdhl::get< libcasm_ir::FloatingType >() );
-    registerType( "Rational", libstdhl::get< libcasm_ir::RationalType >() );
+    registerType( "Void", libstdhl::Memory::get< libcasm_ir::VoidType >() );
+    registerType(
+        "Boolean", libstdhl::Memory::get< libcasm_ir::BooleanType >() );
+    registerType(
+        "Integer", libstdhl::Memory::get< libcasm_ir::IntegerType >() );
+    registerType( "Bit", libstdhl::Memory::get< libcasm_ir::BitType >( 1 ) );
+    registerType( "String", libstdhl::Memory::get< libcasm_ir::StringType >() );
+    registerType(
+        "Floating", libstdhl::Memory::get< libcasm_ir::FloatingType >() );
+    registerType(
+        "Rational", libstdhl::Memory::get< libcasm_ir::RationalType >() );
 }
 
 //
@@ -518,7 +545,7 @@ void SymbolResolverPass::usage( libpass::PassUsage& pu )
 
 u1 SymbolResolverPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
     const auto data = pr.result< AttributionPass >();
     const auto specification = data->specification();
@@ -553,7 +580,7 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
 #endif
 
     pr.setResult< SymbolResolverPass >(
-        libstdhl::make< Data >( specification, symboltable ) );
+        libstdhl::Memory::make< Data >( specification, symboltable ) );
 
     return true;
 }

@@ -22,12 +22,26 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "ConsistencyCheckPass.h"
-
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
 
 #include "../Exception.h"
 #include "../Logger.h"
@@ -35,7 +49,11 @@
 #include "../analyze/TypeInferencePass.h"
 #include "../ast/RecursiveVisitor.h"
 
-#include "../casm-ir/src/Builtin.h"
+#include <libcasm-ir/Builtin>
+
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -55,7 +73,8 @@ static const std::string PROGRAM = "program";
 class ConsistencyCheckVisitor final : public RecursiveVisitor
 {
   public:
-    ConsistencyCheckVisitor( Logger& m_log, const Namespace& symboltable );
+    ConsistencyCheckVisitor(
+        libcasm_fe::Logger& m_log, const Namespace& symboltable );
 
     void visit( Specification& node ) override;
 
@@ -73,14 +92,14 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void verify( const TypedNode& node );
 
   private:
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
     const Namespace& m_symboltable;
     u1 m_functionInitially;
     u1 m_sideEffectFree;
 };
 
 ConsistencyCheckVisitor::ConsistencyCheckVisitor(
-    Logger& log, const Namespace& symboltable )
+    libcasm_fe::Logger& log, const Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 , m_functionInitially( false )
@@ -330,7 +349,7 @@ void ConsistencyCheckPass::usage( libpass::PassUsage& pu )
 
 u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
@@ -347,7 +366,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     }
 
     pr.setResult< ConsistencyCheckPass >(
-        libstdhl::make< Data >( specification ) );
+        libstdhl::Memory::make< Data >( specification ) );
 
     return true;
 }

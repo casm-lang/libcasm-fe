@@ -40,7 +40,7 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 45 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+#line 63 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 
     namespace libcasm_fe
     {
@@ -131,7 +131,7 @@
 # define YYDEBUG 1
 #endif
 
-#line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 namespace libcasm_fe {
 #line 137 "GrammarParser.tab.h" // lalr1.cc:377
 
@@ -446,23 +446,20 @@ namespace libcasm_fe {
       // Specification
       char dummy45[sizeof(Specification::Ptr)];
 
-      // Type
-      char dummy46[sizeof(Type::Ptr)];
-
       // FunctionParameters
       // MaybeFunctionParameters
       // Types
-      char dummy47[sizeof(Types::Ptr)];
+      char dummy46[sizeof(Types::Ptr)];
 
       // Undefined
-      char dummy48[sizeof(UndefAtom::Ptr)];
+      char dummy47[sizeof(UndefAtom::Ptr)];
 
       // UniversalQuantifierExpression
-      char dummy49[sizeof(UniversalQuantifierExpression::Ptr)];
+      char dummy48[sizeof(UniversalQuantifierExpression::Ptr)];
 
       // Initializer
       // UpdateRule
-      char dummy50[sizeof(UpdateRule::Ptr)];
+      char dummy49[sizeof(UpdateRule::Ptr)];
 
       // Boolean
       // String
@@ -470,11 +467,14 @@ namespace libcasm_fe {
       // IntegerNumber
       // FloatingNumber
       // RationalNumber
-      char dummy51[sizeof(ValueAtom::Ptr)];
+      char dummy50[sizeof(ValueAtom::Ptr)];
 
       // Variable
       // AttributedVariable
-      char dummy52[sizeof(VariableDefinition::Ptr)];
+      char dummy51[sizeof(VariableDefinition::Ptr)];
+
+      // Type
+      char dummy52[sizeof(libcasm_fe::Ast::Type::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -712,8 +712,6 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const Specification::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Type::Ptr v, const location_type& l);
-
   basic_symbol (typename Base::kind_type t, const Types::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const UndefAtom::Ptr v, const location_type& l);
@@ -725,6 +723,8 @@ namespace libcasm_fe {
   basic_symbol (typename Base::kind_type t, const ValueAtom::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const libcasm_fe::Ast::Type::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l);
 
@@ -1600,10 +1600,6 @@ namespace libcasm_fe {
         value.copy< Specification::Ptr > (other.value);
         break;
 
-      case 105: // Type
-        value.copy< Type::Ptr > (other.value);
-        break;
-
       case 89: // FunctionParameters
       case 90: // MaybeFunctionParameters
       case 110: // Types
@@ -1635,6 +1631,10 @@ namespace libcasm_fe {
       case 101: // Variable
       case 102: // AttributedVariable
         value.copy< VariableDefinition::Ptr > (other.value);
+        break;
+
+      case 105: // Type
+        value.copy< libcasm_fe::Ast::Type::Ptr > (other.value);
         break;
 
       case 70: // "binary"
@@ -1855,10 +1855,6 @@ namespace libcasm_fe {
         value.copy< Specification::Ptr > (v);
         break;
 
-      case 105: // Type
-        value.copy< Type::Ptr > (v);
-        break;
-
       case 89: // FunctionParameters
       case 90: // MaybeFunctionParameters
       case 110: // Types
@@ -1890,6 +1886,10 @@ namespace libcasm_fe {
       case 101: // Variable
       case 102: // AttributedVariable
         value.copy< VariableDefinition::Ptr > (v);
+        break;
+
+      case 105: // Type
+        value.copy< libcasm_fe::Ast::Type::Ptr > (v);
         break;
 
       case 70: // "binary"
@@ -2233,13 +2233,6 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Type::Ptr v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Types::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -2276,6 +2269,13 @@ namespace libcasm_fe {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const libcasm_fe::Ast::Type::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2505,10 +2505,6 @@ namespace libcasm_fe {
         value.template destroy< Specification::Ptr > ();
         break;
 
-      case 105: // Type
-        value.template destroy< Type::Ptr > ();
-        break;
-
       case 89: // FunctionParameters
       case 90: // MaybeFunctionParameters
       case 110: // Types
@@ -2540,6 +2536,10 @@ namespace libcasm_fe {
       case 101: // Variable
       case 102: // AttributedVariable
         value.template destroy< VariableDefinition::Ptr > ();
+        break;
+
+      case 105: // Type
+        value.template destroy< libcasm_fe::Ast::Type::Ptr > ();
         break;
 
       case 70: // "binary"
@@ -2766,10 +2766,6 @@ namespace libcasm_fe {
         value.move< Specification::Ptr > (s.value);
         break;
 
-      case 105: // Type
-        value.move< Type::Ptr > (s.value);
-        break;
-
       case 89: // FunctionParameters
       case 90: // MaybeFunctionParameters
       case 110: // Types
@@ -2801,6 +2797,10 @@ namespace libcasm_fe {
       case 101: // Variable
       case 102: // AttributedVariable
         value.move< VariableDefinition::Ptr > (s.value);
+        break;
+
+      case 105: // Type
+        value.move< libcasm_fe::Ast::Type::Ptr > (s.value);
         break;
 
       case 70: // "binary"
@@ -3356,7 +3356,7 @@ namespace libcasm_fe {
   }
 
 
-#line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 } // libcasm_fe
 #line 3362 "GrammarParser.tab.h" // lalr1.cc:377
 

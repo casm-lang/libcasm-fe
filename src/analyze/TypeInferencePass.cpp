@@ -22,20 +22,38 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "TypeInferencePass.h"
-
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
 
 #include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
 
-#include "../stdhl/cpp/String.h"
+#include <libcasm-ir/Builtin>
+#include <libcasm-ir/Exception>
 
-#include "../casm-ir/src/Builtin.h"
-#include "../casm-ir/src/Exception.h"
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <libstdhl/String>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -53,7 +71,7 @@ static libpass::PassRegistration< TypeInferencePass > PASS(
 class TypeCheckVisitor final : public RecursiveVisitor
 {
   public:
-    TypeCheckVisitor( Logger& log, Namespace& symboltable );
+    TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
     void visit( VariableDefinition& node ) override;
 
@@ -74,7 +92,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
     void push( VariableDefinition& identifier );
     void pop( VariableDefinition& identifier );
 
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 
     std::unordered_map< std::string, VariableDefinition* > m_id2var;
@@ -82,7 +100,8 @@ class TypeCheckVisitor final : public RecursiveVisitor
     Expression* m_caseExpr = nullptr;
 };
 
-TypeCheckVisitor::TypeCheckVisitor( Logger& log, Namespace& symboltable )
+TypeCheckVisitor::TypeCheckVisitor(
+    libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 {
@@ -364,15 +383,15 @@ void TypeCheckVisitor::visit( ComposedType& node )
     if( name == TYPE_STRING_TUPLE )
     {
         const auto type
-            = libstdhl::make< libcasm_ir::TupleType >( subTypeList );
+            = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
         node.setType( type );
     }
     else if( name == TYPE_STRING_LIST )
     {
         if( subTypeList.size() == 1 )
         {
-            const auto type
-                = libstdhl::make< libcasm_ir::ListType >( subTypeList[ 0 ] );
+            const auto type = libstdhl::Memory::make< libcasm_ir::ListType >(
+                subTypeList[ 0 ] );
             node.setType( type );
         }
         else
@@ -417,8 +436,9 @@ void TypeCheckVisitor::visit( RelationType& node )
     {
         if( node.returnType()->type() )
         {
-            const auto type = libstdhl::make< libcasm_ir::RuleReferenceType >(
-                node.returnType()->type(), argTypeList );
+            const auto type
+                = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
+                    node.returnType()->type(), argTypeList );
             node.setType( type );
         }
     }
@@ -427,7 +447,7 @@ void TypeCheckVisitor::visit( RelationType& node )
         if( node.returnType()->type() )
         {
             const auto type
-                = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
                     node.returnType()->type(), argTypeList );
             node.setType( type );
         }
@@ -461,7 +481,8 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
 
                 try
                 {
-                    auto type = libstdhl::get< libcasm_ir::BitType >( value );
+                    auto type
+                        = libstdhl::Memory::get< libcasm_ir::BitType >( value );
                     node.setType( type );
                 }
                 catch( const std::domain_error& e )
@@ -499,19 +520,21 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                         static_pointer_cast< libcasm_ir::IntegerConstant >(
                             static_cast< const ValueAtom& >( rhs ).value() );
 
-                    auto range
-                        = libstdhl::make< libcasm_ir::Range >( ir_lhs, ir_rhs );
+                    auto range = libstdhl::Memory::make< libcasm_ir::Range >(
+                        ir_lhs, ir_rhs );
 
                     auto range_type
-                        = libstdhl::get< libcasm_ir::RangeType >( range );
+                        = libstdhl::Memory::get< libcasm_ir::RangeType >(
+                            range );
 
                     assert( not expr.type() );
                     expr.setType( range_type );
 
                     try
                     {
-                        auto type = libstdhl::get< libcasm_ir::IntegerType >(
-                            range_type );
+                        auto type
+                            = libstdhl::Memory::get< libcasm_ir::IntegerType >(
+                                range_type );
 
                         node.setType( type );
                     }
@@ -580,7 +603,7 @@ void TypeCheckVisitor::pop( VariableDefinition& node )
 class TypeInferenceVisitor final : public RecursiveVisitor
 {
   public:
-    TypeInferenceVisitor( Logger& log, Namespace& symboltable );
+    TypeInferenceVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
     void visit( Specification& node ) override;
 
@@ -639,7 +662,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     VariableDefinition& find( const IdentifierPath& node );
 
   private:
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
     u1 m_functionInitially;
 
@@ -650,7 +673,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 };
 
 TypeInferenceVisitor::TypeInferenceVisitor(
-    Logger& log, Namespace& symboltable )
+    libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 , m_functionInitially( false )
@@ -794,8 +817,8 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 assert(
                     definition->type() and definition->type()->isRelation() );
 
-                const auto type
-                    = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                const auto type = libstdhl::Memory::
+                    make< libcasm_ir::FunctionReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
                             definition->type() ) );
                 node.setType( type );
@@ -814,8 +837,8 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 assert(
                     definition->type() and definition->type()->isRelation() );
 
-                const auto type
-                    = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                const auto type = libstdhl::Memory::
+                    make< libcasm_ir::FunctionReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
                             definition->type() ) );
                 node.setType( type );
@@ -845,7 +868,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                     definition->type() and definition->type()->isRelation() );
 
                 const auto type
-                    = libstdhl::make< libcasm_ir::RuleReferenceType >(
+                    = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
                         std::static_pointer_cast< libcasm_ir::RelationType >(
                             definition->type() ) );
                 node.setType( type );
@@ -946,8 +969,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             if( node.type() )
             {
-                const auto type = libstdhl::make< libcasm_ir::RelationType >(
-                    node.type(), argTypeList );
+                const auto type
+                    = libstdhl::Memory::make< libcasm_ir::RelationType >(
+                        node.type(), argTypeList );
 
                 node.setType( type );
             }
@@ -1235,7 +1259,7 @@ void TypeInferenceVisitor::visit( RangeExpression& node )
         return;
     }
 
-    const auto range_type = libstdhl::get< libcasm_ir::RangeType >(
+    const auto range_type = libstdhl::Memory::get< libcasm_ir::RangeType >(
         node.left()->type()->ptr_result() );
 
     node.setType( range_type );
@@ -1734,10 +1758,11 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
                     = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
                         valueAtom.value() );
 
-                const auto value = libstdhl::get< libcasm_ir::BitConstant >(
-                    lhs.type()->ptr_result(),
-                    static_cast< const libstdhl::Type::Natural& >(
-                        constant->value() ) );
+                const auto value
+                    = libstdhl::Memory::get< libcasm_ir::BitConstant >(
+                        lhs.type()->ptr_result(),
+                        static_cast< const libstdhl::Type::Natural& >(
+                            constant->value() ) );
 
                 valueAtom.setValue( value );
             }
@@ -1775,17 +1800,17 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
 
     auto result = m_resultTypes.find( &node );
 
-    if( node.id() == Type::ID::UNARY_EXPRESSION )
+    if( node.id() == libcasm_fe::Ast::Type::ID::UNARY_EXPRESSION )
     {
         annotation = &libcasm_ir::Annotation::find(
             static_cast< const UnaryExpression& >( node ).op() );
     }
-    else if( node.id() == Type::ID::BINARY_EXPRESSION )
+    else if( node.id() == libcasm_fe::Ast::Type::ID::BINARY_EXPRESSION )
     {
         annotation = &libcasm_ir::Annotation::find(
             static_cast< const UnaryExpression& >( node ).op() );
     }
-    else if( node.id() == Type::ID::DIRECT_CALL_EXPRESSION )
+    else if( node.id() == libcasm_fe::Ast::Type::ID::DIRECT_CALL_EXPRESSION )
     {
 
         auto& directCall = static_cast< DirectCallExpression& >( node );
@@ -1821,7 +1846,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                                         IntegerConstant >( asbit_size.value() );
 
                             const auto type
-                                = libstdhl::get< libcasm_ir::BitType >(
+                                = libstdhl::Memory::get< libcasm_ir::BitType >(
                                     asbit_size_value );
                             directCall.setType( type );
                         }
@@ -2108,20 +2133,21 @@ void TypeInferenceVisitor::inference( const std::string& description,
     {
         case libcasm_ir::Type::VOID:
         {
-            node.setType( libstdhl::get< libcasm_ir::VoidType >() );
+            node.setType( libstdhl::Memory::get< libcasm_ir::VoidType >() );
             break;
         }
         case libcasm_ir::Type::BOOLEAN:
         {
-            node.setType( libstdhl::get< libcasm_ir::BooleanType >() );
+            node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
             break;
         }
         case libcasm_ir::Type::INTEGER:
         {
             node.setType(
-                libstdhl::get< libcasm_ir::IntegerType >() ); // TODO: PPA:
-                                                              // check for
-                                                              // ranged integers
+                libstdhl::Memory::get< libcasm_ir::IntegerType >() ); // TODO:
+                                                                      // PPA:
+            // check for
+            // ranged integers
             break;
         }
         case libcasm_ir::Type::BIT:
@@ -2136,17 +2162,17 @@ void TypeInferenceVisitor::inference( const std::string& description,
         }
         case libcasm_ir::Type::STRING:
         {
-            node.setType( libstdhl::get< libcasm_ir::StringType >() );
+            node.setType( libstdhl::Memory::get< libcasm_ir::StringType >() );
             break;
         }
         case libcasm_ir::Type::FLOATING:
         {
-            node.setType( libstdhl::get< libcasm_ir::FloatingType >() );
+            node.setType( libstdhl::Memory::get< libcasm_ir::FloatingType >() );
             break;
         }
         case libcasm_ir::Type::RATIONAL:
         {
-            node.setType( libstdhl::get< libcasm_ir::RationalType >() );
+            node.setType( libstdhl::Memory::get< libcasm_ir::RationalType >() );
             break;
         }
         case libcasm_ir::Type::RULE_REFERENCE:
@@ -2202,7 +2228,7 @@ void TypeInferenceVisitor::inference(
         return;
     }
 
-    const auto type = libstdhl::make< libcasm_ir::RelationType >(
+    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
         node.returnType()->type(), argTypeList );
 
     node.setType( type );
@@ -2242,7 +2268,7 @@ void TypeInferenceVisitor::inference(
         pos++;
     }
 
-    const auto type = libstdhl::make< libcasm_ir::RelationType >(
+    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
         node.returnType()->type(), argTypeList );
 
     node.setType( type );
@@ -2281,7 +2307,7 @@ void TypeInferenceVisitor::inference(
         pos++;
     }
 
-    const auto type = libstdhl::make< libcasm_ir::RelationType >(
+    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
         node.returnType()->type(), argTypeList );
 
     node.setType( type );
@@ -2289,7 +2315,7 @@ void TypeInferenceVisitor::inference(
 
 void TypeInferenceVisitor::inference( QuantifierExpression& node )
 {
-    node.setType( libstdhl::get< libcasm_ir::BooleanType >() );
+    node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
 
     m_resultTypes[ node.proposition().get() ].emplace_back( node.type()->id() );
 
@@ -2418,7 +2444,7 @@ void TypeInferencePass::usage( libpass::PassUsage& pu )
 
 u1 TypeInferencePass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
     const auto data = pr.result< SymbolResolverPass >();
     const auto specification = data->specification();
@@ -2449,7 +2475,7 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     }
 
     pr.setResult< TypeInferencePass >(
-        libstdhl::make< Data >( specification, symboltable ) );
+        libstdhl::Memory::make< Data >( specification, symboltable ) );
 
     return true;
 }

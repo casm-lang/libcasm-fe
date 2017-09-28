@@ -9,7 +9,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 6
-#define YY_FLEX_SUBMINOR_VERSION 4
+#define YY_FLEX_SUBMINOR_VERSION 3
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -21,6 +21,12 @@
      * altogether.
      */
     
+
+    #define yyalloc yyalloc
+
+    #define yyrealloc yyrealloc
+
+    #define yyfree yyfree
 
 /* First, we deal with  platform-specific or compiler-specific issues. */
 
@@ -86,10 +92,6 @@ typedef unsigned int flex_uint32_t;
 #endif
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
-#endif
-
-#ifndef SIZE_MAX
-#define SIZE_MAX               (~(size_t)0)
 #endif
 
 #endif /* ! C99 */
@@ -577,27 +579,45 @@ static const flex_int16_t yy_chk[422] =
 #line 2 "obj/src/GrammarLexer.l"
 //  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
-//  
+//
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
 //                https://github.com/casm-lang/libcasm-fe
-//  
+//
 //  This file is part of libcasm-fe.
-//  
+//
 //  libcasm-fe is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  libcasm-fe is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
-//  
+//
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "Lexer.h"
 
@@ -615,11 +635,11 @@ using namespace libcasm_fe;
 // Code run each time a pattern is matched.
 #define YY_USER_ACTION loc.columns( yyleng );
 
-#line 618 "src/various/GrammarLexer.cpp"
+#line 638 "src/various/GrammarLexer.cpp"
 /* %option debug */
 #define YY_NO_INPUT 1
 
-#line 622 "src/various/GrammarLexer.cpp"
+#line 642 "src/various/GrammarLexer.cpp"
 
 #define INITIAL 0
 #define LCOMMENT 1
@@ -754,15 +774,15 @@ YY_DECL
 		}
 
 	{
-#line 57 "obj/src/GrammarLexer.l"
+#line 75 "obj/src/GrammarLexer.l"
 
 
-#line 60 "obj/src/GrammarLexer.l"
+#line 78 "obj/src/GrammarLexer.l"
     // Code run each time yylex is called.
     loc.step();
 
 
-#line 765 "src/various/GrammarLexer.cpp"
+#line 785 "src/various/GrammarLexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -817,384 +837,384 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 64 "obj/src/GrammarLexer.l"
+#line 82 "obj/src/GrammarLexer.l"
 {
     return Parser::make_BINARY( yytext + 2, loc );
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 68 "obj/src/GrammarLexer.l"
+#line 86 "obj/src/GrammarLexer.l"
 {
     return Parser::make_HEXADECIMAL( yytext + 2, loc );
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 72 "obj/src/GrammarLexer.l"
+#line 90 "obj/src/GrammarLexer.l"
 {
     return Parser::make_RATIONAL( yytext + 2, loc );
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 76 "obj/src/GrammarLexer.l"
+#line 94 "obj/src/GrammarLexer.l"
 {
     return Parser::make_INTEGER( yytext, loc );
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 80 "obj/src/GrammarLexer.l"
+#line 98 "obj/src/GrammarLexer.l"
 {
     return Parser::make_FLOATING( yytext, loc );
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 86 "obj/src/GrammarLexer.l"
+#line 104 "obj/src/GrammarLexer.l"
 { return Parser::make_CASM(loc); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 87 "obj/src/GrammarLexer.l"
+#line 105 "obj/src/GrammarLexer.l"
 { return Parser::make_INIT(loc); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 89 "obj/src/GrammarLexer.l"
+#line 107 "obj/src/GrammarLexer.l"
 { return Parser::make_DERIVED(loc); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 90 "obj/src/GrammarLexer.l"
+#line 108 "obj/src/GrammarLexer.l"
 { return Parser::make_ENUM(loc); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 91 "obj/src/GrammarLexer.l"
+#line 109 "obj/src/GrammarLexer.l"
 { return Parser::make_RULE(loc); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 93 "obj/src/GrammarLexer.l"
+#line 111 "obj/src/GrammarLexer.l"
 { return Parser::make_FUNCTION(loc); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 94 "obj/src/GrammarLexer.l"
+#line 112 "obj/src/GrammarLexer.l"
 { return Parser::make_INITIALLY(loc); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 95 "obj/src/GrammarLexer.l"
+#line 113 "obj/src/GrammarLexer.l"
 { return Parser::make_DEFINED(loc); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 97 "obj/src/GrammarLexer.l"
+#line 115 "obj/src/GrammarLexer.l"
 { return Parser::make_SEQ(loc); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 98 "obj/src/GrammarLexer.l"
+#line 116 "obj/src/GrammarLexer.l"
 { return Parser::make_ENDSEQ(loc); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 99 "obj/src/GrammarLexer.l"
+#line 117 "obj/src/GrammarLexer.l"
 { return Parser::make_PAR(loc); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 100 "obj/src/GrammarLexer.l"
+#line 118 "obj/src/GrammarLexer.l"
 { return Parser::make_ENDPAR(loc); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 102 "obj/src/GrammarLexer.l"
+#line 120 "obj/src/GrammarLexer.l"
 { return Parser::make_SKIP(loc); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 103 "obj/src/GrammarLexer.l"
+#line 121 "obj/src/GrammarLexer.l"
 { return Parser::make_LET(loc); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 104 "obj/src/GrammarLexer.l"
+#line 122 "obj/src/GrammarLexer.l"
 { return Parser::make_IN(loc); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 105 "obj/src/GrammarLexer.l"
+#line 123 "obj/src/GrammarLexer.l"
 { return Parser::make_FORALL(loc); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 106 "obj/src/GrammarLexer.l"
+#line 124 "obj/src/GrammarLexer.l"
 { return Parser::make_CHOOSE(loc); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 107 "obj/src/GrammarLexer.l"
+#line 125 "obj/src/GrammarLexer.l"
 { return Parser::make_ITERATE(loc); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 108 "obj/src/GrammarLexer.l"
+#line 126 "obj/src/GrammarLexer.l"
 { return Parser::make_DO(loc); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 109 "obj/src/GrammarLexer.l"
+#line 127 "obj/src/GrammarLexer.l"
 { return Parser::make_CALL(loc); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 110 "obj/src/GrammarLexer.l"
+#line 128 "obj/src/GrammarLexer.l"
 { return Parser::make_IF(loc); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 111 "obj/src/GrammarLexer.l"
+#line 129 "obj/src/GrammarLexer.l"
 { return Parser::make_THEN(loc); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 112 "obj/src/GrammarLexer.l"
+#line 130 "obj/src/GrammarLexer.l"
 { return Parser::make_ELSE(loc); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 113 "obj/src/GrammarLexer.l"
+#line 131 "obj/src/GrammarLexer.l"
 { return Parser::make_CASE(loc); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 114 "obj/src/GrammarLexer.l"
+#line 132 "obj/src/GrammarLexer.l"
 { return Parser::make_OF(loc); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 115 "obj/src/GrammarLexer.l"
+#line 133 "obj/src/GrammarLexer.l"
 { return Parser::make_DEFAULT(loc); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 116 "obj/src/GrammarLexer.l"
+#line 134 "obj/src/GrammarLexer.l"
 { return Parser::make_HOLDS(loc); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 117 "obj/src/GrammarLexer.l"
+#line 135 "obj/src/GrammarLexer.l"
 { return Parser::make_EXISTS(loc); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 118 "obj/src/GrammarLexer.l"
+#line 136 "obj/src/GrammarLexer.l"
 { return Parser::make_WITH(loc); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 120 "obj/src/GrammarLexer.l"
+#line 138 "obj/src/GrammarLexer.l"
 { return Parser::make_UNDEF(loc); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 121 "obj/src/GrammarLexer.l"
+#line 139 "obj/src/GrammarLexer.l"
 { return Parser::make_FALSE(loc); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 122 "obj/src/GrammarLexer.l"
+#line 140 "obj/src/GrammarLexer.l"
 { return Parser::make_TRUE(loc); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 124 "obj/src/GrammarLexer.l"
+#line 142 "obj/src/GrammarLexer.l"
 { return Parser::make_AND(loc); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 125 "obj/src/GrammarLexer.l"
+#line 143 "obj/src/GrammarLexer.l"
 { return Parser::make_OR(loc); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 126 "obj/src/GrammarLexer.l"
+#line 144 "obj/src/GrammarLexer.l"
 { return Parser::make_XOR(loc); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 127 "obj/src/GrammarLexer.l"
+#line 145 "obj/src/GrammarLexer.l"
 { return Parser::make_IMPLIES(loc); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 128 "obj/src/GrammarLexer.l"
+#line 146 "obj/src/GrammarLexer.l"
 { return Parser::make_NOT(loc); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 130 "obj/src/GrammarLexer.l"
+#line 148 "obj/src/GrammarLexer.l"
 { return Parser::make_PLUS(loc); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 131 "obj/src/GrammarLexer.l"
+#line 149 "obj/src/GrammarLexer.l"
 { return Parser::make_MINUS(loc); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 132 "obj/src/GrammarLexer.l"
+#line 150 "obj/src/GrammarLexer.l"
 { return Parser::make_EQUAL(loc); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 133 "obj/src/GrammarLexer.l"
+#line 151 "obj/src/GrammarLexer.l"
 { return Parser::make_LPAREN(loc); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 134 "obj/src/GrammarLexer.l"
+#line 152 "obj/src/GrammarLexer.l"
 { return Parser::make_RPAREN(loc); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 135 "obj/src/GrammarLexer.l"
+#line 153 "obj/src/GrammarLexer.l"
 { return Parser::make_LSQPAREN(loc); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 136 "obj/src/GrammarLexer.l"
+#line 154 "obj/src/GrammarLexer.l"
 { return Parser::make_RSQPAREN(loc); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 137 "obj/src/GrammarLexer.l"
+#line 155 "obj/src/GrammarLexer.l"
 { return Parser::make_LCURPAREN(loc); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 138 "obj/src/GrammarLexer.l"
+#line 156 "obj/src/GrammarLexer.l"
 { return Parser::make_RCURPAREN(loc); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 139 "obj/src/GrammarLexer.l"
+#line 157 "obj/src/GrammarLexer.l"
 { return Parser::make_COLON(loc); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 140 "obj/src/GrammarLexer.l"
+#line 158 "obj/src/GrammarLexer.l"
 { return Parser::make_UNDERLINE(loc); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 141 "obj/src/GrammarLexer.l"
+#line 159 "obj/src/GrammarLexer.l"
 { return Parser::make_AT(loc); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 142 "obj/src/GrammarLexer.l"
+#line 160 "obj/src/GrammarLexer.l"
 { return Parser::make_COMMA(loc); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 143 "obj/src/GrammarLexer.l"
+#line 161 "obj/src/GrammarLexer.l"
 { return Parser::make_LESSER(loc); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 144 "obj/src/GrammarLexer.l"
+#line 162 "obj/src/GrammarLexer.l"
 { return Parser::make_GREATER(loc); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 145 "obj/src/GrammarLexer.l"
+#line 163 "obj/src/GrammarLexer.l"
 { return Parser::make_ASTERIX(loc); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 146 "obj/src/GrammarLexer.l"
+#line 164 "obj/src/GrammarLexer.l"
 { return Parser::make_SLASH(loc); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 147 "obj/src/GrammarLexer.l"
+#line 165 "obj/src/GrammarLexer.l"
 { return Parser::make_PERCENT(loc); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 148 "obj/src/GrammarLexer.l"
+#line 166 "obj/src/GrammarLexer.l"
 { return Parser::make_CARET(loc); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 149 "obj/src/GrammarLexer.l"
+#line 167 "obj/src/GrammarLexer.l"
 { return Parser::make_MARK(loc); }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 151 "obj/src/GrammarLexer.l"
+#line 169 "obj/src/GrammarLexer.l"
 { return Parser::make_DOTDOT(loc); }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 152 "obj/src/GrammarLexer.l"
+#line 170 "obj/src/GrammarLexer.l"
 { return Parser::make_DOT(loc); }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 153 "obj/src/GrammarLexer.l"
+#line 171 "obj/src/GrammarLexer.l"
 { return Parser::make_MAPS(loc); }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 154 "obj/src/GrammarLexer.l"
+#line 172 "obj/src/GrammarLexer.l"
 { return Parser::make_ARROW(loc); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 155 "obj/src/GrammarLexer.l"
+#line 173 "obj/src/GrammarLexer.l"
 { return Parser::make_UPDATE(loc); }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 156 "obj/src/GrammarLexer.l"
+#line 174 "obj/src/GrammarLexer.l"
 { return Parser::make_NEQUAL(loc); }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 157 "obj/src/GrammarLexer.l"
+#line 175 "obj/src/GrammarLexer.l"
 { return Parser::make_LESSEQ(loc); }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 158 "obj/src/GrammarLexer.l"
+#line 176 "obj/src/GrammarLexer.l"
 { return Parser::make_GREATEREQ(loc); }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 159 "obj/src/GrammarLexer.l"
+#line 177 "obj/src/GrammarLexer.l"
 { return Parser::make_SEQ_BRACKET(loc); }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 160 "obj/src/GrammarLexer.l"
+#line 178 "obj/src/GrammarLexer.l"
 { return Parser::make_ENDSEQ_BRACKET(loc); }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 164 "obj/src/GrammarLexer.l"
+#line 182 "obj/src/GrammarLexer.l"
 {
     return Parser::make_IDENTIFIER( yytext, loc );
 }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 168 "obj/src/GrammarLexer.l"
+#line 186 "obj/src/GrammarLexer.l"
 { // ignore spaces
     loc.step();
 }
@@ -1202,7 +1222,7 @@ YY_RULE_SETUP
 case 75:
 /* rule 75 can match eol */
 YY_RULE_SETUP
-#line 172 "obj/src/GrammarLexer.l"
+#line 190 "obj/src/GrammarLexer.l"
 { // ignore newlines
     loc.lines( yyleng );
     loc.step();
@@ -1210,20 +1230,20 @@ YY_RULE_SETUP
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 177 "obj/src/GrammarLexer.l"
+#line 195 "obj/src/GrammarLexer.l"
 { // single-line comments
     BEGIN( LCOMMENT );
 }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 180 "obj/src/GrammarLexer.l"
+#line 198 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case 78:
 /* rule 78 can match eol */
 YY_RULE_SETUP
-#line 181 "obj/src/GrammarLexer.l"
+#line 199 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     loc.lines( 1 );
@@ -1231,21 +1251,21 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(LCOMMENT):
-#line 186 "obj/src/GrammarLexer.l"
+#line 204 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
 }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 190 "obj/src/GrammarLexer.l"
+#line 208 "obj/src/GrammarLexer.l"
 { // multi-line comments
     BEGIN( COMMENT );
 }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 193 "obj/src/GrammarLexer.l"
+#line 211 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
 }
@@ -1253,18 +1273,18 @@ YY_RULE_SETUP
 case 81:
 /* rule 81 can match eol */
 YY_RULE_SETUP
-#line 196 "obj/src/GrammarLexer.l"
+#line 214 "obj/src/GrammarLexer.l"
 {
     loc.lines( 1 );
 }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 199 "obj/src/GrammarLexer.l"
+#line 217 "obj/src/GrammarLexer.l"
 
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 200 "obj/src/GrammarLexer.l"
+#line 218 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     log.error( {loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
@@ -1273,7 +1293,7 @@ case YY_STATE_EOF(COMMENT):
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 206 "obj/src/GrammarLexer.l"
+#line 224 "obj/src/GrammarLexer.l"
 { // strings
     BEGIN( STRING );
     strbuf.clear();
@@ -1281,7 +1301,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 210 "obj/src/GrammarLexer.l"
+#line 228 "obj/src/GrammarLexer.l"
 { /* eat all tokens */
     strbuf.append( yytext );
 }
@@ -1289,41 +1309,41 @@ YY_RULE_SETUP
 case 85:
 /* rule 85 can match eol */
 YY_RULE_SETUP
-#line 213 "obj/src/GrammarLexer.l"
+#line 231 "obj/src/GrammarLexer.l"
 {
     loc.lines( 1 );
 }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 216 "obj/src/GrammarLexer.l"
+#line 234 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\n" );
 }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 219 "obj/src/GrammarLexer.l"
+#line 237 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\t" );
 }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 222 "obj/src/GrammarLexer.l"
+#line 240 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\"" );
 }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 225 "obj/src/GrammarLexer.l"
+#line 243 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\'" );
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 228 "obj/src/GrammarLexer.l"
+#line 246 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     log.error( {loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
@@ -1332,7 +1352,7 @@ case YY_STATE_EOF(STRING):
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 233 "obj/src/GrammarLexer.l"
+#line 251 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     return Parser::make_STRING( strbuf, loc );
@@ -1340,7 +1360,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 238 "obj/src/GrammarLexer.l"
+#line 256 "obj/src/GrammarLexer.l"
 {
     log.error( {loc}, "unrecognized character `" + std::string( yytext ) + "`",
         Code::SyntaxErrorUnrecognizedCharacter );
@@ -1348,10 +1368,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 243 "obj/src/GrammarLexer.l"
+#line 261 "obj/src/GrammarLexer.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1354 "src/various/GrammarLexer.cpp"
+#line 1374 "src/various/GrammarLexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1539,9 +1559,9 @@ void yyFlexLexer::ctor_common()
 yyFlexLexer::~yyFlexLexer()
 {
 	delete [] yy_state_buf;
-	yyfree( yy_start_stack  );
+	yyfree(yy_start_stack  );
 	yy_delete_buffer( YY_CURRENT_BUFFER );
-	yyfree( yy_buffer_stack  );
+	yyfree(yy_buffer_stack  );
 }
 
 /* The contents of this function are C++ specific, so the () macro is not used.
@@ -1682,8 +1702,7 @@ int yyFlexLexer::yy_get_next_buffer()
 
 				b->yy_ch_buf = (char *)
 					/* Include room in for 2 EOB chars. */
-					yyrealloc( (void *) b->yy_ch_buf,
-							 (yy_size_t) (b->yy_buf_size + 2)  );
+					yyrealloc((void *) b->yy_ch_buf,(yy_size_t) (b->yy_buf_size + 2)  );
 				}
 			else
 				/* Can't grow it, we don't own it. */
@@ -1732,12 +1751,9 @@ int yyFlexLexer::yy_get_next_buffer()
 	if (((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
 		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
-		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc(
-			(void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf, (yy_size_t) new_size  );
+		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,(yy_size_t) new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
 			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
-		/* "- 2" to take care of EOB's */
-		YY_CURRENT_BUFFER_LVALUE->yy_buf_size = (int) (new_size - 2);
 	}
 
 	(yy_n_chars) += number_to_move;
@@ -1937,9 +1953,6 @@ int yyFlexLexer::yy_get_next_buffer()
  */
 void yyFlexLexer::yyrestart( std::istream* input_file )
 {
-	if( ! input_file ) {
-		input_file = &yyin;
-	}
 	yyrestart( *input_file );
 }
 
@@ -1996,7 +2009,7 @@ void yyFlexLexer::yyrestart( std::istream* input_file )
 {
 	YY_BUFFER_STATE b;
     
-	b = (YY_BUFFER_STATE) yyalloc( sizeof( struct yy_buffer_state )  );
+	b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
@@ -2005,7 +2018,7 @@ void yyFlexLexer::yyrestart( std::istream* input_file )
 	/* yy_ch_buf has to be 2 characters longer than the size given because
 	 * we need to put in 2 end-of-buffer characters.
 	 */
-	b->yy_ch_buf = (char *) yyalloc( (yy_size_t) (b->yy_buf_size + 2)  );
+	b->yy_ch_buf = (char *) yyalloc((yy_size_t) (b->yy_buf_size + 2)  );
 	if ( ! b->yy_ch_buf )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
@@ -2041,9 +2054,9 @@ void yyFlexLexer::yyrestart( std::istream* input_file )
 		YY_CURRENT_BUFFER_LVALUE = (YY_BUFFER_STATE) 0;
 
 	if ( b->yy_is_our_buffer )
-		yyfree( (void *) b->yy_ch_buf  );
+		yyfree((void *) b->yy_ch_buf  );
 
-	yyfree( (void *) b  );
+	yyfree((void *) b  );
 }
 
 /* Initializes or reinitializes a buffer.
@@ -2057,7 +2070,7 @@ void yyFlexLexer::yyrestart( std::istream* input_file )
     
 	yy_flush_buffer( b );
 
-	b->yy_input_file = file.rdbuf();
+	b->yy_input_file = (&file == 0) ? NULL : file.rdbuf();
 	b->yy_fill_buffer = 1;
 
     /* If b is the current buffer, then yy_init_buffer was _probably_
@@ -2208,11 +2221,10 @@ void yyFlexLexer::yyensure_buffer_stack(void)
 		new_size = (yy_size_t) (yy_start_stack_depth) * sizeof( int );
 
 		if ( ! (yy_start_stack) )
-			(yy_start_stack) = (int *) yyalloc( new_size  );
+			(yy_start_stack) = (int *) yyalloc(new_size  );
 
 		else
-			(yy_start_stack) = (int *) yyrealloc(
-					(void *) (yy_start_stack), new_size  );
+			(yy_start_stack) = (int *) yyrealloc((void *) (yy_start_stack),new_size  );
 
 		if ( ! (yy_start_stack) )
 			YY_FATAL_ERROR( "out of memory expanding start-condition stack" );
@@ -2315,7 +2327,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 243 "obj/src/GrammarLexer.l"
+#line 261 "obj/src/GrammarLexer.l"
 
 
 Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )

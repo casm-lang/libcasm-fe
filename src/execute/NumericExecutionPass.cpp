@@ -22,25 +22,26 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "NumericExecutionPass.h"
-
-#include <stdexcept>
-#include <thread>
-
-#include "../stdhl/cpp/Default.h"
-#include "../stdhl/cpp/Enum.h"
-#include "../stdhl/cpp/Hash.h"
-
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
-
-#include "../casm-ir/src/Exception.h"
-#include "../casm-ir/src/Instruction.h"
-#include "../casm-ir/src/Value.h"
-
-#include "../casm-rt/src/Value.h"
 
 #include "../Exception.h"
 #include "../Logger.h"
@@ -48,13 +49,28 @@
 #include "../ast/EmptyVisitor.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Specification.h"
-
 #include "Frame.h"
 #include "FunctionState.h"
 #include "LocationRegistry.h"
 #include "ReferenceConstant.h"
 #include "Stack.h"
 #include "UpdateSet.h"
+
+#include <libcasm-rt/Value>
+
+#include <libcasm-ir/Exception>
+#include <libcasm-ir/Instruction>
+#include <libcasm-ir/Value>
+
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <libstdhl/Enum>
+#include <libstdhl/Hash>
+
+#include <stdexcept>
+#include <thread>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -313,8 +329,8 @@ class ExecutionVisitor final : public EmptyVisitor
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
-    std::unique_ptr< Frame > makeFrame( CallExpression* call,
-        Node* callee, std::size_t numberOfLocals );
+    std::unique_ptr< Frame > makeFrame(
+        CallExpression* call, Node* callee, std::size_t numberOfLocals );
 
     /**
      * Calls the builtin with id \a id.
@@ -367,9 +383,8 @@ class ExecutionVisitor final : public EmptyVisitor
      * @throws RuntimeException in case of an invalid argument value with proper
      *                          error and location information
      */
-    void validateArguments( const Node& node,
-        const IR::Types& argumentTypes, ValidationFlags flags,
-        Code errorCode ) const;
+    void validateArguments( const Node& node, const IR::Types& argumentTypes,
+        ValidationFlags flags, Code errorCode ) const;
 
     void handleMergeConflict(
         const Node& node, const ExecutionUpdateSet::Conflict& conflict ) const;
@@ -534,8 +549,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::FUNCTION:
         {
             const auto& definition = node.targetDefinition();
-            m_frameStack.push( makeFrame( &node, definition.get(),
-                node.arguments()->size() ) );
+            m_frameStack.push( makeFrame(
+                &node, definition.get(), node.arguments()->size() ) );
             definition->accept( *this );
             m_frameStack.pop();
             break;
@@ -544,8 +559,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         {
             const auto& derived = std::static_pointer_cast< DerivedDefinition >(
                 node.targetDefinition() );
-            m_frameStack.push( makeFrame( &node, derived.get(),
-                derived->maximumNumberOfLocals() ) );
+            m_frameStack.push( makeFrame(
+                &node, derived.get(), derived->maximumNumberOfLocals() ) );
             derived->accept( *this );
             m_frameStack.pop();
             break;
@@ -554,16 +569,16 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         {
             const auto& rule = std::static_pointer_cast< RuleDefinition >(
                 node.targetDefinition() );
-            m_frameStack.push( makeFrame( &node, rule.get(),
-                rule->maximumNumberOfLocals() ) );
+            m_frameStack.push(
+                makeFrame( &node, rule.get(), rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
             break;
         }
         case CallExpression::TargetType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( &node, nullptr,
-                node.arguments()->size() ) );
+            m_frameStack.push(
+                makeFrame( &node, nullptr, node.arguments()->size() ) );
             invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
@@ -618,8 +633,8 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     {
         case ReferenceAtom::ReferenceType::FUNCTION:
         {
-            m_frameStack.push( makeFrame( &node, atom->reference().get(),
-                node.arguments()->size() ) );
+            m_frameStack.push( makeFrame(
+                &node, atom->reference().get(), node.arguments()->size() ) );
             atom->reference()->accept( *this );
             m_frameStack.pop();
             break;
@@ -628,8 +643,8 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         {
             const auto& derived = std::static_pointer_cast< DerivedDefinition >(
                 atom->reference() );
-            m_frameStack.push( makeFrame( &node, derived.get(),
-                derived->maximumNumberOfLocals() ) );
+            m_frameStack.push( makeFrame(
+                &node, derived.get(), derived->maximumNumberOfLocals() ) );
             derived->accept( *this );
             m_frameStack.pop();
             break;
@@ -638,16 +653,16 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         {
             const auto& rule = std::static_pointer_cast< RuleDefinition >(
                 atom->reference() );
-            m_frameStack.push( makeFrame( &node, rule.get(),
-                rule->maximumNumberOfLocals() ) );
+            m_frameStack.push(
+                makeFrame( &node, rule.get(), rule->maximumNumberOfLocals() ) );
             rule->accept( *this );
             m_frameStack.pop();
             break;
         }
         case ReferenceAtom::ReferenceType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( &node, nullptr,
-                node.arguments()->size() ) );
+            m_frameStack.push(
+                makeFrame( &node, nullptr, node.arguments()->size() ) );
             invokeBuiltin( node, atom->builtinId(), node.type() );
             m_frameStack.pop();
             break;
@@ -931,7 +946,8 @@ void ExecutionVisitor::visit( CaseRule& node )
         {
             case Node::ID::DEFAULT_CASE:
             {
-                assert( defaultCase == nullptr
+                assert(
+                    defaultCase == nullptr
                     && "case rule should not contain multiple default cases" );
                 defaultCase = _case.get();
                 break;
@@ -1205,7 +1221,8 @@ u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
     CallExpression* call, Node* callee, std::size_t numberOfLocals )
 {
-    auto frame = libstdhl::make_unique< Frame >( call, callee, numberOfLocals );
+    auto frame = libstdhl::Memory::make_unique< Frame >(
+        call, callee, numberOfLocals );
 
     if( call != nullptr )
     {
@@ -1488,7 +1505,8 @@ class AgentScheduler
 
 AgentScheduler::AgentScheduler(
     ExecutionLocationRegistry& locationRegistry, Storage& globalState )
-: m_dispatchStrategy( libstdhl::make_unique< SequentialDispatchStrategy >() )
+: m_dispatchStrategy(
+      libstdhl::Memory::make_unique< SequentialDispatchStrategy >() )
 , m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
 , m_updateSetManager()
@@ -1618,7 +1636,7 @@ void NumericExecutionPass::usage( libpass::PassUsage& pu )
 
 u1 NumericExecutionPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
     const auto data = pr.result< ConsistencyCheckPass >();
     const auto specification = data->specification();
@@ -1628,7 +1646,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
 
     AgentScheduler scheduler( locationRegistry, globalState );
     /*scheduler.setDispatchStrategy(
-        libstdhl::make_unique< ParallelDispatchStrategy >() );*/
+        libstdhl::Memory::make_unique< ParallelDispatchStrategy >() );*/
 
     try
     {

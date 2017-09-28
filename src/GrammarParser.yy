@@ -20,7 +20,25 @@
 //  GNU General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with this program. If not, see <http://www.gnu.org/licenses/>.
+//  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
+//
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
 //
 
 %skeleton "lalr1.cc"
@@ -70,14 +88,14 @@
     #include "Exception.h"
     #include "Logger.h"
 
-    #include "../stdhl/cpp/Type.h"
+    #include <libstdhl/Type>
 
     #undef yylex
     #define yylex lexer.nextToken
 
     static BasicType::Ptr createVoidType( SourceLocation& sourceLocation )
     {
-        const auto type = libstdhl::get< libcasm_ir::VoidType >();
+        const auto type = libstdhl::Memory::get< libcasm_ir::VoidType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
         const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
         const auto node = Ast::make< BasicType >( sourceLocation, path );
@@ -87,7 +105,7 @@
 
     static BasicType::Ptr createRuleRefType( SourceLocation& sourceLocation )
     {
-        const auto type = libstdhl::get< libcasm_ir::RuleReferenceType >();
+        const auto type = libstdhl::Memory::get< libcasm_ir::RuleReferenceType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
         const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
         const auto node = Ast::make< BasicType >( sourceLocation, path );
@@ -203,7 +221,7 @@ END       0 "end of file"
 %type <CallRule::Ptr> CallRule
 
 // types
-%type <Type::Ptr> Type
+%type <libcasm_fe::Ast::Type::Ptr> Type
 %type <Types::Ptr> Types
 %type <BasicType::Ptr> BasicType
 %type <ComposedType::Ptr> ComposedType
@@ -754,12 +772,12 @@ Undefined
 Boolean
 : TRUE
   {
-      const auto value = libstdhl::get< libcasm_ir::BooleanConstant >( true );
+      const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
       $$ = Ast::make< ValueAtom >( @$, value );
   }
 | FALSE
   {
-      const auto value = libstdhl::get< libcasm_ir::BooleanConstant >( false );
+      const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( false );
       $$ = Ast::make< ValueAtom >( @$, value );
   }
 ;
@@ -770,7 +788,7 @@ String
   {
       try
       {
-          const auto value = libstdhl::get< libcasm_ir::StringConstant >( $1 );
+          const auto value = libstdhl::Memory::get< libcasm_ir::StringConstant >( $1 );
           $$ = Ast::make< ValueAtom >( @$, value );
       }
       catch( const std::domain_error& e )
@@ -786,7 +804,7 @@ BitNumber
   {
       try
       {
-          const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::BINARY );
+          const auto value = libstdhl::Memory::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::BINARY );
           $$ = Ast::make< ValueAtom >( @$, value );
       }
       catch( const std::domain_error& e )
@@ -798,7 +816,7 @@ BitNumber
   {
       try
       {
-          const auto value = libstdhl::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::HEXADECIMAL );
+          const auto value = libstdhl::Memory::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::HEXADECIMAL );
           $$ = Ast::make< ValueAtom >( @$, value );
       }
       catch( const std::domain_error& e )
@@ -814,7 +832,7 @@ IntegerNumber
   {
       try
       {
-          const auto value = libstdhl::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
+          const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
           $$ = Ast::make< ValueAtom >( @$, value );
       }
       catch( const std::domain_error& e )
@@ -830,7 +848,7 @@ FloatingNumber
   {
       try
       {
-          const auto value = libstdhl::get< libcasm_ir::FloatingConstant >( $1 );
+          const auto value = libstdhl::Memory::get< libcasm_ir::FloatingConstant >( $1 );
           $$ = Ast::make< ValueAtom >( @$, value );
       }
       catch( const std::domain_error& e )
@@ -846,7 +864,7 @@ RationalNumber
   {
       try
       {
-          const auto value = libstdhl::get< libcasm_ir::RationalConstant >( $1 );
+          const auto value = libstdhl::Memory::get< libcasm_ir::RationalConstant >( $1 );
           $$ = Ast::make< ValueAtom >( @$, value );
       }
       catch( const std::domain_error& e )
