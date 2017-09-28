@@ -279,9 +279,17 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 }
                 else if( name == "self" )
                 {
-                    assert( node.targetType()
-                            == CallExpression::TargetType::UNKNOWN );
-                    node.setTargetType( CallExpression::TargetType::SELF );
+                    try
+                    {
+                        const auto& symbol = m_symboltable.find( "Agent" );
+                        node.setTargetType( CallExpression::TargetType::SELF );
+                        node.setTargetDefinition( symbol.definition() );
+                    }
+                    catch( const std::domain_error& e )
+                    {
+                        m_log.error( { node.sourceLocation() },
+                            "unable to find 'Agent' symbol" );
+                    }
                 }
                 // single agent execution notation --> agent type domain ==
                 // Enumeration!

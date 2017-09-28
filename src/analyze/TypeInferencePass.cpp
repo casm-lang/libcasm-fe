@@ -47,7 +47,7 @@ static libpass::PassRegistration< TypeInferencePass > PASS(
 class TypeInferenceVisitor final : public RecursiveVisitor
 {
   public:
-    TypeInferenceVisitor( Logger& log, Namespace& symboltable );
+    TypeInferenceVisitor( Logger& log );
 
     void visit( Specification& node ) override;
 
@@ -107,7 +107,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
   private:
     Logger& m_log;
-    Namespace& m_symboltable;
     u1 m_functionInitially;
 
     std::unordered_map< std::string, VariableDefinition* > m_id2var;
@@ -116,10 +115,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         m_resultTypes;
 };
 
-TypeInferenceVisitor::TypeInferenceVisitor(
-    Logger& log, Namespace& symboltable )
+TypeInferenceVisitor::TypeInferenceVisitor( Logger& log )
 : m_log( log )
-, m_symboltable( symboltable )
 , m_functionInitially( false )
 {
 }
@@ -432,19 +429,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::SELF:
         {
             assert( not node.type() );
-            try
-            {
-                auto symbol = m_symboltable.find( "Agent" );
-                assert( symbol.targetType()
-                        == CallExpression::TargetType::TYPE_DOMAIN );
-                const auto& type = symbol.definition()->type();
-                assert( type );
-                node.setType( type );
-            }
-            catch( const std::domain_error& e )
-            {
-                assert( !" inconsistent symbol table! " );
-            }
+            assert( node.targetDefinition() );
+            node.setType( node.targetDefinition()->type() );
             break;
         }
         case CallExpression::TargetType::TYPE_DOMAIN:
@@ -1812,14 +1798,9 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
 
     const auto data = pr.result< TypeCheckPass >();
     const auto specification = data->specification();
-    const auto symboltable = data->symboltable();
 
-    TypeInferenceVisitor visitor( log, *symboltable );
+    TypeInferenceVisitor visitor( log );
     specification->accept( visitor );
-
-#ifndef NDEBUG
-    log.debug( "symbol table = \n" + symboltable->dump() );
-#endif
 
     const auto errors = log.errors();
     if( errors > 0 )
@@ -1828,8 +1809,7 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< TypeInferencePass >(
-        libstdhl::make< Data >( specification, symboltable ) );
+    pr.setResult< TypeInferencePass >( data );
 
     return true;
 }
