@@ -29,7 +29,6 @@
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
-#include "../Exception.h"
 #include "../Logger.h"
 #include "../Namespace.h"
 #include "../analyze/TypeInferencePass.h"
@@ -115,25 +114,7 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 
     m_functionInitially = true;
 
-    try
-    {
-        node.initializers()->accept( *this );
-    }
-    catch( const CompiletimeException& e )
-    {
-        const auto& name = node.identifier()->name();
-
-        if( name == PROGRAM )
-        {
-            m_log.error( { *e.locations().begin(), node.sourceLocation() },
-                "unknown init rule reference '" + std::string( e.what() ) + "'",
-                Code::AgentInitRuleDoesNotExist );
-        }
-        else
-        {
-            m_log.error( e );
-        }
-    }
+    node.initializers()->accept( *this );
 
     m_functionInitially = false;
 
@@ -161,28 +142,6 @@ void ConsistencyCheckVisitor::visit( DerivedDefinition& node )
 void ConsistencyCheckVisitor::visit( ReferenceAtom& node )
 {
     RecursiveVisitor::visit( node );
-
-    if( m_functionInitially )
-    {
-        if( not node.type() )
-        {
-            throw CompiletimeException( node.identifier()->sourceLocation(),
-                node.identifier()->path(), Code::Unspecified );
-        }
-        else
-        {
-            try
-            {
-                m_symboltable.find( *node.identifier() );
-            }
-            catch( const std::domain_error& e )
-            {
-                throw CompiletimeException( node.identifier()->sourceLocation(),
-                    node.identifier()->path(), Code::Unspecified );
-            }
-        }
-    }
-
     verify( node );
 }
 
