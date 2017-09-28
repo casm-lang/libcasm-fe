@@ -396,64 +396,37 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::DERIVED:
         {
             assert( not node.type() );
-            try
-            {
-                auto symbol = m_symboltable.find( node );
-                assert( symbol.targetType() == node.targetType() );
 
-                const auto& definition
-                    = std::static_pointer_cast< DerivedDefinition >(
-                        symbol.definition() );
+            const auto& definition
+                = std::static_pointer_cast< DerivedDefinition >(
+                    node.targetDefinition() );
 
-                inference( *definition, node.arguments()->data() );
-                node.setType( definition->type() );
-            }
-            catch( const std::domain_error& e )
-            {
-                assert( !" inconsistent symbol table! " );
-            }
+            inference( *definition, node.arguments()->data() );
+            node.setType( definition->type() );
             break;
         }
         case CallExpression::TargetType::FUNCTION:
         {
             assert( not node.type() );
-            try
-            {
-                auto symbol = m_symboltable.find( node );
-                assert( symbol.targetType() == node.targetType() );
 
-                const auto& definition
-                    = std::static_pointer_cast< FunctionDefinition >(
-                        symbol.definition() );
+            const auto& definition
+                = std::static_pointer_cast< FunctionDefinition >(
+                    node.targetDefinition() );
 
-                inference( *definition, node.arguments()->data() );
-                node.setType( definition->type() );
-            }
-            catch( const std::domain_error& e )
-            {
-                assert( !" inconsistent symbol table! " );
-            }
+            inference( *definition, node.arguments()->data() );
+            node.setType( definition->type() );
             break;
         }
         case CallExpression::TargetType::RULE:
         {
             assert( not node.type() );
-            try
-            {
-                auto symbol = m_symboltable.find( node );
-                assert( symbol.targetType() == node.targetType() );
 
-                const auto& definition
-                    = std::static_pointer_cast< RuleDefinition >(
-                        symbol.definition() );
+            const auto& definition
+                = std::static_pointer_cast< RuleDefinition >(
+                    node.targetDefinition() );
 
-                inference( *definition, node.arguments()->data() );
-                node.setType( definition->type() );
-            }
-            catch( const std::domain_error& e )
-            {
-                assert( !" inconsistent symbol table! " );
-            }
+            inference( *definition, node.arguments()->data() );
+            node.setType( definition->type() );
             break;
         }
         case CallExpression::TargetType::SELF:
@@ -581,21 +554,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                     + " arguments",
                 code->second );
 
-            try
-            {
-                auto symbol = m_symboltable.find( node );
-                assert( symbol.targetType() == node.targetType() );
-                m_log.info( { symbol.definition()->sourceLocation() },
-                    node.targetTypeName() + " '" + path.path()
-                        + "' is defined as a relation '"
-                        + node.type()->description()
-                        + "', incorrect usage in line "
-                        + std::to_string( node.sourceLocation().begin.line ) );
-            }
-            catch( const std::domain_error& e )
-            {
-                assert( !" inconsistent symbol table! " );
-            }
+            m_log.info( { node.targetDefinition()->sourceLocation() },
+                node.targetTypeName() + " '" + path.path()
+                    + "' is defined as a relation '"
+                    + node.type()->description()
+                    + "', incorrect usage in line "
+                    + std::to_string( node.sourceLocation().begin.line ) );
         }
     }
 }
@@ -1286,50 +1250,41 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
             case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
             case CallExpression::TargetType::RULE:
             {
-                try
+                const auto& definition = directCall.targetDefinition();
+
+                if( definition->type() )
                 {
-                    auto symbol = m_symboltable.find( path );
-                    auto& definition = symbol.definition();
-
-                    if( definition->type() )
+                    for( std::size_t c = 0; c < expressions.size(); c++ )
                     {
-                        for( std::size_t c = 0; c < expressions.size(); c++ )
-                        {
-                            std::vector< libcasm_ir::Type::ID > ty = {
-                                definition->type()->arguments()[ c ]->id()
-                            };
-                            std::vector< libcasm_ir::Type::ID > tmp = {};
-
-                            std::copy( ty.begin(), ty.end(),
-                                std::back_inserter(
-                                    m_resultTypes[ expressions[ c ].get() ] ) );
-                        }
-
-                        std::vector< libcasm_ir::Type::ID > ty
-                            = { definition->type()->result().id() };
+                        std::vector< libcasm_ir::Type::ID > ty = {
+                            definition->type()->arguments()[ c ]->id()
+                        };
                         std::vector< libcasm_ir::Type::ID > tmp = {};
 
-                        if( result != m_resultTypes.end() )
-                        {
-                            std::set_intersection( result->second.begin(),
-                                result->second.end(), ty.begin(), ty.end(),
-                                std::back_inserter( tmp ) );
-                        }
-                        else
-                        {
-                            std::set_intersection( tmp.begin(), tmp.end(),
-                                ty.begin(), ty.end(),
-                                std::back_inserter( tmp ) );
-                        }
-
-                        m_resultTypes[&node ] = std::move( tmp );
+                        std::copy( ty.begin(), ty.end(),
+                            std::back_inserter(
+                                m_resultTypes[ expressions[ c ].get() ] ) );
                     }
-                }
-                catch( const std::domain_error& e )
-                {
-                    assert( !" inconsistent symbol table! " );
-                }
 
+                    std::vector< libcasm_ir::Type::ID > ty
+                        = { definition->type()->result().id() };
+                    std::vector< libcasm_ir::Type::ID > tmp = {};
+
+                    if( result != m_resultTypes.end() )
+                    {
+                        std::set_intersection( result->second.begin(),
+                            result->second.end(), ty.begin(), ty.end(),
+                            std::back_inserter( tmp ) );
+                    }
+                    else
+                    {
+                        std::set_intersection( tmp.begin(), tmp.end(),
+                            ty.begin(), ty.end(),
+                            std::back_inserter( tmp ) );
+                    }
+
+                    m_resultTypes[&node ] = std::move( tmp );
+                }
                 break;
             }
             case CallExpression::TargetType::SELF:
