@@ -32,7 +32,7 @@
 
 #include "../Specification.h"
 #include "../Logger.h"
-#include "../analyze/TypeInferencePass.h"
+#include "../analyze/ConsistencyCheckPass.h"
 #include "../ast/RecursiveVisitor.h"
 #include "../ast/Definition.h"
 #include "../ast/Expression.h"
@@ -524,14 +524,14 @@ void AstDumpDotVisitor::dumpLink( void* from, void* to )
 
 void AstDumpDotPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeInferencePass >();
+    pu.require< ConsistencyCheckPass >();
 }
 
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto& data = pr.result< TypeInferencePass >();
+    const auto& data = pr.result< ConsistencyCheckPass >();
     const auto& specification = data->specification();
 
     const std::string outputFilePath
