@@ -25,12 +25,12 @@
 
 #include "SymbolRegistrationPass.h"
 
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
+#include "../Logger.h"
+#include "../ast/RecursiveVisitor.h"
 
-#include "Logger.h"
-#include "ast/RecursiveVisitor.h"
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -39,13 +39,13 @@ char SymbolRegistrationPass::id = 0;
 
 static libpass::PassRegistration< SymbolRegistrationPass > PASS(
     "ASTSymbolRegistrationPass",
-    "registers declared symbols in the symbol table", "ast-sym-reg",
-    0 );
+    "registers declared symbols in the symbol table", "ast-sym-reg", 0 );
 
 class SymbolRegistrationVisitor final : public RecursiveVisitor
 {
   public:
-    SymbolRegistrationVisitor( Logger& log, Namespace& symboltable );
+    SymbolRegistrationVisitor(
+        libcasm_fe::Logger& log, Namespace& symboltable );
 
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -53,12 +53,12 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
 
   private:
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 };
 
 SymbolRegistrationVisitor::SymbolRegistrationVisitor(
-    Logger& log, Namespace& symboltable )
+    libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 {
@@ -138,13 +138,15 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
         const auto& name = node.identifier()->name();
 
         m_log.debug( "creating IR enumeration type '" + name + "'" );
-        const auto kind = libstdhl::make< libcasm_ir::Enumeration >( name );
+        const auto kind
+            = libstdhl::Memory::make< libcasm_ir::Enumeration >( name );
         for( const auto& enumerator : *node.enumerators() )
         {
             kind->add( enumerator->name() );
         }
 
-        const auto type = libstdhl::make< libcasm_ir::EnumerationType >( kind );
+        const auto type
+            = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
         node.setType( type );
     }
     catch( const std::domain_error& e )
@@ -166,7 +168,7 @@ void SymbolRegistrationPass::usage( libpass::PassUsage& pu )
 
 u1 SymbolRegistrationPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
     const auto data = pr.result< AttributionPass >();
     const auto specification = data->specification();

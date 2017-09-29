@@ -25,28 +25,27 @@
 
 #include "TypeCheckPass.h"
 
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
-
 #include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
 
-#include "../stdhl/cpp/String.h"
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <libstdhl/String>
 
 using namespace libcasm_fe;
 using namespace Ast;
 
 char TypeCheckPass::id = 0;
 
-static libpass::PassRegistration< TypeCheckPass > PASS(
-    "ASTTypeCheckPass",
+static libpass::PassRegistration< TypeCheckPass > PASS( "ASTTypeCheckPass",
     "type check of all types in the AST representation", "ast-type-chk", 0 );
 
 class TypeCheckVisitor final : public RecursiveVisitor
 {
   public:
-    TypeCheckVisitor( Logger& log, Namespace& symboltable );
+    TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
     void visit( VariableDefinition& node ) override;
 
@@ -67,7 +66,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
     void push( VariableDefinition& identifier );
     void pop( VariableDefinition& identifier );
 
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 
     std::unordered_map< std::string, VariableDefinition* > m_id2var;
@@ -75,7 +74,8 @@ class TypeCheckVisitor final : public RecursiveVisitor
     Expression* m_caseExpr = nullptr;
 };
 
-TypeCheckVisitor::TypeCheckVisitor( Logger& log, Namespace& symboltable )
+TypeCheckVisitor::TypeCheckVisitor(
+    libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 {
@@ -357,15 +357,15 @@ void TypeCheckVisitor::visit( ComposedType& node )
     if( name == TYPE_STRING_TUPLE )
     {
         const auto type
-            = libstdhl::make< libcasm_ir::TupleType >( subTypeList );
+            = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
         node.setType( type );
     }
     else if( name == TYPE_STRING_LIST )
     {
         if( subTypeList.size() == 1 )
         {
-            const auto type
-                = libstdhl::make< libcasm_ir::ListType >( subTypeList[ 0 ] );
+            const auto type = libstdhl::Memory::make< libcasm_ir::ListType >(
+                subTypeList[ 0 ] );
             node.setType( type );
         }
         else
@@ -410,8 +410,9 @@ void TypeCheckVisitor::visit( RelationType& node )
     {
         if( node.returnType()->type() )
         {
-            const auto type = libstdhl::make< libcasm_ir::RuleReferenceType >(
-                node.returnType()->type(), argTypeList );
+            const auto type
+                = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
+                    node.returnType()->type(), argTypeList );
             node.setType( type );
         }
     }
@@ -420,7 +421,7 @@ void TypeCheckVisitor::visit( RelationType& node )
         if( node.returnType()->type() )
         {
             const auto type
-                = libstdhl::make< libcasm_ir::FunctionReferenceType >(
+                = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
                     node.returnType()->type(), argTypeList );
             node.setType( type );
         }
@@ -454,7 +455,8 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
 
                 try
                 {
-                    auto type = libstdhl::get< libcasm_ir::BitType >( value );
+                    auto type
+                        = libstdhl::Memory::get< libcasm_ir::BitType >( value );
                     node.setType( type );
                 }
                 catch( const std::domain_error& e )
@@ -492,19 +494,21 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                         static_pointer_cast< libcasm_ir::IntegerConstant >(
                             static_cast< const ValueAtom& >( rhs ).value() );
 
-                    auto range
-                        = libstdhl::make< libcasm_ir::Range >( ir_lhs, ir_rhs );
+                    auto range = libstdhl::Memory::make< libcasm_ir::Range >(
+                        ir_lhs, ir_rhs );
 
                     auto range_type
-                        = libstdhl::get< libcasm_ir::RangeType >( range );
+                        = libstdhl::Memory::get< libcasm_ir::RangeType >(
+                            range );
 
                     assert( not expr.type() );
                     expr.setType( range_type );
 
                     try
                     {
-                        auto type = libstdhl::get< libcasm_ir::IntegerType >(
-                            range_type );
+                        auto type
+                            = libstdhl::Memory::get< libcasm_ir::IntegerType >(
+                                range_type );
 
                         node.setType( type );
                     }
@@ -569,7 +573,7 @@ void TypeCheckPass::usage( libpass::PassUsage& pu )
 
 u1 TypeCheckPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
     const auto data = pr.result< SymbolResolverPass >();
     const auto specification = data->specification();
