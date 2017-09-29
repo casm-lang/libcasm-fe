@@ -46,13 +46,13 @@ set( CXX_SRC_FILES
   src/Exception.cpp
   src/Logger.cpp
   src/Namespace.cpp
+  src/Specification.cpp
 
   src/ast/Attribute.cpp
   src/ast/Definition.cpp
   src/ast/Expression.cpp
   src/ast/Node.cpp
   src/ast/Rule.cpp
-  src/ast/Specification.cpp
   src/ast/Type.cpp
   src/ast/RecursiveVisitor.cpp
   src/ast/EmptyVisitor.cpp

@@ -23,45 +23,32 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _LIB_CASMFE_SPECIFICATION_H_
-#define _LIB_CASMFE_SPECIFICATION_H_
+#include "Specification.h"
 
-#include "Node.h"
+using namespace libcasm_fe;
 
-#include "Definition.h"
-
-namespace libcasm_fe
+Specification::Specification( void )
+: m_name()
+, m_definitions()
 {
-    namespace Ast
-    {
-        class Specification final : public Node
-        {
-          public:
-            using Ptr = std::shared_ptr< Specification >;
-
-            Specification( const Identifier::Ptr& name,
-                const Definitions::Ptr& definitions );
-
-            const Identifier::Ptr& name( void ) const;
-            const Definitions::Ptr& definitions( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Identifier::Ptr m_name;
-            const Definitions::Ptr m_definitions;
-        };
-    }
 }
 
-#endif // _LIB_CASMFE_SPECIFICATION_H_
+void Specification::setName( const std::string& name )
+{
+    m_name = name;
+}
 
-//
-//  Local variables:
-//  mode: c++
-//  indent-tabs-mode: nil
-//  c-basic-offset: 4
-//  tab-width: 4
-//  End:
-//  vim:noexpandtab:sw=4:ts=4:
-//
+const std::string& Specification::name( void ) const
+{
+    return m_name;
+}
+
+void Specification::setDefinitions( const Ast::Definitions::Ptr& definitions )
+{
+    m_definitions = definitions;
+}
+
+const Ast::Definitions::Ptr& Specification::definitions( void ) const
+{
+    return m_definitions;
+}

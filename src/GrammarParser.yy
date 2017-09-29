@@ -50,7 +50,10 @@
         class SourceLocation;
     }
 
-    #include "ast/Specification.h"
+    #include "Specification.h"
+    #include "ast/Definition.h"
+    #include "ast/Expression.h"
+    #include "ast/Rule.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
@@ -60,8 +63,7 @@
 
 %parse-param { Logger& log }
 %parse-param { Lexer& lexer }
-%parse-param { const std::string& filePath }
-%parse-param { Specification::Ptr& result }
+%parse-param { Specification& specification }
 
 %code
 {
@@ -271,11 +273,7 @@ END       0 "end of file"
 Specification
 : CASM Definitions
   {
-      const std::string& fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
-      const std::string& name = fileName.substr( 0, fileName.rfind( "." ) );
-
-      const auto specificationName = make< Identifier >( @$, name );
-      result = Ast::make< Specification >( @$, specificationName, $2 );
+      specification.setDefinitions( $2 );
   }
 ;
 

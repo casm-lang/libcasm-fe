@@ -25,16 +25,12 @@
 
 #include "RecursiveVisitor.h"
 
-#include "Specification.h"
+#include "Definition.h"
+#include "Expression.h"
+#include "Rule.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
-
-void RecursiveVisitor::visit( Specification& node )
-{
-    node.name()->accept( *this );
-    node.definitions()->accept( *this );
-}
 
 void RecursiveVisitor::visit( VariableDefinition& node )
 {

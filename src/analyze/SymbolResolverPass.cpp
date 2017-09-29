@@ -468,7 +468,7 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
     registerBasicTypes( *symboltable );
 
     SymbolResolveVisitor visitor( log, *symboltable );
-    specification->accept( visitor );
+    specification->definitions()->accept( visitor );
 
 #ifndef NDEBUG
     log.debug( "symbol table = \n" + symboltable->dump() );

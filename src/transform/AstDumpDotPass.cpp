@@ -30,10 +30,13 @@
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
+#include "../Specification.h"
 #include "../Logger.h"
 #include "../analyze/TypeInferencePass.h"
 #include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "../ast/Definition.h"
+#include "../ast/Expression.h"
+#include "../ast/Rule.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -53,7 +56,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     class DotLink
     {
       public:
-        DotLink( AstDumpDotVisitor* visitor, Node* node )
+        DotLink( AstDumpDotVisitor* visitor, void* node )
         : m_visitor( visitor )
         {
             if( not visitor->m_parentNodes.empty() )
@@ -78,7 +81,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
     void setDumpNodeLocation( u1 dumpNodeLocation );
 
-    void visit( Specification& node ) override;
+    void visit( Specification& specification );
 
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
@@ -132,11 +135,11 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void dumpNode( const TypedNode& node, const std::string& name );
     void dumpLabel( const Node& node );
     void dumpLabel( const TypedNode& node );
-    void dumpLink( Node* from, Node* to );
+    void dumpLink( void* from, void* to );
 
   private:
     std::ostream& m_stream;
-    std::stack< Node* > m_parentNodes; /**< holds the parent nodes of DotLink */
+    std::stack< void* > m_parentNodes; /**< holds the parent nodes of DotLink */
     u1 m_dumpNodeLocation = false;     /**< dump node source code location */
 };
 
@@ -152,15 +155,15 @@ void AstDumpDotVisitor::setDumpNodeLocation( u1 dumpNodeLocation )
     m_dumpNodeLocation = dumpNodeLocation;
 }
 
-void AstDumpDotVisitor::visit( Specification& node )
+void AstDumpDotVisitor::visit( Specification& specification )
 {
-    m_stream << "subgraph \"" << node.name()->name() << "\" {\n";
+    m_stream << "subgraph \"" << specification.name() << "\" {\n"
+             << "\"" << &specification
+             << "\" [label=\"CASM\\nSpecification\"];\n";
 
-    { // scope for DotLink object
-        DotLink link( this, &node );
-
-        dumpNode( node, "CASM\\nSpecification" );
-        RecursiveVisitor::visit( node );
+    {
+        DotLink link( this, &specification );
+        specification.definitions()->accept( *this );
     }
 
     m_stream << "}\n";
@@ -514,7 +517,7 @@ void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
     }
 }
 
-void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
+void AstDumpDotVisitor::dumpLink( void* from, void* to )
 {
     m_stream << "\"" << from << "\" -> \"" << to << "\";\n";
 }
@@ -541,7 +544,7 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
         AstDumpDotVisitor visitor{ out };
         visitor.setDumpNodeLocation( dumpNodeLocation );
 
-        specification->accept( visitor );
+        visitor.visit( *specification );
 
         out << "}\n";
     };

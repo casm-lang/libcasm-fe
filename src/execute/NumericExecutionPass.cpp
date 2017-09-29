@@ -44,10 +44,13 @@
 
 #include "../Exception.h"
 #include "../Logger.h"
+#include "../Specification.h"
 #include "../analyze/ConsistencyCheckPass.h"
 #include "../ast/EmptyVisitor.h"
 #include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "../ast/Definition.h"
+#include "../ast/Expression.h"
+#include "../ast/Rule.h"
 
 #include "Frame.h"
 #include "FunctionState.h"
@@ -1322,7 +1325,7 @@ class StateInitializationVisitor final : public EmptyVisitor
     StateInitializationVisitor(
         ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
-    void visit( Specification& node ) override;
+    void visit( Specification& node );
 
     void visit( FunctionDefinition& node ) override;
 
@@ -1634,7 +1637,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     {
         StateInitializationVisitor stateInitializationVisitor(
             locationRegistry, globalState );
-        specification->accept( stateInitializationVisitor );
+        stateInitializationVisitor.visit( *specification );
 
         while( not scheduler.done() )
         {

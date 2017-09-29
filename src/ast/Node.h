@@ -47,8 +47,6 @@ namespace libcasm_fe
           public:
             enum class ID
             {
-                SPECIFICATION,
-
                 // definitions
                 VARIABLE_DEFINITION,
                 FUNCTION_DEFINITION,

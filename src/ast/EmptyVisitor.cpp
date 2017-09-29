@@ -25,14 +25,12 @@
 
 #include "EmptyVisitor.h"
 
-#include "Specification.h"
+#include "Definition.h"
+#include "Expression.h"
+#include "Rule.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
-
-void EmptyVisitor::visit( Specification& )
-{
-}
 
 void EmptyVisitor::visit( VariableDefinition& )
 {

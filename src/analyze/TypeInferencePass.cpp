@@ -49,8 +49,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
   public:
     TypeInferenceVisitor( Logger& log );
 
-    void visit( Specification& node ) override;
-
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -119,11 +117,6 @@ TypeInferenceVisitor::TypeInferenceVisitor( Logger& log )
 : m_log( log )
 , m_functionInitially( false )
 {
-}
-
-void TypeInferenceVisitor::visit( Specification& node )
-{
-    RecursiveVisitor::visit( node );
 }
 
 void TypeInferenceVisitor::visit( FunctionDefinition& node )
@@ -1800,7 +1793,7 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     TypeInferenceVisitor visitor( log );
-    specification->accept( visitor );
+    specification->definitions()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )

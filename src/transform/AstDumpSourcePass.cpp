@@ -29,10 +29,13 @@
 #include "../pass/src/PassResult.h"
 #include "../pass/src/PassUsage.h"
 
+#include "../Specification.h"
 #include "../Logger.h"
 #include "../analyze/ConsistencyCheckPass.h"
 #include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "../ast/Definition.h"
+#include "../ast/Expression.h"
+#include "../ast/Rule.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -123,8 +126,6 @@ class AstDumpSourceVisitor final : public Visitor
   public:
     explicit AstDumpSourceVisitor( std::ostream& stream );
 
-    void visit( Specification& node ) override;
-
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -181,17 +182,6 @@ AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 : m_stream( stream )
 , m_indentation( 4 )
 {
-}
-
-void AstDumpSourceVisitor::visit( Specification& node )
-{
-    m_stream << "CASM\n";
-    for( auto& d : *node.definitions() )
-    {
-        m_stream << "\n";
-        d->accept( *this );
-        m_stream << "\n";
-    }
 }
 
 void AstDumpSourceVisitor::visit( VariableDefinition& node )
@@ -704,8 +694,17 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
     const auto& data = pr.result< ConsistencyCheckPass >();
     const auto& specification = data->specification();
 
-    AstDumpSourceVisitor visitor{ std::cout };
-    specification->accept( visitor );
+    auto& outputStream = std::cout;
+
+    AstDumpSourceVisitor visitor{ outputStream };
+
+    outputStream << "CASM\n";
+    for( const auto& definition : *specification->definitions() )
+    {
+        outputStream << "\n";
+        definition->accept( visitor );
+        outputStream << "\n";
+    }
 
     return true;
 }

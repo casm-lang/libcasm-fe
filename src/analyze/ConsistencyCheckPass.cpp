@@ -56,7 +56,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
   public:
     ConsistencyCheckVisitor( Logger& m_log, const Namespace& symboltable );
 
-    void visit( Specification& node ) override;
+    void visit( Specification& node );
 
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -95,12 +95,11 @@ void ConsistencyCheckVisitor::visit( Specification& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.sourceLocation() },
-            "no init definition found in the specification",
+        m_log.error( "no init definition found in the specification",
             Code::AgentInitRuleNotDefined );
     }
 
-    RecursiveVisitor::visit( node );
+    node.definitions()->accept( *this );
 }
 
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
@@ -296,7 +295,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     const auto symboltable = data->symboltable();
 
     ConsistencyCheckVisitor visitor( log, *symboltable );
-    specification->accept( visitor );
+    visitor.visit( *specification );
 
     const auto errors = log.errors();
     if( errors > 0 )

@@ -576,7 +576,7 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
     const auto symboltable = data->symboltable();
 
     TypeCheckVisitor visitor( log, *symboltable );
-    specification->accept( visitor );
+    specification->definitions()->accept( visitor );
 
 #ifndef NDEBUG
     log.debug( "symbol table = \n" + symboltable->dump() );

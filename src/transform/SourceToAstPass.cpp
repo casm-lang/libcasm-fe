@@ -30,6 +30,7 @@
 #include "../pass/src/PassUsage.h"
 #include "../pass/src/analyze/LoadFilePass.h"
 
+#include "../Specification.h"
 #include "../Lexer.h"
 #include "../Logger.h"
 #include "../various/GrammarParser.tab.h"
@@ -54,12 +55,16 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
     const auto filePath = data->filename();
     auto& fileStream = data->stream();
 
-    Ast::Specification::Ptr specification;
+    const auto fileName = filePath.substr( filePath.find_last_of( "/\\" ) + 1 );
+    const auto name = fileName.substr( 0, fileName.rfind( "." ) );
+
+    auto specification = std::make_shared< Specification >();
+    specification->setName( name );
 
     Lexer lexer( log, fileStream, std::cout );
     lexer.setFileName( filePath );
 
-    Parser parser( log, lexer, filePath, specification );
+    Parser parser( log, lexer, *specification );
     parser.set_debug_level( m_debug );
 
     if( ( parser.parse() != 0 ) or not specification or ( log.errors() > 0 ) )

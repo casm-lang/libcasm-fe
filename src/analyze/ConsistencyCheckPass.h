@@ -29,7 +29,7 @@
 #include "../pass/src/Pass.h"
 #include "../pass/src/PassData.h"
 
-#include "../ast/Specification.h"
+#include "../Specification.h"
 
 namespace libcasm_fe
 {
@@ -50,18 +50,18 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Data >;
 
-            Data( const Ast::Specification::Ptr& specification )
+            Data( const Specification::Ptr& specification )
             : m_specification( specification )
             {
             }
 
-            Ast::Specification::Ptr specification( void ) const
+            Specification::Ptr specification( void ) const
             {
                 return m_specification;
             }
 
           private:
-            Ast::Specification::Ptr m_specification;
+            Specification::Ptr m_specification;
         };
     };
 }

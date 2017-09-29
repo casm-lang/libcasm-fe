@@ -49,14 +49,17 @@
         class SourceLocation;
     }
 
-    #include "ast/Specification.h"
+    #include "Specification.h"
+    #include "ast/Definition.h"
+    #include "ast/Expression.h"
+    #include "ast/Rule.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
 
     #define YY_NULLPTR nullptr
 
-#line 60 "GrammarParser.tab.h" // lalr1.cc:377
+#line 63 "GrammarParser.tab.h" // lalr1.cc:377
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -133,7 +136,7 @@
 
 #line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 namespace libcasm_fe {
-#line 137 "GrammarParser.tab.h" // lalr1.cc:377
+#line 140 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
@@ -1113,7 +1116,7 @@ namespace libcasm_fe {
 
 
     /// Build a parser object.
-    Parser (Logger& log_yyarg, Lexer& lexer_yyarg, const std::string& filePath_yyarg, Specification::Ptr& result_yyarg);
+    Parser (Logger& log_yyarg, Lexer& lexer_yyarg, Specification& specification_yyarg);
     virtual ~Parser ();
 
     /// Parse.
@@ -1328,8 +1331,7 @@ namespace libcasm_fe {
     // User arguments.
     Logger& log;
     Lexer& lexer;
-    const std::string& filePath;
-    Specification::Ptr& result;
+    Specification& specification;
   };
 
   // Symbol number corresponding to token number t.
@@ -3358,7 +3360,7 @@ namespace libcasm_fe {
 
 #line 31 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 } // libcasm_fe
-#line 3362 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3364 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

@@ -23,30 +23,42 @@
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "Specification.h"
+#ifndef _LIB_CASMFE_SPECIFICATION_H_
+#define _LIB_CASMFE_SPECIFICATION_H_
 
-using namespace libcasm_fe;
-using namespace Ast;
+#include <memory>
 
-Specification::Specification(
-    const Identifier::Ptr& name, const Definitions::Ptr& definitions )
-: Node( Node::ID::SPECIFICATION )
-, m_name( name )
-, m_definitions( definitions )
+#include "ast/Definition.h"
+
+namespace libcasm_fe
 {
+    class Specification
+    {
+      public:
+        using Ptr = std::shared_ptr< Specification >;
+
+        explicit Specification( void );
+
+        void setName( const std::string& name );
+        const std::string& name( void ) const;
+
+        void setDefinitions( const Ast::Definitions::Ptr& definitions );
+        const Ast::Definitions::Ptr& definitions( void ) const;
+
+      private:
+        std::string m_name;
+        Ast::Definitions::Ptr m_definitions;
+    };
 }
 
-const Identifier::Ptr& Specification::name( void ) const
-{
-    return m_name;
-}
+#endif // _LIB_CASMFE_SPECIFICATION_H_
 
-const Definitions::Ptr& Specification::definitions( void ) const
-{
-    return m_definitions;
-}
-
-void Specification::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

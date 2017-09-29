@@ -175,7 +175,7 @@ u1 SymbolRegistrationPass::run( libpass::PassResult& pr )
     const auto symboltable = std::make_shared< Namespace >();
 
     SymbolRegistrationVisitor visitor( log, *symboltable );
-    specification->accept( visitor );
+    specification->definitions()->accept( visitor );
 
 #ifndef NDEBUG
     log.debug( "symbol table = \n" + symboltable->dump() );

@@ -33,8 +33,11 @@
 
 #include "transform/SourceToAstPass.h"
 
+#include "Specification.h"
 #include "ast/RecursiveVisitor.h"
-#include "ast/Specification.h"
+#include "../ast/Definition.h"
+#include "../ast/Expression.h"
+#include "../ast/Rule.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -261,7 +264,7 @@ u1 AttributionPass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     DefinitionVisitor visitor( log );
-    specification->accept( visitor );
+    specification->definitions()->accept( visitor );
 
     const auto errors = log.errors();
     if( errors > 0 )

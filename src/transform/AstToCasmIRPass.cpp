@@ -27,9 +27,12 @@
 
 #include "../stdhl/cpp/Default.h"
 
+#include "../Specification.h"
 #include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "../ast/Definition.h"
+#include "../ast/Expression.h"
+#include "../ast/Rule.h"
 
 #include "../casm-ir/src/Specification.h"
 #include "../casm-ir/src/analyze/ConsistencyCheckPass.h"
@@ -49,7 +52,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
   public:
     AstToCasmIRVisitor( Logger& log );
 
-    void visit( Specification& node ) override;
+    void visit( Specification& node );
 
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
@@ -136,7 +139,7 @@ static const auto VOID = libstdhl::get< libcasm_ir::VoidType >();
 void AstToCasmIRVisitor::visit( Specification& node )
 {
     m_specification
-        = libstdhl::make< libcasm_ir::Specification >( node.name()->name() );
+        = libstdhl::make< libcasm_ir::Specification >( node.name() );
 
     const auto rule_init_type
         = libstdhl::make< libcasm_ir::RelationType >( VOID );
@@ -746,7 +749,7 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
     const auto& specification = data->specification();
 
     AstToCasmIRVisitor visitor{ log };
-    specification->accept( visitor );
+    visitor.visit( *specification );
 
     if( not visitor.specification() )
     {
