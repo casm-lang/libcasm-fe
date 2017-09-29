@@ -42,36 +42,31 @@
 #
 
 set( PROJECT libcasm-fe )
+
 cmake_minimum_required( VERSION ${CMAKE_VERSION} )
 
+project( ${PROJECT} LANGUAGES C CXX )
+set( CMAKE_CXX_STANDARD 14 )
 set( CMAKE_VERSION 3.2 )
 set( CMAKE_INCLUDE_CURRENT_DIR ON )
+set( CMAKE_MODULE_PATH ${${PROJECT}_SOURCE_DIR}/.cmake )
 
-set( CMAKE_CXX_STANDARD 14 )
-project( ${PROJECT} LANGUAGES CXX )
+include( LibPackage )
 
-find_package( ECM REQUIRED CONFIG QUIET )
-set( CMAKE_MODULE_PATH
-  ${ECM_MODULE_PATH}
-  ${${PROJECT}_SOURCE_DIR}/.cmake
-  )
+package_git( ${PROJECT} )
+package_git_submodule( libstdhl   master REQUIRED obj   ../stdhl   lib/stdhl   )
+package_git_submodule( libpass    master REQUIRED obj   ../pass    lib/pass    )
+package_git_submodule( libcasm-ir master REQUIRED obj   ../casm-ir lib/casm-ir )
+package_git_submodule( libcasm-rt master REQUIRED obj   ../casm-rt lib/casm-rt )
+package_git_submodule( libgtest   master REQUIRED build ../gtest   lib/gtest   )
+package_git_submodule( libhayai   master REQUIRED build ../hayai   lib/hayai   )
 
-set( THREADS_PREFER_PTHREAD_FLAG ON )
 find_package( Threads REQUIRED )
 
 include( ECMGenerateHeaders )
 include( FeatureSummary )
 include( GenerateExportHeader )
 include( CPack )
-include( LibPackage )
-
-package_git( ${PROJECT} )
-package_git_submodule( libstdhl   master REQUIRED obj   ../stdhl   lib/stdhl   )
-package_git_submodule( libgtest   master REQUIRED build ../gtest   lib/gtest   )
-package_git_submodule( libhayai   master REQUIRED build ../hayai   lib/hayai   )
-package_git_submodule( libpass    master REQUIRED obj   ../pass    lib/pass    )
-package_git_submodule( libcasm-ir master REQUIRED obj   ../casm-ir lib/casm-ir )
-package_git_submodule( libcasm-rt master REQUIRED obj   ../casm-rt lib/casm-rt )
 
 add_subdirectory( src )
 add_subdirectory( etc
@@ -150,8 +145,9 @@ add_dependencies( ${PROJECT}
   ${PROJECT}-grammar
   )
 
-if( ${LIBCASM_IR_FOUND} )
+if( ${LIBCASM_RT_FOUND} )
   target_link_libraries( ${PROJECT}
+    ${LIBCASM_RT_LIBRARY}
     ${LIBCASM_IR_LIBRARY}
     ${LIBPASS_LIBRARY}
     ${LIBSTDHL_LIBRARY}

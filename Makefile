@@ -43,7 +43,7 @@
 
 TARGET = libcasm-fe
 
-include .config.mk
+include .cmake/config.mk
 
 
 LX  = flex
