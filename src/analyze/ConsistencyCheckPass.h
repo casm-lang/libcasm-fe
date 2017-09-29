@@ -26,10 +26,7 @@
 #ifndef _LIB_CASMFE_CONSISTENCY_CHECK_PASS_H_
 #define _LIB_CASMFE_CONSISTENCY_CHECK_PASS_H_
 
-#include "../pass/src/Pass.h"
-#include "../pass/src/PassData.h"
-
-#include "../Specification.h"
+#include "TypeInferencePass.h"
 
 namespace libcasm_fe
 {
@@ -45,24 +42,7 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        class Data : public libpass::PassData
-        {
-          public:
-            using Ptr = std::shared_ptr< Data >;
-
-            Data( const Specification::Ptr& specification )
-            : m_specification( specification )
-            {
-            }
-
-            Specification::Ptr specification( void ) const
-            {
-                return m_specification;
-            }
-
-          private:
-            Specification::Ptr m_specification;
-        };
+        using Data = TypeInferencePass::Data;
     };
 }
 

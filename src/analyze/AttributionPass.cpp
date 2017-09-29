@@ -30,9 +30,6 @@
 #include "../pass/src/PassUsage.h"
 
 #include "Logger.h"
-
-#include "transform/SourceToAstPass.h"
-
 #include "Specification.h"
 #include "ast/RecursiveVisitor.h"
 #include "../ast/Definition.h"
@@ -273,7 +270,7 @@ u1 AttributionPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< AttributionPass >( libstdhl::make< Data >( specification ) );
+    pr.setResult< AttributionPass >( data );
 
     return true;
 }

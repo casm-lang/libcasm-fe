@@ -26,11 +26,7 @@
 #ifndef _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
 #define _LIB_CASMFE_SYMBOL_RESOLVER_PASS_H_
 
-#include "../pass/src/Pass.h"
-#include "../pass/src/PassData.h"
-
-#include "../Namespace.h"
-#include "../Specification.h"
+#include "SymbolRegistrationPass.h"
 
 namespace libcasm_fe
 {
@@ -46,32 +42,7 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        class Data : public libpass::PassData
-        {
-          public:
-            using Ptr = std::shared_ptr< Data >;
-
-            Data( const Specification::Ptr& specification,
-                const Namespace::Ptr& symboltable )
-            : m_specification( specification )
-            , m_symboltable( symboltable )
-            {
-            }
-
-            Specification::Ptr specification( void ) const
-            {
-                return m_specification;
-            }
-
-            Namespace::Ptr symboltable( void ) const
-            {
-                return m_symboltable;
-            }
-
-          private:
-            Specification::Ptr m_specification;
-            Namespace::Ptr m_symboltable;
-        };
+        using Data = SymbolRegistrationPass::Data;
     };
 }
 

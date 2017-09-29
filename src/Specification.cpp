@@ -25,11 +25,14 @@
 
 #include "Specification.h"
 
+#include "Namespace.h"
+
 using namespace libcasm_fe;
 
 Specification::Specification( void )
 : m_name()
 , m_definitions()
+, m_symboltable()
 {
 }
 
@@ -51,4 +54,14 @@ void Specification::setDefinitions( const Ast::Definitions::Ptr& definitions )
 const Ast::Definitions::Ptr& Specification::definitions( void ) const
 {
     return m_definitions;
+}
+
+const Namespace& Specification::symboltable( void ) const
+{
+    return m_symboltable;
+}
+
+Namespace& Specification::symboltable( void )
+{
+    return m_symboltable;
 }

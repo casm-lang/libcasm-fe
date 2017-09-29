@@ -31,7 +31,6 @@
 
 #include "../Logger.h"
 #include "../Namespace.h"
-#include "../analyze/TypeInferencePass.h"
 #include "../ast/RecursiveVisitor.h"
 
 #include "../casm-ir/src/Builtin.h"
@@ -292,9 +291,8 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
 
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
-    const auto symboltable = data->symboltable();
 
-    ConsistencyCheckVisitor visitor( log, *symboltable );
+    ConsistencyCheckVisitor visitor( log, specification->symboltable() );
     visitor.visit( *specification );
 
     const auto errors = log.errors();

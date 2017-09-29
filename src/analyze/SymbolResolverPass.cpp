@@ -30,7 +30,6 @@
 #include "../pass/src/PassUsage.h"
 
 #include "Logger.h"
-#include "analyze/SymbolRegistrationPass.h"
 #include "ast/RecursiveVisitor.h"
 
 #include "../casm-ir/src/Builtin.h"
@@ -463,15 +462,14 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
 
     const auto data = pr.result< SymbolRegistrationPass >();
     const auto specification = data->specification();
-    const auto symboltable = data->symboltable();
 
-    registerBasicTypes( *symboltable );
+    registerBasicTypes( specification->symboltable() );
 
-    SymbolResolveVisitor visitor( log, *symboltable );
+    SymbolResolveVisitor visitor( log, specification->symboltable() );
     specification->definitions()->accept( visitor );
 
 #ifndef NDEBUG
-    log.debug( "symbol table = \n" + symboltable->dump() );
+    log.debug( "symbol table = \n" + specification->symboltable().dump() );
 #endif
 
     const auto errors = log.errors();
@@ -481,8 +479,7 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< SymbolResolverPass >(
-        libstdhl::make< Data >( specification, symboltable ) );
+    pr.setResult< SymbolResolverPass >( data );
 
     return true;
 }

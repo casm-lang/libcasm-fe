@@ -573,13 +573,12 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
 
     const auto data = pr.result< SymbolResolverPass >();
     const auto specification = data->specification();
-    const auto symboltable = data->symboltable();
 
-    TypeCheckVisitor visitor( log, *symboltable );
+    TypeCheckVisitor visitor( log, specification->symboltable() );
     specification->definitions()->accept( visitor );
 
 #ifndef NDEBUG
-    log.debug( "symbol table = \n" + symboltable->dump() );
+    log.debug( "symbol table = \n" + specification->symboltable().dump() );
 #endif
 
     const auto errors = log.errors();
@@ -589,8 +588,7 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< TypeCheckPass >(
-        libstdhl::make< Data >( specification, symboltable ) );
+    pr.setResult< TypeCheckPass >( data );
 
     return true;
 }
