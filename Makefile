@@ -48,34 +48,11 @@ include .cmake/config.mk
 
 LX  = flex
 YC  = bison
-YF  = -Wall -v
+YF  = -Wall -v -g -x
 
 grammar: $(OBJ)/src/various/GrammarParser.cpp $(OBJ)/src/various/GrammarLexer.cpp
 .PHONY: grammar
 
-%/src/various/Grammar.org: src/various/Grammar.org
-	mkdir -p `dirname $@`
-	cp -f $< $@
-
-src/various/Grammar.org: src/GrammarParser.yy src/GrammarToken.hpp
-	grep -e "^[:|] [alpha]*" $< -B 1 | \
-		sed "/^  {/d" | \
-		sed "/^  }/d" | \
-		sed "/^--/d"  | \
-		sed "/^\t/d"  | \
-		sed "s/^[^:|]/\n&/" > $@
-
-%/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp
-	mkdir -p `dirname $@`
-	cp -f $< $@
-
-src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hpp
-	mkdir -p `dirname obj/$<`
-	head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	cat $(filter %.hpp,$^) | sed "/^\/\//d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
-	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
-	sed -i "/^{{grammartoken}}/d" obj/$<
-	cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
 
 %/src/various/GrammarLexer.cpp: src/various/GrammarLexer.cpp
 	mkdir -p `dirname $@`
@@ -89,3 +66,33 @@ src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
 	sed -i "/^{{grammartoken}}/d" obj/$<
 	$(LX) $(LFLAGS) -o $@ obj/$<
 	sed -i "s/#define yyFlexLexer yyFlexLexer//g" $@
+
+
+%/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp
+	mkdir -p `dirname $@`
+	cp -f $< $@
+
+src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hpp
+	mkdir -p `dirname obj/$<`
+	head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
+	cat $(filter %.hpp,$^) | sed "/^\/\//d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
+	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
+	sed -i "/^{{grammartoken}}/d" obj/$<
+	cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
+
+
+src/various/GrammarParser.output: src/various/GrammarParser.cpp
+
+
+%/src/various/Grammar.org: src/various/Grammar.org
+	mkdir -p `dirname $@`
+	cp -f $< $@
+
+src/various/Grammar.org: src/various/GrammarParser.output
+	grep -e "^[:|] [alpha]*" $< -B 1 | \
+		sed "/^  {/d" | \
+		sed "/^  }/d" | \
+		sed "/^--/d"  | \
+		sed "/^\t/d"  | \
+		sed "s/^[^:|]/\n&/" > $@
+

@@ -132,6 +132,10 @@ add_custom_target( ${PROJECT}-grammar ALL
     ${CXX_GRAMMAR_LEXER}
   )
 
+add_dependencies( ${PROJECT}-cpp
+  ${PROJECT}-grammar
+  )
+
 
 #
 # library
@@ -139,10 +143,6 @@ add_custom_target( ${PROJECT}-grammar ALL
 
 add_library( ${PROJECT} STATIC
   $<TARGET_OBJECTS:${PROJECT}-cpp>
-  )
-
-add_dependencies( ${PROJECT}
-  ${PROJECT}-grammar
   )
 
 if( ${LIBCASM_RT_FOUND} )
