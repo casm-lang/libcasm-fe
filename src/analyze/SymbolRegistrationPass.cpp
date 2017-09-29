@@ -171,11 +171,11 @@ u1 SymbolRegistrationPass::run( libpass::PassResult& pr )
     const auto data = pr.result< AttributionPass >();
     const auto specification = data->specification();
 
-    SymbolRegistrationVisitor visitor( log, specification->symboltable() );
+    SymbolRegistrationVisitor visitor( log, *specification->symboltable() );
     specification->definitions()->accept( visitor );
 
 #ifndef NDEBUG
-    log.debug( "symbol table = \n" + specification->symboltable().dump() );
+    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
 #endif
 
     const auto errors = log.errors();

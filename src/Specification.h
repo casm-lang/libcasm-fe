@@ -33,8 +33,6 @@
 
 namespace libcasm_fe
 {
-    class Namespace;
-
     class Specification
     {
       public:
@@ -48,13 +46,12 @@ namespace libcasm_fe
         void setDefinitions( const Ast::Definitions::Ptr& definitions );
         const Ast::Definitions::Ptr& definitions( void ) const;
 
-        const Namespace& symboltable( void ) const;
-        Namespace& symboltable( void );
+        const Namespace::Ptr& symboltable( void ) const;
 
       private:
         std::string m_name;
         Ast::Definitions::Ptr m_definitions;
-        Namespace m_symboltable;
+        Namespace::Ptr m_symboltable;
     };
 }
 

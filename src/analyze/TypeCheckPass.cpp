@@ -574,11 +574,11 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
     const auto data = pr.result< SymbolResolverPass >();
     const auto specification = data->specification();
 
-    TypeCheckVisitor visitor( log, specification->symboltable() );
+    TypeCheckVisitor visitor( log, *specification->symboltable() );
     specification->definitions()->accept( visitor );
 
 #ifndef NDEBUG
-    log.debug( "symbol table = \n" + specification->symboltable().dump() );
+    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
 #endif
 
     const auto errors = log.errors();

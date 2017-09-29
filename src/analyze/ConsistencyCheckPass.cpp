@@ -292,7 +292,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
 
-    ConsistencyCheckVisitor visitor( log, specification->symboltable() );
+    ConsistencyCheckVisitor visitor( log, *specification->symboltable() );
     visitor.visit( *specification );
 
     const auto errors = log.errors();
