@@ -177,6 +177,11 @@ install(
   "include/${PROJECT}"
   )
 
+export(
+  TARGETS ${PROJECT}
+  FILE    ${PROJECT}Config.cmake
+  )
+
 
 #
 # test
