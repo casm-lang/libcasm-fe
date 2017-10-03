@@ -619,6 +619,7 @@ class UpdateSetManager
      */
     void rollback()
     {
+        assert( not m_updateSets.empty() );
         m_updateSets.pop_back();
     }
 
