@@ -675,6 +675,14 @@ class UpdateSetTransaction
         manager->fork( semantics, initialSize );
     }
 
+    ~UpdateSetTransaction()
+    {
+        if( m_forked )
+        {
+            rollback();
+        }
+    }
+
     void merge( void )
     {
         if( m_forked )
@@ -690,14 +698,6 @@ class UpdateSetTransaction
         {
             m_manager->rollback();
             m_forked = false;
-        }
-    }
-
-    ~UpdateSetTransaction()
-    {
-        if( m_forked )
-        {
-            rollback();
         }
     }
 
