@@ -678,16 +678,8 @@ class UpdateSetForkGuard
         typename UpdateSet::Semantics semantics, std::size_t initialSize )
     : m_manager( manager )
     {
-        if( manager->empty()
-            or ( manager->currentUpdateSet()->semantics() != semantics ) )
-        {
-            manager->fork( semantics, initialSize );
-            m_state = State::FORKED;
-        }
-        else
-        {
-            m_state = State::MERGED;
-        }
+        manager->fork( semantics, initialSize );
+        m_state = State::FORKED;
     }
 
     void merge( void )
