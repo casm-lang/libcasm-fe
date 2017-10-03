@@ -664,7 +664,7 @@ class UpdateSetManager
 };
 
 template < typename UpdateSet >
-class UpdateSetForkGuard
+class UpdateSetTransaction
 {
     enum class State
     {
@@ -674,7 +674,7 @@ class UpdateSetForkGuard
     };
 
   public:
-    UpdateSetForkGuard( UpdateSetManager< UpdateSet >* manager,
+    UpdateSetTransaction( UpdateSetManager< UpdateSet >* manager,
         typename UpdateSet::Semantics semantics, std::size_t initialSize )
     : m_manager( manager )
     {
@@ -700,7 +700,7 @@ class UpdateSetForkGuard
         }
     }
 
-    ~UpdateSetForkGuard()
+    ~UpdateSetTransaction()
     {
         if( m_state != State::MERGED )
         {

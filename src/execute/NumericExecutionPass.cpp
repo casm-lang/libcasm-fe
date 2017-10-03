@@ -154,7 +154,7 @@ struct UpdateSetDetails
 };
 
 using ExecutionUpdateSet = UpdateSet< UpdateSetDetails >;
-using ForkGuard = UpdateSetForkGuard< ExecutionUpdateSet >;
+using Transaction = UpdateSetTransaction< ExecutionUpdateSet >;
 using Semantics = ExecutionUpdateSet::Semantics;
 
 static std::string updateAsString( const ExecutionUpdateSet::Update& update )
@@ -1011,7 +1011,7 @@ void ExecutionVisitor::visit( LetRule& node )
 
 void ExecutionVisitor::visit( ForallRule& node )
 {
-    ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
 
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
@@ -1034,7 +1034,7 @@ void ExecutionVisitor::visit( ForallRule& node )
 
     try
     {
-        parGuard.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1064,27 +1064,27 @@ void ExecutionVisitor::visit( ChooseRule& node )
 
 void ExecutionVisitor::visit( IterateRule& node )
 {
-    ForkGuard seqGuard( &m_updateSetManager, Semantics::Sequential, 100UL );
+    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100UL );
 
     while( true )
     {
         // uses a new parallel update set on each iteration only to check if the
         // current iteration actually produced any updates
-        ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
+        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100UL );
         node.rule()->accept( *this );
         if( hasEmptyUpdateSet() )
         {
             // the current iteration hasn't produced any updates -> done
             break;
         }
-        parGuard.merge(); // should not throw a merge conflict because of the
+        parTrans.merge(); // should not throw a merge conflict because of the
                           // surrounding sequential block, thus no conflict
                           // handling required
     }
 
     try
     {
-        seqGuard.merge();
+        seqTrans.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1094,12 +1094,12 @@ void ExecutionVisitor::visit( IterateRule& node )
 
 void ExecutionVisitor::visit( BlockRule& node )
 {
-    ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
     node.rules()->accept( *this );
 
     try
     {
-        parGuard.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1109,12 +1109,12 @@ void ExecutionVisitor::visit( BlockRule& node )
 
 void ExecutionVisitor::visit( SequenceRule& node )
 {
-    ForkGuard seqGuard( &m_updateSetManager, Semantics::Sequential, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100UL );
     node.rules()->accept( *this );
 
     try
     {
-        seqGuard.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1374,11 +1374,11 @@ void StateInitializationVisitor::visit( Specification& node )
 
 void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
-    ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
     ExecutionVisitor executionVisitor( m_locationRegistry, m_globalState,
         m_updateSetManager, ReferenceConstant() );
     node.initializers()->accept( executionVisitor );
-    parGuard.merge();
+    transaction.merge();
 }
 
 class Agent
