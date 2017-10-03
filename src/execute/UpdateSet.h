@@ -666,43 +666,36 @@ class UpdateSetManager
 template < typename UpdateSet >
 class UpdateSetTransaction
 {
-    enum class State
-    {
-        FORKED,
-        MERGED,
-        REVERTED
-    };
-
   public:
     UpdateSetTransaction( UpdateSetManager< UpdateSet >* manager,
         typename UpdateSet::Semantics semantics, std::size_t initialSize )
     : m_manager( manager )
+    , m_forked( true )
     {
         manager->fork( semantics, initialSize );
-        m_state = State::FORKED;
     }
 
     void merge( void )
     {
-        if( m_state == State::FORKED )
+        if( m_forked )
         {
             m_manager->merge();
-            m_state = State::MERGED;
+            m_forked = false;
         }
     }
 
     void rollback( void )
     {
-        if( m_state == State::FORKED )
+        if( m_forked )
         {
             m_manager->rollback();
-            m_state = State::REVERTED;
+            m_forked = false;
         }
     }
 
     ~UpdateSetTransaction()
     {
-        if( m_state != State::MERGED )
+        if( m_forked )
         {
             rollback();
         }
@@ -710,7 +703,7 @@ class UpdateSetTransaction
 
   private:
     UpdateSetManager< UpdateSet >* m_manager;
-    State m_state;
+    bool m_forked;
 };
 
 #endif // _LIBCASM_FE_UPDATESET_H_
