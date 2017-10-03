@@ -76,6 +76,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
     void visit( Specification& node );
 
+    void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
 
@@ -120,14 +121,15 @@ void ConsistencyCheckVisitor::visit( Specification& node )
     node.definitions()->accept( *this );
 }
 
+void ConsistencyCheckVisitor::visit( VariableDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 {
     verify( *node.returnType() );
-
-    for( auto arg : *node.argumentTypes() )
-    {
-        verify( *arg );
-    }
 
     m_functionInitially = true;
 
@@ -144,11 +146,6 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 
 void ConsistencyCheckVisitor::visit( DerivedDefinition& node )
 {
-    for( auto arg : *node.arguments() )
-    {
-        verify( *arg );
-    }
-
     m_sideEffectFree = true;
 
     RecursiveVisitor::visit( node );
