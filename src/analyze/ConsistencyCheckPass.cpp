@@ -88,6 +88,11 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
 
+    void visit( BasicType& node ) override;
+    void visit( ComposedType& node ) override;
+    void visit( FixedSizedType& node ) override;
+    void visit( RelationType& node ) override;
+
     void verify( const TypedNode& node );
 
   private:
@@ -129,8 +134,6 @@ void ConsistencyCheckVisitor::visit( VariableDefinition& node )
 
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 {
-    verify( *node.returnType() );
-
     m_functionInitially = true;
 
     node.initializers()->accept( *this );
@@ -281,6 +284,30 @@ void ConsistencyCheckVisitor::visit( CallRule& node )
             call->targetTypeName() + " is not allowed to be called",
             Code::Unspecified );
     }
+}
+
+void ConsistencyCheckVisitor::visit( BasicType& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( ComposedType& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( FixedSizedType& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( RelationType& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
 }
 
 void ConsistencyCheckVisitor::verify( const TypedNode& node )
