@@ -46,7 +46,7 @@ CASM            "CASM"          { return Parser::make_CASM(loc); }
 INIT            "init"          { return Parser::make_INIT(loc); }
 
 DERIVED         "derived"       { return Parser::make_DERIVED(loc); }
-ENUM            "enum"          { return Parser::make_ENUM(loc); }
+ENUMERATION     "enumeration"   { return Parser::make_ENUMERATION(loc); }
 RULE            "rule"          { return Parser::make_RULE(loc); }
 
 FUNCTION        "function"      { return Parser::make_FUNCTION(loc); }

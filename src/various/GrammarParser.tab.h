@@ -513,7 +513,7 @@ namespace libcasm_fe {
         CASM = 258,
         INIT = 259,
         DERIVED = 260,
-        ENUM = 261,
+        ENUMERATION = 261,
         RULE = 262,
         FUNCTION = 263,
         INITIALLY = 264,
@@ -816,7 +816,7 @@ namespace libcasm_fe {
 
     static inline
     symbol_type
-    make_ENUM (const location_type& l);
+    make_ENUMERATION (const location_type& l);
 
     static inline
     symbol_type
@@ -2908,9 +2908,9 @@ namespace libcasm_fe {
   }
 
   Parser::symbol_type
-  Parser::make_ENUM (const location_type& l)
+  Parser::make_ENUMERATION (const location_type& l)
   {
-    return symbol_type (token::ENUM, l);
+    return symbol_type (token::ENUMERATION, l);
   }
 
   Parser::symbol_type

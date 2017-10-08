@@ -533,7 +533,7 @@ DerivedDefinition
 
 
 EnumerationDefinition
-: ENUM Identifier EQUAL LCURPAREN Identifiers RCURPAREN
+: ENUMERATION Identifier EQUAL LCURPAREN Identifiers RCURPAREN
   {
       $$ = Ast::make< EnumerationDefinition >( @$, $2, $5 );
   }

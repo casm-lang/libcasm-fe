@@ -46,7 +46,7 @@ Grammar
 
    30 DerivedDefinition: "derived" Identifier MaybeParameters "->" Type "=" Term
 
-   31 EnumerationDefinition: "enum" Identifier "=" "{" Identifiers "}"
+   31 EnumerationDefinition: "enumeration" Identifier "=" "{" Identifiers "}"
 
    32 Identifier: "identifier"
    33           | "in"
@@ -257,7 +257,7 @@ error (256) 6 47 89 113 117 147 159 160 163 164
 "CASM" (258) 1
 "init" (259) 21 22
 "derived" (260) 30
-"enum" (261) 31
+"enumeration" (261) 31
 "rule" (262) 128 129
 "function" (263) 11
 "initially" (264) 13
@@ -503,13 +503,13 @@ State 1
 
     1 Specification: "CASM" . Definitions
 
-    error       shift, and go to state 3
-    "init"      shift, and go to state 4
-    "derived"   shift, and go to state 5
-    "enum"      shift, and go to state 6
-    "rule"      shift, and go to state 7
-    "function"  shift, and go to state 8
-    "["         shift, and go to state 9
+    error          shift, and go to state 3
+    "init"         shift, and go to state 4
+    "derived"      shift, and go to state 5
+    "enumeration"  shift, and go to state 6
+    "rule"         shift, and go to state 7
+    "function"     shift, and go to state 8
+    "["            shift, and go to state 9
 
     Definition                 go to state 10
     AttributedDefinition       go to state 11
@@ -562,7 +562,7 @@ State 5
 
 State 6
 
-   31 EnumerationDefinition: "enum" . Identifier "=" "{" Identifiers "}"
+   31 EnumerationDefinition: "enumeration" . Identifier "=" "{" Identifiers "}"
 
     "in"          shift, and go to state 19
     "identifier"  shift, and go to state 22
@@ -624,13 +624,13 @@ State 12
     1 Specification: "CASM" Definitions .
     9 Definitions: Definitions . AttributedDefinition
 
-    error       shift, and go to state 3
-    "init"      shift, and go to state 4
-    "derived"   shift, and go to state 5
-    "enum"      shift, and go to state 6
-    "rule"      shift, and go to state 7
-    "function"  shift, and go to state 8
-    "["         shift, and go to state 9
+    error          shift, and go to state 3
+    "init"         shift, and go to state 4
+    "derived"      shift, and go to state 5
+    "enumeration"  shift, and go to state 6
+    "rule"         shift, and go to state 7
+    "function"     shift, and go to state 8
+    "["            shift, and go to state 9
 
     "end of file"  reduce using rule 1 (Specification)
 
@@ -806,7 +806,7 @@ State 26
 
 State 27
 
-   31 EnumerationDefinition: "enum" Identifier . "=" "{" Identifiers "}"
+   31 EnumerationDefinition: "enumeration" Identifier . "=" "{" Identifiers "}"
 
     "="  shift, and go to state 85
 
@@ -1644,7 +1644,7 @@ State 84
 
 State 85
 
-   31 EnumerationDefinition: "enum" Identifier "=" . "{" Identifiers "}"
+   31 EnumerationDefinition: "enumeration" Identifier "=" . "{" Identifiers "}"
 
     "{"  shift, and go to state 140
 
@@ -1783,12 +1783,12 @@ State 90
 
     7 AttributedDefinition: "[" Attributes "]" . Definition
 
-    error       shift, and go to state 3
-    "init"      shift, and go to state 4
-    "derived"   shift, and go to state 5
-    "enum"      shift, and go to state 6
-    "rule"      shift, and go to state 7
-    "function"  shift, and go to state 8
+    error          shift, and go to state 3
+    "init"         shift, and go to state 4
+    "derived"      shift, and go to state 5
+    "enumeration"  shift, and go to state 6
+    "rule"         shift, and go to state 7
+    "function"     shift, and go to state 8
 
     Definition                 go to state 152
     FunctionDefinition         go to state 13
@@ -3353,7 +3353,7 @@ State 139
 
 State 140
 
-   31 EnumerationDefinition: "enum" Identifier "=" "{" . Identifiers "}"
+   31 EnumerationDefinition: "enumeration" Identifier "=" "{" . Identifiers "}"
 
     "in"          shift, and go to state 19
     "identifier"  shift, and go to state 22
@@ -4808,7 +4808,7 @@ State 197
 
 State 198
 
-   31 EnumerationDefinition: "enum" Identifier "=" "{" Identifiers . "}"
+   31 EnumerationDefinition: "enumeration" Identifier "=" "{" Identifiers . "}"
    34 Identifiers: Identifiers . "," Identifier
 
     "}"  shift, and go to state 246
@@ -5861,7 +5861,7 @@ State 245
 
 State 246
 
-   31 EnumerationDefinition: "enum" Identifier "=" "{" Identifiers "}" .
+   31 EnumerationDefinition: "enumeration" Identifier "=" "{" Identifiers "}" .
 
     $default  reduce using rule 31 (EnumerationDefinition)
 
