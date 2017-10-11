@@ -454,6 +454,27 @@ class HashMapBase
         }
     }
 
+    void clear()
+    {
+        if( empty() )
+        {
+            return;
+        }
+
+        for( auto entry = m_lastEntry; entry != nullptr; entry = entry->prev )
+        {
+            entry->~Entry();
+        }
+        m_entryAllocator.freeAll();
+
+        std::memset( m_buckets, 0, sizeof( Bucket ) * m_capacity );
+
+        m_size = 0UL;
+        m_lastEntry = nullptr;
+
+        assert( empty() );
+    }
+
 #ifdef HASH_MAP_PERF
     HashMapPerformanceStatistics performanceStatistics() const
     {
