@@ -213,44 +213,19 @@ void AstDumpSourceVisitor::visit( VariableDefinition& node )
 
 void AstDumpSourceVisitor::visit( FunctionDefinition& node )
 {
-    m_stream << "function ";
-    std::string classification;
-    switch( node.classification() )
-    {
-        case FunctionDefinition::Classification::IN:
-            classification = "in";
-            break;
-        case FunctionDefinition::Classification::CONTROLLED:
-            classification = "controlled";
-            break;
-        case FunctionDefinition::Classification::SHARED:
-            classification = "shared";
-            break;
-        case FunctionDefinition::Classification::OUT:
-            classification = "out";
-            break;
-        case FunctionDefinition::Classification::STATIC:
-            classification = "static";
-            break;
-    }
-    if( node.symbolic() )
-    {
-        m_stream << "(symbolic, " + classification + ") ";
-    }
-    else
-    {
-        m_stream << "(" + classification + ") ";
-    }
+    m_stream << m_indentation << "[";
+    node.attributes()->accept( *this );
+    m_stream << "]\n" << m_indentation << "function ";
     node.identifier()->accept( *this );
     m_stream << " : ";
     bool firstArgType = true;
-    for( auto& t : *node.argumentTypes() )
+    for( const auto& argumentType : *node.argumentTypes() )
     {
         if( not firstArgType )
         {
             m_stream << " * ";
         }
-        t->accept( *this );
+        argumentType->accept( *this );
         firstArgType = false;
     }
     m_stream << " -> ";
@@ -258,76 +233,83 @@ void AstDumpSourceVisitor::visit( FunctionDefinition& node )
     m_stream << " default { ";
     node.defaultValue()->accept( *this );
     m_stream << " } initially { ";
-    bool firstInitializer = true;
-    for( auto& i : *node.initializers() )
     {
-        if( not firstInitializer )
+        bool firstInitializer = true;
+        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        for( const auto& initializer : *node.initializers() )
         {
-            m_stream << ", ";
+            if( not firstInitializer )
+            {
+                m_stream << ",";
+            }
+            m_stream << "\n";
+            initializer->accept( *this );
+            firstInitializer = false;
         }
-        i->accept( *this );
-        firstInitializer = false;
     }
     m_stream << " }";
 }
 
 void AstDumpSourceVisitor::visit( DerivedDefinition& node )
 {
-    m_stream << "derived ";
+    m_stream << m_indentation << "derived ";
     node.identifier()->accept( *this );
     m_stream << "(";
     bool firstArg = true;
-    for( auto& a : *node.arguments() )
+    for( const auto& argument : *node.arguments() )
     {
         if( not firstArg )
         {
             m_stream << ", ";
         }
-        a->accept( *this );
+        argument->accept( *this );
         firstArg = false;
     }
     m_stream << ") -> ";
     node.returnType()->accept( *this );
-    const auto levelGuard = Indentation::NextLevel( m_indentation );
     m_stream << " =\n" << m_indentation;
+
+    const auto levelGuard = Indentation::NextLevel( m_indentation );
+    m_stream << m_indentation;
     node.expression()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( RuleDefinition& node )
 {
-    m_stream << "rule ";
+    m_stream << m_indentation << "rule ";
     node.identifier()->accept( *this );
     m_stream << "(";
     bool firstArg = true;
-    for( auto& a : *node.arguments() )
+    for( auto& argument : *node.arguments() )
     {
         if( not firstArg )
         {
             m_stream << ", ";
         }
-        a->accept( *this );
+        argument->accept( *this );
         firstArg = false;
     }
     m_stream << ") -> ";
     node.returnType()->accept( *this );
     m_stream << " =\n";
+
     const auto levelGuard = Indentation::NextLevel( m_indentation );
     node.rule()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( EnumerationDefinition& node )
 {
-    m_stream << "enum ";
+    m_stream << m_indentation << "enum ";
     node.identifier()->accept( *this );
     m_stream << " = {";
     bool firstEnumerator = true;
-    for( auto& e : *node.enumerators() )
+    for( const auto& enumerator : *node.enumerators() )
     {
         if( not firstEnumerator )
         {
             m_stream << ", ";
         }
-        e->accept( *this );
+        enumerator->accept( *this );
         firstEnumerator = false;
     }
     m_stream << "}";
@@ -356,13 +338,13 @@ void AstDumpSourceVisitor::visit( DirectCallExpression& node )
     {
         m_stream << "(";
         bool firstArg = true;
-        for( auto& a : *node.arguments() )
+        for( const auto& argument : *node.arguments() )
         {
             if( not firstArg )
             {
                 m_stream << ", ";
             }
-            a->accept( *this );
+            argument->accept( *this );
             firstArg = false;
         }
         m_stream << ")";
@@ -375,13 +357,13 @@ void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
     node.expression()->accept( *this );
     m_stream << ")(";
     bool firstArg = true;
-    for( auto& a : *node.arguments() )
+    for( const auto& argument : *node.arguments() )
     {
         if( not firstArg )
         {
             m_stream << ", ";
         }
-        a->accept( *this );
+        argument->accept( *this );
         firstArg = false;
     }
     m_stream << ")";
@@ -395,9 +377,11 @@ void AstDumpSourceVisitor::visit( UnaryExpression& node )
 
 void AstDumpSourceVisitor::visit( BinaryExpression& node )
 {
+    m_stream << "(";
     node.left()->accept( *this );
     m_stream << " " << ir::Value::token( node.op() ) << " ";
     node.right()->accept( *this );
+    m_stream << ")";
 }
 
 void AstDumpSourceVisitor::visit( RangeExpression& node )
@@ -413,13 +397,13 @@ void AstDumpSourceVisitor::visit( ListExpression& node )
 {
     m_stream << "[";
     bool firstExpr = true;
-    for( auto& e : *node.expressions() )
+    for( const auto& expression : *node.expressions() )
     {
         if( not firstExpr )
         {
             m_stream << ", ";
         }
-        e->accept( *this );
+        expression->accept( *this );
         firstExpr = false;
     }
     m_stream << "]";
@@ -501,10 +485,10 @@ void AstDumpSourceVisitor::visit( CaseRule& node )
     m_stream << m_indentation << "case ";
     node.expression()->accept( *this );
     m_stream << " of\n" << m_indentation << "{\n";
-    for( auto& c : *node.cases() )
+    for( const auto& _case : *node.cases() )
     {
         const auto levelGuard = Indentation::NextLevel( m_indentation );
-        c->accept( *this );
+        _case->accept( *this );
         m_stream << "\n";
     }
     m_stream << m_indentation << "}";
@@ -564,9 +548,9 @@ void AstDumpSourceVisitor::visit( BlockRule& node )
         const auto levelGuard = Indentation::PreviousLevel( m_indentation );
         m_stream << m_indentation << "{\n";
     }
-    for( auto& r : *node.rules() )
+    for( const auto& rule : *node.rules() )
     {
-        r->accept( *this );
+        rule->accept( *this );
         m_stream << "\n";
     }
     {
@@ -581,9 +565,9 @@ void AstDumpSourceVisitor::visit( SequenceRule& node )
         const auto levelGuard = Indentation::PreviousLevel( m_indentation );
         m_stream << m_indentation << "{|\n";
     }
-    for( auto& r : *node.rules() )
+    for( const auto& rule : *node.rules() )
     {
-        r->accept( *this );
+        rule->accept( *this );
         m_stream << "\n";
     }
     {
@@ -621,13 +605,13 @@ void AstDumpSourceVisitor::visit( ComposedType& node )
     node.name()->accept( *this );
     m_stream << "<";
     bool firstSubType = true;
-    for( auto& s : *node.subTypes() )
+    for( const auto& subType : *node.subTypes() )
     {
         if( not firstSubType )
         {
             m_stream << ", ";
         }
-        s->accept( *this );
+        subType->accept( *this );
         firstSubType = false;
     }
     m_stream << ">";
@@ -644,36 +628,31 @@ void AstDumpSourceVisitor::visit( FixedSizedType& node )
 void AstDumpSourceVisitor::visit( RelationType& node )
 {
     m_stream << "<";
-
-    u1 first = true;
-    for( auto& s : *node.argumentTypes() )
+    bool firstArgType = true;
+    for( const auto& argumentType : *node.argumentTypes() )
     {
-        m_stream << ( first ? "" : " * " );
-        s->accept( *this );
-        first = false;
+        if( not firstArgType )
+        {
+            m_stream << " * ";
+        }
+        argumentType->accept( *this );
+        firstArgType = false;
     }
-
     m_stream << " -> ";
-
     node.returnType()->accept( *this );
-
     m_stream << ">";
 }
 
 void AstDumpSourceVisitor::visit( BasicAttribute& node )
 {
-    m_stream << "[ ";
     node.identifier()->accept( *this );
-    m_stream << " ]\n";
 }
 
 void AstDumpSourceVisitor::visit( ExpressionAttribute& node )
 {
-    m_stream << "[ ";
     node.identifier()->accept( *this );
     m_stream << " ";
     node.expression()->accept( *this );
-    m_stream << " ]\n";
 }
 
 void AstDumpSourceVisitor::visit( Identifier& node )
@@ -691,6 +670,7 @@ void AstDumpSourceVisitor::visit( ExpressionCase& node )
     m_stream << m_indentation;
     node.expression()->accept( *this );
     m_stream << ":\n";
+
     const auto levelGuard = Indentation::NextLevel( m_indentation );
     node.rule()->accept( *this );
 }
@@ -698,6 +678,7 @@ void AstDumpSourceVisitor::visit( ExpressionCase& node )
 void AstDumpSourceVisitor::visit( DefaultCase& node )
 {
     m_stream << m_indentation << "default:\n";
+
     const auto levelGuard = Indentation::NextLevel( m_indentation );
     node.rule()->accept( *this );
 }
