@@ -50,6 +50,7 @@ Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 : TypedNode( type )
 , m_identifier( identifier )
 , m_attributes( std::make_shared< Attributes >() )
+, m_maxNumberOfLocals( 0 )
 {
 }
 
@@ -66,6 +67,16 @@ void Definition::setAttributes( const Attributes::Ptr& attributes )
 const Attributes::Ptr& Definition::attributes( void ) const
 {
     return m_attributes;
+}
+
+void Definition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )
+{
+    m_maxNumberOfLocals = maxNumberOfLocals;
+}
+
+std::size_t Definition::maximumNumberOfLocals( void ) const
+{
+    return m_maxNumberOfLocals;
 }
 
 VariableDefinition::VariableDefinition(
@@ -229,7 +240,6 @@ DerivedDefinition::DerivedDefinition( const Identifier::Ptr& identifier,
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_expression( expression )
-, m_maxNumberOfLocals( 0 )
 {
 }
 
@@ -249,17 +259,6 @@ const Expression::Ptr& DerivedDefinition::expression( void ) const
     return m_expression;
 }
 
-void DerivedDefinition::setMaximumNumberOfLocals(
-    std::size_t maxNumberOfLocals )
-{
-    m_maxNumberOfLocals = maxNumberOfLocals;
-}
-
-std::size_t DerivedDefinition::maximumNumberOfLocals( void ) const
-{
-    return m_maxNumberOfLocals;
-}
-
 void DerivedDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -273,7 +272,6 @@ RuleDefinition::RuleDefinition( const Identifier::Ptr& identifier,
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_rule( rule )
-, m_maxNumberOfLocals( 0 )
 {
 }
 
@@ -291,16 +289,6 @@ const Type::Ptr& RuleDefinition::returnType( void ) const
 const Rule::Ptr& RuleDefinition::rule( void ) const
 {
     return m_rule;
-}
-
-void RuleDefinition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )
-{
-    m_maxNumberOfLocals = maxNumberOfLocals;
-}
-
-std::size_t RuleDefinition::maximumNumberOfLocals( void ) const
-{
-    return m_maxNumberOfLocals;
 }
 
 void RuleDefinition::accept( Visitor& visitor )

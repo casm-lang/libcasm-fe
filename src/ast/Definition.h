@@ -65,9 +65,18 @@ namespace libcasm_fe
             void setAttributes( const Attributes::Ptr& attributes );
             const Attributes::Ptr& attributes( void ) const;
 
+            /**
+             * Sets the number of required frame local slots.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
+            std::size_t maximumNumberOfLocals( void ) const;
+
           private:
             const Identifier::Ptr m_identifier;
             Attributes::Ptr m_attributes;
+            std::size_t m_maxNumberOfLocals;
         };
 
         using Definitions = NodeList< Definition >;
@@ -170,21 +179,12 @@ namespace libcasm_fe
             const Type::Ptr& returnType( void ) const;
             const Expression::Ptr& expression( void ) const;
 
-            /**
-             * Sets the number of required frame local slots.
-             *
-             * @note Assigned by SymbolResolved and used during execution
-             */
-            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
-            std::size_t maximumNumberOfLocals( void ) const;
-
             void accept( Visitor& visitor ) override final;
 
           private:
             const NodeList< VariableDefinition >::Ptr m_arguments;
             const Type::Ptr m_returnType;
             const Expression::Ptr m_expression;
-            std::size_t m_maxNumberOfLocals;
         };
 
         class RuleDefinition final : public Definition
@@ -202,21 +202,12 @@ namespace libcasm_fe
             const Type::Ptr& returnType( void ) const;
             const Rule::Ptr& rule( void ) const;
 
-            /**
-             * Sets the number of required frame local slots.
-             *
-             * @note Assigned by SymbolResolved and used during execution
-             */
-            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
-            std::size_t maximumNumberOfLocals( void ) const;
-
             void accept( Visitor& visitor ) override final;
 
           private:
             const NodeList< VariableDefinition >::Ptr m_arguments;
             const Type::Ptr m_returnType;
             const Rule::Ptr m_rule;
-            std::size_t m_maxNumberOfLocals;
         };
 
         class EnumerationDefinition final : public Definition

@@ -549,32 +549,15 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 {
     switch( node.targetType() )
     {
-        case CallExpression::TargetType::FUNCTION:
-        {
-            const auto& definition = node.targetDefinition();
-            m_frameStack.push( makeFrame(
-                &node, definition.get(), node.arguments()->size() ) );
-            definition->accept( *this );
-            m_frameStack.pop();
-            break;
-        }
-        case CallExpression::TargetType::DERIVED:
-        {
-            const auto& derived = std::static_pointer_cast< DerivedDefinition >(
-                node.targetDefinition() );
-            m_frameStack.push( makeFrame(
-                &node, derived.get(), derived->maximumNumberOfLocals() ) );
-            derived->accept( *this );
-            m_frameStack.pop();
-            break;
-        }
+        case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
         case CallExpression::TargetType::RULE:
         {
-            const auto& rule = std::static_pointer_cast< RuleDefinition >(
+            const auto& definition = std::static_pointer_cast< Definition >(
                 node.targetDefinition() );
             m_frameStack.push(
-                makeFrame( &node, rule.get(), rule->maximumNumberOfLocals() ) );
-            rule->accept( *this );
+                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
             m_frameStack.pop();
             break;
         }
@@ -634,31 +617,15 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
     const auto& atom = value.value();
     switch( atom->referenceType() )
     {
-        case ReferenceAtom::ReferenceType::FUNCTION:
-        {
-            m_frameStack.push( makeFrame(
-                &node, atom->reference().get(), node.arguments()->size() ) );
-            atom->reference()->accept( *this );
-            m_frameStack.pop();
-            break;
-        }
-        case ReferenceAtom::ReferenceType::DERIVED:
-        {
-            const auto& derived = std::static_pointer_cast< DerivedDefinition >(
-                atom->reference() );
-            m_frameStack.push( makeFrame(
-                &node, derived.get(), derived->maximumNumberOfLocals() ) );
-            derived->accept( *this );
-            m_frameStack.pop();
-            break;
-        }
+        case ReferenceAtom::ReferenceType::FUNCTION: // [[fallthrough]]
+        case ReferenceAtom::ReferenceType::DERIVED:  // [[fallthrough]]
         case ReferenceAtom::ReferenceType::RULE:
         {
-            const auto& rule = std::static_pointer_cast< RuleDefinition >(
+            const auto& definition = std::static_pointer_cast< Definition >(
                 atom->reference() );
             m_frameStack.push(
-                makeFrame( &node, rule.get(), rule->maximumNumberOfLocals() ) );
-            rule->accept( *this );
+                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
             m_frameStack.pop();
             break;
         }

@@ -68,6 +68,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
   public:
     SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
+    void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
 
@@ -133,6 +134,13 @@ SymbolResolveVisitor::SymbolResolveVisitor(
 , m_symboltable( symboltable )
 , m_maxNumberOfLocals( 0 )
 {
+}
+
+void SymbolResolveVisitor::visit( FunctionDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    node.setMaximumNumberOfLocals( node.argumentTypes()->size() );
 }
 
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
