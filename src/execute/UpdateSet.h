@@ -326,6 +326,14 @@ class UpdateSet
     }
 
     /**
+     * Removes all updates from the update-set.
+     */
+    void clear()
+    {
+        m_set.clear();
+    }
+
+    /**
      * @return Iterator to the beginning of the update-set
      */
     const_iterator begin() const noexcept
