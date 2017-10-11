@@ -313,10 +313,6 @@ Definition
   {
       $$ = $1;
   }
-| error // error recovery
-  {
-      $$ = nullptr;
-  }
 ;
 
 
@@ -330,6 +326,10 @@ AttributedDefinition
 | Definition
   {
       $$ = $1;
+  }
+| error // error recovery
+  {
+      $$ = nullptr;
   }
 ;
 

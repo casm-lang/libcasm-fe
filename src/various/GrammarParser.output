@@ -8,10 +8,10 @@ Grammar
     3           | DerivedDefinition
     4           | RuleDefinition
     5           | EnumerationDefinition
-    6           | error
 
-    7 AttributedDefinition: "[" Attributes "]" Definition
-    8                     | Definition
+    6 AttributedDefinition: "[" Attributes "]" Definition
+    7                     | Definition
+    8                     | error
 
     9 Definitions: Definitions AttributedDefinition
    10            | AttributedDefinition
@@ -253,7 +253,7 @@ Grammar
 Terminals, with rules where they appear
 
 "end of file" (0) 0
-error (256) 6 47 89 113 117 147 159 160 163 164
+error (256) 8 47 89 113 117 147 159 160 163 164
 "CASM" (258) 1
 "init" (259) 21 22
 "derived" (260) 30
@@ -296,8 +296,8 @@ error (256) 6 47 89 113 117 147 159 160 163 164
 "=" (297) 30 31 99 123 128 129 153
 "(" (298) 46 47 88 89 116 117 118 119 122
 ")" (299) 46 47 88 89 116 117 118 119 122
-"[" (300) 7 42 110 111 112 113
-"]" (301) 7 42 110 111 112 113
+"[" (300) 6 42 110 111 112 113
+"]" (301) 6 42 110 111 112 113
 "{" (302) 13 15 22 31 146 147 157 159
 "}" (303) 13 15 22 31 146 147 157 159
 ":" (304) 11 40 148 149 150
@@ -341,9 +341,9 @@ $accept (81)
 Specification (82)
     on left: 1, on right: 0
 Definition (83)
-    on left: 2 3 4 5 6, on right: 7 8
+    on left: 2 3 4 5, on right: 6 7
 AttributedDefinition (84)
-    on left: 7 8, on right: 9 10
+    on left: 6 7 8, on right: 9 10
 Definitions (85)
     on left: 9 10, on right: 1 9
 FunctionDefinition (86)
@@ -483,7 +483,7 @@ CallRule (149)
 Attribute (150)
     on left: 170 171, on right: 172 173
 Attributes (151)
-    on left: 172 173, on right: 7 42 172
+    on left: 172 173, on right: 6 42 172
 BasicAttribute (152)
     on left: 174, on right: 170
 ExpressionAttribute (153)
@@ -530,9 +530,9 @@ State 2
 
 State 3
 
-    6 Definition: error .
+    8 AttributedDefinition: error .
 
-    $default  reduce using rule 6 (Definition)
+    $default  reduce using rule 8 (AttributedDefinition)
 
 
 State 4
@@ -593,7 +593,7 @@ State 8
 
 State 9
 
-    7 AttributedDefinition: "[" . Attributes "]" Definition
+    6 AttributedDefinition: "[" . Attributes "]" Definition
 
     "in"          shift, and go to state 19
     "identifier"  shift, and go to state 22
@@ -607,9 +607,9 @@ State 9
 
 State 10
 
-    8 AttributedDefinition: Definition .
+    7 AttributedDefinition: Definition .
 
-    $default  reduce using rule 8 (AttributedDefinition)
+    $default  reduce using rule 7 (AttributedDefinition)
 
 
 State 11
@@ -895,7 +895,7 @@ State 31
 
 State 32
 
-    7 AttributedDefinition: "[" Attributes . "]" Definition
+    6 AttributedDefinition: "[" Attributes . "]" Definition
   172 Attributes: Attributes . "," Attribute
 
     "]"  shift, and go to state 90
@@ -1781,9 +1781,8 @@ State 89
 
 State 90
 
-    7 AttributedDefinition: "[" Attributes "]" . Definition
+    6 AttributedDefinition: "[" Attributes "]" . Definition
 
-    error          shift, and go to state 3
     "init"         shift, and go to state 4
     "derived"      shift, and go to state 5
     "enumeration"  shift, and go to state 6
@@ -3528,9 +3527,9 @@ State 151
 
 State 152
 
-    7 AttributedDefinition: "[" Attributes "]" Definition .
+    6 AttributedDefinition: "[" Attributes "]" Definition .
 
-    $default  reduce using rule 7 (AttributedDefinition)
+    $default  reduce using rule 6 (AttributedDefinition)
 
 
 State 153

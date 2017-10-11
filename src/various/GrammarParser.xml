@@ -45,12 +45,6 @@
         </rhs>
       </rule>
       <rule number="6" usefulness="useful">
-        <lhs>Definition</lhs>
-        <rhs>
-          <symbol>error</symbol>
-        </rhs>
-      </rule>
-      <rule number="7" usefulness="useful">
         <lhs>AttributedDefinition</lhs>
         <rhs>
           <symbol>&quot;[&quot;</symbol>
@@ -59,10 +53,16 @@
           <symbol>Definition</symbol>
         </rhs>
       </rule>
-      <rule number="8" usefulness="useful">
+      <rule number="7" usefulness="useful">
         <lhs>AttributedDefinition</lhs>
         <rhs>
           <symbol>Definition</symbol>
+        </rhs>
+      </rule>
+      <rule number="8" usefulness="useful">
+        <lhs>AttributedDefinition</lhs>
+        <rhs>
+          <symbol>error</symbol>
         </rhs>
       </rule>
       <rule number="9" usefulness="useful">
@@ -1538,13 +1538,13 @@
 
     <state number="3">
       <itemset>
-        <item rule-number="6" point="1"/>
+        <item rule-number="8" point="1"/>
       </itemset>
       <actions>
         <transitions/>
         <errors/>
         <reductions>
-          <reduction symbol="$default" rule="6" enabled="true"/>
+          <reduction symbol="$default" rule="8" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
@@ -1652,7 +1652,7 @@
 
     <state number="9">
       <itemset>
-        <item rule-number="7" point="1"/>
+        <item rule-number="6" point="1"/>
         <item rule-number="32" point="0"/>
         <item rule-number="33" point="0"/>
         <item rule-number="170" point="0"/>
@@ -1680,13 +1680,13 @@
 
     <state number="10">
       <itemset>
-        <item rule-number="8" point="1"/>
+        <item rule-number="7" point="1"/>
       </itemset>
       <actions>
         <transitions/>
         <errors/>
         <reductions>
-          <reduction symbol="$default" rule="8" enabled="true"/>
+          <reduction symbol="$default" rule="7" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
@@ -2388,7 +2388,7 @@
 
     <state number="32">
       <itemset>
-        <item rule-number="7" point="2"/>
+        <item rule-number="6" point="2"/>
         <item rule-number="172" point="1"/>
       </itemset>
       <actions>
@@ -4392,8 +4392,7 @@
         <item rule-number="3" point="0"/>
         <item rule-number="4" point="0"/>
         <item rule-number="5" point="0"/>
-        <item rule-number="6" point="0"/>
-        <item rule-number="7" point="3"/>
+        <item rule-number="6" point="3"/>
         <item rule-number="11" point="0"/>
         <item rule-number="12" point="0"/>
         <item rule-number="21" point="0"/>
@@ -4405,7 +4404,6 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="error" state="3"/>
           <transition type="shift" symbol="&quot;init&quot;" state="4"/>
           <transition type="shift" symbol="&quot;derived&quot;" state="5"/>
           <transition type="shift" symbol="&quot;enumeration&quot;" state="6"/>
@@ -8487,13 +8485,13 @@
 
     <state number="152">
       <itemset>
-        <item rule-number="7" point="4"/>
+        <item rule-number="6" point="4"/>
       </itemset>
       <actions>
         <transitions/>
         <errors/>
         <reductions>
-          <reduction symbol="$default" rule="7" enabled="true"/>
+          <reduction symbol="$default" rule="6" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
