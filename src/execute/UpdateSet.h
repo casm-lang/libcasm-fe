@@ -153,7 +153,8 @@ class UpdateSet
      *                    handle without resizing
      * @param parent The parent update-set (if there is any)
      */
-    explicit UpdateSet( std::size_t initialSize, UpdateSet* parent = nullptr )
+    explicit UpdateSet(
+        std::size_t initialSize = 1UL, UpdateSet* parent = nullptr )
     : m_set( initialSize )
     , m_parent( parent )
     {

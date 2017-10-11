@@ -1495,13 +1495,14 @@ class AgentScheduler
   private:
     std::vector< Agent > collectAgents( void ) const;
     void dispatch( std::vector< Agent >& agents );
-    ExecutionUpdateSet* collectUpdates( const std::vector< Agent >& agents );
+    void collectUpdates( const std::vector< Agent >& agents );
+    void fireUpdates( void );
 
   private:
     std::unique_ptr< DispatchStrategy > m_dispatchStrategy;
     Storage& m_globalState;
     ExecutionLocationRegistry& m_locationRegistry;
-    UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
+    ParallelUpdateSet< UpdateSetDetails > m_collectedUpdates;
     bool m_done;
     std::size_t m_stepCounter;
 };
@@ -1512,7 +1513,7 @@ AgentScheduler::AgentScheduler(
       libstdhl::Memory::make_unique< SequentialDispatchStrategy >() )
 , m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
-, m_updateSetManager()
+, m_collectedUpdates()
 , m_done( false )
 , m_stepCounter( 0UL )
 {
@@ -1535,10 +1536,9 @@ void AgentScheduler::step( void )
 
     dispatch( agents );
 
-    auto* updates = collectUpdates( agents );
-    m_globalState.fireUpdateSet( updates );
-    m_done = updates->empty();
-    m_updateSetManager.clear();
+    collectUpdates( agents );
+    m_done = m_collectedUpdates.empty();
+    fireUpdates();
 
     ++m_stepCounter;
 }
@@ -1585,51 +1585,46 @@ void AgentScheduler::dispatch( std::vector< Agent >& agents )
     m_dispatchStrategy->dispatch( agents );
 }
 
-ExecutionUpdateSet* AgentScheduler::collectUpdates(
-    const std::vector< Agent >& agents )
+void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
 {
-    if( agents.size() == 1 )
+    for( const auto& agent : agents )
     {
-        return agents.at( 0 ).updateSet();
-    }
-    else
-    {
-        m_updateSetManager.fork( Semantics::Parallel, 100UL );
-        auto* updates = m_updateSetManager.currentUpdateSet();
-        for( const auto& agent : agents )
+        try
         {
-            try
-            {
-                agent.updateSet()->mergeInto( updates );
-            }
-            catch( const ExecutionUpdateSet::Conflict& conflict )
-            {
-                // existing
-                const auto& updateA = conflict.existingUpdate();
-                const auto updateStrA = updateAsString( updateA );
-                const auto agentStrA = updateA.value.agent.name();
-                const auto& sourceLocationA
-                    = updateA.value.producer->sourceLocation();
-
-                // conflicting
-                const auto& updateB = conflict.conflictingUpdate();
-                const auto updateStrB = updateAsString( updateB );
-                const auto agentStrB = updateB.value.agent.name();
-                const auto& sourceLocationB
-                    = updateB.value.producer->sourceLocation();
-
-                const auto info
-                    = "Conflict while collection updates from agent "
-                      + agentStrB + ". Update '" + updateStrA
-                      + "' produced by agent " + agentStrA
-                      + " clashed with update '" + updateStrB
-                      + "' produced by agent " + agentStrB;
-                throw RuntimeException( { sourceLocationA, sourceLocationB },
-                    info, libcasm_fe::Code::UpdateSetMergeConflict );
-            }
+            agent.updateSet()->mergeInto( &m_collectedUpdates );
         }
-        return updates;
+        catch( const ExecutionUpdateSet::Conflict& conflict )
+        {
+            // existing
+            const auto& updateA = conflict.existingUpdate();
+            const auto updateStrA = updateAsString( updateA );
+            const auto agentStrA = updateA.value.agent.name();
+            const auto& sourceLocationA
+                = updateA.value.producer->sourceLocation();
+
+            // conflicting
+            const auto& updateB = conflict.conflictingUpdate();
+            const auto updateStrB = updateAsString( updateB );
+            const auto agentStrB = updateB.value.agent.name();
+            const auto& sourceLocationB
+                = updateB.value.producer->sourceLocation();
+
+            const auto info
+                = "Conflict while collection updates from agent "
+                    + agentStrB + ". Update '" + updateStrA
+                    + "' produced by agent " + agentStrA
+                    + " clashed with update '" + updateStrB
+                    + "' produced by agent " + agentStrB;
+            throw RuntimeException( { sourceLocationA, sourceLocationB },
+                info, libcasm_fe::Code::UpdateSetMergeConflict );
+        }
     }
+}
+
+void AgentScheduler::fireUpdates( void )
+{
+    m_globalState.fireUpdateSet( &m_collectedUpdates );
+    m_collectedUpdates.clear();
 }
 
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
