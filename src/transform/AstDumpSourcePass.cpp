@@ -77,12 +77,12 @@ class Indentation
         explicit NextLevel( Indentation& indentation )
         : m_indentation( indentation )
         {
-            m_indentation.push();
+            m_indentation.increase();
         }
 
         ~NextLevel()
         {
-            m_indentation.pop();
+            m_indentation.decrease();
         }
 
       private:
@@ -95,12 +95,12 @@ class Indentation
         explicit PreviousLevel( Indentation& indentation )
         : m_indentation( indentation )
         {
-            m_indentation.pop();
+            m_indentation.decrease();
         }
 
         ~PreviousLevel()
         {
-            m_indentation.push();
+            m_indentation.increase();
         }
 
       private:
@@ -114,12 +114,12 @@ class Indentation
     {
     }
 
-    void push()
+    void increase()
     {
         m_length += m_stepSize;
     }
 
-    void pop()
+    void decrease()
     {
         assert( m_length >= m_stepSize );
         m_length -= m_stepSize;
@@ -218,6 +218,7 @@ void AstDumpSourceVisitor::visit( FunctionDefinition& node )
     m_stream << "]\n" << m_indentation << "function ";
     node.identifier()->accept( *this );
     m_stream << " : ";
+
     bool firstArgType = true;
     for( const auto& argumentType : *node.argumentTypes() )
     {
@@ -228,14 +229,17 @@ void AstDumpSourceVisitor::visit( FunctionDefinition& node )
         argumentType->accept( *this );
         firstArgType = false;
     }
+
     m_stream << " -> ";
     node.returnType()->accept( *this );
+
     m_stream << " default { ";
     node.defaultValue()->accept( *this );
+
     m_stream << " } initially { ";
     {
         bool firstInitializer = true;
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         for( const auto& initializer : *node.initializers() )
         {
             if( not firstInitializer )
@@ -247,7 +251,7 @@ void AstDumpSourceVisitor::visit( FunctionDefinition& node )
             firstInitializer = false;
         }
     }
-    m_stream << " }";
+    m_stream << "\n" << m_indentation << "}";
 }
 
 void AstDumpSourceVisitor::visit( DerivedDefinition& node )
@@ -255,6 +259,7 @@ void AstDumpSourceVisitor::visit( DerivedDefinition& node )
     m_stream << m_indentation << "derived ";
     node.identifier()->accept( *this );
     m_stream << "(";
+
     bool firstArg = true;
     for( const auto& argument : *node.arguments() )
     {
@@ -265,11 +270,12 @@ void AstDumpSourceVisitor::visit( DerivedDefinition& node )
         argument->accept( *this );
         firstArg = false;
     }
+
     m_stream << ") -> ";
     node.returnType()->accept( *this );
     m_stream << " =\n" << m_indentation;
 
-    const auto levelGuard = Indentation::NextLevel( m_indentation );
+    const Indentation::NextLevel level( m_indentation );
     m_stream << m_indentation;
     node.expression()->accept( *this );
 }
@@ -279,6 +285,7 @@ void AstDumpSourceVisitor::visit( RuleDefinition& node )
     m_stream << m_indentation << "rule ";
     node.identifier()->accept( *this );
     m_stream << "(";
+
     bool firstArg = true;
     for( auto& argument : *node.arguments() )
     {
@@ -289,11 +296,12 @@ void AstDumpSourceVisitor::visit( RuleDefinition& node )
         argument->accept( *this );
         firstArg = false;
     }
+
     m_stream << ") -> ";
     node.returnType()->accept( *this );
     m_stream << " =\n";
 
-    const auto levelGuard = Indentation::NextLevel( m_indentation );
+    const Indentation::NextLevel level( m_indentation );
     node.rule()->accept( *this );
 }
 
@@ -302,6 +310,7 @@ void AstDumpSourceVisitor::visit( EnumerationDefinition& node )
     m_stream << m_indentation << "enum ";
     node.identifier()->accept( *this );
     m_stream << " = {";
+
     bool firstEnumerator = true;
     for( const auto& enumerator : *node.enumerators() )
     {
@@ -312,6 +321,7 @@ void AstDumpSourceVisitor::visit( EnumerationDefinition& node )
         enumerator->accept( *this );
         firstEnumerator = false;
     }
+
     m_stream << "}";
 }
 
@@ -334,9 +344,11 @@ void AstDumpSourceVisitor::visit( UndefAtom& node )
 void AstDumpSourceVisitor::visit( DirectCallExpression& node )
 {
     node.identifier()->accept( *this );
+
     if( not node.arguments()->empty() )
     {
         m_stream << "(";
+
         bool firstArg = true;
         for( const auto& argument : *node.arguments() )
         {
@@ -347,6 +359,7 @@ void AstDumpSourceVisitor::visit( DirectCallExpression& node )
             argument->accept( *this );
             firstArg = false;
         }
+
         m_stream << ")";
     }
 }
@@ -356,6 +369,7 @@ void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
     m_stream << "(*";
     node.expression()->accept( *this );
     m_stream << ")(";
+
     bool firstArg = true;
     for( const auto& argument : *node.arguments() )
     {
@@ -366,6 +380,7 @@ void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
         argument->accept( *this );
         firstArg = false;
     }
+
     m_stream << ")";
 }
 
@@ -396,6 +411,7 @@ void AstDumpSourceVisitor::visit( RangeExpression& node )
 void AstDumpSourceVisitor::visit( ListExpression& node )
 {
     m_stream << "[";
+
     bool firstExpr = true;
     for( const auto& expression : *node.expressions() )
     {
@@ -406,6 +422,7 @@ void AstDumpSourceVisitor::visit( ListExpression& node )
         expression->accept( *this );
         firstExpr = false;
     }
+
     m_stream << "]";
 }
 
@@ -468,14 +485,16 @@ void AstDumpSourceVisitor::visit( ConditionalRule& node )
 {
     m_stream << m_indentation << "if ";
     node.condition()->accept( *this );
+
     m_stream << " then\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.thenRule()->accept( *this );
     }
+
     m_stream << "\n" << m_indentation << "else\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.elseRule()->accept( *this );
     }
 }
@@ -485,12 +504,14 @@ void AstDumpSourceVisitor::visit( CaseRule& node )
     m_stream << m_indentation << "case ";
     node.expression()->accept( *this );
     m_stream << " of\n" << m_indentation << "{\n";
+
     for( const auto& _case : *node.cases() )
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         _case->accept( *this );
         m_stream << "\n";
     }
+
     m_stream << m_indentation << "}";
 }
 
@@ -502,7 +523,7 @@ void AstDumpSourceVisitor::visit( LetRule& node )
     node.expression()->accept( *this );
     m_stream << " in\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.rule()->accept( *this );
     }
 }
@@ -515,7 +536,7 @@ void AstDumpSourceVisitor::visit( ForallRule& node )
     node.universe()->accept( *this );
     m_stream << " do\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.rule()->accept( *this );
     }
 }
@@ -528,7 +549,7 @@ void AstDumpSourceVisitor::visit( ChooseRule& node )
     node.universe()->accept( *this );
     m_stream << " do\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.rule()->accept( *this );
     }
 }
@@ -537,7 +558,7 @@ void AstDumpSourceVisitor::visit( IterateRule& node )
 {
     m_stream << "iterate\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.rule()->accept( *this );
     }
 }
@@ -545,16 +566,18 @@ void AstDumpSourceVisitor::visit( IterateRule& node )
 void AstDumpSourceVisitor::visit( BlockRule& node )
 {
     {
-        const auto levelGuard = Indentation::PreviousLevel( m_indentation );
+        const Indentation::PreviousLevel level( m_indentation );
         m_stream << m_indentation << "{\n";
     }
+
     for( const auto& rule : *node.rules() )
     {
         rule->accept( *this );
         m_stream << "\n";
     }
+
     {
-        const auto levelGuard = Indentation::PreviousLevel( m_indentation );
+        const Indentation::PreviousLevel level( m_indentation );
         m_stream << m_indentation << "}";
     }
 }
@@ -562,16 +585,18 @@ void AstDumpSourceVisitor::visit( BlockRule& node )
 void AstDumpSourceVisitor::visit( SequenceRule& node )
 {
     {
-        const auto levelGuard = Indentation::PreviousLevel( m_indentation );
+        const Indentation::PreviousLevel level( m_indentation );
         m_stream << m_indentation << "{|\n";
     }
+
     for( const auto& rule : *node.rules() )
     {
         rule->accept( *this );
         m_stream << "\n";
     }
+
     {
-        const auto levelGuard = Indentation::PreviousLevel( m_indentation );
+        const Indentation::PreviousLevel level( m_indentation );
         m_stream << m_indentation << "|}";
     }
 }
@@ -604,6 +629,7 @@ void AstDumpSourceVisitor::visit( ComposedType& node )
 {
     node.name()->accept( *this );
     m_stream << "<";
+
     bool firstSubType = true;
     for( const auto& subType : *node.subTypes() )
     {
@@ -614,6 +640,7 @@ void AstDumpSourceVisitor::visit( ComposedType& node )
         subType->accept( *this );
         firstSubType = false;
     }
+
     m_stream << ">";
 }
 
@@ -628,6 +655,7 @@ void AstDumpSourceVisitor::visit( FixedSizedType& node )
 void AstDumpSourceVisitor::visit( RelationType& node )
 {
     m_stream << "<";
+
     bool firstArgType = true;
     for( const auto& argumentType : *node.argumentTypes() )
     {
@@ -638,6 +666,7 @@ void AstDumpSourceVisitor::visit( RelationType& node )
         argumentType->accept( *this );
         firstArgType = false;
     }
+
     m_stream << " -> ";
     node.returnType()->accept( *this );
     m_stream << ">";
@@ -671,7 +700,7 @@ void AstDumpSourceVisitor::visit( ExpressionCase& node )
     node.expression()->accept( *this );
     m_stream << ":\n";
 
-    const auto levelGuard = Indentation::NextLevel( m_indentation );
+    const Indentation::NextLevel level( m_indentation );
     node.rule()->accept( *this );
 }
 
@@ -679,7 +708,7 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 {
     m_stream << m_indentation << "default:\n";
 
-    const auto levelGuard = Indentation::NextLevel( m_indentation );
+    const Indentation::NextLevel level( m_indentation );
     node.rule()->accept( *this );
 }
 
