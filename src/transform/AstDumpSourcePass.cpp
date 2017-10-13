@@ -196,6 +196,21 @@ class AstDumpSourceVisitor final : public Visitor
   private:
     void dumpAttributes( Attributes& attributes );
 
+    template < typename T >
+    void dumpNodes( NodeList< T >& nodes, const std::string& separator )
+    {
+        bool firstNode = true;
+        for( const auto& node : nodes )
+        {
+            if( not firstNode )
+            {
+                m_stream << separator;
+            }
+            node->accept( *this );
+            firstNode = false;
+        }
+    }
+
   private:
     std::ostream& m_stream;
     Indentation m_indentation;
@@ -223,38 +238,17 @@ void AstDumpSourceVisitor::visit( FunctionDefinition& node )
     m_stream << "\n" << m_indentation << "function ";
     node.identifier()->accept( *this );
     m_stream << " : ";
-
-    bool firstArgType = true;
-    for( const auto& argumentType : *node.argumentTypes() )
-    {
-        if( not firstArgType )
-        {
-            m_stream << " * ";
-        }
-        argumentType->accept( *this );
-        firstArgType = false;
-    }
-
+    dumpNodes( *node.argumentTypes(), " * " );
     m_stream << " -> ";
     node.returnType()->accept( *this );
 
     m_stream << " default { ";
     node.defaultValue()->accept( *this );
 
-    m_stream << " } initially { ";
+    m_stream << " } initially {\n";
     {
-        bool firstInitializer = true;
         const Indentation::NextLevel level( m_indentation );
-        for( const auto& initializer : *node.initializers() )
-        {
-            if( not firstInitializer )
-            {
-                m_stream << ",";
-            }
-            m_stream << "\n";
-            initializer->accept( *this );
-            firstInitializer = false;
-        }
+        dumpNodes( *node.initializers(), ",\n" );
     }
     m_stream << "\n" << m_indentation << "}";
 }
@@ -266,18 +260,7 @@ void AstDumpSourceVisitor::visit( DerivedDefinition& node )
     m_stream << "\n" << m_indentation << "derived ";
     node.identifier()->accept( *this );
     m_stream << "(";
-
-    bool firstArg = true;
-    for( const auto& argument : *node.arguments() )
-    {
-        if( not firstArg )
-        {
-            m_stream << ", ";
-        }
-        argument->accept( *this );
-        firstArg = false;
-    }
-
+    dumpNodes( *node.arguments(), ", " );
     m_stream << ") -> ";
     node.returnType()->accept( *this );
     m_stream << " =\n" << m_indentation;
@@ -294,18 +277,7 @@ void AstDumpSourceVisitor::visit( RuleDefinition& node )
     m_stream << "\n" << m_indentation << "rule ";
     node.identifier()->accept( *this );
     m_stream << "(";
-
-    bool firstArg = true;
-    for( auto& argument : *node.arguments() )
-    {
-        if( not firstArg )
-        {
-            m_stream << ", ";
-        }
-        argument->accept( *this );
-        firstArg = false;
-    }
-
+    dumpNodes( *node.arguments(), ", " );
     m_stream << ") -> ";
     node.returnType()->accept( *this );
     m_stream << " =\n";
@@ -321,18 +293,7 @@ void AstDumpSourceVisitor::visit( EnumerationDefinition& node )
     m_stream << "\n" << m_indentation << "enum ";
     node.identifier()->accept( *this );
     m_stream << " = {";
-
-    bool firstEnumerator = true;
-    for( const auto& enumerator : *node.enumerators() )
-    {
-        if( not firstEnumerator )
-        {
-            m_stream << ", ";
-        }
-        enumerator->accept( *this );
-        firstEnumerator = false;
-    }
-
+    dumpNodes( *node.enumerators(), ", " );
     m_stream << "}";
 }
 
@@ -359,18 +320,7 @@ void AstDumpSourceVisitor::visit( DirectCallExpression& node )
     if( not node.arguments()->empty() )
     {
         m_stream << "(";
-
-        bool firstArg = true;
-        for( const auto& argument : *node.arguments() )
-        {
-            if( not firstArg )
-            {
-                m_stream << ", ";
-            }
-            argument->accept( *this );
-            firstArg = false;
-        }
-
+        dumpNodes( *node.arguments(), ", " );
         m_stream << ")";
     }
 }
@@ -380,18 +330,7 @@ void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
     m_stream << "(*";
     node.expression()->accept( *this );
     m_stream << ")(";
-
-    bool firstArg = true;
-    for( const auto& argument : *node.arguments() )
-    {
-        if( not firstArg )
-        {
-            m_stream << ", ";
-        }
-        argument->accept( *this );
-        firstArg = false;
-    }
-
+    dumpNodes( *node.arguments(), ", " );
     m_stream << ")";
 }
 
@@ -422,18 +361,7 @@ void AstDumpSourceVisitor::visit( RangeExpression& node )
 void AstDumpSourceVisitor::visit( ListExpression& node )
 {
     m_stream << "[";
-
-    bool firstExpr = true;
-    for( const auto& expression : *node.expressions() )
-    {
-        if( not firstExpr )
-        {
-            m_stream << ", ";
-        }
-        expression->accept( *this );
-        firstExpr = false;
-    }
-
+    dumpNodes( *node.expressions(), ", " );
     m_stream << "]";
 }
 
@@ -515,15 +443,11 @@ void AstDumpSourceVisitor::visit( CaseRule& node )
     m_stream << m_indentation << "case ";
     node.expression()->accept( *this );
     m_stream << " of\n" << m_indentation << "{\n";
-
-    for( const auto& _case : *node.cases() )
     {
         const Indentation::NextLevel level( m_indentation );
-        _case->accept( *this );
-        m_stream << "\n";
+        dumpNodes( *node.cases(), "\n" );
     }
-
-    m_stream << m_indentation << "}";
+    m_stream << "\n" << m_indentation << "}";
 }
 
 void AstDumpSourceVisitor::visit( LetRule& node )
@@ -581,15 +505,11 @@ void AstDumpSourceVisitor::visit( BlockRule& node )
         m_stream << m_indentation << "{\n";
     }
 
-    for( const auto& rule : *node.rules() )
-    {
-        rule->accept( *this );
-        m_stream << "\n";
-    }
+    dumpNodes( *node.rules(), "\n" );
 
     {
         const Indentation::PreviousLevel level( m_indentation );
-        m_stream << m_indentation << "}";
+        m_stream << "\n" << m_indentation << "}";
     }
 }
 
@@ -600,15 +520,11 @@ void AstDumpSourceVisitor::visit( SequenceRule& node )
         m_stream << m_indentation << "{|\n";
     }
 
-    for( const auto& rule : *node.rules() )
-    {
-        rule->accept( *this );
-        m_stream << "\n";
-    }
+    dumpNodes( *node.rules(), "\n" );
 
     {
         const Indentation::PreviousLevel level( m_indentation );
-        m_stream << m_indentation << "|}";
+        m_stream << "\n" << m_indentation << "|}";
     }
 }
 
@@ -640,18 +556,7 @@ void AstDumpSourceVisitor::visit( ComposedType& node )
 {
     node.name()->accept( *this );
     m_stream << "<";
-
-    bool firstSubType = true;
-    for( const auto& subType : *node.subTypes() )
-    {
-        if( not firstSubType )
-        {
-            m_stream << ", ";
-        }
-        subType->accept( *this );
-        firstSubType = false;
-    }
-
+    dumpNodes( *node.subTypes(), ", " );
     m_stream << ">";
 }
 
@@ -666,18 +571,7 @@ void AstDumpSourceVisitor::visit( FixedSizedType& node )
 void AstDumpSourceVisitor::visit( RelationType& node )
 {
     m_stream << "<";
-
-    bool firstArgType = true;
-    for( const auto& argumentType : *node.argumentTypes() )
-    {
-        if( not firstArgType )
-        {
-            m_stream << " * ";
-        }
-        argumentType->accept( *this );
-        firstArgType = false;
-    }
-
+    dumpNodes( *node.argumentTypes(), " * " );
     m_stream << " -> ";
     node.returnType()->accept( *this );
     m_stream << ">";
@@ -725,25 +619,12 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 
 void AstDumpSourceVisitor::dumpAttributes( Attributes& attributes )
 {
-    if( attributes.empty() )
+    if( not attributes.empty() )
     {
-        return;
+        m_stream << "[";
+        dumpNodes( attributes, ", " );
+        m_stream << "]";
     }
-
-    m_stream << "[";
-
-    bool firstAttribute = true;
-    for( const auto& attribute : attributes )
-    {
-        if( not firstAttribute )
-        {
-            m_stream << ", ";
-        }
-        attribute->accept( *this );
-        firstAttribute = false;
-    }
-
-    m_stream << "]";
 }
 
 void AstDumpSourcePass::usage( libpass::PassUsage& pu )
