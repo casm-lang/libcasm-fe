@@ -194,6 +194,9 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( DefaultCase& node ) override;
 
   private:
+    void dumpAttributes( Attributes& attributes );
+
+  private:
     std::ostream& m_stream;
     Indentation m_indentation;
 };
@@ -206,6 +209,8 @@ AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 
 void AstDumpSourceVisitor::visit( VariableDefinition& node )
 {
+    dumpAttributes( *node.attributes() );
+    m_stream << " ";
     node.identifier()->accept( *this );
     m_stream << " : ";
     node.variableType()->accept( *this );
@@ -213,9 +218,9 @@ void AstDumpSourceVisitor::visit( VariableDefinition& node )
 
 void AstDumpSourceVisitor::visit( FunctionDefinition& node )
 {
-    m_stream << m_indentation << "[";
-    node.attributes()->accept( *this );
-    m_stream << "]\n" << m_indentation << "function ";
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "function ";
     node.identifier()->accept( *this );
     m_stream << " : ";
 
@@ -256,7 +261,9 @@ void AstDumpSourceVisitor::visit( FunctionDefinition& node )
 
 void AstDumpSourceVisitor::visit( DerivedDefinition& node )
 {
-    m_stream << m_indentation << "derived ";
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "derived ";
     node.identifier()->accept( *this );
     m_stream << "(";
 
@@ -282,7 +289,9 @@ void AstDumpSourceVisitor::visit( DerivedDefinition& node )
 
 void AstDumpSourceVisitor::visit( RuleDefinition& node )
 {
-    m_stream << m_indentation << "rule ";
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "rule ";
     node.identifier()->accept( *this );
     m_stream << "(";
 
@@ -307,7 +316,9 @@ void AstDumpSourceVisitor::visit( RuleDefinition& node )
 
 void AstDumpSourceVisitor::visit( EnumerationDefinition& node )
 {
-    m_stream << m_indentation << "enum ";
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "enum ";
     node.identifier()->accept( *this );
     m_stream << " = {";
 
@@ -710,6 +721,29 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 
     const Indentation::NextLevel level( m_indentation );
     node.rule()->accept( *this );
+}
+
+void AstDumpSourceVisitor::dumpAttributes( Attributes& attributes )
+{
+    if( attributes.empty() )
+    {
+        return;
+    }
+
+    m_stream << "[";
+
+    bool firstAttribute = true;
+    for( const auto& attribute : attributes )
+    {
+        if( not firstAttribute )
+        {
+            m_stream << ", ";
+        }
+        attribute->accept( *this );
+        firstAttribute = false;
+    }
+
+    m_stream << "]";
 }
 
 void AstDumpSourcePass::usage( libpass::PassUsage& pu )
