@@ -184,9 +184,18 @@ void LetRule::accept( Visitor& visitor )
 
 ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
     const Expression::Ptr& universe, const Rule::Ptr& rule )
+: ForallRule( variable, universe, std::make_shared< ValueAtom >(
+    libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true ) ), rule )
+{
+}
+
+ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& universe, const Expression::Ptr& condition,
+    const Rule::Ptr& rule )
 : Rule( Node::ID::FORALL_RULE )
 , m_variable( variable )
 , m_universe( universe )
+, m_condition( condition )
 , m_rule( rule )
 {
 }
@@ -199,6 +208,11 @@ const VariableDefinition::Ptr& ForallRule::variable( void ) const
 const Expression::Ptr& ForallRule::universe( void ) const
 {
     return m_universe;
+}
+
+const Expression::Ptr& ForallRule::condition( void ) const
+{
+    return m_condition;
 }
 
 const Rule::Ptr& ForallRule::rule( void ) const

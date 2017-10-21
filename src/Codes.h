@@ -202,6 +202,7 @@ namespace libcasm_fe
         TypeInferenceForallVariableHasNoType = 0x1004,
         TypeInferenceForallUniverseHasNoType = 0x1014,
         TypeInferenceForallRuleTypeMismatch = 0x1024,
+        TypeInferenceForallRuleInvalidConditionType = 0x1025,
 
         TypeInferenceInvalidConditionalExpressionCondition = 0x1005,
         TypeInferenceInvalidConditionalExpressionPaths = 0x1006
@@ -262,7 +263,8 @@ namespace libcasm_fe
         QuantifierExpressionInvalidUniverse = 0x9002,
         ChooseExpressionInvalidUniverse = 0x9003,
         ChooseRuleInvalidUniverse = 0x9004,
-        ForallRuleInvalidUniverse = 0x9005
+        ForallRuleInvalidUniverse = 0x9005,
+        ForallRuleInvalidCondition = 0x9006
 
         // --------------------------------------------------------- fff* ...
         // not categorized errors

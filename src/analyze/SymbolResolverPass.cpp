@@ -414,6 +414,7 @@ void SymbolResolveVisitor::visit( ForallRule& node )
     node.universe()->accept( *this );
 
     push( *node.variable() );
+    node.condition()->accept( *this );
     node.rule()->accept( *this );
     pop( *node.variable() );
 }

@@ -1305,6 +1305,10 @@ ForallRule
   {
       $$ = Ast::make< ForallRule >( @$, $2, $4, $6 );
   }
+| FORALL AttributedVariable IN Term WITH Term DO Rule
+  {
+      $$ = Ast::make< ForallRule >( @$, $2, $4, $6, $8 );
+  }
 ;
 
 
