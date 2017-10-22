@@ -996,7 +996,23 @@ void ExecutionVisitor::visit( ForallRule& node )
 
     universe.foreach( [&]( const IR::Constant& value ) {
         frame->setLocal( variableIndex, value );
-        node.rule()->accept( *this );
+
+        // check if value satisfies the condition
+        node.condition()->accept( *this );
+        const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
+
+        if( not condition.defined() )
+        {
+            throw RuntimeException( node.condition()->sourceLocation(),
+                "condition must be true or false but was undefined for '"
+                + value.name() + "'",
+                m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                Code::ForallRuleInvalidCondition );
+        }
+        else if( condition.value() == true )
+        {
+            node.rule()->accept( *this );
+        }
     } );
 
     try

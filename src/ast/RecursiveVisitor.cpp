@@ -202,6 +202,7 @@ void RecursiveVisitor::visit( ForallRule& node )
 {
     node.variable()->accept( *this );
     node.universe()->accept( *this );
+    node.condition()->accept( *this );
     node.rule()->accept( *this );
 }
 

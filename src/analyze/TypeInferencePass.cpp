@@ -965,6 +965,22 @@ void TypeInferenceVisitor::visit( ForallRule& node )
         node.variable()->setType( node.universe()->type()->ptr_result() );
     }
 
+    node.condition()->accept( *this );
+    const auto& conditionType = node.condition()->type();
+    if( conditionType )
+    {
+        if( conditionType->result().id() != libcasm_ir::Type::BOOLEAN )
+        {
+            m_log.error( { node.condition()->sourceLocation() },
+                         "invalid condition type '"
+                         + conditionType->result().description()
+                         + ", shall be '"
+                         + libcasm_ir::Type::token( libcasm_ir::Type::BOOLEAN )
+                         + "'",
+                         Code::TypeInferenceForallRuleInvalidConditionType );
+        }
+    }
+
     node.rule()->accept( *this );
     pop( *node.variable() );
 

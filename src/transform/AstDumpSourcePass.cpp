@@ -469,6 +469,8 @@ void AstDumpSourceVisitor::visit( ForallRule& node )
     node.variable()->accept( *this );
     m_stream << " in ";
     node.universe()->accept( *this );
+    m_stream << " with ";
+    node.condition()->accept( *this );
     m_stream << " do\n";
     {
         const Indentation::NextLevel level( m_indentation );
