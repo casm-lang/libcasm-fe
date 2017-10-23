@@ -189,7 +189,7 @@ void TypeInferenceVisitor::visit( UndefAtom& node )
     auto result = m_resultTypes.find( &node );
     if( result != m_resultTypes.end() and result->second.size() == 1 )
     {
-        inference( "undef atom", 0, node );
+        inference( "undef atom", nullptr, node );
     }
 }
 
@@ -320,7 +320,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 if( not node.type() )
                 {
                     const auto description = "variable '" + path.path() + "'";
-                    inference( description, 0, node );
+                    inference( description, nullptr, node );
                 }
 
                 variable->setType( node.type() );
@@ -691,7 +691,7 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
     if( resTypes.size() > 0 )
     {
-        inference( "conditional expression", 0, node );
+        inference( "conditional expression", nullptr, node );
     }
 
     if( thenExpr.type() and elseExpr.type() )
@@ -1387,7 +1387,7 @@ void TypeInferenceVisitor::inference( const std::string& description,
                         = static_cast< UndefAtom* >( arguments[ pos ].get() );
 
                     m_resultTypes[ undefAtom ] = { relation->argument[ pos ] };
-                    inference( "undef", 0, *undefAtom );
+                    inference( "undef", nullptr, *undefAtom );
                 }
             }
         }
