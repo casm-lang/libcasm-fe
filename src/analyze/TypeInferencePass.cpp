@@ -119,15 +119,9 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
     void inference( QuantifierExpression& node );
 
-    void push( VariableDefinition& node );
-    void pop( VariableDefinition& node );
-    VariableDefinition& find( const IdentifierPath& node );
-
   private:
     libcasm_fe::Logger& m_log;
     u1 m_functionInitially;
-
-    std::unordered_map< std::string, VariableDefinition* > m_id2var;
 
     std::unordered_map< const Node*, std::vector< libcasm_ir::Type::ID > >
         m_resultTypes;
@@ -156,21 +150,11 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
 {
     inference( node, {} );
 
-    for( const auto& argument : *node.arguments() )
-    {
-        push( *argument );
-    }
-
     const auto type = node.returnType()->type();
     assert( type );
     m_resultTypes[ node.expression().get() ].emplace_back( type->id() );
 
     RecursiveVisitor::visit( node );
-
-    for( const auto& argument : *node.arguments() )
-    {
-        pop( *argument );
-    }
 
     inference( node, {} );
 
@@ -200,17 +184,7 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
 {
     inference( node, {} );
 
-    for( const auto& argument : *node.arguments() )
-    {
-        push( *argument );
-    }
-
     RecursiveVisitor::visit( node );
-
-    for( const auto& argument : *node.arguments() )
-    {
-        pop( *argument );
-    }
 
     inference( node, {} );
 }
@@ -335,37 +309,28 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     {
         case CallExpression::TargetType::VARIABLE:
         {
-            try
-            {
-                auto& definition = find( *node.identifier() );
+            const auto& variable = node.targetDefinition();
 
-                if( definition.type() )
+            if( variable->type() )
+            {
+                if( not node.type() )
                 {
-                    if( not node.type() )
-                    {
-                        node.setType( definition.type() );
-                    }
-                    else
-                    {
-                        assert( *definition.type() == *node.type() );
-                    }
+                    node.setType( variable->type() );
                 }
                 else
                 {
-                    if( not node.type() )
-                    {
-                        const auto description
-                            = "variable '" + path.path() + "'";
-                        inference( description, 0, node );
-                    }
-
-                    definition.setType( node.type() );
+                    assert( *variable->type() == *node.type() );
                 }
             }
-            catch( const std::domain_error& e )
+            else
             {
-                std::cerr << e.what() << "\n";
-                assert( !" inconsistent symbol table! " );
+                if( not node.type() )
+                {
+                    const auto description = "variable '" + path.path() + "'";
+                    inference( description, 0, node );
+                }
+
+                variable->setType( node.type() );
             }
             break;
         }
@@ -654,7 +619,6 @@ void TypeInferenceVisitor::visit( LetExpression& node )
             node.variable()->type()->id() );
     }
 
-    push( *node.variable() );
     node.initializer()->accept( *this );
 
     if( not node.variable()->type() and node.initializer()->type() )
@@ -669,7 +633,6 @@ void TypeInferenceVisitor::visit( LetExpression& node )
     }
 
     node.expression()->accept( *this );
-    pop( *node.variable() );
 
     if( not node.type() )
     {
@@ -788,7 +751,6 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
             node.variable()->type()->id() );
     }
 
-    push( *node.variable() );
     node.universe()->accept( *this );
 
     if( not node.variable()->type() and node.universe()->type() )
@@ -803,7 +765,6 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
     }
 
     node.expression()->accept( *this );
-    pop( *node.variable() );
 
     if( not node.type() )
     {
@@ -929,7 +890,6 @@ void TypeInferenceVisitor::visit( LetRule& node )
             node.variable()->type()->id() );
     }
 
-    push( *node.variable() );
     node.expression()->accept( *this );
 
     if( not node.variable()->type() and node.expression()->type() )
@@ -938,7 +898,6 @@ void TypeInferenceVisitor::visit( LetRule& node )
     }
 
     node.rule()->accept( *this );
-    pop( *node.variable() );
 
     assignment( node, *node.variable(), *node.expression(),
         "let variable '" + node.variable()->identifier()->name() + "'",
@@ -957,7 +916,6 @@ void TypeInferenceVisitor::visit( ForallRule& node )
             node.variable()->type()->id() );
     }
 
-    push( *node.variable() );
     node.universe()->accept( *this );
 
     if( not node.variable()->type() and node.universe()->type() )
@@ -982,7 +940,6 @@ void TypeInferenceVisitor::visit( ForallRule& node )
     }
 
     node.rule()->accept( *this );
-    pop( *node.variable() );
 
     if( not node.variable()->type() )
     {
@@ -1026,7 +983,6 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
             node.variable()->type()->id() );
     }
 
-    push( *node.variable() );
     node.universe()->accept( *this );
 
     if( not node.variable()->type() and node.universe()->type() )
@@ -1035,7 +991,6 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
     }
 
     node.rule()->accept( *this );
-    pop( *node.variable() );
 
     if( not node.variable()->type() )
     {
@@ -1714,9 +1669,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
             node.universe()->type()->ptr_result() );
     }
 
-    push( *node.predicateVariable() );
     node.proposition()->accept( *this );
-    pop( *node.predicateVariable() );
 
     if( not node.predicateVariable()->type() )
     {
@@ -1776,40 +1729,6 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
                           TypeInferenceQuantifierUniversalPropositionTypeMismatch );
         }
     }
-}
-
-void TypeInferenceVisitor::push( VariableDefinition& node )
-{
-    const auto& name = node.identifier()->name();
-
-    auto result = m_id2var.emplace( name, &node );
-    if( not result.second )
-    {
-        m_log.error( { node.sourceLocation() },
-            "symbol '" + name + "' already defined" );
-    }
-}
-
-void TypeInferenceVisitor::pop( VariableDefinition& node )
-{
-    const auto& name = node.identifier()->name();
-
-    if( m_id2var.erase( name ) != 1 )
-    {
-        assert( !" internal error! " );
-    }
-}
-
-VariableDefinition& TypeInferenceVisitor::find( const IdentifierPath& node )
-{
-    auto result = m_id2var.find( node.baseName() );
-    if( result == m_id2var.end() )
-    {
-        throw std::domain_error(
-            "unable to find symbol '" + node.path() + "'" );
-    }
-
-    return *result->second;
 }
 
 void TypeInferencePass::usage( libpass::PassUsage& pu )
