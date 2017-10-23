@@ -428,30 +428,6 @@ void SymbolResolveVisitor::pop( const VariableDefinition::Ptr& variable )
     m_variables.pop_back();
 }
 
-static void registerBasicTypes( Namespace& symboltable )
-{
-    const auto registerType
-        = [&]( const std::string& name, const libcasm_ir::Type::Ptr& type ) {
-              const auto typeNode = std::make_shared< BasicType >(
-                  std::make_shared< IdentifierPath >(
-                      std::make_shared< Identifier >( name ) ) );
-              typeNode->setType( type );
-              symboltable.registerSymbol( typeNode );
-          };
-
-    registerType( "Void", libstdhl::Memory::get< libcasm_ir::VoidType >() );
-    registerType(
-        "Boolean", libstdhl::Memory::get< libcasm_ir::BooleanType >() );
-    registerType(
-        "Integer", libstdhl::Memory::get< libcasm_ir::IntegerType >() );
-    registerType( "Bit", libstdhl::Memory::get< libcasm_ir::BitType >( 1 ) );
-    registerType( "String", libstdhl::Memory::get< libcasm_ir::StringType >() );
-    registerType(
-        "Floating", libstdhl::Memory::get< libcasm_ir::FloatingType >() );
-    registerType(
-        "Rational", libstdhl::Memory::get< libcasm_ir::RationalType >() );
-}
-
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SymbolRegistrationPass >();
@@ -463,8 +439,6 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
 
     const auto data = pr.result< SymbolRegistrationPass >();
     const auto specification = data->specification();
-
-    registerBasicTypes( *specification->symboltable() );
 
     SymbolResolveVisitor visitor( log, *specification->symboltable() );
     specification->definitions()->accept( visitor );
