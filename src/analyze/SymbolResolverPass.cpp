@@ -86,8 +86,8 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( ChooseRule& node ) override;
 
   private:
-    void push( const VariableDefinition::Ptr& variable );
-    void pop( const VariableDefinition::Ptr& variable );
+    void pushVariable( const VariableDefinition::Ptr& variable );
+    void popVariable( const VariableDefinition::Ptr& variable );
 
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
@@ -120,7 +120,7 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
 
     for( const auto& argument : *node.arguments() )
     {
-        push( argument );
+        pushVariable( argument );
     }
 
     node.expression()->accept( *this );
@@ -128,7 +128,7 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
     const auto end = node.arguments()->rend();
     for( auto it = node.arguments()->rbegin(); it != end; ++it )
     {
-        pop( *it );
+        popVariable( *it );
     }
 
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
@@ -140,7 +140,7 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
 
     for( const auto& argument : *node.arguments() )
     {
-        push( argument );
+        pushVariable( argument );
     }
 
     node.rule()->accept( *this );
@@ -148,7 +148,7 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     const auto end = node.arguments()->rend();
     for( auto it = node.arguments()->rbegin(); it != end; ++it )
     {
-        pop( *it );
+        popVariable( *it );
     }
 
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
@@ -338,67 +338,67 @@ void SymbolResolveVisitor::visit( LetExpression& node )
 {
     node.initializer()->accept( *this );
 
-    push( node.variable() );
+    pushVariable( node.variable() );
     node.expression()->accept( *this );
-    pop( node.variable() );
+    popVariable( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ChooseExpression& node )
 {
     node.universe()->accept( *this );
 
-    push( node.variable() );
+    pushVariable( node.variable() );
     node.expression()->accept( *this );
-    pop( node.variable() );
+    popVariable( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    push( node.predicateVariable() );
+    pushVariable( node.predicateVariable() );
     node.proposition()->accept( *this );
-    pop( node.predicateVariable() );
+    popVariable( node.predicateVariable() );
 }
 
 void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    push( node.predicateVariable() );
+    pushVariable( node.predicateVariable() );
     node.proposition()->accept( *this );
-    pop( node.predicateVariable() );
+    popVariable( node.predicateVariable() );
 }
 
 void SymbolResolveVisitor::visit( LetRule& node )
 {
     node.expression()->accept( *this );
 
-    push( node.variable() );
+    pushVariable( node.variable() );
     node.rule()->accept( *this );
-    pop( node.variable() );
+    popVariable( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ForallRule& node )
 {
     node.universe()->accept( *this );
 
-    push( node.variable() );
+    pushVariable( node.variable() );
     node.condition()->accept( *this );
     node.rule()->accept( *this );
-    pop( node.variable() );
+    popVariable( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ChooseRule& node )
 {
     node.universe()->accept( *this );
 
-    push( node.variable() );
+    pushVariable( node.variable() );
     node.rule()->accept( *this );
-    pop( node.variable() );
+    popVariable( node.variable() );
 }
 
-void SymbolResolveVisitor::push( const VariableDefinition::Ptr& variable )
+void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable )
 {
     const auto& name = variable->identifier()->name();
 
@@ -420,7 +420,7 @@ void SymbolResolveVisitor::push( const VariableDefinition::Ptr& variable )
     m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_variables.size() );
 }
 
-void SymbolResolveVisitor::pop( const VariableDefinition::Ptr& variable )
+void SymbolResolveVisitor::popVariable( const VariableDefinition::Ptr& variable )
 {
     const auto& name = variable->identifier()->name();
     m_variables.erase( name );
