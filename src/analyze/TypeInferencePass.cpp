@@ -121,15 +121,12 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
   private:
     libcasm_fe::Logger& m_log;
-    u1 m_functionInitially;
-
     std::unordered_map< const Node*, std::vector< libcasm_ir::Type::ID > >
         m_resultTypes;
 };
 
 TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log )
 : m_log( log )
-, m_functionInitially( false )
 {
 }
 
@@ -137,11 +134,7 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
 {
     inference( node, {} );
 
-    m_functionInitially = true;
-
     RecursiveVisitor::visit( node );
-
-    m_functionInitially = false;
 
     inference( node, {} );
 }
