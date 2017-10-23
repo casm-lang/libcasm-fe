@@ -1,8 +1,8 @@
-===== Syntax =====
+====== Syntax ======
 
 {{page>:grammar:readme&noheader&nofooter}}
 
-==== Specification ====
+===== Specification =====
 
 <code>
 Specification ::= "CASM" Definitions
@@ -11,7 +11,7 @@ Specification ::= "CASM" Definitions
 {{page>:grammar:Specification&noheader&nofooter}}
 
 
-==== Definitions ====
+===== Definitions =====
 
 <code>
 Definitions ::= Definitions AttributedDefinition
@@ -21,7 +21,7 @@ Definitions ::= Definitions AttributedDefinition
 {{page>:grammar:Definitions&noheader&nofooter}}
 
 
-==== Definition ====
+===== Definition =====
 
 <code>
 Definition ::= EnumerationDefinition
@@ -33,7 +33,7 @@ Definition ::= EnumerationDefinition
 {{page>:grammar:Definition&noheader&nofooter}}
 
 
-==== AttributedDefinition ====
+===== AttributedDefinition =====
 
 <code>
 AttributedDefinition ::= "[" Attributes "]" Definition
@@ -43,7 +43,7 @@ AttributedDefinition ::= "[" Attributes "]" Definition
 {{page>:grammar:AttributedDefinition&noheader&nofooter}}
 
 
-==== EnumerationDefinition ====
+===== EnumerationDefinition =====
 
 <code>
 EnumerationDefinition ::= "enumeration" Identifier "=" "{" Identifiers "}"
@@ -52,7 +52,7 @@ EnumerationDefinition ::= "enumeration" Identifier "=" "{" Identifiers "}"
 {{page>:grammar:EnumerationDefinition&noheader&nofooter}}
 
 
-==== DerivedDefinition ====
+===== DerivedDefinition =====
 
 <code>
 DerivedDefinition ::= "derived" Identifier MaybeParameters "->" Type "=" Term
@@ -61,7 +61,7 @@ DerivedDefinition ::= "derived" Identifier MaybeParameters "->" Type "=" Term
 {{page>:grammar:DerivedDefinition&noheader&nofooter}}
 
 
-==== RuleDefinition ====
+===== RuleDefinition =====
 
 <code>
 RuleDefinition ::= "rule" Identifier MaybeParameters "=" Rule
@@ -71,7 +71,7 @@ RuleDefinition ::= "rule" Identifier MaybeParameters "=" Rule
 {{page>:grammar:RuleDefinition&noheader&nofooter}}
 
 
-==== FunctionDefinition ====
+===== FunctionDefinition =====
 
 <code>
 FunctionDefinition ::= "function" Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
@@ -81,7 +81,7 @@ FunctionDefinition ::= "function" Identifier ":" MaybeFunctionParameters "->" Ty
 {{page>:grammar:FunctionDefinition&noheader&nofooter}}
 
 
-==== ProgramFunctionDefinition ====
+===== ProgramFunctionDefinition =====
 
 <code>
 ProgramFunctionDefinition ::= "init" IdentifierPath
@@ -91,7 +91,7 @@ ProgramFunctionDefinition ::= "init" IdentifierPath
 {{page>:grammar:ProgramFunctionDefinition&noheader&nofooter}}
 
 
-==== Rule ====
+===== Rule =====
 
 <code>
 Rule ::= SkipRule
@@ -110,7 +110,7 @@ Rule ::= SkipRule
 {{page>:grammar:Rule&noheader&nofooter}}
 
 
-==== Rules ====
+===== Rules =====
 
 <code>
 Rules ::= Rules Rule
@@ -120,7 +120,7 @@ Rules ::= Rules Rule
 {{page>:grammar:Rules&noheader&nofooter}}
 
 
-==== SkipRule ====
+===== SkipRule =====
 
 <code>
 SkipRule ::= "skip"
@@ -129,7 +129,7 @@ SkipRule ::= "skip"
 {{page>:grammar:SkipRule&noheader&nofooter}}
 
 
-==== ConditionalRule ====
+===== ConditionalRule =====
 
 <code>
 ConditionalRule ::= "if" Term "then" Rule
@@ -139,7 +139,7 @@ ConditionalRule ::= "if" Term "then" Rule
 {{page>:grammar:ConditionalRule&noheader&nofooter}}
 
 
-==== CaseRule ====
+===== CaseRule =====
 
 <code>
 CaseRule ::= "case" Term "of" "{" CaseLabels "}"
@@ -148,7 +148,7 @@ CaseRule ::= "case" Term "of" "{" CaseLabels "}"
 {{page>:grammar:CaseRule&noheader&nofooter}}
 
 
-==== CaseLabel ====
+===== CaseLabel =====
 
 <code>
 CaseLabel ::= "default" ":" Rule
@@ -159,7 +159,7 @@ CaseLabel ::= "default" ":" Rule
 {{page>:grammar:CaseLabel&noheader&nofooter}}
 
 
-==== CaseLabels ====
+===== CaseLabels =====
 
 <code>
 CaseLabels ::= CaseLabel CaseLabels
@@ -169,7 +169,7 @@ CaseLabels ::= CaseLabel CaseLabels
 {{page>:grammar:CaseLabels&noheader&nofooter}}
 
 
-==== LetRule ====
+===== LetRule =====
 
 <code>
 LetRule ::= "let" AttributedVariable "=" Term "in" Rule
@@ -178,7 +178,7 @@ LetRule ::= "let" AttributedVariable "=" Term "in" Rule
 {{page>:grammar:LetRule&noheader&nofooter}}
 
 
-==== ForallRule ====
+===== ForallRule =====
 
 <code>
 ForallRule ::= "forall" AttributedVariable "in" Term "do" Rule
@@ -188,7 +188,7 @@ ForallRule ::= "forall" AttributedVariable "in" Term "do" Rule
 {{page>:grammar:ForallRule&noheader&nofooter}}
 
 
-==== ChooseRule ====
+===== ChooseRule =====
 
 <code>
 ChooseRule ::= "choose" AttributedVariable "in" Term "do" Rule
@@ -197,7 +197,7 @@ ChooseRule ::= "choose" AttributedVariable "in" Term "do" Rule
 {{page>:grammar:ChooseRule&noheader&nofooter}}
 
 
-==== IterateRule ====
+===== IterateRule =====
 
 <code>
 IterateRule ::= "iterate" Rule
@@ -206,7 +206,7 @@ IterateRule ::= "iterate" Rule
 {{page>:grammar:IterateRule&noheader&nofooter}}
 
 
-==== BlockRule ====
+===== BlockRule =====
 
 <code>
 BlockRule ::= "{" Rules "}"
@@ -216,7 +216,7 @@ BlockRule ::= "{" Rules "}"
 {{page>:grammar:BlockRule&noheader&nofooter}}
 
 
-==== SequenceRule ====
+===== SequenceRule =====
 
 <code>
 SequenceRule ::= "{|" Rules "|}"
@@ -226,7 +226,7 @@ SequenceRule ::= "{|" Rules "|}"
 {{page>:grammar:SequenceRule&noheader&nofooter}}
 
 
-==== UpdateRule ====
+===== UpdateRule =====
 
 <code>
 UpdateRule ::= DirectCallExpression ":=" Term
@@ -235,7 +235,7 @@ UpdateRule ::= DirectCallExpression ":=" Term
 {{page>:grammar:UpdateRule&noheader&nofooter}}
 
 
-==== CallRule ====
+===== CallRule =====
 
 <code>
 CallRule ::= "call" DirectCallExpression
@@ -247,7 +247,7 @@ CallRule ::= "call" DirectCallExpression
 {{page>:grammar:CallRule&noheader&nofooter}}
 
 
-==== Terms ====
+===== Terms =====
 
 <code>
 Terms ::= Terms "," Term
@@ -257,7 +257,7 @@ Terms ::= Terms "," Term
 {{page>:grammar:Terms&noheader&nofooter}}
 
 
-==== Term ====
+===== Term =====
 
 <code>
 Term ::= DirectCallExpression
@@ -276,7 +276,7 @@ Term ::= DirectCallExpression
 {{page>:grammar:Term&noheader&nofooter}}
 
 
-==== Expression ====
+===== Expression =====
 
 <code>
 Expression ::= "(" Term ")"
@@ -305,7 +305,7 @@ Expression ::= "(" Term ")"
 {{page>:grammar:Expression&noheader&nofooter}}
 
 
-==== DirectCallExpression ====
+===== DirectCallExpression =====
 
 <code>
 DirectCallExpression ::= IdentifierPath
@@ -315,7 +315,7 @@ DirectCallExpression ::= IdentifierPath
 {{page>:grammar:DirectCallExpression&noheader&nofooter}}
 
 
-==== IndirectCallExpression ====
+===== IndirectCallExpression =====
 
 <code>
 IndirectCallExpression ::= "(" "*" Term ")" Arguments
@@ -324,7 +324,7 @@ IndirectCallExpression ::= "(" "*" Term ")" Arguments
 {{page>:grammar:IndirectCallExpression&noheader&nofooter}}
 
 
-==== LetExpression ====
+===== LetExpression =====
 
 <code>
 LetExpression ::= "let" AttributedVariable "=" Term "in" Term
@@ -333,7 +333,7 @@ LetExpression ::= "let" AttributedVariable "=" Term "in" Term
 {{page>:grammar:LetExpression&noheader&nofooter}}
 
 
-==== ConditionalExpression ====
+===== ConditionalExpression =====
 
 <code>
 ConditionalExpression ::= "if" Term "then" Term "else" Term
@@ -342,7 +342,7 @@ ConditionalExpression ::= "if" Term "then" Term "else" Term
 {{page>:grammar:ConditionalExpression&noheader&nofooter}}
 
 
-==== ChooseExpression ====
+===== ChooseExpression =====
 
 <code>
 ChooseExpression ::= "choose" AttributedVariable "in" Term "do" Term
@@ -351,7 +351,7 @@ ChooseExpression ::= "choose" AttributedVariable "in" Term "do" Term
 {{page>:grammar:ChooseExpression&noheader&nofooter}}
 
 
-==== UniversalQuantifierExpression ====
+===== UniversalQuantifierExpression =====
 
 <code>
 UniversalQuantifierExpression ::= "forall" AttributedVariable "in" Term "holds" Term
@@ -360,7 +360,7 @@ UniversalQuantifierExpression ::= "forall" AttributedVariable "in" Term "holds" 
 {{page>:grammar:UniversalQuantifierExpression&noheader&nofooter}}
 
 
-==== ExistentialQuantifierExpression ====
+===== ExistentialQuantifierExpression =====
 
 <code>
 ExistentialQuantifierExpression ::= "exists" AttributedVariable "in" Term "with" Term
@@ -369,7 +369,7 @@ ExistentialQuantifierExpression ::= "exists" AttributedVariable "in" Term "with"
 {{page>:grammar:ExistentialQuantifierExpression&noheader&nofooter}}
 
 
-==== List ====
+===== List =====
 
 <code>
 List ::= "[" "]"
@@ -379,7 +379,7 @@ List ::= "[" "]"
 {{page>:grammar:List&noheader&nofooter}}
 
 
-==== Range ====
+===== Range =====
 
 <code>
 Range ::= "[" Term ".." Term "]"
@@ -388,7 +388,7 @@ Range ::= "[" Term ".." Term "]"
 {{page>:grammar:Range&noheader&nofooter}}
 
 
-==== Literal ====
+===== Literal =====
 
 <code>
 Literal ::= UndefinedLiteral
@@ -404,7 +404,7 @@ Literal ::= UndefinedLiteral
 {{page>:grammar:Literal&noheader&nofooter}}
 
 
-==== UndefinedLiteral ====
+===== UndefinedLiteral =====
 
 <code>
 UndefinedLiteral ::= "undef"
@@ -413,7 +413,7 @@ UndefinedLiteral ::= "undef"
 {{page>:grammar:UndefinedLiteral&noheader&nofooter}}
 
 
-==== BooleanLiteral ====
+===== BooleanLiteral =====
 
 <code>
 BooleanLiteral ::= "true"
@@ -423,7 +423,7 @@ BooleanLiteral ::= "true"
 {{page>:grammar:BooleanLiteral&noheader&nofooter}}
 
 
-==== IntegerLiteral ====
+===== IntegerLiteral =====
 
 <code>
 IntegerLiteral ::= "[0-9][0-9']*[0-9]*"
@@ -432,7 +432,7 @@ IntegerLiteral ::= "[0-9][0-9']*[0-9]*"
 {{page>:grammar:IntegerLiteral&noheader&nofooter}}
 
 
-==== RationalLiteral ====
+===== RationalLiteral =====
 
 <code>
 RationalLiteral ::= "0[rR][0-9][0-9']*[0-9]*(/[0-9][0-9']*[0-9]*)?"
@@ -441,7 +441,7 @@ RationalLiteral ::= "0[rR][0-9][0-9']*[0-9]*(/[0-9][0-9']*[0-9]*)?"
 {{page>:grammar:RationalLiteral&noheader&nofooter}}
 
 
-==== FloatingLiteral ====
+===== FloatingLiteral =====
 
 <code>
 FloatingLiteral ::= "[0-9]+.[0-9]+([eE][+-]?[0-9]+)?"
@@ -450,7 +450,7 @@ FloatingLiteral ::= "[0-9]+.[0-9]+([eE][+-]?[0-9]+)?"
 {{page>:grammar:FloatingLiteral&noheader&nofooter}}
 
 
-==== BitLiteral ====
+===== BitLiteral =====
 
 <code>
 BitLiteral ::= "0[bB][01][01']*[01]*"
@@ -460,7 +460,7 @@ BitLiteral ::= "0[bB][01][01']*[01]*"
 {{page>:grammar:BitLiteral&noheader&nofooter}}
 
 
-==== StringLiteral ====
+===== StringLiteral =====
 
 <code>
 StringLiteral ::= '"'.*'"'
@@ -469,7 +469,7 @@ StringLiteral ::= '"'.*'"'
 {{page>:grammar:StringLiteral&noheader&nofooter}}
 
 
-==== ReferenceLiteral ====
+===== ReferenceLiteral =====
 
 <code>
 ReferenceLiteral ::= "@" IdentifierPath
@@ -478,7 +478,7 @@ ReferenceLiteral ::= "@" IdentifierPath
 {{page>:grammar:ReferenceLiteral&noheader&nofooter}}
 
 
-==== Types ====
+===== Types =====
 
 <code>
 Types ::= Types "," Type
@@ -488,7 +488,7 @@ Types ::= Types "," Type
 {{page>:grammar:Types&noheader&nofooter}}
 
 
-==== Type ====
+===== Type =====
 
 <code>
 Type ::= BasicType
@@ -500,7 +500,7 @@ Type ::= BasicType
 {{page>:grammar:Type&noheader&nofooter}}
 
 
-==== BasicType ====
+===== BasicType =====
 
 <code>
 BasicType ::= IdentifierPath
@@ -509,7 +509,7 @@ BasicType ::= IdentifierPath
 {{page>:grammar:BasicType&noheader&nofooter}}
 
 
-==== ComposedType ====
+===== ComposedType =====
 
 <code>
 ComposedType ::= IdentifierPath "<" Types ">"
@@ -518,7 +518,7 @@ ComposedType ::= IdentifierPath "<" Types ">"
 {{page>:grammar:ComposedType&noheader&nofooter}}
 
 
-==== RelationType ====
+===== RelationType =====
 
 <code>
 RelationType ::= IdentifierPath "<" MaybeFunctionParameters "->" Type ">"
@@ -527,7 +527,7 @@ RelationType ::= IdentifierPath "<" MaybeFunctionParameters "->" Type ">"
 {{page>:grammar:RelationType&noheader&nofooter}}
 
 
-==== FixedSizedType ====
+===== FixedSizedType =====
 
 <code>
 FixedSizedType ::= IdentifierPath "'" Term
@@ -536,7 +536,7 @@ FixedSizedType ::= IdentifierPath "'" Term
 {{page>:grammar:FixedSizedType&noheader&nofooter}}
 
 
-==== Arguments ====
+===== Arguments =====
 
 <code>
 Arguments ::= "(" Terms ")"
@@ -546,7 +546,7 @@ Arguments ::= "(" Terms ")"
 {{page>:grammar:Arguments&noheader&nofooter}}
 
 
-==== TwoOrMoreArguments ====
+===== TwoOrMoreArguments =====
 
 <code>
 TwoOrMoreArguments ::= "(" Terms "," Term ")"
@@ -555,7 +555,7 @@ TwoOrMoreArguments ::= "(" Terms "," Term ")"
 {{page>:grammar:TwoOrMoreArguments&noheader&nofooter}}
 
 
-==== FunctionParameters ====
+===== FunctionParameters =====
 
 <code>
 FunctionParameters ::= FunctionParameters "*" Type
@@ -565,7 +565,7 @@ FunctionParameters ::= FunctionParameters "*" Type
 {{page>:grammar:FunctionParameters&noheader&nofooter}}
 
 
-==== MaybeFunctionParameters ====
+===== MaybeFunctionParameters =====
 
 <code>
 MaybeFunctionParameters ::= FunctionParameters
@@ -575,7 +575,7 @@ MaybeFunctionParameters ::= FunctionParameters
 {{page>:grammar:MaybeFunctionParameters&noheader&nofooter}}
 
 
-==== Parameters ====
+===== Parameters =====
 
 <code>
 Parameters ::= Parameters "," AttributedVariable
@@ -585,7 +585,7 @@ Parameters ::= Parameters "," AttributedVariable
 {{page>:grammar:Parameters&noheader&nofooter}}
 
 
-==== MaybeParameters ====
+===== MaybeParameters =====
 
 <code>
 MaybeParameters ::= "(" Parameters ")"
@@ -595,7 +595,7 @@ MaybeParameters ::= "(" Parameters ")"
 {{page>:grammar:MaybeParameters&noheader&nofooter}}
 
 
-==== MaybeDefined ====
+===== MaybeDefined =====
 
 <code>
 MaybeDefined ::= "defined" "{" Term "}"
@@ -605,7 +605,7 @@ MaybeDefined ::= "defined" "{" Term "}"
 {{page>:grammar:MaybeDefined&noheader&nofooter}}
 
 
-==== MaybeInitially ====
+===== MaybeInitially =====
 
 <code>
 MaybeInitially ::= "initially" "{" MaybeInitializers "}"
@@ -615,7 +615,7 @@ MaybeInitially ::= "initially" "{" MaybeInitializers "}"
 {{page>:grammar:MaybeInitially&noheader&nofooter}}
 
 
-==== Initializers ====
+===== Initializers =====
 
 <code>
 Initializers ::= Initializers "," Initializer
@@ -625,7 +625,7 @@ Initializers ::= Initializers "," Initializer
 {{page>:grammar:Initializers&noheader&nofooter}}
 
 
-==== Initializer ====
+===== Initializer =====
 
 <code>
 Initializer ::= Term
@@ -636,7 +636,7 @@ Initializer ::= Term
 {{page>:grammar:Initializer&noheader&nofooter}}
 
 
-==== MaybeInitializers ====
+===== MaybeInitializers =====
 
 <code>
 MaybeInitializers ::= Initializers
@@ -646,7 +646,7 @@ MaybeInitializers ::= Initializers
 {{page>:grammar:MaybeInitializers&noheader&nofooter}}
 
 
-==== Identifiers ====
+===== Identifiers =====
 
 <code>
 Identifiers ::= Identifiers "," Identifier
@@ -656,7 +656,7 @@ Identifiers ::= Identifiers "," Identifier
 {{page>:grammar:Identifiers&noheader&nofooter}}
 
 
-==== Identifier ====
+===== Identifier =====
 
 <code>
 Identifier ::= "[a-zA-Z_][a-zA-Z0-9_]*"
@@ -666,7 +666,7 @@ Identifier ::= "[a-zA-Z_][a-zA-Z0-9_]*"
 {{page>:grammar:Identifier&noheader&nofooter}}
 
 
-==== IdentifierPath ====
+===== IdentifierPath =====
 
 <code>
 IdentifierPath ::= DotSeparatedIdentifiers
@@ -676,7 +676,7 @@ IdentifierPath ::= DotSeparatedIdentifiers
 {{page>:grammar:IdentifierPath&noheader&nofooter}}
 
 
-==== DotSeparatedIdentifiers ====
+===== DotSeparatedIdentifiers =====
 
 <code>
 DotSeparatedIdentifiers ::= DotSeparatedIdentifiers "." Identifier
@@ -686,7 +686,7 @@ DotSeparatedIdentifiers ::= DotSeparatedIdentifiers "." Identifier
 {{page>:grammar:DotSeparatedIdentifiers&noheader&nofooter}}
 
 
-==== Variable ====
+===== Variable =====
 
 <code>
 Variable ::= Identifier ":" Type
@@ -696,7 +696,7 @@ Variable ::= Identifier ":" Type
 {{page>:grammar:Variable&noheader&nofooter}}
 
 
-==== AttributedVariable ====
+===== AttributedVariable =====
 
 <code>
 AttributedVariable ::= "[" Attributes "]" Variable
@@ -706,7 +706,7 @@ AttributedVariable ::= "[" Attributes "]" Variable
 {{page>:grammar:AttributedVariable&noheader&nofooter}}
 
 
-==== Attributes ====
+===== Attributes =====
 
 <code>
 Attributes ::= Attributes "," Attribute
@@ -716,7 +716,7 @@ Attributes ::= Attributes "," Attribute
 {{page>:grammar:Attributes&noheader&nofooter}}
 
 
-==== Attribute ====
+===== Attribute =====
 
 <code>
 Attribute ::= BasicAttribute
@@ -726,7 +726,7 @@ Attribute ::= BasicAttribute
 {{page>:grammar:Attribute&noheader&nofooter}}
 
 
-==== BasicAttribute ====
+===== BasicAttribute =====
 
 <code>
 BasicAttribute ::= Identifier
@@ -735,7 +735,7 @@ BasicAttribute ::= Identifier
 {{page>:grammar:BasicAttribute&noheader&nofooter}}
 
 
-==== ExpressionAttribute ====
+===== ExpressionAttribute =====
 
 <code>
 ExpressionAttribute ::= Identifier Term
