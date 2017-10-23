@@ -50,8 +50,8 @@ LX  = flex
 YC  = bison
 YF  = -Wall -v -g -x
 
-grammar: $(OBJ)/src/various/GrammarParser.cpp $(OBJ)/src/various/GrammarLexer.cpp
-.PHONY: grammar
+grammar: $(OBJ)/src/various/GrammarParser.cpp $(OBJ)/src/various/GrammarLexer.cpp src/various/Grammar.txt
+.PHONY: grammar src/various/Grammar.txt
 
 
 %/src/various/GrammarLexer.cpp: src/various/GrammarLexer.cpp
@@ -82,17 +82,16 @@ src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hpp
 
 
 src/various/GrammarParser.output: src/various/GrammarParser.cpp
+src/various/GrammarParser.dot:    src/various/GrammarParser.cpp
+src/various/GrammarParser.xml:    src/various/GrammarParser.cpp
 
-
-%/src/various/Grammar.org: src/various/Grammar.org
-	mkdir -p `dirname $@`
-	cp -f $< $@
-
-src/various/Grammar.org: src/various/GrammarParser.output
-	grep -e "^[:|] [alpha]*" $< -B 1 | \
-		sed "/^  {/d" | \
-		sed "/^  }/d" | \
-		sed "/^--/d"  | \
-		sed "/^\t/d"  | \
-		sed "s/^[^:|]/\n&/" > $@
-
+src/various/Grammar.txt: src/various/GrammarParser.xml src/GrammarLexer.l
+	@xsltproc ../stdhl/src/xsl/bison/xml2dw.xsl $< > $@
+	@sed -i "/ error/d" $@
+	@sed -i "s/\"binary\"/\"`grep BINARY src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g'`\"/g" $@
+	@sed -i "s/\"hexadecimal\"/\"`grep HEXADECIMAL src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g'`\"/g" $@
+	@sed -i "s/\"integer\"/\"`grep INTEGER src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g'`\"/g" $@
+	@sed -i "s/\"rational\"/\"`grep RATIONAL src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g'`\"/g" $@
+	@sed -i "s/\"floating\"/\"`grep FLOATING src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g'`\"/g" $@
+	@sed -i "s/\"identifier\"/\"`grep IDENTIFIER src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g'`\"/g" $@
+	@sed -i "s/\"string\"/'\"'.*'\"'/g" $@
