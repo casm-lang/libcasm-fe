@@ -84,45 +84,13 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( ChooseRule& node ) override;
 
   private:
-    void push( VariableDefinition& identifier );
-    void pop( VariableDefinition& identifier );
+    void push( const VariableDefinition::Ptr& variable );
+    void pop( const VariableDefinition::Ptr& variable );
 
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 
-    class Variable
-    {
-      public:
-        Variable( const std::string& name, const std::size_t localIndex,
-            const VariableDefinition::Ptr& definition )
-        : m_name( name )
-        , m_localIndex( localIndex )
-        , m_definition( definition )
-        {
-        }
-
-        std::string name( void ) const
-        {
-            return m_name;
-        }
-
-        std::size_t localIndex( void ) const
-        {
-            return m_localIndex;
-        }
-
-        const VariableDefinition::Ptr& definition( void ) const
-        {
-            return m_definition;
-        }
-
-      private:
-        std::string m_name;
-        std::size_t m_localIndex;
-        const VariableDefinition::Ptr m_definition;
-    };
-
-    std::vector< Variable > m_variables;
+    std::vector< VariableDefinition::Ptr > m_variables;
     std::size_t m_maxNumberOfLocals; /**< Used to calculate the minimum number
                                         of frame slots required for derived
                                         functions and rules during execution */
@@ -149,7 +117,7 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
 
     for( const auto& argument : *node.arguments() )
     {
-        push( *argument );
+        push( argument );
     }
 
     node.expression()->accept( *this );
@@ -157,7 +125,7 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
     const auto end = node.arguments()->rend();
     for( auto it = node.arguments()->rbegin(); it != end; ++it )
     {
-        pop( **it );
+        pop( *it );
     }
 
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
@@ -169,7 +137,7 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
 
     for( const auto& argument : *node.arguments() )
     {
-        push( *argument );
+        push( argument );
     }
 
     node.rule()->accept( *this );
@@ -177,7 +145,7 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     const auto end = node.arguments()->rend();
     for( auto it = node.arguments()->rbegin(); it != end; ++it )
     {
-        pop( **it );
+        pop( *it );
     }
 
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
@@ -295,13 +263,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             else
             {
                 const auto variable
-                    = std::find_if( m_variables.rbegin(), m_variables.rend(),
-                        [&]( const Variable& v ) { return v.name() == name; } );
+                    = std::find_if( m_variables.cbegin(), m_variables.cend(),
+                        [&]( const auto& v ) { return v->identifier()->name() == name; } );
 
-                if( variable != m_variables.rend() )
+                if( variable != m_variables.cend() )
                 {
                     node.setTargetType( CallExpression::TargetType::VARIABLE );
-                    node.setTargetDefinition( variable->definition() );
+                    node.setTargetDefinition( *variable );
                 }
                 else if( name == "self" )
                 {
@@ -368,96 +336,95 @@ void SymbolResolveVisitor::visit( LetExpression& node )
 {
     node.initializer()->accept( *this );
 
-    push( *node.variable() );
+    push( node.variable() );
     node.expression()->accept( *this );
-    pop( *node.variable() );
+    pop( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ChooseExpression& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.variable() );
+    push( node.variable() );
     node.expression()->accept( *this );
-    pop( *node.variable() );
+    pop( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.predicateVariable() );
+    push( node.predicateVariable() );
     node.proposition()->accept( *this );
-    pop( *node.predicateVariable() );
+    pop( node.predicateVariable() );
 }
 
 void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.predicateVariable() );
+    push( node.predicateVariable() );
     node.proposition()->accept( *this );
-    pop( *node.predicateVariable() );
+    pop( node.predicateVariable() );
 }
 
 void SymbolResolveVisitor::visit( LetRule& node )
 {
     node.expression()->accept( *this );
 
-    push( *node.variable() );
+    push( node.variable() );
     node.rule()->accept( *this );
-    pop( *node.variable() );
+    pop( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ForallRule& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.variable() );
+    push( node.variable() );
     node.condition()->accept( *this );
     node.rule()->accept( *this );
-    pop( *node.variable() );
+    pop( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ChooseRule& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.variable() );
+    push( node.variable() );
     node.rule()->accept( *this );
-    pop( *node.variable() );
+    pop( node.variable() );
 }
 
-void SymbolResolveVisitor::push( VariableDefinition& node )
+void SymbolResolveVisitor::push( const VariableDefinition::Ptr& variable )
 {
-    const auto& name = node.identifier()->name();
+    const auto& name = variable->identifier()->name();
 
-    const auto variable
-        = std::find_if( m_variables.rbegin(), m_variables.rend(),
-            [&]( const Variable& v ) { return v.name() == name; } );
+    const auto it
+        = std::find_if( m_variables.cbegin(), m_variables.cend(),
+            [&]( const auto& v ) { return v->identifier()->name() == name; } );
 
-    if( variable != m_variables.rend() )
+    if( it != m_variables.cend() )
     {
-        m_log.error( { node.sourceLocation() },
+        m_log.error( { variable->sourceLocation() },
             "redefinition of symbol '" + name + "'",
             Code::SymbolAlreadyDefined );
 
-        m_log.info( { variable->definition()->sourceLocation() },
+        const auto& existingVariable = *it;
+        m_log.info( { existingVariable->sourceLocation() },
             "previous definition of '" + name + "' is here" );
     }
 
     const std::size_t localIndex = m_variables.size(); // used during execution
-    m_variables.emplace_back(
-        name, localIndex, node.ptr< VariableDefinition >() );
+    m_variables.emplace_back( variable );
 
-    node.setLocalIndex( localIndex );
+    variable->setLocalIndex( localIndex );
     m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_variables.size() );
 }
 
-void SymbolResolveVisitor::pop( VariableDefinition& node )
+void SymbolResolveVisitor::pop( const VariableDefinition::Ptr& variable )
 {
-    assert(
-        m_variables.back().definition() == node.ptr< VariableDefinition >() );
+    assert( m_variables.back() == variable );
     m_variables.pop_back();
 }
 
