@@ -53,6 +53,8 @@
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
+#include <unordered_map>
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -90,7 +92,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 
-    std::vector< VariableDefinition::Ptr > m_variables;
+    std::unordered_map< std::string, VariableDefinition::Ptr > m_variables;
     std::size_t m_maxNumberOfLocals; /**< Used to calculate the minimum number
                                         of frame slots required for derived
                                         functions and rules during execution */
@@ -100,6 +102,7 @@ SymbolResolveVisitor::SymbolResolveVisitor(
     libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
+, m_variables()
 , m_maxNumberOfLocals( 0 )
 {
 }
@@ -262,14 +265,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             }
             else
             {
-                const auto variable
-                    = std::find_if( m_variables.cbegin(), m_variables.cend(),
-                        [&]( const auto& v ) { return v->identifier()->name() == name; } );
-
-                if( variable != m_variables.cend() )
+                const auto it = m_variables.find( name );
+                if( it != m_variables.cend() )
                 {
+                    const auto& variable = it->second;
+
                     node.setTargetType( CallExpression::TargetType::VARIABLE );
-                    node.setTargetDefinition( *variable );
+                    node.setTargetDefinition( variable );
                 }
                 else if( name == "self" )
                 {
@@ -400,32 +402,28 @@ void SymbolResolveVisitor::push( const VariableDefinition::Ptr& variable )
 {
     const auto& name = variable->identifier()->name();
 
-    const auto it
-        = std::find_if( m_variables.cbegin(), m_variables.cend(),
-            [&]( const auto& v ) { return v->identifier()->name() == name; } );
+    const std::size_t localIndex = m_variables.size(); // used during execution
+    variable->setLocalIndex( localIndex );
 
-    if( it != m_variables.cend() )
+    const auto result = m_variables.emplace( name, variable );
+    if( not result.second )
     {
         m_log.error( { variable->sourceLocation() },
             "redefinition of symbol '" + name + "'",
             Code::SymbolAlreadyDefined );
 
-        const auto& existingVariable = *it;
+        const auto& existingVariable = result.first->second;
         m_log.info( { existingVariable->sourceLocation() },
             "previous definition of '" + name + "' is here" );
     }
 
-    const std::size_t localIndex = m_variables.size(); // used during execution
-    m_variables.emplace_back( variable );
-
-    variable->setLocalIndex( localIndex );
     m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_variables.size() );
 }
 
 void SymbolResolveVisitor::pop( const VariableDefinition::Ptr& variable )
 {
-    assert( m_variables.back() == variable );
-    m_variables.pop_back();
+    const auto& name = variable->identifier()->name();
+    m_variables.erase( name );
 }
 
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
