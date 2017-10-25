@@ -95,16 +95,6 @@ add_dependencies( ${PROJECT}-cpp
 # grammar
 #
 
-set( DEF_GRAMMAR "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
-set( TXT_GRAMMAR "${CMAKE_CURRENT_BINARY_DIR}/src/various/Grammar.txt" )
-
-add_custom_command(
-  OUTPUT  ${TXT_GRAMMAR}
-  COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} ${TXT_GRAMMAR}
-  DEPENDS ${DEF_GRAMMAR}
-  COMMENT ""
-)
-
 set( DEF_GRAMMAR_PARSER "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarParser.yy;${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
 set( CXX_GRAMMAR_PARSER "${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarParser.cpp" )
 
@@ -129,7 +119,6 @@ add_custom_target( ${PROJECT}-grammar ALL
   DEPENDS
     ${CXX_GRAMMAR_PARSER}
     ${CXX_GRAMMAR_LEXER}
-    ${TXT_GRAMMAR}
   )
 
 add_dependencies( ${PROJECT}-cpp

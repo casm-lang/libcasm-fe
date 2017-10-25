@@ -85,7 +85,7 @@ src/various/GrammarParser.output: src/various/GrammarParser.cpp
 src/various/GrammarParser.dot:    src/various/GrammarParser.cpp
 src/various/GrammarParser.xml:    src/various/GrammarParser.cpp
 
-%/src/various/Grammar.txt: src/various/GrammarParser.xml src/GrammarLexer.l
+src/various/Grammar.txt: src/various/GrammarParser.xml src/GrammarLexer.l
 	@xsltproc ../stdhl/src/xsl/bison/xml2dw.xsl $< > $@
 	@sed -i "/ error/d" $@
 	@sed -i "s/\"binary\"/\"`grep BINARY src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g'`\"/g" $@
