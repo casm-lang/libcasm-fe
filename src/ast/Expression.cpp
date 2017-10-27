@@ -194,10 +194,6 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
         {
             return "constant";
         }
-        case TargetType::VARIABLE:
-        {
-            return "variable";
-        }
         case TargetType::SELF:
         {
             return "self";

@@ -285,6 +285,14 @@ void TypeCheckVisitor::visit( CaseRule& node )
     }
 }
 
+static const std::string TYPE_STRING_VOID = "Void";
+static const std::string TYPE_STRING_BOOLEAN = "Boolean";
+static const std::string TYPE_STRING_BIT = "Bit";
+static const std::string TYPE_STRING_INTEGER = "Integer";
+static const std::string TYPE_STRING_STRING = "String";
+static const std::string TYPE_STRING_FLOATING = "Floating";
+static const std::string TYPE_STRING_RATIONAL = "Rational";
+
 static const std::string TYPE_STRING_RULEREF = "RuleRef";
 static const std::string TYPE_STRING_FUNCREF = "FuncRef";
 
@@ -301,44 +309,109 @@ void TypeCheckVisitor::visit( BasicType& node )
 {
     RecursiveVisitor::visit( node );
 
-    if( not node.type() )
+    if( node.type() )
     {
-        const auto& name = node.name()->baseName();
+        return;
+    }
 
-        if( TYPE_STRINGS_FOR_REFERENCE_TYPES.count( name ) )
+    const auto& name = node.name()->baseName();
+
+    if( name == TYPE_STRING_VOID )
+    {
+        node.setType( libstdhl::Memory::get< libcasm_ir::VoidType >() );
+    }
+    else if( name == TYPE_STRING_BOOLEAN )
+    {
+        node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
+    }
+    else if( name == TYPE_STRING_BIT )
+    {
+        node.setType( libstdhl::Memory::get< libcasm_ir::BitType >( 1 ) );
+    }
+    else if( name == TYPE_STRING_INTEGER )
+    {
+        node.setType( libstdhl::Memory::get< libcasm_ir::IntegerType >() );
+    }
+    else if( name == TYPE_STRING_STRING )
+    {
+        node.setType( libstdhl::Memory::get< libcasm_ir::StringType >() );
+    }
+    else if( name == TYPE_STRING_FLOATING )
+    {
+        node.setType( libstdhl::Memory::get< libcasm_ir::FloatingType >() );
+    }
+    else if( name == TYPE_STRING_RATIONAL )
+    {
+        node.setType( libstdhl::Memory::get< libcasm_ir::RationalType >() );
+    }
+    else if( TYPE_STRINGS_FOR_REFERENCE_TYPES.count( name ) )
+    {
+        m_log.error( { node.sourceLocation() },
+            "reference type '" + name
+                + "' defined without a relation, use '"
+                + name
+                + "< /* relation type */  >'",
+            Code::TypeAnnotationRelationTypeHasNoSubType );
+    }
+    else if( TYPE_STRINGS_FOR_COMPOSED_TYPES.count( name ) )
+    {
+        m_log.error( { node.sourceLocation() },
+            "composed type '" + name + "' defined without sub-types, use '"
+                + name
+                + "< /* sub-type(s) */  >'",
+            Code::TypeAnnotationComposedTypeHasNoSubType );
+    }
+    else
+    {
+        try
+        {
+// <<<<< HEAD
+//             m_log.error( { node.sourceLocation() },
+//                 "reference type '" + name
+//                     + "' defined without a relation, use '" + name
+//                     + "< /* relation type */  >'",
+//                 Code::TypeAnnotationRelationTypeHasNoSubType );
+// =======
+            const auto symbol = m_symboltable.find( node );
+            assert( symbol.targetType()
+                == CallExpression::TargetType::TYPE_DOMAIN );
+
+            const auto& type = symbol.definition()->type();
+            assert( type );
+            node.setType( type );
+//>>>>>>> master
+        }
+        catch( const std::domain_error& e )
         {
             m_log.error( { node.sourceLocation() },
-                "reference type '" + name
-                    + "' defined without a relation, use '" + name
-                    + "< /* relation type */  >'",
-                Code::TypeAnnotationRelationTypeHasNoSubType );
-        }
-        else if( TYPE_STRINGS_FOR_COMPOSED_TYPES.count( name ) )
-        {
-            m_log.error( { node.sourceLocation() },
-                "composed type '" + name + "' defined without sub-types, use '"
-                    + name + "< /* sub-type(s) */  >'",
-                Code::TypeAnnotationComposedTypeHasNoSubType );
-        }
-        else
-        {
-            try
-            {
-                auto symbol = m_symboltable.find( node );
-
-                assert( symbol.targetType()
-                        == CallExpression::TargetType::TYPE_DOMAIN );
-
-                const auto& type = symbol.definition()->type();
-                assert( type );
-                node.setType( type );
-            }
-            catch( const std::domain_error& e )
-            {
-                m_log.error( { node.sourceLocation() },
-                    "unknown type '" + name + "' found",
-                    Code::TypeAnnotationInvalidBasicTypeName );
-            }
+// <<<<< HEAD
+//                 "composed type '" + name + "' defined without sub-types, use '"
+//                     + name + "< /* sub-type(s) */  >'",
+//                 Code::TypeAnnotationComposedTypeHasNoSubType );
+//         }
+//         else
+//         {
+//             try
+//             {
+//                 auto symbol = m_symboltable.find( node );
+// 
+//                 assert( symbol.targetType()
+//                         == CallExpression::TargetType::TYPE_DOMAIN );
+// 
+//                 const auto& type = symbol.definition()->type();
+//                 assert( type );
+//                 node.setType( type );
+//             }
+//             catch( const std::domain_error& e )
+//             {
+//                 m_log.error( { node.sourceLocation() },
+//                     "unknown type '" + name + "' found",
+//                     Code::TypeAnnotationInvalidBasicTypeName );
+//             }
+// =======
+                "unknown type '" + name + "' found",
+                Code::TypeAnnotationInvalidBasicTypeName );
+// >>>>>>> master
         }
     }
 }
@@ -456,7 +529,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
         const auto& name = node.name()->baseName();
         auto& expr = *node.size();
 
-        if( name.compare( "Bit" ) == 0 )
+        if( name == TYPE_STRING_BIT )
         {
             if( expr.id() == Node::ID::VALUE_ATOM and expr.type()->isInteger() )
             {
@@ -485,7 +558,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                     "expected" );
             }
         }
-        else if( name.compare( "Integer" ) == 0 )
+        else if( name == TYPE_STRING_INTEGER )
         {
             if( expr.id() == Node::ID::RANGE_EXPRESSION )
             {

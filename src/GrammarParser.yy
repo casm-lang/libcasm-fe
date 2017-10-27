@@ -185,7 +185,7 @@ END       0 "end of file"
 // definitions
 %type <Definition::Ptr> Definition AttributedDefinition
 %type <Definitions::Ptr> Definitions
-%type <VariableDefinition::Ptr> Variable AttributedVariable
+%type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
 %type <FunctionDefinition::Ptr> FunctionDefinition
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
@@ -563,10 +563,10 @@ CaseLabel
 
 
 CaseLabels
-: CaseLabel CaseLabels
+: CaseLabels CaseLabel
   {
-      auto cases = $2;
-      cases->add( $1 );
+      auto cases = $1;
+      cases->add( $2 );
       $$ = cases;
   }
 | CaseLabel
@@ -1248,13 +1248,13 @@ MaybeFunctionParameters
 
 
 Parameters
-: Parameters COMMA AttributedVariable
+: Parameters COMMA TypedAttributedVariable
   {
       auto parameters = $1;
       parameters->add( $3 );
       $$ = parameters;
   }
-| AttributedVariable
+| TypedAttributedVariable
   {
       auto parameters = Ast::make< NodeList< VariableDefinition > >( @$ );
       parameters->add( $1 );
@@ -1429,14 +1429,22 @@ DotSeparatedIdentifiers
 //
 
 Variable
-: Identifier COLON Type
+: TypedVariable
   {
-      $$ = Ast::make< VariableDefinition >( @$, $1, $3 );
+      $$ = $1;
   }
 | Identifier
   {
       const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
       $$ = Ast::make< VariableDefinition >( @$, $1, unresolvedType );
+  }
+;
+
+
+TypedVariable
+: Identifier COLON Type
+  {
+      $$ = Ast::make< VariableDefinition >( @$, $1, $3 );
   }
 ;
 
@@ -1449,6 +1457,20 @@ AttributedVariable
       $$ = variable;
   }
 | Variable
+  {
+      $$ = $1;
+  }
+;
+
+
+TypedAttributedVariable
+: LSQPAREN Attributes RSQPAREN TypedVariable
+  {
+      auto variable = $4;
+      variable->setAttributes( $2 );
+      $$ = variable;
+  }
+| TypedVariable
   {
       $$ = $1;
   }

@@ -250,11 +250,6 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             node.setType( type );
             break;
         }
-        case ReferenceAtom::ReferenceType::VARIABLE:
-        {
-            // TODO
-            break;
-        }
         default:
         {
             assert( !" unknown reference type! " );
