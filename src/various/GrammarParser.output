@@ -56,7 +56,7 @@ Grammar
    38          | "_" ":" Rule
    39          | Term ":" Rule
 
-   40 CaseLabels: CaseLabel CaseLabels
+   40 CaseLabels: CaseLabels CaseLabel
    41           | CaseLabel
 
    42 LetRule: "let" AttributedVariable "=" Term "in" Rule
@@ -7908,8 +7908,15 @@ State 334
 
 State 335
 
-   40 CaseLabels: CaseLabel . CaseLabels
-   41           | CaseLabel .
+   41 CaseLabels: CaseLabel .
+
+    $default  reduce using rule 41 (CaseLabels)
+
+
+State 336
+
+   35 CaseRule: "case" Term "of" "{" CaseLabels . "}"
+   40 CaseLabels: CaseLabels . CaseLabel
 
     "let"          shift, and go to state 36
     "in"           shift, and go to state 19
@@ -7926,6 +7933,7 @@ State 335
     "-"            shift, and go to state 46
     "("            shift, and go to state 88
     "["            shift, and go to state 48
+    "}"            shift, and go to state 349
     "_"            shift, and go to state 334
     "@"            shift, and go to state 49
     "."            shift, and go to state 21
@@ -7937,10 +7945,7 @@ State 335
     "string"       shift, and go to state 55
     "identifier"   shift, and go to state 22
 
-    $default  reduce using rule 41 (CaseLabels)
-
-    CaseLabel                        go to state 335
-    CaseLabels                       go to state 349
+    CaseLabel                        go to state 350
     Term                             go to state 337
     Expression                       go to state 57
     DirectCallExpression             go to state 58
@@ -7964,13 +7969,6 @@ State 335
     Identifier                       go to state 23
     IdentifierPath                   go to state 80
     DotSeparatedIdentifiers          go to state 25
-
-
-State 336
-
-   35 CaseRule: "case" Term "of" "{" CaseLabels . "}"
-
-    "}"  shift, and go to state 350
 
 
 State 337
@@ -8279,16 +8277,16 @@ State 348
 
 State 349
 
-   40 CaseLabels: CaseLabel CaseLabels .
+   35 CaseRule: "case" Term "of" "{" CaseLabels "}" .
 
-    $default  reduce using rule 40 (CaseLabels)
+    $default  reduce using rule 35 (CaseRule)
 
 
 State 350
 
-   35 CaseRule: "case" Term "of" "{" CaseLabels "}" .
+   40 CaseLabels: CaseLabels CaseLabel .
 
-    $default  reduce using rule 35 (CaseRule)
+    $default  reduce using rule 40 (CaseLabels)
 
 
 State 351
