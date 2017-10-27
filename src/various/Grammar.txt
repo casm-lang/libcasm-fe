@@ -578,8 +578,8 @@ MaybeFunctionParameters ::= FunctionParameters
 ===== Parameters =====
 
 <code>
-Parameters ::= Parameters "," AttributedVariable
-             | AttributedVariable
+Parameters ::= Parameters "," TypedAttributedVariable
+             | TypedAttributedVariable
 </code>
 
 {{page>:grammar:Parameters&noheader&nofooter}}
@@ -689,11 +689,20 @@ DotSeparatedIdentifiers ::= DotSeparatedIdentifiers "." Identifier
 ===== Variable =====
 
 <code>
-Variable ::= Identifier ":" Type
+Variable ::= TypedVariable
            | Identifier
 </code>
 
 {{page>:grammar:Variable&noheader&nofooter}}
+
+
+===== TypedVariable =====
+
+<code>
+TypedVariable ::= Identifier ":" Type
+</code>
+
+{{page>:grammar:TypedVariable&noheader&nofooter}}
 
 
 ===== AttributedVariable =====
@@ -704,6 +713,16 @@ AttributedVariable ::= "[" Attributes "]" Variable
 </code>
 
 {{page>:grammar:AttributedVariable&noheader&nofooter}}
+
+
+===== TypedAttributedVariable =====
+
+<code>
+TypedAttributedVariable ::= "[" Attributes "]" TypedVariable
+                          | TypedVariable
+</code>
+
+{{page>:grammar:TypedAttributedVariable&noheader&nofooter}}
 
 
 ===== Attributes =====

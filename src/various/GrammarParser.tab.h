@@ -473,7 +473,9 @@ namespace libcasm_fe {
       char dummy50[sizeof(ValueAtom::Ptr)];
 
       // Variable
+      // TypedVariable
       // AttributedVariable
+      // TypedAttributedVariable
       char dummy51[sizeof(VariableDefinition::Ptr)];
 
       // Type
@@ -1319,8 +1321,8 @@ namespace libcasm_fe {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1946,     ///< Last index in yytable_.
-      yynnts_ = 73,  ///< Number of nonterminal symbols.
+      yylast_ = 1981,     ///< Last index in yytable_.
+      yynnts_ = 75,  ///< Number of nonterminal symbols.
       yyfinal_ = 18, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -1411,15 +1413,15 @@ namespace libcasm_fe {
   {
       switch (other.type_get ())
     {
-      case 151: // Attribute
+      case 153: // Attribute
         value.copy< Attribute::Ptr > (other.value);
         break;
 
-      case 150: // Attributes
+      case 152: // Attributes
         value.copy< Attributes::Ptr > (other.value);
         break;
 
-      case 152: // BasicAttribute
+      case 154: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (other.value);
         break;
 
@@ -1499,7 +1501,7 @@ namespace libcasm_fe {
         value.copy< Expression::Ptr > (other.value);
         break;
 
-      case 153: // ExpressionAttribute
+      case 155: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (other.value);
         break;
 
@@ -1631,7 +1633,9 @@ namespace libcasm_fe {
         break;
 
       case 148: // Variable
-      case 149: // AttributedVariable
+      case 149: // TypedVariable
+      case 150: // AttributedVariable
+      case 151: // TypedAttributedVariable
         value.copy< VariableDefinition::Ptr > (other.value);
         break;
 
@@ -1666,15 +1670,15 @@ namespace libcasm_fe {
     (void) v;
       switch (this->type_get ())
     {
-      case 151: // Attribute
+      case 153: // Attribute
         value.copy< Attribute::Ptr > (v);
         break;
 
-      case 150: // Attributes
+      case 152: // Attributes
         value.copy< Attributes::Ptr > (v);
         break;
 
-      case 152: // BasicAttribute
+      case 154: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (v);
         break;
 
@@ -1754,7 +1758,7 @@ namespace libcasm_fe {
         value.copy< Expression::Ptr > (v);
         break;
 
-      case 153: // ExpressionAttribute
+      case 155: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (v);
         break;
 
@@ -1886,7 +1890,9 @@ namespace libcasm_fe {
         break;
 
       case 148: // Variable
-      case 149: // AttributedVariable
+      case 149: // TypedVariable
+      case 150: // AttributedVariable
+      case 151: // TypedAttributedVariable
         value.copy< VariableDefinition::Ptr > (v);
         break;
 
@@ -2316,15 +2322,15 @@ namespace libcasm_fe {
     // Type destructor.
     switch (yytype)
     {
-      case 151: // Attribute
+      case 153: // Attribute
         value.template destroy< Attribute::Ptr > ();
         break;
 
-      case 150: // Attributes
+      case 152: // Attributes
         value.template destroy< Attributes::Ptr > ();
         break;
 
-      case 152: // BasicAttribute
+      case 154: // BasicAttribute
         value.template destroy< BasicAttribute::Ptr > ();
         break;
 
@@ -2404,7 +2410,7 @@ namespace libcasm_fe {
         value.template destroy< Expression::Ptr > ();
         break;
 
-      case 153: // ExpressionAttribute
+      case 155: // ExpressionAttribute
         value.template destroy< ExpressionAttribute::Ptr > ();
         break;
 
@@ -2536,7 +2542,9 @@ namespace libcasm_fe {
         break;
 
       case 148: // Variable
-      case 149: // AttributedVariable
+      case 149: // TypedVariable
+      case 150: // AttributedVariable
+      case 151: // TypedAttributedVariable
         value.template destroy< VariableDefinition::Ptr > ();
         break;
 
@@ -2577,15 +2585,15 @@ namespace libcasm_fe {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 151: // Attribute
+      case 153: // Attribute
         value.move< Attribute::Ptr > (s.value);
         break;
 
-      case 150: // Attributes
+      case 152: // Attributes
         value.move< Attributes::Ptr > (s.value);
         break;
 
-      case 152: // BasicAttribute
+      case 154: // BasicAttribute
         value.move< BasicAttribute::Ptr > (s.value);
         break;
 
@@ -2665,7 +2673,7 @@ namespace libcasm_fe {
         value.move< Expression::Ptr > (s.value);
         break;
 
-      case 153: // ExpressionAttribute
+      case 155: // ExpressionAttribute
         value.move< ExpressionAttribute::Ptr > (s.value);
         break;
 
@@ -2797,7 +2805,9 @@ namespace libcasm_fe {
         break;
 
       case 148: // Variable
-      case 149: // AttributedVariable
+      case 149: // TypedVariable
+      case 150: // AttributedVariable
+      case 151: // TypedAttributedVariable
         value.move< VariableDefinition::Ptr > (s.value);
         break;
 
@@ -3360,7 +3370,7 @@ namespace libcasm_fe {
 
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 } // libcasm_fe
-#line 3364 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3374 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 
