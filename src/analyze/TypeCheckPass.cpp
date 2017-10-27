@@ -150,9 +150,8 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
                             assert( symbol.targetType()
                                     == CallExpression::TargetType::CONSTANT );
 
-                            const auto& definition = std::
-                                static_pointer_cast< EnumerationDefinition >(
-                                    symbol.definition() );
+                            const auto& definition = std::static_pointer_cast<
+                                EnumerationDefinition >( symbol.definition() );
 
                             assert( definition->type() );
                             node.setType( definition->type() );
@@ -232,9 +231,7 @@ void TypeCheckVisitor::visit( DirectCallExpression& node )
 
                         m_log.error( { node.sourceLocation() },
                             "invalid argument size: " + node.targetTypeName()
-                                + " '"
-                                + path.path()
-                                + "' expects "
+                                + " '" + path.path() + "' expects "
                                 + std::to_string( symbol.arity() )
                                 + " arguments",
                             code->second );
@@ -312,8 +309,7 @@ void TypeCheckVisitor::visit( BasicType& node )
         {
             m_log.error( { node.sourceLocation() },
                 "reference type '" + name
-                    + "' defined without a relation, use '"
-                    + name
+                    + "' defined without a relation, use '" + name
                     + "< /* relation type */  >'",
                 Code::TypeAnnotationRelationTypeHasNoSubType );
         }
@@ -321,8 +317,7 @@ void TypeCheckVisitor::visit( BasicType& node )
         {
             m_log.error( { node.sourceLocation() },
                 "composed type '" + name + "' defined without sub-types, use '"
-                    + name
-                    + "< /* sub-type(s) */  >'",
+                    + name + "< /* sub-type(s) */  >'",
                 Code::TypeAnnotationComposedTypeHasNoSubType );
         }
         else
@@ -504,13 +499,13 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                     and rhs.id() == Node::ID::VALUE_ATOM
                     and rhs.type()->isInteger() )
                 {
-                    const auto ir_lhs = std::
-                        static_pointer_cast< libcasm_ir::IntegerConstant >(
-                            static_cast< const ValueAtom& >( lhs ).value() );
+                    const auto ir_lhs = std::static_pointer_cast<
+                        libcasm_ir::IntegerConstant >(
+                        static_cast< const ValueAtom& >( lhs ).value() );
 
-                    const auto ir_rhs = std::
-                        static_pointer_cast< libcasm_ir::IntegerConstant >(
-                            static_cast< const ValueAtom& >( rhs ).value() );
+                    const auto ir_rhs = std::static_pointer_cast<
+                        libcasm_ir::IntegerConstant >(
+                        static_cast< const ValueAtom& >( rhs ).value() );
 
                     auto range = libstdhl::Memory::make< libcasm_ir::Range >(
                         ir_lhs, ir_rhs );
