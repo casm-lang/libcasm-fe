@@ -52,15 +52,24 @@
 
 using namespace libcasm_fe;
 
+static const auto fileNameNull = std::string();
+
 static libstdhl::Log::Items to_location_items(
     const std::vector< SourceLocation >& locations )
 {
     libstdhl::Log::Items items;
     for( const auto& location : locations )
     {
+        const std::string* fileName = location.begin.fileName.get();
+
+        if( not location.begin.fileName )
+        {
+            fileName = &fileNameNull;
+        }
+
         items.add( libstdhl::Memory::make< libstdhl::Log::LocationItem >(
-            *location.begin.fileName, location.begin.line,
-            location.begin.column, location.end.line, location.end.column ) );
+            *fileName, location.begin.line, location.begin.column,
+            location.end.line, location.end.column ) );
     }
     return items;
 }
