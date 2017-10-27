@@ -637,11 +637,6 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             m_frameStack.pop();
             break;
         }
-        case ReferenceAtom::ReferenceType::VARIABLE:
-        {
-            atom->reference()->accept( *this );
-            break;
-        }
         case ReferenceAtom::ReferenceType::UNKNOWN:
         {
             assert( !"cannot call an unknown target" );

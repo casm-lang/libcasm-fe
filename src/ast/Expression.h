@@ -90,7 +90,6 @@ namespace libcasm_fe
                 DERIVED,
                 BUILTIN,
                 RULE,
-                VARIABLE,
                 UNKNOWN
             };
 
