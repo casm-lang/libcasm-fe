@@ -312,8 +312,8 @@
       <rule number="40" usefulness="useful">
         <lhs>CaseLabels</lhs>
         <rhs>
-          <symbol>CaseLabel</symbol>
           <symbol>CaseLabels</symbol>
+          <symbol>CaseLabel</symbol>
         </rhs>
       </rule>
       <rule number="41" usefulness="useful">
@@ -18683,17 +18683,25 @@
 
     <state number="335">
       <itemset>
+        <item rule-number="41" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="41" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="336">
+      <itemset>
+        <item rule-number="35" point="5"/>
         <item rule-number="37" point="0"/>
         <item rule-number="38" point="0"/>
         <item rule-number="39" point="0"/>
-        <item rule-number="40" point="0"/>
         <item rule-number="40" point="1"/>
-        <item rule-number="41" point="0"/>
-        <item rule-number="41" point="1">
-          <lookaheads>
-            <symbol>&quot;}&quot;</symbol>
-          </lookaheads>
-        </item>
         <item rule-number="62" point="0"/>
         <item rule-number="63" point="0"/>
         <item rule-number="64" point="0"/>
@@ -18781,6 +18789,7 @@
           <transition type="shift" symbol="&quot;-&quot;" state="46"/>
           <transition type="shift" symbol="&quot;(&quot;" state="88"/>
           <transition type="shift" symbol="&quot;[&quot;" state="48"/>
+          <transition type="shift" symbol="&quot;}&quot;" state="349"/>
           <transition type="shift" symbol="&quot;_&quot;" state="334"/>
           <transition type="shift" symbol="&quot;@&quot;" state="49"/>
           <transition type="shift" symbol="&quot;.&quot;" state="21"/>
@@ -18791,8 +18800,7 @@
           <transition type="shift" symbol="&quot;floating&quot;" state="54"/>
           <transition type="shift" symbol="&quot;string&quot;" state="55"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="22"/>
-          <transition type="goto" symbol="CaseLabel" state="335"/>
-          <transition type="goto" symbol="CaseLabels" state="349"/>
+          <transition type="goto" symbol="CaseLabel" state="350"/>
           <transition type="goto" symbol="Term" state="337"/>
           <transition type="goto" symbol="Expression" state="57"/>
           <transition type="goto" symbol="DirectCallExpression" state="58"/>
@@ -18816,22 +18824,6 @@
           <transition type="goto" symbol="Identifier" state="23"/>
           <transition type="goto" symbol="IdentifierPath" state="80"/>
           <transition type="goto" symbol="DotSeparatedIdentifiers" state="25"/>
-        </transitions>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="41" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="336">
-      <itemset>
-        <item rule-number="35" point="5"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;}&quot;" state="350"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -19393,20 +19385,6 @@
 
     <state number="349">
       <itemset>
-        <item rule-number="40" point="2"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="40" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="350">
-      <itemset>
         <item rule-number="35" point="6"/>
       </itemset>
       <actions>
@@ -19414,6 +19392,20 @@
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="35" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="350">
+      <itemset>
+        <item rule-number="40" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="40" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>

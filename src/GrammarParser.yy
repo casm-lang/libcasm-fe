@@ -563,10 +563,10 @@ CaseLabel
 
 
 CaseLabels
-: CaseLabel CaseLabels
+: CaseLabels CaseLabel
   {
-      auto cases = $2;
-      cases->add( $1 );
+      auto cases = $1;
+      cases->add( $2 );
       $$ = cases;
   }
 | CaseLabel
