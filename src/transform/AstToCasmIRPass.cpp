@@ -334,11 +334,6 @@ void AstToCasmIRVisitor::visit( ReferenceAtom& node )
                     rule );
             break;
         }
-        case ReferenceAtom::ReferenceType::VARIABLE:
-        {
-            m_log.error( { node.sourceLocation() }, "TODO" );
-            break;
-        }
         case ReferenceAtom::ReferenceType::UNKNOWN:
         {
             m_log.error( { node.sourceLocation() }, "TODO" );

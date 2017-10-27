@@ -192,12 +192,6 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
                 node.setReference( symbol.definition() );
                 break;
             }
-            case CallExpression::TargetType::VARIABLE:
-            {
-                node.setReferenceType( ReferenceAtom::ReferenceType::VARIABLE );
-                node.setReference( symbol.definition() );
-                break;
-            }
             default:
             {
                 m_log.error( { node.identifier()->sourceLocation() },
