@@ -53,6 +53,8 @@
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
+#include <algorithm>
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -85,6 +87,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
 
+    void visit( CaseRule& node ) override;
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
 
@@ -172,6 +175,30 @@ void ConsistencyCheckVisitor::visit( UndefAtom& node )
 {
     RecursiveVisitor::visit( node );
     verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( CaseRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto numberOfDefaultCases
+        = std::count_if( node.cases()->begin(), node.cases()->end(),
+                         []( const auto& _case ) {
+        return _case->id() == Node::ID::DEFAULT_CASE;
+    });
+
+    if( numberOfDefaultCases > 1 )
+    {
+        for( const auto& _case : *node.cases() )
+        {
+            if( _case->id() == Node::ID::DEFAULT_CASE )
+            {
+                m_log.error( { _case->sourceLocation() },
+                             "case rule contains multiple default cases",
+                             Code::CaseRuleMultipleDefaultCases );
+            }
+        }
+    }
 }
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
