@@ -184,6 +184,7 @@ void TypeInferenceVisitor::visit( ValueAtom& node )
     m_typeIDs[&node ] = { node.type()->id() };
 
     RecursiveVisitor::visit( node );
+
     inference( "value atom", nullptr, node );
 }
 
@@ -797,10 +798,12 @@ void TypeInferenceVisitor::visit( CaseRule& node )
 
     if( node.expression()->type() )
     {
+        const auto caseExprTypeID
+            = node.expression()->type()->ptr_result()->id();
+
         for( auto caseExpr : *node.cases() )
         {
-            m_typeIDs[ caseExpr.get() ].emplace(
-                node.expression()->type()->id() );
+            m_typeIDs[ caseExpr.get() ].emplace( caseExprTypeID );
         }
     }
 
@@ -810,7 +813,6 @@ void TypeInferenceVisitor::visit( CaseRule& node )
 void TypeInferenceVisitor::visit( ExpressionCase& node )
 {
     m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
-
     RecursiveVisitor::visit( node );
 }
 
