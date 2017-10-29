@@ -291,13 +291,20 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                     const auto description = "variable '" + path.path() + "'";
                     inference( description, nullptr, node );
                 }
-
-                variable->setType( node.type() );
+                else
+                {
+                    variable->setType( node.type() );
+                }
             }
             break;
         }
         case CallExpression::TargetType::BUILTIN:
         {
+            if( node.type() )
+            {
+                break;
+            }
+
             const auto description = "built-in '" + path.path() + "'";
             inference(
                 description, annotation, node, node.arguments()->data() );
@@ -329,7 +336,10 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::DERIVED:
         {
-            assert( not node.type() );
+            if( node.type() )
+            {
+                break;
+            }
 
             const auto& definition
                 = std::static_pointer_cast< DerivedDefinition >(
@@ -341,7 +351,10 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::FUNCTION:
         {
-            assert( not node.type() );
+            if( node.type() )
+            {
+                break;
+            }
 
             const auto& definition
                 = std::static_pointer_cast< FunctionDefinition >(
@@ -353,7 +366,10 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::RULE:
         {
-            assert( not node.type() );
+            if( node.type() )
+            {
+                break;
+            }
 
             const auto& definition = std::static_pointer_cast< RuleDefinition >(
                 node.targetDefinition() );
@@ -364,7 +380,11 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::SELF:
         {
-            assert( not node.type() );
+            if( node.type() )
+            {
+                break;
+            }
+
             assert( node.targetDefinition() );
             node.setType( node.targetDefinition()->type() );
             break;
@@ -387,7 +407,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::UNKNOWN:
         {
-            assert( not" internal error" );
+            assert( !" internal error! " );
             break;
         }
     }
@@ -828,7 +848,7 @@ void TypeInferenceVisitor::visit( LetRule& node )
     if( node.variable()->type() )
     {
         m_typeIDs[ node.expression().get() ].emplace(
-            node.variable()->type()->id() );
+            node.variable()->type()->ptr_result()->id() );
     }
 
     node.expression()->accept( *this );
@@ -839,6 +859,13 @@ void TypeInferenceVisitor::visit( LetRule& node )
     }
 
     node.rule()->accept( *this );
+
+    if( not node.variable()->type() )
+    {
+        // revisit the rule to infer again the variable type from underlying let
+        // definitions or rules
+        node.rule()->accept( *this );
+    }
 
     assignment( node, *node.variable(), *node.expression(),
         "let variable '" + node.variable()->identifier()->name() + "'",
