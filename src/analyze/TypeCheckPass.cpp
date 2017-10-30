@@ -347,71 +347,34 @@ void TypeCheckVisitor::visit( BasicType& node )
     else if( TYPE_STRINGS_FOR_REFERENCE_TYPES.count( name ) )
     {
         m_log.error( { node.sourceLocation() },
-            "reference type '" + name
-                + "' defined without a relation, use '"
-                + name
-                + "< /* relation type */  >'",
+            "reference type '" + name + "' defined without a relation, use '"
+                + name + "< /* relation type */  >'",
             Code::TypeAnnotationRelationTypeHasNoSubType );
     }
     else if( TYPE_STRINGS_FOR_COMPOSED_TYPES.count( name ) )
     {
         m_log.error( { node.sourceLocation() },
             "composed type '" + name + "' defined without sub-types, use '"
-                + name
-                + "< /* sub-type(s) */  >'",
+                + name + "< /* sub-type(s) */  >'",
             Code::TypeAnnotationComposedTypeHasNoSubType );
     }
     else
     {
         try
         {
-// <<<<< HEAD
-//             m_log.error( { node.sourceLocation() },
-//                 "reference type '" + name
-//                     + "' defined without a relation, use '" + name
-//                     + "< /* relation type */  >'",
-//                 Code::TypeAnnotationRelationTypeHasNoSubType );
-// =======
             const auto symbol = m_symboltable.find( node );
             assert( symbol.targetType()
-                == CallExpression::TargetType::TYPE_DOMAIN );
+                    == CallExpression::TargetType::TYPE_DOMAIN );
 
             const auto& type = symbol.definition()->type();
             assert( type );
             node.setType( type );
-//>>>>>>> master
         }
         catch( const std::domain_error& e )
         {
             m_log.error( { node.sourceLocation() },
-// <<<<< HEAD
-//                 "composed type '" + name + "' defined without sub-types, use '"
-//                     + name + "< /* sub-type(s) */  >'",
-//                 Code::TypeAnnotationComposedTypeHasNoSubType );
-//         }
-//         else
-//         {
-//             try
-//             {
-//                 auto symbol = m_symboltable.find( node );
-// 
-//                 assert( symbol.targetType()
-//                         == CallExpression::TargetType::TYPE_DOMAIN );
-// 
-//                 const auto& type = symbol.definition()->type();
-//                 assert( type );
-//                 node.setType( type );
-//             }
-//             catch( const std::domain_error& e )
-//             {
-//                 m_log.error( { node.sourceLocation() },
-//                     "unknown type '" + name + "' found",
-//                     Code::TypeAnnotationInvalidBasicTypeName );
-//             }
-// =======
                 "unknown type '" + name + "' found",
                 Code::TypeAnnotationInvalidBasicTypeName );
-// >>>>>>> master
         }
     }
 }
