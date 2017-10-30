@@ -490,11 +490,15 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                     + std::to_string( call_type_args.size() ) + " arguments",
                 code->second );
 
-            m_log.info( { node.targetDefinition()->sourceLocation() },
-                node.targetTypeName() + " '" + path.path()
-                    + "' is defined as a relation '"
-                    + node.type()->description() + "', incorrect usage in line "
-                    + std::to_string( node.sourceLocation().begin.line ) );
+            if( node.targetType() != CallExpression::TargetType::BUILTIN )
+            {
+                m_log.info( { node.targetDefinition()->sourceLocation() },
+                    node.targetTypeName() + " '" + path.path()
+                        + "' is defined as a relation '"
+                        + node.type()->description()
+                        + "', incorrect usage in line "
+                        + std::to_string( node.sourceLocation().begin.line ) );
+            }
         }
     }
 }
@@ -1250,36 +1254,48 @@ void TypeInferenceVisitor::inference( const std::string& description,
     {
         annotation->resolve( argTypes );
 
+        auto unknownTypeArgCnt = 0;
         for( std::size_t c = 0; c < arguments.size(); c++ )
         {
+            if( not argTypes[ c ] )
+            {
+                unknownTypeArgCnt++;
+                continue;
+            }
+
             m_typeIDs[ arguments[ c ].get() ].emplace( argTypes[ c ]->id() );
             inference( description, nullptr, *arguments[ c ] );
         }
 
-        try
+        if( unknownTypeArgCnt == 0 )
         {
-            const auto inferredTypeID = annotation->inference( argTypes, {} );
-            typeIDs.insert( inferredTypeID );
-        }
-        catch( const libcasm_ir::TypeArgumentException& e )
-        {
-            m_log.error( { arguments[ e.position() ]->sourceLocation() },
-                "type mismatch: " + description + " argument type at position "
-                    + std::to_string( e.position() + 1 ) + ": " + e.what(),
-                Code::TypeInferenceArgumentTypeMismatch );
-            return;
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error( { node.sourceLocation() },
-                "unable to infer result type of " + description + ": "
-                    + e.what(),
-                Code::TypeInferenceNotDefinedForExpression );
-        }
-        catch( const std::invalid_argument& e )
-        {
-            m_log.error( { node.sourceLocation() }, e.what() );
-            return;
+            try
+            {
+                const auto inferredTypeID
+                    = annotation->inference( argTypes, {} );
+                typeIDs.insert( inferredTypeID );
+            }
+            catch( const libcasm_ir::TypeArgumentException& e )
+            {
+                m_log.error( { arguments[ e.position() ]->sourceLocation() },
+                    "type mismatch: " + description
+                        + " argument type at position "
+                        + std::to_string( e.position() + 1 ) + ": " + e.what(),
+                    Code::TypeInferenceArgumentTypeMismatch );
+                return;
+            }
+            catch( const std::domain_error& e )
+            {
+                m_log.error( { node.sourceLocation() },
+                    "unable to infer result type of " + description + ": "
+                        + e.what(),
+                    Code::TypeInferenceNotDefinedForExpression );
+            }
+            catch( const std::invalid_argument& e )
+            {
+                m_log.error( { node.sourceLocation() }, e.what() );
+                return;
+            }
         }
     }
 
