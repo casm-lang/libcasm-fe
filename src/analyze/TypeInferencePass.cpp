@@ -554,8 +554,25 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
     RecursiveVisitor::visit( node );
 
     const auto description
-        = "operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+        = "unary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
     inference( description, annotation, node, { node.expression() } );
+
+    if( node.type() and node.expression()->type() )
+    {
+        std::vector< libcasm_ir::Type::Ptr > argTypeList
+            = { node.expression()->type()->ptr_result() };
+
+        const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
+            node.type(), argTypeList );
+
+        if( not annotation->valid( type ) )
+        {
+            m_log.error( { node.sourceLocation() },
+                description + " has no type relation '" + type->description()
+                    + "'",
+                Code::TypeInferenceOperatorUnaryRelationTypeInvalid );
+        }
+    }
 }
 
 void TypeInferenceVisitor::visit( BinaryExpression& node )
@@ -565,8 +582,26 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
     RecursiveVisitor::visit( node );
 
     const auto description
-        = "operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+        = "binary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
     inference( description, annotation, node, { node.left(), node.right() } );
+
+    if( node.type() and node.left()->type() and node.right()->type() )
+    {
+        std::vector< libcasm_ir::Type::Ptr > argTypeList
+            = { node.left()->type()->ptr_result(),
+                  node.right()->type()->ptr_result() };
+
+        const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
+            node.type(), argTypeList );
+
+        if( not annotation->valid( type ) )
+        {
+            m_log.error( { node.sourceLocation() },
+                description + " has no type relation '" + type->description()
+                    + "'",
+                Code::TypeInferenceOperatorBinaryRelationTypeInvalid );
+        }
+    }
 }
 
 void TypeInferenceVisitor::visit( RangeExpression& node )

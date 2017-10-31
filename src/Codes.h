@@ -186,6 +186,8 @@ namespace libcasm_fe
         TypeInferenceBuiltinRelationTypeInvalid = 0x1324,
         TypeInferenceRuleArgumentTypeMismatch = 0x1305,
         TypeInferenceRuleArgumentSizeMismatch = 0x1315,
+        TypeInferenceOperatorUnaryRelationTypeInvalid = 0x1306,
+        TypeInferenceOperatorBinaryRelationTypeInvalid = 0x1307,
 
         TypeInferenceQuantifierUniversalPropositionTypeMismatch = 0x1400,
         TypeInferenceQuantifierUniversalPredicateTypeMismatch = 0x1401,
