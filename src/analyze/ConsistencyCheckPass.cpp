@@ -122,7 +122,8 @@ void ConsistencyCheckVisitor::visit( Specification& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( "no init definition found in the specification",
+        m_log.error( { node.headerDefinition()->sourceLocation() },
+            "no init definition found in the specification",
             Code::AgentInitRuleNotDefined );
     }
 
@@ -181,11 +182,10 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto numberOfDefaultCases
-        = std::count_if( node.cases()->begin(), node.cases()->end(),
-                         []( const auto& _case ) {
-        return _case->id() == Node::ID::DEFAULT_CASE;
-    });
+    const auto numberOfDefaultCases = std::count_if(
+        node.cases()->begin(), node.cases()->end(), []( const auto& _case ) {
+            return _case->id() == Node::ID::DEFAULT_CASE;
+        } );
 
     if( numberOfDefaultCases > 1 )
     {
@@ -194,8 +194,8 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
             if( _case->id() == Node::ID::DEFAULT_CASE )
             {
                 m_log.error( { _case->sourceLocation() },
-                             "case rule contains multiple default cases",
-                             Code::CaseRuleMultipleDefaultCases );
+                    "case rule contains multiple default cases",
+                    Code::CaseRuleMultipleDefaultCases );
             }
         }
     }
@@ -219,14 +219,12 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
             m_log.error( { node.sourceLocation() },
                 "calling function '" + node.identifier()->path()
                     + "' is not allowed, it is classified as '"
-                    + function->classificationName()
-                    + "' ",
+                    + function->classificationName() + "' ",
                 Code::DirectCallExpressionInvalidClassifier );
 
             m_log.info( { function->sourceLocation() },
                 "function '" + node.identifier()->path()
-                    + "' is classified as '"
-                    + function->classificationName()
+                    + "' is classified as '" + function->classificationName()
                     + "', incorrect usage in line "
                     + std::to_string( node.sourceLocation().begin.line ) );
         }
@@ -286,14 +284,12 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
         m_log.error( { func->sourceLocation() },
             "updating function '" + func->identifier()->path()
                 + "' is not allowed, it is classified as '"
-                + def->classificationName()
-                + "' ",
+                + def->classificationName() + "' ",
             Code::UpdateRuleInvalidClassifier );
 
         m_log.info( { def->sourceLocation() },
             "function '" + func->identifier()->path() + "' is classified as '"
-                + def->classificationName()
-                + "', incorrect usage in line "
+                + def->classificationName() + "', incorrect usage in line "
                 + std::to_string( func->sourceLocation().begin.line ) );
     }
 }
