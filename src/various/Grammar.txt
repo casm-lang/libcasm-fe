@@ -1,0 +1,764 @@
+====== Syntax ======
+
+{{page>:grammar:readme&noheader&nofooter}}
+
+===== Specification =====
+
+<code>
+Specification ::= "CASM" Definitions
+</code>
+
+{{page>:grammar:Specification&noheader&nofooter}}
+
+
+===== Definitions =====
+
+<code>
+Definitions ::= Definitions AttributedDefinition
+              | AttributedDefinition
+</code>
+
+{{page>:grammar:Definitions&noheader&nofooter}}
+
+
+===== Definition =====
+
+<code>
+Definition ::= EnumerationDefinition
+             | DerivedDefinition
+             | RuleDefinition
+             | FunctionDefinition
+</code>
+
+{{page>:grammar:Definition&noheader&nofooter}}
+
+
+===== AttributedDefinition =====
+
+<code>
+AttributedDefinition ::= "[" Attributes "]" Definition
+                       | Definition
+</code>
+
+{{page>:grammar:AttributedDefinition&noheader&nofooter}}
+
+
+===== EnumerationDefinition =====
+
+<code>
+EnumerationDefinition ::= "enumeration" Identifier "=" "{" Identifiers "}"
+</code>
+
+{{page>:grammar:EnumerationDefinition&noheader&nofooter}}
+
+
+===== DerivedDefinition =====
+
+<code>
+DerivedDefinition ::= "derived" Identifier MaybeParameters "->" Type "=" Term
+</code>
+
+{{page>:grammar:DerivedDefinition&noheader&nofooter}}
+
+
+===== RuleDefinition =====
+
+<code>
+RuleDefinition ::= "rule" Identifier MaybeParameters "=" Rule
+                 | "rule" Identifier MaybeParameters "->" Type "=" Rule
+</code>
+
+{{page>:grammar:RuleDefinition&noheader&nofooter}}
+
+
+===== FunctionDefinition =====
+
+<code>
+FunctionDefinition ::= "function" Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
+                     | ProgramFunctionDefinition
+</code>
+
+{{page>:grammar:FunctionDefinition&noheader&nofooter}}
+
+
+===== ProgramFunctionDefinition =====
+
+<code>
+ProgramFunctionDefinition ::= "init" IdentifierPath
+                            | "init" "{" MaybeInitializers "}"
+</code>
+
+{{page>:grammar:ProgramFunctionDefinition&noheader&nofooter}}
+
+
+===== Rule =====
+
+<code>
+Rule ::= SkipRule
+       | ConditionalRule
+       | CaseRule
+       | LetRule
+       | ForallRule
+       | ChooseRule
+       | IterateRule
+       | BlockRule
+       | SequenceRule
+       | UpdateRule
+       | CallRule
+</code>
+
+{{page>:grammar:Rule&noheader&nofooter}}
+
+
+===== Rules =====
+
+<code>
+Rules ::= Rules Rule
+        | Rule
+</code>
+
+{{page>:grammar:Rules&noheader&nofooter}}
+
+
+===== SkipRule =====
+
+<code>
+SkipRule ::= "skip"
+</code>
+
+{{page>:grammar:SkipRule&noheader&nofooter}}
+
+
+===== ConditionalRule =====
+
+<code>
+ConditionalRule ::= "if" Term "then" Rule
+                  | "if" Term "then" Rule "else" Rule
+</code>
+
+{{page>:grammar:ConditionalRule&noheader&nofooter}}
+
+
+===== CaseRule =====
+
+<code>
+CaseRule ::= "case" Term "of" "{" CaseLabels "}"
+</code>
+
+{{page>:grammar:CaseRule&noheader&nofooter}}
+
+
+===== CaseLabel =====
+
+<code>
+CaseLabel ::= "default" ":" Rule
+            | "_" ":" Rule
+            | Term ":" Rule
+</code>
+
+{{page>:grammar:CaseLabel&noheader&nofooter}}
+
+
+===== CaseLabels =====
+
+<code>
+CaseLabels ::= CaseLabels CaseLabel
+             | CaseLabel
+</code>
+
+{{page>:grammar:CaseLabels&noheader&nofooter}}
+
+
+===== LetRule =====
+
+<code>
+LetRule ::= "let" AttributedVariable "=" Term "in" Rule
+</code>
+
+{{page>:grammar:LetRule&noheader&nofooter}}
+
+
+===== ForallRule =====
+
+<code>
+ForallRule ::= "forall" AttributedVariable "in" Term "do" Rule
+             | "forall" AttributedVariable "in" Term "with" Term "do" Rule
+</code>
+
+{{page>:grammar:ForallRule&noheader&nofooter}}
+
+
+===== ChooseRule =====
+
+<code>
+ChooseRule ::= "choose" AttributedVariable "in" Term "do" Rule
+</code>
+
+{{page>:grammar:ChooseRule&noheader&nofooter}}
+
+
+===== IterateRule =====
+
+<code>
+IterateRule ::= "iterate" Rule
+</code>
+
+{{page>:grammar:IterateRule&noheader&nofooter}}
+
+
+===== BlockRule =====
+
+<code>
+BlockRule ::= "{" Rules "}"
+            | "par" Rules "endpar"
+</code>
+
+{{page>:grammar:BlockRule&noheader&nofooter}}
+
+
+===== SequenceRule =====
+
+<code>
+SequenceRule ::= "{|" Rules "|}"
+               | "seq" Rules "endseq"
+</code>
+
+{{page>:grammar:SequenceRule&noheader&nofooter}}
+
+
+===== UpdateRule =====
+
+<code>
+UpdateRule ::= DirectCallExpression ":=" Term
+</code>
+
+{{page>:grammar:UpdateRule&noheader&nofooter}}
+
+
+===== CallRule =====
+
+<code>
+CallRule ::= "call" DirectCallExpression
+           | DirectCallExpression
+           | "call" IndirectCallExpression
+           | IndirectCallExpression
+</code>
+
+{{page>:grammar:CallRule&noheader&nofooter}}
+
+
+===== Terms =====
+
+<code>
+Terms ::= Terms "," Term
+        | Term
+</code>
+
+{{page>:grammar:Terms&noheader&nofooter}}
+
+
+===== Term =====
+
+<code>
+Term ::= DirectCallExpression
+       | IndirectCallExpression
+       | LetExpression
+       | ConditionalExpression
+       | ChooseExpression
+       | UniversalQuantifierExpression
+       | ExistentialQuantifierExpression
+       | Expression
+       | List
+       | Range
+       | Literal
+</code>
+
+{{page>:grammar:Term&noheader&nofooter}}
+
+
+===== Expression =====
+
+<code>
+Expression ::= "(" Term ")"
+             | "+" Term
+             | "-" Term
+             | Term "+" Term
+             | Term "-" Term
+             | Term "*" Term
+             | Term "/" Term
+             | Term "%" Term
+             | Term "^" Term
+             | Term "!=" Term
+             | Term "=" Term
+             | Term "<" Term
+             | Term ">" Term
+             | Term "<=" Term
+             | Term ">=" Term
+             | Term "or" Term
+             | Term "xor" Term
+             | Term "and" Term
+             | Term "=>" Term
+             | Term "implies" Term
+             | "not" Term
+</code>
+
+{{page>:grammar:Expression&noheader&nofooter}}
+
+
+===== DirectCallExpression =====
+
+<code>
+DirectCallExpression ::= IdentifierPath
+                       | IdentifierPath Arguments
+</code>
+
+{{page>:grammar:DirectCallExpression&noheader&nofooter}}
+
+
+===== IndirectCallExpression =====
+
+<code>
+IndirectCallExpression ::= "(" "*" Term ")" Arguments
+</code>
+
+{{page>:grammar:IndirectCallExpression&noheader&nofooter}}
+
+
+===== LetExpression =====
+
+<code>
+LetExpression ::= "let" AttributedVariable "=" Term "in" Term
+</code>
+
+{{page>:grammar:LetExpression&noheader&nofooter}}
+
+
+===== ConditionalExpression =====
+
+<code>
+ConditionalExpression ::= "if" Term "then" Term "else" Term
+</code>
+
+{{page>:grammar:ConditionalExpression&noheader&nofooter}}
+
+
+===== ChooseExpression =====
+
+<code>
+ChooseExpression ::= "choose" AttributedVariable "in" Term "do" Term
+</code>
+
+{{page>:grammar:ChooseExpression&noheader&nofooter}}
+
+
+===== UniversalQuantifierExpression =====
+
+<code>
+UniversalQuantifierExpression ::= "forall" AttributedVariable "in" Term "holds" Term
+</code>
+
+{{page>:grammar:UniversalQuantifierExpression&noheader&nofooter}}
+
+
+===== ExistentialQuantifierExpression =====
+
+<code>
+ExistentialQuantifierExpression ::= "exists" AttributedVariable "in" Term "with" Term
+</code>
+
+{{page>:grammar:ExistentialQuantifierExpression&noheader&nofooter}}
+
+
+===== List =====
+
+<code>
+List ::= "[" "]"
+       | "[" Terms "]"
+</code>
+
+{{page>:grammar:List&noheader&nofooter}}
+
+
+===== Range =====
+
+<code>
+Range ::= "[" Term ".." Term "]"
+</code>
+
+{{page>:grammar:Range&noheader&nofooter}}
+
+
+===== Literal =====
+
+<code>
+Literal ::= UndefinedLiteral
+          | BooleanLiteral
+          | IntegerLiteral
+          | RationalLiteral
+          | FloatingLiteral
+          | BitLiteral
+          | StringLiteral
+          | ReferenceLiteral
+</code>
+
+{{page>:grammar:Literal&noheader&nofooter}}
+
+
+===== UndefinedLiteral =====
+
+<code>
+UndefinedLiteral ::= "undef"
+</code>
+
+{{page>:grammar:UndefinedLiteral&noheader&nofooter}}
+
+
+===== BooleanLiteral =====
+
+<code>
+BooleanLiteral ::= "true"
+                 | "false"
+</code>
+
+{{page>:grammar:BooleanLiteral&noheader&nofooter}}
+
+
+===== IntegerLiteral =====
+
+<code>
+IntegerLiteral ::= "[0-9][0-9']*[0-9]*"
+</code>
+
+{{page>:grammar:IntegerLiteral&noheader&nofooter}}
+
+
+===== RationalLiteral =====
+
+<code>
+RationalLiteral ::= "0[rR][0-9][0-9']*[0-9]*(/[0-9][0-9']*[0-9]*)?"
+</code>
+
+{{page>:grammar:RationalLiteral&noheader&nofooter}}
+
+
+===== FloatingLiteral =====
+
+<code>
+FloatingLiteral ::= "[0-9]+.[0-9]+([eE][+-]?[0-9]+)?"
+</code>
+
+{{page>:grammar:FloatingLiteral&noheader&nofooter}}
+
+
+===== BitLiteral =====
+
+<code>
+BitLiteral ::= "0[bB][01][01']*[01]*"
+             | "0[xX][0-9a-fA-F][0-9a-fA-F']*[0-9a-fA-F]*"
+</code>
+
+{{page>:grammar:BitLiteral&noheader&nofooter}}
+
+
+===== StringLiteral =====
+
+<code>
+StringLiteral ::= '"'.*'"'
+</code>
+
+{{page>:grammar:StringLiteral&noheader&nofooter}}
+
+
+===== ReferenceLiteral =====
+
+<code>
+ReferenceLiteral ::= "@" IdentifierPath
+</code>
+
+{{page>:grammar:ReferenceLiteral&noheader&nofooter}}
+
+
+===== Types =====
+
+<code>
+Types ::= Types "," Type
+        | Type
+</code>
+
+{{page>:grammar:Types&noheader&nofooter}}
+
+
+===== Type =====
+
+<code>
+Type ::= BasicType
+       | ComposedType
+       | RelationType
+       | FixedSizedType
+</code>
+
+{{page>:grammar:Type&noheader&nofooter}}
+
+
+===== BasicType =====
+
+<code>
+BasicType ::= IdentifierPath
+</code>
+
+{{page>:grammar:BasicType&noheader&nofooter}}
+
+
+===== ComposedType =====
+
+<code>
+ComposedType ::= IdentifierPath "<" Types ">"
+</code>
+
+{{page>:grammar:ComposedType&noheader&nofooter}}
+
+
+===== RelationType =====
+
+<code>
+RelationType ::= IdentifierPath "<" MaybeFunctionParameters "->" Type ">"
+</code>
+
+{{page>:grammar:RelationType&noheader&nofooter}}
+
+
+===== FixedSizedType =====
+
+<code>
+FixedSizedType ::= IdentifierPath "'" Term
+</code>
+
+{{page>:grammar:FixedSizedType&noheader&nofooter}}
+
+
+===== Arguments =====
+
+<code>
+Arguments ::= "(" Terms ")"
+            | "(" ")"
+</code>
+
+{{page>:grammar:Arguments&noheader&nofooter}}
+
+
+===== TwoOrMoreArguments =====
+
+<code>
+TwoOrMoreArguments ::= "(" Terms "," Term ")"
+</code>
+
+{{page>:grammar:TwoOrMoreArguments&noheader&nofooter}}
+
+
+===== FunctionParameters =====
+
+<code>
+FunctionParameters ::= FunctionParameters "*" Type
+                     | Type
+</code>
+
+{{page>:grammar:FunctionParameters&noheader&nofooter}}
+
+
+===== MaybeFunctionParameters =====
+
+<code>
+MaybeFunctionParameters ::= FunctionParameters
+                          | null
+</code>
+
+{{page>:grammar:MaybeFunctionParameters&noheader&nofooter}}
+
+
+===== Parameters =====
+
+<code>
+Parameters ::= Parameters "," TypedAttributedVariable
+             | TypedAttributedVariable
+</code>
+
+{{page>:grammar:Parameters&noheader&nofooter}}
+
+
+===== MaybeParameters =====
+
+<code>
+MaybeParameters ::= "(" Parameters ")"
+                  | null
+</code>
+
+{{page>:grammar:MaybeParameters&noheader&nofooter}}
+
+
+===== MaybeDefined =====
+
+<code>
+MaybeDefined ::= "defined" "{" Term "}"
+               | null
+</code>
+
+{{page>:grammar:MaybeDefined&noheader&nofooter}}
+
+
+===== MaybeInitially =====
+
+<code>
+MaybeInitially ::= "initially" "{" MaybeInitializers "}"
+                 | null
+</code>
+
+{{page>:grammar:MaybeInitially&noheader&nofooter}}
+
+
+===== Initializers =====
+
+<code>
+Initializers ::= Initializers "," Initializer
+               | Initializer
+</code>
+
+{{page>:grammar:Initializers&noheader&nofooter}}
+
+
+===== Initializer =====
+
+<code>
+Initializer ::= Term
+              | Term "->" Term
+              | TwoOrMoreArguments "->" Term
+</code>
+
+{{page>:grammar:Initializer&noheader&nofooter}}
+
+
+===== MaybeInitializers =====
+
+<code>
+MaybeInitializers ::= Initializers
+                    | null
+</code>
+
+{{page>:grammar:MaybeInitializers&noheader&nofooter}}
+
+
+===== Identifiers =====
+
+<code>
+Identifiers ::= Identifiers "," Identifier
+              | Identifier
+</code>
+
+{{page>:grammar:Identifiers&noheader&nofooter}}
+
+
+===== Identifier =====
+
+<code>
+Identifier ::= "[a-zA-Z_][a-zA-Z0-9_]*"
+             | "in"
+</code>
+
+{{page>:grammar:Identifier&noheader&nofooter}}
+
+
+===== IdentifierPath =====
+
+<code>
+IdentifierPath ::= DotSeparatedIdentifiers
+                 | "." DotSeparatedIdentifiers
+</code>
+
+{{page>:grammar:IdentifierPath&noheader&nofooter}}
+
+
+===== DotSeparatedIdentifiers =====
+
+<code>
+DotSeparatedIdentifiers ::= DotSeparatedIdentifiers "." Identifier
+                          | Identifier
+</code>
+
+{{page>:grammar:DotSeparatedIdentifiers&noheader&nofooter}}
+
+
+===== Variable =====
+
+<code>
+Variable ::= TypedVariable
+           | Identifier
+</code>
+
+{{page>:grammar:Variable&noheader&nofooter}}
+
+
+===== TypedVariable =====
+
+<code>
+TypedVariable ::= Identifier ":" Type
+</code>
+
+{{page>:grammar:TypedVariable&noheader&nofooter}}
+
+
+===== AttributedVariable =====
+
+<code>
+AttributedVariable ::= "[" Attributes "]" Variable
+                     | Variable
+</code>
+
+{{page>:grammar:AttributedVariable&noheader&nofooter}}
+
+
+===== TypedAttributedVariable =====
+
+<code>
+TypedAttributedVariable ::= "[" Attributes "]" TypedVariable
+                          | TypedVariable
+</code>
+
+{{page>:grammar:TypedAttributedVariable&noheader&nofooter}}
+
+
+===== Attributes =====
+
+<code>
+Attributes ::= Attributes "," Attribute
+             | Attribute
+</code>
+
+{{page>:grammar:Attributes&noheader&nofooter}}
+
+
+===== Attribute =====
+
+<code>
+Attribute ::= BasicAttribute
+            | ExpressionAttribute
+</code>
+
+{{page>:grammar:Attribute&noheader&nofooter}}
+
+
+===== BasicAttribute =====
+
+<code>
+BasicAttribute ::= Identifier
+</code>
+
+{{page>:grammar:BasicAttribute&noheader&nofooter}}
+
+
+===== ExpressionAttribute =====
+
+<code>
+ExpressionAttribute ::= Identifier Term
+</code>
+
+{{page>:grammar:ExpressionAttribute&noheader&nofooter}}
+
