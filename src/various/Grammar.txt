@@ -5,10 +5,20 @@
 ===== Specification =====
 
 <code>
-Specification ::= "CASM" Definitions
+Specification ::= Header Definitions
 </code>
 
 {{page>:grammar:Specification&noheader&nofooter}}
+
+
+===== Header =====
+
+<code>
+Header ::= "[" Attributes "]" "CASM"
+         | "CASM"
+</code>
+
+{{page>:grammar:Header&noheader&nofooter}}
 
 
 ===== Definitions =====
@@ -21,6 +31,16 @@ Definitions ::= Definitions AttributedDefinition
 {{page>:grammar:Definitions&noheader&nofooter}}
 
 
+===== AttributedDefinition =====
+
+<code>
+AttributedDefinition ::= "[" Attributes "]" Definition
+                       | Definition
+</code>
+
+{{page>:grammar:AttributedDefinition&noheader&nofooter}}
+
+
 ===== Definition =====
 
 <code>
@@ -31,16 +51,6 @@ Definition ::= EnumerationDefinition
 </code>
 
 {{page>:grammar:Definition&noheader&nofooter}}
-
-
-===== AttributedDefinition =====
-
-<code>
-AttributedDefinition ::= "[" Attributes "]" Definition
-                       | Definition
-</code>
-
-{{page>:grammar:AttributedDefinition&noheader&nofooter}}
 
 
 ===== EnumerationDefinition =====

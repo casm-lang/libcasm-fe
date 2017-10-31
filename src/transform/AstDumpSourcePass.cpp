@@ -146,6 +146,7 @@ class AstDumpSourceVisitor final : public Visitor
   public:
     explicit AstDumpSourceVisitor( std::ostream& stream );
 
+    void visit( HeaderDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -220,6 +221,13 @@ AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 : m_stream( stream )
 , m_indentation( 4 )
 {
+}
+
+void AstDumpSourceVisitor::visit( HeaderDefinition& node )
+{
+    dumpAttributes( *node.attributes() );
+    m_stream << " ";
+    node.identifier()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( VariableDefinition& node )
@@ -645,7 +653,6 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 
     AstDumpSourceVisitor visitor{ outputStream };
 
-    outputStream << "CASM\n";
     for( const auto& definition : *specification->definitions() )
     {
         outputStream << "\n";

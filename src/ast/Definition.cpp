@@ -79,6 +79,17 @@ std::size_t Definition::maximumNumberOfLocals( void ) const
     return m_maxNumberOfLocals;
 }
 
+HeaderDefinition::HeaderDefinition( const SourceLocation& sourceLocation )
+: Definition( Node::ID::HEADER_DEFINITION,
+      Ast::make< Identifier >( sourceLocation, "CASM" ) )
+{
+}
+
+void HeaderDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 VariableDefinition::VariableDefinition(
     const Identifier::Ptr& identifier, const Type::Ptr& variableType )
 : Definition( Node::ID::VARIABLE_DEFINITION, identifier )

@@ -65,6 +65,7 @@ namespace libcasm_fe
             enum class ID
             {
                 // definitions
+                HEADER_DEFINITION,
                 VARIABLE_DEFINITION,
                 FUNCTION_DEFINITION,
                 DERIVED_DEFINITION,

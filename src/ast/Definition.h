@@ -80,6 +80,16 @@ namespace libcasm_fe
         };
 
         using Definitions = NodeList< Definition >;
+        
+        class HeaderDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< HeaderDefinition >;
+
+            HeaderDefinition( const SourceLocation& sourceLocation );
+
+            void accept( Visitor& visitor ) override final;
+        };
 
         class VariableDefinition final : public Definition
         {

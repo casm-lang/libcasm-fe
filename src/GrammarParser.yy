@@ -185,6 +185,7 @@ END       0 "end of file"
 // definitions
 %type <Definition::Ptr> Definition AttributedDefinition
 %type <Definitions::Ptr> Definitions
+%type <HeaderDefinition::Ptr> Header
 %type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
 %type <FunctionDefinition::Ptr> FunctionDefinition
 %type <DerivedDefinition::Ptr> DerivedDefinition
@@ -290,9 +291,24 @@ END       0 "end of file"
 
 
 Specification
-: CASM Definitions
+: Header Definitions
   {
+      $2->add( $2->begin(), $1 );
       specification.setDefinitions( $2 );
+  }
+;
+
+
+Header
+: LSQPAREN Attributes RSQPAREN CASM
+  {
+      auto definition = Ast::make< HeaderDefinition >( @$, @$ );
+      definition->setAttributes( $2 );
+      $$ = definition;
+  }
+| CASM
+  {
+      $$ = Ast::make< HeaderDefinition >( @$, @$ );
   }
 ;
 
@@ -313,6 +329,24 @@ Definitions
 ;
 
 
+AttributedDefinition
+: LSQPAREN Attributes RSQPAREN Definition
+  {
+      auto definition = $4;
+      definition->setAttributes( $2 );
+      $$ = definition;
+  }
+| Definition
+  {
+      $$ = $1;
+  }
+| error // error recovery
+  {
+      $$ = nullptr;
+  }
+;
+
+
 Definition
 : EnumerationDefinition
   {
@@ -329,24 +363,6 @@ Definition
 | FunctionDefinition
   {
       $$ = $1;
-  }
-;
-
-
-AttributedDefinition
-: LSQPAREN Attributes RSQPAREN Definition
-  {
-      auto definition = $4;
-      definition->setAttributes( $2 );
-      $$ = definition;
-  }
-| Definition
-  {
-      $$ = $1;
-  }
-| error // error recovery
-  {
-      $$ = nullptr;
   }
 ;
 

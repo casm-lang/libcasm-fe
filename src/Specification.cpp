@@ -48,7 +48,7 @@ using namespace libcasm_fe;
 Specification::Specification( void )
 : m_name()
 , m_definitions()
-, m_symboltable( std::make_shared< Namespace>() )
+, m_symboltable( std::make_shared< Namespace >() )
 {
 }
 
@@ -64,6 +64,11 @@ const std::string& Specification::name( void ) const
 
 void Specification::setDefinitions( const Ast::Definitions::Ptr& definitions )
 {
+    assert( definitions );
+    assert( definitions->size() > 0 );
+    assert( definitions->front() );
+    assert( definitions->front()->id() == Ast::Node::ID::HEADER_DEFINITION );
+
     m_definitions = definitions;
 }
 
@@ -75,4 +80,10 @@ const Ast::Definitions::Ptr& Specification::definitions( void ) const
 const Namespace::Ptr& Specification::symboltable( void ) const
 {
     return m_symboltable;
+}
+
+Ast::HeaderDefinition::Ptr Specification::headerDefinition( void ) const
+{
+    return std::static_pointer_cast< Ast::HeaderDefinition >(
+        m_definitions->front() );
 }

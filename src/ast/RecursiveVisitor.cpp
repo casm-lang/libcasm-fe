@@ -50,6 +50,12 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+void RecursiveVisitor::visit( HeaderDefinition& node )
+{
+    node.identifier()->accept( *this );
+    node.attributes()->accept( *this );
+}
+
 void RecursiveVisitor::visit( VariableDefinition& node )
 {
     node.identifier()->accept( *this );

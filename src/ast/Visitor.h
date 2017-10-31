@@ -48,6 +48,7 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class HeaderDefinition;
         class VariableDefinition;
         class FunctionDefinition;
         class DerivedDefinition;
@@ -103,6 +104,7 @@ namespace libcasm_fe
           public:
             virtual ~Visitor( void ) = default;
 
+            virtual void visit( HeaderDefinition& node ) = 0;
             virtual void visit( VariableDefinition& node ) = 0;
             virtual void visit( FunctionDefinition& node ) = 0;
             virtual void visit( DerivedDefinition& node ) = 0;

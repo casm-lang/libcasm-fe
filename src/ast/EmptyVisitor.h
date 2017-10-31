@@ -53,6 +53,7 @@ namespace libcasm_fe
         class EmptyVisitor : public Visitor
         {
           public:
+            void visit( HeaderDefinition& node ) override;
             void visit( VariableDefinition& node ) override;
             void visit( FunctionDefinition& node ) override;
             void visit( DerivedDefinition& node ) override;

@@ -65,6 +65,8 @@ namespace libcasm_fe
 
         const Namespace::Ptr& symboltable( void ) const;
 
+        Ast::HeaderDefinition::Ptr headerDefinition( void ) const;
+
       private:
         std::string m_name;
         Ast::Definitions::Ptr m_definitions;

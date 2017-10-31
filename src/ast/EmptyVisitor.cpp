@@ -50,6 +50,10 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+void EmptyVisitor::visit( HeaderDefinition& )
+{
+}
+
 void EmptyVisitor::visit( VariableDefinition& )
 {
 }

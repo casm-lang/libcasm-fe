@@ -73,6 +73,10 @@ std::string Node::description( void ) const
 {
     switch( m_id )
     {
+        case ID::HEADER_DEFINITION:
+        {
+            return "header";
+        }
         case ID::VARIABLE_DEFINITION:
         {
             return "variable";
