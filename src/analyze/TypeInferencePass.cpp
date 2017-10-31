@@ -330,6 +330,15 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                         node.type(), argTypeList );
 
                 node.setType( type );
+
+                if( not annotation->valid( type ) )
+                {
+                    m_log.error( { node.sourceLocation() },
+                        "built-in '" + path.path() + "' has no type relation '"
+                            + type->description() + "'",
+                        Code::TypeInferenceBuiltinRelationTypeInvalid );
+                    return;
+                }
             }
 
             break;

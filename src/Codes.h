@@ -183,6 +183,7 @@ namespace libcasm_fe
         TypeInferenceDerivedReturnTypeMismatch = 0x1323,
         TypeInferenceBuiltinArgumentTypeMismatch = 0x1304,
         TypeInferenceBuiltinArgumentSizeMismatch = 0x1314,
+        TypeInferenceBuiltinRelationTypeInvalid = 0x1324,
         TypeInferenceRuleArgumentTypeMismatch = 0x1305,
         TypeInferenceRuleArgumentSizeMismatch = 0x1315,
 
