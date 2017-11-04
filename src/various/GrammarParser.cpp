@@ -544,7 +544,7 @@ namespace libcasm_fe {
       case 121: // BooleanLiteral
       case 122: // IntegerLiteral
       case 123: // RationalLiteral
-      case 124: // FloatingLiteral
+      case 124: // DecimalLiteral
       case 125: // BitLiteral
       case 126: // StringLiteral
         value.move< ValueAtom::Ptr > (that.value);
@@ -565,7 +565,7 @@ namespace libcasm_fe {
       case 71: // "hexadecimal"
       case 72: // "integer"
       case 73: // "rational"
-      case 74: // "floating"
+      case 74: // "decimal"
       case 75: // "string"
       case 76: // "identifier"
         value.move< std::string > (that.value);
@@ -803,7 +803,7 @@ namespace libcasm_fe {
       case 121: // BooleanLiteral
       case 122: // IntegerLiteral
       case 123: // RationalLiteral
-      case 124: // FloatingLiteral
+      case 124: // DecimalLiteral
       case 125: // BitLiteral
       case 126: // StringLiteral
         value.copy< ValueAtom::Ptr > (that.value);
@@ -824,7 +824,7 @@ namespace libcasm_fe {
       case 71: // "hexadecimal"
       case 72: // "integer"
       case 73: // "rational"
-      case 74: // "floating"
+      case 74: // "decimal"
       case 75: // "string"
       case 76: // "identifier"
         value.copy< std::string > (that.value);
@@ -1275,7 +1275,7 @@ namespace libcasm_fe {
       case 121: // BooleanLiteral
       case 122: // IntegerLiteral
       case 123: // RationalLiteral
-      case 124: // FloatingLiteral
+      case 124: // DecimalLiteral
       case 125: // BitLiteral
       case 126: // StringLiteral
         yylhs.value.build< ValueAtom::Ptr > ();
@@ -1296,7 +1296,7 @@ namespace libcasm_fe {
       case 71: // "hexadecimal"
       case 72: // "integer"
       case 73: // "rational"
-      case 74: // "floating"
+      case 74: // "decimal"
       case 75: // "string"
       case 76: // "identifier"
         yylhs.value.build< std::string > ();
@@ -2392,7 +2392,7 @@ namespace libcasm_fe {
     {
       try
       {
-          const auto value = libstdhl::Memory::get< libcasm_ir::FloatingConstant >( yystack_[0].value.as< std::string > () );
+          const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( yystack_[0].value.as< std::string > () );
           yylhs.value.as< ValueAtom::Ptr > () = Ast::make< ValueAtom >( yylhs.location, value );
       }
       catch( const std::domain_error& e )
@@ -3835,7 +3835,7 @@ namespace libcasm_fe {
   "\":\"", "\"_\"", "\"@\"", "\",\"", "\"<\"", "\">\"", "\"*\"", "\"/\"",
   "\"%\"", "\"^\"", "\"'\"", "\"..\"", "\".\"", "\"->\"", "\"=>\"",
   "\":=\"", "\"!=\"", "\"<=\"", "\">=\"", "\"{|\"", "\"|}\"", "\"binary\"",
-  "\"hexadecimal\"", "\"integer\"", "\"rational\"", "\"floating\"",
+  "\"hexadecimal\"", "\"integer\"", "\"rational\"", "\"decimal\"",
   "\"string\"", "\"identifier\"", "ABSOLUTE_PATH", "UPLUS", "UMINUS",
   "CALL_WITHOUT_ARGS", "$accept", "Specification", "Header", "Definitions",
   "AttributedDefinition", "Definition", "EnumerationDefinition",
@@ -3848,7 +3848,7 @@ namespace libcasm_fe {
   "ConditionalExpression", "ChooseExpression",
   "UniversalQuantifierExpression", "ExistentialQuantifierExpression",
   "List", "Range", "Literal", "UndefinedLiteral", "BooleanLiteral",
-  "IntegerLiteral", "RationalLiteral", "FloatingLiteral", "BitLiteral",
+  "IntegerLiteral", "RationalLiteral", "DecimalLiteral", "BitLiteral",
   "StringLiteral", "ReferenceLiteral", "Types", "Type", "BasicType",
   "ComposedType", "RelationType", "FixedSizedType", "Arguments",
   "TwoOrMoreArguments", "FunctionParameters", "MaybeFunctionParameters",

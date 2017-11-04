@@ -868,7 +868,7 @@ case 5:
 YY_RULE_SETUP
 #line 98 "obj/src/GrammarLexer.l"
 {
-    return Parser::make_FLOATING( yytext, loc );
+    return Parser::make_DECIMAL( yytext, loc );
 }
 	YY_BREAK
 case 6:

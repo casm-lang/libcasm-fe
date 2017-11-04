@@ -172,7 +172,7 @@ END       0 "end of file"
 %token <std::string> HEXADECIMAL "hexadecimal"
 %token <std::string> INTEGER     "integer"
 %token <std::string> RATIONAL    "rational"
-%token <std::string> FLOATING    "floating"
+%token <std::string> DECIMAL     "decimal"
 %token <std::string> STRING      "string"
 %token <std::string> IDENTIFIER  "identifier"
 
@@ -195,7 +195,7 @@ END       0 "end of file"
 // expressions
 %type <Expression::Ptr> Expression Term Literal
 %type <Expressions::Ptr> Terms
-%type <ValueAtom::Ptr> BooleanLiteral StringLiteral BitLiteral IntegerLiteral FloatingLiteral RationalLiteral
+%type <ValueAtom::Ptr> BooleanLiteral StringLiteral BitLiteral IntegerLiteral DecimalLiteral RationalLiteral
 %type <ReferenceAtom::Ptr> ReferenceLiteral
 %type <UndefAtom::Ptr> UndefinedLiteral
 %type <RangeExpression::Ptr> Range
@@ -987,7 +987,7 @@ Literal
   {
       $$ = $1;
   }
-| FloatingLiteral
+| DecimalLiteral
   {
       $$ = $1;
   }
@@ -1060,12 +1060,12 @@ RationalLiteral
 ;
 
 
-FloatingLiteral
-: FLOATING
+DecimalLiteral
+: DECIMAL
   {
       try
       {
-          const auto value = libstdhl::Memory::get< libcasm_ir::FloatingConstant >( $1 );
+          const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( $1 );
           $$ = Ast::make< ValueAtom >( @$, value );
       }
       catch( const std::domain_error& e )

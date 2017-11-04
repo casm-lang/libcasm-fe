@@ -290,7 +290,7 @@ static const std::string TYPE_STRING_BOOLEAN = "Boolean";
 static const std::string TYPE_STRING_BIT = "Bit";
 static const std::string TYPE_STRING_INTEGER = "Integer";
 static const std::string TYPE_STRING_STRING = "String";
-static const std::string TYPE_STRING_FLOATING = "Floating";
+static const std::string TYPE_STRING_DECIMAL = "Decimal";
 static const std::string TYPE_STRING_RATIONAL = "Rational";
 
 static const std::string TYPE_STRING_RULEREF = "RuleRef";
@@ -336,9 +336,9 @@ void TypeCheckVisitor::visit( BasicType& node )
     {
         node.setType( libstdhl::Memory::get< libcasm_ir::StringType >() );
     }
-    else if( name == TYPE_STRING_FLOATING )
+    else if( name == TYPE_STRING_DECIMAL )
     {
-        node.setType( libstdhl::Memory::get< libcasm_ir::FloatingType >() );
+        node.setType( libstdhl::Memory::get< libcasm_ir::DecimalType >() );
     }
     else if( name == TYPE_STRING_RATIONAL )
     {

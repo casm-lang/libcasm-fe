@@ -470,7 +470,7 @@ namespace libcasm_fe {
       // BooleanLiteral
       // IntegerLiteral
       // RationalLiteral
-      // FloatingLiteral
+      // DecimalLiteral
       // BitLiteral
       // StringLiteral
       char dummy51[sizeof(ValueAtom::Ptr)];
@@ -488,7 +488,7 @@ namespace libcasm_fe {
       // "hexadecimal"
       // "integer"
       // "rational"
-      // "floating"
+      // "decimal"
       // "string"
       // "identifier"
       char dummy54[sizeof(std::string)];
@@ -586,7 +586,7 @@ namespace libcasm_fe {
         HEXADECIMAL = 326,
         INTEGER = 327,
         RATIONAL = 328,
-        FLOATING = 329,
+        DECIMAL = 329,
         STRING = 330,
         IDENTIFIER = 331,
         ABSOLUTE_PATH = 332,
@@ -1095,7 +1095,7 @@ namespace libcasm_fe {
 
     static inline
     symbol_type
-    make_FLOATING (const std::string& v, const location_type& l);
+    make_DECIMAL (const std::string& v, const location_type& l);
 
     static inline
     symbol_type
@@ -1635,7 +1635,7 @@ namespace libcasm_fe {
       case 121: // BooleanLiteral
       case 122: // IntegerLiteral
       case 123: // RationalLiteral
-      case 124: // FloatingLiteral
+      case 124: // DecimalLiteral
       case 125: // BitLiteral
       case 126: // StringLiteral
         value.copy< ValueAtom::Ptr > (other.value);
@@ -1656,7 +1656,7 @@ namespace libcasm_fe {
       case 71: // "hexadecimal"
       case 72: // "integer"
       case 73: // "rational"
-      case 74: // "floating"
+      case 74: // "decimal"
       case 75: // "string"
       case 76: // "identifier"
         value.copy< std::string > (other.value);
@@ -1896,7 +1896,7 @@ namespace libcasm_fe {
       case 121: // BooleanLiteral
       case 122: // IntegerLiteral
       case 123: // RationalLiteral
-      case 124: // FloatingLiteral
+      case 124: // DecimalLiteral
       case 125: // BitLiteral
       case 126: // StringLiteral
         value.copy< ValueAtom::Ptr > (v);
@@ -1917,7 +1917,7 @@ namespace libcasm_fe {
       case 71: // "hexadecimal"
       case 72: // "integer"
       case 73: // "rational"
-      case 74: // "floating"
+      case 74: // "decimal"
       case 75: // "string"
       case 76: // "identifier"
         value.copy< std::string > (v);
@@ -2559,7 +2559,7 @@ namespace libcasm_fe {
       case 121: // BooleanLiteral
       case 122: // IntegerLiteral
       case 123: // RationalLiteral
-      case 124: // FloatingLiteral
+      case 124: // DecimalLiteral
       case 125: // BitLiteral
       case 126: // StringLiteral
         value.template destroy< ValueAtom::Ptr > ();
@@ -2580,7 +2580,7 @@ namespace libcasm_fe {
       case 71: // "hexadecimal"
       case 72: // "integer"
       case 73: // "rational"
-      case 74: // "floating"
+      case 74: // "decimal"
       case 75: // "string"
       case 76: // "identifier"
         value.template destroy< std::string > ();
@@ -2826,7 +2826,7 @@ namespace libcasm_fe {
       case 121: // BooleanLiteral
       case 122: // IntegerLiteral
       case 123: // RationalLiteral
-      case 124: // FloatingLiteral
+      case 124: // DecimalLiteral
       case 125: // BitLiteral
       case 126: // StringLiteral
         value.move< ValueAtom::Ptr > (s.value);
@@ -2847,7 +2847,7 @@ namespace libcasm_fe {
       case 71: // "hexadecimal"
       case 72: // "integer"
       case 73: // "rational"
-      case 74: // "floating"
+      case 74: // "decimal"
       case 75: // "string"
       case 76: // "identifier"
         value.move< std::string > (s.value);
@@ -3354,9 +3354,9 @@ namespace libcasm_fe {
   }
 
   Parser::symbol_type
-  Parser::make_FLOATING (const std::string& v, const location_type& l)
+  Parser::make_DECIMAL (const std::string& v, const location_type& l)
   {
-    return symbol_type (token::FLOATING, v, l);
+    return symbol_type (token::DECIMAL, v, l);
   }
 
   Parser::symbol_type
