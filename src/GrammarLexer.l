@@ -95,7 +95,7 @@ using namespace libcasm_fe;
 }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
-    return Parser::make_FLOATING( yytext, loc );
+    return Parser::make_DECIMAL( yytext, loc );
 }
 
 {{grammartoken}}

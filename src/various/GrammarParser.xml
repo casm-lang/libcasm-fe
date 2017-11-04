@@ -879,7 +879,7 @@
       <rule number="113" usefulness="useful">
         <lhs>Literal</lhs>
         <rhs>
-          <symbol>FloatingLiteral</symbol>
+          <symbol>DecimalLiteral</symbol>
         </rhs>
       </rule>
       <rule number="114" usefulness="useful">
@@ -931,9 +931,9 @@
         </rhs>
       </rule>
       <rule number="122" usefulness="useful">
-        <lhs>FloatingLiteral</lhs>
+        <lhs>DecimalLiteral</lhs>
         <rhs>
-          <symbol>&quot;floating&quot;</symbol>
+          <symbol>&quot;decimal&quot;</symbol>
         </rhs>
       </rule>
       <rule number="123" usefulness="useful">
@@ -1423,7 +1423,7 @@
       <terminal symbol-number="71" token-number="326" name="&quot;hexadecimal&quot;" usefulness="useful"/>
       <terminal symbol-number="72" token-number="327" name="&quot;integer&quot;" usefulness="useful"/>
       <terminal symbol-number="73" token-number="328" name="&quot;rational&quot;" usefulness="useful"/>
-      <terminal symbol-number="74" token-number="329" name="&quot;floating&quot;" usefulness="useful"/>
+      <terminal symbol-number="74" token-number="329" name="&quot;decimal&quot;" usefulness="useful"/>
       <terminal symbol-number="75" token-number="330" name="&quot;string&quot;" usefulness="useful"/>
       <terminal symbol-number="76" token-number="331" name="&quot;identifier&quot;" usefulness="useful"/>
       <terminal symbol-number="77" token-number="332" name="ABSOLUTE_PATH" usefulness="useful" prec="1" assoc="precedence"/>
@@ -1475,7 +1475,7 @@
       <nonterminal symbol-number="121" name="BooleanLiteral" usefulness="useful"/>
       <nonterminal symbol-number="122" name="IntegerLiteral" usefulness="useful"/>
       <nonterminal symbol-number="123" name="RationalLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="124" name="FloatingLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="124" name="DecimalLiteral" usefulness="useful"/>
       <nonterminal symbol-number="125" name="BitLiteral" usefulness="useful"/>
       <nonterminal symbol-number="126" name="StringLiteral" usefulness="useful"/>
       <nonterminal symbol-number="127" name="ReferenceLiteral" usefulness="useful"/>
@@ -1763,7 +1763,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="49"/>
@@ -1782,7 +1782,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -2335,7 +2335,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="89"/>
@@ -2354,7 +2354,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -2532,7 +2532,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="91"/>
@@ -2551,7 +2551,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -2660,7 +2660,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="92"/>
@@ -2679,7 +2679,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -2788,7 +2788,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="93"/>
@@ -2807,7 +2807,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -2920,7 +2920,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="96"/>
@@ -2939,7 +2939,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -3055,7 +3055,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Terms" state="99"/>
@@ -3075,7 +3075,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -3627,7 +3627,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -3727,7 +3727,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -3894,7 +3894,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="126"/>
@@ -3913,7 +3913,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -4328,7 +4328,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -4436,7 +4436,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -4561,7 +4561,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -4721,7 +4721,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="145"/>
@@ -4740,7 +4740,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -4992,7 +4992,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -5106,7 +5106,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="151"/>
@@ -5125,7 +5125,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -5234,7 +5234,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="152"/>
@@ -5253,7 +5253,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -5362,7 +5362,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="153"/>
@@ -5381,7 +5381,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -5490,7 +5490,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="154"/>
@@ -5509,7 +5509,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -5618,7 +5618,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="155"/>
@@ -5637,7 +5637,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -5746,7 +5746,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="156"/>
@@ -5765,7 +5765,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -5874,7 +5874,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="157"/>
@@ -5893,7 +5893,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -6002,7 +6002,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="158"/>
@@ -6021,7 +6021,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -6130,7 +6130,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="159"/>
@@ -6149,7 +6149,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -6258,7 +6258,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="160"/>
@@ -6277,7 +6277,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -6386,7 +6386,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="161"/>
@@ -6405,7 +6405,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -6514,7 +6514,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="162"/>
@@ -6533,7 +6533,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -6642,7 +6642,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="163"/>
@@ -6661,7 +6661,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -6770,7 +6770,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="164"/>
@@ -6789,7 +6789,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -6898,7 +6898,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="165"/>
@@ -6917,7 +6917,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -7026,7 +7026,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="166"/>
@@ -7045,7 +7045,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -7154,7 +7154,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="167"/>
@@ -7173,7 +7173,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -7288,7 +7288,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Terms" state="170"/>
@@ -7308,7 +7308,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -7484,7 +7484,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Terms" state="173"/>
@@ -7504,7 +7504,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -7945,7 +7945,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="200"/>
@@ -7964,7 +7964,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -8073,7 +8073,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="201"/>
@@ -8092,7 +8092,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -8201,7 +8201,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="202"/>
@@ -8220,7 +8220,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -8329,7 +8329,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="203"/>
@@ -8348,7 +8348,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -8457,7 +8457,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="204"/>
@@ -8476,7 +8476,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -8689,7 +8689,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="206"/>
@@ -8708,7 +8708,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -8817,7 +8817,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="207"/>
@@ -8836,7 +8836,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -8927,7 +8927,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -9049,7 +9049,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -9177,7 +9177,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -9304,7 +9304,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -9425,7 +9425,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -9552,7 +9552,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -9678,7 +9678,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -9809,7 +9809,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -9936,7 +9936,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -10060,7 +10060,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -10187,7 +10187,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -10314,7 +10314,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -10442,7 +10442,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -10562,7 +10562,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -10684,7 +10684,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -10818,7 +10818,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -10945,7 +10945,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -11268,7 +11268,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="211"/>
@@ -11287,7 +11287,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -11396,7 +11396,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="212"/>
@@ -11415,7 +11415,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -11528,7 +11528,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="126"/>
@@ -11547,7 +11547,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -12544,7 +12544,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="261"/>
@@ -12563,7 +12563,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -13312,7 +13312,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="278"/>
@@ -13331,7 +13331,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -13441,7 +13441,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="279"/>
@@ -13460,7 +13460,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -13891,7 +13891,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -14162,7 +14162,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="291"/>
@@ -14181,7 +14181,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -14304,7 +14304,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="292"/>
@@ -14323,7 +14323,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -14432,7 +14432,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="293"/>
@@ -14451,7 +14451,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -14560,7 +14560,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="294"/>
@@ -14579,7 +14579,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -14688,7 +14688,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="295"/>
@@ -14707,7 +14707,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -14816,7 +14816,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="296"/>
@@ -14835,7 +14835,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -15061,7 +15061,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="299"/>
@@ -15080,7 +15080,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -15838,7 +15838,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="315"/>
@@ -15857,7 +15857,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -16206,7 +16206,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -16332,7 +16332,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -16458,7 +16458,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -16584,7 +16584,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -16710,7 +16710,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -17029,7 +17029,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="322"/>
@@ -17048,7 +17048,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -17158,7 +17158,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="323"/>
@@ -17177,7 +17177,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -17286,7 +17286,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="324"/>
@@ -17305,7 +17305,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -17524,7 +17524,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -17917,7 +17917,7 @@
             <symbol>&quot;hexadecimal&quot;</symbol>
             <symbol>&quot;integer&quot;</symbol>
             <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;floating&quot;</symbol>
+            <symbol>&quot;decimal&quot;</symbol>
             <symbol>&quot;string&quot;</symbol>
             <symbol>&quot;identifier&quot;</symbol>
           </lookaheads>
@@ -18042,7 +18042,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="CaseLabel" state="340"/>
@@ -18063,7 +18063,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -18172,7 +18172,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="343"/>
@@ -18191,7 +18191,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -18534,7 +18534,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="348"/>
@@ -18553,7 +18553,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -18903,7 +18903,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="CaseLabel" state="355"/>
@@ -18923,7 +18923,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
@@ -19140,7 +19140,7 @@
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
           <transition type="shift" symbol="&quot;rational&quot;" state="46"/>
-          <transition type="shift" symbol="&quot;floating&quot;" state="47"/>
+          <transition type="shift" symbol="&quot;decimal&quot;" state="47"/>
           <transition type="shift" symbol="&quot;string&quot;" state="48"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Term" state="126"/>
@@ -19159,7 +19159,7 @@
           <transition type="goto" symbol="BooleanLiteral" state="62"/>
           <transition type="goto" symbol="IntegerLiteral" state="63"/>
           <transition type="goto" symbol="RationalLiteral" state="64"/>
-          <transition type="goto" symbol="FloatingLiteral" state="65"/>
+          <transition type="goto" symbol="DecimalLiteral" state="65"/>
           <transition type="goto" symbol="BitLiteral" state="66"/>
           <transition type="goto" symbol="StringLiteral" state="67"/>
           <transition type="goto" symbol="ReferenceLiteral" state="68"/>
