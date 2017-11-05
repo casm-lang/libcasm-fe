@@ -185,6 +185,8 @@ void AstDumpDotVisitor::visit( Specification& specification )
 
     {
         DotLink link( this, &specification );
+
+        specification.header()->accept( *this );
         specification.definitions()->accept( *this );
     }
 

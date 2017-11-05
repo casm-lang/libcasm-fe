@@ -122,11 +122,12 @@ void ConsistencyCheckVisitor::visit( Specification& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.headerDefinition()->sourceLocation() },
+        m_log.error( { node.header()->sourceLocation() },
             "no init definition found in the specification",
             Code::AgentInitRuleNotDefined );
     }
 
+    node.header()->accept( *this );
     node.definitions()->accept( *this );
 }
 
