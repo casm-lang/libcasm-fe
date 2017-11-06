@@ -181,7 +181,7 @@ void AstDumpDotVisitor::visit( Specification& specification )
 {
     m_stream << "subgraph \"" << specification.name() << "\" {\n"
              << "\"" << &specification
-             << "\" [label=\"CASM\\nSpecification\"];\n";
+             << "\" [label=\"Specification\"];\n";
 
     {
         DotLink link( this, &specification );
