@@ -41,29 +41,31 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_H_
-#define _LIBCASM_FE_H_
+#ifndef _LIB_CASMFE_FRAME_SIZE_DETERMINATION_PASS_H_
+#define _LIB_CASMFE_FRAME_SIZE_DETERMINATION_PASS_H_
 
-#include <libcasm-fe/analyze/AttributionPass>
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
-#include <libcasm-fe/analyze/SymbolRegistrationPass>
-#include <libcasm-fe/analyze/SymbolResolverPass>
-#include <libcasm-fe/analyze/TypeCheckPass>
-#include <libcasm-fe/analyze/TypeInferencePass>
-#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
-#include <libcasm-fe/execute/NumericExecutionPass>
-#include <libcasm-fe/execute/UpdateSet>
-//#include <libcasm-fe/execute/SymbolicExecutionPass>
-#include <libcasm-fe/transform/AstDumpDotPass>
-#include <libcasm-fe/transform/AstDumpSourcePass>
-#include <libcasm-fe/transform/AstToCasmIRPass>
-#include <libcasm-fe/transform/SourceToAstPass>
 
 namespace libcasm_fe
 {
+    /**
+     * Determines the minimum size of call frames required during execution:
+     * - The minimum stack size to hold the locals
+     */
+    class FrameSizeDeterminationPass final : public libpass::Pass
+    {
+      public:
+        static char id;
+
+        void usage( libpass::PassUsage& pu ) override;
+
+        bool run( libpass::PassResult& pr ) override;
+
+        using Data = ConsistencyCheckPass::Data;
+    };
 }
 
-#endif // _LIBCASM_FE_H_
+#endif // _LIB_CASMFE_FRAME_SIZE_DETERMINATION_PASS_H_
 
 //
 //  Local variables:

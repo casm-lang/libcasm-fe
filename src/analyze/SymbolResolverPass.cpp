@@ -70,7 +70,6 @@ class SymbolResolveVisitor final : public RecursiveVisitor
   public:
     SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-    void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
 
@@ -93,9 +92,6 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     Namespace& m_symboltable;
 
     std::unordered_map< std::string, VariableDefinition::Ptr > m_variables;
-    std::size_t m_maxNumberOfLocals; /**< Used to calculate the minimum number
-                                        of frame slots required for derived
-                                        functions and rules during execution */
 };
 
 SymbolResolveVisitor::SymbolResolveVisitor(
@@ -103,21 +99,11 @@ SymbolResolveVisitor::SymbolResolveVisitor(
 : m_log( log )
 , m_symboltable( symboltable )
 , m_variables()
-, m_maxNumberOfLocals( 0 )
 {
-}
-
-void SymbolResolveVisitor::visit( FunctionDefinition& node )
-{
-    RecursiveVisitor::visit( node );
-
-    node.setMaximumNumberOfLocals( node.argumentTypes()->size() );
 }
 
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
 {
-    m_maxNumberOfLocals = 0;
-
     for( const auto& argument : *node.arguments() )
     {
         pushVariable( argument );
@@ -130,14 +116,10 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
     {
         popVariable( *it );
     }
-
-    node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
 }
 
 void SymbolResolveVisitor::visit( RuleDefinition& node )
 {
-    m_maxNumberOfLocals = 0;
-
     for( const auto& argument : *node.arguments() )
     {
         pushVariable( argument );
@@ -150,8 +132,6 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     {
         popVariable( *it );
     }
-
-    node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
 }
 
 void SymbolResolveVisitor::visit( ReferenceAtom& node )
@@ -396,9 +376,6 @@ void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable
 {
     const auto& name = variable->identifier()->name();
 
-    const std::size_t localIndex = m_variables.size(); // used during execution
-    variable->setLocalIndex( localIndex );
-
     const auto result = m_variables.emplace( name, variable );
     if( not result.second )
     {
@@ -410,8 +387,6 @@ void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable
         m_log.info( { existingVariable->sourceLocation() },
             "previous definition of '" + name + "' is here" );
     }
-
-    m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_variables.size() );
 }
 
 void SymbolResolveVisitor::popVariable( const VariableDefinition::Ptr& variable )
