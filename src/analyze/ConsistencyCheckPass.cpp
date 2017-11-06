@@ -74,7 +74,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 {
   public:
     ConsistencyCheckVisitor(
-        libcasm_fe::Logger& m_log, const Namespace& symboltable );
+        libcasm_fe::Logger& m_log );
 
     void visit( Specification& node );
 
@@ -100,35 +100,31 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
   private:
     libcasm_fe::Logger& m_log;
-    const Namespace& m_symboltable;
     u1 m_functionInitially;
     u1 m_sideEffectFree;
+    u1 m_initDefinitionFound;
 };
 
 ConsistencyCheckVisitor::ConsistencyCheckVisitor(
-    libcasm_fe::Logger& log, const Namespace& symboltable )
+    libcasm_fe::Logger& log )
 : m_log( log )
-, m_symboltable( symboltable )
 , m_functionInitially( false )
 , m_sideEffectFree( false )
+, m_initDefinitionFound( false )
 {
 }
 
 void ConsistencyCheckVisitor::visit( Specification& node )
 {
-    try
-    {
-        m_symboltable.find( PROGRAM );
-    }
-    catch( const std::domain_error& e )
-    {
-        m_log.error( { node.header()->sourceLocation() },
-            "no init definition found in the specification",
-            Code::AgentInitRuleNotDefined );
-    }
-
     node.header()->accept( *this );
     node.definitions()->accept( *this );
+
+    if( not m_initDefinitionFound )
+    {
+        m_log.error( { node.header()->sourceLocation() },
+            "no init definition found in this specification",
+            Code::AgentInitRuleNotDefined );
+    }
 }
 
 void ConsistencyCheckVisitor::visit( VariableDefinition& node )
@@ -140,9 +136,7 @@ void ConsistencyCheckVisitor::visit( VariableDefinition& node )
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 {
     m_functionInitially = true;
-
     node.initializers()->accept( *this );
-
     m_functionInitially = false;
 
     node.identifier()->accept( *this );
@@ -150,6 +144,11 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     node.returnType()->accept( *this );
     node.defaultValue()->accept( *this );
     node.attributes()->accept( *this );
+
+    if( node.identifier()->name() == PROGRAM )
+    {
+        m_initDefinitionFound = true;
+    }
 }
 
 void ConsistencyCheckVisitor::visit( DerivedDefinition& node )
@@ -359,7 +358,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
 
-    ConsistencyCheckVisitor visitor( log, *specification->symboltable() );
+    ConsistencyCheckVisitor visitor( log );
     visitor.visit( *specification );
 
     const auto errors = log.errors();
