@@ -169,6 +169,8 @@ void AstToCasmIRVisitor::visit( Specification& node )
     rule_init_block->add( rule_init_inner_block );
     m_init_block = rule_init_inner_block;
 
+    node.header()->accept( *this );
+
     // declaration phase
     m_declaration = true;
     node.definitions()->accept( *this );

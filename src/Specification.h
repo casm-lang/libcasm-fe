@@ -58,17 +58,22 @@ namespace libcasm_fe
         explicit Specification( void );
 
         void setName( const std::string& name );
+
         const std::string& name( void ) const;
 
+        void setHeader( const Ast::HeaderDefinition::Ptr& header );
+
+        const Ast::HeaderDefinition::Ptr& header( void ) const;
+
         void setDefinitions( const Ast::Definitions::Ptr& definitions );
+
         const Ast::Definitions::Ptr& definitions( void ) const;
 
         const Namespace::Ptr& symboltable( void ) const;
 
-        Ast::HeaderDefinition::Ptr headerDefinition( void ) const;
-
       private:
         std::string m_name;
+        Ast::HeaderDefinition::Ptr m_header;
         Ast::Definitions::Ptr m_definitions;
         Namespace::Ptr m_symboltable;
     };

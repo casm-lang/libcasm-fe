@@ -1343,6 +1343,7 @@ void StateInitializationVisitor::visit( Specification& node )
 {
     m_updateSetManager.fork( Semantics::Sequential, 100UL );
 
+    node.header()->accept( *this );
     node.definitions()->accept( *this );
 
     auto updateSet = m_updateSetManager.currentUpdateSet();

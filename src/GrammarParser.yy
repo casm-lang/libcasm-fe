@@ -294,7 +294,7 @@ END       0 "end of file"
 Specification
 : Header Definitions
   {
-      $2->add( $2->begin(), $1 );
+      specification.setHeader( $1 );
       specification.setDefinitions( $2 );
   }
 ;

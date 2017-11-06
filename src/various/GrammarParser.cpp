@@ -1322,7 +1322,7 @@ namespace libcasm_fe {
   case 2:
 #line 374 "../../obj/src/GrammarParser.yy" // lalr1.cc:859
     {
-      yystack_[0].value.as< Definitions::Ptr > ()->add( yystack_[0].value.as< Definitions::Ptr > ()->begin(), yystack_[1].value.as< HeaderDefinition::Ptr > () );
+      specification.setHeader( yystack_[1].value.as< HeaderDefinition::Ptr > () );
       specification.setDefinitions( yystack_[0].value.as< Definitions::Ptr > () );
   }
 #line 1329 "GrammarParser.cpp" // lalr1.cc:859
