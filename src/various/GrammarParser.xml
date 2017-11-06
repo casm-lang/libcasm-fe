@@ -1410,7 +1410,7 @@
       <terminal symbol-number="58" token-number="313" name="&quot;^&quot;" usefulness="useful" prec="17" assoc="left"/>
       <terminal symbol-number="59" token-number="314" name="&quot;'&quot;" usefulness="useful" prec="22" assoc="precedence"/>
       <terminal symbol-number="60" token-number="315" name="&quot;..&quot;" usefulness="useful"/>
-      <terminal symbol-number="61" token-number="316" name="&quot;.&quot;" usefulness="useful" prec="8" assoc="left"/>
+      <terminal symbol-number="61" token-number="316" name="&quot;.&quot;" usefulness="useful" prec="8" assoc="precedence"/>
       <terminal symbol-number="62" token-number="317" name="&quot;-&gt;&quot;" usefulness="useful"/>
       <terminal symbol-number="63" token-number="318" name="&quot;=&gt;&quot;" usefulness="useful" prec="9" assoc="left"/>
       <terminal symbol-number="64" token-number="319" name="&quot;:=&quot;" usefulness="useful" prec="7" assoc="precedence"/>

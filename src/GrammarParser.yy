@@ -264,7 +264,8 @@ END       0 "end of file"
 
 %precedence UPDATE
 
-%left DOT
+%precedence DOT
+
 %left IMPLIES ARROW
 %left OR
 %left XOR
