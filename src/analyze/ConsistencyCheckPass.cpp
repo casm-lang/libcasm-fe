@@ -64,8 +64,6 @@ static libpass::PassRegistration< ConsistencyCheckPass > PASS(
     "ASTConsistencyCheckPass",
     "checks the consistency of the AST representation", "ast-check", 0 );
 
-static const std::string PROGRAM = "program";
-
 //
 // ConsistencyCheckVisitor
 //
@@ -73,8 +71,7 @@ static const std::string PROGRAM = "program";
 class ConsistencyCheckVisitor final : public RecursiveVisitor
 {
   public:
-    ConsistencyCheckVisitor(
-        libcasm_fe::Logger& m_log );
+    ConsistencyCheckVisitor( libcasm_fe::Logger& m_log );
 
     void visit( Specification& node );
 
@@ -105,8 +102,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     u1 m_initDefinitionFound;
 };
 
-ConsistencyCheckVisitor::ConsistencyCheckVisitor(
-    libcasm_fe::Logger& log )
+ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 , m_functionInitially( false )
 , m_sideEffectFree( false )
@@ -145,7 +141,7 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     node.defaultValue()->accept( *this );
     node.attributes()->accept( *this );
 
-    if( node.identifier()->name() == PROGRAM )
+    if( node.uid() == FunctionDefinition::UID::PROGRAM )
     {
         m_initDefinitionFound = true;
     }
