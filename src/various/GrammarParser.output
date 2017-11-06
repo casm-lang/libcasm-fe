@@ -232,7 +232,7 @@ Grammar
   164           | "in"
 
   165 IdentifierPath: DotSeparatedIdentifiers
-  166               | "." DotSeparatedIdentifiers
+  166               | "." Identifier
 
   167 DotSeparatedIdentifiers: DotSeparatedIdentifiers "." Identifier
   168                        | Identifier
@@ -482,12 +482,12 @@ MaybeInitializers (144)
 Identifiers (145)
     on left: 161 162, on right: 13 161
 Identifier (146)
-    on left: 163 164, on right: 13 14 15 16 17 161 162 167 168 170
-    171 180 181
+    on left: 163 164, on right: 13 14 15 16 17 161 162 166 167 168
+    170 171 180 181
 IdentifierPath (147)
     on left: 165 166, on right: 19 97 98 126 133 134 135 136
 DotSeparatedIdentifiers (148)
-    on left: 167 168, on right: 165 166 167
+    on left: 167 168, on right: 165 167
 Variable (149)
     on left: 169 170, on right: 172 173
 TypedVariable (150)
@@ -1244,13 +1244,12 @@ State 41
 
 State 42
 
-  166 IdentifierPath: "." . DotSeparatedIdentifiers
+  166 IdentifierPath: "." . Identifier
 
     "in"          shift, and go to state 5
     "identifier"  shift, and go to state 6
 
-    Identifier               go to state 69
-    DotSeparatedIdentifiers  go to state 102
+    Identifier  go to state 102
 
 
 State 43
@@ -1994,8 +1993,7 @@ State 101
 
 State 102
 
-  166 IdentifierPath: "." DotSeparatedIdentifiers .
-  167 DotSeparatedIdentifiers: DotSeparatedIdentifiers . "." Identifier
+  166 IdentifierPath: "." Identifier .
 
     $default  reduce using rule 166 (IdentifierPath)
 

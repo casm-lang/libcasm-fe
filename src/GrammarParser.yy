@@ -264,7 +264,8 @@ END       0 "end of file"
 
 %precedence UPDATE
 
-%left DOT
+%precedence DOT
+
 %left IMPLIES ARROW
 %left OR
 %left XOR
@@ -1417,9 +1418,11 @@ IdentifierPath
   {
       $$ = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
   }
-| DOT DotSeparatedIdentifiers
+| DOT Identifier
   {
-      $$ = Ast::make< IdentifierPath >( @$, $2, IdentifierPath::Type::RELATIVE );
+      auto identifiers = Ast::make< Identifiers >( @$ );
+      identifiers->add( $2 );
+      $$ = Ast::make< IdentifierPath >( @$, identifiers, IdentifierPath::Type::RELATIVE );
   }
 ;
 

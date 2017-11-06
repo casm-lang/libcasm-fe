@@ -1242,7 +1242,7 @@
         <lhs>IdentifierPath</lhs>
         <rhs>
           <symbol>&quot;.&quot;</symbol>
-          <symbol>DotSeparatedIdentifiers</symbol>
+          <symbol>Identifier</symbol>
         </rhs>
       </rule>
       <rule number="167" usefulness="useful">
@@ -1410,7 +1410,7 @@
       <terminal symbol-number="58" token-number="313" name="&quot;^&quot;" usefulness="useful" prec="17" assoc="left"/>
       <terminal symbol-number="59" token-number="314" name="&quot;'&quot;" usefulness="useful" prec="22" assoc="precedence"/>
       <terminal symbol-number="60" token-number="315" name="&quot;..&quot;" usefulness="useful"/>
-      <terminal symbol-number="61" token-number="316" name="&quot;.&quot;" usefulness="useful" prec="8" assoc="left"/>
+      <terminal symbol-number="61" token-number="316" name="&quot;.&quot;" usefulness="useful" prec="8" assoc="precedence"/>
       <terminal symbol-number="62" token-number="317" name="&quot;-&gt;&quot;" usefulness="useful"/>
       <terminal symbol-number="63" token-number="318" name="&quot;=&gt;&quot;" usefulness="useful" prec="9" assoc="left"/>
       <terminal symbol-number="64" token-number="319" name="&quot;:=&quot;" usefulness="useful" prec="7" assoc="precedence"/>
@@ -3119,15 +3119,12 @@
         <item rule-number="163" point="0"/>
         <item rule-number="164" point="0"/>
         <item rule-number="166" point="1"/>
-        <item rule-number="167" point="0"/>
-        <item rule-number="168" point="0"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
-          <transition type="goto" symbol="Identifier" state="69"/>
-          <transition type="goto" symbol="DotSeparatedIdentifiers" state="102"/>
+          <transition type="goto" symbol="Identifier" state="102"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -4918,86 +4915,7 @@
 
     <state number="102">
       <itemset>
-        <item rule-number="166" point="2">
-          <lookaheads>
-            <symbol>&quot;end of file&quot;</symbol>
-            <symbol>error</symbol>
-            <symbol>&quot;init&quot;</symbol>
-            <symbol>&quot;derived&quot;</symbol>
-            <symbol>&quot;enumeration&quot;</symbol>
-            <symbol>&quot;rule&quot;</symbol>
-            <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;initially&quot;</symbol>
-            <symbol>&quot;defined&quot;</symbol>
-            <symbol>&quot;seq&quot;</symbol>
-            <symbol>&quot;endseq&quot;</symbol>
-            <symbol>&quot;par&quot;</symbol>
-            <symbol>&quot;endpar&quot;</symbol>
-            <symbol>&quot;skip&quot;</symbol>
-            <symbol>&quot;let&quot;</symbol>
-            <symbol>&quot;in&quot;</symbol>
-            <symbol>&quot;forall&quot;</symbol>
-            <symbol>&quot;choose&quot;</symbol>
-            <symbol>&quot;iterate&quot;</symbol>
-            <symbol>&quot;do&quot;</symbol>
-            <symbol>&quot;call&quot;</symbol>
-            <symbol>&quot;if&quot;</symbol>
-            <symbol>&quot;then&quot;</symbol>
-            <symbol>&quot;else&quot;</symbol>
-            <symbol>&quot;case&quot;</symbol>
-            <symbol>&quot;of&quot;</symbol>
-            <symbol>&quot;default&quot;</symbol>
-            <symbol>&quot;holds&quot;</symbol>
-            <symbol>&quot;exists&quot;</symbol>
-            <symbol>&quot;with&quot;</symbol>
-            <symbol>&quot;undef&quot;</symbol>
-            <symbol>&quot;false&quot;</symbol>
-            <symbol>&quot;true&quot;</symbol>
-            <symbol>&quot;and&quot;</symbol>
-            <symbol>&quot;or&quot;</symbol>
-            <symbol>&quot;xor&quot;</symbol>
-            <symbol>&quot;implies&quot;</symbol>
-            <symbol>&quot;not&quot;</symbol>
-            <symbol>&quot;+&quot;</symbol>
-            <symbol>&quot;-&quot;</symbol>
-            <symbol>&quot;=&quot;</symbol>
-            <symbol>&quot;(&quot;</symbol>
-            <symbol>&quot;)&quot;</symbol>
-            <symbol>&quot;[&quot;</symbol>
-            <symbol>&quot;]&quot;</symbol>
-            <symbol>&quot;{&quot;</symbol>
-            <symbol>&quot;}&quot;</symbol>
-            <symbol>&quot;:&quot;</symbol>
-            <symbol>&quot;_&quot;</symbol>
-            <symbol>&quot;@&quot;</symbol>
-            <symbol>&quot;,&quot;</symbol>
-            <symbol>&quot;&lt;&quot;</symbol>
-            <symbol>&quot;&gt;&quot;</symbol>
-            <symbol>&quot;*&quot;</symbol>
-            <symbol>&quot;/&quot;</symbol>
-            <symbol>&quot;%&quot;</symbol>
-            <symbol>&quot;^&quot;</symbol>
-            <symbol>&quot;'&quot;</symbol>
-            <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
-            <symbol>&quot;-&gt;&quot;</symbol>
-            <symbol>&quot;=&gt;&quot;</symbol>
-            <symbol>&quot;:=&quot;</symbol>
-            <symbol>&quot;!=&quot;</symbol>
-            <symbol>&quot;&lt;=&quot;</symbol>
-            <symbol>&quot;&gt;=&quot;</symbol>
-            <symbol>&quot;{|&quot;</symbol>
-            <symbol>&quot;|}&quot;</symbol>
-            <symbol>&quot;binary&quot;</symbol>
-            <symbol>&quot;hexadecimal&quot;</symbol>
-            <symbol>&quot;integer&quot;</symbol>
-            <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;decimal&quot;</symbol>
-            <symbol>&quot;string&quot;</symbol>
-            <symbol>&quot;identifier&quot;</symbol>
-          </lookaheads>
-        </item>
-        <item rule-number="167" point="1"/>
+        <item rule-number="166" point="2"/>
       </itemset>
       <actions>
         <transitions/>
@@ -5006,9 +4924,7 @@
           <reduction symbol="$default" rule="166" enabled="true"/>
         </reductions>
       </actions>
-      <solved-conflicts>
-        <resolution rule="166" symbol="&quot;.&quot;" type="reduce">%left &quot;.&quot;</resolution>
-      </solved-conflicts>
+      <solved-conflicts/>
     </state>
 
     <state number="103">
