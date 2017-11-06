@@ -69,6 +69,7 @@ add_library( ${PROJECT}-cpp OBJECT
   analyze/AttributionPass.cpp
   analyze/SymbolRegistrationPass.cpp
   analyze/SymbolResolverPass.cpp
+  analyze/FrameSizeDeterminationPass.cpp
 
   execute/NumericExecutionPass.cpp
   execute/HashMapBase.cpp
@@ -127,6 +128,7 @@ ecm_generate_headers( ${PROJECT}_ANALYZE_HEADERS_CPP
     SymbolResolverPass
     TypeCheckPass
     TypeInferencePass
+    FrameSizeDeterminationPass
   PREFIX
     ${PROJECT}/analyze
   RELATIVE

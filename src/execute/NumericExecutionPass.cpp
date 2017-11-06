@@ -46,7 +46,7 @@
 #include "../Exception.h"
 #include "../Logger.h"
 #include "../Specification.h"
-#include "../analyze/ConsistencyCheckPass.h"
+#include "../analyze/FrameSizeDeterminationPass.h"
 #include "../ast/Definition.h"
 #include "../ast/EmptyVisitor.h"
 #include "../ast/Expression.h"
@@ -1607,14 +1607,14 @@ void AgentScheduler::fireUpdates( void )
 
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< ConsistencyCheckPass >();
+    pu.require< FrameSizeDeterminationPass >();
 }
 
 u1 NumericExecutionPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< ConsistencyCheckPass >();
+    const auto data = pr.result< FrameSizeDeterminationPass >();
     const auto specification = data->specification();
 
     ExecutionLocationRegistry locationRegistry;
