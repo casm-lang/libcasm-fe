@@ -193,17 +193,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 {
     const auto& path = *node.identifier();
 
-    if( path.type() == IdentifierPath::Type::RELATIVE )
-    {
-        m_log.debug( "call: symbol '" + path.path() + "' is relative" );
-
-        if( path.identifiers()->size() != 1 )
-        {
-            m_log.error( { node.sourceLocation() },
-                "invalid relative path '" + path.path() + "' found" );
-        }
-    }
-    else
+    if( path.type() == IdentifierPath::Type::ABSOLUTE )
     {
         try
         {

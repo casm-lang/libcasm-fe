@@ -1417,9 +1417,11 @@ IdentifierPath
   {
       $$ = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
   }
-| DOT DotSeparatedIdentifiers
+| DOT Identifier
   {
-      $$ = Ast::make< IdentifierPath >( @$, $2, IdentifierPath::Type::RELATIVE );
+      auto identifiers = Ast::make< Identifiers >( @$ );
+      identifiers->add( $2 );
+      $$ = Ast::make< IdentifierPath >( @$, identifiers, IdentifierPath::Type::RELATIVE );
   }
 ;
 
