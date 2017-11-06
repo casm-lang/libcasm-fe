@@ -234,9 +234,7 @@ void FrameSizeDeterminationVisitor::pushLocal( VariableDefinition& node )
 
 void FrameSizeDeterminationVisitor::popLocal( void )
 {
-    assert( m_numberOfLocals >= 1 );
-
-    --m_numberOfLocals;
+    popLocals( 1 );
 }
 
 void FrameSizeDeterminationVisitor::popLocals( std::size_t count )
