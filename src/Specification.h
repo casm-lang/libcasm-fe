@@ -63,7 +63,7 @@ namespace libcasm_fe
 
         void setHeader( const Ast::HeaderDefinition::Ptr& header );
 
-        Ast::HeaderDefinition::Ptr header( void ) const;
+        const Ast::HeaderDefinition::Ptr& header( void ) const;
 
         void setDefinitions( const Ast::Definitions::Ptr& definitions );
 

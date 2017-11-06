@@ -68,7 +68,7 @@ void Specification::setHeader( const Ast::HeaderDefinition::Ptr& header )
     m_header = header;
 }
 
-Ast::HeaderDefinition::Ptr Specification::header( void ) const
+const Ast::HeaderDefinition::Ptr& Specification::header( void ) const
 {
     return m_header;
 }
