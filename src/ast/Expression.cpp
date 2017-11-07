@@ -44,6 +44,7 @@
 #include "Expression.h"
 
 #include "Definition.h"
+#include "Type.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -51,6 +52,29 @@ using namespace Ast;
 Expression::Expression( Node::ID id )
 : TypedNode( id )
 {
+}
+
+TypeCastingExpression::TypeCastingExpression(
+    const Expression::Ptr& expression, const Type::Ptr& type )
+: Expression( Node::ID::TYPE_CASTING_EXPRESSION )
+, m_expression( expression )
+, m_type( type )
+{
+}
+
+const Expression::Ptr& TypeCastingExpression::expression( void ) const
+{
+    return m_expression;
+}
+
+const Type::Ptr& TypeCastingExpression::type( void ) const
+{
+    return m_type;
+}
+
+void TypeCastingExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
 }
 
 ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )

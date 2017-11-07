@@ -55,6 +55,7 @@ namespace libcasm_fe
         class RuleDefinition;
         class EnumerationDefinition;
 
+        class TypeCastingExpression;
         class ValueAtom;
         class ReferenceAtom;
         class UndefAtom;
@@ -111,6 +112,7 @@ namespace libcasm_fe
             virtual void visit( RuleDefinition& node ) = 0;
             virtual void visit( EnumerationDefinition& node ) = 0;
 
+            virtual void visit( TypeCastingExpression& node ) = 0;
             virtual void visit( ValueAtom& node ) = 0;
             virtual void visit( ReferenceAtom& node ) = 0;
             virtual void visit( UndefAtom& node ) = 0;

@@ -73,6 +73,7 @@ namespace libcasm_fe
                 ENUMERATION_DEFINITION,
 
                 // expressions
+                TYPE_CASTING_EXPRESSION,
                 VALUE_ATOM,
                 REFERENCE_ATOM,
                 UNDEF_ATOM,

@@ -195,6 +195,7 @@ END       0 "end of file"
 // expressions
 %type <Expression::Ptr> Expression Term Literal
 %type <Expressions::Ptr> Terms
+%type <TypeCastingExpression::Ptr> TypeCastingExpression
 %type <ValueAtom::Ptr> BooleanLiteral StringLiteral BitLiteral IntegerLiteral DecimalLiteral RationalLiteral
 %type <ReferenceAtom::Ptr> ReferenceLiteral
 %type <UndefAtom::Ptr> UndefinedLiteral
@@ -265,6 +266,8 @@ END       0 "end of file"
 %precedence UPDATE
 
 %precedence DOT
+
+%precedence AS
 
 %left IMPLIES ARROW
 %left OR
@@ -764,6 +767,10 @@ Term
   {
       $$ = $1;
   }
+| TypeCastingExpression
+  {
+      $$ = $1;
+  }
 | Expression
   {
       $$ = $1;
@@ -779,6 +786,14 @@ Term
 | Literal
   {
       $$ = $1;
+  }
+;
+
+
+TypeCastingExpression
+: Term AS Type
+  {
+      $$ = Ast::make< TypeCastingExpression >( @$, $1, $3 );
   }
 ;
 

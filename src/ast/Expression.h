@@ -52,6 +52,7 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class Type;
         class VariableDefinition;
 
         class Expression : public TypedNode
@@ -63,6 +64,24 @@ namespace libcasm_fe
         };
 
         using Expressions = NodeList< Expression >;
+
+        class TypeCastingExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< TypeCastingExpression >;
+
+            TypeCastingExpression( const Expression::Ptr& expression,
+                const std::shared_ptr< Type >& type );
+
+            const Expression::Ptr& expression( void ) const;
+            const std::shared_ptr< Type >& type( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_expression;
+            const std::shared_ptr< Type > m_type;
+        };
 
         class ValueAtom final : public Expression
         {
@@ -384,7 +403,7 @@ namespace libcasm_fe
         };
 
         class ExistentialQuantifierExpression final
-            : public QuantifierExpression
+        : public QuantifierExpression
         {
           public:
             using Ptr = std::shared_ptr< ExistentialQuantifierExpression >;

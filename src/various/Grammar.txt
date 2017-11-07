@@ -277,6 +277,7 @@ Term ::= DirectCallExpression
        | ChooseExpression
        | UniversalQuantifierExpression
        | ExistentialQuantifierExpression
+       | TypeCastingExpression
        | Expression
        | List
        | Range
@@ -284,6 +285,15 @@ Term ::= DirectCallExpression
 </code>
 
 {{page>:grammar:Term&noheader&nofooter}}
+
+
+===== TypeCastingExpression =====
+
+<code>
+TypeCastingExpression ::= Term "as" Type
+</code>
+
+{{page>:grammar:TypeCastingExpression&noheader&nofooter}}
 
 
 ===== Expression =====
