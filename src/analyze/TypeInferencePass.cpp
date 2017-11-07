@@ -369,40 +369,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             break;
         }
-        case CallExpression::TargetType::DERIVED:
-        {
-            if( node.type() )
-            {
-                break;
-            }
-
-            const auto& definition
-                = std::static_pointer_cast< DerivedDefinition >(
-                    node.targetDefinition() );
-
-            // make sure that the derived has been typed
-            definition->accept( *this );
-
-            node.setType( definition->type() );
-            break;
-        }
-        case CallExpression::TargetType::FUNCTION:
-        {
-            if( node.type() )
-            {
-                break;
-            }
-
-            const auto& definition
-                = std::static_pointer_cast< FunctionDefinition >(
-                    node.targetDefinition() );
-
-            // make sure that the function has been typed
-            definition->accept( *this );
-
-            node.setType( definition->type() );
-            break;
-        }
+        case CallExpression::TargetType::DERIVED: // [[fallthrough]]
+        case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
         case CallExpression::TargetType::RULE:
         {
             if( node.type() )
@@ -410,10 +378,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 break;
             }
 
-            const auto& definition = std::static_pointer_cast< RuleDefinition >(
-                node.targetDefinition() );
-
-            // make sure that the rule has been typed
+            // make sure that the derived has been typed
+            const auto& definition = node.targetDefinition();
             definition->accept( *this );
 
             node.setType( definition->type() );
