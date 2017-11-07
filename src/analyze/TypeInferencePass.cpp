@@ -424,87 +424,52 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         const auto& call_type_args = node.type()->arguments();
         const auto& call_expr_args = *node.arguments();
 
-        if( call_type_args.size() == call_expr_args.size() )
+        assert( call_type_args.size() == call_expr_args.size() );
+
+        for( std::size_t pos = 0; pos < call_type_args.size(); pos++ )
         {
-            for( std::size_t pos = 0; pos < call_type_args.size(); pos++ )
+            const auto& exprArg = call_expr_args.at( pos );
+            if( not exprArg->type() )
             {
-                const auto& exprArg = call_expr_args.at( pos );
-                if( not exprArg->type() )
-                {
-                    continue;
-                }
-
-                const auto& callArgType = call_type_args.at( pos );
-                if( callArgType->isInteger()
-                    and exprArg->type()->result().isInteger() )
-                {
-                    continue;
-                }
-
-                if( *callArgType != exprArg->type()->result() )
-                {
-                    const std::unordered_map< CallExpression::TargetType, Code >
-                        codes = {
-                            { CallExpression::TargetType::FUNCTION,
-                                Code::
-                                    TypeInferenceFunctionArgumentTypeMismatch },
-                            { CallExpression::TargetType::DERIVED,
-                                Code::
-                                    TypeInferenceDerivedArgumentTypeMismatch },
-                            { CallExpression::TargetType::BUILTIN,
-                                Code::
-                                    TypeInferenceBuiltinArgumentTypeMismatch },
-                            { CallExpression::TargetType::RULE,
-                                Code::TypeInferenceRuleArgumentTypeMismatch },
-                        };
-
-                    const auto code = codes.find( node.targetType() );
-                    assert( code != codes.end()
-                            and " invalid target type with arguments " );
-
-                    m_log.error( { exprArg->sourceLocation() },
-                        "type mismatch: " + node.targetTypeName()
-                            + " argument type at position "
-                            + std::to_string( pos + 1 ) + " was '"
-                            + exprArg->type()->description() + "', "
-                            + node.targetTypeName() + " definition expects '"
-                            + callArgType->description() + "'",
-                        code->second );
-                }
+                continue;
             }
-        }
-        else
-        {
-            const std::unordered_map< CallExpression::TargetType, Code > codes
-                = {
-                      { CallExpression::TargetType::FUNCTION,
-                          Code::TypeInferenceFunctionArgumentSizeMismatch },
-                      { CallExpression::TargetType::DERIVED,
-                          Code::TypeInferenceDerivedArgumentSizeMismatch },
-                      { CallExpression::TargetType::BUILTIN,
-                          Code::TypeInferenceBuiltinArgumentSizeMismatch },
-                      { CallExpression::TargetType::RULE,
-                          Code::TypeInferenceRuleArgumentSizeMismatch },
-                  };
 
-            const auto code = codes.find( node.targetType() );
-            assert( code != codes.end()
-                    and " invalid target type with arguments " );
-
-            m_log.error( { node.sourceLocation() },
-                "invalid argument size: " + node.targetTypeName() + " '"
-                    + path.path() + "' expects "
-                    + std::to_string( call_type_args.size() ) + " arguments",
-                code->second );
-
-            if( node.targetType() != CallExpression::TargetType::BUILTIN )
+            const auto& callArgType = call_type_args.at( pos );
+            if( callArgType->isInteger()
+                and exprArg->type()->result().isInteger() )
             {
-                m_log.info( { node.targetDefinition()->sourceLocation() },
-                    node.targetTypeName() + " '" + path.path()
-                        + "' is defined as a relation '"
-                        + node.type()->description()
-                        + "', incorrect usage in line "
-                        + std::to_string( node.sourceLocation().begin.line ) );
+                continue;
+            }
+
+            if( *callArgType != exprArg->type()->result() )
+            {
+                const std::unordered_map< CallExpression::TargetType, Code >
+                    codes = {
+                        { CallExpression::TargetType::FUNCTION,
+                            Code::
+                                TypeInferenceFunctionArgumentTypeMismatch },
+                        { CallExpression::TargetType::DERIVED,
+                            Code::
+                                TypeInferenceDerivedArgumentTypeMismatch },
+                        { CallExpression::TargetType::BUILTIN,
+                            Code::
+                                TypeInferenceBuiltinArgumentTypeMismatch },
+                        { CallExpression::TargetType::RULE,
+                            Code::TypeInferenceRuleArgumentTypeMismatch },
+                    };
+
+                const auto code = codes.find( node.targetType() );
+                assert( code != codes.end()
+                        and " invalid target type with arguments " );
+
+                m_log.error( { exprArg->sourceLocation() },
+                    "type mismatch: " + node.targetTypeName()
+                        + " argument type at position "
+                        + std::to_string( pos + 1 ) + " was '"
+                        + exprArg->type()->description() + "', "
+                        + node.targetTypeName() + " definition expects '"
+                        + callArgType->description() + "'",
+                    code->second );
             }
         }
     }
