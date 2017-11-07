@@ -378,7 +378,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 break;
             }
 
-            // make sure that the derived has been typed
+            // make sure that the definition has been typed
             const auto& definition = node.targetDefinition();
             definition->accept( *this );
 
