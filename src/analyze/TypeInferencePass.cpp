@@ -247,37 +247,16 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
 
     switch( node.referenceType() )
     {
-        case ReferenceAtom::ReferenceType::FUNCTION:
-        {
-            const auto& definition
-                = std::static_pointer_cast< FunctionDefinition >(
-                    node.reference() );
-
-            // make sure that the function has been typed
-            definition->accept( *this );
-
-            const auto type
-                = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                    std::static_pointer_cast< libcasm_ir::RelationType >(
-                        definition->type() ) );
-
-            node.setType( type );
-            break;
-        }
+        case ReferenceAtom::ReferenceType::FUNCTION: // [[fallthrough]]
         case ReferenceAtom::ReferenceType::DERIVED:
         {
-            const auto& definition
-                = std::static_pointer_cast< DerivedDefinition >(
-                    node.reference() );
-
-            // make sure that the derived has been typed
-            definition->accept( *this );
+            // make sure that the reference has been typed
+            node.reference()->accept( *this );
 
             const auto type
                 = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
                     std::static_pointer_cast< libcasm_ir::RelationType >(
-                        definition->type() ) );
-
+                        node.reference()->type() ) );
             node.setType( type );
             break;
         }
@@ -288,17 +267,13 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
         }
         case ReferenceAtom::ReferenceType::RULE:
         {
-            const auto& definition = std::static_pointer_cast< RuleDefinition >(
-                node.reference() );
-
-            // make sure that the rule has been typed
-            definition->accept( *this );
+            // make sure that the reference has been typed
+            node.reference()->accept( *this );
 
             const auto type
                 = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
                     std::static_pointer_cast< libcasm_ir::RelationType >(
-                        definition->type() ) );
-
+                        node.reference()->type() ) );
             node.setType( type );
             break;
         }
