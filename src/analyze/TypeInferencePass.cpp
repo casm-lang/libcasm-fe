@@ -135,6 +135,7 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     assert( node.returnType()->type() && "return type must be specified" );
 
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    argTypeList.reserve( node.argumentTypes()->size() );
     for( const auto& argumentType : *node.argumentTypes() )
     {
         assert( argumentType->type() && "argument type must be specified" );
@@ -162,6 +163,7 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
     assert( node.returnType()->type() && "return type must be specified" );
 
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    argTypeList.reserve( node.arguments()->size() );
     for( const auto& argument : *node.arguments() )
     {
         assert( argument->type() && "argument type must be specified" );
@@ -207,6 +209,7 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
     assert( node.returnType()->type() && "return type must be specified" );
 
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    argTypeList.reserve( node.arguments()->size() );
     for( const auto& argument : *node.arguments() )
     {
         assert( argument->type() && "argument type must be specified" );
