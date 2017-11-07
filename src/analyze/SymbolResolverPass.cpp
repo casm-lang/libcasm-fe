@@ -175,8 +175,9 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
             default:
             {
                 m_log.error( { node.identifier()->sourceLocation() },
-                    "cannot reference '" + CallExpression::targetTypeString(
-                                               symbol.targetType() )
+                    "cannot reference '"
+                        + CallExpression::targetTypeString(
+                              symbol.targetType() )
                         + "'" );
             }
         }
@@ -212,8 +213,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         {
             const auto& name = path.baseName();
 
-            if( libcasm_ir::Builtin::available(
-                    name, node.arguments()->size() ) )
+            if( libcasm_ir::Builtin::available( name ) )
             {
                 try
                 {
@@ -281,8 +281,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 {
                     m_log.error( { node.sourceLocation() },
                         "unknown " + node.targetTypeName() + " symbol '"
-                            + path.path()
-                            + "' found",
+                            + path.path() + "' found",
                         ( node.targetType()
                             == CallExpression::TargetType::FUNCTION )
                             ? Code::FunctionSymbolIsUnknown
@@ -362,7 +361,8 @@ void SymbolResolveVisitor::visit( ChooseRule& node )
     popVariable( node.variable() );
 }
 
-void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable )
+void SymbolResolveVisitor::pushVariable(
+    const VariableDefinition::Ptr& variable )
 {
     const auto& name = variable->identifier()->name();
 
@@ -379,7 +379,8 @@ void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable
     }
 }
 
-void SymbolResolveVisitor::popVariable( const VariableDefinition::Ptr& variable )
+void SymbolResolveVisitor::popVariable(
+    const VariableDefinition::Ptr& variable )
 {
     const auto& name = variable->identifier()->name();
     m_variables.erase( name );
