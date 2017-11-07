@@ -1171,6 +1171,11 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
             }
         }
     }
+    else
+    {
+        assert( !"no annotation possible for this node type" );
+        return nullptr;
+    }
 
     for( std::size_t c = 0; c < expressions.size(); c++ )
     {
