@@ -288,11 +288,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
     const auto& path = *node.identifier();
 
-    const libcasm_ir::Annotation* annotation
-        = annotate( node, node.arguments()->data() );
-
-    RecursiveVisitor::visit( node );
-
     switch( node.targetType() )
     {
         case CallExpression::TargetType::VARIABLE:
@@ -314,6 +309,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             {
                 if( not node.type() )
                 {
+                    RecursiveVisitor::visit( node );
                     const auto description = "variable '" + path.path() + "'";
                     inference( description, nullptr, node );
                 }
@@ -331,6 +327,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 break;
             }
 
+            const auto* annotation = annotate( node, node.arguments()->data() );
+
+            RecursiveVisitor::visit( node );
             const auto description = "built-in '" + path.path() + "'";
             inference(
                 description, annotation, node, node.arguments()->data() );
@@ -382,6 +381,14 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             const auto& definition = node.targetDefinition();
             definition->accept( *this );
 
+            const auto& arguments = *node.arguments();
+            const auto& argumentTypes = definition->type()->arguments();
+            for( std::size_t i = 0; i < arguments.size(); i++ )
+            {
+                m_typeIDs[ arguments.at( i ).get() ].emplace(
+                    argumentTypes.at( i )->id() );
+            }
+
             node.setType( definition->type() );
             break;
         }
@@ -418,6 +425,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             break;
         }
     }
+
+    RecursiveVisitor::visit( node );
 
     if( node.type() )
     {
@@ -1125,109 +1134,65 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         auto& directCall = static_cast< DirectCallExpression& >( node );
         const auto& path = *directCall.identifier();
 
-        switch( directCall.targetType() )
+        assert( directCall.targetType() == CallExpression::TargetType::BUILTIN );
+
+        try
         {
-            case CallExpression::TargetType::BUILTIN:
+            const auto& builtin_annotation
+                = libcasm_ir::Annotation::find( path.baseName() );
+            annotation = &builtin_annotation;
+
+            directCall.setTargetBuiltinId( annotation->valueID() );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.error( { directCall.sourceLocation() },
+                        "unable to resolve built-in symbol '"
+                        + path.path()
+                        + "', due to missing annotation information from 'libcasm-ir'" );
+            return nullptr;
+        }
+
+        if( annotation->valueID() == libcasm_ir::Value::AS_BIT_BUILTIN )
+        {
+            const auto& asbit_args = directCall.arguments()->data();
+            assert( asbit_args.size() == 2 );
+            const auto& asbit_size
+                = static_cast< const ValueAtom& >( *asbit_args[ 1 ] );
+            if( asbit_size.id() == Node::ID::VALUE_ATOM
+                and asbit_size.type()
+                and asbit_size.type()->kind()
+                        == libcasm_ir::Type::Kind::INTEGER )
             {
-                try
-                {
-                    const auto& builtin_annotation
-                        = libcasm_ir::Annotation::find( path.baseName() );
-                    annotation = &builtin_annotation;
+                const auto asbit_size_value = std::static_pointer_cast<
+                    libcasm_ir::IntegerConstant >( asbit_size.value() );
 
-                    directCall.setTargetBuiltinId( annotation->valueID() );
-                }
-                catch( const std::domain_error& e )
-                {
-                    m_log.error( { directCall.sourceLocation() },
-                             "unable to resolve built-in symbol '"
-                             + path.path()
-                             + "', due to missing annotation information from 'libcasm-ir'" );
-                }
-
-                if( annotation
-                    and ( annotation->valueID()
-                            == libcasm_ir::Value::AS_BIT_BUILTIN ) )
-                {
-                    const auto& asbit_args = directCall.arguments()->data();
-                    assert( asbit_args.size() == 2 );
-                    const auto& asbit_size
-                        = static_cast< const ValueAtom& >( *asbit_args[ 1 ] );
-                    if( asbit_size.id() == Node::ID::VALUE_ATOM
-                        and asbit_size.type()
-                        and asbit_size.type()->kind()
-                                == libcasm_ir::Type::Kind::INTEGER )
-                    {
-                        const auto asbit_size_value = std::static_pointer_cast<
-                            libcasm_ir::IntegerConstant >( asbit_size.value() );
-
-                        const auto type
-                            = libstdhl::Memory::get< libcasm_ir::BitType >(
-                                asbit_size_value );
-                        directCall.setType( type );
-                    }
-                    else
-                    {
-                        m_log.error( { directCall.arguments()->data()[ 1 ]->sourceLocation() },
-                                     "2nd argument of built-in '"
-                                     + path.path()
-                                     + "' is required to be a compile time 'Integer' constant value", Code::TypeInferenceBuiltinAsBitInvalid2ndArgumentType );
-                    }
-                }
-                break;
+                const auto type
+                    = libstdhl::Memory::get< libcasm_ir::BitType >(
+                        asbit_size_value );
+                directCall.setType( type );
             }
-            case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
-            case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-            case CallExpression::TargetType::RULE:
+            else
             {
-                const auto& definition = directCall.targetDefinition();
-
-                if( definition->type() )
-                {
-                    for( std::size_t c = 0; c < expressions.size(); c++ )
-                    {
-                        m_typeIDs[ expressions[ c ].get() ].emplace(
-                            definition->type()->arguments()[ c ]->id() );
-                    }
-
-                    m_typeIDs[&node ].emplace(
-                        definition->type()->ptr_result()->id() );
-                }
-                break;
-            }
-            case CallExpression::TargetType::SELF:
-            {
-                // TODO
-                break;
-            }
-            case CallExpression::TargetType::TYPE_DOMAIN: // [[fallthrough]]
-            case CallExpression::TargetType::CONSTANT:    // [[fallthrough]]
-            case CallExpression::TargetType::VARIABLE:
-            {
-                break;
-            }
-            case CallExpression::TargetType::UNKNOWN:
-            {
-                assert( !" internal error" );
-                break;
+                m_log.error( { directCall.arguments()->data()[ 1 ]->sourceLocation() },
+                                "2nd argument of built-in '"
+                                + path.path()
+                                + "' is required to be a compile time 'Integer' constant value", Code::TypeInferenceBuiltinAsBitInvalid2ndArgumentType );
             }
         }
     }
 
-    if( annotation )
+    for( std::size_t c = 0; c < expressions.size(); c++ )
     {
-        for( std::size_t c = 0; c < expressions.size(); c++ )
+        for( auto argumentTypeID : annotation->argumentTypeIDs( c ) )
         {
-            for( auto argumentTypeID : annotation->argumentTypeIDs( c ) )
-            {
-                m_typeIDs[ expressions[ c ].get() ].emplace( argumentTypeID );
-            }
+            m_typeIDs[ expressions[ c ].get() ].emplace( argumentTypeID );
         }
+    }
 
-        for( auto resultTypeID : annotation->resultTypeIDs() )
-        {
-            m_typeIDs[&node ].emplace( resultTypeID );
-        }
+    for( auto resultTypeID : annotation->resultTypeIDs() )
+    {
+        m_typeIDs[&node ].emplace( resultTypeID );
     }
 
     return annotation;
