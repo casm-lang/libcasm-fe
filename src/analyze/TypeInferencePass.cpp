@@ -1117,7 +1117,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
     else if( node.id() == libcasm_fe::Ast::Type::ID::BINARY_EXPRESSION )
     {
         annotation = &libcasm_ir::Annotation::find(
-            static_cast< const UnaryExpression& >( node ).op() );
+            static_cast< const BinaryExpression& >( node ).op() );
     }
     else if( node.id() == libcasm_fe::Ast::Type::ID::DIRECT_CALL_EXPRESSION )
     {
