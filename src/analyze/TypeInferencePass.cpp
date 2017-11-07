@@ -69,6 +69,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
   public:
     TypeInferenceVisitor( libcasm_fe::Logger& log );
 
+    void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -122,6 +123,25 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 {
+}
+
+void TypeInferenceVisitor::visit( VariableDefinition& node )
+{
+    if( node.type() )
+    {
+        // may be invoked multiple times -> only type once
+        return;
+    }
+
+    RecursiveVisitor::visit( node );
+
+    if( node.variableType()->type() )
+    {
+        node.setType( node.variableType()->type() );
+    }
+
+    const auto description = "variable '" + node.identifier()->name() + "'";
+    inference( description, nullptr, node );
 }
 
 void TypeInferenceVisitor::visit( FunctionDefinition& node )
@@ -294,30 +314,10 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         {
             const auto& variable = node.targetDefinition();
 
-            if( variable->type() )
-            {
-                if( not node.type() )
-                {
-                    node.setType( variable->type() );
-                }
-                else
-                {
-                    assert( *variable->type() == *node.type() );
-                }
-            }
-            else
-            {
-                if( not node.type() )
-                {
-                    RecursiveVisitor::visit( node );
-                    const auto description = "variable '" + path.path() + "'";
-                    inference( description, nullptr, node );
-                }
-                else
-                {
-                    variable->setType( node.type() );
-                }
-            }
+            m_typeIDs[ variable.get() ] = m_typeIDs[&node ];
+            variable->accept( *this );
+
+            node.setType( variable->type() );
             break;
         }
         case CallExpression::TargetType::BUILTIN:
