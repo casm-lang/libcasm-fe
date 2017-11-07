@@ -111,7 +111,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         const std::vector< Expression::Ptr >& arguments = {} );
 
     void inference( FunctionDefinition& node );
-    void inference( DerivedDefinition& node );
 
     void inference( QuantifierExpression& node );
 
@@ -135,28 +134,44 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
 {
-    const auto type = node.returnType()->type();
-    assert( type );
-    m_typeIDs[ node.expression().get() ].emplace( type->id() );
+    if( node.type() )
+    {
+        // may be invoked multiple times -> only type once
+        return;
+    }
+
+    assert( node.returnType()->type() && "return type must be specified" );
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    for( const auto& argument : *node.arguments() )
+    {
+        assert( argument->type() && "argument type must be specified" );
+        argTypeList.emplace_back( argument->type() );
+    }
+
+    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
+        node.returnType()->type(), argTypeList );
+    node.setType( type );
+
+    auto& returnType = *node.returnType()->type();
+    m_typeIDs[ node.expression().get() ].emplace( returnType.id() );
 
     RecursiveVisitor::visit( node );
-    inference( node );
 
-    if( node.type() and node.expression()->type() )
+    if( node.expression()->type() )
     {
         const auto& expTy = node.expression()->type()->result();
-        const auto& resTy = node.type()->result();
 
-        if( resTy != expTy )
+        if( returnType != expTy )
         {
-            if( expTy.isInteger() and resTy.isInteger() )
+            if( expTy.isInteger() and returnType.isInteger() )
             {
                 return;
             }
 
             m_log.error( { node.expression()->sourceLocation() },
                 "type mismatch: result type was '" + expTy.description()
-                    + "', derived expects '" + resTy.description() + "'",
+                    + "', derived expects '" + returnType.description() + "'",
                 Code::TypeInferenceDerivedReturnTypeMismatch );
         }
     }
@@ -233,8 +248,8 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 = std::static_pointer_cast< DerivedDefinition >(
                     node.reference() );
 
-            inference( *definition );
-            assert( definition->type() and definition->type()->isRelation() );
+            // make sure that the derived has been typed
+            definition->accept( *this );
 
             const auto type
                 = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
@@ -368,7 +383,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 = std::static_pointer_cast< DerivedDefinition >(
                     node.targetDefinition() );
 
-            inference( *definition );
+            // make sure that the derived has been typed
+            definition->accept( *this );
+
             node.setType( definition->type() );
             break;
         }
@@ -1406,28 +1423,6 @@ void TypeInferenceVisitor::inference( FunctionDefinition& node )
 
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     for( auto argumentType : *node.argumentTypes() )
-    {
-        assert( argumentType->type() && "argument type must be specified" );
-        argTypeList.emplace_back( argumentType->type() );
-    }
-
-    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-        node.returnType()->type(), argTypeList );
-
-    node.setType( type );
-}
-
-void TypeInferenceVisitor::inference( DerivedDefinition& node )
-{
-    if( node.type() )
-    {
-        return;
-    }
-
-    assert( node.returnType()->type() && "return type must be specified" );
-
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    for( auto argumentType : *node.arguments() )
     {
         assert( argumentType->type() && "argument type must be specified" );
         argTypeList.emplace_back( argumentType->type() );
