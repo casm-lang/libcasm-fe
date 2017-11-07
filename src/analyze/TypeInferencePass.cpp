@@ -110,8 +110,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         const libcasm_ir::Annotation* annotation, TypedNode& node,
         const std::vector< Expression::Ptr >& arguments = {} );
 
-    void inference( FunctionDefinition& node );
-
     void inference( QuantifierExpression& node );
 
   private:
@@ -128,8 +126,32 @@ TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log )
 
 void TypeInferenceVisitor::visit( FunctionDefinition& node )
 {
+    if( node.type() )
+    {
+        // may be invoked multiple times -> only type once
+        return;
+    }
+
+    if( node.defaultValue()->id() == Node::ID::UNDEF_ATOM
+        and not node.defaultValue()->type() )
+    {
+        node.defaultValue()->setType( node.returnType()->type() );
+    }
+
+    assert( node.returnType()->type() && "return type must be specified" );
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    for( const auto& argumentType : *node.argumentTypes() )
+    {
+        assert( argumentType->type() && "argument type must be specified" );
+        argTypeList.emplace_back( argumentType->type() );
+    }
+
+    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
+        node.returnType()->type(), argTypeList );
+    node.setType( type );
+
     RecursiveVisitor::visit( node );
-    inference( node );
 }
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
@@ -231,8 +253,8 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 = std::static_pointer_cast< FunctionDefinition >(
                     node.reference() );
 
-            inference( *definition );
-            assert( definition->type() and definition->type()->isRelation() );
+            // make sure that the function has been typed
+            definition->accept( *this );
 
             const auto type
                 = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
@@ -400,7 +422,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 = std::static_pointer_cast< FunctionDefinition >(
                     node.targetDefinition() );
 
-            inference( *definition );
+            // make sure that the function has been typed
+            definition->accept( *this );
+
             node.setType( definition->type() );
             break;
         }
@@ -1404,34 +1428,6 @@ void TypeInferenceVisitor::inference( const std::string& description,
         const auto typeID = *typeIDs.begin();
         node.setType( libcasm_ir::Type::fromID( typeID ) );
     }
-}
-
-void TypeInferenceVisitor::inference( FunctionDefinition& node )
-{
-    if( node.defaultValue()->id() == Node::ID::UNDEF_ATOM
-        and not node.defaultValue()->type() )
-    {
-        node.defaultValue()->setType( node.returnType()->type() );
-    }
-
-    if( node.type() )
-    {
-        return;
-    }
-
-    assert( node.returnType()->type() && "return type must be specified" );
-
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    for( auto argumentType : *node.argumentTypes() )
-    {
-        assert( argumentType->type() && "argument type must be specified" );
-        argTypeList.emplace_back( argumentType->type() );
-    }
-
-    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-        node.returnType()->type(), argTypeList );
-
-    node.setType( type );
 }
 
 void TypeInferenceVisitor::inference( QuantifierExpression& node )
