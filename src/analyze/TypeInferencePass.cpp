@@ -113,8 +113,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void inference( FunctionDefinition& node,
         const std::vector< Expression::Ptr >& arguments );
     void inference( DerivedDefinition& node );
-    void inference(
-        RuleDefinition& node, const std::vector< Expression::Ptr >& arguments );
+    void inference( RuleDefinition& node );
 
     void inference( QuantifierExpression& node );
 
@@ -168,7 +167,7 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
 void TypeInferenceVisitor::visit( RuleDefinition& node )
 {
     RecursiveVisitor::visit( node );
-    inference( node, {} );
+    inference( node );
 }
 
 void TypeInferenceVisitor::visit( UndefAtom& node )
@@ -239,7 +238,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             const auto& definition = std::static_pointer_cast< RuleDefinition >(
                 node.reference() );
 
-            inference( *definition, {} );
+            inference( *definition );
             assert( definition->type() and definition->type()->isRelation() );
 
             const auto type
@@ -382,7 +381,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             const auto& definition = std::static_pointer_cast< RuleDefinition >(
                 node.targetDefinition() );
 
-            inference( *definition, node.arguments()->data() );
+            inference( *definition );
             node.setType( definition->type() );
             break;
         }
@@ -1435,37 +1434,20 @@ void TypeInferenceVisitor::inference( DerivedDefinition& node )
     node.setType( type );
 }
 
-void TypeInferenceVisitor::inference(
-    RuleDefinition& node, const std::vector< Expression::Ptr >& arguments )
+void TypeInferenceVisitor::inference( RuleDefinition& node )
 {
     if( node.type() )
     {
         return;
     }
 
-    std::size_t pos = 0;
+    assert( node.returnType()->type() && "return type must be specified" );
+
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     for( auto argumentType : *node.arguments() )
     {
-        if( not argumentType->type() )
-        {
-            if( arguments.size() > 0 and arguments[ pos ]->type() )
-            {
-                argTypeList.emplace_back( arguments[ pos ]->type() );
-                argumentType->setType( arguments[ pos ]->type() );
-            }
-            else
-            {
-                m_log.debug( "'" + node.identifier()->name()
-                             + "' has a non-typed argument(s)" );
-                return;
-            }
-        }
-        else
-        {
-            argTypeList.emplace_back( argumentType->type() );
-        }
-        pos++;
+        assert( argumentType->type() && "argument type must be specified" );
+        argTypeList.emplace_back( argumentType->type() );
     }
 
     const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
