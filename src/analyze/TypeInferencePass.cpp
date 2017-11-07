@@ -370,7 +370,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::DERIVED: // [[fallthrough]]
         case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-        case CallExpression::TargetType::RULE:
+        case CallExpression::TargetType::RULE: // [[fallthrough]]
+        case CallExpression::TargetType::SELF:
         {
             if( node.type() )
             {
@@ -390,17 +391,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
 
             node.setType( definition->type() );
-            break;
-        }
-        case CallExpression::TargetType::SELF:
-        {
-            if( node.type() )
-            {
-                break;
-            }
-
-            assert( node.targetDefinition() );
-            node.setType( node.targetDefinition()->type() );
             break;
         }
         case CallExpression::TargetType::TYPE_DOMAIN:
