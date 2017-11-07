@@ -112,7 +112,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
     void inference( FunctionDefinition& node );
     void inference( DerivedDefinition& node );
-    void inference( RuleDefinition& node );
 
     void inference( QuantifierExpression& node );
 
@@ -165,8 +164,26 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
 
 void TypeInferenceVisitor::visit( RuleDefinition& node )
 {
+    if( node.type() )
+    {
+        // may be invoked multiple times -> only type once
+        return;
+    }
+
+    assert( node.returnType()->type() && "return type must be specified" );
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    for( const auto& argument : *node.arguments() )
+    {
+        assert( argument->type() && "argument type must be specified" );
+        argTypeList.emplace_back( argument->type() );
+    }
+
+    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
+        node.returnType()->type(), argTypeList );
+    node.setType( type );
+
     RecursiveVisitor::visit( node );
-    inference( node );
 }
 
 void TypeInferenceVisitor::visit( UndefAtom& node )
@@ -237,8 +254,8 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             const auto& definition = std::static_pointer_cast< RuleDefinition >(
                 node.reference() );
 
-            inference( *definition );
-            assert( definition->type() and definition->type()->isRelation() );
+            // make sure that the rule has been typed
+            definition->accept( *this );
 
             const auto type
                 = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
@@ -380,7 +397,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             const auto& definition = std::static_pointer_cast< RuleDefinition >(
                 node.targetDefinition() );
 
-            inference( *definition );
+            // make sure that the rule has been typed
+            definition->accept( *this );
+
             node.setType( definition->type() );
             break;
         }
@@ -1399,28 +1418,6 @@ void TypeInferenceVisitor::inference( FunctionDefinition& node )
 }
 
 void TypeInferenceVisitor::inference( DerivedDefinition& node )
-{
-    if( node.type() )
-    {
-        return;
-    }
-
-    assert( node.returnType()->type() && "return type must be specified" );
-
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    for( auto argumentType : *node.arguments() )
-    {
-        assert( argumentType->type() && "argument type must be specified" );
-        argTypeList.emplace_back( argumentType->type() );
-    }
-
-    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-        node.returnType()->type(), argTypeList );
-
-    node.setType( type );
-}
-
-void TypeInferenceVisitor::inference( RuleDefinition& node )
 {
     if( node.type() )
     {
