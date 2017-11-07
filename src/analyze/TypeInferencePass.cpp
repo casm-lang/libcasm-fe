@@ -132,12 +132,6 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
         return;
     }
 
-    if( node.defaultValue()->id() == Node::ID::UNDEF_ATOM
-        and not node.defaultValue()->type() )
-    {
-        node.defaultValue()->setType( node.returnType()->type() );
-    }
-
     assert( node.returnType()->type() && "return type must be specified" );
 
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
@@ -150,6 +144,9 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
         node.returnType()->type(), argTypeList );
     node.setType( type );
+
+    auto& returnType = *node.returnType()->type();
+    m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
 
     RecursiveVisitor::visit( node );
 }
