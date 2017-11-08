@@ -94,43 +94,43 @@ Grammar
    62 Terms: Terms "," Term
    63      | Term
 
-   64 Term: DirectCallExpression
-   65     | IndirectCallExpression
-   66     | LetExpression
-   67     | ConditionalExpression
-   68     | ChooseExpression
-   69     | UniversalQuantifierExpression
-   70     | ExistentialQuantifierExpression
-   71     | TypeCastingExpression
-   72     | Expression
+   64 Term: Expression
+   65     | TypeCastingExpression
+   66     | DirectCallExpression
+   67     | IndirectCallExpression
+   68     | LetExpression
+   69     | ConditionalExpression
+   70     | ChooseExpression
+   71     | UniversalQuantifierExpression
+   72     | ExistentialQuantifierExpression
    73     | List
    74     | Range
    75     | Literal
 
-   76 TypeCastingExpression: Term "as" Type
+   76 Expression: "(" Term ")"
+   77           | "(" error ")"
+   78           | "+" Term
+   79           | "-" Term
+   80           | Term "+" Term
+   81           | Term "-" Term
+   82           | Term "*" Term
+   83           | Term "/" Term
+   84           | Term "%" Term
+   85           | Term "^" Term
+   86           | Term "!=" Term
+   87           | Term "=" Term
+   88           | Term "<" Term
+   89           | Term ">" Term
+   90           | Term "<=" Term
+   91           | Term ">=" Term
+   92           | Term "or" Term
+   93           | Term "xor" Term
+   94           | Term "and" Term
+   95           | Term "=>" Term
+   96           | Term "implies" Term
+   97           | "not" Term
 
-   77 Expression: "(" Term ")"
-   78           | "(" error ")"
-   79           | "+" Term
-   80           | "-" Term
-   81           | Term "+" Term
-   82           | Term "-" Term
-   83           | Term "*" Term
-   84           | Term "/" Term
-   85           | Term "%" Term
-   86           | Term "^" Term
-   87           | Term "!=" Term
-   88           | Term "=" Term
-   89           | Term "<" Term
-   90           | Term ">" Term
-   91           | Term "<=" Term
-   92           | Term ">=" Term
-   93           | Term "or" Term
-   94           | Term "xor" Term
-   95           | Term "and" Term
-   96           | Term "=>" Term
-   97           | Term "implies" Term
-   98           | "not" Term
+   98 TypeCastingExpression: Term "as" Type
 
    99 DirectCallExpression: IdentifierPath
   100                     | IdentifierPath Arguments
@@ -268,7 +268,7 @@ Grammar
 Terminals, with rules where they appear
 
 "end of file" (0) 0
-error (256) 8 38 51 52 55 56 78 109 140 150
+error (256) 8 38 51 52 55 56 77 109 140 150
 "CASM" (258) 2 3
 "init" (259) 19 20
 "derived" (260) 14
@@ -298,20 +298,20 @@ error (256) 8 38 51 52 55 56 78 109 140 150
 "holds" (284) 105
 "exists" (285) 106
 "with" (286) 46 106
-"as" (287) 76
+"as" (287) 98
 "undef" (288) 119
 "false" (289) 121
 "true" (290) 120
-"and" (291) 95
-"or" (292) 93
-"xor" (293) 94
-"implies" (294) 97
-"not" (295) 98
-"+" (296) 79 81
-"-" (297) 80 82
-"=" (298) 13 14 15 16 44 88 102
-"(" (299) 77 78 101 139 140 141 142 149 150
-")" (300) 77 78 101 139 140 141 142 149 150
+"and" (291) 94
+"or" (292) 92
+"xor" (293) 93
+"implies" (294) 96
+"not" (295) 97
+"+" (296) 78 80
+"-" (297) 79 81
+"=" (298) 13 14 15 16 44 87 102
+"(" (299) 76 77 101 139 140 141 142 149 150
+")" (300) 76 77 101 139 140 141 142 149 150
 "[" (301) 2 6 107 108 109 110 174 176
 "]" (302) 2 6 107 108 109 110 174 176
 "{" (303) 13 20 37 38 49 51 152 154
@@ -320,21 +320,21 @@ error (256) 8 38 51 52 55 56 78 109 140 150
 "_" (306) 40
 "@" (307) 128
 "," (308) 62 129 142 147 156 163 178
-"<" (309) 89 136 137
-">" (310) 90 136 137
-"*" (311) 83 101 143
-"/" (312) 84
-"%" (313) 85
-"^" (314) 86
+"<" (309) 88 136 137
+">" (310) 89 136 137
+"*" (311) 82 101 143
+"/" (312) 83
+"%" (313) 84
+"^" (314) 85
 "'" (315) 138
 ".." (316) 110
 "." (317) 168 169
 "->" (318) 14 16 17 137 159 160
-"=>" (319) 96
+"=>" (319) 95
 ":=" (320) 57
-"!=" (321) 87
-"<=" (322) 91
-">=" (323) 92
+"!=" (321) 86
+"<=" (322) 90
+">=" (323) 91
 "{|" (324) 53 55
 "|}" (325) 53 55
 "binary" (326) 125
@@ -409,28 +409,28 @@ Terms (108)
     on left: 62 63, on right: 62 108 139 142
 Term (109)
     on left: 64 65 66 67 68 69 70 71 72 73 74 75, on right: 14 35 36
-    37 38 41 44 45 46 47 57 62 63 76 77 79 80 81 82 83 84 85 86 87
+    37 38 41 44 45 46 47 57 62 63 76 78 79 80 81 82 83 84 85 86 87
     88 89 90 91 92 93 94 95 96 97 98 101 102 103 104 105 106 110 138
     142 152 158 159 160 183
-TypeCastingExpression (110)
-    on left: 76, on right: 71
-Expression (111)
-    on left: 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94
-    95 96 97 98, on right: 72
+Expression (110)
+    on left: 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93
+    94 95 96 97, on right: 64
+TypeCastingExpression (111)
+    on left: 98, on right: 65
 DirectCallExpression (112)
-    on left: 99 100, on right: 57 58 59 64
+    on left: 99 100, on right: 57 58 59 66
 IndirectCallExpression (113)
-    on left: 101, on right: 60 61 65
+    on left: 101, on right: 60 61 67
 LetExpression (114)
-    on left: 102, on right: 66
+    on left: 102, on right: 68
 ConditionalExpression (115)
-    on left: 103, on right: 67
+    on left: 103, on right: 69
 ChooseExpression (116)
-    on left: 104, on right: 68
+    on left: 104, on right: 70
 UniversalQuantifierExpression (117)
-    on left: 105, on right: 69
+    on left: 105, on right: 71
 ExistentialQuantifierExpression (118)
-    on left: 106, on right: 70
+    on left: 106, on right: 72
 List (119)
     on left: 107 108 109, on right: 73
 Range (120)
@@ -456,7 +456,7 @@ ReferenceLiteral (129)
 Types (130)
     on left: 129 130, on right: 129 136
 Type (131)
-    on left: 131 132 133 134, on right: 14 16 17 76 129 130 137 143
+    on left: 131 132 133 134, on right: 14 16 17 98 129 130 137 143
     144 173
 BasicType (132)
     on left: 135, on right: 131
@@ -622,8 +622,8 @@ State 7
     $default  reduce using rule 182 (BasicAttribute)
 
     Term                             go to state 49
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -905,8 +905,8 @@ State 31
     "identifier"   shift, and go to state 6
 
     Term                             go to state 90
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -967,7 +967,7 @@ State 35
 
 State 36
 
-   98 Expression: "not" . Term
+   97 Expression: "not" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -994,8 +994,8 @@ State 36
     "identifier"   shift, and go to state 6
 
     Term                             go to state 92
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -1021,7 +1021,7 @@ State 36
 
 State 37
 
-   79 Expression: "+" . Term
+   78 Expression: "+" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -1048,8 +1048,8 @@ State 37
     "identifier"   shift, and go to state 6
 
     Term                             go to state 93
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -1075,7 +1075,7 @@ State 37
 
 State 38
 
-   80 Expression: "-" . Term
+   79 Expression: "-" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -1102,8 +1102,8 @@ State 38
     "identifier"   shift, and go to state 6
 
     Term                             go to state 94
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -1129,8 +1129,8 @@ State 38
 
 State 39
 
-   77 Expression: "(" . Term ")"
-   78           | "(" . error ")"
+   76 Expression: "(" . Term ")"
+   77           | "(" . error ")"
   101 IndirectCallExpression: "(" . "*" Term ")" Arguments
 
     error          shift, and go to state 95
@@ -1160,8 +1160,8 @@ State 39
     "identifier"   shift, and go to state 6
 
     Term                             go to state 97
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -1220,8 +1220,8 @@ State 40
 
     Terms                            go to state 100
     Term                             go to state 101
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -1312,24 +1312,24 @@ State 48
 
 State 49
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   183 ExpressionAttribute: Identifier Term .
 
     "as"       shift, and go to state 104
@@ -1356,65 +1356,65 @@ State 49
 
 State 50
 
-   71 Term: TypeCastingExpression .
-
-    $default  reduce using rule 71 (Term)
-
-
-State 51
-
-   72 Term: Expression .
-
-    $default  reduce using rule 72 (Term)
-
-
-State 52
-
-   64 Term: DirectCallExpression .
+   64 Term: Expression .
 
     $default  reduce using rule 64 (Term)
 
 
-State 53
+State 51
 
-   65 Term: IndirectCallExpression .
+   65 Term: TypeCastingExpression .
 
     $default  reduce using rule 65 (Term)
 
 
-State 54
+State 52
 
-   66 Term: LetExpression .
+   66 Term: DirectCallExpression .
 
     $default  reduce using rule 66 (Term)
 
 
-State 55
+State 53
 
-   67 Term: ConditionalExpression .
+   67 Term: IndirectCallExpression .
 
     $default  reduce using rule 67 (Term)
 
 
-State 56
+State 54
 
-   68 Term: ChooseExpression .
+   68 Term: LetExpression .
 
     $default  reduce using rule 68 (Term)
 
 
-State 57
+State 55
 
-   69 Term: UniversalQuantifierExpression .
+   69 Term: ConditionalExpression .
 
     $default  reduce using rule 69 (Term)
 
 
-State 58
+State 56
 
-   70 Term: ExistentialQuantifierExpression .
+   70 Term: ChooseExpression .
 
     $default  reduce using rule 70 (Term)
+
+
+State 57
+
+   71 Term: UniversalQuantifierExpression .
+
+    $default  reduce using rule 71 (Term)
+
+
+State 58
+
+   72 Term: ExistentialQuantifierExpression .
+
+    $default  reduce using rule 72 (Term)
 
 
 State 59
@@ -1574,8 +1574,8 @@ State 75
     $default  reduce using rule 162 (MaybeInitializers)
 
     Term                             go to state 128
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -1724,24 +1724,24 @@ State 89
 
 State 90
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   103 ConditionalExpression: "if" Term . "then" Term "else" Term
 
     "then"     shift, and go to state 144
@@ -1774,82 +1774,82 @@ State 91
 
 State 92
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-   98           | "not" Term .
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   97           | "not" Term .
+   98 TypeCastingExpression: Term . "as" Type
 
-    $default  reduce using rule 98 (Expression)
+    $default  reduce using rule 97 (Expression)
 
 
 State 93
 
-   76 TypeCastingExpression: Term . "as" Type
-   79 Expression: "+" Term .
-   81           | Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   78 Expression: "+" Term .
+   80           | Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
-    $default  reduce using rule 79 (Expression)
+    $default  reduce using rule 78 (Expression)
 
 
 State 94
 
-   76 TypeCastingExpression: Term . "as" Type
-   80 Expression: "-" Term .
-   81           | Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   79 Expression: "-" Term .
+   80           | Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
-    $default  reduce using rule 80 (Expression)
+    $default  reduce using rule 79 (Expression)
 
 
 State 95
 
-   78 Expression: "(" error . ")"
+   77 Expression: "(" error . ")"
 
     ")"  shift, and go to state 146
 
@@ -1883,8 +1883,8 @@ State 96
     "identifier"   shift, and go to state 6
 
     Term                             go to state 147
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -1910,25 +1910,25 @@ State 96
 
 State 97
 
-   76 TypeCastingExpression: Term . "as" Type
-   77 Expression: "(" Term . ")"
-   81           | Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   76 Expression: "(" Term . ")"
+   80           | Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "as"       shift, and go to state 104
     "and"      shift, and go to state 105
@@ -1977,24 +1977,24 @@ State 100
 State 101
 
    63 Terms: Term .
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   110 Range: "[" Term . ".." Term "]"
 
     "as"       shift, and go to state 104
@@ -2036,7 +2036,7 @@ State 103
 
 State 104
 
-   76 TypeCastingExpression: Term "as" . Type
+   98 TypeCastingExpression: Term "as" . Type
 
     "in"          shift, and go to state 5
     "."           shift, and go to state 42
@@ -2054,7 +2054,7 @@ State 104
 
 State 105
 
-   95 Expression: Term "and" . Term
+   94 Expression: Term "and" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2081,8 +2081,8 @@ State 105
     "identifier"   shift, and go to state 6
 
     Term                             go to state 159
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2108,7 +2108,7 @@ State 105
 
 State 106
 
-   93 Expression: Term "or" . Term
+   92 Expression: Term "or" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2135,8 +2135,8 @@ State 106
     "identifier"   shift, and go to state 6
 
     Term                             go to state 160
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2162,7 +2162,7 @@ State 106
 
 State 107
 
-   94 Expression: Term "xor" . Term
+   93 Expression: Term "xor" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2189,8 +2189,8 @@ State 107
     "identifier"   shift, and go to state 6
 
     Term                             go to state 161
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2216,7 +2216,7 @@ State 107
 
 State 108
 
-   97 Expression: Term "implies" . Term
+   96 Expression: Term "implies" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2243,8 +2243,8 @@ State 108
     "identifier"   shift, and go to state 6
 
     Term                             go to state 162
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2270,7 +2270,7 @@ State 108
 
 State 109
 
-   81 Expression: Term "+" . Term
+   80 Expression: Term "+" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2297,8 +2297,8 @@ State 109
     "identifier"   shift, and go to state 6
 
     Term                             go to state 163
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2324,7 +2324,7 @@ State 109
 
 State 110
 
-   82 Expression: Term "-" . Term
+   81 Expression: Term "-" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2351,8 +2351,8 @@ State 110
     "identifier"   shift, and go to state 6
 
     Term                             go to state 164
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2378,7 +2378,7 @@ State 110
 
 State 111
 
-   88 Expression: Term "=" . Term
+   87 Expression: Term "=" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2405,8 +2405,8 @@ State 111
     "identifier"   shift, and go to state 6
 
     Term                             go to state 165
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2432,7 +2432,7 @@ State 111
 
 State 112
 
-   89 Expression: Term "<" . Term
+   88 Expression: Term "<" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2459,8 +2459,8 @@ State 112
     "identifier"   shift, and go to state 6
 
     Term                             go to state 166
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2486,7 +2486,7 @@ State 112
 
 State 113
 
-   90 Expression: Term ">" . Term
+   89 Expression: Term ">" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2513,8 +2513,8 @@ State 113
     "identifier"   shift, and go to state 6
 
     Term                             go to state 167
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2540,7 +2540,7 @@ State 113
 
 State 114
 
-   83 Expression: Term "*" . Term
+   82 Expression: Term "*" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2567,8 +2567,8 @@ State 114
     "identifier"   shift, and go to state 6
 
     Term                             go to state 168
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2594,7 +2594,7 @@ State 114
 
 State 115
 
-   84 Expression: Term "/" . Term
+   83 Expression: Term "/" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2621,8 +2621,8 @@ State 115
     "identifier"   shift, and go to state 6
 
     Term                             go to state 169
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2648,7 +2648,7 @@ State 115
 
 State 116
 
-   85 Expression: Term "%" . Term
+   84 Expression: Term "%" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2675,8 +2675,8 @@ State 116
     "identifier"   shift, and go to state 6
 
     Term                             go to state 170
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2702,7 +2702,7 @@ State 116
 
 State 117
 
-   86 Expression: Term "^" . Term
+   85 Expression: Term "^" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2729,8 +2729,8 @@ State 117
     "identifier"   shift, and go to state 6
 
     Term                             go to state 171
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2756,7 +2756,7 @@ State 117
 
 State 118
 
-   96 Expression: Term "=>" . Term
+   95 Expression: Term "=>" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2783,8 +2783,8 @@ State 118
     "identifier"   shift, and go to state 6
 
     Term                             go to state 172
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2810,7 +2810,7 @@ State 118
 
 State 119
 
-   87 Expression: Term "!=" . Term
+   86 Expression: Term "!=" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2837,8 +2837,8 @@ State 119
     "identifier"   shift, and go to state 6
 
     Term                             go to state 173
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2864,7 +2864,7 @@ State 119
 
 State 120
 
-   91 Expression: Term "<=" . Term
+   90 Expression: Term "<=" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2891,8 +2891,8 @@ State 120
     "identifier"   shift, and go to state 6
 
     Term                             go to state 174
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -2918,7 +2918,7 @@ State 120
 
 State 121
 
-   92 Expression: Term ">=" . Term
+   91 Expression: Term ">=" . Term
 
     "let"          shift, and go to state 28
     "in"           shift, and go to state 5
@@ -2945,8 +2945,8 @@ State 121
     "identifier"   shift, and go to state 6
 
     Term                             go to state 175
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3004,8 +3004,8 @@ State 122
 
     Terms                            go to state 178
     Term                             go to state 179
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3062,8 +3062,8 @@ State 126
 
 State 127
 
-   77 Expression: "(" . Term ")"
-   78           | "(" . error ")"
+   76 Expression: "(" . Term ")"
+   77           | "(" . error ")"
   101 IndirectCallExpression: "(" . "*" Term ")" Arguments
   142 TwoOrMoreArguments: "(" . Terms "," Term ")"
 
@@ -3095,8 +3095,8 @@ State 127
 
     Terms                            go to state 181
     Term                             go to state 182
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3122,24 +3122,24 @@ State 127
 
 State 128
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   158 Initializer: Term .
   159            | Term . "->" Term
 
@@ -3332,8 +3332,8 @@ State 141
     "identifier"   shift, and go to state 6
 
     Term                             go to state 203
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3386,8 +3386,8 @@ State 142
     "identifier"   shift, and go to state 6
 
     Term                             go to state 204
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3440,8 +3440,8 @@ State 143
     "identifier"   shift, and go to state 6
 
     Term                             go to state 205
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3494,8 +3494,8 @@ State 144
     "identifier"   shift, and go to state 6
 
     Term                             go to state 206
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3548,8 +3548,8 @@ State 145
     "identifier"   shift, and go to state 6
 
     Term                             go to state 207
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3575,31 +3575,31 @@ State 145
 
 State 146
 
-   78 Expression: "(" error ")" .
+   77 Expression: "(" error ")" .
 
-    $default  reduce using rule 78 (Expression)
+    $default  reduce using rule 77 (Expression)
 
 
 State 147
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   101 IndirectCallExpression: "(" "*" Term . ")" Arguments
 
     "as"       shift, and go to state 104
@@ -3625,9 +3625,9 @@ State 147
 
 State 148
 
-   77 Expression: "(" Term ")" .
+   76 Expression: "(" Term ")" .
 
-    $default  reduce using rule 77 (Expression)
+    $default  reduce using rule 76 (Expression)
 
 
 State 149
@@ -3673,8 +3673,8 @@ State 151
     "identifier"   shift, and go to state 6
 
     Term                             go to state 209
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3727,8 +3727,8 @@ State 152
     "identifier"   shift, and go to state 6
 
     Term                             go to state 210
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -3754,9 +3754,9 @@ State 152
 
 State 153
 
-   76 TypeCastingExpression: Term "as" Type .
+   98 TypeCastingExpression: Term "as" Type .
 
-    $default  reduce using rule 76 (TypeCastingExpression)
+    $default  reduce using rule 98 (TypeCastingExpression)
 
 
 State 154
@@ -3803,25 +3803,25 @@ State 158
 
 State 159
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   95           | Term "and" Term .
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   94           | Term "and" Term .
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "+"   shift, and go to state 109
     "-"   shift, and go to state 110
@@ -3836,33 +3836,72 @@ State 159
     "<="  shift, and go to state 120
     ">="  shift, and go to state 121
 
-    $default  reduce using rule 95 (Expression)
+    $default  reduce using rule 94 (Expression)
 
 
 State 160
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   93           | Term "or" Term .
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   92           | Term "or" Term .
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "and"  shift, and go to state 105
     "xor"  shift, and go to state 107
+    "+"    shift, and go to state 109
+    "-"    shift, and go to state 110
+    "="    shift, and go to state 111
+    "<"    shift, and go to state 112
+    ">"    shift, and go to state 113
+    "*"    shift, and go to state 114
+    "/"    shift, and go to state 115
+    "%"    shift, and go to state 116
+    "^"    shift, and go to state 117
+    "!="   shift, and go to state 119
+    "<="   shift, and go to state 120
+    ">="   shift, and go to state 121
+
+    $default  reduce using rule 92 (Expression)
+
+
+State 161
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   93           | Term "xor" Term .
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "and"  shift, and go to state 105
     "+"    shift, and go to state 109
     "-"    shift, and go to state 110
     "="    shift, and go to state 111
@@ -3879,373 +3918,27 @@ State 160
     $default  reduce using rule 93 (Expression)
 
 
-State 161
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   94           | Term "xor" Term .
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "and"  shift, and go to state 105
-    "+"    shift, and go to state 109
-    "-"    shift, and go to state 110
-    "="    shift, and go to state 111
-    "<"    shift, and go to state 112
-    ">"    shift, and go to state 113
-    "*"    shift, and go to state 114
-    "/"    shift, and go to state 115
-    "%"    shift, and go to state 116
-    "^"    shift, and go to state 117
-    "!="   shift, and go to state 119
-    "<="   shift, and go to state 120
-    ">="   shift, and go to state 121
-
-    $default  reduce using rule 94 (Expression)
-
-
 State 162
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-   97           | Term "implies" Term .
-
-    "and"  shift, and go to state 105
-    "or"   shift, and go to state 106
-    "xor"  shift, and go to state 107
-    "+"    shift, and go to state 109
-    "-"    shift, and go to state 110
-    "="    shift, and go to state 111
-    "<"    shift, and go to state 112
-    ">"    shift, and go to state 113
-    "*"    shift, and go to state 114
-    "/"    shift, and go to state 115
-    "%"    shift, and go to state 116
-    "^"    shift, and go to state 117
-    "!="   shift, and go to state 119
-    "<="   shift, and go to state 120
-    ">="   shift, and go to state 121
-
-    $default  reduce using rule 97 (Expression)
-
-
-State 163
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   81           | Term "+" Term .
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "*"  shift, and go to state 114
-    "/"  shift, and go to state 115
-    "%"  shift, and go to state 116
-    "^"  shift, and go to state 117
-
-    $default  reduce using rule 81 (Expression)
-
-
-State 164
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   82           | Term "-" Term .
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "*"  shift, and go to state 114
-    "/"  shift, and go to state 115
-    "%"  shift, and go to state 116
-    "^"  shift, and go to state 117
-
-    $default  reduce using rule 82 (Expression)
-
-
-State 165
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   88           | Term "=" Term .
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "+"   shift, and go to state 109
-    "-"   shift, and go to state 110
-    "<"   shift, and go to state 112
-    ">"   shift, and go to state 113
-    "*"   shift, and go to state 114
-    "/"   shift, and go to state 115
-    "%"   shift, and go to state 116
-    "^"   shift, and go to state 117
-    "<="  shift, and go to state 120
-    ">="  shift, and go to state 121
-
-    $default  reduce using rule 88 (Expression)
-
-
-State 166
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   89           | Term "<" Term .
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "+"  shift, and go to state 109
-    "-"  shift, and go to state 110
-    "*"  shift, and go to state 114
-    "/"  shift, and go to state 115
-    "%"  shift, and go to state 116
-    "^"  shift, and go to state 117
-
-    $default  reduce using rule 89 (Expression)
-
-
-State 167
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   90           | Term ">" Term .
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "+"  shift, and go to state 109
-    "-"  shift, and go to state 110
-    "*"  shift, and go to state 114
-    "/"  shift, and go to state 115
-    "%"  shift, and go to state 116
-    "^"  shift, and go to state 117
-
-    $default  reduce using rule 90 (Expression)
-
-
-State 168
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   83           | Term "*" Term .
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "^"  shift, and go to state 117
-
-    $default  reduce using rule 83 (Expression)
-
-
-State 169
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   84           | Term "/" Term .
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "^"  shift, and go to state 117
-
-    $default  reduce using rule 84 (Expression)
-
-
-State 170
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   85           | Term "%" Term .
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "^"  shift, and go to state 117
-
-    $default  reduce using rule 85 (Expression)
-
-
-State 171
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   86           | Term "^" Term .
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    $default  reduce using rule 86 (Expression)
-
-
-State 172
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   96           | Term "=>" Term .
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   96           | Term "implies" Term .
+   98 TypeCastingExpression: Term . "as" Type
 
     "and"  shift, and go to state 105
     "or"   shift, and go to state 106
@@ -4266,27 +3959,87 @@ State 172
     $default  reduce using rule 96 (Expression)
 
 
-State 173
+State 163
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   87           | Term "!=" Term .
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   80           | Term "+" Term .
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "*"  shift, and go to state 114
+    "/"  shift, and go to state 115
+    "%"  shift, and go to state 116
+    "^"  shift, and go to state 117
+
+    $default  reduce using rule 80 (Expression)
+
+
+State 164
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   81           | Term "-" Term .
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "*"  shift, and go to state 114
+    "/"  shift, and go to state 115
+    "%"  shift, and go to state 116
+    "^"  shift, and go to state 117
+
+    $default  reduce using rule 81 (Expression)
+
+
+State 165
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   87           | Term "=" Term .
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "+"   shift, and go to state 109
     "-"   shift, and go to state 110
@@ -4302,27 +4055,306 @@ State 173
     $default  reduce using rule 87 (Expression)
 
 
+State 166
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   88           | Term "<" Term .
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "+"  shift, and go to state 109
+    "-"  shift, and go to state 110
+    "*"  shift, and go to state 114
+    "/"  shift, and go to state 115
+    "%"  shift, and go to state 116
+    "^"  shift, and go to state 117
+
+    $default  reduce using rule 88 (Expression)
+
+
+State 167
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   89           | Term ">" Term .
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "+"  shift, and go to state 109
+    "-"  shift, and go to state 110
+    "*"  shift, and go to state 114
+    "/"  shift, and go to state 115
+    "%"  shift, and go to state 116
+    "^"  shift, and go to state 117
+
+    $default  reduce using rule 89 (Expression)
+
+
+State 168
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   82           | Term "*" Term .
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "^"  shift, and go to state 117
+
+    $default  reduce using rule 82 (Expression)
+
+
+State 169
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   83           | Term "/" Term .
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "^"  shift, and go to state 117
+
+    $default  reduce using rule 83 (Expression)
+
+
+State 170
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   84           | Term "%" Term .
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "^"  shift, and go to state 117
+
+    $default  reduce using rule 84 (Expression)
+
+
+State 171
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   85           | Term "^" Term .
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    $default  reduce using rule 85 (Expression)
+
+
+State 172
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   95           | Term "=>" Term .
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "and"  shift, and go to state 105
+    "or"   shift, and go to state 106
+    "xor"  shift, and go to state 107
+    "+"    shift, and go to state 109
+    "-"    shift, and go to state 110
+    "="    shift, and go to state 111
+    "<"    shift, and go to state 112
+    ">"    shift, and go to state 113
+    "*"    shift, and go to state 114
+    "/"    shift, and go to state 115
+    "%"    shift, and go to state 116
+    "^"    shift, and go to state 117
+    "!="   shift, and go to state 119
+    "<="   shift, and go to state 120
+    ">="   shift, and go to state 121
+
+    $default  reduce using rule 95 (Expression)
+
+
+State 173
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   86           | Term "!=" Term .
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "+"   shift, and go to state 109
+    "-"   shift, and go to state 110
+    "<"   shift, and go to state 112
+    ">"   shift, and go to state 113
+    "*"   shift, and go to state 114
+    "/"   shift, and go to state 115
+    "%"   shift, and go to state 116
+    "^"   shift, and go to state 117
+    "<="  shift, and go to state 120
+    ">="  shift, and go to state 121
+
+    $default  reduce using rule 86 (Expression)
+
+
 State 174
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   91           | Term "<=" Term .
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   90           | Term "<=" Term .
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
+
+    "+"  shift, and go to state 109
+    "-"  shift, and go to state 110
+    "*"  shift, and go to state 114
+    "/"  shift, and go to state 115
+    "%"  shift, and go to state 116
+    "^"  shift, and go to state 117
+
+    $default  reduce using rule 90 (Expression)
+
+
+State 175
+
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   91           | Term ">=" Term .
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "+"  shift, and go to state 109
     "-"  shift, and go to state 110
@@ -4332,38 +4364,6 @@ State 174
     "^"  shift, and go to state 117
 
     $default  reduce using rule 91 (Expression)
-
-
-State 175
-
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   92           | Term ">=" Term .
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
-
-    "+"  shift, and go to state 109
-    "-"  shift, and go to state 110
-    "*"  shift, and go to state 114
-    "/"  shift, and go to state 115
-    "%"  shift, and go to state 116
-    "^"  shift, and go to state 117
-
-    $default  reduce using rule 92 (Expression)
 
 
 State 176
@@ -4392,24 +4392,24 @@ State 178
 State 179
 
    63 Terms: Term .
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "as"       shift, and go to state 104
     "and"      shift, and go to state 105
@@ -4451,25 +4451,25 @@ State 181
 State 182
 
    63 Terms: Term .
-   76 TypeCastingExpression: Term . "as" Type
-   77 Expression: "(" Term . ")"
-   81           | Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   76 Expression: "(" Term . ")"
+   80           | Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "as"       shift, and go to state 104
     "and"      shift, and go to state 105
@@ -4523,8 +4523,8 @@ State 183
     "identifier"   shift, and go to state 6
 
     Term                             go to state 216
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -4577,8 +4577,8 @@ State 184
     "identifier"   shift, and go to state 6
 
     Term                             go to state 217
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -4631,8 +4631,8 @@ State 185
     "identifier"   shift, and go to state 6
 
     Term                             go to state 128
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -4855,24 +4855,24 @@ State 202
 
 State 203
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   102 LetExpression: "let" AttributedVariable "=" Term . "in" Term
 
     "in"       shift, and go to state 257
@@ -4898,24 +4898,24 @@ State 203
 
 State 204
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   105 UniversalQuantifierExpression: "forall" AttributedVariable "in" Term . "holds" Term
 
     "holds"    shift, and go to state 258
@@ -4941,24 +4941,24 @@ State 204
 
 State 205
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   104 ChooseExpression: "choose" AttributedVariable "in" Term . "do" Term
 
     "do"       shift, and go to state 259
@@ -4984,24 +4984,24 @@ State 205
 
 State 206
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   103 ConditionalExpression: "if" Term "then" Term . "else" Term
 
     "else"     shift, and go to state 260
@@ -5027,24 +5027,24 @@ State 206
 
 State 207
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   106 ExistentialQuantifierExpression: "exists" AttributedVariable "in" Term . "with" Term
 
     "with"     shift, and go to state 261
@@ -5080,24 +5080,24 @@ State 208
 State 209
 
    62 Terms: Terms "," Term .
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "as"       shift, and go to state 104
     "and"      shift, and go to state 105
@@ -5123,24 +5123,24 @@ State 209
 
 State 210
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   110 Range: "[" Term ".." Term . "]"
 
     "as"       shift, and go to state 104
@@ -5217,8 +5217,8 @@ State 212
     "identifier"   shift, and go to state 6
 
     Term                             go to state 267
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -5286,8 +5286,8 @@ State 215
     "identifier"   shift, and go to state 6
 
     Term                             go to state 268
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -5313,24 +5313,24 @@ State 215
 
 State 216
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   159 Initializer: Term "->" Term .
 
     "as"       shift, and go to state 104
@@ -5357,24 +5357,24 @@ State 216
 
 State 217
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   160 Initializer: TwoOrMoreArguments "->" Term .
 
     "as"       shift, and go to state 104
@@ -5688,8 +5688,8 @@ State 234
     "identifier"   shift, and go to state 6
 
     Term                             go to state 285
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -5743,8 +5743,8 @@ State 235
     "identifier"   shift, and go to state 6
 
     Term                             go to state 286
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -6041,8 +6041,8 @@ State 257
     "identifier"   shift, and go to state 6
 
     Term                             go to state 295
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -6095,8 +6095,8 @@ State 258
     "identifier"   shift, and go to state 6
 
     Term                             go to state 296
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -6149,8 +6149,8 @@ State 259
     "identifier"   shift, and go to state 6
 
     Term                             go to state 297
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -6203,8 +6203,8 @@ State 260
     "identifier"   shift, and go to state 6
 
     Term                             go to state 298
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -6257,8 +6257,8 @@ State 261
     "identifier"   shift, and go to state 6
 
     Term                             go to state 299
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -6324,24 +6324,24 @@ State 266
 
 State 267
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   138 FixedSizedType: IdentifierPath "'" Term .
 
     $default  reduce using rule 138 (FixedSizedType)
@@ -6350,24 +6350,24 @@ State 267
 State 268
 
    62 Terms: Terms "," Term .
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   142 TwoOrMoreArguments: "(" Terms "," Term . ")"
 
     "as"       shift, and go to state 104
@@ -6440,8 +6440,8 @@ State 271
     "identifier"   shift, and go to state 6
 
     Term                             go to state 305
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -6634,24 +6634,24 @@ State 285
 
    35 ConditionalRule: "if" Term . "then" Rule
    36                | "if" Term . "then" Rule "else" Rule
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "then"     shift, and go to state 315
     "as"       shift, and go to state 104
@@ -6678,24 +6678,24 @@ State 286
 
    37 CaseRule: "case" Term . "of" "{" CaseLabels "}"
    38         | "case" Term . "of" "{" error "}"
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "of"       shift, and go to state 316
     "as"       shift, and go to state 104
@@ -6845,8 +6845,8 @@ State 291
     "identifier"   shift, and go to state 6
 
     Term                             go to state 321
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -6930,24 +6930,24 @@ State 294
 
 State 295
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   102 LetExpression: "let" AttributedVariable "=" Term "in" Term .
 
     "as"       shift, and go to state 104
@@ -6974,24 +6974,24 @@ State 295
 
 State 296
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   105 UniversalQuantifierExpression: "forall" AttributedVariable "in" Term "holds" Term .
 
     "as"       shift, and go to state 104
@@ -7018,24 +7018,24 @@ State 296
 
 State 297
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   104 ChooseExpression: "choose" AttributedVariable "in" Term "do" Term .
 
     "as"       shift, and go to state 104
@@ -7062,24 +7062,24 @@ State 297
 
 State 298
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   103 ConditionalExpression: "if" Term "then" Term "else" Term .
 
     "as"       shift, and go to state 104
@@ -7106,24 +7106,24 @@ State 298
 
 State 299
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   106 ExistentialQuantifierExpression: "exists" AttributedVariable "in" Term "with" Term .
 
     "as"       shift, and go to state 104
@@ -7208,24 +7208,24 @@ State 304
 State 305
 
    14 DerivedDefinition: "derived" Identifier MaybeParameters "->" Type "=" Term .
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "as"       shift, and go to state 104
     "and"      shift, and go to state 105
@@ -7320,8 +7320,8 @@ State 312
     "identifier"   shift, and go to state 6
 
     Term                             go to state 327
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -7375,8 +7375,8 @@ State 313
     "identifier"   shift, and go to state 6
 
     Term                             go to state 328
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -7429,8 +7429,8 @@ State 314
     "identifier"   shift, and go to state 6
 
     Term                             go to state 329
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -7534,24 +7534,24 @@ State 320
 State 321
 
    57 UpdateRule: DirectCallExpression ":=" Term .
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "as"       shift, and go to state 104
     "and"      shift, and go to state 105
@@ -7617,24 +7617,24 @@ State 326
 State 327
 
    44 LetRule: "let" AttributedVariable "=" Term . "in" Rule
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "in"       shift, and go to state 336
     "as"       shift, and go to state 104
@@ -7661,24 +7661,24 @@ State 328
 
    45 ForallRule: "forall" AttributedVariable "in" Term . "do" Rule
    46           | "forall" AttributedVariable "in" Term . "with" Term "do" Rule
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "do"       shift, and go to state 337
     "with"     shift, and go to state 338
@@ -7705,24 +7705,24 @@ State 328
 State 329
 
    47 ChooseRule: "choose" AttributedVariable "in" Term . "do" Rule
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "do"       shift, and go to state 339
     "as"       shift, and go to state 104
@@ -7790,8 +7790,8 @@ State 331
     CaseLabel                        go to state 344
     CaseLabels                       go to state 345
     Term                             go to state 346
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -7844,8 +7844,8 @@ State 332
     "identifier"   shift, and go to state 6
 
     Term                             go to state 347
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -7999,8 +7999,8 @@ State 338
     "identifier"   shift, and go to state 6
 
     Term                             go to state 351
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -8166,8 +8166,8 @@ State 345
 
     CaseLabel                        go to state 358
     Term                             go to state 346
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -8194,24 +8194,24 @@ State 345
 State 346
 
    41 CaseLabel: Term . ":" Rule
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "as"       shift, and go to state 104
     "and"      shift, and go to state 105
@@ -8236,24 +8236,24 @@ State 346
 
 State 347
 
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
   152 MaybeDefined: "defined" "{" Term . "}"
 
     "as"       shift, and go to state 104
@@ -8308,8 +8308,8 @@ State 348
     $default  reduce using rule 162 (MaybeInitializers)
 
     Term                             go to state 128
-    TypeCastingExpression            go to state 50
-    Expression                       go to state 51
+    Expression                       go to state 50
+    TypeCastingExpression            go to state 51
     DirectCallExpression             go to state 52
     IndirectCallExpression           go to state 53
     LetExpression                    go to state 54
@@ -8354,24 +8354,24 @@ State 350
 State 351
 
    46 ForallRule: "forall" AttributedVariable "in" Term "with" Term . "do" Rule
-   76 TypeCastingExpression: Term . "as" Type
-   81 Expression: Term . "+" Term
-   82           | Term . "-" Term
-   83           | Term . "*" Term
-   84           | Term . "/" Term
-   85           | Term . "%" Term
-   86           | Term . "^" Term
-   87           | Term . "!=" Term
-   88           | Term . "=" Term
-   89           | Term . "<" Term
-   90           | Term . ">" Term
-   91           | Term . "<=" Term
-   92           | Term . ">=" Term
-   93           | Term . "or" Term
-   94           | Term . "xor" Term
-   95           | Term . "and" Term
-   96           | Term . "=>" Term
-   97           | Term . "implies" Term
+   80 Expression: Term . "+" Term
+   81           | Term . "-" Term
+   82           | Term . "*" Term
+   83           | Term . "/" Term
+   84           | Term . "%" Term
+   85           | Term . "^" Term
+   86           | Term . "!=" Term
+   87           | Term . "=" Term
+   88           | Term . "<" Term
+   89           | Term . ">" Term
+   90           | Term . "<=" Term
+   91           | Term . ">=" Term
+   92           | Term . "or" Term
+   93           | Term . "xor" Term
+   94           | Term . "and" Term
+   95           | Term . "=>" Term
+   96           | Term . "implies" Term
+   98 TypeCastingExpression: Term . "as" Type
 
     "do"       shift, and go to state 362
     "as"       shift, and go to state 104

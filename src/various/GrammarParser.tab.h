@@ -1510,7 +1510,7 @@ namespace libcasm_fe {
         break;
 
       case 109: // Term
-      case 111: // Expression
+      case 110: // Expression
       case 121: // Literal
       case 142: // MaybeDefined
         value.copy< Expression::Ptr > (other.value);
@@ -1623,7 +1623,7 @@ namespace libcasm_fe {
         value.copy< Specification::Ptr > (other.value);
         break;
 
-      case 110: // TypeCastingExpression
+      case 111: // TypeCastingExpression
         value.copy< TypeCastingExpression::Ptr > (other.value);
         break;
 
@@ -1775,7 +1775,7 @@ namespace libcasm_fe {
         break;
 
       case 109: // Term
-      case 111: // Expression
+      case 110: // Expression
       case 121: // Literal
       case 142: // MaybeDefined
         value.copy< Expression::Ptr > (v);
@@ -1888,7 +1888,7 @@ namespace libcasm_fe {
         value.copy< Specification::Ptr > (v);
         break;
 
-      case 110: // TypeCastingExpression
+      case 111: // TypeCastingExpression
         value.copy< TypeCastingExpression::Ptr > (v);
         break;
 
@@ -2449,7 +2449,7 @@ namespace libcasm_fe {
         break;
 
       case 109: // Term
-      case 111: // Expression
+      case 110: // Expression
       case 121: // Literal
       case 142: // MaybeDefined
         value.template destroy< Expression::Ptr > ();
@@ -2562,7 +2562,7 @@ namespace libcasm_fe {
         value.template destroy< Specification::Ptr > ();
         break;
 
-      case 110: // TypeCastingExpression
+      case 111: // TypeCastingExpression
         value.template destroy< TypeCastingExpression::Ptr > ();
         break;
 
@@ -2720,7 +2720,7 @@ namespace libcasm_fe {
         break;
 
       case 109: // Term
-      case 111: // Expression
+      case 110: // Expression
       case 121: // Literal
       case 142: // MaybeDefined
         value.move< Expression::Ptr > (s.value);
@@ -2833,7 +2833,7 @@ namespace libcasm_fe {
         value.move< Specification::Ptr > (s.value);
         break;
 
-      case 110: // TypeCastingExpression
+      case 111: // TypeCastingExpression
         value.move< TypeCastingExpression::Ptr > (s.value);
         break;
 

@@ -739,7 +739,15 @@ Terms
 
 
 Term
-: DirectCallExpression
+: Expression
+  {
+      $$ = $1;
+  }
+| TypeCastingExpression
+  {
+      $$ = $1;
+  }
+| DirectCallExpression
   {
       $$ = $1;
   }
@@ -767,14 +775,6 @@ Term
   {
       $$ = $1;
   }
-| TypeCastingExpression
-  {
-      $$ = $1;
-  }
-| Expression
-  {
-      $$ = $1;
-  }
 | List
   {
       $$ = $1;
@@ -786,14 +786,6 @@ Term
 | Literal
   {
       $$ = $1;
-  }
-;
-
-
-TypeCastingExpression
-: Term AS Type
-  {
-      $$ = Ast::make< TypeCastingExpression >( @$, $1, $3 );
   }
 ;
 
@@ -894,6 +886,14 @@ Expression
 ;
 
 
+TypeCastingExpression
+: Term AS Type
+  {
+      $$ = Ast::make< TypeCastingExpression >( @$, $1, $3 );
+  }
+;
+
+
 DirectCallExpression
 : IdentifierPath %prec CALL_WITHOUT_ARGS
   {
@@ -953,8 +953,6 @@ ExistentialQuantifierExpression
       $$ = Ast::make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
   }
 ;
-
-
 
 
 List
