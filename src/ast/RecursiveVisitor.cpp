@@ -100,8 +100,8 @@ void RecursiveVisitor::visit( EnumerationDefinition& node )
 
 void RecursiveVisitor::visit( TypeCastingExpression& node )
 {
-    node.expression()->accept( *this );
-    node.type()->accept( *this );
+    node.fromExpression()->accept( *this );
+    node.asType()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ValueAtom& node )

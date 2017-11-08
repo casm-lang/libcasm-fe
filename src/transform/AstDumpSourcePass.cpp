@@ -308,9 +308,9 @@ void AstDumpSourceVisitor::visit( EnumerationDefinition& node )
 
 void AstDumpSourceVisitor::visit( TypeCastingExpression& node )
 {
-    node.expression()->accept( *this );
+    node.fromExpression()->accept( *this );
     m_stream << " as ";
-    node.type()->accept( *this );
+    node.asType()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( ValueAtom& node )
