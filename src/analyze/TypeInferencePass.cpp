@@ -261,9 +261,12 @@ void TypeInferenceVisitor::visit( ValueAtom& node )
 
 void TypeInferenceVisitor::visit( ReferenceAtom& node )
 {
-    RecursiveVisitor::visit( node );
+    if( node.type() )
+    {
+        return;
+    }
 
-    assert( not node.type() );
+    RecursiveVisitor::visit( node );
 
     switch( node.referenceType() )
     {
