@@ -55,21 +55,21 @@ Expression::Expression( Node::ID id )
 }
 
 TypeCastingExpression::TypeCastingExpression(
-    const Expression::Ptr& expression, const Type::Ptr& type )
+    const Expression::Ptr& fromExpression, const Type::Ptr& asType )
 : Expression( Node::ID::TYPE_CASTING_EXPRESSION )
-, m_expression( expression )
-, m_type( type )
+, m_fromExpression( fromExpression )
+, m_asType( asType )
 {
 }
 
-const Expression::Ptr& TypeCastingExpression::expression( void ) const
+const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
 {
-    return m_expression;
+    return m_fromExpression;
 }
 
-const Type::Ptr& TypeCastingExpression::type( void ) const
+const Type::Ptr& TypeCastingExpression::asType( void ) const
 {
-    return m_type;
+    return m_asType;
 }
 
 void TypeCastingExpression::accept( Visitor& visitor )

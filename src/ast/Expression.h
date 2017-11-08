@@ -70,17 +70,17 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< TypeCastingExpression >;
 
-            TypeCastingExpression( const Expression::Ptr& expression,
-                const std::shared_ptr< Type >& type );
+            TypeCastingExpression( const Expression::Ptr& fromExpression,
+                const std::shared_ptr< Type >& asType );
 
-            const Expression::Ptr& expression( void ) const;
-            const std::shared_ptr< Type >& type( void ) const;
+            const Expression::Ptr& fromExpression( void ) const;
+            const std::shared_ptr< Type >& asType( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const Expression::Ptr m_expression;
-            const std::shared_ptr< Type > m_type;
+            const Expression::Ptr m_fromExpression;
+            const std::shared_ptr< Type > m_asType;
         };
 
         class ValueAtom final : public Expression
