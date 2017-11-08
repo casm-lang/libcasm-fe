@@ -69,6 +69,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
   public:
     TypeInferenceVisitor( libcasm_fe::Logger& log );
 
+    void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
@@ -110,13 +111,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         const libcasm_ir::Annotation* annotation, TypedNode& node,
         const std::vector< Expression::Ptr >& arguments = {} );
 
-    void inference( FunctionDefinition& node,
-        const std::vector< Expression::Ptr >& arguments );
-    void inference( DerivedDefinition& node,
-        const std::vector< Expression::Ptr >& arguments );
-    void inference(
-        RuleDefinition& node, const std::vector< Expression::Ptr >& arguments );
-
     void inference( QuantifierExpression& node );
 
   private:
@@ -131,36 +125,94 @@ TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log )
 {
 }
 
+void TypeInferenceVisitor::visit( VariableDefinition& node )
+{
+    if( node.type() )
+    {
+        // may be invoked multiple times -> only type once
+        return;
+    }
+
+    RecursiveVisitor::visit( node );
+
+    if( node.variableType()->type() )
+    {
+        node.setType( node.variableType()->type() );
+    }
+
+    const auto description = "variable '" + node.identifier()->name() + "'";
+    inference( description, nullptr, node );
+}
+
 void TypeInferenceVisitor::visit( FunctionDefinition& node )
 {
+    if( node.type() )
+    {
+        // may be invoked multiple times -> only type once
+        return;
+    }
+
+    assert( node.returnType()->type() && "return type must be specified" );
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    argTypeList.reserve( node.argumentTypes()->size() );
+    for( const auto& argumentType : *node.argumentTypes() )
+    {
+        assert( argumentType->type() && "argument type must be specified" );
+        argTypeList.emplace_back( argumentType->type() );
+    }
+
+    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
+        node.returnType()->type(), argTypeList );
+    node.setType( type );
+
+    auto& returnType = *node.returnType()->type();
+    m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
+
     RecursiveVisitor::visit( node );
-    inference( node, {} );
 }
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
 {
-    const auto type = node.returnType()->type();
-    assert( type );
-    m_typeIDs[ node.expression().get() ].emplace( type->id() );
+    if( node.type() )
+    {
+        // may be invoked multiple times -> only type once
+        return;
+    }
+
+    assert( node.returnType()->type() && "return type must be specified" );
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    argTypeList.reserve( node.arguments()->size() );
+    for( const auto& argument : *node.arguments() )
+    {
+        assert( argument->type() && "argument type must be specified" );
+        argTypeList.emplace_back( argument->type() );
+    }
+
+    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
+        node.returnType()->type(), argTypeList );
+    node.setType( type );
+
+    auto& returnType = *node.returnType()->type();
+    m_typeIDs[ node.expression().get() ].emplace( returnType.id() );
 
     RecursiveVisitor::visit( node );
-    inference( node, {} );
 
-    if( node.type() and node.expression()->type() )
+    if( node.expression()->type() )
     {
         const auto& expTy = node.expression()->type()->result();
-        const auto& resTy = node.type()->result();
 
-        if( resTy != expTy )
+        if( returnType != expTy )
         {
-            if( expTy.isInteger() and resTy.isInteger() )
+            if( expTy.isInteger() and returnType.isInteger() )
             {
                 return;
             }
 
             m_log.error( { node.expression()->sourceLocation() },
                 "type mismatch: result type was '" + expTy.description()
-                    + "', derived expects '" + resTy.description() + "'",
+                    + "', derived expects '" + returnType.description() + "'",
                 Code::TypeInferenceDerivedReturnTypeMismatch );
         }
     }
@@ -168,8 +220,27 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
 
 void TypeInferenceVisitor::visit( RuleDefinition& node )
 {
+    if( node.type() )
+    {
+        // may be invoked multiple times -> only type once
+        return;
+    }
+
+    assert( node.returnType()->type() && "return type must be specified" );
+
+    std::vector< libcasm_ir::Type::Ptr > argTypeList;
+    argTypeList.reserve( node.arguments()->size() );
+    for( const auto& argument : *node.arguments() )
+    {
+        assert( argument->type() && "argument type must be specified" );
+        argTypeList.emplace_back( argument->type() );
+    }
+
+    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
+        node.returnType()->type(), argTypeList );
+    node.setType( type );
+
     RecursiveVisitor::visit( node );
-    inference( node, {} );
 }
 
 void TypeInferenceVisitor::visit( UndefAtom& node )
@@ -196,37 +267,16 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
 
     switch( node.referenceType() )
     {
-        case ReferenceAtom::ReferenceType::FUNCTION:
-        {
-            const auto& definition
-                = std::static_pointer_cast< FunctionDefinition >(
-                    node.reference() );
-
-            inference( *definition, {} );
-            assert( definition->type() and definition->type()->isRelation() );
-
-            const auto type
-                = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                    std::static_pointer_cast< libcasm_ir::RelationType >(
-                        definition->type() ) );
-
-            node.setType( type );
-            break;
-        }
+        case ReferenceAtom::ReferenceType::FUNCTION: // [[fallthrough]]
         case ReferenceAtom::ReferenceType::DERIVED:
         {
-            const auto& definition
-                = std::static_pointer_cast< DerivedDefinition >(
-                    node.reference() );
-
-            inference( *definition, {} );
-            assert( definition->type() and definition->type()->isRelation() );
+            // make sure that the reference has been typed
+            node.reference()->accept( *this );
 
             const auto type
                 = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
                     std::static_pointer_cast< libcasm_ir::RelationType >(
-                        definition->type() ) );
-
+                        node.reference()->type() ) );
             node.setType( type );
             break;
         }
@@ -237,17 +287,13 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
         }
         case ReferenceAtom::ReferenceType::RULE:
         {
-            const auto& definition = std::static_pointer_cast< RuleDefinition >(
-                node.reference() );
-
-            inference( *definition, {} );
-            assert( definition->type() and definition->type()->isRelation() );
+            // make sure that the reference has been typed
+            node.reference()->accept( *this );
 
             const auto type
                 = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
                     std::static_pointer_cast< libcasm_ir::RelationType >(
-                        definition->type() ) );
-
+                        node.reference()->type() ) );
             node.setType( type );
             break;
         }
@@ -262,40 +308,16 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
     const auto& path = *node.identifier();
 
-    const libcasm_ir::Annotation* annotation
-        = annotate( node, node.arguments()->data() );
-
-    RecursiveVisitor::visit( node );
-
     switch( node.targetType() )
     {
         case CallExpression::TargetType::VARIABLE:
         {
             const auto& variable = node.targetDefinition();
 
-            if( variable->type() )
-            {
-                if( not node.type() )
-                {
-                    node.setType( variable->type() );
-                }
-                else
-                {
-                    assert( *variable->type() == *node.type() );
-                }
-            }
-            else
-            {
-                if( not node.type() )
-                {
-                    const auto description = "variable '" + path.path() + "'";
-                    inference( description, nullptr, node );
-                }
-                else
-                {
-                    variable->setType( node.type() );
-                }
-            }
+            m_typeIDs[ variable.get() ] = m_typeIDs[&node ];
+            variable->accept( *this );
+
+            node.setType( variable->type() );
             break;
         }
         case CallExpression::TargetType::BUILTIN:
@@ -305,6 +327,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 break;
             }
 
+            const auto* annotation = annotate( node, node.arguments()->data() );
+
+            RecursiveVisitor::visit( node );
             const auto description = "built-in '" + path.path() + "'";
             inference(
                 description, annotation, node, node.arguments()->data() );
@@ -343,50 +368,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             break;
         }
-        case CallExpression::TargetType::DERIVED:
-        {
-            if( node.type() )
-            {
-                break;
-            }
-
-            const auto& definition
-                = std::static_pointer_cast< DerivedDefinition >(
-                    node.targetDefinition() );
-
-            inference( *definition, node.arguments()->data() );
-            node.setType( definition->type() );
-            break;
-        }
-        case CallExpression::TargetType::FUNCTION:
-        {
-            if( node.type() )
-            {
-                break;
-            }
-
-            const auto& definition
-                = std::static_pointer_cast< FunctionDefinition >(
-                    node.targetDefinition() );
-
-            inference( *definition, node.arguments()->data() );
-            node.setType( definition->type() );
-            break;
-        }
-        case CallExpression::TargetType::RULE:
-        {
-            if( node.type() )
-            {
-                break;
-            }
-
-            const auto& definition = std::static_pointer_cast< RuleDefinition >(
-                node.targetDefinition() );
-
-            inference( *definition, node.arguments()->data() );
-            node.setType( definition->type() );
-            break;
-        }
+        case CallExpression::TargetType::DERIVED: // [[fallthrough]]
+        case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
+        case CallExpression::TargetType::RULE: // [[fallthrough]]
         case CallExpression::TargetType::SELF:
         {
             if( node.type() )
@@ -394,8 +378,19 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 break;
             }
 
-            assert( node.targetDefinition() );
-            node.setType( node.targetDefinition()->type() );
+            // make sure that the definition has been typed
+            const auto& definition = node.targetDefinition();
+            definition->accept( *this );
+
+            const auto& arguments = *node.arguments();
+            const auto& argumentTypes = definition->type()->arguments();
+            for( std::size_t i = 0; i < arguments.size(); i++ )
+            {
+                m_typeIDs[ arguments.at( i ).get() ].emplace(
+                    argumentTypes.at( i )->id() );
+            }
+
+            node.setType( definition->type() );
             break;
         }
         case CallExpression::TargetType::TYPE_DOMAIN:
@@ -421,92 +416,59 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
     }
 
+    RecursiveVisitor::visit( node );
+
     if( node.type() )
     {
         const auto& call_type_args = node.type()->arguments();
         const auto& call_expr_args = *node.arguments();
 
-        if( call_type_args.size() == call_expr_args.size() )
+        assert( call_type_args.size() == call_expr_args.size() );
+
+        for( std::size_t pos = 0; pos < call_type_args.size(); pos++ )
         {
-            for( std::size_t pos = 0; pos < call_type_args.size(); pos++ )
+            const auto& exprArg = call_expr_args.at( pos );
+            if( not exprArg->type() )
             {
-                const auto& exprArg = call_expr_args.at( pos );
-                if( not exprArg->type() )
-                {
-                    continue;
-                }
-
-                const auto& callArgType = call_type_args.at( pos );
-                if( callArgType->isInteger()
-                    and exprArg->type()->result().isInteger() )
-                {
-                    continue;
-                }
-
-                if( *callArgType != exprArg->type()->result() )
-                {
-                    const std::unordered_map< CallExpression::TargetType, Code >
-                        codes = {
-                            { CallExpression::TargetType::FUNCTION,
-                                Code::
-                                    TypeInferenceFunctionArgumentTypeMismatch },
-                            { CallExpression::TargetType::DERIVED,
-                                Code::
-                                    TypeInferenceDerivedArgumentTypeMismatch },
-                            { CallExpression::TargetType::BUILTIN,
-                                Code::
-                                    TypeInferenceBuiltinArgumentTypeMismatch },
-                            { CallExpression::TargetType::RULE,
-                                Code::TypeInferenceRuleArgumentTypeMismatch },
-                        };
-
-                    const auto code = codes.find( node.targetType() );
-                    assert( code != codes.end()
-                            and " invalid target type with arguments " );
-
-                    m_log.error( { exprArg->sourceLocation() },
-                        "type mismatch: " + node.targetTypeName()
-                            + " argument type at position "
-                            + std::to_string( pos + 1 ) + " was '"
-                            + exprArg->type()->description() + "', "
-                            + node.targetTypeName() + " definition expects '"
-                            + callArgType->description() + "'",
-                        code->second );
-                }
+                continue;
             }
-        }
-        else
-        {
-            const std::unordered_map< CallExpression::TargetType, Code > codes
-                = {
-                      { CallExpression::TargetType::FUNCTION,
-                          Code::TypeInferenceFunctionArgumentSizeMismatch },
-                      { CallExpression::TargetType::DERIVED,
-                          Code::TypeInferenceDerivedArgumentSizeMismatch },
-                      { CallExpression::TargetType::BUILTIN,
-                          Code::TypeInferenceBuiltinArgumentSizeMismatch },
-                      { CallExpression::TargetType::RULE,
-                          Code::TypeInferenceRuleArgumentSizeMismatch },
-                  };
 
-            const auto code = codes.find( node.targetType() );
-            assert( code != codes.end()
-                    and " invalid target type with arguments " );
-
-            m_log.error( { node.sourceLocation() },
-                "invalid argument size: " + node.targetTypeName() + " '"
-                    + path.path() + "' expects "
-                    + std::to_string( call_type_args.size() ) + " arguments",
-                code->second );
-
-            if( node.targetType() != CallExpression::TargetType::BUILTIN )
+            const auto& callArgType = call_type_args.at( pos );
+            if( callArgType->isInteger()
+                and exprArg->type()->result().isInteger() )
             {
-                m_log.info( { node.targetDefinition()->sourceLocation() },
-                    node.targetTypeName() + " '" + path.path()
-                        + "' is defined as a relation '"
-                        + node.type()->description()
-                        + "', incorrect usage in line "
-                        + std::to_string( node.sourceLocation().begin.line ) );
+                continue;
+            }
+
+            if( *callArgType != exprArg->type()->result() )
+            {
+                const std::unordered_map< CallExpression::TargetType, Code >
+                    codes = {
+                        { CallExpression::TargetType::FUNCTION,
+                            Code::
+                                TypeInferenceFunctionArgumentTypeMismatch },
+                        { CallExpression::TargetType::DERIVED,
+                            Code::
+                                TypeInferenceDerivedArgumentTypeMismatch },
+                        { CallExpression::TargetType::BUILTIN,
+                            Code::
+                                TypeInferenceBuiltinArgumentTypeMismatch },
+                        { CallExpression::TargetType::RULE,
+                            Code::TypeInferenceRuleArgumentTypeMismatch },
+                    };
+
+                const auto code = codes.find( node.targetType() );
+                assert( code != codes.end()
+                        and " invalid target type with arguments " );
+
+                m_log.error( { exprArg->sourceLocation() },
+                    "type mismatch: " + node.targetTypeName()
+                        + " argument type at position "
+                        + std::to_string( pos + 1 ) + " was '"
+                        + exprArg->type()->description() + "', "
+                        + node.targetTypeName() + " definition expects '"
+                        + callArgType->description() + "'",
+                    code->second );
             }
         }
     }
@@ -1155,116 +1117,77 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
     else if( node.id() == libcasm_fe::Ast::Type::ID::BINARY_EXPRESSION )
     {
         annotation = &libcasm_ir::Annotation::find(
-            static_cast< const UnaryExpression& >( node ).op() );
+            static_cast< const BinaryExpression& >( node ).op() );
     }
     else if( node.id() == libcasm_fe::Ast::Type::ID::DIRECT_CALL_EXPRESSION )
     {
         auto& directCall = static_cast< DirectCallExpression& >( node );
         const auto& path = *directCall.identifier();
 
-        switch( directCall.targetType() )
+        assert( directCall.targetType() == CallExpression::TargetType::BUILTIN );
+
+        try
         {
-            case CallExpression::TargetType::BUILTIN:
+            const auto& builtin_annotation
+                = libcasm_ir::Annotation::find( path.baseName() );
+            annotation = &builtin_annotation;
+
+            directCall.setTargetBuiltinId( annotation->valueID() );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.error( { directCall.sourceLocation() },
+                        "unable to resolve built-in symbol '"
+                        + path.path()
+                        + "', due to missing annotation information from 'libcasm-ir'" );
+            return nullptr;
+        }
+
+        if( annotation->valueID() == libcasm_ir::Value::AS_BIT_BUILTIN )
+        {
+            const auto& asbit_args = directCall.arguments()->data();
+            assert( asbit_args.size() == 2 );
+            const auto& asbit_size
+                = static_cast< const ValueAtom& >( *asbit_args[ 1 ] );
+            if( asbit_size.id() == Node::ID::VALUE_ATOM
+                and asbit_size.type()
+                and asbit_size.type()->kind()
+                        == libcasm_ir::Type::Kind::INTEGER )
             {
-                try
-                {
-                    const auto& builtin_annotation
-                        = libcasm_ir::Annotation::find( path.baseName() );
-                    annotation = &builtin_annotation;
+                const auto asbit_size_value = std::static_pointer_cast<
+                    libcasm_ir::IntegerConstant >( asbit_size.value() );
 
-                    directCall.setTargetBuiltinId( annotation->valueID() );
-                }
-                catch( const std::domain_error& e )
-                {
-                    m_log.error( { directCall.sourceLocation() },
-                             "unable to resolve built-in symbol '"
-                             + path.path()
-                             + "', due to missing annotation information from 'libcasm-ir'" );
-                }
-
-                if( annotation
-                    and ( annotation->valueID()
-                            == libcasm_ir::Value::AS_BIT_BUILTIN ) )
-                {
-                    const auto& asbit_args = directCall.arguments()->data();
-                    assert( asbit_args.size() == 2 );
-                    const auto& asbit_size
-                        = static_cast< const ValueAtom& >( *asbit_args[ 1 ] );
-                    if( asbit_size.id() == Node::ID::VALUE_ATOM
-                        and asbit_size.type()
-                        and asbit_size.type()->kind()
-                                == libcasm_ir::Type::Kind::INTEGER )
-                    {
-                        const auto asbit_size_value = std::static_pointer_cast<
-                            libcasm_ir::IntegerConstant >( asbit_size.value() );
-
-                        const auto type
-                            = libstdhl::Memory::get< libcasm_ir::BitType >(
-                                asbit_size_value );
-                        directCall.setType( type );
-                    }
-                    else
-                    {
-                        m_log.error( { directCall.arguments()->data()[ 1 ]->sourceLocation() },
-                                     "2nd argument of built-in '"
-                                     + path.path()
-                                     + "' is required to be a compile time 'Integer' constant value", Code::TypeInferenceBuiltinAsBitInvalid2ndArgumentType );
-                    }
-                }
-                break;
+                const auto type
+                    = libstdhl::Memory::get< libcasm_ir::BitType >(
+                        asbit_size_value );
+                directCall.setType( type );
             }
-            case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
-            case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-            case CallExpression::TargetType::RULE:
+            else
             {
-                const auto& definition = directCall.targetDefinition();
-
-                if( definition->type() )
-                {
-                    for( std::size_t c = 0; c < expressions.size(); c++ )
-                    {
-                        m_typeIDs[ expressions[ c ].get() ].emplace(
-                            definition->type()->arguments()[ c ]->id() );
-                    }
-
-                    m_typeIDs[&node ].emplace(
-                        definition->type()->ptr_result()->id() );
-                }
-                break;
-            }
-            case CallExpression::TargetType::SELF:
-            {
-                // TODO
-                break;
-            }
-            case CallExpression::TargetType::TYPE_DOMAIN: // [[fallthrough]]
-            case CallExpression::TargetType::CONSTANT:    // [[fallthrough]]
-            case CallExpression::TargetType::VARIABLE:
-            {
-                break;
-            }
-            case CallExpression::TargetType::UNKNOWN:
-            {
-                assert( !" internal error" );
-                break;
+                m_log.error( { directCall.arguments()->data()[ 1 ]->sourceLocation() },
+                                "2nd argument of built-in '"
+                                + path.path()
+                                + "' is required to be a compile time 'Integer' constant value", Code::TypeInferenceBuiltinAsBitInvalid2ndArgumentType );
             }
         }
     }
-
-    if( annotation )
+    else
     {
-        for( std::size_t c = 0; c < expressions.size(); c++ )
-        {
-            for( auto argumentTypeID : annotation->argumentTypeIDs( c ) )
-            {
-                m_typeIDs[ expressions[ c ].get() ].emplace( argumentTypeID );
-            }
-        }
+        assert( !"no annotation possible for this node type" );
+        return nullptr;
+    }
 
-        for( auto resultTypeID : annotation->resultTypeIDs() )
+    for( std::size_t c = 0; c < expressions.size(); c++ )
+    {
+        for( auto argumentTypeID : annotation->argumentTypeIDs( c ) )
         {
-            m_typeIDs[&node ].emplace( resultTypeID );
+            m_typeIDs[ expressions[ c ].get() ].emplace( argumentTypeID );
         }
+    }
+
+    for( auto resultTypeID : annotation->resultTypeIDs() )
+    {
+        m_typeIDs[&node ].emplace( resultTypeID );
     }
 
     return annotation;
@@ -1371,126 +1294,6 @@ void TypeInferenceVisitor::inference( const std::string& description,
         const auto typeID = *typeIDs.begin();
         node.setType( libcasm_ir::Type::fromID( typeID ) );
     }
-}
-
-void TypeInferenceVisitor::inference(
-    FunctionDefinition& node, const std::vector< Expression::Ptr >& arguments )
-{
-    if( node.defaultValue()->id() == Node::ID::UNDEF_ATOM
-        and not node.defaultValue()->type() )
-    {
-        node.defaultValue()->setType( node.returnType()->type() );
-    }
-
-    if( node.type() )
-    {
-        return;
-    }
-
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    for( auto argumentType : *node.argumentTypes() )
-    {
-        if( not argumentType->type() )
-        {
-            m_log.info( { argumentType->sourceLocation() },
-                "TODO: '" + node.identifier()->name()
-                    + "' has a non-typed argument(s)" );
-            return;
-        }
-
-        argTypeList.emplace_back( argumentType->type() );
-    }
-
-    if( not node.returnType()->type() )
-    {
-        m_log.info( { node.returnType()->sourceLocation() },
-            "TODO: '" + node.identifier()->name() + "' has a no return type" );
-        return;
-    }
-
-    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-        node.returnType()->type(), argTypeList );
-
-    node.setType( type );
-}
-
-void TypeInferenceVisitor::inference(
-    DerivedDefinition& node, const std::vector< Expression::Ptr >& arguments )
-{
-    if( node.type() )
-    {
-        return;
-    }
-
-    std::size_t pos = 0;
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    for( auto argumentType : *node.arguments() )
-    {
-        if( not argumentType->type() )
-        {
-            if( arguments.size() > 0 and pos < arguments.size()
-                and arguments[ pos ]->type() )
-            {
-                argTypeList.emplace_back( arguments[ pos ]->type() );
-                argumentType->setType( arguments[ pos ]->type() );
-            }
-            else
-            {
-                m_log.debug( "'" + node.identifier()->name()
-                             + "' has a non-typed argument(s)" );
-                return;
-            }
-        }
-        else
-        {
-            argTypeList.emplace_back( argumentType->type() );
-        }
-        pos++;
-    }
-
-    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-        node.returnType()->type(), argTypeList );
-
-    node.setType( type );
-}
-
-void TypeInferenceVisitor::inference(
-    RuleDefinition& node, const std::vector< Expression::Ptr >& arguments )
-{
-    if( node.type() )
-    {
-        return;
-    }
-
-    std::size_t pos = 0;
-    std::vector< libcasm_ir::Type::Ptr > argTypeList;
-    for( auto argumentType : *node.arguments() )
-    {
-        if( not argumentType->type() )
-        {
-            if( arguments.size() > 0 and arguments[ pos ]->type() )
-            {
-                argTypeList.emplace_back( arguments[ pos ]->type() );
-                argumentType->setType( arguments[ pos ]->type() );
-            }
-            else
-            {
-                m_log.debug( "'" + node.identifier()->name()
-                             + "' has a non-typed argument(s)" );
-                return;
-            }
-        }
-        else
-        {
-            argTypeList.emplace_back( argumentType->type() );
-        }
-        pos++;
-    }
-
-    const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-        node.returnType()->type(), argTypeList );
-
-    node.setType( type );
 }
 
 void TypeInferenceVisitor::inference( QuantifierExpression& node )
