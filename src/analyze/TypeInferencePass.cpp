@@ -73,6 +73,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
 
+    void visit( TypeCastingExpression& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
@@ -170,6 +171,16 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
 {
     RecursiveVisitor::visit( node );
     inference( node, {} );
+}
+
+void TypeInferenceVisitor::visit( TypeCastingExpression& node )
+{
+    RecursiveVisitor::visit( node );
+
+    assert( node.asType() and node.asType()->type() );
+    m_typeIDs[&node ] = { node.asType()->type()->id() };
+
+    inference( "as operator", nullptr, node );
 }
 
 void TypeInferenceVisitor::visit( UndefAtom& node )
