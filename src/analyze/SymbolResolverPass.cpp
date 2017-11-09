@@ -199,11 +199,19 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     RecursiveVisitor::visit( node );
 
     const auto& path = *node.identifier();
+    const auto& name = path.path();
 
     if( path.type() == IdentifierPath::Type::RELATIVE )
     {
         // only absolute types can be resolved here, relative types will be
         // resolved later in the type inference pass
+        return;
+    }
+
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        node.setTargetType( CallExpression::TargetType::BUILTIN );
+        node.setTargetBuiltinId( libcasm_ir::Annotation::find( name ).valueID() );
         return;
     }
 
@@ -222,82 +230,63 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     }
     catch( const std::domain_error& e )
     {
-        const auto& name = path.baseName();
+        const auto it = m_variables.find( name );
+        if( it != m_variables.cend() )
+        {
+            const auto& variable = it->second;
 
-        if( libcasm_ir::Builtin::available( name ) )
+            node.setTargetType( CallExpression::TargetType::VARIABLE );
+            node.setTargetDefinition( variable );
+        }
+        else if( name == "self" )
         {
             try
             {
-                m_symboltable.registerSymbol(
-                    node.ptr< DirectCallExpression >(),
-                    CallExpression::TargetType::BUILTIN );
-                node.setTargetType( CallExpression::TargetType::BUILTIN );
+                const auto& symbol = m_symboltable.find( "Agent" );
+                node.setTargetType( CallExpression::TargetType::SELF );
+                node.setTargetDefinition( symbol.definition() );
             }
             catch( const std::domain_error& e )
             {
-                m_log.error( { node.sourceLocation() }, e.what() );
+                m_log.error( { node.sourceLocation() },
+                    "unable to find 'Agent' symbol" );
             }
+        }
+        // single agent execution notation --> agent type domain ==
+        // Enumeration!
+        else if( name == "$" )
+        {
+            assert( node.targetType()
+                    == CallExpression::TargetType::CONSTANT );
+
+            const auto kind
+                = libstdhl::Memory::make< libcasm_ir::Enumeration >(
+                    "Agent" );
+            kind->add( "$" );
+
+            const auto type
+                = libstdhl::Memory::make< libcasm_ir::EnumerationType >(
+                    kind );
+            node.setType( type );
+
+            m_symboltable.registerSymbol( "Agent",
+                node.ptr< DirectCallExpression >(),
+                CallExpression::TargetType::TYPE_DOMAIN );
+
+            m_symboltable.registerSymbol(
+                node.ptr< DirectCallExpression >(),
+                CallExpression::TargetType::CONSTANT );
+            node.setTargetType( CallExpression::TargetType::CONSTANT );
         }
         else
         {
-            const auto it = m_variables.find( name );
-            if( it != m_variables.cend() )
-            {
-                const auto& variable = it->second;
-
-                node.setTargetType( CallExpression::TargetType::VARIABLE );
-                node.setTargetDefinition( variable );
-            }
-            else if( name == "self" )
-            {
-                try
-                {
-                    const auto& symbol = m_symboltable.find( "Agent" );
-                    node.setTargetType( CallExpression::TargetType::SELF );
-                    node.setTargetDefinition( symbol.definition() );
-                }
-                catch( const std::domain_error& e )
-                {
-                    m_log.error( { node.sourceLocation() },
-                        "unable to find 'Agent' symbol" );
-                }
-            }
-            // single agent execution notation --> agent type domain ==
-            // Enumeration!
-            else if( name == "$" )
-            {
-                assert( node.targetType()
-                        == CallExpression::TargetType::CONSTANT );
-
-                const auto kind
-                    = libstdhl::Memory::make< libcasm_ir::Enumeration >(
-                        "Agent" );
-                kind->add( "$" );
-
-                const auto type
-                    = libstdhl::Memory::make< libcasm_ir::EnumerationType >(
-                        kind );
-                node.setType( type );
-
-                m_symboltable.registerSymbol( "Agent",
-                    node.ptr< DirectCallExpression >(),
-                    CallExpression::TargetType::TYPE_DOMAIN );
-
-                m_symboltable.registerSymbol(
-                    node.ptr< DirectCallExpression >(),
-                    CallExpression::TargetType::CONSTANT );
-                node.setTargetType( CallExpression::TargetType::CONSTANT );
-            }
-            else
-            {
-                m_log.error( { node.sourceLocation() },
-                    "unknown " + node.targetTypeName() + " symbol '"
-                        + path.path() + "' found",
-                    ( node.targetType()
-                        == CallExpression::TargetType::FUNCTION )
-                        ? Code::FunctionSymbolIsUnknown
-                        : Code::SymbolIsUnknown );
-            }
+            m_log.error( { node.sourceLocation() },
+                "unknown " + node.targetTypeName() + " symbol '"
+                    + path.path() + "' found",
+                ( node.targetType()
+                    == CallExpression::TargetType::FUNCTION )
+                    ? Code::FunctionSymbolIsUnknown
+                    : Code::SymbolIsUnknown );
         }
     }
 
