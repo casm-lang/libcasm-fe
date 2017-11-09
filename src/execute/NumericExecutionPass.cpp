@@ -302,6 +302,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( RuleDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
+    void visit( TypeCastingExpression& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
@@ -521,6 +522,11 @@ void ExecutionVisitor::visit( EnumerationDefinition& node )
     const auto& enumType
         = std::static_pointer_cast< IR::EnumerationType >( node.type() );
     m_evaluationStack.push( IR::EnumerationConstant( enumType ) );
+}
+
+void ExecutionVisitor::visit( TypeCastingExpression& node )
+{
+    node.typeCasting()->accept( *this );
 }
 
 void ExecutionVisitor::visit( ValueAtom& node )
