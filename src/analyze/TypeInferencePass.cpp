@@ -248,10 +248,92 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    assert( node.asType() and node.asType()->type() );
-    m_typeIDs[&node ] = { node.asType()->type()->id() };
+    assert( node.fromExpression()->type() );
+    assert( node.asType()->type() );
 
-    inference( "as operator", nullptr, node );
+    const auto resultType = node.asType()->type();
+    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+    argumentTypes.emplace_back( node.fromExpression()->type()->ptr_result() );
+
+    const auto relationType
+        = libstdhl::Memory::make< libcasm_ir::RelationType >(
+            resultType, argumentTypes );
+    node.setType( relationType );
+
+    switch( resultType->kind() )
+    {
+        case libcasm_ir::Type::Kind::VOID:     // [fallthrough]
+        case libcasm_ir::Type::Kind::LABEL:    // [fallthrough]
+        case libcasm_ir::Type::Kind::LOCATION: // [fallthrough]
+        case libcasm_ir::Type::Kind::RELATION: // [fallthrough]
+        {
+            // invalid type kind to perform 'as operator'
+            return;
+        }
+        case libcasm_ir::Type::Kind::BOOLEAN:
+        {
+            node.setTypeCasting( libcasm_ir::Value::AS_BOOLEAN_BUILTIN );
+            break;
+        }
+        case libcasm_ir::Type::Kind::INTEGER:
+        {
+            node.setTypeCasting( libcasm_ir::Value::AS_INTEGER_BUILTIN );
+            break;
+        }
+        case libcasm_ir::Type::Kind::RATIONAL:
+        {
+            node.setTypeCasting( libcasm_ir::Value::AS_RATIONAL_BUILTIN );
+            break;
+        }
+        case libcasm_ir::Type::Kind::BIT:
+        {
+            const auto bittype
+                = std::static_pointer_cast< libcasm_ir::BitType >( resultType );
+
+            const auto bitsize = make< ValueAtom >( node.sourceLocation(),
+                libstdhl::Memory::get< libcasm_ir::IntegerConstant >(
+                    bittype->bitsize() ) );
+
+            node.setTypeCasting(
+                libcasm_ir::Value::AS_BIT_BUILTIN, { bitsize } );
+            break;
+        }
+        case libcasm_ir::Type::Kind::DECIMAL:
+        {
+            node.setTypeCasting( libcasm_ir::Value::AS_DECIMAL_BUILTIN );
+            break;
+        }
+        case libcasm_ir::Type::Kind::STRING:
+        {
+            node.setTypeCasting( libcasm_ir::Value::AS_STRING_BUILTIN );
+            break;
+        }
+        case libcasm_ir::Type::Kind::ENUMERATION:
+        {
+            node.setTypeCasting( libcasm_ir::Value::AS_ENUMERATION_BUILTIN );
+            break;
+        }
+        case libcasm_ir::Type::Kind::RANGE:              // [fallthrough]
+        case libcasm_ir::Type::Kind::TUPLE:              // [fallthrough]
+        case libcasm_ir::Type::Kind::LIST:               // [fallthrough]
+        case libcasm_ir::Type::Kind::RULE_REFERENCE:     // [fallthrough]
+        case libcasm_ir::Type::Kind::FUNCTION_REFERENCE: // [fallthrough]
+        case libcasm_ir::Type::Kind::FILE:               // [fallthrough]
+        case libcasm_ir::Type::Kind::PORT:
+        {
+            // TODO: PPA: FIXME: continue here with missing casting
+            // functionality
+            return;
+        }
+        case libcasm_ir::Type::Kind::_SIZE_:
+        {
+            assert( !" internal error!" );
+            break;
+        }
+    }
+
+    node.typeCasting()->accept( *this );
+    node.typeCasting()->setType( relationType );
 }
 
 void TypeInferenceVisitor::visit( UndefAtom& node )
@@ -1139,9 +1221,18 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
 
         try
         {
-            const auto& builtin_annotation
-                = libcasm_ir::Annotation::find( path.baseName() );
-            annotation = &builtin_annotation;
+            if( directCall.targetBuiltinId() == libcasm_ir::Value::ID::_SIZE_ )
+            {
+                const auto& builtin_annotation
+                    = libcasm_ir::Annotation::find( path.baseName() );
+                annotation = &builtin_annotation;
+            }
+            else
+            {
+                const auto& builtin_annotation = libcasm_ir::Annotation::find(
+                    directCall.targetBuiltinId() );
+                annotation = &builtin_annotation;
+            }
 
             directCall.setTargetBuiltinId( annotation->valueID() );
         }
@@ -1154,7 +1245,14 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
             return nullptr;
         }
 
-        if( annotation->valueID() == libcasm_ir::Value::AS_BIT_BUILTIN )
+        if( annotation->valueID()
+            == libcasm_ir::Value::AS_BIT_BUILTIN ) // REMOVE: PPA: this
+                                                   // condition gets obsolete,
+                                                   // because we will force type
+                                                   // conversions over the
+                                                   // TypeCastingExpression and
+                                                   // I'll remove this ASAP in a
+                                                   // followup commit
         {
             const auto& asbit_args = directCall.arguments()->data();
             assert( asbit_args.size() == 2 );
