@@ -57,14 +57,8 @@ const IdentifierPath::Ptr& Type::name( void ) const
     return m_name;
 }
 
-static IdentifierPath::Ptr createUnresolvedIdentifierPath( void )
-{
-    return std::make_shared< IdentifierPath >(
-        std::make_shared< Identifier >( "$unresolved$" ) );
-}
-
 UnresolvedType::UnresolvedType( void )
-: Type( Node::ID::UNRESOLVED_TYPE, createUnresolvedIdentifierPath() )
+: Type( Node::ID::UNRESOLVED_TYPE, IdentifierPath::createUnresolved() )
 {
 }
 
