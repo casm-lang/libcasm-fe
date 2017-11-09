@@ -232,7 +232,8 @@ void AstDumpDotVisitor::visit( TypeCastingExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "TypeCastingExpression" );
-    RecursiveVisitor::visit( node );
+    node.typeCasting()->accept( *this );
+    node.asType()->accept( *this );
 }
 
 void AstDumpDotVisitor::visit( ValueAtom& node )
