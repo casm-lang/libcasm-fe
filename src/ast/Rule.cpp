@@ -327,11 +327,10 @@ void UpdateRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-CallRule::CallRule( const CallExpression::Ptr& call,
-    const std::set< CallExpression::TargetType >& allowedCallTargetTypes )
+CallRule::CallRule( const CallExpression::Ptr& call, Type type )
 : Rule( Node::ID::CALL_RULE )
 , m_call( call )
-, m_allowedCallTargetTypes( allowedCallTargetTypes )
+, m_type( type )
 {
 }
 
@@ -340,10 +339,9 @@ const CallExpression::Ptr& CallRule::call( void ) const
     return m_call;
 }
 
-const std::set< CallExpression::TargetType >& CallRule::allowedCallTargetTypes(
-    void ) const
+CallRule::Type CallRule::type( void ) const
 {
-    return m_allowedCallTargetTypes;
+    return m_type;
 }
 
 void CallRule::accept( Visitor& visitor )

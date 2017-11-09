@@ -294,14 +294,38 @@ void ConsistencyCheckVisitor::visit( CallRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& call = node.call();
-    const auto& kind = node.allowedCallTargetTypes();
+    const auto& call = *node.call();
 
-    if( kind.find( call->targetType() ) == kind.end() )
+    switch( node.type() )
     {
-        m_log.error( { node.sourceLocation() },
-            call->targetTypeName() + " is not allowed to be called",
-            Code::Unspecified );
+        case CallRule::Type::RULE_CALL:
+        {
+            if( call.targetType() != CallExpression::TargetType::RULE )
+            {
+                m_log.error( { node.sourceLocation() },
+                    "only rules are allowed to be called",
+                    Code::Unspecified );
+                m_log.hint( { call.sourceLocation() },
+                    call.targetTypeName() + " has to be used without 'call'" );
+            }
+            break;
+        }
+        case CallRule::Type::FUNCTION_CALL:
+        {
+            if( call.targetType() == CallExpression::TargetType::RULE )
+            {
+                m_log.error( { node.sourceLocation() },
+                    "rule is not allowed to be called",
+                    Code::Unspecified );
+                m_log.hint( { call.sourceLocation() },
+                    "rule has to be used with 'call'" );
+            }
+            break;
+        }
+        default:
+        {
+            assert( !"unknown call rule type" );
+        }
     }
 }
 
