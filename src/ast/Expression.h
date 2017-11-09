@@ -65,24 +65,6 @@ namespace libcasm_fe
 
         using Expressions = NodeList< Expression >;
 
-        class TypeCastingExpression final : public Expression
-        {
-          public:
-            using Ptr = std::shared_ptr< TypeCastingExpression >;
-
-            TypeCastingExpression( const Expression::Ptr& fromExpression,
-                const std::shared_ptr< Type >& asType );
-
-            const Expression::Ptr& fromExpression( void ) const;
-            const std::shared_ptr< Type >& asType( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Expression::Ptr m_fromExpression;
-            const std::shared_ptr< Type > m_asType;
-        };
-
         class ValueAtom final : public Expression
         {
           public:
@@ -230,6 +212,32 @@ namespace libcasm_fe
 
           private:
             const Expression::Ptr m_expression;
+        };
+
+        class TypeCastingExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< TypeCastingExpression >;
+
+            TypeCastingExpression( const Expression::Ptr& fromExpression,
+                const std::shared_ptr< Type >& asType );
+
+            const Expression::Ptr& fromExpression( void ) const;
+
+            const std::shared_ptr< Type >& asType( void ) const;
+
+            void setTypeCasting(
+                const libcasm_ir::Value::ID builtinID,
+                const std::vector< Expression::Ptr >& arguments = {} );
+
+            const DirectCallExpression::Ptr& typeCasting( void ) const;
+
+            void accept( Visitor& visitor ) override;
+
+          private:
+            const Expression::Ptr m_fromExpression;
+            const std::shared_ptr< Type > m_asType;
+            DirectCallExpression::Ptr m_typeCasting;
         };
 
         class UnaryExpression final : public Expression
