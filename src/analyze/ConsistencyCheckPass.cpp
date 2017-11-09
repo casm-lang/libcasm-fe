@@ -304,7 +304,7 @@ void ConsistencyCheckVisitor::visit( CallRule& node )
             {
                 m_log.error( { node.sourceLocation() },
                     "only rules are allowed to be called",
-                    Code::Unspecified );
+                    Code::CallRuleOnlyRulesAllowed );
                 m_log.hint( { call.sourceLocation() },
                     call.targetTypeName() + " has to be used without 'call'" );
             }
@@ -316,7 +316,7 @@ void ConsistencyCheckVisitor::visit( CallRule& node )
             {
                 m_log.error( { node.sourceLocation() },
                     "rule is not allowed to be called",
-                    Code::Unspecified );
+                    Code::CallRuleOnlyFunctionsAllowed );
                 m_log.hint( { call.sourceLocation() },
                     "rule has to be used with 'call'" );
             }
