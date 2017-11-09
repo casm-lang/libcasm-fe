@@ -138,6 +138,15 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
 {
     RecursiveVisitor::visit( node );
 
+    const auto& name = node.identifier()->path();
+
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        node.setReferenceType( ReferenceAtom::ReferenceType::BUILTIN );
+        node.setBuiltinId( libcasm_ir::Annotation::find( name ).valueID() );
+        return;
+    }
+
     try
     {
         const auto symbol = m_symboltable.find( *node.identifier() );
@@ -158,12 +167,7 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
             }
             case CallExpression::TargetType::BUILTIN:
             {
-                // TODO
-
-                // node.setReferenceType(
-                // ReferenceAtom::ReferenceType::BUILTIN
-                // );
-                // node.setBuiltinId( annotation.id() );
+                assert( false );
                 break;
             }
             case CallExpression::TargetType::RULE:
@@ -185,7 +189,7 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
     catch( const std::domain_error& e )
     {
         m_log.error( { node.identifier()->sourceLocation() },
-            "'" + node.identifier()->path() + "' has not been defined",
+            "'" + name + "' has not been defined",
             Code::SymbolIsUnknown );
     }
 }
