@@ -267,6 +267,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
     }
 
     RecursiveVisitor::visit( node );
+    inference( "reference atom", nullptr, node );
 
     switch( node.referenceType() )
     {
@@ -297,9 +298,27 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             }
             assert( annotation );
 
-            // only unambiguous annotations can be used for type resolving
-            if( annotation->relations().size() == 1 )
+            if( node.type() )
             {
+                // type has been inferred -> check if relation type is valid
+                assert( node.type()->isReference() );
+                const auto& referenceType
+                    = std::static_pointer_cast< libcasm_ir::ReferenceType>(
+                        node.type() );
+                const auto& relationType = referenceType->dereference();
+
+                if( not annotation->valid( relationType ) )
+                {
+                    m_log.error( { node.sourceLocation() },
+                        "built-in '" + node.identifier()->path()
+                        + "' has no type relation '"
+                        + relationType->description() + "'",
+                        Code::TypeInferenceBuiltinRelationTypeInvalid );
+                }
+            }
+            else if( annotation->relations().size() == 1 )
+            {
+                // only unambiguous annotations can be used for type resolving
                 const auto& relation = annotation->relations().at( 0 );
 
                 std::vector< libcasm_ir::Type::Ptr > argumentTypes;
@@ -314,8 +333,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
 
                 const auto type
                     = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                        libstdhl::Memory::make< libcasm_ir::RelationType >(
-                            returnType, argumentTypes ) );
+                        returnType, argumentTypes );
                 node.setType( type );
             }
             break;
