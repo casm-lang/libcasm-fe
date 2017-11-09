@@ -285,7 +285,39 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
         }
         case ReferenceAtom::ReferenceType::BUILTIN:
         {
-            // TODO
+            libcasm_ir::Annotation const* annotation = nullptr;
+            try
+            {
+                annotation = &libcasm_ir::Annotation::find( node.builtinId() );
+            }
+            catch( const std::domain_error& e )
+            {
+                assert( !"reference should have been resolved" );
+                return;
+            }
+            assert( annotation );
+
+            // only unambiguous annotations can be used for type resolving
+            if( annotation->relations().size() == 1 )
+            {
+                const auto& relation = annotation->relations().at( 0 );
+
+                std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+                for( const auto& argumentId : relation.argument )
+                {
+                    argumentTypes.emplace_back(
+                        libcasm_ir::Type::fromID( argumentId ) );
+                }
+
+                const auto& returnType
+                    = libcasm_ir::Type::fromID( relation.result );
+
+                const auto type
+                    = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
+                        libstdhl::Memory::make< libcasm_ir::RelationType >(
+                            returnType, argumentTypes ) );
+                node.setType( type );
+            }
             break;
         }
         case ReferenceAtom::ReferenceType::RULE:
