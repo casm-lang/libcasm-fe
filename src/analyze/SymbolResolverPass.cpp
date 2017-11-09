@@ -208,6 +208,14 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
+    const auto variableIt = m_variables.find( name );
+    if( variableIt != m_variables.cend() )
+    {
+        node.setTargetType( CallExpression::TargetType::VARIABLE );
+        node.setTargetDefinition( variableIt->second );
+        return;
+    }
+
     if( libcasm_ir::Builtin::available( name ) )
     {
         node.setTargetType( CallExpression::TargetType::BUILTIN );
@@ -230,15 +238,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     }
     catch( const std::domain_error& e )
     {
-        const auto it = m_variables.find( name );
-        if( it != m_variables.cend() )
-        {
-            const auto& variable = it->second;
-
-            node.setTargetType( CallExpression::TargetType::VARIABLE );
-            node.setTargetDefinition( variable );
-        }
-        else if( name == "self" )
+        if( name == "self" )
         {
             try
             {
