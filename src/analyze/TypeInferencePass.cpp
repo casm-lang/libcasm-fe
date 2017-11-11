@@ -398,7 +398,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 const auto& referenceType
                     = std::static_pointer_cast< libcasm_ir::ReferenceType>(
                         node.type() );
-                const auto& relationType = referenceType->dereference();
+                const auto relationType = referenceType->dereference();
 
                 if( not annotation->valid( relationType ) )
                 {
