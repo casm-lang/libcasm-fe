@@ -307,7 +307,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                         node.type() );
                 const auto& relationType = referenceType->dereference();
 
-                if( not annotation->valid( relationType ) )
+                if( not annotation->valid( *relationType ) )
                 {
                     m_log.error( { node.sourceLocation() },
                         "built-in '" + node.identifier()->path()
@@ -409,7 +409,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
                 node.setType( type );
 
-                if( not annotation->valid( type ) )
+                if( not annotation->valid( *type ) )
                 {
                     m_log.error( { node.sourceLocation() },
                         "built-in '" + path.path() + "' has no type relation '"
@@ -574,17 +574,16 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
 
     if( node.type() and node.expression()->type() )
     {
-        std::vector< libcasm_ir::Type::Ptr > argTypeList
-            = { node.expression()->type()->ptr_result() };
+        const std::vector< libcasm_ir::Type::Ptr > argTypeList{
+            node.expression()->type()->ptr_result() };
 
-        const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-            node.type(), argTypeList );
+        const libcasm_ir::RelationType relationType( node.type(), argTypeList );
 
-        if( not annotation->valid( type ) )
+        if( not annotation->valid( relationType ) )
         {
             m_log.error( { node.sourceLocation() },
-                description + " has no type relation '" + type->description()
-                    + "'",
+                description + " has no type relation '"
+                    + relationType.description() + "'",
                 Code::TypeInferenceOperatorUnaryRelationTypeInvalid );
         }
     }
@@ -602,18 +601,17 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 
     if( node.type() and node.left()->type() and node.right()->type() )
     {
-        std::vector< libcasm_ir::Type::Ptr > argTypeList
-            = { node.left()->type()->ptr_result(),
-                  node.right()->type()->ptr_result() };
+        const std::vector< libcasm_ir::Type::Ptr > argTypeList{
+            node.left()->type()->ptr_result(),
+                node.right()->type()->ptr_result() };
 
-        const auto type = libstdhl::Memory::make< libcasm_ir::RelationType >(
-            node.type(), argTypeList );
+        const libcasm_ir::RelationType relationType( node.type(), argTypeList );
 
-        if( not annotation->valid( type ) )
+        if( not annotation->valid( relationType ) )
         {
             m_log.error( { node.sourceLocation() },
-                description + " has no type relation '" + type->description()
-                    + "'",
+                description + " has no type relation '"
+                    + relationType.description() + "'",
                 Code::TypeInferenceOperatorBinaryRelationTypeInvalid );
         }
     }
