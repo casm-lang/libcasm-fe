@@ -691,29 +691,19 @@ UpdateRule
 CallRule
 : CALL DirectCallExpression
   {
-      const std::set< CallExpression::TargetType >
-          allowedCallTargetTypes{ CallExpression::TargetType::RULE };
-      $$ = Ast::make< CallRule >( @$, $2, allowedCallTargetTypes );
+      $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
   }
 | DirectCallExpression
   {
-      const std::set< CallExpression::TargetType >
-          allowedCallTargetTypes{ CallExpression::TargetType::DERIVED,
-                                  CallExpression::TargetType::BUILTIN };
-      $$ = Ast::make< CallRule >( @$, $1, allowedCallTargetTypes );
+      $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
   }
 | CALL IndirectCallExpression
   {
-      const std::set< CallExpression::TargetType >
-          allowedCallTargetTypes{ CallExpression::TargetType::RULE };
-      $$ = Ast::make< CallRule >( @$, $2, allowedCallTargetTypes );
+      $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
   }
 | IndirectCallExpression
   {
-      const std::set< CallExpression::TargetType >
-          allowedCallTargetTypes{ CallExpression::TargetType::DERIVED,
-                                  CallExpression::TargetType::BUILTIN };
-      $$ = Ast::make< CallRule >( @$, $1, allowedCallTargetTypes );
+      $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
   }
 ;
 
