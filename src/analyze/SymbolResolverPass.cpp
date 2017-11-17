@@ -239,7 +239,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
     try
     {
-        const auto& symbol = m_symboltable.find( node );
+        const auto& symbol = m_symboltable.find( *node.identifier() );
 
         node.setTargetType( symbol.targetType() );
         node.setTargetDefinition( symbol.definition() );

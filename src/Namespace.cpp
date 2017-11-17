@@ -145,36 +145,6 @@ void Namespace::registerSymbol( const BasicType::Ptr& node )
         CallExpression::TargetType::TYPE_DOMAIN );
 }
 
-Namespace::Symbol Namespace::find( const DirectCallExpression& node ) const
-{
-    return find( *node.identifier(), node.arguments()->size() );
-}
-
-Namespace::Symbol Namespace::find( const FunctionDefinition& node ) const
-{
-    return find( node.identifier()->name(), node.argumentTypes()->size() );
-}
-
-Namespace::Symbol Namespace::find( const DerivedDefinition& node ) const
-{
-    return find( node.identifier()->name(), node.arguments()->size() );
-}
-
-Namespace::Symbol Namespace::find( const RuleDefinition& node ) const
-{
-    return find( node.identifier()->name(), node.arguments()->size() );
-}
-
-Namespace::Symbol Namespace::find( const EnumerationDefinition& node ) const
-{
-    return find( node.identifier()->name() );
-}
-
-Namespace::Symbol Namespace::find( const BasicType& node ) const
-{
-    return find( *node.name(), 0 );
-}
-
 Namespace::Symbol Namespace::find( const IdentifierPath& node ) const
 {
     return find( node, 0 );

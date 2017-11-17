@@ -159,7 +159,7 @@ void TypeCheckVisitor::visit( BasicType& node )
     {
         try
         {
-            const auto symbol = m_symboltable.find( node );
+            const auto symbol = m_symboltable.find( *node.name() );
             assert( symbol.targetType()
                     == CallExpression::TargetType::TYPE_DOMAIN );
 
