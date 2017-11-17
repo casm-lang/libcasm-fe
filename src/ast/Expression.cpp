@@ -311,6 +311,7 @@ void TypeCastingExpression::setTargetBuiltinId(
     libcasm_ir::Value::ID builtinId )
 {
     m_targetBuiltinId = builtinId;
+    setTargetType( CallExpression::TargetType::BUILTIN );
 }
 
 libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
@@ -322,6 +323,7 @@ void TypeCastingExpression::setTargetDefinition(
     const TypedNode::Ptr& definition )
 {
     m_targetDefinition = definition;
+    setTargetType( CallExpression::TargetType::DERIVED );
 }
 
 const TypedNode::Ptr& TypeCastingExpression::targetDefinition( void ) const
