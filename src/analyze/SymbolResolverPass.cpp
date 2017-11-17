@@ -218,8 +218,22 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
     if( libcasm_ir::Builtin::available( name ) )
     {
+        const auto& annotation = libcasm_ir::Annotation::find( name );
+
         node.setTargetType( CallExpression::TargetType::BUILTIN );
-        node.setTargetBuiltinId( libcasm_ir::Annotation::find( name ).valueID() );
+        node.setTargetBuiltinId( annotation.valueID() );
+
+        const auto expectedNumberOfArguments
+            = annotation.relations().front().argument.size();
+        if( node.arguments()->size() != expectedNumberOfArguments )
+        {
+            m_log.error( { node.sourceLocation() },
+                "invalid argument size: builtin '" + name + "' expects "
+                    + std::to_string( expectedNumberOfArguments )
+                    + " arguments",
+                Code::TypeInferenceBuiltinArgumentSizeMismatch );
+        }
+
         return;
     }
 
@@ -234,6 +248,30 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             or symbol.targetType() == CallExpression::TargetType::CONSTANT )
         {
             node.setType( symbol.definition()->type() );
+        }
+
+        if( node.arguments()->size() != symbol.arity() )
+        {
+            const std::unordered_map< CallExpression::TargetType, Code >
+                codes = {
+                    { CallExpression::TargetType::FUNCTION,
+                        Code::TypeInferenceFunctionArgumentSizeMismatch },
+                    { CallExpression::TargetType::DERIVED,
+                        Code::TypeInferenceDerivedArgumentSizeMismatch },
+                    { CallExpression::TargetType::RULE,
+                        Code::TypeInferenceRuleArgumentSizeMismatch },
+                };
+
+            const auto code = codes.find( node.targetType() );
+            assert( code != codes.end()
+                    and " invalid target type with arguments " );
+
+            m_log.error( { node.sourceLocation() },
+                "invalid argument size: " + node.targetTypeName()
+                    + " '" + path.path() + "' expects "
+                    + std::to_string( symbol.arity() )
+                    + " arguments",
+                code->second );
         }
     }
     catch( const std::domain_error& e )
