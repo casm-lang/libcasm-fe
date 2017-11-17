@@ -153,8 +153,10 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
         return;
     }
 
+    node.returnType()->accept( *this );
     assert( node.returnType()->type() && "return type must be specified" );
 
+    node.argumentTypes()->accept( *this );
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     argTypeList.reserve( node.argumentTypes()->size() );
     for( const auto& argumentType : *node.argumentTypes() )
@@ -169,8 +171,9 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
 
     auto& returnType = *node.returnType()->type();
     m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
+    node.defaultValue()->accept( *this );
 
-    RecursiveVisitor::visit( node );
+    node.initializers()->accept( *this );
 }
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
@@ -181,8 +184,10 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
         return;
     }
 
+    node.returnType()->accept( *this );
     assert( node.returnType()->type() && "return type must be specified" );
 
+    node.arguments()->accept( *this );
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     argTypeList.reserve( node.arguments()->size() );
     for( const auto& argument : *node.arguments() )
@@ -197,8 +202,7 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
 
     auto& returnType = *node.returnType()->type();
     m_typeIDs[ node.expression().get() ].emplace( returnType.id() );
-
-    RecursiveVisitor::visit( node );
+    node.expression()->accept( *this );
 
     if( node.expression()->type() )
     {
@@ -227,8 +231,10 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
         return;
     }
 
+    node.returnType()->accept( *this );
     assert( node.returnType()->type() && "return type must be specified" );
 
+    node.arguments()->accept( *this );
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     argTypeList.reserve( node.arguments()->size() );
     for( const auto& argument : *node.arguments() )
@@ -241,7 +247,7 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
         node.returnType()->type(), argTypeList );
     node.setType( type );
 
-    RecursiveVisitor::visit( node );
+    node.rule()->accept( *this );
 }
 
 void TypeInferenceVisitor::visit( TypeCastingExpression& node )
