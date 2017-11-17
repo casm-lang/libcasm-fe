@@ -254,8 +254,17 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    assert( node.fromExpression()->type() );
-    assert( node.asType()->type() );
+    if( not node.fromExpression()->type() )
+    {
+        m_log.error( { node.fromExpression()->sourceLocation() },
+            "unable to infer expression type of 'as operator'",
+            Code::TypeInferenceTypeCastingExpressionFromHasNoType );
+    }
+
+    if( not node.fromExpression()->type() or not node.asType()->type() )
+    {
+        return;
+    }
 
     const auto resultType = node.asType()->type();
     std::vector< libcasm_ir::Type::Ptr > argumentTypes;
@@ -349,7 +358,7 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
             m_log.error( { node.sourceLocation() },
                 "unknown 'as operator' type casting relation '"
                     + relationType->description() + "' found",
-                Code::TypeInferenceUnknownTypeCastingExpression );
+                Code::TypeInferenceInvalidTypeCastingExpression );
             return;
         }
     }
@@ -360,7 +369,7 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         m_log.error( { node.sourceLocation() },
             "unknown 'as operator' type casting relation '"
                 + relationType->description() + "' found",
-            Code::TypeInferenceUnknownTypeCastingExpression );
+            Code::TypeInferenceInvalidTypeCastingExpression );
         return;
     }
 

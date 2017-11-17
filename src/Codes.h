@@ -224,7 +224,8 @@ namespace libcasm_fe
 
         TypeInferenceRangeExpressionTypeMismatch = 0x1600,
 
-        TypeInferenceUnknownTypeCastingExpression = 0x1700,
+        TypeInferenceInvalidTypeCastingExpression = 0x1700,
+        TypeInferenceTypeCastingExpressionFromHasNoType = 0x1701,
 
         TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000,
 
