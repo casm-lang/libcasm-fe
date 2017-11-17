@@ -65,31 +65,16 @@ class TypeCheckVisitor final : public RecursiveVisitor
   public:
     TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-    void visit( VariableDefinition& node ) override;
-
     void visit( DirectCallExpression& node ) override;
-
-    void visit( CaseRule& node ) override;
-    void visit( LetRule& node ) override;
 
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
     void visit( RelationType& node ) override;
     void visit( FixedSizedType& node ) override;
 
-    void visit( ExpressionCase& node ) override;
-    void visit( DefaultCase& node ) override;
-
   private:
-    void push( VariableDefinition& identifier );
-    void pop( VariableDefinition& identifier );
-
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
-
-    std::unordered_map< std::string, VariableDefinition* > m_id2var;
-    std::vector< VariableDefinition* > m_stack;
-    Expression* m_caseExpr = nullptr;
 };
 
 TypeCheckVisitor::TypeCheckVisitor(
@@ -99,190 +84,46 @@ TypeCheckVisitor::TypeCheckVisitor(
 {
 }
 
-void TypeCheckVisitor::visit( VariableDefinition& node )
-{
-    RecursiveVisitor::visit( node );
-
-    if( not node.type() and node.variableType()->type() )
-    {
-        node.setType( node.variableType()->type() );
-    }
-}
-
 void TypeCheckVisitor::visit( DirectCallExpression& node )
 {
     const auto& path = *node.identifier();
 
-    if( not node.type() )
+    try
     {
-        auto result = m_id2var.find( path.path() );
-        if( result != m_id2var.end() )
+        auto symbol = m_symboltable.find( node );
+
+        if( node.arguments()->size() != symbol.arity() )
         {
-            node.setType( result->second->type() );
+            const std::unordered_map< CallExpression::TargetType,
+                Code >
+                codes = {
+                    { CallExpression::TargetType::FUNCTION,
+                        Code::TypeInferenceFunctionArgumentSizeMismatch },
+                    { CallExpression::TargetType::DERIVED,
+                        Code::TypeInferenceDerivedArgumentSizeMismatch },
+                    { CallExpression::TargetType::BUILTIN,
+                        Code::TypeInferenceBuiltinArgumentSizeMismatch },
+                    { CallExpression::TargetType::RULE,
+                        Code::TypeInferenceRuleArgumentSizeMismatch },
+                };
+
+            const auto code = codes.find( node.targetType() );
+            assert( code != codes.end()
+                    and " invalid target type with arguments " );
+
+            m_log.error( { node.sourceLocation() },
+                "invalid argument size: " + node.targetTypeName()
+                    + " '" + path.path() + "' expects "
+                    + std::to_string( symbol.arity() )
+                    + " arguments",
+                code->second );
         }
-        else
-        {
-            if( node.targetType() == CallExpression::TargetType::UNKNOWN )
-            {
-                assert( path.type() == IdentifierPath::Type::RELATIVE );
-                assert( path.identifiers()->size() == 1 );
-                // can only be a relative addressed enumeration constant
-
-                if( not m_caseExpr )
-                {
-                    // we are not in a 'case' context ... check latest
-                    // m_stack entry!
-                    if( not m_stack.empty() and m_stack.back()->type() )
-                    {
-                        const auto variable = m_stack.back();
-
-                        std::vector< std::string > parts;
-                        libstdhl::String::split(
-                            variable->type()->name(), ".", parts );
-                        parts.emplace_back( path.baseName() );
-
-                        try
-                        {
-                            auto symbol = m_symboltable.find( parts );
-
-                            node.setTargetType( symbol.targetType() );
-
-                            assert( symbol.targetType()
-                                    == CallExpression::TargetType::CONSTANT );
-
-                            const auto& definition = std::static_pointer_cast<
-                                EnumerationDefinition >( symbol.definition() );
-
-                            assert( definition->type() );
-                            node.setType( definition->type() );
-                        }
-                        catch( const std::domain_error& e )
-                        {
-                            m_log.error( { node.sourceLocation() },
-                                "unknown symbol '" + path.path() + "' found" );
-                        }
-                    }
-                    else
-                    {
-                        m_log.error( { node.sourceLocation() },
-                            "unable to resolve symbol '" + path.path() + "'" );
-                    }
-                }
-                else if( m_caseExpr and m_caseExpr->type() )
-                {
-                    std::vector< std::string > parts;
-                    libstdhl::String::split(
-                        m_caseExpr->type()->name(), ".", parts );
-                    parts.emplace_back( path.baseName() );
-
-                    try
-                    {
-                        auto symbol = m_symboltable.find( parts );
-
-                        node.setTargetType( symbol.targetType() );
-
-                        assert( symbol.targetType()
-                                == CallExpression::TargetType::CONSTANT );
-
-                        const auto& type = symbol.definition()->type();
-                        assert( type );
-                        node.setType( type );
-                    }
-                    catch( const std::domain_error& e )
-                    {
-                        m_log.error( { node.sourceLocation() },
-                            "unknown symbol '" + path.path() + "' found" );
-                    }
-                }
-                else
-                {
-                    m_log.error( { node.sourceLocation() },
-                        "unknown symbol '" + path.path() + "' found" );
-                }
-            }
-            else
-            {
-                try
-                {
-                    auto symbol = m_symboltable.find( node );
-
-                    if( node.arguments()->size() != symbol.arity() )
-                    {
-                        const std::unordered_map< CallExpression::TargetType,
-                            Code >
-                            codes = {
-                                { CallExpression::TargetType::FUNCTION,
-                                    Code::
-                                        TypeInferenceFunctionArgumentSizeMismatch },
-                                { CallExpression::TargetType::DERIVED,
-                                    Code::
-                                        TypeInferenceDerivedArgumentSizeMismatch },
-                                { CallExpression::TargetType::BUILTIN,
-                                    Code::
-                                        TypeInferenceBuiltinArgumentSizeMismatch },
-                                { CallExpression::TargetType::RULE,
-                                    Code::
-                                        TypeInferenceRuleArgumentSizeMismatch },
-                            };
-
-                        const auto code = codes.find( node.targetType() );
-                        assert( code != codes.end()
-                                and " invalid target type with arguments " );
-
-                        m_log.error( { node.sourceLocation() },
-                            "invalid argument size: " + node.targetTypeName()
-                                + " '" + path.path() + "' expects "
-                                + std::to_string( symbol.arity() )
-                                + " arguments",
-                            code->second );
-                    }
-                }
-                catch( const std::domain_error& e )
-                {
-                }
-            }
-        }
+    }
+    catch( const std::domain_error& e )
+    {
     }
 
     RecursiveVisitor::visit( node );
-}
-
-void TypeCheckVisitor::visit( LetRule& node )
-{
-    node.variable()->accept( *this );
-    push( *node.variable() );
-    node.expression()->accept( *this );
-
-    if( not node.variable()->type() and node.expression()->type() )
-    {
-        node.variable()->setType( node.expression()->type()->ptr_result() );
-    }
-
-    node.rule()->accept( *this );
-    pop( *node.variable() );
-}
-
-void TypeCheckVisitor::visit( CaseRule& node )
-{
-    // check the case expression itself
-    node.expression()->accept( *this );
-
-    // set case expression and its type
-    assert( not m_caseExpr );
-    m_caseExpr = node.expression().get();
-
-    // iterate only over the expressions
-    node.cases()->accept( *this );
-
-    // clear case expression and its type
-    assert( m_caseExpr );
-    m_caseExpr = nullptr;
-
-    // iterate over the case expression rules
-    for( auto c : *node.cases() )
-    {
-        c->rule()->accept( *this );
-    }
 }
 
 static const std::string TYPE_STRING_VOID = "Void";
@@ -581,38 +422,6 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                 Code::TypeAnnotationInvalidFixedSizeTypeName );
         }
     }
-}
-
-void TypeCheckVisitor::visit( ExpressionCase& node )
-{
-    // omit redundant traversal of rule(), see visit( CaseRule& )
-    node.expression()->accept( *this );
-}
-
-void TypeCheckVisitor::visit( DefaultCase& node )
-{
-    // omit redundant traversal of rule(), see visit( CaseRule& )
-}
-
-void TypeCheckVisitor::push( VariableDefinition& node )
-{
-    const auto& name = node.identifier()->name();
-
-    auto result = m_id2var.emplace( name, &node );
-    assert( result.second && "symbol already defined!" );
-    m_stack.push_back( &node );
-}
-
-void TypeCheckVisitor::pop( VariableDefinition& node )
-{
-    const auto& name = node.identifier()->name();
-
-    if( m_id2var.erase( name ) != 1 )
-    {
-        assert( !" internal error! " );
-    }
-    assert( m_stack.back() == &node );
-    m_stack.pop_back();
 }
 
 void TypeCheckPass::usage( libpass::PassUsage& pu )
