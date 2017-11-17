@@ -224,6 +224,8 @@ namespace libcasm_fe
 
         TypeInferenceRangeExpressionTypeMismatch = 0x1600,
 
+        TypeInferenceUnknownTypeCastingExpression = 0x1700,
+
         TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000,
 
         TypeIntegerRangedInvalidInterval
