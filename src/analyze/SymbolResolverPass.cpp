@@ -284,8 +284,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 else
                 {
                     m_log.error( { node.sourceLocation() },
-                        "unknown " + node.targetTypeName() + " symbol '"
-                            + path.path() + "' found",
+                        node.targetTypeName() + " symbol '" + path.path()
+                            + "' found",
                         ( node.targetType()
                             == CallExpression::TargetType::FUNCTION )
                             ? Code::FunctionSymbolIsUnknown
