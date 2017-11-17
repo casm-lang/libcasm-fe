@@ -258,31 +258,30 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
     const auto relationType
         = libstdhl::Memory::make< libcasm_ir::RelationType >(
             resultType, argumentTypes );
-    node.setType( relationType );
 
     switch( resultType->kind() )
     {
         case libcasm_ir::Type::Kind::VOID:     // [fallthrough]
         case libcasm_ir::Type::Kind::LABEL:    // [fallthrough]
         case libcasm_ir::Type::Kind::LOCATION: // [fallthrough]
-        case libcasm_ir::Type::Kind::RELATION: // [fallthrough]
+        case libcasm_ir::Type::Kind::RELATION:
         {
-            // invalid type kind to perform 'as operator'
-            return;
+            assert( !" invalid type kind to perform 'as operator' at source level!" );
+            break;
         }
         case libcasm_ir::Type::Kind::BOOLEAN:
         {
-            node.setTypeCasting( libcasm_ir::Value::AS_BOOLEAN_BUILTIN );
+            node.setTargetBuiltinId( libcasm_ir::Value::AS_BOOLEAN_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::INTEGER:
         {
-            node.setTypeCasting( libcasm_ir::Value::AS_INTEGER_BUILTIN );
+            node.setTargetBuiltinId( libcasm_ir::Value::AS_INTEGER_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::RATIONAL:
         {
-            node.setTypeCasting( libcasm_ir::Value::AS_RATIONAL_BUILTIN );
+            node.setTargetBuiltinId( libcasm_ir::Value::AS_RATIONAL_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::BIT:
@@ -294,23 +293,25 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
                 libstdhl::Memory::get< libcasm_ir::IntegerConstant >(
                     bittype->bitsize() ) );
 
-            node.setTypeCasting(
-                libcasm_ir::Value::AS_BIT_BUILTIN, { bitsize } );
+            node.arguments()->add( bitsize );
+
+            node.setTargetBuiltinId( libcasm_ir::Value::AS_BIT_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::DECIMAL:
         {
-            node.setTypeCasting( libcasm_ir::Value::AS_DECIMAL_BUILTIN );
+            node.setTargetBuiltinId( libcasm_ir::Value::AS_DECIMAL_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::STRING:
         {
-            node.setTypeCasting( libcasm_ir::Value::AS_STRING_BUILTIN );
+            node.setTargetBuiltinId( libcasm_ir::Value::AS_STRING_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::ENUMERATION:
         {
-            node.setTypeCasting( libcasm_ir::Value::AS_ENUMERATION_BUILTIN );
+            node.setTargetBuiltinId(
+                libcasm_ir::Value::AS_ENUMERATION_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::RANGE:              // [fallthrough]
@@ -323,7 +324,7 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         {
             // TODO: PPA: FIXME: continue here with missing casting
             // functionality
-            return;
+            break;
         }
         case libcasm_ir::Type::Kind::_SIZE_:
         {
@@ -332,8 +333,32 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         }
     }
 
-    node.typeCasting()->accept( *this );
-    node.typeCasting()->setType( relationType );
+    if( node.builtin() )
+    {
+        const auto& annotation
+            = libcasm_ir::Annotation::find( node.targetBuiltinId() );
+
+        if( not annotation.valid( *relationType ) )
+        {
+            m_log.error( { node.sourceLocation() },
+                "unknown 'as operator' type casting relation '"
+                    + relationType->description() + "' found",
+                Code::TypeInferenceUnknownTypeCastingExpression );
+            return;
+        }
+    }
+    else
+    {
+        // TODO: PPA: FIXME: implement here possible derived and feature type
+        // casting expressions
+        m_log.error( { node.sourceLocation() },
+            "unknown 'as operator' type casting relation '"
+                + relationType->description() + "' found",
+            Code::TypeInferenceUnknownTypeCastingExpression );
+        return;
+    }
+
+    node.setType( relationType );
 }
 
 void TypeInferenceVisitor::visit( UndefAtom& node )
@@ -396,7 +421,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 // type has been inferred -> check if relation type is valid
                 assert( node.type()->isReference() );
                 const auto& referenceType
-                    = std::static_pointer_cast< libcasm_ir::ReferenceType>(
+                    = std::static_pointer_cast< libcasm_ir::ReferenceType >(
                         node.type() );
                 const auto relationType = referenceType->dereference();
 
@@ -404,8 +429,8 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 {
                     m_log.error( { node.sourceLocation() },
                         "built-in '" + node.identifier()->path()
-                        + "' has no type relation '"
-                        + relationType->description() + "'",
+                            + "' has no type relation '"
+                            + relationType->description() + "'",
                         Code::TypeInferenceBuiltinRelationTypeInvalid );
                 }
             }
@@ -424,9 +449,9 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 const auto& returnType
                     = libcasm_ir::Type::fromID( relation.result );
 
-                const auto type
-                    = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                        returnType, argumentTypes );
+                const auto type = libstdhl::Memory::make<
+                    libcasm_ir::FunctionReferenceType >(
+                    returnType, argumentTypes );
                 node.setType( type );
             }
             break;
@@ -514,9 +539,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             break;
         }
-        case CallExpression::TargetType::DERIVED: // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
         case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-        case CallExpression::TargetType::RULE: // [[fallthrough]]
+        case CallExpression::TargetType::RULE:     // [[fallthrough]]
         case CallExpression::TargetType::SELF:
         {
             if( node.type() )
@@ -591,14 +616,11 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 const std::unordered_map< CallExpression::TargetType, Code >
                     codes = {
                         { CallExpression::TargetType::FUNCTION,
-                            Code::
-                                TypeInferenceFunctionArgumentTypeMismatch },
+                            Code::TypeInferenceFunctionArgumentTypeMismatch },
                         { CallExpression::TargetType::DERIVED,
-                            Code::
-                                TypeInferenceDerivedArgumentTypeMismatch },
+                            Code::TypeInferenceDerivedArgumentTypeMismatch },
                         { CallExpression::TargetType::BUILTIN,
-                            Code::
-                                TypeInferenceBuiltinArgumentTypeMismatch },
+                            Code::TypeInferenceBuiltinArgumentTypeMismatch },
                         { CallExpression::TargetType::RULE,
                             Code::TypeInferenceRuleArgumentTypeMismatch },
                     };
@@ -668,7 +690,8 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
     if( node.type() and node.expression()->type() )
     {
         const std::vector< libcasm_ir::Type::Ptr > argTypeList{
-            node.expression()->type()->ptr_result() };
+            node.expression()->type()->ptr_result()
+        };
 
         const libcasm_ir::RelationType relationType( node.type(), argTypeList );
 
@@ -696,7 +719,8 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
     {
         const std::vector< libcasm_ir::Type::Ptr > argTypeList{
             node.left()->type()->ptr_result(),
-                node.right()->type()->ptr_result() };
+            node.right()->type()->ptr_result()
+        };
 
         const libcasm_ir::RelationType relationType( node.type(), argTypeList );
 
@@ -1268,7 +1292,8 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         auto& directCall = static_cast< DirectCallExpression& >( node );
         const auto& path = *directCall.identifier();
 
-        assert( directCall.targetType() == CallExpression::TargetType::BUILTIN );
+        assert(
+            directCall.targetType() == CallExpression::TargetType::BUILTIN );
 
         try
         {
@@ -1309,17 +1334,16 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
             assert( asbit_args.size() == 2 );
             const auto& asbit_size
                 = static_cast< const ValueAtom& >( *asbit_args[ 1 ] );
-            if( asbit_size.id() == Node::ID::VALUE_ATOM
-                and asbit_size.type()
+            if( asbit_size.id() == Node::ID::VALUE_ATOM and asbit_size.type()
                 and asbit_size.type()->kind()
                         == libcasm_ir::Type::Kind::INTEGER )
             {
-                const auto asbit_size_value = std::static_pointer_cast<
-                    libcasm_ir::IntegerConstant >( asbit_size.value() );
+                const auto asbit_size_value
+                    = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
+                        asbit_size.value() );
 
-                const auto type
-                    = libstdhl::Memory::get< libcasm_ir::BitType >(
-                        asbit_size_value );
+                const auto type = libstdhl::Memory::get< libcasm_ir::BitType >(
+                    asbit_size_value );
                 directCall.setType( type );
             }
             else

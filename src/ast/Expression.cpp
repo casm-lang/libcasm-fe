@@ -282,13 +282,14 @@ void IndirectCallExpression::accept( Visitor& visitor )
 
 TypeCastingExpression::TypeCastingExpression(
     const Expression::Ptr& fromExpression, const Type::Ptr& asType )
-: Expression( Node::ID::TYPE_CASTING_EXPRESSION )
+: CallExpression(
+      Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
 , m_fromExpression( fromExpression )
 , m_asType( asType )
-, m_typeCasting( std::make_shared< DirectCallExpression >(
-      IdentifierPath::createUnresolved(), std::make_shared< Expressions >() ) )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_targetDefinition()
 {
-    m_typeCasting->arguments()->add( fromExpression );
+    arguments()->add( fromExpression );
 }
 
 const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
@@ -301,34 +302,31 @@ const Type::Ptr& TypeCastingExpression::asType( void ) const
     return m_asType;
 }
 
-void TypeCastingExpression::setTypeCasting(
-    const libcasm_ir::Value::ID builtinID,
-    const std::vector< Expression::Ptr >& arguments )
+u1 TypeCastingExpression::builtin( void ) const
 {
-    const auto currentSourceLocation = sourceLocation();
-
-    auto typeCastingIdentifier = make< IdentifierPath >( currentSourceLocation,
-        make< Identifier >( currentSourceLocation, "as operator" ) );
-
-    auto typeCastingExpressions = make< Expressions >( currentSourceLocation );
-    typeCastingExpressions->add( m_fromExpression );
-
-    for( auto argument : arguments )
-    {
-        typeCastingExpressions->add( argument );
-    }
-
-    m_typeCasting = make< DirectCallExpression >(
-        currentSourceLocation, typeCastingIdentifier, typeCastingExpressions );
-
-    m_typeCasting->setTargetType( CallExpression::TargetType::BUILTIN );
-    m_typeCasting->setTargetBuiltinId( builtinID );
+    return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_;
 }
 
-const DirectCallExpression::Ptr& TypeCastingExpression::typeCasting(
-    void ) const
+void TypeCastingExpression::setTargetBuiltinId(
+    libcasm_ir::Value::ID builtinId )
 {
-    return m_typeCasting;
+    m_targetBuiltinId = builtinId;
+}
+
+libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
+{
+    return m_targetBuiltinId;
+}
+
+void TypeCastingExpression::setTargetDefinition(
+    const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+}
+
+const TypedNode::Ptr& TypeCastingExpression::targetDefinition( void ) const
+{
+    return m_targetDefinition;
 }
 
 void TypeCastingExpression::accept( Visitor& visitor )
