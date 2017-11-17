@@ -1335,40 +1335,6 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                         + "', due to missing annotation information from 'libcasm-ir'" );
             return nullptr;
         }
-
-        if( annotation->valueID()
-            == libcasm_ir::Value::AS_BIT_BUILTIN ) // REMOVE: PPA: this
-                                                   // condition gets obsolete,
-                                                   // because we will force type
-                                                   // conversions over the
-                                                   // TypeCastingExpression and
-                                                   // I'll remove this ASAP in a
-                                                   // followup commit
-        {
-            const auto& asbit_args = directCall.arguments()->data();
-            assert( asbit_args.size() == 2 );
-            const auto& asbit_size
-                = static_cast< const ValueAtom& >( *asbit_args[ 1 ] );
-            if( asbit_size.id() == Node::ID::VALUE_ATOM and asbit_size.type()
-                and asbit_size.type()->kind()
-                        == libcasm_ir::Type::Kind::INTEGER )
-            {
-                const auto asbit_size_value
-                    = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
-                        asbit_size.value() );
-
-                const auto type = libstdhl::Memory::get< libcasm_ir::BitType >(
-                    asbit_size_value );
-                directCall.setType( type );
-            }
-            else
-            {
-                m_log.error( { directCall.arguments()->data()[ 1 ]->sourceLocation() },
-                                "2nd argument of built-in '"
-                                + path.path()
-                                + "' is required to be a compile time 'Integer' constant value", Code::TypeInferenceBuiltinAsBitInvalid2ndArgumentType );
-            }
-        }
     }
     else
     {
