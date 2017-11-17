@@ -301,15 +301,6 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         }
         case libcasm_ir::Type::Kind::BIT:
         {
-            const auto bittype
-                = std::static_pointer_cast< libcasm_ir::BitType >( resultType );
-
-            const auto bitsize = make< ValueAtom >( node.sourceLocation(),
-                libstdhl::Memory::get< libcasm_ir::IntegerConstant >(
-                    bittype->bitsize() ) );
-
-            node.arguments()->add( bitsize );
-
             node.setTargetBuiltinId( libcasm_ir::Value::AS_BIT_BUILTIN );
             break;
         }
