@@ -154,7 +154,7 @@ Namespace::Symbol Namespace::find( const std::string& name ) const
             "unable to find symbol '" + name + "'" );
     }
 
-    return result->second.front();
+    return result->second;
 }
 
 Namespace::Symbol Namespace::find( const std::vector< std::string >& path ) const
@@ -201,7 +201,7 @@ std::string Namespace::dump( const std::string& indention ) const
     for( const auto& v : m_symboltable )
     {
         const auto& name = v.first;
-        const auto& symbol = v.second.front();
+        const auto& symbol = v.second;
 
         const auto& type = symbol.definition()->type();
 
@@ -226,22 +226,17 @@ void Namespace::registerSymbol( const std::string& name,
     const TypedNode::Ptr& definition,
     const CallExpression::TargetType targetType, const std::size_t arity )
 {
-    auto& symtbl = m_symboltable[ name ];
+    const Symbol symbol{ definition, targetType, arity };
+    const auto result = m_symboltable.emplace( name, symbol );
 
-    for( const auto& symbol : symtbl )
+    if( not result.second )
     {
-        if( symbol.arity() == arity )
-        {
-            throw std::domain_error(
-                "symbol '" + name + "' already defined as "
-                + std::to_string( arity )
-                + "-ary '"
-                + CallExpression::targetTypeString( symbol.targetType() )
+        const auto& existingSymbol = result.first->second;
+        throw std::domain_error(
+            "symbol '" + name + "' already defined as "
+                + CallExpression::targetTypeString( existingSymbol.targetType() )
                 + "'" );
-        }
     }
-
-    symtbl.emplace_back( definition, targetType, arity );
 }
 
 Namespace::Symbol Namespace::find( const IdentifierPath& node,
@@ -282,6 +277,6 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
                 "unable to find symbol '" + node.path() + "'" );
         }
 
-        return result->second.front();
+        return result->second;
     }
 }

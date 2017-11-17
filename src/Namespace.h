@@ -105,7 +105,7 @@ namespace libcasm_fe
             const Ast::CallExpression::TargetType targetType,
             const std::size_t arity );
 
-        std::unordered_map< std::string, std::vector< Symbol > > m_symboltable;
+        std::unordered_map< std::string, Symbol > m_symboltable;
 
         std::unordered_map< std::string, Namespace::Ptr > m_namespaces;
     };
