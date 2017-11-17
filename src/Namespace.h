@@ -90,13 +90,12 @@ namespace libcasm_fe
         void registerSymbol( const Ast::EnumerationDefinition::Ptr& node );
         void registerSymbol( const Ast::BasicType::Ptr& node );
 
-        Symbol find( const Ast::IdentifierPath& node ) const;
+        Symbol find( const Ast::IdentifierPath& node,
+            const std::size_t index = 0 ) const;
 
-        Symbol find(
-            const std::string& name, const std::size_t arity = 0 ) const;
+        Symbol find( const std::string& name ) const;
 
-        Symbol find( const std::vector< std::string >& path,
-            const std::size_t arity = 0 ) const;
+        Symbol find( const std::vector< std::string >& path ) const;
 
         std::string dump( const std::string& indention = "" ) const;
 
@@ -105,9 +104,6 @@ namespace libcasm_fe
             const Ast::TypedNode::Ptr& definition,
             const Ast::CallExpression::TargetType targetType,
             const std::size_t arity );
-
-        Symbol find( const Ast::IdentifierPath& node, const std::size_t arity,
-            const std::size_t index = 0 ) const;
 
         std::unordered_map< std::string, std::vector< Symbol > > m_symboltable;
 
