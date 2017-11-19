@@ -1,14 +1,3 @@
-Nonterminals useless in grammar
-
-   Identifiers
-
-
-Rules useless in grammar
-
-  185 Identifiers: Identifiers "," Identifier
-  186            | Identifier
-
-
 Grammar
 
     0 $accept: Specification "end of file"

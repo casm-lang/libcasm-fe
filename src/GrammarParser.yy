@@ -179,7 +179,7 @@ END       0 "end of file"
 %type <Specification::Ptr> Specification
 
 %type <Identifier::Ptr> Identifier
-%type <Identifiers::Ptr> Identifiers DotSeparatedIdentifiers
+%type <Identifiers::Ptr> DotSeparatedIdentifiers
 %type <IdentifierPath::Ptr> IdentifierPath
 
 // definitions
@@ -1410,22 +1410,6 @@ MaybeInitializers
 //
 // Identifiers
 //
-
-Identifiers
-: Identifiers COMMA Identifier
-  {
-      auto identifiers = $1;
-      identifiers->add( $3 );
-      $$ = identifiers;
-  }
-| Identifier
-  {
-      auto identifiers = Ast::make< Identifiers >( @$ );
-      identifiers->add( $1 );
-      $$ = identifiers;
-  }
-;
-
 
 Identifier
 : IDENTIFIER

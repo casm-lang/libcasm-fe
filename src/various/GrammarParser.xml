@@ -1369,20 +1369,6 @@
           <symbol>Term</symbol>
         </rhs>
       </rule>
-      <rule number="185" usefulness="useless-in-grammar">
-        <lhs>Identifiers</lhs>
-        <rhs>
-          <symbol>Identifiers</symbol>
-          <symbol>&quot;,&quot;</symbol>
-          <symbol>Identifier</symbol>
-        </rhs>
-      </rule>
-      <rule number="186" usefulness="useless-in-grammar">
-        <lhs>Identifiers</lhs>
-        <rhs>
-          <symbol>Identifier</symbol>
-        </rhs>
-      </rule>
     </rules>
     <terminals>
       <terminal symbol-number="0" token-number="0" name="&quot;end of file&quot;" usefulness="useful"/>
@@ -1544,7 +1530,6 @@
       <nonterminal symbol-number="155" name="Attribute" usefulness="useful"/>
       <nonterminal symbol-number="156" name="BasicAttribute" usefulness="useful"/>
       <nonterminal symbol-number="157" name="ExpressionAttribute" usefulness="useful"/>
-      <nonterminal symbol-number="158" name="Identifiers" usefulness="useless-in-grammar"/>
     </nonterminals>
   </grammar>
 
