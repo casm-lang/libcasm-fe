@@ -1303,18 +1303,12 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
 
         try
         {
-            if( directCall.targetBuiltinId() == libcasm_ir::Value::ID::_SIZE_ )
-            {
-                const auto& builtin_annotation
-                    = libcasm_ir::Annotation::find( path.baseName() );
-                annotation = &builtin_annotation;
-            }
-            else
-            {
-                const auto& builtin_annotation = libcasm_ir::Annotation::find(
-                    directCall.targetBuiltinId() );
-                annotation = &builtin_annotation;
-            }
+            assert(
+                directCall.targetBuiltinId() == libcasm_ir::Value::ID::_SIZE_ );
+
+            const auto& builtin_annotation
+                = libcasm_ir::Annotation::find( path.baseName() );
+            annotation = &builtin_annotation;
 
             directCall.setTargetBuiltinId( annotation->valueID() );
         }
