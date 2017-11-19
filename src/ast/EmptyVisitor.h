@@ -58,6 +58,7 @@ namespace libcasm_fe
             void visit( FunctionDefinition& node ) override;
             void visit( DerivedDefinition& node ) override;
             void visit( RuleDefinition& node ) override;
+            void visit( EnumeratorDefinition& node ) override;
             void visit( EnumerationDefinition& node ) override;
 
             void visit( ValueAtom& node ) override;

@@ -74,6 +74,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
     void visit( ValueAtom& node ) override;
@@ -276,6 +277,12 @@ void AstToCasmIRVisitor::visit( RuleDefinition& node )
 
         assert( m_blocks.size() == 0 );
     }
+}
+
+void AstToCasmIRVisitor::visit( EnumeratorDefinition& node )
+{
+    m_log.info(
+        "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( EnumerationDefinition& node )

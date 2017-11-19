@@ -68,6 +68,7 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
   private:
@@ -147,25 +148,11 @@ void SymbolRegistrationVisitor::visit( RuleDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
-void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
+void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
 {
     try
     {
-        m_symboltable.registerSymbol( node.ptr< EnumerationDefinition >() );
-
-        const auto& name = node.identifier()->name();
-
-        m_log.debug( "creating IR enumeration type '" + name + "'" );
-        const auto kind
-            = libstdhl::Memory::make< libcasm_ir::Enumeration >( name );
-        for( const auto& enumerator : *node.enumerators() )
-        {
-            kind->add( enumerator->name() );
-        }
-
-        const auto type
-            = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
-        node.setType( type );
+        m_symboltable.registerSymbol( node.ptr< EnumeratorDefinition >() );
     }
     catch( const std::domain_error& e )
     {
@@ -175,8 +162,53 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
             { node.sourceLocation(), symbol.definition()->sourceLocation() },
             e.what() );
     }
+}
 
-    RecursiveVisitor::visit( node );
+void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
+{
+    const auto& name = node.identifier()->name();
+
+    m_log.debug( "creating IR enumeration type '" + name + "'" );
+    const auto kind = std::make_shared< libcasm_ir::Enumeration >( name );
+    for( const auto& enumerator : *node.enumerators() )
+    {
+        kind->add( enumerator->identifier()->name() );
+    }
+
+    const auto type = std::make_shared< libcasm_ir::EnumerationType >( kind );
+    node.setType( type );
+
+    for( const auto& enumerator : *node.enumerators() )
+    {
+        enumerator->setType( type );
+    }
+
+    try
+    {
+        m_symboltable.registerSymbol( node.ptr< EnumerationDefinition >() );
+    }
+    catch( const std::domain_error& e )
+    {
+        const auto& symbol = m_symboltable.find( name );
+
+        m_log.error(
+            { node.sourceLocation(), symbol.definition()->sourceLocation() },
+            e.what() );
+    }
+
+    // register enumerators in a sub-namespace
+    const auto enumeratorNamespace = std::make_shared< Namespace >();
+    SymbolRegistrationVisitor enumeratorVisitor( m_log, *enumeratorNamespace );
+    node.enumerators()->accept( enumeratorVisitor );
+
+    try
+    {
+        m_symboltable.registerNamespace( name, enumeratorNamespace );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error( { node.sourceLocation() }, e.what() );
+    }
 }
 
 void SymbolRegistrationPass::usage( libpass::PassUsage& pu )

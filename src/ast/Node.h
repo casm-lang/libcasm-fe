@@ -70,6 +70,7 @@ namespace libcasm_fe
                 FUNCTION_DEFINITION,
                 DERIVED_DEFINITION,
                 RULE_DEFINITION,
+                ENUMERATOR_DEFINITION,
                 ENUMERATION_DEFINITION,
 
                 // expressions

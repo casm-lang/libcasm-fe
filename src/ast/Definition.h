@@ -220,20 +220,32 @@ namespace libcasm_fe
             const Rule::Ptr m_rule;
         };
 
+        class EnumeratorDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< EnumeratorDefinition >;
+
+            EnumeratorDefinition( const Identifier::Ptr& identifier );
+
+            void accept( Visitor& visitor ) override final;
+        };
+
+        using Enumerators = NodeList< EnumeratorDefinition >;
+
         class EnumerationDefinition final : public Definition
         {
           public:
             using Ptr = std::shared_ptr< EnumerationDefinition >;
 
             EnumerationDefinition( const Identifier::Ptr& identifier,
-                const Identifiers::Ptr& enumerators );
+                const Enumerators::Ptr& enumerators );
 
-            const Identifiers::Ptr& enumerators( void ) const;
+            const Enumerators::Ptr& enumerators( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const Identifiers::Ptr m_enumerators;
+            const Enumerators::Ptr m_enumerators;
         };
     }
 }
