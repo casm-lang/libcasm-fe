@@ -300,6 +300,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
     void visit( ValueAtom& node ) override;
@@ -515,6 +516,15 @@ void ExecutionVisitor::visit( RuleDefinition& node )
     }
 }
 
+void ExecutionVisitor::visit( EnumeratorDefinition& node )
+{
+    assert( node.type()->isEnumeration() );
+    const auto& enumType
+        = std::static_pointer_cast< IR::EnumerationType >( node.type() );
+    m_evaluationStack.push( IR::EnumerationConstant(
+        enumType, node.identifier()->name() ) );
+}
+
 void ExecutionVisitor::visit( EnumerationDefinition& node )
 {
     assert( node.type()->isEnumeration() );
@@ -569,21 +579,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             m_frameStack.pop();
             break;
         }
-        case CallExpression::TargetType::TYPE_DOMAIN:
-        {
-            node.targetDefinition()->accept( *this );
-            break;
-        }
-        case CallExpression::TargetType::CONSTANT:
-        {
-            assert( node.type()->isEnumeration() );
-            const auto& enumType
-                = std::static_pointer_cast< IR::EnumerationType >(
-                    node.type() );
-            m_evaluationStack.push( IR::EnumerationConstant(
-                enumType, node.identifier()->baseName() ) );
-            break;
-        }
+        case CallExpression::TargetType::TYPE_DOMAIN: // [[fallthrough]]
+        case CallExpression::TargetType::CONSTANT:    // [[fallthrough]]
         case CallExpression::TargetType::VARIABLE:
         {
             node.targetDefinition()->accept( *this );
