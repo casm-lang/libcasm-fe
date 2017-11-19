@@ -297,6 +297,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             assert( node.targetType()
                     == CallExpression::TargetType::CONSTANT );
 
+            const auto agent = std::make_shared< EnumeratorDefinition >(
+                std::make_shared< Identifier >( "$" ) );
+            const auto agentEnumerators = std::make_shared< Enumerators >();
+            agentEnumerators->add( agent );
+            const auto agentEnum = std::make_shared< EnumerationDefinition >(
+                std::make_shared< Identifier >( "Agent" ), agentEnumerators );
+
             const auto kind
                 = libstdhl::Memory::make< libcasm_ir::Enumeration >(
                     "Agent" );
@@ -305,16 +312,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             const auto type
                 = libstdhl::Memory::make< libcasm_ir::EnumerationType >(
                     kind );
+            agent->setType( type );
+            agentEnum->setType( type );
+
+            m_symboltable.registerSymbol( agentEnum );
+
+            node.setTargetDefinition( agent );
             node.setType( type );
-
-            m_symboltable.registerSymbol( "Agent",
-                node.ptr< DirectCallExpression >(),
-                CallExpression::TargetType::TYPE_DOMAIN );
-
-            m_symboltable.registerSymbol(
-                node.ptr< DirectCallExpression >(),
-                CallExpression::TargetType::CONSTANT );
-            node.setTargetType( CallExpression::TargetType::CONSTANT );
         }
         else
         {
