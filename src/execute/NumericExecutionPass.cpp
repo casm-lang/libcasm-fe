@@ -124,7 +124,7 @@ struct Update
 };
 
 struct UpdateEquals
-    : public std::binary_function< const Update&, const Update&, bool >
+: public std::binary_function< const Update&, const Update&, bool >
 {
     bool operator()( const Update& lhs, const Update& rhs ) const
     {
@@ -303,6 +303,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
+    void visit( TypeCastingExpression& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
@@ -533,6 +534,26 @@ void ExecutionVisitor::visit( EnumerationDefinition& node )
     m_evaluationStack.push( IR::EnumerationConstant( enumType ) );
 }
 
+void ExecutionVisitor::visit( TypeCastingExpression& node )
+{
+    if( node.builtin() )
+    {
+        m_frameStack.push(
+            makeFrame( &node, nullptr, node.arguments()->size() ) );
+        invokeBuiltin( node, node.targetBuiltinId(), node.type() );
+        m_frameStack.pop();
+    }
+    else
+    {
+        const auto& definition
+            = std::static_pointer_cast< Definition >( node.targetDefinition() );
+        m_frameStack.push( makeFrame(
+            &node, definition.get(), definition->maximumNumberOfLocals() ) );
+        definition->accept( *this );
+        m_frameStack.pop();
+    }
+}
+
 void ExecutionVisitor::visit( ValueAtom& node )
 {
     m_evaluationStack.push( *node.value() );
@@ -565,8 +586,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         {
             const auto& definition = std::static_pointer_cast< Definition >(
                 node.targetDefinition() );
-            m_frameStack.push(
-                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            m_frameStack.push( makeFrame( &node, definition.get(),
+                definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
             break;
@@ -618,10 +639,10 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         case ReferenceAtom::ReferenceType::DERIVED:  // [[fallthrough]]
         case ReferenceAtom::ReferenceType::RULE:
         {
-            const auto& definition = std::static_pointer_cast< Definition >(
-                atom->reference() );
-            m_frameStack.push(
-                makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            const auto& definition
+                = std::static_pointer_cast< Definition >( atom->reference() );
+            m_frameStack.push( makeFrame( &node, definition.get(),
+                definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
             break;
@@ -997,8 +1018,9 @@ void ExecutionVisitor::visit( ForallRule& node )
         {
             throw RuntimeException( node.condition()->sourceLocation(),
                 "condition must be true or false but was undefined for '"
-                + value.name() + "'",
-                m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                    + value.name() + "'",
+                m_frameStack.generateBacktrace(
+                    node.sourceLocation(), m_agentId ),
                 Code::ForallRuleInvalidCondition );
         }
         else if( condition.value() == true )
@@ -1084,7 +1106,8 @@ void ExecutionVisitor::visit( BlockRule& node )
 
 void ExecutionVisitor::visit( SequenceRule& node )
 {
-    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100UL );
+    Transaction transaction(
+        &m_updateSetManager, Semantics::Sequential, 100UL );
     node.rules()->accept( *this );
 
     try
@@ -1585,14 +1608,13 @@ void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
             const auto& sourceLocationB
                 = updateB.value.producer->sourceLocation();
 
-            const auto info
-                = "Conflict while collection updates from agent "
-                    + agentStrB + ". Update '" + updateStrA
-                    + "' produced by agent " + agentStrA
-                    + " clashed with update '" + updateStrB
-                    + "' produced by agent " + agentStrB;
-            throw RuntimeException( { sourceLocationA, sourceLocationB },
-                info, libcasm_fe::Code::UpdateSetMergeConflict );
+            const auto info = "Conflict while collection updates from agent "
+                              + agentStrB + ". Update '" + updateStrA
+                              + "' produced by agent " + agentStrA
+                              + " clashed with update '" + updateStrB
+                              + "' produced by agent " + agentStrB;
+            throw RuntimeException( { sourceLocationA, sourceLocationB }, info,
+                libcasm_fe::Code::UpdateSetMergeConflict );
         }
     }
 }
@@ -1634,8 +1656,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
         }
 
         log.info( "Finished execution after "
-                  + std::to_string( scheduler.numberOfSteps() )
-                  + " steps" );
+                  + std::to_string( scheduler.numberOfSteps() ) + " steps" );
     }
     catch( const RuntimeException& e )
     {

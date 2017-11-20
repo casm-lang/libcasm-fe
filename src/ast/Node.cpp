@@ -101,6 +101,10 @@ std::string Node::description( void ) const
         {
             return "enumeration";
         }
+        case ID::TYPE_CASTING_EXPRESSION:
+        {
+            return "type casting expression";
+        }
         case ID::VALUE_ATOM:
         {
             return "value";

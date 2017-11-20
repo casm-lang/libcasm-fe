@@ -290,14 +290,15 @@ Terms ::= Terms "," Term
 ===== Term =====
 
 <code>
-Term ::= DirectCallExpression
+Term ::= Expression
+       | TypeCastingExpression
+       | DirectCallExpression
        | IndirectCallExpression
        | LetExpression
        | ConditionalExpression
        | ChooseExpression
        | UniversalQuantifierExpression
        | ExistentialQuantifierExpression
-       | Expression
        | List
        | Range
        | Literal
@@ -333,6 +334,15 @@ Expression ::= "(" Term ")"
 </code>
 
 {{page>:grammar:Expression&noheader&nofooter}}
+
+
+===== TypeCastingExpression =====
+
+<code>
+TypeCastingExpression ::= Term "as" Type
+</code>
+
+{{page>:grammar:TypeCastingExpression&noheader&nofooter}}
 
 
 ===== DirectCallExpression =====

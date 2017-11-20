@@ -78,6 +78,10 @@ void EmptyVisitor::visit( EnumerationDefinition& )
 {
 }
 
+void EmptyVisitor::visit( TypeCastingExpression& )
+{
+}
+
 void EmptyVisitor::visit( ValueAtom& )
 {
 }

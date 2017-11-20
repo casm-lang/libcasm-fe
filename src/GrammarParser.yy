@@ -197,6 +197,7 @@ END       0 "end of file"
 // expressions
 %type <Expression::Ptr> Expression Term Literal
 %type <Expressions::Ptr> Terms
+%type <TypeCastingExpression::Ptr> TypeCastingExpression
 %type <ValueAtom::Ptr> BooleanLiteral StringLiteral BitLiteral IntegerLiteral DecimalLiteral RationalLiteral
 %type <ReferenceAtom::Ptr> ReferenceLiteral
 %type <UndefAtom::Ptr> UndefinedLiteral
@@ -267,6 +268,8 @@ END       0 "end of file"
 %precedence UPDATE
 
 %precedence DOT
+
+%precedence AS
 
 %left IMPLIES ARROW
 %left OR
@@ -762,7 +765,15 @@ Terms
 
 
 Term
-: DirectCallExpression
+: Expression
+  {
+      $$ = $1;
+  }
+| TypeCastingExpression
+  {
+      $$ = $1;
+  }
+| DirectCallExpression
   {
       $$ = $1;
   }
@@ -787,10 +798,6 @@ Term
       $$ = $1;
   }
 | ExistentialQuantifierExpression
-  {
-      $$ = $1;
-  }
-| Expression
   {
       $$ = $1;
   }
@@ -905,6 +912,14 @@ Expression
 ;
 
 
+TypeCastingExpression
+: Term AS Type
+  {
+      $$ = Ast::make< TypeCastingExpression >( @$, $1, $3 );
+  }
+;
+
+
 DirectCallExpression
 : IdentifierPath %prec CALL_WITHOUT_ARGS
   {
@@ -964,8 +979,6 @@ ExistentialQuantifierExpression
       $$ = Ast::make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
   }
 ;
-
-
 
 
 List

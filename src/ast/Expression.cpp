@@ -44,6 +44,7 @@
 #include "Expression.h"
 
 #include "Definition.h"
+#include "Type.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -275,6 +276,62 @@ const Expression::Ptr& IndirectCallExpression::expression( void ) const
 }
 
 void IndirectCallExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+TypeCastingExpression::TypeCastingExpression(
+    const Expression::Ptr& fromExpression, const Type::Ptr& asType )
+: CallExpression(
+      Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
+, m_fromExpression( fromExpression )
+, m_asType( asType )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_targetDefinition()
+{
+    arguments()->add( fromExpression );
+}
+
+const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
+{
+    return m_fromExpression;
+}
+
+const Type::Ptr& TypeCastingExpression::asType( void ) const
+{
+    return m_asType;
+}
+
+u1 TypeCastingExpression::builtin( void ) const
+{
+    return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_;
+}
+
+void TypeCastingExpression::setTargetBuiltinId(
+    libcasm_ir::Value::ID builtinId )
+{
+    m_targetBuiltinId = builtinId;
+    setTargetType( CallExpression::TargetType::BUILTIN );
+}
+
+libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
+{
+    return m_targetBuiltinId;
+}
+
+void TypeCastingExpression::setTargetDefinition(
+    const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+    setTargetType( CallExpression::TargetType::DERIVED );
+}
+
+const TypedNode::Ptr& TypeCastingExpression::targetDefinition( void ) const
+{
+    return m_targetDefinition;
+}
+
+void TypeCastingExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

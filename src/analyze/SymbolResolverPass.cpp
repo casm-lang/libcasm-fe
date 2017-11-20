@@ -276,11 +276,14 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     }
     catch( const std::domain_error& e )
     {
-        if( name == "self" )
+        static const auto SELF( "self" );
+        static const auto AGENT( "Agent" );
+
+        if( name == SELF )
         {
             try
             {
-                const auto& symbol = m_symboltable.find( "Agent" );
+                const auto& symbol = m_symboltable.find( AGENT );
                 node.setTargetType( CallExpression::TargetType::SELF );
                 node.setTargetDefinition( symbol.definition() );
             }
@@ -305,8 +308,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 std::make_shared< Identifier >( "Agent" ), agentEnumerators );
 
             const auto kind
-                = libstdhl::Memory::make< libcasm_ir::Enumeration >(
-                    "Agent" );
+                = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
             kind->add( "$" );
 
             const auto type

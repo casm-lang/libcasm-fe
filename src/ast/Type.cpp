@@ -46,6 +46,12 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+static IdentifierPath::Ptr createUnresolvedIdentifierPath( void )
+{
+    return std::make_shared< IdentifierPath >(
+        std::make_shared< Identifier >( "$unresolved$" ) );
+}
+
 Type::Type( Node::ID id, const IdentifierPath::Ptr& name )
 : TypedNode( id )
 , m_name( name )
@@ -55,12 +61,6 @@ Type::Type( Node::ID id, const IdentifierPath::Ptr& name )
 const IdentifierPath::Ptr& Type::name( void ) const
 {
     return m_name;
-}
-
-static IdentifierPath::Ptr createUnresolvedIdentifierPath( void )
-{
-    return std::make_shared< IdentifierPath >(
-        std::make_shared< Identifier >( "$unresolved$" ) );
 }
 
 UnresolvedType::UnresolvedType( void )

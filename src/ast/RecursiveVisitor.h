@@ -61,6 +61,7 @@ namespace libcasm_fe
             void visit( EnumeratorDefinition& node ) override;
             void visit( EnumerationDefinition& node ) override;
 
+            void visit( TypeCastingExpression& node ) override;
             void visit( ValueAtom& node ) override;
             void visit( ReferenceAtom& node ) override;
             void visit( UndefAtom& node ) override;
