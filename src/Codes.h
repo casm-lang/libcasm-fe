@@ -224,6 +224,7 @@ namespace libcasm_fe
 
         TypeInferenceInvalidTypeCastingExpression = 0x1700,
         TypeInferenceTypeCastingExpressionFromHasNoType = 0x1701,
+        TypeInferenceTypeCastingExpressionAsHasInvalidType = 0x1702,
 
         TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000,
 

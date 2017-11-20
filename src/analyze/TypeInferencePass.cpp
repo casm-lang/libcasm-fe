@@ -281,8 +281,11 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         case libcasm_ir::Type::Kind::LOCATION: // [fallthrough]
         case libcasm_ir::Type::Kind::RELATION:
         {
-            assert( !" invalid type kind to perform 'as operator' at source level!" );
-            break;
+            m_log.error( { node.asType()->sourceLocation() },
+                "invalid 'as' operator type '" + resultType->description()
+                    + "' to perform type casting",
+                Code::TypeInferenceTypeCastingExpressionAsHasInvalidType );
+            return;
         }
         case libcasm_ir::Type::Kind::BOOLEAN:
         {
