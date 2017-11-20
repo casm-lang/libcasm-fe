@@ -250,9 +250,6 @@ namespace libcasm_fe
           private:
             const Identifiers::Ptr m_identifiers;
             const Type m_type;
-
-          public:
-            static IdentifierPath::Ptr createUnresolved( void );
         };
 
         template < typename T, typename... Args >

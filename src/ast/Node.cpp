@@ -360,9 +360,3 @@ void IdentifierPath::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
-
-IdentifierPath::Ptr IdentifierPath::createUnresolved( void )
-{
-    return std::make_shared< IdentifierPath >(
-        std::make_shared< Identifier >( "$unresolved$" ) );
-}
