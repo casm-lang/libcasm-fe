@@ -65,8 +65,6 @@ class TypeCheckVisitor final : public RecursiveVisitor
   public:
     TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
-    void visit( DirectCallExpression& node ) override;
-
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
     void visit( RelationType& node ) override;
@@ -82,48 +80,6 @@ TypeCheckVisitor::TypeCheckVisitor(
 : m_log( log )
 , m_symboltable( symboltable )
 {
-}
-
-void TypeCheckVisitor::visit( DirectCallExpression& node )
-{
-    const auto& path = *node.identifier();
-
-    try
-    {
-        auto symbol = m_symboltable.find( node );
-
-        if( node.arguments()->size() != symbol.arity() )
-        {
-            const std::unordered_map< CallExpression::TargetType,
-                Code >
-                codes = {
-                    { CallExpression::TargetType::FUNCTION,
-                        Code::TypeInferenceFunctionArgumentSizeMismatch },
-                    { CallExpression::TargetType::DERIVED,
-                        Code::TypeInferenceDerivedArgumentSizeMismatch },
-                    { CallExpression::TargetType::BUILTIN,
-                        Code::TypeInferenceBuiltinArgumentSizeMismatch },
-                    { CallExpression::TargetType::RULE,
-                        Code::TypeInferenceRuleArgumentSizeMismatch },
-                };
-
-            const auto code = codes.find( node.targetType() );
-            assert( code != codes.end()
-                    and " invalid target type with arguments " );
-
-            m_log.error( { node.sourceLocation() },
-                "invalid argument size: " + node.targetTypeName()
-                    + " '" + path.path() + "' expects "
-                    + std::to_string( symbol.arity() )
-                    + " arguments",
-                code->second );
-        }
-    }
-    catch( const std::domain_error& e )
-    {
-    }
-
-    RecursiveVisitor::visit( node );
 }
 
 static const std::string TYPE_STRING_VOID = "Void";
@@ -203,7 +159,7 @@ void TypeCheckVisitor::visit( BasicType& node )
     {
         try
         {
-            const auto symbol = m_symboltable.find( node );
+            const auto symbol = m_symboltable.find( *node.name() );
             assert( symbol.targetType()
                     == CallExpression::TargetType::TYPE_DOMAIN );
 
