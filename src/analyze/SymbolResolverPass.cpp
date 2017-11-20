@@ -196,109 +196,142 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
 
 void SymbolResolveVisitor::visit( DirectCallExpression& node )
 {
+    RecursiveVisitor::visit( node );
+
     const auto& path = *node.identifier();
+    const auto& name = path.path();
 
-    if( path.type() == IdentifierPath::Type::ABSOLUTE )
+    if( path.type() == IdentifierPath::Type::RELATIVE )
     {
-        try
-        {
-            const auto& symbol = m_symboltable.find( node );
-
-            node.setTargetType( symbol.targetType() );
-            node.setTargetDefinition( symbol.definition() );
-
-            if( symbol.targetType() == CallExpression::TargetType::TYPE_DOMAIN
-                or symbol.targetType() == CallExpression::TargetType::CONSTANT )
-            {
-                node.setType( symbol.definition()->type() );
-            }
-        }
-        catch( const std::domain_error& e )
-        {
-            const auto& name = path.baseName();
-
-            if( libcasm_ir::Builtin::available( name ) )
-            {
-                try
-                {
-                    m_symboltable.registerSymbol(
-                        node.ptr< DirectCallExpression >(),
-                        CallExpression::TargetType::BUILTIN );
-                    node.setTargetType( CallExpression::TargetType::BUILTIN );
-                }
-                catch( const std::domain_error& e )
-                {
-                    m_log.error( { node.sourceLocation() }, e.what() );
-                }
-            }
-            else
-            {
-                const auto it = m_variables.find( name );
-                if( it != m_variables.cend() )
-                {
-                    const auto& variable = it->second;
-
-                    node.setTargetType( CallExpression::TargetType::VARIABLE );
-                    node.setTargetDefinition( variable );
-                }
-                else if( name == "self" )
-                {
-                    try
-                    {
-                        const auto& symbol = m_symboltable.find( "Agent" );
-                        node.setTargetType( CallExpression::TargetType::SELF );
-                        node.setTargetDefinition( symbol.definition() );
-                    }
-                    catch( const std::domain_error& e )
-                    {
-                        m_log.error( { node.sourceLocation() },
-                            "unable to find 'Agent' symbol" );
-                    }
-                }
-                // single agent execution notation --> agent type domain ==
-                // Enumeration!
-                else if( name == "$" )
-                {
-                    assert( node.targetType()
-                            == CallExpression::TargetType::CONSTANT );
-
-                    const auto kind
-                        = libstdhl::Memory::make< libcasm_ir::Enumeration >(
-                            "Agent" );
-                    kind->add( "$" );
-
-                    const auto type
-                        = libstdhl::Memory::make< libcasm_ir::EnumerationType >(
-                            kind );
-                    node.setType( type );
-
-                    m_symboltable.registerSymbol( "Agent",
-                        node.ptr< DirectCallExpression >(),
-                        CallExpression::TargetType::TYPE_DOMAIN );
-
-                    m_symboltable.registerSymbol(
-                        node.ptr< DirectCallExpression >(),
-                        CallExpression::TargetType::CONSTANT );
-                    node.setTargetType( CallExpression::TargetType::CONSTANT );
-                }
-                else
-                {
-                    m_log.error( { node.sourceLocation() },
-                        "unknown " + node.targetTypeName() + " symbol '"
-                            + path.path() + "' found",
-                        ( node.targetType()
-                            == CallExpression::TargetType::FUNCTION )
-                            ? Code::FunctionSymbolIsUnknown
-                            : Code::SymbolIsUnknown );
-                }
-            }
-        }
-
-        m_log.debug(
-            "call: " + path.path() + "{ " + node.targetTypeName() + " }" );
+        // only absolute types can be resolved here, relative types will be
+        // resolved later in the type inference pass
+        return;
     }
 
-    RecursiveVisitor::visit( node );
+    const auto variableIt = m_variables.find( name );
+    if( variableIt != m_variables.cend() )
+    {
+        node.setTargetType( CallExpression::TargetType::VARIABLE );
+        node.setTargetDefinition( variableIt->second );
+        return;
+    }
+
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        const auto& annotation = libcasm_ir::Annotation::find( name );
+
+        node.setTargetType( CallExpression::TargetType::BUILTIN );
+        node.setTargetBuiltinId( annotation.valueID() );
+
+        const auto expectedNumberOfArguments
+            = annotation.relations().front().argument.size();
+        if( node.arguments()->size() != expectedNumberOfArguments )
+        {
+            m_log.error( { node.sourceLocation() },
+                "invalid argument size: builtin '" + name + "' expects "
+                    + std::to_string( expectedNumberOfArguments )
+                    + " arguments",
+                Code::TypeInferenceBuiltinArgumentSizeMismatch );
+        }
+
+        return;
+    }
+
+    try
+    {
+        const auto& symbol = m_symboltable.find( *node.identifier() );
+
+        node.setTargetType( symbol.targetType() );
+        node.setTargetDefinition( symbol.definition() );
+
+        if( symbol.targetType() == CallExpression::TargetType::TYPE_DOMAIN
+            or symbol.targetType() == CallExpression::TargetType::CONSTANT )
+        {
+            node.setType( symbol.definition()->type() );
+        }
+
+        if( node.arguments()->size() != symbol.arity() )
+        {
+            const std::unordered_map< CallExpression::TargetType, Code >
+                codes = {
+                    { CallExpression::TargetType::FUNCTION,
+                        Code::TypeInferenceFunctionArgumentSizeMismatch },
+                    { CallExpression::TargetType::DERIVED,
+                        Code::TypeInferenceDerivedArgumentSizeMismatch },
+                    { CallExpression::TargetType::RULE,
+                        Code::TypeInferenceRuleArgumentSizeMismatch },
+                };
+
+            const auto code = codes.find( node.targetType() );
+            assert( code != codes.end()
+                    and " invalid target type with arguments " );
+
+            m_log.error( { node.sourceLocation() },
+                "invalid argument size: " + node.targetTypeName()
+                    + " '" + path.path() + "' expects "
+                    + std::to_string( symbol.arity() )
+                    + " arguments",
+                code->second );
+        }
+    }
+    catch( const std::domain_error& e )
+    {
+        static const auto SELF( "self" );
+        static const auto AGENT( "Agent" );
+
+        if( name == SELF )
+        {
+            try
+            {
+                const auto& symbol = m_symboltable.find( AGENT );
+                node.setTargetType( CallExpression::TargetType::SELF );
+                node.setTargetDefinition( symbol.definition() );
+            }
+            catch( const std::domain_error& e )
+            {
+                m_log.error( { node.sourceLocation() },
+                    "unable to find 'Agent' symbol" );
+            }
+        }
+        // single agent execution notation --> agent type domain ==
+        // Enumeration!
+        else if( name == "$" )
+        {
+            assert( node.targetType()
+                    == CallExpression::TargetType::CONSTANT );
+
+            const auto kind
+                = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
+            kind->add( "$" );
+
+            const auto type
+                = libstdhl::Memory::make< libcasm_ir::EnumerationType >(
+                    kind );
+            node.setType( type );
+
+            m_symboltable.registerSymbol( AGENT,
+                node.ptr< DirectCallExpression >(),
+                CallExpression::TargetType::TYPE_DOMAIN );
+
+            m_symboltable.registerSymbol(
+                node.ptr< DirectCallExpression >(),
+                CallExpression::TargetType::CONSTANT );
+            node.setTargetType( CallExpression::TargetType::CONSTANT );
+        }
+        else
+        {
+            m_log.error( { node.sourceLocation() },
+                "unknown " + node.targetTypeName() + " symbol '"
+                    + path.path() + "' found",
+                ( node.targetType()
+                    == CallExpression::TargetType::FUNCTION )
+                    ? Code::FunctionSymbolIsUnknown
+                    : Code::SymbolIsUnknown );
+        }
+    }
+
+    m_log.debug(
+        "call: " + path.path() + "{ " + node.targetTypeName() + " }" );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )

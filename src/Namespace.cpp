@@ -145,57 +145,19 @@ void Namespace::registerSymbol( const BasicType::Ptr& node )
         CallExpression::TargetType::TYPE_DOMAIN );
 }
 
-Namespace::Symbol Namespace::find( const DirectCallExpression& node ) const
-{
-    return find( *node.identifier(), node.arguments()->size() );
-}
-
-Namespace::Symbol Namespace::find( const FunctionDefinition& node ) const
-{
-    return find( node.identifier()->name(), node.argumentTypes()->size() );
-}
-
-Namespace::Symbol Namespace::find( const DerivedDefinition& node ) const
-{
-    return find( node.identifier()->name(), node.arguments()->size() );
-}
-
-Namespace::Symbol Namespace::find( const RuleDefinition& node ) const
-{
-    return find( node.identifier()->name(), node.arguments()->size() );
-}
-
-Namespace::Symbol Namespace::find( const EnumerationDefinition& node ) const
-{
-    return find( node.identifier()->name() );
-}
-
-Namespace::Symbol Namespace::find( const BasicType& node ) const
-{
-    return find( *node.name(), 0 );
-}
-
-Namespace::Symbol Namespace::find( const IdentifierPath& node ) const
-{
-    return find( node, 0 );
-}
-
-Namespace::Symbol Namespace::find(
-    const std::string& name, const std::size_t arity ) const
+Namespace::Symbol Namespace::find( const std::string& name ) const
 {
     auto result = m_symboltable.find( name );
     if( result == m_symboltable.end() )
     {
         throw std::domain_error(
-            "unable to find " + std::to_string( arity ) + "-ary symbol '" + name
-            + "'" );
+            "unable to find symbol '" + name + "'" );
     }
 
-    return result->second.front();
+    return result->second;
 }
 
-Namespace::Symbol Namespace::find(
-    const std::vector< std::string >& path, const std::size_t arity ) const
+Namespace::Symbol Namespace::find( const std::vector< std::string >& path ) const
 {
     assert( path.size() > 0 );
 
@@ -221,13 +183,12 @@ Namespace::Symbol Namespace::find(
 
     try
     {
-        const auto symbol = n->find( path[ pos ], arity );
+        const auto symbol = n->find( path[ pos ] );
         return symbol;
     }
     catch( const std::domain_error& e )
     {
-        throw std::domain_error( "unable to find " + std::to_string( arity )
-                                 + "-ary symbol '"
+        throw std::domain_error( "unable to find symbol '"
                                  + libstdhl::String::join( path, "." )
                                  + "'" );
     }
@@ -240,7 +201,7 @@ std::string Namespace::dump( const std::string& indention ) const
     for( const auto& v : m_symboltable )
     {
         const auto& name = v.first;
-        const auto& symbol = v.second.front();
+        const auto& symbol = v.second;
 
         const auto& type = symbol.definition()->type();
 
@@ -265,26 +226,21 @@ void Namespace::registerSymbol( const std::string& name,
     const TypedNode::Ptr& definition,
     const CallExpression::TargetType targetType, const std::size_t arity )
 {
-    auto& symtbl = m_symboltable[ name ];
+    const Symbol symbol{ definition, targetType, arity };
+    const auto result = m_symboltable.emplace( name, symbol );
 
-    for( const auto& symbol : symtbl )
+    if( not result.second )
     {
-        if( symbol.arity() == arity )
-        {
-            throw std::domain_error(
-                "symbol '" + name + "' already defined as "
-                + std::to_string( arity )
-                + "-ary '"
-                + CallExpression::targetTypeString( symbol.targetType() )
+        const auto& existingSymbol = result.first->second;
+        throw std::domain_error(
+            "symbol '" + name + "' already defined as "
+                + CallExpression::targetTypeString( existingSymbol.targetType() )
                 + "'" );
-        }
     }
-
-    symtbl.emplace_back( definition, targetType, arity );
 }
 
 Namespace::Symbol Namespace::find( const IdentifierPath& node,
-    const std::size_t arity, const std::size_t index ) const
+    const std::size_t index ) const
 {
     const auto& path = *node.identifiers();
 
@@ -306,7 +262,7 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
                                      + "'" );
         }
 
-        return result->second->find( node, arity, index + 1 );
+        return result->second->find( node, index + 1 );
     }
     else
     {
@@ -321,22 +277,6 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
                 "unable to find symbol '" + node.path() + "'" );
         }
 
-        if( result->second.size() > 1 )
-        {
-            for( const auto& symbol : result->second )
-            {
-                if( symbol.arity() == arity )
-                {
-                    return symbol;
-                }
-            }
-
-            throw std::domain_error( "unable to find " + std::to_string( arity )
-                                     + "-ary symbol '"
-                                     + node.path()
-                                     + "'" );
-        }
-
-        return result->second.front();
+        return result->second;
     }
 }

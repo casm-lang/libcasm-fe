@@ -90,7 +90,7 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( node );
+        const auto& symbol = m_symboltable.find( node.identifier()->name() );
 
         if( node.uid() == FunctionDefinition::UID::PROGRAM )
         {
@@ -119,7 +119,7 @@ void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( node );
+        const auto& symbol = m_symboltable.find( node.identifier()->name() );
 
         m_log.error(
             { node.sourceLocation(), symbol.definition()->sourceLocation() },
@@ -137,7 +137,7 @@ void SymbolRegistrationVisitor::visit( RuleDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( node );
+        const auto& symbol = m_symboltable.find( node.identifier()->name() );
 
         m_log.error(
             { node.sourceLocation(), symbol.definition()->sourceLocation() },
@@ -169,7 +169,7 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( node );
+        const auto& symbol = m_symboltable.find( node.identifier()->name() );
 
         m_log.error(
             { node.sourceLocation(), symbol.definition()->sourceLocation() },
