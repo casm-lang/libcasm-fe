@@ -305,7 +305,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             const auto agentEnumerators = std::make_shared< Enumerators >();
             agentEnumerators->add( agent );
             const auto agentEnum = std::make_shared< EnumerationDefinition >(
-                std::make_shared< Identifier >( "Agent" ), agentEnumerators );
+                std::make_shared< Identifier >( AGENT ), agentEnumerators );
 
             const auto kind
                 = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
