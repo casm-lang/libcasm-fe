@@ -52,6 +52,7 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class Type;
         class VariableDefinition;
 
         class Expression : public TypedNode
@@ -211,6 +212,47 @@ namespace libcasm_fe
 
           private:
             const Expression::Ptr m_expression;
+        };
+
+        class TypeCastingExpression final : public CallExpression
+        {
+          public:
+            using Ptr = std::shared_ptr< TypeCastingExpression >;
+
+            TypeCastingExpression( const Expression::Ptr& fromExpression,
+                const std::shared_ptr< Type >& asType );
+
+            const Expression::Ptr& fromExpression( void ) const;
+
+            const std::shared_ptr< Type >& asType( void ) const;
+
+            u1 builtin( void ) const;
+
+            /**
+             * Sets the builtin id of this call.
+             *
+             * @note Assigned by TypeInferencePass
+             */
+            void setTargetBuiltinId( libcasm_ir::Value::ID builtinId );
+
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
+
+            /**
+               Sets the definition of this call.
+
+               @note Assigned by TypeInferencePass
+             */
+            void setTargetDefinition( const TypedNode::Ptr& definition );
+
+            const TypedNode::Ptr& targetDefinition( void ) const;
+
+            void accept( Visitor& visitor ) override;
+
+          private:
+            const Expression::Ptr m_fromExpression;
+            const std::shared_ptr< Type > m_asType;
+            libcasm_ir::Value::ID m_targetBuiltinId;
+            TypedNode::Ptr m_targetDefinition;
         };
 
         class UnaryExpression final : public Expression
@@ -384,7 +426,7 @@ namespace libcasm_fe
         };
 
         class ExistentialQuantifierExpression final
-            : public QuantifierExpression
+        : public QuantifierExpression
         {
           public:
             using Ptr = std::shared_ptr< ExistentialQuantifierExpression >;

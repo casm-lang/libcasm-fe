@@ -171,8 +171,6 @@ namespace libcasm_fe
         TypeInferenceInvalidUpdateRuleExpressionType = 0x1204,
         TypeInferenceUpdateRuleTypesMismatch = 0x1205,
 
-        TypeInferenceBuiltinAsBitInvalid2ndArgumentType = 0x1b00,
-
         TypeInferenceNotDefinedForExpression = 0x1300,
         TypeInferenceArgumentTypeMismatch = 0x1301,
 
@@ -223,6 +221,10 @@ namespace libcasm_fe
         TypeInferenceInvalidLetExpressionTypeMismatch = 0x1012,
 
         TypeInferenceRangeExpressionTypeMismatch = 0x1600,
+
+        TypeInferenceInvalidTypeCastingExpression = 0x1700,
+        TypeInferenceTypeCastingExpressionFromHasNoType = 0x1701,
+        TypeInferenceTypeCastingExpressionAsHasInvalidType = 0x1702,
 
         TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000,
 
