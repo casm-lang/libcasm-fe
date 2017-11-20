@@ -1303,17 +1303,13 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
 
         assert(
             directCall.targetType() == CallExpression::TargetType::BUILTIN );
+        assert( directCall.targetBuiltinId() != libcasm_ir::Value::ID::_SIZE_ );
 
         try
         {
-            assert(
-                directCall.targetBuiltinId() == libcasm_ir::Value::ID::_SIZE_ );
-
             const auto& builtin_annotation
-                = libcasm_ir::Annotation::find( path.baseName() );
+                = libcasm_ir::Annotation::find( directCall.targetBuiltinId() );
             annotation = &builtin_annotation;
-
-            directCall.setTargetBuiltinId( annotation->valueID() );
         }
         catch( const std::domain_error& e )
         {
