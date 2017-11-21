@@ -205,6 +205,7 @@ END       0 "end of file"
 %type <ListExpression::Ptr> List
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
+%type <MethodCallExpression::Ptr> MethodCallExpression
 %type <LetExpression::Ptr> LetExpression
 %type <ConditionalExpression::Ptr> ConditionalExpression
 %type <ChooseExpression::Ptr> ChooseExpression
@@ -781,6 +782,10 @@ Term
   {
       $$ = $1;
   }
+| MethodCallExpression
+  {
+      $$ = $1;
+  }
 | LetExpression
   {
       $$ = $1;
@@ -937,6 +942,14 @@ IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
   {
       $$ = Ast::make< IndirectCallExpression >( @$, $3, $5 );
+  }
+;
+
+
+MethodCallExpression
+: Term DOT DirectCallExpression
+  {
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $3 );
   }
 ;
 
