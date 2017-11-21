@@ -135,6 +135,12 @@ void RecursiveVisitor::visit( IndirectCallExpression& node )
     node.arguments()->accept( *this );
 }
 
+void RecursiveVisitor::visit( MethodCallExpression& node )
+{
+    node.expression()->accept( *this );
+    node.directCall()->accept( *this );
+}
+
 void RecursiveVisitor::visit( UnaryExpression& node )
 {
     node.expression()->accept( *this );

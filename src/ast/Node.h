@@ -80,6 +80,7 @@ namespace libcasm_fe
                 UNDEF_ATOM,
                 DIRECT_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,
+                METHOD_CALL_EXPRESSION,
                 UNARY_EXPRESSION,
                 BINARY_EXPRESSION,
                 RANGE_EXPRESSION,

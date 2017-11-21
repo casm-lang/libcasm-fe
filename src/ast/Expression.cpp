@@ -144,6 +144,7 @@ void UndefAtom::accept( Visitor& visitor )
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
 , m_arguments( arguments )
+, m_baseExpression()
 {
 }
 
@@ -211,6 +212,22 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
 
     assert( !" internal error! " );
     return std::string();
+}
+
+void CallExpression::setBaseExpression( const Expression::Ptr& baseExpression )
+{
+    assert( baseExpression != nullptr );
+    m_baseExpression = baseExpression;
+}
+
+const Expression::Ptr& CallExpression::baseExpression( void ) const
+{
+    return m_baseExpression;
+}
+
+u1 CallExpression::methodCall( void ) const
+{
+    return m_baseExpression != nullptr;
 }
 
 DirectCallExpression::DirectCallExpression(
@@ -332,6 +349,30 @@ const TypedNode::Ptr& TypeCastingExpression::targetDefinition( void ) const
 }
 
 void TypeCastingExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+MethodCallExpression::MethodCallExpression( const Expression::Ptr& expression,
+    const DirectCallExpression::Ptr& directCall )
+: Expression( Node::ID::METHOD_CALL_EXPRESSION )
+, m_expression( expression )
+, m_directCall( directCall )
+{
+    m_directCall->setBaseExpression( expression );
+}
+
+const Expression::Ptr& MethodCallExpression::expression( void ) const
+{
+    return m_expression;
+}
+
+const DirectCallExpression::Ptr& MethodCallExpression::directCall( void ) const
+{
+    return m_directCall;
+}
+
+void MethodCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

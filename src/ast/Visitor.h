@@ -62,6 +62,7 @@ namespace libcasm_fe
         class UndefAtom;
         class DirectCallExpression;
         class IndirectCallExpression;
+        class MethodCallExpression;
         class UnaryExpression;
         class BinaryExpression;
         class RangeExpression;
@@ -120,6 +121,7 @@ namespace libcasm_fe
             virtual void visit( UndefAtom& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( IndirectCallExpression& node ) = 0;
+            virtual void visit( MethodCallExpression& node ) = 0;
             virtual void visit( UnaryExpression& node ) = 0;
             virtual void visit( BinaryExpression& node ) = 0;
             virtual void visit( RangeExpression& node ) = 0;

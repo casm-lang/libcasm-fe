@@ -125,6 +125,10 @@ std::string Node::description( void ) const
         {
             return "indirect call";
         }
+        case ID::METHOD_CALL_EXPRESSION:
+        {
+            return "method call";
+        }
         case ID::UNARY_EXPRESSION:
         {
             return "expression";

@@ -155,9 +155,20 @@ namespace libcasm_fe
 
             std::string targetTypeName( void ) const;
 
+            /**
+               Sets the base expression of this call.
+
+               @note Assigned by SymbolResolved and used during execution
+             */
+            void setBaseExpression( const Expression::Ptr& baseExpression );
+            const Expression::Ptr& baseExpression( void ) const;
+
+            u1 methodCall( void ) const;
+
           private:
             const Expressions::Ptr m_arguments;
             TargetType m_targetType = TargetType::UNKNOWN;
+            Expression::Ptr m_baseExpression;
 
           public:
             static std::string targetTypeString( const TargetType targetType );
@@ -253,6 +264,25 @@ namespace libcasm_fe
             const std::shared_ptr< Type > m_asType;
             libcasm_ir::Value::ID m_targetBuiltinId;
             TypedNode::Ptr m_targetDefinition;
+        };
+
+        class MethodCallExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< MethodCallExpression >;
+
+            MethodCallExpression( const Expression::Ptr& expression,
+                const DirectCallExpression::Ptr& directCall );
+
+            const Expression::Ptr& expression( void ) const;
+
+            const DirectCallExpression::Ptr& directCall( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_expression;
+            const DirectCallExpression::Ptr m_directCall;
         };
 
         class UnaryExpression final : public Expression
