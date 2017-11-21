@@ -183,6 +183,7 @@ class DefinitionVisitor final : public RecursiveVisitor
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
   private:
@@ -252,6 +253,14 @@ void DefinitionVisitor::visit( DerivedDefinition& node )
 }
 
 void DefinitionVisitor::visit( RuleDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    DefinitionAttributionVisitor visitor( m_log, node );
+    node.attributes()->accept( visitor );
+}
+
+void DefinitionVisitor::visit( EnumeratorDefinition& node )
 {
     RecursiveVisitor::visit( node );
 

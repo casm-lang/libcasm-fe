@@ -116,33 +116,32 @@ void Namespace::registerSymbol( const RuleDefinition::Ptr& node )
         CallExpression::TargetType::RULE, node->arguments()->size() );
 }
 
+void Namespace::registerSymbol( const EnumeratorDefinition::Ptr& node )
+{
+    registerSymbol( node->identifier()->name(), node,
+        CallExpression::TargetType::CONSTANT );
+}
+
 void Namespace::registerSymbol( const EnumerationDefinition::Ptr& node )
 {
     registerSymbol( node->identifier()->name(), node,
         CallExpression::TargetType::TYPE_DOMAIN );
-
-    auto enumerationNamespace = libstdhl::Memory::make< Namespace >();
-
-    auto result = m_namespaces.emplace(
-        node->identifier()->name(), enumerationNamespace );
-
-    if( not result.second )
-    {
-        throw std::domain_error(
-            "namespace '" + result.first->first + "' already defined" );
-    }
-
-    for( auto e : *node->enumerators() )
-    {
-        enumerationNamespace->registerSymbol(
-            e->name(), node, CallExpression::TargetType::CONSTANT );
-    }
 }
 
 void Namespace::registerSymbol( const BasicType::Ptr& node )
 {
     registerSymbol( node->name()->baseName(), node,
         CallExpression::TargetType::TYPE_DOMAIN );
+}
+
+void Namespace::registerNamespace( const std::string& name,
+    const Namespace::Ptr& _namespace )
+{
+    const auto result = m_namespaces.emplace( name, _namespace );
+    if( not result.second )
+    {
+        throw std::domain_error( "namespace '" + name + "' already defined" );
+    }
 }
 
 Namespace::Symbol Namespace::find( const std::string& name ) const

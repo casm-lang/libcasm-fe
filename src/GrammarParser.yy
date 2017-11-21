@@ -179,7 +179,7 @@ END       0 "end of file"
 %type <Specification::Ptr> Specification
 
 %type <Identifier::Ptr> Identifier
-%type <Identifiers::Ptr> Identifiers DotSeparatedIdentifiers
+%type <Identifiers::Ptr> DotSeparatedIdentifiers
 %type <IdentifierPath::Ptr> IdentifierPath
 
 // definitions
@@ -190,6 +190,8 @@ END       0 "end of file"
 %type <FunctionDefinition::Ptr> FunctionDefinition
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
+%type <EnumeratorDefinition::Ptr> EnumeratorDefinition
+%type <Enumerators::Ptr> Enumerators
 %type <EnumerationDefinition::Ptr> EnumerationDefinition
 
 // expressions
@@ -372,7 +374,7 @@ Definition
 
 
 EnumerationDefinition
-: ENUMERATION Identifier EQUAL LCURPAREN Identifiers RCURPAREN
+: ENUMERATION Identifier EQUAL LCURPAREN Enumerators RCURPAREN
   {
       $$ = Ast::make< EnumerationDefinition >( @$, $2, $5 );
   }
@@ -462,6 +464,40 @@ ProgramFunctionDefinition
       programDefinition->setInitializers( initializers );
 
       $$ = programDefinition;
+  }
+;
+
+
+EnumeratorDefinition
+: Identifier
+  {
+      $$ = Ast::make< EnumeratorDefinition >( @$, $1 );
+  }
+| LSQPAREN Attributes RSQPAREN Identifier
+  {
+      auto enumerator = Ast::make< EnumeratorDefinition >( @$, $4 );
+      enumerator->setAttributes( $2 );
+      $$ = enumerator;
+  }
+| error // error recovery
+  {
+      $$ = nullptr;
+  }
+;
+
+
+Enumerators
+: Enumerators COMMA EnumeratorDefinition
+  {
+      auto enumerators = $1;
+      enumerators->add( $3 );
+      $$ = enumerators;
+  }
+| EnumeratorDefinition
+  {
+      auto enumerators = Ast::make< Enumerators >( @$ );
+      enumerators->add( $1 );
+      $$ = enumerators;
   }
 ;
 
@@ -1387,22 +1423,6 @@ MaybeInitializers
 //
 // Identifiers
 //
-
-Identifiers
-: Identifiers COMMA Identifier
-  {
-      auto identifiers = $1;
-      identifiers->add( $3 );
-      $$ = identifiers;
-  }
-| Identifier
-  {
-      auto identifiers = Ast::make< Identifiers >( @$ );
-      identifiers->add( $1 );
-      $$ = identifiers;
-  }
-;
-
 
 Identifier
 : IDENTIFIER

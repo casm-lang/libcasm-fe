@@ -307,14 +307,24 @@ void RuleDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+EnumeratorDefinition::EnumeratorDefinition( const Identifier::Ptr& identifier )
+: Definition( Node::ID::ENUMERATOR_DEFINITION, identifier )
+{
+}
+
+void EnumeratorDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 EnumerationDefinition::EnumerationDefinition(
-    const Identifier::Ptr& identifier, const Identifiers::Ptr& enumerators )
+    const Identifier::Ptr& identifier, const Enumerators::Ptr& enumerators )
 : Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
 }
 
-const Identifiers::Ptr& EnumerationDefinition::enumerators( void ) const
+const Enumerators::Ptr& EnumerationDefinition::enumerators( void ) const
 {
     return m_enumerators;
 }

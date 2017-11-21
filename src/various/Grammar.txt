@@ -56,7 +56,7 @@ Definition ::= EnumerationDefinition
 ===== EnumerationDefinition =====
 
 <code>
-EnumerationDefinition ::= "enumeration" Identifier "=" "{" Identifiers "}"
+EnumerationDefinition ::= "enumeration" Identifier "=" "{" Enumerators "}"
 </code>
 
 {{page>:grammar:EnumerationDefinition&noheader&nofooter}}
@@ -99,6 +99,26 @@ ProgramFunctionDefinition ::= "init" IdentifierPath
 </code>
 
 {{page>:grammar:ProgramFunctionDefinition&noheader&nofooter}}
+
+
+===== EnumeratorDefinition =====
+
+<code>
+EnumeratorDefinition ::= Identifier
+                       | "[" Attributes "]" Identifier
+</code>
+
+{{page>:grammar:EnumeratorDefinition&noheader&nofooter}}
+
+
+===== Enumerators =====
+
+<code>
+Enumerators ::= Enumerators "," EnumeratorDefinition
+              | EnumeratorDefinition
+</code>
+
+{{page>:grammar:Enumerators&noheader&nofooter}}
 
 
 ===== Rule =====
@@ -664,16 +684,6 @@ MaybeInitializers ::= Initializers
 </code>
 
 {{page>:grammar:MaybeInitializers&noheader&nofooter}}
-
-
-===== Identifiers =====
-
-<code>
-Identifiers ::= Identifiers "," Identifier
-              | Identifier
-</code>
-
-{{page>:grammar:Identifiers&noheader&nofooter}}
 
 
 ===== Identifier =====

@@ -70,6 +70,10 @@ void EmptyVisitor::visit( RuleDefinition& )
 {
 }
 
+void EmptyVisitor::visit( EnumeratorDefinition& )
+{
+}
+
 void EmptyVisitor::visit( EnumerationDefinition& )
 {
 }

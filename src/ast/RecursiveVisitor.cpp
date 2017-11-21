@@ -91,6 +91,12 @@ void RecursiveVisitor::visit( RuleDefinition& node )
     node.attributes()->accept( *this );
 }
 
+void RecursiveVisitor::visit( EnumeratorDefinition& node )
+{
+    node.identifier()->accept( *this );
+    node.attributes()->accept( *this );
+}
+
 void RecursiveVisitor::visit( EnumerationDefinition& node )
 {
     node.identifier()->accept( *this );

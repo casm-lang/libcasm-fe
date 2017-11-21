@@ -93,6 +93,10 @@ std::string Node::description( void ) const
         {
             return "rule";
         }
+        case ID::ENUMERATOR_DEFINITION:
+        {
+            return "enumerator";
+        }
         case ID::ENUMERATION_DEFINITION:
         {
             return "enumeration";
