@@ -174,7 +174,7 @@ namespace libcasm_fe
             static std::string targetTypeString( const TargetType targetType );
         };
 
-        class DirectCallExpression final : public CallExpression
+        class DirectCallExpression : public CallExpression
         {
           public:
             using Ptr = std::shared_ptr< DirectCallExpression >;
@@ -182,6 +182,11 @@ namespace libcasm_fe
             DirectCallExpression( const IdentifierPath::Ptr& identifier,
                 const Expressions::Ptr& arguments );
 
+          protected:
+            DirectCallExpression( const Node::ID id, const IdentifierPath::Ptr& identifier,
+                const Expressions::Ptr& arguments );
+
+          public:
             void setIdentifier( const IdentifierPath::Ptr& identifier );
             const IdentifierPath::Ptr& identifier( void ) const;
 
@@ -201,7 +206,7 @@ namespace libcasm_fe
             void setTargetDefinition( const TypedNode::Ptr& definition );
             const TypedNode::Ptr& targetDefinition( void ) const;
 
-            void accept( Visitor& visitor ) override final;
+            void accept( Visitor& visitor ) override;
 
           private:
             IdentifierPath::Ptr m_identifier;
@@ -266,23 +271,21 @@ namespace libcasm_fe
             TypedNode::Ptr m_targetDefinition;
         };
 
-        class MethodCallExpression final : public Expression
+        class MethodCallExpression final : public DirectCallExpression
         {
           public:
             using Ptr = std::shared_ptr< MethodCallExpression >;
 
             MethodCallExpression( const Expression::Ptr& expression,
-                const DirectCallExpression::Ptr& directCall );
+                const Identifier::Ptr& identifier,
+                const Expressions::Ptr& arguments );
 
             const Expression::Ptr& expression( void ) const;
 
-            const DirectCallExpression::Ptr& directCall( void ) const;
-
-            void accept( Visitor& visitor ) override final;
+            void accept( Visitor& visitor ) override;
 
           private:
             const Expression::Ptr m_expression;
-            const DirectCallExpression::Ptr m_directCall;
         };
 
         class UnaryExpression final : public Expression

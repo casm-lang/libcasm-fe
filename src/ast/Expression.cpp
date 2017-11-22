@@ -232,7 +232,14 @@ u1 CallExpression::methodCall( void ) const
 
 DirectCallExpression::DirectCallExpression(
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
-: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
+: DirectCallExpression(
+      Node::ID::DIRECT_CALL_EXPRESSION, identifier, arguments )
+{
+}
+
+DirectCallExpression::DirectCallExpression( const Node::ID id,
+    const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
+: CallExpression( id, arguments )
 , m_identifier( identifier )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 {
@@ -354,22 +361,20 @@ void TypeCastingExpression::accept( Visitor& visitor )
 }
 
 MethodCallExpression::MethodCallExpression( const Expression::Ptr& expression,
-    const DirectCallExpression::Ptr& directCall )
-: Expression( Node::ID::METHOD_CALL_EXPRESSION )
+    const Identifier::Ptr& identifier,
+    const Expressions::Ptr& arguments )
+: DirectCallExpression( Node::ID::METHOD_CALL_EXPRESSION,
+      std::make_shared< IdentifierPath >(
+          identifier, IdentifierPath::Type::ABSOLUTE ),
+      arguments )
 , m_expression( expression )
-, m_directCall( directCall )
 {
-    m_directCall->setBaseExpression( expression );
+    setBaseExpression( expression );
 }
 
 const Expression::Ptr& MethodCallExpression::expression( void ) const
 {
     return m_expression;
-}
-
-const DirectCallExpression::Ptr& MethodCallExpression::directCall( void ) const
-{
-    return m_directCall;
 }
 
 void MethodCallExpression::accept( Visitor& visitor )
