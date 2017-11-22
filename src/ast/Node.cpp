@@ -105,6 +105,10 @@ std::string Node::description( void ) const
         {
             return "type casting expression";
         }
+        case ID::UNRESOLVED_NAMESPACE:
+        {
+            return "unresolved namespace";
+        }
         case ID::VALUE_ATOM:
         {
             return "value";

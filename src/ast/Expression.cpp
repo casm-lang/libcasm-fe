@@ -54,6 +54,16 @@ Expression::Expression( Node::ID id )
 {
 }
 
+UnresolvedNamespace::UnresolvedNamespace( void )
+: Expression( Node::ID::UNRESOLVED_NAMESPACE )
+{
+}
+
+void UnresolvedNamespace::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )
 : Expression( Node::ID::VALUE_ATOM )
 , m_value( value )
