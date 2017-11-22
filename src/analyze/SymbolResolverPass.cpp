@@ -75,6 +75,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
 
     void visit( ReferenceAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
@@ -225,15 +226,17 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         const auto expectedNumberOfArguments
             = annotation.relations().front().argument.size();
-        if( node.arguments()->size() != expectedNumberOfArguments )
+
+        if( ( node.arguments()->size() + ( node.methodCall() ? 1 : 0 ) )
+            != expectedNumberOfArguments )
         {
             m_log.error( { node.sourceLocation() },
                 "invalid argument size: builtin '" + name + "' expects "
-                    + std::to_string( expectedNumberOfArguments )
+                    + std::to_string( expectedNumberOfArguments
+                                      - ( node.methodCall() ? 1 : 0 ) )
                     + " arguments",
                 Code::TypeInferenceBuiltinArgumentSizeMismatch );
         }
-
         return;
     }
 
@@ -252,25 +255,24 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         if( node.arguments()->size() != symbol.arity() )
         {
-            const std::unordered_map< CallExpression::TargetType, Code >
-                codes = {
-                    { CallExpression::TargetType::FUNCTION,
-                        Code::TypeInferenceFunctionArgumentSizeMismatch },
-                    { CallExpression::TargetType::DERIVED,
-                        Code::TypeInferenceDerivedArgumentSizeMismatch },
-                    { CallExpression::TargetType::RULE,
-                        Code::TypeInferenceRuleArgumentSizeMismatch },
-                };
+            const std::unordered_map< CallExpression::TargetType, Code > codes
+                = {
+                      { CallExpression::TargetType::FUNCTION,
+                          Code::TypeInferenceFunctionArgumentSizeMismatch },
+                      { CallExpression::TargetType::DERIVED,
+                          Code::TypeInferenceDerivedArgumentSizeMismatch },
+                      { CallExpression::TargetType::RULE,
+                          Code::TypeInferenceRuleArgumentSizeMismatch },
+                  };
 
             const auto code = codes.find( node.targetType() );
             assert( code != codes.end()
                     and " invalid target type with arguments " );
 
             m_log.error( { node.sourceLocation() },
-                "invalid argument size: " + node.targetTypeName()
-                    + " '" + path.path() + "' expects "
-                    + std::to_string( symbol.arity() )
-                    + " arguments",
+                "invalid argument size: " + node.targetTypeName() + " '"
+                    + path.path() + "' expects "
+                    + std::to_string( symbol.arity() ) + " arguments",
                 code->second );
         }
     }
@@ -297,8 +299,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         // Enumeration!
         else if( name == "$" )
         {
-            assert( node.targetType()
-                    == CallExpression::TargetType::CONSTANT );
+            assert( node.targetType() == CallExpression::TargetType::CONSTANT );
 
             const auto agent = std::make_shared< EnumeratorDefinition >(
                 std::make_shared< Identifier >( "$" ) );
@@ -312,8 +313,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             kind->add( "$" );
 
             const auto type
-                = libstdhl::Memory::make< libcasm_ir::EnumerationType >(
-                    kind );
+                = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
             agent->setType( type );
             agentEnum->setType( type );
 
@@ -325,17 +325,24 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         else
         {
             m_log.error( { node.sourceLocation() },
-                "unknown " + node.targetTypeName() + " symbol '"
-                    + path.path() + "' found",
-                ( node.targetType()
-                    == CallExpression::TargetType::FUNCTION )
+                "unknown "
+                    + ( node.targetType() != CallExpression::TargetType::UNKNOWN
+                              ? node.targetTypeName() + " "
+                              : "" )
+                    + "symbol '" + path.path() + "' found",
+                ( node.targetType() == CallExpression::TargetType::FUNCTION )
                     ? Code::FunctionSymbolIsUnknown
                     : Code::SymbolIsUnknown );
         }
     }
 
-    m_log.debug(
-        "call: " + path.path() + "{ " + node.targetTypeName() + " }" );
+    m_log.debug( "call: " + path.path() + "{ " + node.targetTypeName() + " }" );
+}
+
+void SymbolResolveVisitor::visit( MethodCallExpression& node )
+{
+    node.expression()->accept( *this );
+    node.DirectCallExpression::accept( *this );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )

@@ -194,6 +194,8 @@ namespace libcasm_fe
 
         TypeInferenceConditionalRuleInvalidConditionType = 0x1500,
 
+        TypeInferenceInvalidMethodCallExpression = 0x1900,
+
         TypeInferenceInvalidExpression = 0x1001,
         TypeInferenceInvalidPrint = 0x1002
 
@@ -271,11 +273,13 @@ namespace libcasm_fe
         ChooseExpressionInvalidUniverse = 0x9003,
         ChooseRuleInvalidUniverse = 0x9004,
         ForallRuleInvalidUniverse = 0x9005,
-        ForallRuleInvalidCondition = 0x9006
+        ForallRuleInvalidCondition = 0x9006,
+
+        MethodCallExpressionInvalidBaseExpression = 0x9100,
 
         // --------------------------------------------------------- fff* ...
         // not categorized errors
-        ,
+
         TypeUnknown = 0xfffd,
         TypeUnsupported = 0xfffe
 

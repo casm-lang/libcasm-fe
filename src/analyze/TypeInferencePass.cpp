@@ -80,6 +80,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ReferenceAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
@@ -507,14 +508,31 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 break;
             }
 
-            const auto* annotation = annotate( node, node.arguments()->data() );
+            std::vector< libcasm_ir::Type::Ptr > argTypeList;
+            auto directCallArguments = node.arguments()->data();
 
+            if( node.methodCall() )
+            {
+                // built-ins from the IR are defined as implementation functions
+                // with fully specified flat parameter signature, so therefore
+                // we add an additional argument for the built-in direct call
+                // which comes directly from the expression part of the method
+                // call
+                const auto baseExpression = node.baseExpression();
+                assert( baseExpression->type() != nullptr );
+
+                directCallArguments.insert(
+                    directCallArguments.begin(), baseExpression );
+
+                argTypeList.emplace_back(
+                    baseExpression->type()->ptr_result() );
+            }
+
+            const auto* annotation = annotate( node, directCallArguments );
             RecursiveVisitor::visit( node );
             const auto description = "built-in '" + path.path() + "'";
-            inference(
-                description, annotation, node, node.arguments()->data() );
+            inference( description, annotation, node, directCallArguments );
 
-            std::vector< libcasm_ir::Type::Ptr > argTypeList;
             for( auto argumentType : *node.arguments() )
             {
                 if( not argumentType->type() )
@@ -591,7 +609,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::UNKNOWN:
         {
-            assert( !" internal error! " );
+            assert( !"unknown target type!" );
             break;
         }
     }
@@ -600,9 +618,16 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
     if( node.type() )
     {
+        if( node.methodCall()
+            and node.targetType() == CallExpression::TargetType::BUILTIN )
+        {
+            // method call arguments etc. are checked during the visiting of
+            // the MethodCallExpression
+            return;
+        }
+
         const auto& call_type_args = node.type()->arguments();
         const auto& call_expr_args = *node.arguments();
-
         assert( call_type_args.size() == call_expr_args.size() );
 
         for( std::size_t pos = 0; pos < call_type_args.size(); pos++ )
@@ -684,6 +709,24 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
     const auto& refType
         = std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
     node.setType( refType->dereference() );
+}
+
+void TypeInferenceVisitor::visit( MethodCallExpression& node )
+{
+    node.expression()->accept( *this );
+
+    if( node.expression()->type() )
+    {
+        node.DirectCallExpression::accept( *this );
+    }
+
+    if( not node.expression()->type() or not node.type() )
+    {
+        m_log.error( { node.sourceLocation() },
+            "unable to resolve type of method call expression",
+            Code::TypeInferenceInvalidMethodCallExpression );
+        node.setType( nullptr );
+    }
 }
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
@@ -1296,7 +1339,8 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         annotation = &libcasm_ir::Annotation::find(
             static_cast< const BinaryExpression& >( node ).op() );
     }
-    else if( node.id() == libcasm_fe::Ast::Type::ID::DIRECT_CALL_EXPRESSION )
+    else if( node.id() == libcasm_fe::Ast::Type::ID::DIRECT_CALL_EXPRESSION
+             or node.id() == libcasm_fe::Ast::Type::ID::METHOD_CALL_EXPRESSION )
     {
         auto& directCall = static_cast< DirectCallExpression& >( node );
         const auto& path = *directCall.identifier();
