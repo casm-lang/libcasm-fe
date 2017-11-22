@@ -113,6 +113,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
 
     void visit( TypeCastingExpression& node ) override;
+    void visit( UnresolvedNamespace& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
@@ -242,6 +243,12 @@ void AstDumpDotVisitor::visit( TypeCastingExpression& node )
     DotLink link( this, &node );
     dumpNode( node, "TypeCastingExpression" );
     RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( UnresolvedNamespace& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "UnresolvedNamespace" );
 }
 
 void AstDumpDotVisitor::visit( ValueAtom& node )

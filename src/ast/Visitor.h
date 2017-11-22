@@ -57,6 +57,7 @@ namespace libcasm_fe
         class EnumerationDefinition;
 
         class TypeCastingExpression;
+        class UnresolvedNamespace;
         class ValueAtom;
         class ReferenceAtom;
         class UndefAtom;
@@ -116,6 +117,7 @@ namespace libcasm_fe
             virtual void visit( EnumerationDefinition& node ) = 0;
 
             virtual void visit( TypeCastingExpression& node ) = 0;
+            virtual void visit( UnresolvedNamespace& node ) = 0;
             virtual void visit( ValueAtom& node ) = 0;
             virtual void visit( ReferenceAtom& node ) = 0;
             virtual void visit( UndefAtom& node ) = 0;
