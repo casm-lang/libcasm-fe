@@ -118,6 +118,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
@@ -276,6 +277,13 @@ void AstDumpDotVisitor::visit( IndirectCallExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "IndirectCallExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( MethodCallExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "MethodCallExpression" );
     RecursiveVisitor::visit( node );
 }
 

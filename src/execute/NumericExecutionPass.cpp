@@ -310,6 +310,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( BasicType& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
@@ -522,8 +523,8 @@ void ExecutionVisitor::visit( EnumeratorDefinition& node )
     assert( node.type()->isEnumeration() );
     const auto& enumType
         = std::static_pointer_cast< IR::EnumerationType >( node.type() );
-    m_evaluationStack.push( IR::EnumerationConstant(
-        enumType, node.identifier()->name() ) );
+    m_evaluationStack.push(
+        IR::EnumerationConstant( enumType, node.identifier()->name() ) );
 }
 
 void ExecutionVisitor::visit( EnumerationDefinition& node )
@@ -661,6 +662,22 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             break;
         }
     }
+}
+
+void ExecutionVisitor::visit( MethodCallExpression& node )
+{
+    node.expression()->accept( *this );
+
+    auto& expression = m_evaluationStack.top();
+    if( not expression.defined() )
+    {
+        throw RuntimeException( node.sourceLocation(),
+            "base of method call expression is undefined",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::MethodCallExpressionInvalidBaseExpression );
+    }
+
+    node.DirectCallExpression::accept( *this );
 }
 
 void ExecutionVisitor::visit( UnaryExpression& node )
@@ -1222,14 +1239,31 @@ u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
     CallExpression* call, Node* callee, std::size_t numberOfLocals )
 {
-    auto frame = libstdhl::Memory::make_unique< Frame >(
-        call, callee, numberOfLocals );
+    std::unique_ptr< Frame > frame = nullptr;
 
     if( call != nullptr )
     {
         assert( numberOfLocals >= call->arguments()->size() );
 
         std::size_t localIndex = 0;
+
+        if( call->methodCall() )
+        {
+            frame = libstdhl::Memory::make_unique< Frame >(
+                call, callee, numberOfLocals + 1 );
+
+            // already evaluated in the MethodCallExpression, just pop the
+            // latest value from the evaluation stack!
+            const auto value = m_evaluationStack.pop();
+            frame->setLocal( localIndex, value );
+            ++localIndex;
+        }
+        else
+        {
+            frame = libstdhl::Memory::make_unique< Frame >(
+                call, callee, numberOfLocals );
+        }
+
         for( const auto& argument : *call->arguments() )
         {
             argument->accept( *this );
@@ -1237,6 +1271,11 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
             frame->setLocal( localIndex, value );
             ++localIndex;
         }
+    }
+    else
+    {
+        frame = libstdhl::Memory::make_unique< Frame >(
+            call, callee, numberOfLocals );
     }
 
     return frame;

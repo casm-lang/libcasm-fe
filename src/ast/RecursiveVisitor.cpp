@@ -138,7 +138,7 @@ void RecursiveVisitor::visit( IndirectCallExpression& node )
 void RecursiveVisitor::visit( MethodCallExpression& node )
 {
     node.expression()->accept( *this );
-    node.directCall()->accept( *this );
+    node.DirectCallExpression::accept( *this );
 }
 
 void RecursiveVisitor::visit( UnaryExpression& node )
