@@ -221,7 +221,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     {
         const auto& annotation = libcasm_ir::Annotation::find( name );
 
-        node.setTargetType( CallExpression::TargetType::BUILTIN );
         node.setTargetBuiltinId( annotation.valueID() );
 
         const auto expectedNumberOfArguments
