@@ -727,11 +727,19 @@ UpdateRule
 
 
 CallRule
-: CALL CallExpression
+: CALL DirectCallExpression
   {
       $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
   }
-| CallExpression
+| CALL IndirectCallExpression
+  {
+      $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
+  }
+| DirectCallExpression
+  {
+      $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
+  }
+| IndirectCallExpression
   {
       $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
   }
