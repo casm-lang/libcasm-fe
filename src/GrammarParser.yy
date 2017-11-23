@@ -203,6 +203,7 @@ END       0 "end of file"
 %type <UndefAtom::Ptr> UndefinedLiteral
 %type <RangeExpression::Ptr> Range
 %type <ListExpression::Ptr> List
+%type <CallExpression::Ptr> CallExpression
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
 %type <MethodCallExpression::Ptr> MethodCallExpression
@@ -726,19 +727,11 @@ UpdateRule
 
 
 CallRule
-: CALL DirectCallExpression
+: CALL CallExpression
   {
       $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
   }
-| DirectCallExpression
-  {
-      $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
-  }
-| CALL IndirectCallExpression
-  {
-      $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
-  }
-| IndirectCallExpression
+| CallExpression
   {
       $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
   }
@@ -774,15 +767,7 @@ Term
   {
       $$ = $1;
   }
-| DirectCallExpression
-  {
-      $$ = $1;
-  }
-| IndirectCallExpression
-  {
-      $$ = $1;
-  }
-| MethodCallExpression
+| CallExpression
   {
       $$ = $1;
   }
@@ -925,15 +910,35 @@ TypeCastingExpression
 ;
 
 
+CallExpression
+: DirectCallExpression %prec ABSOLUTE_PATH
+  {
+      $$ = $1;
+  }
+| IndirectCallExpression
+  {
+      $$ = $1;
+  }
+| MethodCallExpression
+  {
+      $$ = $1;
+  }
+;
+
+
 DirectCallExpression
-: IdentifierPath %prec CALL_WITHOUT_ARGS
+: Identifier %prec CALL_WITHOUT_ARGS
   {
       const auto arguments = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
+      const auto identifierPath
+          = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
+      $$ = Ast::make< DirectCallExpression >( @$, identifierPath, arguments );
   }
-| IdentifierPath Arguments
+| Identifier Arguments
   {
-      $$ = Ast::make< DirectCallExpression >( @$, $1, $2 );
+      const auto identifierPath
+          = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
+      $$ = Ast::make< DirectCallExpression >( @$, identifierPath, $2 );
   }
 ;
 
@@ -947,9 +952,21 @@ IndirectCallExpression
 
 
 MethodCallExpression
-: Term DOT DirectCallExpression
+: Term DOT Identifier %prec CALL_WITHOUT_ARGS
   {
-      $$ = Ast::make< MethodCallExpression >( @$, $1, $3 );
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $3, arguments );
+  }
+| Term DOT Identifier Arguments
+  {
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $3, $4 );
+  }
+| DOT Identifier
+  {
+      const auto unresolvedNamespace = Ast::make< UnresolvedNamespace >( @$ );
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< MethodCallExpression >( @$, unresolvedNamespace, $2, arguments );
   }
 ;
 
@@ -1222,7 +1239,7 @@ Type
 
 
 BasicType
-: IdentifierPath
+: IdentifierPath %prec ABSOLUTE_PATH
   {
       $$ = Ast::make< BasicType >( @$, $1 );
   }
