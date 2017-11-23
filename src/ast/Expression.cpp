@@ -154,6 +154,9 @@ void UndefAtom::accept( Visitor& visitor )
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
 , m_arguments( arguments )
+, m_targetType( TargetType::UNKNOWN )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_targetDefinition()
 , m_baseExpression()
 {
 }
@@ -224,6 +227,31 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
     return std::string();
 }
 
+void CallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
+{
+    setTargetType( CallExpression::TargetType::BUILTIN );
+    m_targetBuiltinId = builtinId;
+}
+
+libcasm_ir::Value::ID CallExpression::targetBuiltinId( void ) const
+{
+    assert( targetType() == TargetType::BUILTIN );
+    return m_targetBuiltinId;
+}
+
+void CallExpression::setTargetDefinition( const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+}
+
+const TypedNode::Ptr& CallExpression::targetDefinition( void ) const
+{
+    assert( ( targetType() != TargetType::BUILTIN )
+            and ( targetType() != TargetType::UNKNOWN ) );
+
+    return m_targetDefinition;
+}
+
 void CallExpression::setBaseExpression( const Expression::Ptr& baseExpression )
 {
     assert( baseExpression != nullptr );
@@ -235,9 +263,23 @@ const Expression::Ptr& CallExpression::baseExpression( void ) const
     return m_baseExpression;
 }
 
+u1 CallExpression::builtin( void ) const
+{
+    return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_
+           and targetType() == CallExpression::TargetType::BUILTIN;
+}
+
+u1 CallExpression::definition( void ) const
+{
+    return m_targetDefinition != nullptr
+           and targetType() != CallExpression::TargetType::BUILTIN
+           and targetType() != CallExpression::TargetType::UNKNOWN;
+}
+
 u1 CallExpression::methodCall( void ) const
 {
-    return m_baseExpression != nullptr;
+    return m_baseExpression != nullptr
+           and targetType() == CallExpression::TargetType::BUILTIN;
 }
 
 DirectCallExpression::DirectCallExpression(
@@ -251,7 +293,6 @@ DirectCallExpression::DirectCallExpression( const Node::ID id,
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( id, arguments )
 , m_identifier( identifier )
-, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 {
 }
 
@@ -264,32 +305,6 @@ void DirectCallExpression::setIdentifier(
 const IdentifierPath::Ptr& DirectCallExpression::identifier( void ) const
 {
     return m_identifier;
-}
-
-void DirectCallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
-{
-    m_targetBuiltinId = builtinId;
-}
-
-libcasm_ir::Value::ID DirectCallExpression::targetBuiltinId( void ) const
-{
-    assert( targetType() == TargetType::BUILTIN );
-
-    return m_targetBuiltinId;
-}
-
-void DirectCallExpression::setTargetDefinition(
-    const TypedNode::Ptr& definition )
-{
-    m_targetDefinition = definition;
-}
-
-const TypedNode::Ptr& DirectCallExpression::targetDefinition( void ) const
-{
-    assert( ( targetType() != TargetType::BUILTIN )
-            and ( targetType() != TargetType::UNKNOWN ) );
-
-    return m_targetDefinition;
 }
 
 void DirectCallExpression::accept( Visitor& visitor )
@@ -320,8 +335,6 @@ TypeCastingExpression::TypeCastingExpression(
       Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
 , m_fromExpression( fromExpression )
 , m_asType( asType )
-, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
-, m_targetDefinition()
 {
     arguments()->add( fromExpression );
 }
@@ -334,35 +347,6 @@ const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
 const Type::Ptr& TypeCastingExpression::asType( void ) const
 {
     return m_asType;
-}
-
-u1 TypeCastingExpression::builtin( void ) const
-{
-    return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_;
-}
-
-void TypeCastingExpression::setTargetBuiltinId(
-    libcasm_ir::Value::ID builtinId )
-{
-    m_targetBuiltinId = builtinId;
-    setTargetType( CallExpression::TargetType::BUILTIN );
-}
-
-libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
-{
-    return m_targetBuiltinId;
-}
-
-void TypeCastingExpression::setTargetDefinition(
-    const TypedNode::Ptr& definition )
-{
-    m_targetDefinition = definition;
-    setTargetType( CallExpression::TargetType::DERIVED );
-}
-
-const TypedNode::Ptr& TypeCastingExpression::targetDefinition( void ) const
-{
-    return m_targetDefinition;
 }
 
 void TypeCastingExpression::accept( Visitor& visitor )
