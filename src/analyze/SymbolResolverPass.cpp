@@ -342,7 +342,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 void SymbolResolveVisitor::visit( MethodCallExpression& node )
 {
     node.expression()->accept( *this );
-    node.DirectCallExpression::accept( *this );
+    reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )

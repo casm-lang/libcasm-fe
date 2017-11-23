@@ -435,14 +435,14 @@ ProgramFunctionDefinition
       const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
       auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
+          @$, singleAgentIdentifier, singleAgentArguments );
       singleAgent->setTargetType( CallExpression::TargetType::CONSTANT );
 
       auto programDefinition = createProgramFunction( @$ );
       auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       programArguments->add( singleAgent );
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
+          @$, programDefinition->identifier(), programArguments );
       program->setTargetType( CallExpression::TargetType::FUNCTION );
 
       const auto ruleReference = Ast::make< ReferenceAtom >( @$, $2 );
@@ -938,15 +938,11 @@ DirectCallExpression
 : Identifier %prec CALL_WITHOUT_ARGS
   {
       const auto arguments = Ast::make< Expressions >( @$ );
-      const auto identifierPath
-          = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
-      $$ = Ast::make< DirectCallExpression >( @$, identifierPath, arguments );
+      $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
   }
 | Identifier Arguments
   {
-      const auto identifierPath
-          = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
-      $$ = Ast::make< DirectCallExpression >( @$, identifierPath, $2 );
+      $$ = Ast::make< DirectCallExpression >( @$, $1, $2 );
   }
 ;
 

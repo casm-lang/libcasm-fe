@@ -677,7 +677,7 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
             Code::MethodCallExpressionInvalidBaseExpression );
     }
 
-    node.DirectCallExpression::accept( *this );
+    reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
 }
 
 void ExecutionVisitor::visit( UnaryExpression& node )
