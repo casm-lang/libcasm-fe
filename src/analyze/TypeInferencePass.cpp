@@ -351,8 +351,8 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         if( not annotation.valid( *relationType ) )
         {
             m_log.error( { node.sourceLocation() },
-                "unknown 'as operator' type casting relation '"
-                    + relationType->description() + "' found",
+                "invalid 'as operator' type casting relation '"
+                    + relationType->description() + "' found'",
                 Code::TypeInferenceInvalidTypeCastingExpression );
             return;
         }
