@@ -22,18 +22,43 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "AstDumpDotPass.h"
 
-#include "../pass/src/PassLogger.h"
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
-
 #include "../Logger.h"
-#include "../analyze/TypeInferencePass.h"
+#include "../Specification.h"
+#include "../analyze/ConsistencyCheckPass.h"
+#include "../ast/Definition.h"
+#include "../ast/Expression.h"
 #include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "../ast/Rule.h"
+
+#include <libpass/PassLogger>
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <fstream>
+#include <iostream>
+#include <stack>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -53,7 +78,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     class DotLink
     {
       public:
-        DotLink( AstDumpDotVisitor* visitor, Node* node )
+        DotLink( AstDumpDotVisitor* visitor, void* node )
         : m_visitor( visitor )
         {
             if( not visitor->m_parentNodes.empty() )
@@ -78,15 +103,17 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
     void setDumpNodeLocation( u1 dumpNodeLocation );
 
-    void visit( Specification& node ) override;
+    void visit( Specification& specification );
 
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
     void visit( TypeDefinition& node ) override;
 
+    void visit( TypeCastingExpression& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
@@ -133,11 +160,11 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void dumpNode( const TypedNode& node, const std::string& name );
     void dumpLabel( const Node& node );
     void dumpLabel( const TypedNode& node );
-    void dumpLink( Node* from, Node* to );
+    void dumpLink( void* from, void* to );
 
   private:
     std::ostream& m_stream;
-    std::stack< Node* > m_parentNodes; /**< holds the parent nodes of DotLink */
+    std::stack< void* > m_parentNodes; /**< holds the parent nodes of DotLink */
     u1 m_dumpNodeLocation = false;     /**< dump node source code location */
 };
 
@@ -153,15 +180,16 @@ void AstDumpDotVisitor::setDumpNodeLocation( u1 dumpNodeLocation )
     m_dumpNodeLocation = dumpNodeLocation;
 }
 
-void AstDumpDotVisitor::visit( Specification& node )
+void AstDumpDotVisitor::visit( Specification& specification )
 {
-    m_stream << "subgraph \"" << node.name()->name() << "\" {\n";
+    m_stream << "subgraph \"" << specification.name() << "\" {\n"
+             << "\"" << &specification << "\" [label=\"Specification\"];\n";
 
-    { // scope for DotLink object
-        DotLink link( this, &node );
+    {
+        DotLink link( this, &specification );
 
-        dumpNode( node, "CASM\\nSpecification" );
-        RecursiveVisitor::visit( node );
+        specification.header()->accept( *this );
+        specification.definitions()->accept( *this );
     }
 
     m_stream << "}\n";
@@ -195,6 +223,13 @@ void AstDumpDotVisitor::visit( RuleDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( EnumeratorDefinition& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "EnumeratorDefinition" );
+    RecursiveVisitor::visit( node );
+}
+
 void AstDumpDotVisitor::visit( EnumerationDefinition& node )
 {
     DotLink link( this, &node );
@@ -206,6 +241,13 @@ void AstDumpDotVisitor::visit( TypeDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "TypeDefinition" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( TypeCastingExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "TypeCastingExpression" );
     RecursiveVisitor::visit( node );
 }
 
@@ -248,14 +290,16 @@ void AstDumpDotVisitor::visit( IndirectCallExpression& node )
 void AstDumpDotVisitor::visit( UnaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "Expression\n" + libcasm_ir::Value::token( node.op() ) );
+    dumpNode(
+        node, "UnaryExpression\n" + libcasm_ir::Value::token( node.op() ) );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BinaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "Expression\n" + libcasm_ir::Value::token( node.op() ) );
+    dumpNode(
+        node, "BinaryExpression\n" + libcasm_ir::Value::token( node.op() ) );
     RecursiveVisitor::visit( node );
 }
 
@@ -520,21 +564,21 @@ void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
     }
 }
 
-void AstDumpDotVisitor::dumpLink( Node* from, Node* to )
+void AstDumpDotVisitor::dumpLink( void* from, void* to )
 {
     m_stream << "\"" << from << "\" -> \"" << to << "\";\n";
 }
 
 void AstDumpDotPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeInferencePass >();
+    pu.require< ConsistencyCheckPass >();
 }
 
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto& data = pr.result< TypeInferencePass >();
+    const auto& data = pr.result< ConsistencyCheckPass >();
     const auto& specification = data->specification();
 
     const std::string outputFilePath
@@ -547,7 +591,7 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
         AstDumpDotVisitor visitor{ out };
         visitor.setDumpNodeLocation( dumpNodeLocation );
 
-        specification->accept( visitor );
+        visitor.visit( *specification );
 
         out << "}\n";
     };

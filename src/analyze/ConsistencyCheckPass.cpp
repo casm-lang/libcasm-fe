@@ -22,20 +22,38 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "ConsistencyCheckPass.h"
 
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
-
-#include "../Exception.h"
 #include "../Logger.h"
 #include "../Namespace.h"
-#include "../analyze/TypeInferencePass.h"
 #include "../ast/RecursiveVisitor.h"
 
-#include "../casm-ir/src/Builtin.h"
+#include <libcasm-ir/Builtin>
+
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <algorithm>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -46,8 +64,6 @@ static libpass::PassRegistration< ConsistencyCheckPass > PASS(
     "ASTConsistencyCheckPass",
     "checks the consistency of the AST representation", "ast-check", 0 );
 
-static const std::string PROGRAM = "program";
-
 //
 // ConsistencyCheckVisitor
 //
@@ -55,10 +71,11 @@ static const std::string PROGRAM = "program";
 class ConsistencyCheckVisitor final : public RecursiveVisitor
 {
   public:
-    ConsistencyCheckVisitor( Logger& m_log, const Namespace& symboltable );
+    ConsistencyCheckVisitor( libcasm_fe::Logger& m_log );
 
-    void visit( Specification& node ) override;
+    void visit( Specification& node );
 
+    void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
 
@@ -67,74 +84,55 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
 
+    void visit( CaseRule& node ) override;
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
+
+    void visit( BasicType& node ) override;
+    void visit( ComposedType& node ) override;
+    void visit( FixedSizedType& node ) override;
+    void visit( RelationType& node ) override;
 
     void verify( const TypedNode& node );
 
   private:
-    Logger& m_log;
-    const Namespace& m_symboltable;
+    libcasm_fe::Logger& m_log;
     u1 m_functionInitially;
     u1 m_sideEffectFree;
+    u1 m_initDefinitionFound;
 };
 
-ConsistencyCheckVisitor::ConsistencyCheckVisitor(
-    Logger& log, const Namespace& symboltable )
+ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
 : m_log( log )
-, m_symboltable( symboltable )
 , m_functionInitially( false )
 , m_sideEffectFree( false )
+, m_initDefinitionFound( false )
 {
 }
 
 void ConsistencyCheckVisitor::visit( Specification& node )
 {
-    try
+    node.header()->accept( *this );
+    node.definitions()->accept( *this );
+
+    if( not m_initDefinitionFound )
     {
-        m_symboltable.find( PROGRAM );
-    }
-    catch( const std::domain_error& e )
-    {
-        m_log.error( { node.sourceLocation() },
-            "no init definition found in the specification",
+        m_log.error( { node.header()->sourceLocation() },
+            "no init definition found in this specification",
             Code::AgentInitRuleNotDefined );
     }
+}
 
+void ConsistencyCheckVisitor::visit( VariableDefinition& node )
+{
     RecursiveVisitor::visit( node );
+    verify( node );
 }
 
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 {
-    verify( *node.returnType() );
-
-    for( auto arg : *node.argumentTypes() )
-    {
-        verify( *arg );
-    }
-
     m_functionInitially = true;
-
-    try
-    {
-        node.initializers()->accept( *this );
-    }
-    catch( const CompiletimeException& e )
-    {
-        const auto& name = node.identifier()->name();
-
-        if( name == PROGRAM )
-        {
-            m_log.error( { *e.locations().begin(), node.sourceLocation() },
-                "unknown init rule reference '" + std::string( e.what() ) + "'",
-                Code::AgentInitRuleDoesNotExist );
-        }
-        else
-        {
-            m_log.error( e );
-        }
-    }
-
+    node.initializers()->accept( *this );
     m_functionInitially = false;
 
     node.identifier()->accept( *this );
@@ -142,15 +140,15 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     node.returnType()->accept( *this );
     node.defaultValue()->accept( *this );
     node.attributes()->accept( *this );
+
+    if( node.uid() == FunctionDefinition::UID::PROGRAM )
+    {
+        m_initDefinitionFound = true;
+    }
 }
 
 void ConsistencyCheckVisitor::visit( DerivedDefinition& node )
 {
-    for( auto arg : *node.arguments() )
-    {
-        verify( *arg );
-    }
-
     m_sideEffectFree = true;
 
     RecursiveVisitor::visit( node );
@@ -161,28 +159,6 @@ void ConsistencyCheckVisitor::visit( DerivedDefinition& node )
 void ConsistencyCheckVisitor::visit( ReferenceAtom& node )
 {
     RecursiveVisitor::visit( node );
-
-    if( m_functionInitially )
-    {
-        if( not node.type() )
-        {
-            throw CompiletimeException( node.identifier()->sourceLocation(),
-                node.identifier()->path(), Code::Unspecified );
-        }
-        else
-        {
-            try
-            {
-                m_symboltable.find( *node.identifier() );
-            }
-            catch( const std::domain_error& e )
-            {
-                throw CompiletimeException( node.identifier()->sourceLocation(),
-                    node.identifier()->path(), Code::Unspecified );
-            }
-        }
-    }
-
     verify( node );
 }
 
@@ -196,6 +172,29 @@ void ConsistencyCheckVisitor::visit( UndefAtom& node )
 {
     RecursiveVisitor::visit( node );
     verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( CaseRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto numberOfDefaultCases = std::count_if(
+        node.cases()->begin(), node.cases()->end(), []( const auto& _case ) {
+            return _case->id() == Node::ID::DEFAULT_CASE;
+        } );
+
+    if( numberOfDefaultCases > 1 )
+    {
+        for( const auto& _case : *node.cases() )
+        {
+            if( _case->id() == Node::ID::DEFAULT_CASE )
+            {
+                m_log.error( { _case->sourceLocation() },
+                    "case rule contains multiple default cases",
+                    Code::CaseRuleMultipleDefaultCases );
+            }
+        }
+    }
 }
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
@@ -216,14 +215,12 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
             m_log.error( { node.sourceLocation() },
                 "calling function '" + node.identifier()->path()
                     + "' is not allowed, it is classified as '"
-                    + function->classificationName()
-                    + "' ",
+                    + function->classificationName() + "' ",
                 Code::DirectCallExpressionInvalidClassifier );
 
             m_log.info( { function->sourceLocation() },
                 "function '" + node.identifier()->path()
-                    + "' is classified as '"
-                    + function->classificationName()
+                    + "' is classified as '" + function->classificationName()
                     + "', incorrect usage in line "
                     + std::to_string( node.sourceLocation().begin.line ) );
         }
@@ -246,8 +243,16 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     RecursiveVisitor::visit( node );
 
     const auto& func = node.function();
+    if( func->targetType() != CallExpression::TargetType::FUNCTION )
+    {
+        m_log.error( { func->sourceLocation() },
+            "updating " + func->targetTypeName() + " '"
+                + func->identifier()->path()
+                + "' is not allowed, only function symbols are allowed",
+            Code::UpdateRuleFunctionSymbolIsInvalid );
+        return;
+    }
 
-    assert( func->targetType() == CallExpression::TargetType::FUNCTION );
     const auto& def = func->targetDefinition()->ptr< FunctionDefinition >();
 
     bool updatesAllowed;
@@ -275,14 +280,12 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
         m_log.error( { func->sourceLocation() },
             "updating function '" + func->identifier()->path()
                 + "' is not allowed, it is classified as '"
-                + def->classificationName()
-                + "' ",
+                + def->classificationName() + "' ",
             Code::UpdateRuleInvalidClassifier );
 
         m_log.info( { def->sourceLocation() },
             "function '" + func->identifier()->path() + "' is classified as '"
-                + def->classificationName()
-                + "', incorrect usage in line "
+                + def->classificationName() + "', incorrect usage in line "
                 + std::to_string( func->sourceLocation().begin.line ) );
     }
 }
@@ -291,15 +294,63 @@ void ConsistencyCheckVisitor::visit( CallRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& call = node.call();
-    const auto& kind = node.allowedCallTargetTypes();
+    const auto& call = *node.call();
 
-    if( kind.find( call->targetType() ) == kind.end() )
+    switch( node.type() )
     {
-        m_log.error( { node.sourceLocation() },
-            call->targetTypeName() + " is not allowed to be called",
-            Code::Unspecified );
+        case CallRule::Type::RULE_CALL:
+        {
+            if( call.targetType() != CallExpression::TargetType::RULE )
+            {
+                m_log.error( { node.sourceLocation() },
+                    "only rules are allowed to be called",
+                    Code::CallRuleOnlyRulesAllowed );
+                m_log.hint( { call.sourceLocation() },
+                    call.targetTypeName() + " has to be used without 'call'" );
+            }
+            break;
+        }
+        case CallRule::Type::FUNCTION_CALL:
+        {
+            if( call.targetType() == CallExpression::TargetType::RULE )
+            {
+                m_log.error( { node.sourceLocation() },
+                    "rule is not allowed to be called",
+                    Code::CallRuleOnlyFunctionsAllowed );
+                m_log.hint( { call.sourceLocation() },
+                    "rule has to be used with 'call'" );
+            }
+            break;
+        }
+        default:
+        {
+            assert( !"unknown call rule type" );
+        }
     }
+}
+
+void ConsistencyCheckVisitor::visit( BasicType& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( ComposedType& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( FixedSizedType& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( RelationType& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
 }
 
 void ConsistencyCheckVisitor::verify( const TypedNode& node )
@@ -322,14 +373,13 @@ void ConsistencyCheckPass::usage( libpass::PassUsage& pu )
 
 u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
-    const auto symboltable = data->symboltable();
 
-    ConsistencyCheckVisitor visitor( log, *symboltable );
-    specification->accept( visitor );
+    ConsistencyCheckVisitor visitor( log );
+    visitor.visit( *specification );
 
     const auto errors = log.errors();
     if( errors > 0 )
@@ -339,7 +389,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     }
 
     pr.setResult< ConsistencyCheckPass >(
-        libstdhl::make< Data >( specification ) );
+        libstdhl::Memory::make< Data >( specification ) );
 
     return true;
 }

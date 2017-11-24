@@ -22,20 +22,37 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
-#ifndef _LIB_CASMFE_UPDATESET_H_
-#define _LIB_CASMFE_UPDATESET_H_
+#ifndef _LIBCASM_FE_UPDATESET_H_
+#define _LIBCASM_FE_UPDATESET_H_
+
+#include <libcasm-fe/execute/ChainedHashMap>
+#include <libcasm-fe/execute/ProbingHashMap>
+#include <libcasm-fe/execute/RobinHoodHashMap>
 
 #include <algorithm>
+#include <experimental/optional>
 #include <memory>
 #include <stdexcept>
 #include <vector>
-
-#include <experimental/optional>
-
-#include "ChainedHashMap.h"
-#include "ProbingHashMap.h"
-#include "RobinHoodHashMap.h"
 
 /*struct UpdateSetDetails
 {
@@ -62,7 +79,12 @@ class UpdateSet
     using Details = _Details;
     using Location = typename Details::Location;
     using Value = typename Details::Value;
-    using Update = std::pair< Location, Value >;
+
+    struct Update
+    {
+        Location location;
+        Value value;
+    };
 
   private:
     using UpdateHashMap = ChainedHashMap< Location, Value,
@@ -131,7 +153,8 @@ class UpdateSet
      *                    handle without resizing
      * @param parent The parent update-set (if there is any)
      */
-    explicit UpdateSet( std::size_t initialSize, UpdateSet* parent = nullptr )
+    explicit UpdateSet(
+        std::size_t initialSize = 1UL, UpdateSet* parent = nullptr )
     : m_set( initialSize )
     , m_parent( parent )
     {
@@ -301,6 +324,14 @@ class UpdateSet
                 other->add( it.key(), it.value() );
             }
         }
+    }
+
+    /**
+     * Removes all updates from the update-set.
+     */
+    void clear()
+    {
+        m_set.clear();
     }
 
     /**
@@ -597,6 +628,7 @@ class UpdateSetManager
      */
     void rollback()
     {
+        assert( not m_updateSets.empty() );
         m_updateSets.pop_back();
     }
 
@@ -642,64 +674,49 @@ class UpdateSetManager
 };
 
 template < typename UpdateSet >
-class UpdateSetForkGuard
+class UpdateSetTransaction
 {
-    enum class State
-    {
-        FORKED,
-        MERGED,
-        REVERTED
-    };
-
   public:
-    UpdateSetForkGuard( UpdateSetManager< UpdateSet >* manager,
+    UpdateSetTransaction( UpdateSetManager< UpdateSet >* manager,
         typename UpdateSet::Semantics semantics, std::size_t initialSize )
     : m_manager( manager )
+    , m_forked( true )
     {
-        if( manager->empty()
-            or ( manager->currentUpdateSet()->semantics() != semantics ) )
-        {
-            manager->fork( semantics, initialSize );
-            m_state = State::FORKED;
-        }
-        else
-        {
-            m_state = State::MERGED;
-        }
+        manager->fork( semantics, initialSize );
     }
 
-    void merge( void )
+    ~UpdateSetTransaction()
     {
-        if( m_state == State::FORKED )
-        {
-            m_manager->merge();
-            m_state = State::MERGED;
-        }
-    }
-
-    void rollback( void )
-    {
-        if( m_state == State::FORKED )
-        {
-            m_manager->rollback();
-            m_state = State::REVERTED;
-        }
-    }
-
-    ~UpdateSetForkGuard()
-    {
-        if( m_state != State::MERGED )
+        if( m_forked )
         {
             rollback();
         }
     }
 
+    void merge( void )
+    {
+        if( m_forked )
+        {
+            m_manager->merge();
+            m_forked = false;
+        }
+    }
+
+    void rollback( void )
+    {
+        if( m_forked )
+        {
+            m_manager->rollback();
+            m_forked = false;
+        }
+    }
+
   private:
     UpdateSetManager< UpdateSet >* m_manager;
-    State m_state;
+    bool m_forked;
 };
 
-#endif // _LIB_CASMFE_UPDATESET_H_
+#endif // _LIBCASM_FE_UPDATESET_H_
 
 //
 //  Local variables:

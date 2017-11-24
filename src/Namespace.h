@@ -22,12 +22,29 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
-#ifndef _LIB_CASMFE_NAMESPACE_H_
-#define _LIB_CASMFE_NAMESPACE_H_
+#ifndef _LIBCASM_FE_NAMESPACE_H_
+#define _LIBCASM_FE_NAMESPACE_H_
 
-#include "ast/Definition.h"
-#include "ast/Expression.h"
+#include <libcasm-fe/ast/Definition>
 
 namespace libcasm_fe
 {
@@ -37,76 +54,34 @@ namespace libcasm_fe
     class Namespace
     {
       public:
-        class Symbol
-        {
-          public:
-            Symbol( const Ast::TypedNode::Ptr& definition,
-                const Ast::CallExpression::TargetType targetType,
-                const std::size_t arity );
-
-            const Ast::TypedNode::Ptr& definition( void ) const;
-            Ast::CallExpression::TargetType targetType( void ) const;
-            std::size_t arity( void ) const;
-
-          private:
-            const Ast::TypedNode::Ptr m_definition;
-            const Ast::CallExpression::TargetType m_targetType;
-            const std::size_t m_arity;
-        };
-
-      public:
         using Ptr = std::shared_ptr< Namespace >;
 
-        Namespace( void );
+        explicit Namespace( void );
 
-        void registerSymbol( const Ast::DirectCallExpression::Ptr& node,
-            const Ast::CallExpression::TargetType targetType );
+        void registerSymbol(
+            const std::string& name, const Ast::Definition::Ptr& definition );
 
-        void registerSymbol( const std::string& name,
-            const Ast::TypedNode::Ptr& definition,
-            const Ast::CallExpression::TargetType targetType );
+        void registerNamespace(
+            const std::string& name, const Namespace::Ptr& _namespace );
 
-        void registerSymbol( const Ast::FunctionDefinition::Ptr& node );
-        void registerSymbol( const Ast::DerivedDefinition::Ptr& node );
-        void registerSymbol( const Ast::RuleDefinition::Ptr& node );
-        void registerSymbol( const Ast::EnumerationDefinition::Ptr& node );
-        void registerSymbol( const Ast::TypeDefinition::Ptr& node );
-        void registerSymbol( const Ast::BasicType::Ptr& node );
+        Ast::Definition::Ptr find( const Ast::IdentifierPath& node,
+            const std::size_t index = 0 ) const;
 
-        Symbol find( const Ast::DirectCallExpression& node ) const;
-        Symbol find( const Ast::FunctionDefinition& node ) const;
-        Symbol find( const Ast::DerivedDefinition& node ) const;
-        Symbol find( const Ast::RuleDefinition& node ) const;
-        Symbol find( const Ast::EnumerationDefinition& node ) const;
-        Symbol find( const Ast::TypeDefinition& node ) const;
-        Symbol find( const Ast::BasicType& node ) const;
+        Ast::Definition::Ptr find( const std::string& name ) const;
 
-        Symbol find( const Ast::IdentifierPath& node ) const;
-
-        Symbol find(
-            const std::string& name, const std::size_t arity = 0 ) const;
-
-        Symbol find( const std::vector< std::string >& path,
-            const std::size_t arity = 0 ) const;
+        Ast::Definition::Ptr find(
+            const std::vector< std::string >& path ) const;
 
         std::string dump( const std::string& indention = "" ) const;
 
       private:
-        void registerSymbol( const std::string& name,
-            const Ast::TypedNode::Ptr& definition,
-            const Ast::CallExpression::TargetType targetType,
-            const std::size_t arity );
-
-        Symbol find( const Ast::IdentifierPath& node, const std::size_t arity,
-            const std::size_t index = 0 ) const;
-
-        std::unordered_map< std::string, std::vector< Symbol > > m_symboltable;
+        std::unordered_map< std::string, Ast::Definition::Ptr > m_symbols;
 
         std::unordered_map< std::string, Namespace::Ptr > m_namespaces;
     };
 }
 
-#endif // _LIB_CASMFE_NAMESPACE_H_
+#endif // _LIBCASM_FE_NAMESPACE_H_
 
 //
 //  Local variables:

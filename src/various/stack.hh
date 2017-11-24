@@ -40,7 +40,7 @@
 
 # include <vector>
 
-#line 31 "../../obj/src/GrammarParser.yy" // stack.hh:132
+#line 49 "../../obj/src/GrammarParser.yy" // stack.hh:132
 namespace libcasm_fe {
 #line 46 "stack.hh" // stack.hh:132
   template <class T, class S = std::vector<T> >
@@ -150,7 +150,7 @@ namespace libcasm_fe {
     unsigned int range_;
   };
 
-#line 31 "../../obj/src/GrammarParser.yy" // stack.hh:132
+#line 49 "../../obj/src/GrammarParser.yy" // stack.hh:132
 } // libcasm_fe
 #line 156 "stack.hh" // stack.hh:132
 

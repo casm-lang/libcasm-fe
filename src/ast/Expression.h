@@ -22,18 +22,37 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
-#ifndef _LIB_CASMFE_EXPRESSION_H_
-#define _LIB_CASMFE_EXPRESSION_H_
+#ifndef _LIBCASM_FE_EXPRESSION_H_
+#define _LIBCASM_FE_EXPRESSION_H_
 
-#include "Node.h"
+#include <libcasm-fe/ast/Node>
 
-#include "../../casm-ir/src/Constant.h"
+#include <libcasm-ir/Constant>
 
 namespace libcasm_fe
 {
     namespace Ast
     {
+        class Type;
         class VariableDefinition;
 
         class Expression : public TypedNode
@@ -55,10 +74,12 @@ namespace libcasm_fe
 
             const libcasm_ir::Constant::Ptr& value( void ) const;
 
+            void setValue( const libcasm_ir::Constant::Ptr& value );
+
             void accept( Visitor& visitor ) override final;
 
           private:
-            const libcasm_ir::Constant::Ptr m_value;
+            libcasm_ir::Constant::Ptr m_value;
         };
 
         class ReferenceAtom final : public Expression
@@ -70,7 +91,6 @@ namespace libcasm_fe
                 DERIVED,
                 BUILTIN,
                 RULE,
-                VARIABLE,
                 UNKNOWN
             };
 
@@ -192,6 +212,47 @@ namespace libcasm_fe
 
           private:
             const Expression::Ptr m_expression;
+        };
+
+        class TypeCastingExpression final : public CallExpression
+        {
+          public:
+            using Ptr = std::shared_ptr< TypeCastingExpression >;
+
+            TypeCastingExpression( const Expression::Ptr& fromExpression,
+                const std::shared_ptr< Type >& asType );
+
+            const Expression::Ptr& fromExpression( void ) const;
+
+            const std::shared_ptr< Type >& asType( void ) const;
+
+            u1 builtin( void ) const;
+
+            /**
+             * Sets the builtin id of this call.
+             *
+             * @note Assigned by TypeInferencePass
+             */
+            void setTargetBuiltinId( libcasm_ir::Value::ID builtinId );
+
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
+
+            /**
+               Sets the definition of this call.
+
+               @note Assigned by TypeInferencePass
+             */
+            void setTargetDefinition( const TypedNode::Ptr& definition );
+
+            const TypedNode::Ptr& targetDefinition( void ) const;
+
+            void accept( Visitor& visitor ) override;
+
+          private:
+            const Expression::Ptr m_fromExpression;
+            const std::shared_ptr< Type > m_asType;
+            libcasm_ir::Value::ID m_targetBuiltinId;
+            TypedNode::Ptr m_targetDefinition;
         };
 
         class UnaryExpression final : public Expression
@@ -365,7 +426,7 @@ namespace libcasm_fe
         };
 
         class ExistentialQuantifierExpression final
-            : public QuantifierExpression
+        : public QuantifierExpression
         {
           public:
             using Ptr = std::shared_ptr< ExistentialQuantifierExpression >;
@@ -393,7 +454,7 @@ namespace std
     };
 }
 
-#endif // _LIB_CASMFE_EXPRESSION_H_
+#endif // _LIBCASM_FE_EXPRESSION_H_
 
 //
 //  Local variables:

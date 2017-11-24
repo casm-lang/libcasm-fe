@@ -22,36 +22,63 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "Logger.h"
 
 #include "Exception.h"
 #include "SourceLocation.h"
 
-#include "../stdhl/cpp/String.h"
+#include <libstdhl/String>
+
+#include <unordered_set>
 
 using namespace libcasm_fe;
 
-namespace Log = libstdhl::Log;
+static const auto fileNameNull = std::string();
 
-static Log::Items to_location_items(
+static libstdhl::Log::Items to_location_items(
     const std::vector< SourceLocation >& locations )
 {
-    Log::Items items;
+    libstdhl::Log::Items items;
     for( const auto& location : locations )
     {
-        items.add( libstdhl::make< Log::LocationItem >(
-            *location.begin.fileName, location.begin.line,
-            location.begin.column, location.end.line, location.end.column ) );
+        const std::string* fileName = location.begin.fileName.get();
+
+        if( not location.begin.fileName )
+        {
+            fileName = &fileNameNull;
+        }
+
+        items.add( libstdhl::Memory::make< libstdhl::Log::LocationItem >(
+            *fileName, location.begin.line, location.begin.column,
+            location.end.line, location.end.column ) );
     }
     return items;
 }
 
-void Logger::error( const std::vector< SourceLocation >& locations,
+void libcasm_fe::Logger::error( const std::vector< SourceLocation >& locations,
     const std::string& message, libcasm_fe::Code errorCode )
 {
     auto items = to_location_items( locations );
-    items.add( libstdhl::make< Log::TextItem >( message ) );
+    items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );
 
     if( errorCode != Code::Unspecified )
     {
@@ -68,11 +95,12 @@ void Logger::error( const std::vector< SourceLocation >& locations,
                 continue;
             }
 
-            items.add( libstdhl::make< Log::TextItem >( errorCodeString ) );
+            items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >(
+                errorCodeString ) );
         }
     }
 
-    log< Log::Level::ID::ERROR >( items );
+    log< libstdhl::Log::Level::ID::ERROR >( items );
 
     if( errorCode == Code::Unspecified )
     {
@@ -80,43 +108,43 @@ void Logger::error( const std::vector< SourceLocation >& locations,
     }
 }
 
-void Logger::error( const Exception& exception )
+void libcasm_fe::Logger::error( const Exception& exception )
 {
     error( exception.locations(), exception.what(), exception.errorCode() );
     info( "Backtrace:\n"
           + libstdhl::String::join( exception.backtrace(), "\n" ) );
 }
 
-void Logger::warning(
+void libcasm_fe::Logger::warning(
     const std::vector< SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
-    items.add( libstdhl::make< Log::TextItem >( message ) );
-    log< Log::Level::ID::WARNING >( items );
+    items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );
+    log< libstdhl::Log::Level::ID::WARNING >( items );
 }
 
-void Logger::info(
+void libcasm_fe::Logger::info(
     const std::vector< SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
-    items.add( libstdhl::make< Log::TextItem >( message ) );
-    log< Log::Level::ID::INFORMATIONAL >( items );
+    items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );
+    log< libstdhl::Log::Level::ID::INFORMATIONAL >( items );
 }
 
-void Logger::hint(
+void libcasm_fe::Logger::hint(
     const std::vector< SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
-    items.add( libstdhl::make< Log::TextItem >( message ) );
-    log< Log::Level::ID::NOTICE >( items );
+    items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );
+    log< libstdhl::Log::Level::ID::NOTICE >( items );
 }
 
-void Logger::debug(
+void libcasm_fe::Logger::debug(
     const std::vector< SourceLocation >& locations, const std::string& message )
 {
     auto items = to_location_items( locations );
-    items.add( libstdhl::make< Log::TextItem >( message ) );
-    log< Log::Level::ID::DEBUG >( items );
+    items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );
+    log< libstdhl::Log::Level::ID::DEBUG >( items );
 }
 
 //

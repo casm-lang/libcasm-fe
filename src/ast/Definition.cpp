@@ -22,6 +22,24 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "Definition.h"
 
@@ -32,6 +50,7 @@ Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 : TypedNode( type )
 , m_identifier( identifier )
 , m_attributes( std::make_shared< Attributes >() )
+, m_maxNumberOfLocals( 0 )
 {
 }
 
@@ -48,6 +67,27 @@ void Definition::setAttributes( const Attributes::Ptr& attributes )
 const Attributes::Ptr& Definition::attributes( void ) const
 {
     return m_attributes;
+}
+
+void Definition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )
+{
+    m_maxNumberOfLocals = maxNumberOfLocals;
+}
+
+std::size_t Definition::maximumNumberOfLocals( void ) const
+{
+    return m_maxNumberOfLocals;
+}
+
+HeaderDefinition::HeaderDefinition( const SourceLocation& sourceLocation )
+: Definition( Node::ID::HEADER_DEFINITION,
+      Ast::make< Identifier >( sourceLocation, "CASM" ) )
+{
+}
+
+void HeaderDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
 }
 
 VariableDefinition::VariableDefinition(
@@ -211,7 +251,6 @@ DerivedDefinition::DerivedDefinition( const Identifier::Ptr& identifier,
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_expression( expression )
-, m_maxNumberOfLocals( 0 )
 {
 }
 
@@ -231,17 +270,6 @@ const Expression::Ptr& DerivedDefinition::expression( void ) const
     return m_expression;
 }
 
-void DerivedDefinition::setMaximumNumberOfLocals(
-    std::size_t maxNumberOfLocals )
-{
-    m_maxNumberOfLocals = maxNumberOfLocals;
-}
-
-std::size_t DerivedDefinition::maximumNumberOfLocals( void ) const
-{
-    return m_maxNumberOfLocals;
-}
-
 void DerivedDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -255,7 +283,6 @@ RuleDefinition::RuleDefinition( const Identifier::Ptr& identifier,
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_rule( rule )
-, m_maxNumberOfLocals( 0 )
 {
 }
 
@@ -275,29 +302,29 @@ const Rule::Ptr& RuleDefinition::rule( void ) const
     return m_rule;
 }
 
-void RuleDefinition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )
-{
-    m_maxNumberOfLocals = maxNumberOfLocals;
-}
-
-std::size_t RuleDefinition::maximumNumberOfLocals( void ) const
-{
-    return m_maxNumberOfLocals;
-}
-
 void RuleDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
+EnumeratorDefinition::EnumeratorDefinition( const Identifier::Ptr& identifier )
+: Definition( Node::ID::ENUMERATOR_DEFINITION, identifier )
+{
+}
+
+void EnumeratorDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 EnumerationDefinition::EnumerationDefinition(
-    const Identifier::Ptr& identifier, const Identifiers::Ptr& enumerators )
+    const Identifier::Ptr& identifier, const Enumerators::Ptr& enumerators )
 : Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
 }
 
-const Identifiers::Ptr& EnumerationDefinition::enumerators( void ) const
+const Enumerators::Ptr& EnumerationDefinition::enumerators( void ) const
 {
     return m_enumerators;
 }

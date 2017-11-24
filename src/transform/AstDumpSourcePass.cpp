@@ -22,17 +22,40 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "AstDumpSourcePass.h"
 
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
-
 #include "../Logger.h"
+#include "../Specification.h"
 #include "../analyze/ConsistencyCheckPass.h"
+#include "../ast/Definition.h"
+#include "../ast/Expression.h"
 #include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
+#include "../ast/Rule.h"
+
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <iostream>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -54,12 +77,12 @@ class Indentation
         explicit NextLevel( Indentation& indentation )
         : m_indentation( indentation )
         {
-            m_indentation.push();
+            m_indentation.increase();
         }
 
         ~NextLevel()
         {
-            m_indentation.pop();
+            m_indentation.decrease();
         }
 
       private:
@@ -72,12 +95,12 @@ class Indentation
         explicit PreviousLevel( Indentation& indentation )
         : m_indentation( indentation )
         {
-            m_indentation.pop();
+            m_indentation.decrease();
         }
 
         ~PreviousLevel()
         {
-            m_indentation.push();
+            m_indentation.increase();
         }
 
       private:
@@ -91,12 +114,12 @@ class Indentation
     {
     }
 
-    void push()
+    void increase()
     {
         m_length += m_stepSize;
     }
 
-    void pop()
+    void decrease()
     {
         assert( m_length >= m_stepSize );
         m_length -= m_stepSize;
@@ -123,15 +146,16 @@ class AstDumpSourceVisitor final : public Visitor
   public:
     explicit AstDumpSourceVisitor( std::ostream& stream );
 
-    void visit( Specification& node ) override;
-
+    void visit( HeaderDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
     void visit( TypeDefinition& node ) override;
 
+    void visit( TypeCastingExpression& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
@@ -174,6 +198,24 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( DefaultCase& node ) override;
 
   private:
+    void dumpAttributes( Attributes& attributes );
+
+    template < typename T >
+    void dumpNodes( NodeList< T >& nodes, const std::string& separator )
+    {
+        bool firstNode = true;
+        for( const auto& node : nodes )
+        {
+            if( not firstNode )
+            {
+                m_stream << separator;
+            }
+            node->accept( *this );
+            firstNode = false;
+        }
+    }
+
+  private:
     std::ostream& m_stream;
     Indentation m_indentation;
 };
@@ -184,19 +226,17 @@ AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 {
 }
 
-void AstDumpSourceVisitor::visit( Specification& node )
+void AstDumpSourceVisitor::visit( HeaderDefinition& node )
 {
-    m_stream << "CASM\n";
-    for( auto& d : *node.definitions() )
-    {
-        m_stream << "\n";
-        d->accept( *this );
-        m_stream << "\n";
-    }
+    dumpAttributes( *node.attributes() );
+    m_stream << " ";
+    node.identifier()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( VariableDefinition& node )
 {
+    dumpAttributes( *node.attributes() );
+    m_stream << " ";
     node.identifier()->accept( *this );
     m_stream << " : ";
     node.variableType()->accept( *this );
@@ -204,132 +244,91 @@ void AstDumpSourceVisitor::visit( VariableDefinition& node )
 
 void AstDumpSourceVisitor::visit( FunctionDefinition& node )
 {
-    m_stream << "function ";
-    std::string classification;
-    switch( node.classification() )
-    {
-        case FunctionDefinition::Classification::IN:
-            classification = "in";
-            break;
-        case FunctionDefinition::Classification::CONTROLLED:
-            classification = "controlled";
-            break;
-        case FunctionDefinition::Classification::SHARED:
-            classification = "shared";
-            break;
-        case FunctionDefinition::Classification::OUT:
-            classification = "out";
-            break;
-        case FunctionDefinition::Classification::STATIC:
-            classification = "static";
-            break;
-    }
-    if( node.symbolic() )
-    {
-        m_stream << "(symbolic, " + classification + ") ";
-    }
-    else
-    {
-        m_stream << "(" + classification + ") ";
-    }
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "function ";
     node.identifier()->accept( *this );
     m_stream << " : ";
-    bool firstArgType = true;
-    for( auto& t : *node.argumentTypes() )
-    {
-        if( not firstArgType )
-        {
-            m_stream << " * ";
-        }
-        t->accept( *this );
-        firstArgType = false;
-    }
+    dumpNodes( *node.argumentTypes(), " * " );
     m_stream << " -> ";
     node.returnType()->accept( *this );
+
     m_stream << " default { ";
     node.defaultValue()->accept( *this );
-    m_stream << " } initially { ";
-    bool firstInitializer = true;
-    for( auto& i : *node.initializers() )
+
+    m_stream << " } initially {\n";
     {
-        if( not firstInitializer )
-        {
-            m_stream << ", ";
-        }
-        i->accept( *this );
-        firstInitializer = false;
+        const Indentation::NextLevel level( m_indentation );
+        dumpNodes( *node.initializers(), ",\n" );
     }
-    m_stream << " }";
+    m_stream << "\n" << m_indentation << "}";
 }
 
 void AstDumpSourceVisitor::visit( DerivedDefinition& node )
 {
-    m_stream << "derived ";
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "derived ";
     node.identifier()->accept( *this );
     m_stream << "(";
-    bool firstArg = true;
-    for( auto& a : *node.arguments() )
-    {
-        if( not firstArg )
-        {
-            m_stream << ", ";
-        }
-        a->accept( *this );
-        firstArg = false;
-    }
+    dumpNodes( *node.arguments(), ", " );
     m_stream << ") -> ";
     node.returnType()->accept( *this );
-    const auto levelGuard = Indentation::NextLevel( m_indentation );
     m_stream << " =\n" << m_indentation;
+
+    const Indentation::NextLevel level( m_indentation );
+    m_stream << m_indentation;
     node.expression()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( RuleDefinition& node )
 {
-    m_stream << "rule ";
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "rule ";
     node.identifier()->accept( *this );
     m_stream << "(";
-    bool firstArg = true;
-    for( auto& a : *node.arguments() )
-    {
-        if( not firstArg )
-        {
-            m_stream << ", ";
-        }
-        a->accept( *this );
-        firstArg = false;
-    }
+    dumpNodes( *node.arguments(), ", " );
     m_stream << ") -> ";
     node.returnType()->accept( *this );
     m_stream << " =\n";
-    const auto levelGuard = Indentation::NextLevel( m_indentation );
+
+    const Indentation::NextLevel level( m_indentation );
     node.rule()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( EnumeratorDefinition& node )
+{
+    dumpAttributes( *node.attributes() );
+    node.identifier()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( EnumerationDefinition& node )
 {
-    m_stream << "enum ";
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "enum ";
     node.identifier()->accept( *this );
     m_stream << " = {";
-    bool firstEnumerator = true;
-    for( auto& e : *node.enumerators() )
-    {
-        if( not firstEnumerator )
-        {
-            m_stream << ", ";
-        }
-        e->accept( *this );
-        firstEnumerator = false;
-    }
+    dumpNodes( *node.enumerators(), ", " );
     m_stream << "}";
 }
 
 void AstDumpSourceVisitor::visit( TypeDefinition& node )
 {
-    m_stream << "type ";
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "type ";
     node.identifier()->accept( *this );
     m_stream << " = ";
     node.type()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( TypeCastingExpression& node )
+{
+    node.fromExpression()->accept( *this );
+    m_stream << " as ";
+    node.asType()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( ValueAtom& node )
@@ -351,19 +350,11 @@ void AstDumpSourceVisitor::visit( UndefAtom& node )
 void AstDumpSourceVisitor::visit( DirectCallExpression& node )
 {
     node.identifier()->accept( *this );
+
     if( not node.arguments()->empty() )
     {
         m_stream << "(";
-        bool firstArg = true;
-        for( auto& a : *node.arguments() )
-        {
-            if( not firstArg )
-            {
-                m_stream << ", ";
-            }
-            a->accept( *this );
-            firstArg = false;
-        }
+        dumpNodes( *node.arguments(), ", " );
         m_stream << ")";
     }
 }
@@ -373,16 +364,7 @@ void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
     m_stream << "(*";
     node.expression()->accept( *this );
     m_stream << ")(";
-    bool firstArg = true;
-    for( auto& a : *node.arguments() )
-    {
-        if( not firstArg )
-        {
-            m_stream << ", ";
-        }
-        a->accept( *this );
-        firstArg = false;
-    }
+    dumpNodes( *node.arguments(), ", " );
     m_stream << ")";
 }
 
@@ -394,9 +376,11 @@ void AstDumpSourceVisitor::visit( UnaryExpression& node )
 
 void AstDumpSourceVisitor::visit( BinaryExpression& node )
 {
+    m_stream << "(";
     node.left()->accept( *this );
     m_stream << " " << ir::Value::token( node.op() ) << " ";
     node.right()->accept( *this );
+    m_stream << ")";
 }
 
 void AstDumpSourceVisitor::visit( RangeExpression& node )
@@ -411,16 +395,7 @@ void AstDumpSourceVisitor::visit( RangeExpression& node )
 void AstDumpSourceVisitor::visit( ListExpression& node )
 {
     m_stream << "[";
-    bool firstExpr = true;
-    for( auto& e : *node.expressions() )
-    {
-        if( not firstExpr )
-        {
-            m_stream << ", ";
-        }
-        e->accept( *this );
-        firstExpr = false;
-    }
+    dumpNodes( *node.expressions(), ", " );
     m_stream << "]";
 }
 
@@ -483,14 +458,16 @@ void AstDumpSourceVisitor::visit( ConditionalRule& node )
 {
     m_stream << m_indentation << "if ";
     node.condition()->accept( *this );
+
     m_stream << " then\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.thenRule()->accept( *this );
     }
+
     m_stream << "\n" << m_indentation << "else\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.elseRule()->accept( *this );
     }
 }
@@ -500,13 +477,11 @@ void AstDumpSourceVisitor::visit( CaseRule& node )
     m_stream << m_indentation << "case ";
     node.expression()->accept( *this );
     m_stream << " of\n" << m_indentation << "{\n";
-    for( auto& c : *node.cases() )
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
-        c->accept( *this );
-        m_stream << "\n";
+        const Indentation::NextLevel level( m_indentation );
+        dumpNodes( *node.cases(), "\n" );
     }
-    m_stream << m_indentation << "}";
+    m_stream << "\n" << m_indentation << "}";
 }
 
 void AstDumpSourceVisitor::visit( LetRule& node )
@@ -517,7 +492,7 @@ void AstDumpSourceVisitor::visit( LetRule& node )
     node.expression()->accept( *this );
     m_stream << " in\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.rule()->accept( *this );
     }
 }
@@ -528,9 +503,11 @@ void AstDumpSourceVisitor::visit( ForallRule& node )
     node.variable()->accept( *this );
     m_stream << " in ";
     node.universe()->accept( *this );
+    m_stream << " with ";
+    node.condition()->accept( *this );
     m_stream << " do\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.rule()->accept( *this );
     }
 }
@@ -543,7 +520,7 @@ void AstDumpSourceVisitor::visit( ChooseRule& node )
     node.universe()->accept( *this );
     m_stream << " do\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.rule()->accept( *this );
     }
 }
@@ -552,7 +529,7 @@ void AstDumpSourceVisitor::visit( IterateRule& node )
 {
     m_stream << "iterate\n";
     {
-        const auto levelGuard = Indentation::NextLevel( m_indentation );
+        const Indentation::NextLevel level( m_indentation );
         node.rule()->accept( *this );
     }
 }
@@ -560,34 +537,30 @@ void AstDumpSourceVisitor::visit( IterateRule& node )
 void AstDumpSourceVisitor::visit( BlockRule& node )
 {
     {
-        const auto levelGuard = Indentation::PreviousLevel( m_indentation );
+        const Indentation::PreviousLevel level( m_indentation );
         m_stream << m_indentation << "{\n";
     }
-    for( auto& r : *node.rules() )
+
+    dumpNodes( *node.rules(), "\n" );
+
     {
-        r->accept( *this );
-        m_stream << "\n";
-    }
-    {
-        const auto levelGuard = Indentation::PreviousLevel( m_indentation );
-        m_stream << m_indentation << "}";
+        const Indentation::PreviousLevel level( m_indentation );
+        m_stream << "\n" << m_indentation << "}";
     }
 }
 
 void AstDumpSourceVisitor::visit( SequenceRule& node )
 {
     {
-        const auto levelGuard = Indentation::PreviousLevel( m_indentation );
+        const Indentation::PreviousLevel level( m_indentation );
         m_stream << m_indentation << "{|\n";
     }
-    for( auto& r : *node.rules() )
+
+    dumpNodes( *node.rules(), "\n" );
+
     {
-        r->accept( *this );
-        m_stream << "\n";
-    }
-    {
-        const auto levelGuard = Indentation::PreviousLevel( m_indentation );
-        m_stream << m_indentation << "|}";
+        const Indentation::PreviousLevel level( m_indentation );
+        m_stream << "\n" << m_indentation << "|}";
     }
 }
 
@@ -619,16 +592,7 @@ void AstDumpSourceVisitor::visit( ComposedType& node )
 {
     node.name()->accept( *this );
     m_stream << "<";
-    bool firstSubType = true;
-    for( auto& s : *node.subTypes() )
-    {
-        if( not firstSubType )
-        {
-            m_stream << ", ";
-        }
-        s->accept( *this );
-        firstSubType = false;
-    }
+    dumpNodes( *node.subTypes(), ", " );
     m_stream << ">";
 }
 
@@ -643,36 +607,22 @@ void AstDumpSourceVisitor::visit( FixedSizedType& node )
 void AstDumpSourceVisitor::visit( RelationType& node )
 {
     m_stream << "<";
-
-    u1 first = true;
-    for( auto& s : *node.argumentTypes() )
-    {
-        m_stream << ( first ? "" : " * " );
-        s->accept( *this );
-        first = false;
-    }
-
+    dumpNodes( *node.argumentTypes(), " * " );
     m_stream << " -> ";
-
     node.returnType()->accept( *this );
-
     m_stream << ">";
 }
 
 void AstDumpSourceVisitor::visit( BasicAttribute& node )
 {
-    m_stream << "[ ";
     node.identifier()->accept( *this );
-    m_stream << " ]\n";
 }
 
 void AstDumpSourceVisitor::visit( ExpressionAttribute& node )
 {
-    m_stream << "[ ";
     node.identifier()->accept( *this );
     m_stream << " ";
     node.expression()->accept( *this );
-    m_stream << " ]\n";
 }
 
 void AstDumpSourceVisitor::visit( Identifier& node )
@@ -690,15 +640,27 @@ void AstDumpSourceVisitor::visit( ExpressionCase& node )
     m_stream << m_indentation;
     node.expression()->accept( *this );
     m_stream << ":\n";
-    const auto levelGuard = Indentation::NextLevel( m_indentation );
+
+    const Indentation::NextLevel level( m_indentation );
     node.rule()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( DefaultCase& node )
 {
     m_stream << m_indentation << "default:\n";
-    const auto levelGuard = Indentation::NextLevel( m_indentation );
+
+    const Indentation::NextLevel level( m_indentation );
     node.rule()->accept( *this );
+}
+
+void AstDumpSourceVisitor::dumpAttributes( Attributes& attributes )
+{
+    if( not attributes.empty() )
+    {
+        m_stream << "[";
+        dumpNodes( attributes, ", " );
+        m_stream << "]";
+    }
 }
 
 void AstDumpSourcePass::usage( libpass::PassUsage& pu )
@@ -713,8 +675,16 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
     const auto& data = pr.result< ConsistencyCheckPass >();
     const auto& specification = data->specification();
 
-    AstDumpSourceVisitor visitor{ std::cout };
-    specification->accept( visitor );
+    auto& outputStream = std::cout;
+
+    AstDumpSourceVisitor visitor{ outputStream };
+
+    for( const auto& definition : *specification->definitions() )
+    {
+        outputStream << "\n";
+        definition->accept( visitor );
+        outputStream << "\n";
+    }
 
     return true;
 }

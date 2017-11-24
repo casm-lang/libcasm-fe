@@ -22,6 +22,24 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "Rule.h"
 
@@ -166,9 +184,20 @@ void LetRule::accept( Visitor& visitor )
 
 ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
     const Expression::Ptr& universe, const Rule::Ptr& rule )
+: ForallRule( variable, universe,
+      std::make_shared< ValueAtom >(
+          libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true ) ),
+      rule )
+{
+}
+
+ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& universe, const Expression::Ptr& condition,
+    const Rule::Ptr& rule )
 : Rule( Node::ID::FORALL_RULE )
 , m_variable( variable )
 , m_universe( universe )
+, m_condition( condition )
 , m_rule( rule )
 {
 }
@@ -181,6 +210,11 @@ const VariableDefinition::Ptr& ForallRule::variable( void ) const
 const Expression::Ptr& ForallRule::universe( void ) const
 {
     return m_universe;
+}
+
+const Expression::Ptr& ForallRule::condition( void ) const
+{
+    return m_condition;
 }
 
 const Rule::Ptr& ForallRule::rule( void ) const
@@ -293,11 +327,10 @@ void UpdateRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-CallRule::CallRule( const CallExpression::Ptr& call,
-    const std::set< CallExpression::TargetType >& allowedCallTargetTypes )
+CallRule::CallRule( const CallExpression::Ptr& call, Type type )
 : Rule( Node::ID::CALL_RULE )
 , m_call( call )
-, m_allowedCallTargetTypes( allowedCallTargetTypes )
+, m_type( type )
 {
 }
 
@@ -306,10 +339,9 @@ const CallExpression::Ptr& CallRule::call( void ) const
     return m_call;
 }
 
-const std::set< CallExpression::TargetType >& CallRule::allowedCallTargetTypes(
-    void ) const
+CallRule::Type CallRule::type( void ) const
 {
-    return m_allowedCallTargetTypes;
+    return m_type;
 }
 
 void CallRule::accept( Visitor& visitor )

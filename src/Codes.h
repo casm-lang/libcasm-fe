@@ -22,9 +22,27 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
-#ifndef _LIB_CASMFE_CODES_H_
-#define _LIB_CASMFE_CODES_H_
+#ifndef _LIBCASM_FE_CODES_H_
+#define _LIBCASM_FE_CODES_H_
 
 namespace libcasm_fe
 {
@@ -47,7 +65,8 @@ namespace libcasm_fe
         ,
         SymbolIsUnknown = 0x0500,
         UpdateRuleFunctionSymbolIsInvalid = 0x0501,
-        SymbolAlreadyDefined = 0x0502
+        SymbolAlreadyDefined = 0x0502,
+        SymbolArgumentSizeMismatch = 0x0503
 
         // --------------------------------------------------------- f*** ...
         // function errors
@@ -106,7 +125,7 @@ namespace libcasm_fe
         RuleArgumentsTypeInvalidAtIndirectCall = 0x5e05
 
         ,
-        CaseLabelMultipleUseOfDefault = 0x5c00 // 5c** ... case errors
+        CaseRuleMultipleDefaultCases = 0x5c00 // 5c** ... case errors
 
         ,
         AssertInvalidExpression = 0x5a00 // 5a** ... assert errors
@@ -127,7 +146,13 @@ namespace libcasm_fe
         // --------------------------------------------------------- 01** ...
         // type annotation errors
 
-        TypeAnnotationInvalidComposedTypeName = 0x0100,
+        TypeAnnotationInvalidBasicTypeName = 0x0100,
+        TypeAnnotationInvalidFixedSizeTypeName = 0x0101,
+        TypeAnnotationInvalidComposedTypeName = 0x0102,
+        TypeAnnotationInvalidRelationTypeName = 0x0103,
+
+        TypeAnnotationComposedTypeHasNoSubType = 0x0112,
+        TypeAnnotationRelationTypeHasNoSubType = 0x0113,
 
         // --------------------------------------------------------- 1*** ...
         // type inference errors
@@ -147,20 +172,17 @@ namespace libcasm_fe
         TypeInferenceInvalidUpdateRuleExpressionType = 0x1204,
         TypeInferenceUpdateRuleTypesMismatch = 0x1205,
 
-        TypeInferenceBuiltinAsBitInvalid2ndArgumentType = 0x1b00,
-
         TypeInferenceNotDefinedForExpression = 0x1300,
         TypeInferenceArgumentTypeMismatch = 0x1301,
 
         TypeInferenceFunctionArgumentTypeMismatch = 0x1302,
-        TypeInferenceFunctionArgumentSizeMismatch = 0x1312,
         TypeInferenceDerivedArgumentTypeMismatch = 0x1303,
-        TypeInferenceDerivedArgumentSizeMismatch = 0x1313,
         TypeInferenceDerivedReturnTypeMismatch = 0x1323,
         TypeInferenceBuiltinArgumentTypeMismatch = 0x1304,
-        TypeInferenceBuiltinArgumentSizeMismatch = 0x1314,
+        TypeInferenceBuiltinRelationTypeInvalid = 0x1324,
         TypeInferenceRuleArgumentTypeMismatch = 0x1305,
-        TypeInferenceRuleArgumentSizeMismatch = 0x1315,
+        TypeInferenceOperatorUnaryRelationTypeInvalid = 0x1306,
+        TypeInferenceOperatorBinaryRelationTypeInvalid = 0x1307,
 
         TypeInferenceQuantifierUniversalPropositionTypeMismatch = 0x1400,
         TypeInferenceQuantifierUniversalPredicateTypeMismatch = 0x1401,
@@ -174,9 +196,12 @@ namespace libcasm_fe
 
         ,
         TypeInferenceInvalidIfExpression = 0x1003,
-        TypeInferenceInvalidForallExpression = 0x1004
 
-        ,
+        TypeInferenceForallVariableHasNoType = 0x1004,
+        TypeInferenceForallUniverseHasNoType = 0x1014,
+        TypeInferenceForallRuleTypeMismatch = 0x1024,
+        TypeInferenceForallRuleInvalidConditionType = 0x1025,
+
         TypeInferenceInvalidConditionalExpressionCondition = 0x1005,
         TypeInferenceInvalidConditionalExpressionPaths = 0x1006
 
@@ -190,26 +215,26 @@ namespace libcasm_fe
         ,
         TypeInferenceInvalidLetExpressionVariableType = 0x1010,
         TypeInferenceInvalidLetExpressionInitializerType = 0x1011,
-        TypeInferenceInvalidLetExpressionTypeMismatch = 0x1012
+        TypeInferenceInvalidLetExpressionTypeMismatch = 0x1012,
 
-        ,
-        TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000
+        TypeInferenceRangeExpressionTypeMismatch = 0x1600,
 
-        ,
-        TypeIntegerRangedInvalidInterval = 0x2000 // 2*** ... Integer type error
+        TypeInferenceInvalidTypeCastingExpression = 0x1700,
+        TypeInferenceTypeCastingExpressionFromHasNoType = 0x1701,
+        TypeInferenceTypeCastingExpressionAsHasInvalidType = 0x1702,
 
-        ,
-        TypeNumberRangeInvalidTypeAtLeftHandSide
-        = 0x3000 // 3*** ... Number range type error
-        ,
-        TypeNumberRangeInvalidTypeAtRightHandSide
-        = 0x3001 // 3*** ... Number range type error
+        TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000,
+
+        TypeIntegerRangedInvalidInterval
+        = 0x2000, // 2*** ... Integer type error
 
         // --------------------------------------------------------- cc** ...
         // consistency check errors
-        ,
+
         UpdateRuleInvalidClassifier = 0xcc00,
-        DirectCallExpressionInvalidClassifier = 0xcc01
+        DirectCallExpressionInvalidClassifier = 0xcc01,
+        CallRuleOnlyRulesAllowed = 0xcc02,
+        CallRuleOnlyFunctionsAllowed = 0xcc03
 
         // --------------------------------------------------------- 8*** ...
         // operator errors
@@ -242,7 +267,8 @@ namespace libcasm_fe
         QuantifierExpressionInvalidUniverse = 0x9002,
         ChooseExpressionInvalidUniverse = 0x9003,
         ChooseRuleInvalidUniverse = 0x9004,
-        ForallRuleInvalidUniverse = 0x9005
+        ForallRuleInvalidUniverse = 0x9005,
+        ForallRuleInvalidCondition = 0x9006
 
         // --------------------------------------------------------- fff* ...
         // not categorized errors
@@ -255,7 +281,7 @@ namespace libcasm_fe
     };
 }
 
-#endif /* _LIB_CASMFE_CODES_H_ */
+#endif /* _LIBCASM_FE_CODES_H_ */
 
 //
 //  Local variables:

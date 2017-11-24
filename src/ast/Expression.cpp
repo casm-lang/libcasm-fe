@@ -22,10 +22,29 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "Expression.h"
 
 #include "Definition.h"
+#include "Type.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -39,12 +58,18 @@ ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )
 : Expression( Node::ID::VALUE_ATOM )
 , m_value( value )
 {
-    Expression::setType( value->ptr_type() );
+    Expression::setType( value->type().ptr_type() );
 }
 
 const libcasm_ir::Constant::Ptr& ValueAtom::value( void ) const
 {
     return m_value;
+}
+
+void ValueAtom::setValue( const libcasm_ir::Constant::Ptr& value )
+{
+    m_value = value;
+    Expression::setType( m_value->type().ptr_type() );
 }
 
 void ValueAtom::accept( Visitor& visitor )
@@ -251,6 +276,62 @@ const Expression::Ptr& IndirectCallExpression::expression( void ) const
 }
 
 void IndirectCallExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+TypeCastingExpression::TypeCastingExpression(
+    const Expression::Ptr& fromExpression, const Type::Ptr& asType )
+: CallExpression(
+      Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
+, m_fromExpression( fromExpression )
+, m_asType( asType )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_targetDefinition()
+{
+    arguments()->add( fromExpression );
+}
+
+const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
+{
+    return m_fromExpression;
+}
+
+const Type::Ptr& TypeCastingExpression::asType( void ) const
+{
+    return m_asType;
+}
+
+u1 TypeCastingExpression::builtin( void ) const
+{
+    return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_;
+}
+
+void TypeCastingExpression::setTargetBuiltinId(
+    libcasm_ir::Value::ID builtinId )
+{
+    m_targetBuiltinId = builtinId;
+    setTargetType( CallExpression::TargetType::BUILTIN );
+}
+
+libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
+{
+    return m_targetBuiltinId;
+}
+
+void TypeCastingExpression::setTargetDefinition(
+    const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+    setTargetType( CallExpression::TargetType::DERIVED );
+}
+
+const TypedNode::Ptr& TypeCastingExpression::targetDefinition( void ) const
+{
+    return m_targetDefinition;
+}
+
+void TypeCastingExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

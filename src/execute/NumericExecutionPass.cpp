@@ -22,33 +22,36 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "NumericExecutionPass.h"
 
-#include <stdexcept>
-#include <thread>
-
-#include "../stdhl/cpp/Default.h"
-#include "../stdhl/cpp/Enum.h"
-#include "../stdhl/cpp/Hash.h"
-
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
-
-#include "../casm-ir/src/Exception.h"
-#include "../casm-ir/src/Instruction.h"
-#include "../casm-ir/src/Value.h"
-
-#include "../casm-rt/src/Value.h"
-
 #include "../Exception.h"
 #include "../Logger.h"
-#include "../analyze/ConsistencyCheckPass.h"
+#include "../Specification.h"
+#include "../analyze/FrameSizeDeterminationPass.h"
+#include "../ast/Definition.h"
 #include "../ast/EmptyVisitor.h"
+#include "../ast/Expression.h"
 #include "../ast/RecursiveVisitor.h"
-#include "../ast/Specification.h"
-
+#include "../ast/Rule.h"
 #include "Frame.h"
 #include "FunctionState.h"
 #include "LocationRegistry.h"
@@ -56,10 +59,27 @@
 #include "Stack.h"
 #include "UpdateSet.h"
 
+#include <libcasm-rt/Value>
+
+#include <libcasm-ir/Exception>
+#include <libcasm-ir/Instruction>
+#include <libcasm-ir/Value>
+
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <libstdhl/Enum>
+#include <libstdhl/Hash>
+
+#include <stdexcept>
+#include <thread>
+
 using namespace libcasm_fe;
 using namespace Ast;
 
-namespace ir = libcasm_ir;
+namespace IR = libcasm_ir;
+namespace RT = libcasm_rt;
 
 char NumericExecutionPass::id = 0;
 
@@ -67,7 +87,7 @@ static libpass::PassRegistration< NumericExecutionPass > PASS(
     "NumericExecutionPass",
     "execute numerically over the AST input specification", "ast-exec-num", 0 );
 
-class ConstantStack : public Stack< ir::Constant >
+class ConstantStack : public Stack< IR::Constant >
 {
   public:
     using Stack::Stack;
@@ -77,8 +97,8 @@ class ConstantStack : public Stack< ir::Constant >
     template < typename T >
     T pop( void )
     {
-        const auto& value = Stack::pop();
-        assert( ir::isa< T >( value ) );
+        const auto value = Stack::pop();
+        assert( IR::isa< T >( value ) );
         return static_cast< const T& >( value );
     }
 };
@@ -86,7 +106,7 @@ class ConstantStack : public Stack< ir::Constant >
 struct ConstantsHash
 {
     inline std::size_t operator()(
-        const std::vector< ir::Constant >& constants ) const
+        const std::vector< IR::Constant >& constants ) const
     {
         return libstdhl::Hash::value( constants );
     }
@@ -97,14 +117,14 @@ struct ConstantsHash
  */
 struct Update
 {
-    ir::Constant value;       /**< The value of the update */
-    UpdateRule::Ptr producer; /**< The update producer */
-    ir::Constant agent;       /**< The contributing agent */
-                              // TODO maybe a list of agents (multi-agent case)?
+    IR::Constant value;   /**< The value of the update */
+    UpdateRule* producer; /**< The update producer */
+    IR::Constant agent;   /**< The contributing agent */
+                          // TODO maybe a list of agents (multi-agent case)?
 };
 
 struct UpdateEquals
-    : public std::binary_function< const Update&, const Update&, bool >
+: public std::binary_function< const Update&, const Update&, bool >
 {
     bool operator()( const Update& lhs, const Update& rhs ) const
     {
@@ -117,7 +137,7 @@ struct LocationRegistryDetails
     using Function = FunctionDefinition::UID;
     using FunctionHash = std::hash< Function >;
     using FunctionEquals = std::equal_to< Function >;
-    using Arguments = std::vector< ir::Constant >;
+    using Arguments = std::vector< IR::Constant >;
     using ArgumentsHash = ConstantsHash;
     using ArgumentsEquals = std::equal_to< Arguments >;
 };
@@ -134,13 +154,39 @@ struct UpdateSetDetails
 };
 
 using ExecutionUpdateSet = UpdateSet< UpdateSetDetails >;
-using ForkGuard = UpdateSetForkGuard< ExecutionUpdateSet >;
+using Transaction = UpdateSetTransaction< ExecutionUpdateSet >;
 using Semantics = ExecutionUpdateSet::Semantics;
+
+static std::string updateAsString( const ExecutionUpdateSet::Update& update )
+{
+    const auto& location = update.location;
+    const auto& value = update.value;
+
+    auto locationStr = value.producer->function()->identifier()->path();
+
+    if( not location.arguments().empty() )
+    {
+        locationStr += "(";
+        bool isFirst = true;
+        for( const auto& arg : location.arguments() )
+        {
+            if( not isFirst )
+            {
+                locationStr += ", ";
+            }
+            locationStr += arg.name();
+            isFirst = false;
+        }
+        locationStr += ")";
+    }
+
+    return locationStr + " := " + value.value.name();
+}
 
 class Storage
 {
     using Location = ExecutionLocationRegistry::Location;
-    using Value = ir::Constant;
+    using Value = IR::Constant;
 
     struct FunctionStateDetails
     {
@@ -238,7 +284,7 @@ class ExecutionVisitor final : public EmptyVisitor
     ExecutionVisitor( ExecutionLocationRegistry& locationRegistry,
         const Storage& globalState,
         UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
-        const ir::Constant& agentId );
+        const IR::Constant& agentId );
 
     /**
      * Executes the rule reference stored in \a value.
@@ -254,8 +300,10 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
+    void visit( TypeCastingExpression& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
@@ -283,14 +331,11 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
 
-    void visit( ExpressionCase& node ) override;
-    void visit( DefaultCase& node ) override;
-
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
-    std::unique_ptr< Frame > makeFrame( const CallExpression::Ptr& call,
-        const Node::Ptr& callee, std::size_t numberOfLocals );
+    std::unique_ptr< Frame > makeFrame(
+        CallExpression* call, Node* callee, std::size_t numberOfLocals );
 
     /**
      * Calls the builtin with id \a id.
@@ -305,7 +350,7 @@ class ExecutionVisitor final : public EmptyVisitor
      * @throws RuntimeException in case of an error
      */
     void invokeBuiltin(
-        const Node& node, ir::Value::ID id, const ir::Type::Ptr& type );
+        const Node& node, IR::Value::ID id, const IR::Type::Ptr& type );
 
     enum class ValidationFlag
     {
@@ -321,10 +366,10 @@ class ExecutionVisitor final : public EmptyVisitor
      * @param type The specified type
      * @param flags Disables or enables various validation properties
      *
-     * @throws libcasm_ir::ValidationException in case of an invalid value
+     * @throws libcasm_IR::ValidationException in case of an invalid value
      */
-    void validateValue( const ir::Constant& value,
-        const libcasm_ir::Type& type,
+    void validateValue( const IR::Constant& value,
+        const IR::Type& type,
         ValidationFlags flags = {} ) const;
 
     /**
@@ -343,9 +388,8 @@ class ExecutionVisitor final : public EmptyVisitor
      * @throws RuntimeException in case of an invalid argument value with proper
      *                          error and location information
      */
-    void validateArguments( const Node& node,
-        const libcasm_ir::Types& argumentTypes, ValidationFlags flags,
-        Code errorCode ) const;
+    void validateArguments( const Node& node, const IR::Types& argumentTypes,
+        ValidationFlags flags, Code errorCode ) const;
 
     void handleMergeConflict(
         const Node& node, const ExecutionUpdateSet::Conflict& conflict ) const;
@@ -354,7 +398,7 @@ class ExecutionVisitor final : public EmptyVisitor
     const Storage& m_globalState;
     ExecutionLocationRegistry& m_locationRegistry;
     UpdateSetManager< ExecutionUpdateSet >& m_updateSetManager;
-    const ir::Constant& m_agentId;
+    const IR::Constant& m_agentId;
 
     ConstantStack m_evaluationStack;
     FrameStack m_frameStack;
@@ -363,7 +407,7 @@ class ExecutionVisitor final : public EmptyVisitor
 ExecutionVisitor::ExecutionVisitor( ExecutionLocationRegistry& locationRegistry,
     const Storage& globalState,
     UpdateSetManager< ExecutionUpdateSet >& updateSetManager,
-    const ir::Constant& agentId )
+    const IR::Constant& agentId )
 : m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
 , m_updateSetManager( updateSetManager )
@@ -377,7 +421,7 @@ void ExecutionVisitor::execute( const ReferenceConstant& value )
 {
     assert( value.defined() && "Reference must be defined" );
 
-    const auto& atom = value.atom();
+    const auto& atom = value.value();
     assert( ( atom->referenceType() == ReferenceAtom::ReferenceType::RULE )
             && "Must be a rule reference" );
 
@@ -387,7 +431,7 @@ void ExecutionVisitor::execute( const ReferenceConstant& value )
             && "Only parameter-less rules are supported" );
 
     m_frameStack.push(
-        makeFrame( nullptr, rule, rule->maximumNumberOfLocals() ) );
+        makeFrame( nullptr, rule.get(), rule->maximumNumberOfLocals() ) );
     rule->accept( *this );
     m_frameStack.pop();
 }
@@ -440,7 +484,7 @@ void ExecutionVisitor::visit( DerivedDefinition& node )
     {
         validateValue( returnValue, returnType );
     }
-    catch( const libcasm_ir::ValidationException& e )
+    catch( const IR::ValidationException& e )
     {
         throw RuntimeException( { node.expression()->sourceLocation() },
             e.what(),
@@ -468,17 +512,46 @@ void ExecutionVisitor::visit( RuleDefinition& node )
         }
         else
         {
-            m_evaluationStack.push( ir::Constant::undef( returnType ) );
+            m_evaluationStack.push( IR::Constant::undef( returnType ) );
         }
     }
+}
+
+void ExecutionVisitor::visit( EnumeratorDefinition& node )
+{
+    assert( node.type()->isEnumeration() );
+    const auto& enumType
+        = std::static_pointer_cast< IR::EnumerationType >( node.type() );
+    m_evaluationStack.push(
+        IR::EnumerationConstant( enumType, node.identifier()->name() ) );
 }
 
 void ExecutionVisitor::visit( EnumerationDefinition& node )
 {
     assert( node.type()->isEnumeration() );
     const auto& enumType
-        = std::static_pointer_cast< ir::EnumerationType >( node.type() );
-    m_evaluationStack.push( ir::EnumerationConstant( enumType ) );
+        = std::static_pointer_cast< IR::EnumerationType >( node.type() );
+    m_evaluationStack.push( IR::EnumerationConstant( enumType ) );
+}
+
+void ExecutionVisitor::visit( TypeCastingExpression& node )
+{
+    if( node.builtin() )
+    {
+        m_frameStack.push(
+            makeFrame( &node, nullptr, node.arguments()->size() ) );
+        invokeBuiltin( node, node.targetBuiltinId(), node.type() );
+        m_frameStack.pop();
+    }
+    else
+    {
+        const auto& definition
+            = std::static_pointer_cast< Definition >( node.targetDefinition() );
+        m_frameStack.push( makeFrame(
+            &node, definition.get(), definition->maximumNumberOfLocals() ) );
+        definition->accept( *this );
+        m_frameStack.pop();
+    }
 }
 
 void ExecutionVisitor::visit( ValueAtom& node )
@@ -488,77 +561,47 @@ void ExecutionVisitor::visit( ValueAtom& node )
 
 void ExecutionVisitor::visit( ReferenceAtom& node )
 {
-    m_evaluationStack.push( ReferenceConstant( node.ptr< ReferenceAtom >() ) );
+    m_evaluationStack.push( ReferenceConstant( &node ) );
 }
 
 void ExecutionVisitor::visit( UndefAtom& node )
 {
-    m_evaluationStack.push( ir::Constant::undef( node.type() ) );
+    m_evaluationStack.push( IR::Constant::undef( node.type() ) );
 }
 
 void ExecutionVisitor::visit( BasicType& node )
 {
-    const auto rangeType = std::make_shared< ir::RangeType >( node.type() );
-    const auto range = std::make_shared< ir::Range >( rangeType );
-    m_evaluationStack.push( ir::RangeConstant( rangeType, range ) );
+    const auto rangeType = std::make_shared< IR::RangeType >( node.type() );
+    const auto range = std::make_shared< IR::Range >( rangeType );
+    m_evaluationStack.push( IR::RangeConstant( rangeType, range ) );
 }
 
 void ExecutionVisitor::visit( DirectCallExpression& node )
 {
     switch( node.targetType() )
     {
-        case CallExpression::TargetType::FUNCTION:
-        {
-            const auto& definition = node.targetDefinition();
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(),
-                definition, node.arguments()->size() ) );
-            definition->accept( *this );
-            m_frameStack.pop();
-            break;
-        }
-        case CallExpression::TargetType::DERIVED:
-        {
-            const auto& derived = std::static_pointer_cast< DerivedDefinition >(
-                node.targetDefinition() );
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), derived,
-                derived->maximumNumberOfLocals() ) );
-            derived->accept( *this );
-            m_frameStack.pop();
-            break;
-        }
+        case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
         case CallExpression::TargetType::RULE:
         {
-            const auto& rule = std::static_pointer_cast< RuleDefinition >(
+            const auto& definition = std::static_pointer_cast< Definition >(
                 node.targetDefinition() );
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), rule,
-                rule->maximumNumberOfLocals() ) );
-            rule->accept( *this );
+            m_frameStack.push( makeFrame( &node, definition.get(),
+                definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
             m_frameStack.pop();
             break;
         }
         case CallExpression::TargetType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), nullptr,
-                node.arguments()->size() ) );
+            m_frameStack.push(
+                makeFrame( &node, nullptr, node.arguments()->size() ) );
             invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
         }
-        case CallExpression::TargetType::TYPE_DOMAIN:
-        {
-            node.targetDefinition()->accept( *this );
-            break;
-        }
-        case CallExpression::TargetType::CONSTANT:
-        {
-            assert( node.type()->isEnumeration() );
-            const auto& enumType
-                = std::static_pointer_cast< ir::EnumerationType >(
-                    node.type() );
-            m_evaluationStack.push( ir::EnumerationConstant(
-                enumType, node.identifier()->baseName() ) );
-            break;
-        }
+        case CallExpression::TargetType::TYPE_DOMAIN: // [[fallthrough]]
+        case CallExpression::TargetType::CONSTANT:    // [[fallthrough]]
         case CallExpression::TargetType::VARIABLE:
         {
             node.targetDefinition()->accept( *this );
@@ -580,7 +623,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 void ExecutionVisitor::visit( IndirectCallExpression& node )
 {
     node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop< ReferenceConstant >();
+    const auto value = m_evaluationStack.pop< ReferenceConstant >();
     if( not value.defined() )
     {
         throw RuntimeException( node.expression()->sourceLocation(),
@@ -589,48 +632,27 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             Code::Unspecified );
     }
 
-    const auto& atom = value.atom();
+    const auto& atom = value.value();
     switch( atom->referenceType() )
     {
-        case ReferenceAtom::ReferenceType::FUNCTION:
-        {
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(),
-                atom->reference(), node.arguments()->size() ) );
-            atom->reference()->accept( *this );
-            m_frameStack.pop();
-            break;
-        }
-        case ReferenceAtom::ReferenceType::DERIVED:
-        {
-            const auto& derived = std::static_pointer_cast< DerivedDefinition >(
-                atom->reference() );
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), derived,
-                derived->maximumNumberOfLocals() ) );
-            derived->accept( *this );
-            m_frameStack.pop();
-            break;
-        }
+        case ReferenceAtom::ReferenceType::FUNCTION: // [[fallthrough]]
+        case ReferenceAtom::ReferenceType::DERIVED:  // [[fallthrough]]
         case ReferenceAtom::ReferenceType::RULE:
         {
-            const auto& rule = std::static_pointer_cast< RuleDefinition >(
-                atom->reference() );
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), rule,
-                rule->maximumNumberOfLocals() ) );
-            rule->accept( *this );
+            const auto& definition
+                = std::static_pointer_cast< Definition >( atom->reference() );
+            m_frameStack.push( makeFrame( &node, definition.get(),
+                definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
             m_frameStack.pop();
             break;
         }
         case ReferenceAtom::ReferenceType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( node.ptr< CallExpression >(), nullptr,
-                node.arguments()->size() ) );
+            m_frameStack.push(
+                makeFrame( &node, nullptr, node.arguments()->size() ) );
             invokeBuiltin( node, atom->builtinId(), node.type() );
             m_frameStack.pop();
-            break;
-        }
-        case ReferenceAtom::ReferenceType::VARIABLE:
-        {
-            atom->reference()->accept( *this );
             break;
         }
         case ReferenceAtom::ReferenceType::UNKNOWN:
@@ -644,13 +666,11 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
 void ExecutionVisitor::visit( UnaryExpression& node )
 {
     node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
+    auto& value = m_evaluationStack.top();
 
     try
     {
-        const auto result
-            = libcasm_rt::Value::execute_( node.op(), node.type(), &value, 1 );
-        m_evaluationStack.push( result );
+        RT::Value::execute( node.op(), node.type(), value, value );
     }
     catch( const std::exception& e )
     {
@@ -665,20 +685,17 @@ void ExecutionVisitor::visit( UnaryExpression& node )
 void ExecutionVisitor::visit( BinaryExpression& node )
 {
     node.left()->accept( *this );
-    node.right()->accept( *this );
+    const auto lhs = m_evaluationStack.pop();
 
-    const auto* operands = m_evaluationStack.top_ptr( 2 );
+    node.right()->accept( *this );
+    auto& rhs = m_evaluationStack.top();
 
     try
     {
-        const auto result = libcasm_rt::Value::execute_(
-            node.op(), node.type(), operands, 2 );
-        m_evaluationStack.drop( 2 );
-        m_evaluationStack.push( result );
+        RT::Value::execute( node.op(), node.type(), rhs, lhs, rhs );
     }
-    catch( const ir::Exception& e )
+    catch( const IR::Exception& e )
     {
-        m_evaluationStack.drop( 2 );
         throw RuntimeException( node.sourceLocation(),
             "binary expression has thrown an exception: "
                 + std::string( e.what() ),
@@ -690,12 +707,12 @@ void ExecutionVisitor::visit( BinaryExpression& node )
 void ExecutionVisitor::visit( RangeExpression& node )
 {
     node.left()->accept( *this );
-    const auto& lhs = m_evaluationStack.pop();
+    const auto lhs = m_evaluationStack.pop();
 
     node.right()->accept( *this );
-    const auto& rhs = m_evaluationStack.pop();
+    const auto rhs = m_evaluationStack.pop();
 
-    m_evaluationStack.push( ir::RangeConstant( node.type(), lhs, rhs ) );
+    m_evaluationStack.push( IR::RangeConstant( node.type(), lhs, rhs ) );
 }
 
 void ExecutionVisitor::visit( ListExpression& node )
@@ -706,7 +723,7 @@ void ExecutionVisitor::visit( ListExpression& node )
 void ExecutionVisitor::visit( LetExpression& node )
 {
     node.initializer()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
+    const auto value = m_evaluationStack.pop();
 
     // validate value
     const auto& variableType = node.variable()->type()->result();
@@ -714,7 +731,7 @@ void ExecutionVisitor::visit( LetExpression& node )
     {
         validateValue( value, variableType );
     }
-    catch( const libcasm_ir::ValidationException& e )
+    catch( const IR::ValidationException& e )
     {
         throw RuntimeException( { node.initializer()->sourceLocation() },
             e.what(),
@@ -732,12 +749,12 @@ void ExecutionVisitor::visit( LetExpression& node )
 void ExecutionVisitor::visit( ConditionalExpression& node )
 {
     node.condition()->accept( *this );
-    const auto& condition = m_evaluationStack.pop< ir::BooleanConstant >();
+    const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
 
     if( not condition.defined() )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
-            "condition must be true or false but was undef",
+            "condition must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalExpressionInvalidCondition );
     }
@@ -757,12 +774,12 @@ void ExecutionVisitor::visit( ChooseExpression& node )
     const auto variableIndex = node.variable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseExpressionInvalidUniverse );
     }
@@ -780,21 +797,21 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     const auto variableIndex = node.predicateVariable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    universe.foreach( [&]( const ir::Constant& value ) {
+    universe.foreach( [&]( const IR::Constant& value ) {
         frame->setLocal( variableIndex, value );
 
         node.proposition()->accept( *this );
-        const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
+        const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
         if( not prop.defined() )
         {
@@ -809,17 +826,17 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
 
     if( defined )
     {
-        m_evaluationStack.push( ir::BooleanConstant( result ) );
+        m_evaluationStack.push( IR::BooleanConstant( result ) );
     }
     else
     {
         if( result == false )
         {
-            m_evaluationStack.push( ir::BooleanConstant( false ) );
+            m_evaluationStack.push( IR::BooleanConstant( false ) );
         }
         else
         {
-            m_evaluationStack.push( ir::BooleanConstant() );
+            m_evaluationStack.push( IR::BooleanConstant() );
         }
     }
 }
@@ -833,21 +850,21 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     const auto variableIndex = node.predicateVariable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    universe.foreach( [&]( const ir::Constant& value ) {
+    universe.foreach( [&]( const IR::Constant& value ) {
         frame->setLocal( variableIndex, value );
 
         node.proposition()->accept( *this );
-        const auto& prop = m_evaluationStack.pop< ir::BooleanConstant >();
+        const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
         if( not prop.defined() )
         {
@@ -862,17 +879,17 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
 
     if( defined )
     {
-        m_evaluationStack.push( ir::BooleanConstant( result ) );
+        m_evaluationStack.push( IR::BooleanConstant( result ) );
     }
     else
     {
         if( result == true )
         {
-            m_evaluationStack.push( ir::BooleanConstant( true ) );
+            m_evaluationStack.push( IR::BooleanConstant( true ) );
         }
         else
         {
-            m_evaluationStack.push( ir::BooleanConstant() );
+            m_evaluationStack.push( IR::BooleanConstant() );
         }
     }
 }
@@ -880,12 +897,12 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
 void ExecutionVisitor::visit( ConditionalRule& node )
 {
     node.condition()->accept( *this );
-    const auto& condition = m_evaluationStack.pop< ir::BooleanConstant >();
+    const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
 
     if( not condition.defined() )
     {
         throw RuntimeException( node.condition()->sourceLocation(),
-            "condition must be true or false but was undef",
+            "condition must be true or false but was undefined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ConditionalRuleInvalidCondition );
     }
@@ -902,27 +919,41 @@ void ExecutionVisitor::visit( ConditionalRule& node )
 void ExecutionVisitor::visit( CaseRule& node )
 {
     node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
+    const auto value = m_evaluationStack.pop();
 
-    Case::Ptr defaultCase = nullptr;
+    Case* defaultCase = nullptr;
 
     for( const auto& _case : *node.cases() )
     {
-        if( _case->id() == Node::ID::DEFAULT_CASE )
+        switch( _case->id() )
         {
-            assert( not defaultCase
+            case Node::ID::DEFAULT_CASE:
+            {
+                assert(
+                    defaultCase == nullptr
                     && "case rule should not contain multiple default cases" );
-            defaultCase = _case;
-            continue;
-        }
-
-        _case->accept( *this ); // only evaluates the case expression
-        const auto& caseValue = m_evaluationStack.pop();
-        if( value == caseValue )
-        {
-            // match
-            _case->rule()->accept( *this );
-            return;
+                defaultCase = _case.get();
+                break;
+            }
+            case Node::ID::EXPRESSION_CASE:
+            {
+                const auto& exprCase
+                    = std::static_pointer_cast< ExpressionCase >( _case );
+                exprCase->expression()->accept( *this );
+                const auto caseValue = m_evaluationStack.pop();
+                if( value == caseValue )
+                {
+                    // match
+                    _case->rule()->accept( *this );
+                    return;
+                }
+                break;
+            }
+            default:
+            {
+                assert( !"unknown case" );
+                break;
+            }
         }
     }
 
@@ -935,7 +966,7 @@ void ExecutionVisitor::visit( CaseRule& node )
 void ExecutionVisitor::visit( LetRule& node )
 {
     node.expression()->accept( *this );
-    const auto& value = m_evaluationStack.pop();
+    const auto value = m_evaluationStack.pop();
 
     // validate value
     const auto& variableType = node.variable()->type()->result();
@@ -943,7 +974,7 @@ void ExecutionVisitor::visit( LetRule& node )
     {
         validateValue( value, variableType );
     }
-    catch( const libcasm_ir::ValidationException& e )
+    catch( const IR::ValidationException& e )
     {
         throw RuntimeException( { node.expression()->sourceLocation() },
             e.what(),
@@ -960,30 +991,47 @@ void ExecutionVisitor::visit( LetRule& node )
 
 void ExecutionVisitor::visit( ForallRule& node )
 {
-    ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
 
     auto* frame = m_frameStack.top();
     const auto variableIndex = node.variable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ForallRuleInvalidUniverse );
     }
 
-    universe.foreach( [&]( const ir::Constant& value ) {
+    universe.foreach( [&]( const IR::Constant& value ) {
         frame->setLocal( variableIndex, value );
-        node.rule()->accept( *this );
+
+        // check if value satisfies the condition
+        node.condition()->accept( *this );
+        const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
+
+        if( not condition.defined() )
+        {
+            throw RuntimeException( node.condition()->sourceLocation(),
+                "condition must be true or false but was undefined for '"
+                    + value.name() + "'",
+                m_frameStack.generateBacktrace(
+                    node.sourceLocation(), m_agentId ),
+                Code::ForallRuleInvalidCondition );
+        }
+        else if( condition.value() == true )
+        {
+            node.rule()->accept( *this );
+        }
     } );
 
     try
     {
-        parGuard.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -997,12 +1045,12 @@ void ExecutionVisitor::visit( ChooseRule& node )
     const auto variableIndex = node.variable()->localIndex();
 
     node.universe()->accept( *this );
-    const auto& universe = m_evaluationStack.pop();
+    const auto universe = m_evaluationStack.pop();
 
     if( not universe.defined() )
     {
         throw RuntimeException( node.universe()->sourceLocation(),
-            "universe must not be undef",
+            "universe must be defined",
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::ChooseRuleInvalidUniverse );
     }
@@ -1013,27 +1061,27 @@ void ExecutionVisitor::visit( ChooseRule& node )
 
 void ExecutionVisitor::visit( IterateRule& node )
 {
-    ForkGuard seqGuard( &m_updateSetManager, Semantics::Sequential, 100UL );
+    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100UL );
 
     while( true )
     {
         // uses a new parallel update set on each iteration only to check if the
         // current iteration actually produced any updates
-        ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
+        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100UL );
         node.rule()->accept( *this );
         if( hasEmptyUpdateSet() )
         {
             // the current iteration hasn't produced any updates -> done
             break;
         }
-        parGuard.merge(); // should not throw a merge conflict because of the
+        parTrans.merge(); // should not throw a merge conflict because of the
                           // surrounding sequential block, thus no conflict
                           // handling required
     }
 
     try
     {
-        seqGuard.merge();
+        seqTrans.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1043,12 +1091,12 @@ void ExecutionVisitor::visit( IterateRule& node )
 
 void ExecutionVisitor::visit( BlockRule& node )
 {
-    ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
     node.rules()->accept( *this );
 
     try
     {
-        parGuard.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
@@ -1058,41 +1106,18 @@ void ExecutionVisitor::visit( BlockRule& node )
 
 void ExecutionVisitor::visit( SequenceRule& node )
 {
-    ForkGuard seqGuard( &m_updateSetManager, Semantics::Sequential, 100UL );
+    Transaction transaction(
+        &m_updateSetManager, Semantics::Sequential, 100UL );
     node.rules()->accept( *this );
 
     try
     {
-        seqGuard.merge();
+        transaction.merge();
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
         handleMergeConflict( node, conflict );
     }
-}
-
-static std::string toLocationString(
-    const UpdateRule& update, const std::vector< ir::Constant >& arguments )
-{
-    std::string location = update.function()->identifier()->path();
-
-    if( not arguments.empty() )
-    {
-        location += "(";
-        bool isFirst = true;
-        for( const auto& arg : arguments )
-        {
-            if( not isFirst )
-            {
-                location += ", ";
-            }
-            location += arg.name();
-            isFirst = false;
-        }
-        location += ")";
-    }
-
-    return location;
 }
 
 void ExecutionVisitor::visit( UpdateRule& node )
@@ -1102,12 +1127,12 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
     // evalute update value
     expression->accept( *this );
-    const auto& updateValue = m_evaluationStack.pop();
+    const auto updateValue = m_evaluationStack.pop();
     try
     {
         validateValue( updateValue, function->type()->result() );
     }
-    catch( const libcasm_ir::ValidationException& e )
+    catch( const IR::ValidationException& e )
     {
         throw RuntimeException( { expression->sourceLocation() }, e.what(),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
@@ -1117,7 +1142,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     // evaluate function arguments
     const auto& arguments = function->arguments();
     const auto& argumentTypes = function->type()->arguments();
-    std::vector< ir::Constant > argumentValues;
+    std::vector< IR::Constant > argumentValues;
     argumentValues.reserve( arguments->size() );
     for( std::size_t i = 0; i < arguments->size(); ++i )
     {
@@ -1125,14 +1150,14 @@ void ExecutionVisitor::visit( UpdateRule& node )
         const auto& argumentType = argumentTypes.at( i );
 
         argument->accept( *this );
-        const auto& value = m_evaluationStack.pop();
+        const auto value = m_evaluationStack.pop();
 
         try
         {
             validateValue(
                 value, *argumentType, ValidationFlag::ValueMustBeDefined );
         }
-        catch( const libcasm_ir::ValidationException& e )
+        catch( const IR::ValidationException& e )
         {
             throw RuntimeException( { argument->sourceLocation() }, e.what(),
                 m_frameStack.generateBacktrace(
@@ -1151,7 +1176,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
     const auto location
         = m_locationRegistry.get( functionDefintion->uid(), argumentValues );
-    const Update update{ updateValue, node.ptr< UpdateRule >(), m_agentId };
+    const Update update{ updateValue, &node, m_agentId };
 
     try
     {
@@ -1159,22 +1184,20 @@ void ExecutionVisitor::visit( UpdateRule& node )
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
-        const auto& srcLocA = node.sourceLocation();
-        const auto& valA = updateValue.name();
+        // existing
+        const auto& updateA = conflict.existingUpdate();
+        const auto updateStrA = updateAsString( conflict.existingUpdate() );
+        const auto& sourceLocationA = updateA.value.producer->sourceLocation();
 
-        const auto& existingValue = conflict.existingUpdate().second;
-        const auto& srcLocB = existingValue.producer->sourceLocation();
-        const auto& valB = existingValue.value.name();
-
-        const auto location = toLocationString( node, argumentValues );
+        // conflicting
+        const auto& updateB = conflict.conflictingUpdate();
+        const auto updateStrB = updateAsString( updateB );
+        const auto& sourceLocationB = node.sourceLocation();
 
         const auto info = "Conflict while adding an update in agent "
-                          + m_agentId.name() + ". Update '" + location
-                          + " := " + valA + " at line "
-                          + std::to_string( srcLocA.begin.line )
-                          + " clashed with update '" + location + " := " + valB
-                          + "' at line " + std::to_string( srcLocB.begin.line );
-        throw RuntimeException( { srcLocA, srcLocB }, info,
+                          + m_agentId.name() + ". Update '" + updateStrA
+                          + "' clashed with update '" + updateStrB + "'";
+        throw RuntimeException( { sourceLocationA, sourceLocationB }, info,
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             libcasm_fe::Code::UpdateSetClash );
     }
@@ -1191,29 +1214,16 @@ void ExecutionVisitor::visit( CallRule& node )
     }
 }
 
-void ExecutionVisitor::visit( ExpressionCase& node )
-{
-    node.expression()->accept( *this );
-    // note: rule will be invoked in visit(CaseRule) if expressions match
-}
-
-void ExecutionVisitor::visit( DefaultCase& node )
-{
-    assert( !"default case should not be executed, "
-             "accept rule of default case instead!" );
-    // note: rule will be invoked in visit(CaseRule)
-}
-
 u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
 {
     return m_updateSetManager.currentUpdateSet()->empty();
 }
 
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
-    const CallExpression::Ptr& call, const Node::Ptr& callee,
-    std::size_t numberOfLocals )
+    CallExpression* call, Node* callee, std::size_t numberOfLocals )
 {
-    auto frame = libstdhl::make_unique< Frame >( call, callee, numberOfLocals );
+    auto frame = libstdhl::Memory::make_unique< Frame >(
+        call, callee, numberOfLocals );
 
     if( call != nullptr )
     {
@@ -1223,7 +1233,7 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
         for( const auto& argument : *call->arguments() )
         {
             argument->accept( *this );
-            const auto& value = m_evaluationStack.pop();
+            const auto value = m_evaluationStack.pop();
             frame->setLocal( localIndex, value );
             ++localIndex;
         }
@@ -1233,7 +1243,7 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
 }
 
 void ExecutionVisitor::invokeBuiltin(
-    const Node& node, ir::Value::ID id, const ir::Type::Ptr& type )
+    const Node& node, IR::Value::ID id, const IR::Type::Ptr& type )
 {
     validateArguments(
         node, type->arguments(), {}, Code::BuiltinArgumentValueInvalid );
@@ -1241,8 +1251,10 @@ void ExecutionVisitor::invokeBuiltin(
     try
     {
         const auto& arguments = m_frameStack.top()->locals();
-        const auto& returnValue = libcasm_rt::Value::execute_(
-            id, type, arguments.data(), arguments.size() );
+        IR::Constant returnValue;
+
+        RT::Value::execute(
+            id, type, returnValue, arguments.data(), arguments.size() );
 
         const auto& returnType = type->result();
         if( not returnType.isVoid() )
@@ -1259,21 +1271,20 @@ void ExecutionVisitor::invokeBuiltin(
     }
 }
 
-void ExecutionVisitor::validateValue( const ir::Constant& value,
-    const libcasm_ir::Type& type, ValidationFlags flags ) const
+void ExecutionVisitor::validateValue( const IR::Constant& value,
+    const IR::Type& type, ValidationFlags flags ) const
 {
     if( flags.isSet( ValidationFlag::ValueMustBeDefined )
         and not value.defined() )
     {
-        throw libcasm_ir::ValidationException(
-            "value isn't defined, but undef isn't allowed" );
+        throw IR::ValidationException( "value must be defined" );
     }
 
     type.validate( value );
 }
 
 void ExecutionVisitor::validateArguments( const Node& node,
-    const libcasm_ir::Types& argumentTypes, ValidationFlags flags,
+    const IR::Types& argumentTypes, ValidationFlags flags,
     Code errorCode ) const
 {
     const auto* frame = m_frameStack.top();
@@ -1290,7 +1301,7 @@ void ExecutionVisitor::validateArguments( const Node& node,
         {
             validateValue( argumentValue, *argumentType, flags );
         }
-        catch( const libcasm_ir::ValidationException& e )
+        catch( const IR::ValidationException& e )
         {
             const auto& callArgument = frame->call()->arguments()->at( i );
             throw RuntimeException( { callArgument->sourceLocation() },
@@ -1305,27 +1316,20 @@ void ExecutionVisitor::validateArguments( const Node& node,
 void ExecutionVisitor::handleMergeConflict(
     const Node& node, const ExecutionUpdateSet::Conflict& conflict ) const
 {
-    const auto& conflictingUpdate = conflict.conflictingUpdate();
-    const auto& existingUpdate = conflict.existingUpdate();
+    // existing
+    const auto& updateA = conflict.existingUpdate();
+    const auto updateStrA = updateAsString( updateA );
+    const auto& sourceLocationA = updateA.value.producer->sourceLocation();
 
-    const auto& conflictValue = conflictingUpdate.second;
-    const auto& srcLocA = conflictValue.producer->sourceLocation();
-    const auto& valA = conflictValue.value.name();
-
-    const auto& existingValue = existingUpdate.second;
-    const auto& srcLocB = existingValue.producer->sourceLocation();
-    const auto& valB = existingValue.value.name();
-
-    const auto location = toLocationString(
-        *conflictValue.producer, conflictingUpdate.first.arguments() );
+    // conflicting
+    const auto& updateB = conflict.conflictingUpdate();
+    const auto updateStrB = updateAsString( updateB );
+    const auto& sourceLocationB = updateB.value.producer->sourceLocation();
 
     const auto info = "Conflict while merging update sets in agent "
-                      + m_agentId.name() + ". Update '" + location
-                      + " := " + valA + " at line "
-                      + std::to_string( srcLocA.begin.line )
-                      + " clashed with update '" + location + " := " + valB
-                      + "' at line " + std::to_string( srcLocB.begin.line );
-    throw RuntimeException( { srcLocA, srcLocB }, info,
+                      + m_agentId.name() + ". Update '" + updateStrA
+                      + "' clashed with update '" + updateStrB + "'";
+    throw RuntimeException( { sourceLocationA, sourceLocationB }, info,
         m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
         libcasm_fe::Code::UpdateSetMergeConflict );
 }
@@ -1336,7 +1340,7 @@ class StateInitializationVisitor final : public EmptyVisitor
     StateInitializationVisitor(
         ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
-    void visit( Specification& node ) override;
+    void visit( Specification& node );
 
     void visit( FunctionDefinition& node ) override;
 
@@ -1359,6 +1363,7 @@ void StateInitializationVisitor::visit( Specification& node )
 {
     m_updateSetManager.fork( Semantics::Sequential, 100UL );
 
+    node.header()->accept( *this );
     node.definitions()->accept( *this );
 
     auto updateSet = m_updateSetManager.currentUpdateSet();
@@ -1368,18 +1373,18 @@ void StateInitializationVisitor::visit( Specification& node )
 
 void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
-    ForkGuard parGuard( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
     ExecutionVisitor executionVisitor( m_locationRegistry, m_globalState,
         m_updateSetManager, ReferenceConstant() );
     node.initializers()->accept( executionVisitor );
-    parGuard.merge();
+    transaction.merge();
 }
 
 class Agent
 {
   public:
     Agent( ExecutionLocationRegistry& locationRegistry,
-        const Storage& globalState, const ir::Constant& agentId,
+        const Storage& globalState, const IR::Constant& agentId,
         const ReferenceConstant& rule );
 
     void run( void );
@@ -1389,13 +1394,13 @@ class Agent
   private:
     const Storage& m_globalState;
     ExecutionLocationRegistry& m_locationRegistry;
-    const ir::Constant& m_agentId;
+    const IR::Constant& m_agentId;
     const ReferenceConstant& m_rule;
     UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
 };
 
 Agent::Agent( ExecutionLocationRegistry& locationRegistry,
-    const Storage& globalState, const ir::Constant& agentId,
+    const Storage& globalState, const IR::Constant& agentId,
     const ReferenceConstant& rule )
 : m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
@@ -1489,23 +1494,25 @@ class AgentScheduler
   private:
     std::vector< Agent > collectAgents( void ) const;
     void dispatch( std::vector< Agent >& agents );
-    ExecutionUpdateSet* collectUpdates( const std::vector< Agent >& agents );
+    void collectUpdates( const std::vector< Agent >& agents );
+    void fireUpdates( void );
 
   private:
     std::unique_ptr< DispatchStrategy > m_dispatchStrategy;
     Storage& m_globalState;
     ExecutionLocationRegistry& m_locationRegistry;
-    UpdateSetManager< ExecutionUpdateSet > m_updateSetManager;
+    ParallelUpdateSet< UpdateSetDetails > m_collectedUpdates;
     bool m_done;
     std::size_t m_stepCounter;
 };
 
 AgentScheduler::AgentScheduler(
     ExecutionLocationRegistry& locationRegistry, Storage& globalState )
-: m_dispatchStrategy( libstdhl::make_unique< SequentialDispatchStrategy >() )
+: m_dispatchStrategy(
+      libstdhl::Memory::make_unique< SequentialDispatchStrategy >() )
 , m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
-, m_updateSetManager()
+, m_collectedUpdates()
 , m_done( false )
 , m_stepCounter( 0UL )
 {
@@ -1528,10 +1535,9 @@ void AgentScheduler::step( void )
 
     dispatch( agents );
 
-    auto* updates = collectUpdates( agents );
-    m_globalState.fireUpdateSet( updates );
-    m_done = updates->empty();
-    m_updateSetManager.clear();
+    collectUpdates( agents );
+    m_done = m_collectedUpdates.empty();
+    fireUpdates();
 
     ++m_stepCounter;
 }
@@ -1559,7 +1565,7 @@ std::vector< Agent > AgentScheduler::collectAgents( void ) const
 
         const auto& agentId = location.arguments().at( 0 );
 
-        assert( ir::isa< ReferenceConstant >( value ) );
+        assert( IR::isa< ReferenceConstant >( value ) );
         const auto& rule = static_cast< const ReferenceConstant& >( value );
 
         if( rule.defined() )
@@ -1578,67 +1584,57 @@ void AgentScheduler::dispatch( std::vector< Agent >& agents )
     m_dispatchStrategy->dispatch( agents );
 }
 
-ExecutionUpdateSet* AgentScheduler::collectUpdates(
-    const std::vector< Agent >& agents )
+void AgentScheduler::collectUpdates( const std::vector< Agent >& agents )
 {
-    if( agents.size() == 1 )
+    for( const auto& agent : agents )
     {
-        return agents.at( 0 ).updateSet();
-    }
-    else
-    {
-        m_updateSetManager.fork( Semantics::Parallel, 100UL );
-        auto* updates = m_updateSetManager.currentUpdateSet();
-        for( const auto& agent : agents )
+        try
         {
-            try
-            {
-                agent.updateSet()->mergeInto( updates );
-            }
-            catch( const ExecutionUpdateSet::Conflict& conflict )
-            {
-                const auto& conflictingUpdate = conflict.conflictingUpdate();
-                const auto& existingUpdate = conflict.existingUpdate();
-
-                const auto& conflictValue = conflictingUpdate.second;
-                const auto& agentA = conflictValue.agent.name();
-                const auto& srcLocA = conflictValue.producer->sourceLocation();
-                const auto& valA = conflictValue.value.name();
-
-                const auto& existingValue = existingUpdate.second;
-                const auto& agentB = existingValue.agent.name();
-                const auto& srcLocB = existingValue.producer->sourceLocation();
-                const auto& valB = existingValue.value.name();
-
-                const auto location = toLocationString( *conflictValue.producer,
-                    conflictingUpdate.first.arguments() );
-
-                const auto info
-                    = "Conflict while collection updates from agent " + agentA
-                      + ". Update '" + location + " := " + valA
-                      + "' produced by agent " + agentA + " at line "
-                      + std::to_string( srcLocA.begin.line )
-                      + " clashed with update '" + location + " := " + valB
-                      + "' produced by agent " + agentB + " at line "
-                      + std::to_string( srcLocB.begin.line );
-                throw RuntimeException( { srcLocA, srcLocB }, info,
-                    libcasm_fe::Code::UpdateSetMergeConflict );
-            }
+            agent.updateSet()->mergeInto( &m_collectedUpdates );
         }
-        return updates;
+        catch( const ExecutionUpdateSet::Conflict& conflict )
+        {
+            // existing
+            const auto& updateA = conflict.existingUpdate();
+            const auto updateStrA = updateAsString( updateA );
+            const auto agentStrA = updateA.value.agent.name();
+            const auto& sourceLocationA
+                = updateA.value.producer->sourceLocation();
+
+            // conflicting
+            const auto& updateB = conflict.conflictingUpdate();
+            const auto updateStrB = updateAsString( updateB );
+            const auto agentStrB = updateB.value.agent.name();
+            const auto& sourceLocationB
+                = updateB.value.producer->sourceLocation();
+
+            const auto info = "Conflict while collection updates from agent "
+                              + agentStrB + ". Update '" + updateStrA
+                              + "' produced by agent " + agentStrA
+                              + " clashed with update '" + updateStrB
+                              + "' produced by agent " + agentStrB;
+            throw RuntimeException( { sourceLocationA, sourceLocationB }, info,
+                libcasm_fe::Code::UpdateSetMergeConflict );
+        }
     }
+}
+
+void AgentScheduler::fireUpdates( void )
+{
+    m_globalState.fireUpdateSet( &m_collectedUpdates );
+    m_collectedUpdates.clear();
 }
 
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< ConsistencyCheckPass >();
+    pu.require< FrameSizeDeterminationPass >();
 }
 
 u1 NumericExecutionPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< ConsistencyCheckPass >();
+    const auto data = pr.result< FrameSizeDeterminationPass >();
     const auto specification = data->specification();
 
     ExecutionLocationRegistry locationRegistry;
@@ -1646,13 +1642,13 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
 
     AgentScheduler scheduler( locationRegistry, globalState );
     /*scheduler.setDispatchStrategy(
-        libstdhl::make_unique< ParallelDispatchStrategy >() );*/
+        libstdhl::Memory::make_unique< ParallelDispatchStrategy >() );*/
 
     try
     {
         StateInitializationVisitor stateInitializationVisitor(
             locationRegistry, globalState );
-        specification->accept( stateInitializationVisitor );
+        stateInitializationVisitor.visit( *specification );
 
         while( not scheduler.done() )
         {
@@ -1660,8 +1656,7 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
         }
 
         log.info( "Finished execution after "
-                  + std::to_string( scheduler.numberOfSteps() )
-                  + " steps" );
+                  + std::to_string( scheduler.numberOfSteps() ) + " steps" );
     }
     catch( const RuntimeException& e )
     {

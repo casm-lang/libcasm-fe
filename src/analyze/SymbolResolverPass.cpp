@@ -22,18 +22,38 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
 #include "SymbolResolverPass.h"
 
-#include "../pass/src/PassRegistry.h"
-#include "../pass/src/PassResult.h"
-#include "../pass/src/PassUsage.h"
+#include "../Logger.h"
+#include "../analyze/AttributionPass.h"
+#include "../ast/RecursiveVisitor.h"
 
-#include "Logger.h"
-#include "analyze/AttributionPass.h"
-#include "ast/RecursiveVisitor.h"
+#include <libcasm-ir/Builtin>
 
-#include "../casm-ir/src/Builtin.h"
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <unordered_map>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -42,244 +62,51 @@ char SymbolResolverPass::id = 0;
 
 static libpass::PassRegistration< SymbolResolverPass > PASS(
     "ASTSymbolResolverPass",
-    "resolves all AST identifiers and creates a symbol table", "ast-symtbl",
+    "resolves AST identifiers of type-, call-, ... nodes", "ast-sym-resolve",
     0 );
-
-//
-// SymbolTableVisitor
-//
-
-class SymbolTableVisitor final : public RecursiveVisitor
-{
-  public:
-    SymbolTableVisitor( Logger& log, Namespace& symboltable );
-
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
-    void visit( TypeDefinition& node ) override;
-
-  private:
-    Logger& m_log;
-    Namespace& m_symboltable;
-};
-
-SymbolTableVisitor::SymbolTableVisitor( Logger& log, Namespace& symboltable )
-: m_log( log )
-, m_symboltable( symboltable )
-{
-}
-
-void SymbolTableVisitor::visit( FunctionDefinition& node )
-{
-    try
-    {
-        m_symboltable.registerSymbol( node.ptr< FunctionDefinition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( node );
-
-        if( node.uid() == FunctionDefinition::UID::PROGRAM )
-        {
-            m_log.error( { node.sourceLocation(),
-                             symbol.definition()->sourceLocation() },
-                "init already defined",
-                Code::AgentInitRuleMultipleDefinitions );
-        }
-        else
-        {
-            m_log.error( { node.sourceLocation(),
-                             symbol.definition()->sourceLocation() },
-                e.what(),
-                Code::FunctionDefinitionAlreadyUsed );
-        }
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-void SymbolTableVisitor::visit( DerivedDefinition& node )
-{
-    try
-    {
-        m_symboltable.registerSymbol( node.ptr< DerivedDefinition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( node );
-
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what(), Code::DerivedDefinitionAlreadyUsed );
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-void SymbolTableVisitor::visit( RuleDefinition& node )
-{
-    try
-    {
-        m_symboltable.registerSymbol( node.ptr< RuleDefinition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( node );
-
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what(), Code::RuleDefinitionAlreadyUsed );
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-void SymbolTableVisitor::visit( EnumerationDefinition& node )
-{
-    try
-    {
-        m_symboltable.registerSymbol( node.ptr< EnumerationDefinition >() );
-
-        const auto& name = node.identifier()->name();
-
-        m_log.debug( "creating IR enumeration type '" + name + "'" );
-        const auto kind = libstdhl::make< libcasm_ir::Enumeration >( name );
-        for( const auto& enumerator : *node.enumerators() )
-        {
-            kind->add( enumerator->name() );
-        }
-
-        const auto type = libstdhl::make< libcasm_ir::EnumerationType >( kind );
-        node.setType( type );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( node );
-
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what() );
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-void SymbolTableVisitor::visit( TypeDefinition& node )
-{
-    // assign type before registering the alias
-    try
-    {
-        const auto& symbol = m_symboltable.find( *node.type()->name() );
-        node.setType( symbol.definition()->type() );
-    }
-    catch( const std::domain_error& e )
-    {
-        m_log.error( { node.type()->sourceLocation() }, e.what(),
-            Code::SymbolIsUnknown );
-    }
-
-    try
-    {
-        m_symboltable.registerSymbol( node.ptr< TypeDefinition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( node );
-
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what(), Code::SymbolAlreadyDefined );
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
-//
-// SymbolResolveVisitor
-//
 
 class SymbolResolveVisitor final : public RecursiveVisitor
 {
   public:
-    SymbolResolveVisitor( Logger& log, Namespace& symboltable );
+    SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
 
+    void visit( ReferenceAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
-
     void visit( LetExpression& node ) override;
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
-    void visit( UpdateRule& node ) override;
     void visit( LetRule& node ) override;
     void visit( ForallRule& node ) override;
     void visit( ChooseRule& node ) override;
 
   private:
-    void push( VariableDefinition& identifier );
-    void pop( VariableDefinition& identifier );
+    void pushVariable( const VariableDefinition::Ptr& variable );
+    void popVariable( const VariableDefinition::Ptr& variable );
 
-    Logger& m_log;
+    libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 
-    class Variable
-    {
-      public:
-        Variable( const std::string& name, const std::size_t localIndex,
-            const VariableDefinition::Ptr& definition )
-        : m_name( name )
-        , m_localIndex( localIndex )
-        , m_definition( definition )
-        {
-        }
-
-        std::string name( void ) const
-        {
-            return m_name;
-        }
-
-        std::size_t localIndex( void ) const
-        {
-            return m_localIndex;
-        }
-
-        const VariableDefinition::Ptr& definition( void ) const
-        {
-            return m_definition;
-        }
-
-      private:
-        std::string m_name;
-        std::size_t m_localIndex;
-        const VariableDefinition::Ptr m_definition;
-    };
-
-    std::vector< Variable > m_variables;
-    std::size_t m_maxNumberOfLocals; /**< Used to calculate the minimum number
-                                        of frame slots required for derived
-                                        functions and rules during execution */
+    std::unordered_map< std::string, VariableDefinition::Ptr > m_variables;
 };
 
 SymbolResolveVisitor::SymbolResolveVisitor(
-    Logger& log, Namespace& symboltable )
+    libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
-, m_maxNumberOfLocals( 0 )
+, m_variables()
 {
 }
 
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
 {
-    m_maxNumberOfLocals = 0;
-
     for( const auto& argument : *node.arguments() )
     {
-        push( *argument );
+        pushVariable( argument );
     }
 
     node.expression()->accept( *this );
@@ -287,19 +114,15 @@ void SymbolResolveVisitor::visit( DerivedDefinition& node )
     const auto end = node.arguments()->rend();
     for( auto it = node.arguments()->rbegin(); it != end; ++it )
     {
-        pop( **it );
+        popVariable( *it );
     }
-
-    node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
 }
 
 void SymbolResolveVisitor::visit( RuleDefinition& node )
 {
-    m_maxNumberOfLocals = 0;
-
     for( const auto& argument : *node.arguments() )
     {
-        push( *argument );
+        pushVariable( argument );
     }
 
     node.rule()->accept( *this );
@@ -307,300 +130,343 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     const auto end = node.arguments()->rend();
     for( auto it = node.arguments()->rbegin(); it != end; ++it )
     {
-        pop( **it );
+        popVariable( *it );
+    }
+}
+
+void SymbolResolveVisitor::visit( ReferenceAtom& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& name = node.identifier()->path();
+
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        node.setReferenceType( ReferenceAtom::ReferenceType::BUILTIN );
+        node.setBuiltinId( libcasm_ir::Annotation::find( name ).valueID() );
+        return;
     }
 
-    node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
+    try
+    {
+        const auto symbol = m_symboltable.find( *node.identifier() );
+
+        switch( symbol->id() )
+        {
+            case Node::ID::FUNCTION_DEFINITION:
+            {
+                node.setReferenceType( ReferenceAtom::ReferenceType::FUNCTION );
+                node.setReference( symbol );
+                break;
+            }
+            case Node::ID::DERIVED_DEFINITION:
+            {
+                node.setReferenceType( ReferenceAtom::ReferenceType::DERIVED );
+                node.setReference( symbol );
+                break;
+            }
+            case Node::ID::RULE_DEFINITION:
+            {
+                node.setReferenceType( ReferenceAtom::ReferenceType::RULE );
+                node.setReference( symbol );
+                break;
+            }
+            default:
+            {
+                m_log.error( { node.identifier()->sourceLocation() },
+                    "cannot reference '" + symbol->description() + "'" );
+            }
+        }
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error( { node.identifier()->sourceLocation() },
+            "'" + name + "' has not been defined",
+            Code::SymbolIsUnknown );
+    }
 }
 
 void SymbolResolveVisitor::visit( DirectCallExpression& node )
 {
+    RecursiveVisitor::visit( node );
+
     const auto& path = *node.identifier();
+    const auto& name = path.path();
 
     if( path.type() == IdentifierPath::Type::RELATIVE )
     {
-        m_log.debug( "call: symbol '" + path.path() + "' is relative" );
+        // only absolute types can be resolved here, relative types will be
+        // resolved later in the type inference pass
+        return;
+    }
 
-        if( path.identifiers()->size() != 1 )
+    const auto variableIt = m_variables.find( name );
+    if( variableIt != m_variables.cend() )
+    {
+        node.setTargetType( CallExpression::TargetType::VARIABLE );
+        node.setTargetDefinition( variableIt->second );
+        return;
+    }
+
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        const auto& annotation = libcasm_ir::Annotation::find( name );
+
+        node.setTargetType( CallExpression::TargetType::BUILTIN );
+        node.setTargetBuiltinId( annotation.valueID() );
+
+        const auto expectedNumberOfArguments
+            = annotation.relations().front().argument.size();
+        if( node.arguments()->size() != expectedNumberOfArguments )
         {
             m_log.error( { node.sourceLocation() },
-                "invalid relative path '" + path.path() + "' found" );
+                "invalid argument size: builtin '" + name + "' expects "
+                    + std::to_string( expectedNumberOfArguments )
+                    + " arguments",
+                Code::SymbolArgumentSizeMismatch );
         }
+
+        return;
     }
-    else
+
+    try
     {
-        try
+        const auto& symbol = m_symboltable.find( *node.identifier() );
+
+        std::size_t expectedNumberOfArguments = 0;
+
+        switch( symbol->id() )
         {
-            const auto& symbol = m_symboltable.find( node );
-
-            node.setTargetType( symbol.targetType() );
-            node.setTargetDefinition( symbol.definition() );
-
-            if( symbol.targetType() == CallExpression::TargetType::TYPE_DOMAIN
-                or symbol.targetType() == CallExpression::TargetType::CONSTANT )
+            case Node::ID::FUNCTION_DEFINITION:
             {
-                node.setType( symbol.definition()->type() );
+                node.setTargetType( CallExpression::TargetType::FUNCTION );
+                const auto function
+                    = std::static_pointer_cast< FunctionDefinition >( symbol );
+                expectedNumberOfArguments = function->argumentTypes()->size();
+                break;
             }
-        }
-        catch( const std::domain_error& e )
-        {
-            const auto& name = path.baseName();
-
-            if( libcasm_ir::Builtin::available(
-                    name, node.arguments()->size() ) )
+            case Node::ID::DERIVED_DEFINITION:
             {
-                try
-                {
-                    m_symboltable.registerSymbol(
-                        node.ptr< DirectCallExpression >(),
-                        CallExpression::TargetType::BUILTIN );
-                    node.setTargetType( CallExpression::TargetType::BUILTIN );
-                }
-                catch( const std::domain_error& e )
-                {
-                    m_log.error( { node.sourceLocation() }, e.what() );
-                }
+                node.setTargetType( CallExpression::TargetType::DERIVED );
+                const auto derived
+                    = std::static_pointer_cast< DerivedDefinition >( symbol );
+                expectedNumberOfArguments = derived->arguments()->size();
+                break;
             }
-            else
+            case Node::ID::RULE_DEFINITION:
             {
-                const auto variable
-                    = std::find_if( m_variables.rbegin(), m_variables.rend(),
-                        [&]( const Variable& v ) { return v.name() == name; } );
-
-                if( variable != m_variables.rend() )
-                {
-                    node.setTargetType( CallExpression::TargetType::VARIABLE );
-                    node.setTargetDefinition( variable->definition() );
-                }
-                else if( name == "self" )
-                {
-                    assert( node.targetType()
-                            == CallExpression::TargetType::UNKNOWN );
-                    node.setTargetType( CallExpression::TargetType::SELF );
-                }
-                // single agent execution notation --> agent type domain ==
-                // Enumeration!
-                else if( name == "$" )
-                {
-                    assert( node.targetType()
-                            == CallExpression::TargetType::CONSTANT );
-
-                    const auto kind
-                        = libstdhl::make< libcasm_ir::Enumeration >( "Agent" );
-                    kind->add( "$" );
-
-                    const auto type
-                        = libstdhl::make< libcasm_ir::EnumerationType >( kind );
-                    node.setType( type );
-
-                    m_symboltable.registerSymbol( "Agent",
-                        node.ptr< DirectCallExpression >(),
-                        CallExpression::TargetType::TYPE_DOMAIN );
-
-                    m_symboltable.registerSymbol(
-                        node.ptr< DirectCallExpression >(),
-                        CallExpression::TargetType::CONSTANT );
-                    node.setTargetType( CallExpression::TargetType::CONSTANT );
-                }
-                else
-                {
-                    m_log.error( { node.sourceLocation() },
-                        "unknown " + node.targetTypeName() + " symbol '"
-                            + path.path()
-                            + "' found",
-                        ( node.targetType()
-                            == CallExpression::TargetType::FUNCTION )
-                            ? Code::FunctionSymbolIsUnknown
-                            : Code::SymbolIsUnknown );
-                }
+                node.setTargetType( CallExpression::TargetType::RULE );
+                const auto rule
+                    = std::static_pointer_cast< RuleDefinition >( symbol );
+                expectedNumberOfArguments = rule->arguments()->size();
+                break;
+            }
+            case Node::ID::ENUMERATOR_DEFINITION:
+            {
+                node.setTargetType( CallExpression::TargetType::CONSTANT );
+                break;
+            }
+            case Node::ID::ENUMERATION_DEFINITION: // [[fallthrough]]
+            case Node::ID::TYPE_DEFINITION:
+            {
+                node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
+                break;
+            }
+            default:
+            {
+                m_log.error( { node.identifier()->sourceLocation() },
+                    "cannot reference '" + symbol->description() + "'" );
+                return;
             }
         }
 
-        m_log.debug(
-            "call: " + path.path() + "{ " + node.targetTypeName() + " }" );
+        node.setTargetDefinition( symbol );
+
+        if( node.arguments()->size() != expectedNumberOfArguments )
+        {
+            m_log.error( { node.sourceLocation() },
+                "invalid argument size: " + symbol->description() + " '" + name
+                    + "' expects " + std::to_string( expectedNumberOfArguments )
+                    + " arguments",
+                Code::SymbolArgumentSizeMismatch );
+        }
+    }
+    catch( const std::domain_error& e )
+    {
+        static const auto SELF( "self" );
+        static const auto AGENT( "Agent" );
+
+        if( name == SELF )
+        {
+            try
+            {
+                const auto& symbol = m_symboltable.find( AGENT );
+                node.setTargetType( CallExpression::TargetType::SELF );
+                node.setTargetDefinition( symbol );
+            }
+            catch( const std::domain_error& e )
+            {
+                m_log.error( { node.sourceLocation() },
+                    "unable to find 'Agent' symbol" );
+            }
+        }
+        // single agent execution notation --> agent type domain ==
+        // Enumeration!
+        else if( name == "$" )
+        {
+            assert( node.targetType() == CallExpression::TargetType::CONSTANT );
+
+            const auto agent = std::make_shared< EnumeratorDefinition >(
+                std::make_shared< Identifier >( "$" ) );
+            const auto agentEnumerators = std::make_shared< Enumerators >();
+            agentEnumerators->add( agent );
+            const auto agentEnum = std::make_shared< EnumerationDefinition >(
+                std::make_shared< Identifier >( AGENT ), agentEnumerators );
+
+            const auto kind
+                = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
+            kind->add( "$" );
+
+            const auto type
+                = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
+            agent->setType( type );
+            agentEnum->setType( type );
+
+            m_symboltable.registerSymbol( AGENT, agentEnum );
+
+            node.setTargetDefinition( agent );
+            node.setType( type );
+        }
+        else
+        {
+            m_log.error( { node.sourceLocation() },
+                "unknown " + node.targetTypeName() + " symbol '" + path.path()
+                    + "' found",
+                ( node.targetType() == CallExpression::TargetType::FUNCTION )
+                    ? Code::FunctionSymbolIsUnknown
+                    : Code::SymbolIsUnknown );
+        }
     }
 
-    RecursiveVisitor::visit( node );
+    m_log.debug( "call: " + path.path() + "{ " + node.targetTypeName() + " }" );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )
 {
     node.initializer()->accept( *this );
 
-    push( *node.variable() );
+    pushVariable( node.variable() );
     node.expression()->accept( *this );
-    pop( *node.variable() );
+    popVariable( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ChooseExpression& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.variable() );
+    pushVariable( node.variable() );
     node.expression()->accept( *this );
-    pop( *node.variable() );
+    popVariable( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.predicateVariable() );
+    pushVariable( node.predicateVariable() );
     node.proposition()->accept( *this );
-    pop( *node.predicateVariable() );
+    popVariable( node.predicateVariable() );
 }
 
 void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.predicateVariable() );
+    pushVariable( node.predicateVariable() );
     node.proposition()->accept( *this );
-    pop( *node.predicateVariable() );
-}
-
-void SymbolResolveVisitor::visit( UpdateRule& node )
-{
-    RecursiveVisitor::visit( node );
-
-    const auto& function = node.function();
-    if( function->targetType() != CallExpression::TargetType::FUNCTION )
-    {
-        m_log.error( { function->sourceLocation() },
-            "updating " + function->targetTypeName() + " '"
-                + function->identifier()->path()
-                + "' is not allowed, only function symbols are valid",
-            Code::UpdateRuleFunctionSymbolIsInvalid );
-    }
+    popVariable( node.predicateVariable() );
 }
 
 void SymbolResolveVisitor::visit( LetRule& node )
 {
     node.expression()->accept( *this );
 
-    push( *node.variable() );
+    pushVariable( node.variable() );
     node.rule()->accept( *this );
-    pop( *node.variable() );
+    popVariable( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ForallRule& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.variable() );
+    pushVariable( node.variable() );
+    node.condition()->accept( *this );
     node.rule()->accept( *this );
-    pop( *node.variable() );
+    popVariable( node.variable() );
 }
 
 void SymbolResolveVisitor::visit( ChooseRule& node )
 {
     node.universe()->accept( *this );
 
-    push( *node.variable() );
+    pushVariable( node.variable() );
     node.rule()->accept( *this );
-    pop( *node.variable() );
+    popVariable( node.variable() );
 }
 
-void SymbolResolveVisitor::push( VariableDefinition& node )
+void SymbolResolveVisitor::pushVariable(
+    const VariableDefinition::Ptr& variable )
 {
-    const auto& name = node.identifier()->name();
+    const auto& name = variable->identifier()->name();
 
-    const auto variable
-        = std::find_if( m_variables.rbegin(), m_variables.rend(),
-            [&]( const Variable& v ) { return v.name() == name; } );
-
-    if( variable != m_variables.rend() )
+    const auto result = m_variables.emplace( name, variable );
+    if( not result.second )
     {
-        m_log.error( { node.sourceLocation() },
+        m_log.error( { variable->sourceLocation() },
             "redefinition of symbol '" + name + "'",
             Code::SymbolAlreadyDefined );
 
-        m_log.info( { variable->definition()->sourceLocation() },
+        const auto& existingVariable = result.first->second;
+        m_log.info( { existingVariable->sourceLocation() },
             "previous definition of '" + name + "' is here" );
     }
-
-    const std::size_t localIndex = m_variables.size(); // used during execution
-    m_variables.emplace_back(
-        name, localIndex, node.ptr< VariableDefinition >() );
-
-    node.setLocalIndex( localIndex );
-    m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_variables.size() );
 }
 
-void SymbolResolveVisitor::pop( VariableDefinition& node )
+void SymbolResolveVisitor::popVariable(
+    const VariableDefinition::Ptr& variable )
 {
-    assert(
-        m_variables.back().definition() == node.ptr< VariableDefinition >() );
-    m_variables.pop_back();
+    const auto& name = variable->identifier()->name();
+    m_variables.erase( name );
 }
-
-static void registerBasicTypes( Namespace& symboltable )
-{
-    const auto registerType
-        = [&]( const std::string& name, const libcasm_ir::Type::Ptr& type ) {
-              const auto typeNode = std::make_shared< BasicType >(
-                  std::make_shared< IdentifierPath >(
-                      std::make_shared< Identifier >( name ) ) );
-              typeNode->setType( type );
-              symboltable.registerSymbol( typeNode );
-          };
-
-    registerType( "Void", libstdhl::get< libcasm_ir::VoidType >() );
-    registerType( "Boolean", libstdhl::get< libcasm_ir::BooleanType >() );
-    registerType( "Integer", libstdhl::get< libcasm_ir::IntegerType >() );
-    registerType( "Bit", libstdhl::get< libcasm_ir::BitType >( 1 ) );
-    registerType( "String", libstdhl::get< libcasm_ir::StringType >() );
-    registerType( "Floating", libstdhl::get< libcasm_ir::FloatingType >() );
-    registerType( "Rational", libstdhl::get< libcasm_ir::RationalType >() );
-}
-
-//
-// SymbolResolverPass
-//
 
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< AttributionPass >();
+    pu.require< SymbolRegistrationPass >();
 }
 
 u1 SymbolResolverPass::run( libpass::PassResult& pr )
 {
-    Logger log( &id, stream() );
+    libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< AttributionPass >();
+    const auto data = pr.result< SymbolRegistrationPass >();
     const auto specification = data->specification();
 
-    const auto symboltable = std::make_shared< Namespace >();
-
-    registerBasicTypes( *symboltable );
-
-    SymbolTableVisitor symbolTableGenerator( log, *symboltable );
-    specification->accept( symbolTableGenerator );
-
-    const auto symTblErr = log.errors();
-    if( symTblErr > 0 )
-    {
-        log.debug(
-            "found %lu error(s) during symbol table creation", symTblErr );
-        return false;
-    }
-
-    SymbolResolveVisitor symbolResolver( log, *symboltable );
-    specification->accept( symbolResolver );
-
-    const auto symResErr = log.errors();
-    if( symResErr > 0 )
-    {
-        log.debug( "found %lu error(s) during symbol resolving", symResErr );
-        return false;
-    }
+    SymbolResolveVisitor visitor( log, *specification->symboltable() );
+    specification->definitions()->accept( visitor );
 
 #ifndef NDEBUG
-    log.debug( "symbol table = \n" + symboltable->dump() );
+    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
 #endif
 
-    pr.setResult< SymbolResolverPass >(
-        libstdhl::make< Data >( specification, symboltable ) );
+    const auto errors = log.errors();
+    if( errors > 0 )
+    {
+        log.debug( "found %lu error(s) during symbol resolving", errors );
+        return false;
+    }
+
+    pr.setResult< SymbolResolverPass >( data );
 
     return true;
 }

@@ -22,14 +22,32 @@
 //  You should have received a copy of the GNU General Public License
 //  along with libcasm-fe. If not, see <http://www.gnu.org/licenses/>.
 //
+//  Additional permission under GNU GPL version 3 section 7
+//
+//  libcasm-fe is distributed under the terms of the GNU General Public License
+//  with the following clarification and special exception: Linking libcasm-fe
+//  statically or dynamically with other modules is making a combined work
+//  based on libcasm-fe. Thus, the terms and conditions of the GNU General
+//  Public License cover the whole combination. As a special exception,
+//  the copyright holders of libcasm-fe give you permission to link libcasm-fe
+//  with independent modules to produce an executable, regardless of the
+//  license terms of these independent modules, and to copy and distribute
+//  the resulting executable under terms of your choice, provided that you
+//  also meet, for each linked independent module, the terms and conditions
+//  of the license of that module. An independent module is a module which
+//  is not derived from or based on libcasm-fe. If you modify libcasm-fe, you
+//  may extend this exception to your version of the library, but you are
+//  not obliged to do so. If you do not wish to do so, delete this exception
+//  statement from your version.
+//
 
-#ifndef _LIB_CASMFE_DEFINITION_H_
-#define _LIB_CASMFE_DEFINITION_H_
+#ifndef _LIBCASM_FE_DEFINITION_H_
+#define _LIBCASM_FE_DEFINITION_H_
 
-#include "Attribute.h"
-#include "Node.h"
-#include "Rule.h"
-#include "Type.h"
+#include <libcasm-fe/ast/Attribute>
+#include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Rule>
+#include <libcasm-fe/ast/Type>
 
 namespace libcasm_fe
 {
@@ -47,12 +65,31 @@ namespace libcasm_fe
             void setAttributes( const Attributes::Ptr& attributes );
             const Attributes::Ptr& attributes( void ) const;
 
+            /**
+             * Sets the number of required frame local slots.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
+            std::size_t maximumNumberOfLocals( void ) const;
+
           private:
             const Identifier::Ptr m_identifier;
             Attributes::Ptr m_attributes;
+            std::size_t m_maxNumberOfLocals;
         };
 
         using Definitions = NodeList< Definition >;
+
+        class HeaderDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< HeaderDefinition >;
+
+            HeaderDefinition( const SourceLocation& sourceLocation );
+
+            void accept( Visitor& visitor ) override final;
+        };
 
         class VariableDefinition final : public Definition
         {
@@ -152,21 +189,12 @@ namespace libcasm_fe
             const Type::Ptr& returnType( void ) const;
             const Expression::Ptr& expression( void ) const;
 
-            /**
-             * Sets the number of required frame local slots.
-             *
-             * @note Assigned by SymbolResolved and used during execution
-             */
-            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
-            std::size_t maximumNumberOfLocals( void ) const;
-
             void accept( Visitor& visitor ) override final;
 
           private:
             const NodeList< VariableDefinition >::Ptr m_arguments;
             const Type::Ptr m_returnType;
             const Expression::Ptr m_expression;
-            std::size_t m_maxNumberOfLocals;
         };
 
         class RuleDefinition final : public Definition
@@ -184,22 +212,25 @@ namespace libcasm_fe
             const Type::Ptr& returnType( void ) const;
             const Rule::Ptr& rule( void ) const;
 
-            /**
-             * Sets the number of required frame local slots.
-             *
-             * @note Assigned by SymbolResolved and used during execution
-             */
-            void setMaximumNumberOfLocals( std::size_t maxNumberOfLocals );
-            std::size_t maximumNumberOfLocals( void ) const;
-
             void accept( Visitor& visitor ) override final;
 
           private:
             const NodeList< VariableDefinition >::Ptr m_arguments;
             const Type::Ptr m_returnType;
             const Rule::Ptr m_rule;
-            std::size_t m_maxNumberOfLocals;
         };
+
+        class EnumeratorDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< EnumeratorDefinition >;
+
+            EnumeratorDefinition( const Identifier::Ptr& identifier );
+
+            void accept( Visitor& visitor ) override final;
+        };
+
+        using Enumerators = NodeList< EnumeratorDefinition >;
 
         class EnumerationDefinition final : public Definition
         {
@@ -207,14 +238,14 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< EnumerationDefinition >;
 
             EnumerationDefinition( const Identifier::Ptr& identifier,
-                const Identifiers::Ptr& enumerators );
+                const Enumerators::Ptr& enumerators );
 
-            const Identifiers::Ptr& enumerators( void ) const;
+            const Enumerators::Ptr& enumerators( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const Identifiers::Ptr m_enumerators;
+            const Enumerators::Ptr m_enumerators;
         };
 
         class TypeDefinition final : public Definition
@@ -248,7 +279,7 @@ namespace std
     };
 }
 
-#endif // _LIB_CASMFE_DEFINITION_H_
+#endif // _LIBCASM_FE_DEFINITION_H_
 
 //
 //  Local variables:
