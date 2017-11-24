@@ -46,11 +46,11 @@
 
 #include <libcasm-fe/analyze/AttributionPass>
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
 #include <libcasm-fe/analyze/SymbolResolverPass>
 #include <libcasm-fe/analyze/TypeCheckPass>
 #include <libcasm-fe/analyze/TypeInferencePass>
-#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
 #include <libcasm-fe/execute/NumericExecutionPass>
 #include <libcasm-fe/execute/UpdateSet>
 //#include <libcasm-fe/execute/SymbolicExecutionPass>

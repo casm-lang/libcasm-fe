@@ -52,7 +52,7 @@
 namespace libcasm_fe
 {
     class ReferenceConstant final
-        : public libcasm_ir::ReferenceConstant< Ast::ReferenceAtom >
+    : public libcasm_ir::ReferenceConstant< Ast::ReferenceAtom >
     {
       public:
         explicit ReferenceConstant( const Ast::ReferenceAtom* atom );

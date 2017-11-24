@@ -80,14 +80,22 @@ static const std::string DUMPS_ATTRIBUTE = "dumps";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
-    DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE, MONITORED_ATTRIBUTE, EXTERNAL_ATTRIBUTE,
-    CONTROLLED_ATTRIBUTE, INTERNAL_ATTRIBUTE, SHARED_ATTRIBUTE, OUT_ATTRIBUTE,
-    STATIC_ATTRIBUTE, SYMBOLIC_ATTRIBUTE,
+    DEPRECATED_ATTRIBUTE,
+    IN_ATTRIBUTE,
+    MONITORED_ATTRIBUTE,
+    EXTERNAL_ATTRIBUTE,
+    CONTROLLED_ATTRIBUTE,
+    INTERNAL_ATTRIBUTE,
+    SHARED_ATTRIBUTE,
+    OUT_ATTRIBUTE,
+    STATIC_ATTRIBUTE,
+    SYMBOLIC_ATTRIBUTE,
 };
 
 // list of allowed expression attribute names
 static const std::unordered_set< std::string > VALID_EXPRESSION_ATTRIBUTES = {
-    VARIANT_ATTRIBUTE, DUMPS_ATTRIBUTE,
+    VARIANT_ATTRIBUTE,
+    DUMPS_ATTRIBUTE,
 };
 
 class DefinitionAttributionVisitor final : public RecursiveVisitor

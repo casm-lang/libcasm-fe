@@ -186,7 +186,8 @@ void FrameSizeDeterminationVisitor::visit( UniversalQuantifierExpression& node )
     popLocal();
 }
 
-void FrameSizeDeterminationVisitor::visit( ExistentialQuantifierExpression& node )
+void FrameSizeDeterminationVisitor::visit(
+    ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
