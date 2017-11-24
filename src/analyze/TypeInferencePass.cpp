@@ -174,6 +174,18 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
     node.defaultValue()->accept( *this );
 
+    if( node.defaultValue() and node.defaultValue()->type()
+        and node.defaultValue()->type() != node.returnType()->type() )
+    {
+        m_log.error( { node.defaultValue()->sourceLocation(),
+                         node.returnType()->sourceLocation() },
+            "type mismatch: type of default value was '"
+                + node.defaultValue()->type()->description()
+                + "', function expects '"
+                + node.returnType()->type()->description() + "'",
+            Code::TypeInferenceFunctionDefaultValueTypeMismatch );
+    }
+
     node.initializers()->accept( *this );
 }
 
