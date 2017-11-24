@@ -263,8 +263,6 @@ END       0 "end of file"
 
 %precedence UPDATE
 
-%precedence DOT
-
 %precedence AS
 
 %left IMPLIES ARROW
@@ -285,6 +283,9 @@ END       0 "end of file"
 // prefer calls with args (starts with LPAREN) over calls without args
 %precedence CALL_WITHOUT_ARGS
 %precedence LPAREN
+
+// dot operator shall have a higher precedence than all term operator symbols  
+%precedence DOT
 
 // prefer fixed sized types over composed types (start with LESSER) over basic types
 %precedence MARK

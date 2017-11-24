@@ -1452,19 +1452,19 @@
       <terminal symbol-number="29" token-number="284" name="&quot;holds&quot;" usefulness="useful" prec="6" assoc="precedence"/>
       <terminal symbol-number="30" token-number="285" name="&quot;exists&quot;" usefulness="useful"/>
       <terminal symbol-number="31" token-number="286" name="&quot;with&quot;" usefulness="useful" prec="6" assoc="precedence"/>
-      <terminal symbol-number="32" token-number="287" name="&quot;as&quot;" usefulness="useful" prec="9" assoc="precedence"/>
+      <terminal symbol-number="32" token-number="287" name="&quot;as&quot;" usefulness="useful" prec="8" assoc="precedence"/>
       <terminal symbol-number="33" token-number="288" name="&quot;undef&quot;" usefulness="useful"/>
       <terminal symbol-number="34" token-number="289" name="&quot;false&quot;" usefulness="useful"/>
       <terminal symbol-number="35" token-number="290" name="&quot;true&quot;" usefulness="useful"/>
-      <terminal symbol-number="36" token-number="291" name="&quot;and&quot;" usefulness="useful" prec="13" assoc="left"/>
-      <terminal symbol-number="37" token-number="292" name="&quot;or&quot;" usefulness="useful" prec="11" assoc="left"/>
-      <terminal symbol-number="38" token-number="293" name="&quot;xor&quot;" usefulness="useful" prec="12" assoc="left"/>
-      <terminal symbol-number="39" token-number="294" name="&quot;implies&quot;" usefulness="useful" prec="10" assoc="left"/>
-      <terminal symbol-number="40" token-number="295" name="&quot;not&quot;" usefulness="useful" prec="20" assoc="precedence"/>
-      <terminal symbol-number="41" token-number="296" name="&quot;+&quot;" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="42" token-number="297" name="&quot;-&quot;" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="43" token-number="298" name="&quot;=&quot;" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="44" token-number="299" name="&quot;(&quot;" usefulness="useful" prec="22" assoc="precedence"/>
+      <terminal symbol-number="36" token-number="291" name="&quot;and&quot;" usefulness="useful" prec="12" assoc="left"/>
+      <terminal symbol-number="37" token-number="292" name="&quot;or&quot;" usefulness="useful" prec="10" assoc="left"/>
+      <terminal symbol-number="38" token-number="293" name="&quot;xor&quot;" usefulness="useful" prec="11" assoc="left"/>
+      <terminal symbol-number="39" token-number="294" name="&quot;implies&quot;" usefulness="useful" prec="9" assoc="left"/>
+      <terminal symbol-number="40" token-number="295" name="&quot;not&quot;" usefulness="useful" prec="19" assoc="precedence"/>
+      <terminal symbol-number="41" token-number="296" name="&quot;+&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="42" token-number="297" name="&quot;-&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="43" token-number="298" name="&quot;=&quot;" usefulness="useful" prec="13" assoc="left"/>
+      <terminal symbol-number="44" token-number="299" name="&quot;(&quot;" usefulness="useful" prec="21" assoc="precedence"/>
       <terminal symbol-number="45" token-number="300" name="&quot;)&quot;" usefulness="useful"/>
       <terminal symbol-number="46" token-number="301" name="&quot;[&quot;" usefulness="useful"/>
       <terminal symbol-number="47" token-number="302" name="&quot;]&quot;" usefulness="useful"/>
@@ -1474,21 +1474,21 @@
       <terminal symbol-number="51" token-number="306" name="&quot;_&quot;" usefulness="useful"/>
       <terminal symbol-number="52" token-number="307" name="&quot;@&quot;" usefulness="useful"/>
       <terminal symbol-number="53" token-number="308" name="&quot;,&quot;" usefulness="useful"/>
-      <terminal symbol-number="54" token-number="309" name="&quot;&lt;&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="55" token-number="310" name="&quot;&gt;&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="56" token-number="311" name="&quot;*&quot;" usefulness="useful" prec="17" assoc="left"/>
-      <terminal symbol-number="57" token-number="312" name="&quot;/&quot;" usefulness="useful" prec="17" assoc="left"/>
-      <terminal symbol-number="58" token-number="313" name="&quot;%&quot;" usefulness="useful" prec="17" assoc="left"/>
-      <terminal symbol-number="59" token-number="314" name="&quot;^&quot;" usefulness="useful" prec="18" assoc="left"/>
+      <terminal symbol-number="54" token-number="309" name="&quot;&lt;&quot;" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="55" token-number="310" name="&quot;&gt;&quot;" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="56" token-number="311" name="&quot;*&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="57" token-number="312" name="&quot;/&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="58" token-number="313" name="&quot;%&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="59" token-number="314" name="&quot;^&quot;" usefulness="useful" prec="17" assoc="left"/>
       <terminal symbol-number="60" token-number="315" name="&quot;'&quot;" usefulness="useful" prec="23" assoc="precedence"/>
       <terminal symbol-number="61" token-number="316" name="&quot;..&quot;" usefulness="useful"/>
-      <terminal symbol-number="62" token-number="317" name="&quot;.&quot;" usefulness="useful" prec="8" assoc="precedence"/>
+      <terminal symbol-number="62" token-number="317" name="&quot;.&quot;" usefulness="useful" prec="22" assoc="precedence"/>
       <terminal symbol-number="63" token-number="318" name="&quot;-&gt;&quot;" usefulness="useful"/>
-      <terminal symbol-number="64" token-number="319" name="&quot;=&gt;&quot;" usefulness="useful" prec="10" assoc="left"/>
+      <terminal symbol-number="64" token-number="319" name="&quot;=&gt;&quot;" usefulness="useful" prec="9" assoc="left"/>
       <terminal symbol-number="65" token-number="320" name="&quot;:=&quot;" usefulness="useful" prec="7" assoc="precedence"/>
-      <terminal symbol-number="66" token-number="321" name="&quot;!=&quot;" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="67" token-number="322" name="&quot;&lt;=&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="68" token-number="323" name="&quot;&gt;=&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="66" token-number="321" name="&quot;!=&quot;" usefulness="useful" prec="13" assoc="left"/>
+      <terminal symbol-number="67" token-number="322" name="&quot;&lt;=&quot;" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="68" token-number="323" name="&quot;&gt;=&quot;" usefulness="useful" prec="14" assoc="left"/>
       <terminal symbol-number="69" token-number="324" name="&quot;{|&quot;" usefulness="useful"/>
       <terminal symbol-number="70" token-number="325" name="&quot;|}&quot;" usefulness="useful"/>
       <terminal symbol-number="71" token-number="326" name="&quot;binary&quot;" usefulness="useful"/>
@@ -1499,9 +1499,9 @@
       <terminal symbol-number="76" token-number="331" name="&quot;string&quot;" usefulness="useful"/>
       <terminal symbol-number="77" token-number="332" name="&quot;identifier&quot;" usefulness="useful"/>
       <terminal symbol-number="78" token-number="333" name="ABSOLUTE_PATH" usefulness="useful" prec="1" assoc="precedence"/>
-      <terminal symbol-number="79" token-number="334" name="UPLUS" usefulness="useful" prec="19" assoc="precedence"/>
-      <terminal symbol-number="80" token-number="335" name="UMINUS" usefulness="useful" prec="19" assoc="precedence"/>
-      <terminal symbol-number="81" token-number="336" name="CALL_WITHOUT_ARGS" usefulness="useful" prec="21" assoc="precedence"/>
+      <terminal symbol-number="79" token-number="334" name="UPLUS" usefulness="useful" prec="18" assoc="precedence"/>
+      <terminal symbol-number="80" token-number="335" name="UMINUS" usefulness="useful" prec="18" assoc="precedence"/>
+      <terminal symbol-number="81" token-number="336" name="CALL_WITHOUT_ARGS" usefulness="useful" prec="20" assoc="precedence"/>
     </terminals>
     <nonterminals>
       <nonterminal symbol-number="82" name="$accept" usefulness="useful"/>
@@ -4493,7 +4493,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -4515,7 +4514,9 @@
         <item rule-number="110" point="1"/>
       </itemset>
       <actions>
-        <transitions/>
+        <transitions>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
+        </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="101" enabled="true"/>
@@ -4536,7 +4537,7 @@
         <resolution rule="101" symbol="&quot;/&quot;" type="reduce">&quot;/&quot; &lt; NOT</resolution>
         <resolution rule="101" symbol="&quot;%&quot;" type="reduce">&quot;%&quot; &lt; NOT</resolution>
         <resolution rule="101" symbol="&quot;^&quot;" type="reduce">&quot;^&quot; &lt; NOT</resolution>
-        <resolution rule="101" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; NOT</resolution>
+        <resolution rule="101" symbol="&quot;.&quot;" type="shift">NOT &lt; &quot;.&quot;</resolution>
         <resolution rule="101" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; NOT</resolution>
         <resolution rule="101" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; NOT</resolution>
         <resolution rule="101" symbol="&quot;&lt;=&quot;" type="reduce">&quot;&lt;=&quot; &lt; NOT</resolution>
@@ -4607,7 +4608,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -4646,7 +4646,9 @@
         <item rule-number="110" point="1"/>
       </itemset>
       <actions>
-        <transitions/>
+        <transitions>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
+        </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="82" enabled="true"/>
@@ -4667,7 +4669,7 @@
         <resolution rule="82" symbol="&quot;/&quot;" type="reduce">&quot;/&quot; &lt; UPLUS</resolution>
         <resolution rule="82" symbol="&quot;%&quot;" type="reduce">&quot;%&quot; &lt; UPLUS</resolution>
         <resolution rule="82" symbol="&quot;^&quot;" type="reduce">&quot;^&quot; &lt; UPLUS</resolution>
-        <resolution rule="82" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; UPLUS</resolution>
+        <resolution rule="82" symbol="&quot;.&quot;" type="shift">UPLUS &lt; &quot;.&quot;</resolution>
         <resolution rule="82" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; UPLUS</resolution>
         <resolution rule="82" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; UPLUS</resolution>
         <resolution rule="82" symbol="&quot;&lt;=&quot;" type="reduce">&quot;&lt;=&quot; &lt; UPLUS</resolution>
@@ -4738,7 +4740,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -4777,7 +4778,9 @@
         <item rule-number="110" point="1"/>
       </itemset>
       <actions>
-        <transitions/>
+        <transitions>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
+        </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="83" enabled="true"/>
@@ -4798,7 +4801,7 @@
         <resolution rule="83" symbol="&quot;/&quot;" type="reduce">&quot;/&quot; &lt; UMINUS</resolution>
         <resolution rule="83" symbol="&quot;%&quot;" type="reduce">&quot;%&quot; &lt; UMINUS</resolution>
         <resolution rule="83" symbol="&quot;^&quot;" type="reduce">&quot;^&quot; &lt; UMINUS</resolution>
-        <resolution rule="83" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; UMINUS</resolution>
+        <resolution rule="83" symbol="&quot;.&quot;" type="shift">UMINUS &lt; &quot;.&quot;</resolution>
         <resolution rule="83" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; UMINUS</resolution>
         <resolution rule="83" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; UMINUS</resolution>
         <resolution rule="83" symbol="&quot;&lt;=&quot;" type="reduce">&quot;&lt;=&quot; &lt; UMINUS</resolution>
@@ -9399,7 +9402,6 @@
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -9430,6 +9432,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
           <transition type="shift" symbol="&quot;!=&quot;" state="123"/>
           <transition type="shift" symbol="&quot;&lt;=&quot;" state="124"/>
           <transition type="shift" symbol="&quot;&gt;=&quot;" state="125"/>
@@ -9454,7 +9457,7 @@
         <resolution rule="98" symbol="&quot;/&quot;" type="shift">AND &lt; &quot;/&quot;</resolution>
         <resolution rule="98" symbol="&quot;%&quot;" type="shift">AND &lt; &quot;%&quot;</resolution>
         <resolution rule="98" symbol="&quot;^&quot;" type="shift">AND &lt; &quot;^&quot;</resolution>
-        <resolution rule="98" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; AND</resolution>
+        <resolution rule="98" symbol="&quot;.&quot;" type="shift">AND &lt; &quot;.&quot;</resolution>
         <resolution rule="98" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; AND</resolution>
         <resolution rule="98" symbol="&quot;!=&quot;" type="shift">AND &lt; &quot;!=&quot;</resolution>
         <resolution rule="98" symbol="&quot;&lt;=&quot;" type="shift">AND &lt; &quot;&lt;=&quot;</resolution>
@@ -9527,7 +9530,6 @@
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -9562,6 +9564,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
           <transition type="shift" symbol="&quot;!=&quot;" state="123"/>
           <transition type="shift" symbol="&quot;&lt;=&quot;" state="124"/>
           <transition type="shift" symbol="&quot;&gt;=&quot;" state="125"/>
@@ -9586,7 +9589,7 @@
         <resolution rule="96" symbol="&quot;/&quot;" type="shift">OR &lt; &quot;/&quot;</resolution>
         <resolution rule="96" symbol="&quot;%&quot;" type="shift">OR &lt; &quot;%&quot;</resolution>
         <resolution rule="96" symbol="&quot;^&quot;" type="shift">OR &lt; &quot;^&quot;</resolution>
-        <resolution rule="96" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; OR</resolution>
+        <resolution rule="96" symbol="&quot;.&quot;" type="shift">OR &lt; &quot;.&quot;</resolution>
         <resolution rule="96" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; OR</resolution>
         <resolution rule="96" symbol="&quot;!=&quot;" type="shift">OR &lt; &quot;!=&quot;</resolution>
         <resolution rule="96" symbol="&quot;&lt;=&quot;" type="shift">OR &lt; &quot;&lt;=&quot;</resolution>
@@ -9661,7 +9664,6 @@
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -9694,6 +9696,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
           <transition type="shift" symbol="&quot;!=&quot;" state="123"/>
           <transition type="shift" symbol="&quot;&lt;=&quot;" state="124"/>
           <transition type="shift" symbol="&quot;&gt;=&quot;" state="125"/>
@@ -9718,7 +9721,7 @@
         <resolution rule="97" symbol="&quot;/&quot;" type="shift">XOR &lt; &quot;/&quot;</resolution>
         <resolution rule="97" symbol="&quot;%&quot;" type="shift">XOR &lt; &quot;%&quot;</resolution>
         <resolution rule="97" symbol="&quot;^&quot;" type="shift">XOR &lt; &quot;^&quot;</resolution>
-        <resolution rule="97" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; XOR</resolution>
+        <resolution rule="97" symbol="&quot;.&quot;" type="shift">XOR &lt; &quot;.&quot;</resolution>
         <resolution rule="97" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; XOR</resolution>
         <resolution rule="97" symbol="&quot;!=&quot;" type="shift">XOR &lt; &quot;!=&quot;</resolution>
         <resolution rule="97" symbol="&quot;&lt;=&quot;" type="shift">XOR &lt; &quot;&lt;=&quot;</resolution>
@@ -9794,7 +9797,6 @@
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -9826,6 +9828,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
           <transition type="shift" symbol="&quot;!=&quot;" state="123"/>
           <transition type="shift" symbol="&quot;&lt;=&quot;" state="124"/>
           <transition type="shift" symbol="&quot;&gt;=&quot;" state="125"/>
@@ -9850,7 +9853,7 @@
         <resolution rule="100" symbol="&quot;/&quot;" type="shift">IMPLIES &lt; &quot;/&quot;</resolution>
         <resolution rule="100" symbol="&quot;%&quot;" type="shift">IMPLIES &lt; &quot;%&quot;</resolution>
         <resolution rule="100" symbol="&quot;^&quot;" type="shift">IMPLIES &lt; &quot;^&quot;</resolution>
-        <resolution rule="100" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; IMPLIES</resolution>
+        <resolution rule="100" symbol="&quot;.&quot;" type="shift">IMPLIES &lt; &quot;.&quot;</resolution>
         <resolution rule="100" symbol="&quot;=&gt;&quot;" type="reduce">%left &quot;=&gt;&quot;</resolution>
         <resolution rule="100" symbol="&quot;!=&quot;" type="shift">IMPLIES &lt; &quot;!=&quot;</resolution>
         <resolution rule="100" symbol="&quot;&lt;=&quot;" type="shift">IMPLIES &lt; &quot;&lt;=&quot;</resolution>
@@ -9918,7 +9921,6 @@
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -9961,6 +9963,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
         </transitions>
         <errors/>
         <reductions>
@@ -9982,7 +9985,7 @@
         <resolution rule="84" symbol="&quot;/&quot;" type="shift">PLUS &lt; &quot;/&quot;</resolution>
         <resolution rule="84" symbol="&quot;%&quot;" type="shift">PLUS &lt; &quot;%&quot;</resolution>
         <resolution rule="84" symbol="&quot;^&quot;" type="shift">PLUS &lt; &quot;^&quot;</resolution>
-        <resolution rule="84" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; PLUS</resolution>
+        <resolution rule="84" symbol="&quot;.&quot;" type="shift">PLUS &lt; &quot;.&quot;</resolution>
         <resolution rule="84" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; PLUS</resolution>
         <resolution rule="84" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; PLUS</resolution>
         <resolution rule="84" symbol="&quot;&lt;=&quot;" type="reduce">&quot;&lt;=&quot; &lt; PLUS</resolution>
@@ -10051,7 +10054,6 @@
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10093,6 +10095,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
         </transitions>
         <errors/>
         <reductions>
@@ -10114,7 +10117,7 @@
         <resolution rule="85" symbol="&quot;/&quot;" type="shift">MINUS &lt; &quot;/&quot;</resolution>
         <resolution rule="85" symbol="&quot;%&quot;" type="shift">MINUS &lt; &quot;%&quot;</resolution>
         <resolution rule="85" symbol="&quot;^&quot;" type="shift">MINUS &lt; &quot;^&quot;</resolution>
-        <resolution rule="85" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; MINUS</resolution>
+        <resolution rule="85" symbol="&quot;.&quot;" type="shift">MINUS &lt; &quot;.&quot;</resolution>
         <resolution rule="85" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; MINUS</resolution>
         <resolution rule="85" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; MINUS</resolution>
         <resolution rule="85" symbol="&quot;&lt;=&quot;" type="reduce">&quot;&lt;=&quot; &lt; MINUS</resolution>
@@ -10185,7 +10188,6 @@
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10223,6 +10225,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
           <transition type="shift" symbol="&quot;&lt;=&quot;" state="124"/>
           <transition type="shift" symbol="&quot;&gt;=&quot;" state="125"/>
         </transitions>
@@ -10246,7 +10249,7 @@
         <resolution rule="91" symbol="&quot;/&quot;" type="shift">EQUAL &lt; &quot;/&quot;</resolution>
         <resolution rule="91" symbol="&quot;%&quot;" type="shift">EQUAL &lt; &quot;%&quot;</resolution>
         <resolution rule="91" symbol="&quot;^&quot;" type="shift">EQUAL &lt; &quot;^&quot;</resolution>
-        <resolution rule="91" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; EQUAL</resolution>
+        <resolution rule="91" symbol="&quot;.&quot;" type="shift">EQUAL &lt; &quot;.&quot;</resolution>
         <resolution rule="91" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; EQUAL</resolution>
         <resolution rule="91" symbol="&quot;!=&quot;" type="reduce">%left &quot;!=&quot;</resolution>
         <resolution rule="91" symbol="&quot;&lt;=&quot;" type="shift">EQUAL &lt; &quot;&lt;=&quot;</resolution>
@@ -10320,7 +10323,6 @@
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10357,6 +10359,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
         </transitions>
         <errors/>
         <reductions>
@@ -10378,7 +10381,7 @@
         <resolution rule="92" symbol="&quot;/&quot;" type="shift">LESSER &lt; &quot;/&quot;</resolution>
         <resolution rule="92" symbol="&quot;%&quot;" type="shift">LESSER &lt; &quot;%&quot;</resolution>
         <resolution rule="92" symbol="&quot;^&quot;" type="shift">LESSER &lt; &quot;^&quot;</resolution>
-        <resolution rule="92" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; LESSER</resolution>
+        <resolution rule="92" symbol="&quot;.&quot;" type="shift">LESSER &lt; &quot;.&quot;</resolution>
         <resolution rule="92" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; LESSER</resolution>
         <resolution rule="92" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; LESSER</resolution>
         <resolution rule="92" symbol="&quot;&lt;=&quot;" type="reduce">%left &quot;&lt;=&quot;</resolution>
@@ -10453,7 +10456,6 @@
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10489,6 +10491,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
         </transitions>
         <errors/>
         <reductions>
@@ -10510,7 +10513,7 @@
         <resolution rule="93" symbol="&quot;/&quot;" type="shift">GREATER &lt; &quot;/&quot;</resolution>
         <resolution rule="93" symbol="&quot;%&quot;" type="shift">GREATER &lt; &quot;%&quot;</resolution>
         <resolution rule="93" symbol="&quot;^&quot;" type="shift">GREATER &lt; &quot;^&quot;</resolution>
-        <resolution rule="93" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; GREATER</resolution>
+        <resolution rule="93" symbol="&quot;.&quot;" type="shift">GREATER &lt; &quot;.&quot;</resolution>
         <resolution rule="93" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; GREATER</resolution>
         <resolution rule="93" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; GREATER</resolution>
         <resolution rule="93" symbol="&quot;&lt;=&quot;" type="reduce">%left &quot;&lt;=&quot;</resolution>
@@ -10583,7 +10586,6 @@
             <symbol>&quot;/&quot;</symbol>
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10621,6 +10623,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
         </transitions>
         <errors/>
         <reductions>
@@ -10642,7 +10645,7 @@
         <resolution rule="86" symbol="&quot;/&quot;" type="reduce">%left &quot;/&quot;</resolution>
         <resolution rule="86" symbol="&quot;%&quot;" type="reduce">%left &quot;%&quot;</resolution>
         <resolution rule="86" symbol="&quot;^&quot;" type="shift">ASTERIX &lt; &quot;^&quot;</resolution>
-        <resolution rule="86" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; ASTERIX</resolution>
+        <resolution rule="86" symbol="&quot;.&quot;" type="shift">ASTERIX &lt; &quot;.&quot;</resolution>
         <resolution rule="86" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; ASTERIX</resolution>
         <resolution rule="86" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; ASTERIX</resolution>
         <resolution rule="86" symbol="&quot;&lt;=&quot;" type="reduce">&quot;&lt;=&quot; &lt; ASTERIX</resolution>
@@ -10716,7 +10719,6 @@
             <symbol>&quot;/&quot;</symbol>
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10753,6 +10755,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
         </transitions>
         <errors/>
         <reductions>
@@ -10774,7 +10777,7 @@
         <resolution rule="87" symbol="&quot;/&quot;" type="reduce">%left &quot;/&quot;</resolution>
         <resolution rule="87" symbol="&quot;%&quot;" type="reduce">%left &quot;%&quot;</resolution>
         <resolution rule="87" symbol="&quot;^&quot;" type="shift">SLASH &lt; &quot;^&quot;</resolution>
-        <resolution rule="87" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; SLASH</resolution>
+        <resolution rule="87" symbol="&quot;.&quot;" type="shift">SLASH &lt; &quot;.&quot;</resolution>
         <resolution rule="87" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; SLASH</resolution>
         <resolution rule="87" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; SLASH</resolution>
         <resolution rule="87" symbol="&quot;&lt;=&quot;" type="reduce">&quot;&lt;=&quot; &lt; SLASH</resolution>
@@ -10849,7 +10852,6 @@
             <symbol>&quot;/&quot;</symbol>
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10885,6 +10887,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
         </transitions>
         <errors/>
         <reductions>
@@ -10906,7 +10909,7 @@
         <resolution rule="88" symbol="&quot;/&quot;" type="reduce">%left &quot;/&quot;</resolution>
         <resolution rule="88" symbol="&quot;%&quot;" type="reduce">%left &quot;%&quot;</resolution>
         <resolution rule="88" symbol="&quot;^&quot;" type="shift">PERCENT &lt; &quot;^&quot;</resolution>
-        <resolution rule="88" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; PERCENT</resolution>
+        <resolution rule="88" symbol="&quot;.&quot;" type="shift">PERCENT &lt; &quot;.&quot;</resolution>
         <resolution rule="88" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; PERCENT</resolution>
         <resolution rule="88" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; PERCENT</resolution>
         <resolution rule="88" symbol="&quot;&lt;=&quot;" type="reduce">&quot;&lt;=&quot; &lt; PERCENT</resolution>
@@ -10983,7 +10986,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -11016,7 +11018,9 @@
         <item rule-number="110" point="1"/>
       </itemset>
       <actions>
-        <transitions/>
+        <transitions>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
+        </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="89" enabled="true"/>
@@ -11037,7 +11041,7 @@
         <resolution rule="89" symbol="&quot;/&quot;" type="reduce">&quot;/&quot; &lt; CARET</resolution>
         <resolution rule="89" symbol="&quot;%&quot;" type="reduce">&quot;%&quot; &lt; CARET</resolution>
         <resolution rule="89" symbol="&quot;^&quot;" type="reduce">%left &quot;^&quot;</resolution>
-        <resolution rule="89" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; CARET</resolution>
+        <resolution rule="89" symbol="&quot;.&quot;" type="shift">CARET &lt; &quot;.&quot;</resolution>
         <resolution rule="89" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; CARET</resolution>
         <resolution rule="89" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; CARET</resolution>
         <resolution rule="89" symbol="&quot;&lt;=&quot;" type="reduce">&quot;&lt;=&quot; &lt; CARET</resolution>
@@ -11211,7 +11215,6 @@
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -11244,6 +11247,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
           <transition type="shift" symbol="&quot;!=&quot;" state="123"/>
           <transition type="shift" symbol="&quot;&lt;=&quot;" state="124"/>
           <transition type="shift" symbol="&quot;&gt;=&quot;" state="125"/>
@@ -11268,7 +11272,7 @@
         <resolution rule="99" symbol="&quot;/&quot;" type="shift">ARROW &lt; &quot;/&quot;</resolution>
         <resolution rule="99" symbol="&quot;%&quot;" type="shift">ARROW &lt; &quot;%&quot;</resolution>
         <resolution rule="99" symbol="&quot;^&quot;" type="shift">ARROW &lt; &quot;^&quot;</resolution>
-        <resolution rule="99" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; ARROW</resolution>
+        <resolution rule="99" symbol="&quot;.&quot;" type="shift">ARROW &lt; &quot;.&quot;</resolution>
         <resolution rule="99" symbol="&quot;=&gt;&quot;" type="reduce">%left &quot;=&gt;&quot;</resolution>
         <resolution rule="99" symbol="&quot;!=&quot;" type="shift">ARROW &lt; &quot;!=&quot;</resolution>
         <resolution rule="99" symbol="&quot;&lt;=&quot;" type="shift">ARROW &lt; &quot;&lt;=&quot;</resolution>
@@ -11338,7 +11342,6 @@
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -11377,6 +11380,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
           <transition type="shift" symbol="&quot;&lt;=&quot;" state="124"/>
           <transition type="shift" symbol="&quot;&gt;=&quot;" state="125"/>
         </transitions>
@@ -11400,7 +11404,7 @@
         <resolution rule="90" symbol="&quot;/&quot;" type="shift">NEQUAL &lt; &quot;/&quot;</resolution>
         <resolution rule="90" symbol="&quot;%&quot;" type="shift">NEQUAL &lt; &quot;%&quot;</resolution>
         <resolution rule="90" symbol="&quot;^&quot;" type="shift">NEQUAL &lt; &quot;^&quot;</resolution>
-        <resolution rule="90" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; NEQUAL</resolution>
+        <resolution rule="90" symbol="&quot;.&quot;" type="shift">NEQUAL &lt; &quot;.&quot;</resolution>
         <resolution rule="90" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; NEQUAL</resolution>
         <resolution rule="90" symbol="&quot;!=&quot;" type="reduce">%left &quot;!=&quot;</resolution>
         <resolution rule="90" symbol="&quot;&lt;=&quot;" type="shift">NEQUAL &lt; &quot;&lt;=&quot;</resolution>
@@ -11476,7 +11480,6 @@
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -11511,6 +11514,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
         </transitions>
         <errors/>
         <reductions>
@@ -11532,7 +11536,7 @@
         <resolution rule="94" symbol="&quot;/&quot;" type="shift">LESSEQ &lt; &quot;/&quot;</resolution>
         <resolution rule="94" symbol="&quot;%&quot;" type="shift">LESSEQ &lt; &quot;%&quot;</resolution>
         <resolution rule="94" symbol="&quot;^&quot;" type="shift">LESSEQ &lt; &quot;^&quot;</resolution>
-        <resolution rule="94" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; LESSEQ</resolution>
+        <resolution rule="94" symbol="&quot;.&quot;" type="shift">LESSEQ &lt; &quot;.&quot;</resolution>
         <resolution rule="94" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; LESSEQ</resolution>
         <resolution rule="94" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; LESSEQ</resolution>
         <resolution rule="94" symbol="&quot;&lt;=&quot;" type="reduce">%left &quot;&lt;=&quot;</resolution>
@@ -11609,7 +11613,6 @@
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -11643,6 +11646,7 @@
           <transition type="shift" symbol="&quot;/&quot;" state="118"/>
           <transition type="shift" symbol="&quot;%&quot;" state="119"/>
           <transition type="shift" symbol="&quot;^&quot;" state="120"/>
+          <transition type="shift" symbol="&quot;.&quot;" state="121"/>
         </transitions>
         <errors/>
         <reductions>
@@ -11664,7 +11668,7 @@
         <resolution rule="95" symbol="&quot;/&quot;" type="shift">GREATEREQ &lt; &quot;/&quot;</resolution>
         <resolution rule="95" symbol="&quot;%&quot;" type="shift">GREATEREQ &lt; &quot;%&quot;</resolution>
         <resolution rule="95" symbol="&quot;^&quot;" type="shift">GREATEREQ &lt; &quot;^&quot;</resolution>
-        <resolution rule="95" symbol="&quot;.&quot;" type="reduce">&quot;.&quot; &lt; GREATEREQ</resolution>
+        <resolution rule="95" symbol="&quot;.&quot;" type="shift">GREATEREQ &lt; &quot;.&quot;</resolution>
         <resolution rule="95" symbol="&quot;=&gt;&quot;" type="reduce">&quot;=&gt;&quot; &lt; GREATEREQ</resolution>
         <resolution rule="95" symbol="&quot;!=&quot;" type="reduce">&quot;!=&quot; &lt; GREATEREQ</resolution>
         <resolution rule="95" symbol="&quot;&lt;=&quot;" type="reduce">%left &quot;&lt;=&quot;</resolution>
