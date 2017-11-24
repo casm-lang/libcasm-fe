@@ -80,7 +80,7 @@ namespace libcasm_fe
         };
 
         using Definitions = NodeList< Definition >;
-        
+
         class HeaderDefinition final : public Definition
         {
           public:
