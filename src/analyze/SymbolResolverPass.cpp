@@ -347,11 +347,18 @@ void SymbolResolveVisitor::visit( MethodCallExpression& node )
         if( directCall.targetType() == CallExpression::TargetType::TYPE_DOMAIN )
         {
             const auto currentSymboltable = m_symboltable;
-            m_symboltable = currentSymboltable.findNestedNamespace(
-                directCall.identifier() );
+
+            try
+            {
+                m_symboltable = currentSymboltable.findNestedNamespace(
+                    directCall.identifier() );
+            }
+            catch( const std::domain_error& e )
+            {
+                m_log.error( { directCall.sourceLocation() }, e.what() );
+            }
 
             reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
-
             m_symboltable = currentSymboltable;
             return;
         }
