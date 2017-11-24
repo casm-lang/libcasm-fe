@@ -231,7 +231,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 "invalid argument size: builtin '" + name + "' expects "
                     + std::to_string( expectedNumberOfArguments )
                     + " arguments",
-                Code::TypeInferenceBuiltinArgumentSizeMismatch );
+                Code::SymbolArgumentSizeMismatch );
         }
 
         return;
@@ -252,25 +252,11 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         if( node.arguments()->size() != symbol.arity() )
         {
-            const std::unordered_map< CallExpression::TargetType, Code > codes
-                = {
-                      { CallExpression::TargetType::FUNCTION,
-                          Code::TypeInferenceFunctionArgumentSizeMismatch },
-                      { CallExpression::TargetType::DERIVED,
-                          Code::TypeInferenceDerivedArgumentSizeMismatch },
-                      { CallExpression::TargetType::RULE,
-                          Code::TypeInferenceRuleArgumentSizeMismatch },
-                  };
-
-            const auto code = codes.find( node.targetType() );
-            assert( code != codes.end()
-                    and " invalid target type with arguments " );
-
             m_log.error( { node.sourceLocation() },
                 "invalid argument size: " + node.targetTypeName() + " '"
                     + path.path() + "' expects "
                     + std::to_string( symbol.arity() ) + " arguments",
-                code->second );
+                Code::SymbolArgumentSizeMismatch );
         }
     }
     catch( const std::domain_error& e )
