@@ -137,7 +137,8 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     if( VALID_BASIC_ATTRIBUTES.count( name ) == 0 )
     {
         m_log.error( { node.sourceLocation() },
-            "`" + name + "` is a unknown basic attribute" );
+            "'" + name + "' is a unknown basic attribute",
+            Code::AttributionBasicAttributeUnknown );
         return;
     }
 
@@ -145,7 +146,8 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     if( m_attributeNames.count( name ) != 0 )
     {
         m_log.error( { node.sourceLocation() },
-            "attribute `" + name + "` has already been used" );
+            "basic attribute '" + name + "' has already been used",
+            Code::AttributionBasicAttributeAlreadyUsed );
         return;
     }
     m_attributeNames.insert( node.identifier()->name() );
@@ -168,7 +170,8 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     if( VALID_EXPRESSION_ATTRIBUTES.count( name ) == 0 )
     {
         m_log.error( { node.sourceLocation() },
-            "`" + name + "` is a unknown expression attribute" );
+            "'" + name + "' is a unknown expression attribute",
+            Code::AttributionExpressionAttributeUnknown );
         return;
     }
 
@@ -176,7 +179,8 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     if( m_attributeNames.count( name ) != 0 )
     {
         m_log.error( { node.sourceLocation() },
-            "attribute `" + name + "` has already been used" );
+            "expression attribute '" + name + "' has already been used",
+            Code::AttributionExpressionAttributeAlreadyUsed );
         return;
     }
     m_attributeNames.insert( node.identifier()->name() );
