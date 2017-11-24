@@ -48,70 +48,33 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-//
-// Symbol
-//
-
-Namespace::Symbol::Symbol( const Ast::TypedNode::Ptr& definition,
-    const Ast::CallExpression::TargetType targetType,
-    const std::size_t arity )
-: m_definition( definition )
-, m_targetType( targetType )
-, m_arity( arity )
-{
-}
-
-const Ast::TypedNode::Ptr& Namespace::Symbol::definition( void ) const
-{
-    return m_definition;
-}
-
-Ast::CallExpression::TargetType Namespace::Symbol::targetType( void ) const
-{
-    return m_targetType;
-}
-
-std::size_t Namespace::Symbol::arity( void ) const
-{
-    return m_arity;
-}
-
-//
-// Namespace
-//
-
 Namespace::Namespace( void )
 {
 }
 
 void Namespace::registerSymbol( const FunctionDefinition::Ptr& node )
 {
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::FUNCTION, node->argumentTypes()->size() );
+    registerSymbol( node->identifier()->name(), node );
 }
 
 void Namespace::registerSymbol( const DerivedDefinition::Ptr& node )
 {
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::DERIVED, node->arguments()->size() );
+    registerSymbol( node->identifier()->name(), node );
 }
 
 void Namespace::registerSymbol( const RuleDefinition::Ptr& node )
 {
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::RULE, node->arguments()->size() );
+    registerSymbol( node->identifier()->name(), node );
 }
 
 void Namespace::registerSymbol( const EnumeratorDefinition::Ptr& node )
 {
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::CONSTANT, 0 );
+    registerSymbol( node->identifier()->name(), node );
 }
 
 void Namespace::registerSymbol( const EnumerationDefinition::Ptr& node )
 {
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::TYPE_DOMAIN, 0 );
+    registerSymbol( node->identifier()->name(), node );
 }
 
 void Namespace::registerNamespace(
@@ -124,7 +87,7 @@ void Namespace::registerNamespace(
     }
 }
 
-Namespace::Symbol Namespace::find( const std::string& name ) const
+Ast::Definition::Ptr Namespace::find( const std::string& name ) const
 {
     auto result = m_symboltable.find( name );
     if( result == m_symboltable.end() )
@@ -135,7 +98,7 @@ Namespace::Symbol Namespace::find( const std::string& name ) const
     return result->second;
 }
 
-Namespace::Symbol Namespace::find(
+Ast::Definition::Ptr Namespace::find(
     const std::vector< std::string >& path ) const
 {
     assert( path.size() > 0 );
@@ -178,14 +141,12 @@ std::string Namespace::dump( const std::string& indention ) const
     for( const auto& v : m_symboltable )
     {
         const auto& name = v.first;
-        const auto& symbol = v.second;
+        const auto& definition = v.second;
 
-        const auto& type = symbol.definition()->type();
+        const auto& type = definition->type();
 
-        s << indention << name << " : "
-          << CallExpression::targetTypeString( symbol.targetType() ) << " ("
-          << symbol.arity() << "-ary)"
-          << " " << ( type ? type->description() : "$unresolved$" ) << "\n";
+        s << indention << name << " : " << definition->description() << " "
+          << ( type ? type->description() : "$unresolved$" ) << "\n";
     }
 
     for( const auto& v : m_namespaces )
@@ -199,24 +160,20 @@ std::string Namespace::dump( const std::string& indention ) const
     return s.str();
 }
 
-void Namespace::registerSymbol( const std::string& name,
-    const TypedNode::Ptr& definition,
-    const CallExpression::TargetType targetType, const std::size_t arity )
+void Namespace::registerSymbol(
+    const std::string& name, const Ast::Definition::Ptr& definition )
 {
-    const Symbol symbol{ definition, targetType, arity };
-    const auto result = m_symboltable.emplace( name, symbol );
+    const auto result = m_symboltable.emplace( name, definition );
 
     if( not result.second )
     {
-        const auto& existingSymbol = result.first->second;
-        throw std::domain_error(
-            "symbol '" + name + "' already defined as "
-            + CallExpression::targetTypeString( existingSymbol.targetType() )
-            + "'" );
+        const auto& existingDefinition = result.first->second;
+        throw std::domain_error( "symbol '" + name + "' already defined as "
+                                 + existingDefinition->description() + "'" );
     }
 }
 
-Namespace::Symbol Namespace::find(
+Ast::Definition::Ptr Namespace::find(
     const IdentifierPath& node, const std::size_t index ) const
 {
     const auto& path = *node.identifiers();

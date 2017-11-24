@@ -95,15 +95,13 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 
         if( node.uid() == FunctionDefinition::UID::PROGRAM )
         {
-            m_log.error( { node.sourceLocation(),
-                             symbol.definition()->sourceLocation() },
+            m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
                 "init already defined",
                 Code::AgentInitRuleMultipleDefinitions );
         }
         else
         {
-            m_log.error( { node.sourceLocation(),
-                             symbol.definition()->sourceLocation() },
+            m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
                 e.what(),
                 Code::FunctionDefinitionAlreadyUsed );
         }
@@ -122,8 +120,7 @@ void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
     {
         const auto& symbol = m_symboltable.find( node.identifier()->name() );
 
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
+        m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
             e.what(), Code::DerivedDefinitionAlreadyUsed );
     }
 
@@ -140,8 +137,7 @@ void SymbolRegistrationVisitor::visit( RuleDefinition& node )
     {
         const auto& symbol = m_symboltable.find( node.identifier()->name() );
 
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
+        m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
             e.what(), Code::RuleDefinitionAlreadyUsed );
     }
 
@@ -159,8 +155,7 @@ void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
         const auto& symbol = m_symboltable.find( node.identifier()->name() );
 
         m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what() );
+            { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
     }
 }
 
@@ -192,8 +187,7 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
         const auto& symbol = m_symboltable.find( name );
 
         m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what() );
+            { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
     }
 
     // register enumerators in a sub-namespace

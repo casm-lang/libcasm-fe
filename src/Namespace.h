@@ -55,24 +55,6 @@ namespace libcasm_fe
     class Namespace
     {
       public:
-        class Symbol
-        {
-          public:
-            Symbol( const Ast::TypedNode::Ptr& definition,
-                const Ast::CallExpression::TargetType targetType,
-                const std::size_t arity );
-
-            const Ast::TypedNode::Ptr& definition( void ) const;
-            Ast::CallExpression::TargetType targetType( void ) const;
-            std::size_t arity( void ) const;
-
-          private:
-            const Ast::TypedNode::Ptr m_definition;
-            const Ast::CallExpression::TargetType m_targetType;
-            const std::size_t m_arity;
-        };
-
-      public:
         using Ptr = std::shared_ptr< Namespace >;
 
         Namespace( void );
@@ -86,22 +68,21 @@ namespace libcasm_fe
         void registerNamespace(
             const std::string& name, const Namespace::Ptr& _namespace );
 
-        Symbol find( const Ast::IdentifierPath& node,
+        Ast::Definition::Ptr find( const Ast::IdentifierPath& node,
             const std::size_t index = 0 ) const;
 
-        Symbol find( const std::string& name ) const;
+        Ast::Definition::Ptr find( const std::string& name ) const;
 
-        Symbol find( const std::vector< std::string >& path ) const;
+        Ast::Definition::Ptr find(
+            const std::vector< std::string >& path ) const;
 
         std::string dump( const std::string& indention = "" ) const;
 
       private:
-        void registerSymbol( const std::string& name,
-            const Ast::TypedNode::Ptr& definition,
-            const Ast::CallExpression::TargetType targetType,
-            const std::size_t arity );
+        void registerSymbol(
+            const std::string& name, const Ast::Definition::Ptr& definition );
 
-        std::unordered_map< std::string, Symbol > m_symboltable;
+        std::unordered_map< std::string, Ast::Definition::Ptr > m_symboltable;
 
         std::unordered_map< std::string, Namespace::Ptr > m_namespaces;
     };
