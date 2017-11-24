@@ -163,7 +163,8 @@ void TypeCheckVisitor::visit( BasicType& node )
 
             switch( symbol->id() )
             {
-                case Node::ID::ENUMERATION_DEFINITION:
+                case Node::ID::ENUMERATION_DEFINITION: // [[fallthrough]]
+                case Node::ID::TYPE_DEFINITION:
                 {
                     break;
                 }
