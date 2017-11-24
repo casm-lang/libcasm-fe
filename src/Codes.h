@@ -61,6 +61,14 @@ namespace libcasm_fe
         IdentifierAlreadyUsed = 0x0010
 
         // --------------------------------------------------------- 05** ...
+        // attribution errors
+        ,
+        AttributionBasicAttributeUnknown = 0x0400,
+        AttributionBasicAttributeAlreadyUsed = 0x0401,
+        AttributionExpressionAttributeUnknown = 0x0410,
+        AttributionExpressionAttributeAlreadyUsed = 0x0411
+
+        // --------------------------------------------------------- 05** ...
         // symbol resolver errors
         ,
         SymbolIsUnknown = 0x0500,
@@ -176,6 +184,8 @@ namespace libcasm_fe
 
         TypeInferenceFunctionArgumentTypeMismatch = 0x1302,
         TypeInferenceFunctionArgumentSizeMismatch = 0x1312,
+        TypeInferenceFunctionDefaultValueTypeMismatch = 0x1332,
+
         TypeInferenceDerivedArgumentTypeMismatch = 0x1303,
         TypeInferenceDerivedArgumentSizeMismatch = 0x1313,
         TypeInferenceDerivedReturnTypeMismatch = 0x1323,
