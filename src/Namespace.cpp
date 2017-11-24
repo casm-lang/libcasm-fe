@@ -84,13 +84,6 @@ Namespace::Namespace( void )
 {
 }
 
-void Namespace::registerSymbol( const std::string& identifier,
-    const TypedNode::Ptr& definition,
-    const CallExpression::TargetType targetType )
-{
-    registerSymbol( identifier, definition, targetType, 0 );
-}
-
 void Namespace::registerSymbol( const FunctionDefinition::Ptr& node )
 {
     registerSymbol( node->identifier()->name(), node,
@@ -112,13 +105,13 @@ void Namespace::registerSymbol( const RuleDefinition::Ptr& node )
 void Namespace::registerSymbol( const EnumeratorDefinition::Ptr& node )
 {
     registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::CONSTANT );
+        CallExpression::TargetType::CONSTANT, 0 );
 }
 
 void Namespace::registerSymbol( const EnumerationDefinition::Ptr& node )
 {
     registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::TYPE_DOMAIN );
+        CallExpression::TargetType::TYPE_DOMAIN, 0 );
 }
 
 void Namespace::registerNamespace(
