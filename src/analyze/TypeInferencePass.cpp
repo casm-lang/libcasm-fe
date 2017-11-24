@@ -620,8 +620,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
     if( node.type() )
     {
-        if( node.methodCall()
-            and node.targetType() == CallExpression::TargetType::BUILTIN )
+        if( node.methodCall() )
         {
             // method call arguments etc. are checked during the visiting of
             // the MethodCallExpression
@@ -717,10 +716,12 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
 {
     node.expression()->accept( *this );
 
-    if( node.expression()->type() )
+    if( node.type() )
     {
-        reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
+        node.expression()->setType( node.type() );
     }
+
+    reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
 
     if( not node.expression()->type() or not node.type() )
     {
