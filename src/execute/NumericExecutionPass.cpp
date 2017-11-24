@@ -667,20 +667,6 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
 void ExecutionVisitor::visit( MethodCallExpression& node )
 {
     node.expression()->accept( *this );
-
-    if( node.targetType() == CallExpression::TargetType::BUILTIN )
-    {
-        auto& expression = m_evaluationStack.top();
-        if( not expression.defined() )
-        {
-            throw RuntimeException( node.sourceLocation(),
-                "base of method call expression is undefined",
-                m_frameStack.generateBacktrace(
-                    node.sourceLocation(), m_agentId ),
-                Code::MethodCallExpressionInvalidBaseExpression );
-        }
-    }
-
     reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
 }
 
