@@ -338,6 +338,25 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 void SymbolResolveVisitor::visit( MethodCallExpression& node )
 {
     node.expression()->accept( *this );
+
+    if( node.expression()->id() == Node::ID::DIRECT_CALL_EXPRESSION )
+    {
+        const auto& directCall
+            = static_cast< DirectCallExpression& >( *node.expression() );
+
+        if( directCall.targetType() == CallExpression::TargetType::TYPE_DOMAIN )
+        {
+            const auto currentSymboltable = m_symboltable;
+            m_symboltable = currentSymboltable.findNestedNamespace(
+                directCall.identifier() );
+
+            reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
+
+            m_symboltable = currentSymboltable;
+            return;
+        }
+    }
+
     reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
 }
 

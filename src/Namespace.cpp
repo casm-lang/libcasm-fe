@@ -144,6 +144,47 @@ void Namespace::registerNamespace(
     }
 }
 
+void Namespace::addNamespace(
+    const Ast::IdentifierPath::Ptr& path, const Namespace::Ptr& _namespace )
+{
+    const auto identifiers = path->identifiers();
+    assert( not identifiers->empty() );
+
+    // Get the deepest nested namespace to register the given namespace.
+    // The last identifier of the path will be used for the namespace name.
+    Namespace* ns = this;
+    const auto end = std::prev( identifiers->cend() );
+    for( auto it = identifiers->cbegin(); it != end; ++it )
+    {
+        ns = &ns->nestedNamespace( *it );
+    }
+    ns->addNamespace( identifiers->back(), _namespace );
+}
+
+void Namespace::addNamespace(
+    const Ast::Identifier::Ptr& identifier, const Namespace::Ptr& _namespace )
+{
+    const auto result = m_namespaces.emplace( identifier->name(), _namespace );
+    if( not result.second )
+    {
+        throw std::domain_error(
+            "namespace '" + identifier->name() + "' already defined" );
+    }
+}
+
+Namespace& Namespace::findNestedNamespace(
+    const Ast::Identifier::Ptr& identifier ) const
+{
+    const auto it = m_namespaces.find( identifier->name() );
+    if( it == m_namespaces.cend() )
+    {
+        throw std::domain_error(
+            "namespace '" + identifier->name() + "' not found" );
+    }
+
+    return *it->second;
+}
+
 Namespace::Symbol Namespace::find( const std::string& name ) const
 {
     auto result = m_symboltable.find( name );
@@ -217,6 +258,23 @@ std::string Namespace::dump( const std::string& indention ) const
     }
 
     return s.str();
+}
+
+Namespace& Namespace::nestedNamespace( const Ast::Identifier::Ptr& identifier )
+{
+    try
+    {
+        return findNestedNamespace( identifier );
+    }
+    catch( const std::domain_error& e )
+    {
+        const auto _namespace = std::make_shared< Namespace >();
+        this->addNamespace( identifier, _namespace );
+        return *_namespace;
+    }
+
+    assert( !"internal error!" );
+    return *this;
 }
 
 void Namespace::registerSymbol( const std::string& name,

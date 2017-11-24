@@ -91,8 +91,16 @@ namespace libcasm_fe
         void registerSymbol( const Ast::EnumerationDefinition::Ptr& node );
         void registerSymbol( const Ast::BasicType::Ptr& node );
 
-        void registerNamespace( const std::string& name,
+        void registerNamespace(
+            const std::string& name, const Namespace::Ptr& _namespace );
+
+        void addNamespace( const Ast::IdentifierPath::Ptr& path,
             const Namespace::Ptr& _namespace );
+        void addNamespace( const Ast::Identifier::Ptr& identifier,
+            const Namespace::Ptr& _namespace );
+
+        Namespace& findNestedNamespace(
+            const Ast::Identifier::Ptr& identifier ) const;
 
         Symbol find( const Ast::IdentifierPath& node,
             const std::size_t index = 0 ) const;
@@ -102,6 +110,12 @@ namespace libcasm_fe
         Symbol find( const std::vector< std::string >& path ) const;
 
         std::string dump( const std::string& indention = "" ) const;
+
+      private:
+        /**
+         * Returns an existing sub-namespace or creates and registers a new one.
+         */
+        Namespace& nestedNamespace( const Ast::Identifier::Ptr& identifier );
 
       private:
         void registerSymbol( const std::string& name,
