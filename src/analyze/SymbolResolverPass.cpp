@@ -199,17 +199,11 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& path = *node.identifier();
-    const auto& name = path.path();
+    assert( node.identifier() );
+    const auto& identifier = node.identifier();
+    const auto& identifierName = identifier->name();
 
-    if( path.type() == IdentifierPath::Type::RELATIVE )
-    {
-        // only absolute types can be resolved here, relative types will be
-        // resolved later in the type inference pass
-        return;
-    }
-
-    const auto variableIt = m_variables.find( name );
+    const auto variableIt = m_variables.find( identifierName );
     if( variableIt != m_variables.cend() )
     {
         node.setTargetType( CallExpression::TargetType::VARIABLE );
@@ -217,9 +211,9 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    if( libcasm_ir::Builtin::available( name ) )
+    if( libcasm_ir::Builtin::available( identifierName ) )
     {
-        const auto& annotation = libcasm_ir::Annotation::find( name );
+        const auto& annotation = libcasm_ir::Annotation::find( identifierName );
 
         node.setTargetBuiltinId( annotation.valueID() );
 
@@ -230,7 +224,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             != expectedNumberOfArguments )
         {
             m_log.error( { node.sourceLocation() },
-                "invalid argument size: builtin '" + name + "' expects "
+                "invalid argument size: builtin '" + identifierName
+                    + "' expects "
                     + std::to_string( expectedNumberOfArguments
                                       - ( node.methodCall() ? 1 : 0 ) )
                     + " arguments",
@@ -241,7 +236,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
     try
     {
-        const auto& symbol = m_symboltable.find( *node.identifier() );
+        const auto& symbol = m_symboltable.find( identifier );
 
         node.setTargetType( symbol.targetType() );
         node.setTargetDefinition( symbol.definition() );
@@ -270,7 +265,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
             m_log.error( { node.sourceLocation() },
                 "invalid argument size: " + node.targetTypeName() + " '"
-                    + path.path() + "' expects "
+                    + identifierName + "' expects "
                     + std::to_string( symbol.arity() ) + " arguments",
                 code->second );
         }
@@ -281,7 +276,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         static const auto AGENT( "Agent" );
         static const auto SINGLE_AGENT_CONSTANT( "$" );
 
-        if( name == SELF )
+        if( identifierName == SELF )
         {
             try
             {
@@ -297,7 +292,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         }
         // single agent execution notation --> agent type domain ==
         // Enumeration!
-        else if( name == SINGLE_AGENT_CONSTANT )
+        else if( identifierName == SINGLE_AGENT_CONSTANT )
         {
             assert( node.targetType() == CallExpression::TargetType::CONSTANT );
 
@@ -329,14 +324,15 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                     + ( node.targetType() != CallExpression::TargetType::UNKNOWN
                               ? node.targetTypeName() + " "
                               : "" )
-                    + "symbol '" + path.path() + "' found",
+                    + "symbol '" + identifierName + "' found",
                 ( node.targetType() == CallExpression::TargetType::FUNCTION )
                     ? Code::FunctionSymbolIsUnknown
                     : Code::SymbolIsUnknown );
         }
     }
 
-    m_log.debug( "call: " + path.path() + "{ " + node.targetTypeName() + " }" );
+    m_log.debug(
+        "call: " + identifierName + "{ " + node.targetTypeName() + " }" );
 }
 
 void SymbolResolveVisitor::visit( MethodCallExpression& node )

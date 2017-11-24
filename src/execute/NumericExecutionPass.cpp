@@ -162,7 +162,7 @@ static std::string updateAsString( const ExecutionUpdateSet::Update& update )
     const auto& location = update.location;
     const auto& value = update.value;
 
-    auto locationStr = value.producer->function()->identifier()->path();
+    auto locationStr = value.producer->function()->identifier()->name();
 
     if( not location.arguments().empty() )
     {

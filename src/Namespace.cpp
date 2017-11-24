@@ -87,7 +87,7 @@ Namespace::Namespace( void )
 void Namespace::registerSymbol( const DirectCallExpression::Ptr& node,
     const CallExpression::TargetType targetType )
 {
-    registerSymbol( node->identifier()->baseName(), node, targetType,
+    registerSymbol( node->identifier()->name(), node, targetType,
         node->arguments()->size() );
 }
 
@@ -134,8 +134,8 @@ void Namespace::registerSymbol( const BasicType::Ptr& node )
         CallExpression::TargetType::TYPE_DOMAIN );
 }
 
-void Namespace::registerNamespace( const std::string& name,
-    const Namespace::Ptr& _namespace )
+void Namespace::registerNamespace(
+    const std::string& name, const Namespace::Ptr& _namespace )
 {
     const auto result = m_namespaces.emplace( name, _namespace );
     if( not result.second )
@@ -149,14 +149,14 @@ Namespace::Symbol Namespace::find( const std::string& name ) const
     auto result = m_symboltable.find( name );
     if( result == m_symboltable.end() )
     {
-        throw std::domain_error(
-            "unable to find symbol '" + name + "'" );
+        throw std::domain_error( "unable to find symbol '" + name + "'" );
     }
 
     return result->second;
 }
 
-Namespace::Symbol Namespace::find( const std::vector< std::string >& path ) const
+Namespace::Symbol Namespace::find(
+    const std::vector< std::string >& path ) const
 {
     assert( path.size() > 0 );
 
@@ -170,10 +170,9 @@ Namespace::Symbol Namespace::find( const std::vector< std::string >& path ) cons
         auto result = m_namespaces.find( name );
         if( result == m_namespaces.end() )
         {
-            throw std::domain_error( "unable to find namespace '" + name
-                                     + "' in symbol path '"
-                                     + libstdhl::String::join( path, "." )
-                                     + "'" );
+            throw std::domain_error(
+                "unable to find namespace '" + name + "' in symbol path '"
+                + libstdhl::String::join( path, "." ) + "'" );
         }
 
         n = result->second.get();
@@ -188,8 +187,7 @@ Namespace::Symbol Namespace::find( const std::vector< std::string >& path ) cons
     catch( const std::domain_error& e )
     {
         throw std::domain_error( "unable to find symbol '"
-                                 + libstdhl::String::join( path, "." )
-                                 + "'" );
+                                 + libstdhl::String::join( path, "." ) + "'" );
     }
 }
 
@@ -233,13 +231,13 @@ void Namespace::registerSymbol( const std::string& name,
         const auto& existingSymbol = result.first->second;
         throw std::domain_error(
             "symbol '" + name + "' already defined as "
-                + CallExpression::targetTypeString( existingSymbol.targetType() )
-                + "'" );
+            + CallExpression::targetTypeString( existingSymbol.targetType() )
+            + "'" );
     }
 }
 
-Namespace::Symbol Namespace::find( const IdentifierPath& node,
-    const std::size_t index ) const
+Namespace::Symbol Namespace::find(
+    const IdentifierPath& node, const std::size_t index ) const
 {
     const auto& path = *node.identifiers();
 
@@ -256,8 +254,7 @@ Namespace::Symbol Namespace::find( const IdentifierPath& node,
         if( result == m_namespaces.end() )
         {
             throw std::domain_error( "unable to find namespace '" + name
-                                     + "' in symbol path '"
-                                     + node.path()
+                                     + "' in symbol path '" + node.path()
                                      + "'" );
         }
 

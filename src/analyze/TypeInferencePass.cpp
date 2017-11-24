@@ -487,7 +487,8 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
 
 void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
-    const auto& path = *node.identifier();
+    assert( node.identifier() );
+    const auto identifier = node.identifier();
 
     switch( node.targetType() )
     {
@@ -530,7 +531,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             const auto* annotation = annotate( node, directCallArguments );
             RecursiveVisitor::visit( node );
-            const auto description = "built-in '" + path.path() + "'";
+            const auto description = "built-in '" + identifier->name() + "'";
             inference( description, annotation, node, directCallArguments );
 
             for( auto argumentType : *node.arguments() )
@@ -538,7 +539,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 if( not argumentType->type() )
                 {
                     m_log.debug( { argumentType->sourceLocation() },
-                        "TODO: '" + path.path()
+                        "TODO: '" + identifier->name()
                             + "' has a non-typed argument(s)" );
                     return;
                 }
@@ -557,8 +558,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 if( not annotation->valid( *type ) )
                 {
                     m_log.error( { node.sourceLocation() },
-                        "built-in '" + path.path() + "' has no type relation '"
-                            + type->description() + "'",
+                        "built-in '" + identifier->name()
+                            + "' has no type relation '" + type->description()
+                            + "'",
                         Code::TypeInferenceBuiltinRelationTypeInvalid );
                     return;
                 }
@@ -1343,7 +1345,8 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
              or node.id() == libcasm_fe::Ast::Type::ID::METHOD_CALL_EXPRESSION )
     {
         auto& directCall = static_cast< DirectCallExpression& >( node );
-        const auto& path = *directCall.identifier();
+        assert( directCall.identifier() );
+        const auto identifier = directCall.identifier();
 
         assert(
             directCall.targetType() == CallExpression::TargetType::BUILTIN );
@@ -1359,7 +1362,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         {
             m_log.error( { directCall.sourceLocation() },
                         "unable to resolve built-in symbol '"
-                        + path.path()
+                        + identifier->name()
                         + "', due to missing annotation information from 'libcasm-ir'" );
             return nullptr;
         }

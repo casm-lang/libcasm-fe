@@ -285,21 +285,17 @@ u1 CallExpression::methodCall( void ) const
 IdentifierCallExpression::IdentifierCallExpression( const Node::ID id,
     const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( id, arguments )
-, m_identifier(
-      ( identifier != nullptr )
-          ? ( Ast::make< IdentifierPath >( identifier->sourceLocation(),
-                identifier, IdentifierPath::Type::ABSOLUTE ) )
-          : nullptr )
+, m_identifier( identifier )
 {
 }
 
 void IdentifierCallExpression::setIdentifier(
-    const IdentifierPath::Ptr& identifier )
+    const Identifier::Ptr& identifier )
 {
     m_identifier = identifier;
 }
 
-const IdentifierPath::Ptr& IdentifierCallExpression::identifier( void ) const
+const Identifier::Ptr& IdentifierCallExpression::identifier( void ) const
 {
     return m_identifier;
 }

@@ -135,12 +135,6 @@
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
-    static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
-    {
-        const auto& location = identifier->sourceLocation();
-        return Ast::make< IdentifierPath >( location, identifier );
-    }
-
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
     {
         if( rule == nullptr )
@@ -416,7 +410,7 @@ FunctionDefinition
       // apply the name of the function declaration to the initializer functions
       auto initializers = $8;
       for (auto& initializer : *initializers) {
-           initializer->function()->setIdentifier( asIdentifierPath( identifier ) );
+           initializer->function()->setIdentifier( identifier );
       }
       function->setInitializers( initializers );
 
@@ -460,8 +454,7 @@ ProgramFunctionDefinition
       // apply the name of the program declaration to the initializer functions
       auto initializers = $3;
       for (auto& initializer : *initializers) {
-          initializer->function()->setIdentifier(
-                asIdentifierPath( programDefinition->identifier() ) );
+          initializer->function()->setIdentifier( programDefinition->identifier() );
       }
       programDefinition->setInitializers( initializers );
 

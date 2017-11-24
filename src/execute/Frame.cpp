@@ -134,7 +134,7 @@ static std::string generateBuiltinTraceLine( Frame* frame )
     std::string name;
     if( call->id() == Node::ID::DIRECT_CALL_EXPRESSION )
     {
-        name = call->ptr< DirectCallExpression >()->identifier()->path();
+        name = call->ptr< DirectCallExpression >()->identifier()->name();
     }
     else
     {

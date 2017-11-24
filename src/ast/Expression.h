@@ -214,11 +214,11 @@ namespace libcasm_fe
                 const Expressions::Ptr& arguments );
 
           public:
-            void setIdentifier( const IdentifierPath::Ptr& identifier );
-            const IdentifierPath::Ptr& identifier( void ) const;
+            void setIdentifier( const Identifier::Ptr& identifier );
+            const Identifier::Ptr& identifier( void ) const;
 
           private:
-            IdentifierPath::Ptr m_identifier;
+            Identifier::Ptr m_identifier;
         };
 
         class DirectCallExpression final : public IdentifierCallExpression
