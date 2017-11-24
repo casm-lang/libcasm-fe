@@ -48,90 +48,22 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-//
-// Symbol
-//
-
-Namespace::Symbol::Symbol( const Ast::TypedNode::Ptr& definition,
-    const Ast::CallExpression::TargetType targetType,
-    const std::size_t arity )
-: m_definition( definition )
-, m_targetType( targetType )
-, m_arity( arity )
-{
-}
-
-const Ast::TypedNode::Ptr& Namespace::Symbol::definition( void ) const
-{
-    return m_definition;
-}
-
-Ast::CallExpression::TargetType Namespace::Symbol::targetType( void ) const
-{
-    return m_targetType;
-}
-
-std::size_t Namespace::Symbol::arity( void ) const
-{
-    return m_arity;
-}
-
-//
-// Namespace
-//
-
 Namespace::Namespace( void )
+: m_symbols()
+, m_namespaces()
 {
 }
 
-void Namespace::registerSymbol( const DirectCallExpression::Ptr& node,
-    const CallExpression::TargetType targetType )
+void Namespace::registerSymbol(
+    const std::string& name, const Ast::Definition::Ptr& definition )
 {
-    registerSymbol( node->identifier()->name(), node, targetType,
-        node->arguments()->size() );
-}
-
-void Namespace::registerSymbol( const std::string& identifier,
-    const TypedNode::Ptr& definition,
-    const CallExpression::TargetType targetType )
-{
-    registerSymbol( identifier, definition, targetType, 0 );
-}
-
-void Namespace::registerSymbol( const FunctionDefinition::Ptr& node )
-{
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::FUNCTION, node->argumentTypes()->size() );
-}
-
-void Namespace::registerSymbol( const DerivedDefinition::Ptr& node )
-{
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::DERIVED, node->arguments()->size() );
-}
-
-void Namespace::registerSymbol( const RuleDefinition::Ptr& node )
-{
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::RULE, node->arguments()->size() );
-}
-
-void Namespace::registerSymbol( const EnumeratorDefinition::Ptr& node )
-{
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::CONSTANT );
-}
-
-void Namespace::registerSymbol( const EnumerationDefinition::Ptr& node )
-{
-    registerSymbol( node->identifier()->name(), node,
-        CallExpression::TargetType::TYPE_DOMAIN );
-}
-
-void Namespace::registerSymbol( const BasicType::Ptr& node )
-{
-    registerSymbol( node->name()->baseName(), node,
-        CallExpression::TargetType::TYPE_DOMAIN );
+    const auto result = m_symbols.emplace( name, definition );
+    if( not result.second )
+    {
+        const auto& existingDefinition = result.first->second;
+        throw std::domain_error( "symbol '" + name + "' already defined as "
+                                 + existingDefinition->description() + "'" );
+    }
 }
 
 void Namespace::registerNamespace(
@@ -185,45 +117,44 @@ Namespace& Namespace::findNestedNamespace(
     return *it->second;
 }
 
-Namespace::Symbol Namespace::find( const std::string& name ) const
+Ast::Definition::Ptr Namespace::find( const std::string& name ) const
 {
-    auto result = m_symboltable.find( name );
-    if( result == m_symboltable.end() )
+    const auto it = m_symbols.find( name );
+    if( it == m_symbols.end() )
     {
         throw std::domain_error( "unable to find symbol '" + name + "'" );
     }
 
-    return result->second;
+    return it->second;
 }
 
-Namespace::Symbol Namespace::find(
+Ast::Definition::Ptr Namespace::find(
     const std::vector< std::string >& path ) const
 {
     assert( path.size() > 0 );
 
-    Namespace* n = const_cast< Namespace* >( this );
+    auto* _namespace = this;
     u64 pos = 0;
 
     while( ( pos + 1 ) != path.size() )
     {
         const auto& name = path[ pos ];
 
-        auto result = m_namespaces.find( name );
-        if( result == m_namespaces.end() )
+        const auto it = m_namespaces.find( name );
+        if( it == m_namespaces.end() )
         {
             throw std::domain_error(
                 "unable to find namespace '" + name + "' in symbol path '"
                 + libstdhl::String::join( path, "." ) + "'" );
         }
 
-        n = result->second.get();
+        _namespace = it->second.get();
         pos++;
     }
 
     try
     {
-        const auto symbol = n->find( path[ pos ] );
-        return symbol;
+        return _namespace->find( path[ pos ] );
     }
     catch( const std::domain_error& e )
     {
@@ -236,23 +167,21 @@ std::string Namespace::dump( const std::string& indention ) const
 {
     std::stringstream s;
 
-    for( const auto& v : m_symboltable )
+    for( const auto& symbol : m_symbols )
     {
-        const auto& name = v.first;
-        const auto& symbol = v.second;
+        const auto& name = symbol.first;
+        const auto& definition = symbol.second;
 
-        const auto& type = symbol.definition()->type();
+        const auto& type = definition->type();
 
-        s << indention << name << " : "
-          << CallExpression::targetTypeString( symbol.targetType() ) << " ("
-          << symbol.arity() << "-ary)"
-          << " " << ( type ? type->description() : "$unresolved$" ) << "\n";
+        s << indention << name << " : " << definition->description() << " "
+          << ( type ? type->description() : "$unresolved$" ) << "\n";
     }
 
-    for( const auto& v : m_namespaces )
+    for( const auto& _namespace : m_namespaces )
     {
-        const auto& name = v.first;
-        const auto& space = v.second;
+        const auto& name = _namespace.first;
+        const auto& space = _namespace.second;
 
         s << space->dump( name + "." );
     }
@@ -277,24 +206,7 @@ Namespace& Namespace::nestedNamespace( const Ast::Identifier::Ptr& identifier )
     return *this;
 }
 
-void Namespace::registerSymbol( const std::string& name,
-    const TypedNode::Ptr& definition,
-    const CallExpression::TargetType targetType, const std::size_t arity )
-{
-    const Symbol symbol{ definition, targetType, arity };
-    const auto result = m_symboltable.emplace( name, symbol );
-
-    if( not result.second )
-    {
-        const auto& existingSymbol = result.first->second;
-        throw std::domain_error(
-            "symbol '" + name + "' already defined as "
-            + CallExpression::targetTypeString( existingSymbol.targetType() )
-            + "'" );
-    }
-}
-
-Namespace::Symbol Namespace::find(
+Ast::Definition::Ptr Namespace::find(
     const IdentifierPath& node, const std::size_t index ) const
 {
     const auto& path = *node.identifiers();
@@ -308,15 +220,15 @@ Namespace::Symbol Namespace::find(
 
         const auto& name = path[ index ]->name();
 
-        auto result = m_namespaces.find( name );
-        if( result == m_namespaces.end() )
+        const auto it = m_namespaces.find( name );
+        if( it == m_namespaces.end() )
         {
             throw std::domain_error( "unable to find namespace '" + name
                                      + "' in symbol path '" + node.path()
                                      + "'" );
         }
 
-        return result->second->find( node, index + 1 );
+        return it->second->find( node, index + 1 );
     }
     else
     {
@@ -324,13 +236,13 @@ Namespace::Symbol Namespace::find(
 
         const auto& name = path[ index ]->name();
 
-        auto result = m_symboltable.find( name );
-        if( result == m_symboltable.end() )
+        const auto it = m_symbols.find( name );
+        if( it == m_symbols.end() )
         {
             throw std::domain_error(
                 "unable to find symbol '" + node.path() + "'" );
         }
 
-        return result->second;
+        return it->second;
     }
 }

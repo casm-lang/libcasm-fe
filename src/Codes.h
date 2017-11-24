@@ -73,7 +73,8 @@ namespace libcasm_fe
         ,
         SymbolIsUnknown = 0x0500,
         UpdateRuleFunctionSymbolIsInvalid = 0x0501,
-        SymbolAlreadyDefined = 0x0502
+        SymbolAlreadyDefined = 0x0502,
+        SymbolArgumentSizeMismatch = 0x0503
 
         // --------------------------------------------------------- f*** ...
         // function errors
@@ -183,17 +184,16 @@ namespace libcasm_fe
         TypeInferenceArgumentTypeMismatch = 0x1301,
 
         TypeInferenceFunctionArgumentTypeMismatch = 0x1302,
-        TypeInferenceFunctionArgumentSizeMismatch = 0x1312,
         TypeInferenceFunctionDefaultValueTypeMismatch = 0x1332,
 
         TypeInferenceDerivedArgumentTypeMismatch = 0x1303,
-        TypeInferenceDerivedArgumentSizeMismatch = 0x1313,
         TypeInferenceDerivedReturnTypeMismatch = 0x1323,
+
         TypeInferenceBuiltinArgumentTypeMismatch = 0x1304,
-        TypeInferenceBuiltinArgumentSizeMismatch = 0x1314,
         TypeInferenceBuiltinRelationTypeInvalid = 0x1324,
+
         TypeInferenceRuleArgumentTypeMismatch = 0x1305,
-        TypeInferenceRuleArgumentSizeMismatch = 0x1315,
+
         TypeInferenceOperatorUnaryRelationTypeInvalid = 0x1306,
         TypeInferenceOperatorBinaryRelationTypeInvalid = 0x1307,
 

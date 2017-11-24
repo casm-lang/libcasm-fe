@@ -591,10 +591,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             break;
         }
-        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
-        case CallExpression::TargetType::FUNCTION: // [[fallthrough]]
-        case CallExpression::TargetType::RULE:     // [[fallthrough]]
-        case CallExpression::TargetType::SELF:
+        case CallExpression::TargetType::DERIVED:     // [[fallthrough]]
+        case CallExpression::TargetType::FUNCTION:    // [[fallthrough]]
+        case CallExpression::TargetType::RULE:        // [[fallthrough]]
+        case CallExpression::TargetType::SELF:        // [[fallthrough]]
+        case CallExpression::TargetType::TYPE_DOMAIN: // [[fallthrough]]
+        case CallExpression::TargetType::CONSTANT:
         {
             if( node.type() )
             {
@@ -614,22 +616,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
 
             node.setType( definition->type() );
-            break;
-        }
-        case CallExpression::TargetType::TYPE_DOMAIN:
-        {
-            if( not node.type() )
-            {
-                m_log.error( { node.sourceLocation() }, "TODO: TYPE_DOMAIN" );
-            }
-            break;
-        }
-        case CallExpression::TargetType::CONSTANT:
-        {
-            if( not node.type() )
-            {
-                m_log.error( { node.sourceLocation() }, "TODO: CONSTANT" );
-            }
             break;
         }
         case CallExpression::TargetType::UNKNOWN:

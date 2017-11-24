@@ -85,25 +85,25 @@ SymbolRegistrationVisitor::SymbolRegistrationVisitor(
 
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
+    const auto& name = node.identifier()->name();
+
     try
     {
-        m_symboltable.registerSymbol( node.ptr< FunctionDefinition >() );
+        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( node.identifier()->name() );
+        const auto& symbol = m_symboltable.find( name );
 
         if( node.uid() == FunctionDefinition::UID::PROGRAM )
         {
-            m_log.error( { node.sourceLocation(),
-                             symbol.definition()->sourceLocation() },
+            m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
                 "init already defined",
                 Code::AgentInitRuleMultipleDefinitions );
         }
         else
         {
-            m_log.error( { node.sourceLocation(),
-                             symbol.definition()->sourceLocation() },
+            m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
                 e.what(),
                 Code::FunctionDefinitionAlreadyUsed );
         }
@@ -114,16 +114,17 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 
 void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 {
+    const auto& name = node.identifier()->name();
+
     try
     {
-        m_symboltable.registerSymbol( node.ptr< DerivedDefinition >() );
+        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( node.identifier()->name() );
+        const auto& symbol = m_symboltable.find( name );
 
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
+        m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
             e.what(), Code::DerivedDefinitionAlreadyUsed );
     }
 
@@ -132,16 +133,17 @@ void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 
 void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 {
+    const auto& name = node.identifier()->name();
+
     try
     {
-        m_symboltable.registerSymbol( node.ptr< RuleDefinition >() );
+        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( node.identifier()->name() );
+        const auto& symbol = m_symboltable.find( name );
 
-        m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
+        m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
             e.what(), Code::RuleDefinitionAlreadyUsed );
     }
 
@@ -150,17 +152,18 @@ void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 
 void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
 {
+    const auto& name = node.identifier()->name();
+
     try
     {
-        m_symboltable.registerSymbol( node.ptr< EnumeratorDefinition >() );
+        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( node.identifier()->name() );
+        const auto& symbol = m_symboltable.find( name );
 
         m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what() );
+            { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
     }
 }
 
@@ -185,15 +188,14 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 
     try
     {
-        m_symboltable.registerSymbol( node.ptr< EnumerationDefinition >() );
+        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
     }
     catch( const std::domain_error& e )
     {
         const auto& symbol = m_symboltable.find( name );
 
         m_log.error(
-            { node.sourceLocation(), symbol.definition()->sourceLocation() },
-            e.what() );
+            { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
     }
 
     // register enumerators in a sub-namespace
