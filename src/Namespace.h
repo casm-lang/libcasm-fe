@@ -77,9 +77,6 @@ namespace libcasm_fe
 
         Namespace( void );
 
-        void registerSymbol( const Ast::DirectCallExpression::Ptr& node,
-            const Ast::CallExpression::TargetType targetType );
-
         void registerSymbol( const std::string& name,
             const Ast::TypedNode::Ptr& definition,
             const Ast::CallExpression::TargetType targetType );

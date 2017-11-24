@@ -84,13 +84,6 @@ Namespace::Namespace( void )
 {
 }
 
-void Namespace::registerSymbol( const DirectCallExpression::Ptr& node,
-    const CallExpression::TargetType targetType )
-{
-    registerSymbol( node->identifier()->baseName(), node, targetType,
-        node->arguments()->size() );
-}
-
 void Namespace::registerSymbol( const std::string& identifier,
     const TypedNode::Ptr& definition,
     const CallExpression::TargetType targetType )
