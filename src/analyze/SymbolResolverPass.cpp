@@ -211,6 +211,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
+    if( node.baseExpression()
+        and node.baseExpression()->id() == Node::ID::UNRESOLVED_NAMESPACE )
+    {
+        // relative method call will be resolved in the TypeInferencePass
+        return;
+    }
+
     if( libcasm_ir::Builtin::available( identifierName ) )
     {
         const auto& annotation = libcasm_ir::Annotation::find( identifierName );
@@ -339,6 +346,7 @@ void SymbolResolveVisitor::visit( MethodCallExpression& node )
 {
     node.expression()->accept( *this );
 
+    const auto currentSymboltable = m_symboltable;
     if( node.expression()->id() == Node::ID::DIRECT_CALL_EXPRESSION )
     {
         const auto& directCall
@@ -346,8 +354,6 @@ void SymbolResolveVisitor::visit( MethodCallExpression& node )
 
         if( directCall.targetType() == CallExpression::TargetType::TYPE_DOMAIN )
         {
-            const auto currentSymboltable = m_symboltable;
-
             try
             {
                 m_symboltable = currentSymboltable.findNestedNamespace(
@@ -357,14 +363,15 @@ void SymbolResolveVisitor::visit( MethodCallExpression& node )
             {
                 m_log.error( { directCall.sourceLocation() }, e.what() );
             }
-
-            reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
-            m_symboltable = currentSymboltable;
-            return;
         }
+    }
+    else if( node.expression()->id() == Node::ID::UNRESOLVED_NAMESPACE )
+    {
+        node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
     }
 
     reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
+    m_symboltable = currentSymboltable;
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )
