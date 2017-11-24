@@ -522,8 +522,8 @@ void ExecutionVisitor::visit( EnumeratorDefinition& node )
     assert( node.type()->isEnumeration() );
     const auto& enumType
         = std::static_pointer_cast< IR::EnumerationType >( node.type() );
-    m_evaluationStack.push( IR::EnumerationConstant(
-        enumType, node.identifier()->name() ) );
+    m_evaluationStack.push(
+        IR::EnumerationConstant( enumType, node.identifier()->name() ) );
 }
 
 void ExecutionVisitor::visit( EnumerationDefinition& node )

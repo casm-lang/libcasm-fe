@@ -83,8 +83,8 @@ class LocationRegistry
     };
 
     struct LocationDataEquals
-        : public std::
-              binary_function< const LocationData&, const LocationData&, bool >
+    : public std::
+          binary_function< const LocationData&, const LocationData&, bool >
     {
         bool operator()(
             const LocationData& lhs, const LocationData& rhs ) const
@@ -137,7 +137,7 @@ class LocationRegistry
     };
 
     struct LocationEquals
-        : public std::binary_function< const Location&, const Location&, bool >
+    : public std::binary_function< const Location&, const Location&, bool >
     {
         bool operator()( const Location& lhs, const Location& rhs ) const
         {

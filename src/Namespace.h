@@ -91,8 +91,8 @@ namespace libcasm_fe
         void registerSymbol( const Ast::EnumerationDefinition::Ptr& node );
         void registerSymbol( const Ast::BasicType::Ptr& node );
 
-        void registerNamespace( const std::string& name,
-            const Namespace::Ptr& _namespace );
+        void registerNamespace(
+            const std::string& name, const Namespace::Ptr& _namespace );
 
         Symbol find( const Ast::IdentifierPath& node,
             const std::size_t index = 0 ) const;
