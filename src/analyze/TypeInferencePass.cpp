@@ -564,6 +564,17 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                         Code::TypeInferenceBuiltinRelationTypeInvalid );
                     return;
                 }
+
+                if( not node.methodCall() and not type->result().isVoid() )
+                {
+                    m_log.error( { node.sourceLocation() },
+                                 "built-in '" + identifier->name()
+                                 + "' has to be a method call of base expression type '"
+                                 + type->arguments().front()->description()
+                                 + "'"
+                        );
+                    return;
+                }
             }
 
             break;
