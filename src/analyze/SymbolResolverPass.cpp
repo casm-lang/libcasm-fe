@@ -151,38 +151,30 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
     {
         const auto symbol = m_symboltable.find( *node.identifier() );
 
-        switch( symbol.targetType() )
+        switch( symbol->id() )
         {
-            case CallExpression::TargetType::FUNCTION:
+            case Node::ID::FUNCTION_DEFINITION:
             {
                 node.setReferenceType( ReferenceAtom::ReferenceType::FUNCTION );
-                node.setReference( symbol.definition() );
+                node.setReference( symbol );
                 break;
             }
-            case CallExpression::TargetType::DERIVED:
+            case Node::ID::DERIVED_DEFINITION:
             {
                 node.setReferenceType( ReferenceAtom::ReferenceType::DERIVED );
-                node.setReference( symbol.definition() );
+                node.setReference( symbol );
                 break;
             }
-            case CallExpression::TargetType::BUILTIN:
-            {
-                assert( false );
-                break;
-            }
-            case CallExpression::TargetType::RULE:
+            case Node::ID::RULE_DEFINITION:
             {
                 node.setReferenceType( ReferenceAtom::ReferenceType::RULE );
-                node.setReference( symbol.definition() );
+                node.setReference( symbol );
                 break;
             }
             default:
             {
                 m_log.error( { node.identifier()->sourceLocation() },
-                    "cannot reference '"
-                        + CallExpression::targetTypeString(
-                              symbol.targetType() )
-                        + "'" );
+                    "cannot reference '" + symbol->description() + "'" );
             }
         }
     }
@@ -231,7 +223,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 "invalid argument size: builtin '" + name + "' expects "
                     + std::to_string( expectedNumberOfArguments )
                     + " arguments",
-                Code::TypeInferenceBuiltinArgumentSizeMismatch );
+                Code::SymbolArgumentSizeMismatch );
         }
 
         return;
@@ -241,36 +233,61 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     {
         const auto& symbol = m_symboltable.find( *node.identifier() );
 
-        node.setTargetType( symbol.targetType() );
-        node.setTargetDefinition( symbol.definition() );
+        std::size_t expectedNumberOfArguments = 0;
 
-        if( symbol.targetType() == CallExpression::TargetType::TYPE_DOMAIN
-            or symbol.targetType() == CallExpression::TargetType::CONSTANT )
+        switch( symbol->id() )
         {
-            node.setType( symbol.definition()->type() );
+            case Node::ID::FUNCTION_DEFINITION:
+            {
+                node.setTargetType( CallExpression::TargetType::FUNCTION );
+                const auto function
+                    = std::static_pointer_cast< FunctionDefinition >( symbol );
+                expectedNumberOfArguments = function->argumentTypes()->size();
+                break;
+            }
+            case Node::ID::DERIVED_DEFINITION:
+            {
+                node.setTargetType( CallExpression::TargetType::DERIVED );
+                const auto derived
+                    = std::static_pointer_cast< DerivedDefinition >( symbol );
+                expectedNumberOfArguments = derived->arguments()->size();
+                break;
+            }
+            case Node::ID::RULE_DEFINITION:
+            {
+                node.setTargetType( CallExpression::TargetType::RULE );
+                const auto rule
+                    = std::static_pointer_cast< RuleDefinition >( symbol );
+                expectedNumberOfArguments = rule->arguments()->size();
+                break;
+            }
+            case Node::ID::ENUMERATOR_DEFINITION:
+            {
+                node.setTargetType( CallExpression::TargetType::CONSTANT );
+                break;
+            }
+            case Node::ID::ENUMERATION_DEFINITION:
+            {
+                node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
+                break;
+            }
+            default:
+            {
+                m_log.error( { node.identifier()->sourceLocation() },
+                    "cannot reference '" + symbol->description() + "'" );
+                return;
+            }
         }
 
-        if( node.arguments()->size() != symbol.arity() )
+        node.setTargetDefinition( symbol );
+
+        if( node.arguments()->size() != expectedNumberOfArguments )
         {
-            const std::unordered_map< CallExpression::TargetType, Code > codes
-                = {
-                      { CallExpression::TargetType::FUNCTION,
-                          Code::TypeInferenceFunctionArgumentSizeMismatch },
-                      { CallExpression::TargetType::DERIVED,
-                          Code::TypeInferenceDerivedArgumentSizeMismatch },
-                      { CallExpression::TargetType::RULE,
-                          Code::TypeInferenceRuleArgumentSizeMismatch },
-                  };
-
-            const auto code = codes.find( node.targetType() );
-            assert( code != codes.end()
-                    and " invalid target type with arguments " );
-
             m_log.error( { node.sourceLocation() },
-                "invalid argument size: " + node.targetTypeName() + " '"
-                    + path.path() + "' expects "
-                    + std::to_string( symbol.arity() ) + " arguments",
-                code->second );
+                "invalid argument size: " + symbol->description() + " '" + name
+                    + "' expects " + std::to_string( expectedNumberOfArguments )
+                    + " arguments",
+                Code::SymbolArgumentSizeMismatch );
         }
     }
     catch( const std::domain_error& e )
@@ -284,7 +301,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             {
                 const auto& symbol = m_symboltable.find( AGENT );
                 node.setTargetType( CallExpression::TargetType::SELF );
-                node.setTargetDefinition( symbol.definition() );
+                node.setTargetDefinition( symbol );
             }
             catch( const std::domain_error& e )
             {
@@ -314,7 +331,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             agent->setType( type );
             agentEnum->setType( type );
 
-            m_symboltable.registerSymbol( agentEnum );
+            m_symboltable.registerSymbol( AGENT, agentEnum );
 
             node.setTargetDefinition( agent );
             node.setType( type );

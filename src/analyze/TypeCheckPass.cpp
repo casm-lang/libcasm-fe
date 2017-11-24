@@ -111,7 +111,7 @@ void TypeCheckVisitor::visit( BasicType& node )
         return;
     }
 
-    const auto& name = node.name()->baseName();
+    const auto& name = node.name()->path();
 
     if( name == TYPE_STRING_VOID )
     {
@@ -160,10 +160,23 @@ void TypeCheckVisitor::visit( BasicType& node )
         try
         {
             const auto symbol = m_symboltable.find( *node.name() );
-            assert( symbol.targetType()
-                    == CallExpression::TargetType::TYPE_DOMAIN );
 
-            const auto& type = symbol.definition()->type();
+            switch( symbol->id() )
+            {
+                case Node::ID::ENUMERATION_DEFINITION:
+                {
+                    break;
+                }
+                default:
+                {
+                    m_log.error( { node.sourceLocation() },
+                        "cannot use " + symbol->description() + " '" + name
+                            + "' as type" );
+                    return;
+                }
+            }
+
+            const auto& type = symbol->type();
             assert( type );
             node.setType( type );
         }
