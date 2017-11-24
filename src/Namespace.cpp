@@ -49,13 +49,15 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 Namespace::Namespace( void )
+: m_symbols()
+, m_namespaces()
 {
 }
 
 void Namespace::registerSymbol(
     const std::string& name, const Ast::Definition::Ptr& definition )
 {
-    const auto result = m_symboltable.emplace( name, definition );
+    const auto result = m_symbols.emplace( name, definition );
     if( not result.second )
     {
         const auto& existingDefinition = result.first->second;
@@ -76,13 +78,13 @@ void Namespace::registerNamespace(
 
 Ast::Definition::Ptr Namespace::find( const std::string& name ) const
 {
-    auto result = m_symboltable.find( name );
-    if( result == m_symboltable.end() )
+    const auto it = m_symbols.find( name );
+    if( it == m_symbols.end() )
     {
         throw std::domain_error( "unable to find symbol '" + name + "'" );
     }
 
-    return result->second;
+    return it->second;
 }
 
 Ast::Definition::Ptr Namespace::find(
@@ -90,29 +92,28 @@ Ast::Definition::Ptr Namespace::find(
 {
     assert( path.size() > 0 );
 
-    Namespace* n = const_cast< Namespace* >( this );
+    auto* _namespace = this;
     u64 pos = 0;
 
     while( ( pos + 1 ) != path.size() )
     {
         const auto& name = path[ pos ];
 
-        auto result = m_namespaces.find( name );
-        if( result == m_namespaces.end() )
+        const auto it = m_namespaces.find( name );
+        if( it == m_namespaces.end() )
         {
             throw std::domain_error(
                 "unable to find namespace '" + name + "' in symbol path '"
                 + libstdhl::String::join( path, "." ) + "'" );
         }
 
-        n = result->second.get();
+        _namespace = it->second.get();
         pos++;
     }
 
     try
     {
-        const auto symbol = n->find( path[ pos ] );
-        return symbol;
+        return _namespace->find( path[ pos ] );
     }
     catch( const std::domain_error& e )
     {
@@ -125,10 +126,10 @@ std::string Namespace::dump( const std::string& indention ) const
 {
     std::stringstream s;
 
-    for( const auto& v : m_symboltable )
+    for( const auto& symbol : m_symbols )
     {
-        const auto& name = v.first;
-        const auto& definition = v.second;
+        const auto& name = symbol.first;
+        const auto& definition = symbol.second;
 
         const auto& type = definition->type();
 
@@ -136,10 +137,10 @@ std::string Namespace::dump( const std::string& indention ) const
           << ( type ? type->description() : "$unresolved$" ) << "\n";
     }
 
-    for( const auto& v : m_namespaces )
+    for( const auto& _namespace : m_namespaces )
     {
-        const auto& name = v.first;
-        const auto& space = v.second;
+        const auto& name = _namespace.first;
+        const auto& space = _namespace.second;
 
         s << space->dump( name + "." );
     }
@@ -161,15 +162,15 @@ Ast::Definition::Ptr Namespace::find(
 
         const auto& name = path[ index ]->name();
 
-        auto result = m_namespaces.find( name );
-        if( result == m_namespaces.end() )
+        const auto it = m_namespaces.find( name );
+        if( it == m_namespaces.end() )
         {
             throw std::domain_error( "unable to find namespace '" + name
                                      + "' in symbol path '" + node.path()
                                      + "'" );
         }
 
-        return result->second->find( node, index + 1 );
+        return it->second->find( node, index + 1 );
     }
     else
     {
@@ -177,13 +178,13 @@ Ast::Definition::Ptr Namespace::find(
 
         const auto& name = path[ index ]->name();
 
-        auto result = m_symboltable.find( name );
-        if( result == m_symboltable.end() )
+        const auto it = m_symbols.find( name );
+        if( it == m_symbols.end() )
         {
             throw std::domain_error(
                 "unable to find symbol '" + node.path() + "'" );
         }
 
-        return result->second;
+        return it->second;
     }
 }

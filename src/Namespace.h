@@ -56,7 +56,7 @@ namespace libcasm_fe
       public:
         using Ptr = std::shared_ptr< Namespace >;
 
-        Namespace( void );
+        explicit Namespace( void );
 
         void registerSymbol(
             const std::string& name, const Ast::Definition::Ptr& definition );
@@ -75,7 +75,7 @@ namespace libcasm_fe
         std::string dump( const std::string& indention = "" ) const;
 
       private:
-        std::unordered_map< std::string, Ast::Definition::Ptr > m_symboltable;
+        std::unordered_map< std::string, Ast::Definition::Ptr > m_symbols;
 
         std::unordered_map< std::string, Namespace::Ptr > m_namespaces;
     };
