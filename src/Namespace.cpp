@@ -52,29 +52,16 @@ Namespace::Namespace( void )
 {
 }
 
-void Namespace::registerSymbol( const FunctionDefinition::Ptr& node )
+void Namespace::registerSymbol(
+    const std::string& name, const Ast::Definition::Ptr& definition )
 {
-    registerSymbol( node->identifier()->name(), node );
-}
-
-void Namespace::registerSymbol( const DerivedDefinition::Ptr& node )
-{
-    registerSymbol( node->identifier()->name(), node );
-}
-
-void Namespace::registerSymbol( const RuleDefinition::Ptr& node )
-{
-    registerSymbol( node->identifier()->name(), node );
-}
-
-void Namespace::registerSymbol( const EnumeratorDefinition::Ptr& node )
-{
-    registerSymbol( node->identifier()->name(), node );
-}
-
-void Namespace::registerSymbol( const EnumerationDefinition::Ptr& node )
-{
-    registerSymbol( node->identifier()->name(), node );
+    const auto result = m_symboltable.emplace( name, definition );
+    if( not result.second )
+    {
+        const auto& existingDefinition = result.first->second;
+        throw std::domain_error( "symbol '" + name + "' already defined as "
+                                 + existingDefinition->description() + "'" );
+    }
 }
 
 void Namespace::registerNamespace(
@@ -158,19 +145,6 @@ std::string Namespace::dump( const std::string& indention ) const
     }
 
     return s.str();
-}
-
-void Namespace::registerSymbol(
-    const std::string& name, const Ast::Definition::Ptr& definition )
-{
-    const auto result = m_symboltable.emplace( name, definition );
-
-    if( not result.second )
-    {
-        const auto& existingDefinition = result.first->second;
-        throw std::domain_error( "symbol '" + name + "' already defined as "
-                                 + existingDefinition->description() + "'" );
-    }
 }
 
 Ast::Definition::Ptr Namespace::find(

@@ -45,7 +45,6 @@
 #define _LIBCASM_FE_NAMESPACE_H_
 
 #include <libcasm-fe/ast/Definition>
-#include <libcasm-fe/ast/Expression>
 
 namespace libcasm_fe
 {
@@ -59,11 +58,8 @@ namespace libcasm_fe
 
         Namespace( void );
 
-        void registerSymbol( const Ast::FunctionDefinition::Ptr& node );
-        void registerSymbol( const Ast::DerivedDefinition::Ptr& node );
-        void registerSymbol( const Ast::RuleDefinition::Ptr& node );
-        void registerSymbol( const Ast::EnumeratorDefinition::Ptr& node );
-        void registerSymbol( const Ast::EnumerationDefinition::Ptr& node );
+        void registerSymbol(
+            const std::string& name, const Ast::Definition::Ptr& definition );
 
         void registerNamespace(
             const std::string& name, const Namespace::Ptr& _namespace );
@@ -79,9 +75,6 @@ namespace libcasm_fe
         std::string dump( const std::string& indention = "" ) const;
 
       private:
-        void registerSymbol(
-            const std::string& name, const Ast::Definition::Ptr& definition );
-
         std::unordered_map< std::string, Ast::Definition::Ptr > m_symboltable;
 
         std::unordered_map< std::string, Namespace::Ptr > m_namespaces;

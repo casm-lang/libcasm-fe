@@ -331,7 +331,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             agent->setType( type );
             agentEnum->setType( type );
 
-            m_symboltable.registerSymbol( agentEnum );
+            m_symboltable.registerSymbol( AGENT, agentEnum );
 
             node.setTargetDefinition( agent );
             node.setType( type );
