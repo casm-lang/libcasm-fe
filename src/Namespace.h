@@ -86,7 +86,6 @@ namespace libcasm_fe
         void registerSymbol( const Ast::RuleDefinition::Ptr& node );
         void registerSymbol( const Ast::EnumeratorDefinition::Ptr& node );
         void registerSymbol( const Ast::EnumerationDefinition::Ptr& node );
-        void registerSymbol( const Ast::BasicType::Ptr& node );
 
         void registerNamespace(
             const std::string& name, const Namespace::Ptr& _namespace );

@@ -121,12 +121,6 @@ void Namespace::registerSymbol( const EnumerationDefinition::Ptr& node )
         CallExpression::TargetType::TYPE_DOMAIN );
 }
 
-void Namespace::registerSymbol( const BasicType::Ptr& node )
-{
-    registerSymbol( node->name()->baseName(), node,
-        CallExpression::TargetType::TYPE_DOMAIN );
-}
-
 void Namespace::registerNamespace(
     const std::string& name, const Namespace::Ptr& _namespace )
 {
