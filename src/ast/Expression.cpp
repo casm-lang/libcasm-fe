@@ -247,8 +247,7 @@ void CallExpression::setTargetDefinition( const TypedNode::Ptr& definition )
 
 const TypedNode::Ptr& CallExpression::targetDefinition( void ) const
 {
-    assert( ( targetType() != TargetType::BUILTIN )
-            and ( targetType() != TargetType::UNKNOWN ) );
+    assert( ( targetType() != TargetType::BUILTIN ) and ( targetType() != TargetType::UNKNOWN ) );
 
     return m_targetDefinition;
 }
@@ -266,32 +265,29 @@ const Expression::Ptr& CallExpression::baseExpression( void ) const
 
 u1 CallExpression::builtin( void ) const
 {
-    return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_
-           and targetType() == CallExpression::TargetType::BUILTIN;
+    return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_ and
+           targetType() == CallExpression::TargetType::BUILTIN;
 }
 
 u1 CallExpression::definition( void ) const
 {
-    return m_targetDefinition != nullptr
-           and targetType() != CallExpression::TargetType::BUILTIN
-           and targetType() != CallExpression::TargetType::UNKNOWN;
+    return m_targetDefinition != nullptr and targetType() != CallExpression::TargetType::BUILTIN and
+           targetType() != CallExpression::TargetType::UNKNOWN;
 }
 
 u1 CallExpression::methodCall( void ) const
 {
-    return m_baseExpression != nullptr
-           and targetType() == CallExpression::TargetType::BUILTIN;
+    return m_baseExpression != nullptr and targetType() == CallExpression::TargetType::BUILTIN;
 }
 
-IdentifierCallExpression::IdentifierCallExpression( const Node::ID id,
-    const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
+IdentifierCallExpression::IdentifierCallExpression(
+    const Node::ID id, const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( id, arguments )
 , m_identifier( identifier )
 {
 }
 
-void IdentifierCallExpression::setIdentifier(
-    const Identifier::Ptr& identifier )
+void IdentifierCallExpression::setIdentifier( const Identifier::Ptr& identifier )
 {
     m_identifier = identifier;
 }
@@ -303,8 +299,7 @@ const Identifier::Ptr& IdentifierCallExpression::identifier( void ) const
 
 DirectCallExpression::DirectCallExpression(
     const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
-: IdentifierCallExpression(
-      Node::ID::DIRECT_CALL_EXPRESSION, identifier, arguments )
+: IdentifierCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, identifier, arguments )
 {
 }
 
@@ -354,11 +349,11 @@ void TypeCastingExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-MethodCallExpression::MethodCallExpression( const Expression::Ptr& expression,
+MethodCallExpression::MethodCallExpression(
+    const Expression::Ptr& expression,
     const Identifier::Ptr& identifier,
     const Expressions::Ptr& arguments )
-: IdentifierCallExpression(
-      Node::ID::METHOD_CALL_EXPRESSION, identifier, arguments )
+: IdentifierCallExpression( Node::ID::METHOD_CALL_EXPRESSION, identifier, arguments )
 , m_expression( expression )
 {
     setBaseExpression( expression );

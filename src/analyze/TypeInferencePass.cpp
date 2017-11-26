@@ -183,15 +183,14 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
     node.defaultValue()->accept( *this );
 
-    if( node.defaultValue() and node.defaultValue()->type()
-        and node.defaultValue()->type() != node.returnType()->type() )
+    if( node.defaultValue() and node.defaultValue()->type() and
+        node.defaultValue()->type() != node.returnType()->type() )
     {
-        m_log.error( { node.defaultValue()->sourceLocation(),
-                         node.returnType()->sourceLocation() },
-            "type mismatch: type of default value was '"
-                + node.defaultValue()->type()->description()
-                + "', function expects '"
-                + node.returnType()->type()->description() + "'",
+        m_log.error(
+            { node.defaultValue()->sourceLocation(), node.returnType()->sourceLocation() },
+            "type mismatch: type of default value was '" +
+                node.defaultValue()->type()->description() + "', function expects '" +
+                node.returnType()->type()->description() + "'",
             Code::TypeInferenceFunctionDefaultValueTypeMismatch );
     }
 
@@ -371,9 +370,10 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
         if( not annotation.valid( *relationType ) )
         {
-            m_log.error( { node.sourceLocation() },
-                "invalid 'as operator' type casting relation '"
-                    + relationType->description() + "' found'",
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid 'as operator' type casting relation '" + relationType->description() +
+                    "' found'",
                 Code::TypeInferenceInvalidTypeCastingExpression );
             return;
         }
@@ -536,11 +536,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 const auto baseExpression = node.baseExpression();
                 assert( baseExpression->type() != nullptr );
 
-                directCallArguments.insert(
-                    directCallArguments.begin(), baseExpression );
+                directCallArguments.insert( directCallArguments.begin(), baseExpression );
 
-                argTypeList.emplace_back(
-                    baseExpression->type()->ptr_result() );
+                argTypeList.emplace_back( baseExpression->type()->ptr_result() );
             }
 
             const auto* annotation = annotate( node, directCallArguments );
@@ -552,9 +550,9 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             {
                 if( not argumentType->type() )
                 {
-                    m_log.debug( { argumentType->sourceLocation() },
-                        "TODO: '" + identifier->name()
-                            + "' has a non-typed argument(s)" );
+                    m_log.debug(
+                        { argumentType->sourceLocation() },
+                        "TODO: '" + identifier->name() + "' has a non-typed argument(s)" );
                     return;
                 }
 
@@ -570,22 +568,21 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
                 if( not annotation->valid( *type ) )
                 {
-                    m_log.error( { node.sourceLocation() },
-                        "built-in '" + identifier->name()
-                            + "' has no type relation '" + type->description()
-                            + "'",
+                    m_log.error(
+                        { node.sourceLocation() },
+                        "built-in '" + identifier->name() + "' has no type relation '" +
+                            type->description() + "'",
                         Code::TypeInferenceBuiltinRelationTypeInvalid );
                     return;
                 }
 
                 if( not node.methodCall() and not type->result().isVoid() )
                 {
-                    m_log.error( { node.sourceLocation() },
-                                 "built-in '" + identifier->name()
-                                 + "' has to be a method call of base expression type '"
-                                 + type->arguments().front()->description()
-                                 + "'"
-                        );
+                    m_log.error(
+                        { node.sourceLocation() },
+                        "built-in '" + identifier->name() +
+                            "' has to be a method call of base expression type '" +
+                            type->arguments().front()->description() + "'" );
                     return;
                 }
             }
@@ -730,7 +727,8 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
 
     if( not node.expression()->type() or not node.type() )
     {
-        m_log.error( { node.sourceLocation() },
+        m_log.error(
+            { node.sourceLocation() },
             "unable to resolve type of method call expression",
             Code::TypeInferenceInvalidMethodCallExpression );
         node.setType( nullptr );
@@ -1355,8 +1353,9 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         annotation =
             &libcasm_ir::Annotation::find( static_cast< const BinaryExpression& >( node ).op() );
     }
-    else if( node.id() == libcasm_fe::Ast::Type::ID::DIRECT_CALL_EXPRESSION
-             or node.id() == libcasm_fe::Ast::Type::ID::METHOD_CALL_EXPRESSION )
+    else if(
+        node.id() == libcasm_fe::Ast::Type::ID::DIRECT_CALL_EXPRESSION or
+        node.id() == libcasm_fe::Ast::Type::ID::METHOD_CALL_EXPRESSION )
     {
         auto& directCall = static_cast< DirectCallExpression& >( node );
         assert( directCall.identifier() );
@@ -1373,10 +1372,10 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         }
         catch( const std::domain_error& e )
         {
-            m_log.error( { directCall.sourceLocation() },
-                        "unable to resolve built-in symbol '"
-                        + identifier->name()
-                        + "', due to missing annotation information from 'libcasm-ir'" );
+            m_log.error(
+                { directCall.sourceLocation() },
+                "unable to resolve built-in symbol '" + identifier->name() +
+                    "', due to missing annotation information from 'libcasm-ir'" );
             return nullptr;
         }
     }

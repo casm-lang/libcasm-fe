@@ -424,9 +424,8 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
 
             m_specification->add( type );
 
-            const libcasm_ir::Constant::Ptr constant
-                = libstdhl::Memory::make< libcasm_ir::EnumerationConstant >(
-                    type, identifierName );
+            const libcasm_ir::Constant::Ptr constant =
+                libstdhl::Memory::make< libcasm_ir::EnumerationConstant >( type, identifierName );
 
             m_specification->add( constant );
             m_ast2ir.emplace( &node, constant );

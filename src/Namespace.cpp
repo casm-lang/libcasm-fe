@@ -97,19 +97,16 @@ void Namespace::addNamespace(
     const auto result = m_namespaces.emplace( identifier->name(), _namespace );
     if( not result.second )
     {
-        throw std::domain_error(
-            "namespace '" + identifier->name() + "' already defined" );
+        throw std::domain_error( "namespace '" + identifier->name() + "' already defined" );
     }
 }
 
-Namespace& Namespace::findNestedNamespace(
-    const Ast::Identifier::Ptr& identifier ) const
+Namespace& Namespace::findNestedNamespace( const Ast::Identifier::Ptr& identifier ) const
 {
     const auto it = m_namespaces.find( identifier->name() );
     if( it == m_namespaces.cend() )
     {
-        throw std::domain_error(
-            "namespace '" + identifier->name() + "' not found" );
+        throw std::domain_error( "namespace '" + identifier->name() + "' not found" );
     }
 
     return *it->second;

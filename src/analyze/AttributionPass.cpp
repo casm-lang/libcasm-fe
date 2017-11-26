@@ -129,7 +129,8 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     // allow only basic attributes
     if( VALID_BASIC_ATTRIBUTES.count( name ) == 0 )
     {
-        m_log.error( { node.sourceLocation() },
+        m_log.error(
+            { node.sourceLocation() },
             "'" + name + "' is a unknown basic attribute",
             Code::AttributionBasicAttributeUnknown );
         return;
@@ -138,7 +139,8 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     // each attribute should only be used once
     if( m_attributeNames.count( name ) != 0 )
     {
-        m_log.error( { node.sourceLocation() },
+        m_log.error(
+            { node.sourceLocation() },
             "basic attribute '" + name + "' has already been used",
             Code::AttributionBasicAttributeAlreadyUsed );
         return;
@@ -162,7 +164,8 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     // allow only expression attributes
     if( VALID_EXPRESSION_ATTRIBUTES.count( name ) == 0 )
     {
-        m_log.error( { node.sourceLocation() },
+        m_log.error(
+            { node.sourceLocation() },
             "'" + name + "' is a unknown expression attribute",
             Code::AttributionExpressionAttributeUnknown );
         return;
@@ -171,7 +174,8 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     // each attribute should only be used once
     if( m_attributeNames.count( name ) != 0 )
     {
-        m_log.error( { node.sourceLocation() },
+        m_log.error(
+            { node.sourceLocation() },
             "expression attribute '" + name + "' has already been used",
             Code::AttributionExpressionAttributeAlreadyUsed );
         return;
