@@ -171,8 +171,7 @@ class HashMapPerformanceStatistics
     mutable std::size_t m_numberOfWrites = 0UL;
 };
 
-std::ostream& operator<<(
-    std::ostream& stream, const HashMapPerformanceStatistics& statistics );
+std::ostream& operator<<( std::ostream& stream, const HashMapPerformanceStatistics& statistics );
 #endif
 
 template < typename Details >
@@ -286,8 +285,7 @@ class HashMapBase
     {
         if( m_buckets )
         {
-            for( auto entry = m_lastEntry; entry != nullptr;
-                 entry = entry->prev )
+            for( auto entry = m_lastEntry; entry != nullptr; entry = entry->prev )
             {
                 entry->~Entry();
             }
@@ -340,8 +338,7 @@ class HashMapBase
      *         entry and a boolean value indicating if the insertion was
      *         successful (true) or not (false)
      */
-    std::pair< const_iterator, bool > insert(
-        const Key& key, const Value& value )
+    std::pair< const_iterator, bool > insert( const Key& key, const Value& value )
     {
 #ifdef HASH_MAP_PERF
         m_performanceStatistics.write();
@@ -444,8 +441,7 @@ class HashMapBase
         {
             if( needsResizing( n ) )
             {
-                resize( HashingStrategy::initialSize(
-                    n / maximumLoadFactor() + 1UL ) );
+                resize( HashingStrategy::initialSize( n / maximumLoadFactor() + 1UL ) );
             }
         }
         else
@@ -493,9 +489,7 @@ class HashMapBase
      *
      * @return The entry for the given key or nullptr if no entry could be found
      */
-    virtual Entry* searchEntry(
-        const Key& key, const std::size_t hashCode ) const noexcept
-        = 0;
+    virtual Entry* searchEntry( const Key& key, const std::size_t hashCode ) const noexcept = 0;
 
     /**
      * Inserts the \a entry into the hash map.
@@ -507,9 +501,7 @@ class HashMapBase
      * @param entry A valid entry
      * @param hashCode The hash code of the key of the \a entry
      */
-    virtual void insertEntry( Entry* entry, std::size_t hashCode ) const
-        noexcept
-        = 0;
+    virtual void insertEntry( Entry* entry, std::size_t hashCode ) const noexcept = 0;
 
     /**
      * Resizes the hash map to a size of \a newCapacity, all old entries will be
@@ -563,7 +555,7 @@ class HashMapBase
      */
     void growIfNecessary()
     {
-        if( m_buckets == nullptr ) // initial resize
+        if( m_buckets == nullptr )  // initial resize
         {
             resize( HashingStrategy::initialSize( m_capacity ) );
         }
@@ -581,8 +573,7 @@ class HashMapBase
     std::size_t m_size;     /**< The current size of the hash map */
     std::size_t m_capacity; /**< The capacity of the hash map */
 
-    Entry*
-        m_lastEntry; /**< Used to build a single-linked list in createEntry() */
+    Entry* m_lastEntry; /**< Used to build a single-linked list in createEntry() */
 
 #ifdef HASH_MAP_PERF
     HashMapPerformanceStatistics m_performanceStatistics;
@@ -592,7 +583,7 @@ class HashMapBase
     BlockAllocator< 4096 > m_entryAllocator;
 };
 
-#endif // _LIBCASM_FE_HASHMAPBASE_H_
+#endif  // _LIBCASM_FE_HASHMAPBASE_H_
 
 //
 //  Local variables:

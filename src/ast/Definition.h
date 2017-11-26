@@ -96,8 +96,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< VariableDefinition >;
 
-            VariableDefinition( const Identifier::Ptr& identifier,
-                const Type::Ptr& variableType );
+            VariableDefinition( const Identifier::Ptr& identifier, const Type::Ptr& variableType );
 
             const Type::Ptr& variableType( void ) const;
 
@@ -121,10 +120,10 @@ namespace libcasm_fe
           public:
             enum class Classification
             {
-                IN, /**< only read by an ASM, only written by its env. */
+                IN,         /**< only read by an ASM, only written by its env. */
                 CONTROLLED, /**< read and written by an ASM */
                 SHARED,     /**< read and written by an ASM and its env. */
-                OUT, /**< only written by an ASM, only read by its env. */
+                OUT,        /**< only written by an ASM, only read by its env. */
                 STATIC
             };
 
@@ -139,7 +138,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< FunctionDefinition >;
 
-            FunctionDefinition( const Identifier::Ptr& identifier,
+            FunctionDefinition(
+                const Identifier::Ptr& identifier,
                 const Types::Ptr& argumentTypes,
                 const Type::Ptr& returnType );
 
@@ -155,8 +155,7 @@ namespace libcasm_fe
             void setSymbolic( u1 symbolic );
             u1 symbolic( void ) const;
 
-            void setInitializers(
-                const NodeList< UpdateRule >::Ptr& initializers );
+            void setInitializers( const NodeList< UpdateRule >::Ptr& initializers );
             const NodeList< UpdateRule >::Ptr& initializers( void ) const;
 
             void setDefaultValue( const Expression::Ptr& defaultValue );
@@ -179,7 +178,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< DerivedDefinition >;
 
-            DerivedDefinition( const Identifier::Ptr& identifier,
+            DerivedDefinition(
+                const Identifier::Ptr& identifier,
                 const NodeList< VariableDefinition >::Ptr& arguments,
                 const Type::Ptr& returnType,
                 const Expression::Ptr& expression );
@@ -202,7 +202,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< RuleDefinition >;
 
-            RuleDefinition( const Identifier::Ptr& identifier,
+            RuleDefinition(
+                const Identifier::Ptr& identifier,
                 const NodeList< VariableDefinition >::Ptr& arguments,
                 const Type::Ptr& returnType,
                 const Rule::Ptr& rule );
@@ -237,8 +238,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< EnumerationDefinition >;
 
-            EnumerationDefinition( const Identifier::Ptr& identifier,
-                const Enumerators::Ptr& enumerators );
+            EnumerationDefinition(
+                const Identifier::Ptr& identifier, const Enumerators::Ptr& enumerators );
 
             const Enumerators::Ptr& enumerators( void ) const;
 
@@ -255,15 +256,14 @@ namespace std
     template <>
     struct hash< libcasm_fe::Ast::FunctionDefinition::UID >
     {
-        std::size_t operator()(
-            libcasm_fe::Ast::FunctionDefinition::UID uid ) const
+        std::size_t operator()( libcasm_fe::Ast::FunctionDefinition::UID uid ) const
         {
             return static_cast< std::size_t >( uid );
         }
     };
 }
 
-#endif // _LIBCASM_FE_DEFINITION_H_
+#endif  // _LIBCASM_FE_DEFINITION_H_
 
 //
 //  Local variables:

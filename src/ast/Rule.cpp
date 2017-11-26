@@ -58,8 +58,8 @@ void SkipRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-ConditionalRule::ConditionalRule( const Expression::Ptr& condition,
-    const Rule::Ptr& thenRule, const Rule::Ptr& elseRule )
+ConditionalRule::ConditionalRule(
+    const Expression::Ptr& condition, const Rule::Ptr& thenRule, const Rule::Ptr& elseRule )
 : Rule( Node::ID::CONDITIONAL_RULE )
 , m_condition( condition )
 , m_thenRule( thenRule )
@@ -67,8 +67,7 @@ ConditionalRule::ConditionalRule( const Expression::Ptr& condition,
 {
 }
 
-ConditionalRule::ConditionalRule(
-    const Expression::Ptr& condition, const Rule::Ptr& thenRule )
+ConditionalRule::ConditionalRule( const Expression::Ptr& condition, const Rule::Ptr& thenRule )
 : ConditionalRule( condition, thenRule, std::make_shared< SkipRule >() )
 {
 }
@@ -104,8 +103,7 @@ const Rule::Ptr& Case::rule() const
     return m_rule;
 }
 
-ExpressionCase::ExpressionCase(
-    const Expression::Ptr& expression, const Rule::Ptr& rule )
+ExpressionCase::ExpressionCase( const Expression::Ptr& expression, const Rule::Ptr& rule )
 : Case( Node::ID::EXPRESSION_CASE, rule )
 , m_expression( expression )
 {
@@ -153,8 +151,10 @@ void CaseRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-LetRule::LetRule( const VariableDefinition::Ptr& variable,
-    const Expression::Ptr& expression, const Rule::Ptr& rule )
+LetRule::LetRule(
+    const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& expression,
+    const Rule::Ptr& rule )
 : Rule( Node::ID::LET_RULE )
 , m_variable( variable )
 , m_expression( expression )
@@ -182,17 +182,22 @@ void LetRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
-    const Expression::Ptr& universe, const Rule::Ptr& rule )
-: ForallRule( variable, universe,
-      std::make_shared< ValueAtom >(
-          libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true ) ),
+ForallRule::ForallRule(
+    const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& universe,
+    const Rule::Ptr& rule )
+: ForallRule(
+      variable,
+      universe,
+      std::make_shared< ValueAtom >( libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true ) ),
       rule )
 {
 }
 
-ForallRule::ForallRule( const VariableDefinition::Ptr& variable,
-    const Expression::Ptr& universe, const Expression::Ptr& condition,
+ForallRule::ForallRule(
+    const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& universe,
+    const Expression::Ptr& condition,
     const Rule::Ptr& rule )
 : Rule( Node::ID::FORALL_RULE )
 , m_variable( variable )
@@ -227,8 +232,10 @@ void ForallRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-ChooseRule::ChooseRule( const VariableDefinition::Ptr& variable,
-    const Expression::Ptr& universe, const Rule::Ptr& rule )
+ChooseRule::ChooseRule(
+    const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& universe,
+    const Rule::Ptr& rule )
 : Rule( Node::ID::CHOOSE_RULE )
 , m_variable( variable )
 , m_universe( universe )
@@ -304,8 +311,8 @@ void SequenceRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-UpdateRule::UpdateRule( const DirectCallExpression::Ptr& function,
-    const Expression::Ptr& expression )
+UpdateRule::UpdateRule(
+    const DirectCallExpression::Ptr& function, const Expression::Ptr& expression )
 : Rule( Node::ID::UPDATE_RULE )
 , m_function( function )
 , m_expression( expression )

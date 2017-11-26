@@ -327,7 +327,7 @@ IdentifierPath::Type IdentifierPath::type( void ) const
 
 const std::string& IdentifierPath::baseName( void ) const
 {
-    assert( not m_identifiers->empty() ); // see ctor precondition
+    assert( not m_identifiers->empty() );  // see ctor precondition
     return m_identifiers->back()->name();
 }
 

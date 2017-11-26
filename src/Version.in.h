@@ -59,7 +59,7 @@ namespace libcasm_fe
     constexpr const char* BRANCH = "@GIT_BRANCH@";
 }
 
-#endif // _LIBCASM_FE_VERSION_H_
+#endif  // _LIBCASM_FE_VERSION_H_
 
 //
 //  Local variables:

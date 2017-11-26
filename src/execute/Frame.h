@@ -51,8 +51,7 @@ namespace libcasm_fe
     class Frame
     {
       public:
-        Frame( Ast::CallExpression* call, Ast::Node* callee,
-            std::size_t numberOfLocals );
+        Frame( Ast::CallExpression* call, Ast::Node* callee, std::size_t numberOfLocals );
 
         Ast::CallExpression* call( void ) const;
         Ast::Node* callee( void ) const;
@@ -78,15 +77,14 @@ namespace libcasm_fe
         Frame* top( void ) const;
 
         std::vector< std::string > generateBacktrace(
-            SourceLocation problemLocation,
-            const libcasm_ir::Constant& agentId ) const;
+            SourceLocation problemLocation, const libcasm_ir::Constant& agentId ) const;
 
       private:
         std::vector< std::unique_ptr< Frame > > m_frames;
     };
 }
 
-#endif // _LIBCASM_FE_FRAME_H_
+#endif  // _LIBCASM_FE_FRAME_H_
 
 //
 //  Local variables:

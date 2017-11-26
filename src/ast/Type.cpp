@@ -48,8 +48,7 @@ using namespace Ast;
 
 static IdentifierPath::Ptr createUnresolvedIdentifierPath( void )
 {
-    return std::make_shared< IdentifierPath >(
-        std::make_shared< Identifier >( "$unresolved$" ) );
+    return std::make_shared< IdentifierPath >( std::make_shared< Identifier >( "$unresolved$" ) );
 }
 
 Type::Type( Node::ID id, const IdentifierPath::Ptr& name )
@@ -83,8 +82,7 @@ void BasicType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-ComposedType::ComposedType(
-    const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
+ComposedType::ComposedType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
 : Type( Node::ID::COMPOSED_TYPE, identifier )
 , m_subTypes( subTypes )
 {
@@ -100,8 +98,7 @@ void ComposedType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-FixedSizedType::FixedSizedType(
-    const IdentifierPath::Ptr& identifier, const Expression::Ptr& size )
+FixedSizedType::FixedSizedType( const IdentifierPath::Ptr& identifier, const Expression::Ptr& size )
 : Type( Node::ID::FIXED_SIZED_TYPE, identifier )
 , m_size( size )
 {
@@ -117,8 +114,10 @@ void FixedSizedType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-RelationType::RelationType( const IdentifierPath::Ptr& identifier,
-    const Types::Ptr& argumentTypes, const Type::Ptr& returnType )
+RelationType::RelationType(
+    const IdentifierPath::Ptr& identifier,
+    const Types::Ptr& argumentTypes,
+    const Type::Ptr& returnType )
 : Type( Node::ID::RELATION_TYPE, identifier )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )

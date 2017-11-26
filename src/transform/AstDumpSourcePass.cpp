@@ -64,9 +64,11 @@ namespace ir = libcasm_ir;
 
 char AstDumpSourcePass::id = 0;
 
-static libpass::PassRegistration< AstDumpSourcePass > PASS( "AstDumpSourcePass",
+static libpass::PassRegistration< AstDumpSourcePass > PASS(
+    "AstDumpSourcePass",
     "outputs the parsed AST as a CASM input specification to stdout",
-    "ast-dump", 0 );
+    "ast-dump",
+    0 );
 
 class Indentation
 {

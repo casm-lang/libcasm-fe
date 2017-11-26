@@ -100,16 +100,13 @@ static value_t make_value( TypeType type )
     return value;
 }
 
-static std::unique_ptr< UnaryExpression > make_unary_expression(
-    libcasm_ir::Value::ID op )
+static std::unique_ptr< UnaryExpression > make_unary_expression( libcasm_ir::Value::ID op )
 {
     auto location = yy::location( nullptr );
-    return std::unique_ptr< UnaryExpression >(
-        new UnaryExpression( location, nullptr, op ) );
+    return std::unique_ptr< UnaryExpression >( new UnaryExpression( location, nullptr, op ) );
 }
 
-static std::unique_ptr< BinaryExpression > make_binary_expression(
-    libcasm_ir::Value::ID op )
+static std::unique_ptr< BinaryExpression > make_binary_expression( libcasm_ir::Value::ID op )
 {
     auto location = yy::location( nullptr );
     return std::unique_ptr< BinaryExpression >(
@@ -129,7 +126,7 @@ struct UnaryOpArgs
 };
 
 class symbolic_una_expr_test
-    : public TestWithParam< std::tuple< libcasm_ir::Value::ID, UnaryOpArgs > >
+: public TestWithParam< std::tuple< libcasm_ir::Value::ID, UnaryOpArgs > >
 {
 };
 
@@ -165,7 +162,7 @@ struct BinaryOpArgs
 };
 
 class symbolic_bin_expr_test
-    : public TestWithParam< std::tuple< libcasm_ir::Value::ID, BinaryOpArgs > >
+: public TestWithParam< std::tuple< libcasm_ir::Value::ID, BinaryOpArgs > >
 {
 };
 
@@ -202,142 +199,162 @@ static BinaryOpArgss generateSymbolic_BinaryExpressionTestCases(
     for( auto type : types )
     {
         const auto instantiatedTypes = testTemplate( type );
-        binOpTypes.insert( binOpTypes.cend(), instantiatedTypes.cbegin(),
-            instantiatedTypes.cend() );
+        binOpTypes.insert(
+            binOpTypes.cend(), instantiatedTypes.cbegin(), instantiatedTypes.cend() );
     }
     return binOpTypes;
 }
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_una_op, symbolic_una_expr_test,
-    Combine( Values( libcasm_ir::Value::NOT_INSTRUCTION ),
-        Values( UnaryOpArgs{ make_value( TypeType::UNDEF ),
-                    yields( make_value( TypeType::UNDEF ) ) },
-            UnaryOpArgs{ make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_una_op,
+    symbolic_una_expr_test,
+    Combine(
+        Values( libcasm_ir::Value::NOT_INSTRUCTION ),
+        Values(
+            UnaryOpArgs{ make_value( TypeType::UNDEF ), yields( make_value( TypeType::UNDEF ) ) },
+            UnaryOpArgs{ make_value( TypeType::SYMBOL ), yields( make_value( TypeType::SYMBOL ) ) },
             UnaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
+                         yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_log_op_xor,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_log_op_xor,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::XOR_INSTRUCTION ),
-        Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                    make_value( TypeType::UNDEF ),
-                    yields( make_value( TypeType::UNDEF ) ) },
+    Combine(
+        Values( libcasm_ir::Value::XOR_INSTRUCTION ),
+        Values(
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::UNDEF ) ) },
-            BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::UNDEF ) ) },
-            BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
-            BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
-            BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::BOOLEAN ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
+            BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
+            BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
+            BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
+            BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                          make_value( TypeType::BOOLEAN ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
+            BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
+                          make_value( TypeType::BOOLEAN ),
+                          yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_log_op_and,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_log_op_and,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::AND_INSTRUCTION ),
-        Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                    make_value( TypeType::UNDEF ),
-                    yields( make_value( TypeType::UNDEF ) ) },
+    Combine(
+        Values( libcasm_ir::Value::AND_INSTRUCTION ),
+        Values(
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN, false ),
-                yields( make_value( TypeType::BOOLEAN, false ) ), true },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN, true ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::BOOLEAN, false ),
+                          yields( make_value( TypeType::BOOLEAN, false ) ),
+                          true },
+            BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                          make_value( TypeType::BOOLEAN, true ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, false ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::BOOLEAN, false ) ), true },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::BOOLEAN, false ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, true ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::BOOLEAN, false ),
-                yields( make_value( TypeType::BOOLEAN, false ) ), true },
+                          make_value( TypeType::BOOLEAN, false ),
+                          yields( make_value( TypeType::BOOLEAN, false ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::BOOLEAN, true ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::BOOLEAN, true ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, false ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::BOOLEAN, false ) ), true },
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::BOOLEAN, false ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, true ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
+                          make_value( TypeType::BOOLEAN ),
+                          yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_log_op_or,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_log_op_or,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::OR_INSTRUCTION ),
-        Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                    make_value( TypeType::UNDEF ),
-                    yields( make_value( TypeType::UNDEF ) ) },
+    Combine(
+        Values( libcasm_ir::Value::OR_INSTRUCTION ),
+        Values(
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN, false ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN, true ),
-                yields( make_value( TypeType::BOOLEAN, true ) ), true },
+                          make_value( TypeType::BOOLEAN, false ),
+                          yields( make_value( TypeType::UNDEF ) ) },
+            BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                          make_value( TypeType::BOOLEAN, true ),
+                          yields( make_value( TypeType::BOOLEAN, true ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, false ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, true ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::BOOLEAN, true ) ), true },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::BOOLEAN, true ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::BOOLEAN, false ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::BOOLEAN, false ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                make_value( TypeType::BOOLEAN, true ),
-                yields( make_value( TypeType::BOOLEAN, true ) ), true },
+                          make_value( TypeType::BOOLEAN, true ),
+                          yields( make_value( TypeType::BOOLEAN, true ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, false ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::SYMBOL ) ) },
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::SYMBOL ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, true ),
-                make_value( TypeType::SYMBOL ),
-                yields( make_value( TypeType::BOOLEAN, true ) ), true },
+                          make_value( TypeType::SYMBOL ),
+                          yields( make_value( TypeType::BOOLEAN, true ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
+                          make_value( TypeType::BOOLEAN ),
+                          yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_cmp_op_lth_gth,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_cmp_op_lth_gth,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::LTH_INSTRUCTION,
-                 libcasm_ir::Value::GTH_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::LTH_INSTRUCTION, libcasm_ir::Value::GTH_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -345,46 +362,46 @@ INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_cmp_op_lth_gth,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        yields( make_value( TypeType::BOOLEAN, false ) ),
-                        true }, // same symbols -> false
-                    BinaryOpArgs{
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        make_value( TypeType::SYMBOL, new symbol_t( 2 ) ),
-                        yields( make_value( TypeType::SYMBOL ) ) }, // different
-                                                                    // symbols
-                                                                    // -> new
-                                                                    // symbol
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( number ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( TypeType::BOOLEAN ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       yields( make_value( TypeType::BOOLEAN, false ) ),
+                                       true },  // same symbols -> false
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       make_value( TypeType::SYMBOL, new symbol_t( 2 ) ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },  // different
+                                                                                    // symbols
+                                                                                    // -> new
+                                                                                    // symbol
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_cmp_op_leq_geq,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_cmp_op_leq_geq,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::LEQ_INSTRUCTION,
-                 libcasm_ir::Value::GEQ_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::LEQ_INSTRUCTION, libcasm_ir::Value::GEQ_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -392,248 +409,278 @@ INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_cmp_op_leq_geq,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::BOOLEAN, true ) ),
-                             true },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        yields( make_value( TypeType::BOOLEAN, true ) ),
-                        true }, // same symbols -> true
-                    BinaryOpArgs{
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        make_value( TypeType::SYMBOL, new symbol_t( 2 ) ),
-                        yields( make_value( TypeType::SYMBOL ) ) }, // different
-                                                                    // symbols
-                                                                    // -> new
-                                                                    // symbol
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( number ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( TypeType::BOOLEAN ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN, true ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       yields( make_value( TypeType::BOOLEAN, true ) ),
+                                       true },  // same symbols -> true
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       make_value( TypeType::SYMBOL, new symbol_t( 2 ) ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },  // different
+                                                                                    // symbols
+                                                                                    // -> new
+                                                                                    // symbol
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_cmp_op_equ,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_cmp_op_equ,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::EQU_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::EQU_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
-                TypeType::STRING, TypeType::INTEGER, TypeType::FLOATING,
-                TypeType::BOOLEAN, TypeType::LIST, TypeType::TUPLE,
-                TypeType::TUPLE_OR_LIST, TypeType::ENUM, TypeType::RATIONAL,
+                TypeType::STRING,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::BOOLEAN,
+                TypeType::LIST,
+                TypeType::TUPLE,
+                TypeType::TUPLE_OR_LIST,
+                TypeType::ENUM,
+                TypeType::RATIONAL,
             },
             []( TypeType literal ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::BOOLEAN, true ) ),
-                             true },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( literal ),
-                        yields( make_value( TypeType::BOOLEAN, false ) ),
-                        true },
-                    BinaryOpArgs{ make_value( literal ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::BOOLEAN, false ) ),
-                        true },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        yields( make_value( TypeType::BOOLEAN, true ) ),
-                        true }, // same symbols -> true
-                    BinaryOpArgs{
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        make_value( TypeType::SYMBOL, new symbol_t( 2 ) ),
-                        yields( make_value( TypeType::SYMBOL ) ) }, // different
-                                                                    // symbols
-                                                                    // -> new
-                                                                    // symbol
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( literal ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( literal ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( literal ), make_value( literal ),
-                        yields( make_value( TypeType::BOOLEAN ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN, true ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::BOOLEAN, false ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN, false ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       yields( make_value( TypeType::BOOLEAN, true ) ),
+                                       true },  // same symbols -> true
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       make_value( TypeType::SYMBOL, new symbol_t( 2 ) ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },  // different
+                                                                                    // symbols
+                                                                                    // -> new
+                                                                                    // symbol
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_cmp_op_neq,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_cmp_op_neq,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::NEQ_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::NEQ_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
-                TypeType::STRING, TypeType::INTEGER, TypeType::FLOATING,
-                TypeType::BOOLEAN, TypeType::LIST, TypeType::TUPLE,
-                TypeType::TUPLE_OR_LIST, TypeType::ENUM, TypeType::RATIONAL,
+                TypeType::STRING,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::BOOLEAN,
+                TypeType::LIST,
+                TypeType::TUPLE,
+                TypeType::TUPLE_OR_LIST,
+                TypeType::ENUM,
+                TypeType::RATIONAL,
             },
             []( TypeType literal ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::BOOLEAN, false ) ),
-                             true },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( literal ),
-                        yields( make_value( TypeType::BOOLEAN, true ) ), true },
-                    BinaryOpArgs{ make_value( literal ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::BOOLEAN, true ) ), true },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        yields( make_value( TypeType::BOOLEAN, false ) ),
-                        true }, // same symbols -> false
-                    BinaryOpArgs{
-                        make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
-                        make_value( TypeType::SYMBOL, new symbol_t( 2 ) ),
-                        yields( make_value( TypeType::SYMBOL ) ) }, // different
-                                                                    // symbols
-                                                                    // -> new
-                                                                    // symbol
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( literal ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( literal ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( literal ), make_value( literal ),
-                        yields( make_value( TypeType::BOOLEAN ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN, false ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::BOOLEAN, true ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN, true ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       yields( make_value( TypeType::BOOLEAN, false ) ),
+                                       true },  // same symbols -> false
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL, new symbol_t( 1 ) ),
+                                       make_value( TypeType::SYMBOL, new symbol_t( 2 ) ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },  // different
+                                                                                    // symbols
+                                                                                    // -> new
+                                                                                    // symbol
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_arith_op_add,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_arith_op_add,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::ADD_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::ADD_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
-                TypeType::INTEGER, TypeType::FLOATING, TypeType::RATIONAL,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::RATIONAL,
                 TypeType::STRING,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( number ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( number ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( number ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_arith_op_sub_mul_div,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_arith_op_sub_mul_div,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::SUB_INSTRUCTION,
-                 libcasm_ir::Value::MUL_INSTRUCTION,
-                 libcasm_ir::Value::DIV_INSTRUCTION ),
+    Combine(
+        Values(
+            libcasm_ir::Value::SUB_INSTRUCTION,
+            libcasm_ir::Value::MUL_INSTRUCTION,
+            libcasm_ir::Value::DIV_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
-                TypeType::INTEGER, TypeType::FLOATING, TypeType::RATIONAL,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::RATIONAL,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( number ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( number ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( number ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__symbolic_arith_op_mod,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__symbolic_arith_op_mod,
     symbolic_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::MOD_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::MOD_INSTRUCTION ),
         ValuesIn( generateSymbolic_BinaryExpressionTestCases(
             {
-                TypeType::INTEGER, TypeType::FLOATING,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( TypeType::SYMBOL ),
-                        make_value( number ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::SYMBOL ),
-                        yields( make_value( TypeType::SYMBOL ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( number ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( TypeType::SYMBOL ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::SYMBOL ),
+                                       yields( make_value( TypeType::SYMBOL ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( number ) ) } };
             } ) ) ) );

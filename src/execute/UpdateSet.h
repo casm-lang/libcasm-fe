@@ -87,8 +87,11 @@ class UpdateSet
     };
 
   private:
-    using UpdateHashMap = ChainedHashMap< Location, Value,
-        typename Details::LocationHash, typename Details::LocationEquals >;
+    using UpdateHashMap = ChainedHashMap<
+        Location,
+        Value,
+        typename Details::LocationHash,
+        typename Details::LocationEquals >;
 
   public:
     using const_iterator = typename UpdateHashMap::const_iterator;
@@ -115,8 +118,7 @@ class UpdateSet
          * @param existingUpdate Existing update for the same location as the
          *                       \a conflictingUpdate
          */
-        Conflict(
-            const Update& conflictingUpdate, const Update& existingUpdate )
+        Conflict( const Update& conflictingUpdate, const Update& existingUpdate )
         : std::logic_error( "conflict in update set" )
         , m_conflictingUpdate( conflictingUpdate )
         , m_existingUpdate( existingUpdate )
@@ -153,8 +155,7 @@ class UpdateSet
      *                    handle without resizing
      * @param parent The parent update-set (if there is any)
      */
-    explicit UpdateSet(
-        std::size_t initialSize = 1UL, UpdateSet* parent = nullptr )
+    explicit UpdateSet( std::size_t initialSize = 1UL, UpdateSet* parent = nullptr )
     : m_set( initialSize )
     , m_parent( parent )
     {
@@ -246,8 +247,7 @@ class UpdateSet
      *
      * @return The update value for the \a location if an update exists.
      */
-    virtual std::experimental::optional< Value > lookup(
-        const Location& location ) const noexcept
+    virtual std::experimental::optional< Value > lookup( const Location& location ) const noexcept
     {
         if( m_parent )
         {
@@ -267,8 +267,7 @@ class UpdateSet
      * @return A new update-set of type \a updateSetType with the current
      *         update-set as parent
      */
-    std::unique_ptr< UpdateSet > fork(
-        Semantics semantics, std::size_t initialSize )
+    std::unique_ptr< UpdateSet > fork( Semantics semantics, std::size_t initialSize )
     {
         switch( semantics )
         {
@@ -362,8 +361,7 @@ class UpdateSet
      *
      * @return The update value for the \a location if an update exists.
      */
-    std::experimental::optional< Value > get( const Location& location ) const
-        noexcept
+    std::experimental::optional< Value > get( const Location& location ) const noexcept
     {
         const auto it = m_set.find( location );
         if( it != m_set.end() )
@@ -429,8 +427,7 @@ class SequentialUpdateSet final : public UpdateSet< Details >
      *
      * @return The update value for the \a location if an update exists.
      */
-    std::experimental::optional< Value > lookup(
-        const Location& location ) const noexcept override
+    std::experimental::optional< Value > lookup( const Location& location ) const noexcept override
     {
         const auto it = Super::m_set.find( location );
         if( it != Super::m_set.end() )
@@ -488,8 +485,7 @@ class ParallelUpdateSet final : public UpdateSet< Details >
 
             if( not equals( value, existingValue ) )
             {
-                throw Conflict(
-                    { location, value }, { location, existingValue } );
+                throw Conflict( { location, value }, { location, existingValue } );
             }
         }
     }
@@ -546,8 +542,7 @@ class UpdateSetManager
      *
      * @return The update value for the \a location if an update exists.
      */
-    std::experimental::optional< Value > lookup(
-        const Location& location ) const noexcept
+    std::experimental::optional< Value > lookup( const Location& location ) const noexcept
     {
         if( m_updateSets.empty() )
         {
@@ -570,8 +565,7 @@ class UpdateSetManager
      * @param initialSize The number of updates the update-set should be able to
      *                    handle without resizing
      */
-    void fork(
-        typename UpdateSet::Semantics semantics, std::size_t initialSize )
+    void fork( typename UpdateSet::Semantics semantics, std::size_t initialSize )
     {
         if( m_updateSets.empty() )
         {
@@ -579,20 +573,17 @@ class UpdateSetManager
             {
                 case UpdateSet::Semantics::Sequential:
                     m_updateSets.emplace_back(
-                        new SequentialUpdateSet< typename UpdateSet::Details >(
-                            initialSize ) );
+                        new SequentialUpdateSet< typename UpdateSet::Details >( initialSize ) );
                     break;
                 case UpdateSet::Semantics::Parallel:
                     m_updateSets.emplace_back(
-                        new ParallelUpdateSet< typename UpdateSet::Details >(
-                            initialSize ) );
+                        new ParallelUpdateSet< typename UpdateSet::Details >( initialSize ) );
                     break;
             }
         }
         else
         {
-            m_updateSets.emplace_back(
-                currentUpdateSet()->fork( semantics, initialSize ) );
+            m_updateSets.emplace_back( currentUpdateSet()->fork( semantics, initialSize ) );
         }
     }
 
@@ -677,8 +668,10 @@ template < typename UpdateSet >
 class UpdateSetTransaction
 {
   public:
-    UpdateSetTransaction( UpdateSetManager< UpdateSet >* manager,
-        typename UpdateSet::Semantics semantics, std::size_t initialSize )
+    UpdateSetTransaction(
+        UpdateSetManager< UpdateSet >* manager,
+        typename UpdateSet::Semantics semantics,
+        std::size_t initialSize )
     : m_manager( manager )
     , m_forked( true )
     {
@@ -716,7 +709,7 @@ class UpdateSetTransaction
     bool m_forked;
 };
 
-#endif // _LIBCASM_FE_UPDATESET_H_
+#endif  // _LIBCASM_FE_UPDATESET_H_
 
 //
 //  Local variables:

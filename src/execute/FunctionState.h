@@ -68,8 +68,11 @@ class FunctionState
     using Value = typename Details::Value;
 
   private:
-    using StateHashMap = ProbingHashMap< Location, Value,
-        typename Details::LocationHash, typename Details::LocationEquals >;
+    using StateHashMap = ProbingHashMap<
+        Location,
+        Value,
+        typename Details::LocationHash,
+        typename Details::LocationEquals >;
 
   public:
     using const_iterator = typename StateHashMap::const_iterator;
@@ -140,8 +143,7 @@ class FunctionState
      *
      * @return The function value for the \a location if an value exists.
      */
-    std::experimental::optional< Value > get( const Location& location ) const
-        noexcept
+    std::experimental::optional< Value > get( const Location& location ) const noexcept
     {
         const auto it = m_state.find( location );
         if( it != m_state.end() )
@@ -172,7 +174,7 @@ class FunctionState
     StateHashMap m_state;
 };
 
-#endif // _LIBCASM_FE_FUNCTION_STATE_H_
+#endif  // _LIBCASM_FE_FUNCTION_STATE_H_
 
 //
 //  Local variables:

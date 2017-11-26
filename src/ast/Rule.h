@@ -80,10 +80,11 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ConditionalRule >;
 
-            ConditionalRule( const Expression::Ptr& condition,
-                const Rule::Ptr& thenRule, const Rule::Ptr& elseRule );
             ConditionalRule(
-                const Expression::Ptr& condition, const Rule::Ptr& thenRule );
+                const Expression::Ptr& condition,
+                const Rule::Ptr& thenRule,
+                const Rule::Ptr& elseRule );
+            ConditionalRule( const Expression::Ptr& condition, const Rule::Ptr& thenRule );
 
             const Expression::Ptr& condition( void ) const;
             const Rule::Ptr& thenRule( void ) const;
@@ -117,8 +118,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ExpressionCase >;
 
-            ExpressionCase(
-                const Expression::Ptr& expression, const Rule::Ptr& rule );
+            ExpressionCase( const Expression::Ptr& expression, const Rule::Ptr& rule );
 
             const Expression::Ptr& expression( void ) const;
 
@@ -143,8 +143,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< CaseRule >;
 
-            CaseRule(
-                const Expression::Ptr& expression, const Cases::Ptr& cases );
+            CaseRule( const Expression::Ptr& expression, const Cases::Ptr& cases );
 
             const Expression::Ptr& expression( void ) const;
             const Cases::Ptr& cases( void ) const;
@@ -161,8 +160,10 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< LetRule >;
 
-            LetRule( const std::shared_ptr< VariableDefinition >& variable,
-                const Expression::Ptr& expression, const Rule::Ptr& rule );
+            LetRule(
+                const std::shared_ptr< VariableDefinition >& variable,
+                const Expression::Ptr& expression,
+                const Rule::Ptr& rule );
 
             const std::shared_ptr< VariableDefinition >& variable( void ) const;
             const Expression::Ptr& expression( void ) const;
@@ -181,11 +182,15 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ForallRule >;
 
-            ForallRule( const std::shared_ptr< VariableDefinition >& variable,
-                const Expression::Ptr& universe, const Rule::Ptr& rule );
-            ForallRule( const std::shared_ptr< VariableDefinition >& variable,
+            ForallRule(
+                const std::shared_ptr< VariableDefinition >& variable,
                 const Expression::Ptr& universe,
-                const Expression::Ptr& condition, const Rule::Ptr& rule );
+                const Rule::Ptr& rule );
+            ForallRule(
+                const std::shared_ptr< VariableDefinition >& variable,
+                const Expression::Ptr& universe,
+                const Expression::Ptr& condition,
+                const Rule::Ptr& rule );
 
             const std::shared_ptr< VariableDefinition >& variable( void ) const;
             const Expression::Ptr& universe( void ) const;
@@ -206,8 +211,10 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ChooseRule >;
 
-            ChooseRule( const std::shared_ptr< VariableDefinition >& variable,
-                const Expression::Ptr& universe, const Rule::Ptr& rule );
+            ChooseRule(
+                const std::shared_ptr< VariableDefinition >& variable,
+                const Expression::Ptr& universe,
+                const Rule::Ptr& rule );
 
             const std::shared_ptr< VariableDefinition >& variable( void ) const;
             const Expression::Ptr& universe( void ) const;
@@ -271,8 +278,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UpdateRule >;
 
-            UpdateRule( const DirectCallExpression::Ptr& function,
-                const Expression::Ptr& expression );
+            UpdateRule(
+                const DirectCallExpression::Ptr& function, const Expression::Ptr& expression );
 
             const DirectCallExpression::Ptr& function( void ) const;
             const Expression::Ptr& expression( void ) const;
@@ -310,7 +317,7 @@ namespace libcasm_fe
     }
 }
 
-#endif // _LIBCASM_FE_RULE_H_
+#endif  // _LIBCASM_FE_RULE_H_
 
 //
 //  Local variables:

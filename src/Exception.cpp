@@ -50,14 +50,16 @@ Exception::Exception( const std::string& msg, Code errorCode )
 {
 }
 
-Exception::Exception(
-    const SourceLocation& location, const std::string& msg, Code errorCode )
+Exception::Exception( const SourceLocation& location, const std::string& msg, Code errorCode )
 : Exception( location, msg, {}, errorCode )
 {
 }
 
-Exception::Exception( const SourceLocation& location, const std::string& msg,
-    const std::vector< std::string >& backtrace, Code errorCode )
+Exception::Exception(
+    const SourceLocation& location,
+    const std::string& msg,
+    const std::vector< std::string >& backtrace,
+    Code errorCode )
 : m_msg( msg )
 , m_locations( { location } )
 , m_backtrace( backtrace )
@@ -65,14 +67,16 @@ Exception::Exception( const SourceLocation& location, const std::string& msg,
 {
 }
 
-Exception::Exception( const std::vector< SourceLocation >& locations,
-    const std::string& msg, Code errorCode )
+Exception::Exception(
+    const std::vector< SourceLocation >& locations, const std::string& msg, Code errorCode )
 : Exception( locations, msg, {}, errorCode )
 {
 }
 
-Exception::Exception( const std::vector< SourceLocation >& locations,
-    const std::string& msg, const std::vector< std::string >& backtrace,
+Exception::Exception(
+    const std::vector< SourceLocation >& locations,
+    const std::string& msg,
+    const std::vector< std::string >& backtrace,
     Code errorCode )
 : m_msg( msg )
 , m_locations( locations )

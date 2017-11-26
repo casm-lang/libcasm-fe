@@ -81,8 +81,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ExpressionAttribute >;
 
-            ExpressionAttribute( const Identifier::Ptr& identifier,
-                const Expression::Ptr& expression );
+            ExpressionAttribute(
+                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
 
             const Expression::Ptr& expression( void ) const;
 
@@ -94,7 +94,7 @@ namespace libcasm_fe
     }
 }
 
-#endif // _LIBCASM_FE_ATTRIBUTE_H_
+#endif  // _LIBCASM_FE_ATTRIBUTE_H_
 
 //
 //  Local variables:

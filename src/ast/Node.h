@@ -154,7 +154,9 @@ namespace libcasm_fe
         };
 
         template < typename T >
-        class NodeList final : public Node, public libstdhl::List< T >
+        class NodeList final
+        : public Node
+        , public libstdhl::List< T >
         {
           public:
             using Ptr = std::shared_ptr< NodeList >;
@@ -231,15 +233,13 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< IdentifierPath >;
 
-            IdentifierPath(
-                const Identifier::Ptr& identifier, Type type = Type::ABSOLUTE );
+            IdentifierPath( const Identifier::Ptr& identifier, Type type = Type::ABSOLUTE );
 
             /**
              * @param identifiers A list of identifiers (must not be empty)
              * @param type The type of the identifier path (default is ABSOLUTE)
              */
-            IdentifierPath( const Identifiers::Ptr& identifiers,
-                Type type = Type::ABSOLUTE );
+            IdentifierPath( const Identifiers::Ptr& identifiers, Type type = Type::ABSOLUTE );
 
             Identifiers::Ptr identifiers( void ) const;
             Type type( void ) const;
@@ -256,18 +256,16 @@ namespace libcasm_fe
         };
 
         template < typename T, typename... Args >
-        typename T::Ptr make(
-            const SourceLocation& sourceLocation, Args&&... args )
+        typename T::Ptr make( const SourceLocation& sourceLocation, Args&&... args )
         {
-            auto node
-                = std::make_shared< T >( std::forward< Args >( args )... );
+            auto node = std::make_shared< T >( std::forward< Args >( args )... );
             node->setSourceLocation( sourceLocation );
             return node;
         }
     }
 }
 
-#endif // _LIBCASM_FE_NODE_H_
+#endif  // _LIBCASM_FE_NODE_H_
 
 //
 //  Local variables:

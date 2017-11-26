@@ -65,9 +65,11 @@ using namespace Ast;
 
 char AstDumpDotPass::id = 0;
 
-static libpass::PassRegistration< AstDumpDotPass > PASS( "AstDumpDotPass",
+static libpass::PassRegistration< AstDumpDotPass > PASS(
+    "AstDumpDotPass",
     "generates a DOT graph of the AST and dumps it to './out.dot' for now",
-    "ast-dump-dot", 0 );
+    "ast-dump-dot",
+    0 );
 
 class AstDumpDotVisitor final : public RecursiveVisitor
 {
@@ -275,8 +277,7 @@ void AstDumpDotVisitor::visit( UndefAtom& node )
 void AstDumpDotVisitor::visit( DirectCallExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode(
-        node, "DirectCallExpression\nTarget type: " + node.targetTypeName() );
+    dumpNode( node, "DirectCallExpression\nTarget type: " + node.targetTypeName() );
     RecursiveVisitor::visit( node );
 }
 
@@ -298,16 +299,14 @@ void AstDumpDotVisitor::visit( MethodCallExpression& node )
 void AstDumpDotVisitor::visit( UnaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode(
-        node, "UnaryExpression\n" + libcasm_ir::Value::token( node.op() ) );
+    dumpNode( node, "UnaryExpression\n" + libcasm_ir::Value::token( node.op() ) );
     RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BinaryExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode(
-        node, "BinaryExpression\n" + libcasm_ir::Value::token( node.op() ) );
+    dumpNode( node, "BinaryExpression\n" + libcasm_ir::Value::token( node.op() ) );
     RecursiveVisitor::visit( node );
 }
 
@@ -535,8 +534,7 @@ void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
     m_stream << "\"];\n";
 }
 
-void AstDumpDotVisitor::dumpNode(
-    const TypedNode& node, const std::string& name )
+void AstDumpDotVisitor::dumpNode( const TypedNode& node, const std::string& name )
 {
     m_stream << "\"" << &node << "\" [label=\"" << name;
 
@@ -557,7 +555,7 @@ void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
 {
     dumpLabel( static_cast< const Node& >( node ) );
 
-    if( true ) // m_dumpType
+    if( true )  // m_dumpType
     {
         m_stream << "\n";
 
@@ -589,9 +587,8 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     const auto& data = pr.result< ConsistencyCheckPass >();
     const auto& specification = data->specification();
 
-    const std::string outputFilePath
-        = "./obj/out.dot";            // TODO: add command-line switch
-    const u1 dumpNodeLocation = true; // TODO: add command-line switch
+    const std::string outputFilePath = "./obj/out.dot";  // TODO: add command-line switch
+    const u1 dumpNodeLocation = true;                    // TODO: add command-line switch
 
     const auto printDotGraph = [&]( std::ostream& out ) {
         out << "digraph \"main\" {\n";

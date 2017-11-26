@@ -45,8 +45,8 @@
 
 void libcasm_fe_main_dummy( void )
 {
-    const auto source = libstdhl::Memory::make< libstdhl::Log::Source >(
-        "libcasm-fe", "CASM FE Library" );
+    const auto source =
+        libstdhl::Memory::make< libstdhl::Log::Source >( "libcasm-fe", "CASM FE Library" );
 
     libstdhl::Log::defaultSource( source );
 }

@@ -80,8 +80,7 @@ std::size_t Definition::maximumNumberOfLocals( void ) const
 }
 
 HeaderDefinition::HeaderDefinition( const SourceLocation& sourceLocation )
-: Definition( Node::ID::HEADER_DEFINITION,
-      Ast::make< Identifier >( sourceLocation, "CASM" ) )
+: Definition( Node::ID::HEADER_DEFINITION, Ast::make< Identifier >( sourceLocation, "CASM" ) )
 {
 }
 
@@ -118,7 +117,8 @@ void VariableDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-FunctionDefinition::FunctionDefinition( const Identifier::Ptr& identifier,
+FunctionDefinition::FunctionDefinition(
+    const Identifier::Ptr& identifier,
     const Types::Ptr& argumentTypes,
     const Type::Ptr& returnType )
 : Definition( Node::ID::FUNCTION_DEFINITION, identifier )
@@ -164,14 +164,12 @@ const Type::Ptr& FunctionDefinition::returnType( void ) const
     return m_returnType;
 }
 
-void FunctionDefinition::setClassification(
-    FunctionDefinition::Classification classification )
+void FunctionDefinition::setClassification( FunctionDefinition::Classification classification )
 {
     m_classification = classification;
 }
 
-FunctionDefinition::Classification FunctionDefinition::classification(
-    void ) const
+FunctionDefinition::Classification FunctionDefinition::classification( void ) const
 {
     return m_classification;
 }
@@ -216,14 +214,12 @@ u1 FunctionDefinition::symbolic( void ) const
     return m_symbolic;
 }
 
-void FunctionDefinition::setInitializers(
-    const NodeList< UpdateRule >::Ptr& initializers )
+void FunctionDefinition::setInitializers( const NodeList< UpdateRule >::Ptr& initializers )
 {
     m_initializers = initializers;
 }
 
-const NodeList< UpdateRule >::Ptr& FunctionDefinition::initializers(
-    void ) const
+const NodeList< UpdateRule >::Ptr& FunctionDefinition::initializers( void ) const
 {
     return m_initializers;
 }
@@ -243,7 +239,8 @@ void FunctionDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-DerivedDefinition::DerivedDefinition( const Identifier::Ptr& identifier,
+DerivedDefinition::DerivedDefinition(
+    const Identifier::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Expression::Ptr& expression )
@@ -254,8 +251,7 @@ DerivedDefinition::DerivedDefinition( const Identifier::Ptr& identifier,
 {
 }
 
-const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments(
-    void ) const
+const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments( void ) const
 {
     return m_arguments;
 }
@@ -275,7 +271,8 @@ void DerivedDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-RuleDefinition::RuleDefinition( const Identifier::Ptr& identifier,
+RuleDefinition::RuleDefinition(
+    const Identifier::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
     const Type::Ptr& returnType,
     const Rule::Ptr& rule )
@@ -286,8 +283,7 @@ RuleDefinition::RuleDefinition( const Identifier::Ptr& identifier,
 {
 }
 
-const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments(
-    void ) const
+const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments( void ) const
 {
     return m_arguments;
 }

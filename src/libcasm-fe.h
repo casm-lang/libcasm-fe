@@ -63,7 +63,7 @@ namespace libcasm_fe
 {
 }
 
-#endif // _LIBCASM_FE_H_
+#endif  // _LIBCASM_FE_H_
 
 //
 //  Local variables:

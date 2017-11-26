@@ -57,8 +57,8 @@ using namespace libcasm_fe;
 
 char SourceToAstPass::id = 0;
 
-static libpass::PassRegistration< SourceToAstPass > PASS( "SourceToAstPass",
-    "parse the source code and generate an AST", "ast-parse", 0 );
+static libpass::PassRegistration< SourceToAstPass > PASS(
+    "SourceToAstPass", "parse the source code and generate an AST", "ast-parse", 0 );
 
 void SourceToAstPass::usage( libpass::PassUsage& pu )
 {
@@ -91,8 +91,7 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< SourceToAstPass >(
-        libstdhl::Memory::make< Data >( specification ) );
+    pr.setResult< SourceToAstPass >( libstdhl::Memory::make< Data >( specification ) );
 
     return true;
 }

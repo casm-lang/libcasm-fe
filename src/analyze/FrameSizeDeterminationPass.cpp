@@ -59,7 +59,9 @@ char FrameSizeDeterminationPass::id = 0;
 
 static libpass::PassRegistration< FrameSizeDeterminationPass > PASS(
     "ASTFrameSizeDeterminationPass",
-    "determines the required size of call frames", "ast-frame-size-det", 0 );
+    "determines the required size of call frames",
+    "ast-frame-size-det",
+    0 );
 
 class FrameSizeDeterminationVisitor final : public RecursiveVisitor
 {
@@ -91,8 +93,7 @@ class FrameSizeDeterminationVisitor final : public RecursiveVisitor
     std::size_t m_maxNumberOfLocals;
 };
 
-FrameSizeDeterminationVisitor::FrameSizeDeterminationVisitor(
-    libcasm_fe::Logger& log )
+FrameSizeDeterminationVisitor::FrameSizeDeterminationVisitor( libcasm_fe::Logger& log )
 : RecursiveVisitor()
 , m_log( log )
 , m_numberOfLocals( 0 )
@@ -107,9 +108,10 @@ void FrameSizeDeterminationVisitor::visit( FunctionDefinition& node )
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
 
 #ifndef NDEBUG
-    m_log.debug( { node.sourceLocation() },
-        "function '" + node.identifier()->name() + "' requires space for "
-            + std::to_string( m_maxNumberOfLocals ) + " locals" );
+    m_log.debug(
+        { node.sourceLocation() },
+        "function '" + node.identifier()->name() + "' requires space for " +
+            std::to_string( m_maxNumberOfLocals ) + " locals" );
 #endif
 }
 
@@ -130,9 +132,10 @@ void FrameSizeDeterminationVisitor::visit( DerivedDefinition& node )
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
 
 #ifndef NDEBUG
-    m_log.debug( { node.sourceLocation() },
-        "derived '" + node.identifier()->name() + "' requires space for "
-            + std::to_string( m_maxNumberOfLocals ) + " locals" );
+    m_log.debug(
+        { node.sourceLocation() },
+        "derived '" + node.identifier()->name() + "' requires space for " +
+            std::to_string( m_maxNumberOfLocals ) + " locals" );
 #endif
 }
 
@@ -153,9 +156,10 @@ void FrameSizeDeterminationVisitor::visit( RuleDefinition& node )
     node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
 
 #ifndef NDEBUG
-    m_log.debug( { node.sourceLocation() },
-        "rule '" + node.identifier()->name() + "' requires space for "
-            + std::to_string( m_maxNumberOfLocals ) + " locals" );
+    m_log.debug(
+        { node.sourceLocation() },
+        "rule '" + node.identifier()->name() + "' requires space for " +
+            std::to_string( m_maxNumberOfLocals ) + " locals" );
 #endif
 }
 
@@ -186,8 +190,7 @@ void FrameSizeDeterminationVisitor::visit( UniversalQuantifierExpression& node )
     popLocal();
 }
 
-void FrameSizeDeterminationVisitor::visit(
-    ExistentialQuantifierExpression& node )
+void FrameSizeDeterminationVisitor::visit( ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
@@ -263,8 +266,7 @@ u1 FrameSizeDeterminationPass::run( libpass::PassResult& pr )
     const auto errors = log.errors();
     if( errors > 0 )
     {
-        log.debug(
-            "found %lu error(s) during frame size determination", errors );
+        log.debug( "found %lu error(s) during frame size determination", errors );
         return false;
     }
 

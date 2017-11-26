@@ -118,8 +118,9 @@ void ReferenceAtom::setReference( const TypedNode::Ptr& reference )
 
 const TypedNode::Ptr& ReferenceAtom::reference( void ) const
 {
-    assert( ( m_referenceType != ReferenceType::BUILTIN )
-            and ( m_referenceType != ReferenceType::UNKNOWN ) );
+    assert(
+        ( m_referenceType != ReferenceType::BUILTIN ) and
+        ( m_referenceType != ReferenceType::UNKNOWN ) );
 
     return m_reference;
 }
@@ -331,8 +332,7 @@ void IndirectCallExpression::accept( Visitor& visitor )
 
 TypeCastingExpression::TypeCastingExpression(
     const Expression::Ptr& fromExpression, const Type::Ptr& asType )
-: CallExpression(
-      Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
+: CallExpression( Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
 , m_fromExpression( fromExpression )
 , m_asType( asType )
 {
@@ -374,8 +374,7 @@ void MethodCallExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-UnaryExpression::UnaryExpression(
-    const Expression::Ptr& expression, libcasm_ir::Value::ID op )
+UnaryExpression::UnaryExpression( const Expression::Ptr& expression, libcasm_ir::Value::ID op )
 : Expression( Node::ID::UNARY_EXPRESSION )
 , m_op( op )
 , m_expression( expression )
@@ -397,8 +396,8 @@ void UnaryExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-BinaryExpression::BinaryExpression( const Expression::Ptr& left,
-    const Expression::Ptr& right, libcasm_ir::Value::ID op )
+BinaryExpression::BinaryExpression(
+    const Expression::Ptr& left, const Expression::Ptr& right, libcasm_ir::Value::ID op )
 : Expression( Node::ID::BINARY_EXPRESSION )
 , m_op( op )
 , m_left( left )
@@ -426,8 +425,7 @@ void BinaryExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-RangeExpression::RangeExpression(
-    const Expression::Ptr& left, const Expression::Ptr& right )
+RangeExpression::RangeExpression( const Expression::Ptr& left, const Expression::Ptr& right )
 : Expression( Node::ID::RANGE_EXPRESSION )
 , m_left( left )
 , m_right( right )
@@ -465,8 +463,10 @@ void ListExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-LetExpression::LetExpression( const VariableDefinition::Ptr& variable,
-    const Expression::Ptr& initializer, const Expression::Ptr& expression )
+LetExpression::LetExpression(
+    const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& initializer,
+    const Expression::Ptr& expression )
 : Expression( Node::ID::LET_EXPRESSION )
 , m_variable( variable )
 , m_initializer( initializer )
@@ -494,7 +494,8 @@ void LetExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-ConditionalExpression::ConditionalExpression( const Expression::Ptr& condition,
+ConditionalExpression::ConditionalExpression(
+    const Expression::Ptr& condition,
     const Expression::Ptr& thenExpression,
     const Expression::Ptr& elseExpression )
 : Expression( Node::ID::CONDITIONAL_EXPRESSION )
@@ -524,8 +525,10 @@ void ConditionalExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-ChooseExpression::ChooseExpression( const VariableDefinition::Ptr& variable,
-    const Expression::Ptr& universe, const Expression::Ptr& expression )
+ChooseExpression::ChooseExpression(
+    const VariableDefinition::Ptr& variable,
+    const Expression::Ptr& universe,
+    const Expression::Ptr& expression )
 : Expression( Node::ID::CHOOSE_EXPRESSION )
 , m_variable( variable )
 , m_universe( universe )
@@ -553,7 +556,8 @@ void ChooseExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-QuantifierExpression::QuantifierExpression( Node::ID id,
+QuantifierExpression::QuantifierExpression(
+    Node::ID id,
     const VariableDefinition::Ptr& predicateVariable,
     const Expression::Ptr& universe,
     const Expression::Ptr& proposition )
@@ -564,8 +568,7 @@ QuantifierExpression::QuantifierExpression( Node::ID id,
 {
 }
 
-const VariableDefinition::Ptr& QuantifierExpression::predicateVariable(
-    void ) const
+const VariableDefinition::Ptr& QuantifierExpression::predicateVariable( void ) const
 {
     return m_predicateVariable;
 }
@@ -584,8 +587,8 @@ UniversalQuantifierExpression::UniversalQuantifierExpression(
     const std::shared_ptr< VariableDefinition >& predicateVariable,
     const Expression::Ptr& universe,
     const Expression::Ptr& proposition )
-: QuantifierExpression( Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION,
-      predicateVariable, universe, proposition )
+: QuantifierExpression(
+      Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION, predicateVariable, universe, proposition )
 {
 }
 
@@ -598,8 +601,8 @@ ExistentialQuantifierExpression::ExistentialQuantifierExpression(
     const std::shared_ptr< VariableDefinition >& predicateVariable,
     const Expression::Ptr& universe,
     const Expression::Ptr& proposition )
-: QuantifierExpression( Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION,
-      predicateVariable, universe, proposition )
+: QuantifierExpression(
+      Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION, predicateVariable, universe, proposition )
 {
 }
 

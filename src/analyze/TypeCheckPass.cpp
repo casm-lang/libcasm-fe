@@ -57,8 +57,8 @@ using namespace Ast;
 
 char TypeCheckPass::id = 0;
 
-static libpass::PassRegistration< TypeCheckPass > PASS( "ASTTypeCheckPass",
-    "type check of all types in the AST representation", "ast-type-chk", 0 );
+static libpass::PassRegistration< TypeCheckPass > PASS(
+    "ASTTypeCheckPass", "type check of all types in the AST representation", "ast-type-chk", 0 );
 
 class TypeCheckVisitor final : public RecursiveVisitor
 {
@@ -75,8 +75,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
     Namespace& m_symboltable;
 };
 
-TypeCheckVisitor::TypeCheckVisitor(
-    libcasm_fe::Logger& log, Namespace& symboltable )
+TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 {
@@ -93,14 +92,16 @@ static const std::string TYPE_STRING_RATIONAL = "Rational";
 static const std::string TYPE_STRING_RULEREF = "RuleRef";
 static const std::string TYPE_STRING_FUNCREF = "FuncRef";
 
-static const std::unordered_set< std::string > TYPE_STRINGS_FOR_REFERENCE_TYPES
-    = { TYPE_STRING_RULEREF, TYPE_STRING_FUNCREF };
+static const std::unordered_set< std::string > TYPE_STRINGS_FOR_REFERENCE_TYPES = {
+    TYPE_STRING_RULEREF, TYPE_STRING_FUNCREF
+};
 
 static const std::string TYPE_STRING_TUPLE = "Tuple";
 static const std::string TYPE_STRING_LIST = "List";
 
-static const std::unordered_set< std::string > TYPE_STRINGS_FOR_COMPOSED_TYPES
-    = { TYPE_STRING_TUPLE, TYPE_STRING_LIST };
+static const std::unordered_set< std::string > TYPE_STRINGS_FOR_COMPOSED_TYPES = {
+    TYPE_STRING_TUPLE, TYPE_STRING_LIST
+};
 
 void TypeCheckVisitor::visit( BasicType& node )
 {
@@ -143,16 +144,18 @@ void TypeCheckVisitor::visit( BasicType& node )
     }
     else if( TYPE_STRINGS_FOR_REFERENCE_TYPES.count( name ) )
     {
-        m_log.error( { node.sourceLocation() },
-            "reference type '" + name + "' defined without a relation, use '"
-                + name + "< /* relation type */  >'",
+        m_log.error(
+            { node.sourceLocation() },
+            "reference type '" + name + "' defined without a relation, use '" + name +
+                "< /* relation type */  >'",
             Code::TypeAnnotationRelationTypeHasNoSubType );
     }
     else if( TYPE_STRINGS_FOR_COMPOSED_TYPES.count( name ) )
     {
-        m_log.error( { node.sourceLocation() },
-            "composed type '" + name + "' defined without sub-types, use '"
-                + name + "< /* sub-type(s) */  >'",
+        m_log.error(
+            { node.sourceLocation() },
+            "composed type '" + name + "' defined without sub-types, use '" + name +
+                "< /* sub-type(s) */  >'",
             Code::TypeAnnotationComposedTypeHasNoSubType );
     }
     else
@@ -169,9 +172,9 @@ void TypeCheckVisitor::visit( BasicType& node )
                 }
                 default:
                 {
-                    m_log.error( { node.sourceLocation() },
-                        "cannot use " + symbol->description() + " '" + name
-                            + "' as type" );
+                    m_log.error(
+                        { node.sourceLocation() },
+                        "cannot use " + symbol->description() + " '" + name + "' as type" );
                     return;
                 }
             }
@@ -182,7 +185,8 @@ void TypeCheckVisitor::visit( BasicType& node )
         }
         catch( const std::domain_error& e )
         {
-            m_log.error( { node.sourceLocation() },
+            m_log.error(
+                { node.sourceLocation() },
                 "unknown type '" + name + "' found",
                 Code::TypeAnnotationInvalidBasicTypeName );
         }
@@ -205,8 +209,8 @@ void TypeCheckVisitor::visit( ComposedType& node )
     {
         if( not subType->type() )
         {
-            m_log.info( { subType->sourceLocation() },
-                "TODO: '" + name + "' has a non-typed sub type" );
+            m_log.info(
+                { subType->sourceLocation() }, "TODO: '" + name + "' has a non-typed sub type" );
             return;
         }
 
@@ -215,27 +219,27 @@ void TypeCheckVisitor::visit( ComposedType& node )
 
     if( name == TYPE_STRING_TUPLE )
     {
-        const auto type
-            = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
+        const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
         node.setType( type );
     }
     else if( name == TYPE_STRING_LIST )
     {
         if( subTypeList.size() == 1 )
         {
-            const auto type = libstdhl::Memory::make< libcasm_ir::ListType >(
-                subTypeList[ 0 ] );
+            const auto type = libstdhl::Memory::make< libcasm_ir::ListType >( subTypeList[ 0 ] );
             node.setType( type );
         }
         else
         {
-            m_log.error( { node.sourceLocation() },
+            m_log.error(
+                { node.sourceLocation() },
                 "composed type '" + name + "' can only have one sub-type" );
         }
     }
     else
     {
-        m_log.error( { node.sourceLocation() },
+        m_log.error(
+            { node.sourceLocation() },
             "unknown composed type '" + name + "' found",
             Code::TypeAnnotationInvalidComposedTypeName );
     }
@@ -257,7 +261,8 @@ void TypeCheckVisitor::visit( RelationType& node )
     {
         if( not argumentType->type() )
         {
-            m_log.info( { argumentType->sourceLocation() },
+            m_log.info(
+                { argumentType->sourceLocation() },
                 "TODO: '" + name + "' has a non-typed argument(s)" );
             return;
         }
@@ -269,9 +274,8 @@ void TypeCheckVisitor::visit( RelationType& node )
     {
         if( node.returnType()->type() )
         {
-            const auto type
-                = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
-                    node.returnType()->type(), argTypeList );
+            const auto type = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
+                node.returnType()->type(), argTypeList );
             node.setType( type );
         }
     }
@@ -279,15 +283,15 @@ void TypeCheckVisitor::visit( RelationType& node )
     {
         if( node.returnType()->type() )
         {
-            const auto type
-                = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                    node.returnType()->type(), argTypeList );
+            const auto type = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
+                node.returnType()->type(), argTypeList );
             node.setType( type );
         }
     }
     else
     {
-        m_log.error( { node.sourceLocation() },
+        m_log.error(
+            { node.sourceLocation() },
             "unknown relation type '" + name + "' found",
             Code::TypeAnnotationInvalidRelationTypeName );
     }
@@ -308,25 +312,23 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
             {
                 const auto& atom = static_cast< const ValueAtom& >( expr );
 
-                const auto value
-                    = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
-                        atom.value() );
+                const auto value =
+                    std::static_pointer_cast< libcasm_ir::IntegerConstant >( atom.value() );
 
                 try
                 {
-                    auto type
-                        = libstdhl::Memory::get< libcasm_ir::BitType >( value );
+                    auto type = libstdhl::Memory::get< libcasm_ir::BitType >( value );
                     node.setType( type );
                 }
                 catch( const std::domain_error& e )
                 {
-                    m_log.error( { expr.sourceLocation() }, e.what(),
-                        Code::TypeBitSizeIsInvalid );
+                    m_log.error( { expr.sourceLocation() }, e.what(), Code::TypeBitSizeIsInvalid );
                 }
             }
             else
             {
-                m_log.error( { expr.sourceLocation() },
+                m_log.error(
+                    { expr.sourceLocation() },
                     "unsupported expr for 'Bit' type, constant Integer value "
                     "expected" );
             }
@@ -335,39 +337,30 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
         {
             if( expr.id() == Node::ID::RANGE_EXPRESSION )
             {
-                const auto& range_expr
-                    = static_cast< const RangeExpression& >( expr );
+                const auto& range_expr = static_cast< const RangeExpression& >( expr );
 
                 const auto& lhs = *range_expr.left();
                 const auto& rhs = *range_expr.right();
 
-                if( lhs.id() == Node::ID::VALUE_ATOM and lhs.type()->isInteger()
-                    and rhs.id() == Node::ID::VALUE_ATOM
-                    and rhs.type()->isInteger() )
+                if( lhs.id() == Node::ID::VALUE_ATOM and lhs.type()->isInteger() and
+                    rhs.id() == Node::ID::VALUE_ATOM and rhs.type()->isInteger() )
                 {
-                    const auto ir_lhs = std::static_pointer_cast<
-                        libcasm_ir::IntegerConstant >(
+                    const auto ir_lhs = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
                         static_cast< const ValueAtom& >( lhs ).value() );
 
-                    const auto ir_rhs = std::static_pointer_cast<
-                        libcasm_ir::IntegerConstant >(
+                    const auto ir_rhs = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
                         static_cast< const ValueAtom& >( rhs ).value() );
 
-                    auto range = libstdhl::Memory::make< libcasm_ir::Range >(
-                        ir_lhs, ir_rhs );
+                    auto range = libstdhl::Memory::make< libcasm_ir::Range >( ir_lhs, ir_rhs );
 
-                    auto range_type
-                        = libstdhl::Memory::get< libcasm_ir::RangeType >(
-                            range );
+                    auto range_type = libstdhl::Memory::get< libcasm_ir::RangeType >( range );
 
                     assert( not expr.type() );
                     expr.setType( range_type );
 
                     try
                     {
-                        auto type
-                            = libstdhl::Memory::get< libcasm_ir::IntegerType >(
-                                range_type );
+                        auto type = libstdhl::Memory::get< libcasm_ir::IntegerType >( range_type );
 
                         node.setType( type );
                     }
@@ -379,14 +372,16 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
             }
             else
             {
-                m_log.error( { expr.sourceLocation() },
+                m_log.error(
+                    { expr.sourceLocation() },
                     "unsupported expr for 'Integer' type, only range "
                     "expressions are allowed, e.g. `Integer'[5..10]`" );
             }
         }
         else
         {
-            m_log.error( { node.sourceLocation() },
+            m_log.error(
+                { node.sourceLocation() },
                 "unknown type '" + name + "' found",
                 Code::TypeAnnotationInvalidFixedSizeTypeName );
         }

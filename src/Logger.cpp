@@ -54,8 +54,7 @@ using namespace libcasm_fe;
 
 static const auto fileNameNull = std::string();
 
-static libstdhl::Log::Items to_location_items(
-    const std::vector< SourceLocation >& locations )
+static libstdhl::Log::Items to_location_items( const std::vector< SourceLocation >& locations )
 {
     libstdhl::Log::Items items;
     for( const auto& location : locations )
@@ -68,14 +67,19 @@ static libstdhl::Log::Items to_location_items(
         }
 
         items.add( libstdhl::Memory::make< libstdhl::Log::LocationItem >(
-            *fileName, location.begin.line, location.begin.column,
-            location.end.line, location.end.column ) );
+            *fileName,
+            location.begin.line,
+            location.begin.column,
+            location.end.line,
+            location.end.column ) );
     }
     return items;
 }
 
-void libcasm_fe::Logger::error( const std::vector< SourceLocation >& locations,
-    const std::string& message, libcasm_fe::Code errorCode )
+void libcasm_fe::Logger::error(
+    const std::vector< SourceLocation >& locations,
+    const std::string& message,
+    libcasm_fe::Code errorCode )
 {
     auto items = to_location_items( locations );
     items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( message ) );
@@ -86,8 +90,8 @@ void libcasm_fe::Logger::error( const std::vector< SourceLocation >& locations,
 
         for( const auto& location : locations )
         {
-            const auto errorCodeString = libstdhl::String::format(
-                "@%i{%04x}", location.begin.line, errorCode );
+            const auto errorCodeString =
+                libstdhl::String::format( "@%i{%04x}", location.begin.line, errorCode );
 
             const auto result = usedErrorCodeStrings.emplace( errorCodeString );
             if( not result.second )
@@ -95,8 +99,7 @@ void libcasm_fe::Logger::error( const std::vector< SourceLocation >& locations,
                 continue;
             }
 
-            items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >(
-                errorCodeString ) );
+            items.add( libstdhl::Memory::make< libstdhl::Log::TextItem >( errorCodeString ) );
         }
     }
 
@@ -111,8 +114,7 @@ void libcasm_fe::Logger::error( const std::vector< SourceLocation >& locations,
 void libcasm_fe::Logger::error( const Exception& exception )
 {
     error( exception.locations(), exception.what(), exception.errorCode() );
-    info( "Backtrace:\n"
-          + libstdhl::String::join( exception.backtrace(), "\n" ) );
+    info( "Backtrace:\n" + libstdhl::String::join( exception.backtrace(), "\n" ) );
 }
 
 void libcasm_fe::Logger::warning(

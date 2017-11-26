@@ -50,7 +50,7 @@ namespace libcasm_fe
     // --------------------------------------------------------- 0*** ...
     // generic syntax error
     {
-        SyntaxError = 0x0000 // 00** ... syntax/grammar
+        SyntaxError = 0x0000  // 00** ... syntax/grammar
         ,
         SyntaxErrorUnrecognizedCharacter = 0x0001,
         SyntaxErrorUnclosedString = 0x0002,
@@ -83,7 +83,7 @@ namespace libcasm_fe
 
         FunctionDefinitionAlreadyUsed = 0xf010,
 
-        FunctionAttributeIsInvalid = 0xfa00 // fa** ... function attribute
+        FunctionAttributeIsInvalid = 0xfa00  // fa** ... function attribute
         ,
         FunctionAttributeMultipleUseOfFunctionClassifier = 0xfa01,
         FunctionAttributeMultipleUseOfSymbolic = 0xfa02
@@ -93,28 +93,27 @@ namespace libcasm_fe
         FunctionDefaultValueTypeMismatch = 0xfb02
 
         ,
-        FunctionArgumentInvalidValueAtLookup
-        = 0xfe00 // fe** ... function argument
+        FunctionArgumentInvalidValueAtLookup = 0xfe00  // fe** ... function argument
         ,
         FunctionArgumentInvalidValueAtUpdate = 0xfe01
 
         ,
-        FunctionUpdateInvalidValueAtUpdate = 0xfd00 // fd** ... function value
+        FunctionUpdateInvalidValueAtUpdate = 0xfd00  // fd** ... function value
         ,
         FunctionValueInvalidRangeAtInitially = 0xfd01,
         FunctionValueAlreadyInitializedAtInitially = 0xfd02
 
         ,
-        FunctionIdentifierIsBuiltinName = 0xf100 // f1** ... function identifer
+        FunctionIdentifierIsBuiltinName = 0xf100  // f1** ... function identifer
 
         // --------------------------------------------------------- d*** ...
         // derived errors
         ,
         DerivedDefinitionAlreadyUsed = 0xd000,
 
-        DerivedArgumentValueInvalid = 0xda00, // da** ... derived argment
+        DerivedArgumentValueInvalid = 0xda00,  // da** ... derived argment
         DerivedReturnValueInvalid = 0xda01,
-        DerivedExpressionInvalidType = 0xde00 // de** ... derived expression
+        DerivedExpressionInvalidType = 0xde00  // de** ... derived expression
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
@@ -123,7 +122,7 @@ namespace libcasm_fe
 
         NotSideEffectFreeRuleCall = 0x5100,
 
-        RuleArgumentValueInvalid = 0x5e00 // 5e** ... rule argument
+        RuleArgumentValueInvalid = 0x5e00  // 5e** ... rule argument
         ,
         RuleArgumentsSizeInvalidAtCall = 0x5e01,
         RuleArgumentsTypeInvalidAtCall = 0x5e02
@@ -133,10 +132,10 @@ namespace libcasm_fe
         RuleArgumentsTypeInvalidAtIndirectCall = 0x5e05
 
         ,
-        CaseRuleMultipleDefaultCases = 0x5c00 // 5c** ... case errors
+        CaseRuleMultipleDefaultCases = 0x5c00  // 5c** ... case errors
 
         ,
-        AssertInvalidExpression = 0x5a00 // 5a** ... assert errors
+        AssertInvalidExpression = 0x5a00  // 5a** ... assert errors
 
         ,
         LetAssignedValueInvalid = 0x5d00
@@ -240,8 +239,7 @@ namespace libcasm_fe
 
         TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000,
 
-        TypeIntegerRangedInvalidInterval
-        = 0x2000, // 2*** ... Integer type error
+        TypeIntegerRangedInvalidInterval = 0x2000,  // 2*** ... Integer type error
 
         // --------------------------------------------------------- cc** ...
         // consistency check errors

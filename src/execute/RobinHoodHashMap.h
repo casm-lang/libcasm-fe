@@ -61,7 +61,7 @@ namespace details
         {
             Key key;
             Value value;
-            Entry* prev; // linked-list
+            Entry* prev;  // linked-list
 
             Entry( const Key& key, const Value& value, Entry* prev )
             : key( key )
@@ -90,7 +90,8 @@ namespace details
     };
 }
 
-template < typename Key,
+template <
+    typename Key,
     typename Value,
     typename Hash = std::hash< Key >,
     typename Pred = std::equal_to< Key >,
@@ -106,8 +107,7 @@ class RobinHoodHashMap final : public HashMapBase< Details >
     using HashMapBase< Details >::HashMapBase;
 
   protected:
-    Entry* searchEntry( const Key& key, const std::size_t hashCode ) const
-        noexcept override
+    Entry* searchEntry( const Key& key, const std::size_t hashCode ) const noexcept override
     {
 #ifdef HASH_MAP_PERF
         HashMap::m_performanceStatistics.searched();
@@ -122,15 +122,13 @@ class RobinHoodHashMap final : public HashMapBase< Details >
         }
 
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex
-            = HashingStrategy::compress( hashCode, capacity );
+        const auto initialIndex = HashingStrategy::compress( hashCode, capacity );
 
         for( auto distance = 0UL;; ++distance )
         {
             assert( distance < capacity );
 
-            const auto index = HashingStrategy::compress(
-                initialIndex + distance, capacity );
+            const auto index = HashingStrategy::compress( initialIndex + distance, capacity );
             const auto bucket = buckets + index;
 
             if( bucket->empty() or ( distance > bucket->distance ) )
@@ -141,8 +139,7 @@ class RobinHoodHashMap final : public HashMapBase< Details >
                 return nullptr;
             }
 
-            if( ( bucket->hashCode == hashCode )
-                and equals( bucket->entry->key, key ) )
+            if( ( bucket->hashCode == hashCode ) and equals( bucket->entry->key, key ) )
             {
 #ifdef HASH_MAP_PERF
                 HashMap::m_performanceStatistics.probedOnSearch( distance );
@@ -154,8 +151,7 @@ class RobinHoodHashMap final : public HashMapBase< Details >
         return nullptr;
     }
 
-    void insertEntry( Entry* entry, std::size_t hashCode ) const
-        noexcept override
+    void insertEntry( Entry* entry, std::size_t hashCode ) const noexcept override
     {
         assert( HashMap::m_buckets != nullptr );
 
@@ -171,8 +167,7 @@ class RobinHoodHashMap final : public HashMapBase< Details >
         {
             assert( distance < capacity );
 
-            const auto index = HashingStrategy::compress(
-                initialIndex + distance, capacity );
+            const auto index = HashingStrategy::compress( initialIndex + distance, capacity );
             const auto bucket = buckets + index;
 
             if( bucket->empty() )
@@ -230,7 +225,7 @@ class RobinHoodHashMap final : public HashMapBase< Details >
     }
 };
 
-#endif // _LIBCASM_FE_ROBINHOODHASHMAP_H_
+#endif  // _LIBCASM_FE_ROBINHOODHASHMAP_H_
 
 //
 //  Local variables:

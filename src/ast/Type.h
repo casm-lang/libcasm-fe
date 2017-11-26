@@ -90,8 +90,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ComposedType >;
 
-            ComposedType( const IdentifierPath::Ptr& identifier,
-                const Types::Ptr& subTypes );
+            ComposedType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes );
 
             const Types::Ptr& subTypes( void ) const;
 
@@ -106,8 +105,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< FixedSizedType >;
 
-            FixedSizedType( const IdentifierPath::Ptr& identifier,
-                const Expression::Ptr& size );
+            FixedSizedType( const IdentifierPath::Ptr& identifier, const Expression::Ptr& size );
 
             const Expression::Ptr& size( void ) const;
 
@@ -122,7 +120,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< RelationType >;
 
-            RelationType( const IdentifierPath::Ptr& identifier,
+            RelationType(
+                const IdentifierPath::Ptr& identifier,
                 const Types::Ptr& argumentTypes,
                 const Type::Ptr& returnType );
 
@@ -138,7 +137,7 @@ namespace libcasm_fe
     }
 }
 
-#endif // _LIBCASM_FE_TYPE_H_
+#endif  // _LIBCASM_FE_TYPE_H_
 
 //
 //  Local variables:

@@ -45,8 +45,7 @@
 
 using namespace libcasm_fe;
 
-static const auto registration
-    = libcasm_ir::Constant::registerConstant< ReferenceConstant >();
+static const auto registration = libcasm_ir::Constant::registerConstant< ReferenceConstant >();
 
 static const auto VOID = libstdhl::Memory::get< libcasm_ir::VoidType >();
 
@@ -74,8 +73,7 @@ std::string ReferenceConstant::name( void ) const
 
 u1 ReferenceConstant::classof( Value const* obj )
 {
-    return obj->id() == classid()
-           or libcasm_ir::RuleReferenceConstant::classof( obj )
+    return obj->id() == classid() or libcasm_ir::RuleReferenceConstant::classof( obj )
         // or libcasm_ir::FunctionReferenceConstant::classof( obj )
         // TODO: enable if FuncRef constant and type is ready
         ;
