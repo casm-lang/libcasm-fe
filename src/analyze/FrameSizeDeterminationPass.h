@@ -65,7 +65,7 @@ namespace libcasm_fe
     };
 }
 
-#endif // _LIB_CASMFE_FRAME_SIZE_DETERMINATION_PASS_H_
+#endif  // _LIB_CASMFE_FRAME_SIZE_DETERMINATION_PASS_H_
 
 //
 //  Local variables:

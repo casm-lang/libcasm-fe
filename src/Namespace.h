@@ -58,19 +58,16 @@ namespace libcasm_fe
 
         explicit Namespace( void );
 
-        void registerSymbol(
-            const std::string& name, const Ast::Definition::Ptr& definition );
+        void registerSymbol( const std::string& name, const Ast::Definition::Ptr& definition );
 
-        void registerNamespace(
-            const std::string& name, const Namespace::Ptr& _namespace );
+        void registerNamespace( const std::string& name, const Namespace::Ptr& _namespace );
 
-        Ast::Definition::Ptr find( const Ast::IdentifierPath& node,
-            const std::size_t index = 0 ) const;
+        Ast::Definition::Ptr find(
+            const Ast::IdentifierPath& node, const std::size_t index = 0 ) const;
 
         Ast::Definition::Ptr find( const std::string& name ) const;
 
-        Ast::Definition::Ptr find(
-            const std::vector< std::string >& path ) const;
+        Ast::Definition::Ptr find( const std::vector< std::string >& path ) const;
 
         std::string dump( const std::string& indention = "" ) const;
 
@@ -81,7 +78,7 @@ namespace libcasm_fe
     };
 }
 
-#endif // _LIBCASM_FE_NAMESPACE_H_
+#endif  // _LIBCASM_FE_NAMESPACE_H_
 
 //
 //  Local variables:

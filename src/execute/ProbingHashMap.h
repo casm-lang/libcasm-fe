@@ -53,8 +53,7 @@ namespace details
         // h(i, k) = h1(k) + i
         struct LinearProbing
         {
-            static constexpr std::size_t probe(
-                const std::size_t index, const std::size_t round )
+            static constexpr std::size_t probe( const std::size_t index, const std::size_t round )
             {
                 return index + round;
             }
@@ -63,8 +62,7 @@ namespace details
         // h(i, k) = h1(k) + i / 2 + i^2 / 2
         struct QuadraticProbing
         {
-            static constexpr std::size_t probe(
-                const std::size_t index, const std::size_t round )
+            static constexpr std::size_t probe( const std::size_t index, const std::size_t round )
             {
                 return index + ( round + round * round ) / 2;
             }
@@ -85,7 +83,7 @@ namespace details
         {
             Key key;
             Value value;
-            Entry* prev; // linked-list
+            Entry* prev;  // linked-list
 
             Entry( const Key& key, const Value& value, Entry* prev )
             : key( key )
@@ -113,7 +111,8 @@ namespace details
     };
 }
 
-template < typename Key,
+template <
+    typename Key,
     typename Value,
     typename Hash = std::hash< Key >,
     typename Pred = std::equal_to< Key >,
@@ -130,8 +129,7 @@ class ProbingHashMap final : public HashMapBase< Details >
     using HashMapBase< Details >::HashMapBase;
 
   protected:
-    Entry* searchEntry( const Key& key, const std::size_t hashCode ) const
-        noexcept override
+    Entry* searchEntry( const Key& key, const std::size_t hashCode ) const noexcept override
     {
 #ifdef HASH_MAP_PERF
         HashMap::m_performanceStatistics.searched();
@@ -146,17 +144,14 @@ class ProbingHashMap final : public HashMapBase< Details >
         }
 
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex
-            = HashingStrategy::compress( hashCode, capacity );
+        const auto initialIndex = HashingStrategy::compress( hashCode, capacity );
 
         for( std::size_t round = 0;; round++ )
         {
             assert( round < capacity );
 
-            const auto probedIndex
-                = ProbingStrategy::probe( initialIndex, round );
-            const auto index
-                = HashingStrategy::compress( probedIndex, capacity );
+            const auto probedIndex = ProbingStrategy::probe( initialIndex, round );
+            const auto index = HashingStrategy::compress( probedIndex, capacity );
             const auto bucket = buckets + index;
 
             if( bucket->empty() )
@@ -167,8 +162,7 @@ class ProbingHashMap final : public HashMapBase< Details >
                 return nullptr;
             }
 
-            if( ( bucket->hashCode == hashCode )
-                and equals( bucket->entry->key, key ) )
+            if( ( bucket->hashCode == hashCode ) and equals( bucket->entry->key, key ) )
             {
 #ifdef HASH_MAP_PERF
                 HashMap::m_performanceStatistics.probedOnSearch( round );
@@ -180,8 +174,7 @@ class ProbingHashMap final : public HashMapBase< Details >
         return nullptr;
     }
 
-    void insertEntry( Entry* entry, std::size_t hashCode ) const
-        noexcept override
+    void insertEntry( Entry* entry, std::size_t hashCode ) const noexcept override
     {
         assert( HashMap::m_buckets != nullptr );
 
@@ -191,17 +184,14 @@ class ProbingHashMap final : public HashMapBase< Details >
 
         const auto buckets = HashMap::m_buckets;
         const auto capacity = HashMap::m_capacity;
-        const auto initialIndex
-            = HashingStrategy::compress( hashCode, capacity );
+        const auto initialIndex = HashingStrategy::compress( hashCode, capacity );
 
         for( std::size_t round = 0;; round++ )
         {
             assert( round < capacity );
 
-            const auto probedIndex
-                = ProbingStrategy::probe( initialIndex, round );
-            const auto index
-                = HashingStrategy::compress( probedIndex, capacity );
+            const auto probedIndex = ProbingStrategy::probe( initialIndex, round );
+            const auto index = HashingStrategy::compress( probedIndex, capacity );
             const auto bucket = buckets + index;
 
             if( bucket->empty() )
@@ -249,7 +239,7 @@ class ProbingHashMap final : public HashMapBase< Details >
     }
 };
 
-#endif // _LIBCASM_FE_PROBINGHASHMAP_H_
+#endif  // _LIBCASM_FE_PROBINGHASHMAP_H_
 
 //
 //  Local variables:

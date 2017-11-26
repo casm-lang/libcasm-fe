@@ -62,8 +62,8 @@ namespace libcasm_fe
         {
         }
 
-        SourcePosition( const std::shared_ptr< std::string >& fileName,
-            value_type line, value_type column )
+        SourcePosition(
+            const std::shared_ptr< std::string >& fileName, value_type line, value_type column )
         : fileName( fileName )
         , line( line )
         , column( column )
@@ -102,8 +102,7 @@ namespace libcasm_fe
         /**
          * Add \a width columns.
          */
-        friend SourcePosition operator+(
-            SourcePosition lhs, difference_type width )
+        friend SourcePosition operator+( SourcePosition lhs, difference_type width )
         {
             return lhs += width;
         }
@@ -119,29 +118,24 @@ namespace libcasm_fe
         /**
          * Subtract \a width columns.
          */
-        friend SourcePosition operator-(
-            SourcePosition lhs, difference_type width )
+        friend SourcePosition operator-( SourcePosition lhs, difference_type width )
         {
             return lhs += -width;
         }
 
-        friend bool operator==(
-            const SourcePosition& lhs, const SourcePosition& rhs )
+        friend bool operator==( const SourcePosition& lhs, const SourcePosition& rhs )
         {
-            return ( lhs.line == rhs.line ) and ( lhs.column == rhs.column )
-                   and ( ( lhs.fileName == rhs.fileName )
-                           or ( lhs.fileName and rhs.fileName
-                                  and *lhs.fileName == *rhs.fileName ) );
+            return ( lhs.line == rhs.line ) and ( lhs.column == rhs.column ) and
+                   ( ( lhs.fileName == rhs.fileName ) or
+                     ( lhs.fileName and rhs.fileName and *lhs.fileName == *rhs.fileName ) );
         }
 
-        friend bool operator!=(
-            const SourcePosition& lhs, const SourcePosition& rhs )
+        friend bool operator!=( const SourcePosition& lhs, const SourcePosition& rhs )
         {
             return not( lhs == rhs );
         }
 
-        friend std::ostream& operator<<(
-            std::ostream& stream, const SourcePosition& position )
+        friend std::ostream& operator<<( std::ostream& stream, const SourcePosition& position )
         {
             return stream << std::to_string( position.line ) << ":"
                           << std::to_string( position.column );
@@ -151,26 +145,21 @@ namespace libcasm_fe
         /**
          * Compute max(min, lhs+rhs) (provided min <= lhs).
          */
-        static value_type add_(
-            value_type lhs, difference_type rhs, difference_type min )
+        static value_type add_( value_type lhs, difference_type rhs, difference_type min )
         {
-            return ( 0 < rhs || -static_cast< value_type >( rhs ) < lhs
-                         ? rhs + lhs
-                         : min );
+            return ( 0 < rhs || -static_cast< value_type >( rhs ) < lhs ? rhs + lhs : min );
         }
 
       public:
-        std::shared_ptr< std::string >
-            fileName;      /**< File name to which this position refers. */
-        value_type line;   /**< Current line number. */
-        value_type column; /**< Current column number. */
+        std::shared_ptr< std::string > fileName; /**< File name to which this position refers. */
+        value_type line;                         /**< Current line number. */
+        value_type column;                       /**< Current column number. */
     };
 
     class SourceLocation
     {
       public:
-        explicit SourceLocation(
-            const SourcePosition& position = SourcePosition() )
+        explicit SourceLocation( const SourcePosition& position = SourcePosition() )
         : SourceLocation( position, position )
         {
         }
@@ -222,8 +211,7 @@ namespace libcasm_fe
         /**
          * Join two locations.
          */
-        friend SourceLocation operator+(
-            SourceLocation lhs, const SourceLocation& rhs )
+        friend SourceLocation operator+( SourceLocation lhs, const SourceLocation& rhs )
         {
             return lhs += rhs;
         }
@@ -240,8 +228,7 @@ namespace libcasm_fe
         /**
          * Add \a width columns to the end position.
          */
-        friend SourceLocation operator+(
-            SourceLocation lhs, SourcePosition::difference_type width )
+        friend SourceLocation operator+( SourceLocation lhs, SourcePosition::difference_type width )
         {
             return lhs += width;
         }
@@ -257,26 +244,22 @@ namespace libcasm_fe
         /**
          * Subtract \a width columns from the end position.
          */
-        friend SourceLocation operator-(
-            SourceLocation lhs, SourcePosition::difference_type width )
+        friend SourceLocation operator-( SourceLocation lhs, SourcePosition::difference_type width )
         {
             return lhs += -width;
         }
 
-        friend bool operator==(
-            const SourceLocation& lhs, const SourceLocation& rhs )
+        friend bool operator==( const SourceLocation& lhs, const SourceLocation& rhs )
         {
             return lhs.begin == rhs.begin and lhs.end == rhs.end;
         }
 
-        friend bool operator!=(
-            const SourceLocation& lhs, const SourceLocation& rhs )
+        friend bool operator!=( const SourceLocation& lhs, const SourceLocation& rhs )
         {
             return not( lhs == rhs );
         }
 
-        friend std::ostream& operator<<(
-            std::ostream& stream, const SourceLocation& location )
+        friend std::ostream& operator<<( std::ostream& stream, const SourceLocation& location )
         {
             if( location.begin != location.end )
             {
@@ -294,7 +277,7 @@ namespace libcasm_fe
     };
 }
 
-#endif // _LIBCASM_FE_SOURCE_LOCATION_H_
+#endif  // _LIBCASM_FE_SOURCE_LOCATION_H_
 
 //
 //  Local variables:

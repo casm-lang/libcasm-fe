@@ -62,7 +62,8 @@ char SymbolResolverPass::id = 0;
 
 static libpass::PassRegistration< SymbolResolverPass > PASS(
     "ASTSymbolResolverPass",
-    "resolves AST identifiers of type-, call-, ... nodes", "ast-sym-resolve",
+    "resolves AST identifiers of type-, call-, ... nodes",
+    "ast-sym-resolve",
     0 );
 
 class SymbolResolveVisitor final : public RecursiveVisitor
@@ -94,8 +95,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     std::unordered_map< std::string, VariableDefinition::Ptr > m_variables;
 };
 
-SymbolResolveVisitor::SymbolResolveVisitor(
-    libcasm_fe::Logger& log, Namespace& symboltable )
+SymbolResolveVisitor::SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& symboltable )
 : m_log( log )
 , m_symboltable( symboltable )
 , m_variables()
@@ -173,14 +173,16 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
             }
             default:
             {
-                m_log.error( { node.identifier()->sourceLocation() },
+                m_log.error(
+                    { node.identifier()->sourceLocation() },
                     "cannot reference '" + symbol->description() + "'" );
             }
         }
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.identifier()->sourceLocation() },
+        m_log.error(
+            { node.identifier()->sourceLocation() },
             "'" + name + "' has not been defined",
             Code::SymbolIsUnknown );
     }
@@ -215,14 +217,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         node.setTargetType( CallExpression::TargetType::BUILTIN );
         node.setTargetBuiltinId( annotation.valueID() );
 
-        const auto expectedNumberOfArguments
-            = annotation.relations().front().argument.size();
+        const auto expectedNumberOfArguments = annotation.relations().front().argument.size();
         if( node.arguments()->size() != expectedNumberOfArguments )
         {
-            m_log.error( { node.sourceLocation() },
-                "invalid argument size: builtin '" + name + "' expects "
-                    + std::to_string( expectedNumberOfArguments )
-                    + " arguments",
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid argument size: builtin '" + name + "' expects " +
+                    std::to_string( expectedNumberOfArguments ) + " arguments",
                 Code::SymbolArgumentSizeMismatch );
         }
 
@@ -240,24 +241,21 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             case Node::ID::FUNCTION_DEFINITION:
             {
                 node.setTargetType( CallExpression::TargetType::FUNCTION );
-                const auto function
-                    = std::static_pointer_cast< FunctionDefinition >( symbol );
+                const auto function = std::static_pointer_cast< FunctionDefinition >( symbol );
                 expectedNumberOfArguments = function->argumentTypes()->size();
                 break;
             }
             case Node::ID::DERIVED_DEFINITION:
             {
                 node.setTargetType( CallExpression::TargetType::DERIVED );
-                const auto derived
-                    = std::static_pointer_cast< DerivedDefinition >( symbol );
+                const auto derived = std::static_pointer_cast< DerivedDefinition >( symbol );
                 expectedNumberOfArguments = derived->arguments()->size();
                 break;
             }
             case Node::ID::RULE_DEFINITION:
             {
                 node.setTargetType( CallExpression::TargetType::RULE );
-                const auto rule
-                    = std::static_pointer_cast< RuleDefinition >( symbol );
+                const auto rule = std::static_pointer_cast< RuleDefinition >( symbol );
                 expectedNumberOfArguments = rule->arguments()->size();
                 break;
             }
@@ -273,7 +271,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             }
             default:
             {
-                m_log.error( { node.identifier()->sourceLocation() },
+                m_log.error(
+                    { node.identifier()->sourceLocation() },
                     "cannot reference '" + symbol->description() + "'" );
                 return;
             }
@@ -283,10 +282,10 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         if( node.arguments()->size() != expectedNumberOfArguments )
         {
-            m_log.error( { node.sourceLocation() },
-                "invalid argument size: " + symbol->description() + " '" + name
-                    + "' expects " + std::to_string( expectedNumberOfArguments )
-                    + " arguments",
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid argument size: " + symbol->description() + " '" + name + "' expects " +
+                    std::to_string( expectedNumberOfArguments ) + " arguments",
                 Code::SymbolArgumentSizeMismatch );
         }
     }
@@ -305,8 +304,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             }
             catch( const std::domain_error& e )
             {
-                m_log.error( { node.sourceLocation() },
-                    "unable to find 'Agent' symbol" );
+                m_log.error( { node.sourceLocation() }, "unable to find 'Agent' symbol" );
             }
         }
         // single agent execution notation --> agent type domain ==
@@ -315,19 +313,17 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         {
             assert( node.targetType() == CallExpression::TargetType::CONSTANT );
 
-            const auto agent = std::make_shared< EnumeratorDefinition >(
-                std::make_shared< Identifier >( "$" ) );
+            const auto agent =
+                std::make_shared< EnumeratorDefinition >( std::make_shared< Identifier >( "$" ) );
             const auto agentEnumerators = std::make_shared< Enumerators >();
             agentEnumerators->add( agent );
             const auto agentEnum = std::make_shared< EnumerationDefinition >(
                 std::make_shared< Identifier >( AGENT ), agentEnumerators );
 
-            const auto kind
-                = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
+            const auto kind = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
             kind->add( "$" );
 
-            const auto type
-                = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
+            const auto type = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
             agent->setType( type );
             agentEnum->setType( type );
 
@@ -338,9 +334,9 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         }
         else
         {
-            m_log.error( { node.sourceLocation() },
-                "unknown " + node.targetTypeName() + " symbol '" + path.path()
-                    + "' found",
+            m_log.error(
+                { node.sourceLocation() },
+                "unknown " + node.targetTypeName() + " symbol '" + path.path() + "' found",
                 ( node.targetType() == CallExpression::TargetType::FUNCTION )
                     ? Code::FunctionSymbolIsUnknown
                     : Code::SymbolIsUnknown );
@@ -414,26 +410,26 @@ void SymbolResolveVisitor::visit( ChooseRule& node )
     popVariable( node.variable() );
 }
 
-void SymbolResolveVisitor::pushVariable(
-    const VariableDefinition::Ptr& variable )
+void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable )
 {
     const auto& name = variable->identifier()->name();
 
     const auto result = m_variables.emplace( name, variable );
     if( not result.second )
     {
-        m_log.error( { variable->sourceLocation() },
+        m_log.error(
+            { variable->sourceLocation() },
             "redefinition of symbol '" + name + "'",
             Code::SymbolAlreadyDefined );
 
         const auto& existingVariable = result.first->second;
-        m_log.info( { existingVariable->sourceLocation() },
+        m_log.info(
+            { existingVariable->sourceLocation() },
             "previous definition of '" + name + "' is here" );
     }
 }
 
-void SymbolResolveVisitor::popVariable(
-    const VariableDefinition::Ptr& variable )
+void SymbolResolveVisitor::popVariable( const VariableDefinition::Ptr& variable )
 {
     const auto& name = variable->identifier()->name();
     m_variables.erase( name );

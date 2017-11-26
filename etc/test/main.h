@@ -48,7 +48,7 @@
 
 #include <libcasm-fe/libcasm-fe>
 
-#endif // _LIBCASM_FE_TEST_MAIN_H_
+#endif  // _LIBCASM_FE_TEST_MAIN_H_
 
 //
 //  Local variables:

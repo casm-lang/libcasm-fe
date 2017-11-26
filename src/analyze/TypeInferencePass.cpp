@@ -62,7 +62,9 @@ char TypeInferencePass::id = 0;
 
 static libpass::PassRegistration< TypeInferencePass > PASS(
     "ASTTypeInferencePass",
-    "type inference of all types in the AST representation", "ast-infer", 0 );
+    "type inference of all types in the AST representation",
+    "ast-infer",
+    0 );
 
 class TypeInferenceVisitor final : public RecursiveVisitor
 {
@@ -101,15 +103,23 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ChooseRule& node ) override;
     void visit( UpdateRule& node ) override;
 
-    void assignment( const Node& node, TypedNode& lhs, TypedNode& rhs,
-        const std::string& dst, const std::string& src, const Code& dstErr,
-        const Code& srcErr, const Code& assignmentErr );
+    void assignment(
+        const Node& node,
+        TypedNode& lhs,
+        TypedNode& rhs,
+        const std::string& dst,
+        const std::string& src,
+        const Code& dstErr,
+        const Code& srcErr,
+        const Code& assignmentErr );
 
     const libcasm_ir::Annotation* annotate(
         Node& node, const std::vector< Expression::Ptr >& expressions = {} );
 
-    void inference( const std::string& description,
-        const libcasm_ir::Annotation* annotation, TypedNode& node,
+    void inference(
+        const std::string& description,
+        const libcasm_ir::Annotation* annotation,
+        TypedNode& node,
         const std::vector< Expression::Ptr >& arguments = {} );
 
     void inference( QuantifierExpression& node );
@@ -117,8 +127,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
   private:
     libcasm_fe::Logger& m_log;
 
-    std::unordered_map< const Node*, std::set< libcasm_ir::Type::ID > >
-        m_typeIDs;
+    std::unordered_map< const Node*, std::set< libcasm_ir::Type::ID > > m_typeIDs;
 };
 
 TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log )
@@ -215,9 +224,10 @@ void TypeInferenceVisitor::visit( DerivedDefinition& node )
                 return;
             }
 
-            m_log.error( { node.expression()->sourceLocation() },
-                "type mismatch: result type was '" + expTy.description()
-                    + "', derived expects '" + returnType.description() + "'",
+            m_log.error(
+                { node.expression()->sourceLocation() },
+                "type mismatch: result type was '" + expTy.description() + "', derived expects '" +
+                    returnType.description() + "'",
                 Code::TypeInferenceDerivedReturnTypeMismatch );
         }
     }
@@ -256,7 +266,8 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
     if( not node.fromExpression()->type() )
     {
-        m_log.error( { node.fromExpression()->sourceLocation() },
+        m_log.error(
+            { node.fromExpression()->sourceLocation() },
             "unable to infer expression type of 'as operator'",
             Code::TypeInferenceTypeCastingExpressionFromHasNoType );
     }
@@ -270,20 +281,20 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
     std::vector< libcasm_ir::Type::Ptr > argumentTypes;
     argumentTypes.emplace_back( node.fromExpression()->type()->ptr_result() );
 
-    const auto relationType
-        = libstdhl::Memory::make< libcasm_ir::RelationType >(
-            resultType, argumentTypes );
+    const auto relationType =
+        libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
 
     switch( resultType->kind() )
     {
-        case libcasm_ir::Type::Kind::VOID:     // [fallthrough]
-        case libcasm_ir::Type::Kind::LABEL:    // [fallthrough]
-        case libcasm_ir::Type::Kind::LOCATION: // [fallthrough]
+        case libcasm_ir::Type::Kind::VOID:      // [fallthrough]
+        case libcasm_ir::Type::Kind::LABEL:     // [fallthrough]
+        case libcasm_ir::Type::Kind::LOCATION:  // [fallthrough]
         case libcasm_ir::Type::Kind::RELATION:
         {
-            m_log.error( { node.asType()->sourceLocation() },
-                "invalid 'as' operator type '" + resultType->description()
-                    + "' to perform type casting",
+            m_log.error(
+                { node.asType()->sourceLocation() },
+                "invalid 'as' operator type '" + resultType->description() +
+                    "' to perform type casting",
                 Code::TypeInferenceTypeCastingExpressionAsHasInvalidType );
             return;
         }
@@ -319,16 +330,15 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         }
         case libcasm_ir::Type::Kind::ENUMERATION:
         {
-            node.setTargetBuiltinId(
-                libcasm_ir::Value::AS_ENUMERATION_BUILTIN );
+            node.setTargetBuiltinId( libcasm_ir::Value::AS_ENUMERATION_BUILTIN );
             break;
         }
-        case libcasm_ir::Type::Kind::RANGE:              // [fallthrough]
-        case libcasm_ir::Type::Kind::TUPLE:              // [fallthrough]
-        case libcasm_ir::Type::Kind::LIST:               // [fallthrough]
-        case libcasm_ir::Type::Kind::RULE_REFERENCE:     // [fallthrough]
-        case libcasm_ir::Type::Kind::FUNCTION_REFERENCE: // [fallthrough]
-        case libcasm_ir::Type::Kind::FILE:               // [fallthrough]
+        case libcasm_ir::Type::Kind::RANGE:               // [fallthrough]
+        case libcasm_ir::Type::Kind::TUPLE:               // [fallthrough]
+        case libcasm_ir::Type::Kind::LIST:                // [fallthrough]
+        case libcasm_ir::Type::Kind::RULE_REFERENCE:      // [fallthrough]
+        case libcasm_ir::Type::Kind::FUNCTION_REFERENCE:  // [fallthrough]
+        case libcasm_ir::Type::Kind::FILE:                // [fallthrough]
         case libcasm_ir::Type::Kind::PORT:
         {
             // TODO: PPA: FIXME: continue here with missing casting
@@ -344,14 +354,14 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
     if( node.builtin() )
     {
-        const auto& annotation
-            = libcasm_ir::Annotation::find( node.targetBuiltinId() );
+        const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
 
         if( not annotation.valid( *relationType ) )
         {
-            m_log.error( { node.sourceLocation() },
-                "unknown 'as operator' type casting relation '"
-                    + relationType->description() + "' found",
+            m_log.error(
+                { node.sourceLocation() },
+                "unknown 'as operator' type casting relation '" + relationType->description() +
+                    "' found",
                 Code::TypeInferenceInvalidTypeCastingExpression );
             return;
         }
@@ -360,9 +370,10 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
     {
         // TODO: PPA: FIXME: implement here possible derived and feature type
         // casting expressions
-        m_log.error( { node.sourceLocation() },
-            "unknown 'as operator' type casting relation '"
-                + relationType->description() + "' found",
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown 'as operator' type casting relation '" + relationType->description() +
+                "' found",
             Code::TypeInferenceInvalidTypeCastingExpression );
         return;
     }
@@ -398,16 +409,14 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
 
     switch( node.referenceType() )
     {
-        case ReferenceAtom::ReferenceType::FUNCTION: // [[fallthrough]]
+        case ReferenceAtom::ReferenceType::FUNCTION:  // [[fallthrough]]
         case ReferenceAtom::ReferenceType::DERIVED:
         {
             // make sure that the reference has been typed
             node.reference()->accept( *this );
 
-            const auto type
-                = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
-                    std::static_pointer_cast< libcasm_ir::RelationType >(
-                        node.reference()->type() ) );
+            const auto type = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
+                std::static_pointer_cast< libcasm_ir::RelationType >( node.reference()->type() ) );
             node.setType( type );
             break;
         }
@@ -429,17 +438,16 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             {
                 // type has been inferred -> check if relation type is valid
                 assert( node.type()->isReference() );
-                const auto& referenceType
-                    = std::static_pointer_cast< libcasm_ir::ReferenceType >(
-                        node.type() );
+                const auto& referenceType =
+                    std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
                 const auto relationType = referenceType->dereference();
 
                 if( not annotation->valid( *relationType ) )
                 {
-                    m_log.error( { node.sourceLocation() },
-                        "built-in '" + node.identifier()->path()
-                            + "' has no type relation '"
-                            + relationType->description() + "'",
+                    m_log.error(
+                        { node.sourceLocation() },
+                        "built-in '" + node.identifier()->path() + "' has no type relation '" +
+                            relationType->description() + "'",
                         Code::TypeInferenceBuiltinRelationTypeInvalid );
                 }
             }
@@ -451,15 +459,12 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
                 std::vector< libcasm_ir::Type::Ptr > argumentTypes;
                 for( const auto& argumentId : relation.argument )
                 {
-                    argumentTypes.emplace_back(
-                        libcasm_ir::Type::fromID( argumentId ) );
+                    argumentTypes.emplace_back( libcasm_ir::Type::fromID( argumentId ) );
                 }
 
-                const auto& returnType
-                    = libcasm_ir::Type::fromID( relation.result );
+                const auto& returnType = libcasm_ir::Type::fromID( relation.result );
 
-                const auto type = libstdhl::Memory::make<
-                    libcasm_ir::FunctionReferenceType >(
+                const auto type = libstdhl::Memory::make< libcasm_ir::FunctionReferenceType >(
                     returnType, argumentTypes );
                 node.setType( type );
             }
@@ -470,10 +475,8 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             // make sure that the reference has been typed
             node.reference()->accept( *this );
 
-            const auto type
-                = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
-                    std::static_pointer_cast< libcasm_ir::RelationType >(
-                        node.reference()->type() ) );
+            const auto type = libstdhl::Memory::make< libcasm_ir::RuleReferenceType >(
+                std::static_pointer_cast< libcasm_ir::RelationType >( node.reference()->type() ) );
             node.setType( type );
             break;
         }
@@ -511,17 +514,16 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             RecursiveVisitor::visit( node );
             const auto description = "built-in '" + path.path() + "'";
-            inference(
-                description, annotation, node, node.arguments()->data() );
+            inference( description, annotation, node, node.arguments()->data() );
 
             std::vector< libcasm_ir::Type::Ptr > argTypeList;
             for( auto argumentType : *node.arguments() )
             {
                 if( not argumentType->type() )
                 {
-                    m_log.debug( { argumentType->sourceLocation() },
-                        "TODO: '" + path.path()
-                            + "' has a non-typed argument(s)" );
+                    m_log.debug(
+                        { argumentType->sourceLocation() },
+                        "TODO: '" + path.path() + "' has a non-typed argument(s)" );
                     return;
                 }
 
@@ -530,17 +532,17 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             if( node.type() )
             {
-                const auto type
-                    = libstdhl::Memory::make< libcasm_ir::RelationType >(
-                        node.type(), argTypeList );
+                const auto type =
+                    libstdhl::Memory::make< libcasm_ir::RelationType >( node.type(), argTypeList );
 
                 node.setType( type );
 
                 if( not annotation->valid( *type ) )
                 {
-                    m_log.error( { node.sourceLocation() },
-                        "built-in '" + path.path() + "' has no type relation '"
-                            + type->description() + "'",
+                    m_log.error(
+                        { node.sourceLocation() },
+                        "built-in '" + path.path() + "' has no type relation '" +
+                            type->description() + "'",
                         Code::TypeInferenceBuiltinRelationTypeInvalid );
                     return;
                 }
@@ -548,11 +550,11 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             break;
         }
-        case CallExpression::TargetType::DERIVED:     // [[fallthrough]]
-        case CallExpression::TargetType::FUNCTION:    // [[fallthrough]]
-        case CallExpression::TargetType::RULE:        // [[fallthrough]]
-        case CallExpression::TargetType::SELF:        // [[fallthrough]]
-        case CallExpression::TargetType::TYPE_DOMAIN: // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:      // [[fallthrough]]
+        case CallExpression::TargetType::FUNCTION:     // [[fallthrough]]
+        case CallExpression::TargetType::RULE:         // [[fallthrough]]
+        case CallExpression::TargetType::SELF:         // [[fallthrough]]
+        case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
         case CallExpression::TargetType::CONSTANT:
         {
             if( node.type() )
@@ -568,8 +570,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             const auto& argumentTypes = definition->type()->arguments();
             for( std::size_t i = 0; i < arguments.size(); i++ )
             {
-                m_typeIDs[ arguments.at( i ).get() ].emplace(
-                    argumentTypes.at( i )->id() );
+                m_typeIDs[ arguments.at( i ).get() ].emplace( argumentTypes.at( i )->id() );
             }
 
             node.setType( definition->type() );
@@ -600,37 +601,33 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
 
             const auto& callArgType = call_type_args.at( pos );
-            if( callArgType->isInteger()
-                and exprArg->type()->result().isInteger() )
+            if( callArgType->isInteger() and exprArg->type()->result().isInteger() )
             {
                 continue;
             }
 
             if( *callArgType != exprArg->type()->result() )
             {
-                const std::unordered_map< CallExpression::TargetType, Code >
-                    codes = {
-                        { CallExpression::TargetType::FUNCTION,
-                            Code::TypeInferenceFunctionArgumentTypeMismatch },
-                        { CallExpression::TargetType::DERIVED,
-                            Code::TypeInferenceDerivedArgumentTypeMismatch },
-                        { CallExpression::TargetType::BUILTIN,
-                            Code::TypeInferenceBuiltinArgumentTypeMismatch },
-                        { CallExpression::TargetType::RULE,
-                            Code::TypeInferenceRuleArgumentTypeMismatch },
-                    };
+                const std::unordered_map< CallExpression::TargetType, Code > codes = {
+                    { CallExpression::TargetType::FUNCTION,
+                      Code::TypeInferenceFunctionArgumentTypeMismatch },
+                    { CallExpression::TargetType::DERIVED,
+                      Code::TypeInferenceDerivedArgumentTypeMismatch },
+                    { CallExpression::TargetType::BUILTIN,
+                      Code::TypeInferenceBuiltinArgumentTypeMismatch },
+                    { CallExpression::TargetType::RULE,
+                      Code::TypeInferenceRuleArgumentTypeMismatch },
+                };
 
                 const auto code = codes.find( node.targetType() );
-                assert( code != codes.end()
-                        and " invalid target type with arguments " );
+                assert( code != codes.end() and " invalid target type with arguments " );
 
-                m_log.error( { exprArg->sourceLocation() },
-                    "type mismatch: " + node.targetTypeName()
-                        + " argument type at position "
-                        + std::to_string( pos + 1 ) + " was '"
-                        + exprArg->type()->description() + "', "
-                        + node.targetTypeName() + " definition expects '"
-                        + callArgType->description() + "'",
+                m_log.error(
+                    { exprArg->sourceLocation() },
+                    "type mismatch: " + node.targetTypeName() + " argument type at position " +
+                        std::to_string( pos + 1 ) + " was '" + exprArg->type()->description() +
+                        "', " + node.targetTypeName() + " definition expects '" +
+                        callArgType->description() + "'",
                     code->second );
             }
         }
@@ -643,8 +640,8 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 
     if( not node.expression()->type() )
     {
-        m_log.error( { node.sourceLocation() },
-            "unable to resolve type of indirect call expression" );
+        m_log.error(
+            { node.sourceLocation() }, "unable to resolve type of indirect call expression" );
     }
 
     node.setType( node.expression()->type() );
@@ -661,14 +658,14 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
     }
     else
     {
-        m_log.debug( { node.expression()->sourceLocation() },
+        m_log.debug(
+            { node.expression()->sourceLocation() },
             "unable to set indirect call expression target type for expression "
-            "kind of '"
-                + node.expression()->description() + "'" );
+            "kind of '" +
+                node.expression()->description() + "'" );
     }
 
-    const auto& refType
-        = std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
+    const auto& refType = std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
     node.setType( refType->dereference() );
 }
 
@@ -678,8 +675,7 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    const auto description
-        = "unary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+    const auto description = "unary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
     inference( description, annotation, node, { node.expression() } );
 
     if( node.type() and node.expression()->type() )
@@ -692,9 +688,9 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
 
         if( not annotation->valid( relationType ) )
         {
-            m_log.error( { node.sourceLocation() },
-                description + " has no type relation '"
-                    + relationType.description() + "'",
+            m_log.error(
+                { node.sourceLocation() },
+                description + " has no type relation '" + relationType.description() + "'",
                 Code::TypeInferenceOperatorUnaryRelationTypeInvalid );
         }
     }
@@ -706,24 +702,22 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    const auto description
-        = "binary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+    const auto description = "binary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
     inference( description, annotation, node, { node.left(), node.right() } );
 
     if( node.type() and node.left()->type() and node.right()->type() )
     {
         const std::vector< libcasm_ir::Type::Ptr > argTypeList{
-            node.left()->type()->ptr_result(),
-            node.right()->type()->ptr_result()
+            node.left()->type()->ptr_result(), node.right()->type()->ptr_result()
         };
 
         const libcasm_ir::RelationType relationType( node.type(), argTypeList );
 
         if( not annotation->valid( relationType ) )
         {
-            m_log.error( { node.sourceLocation() },
-                description + " has no type relation '"
-                    + relationType.description() + "'",
+            m_log.error(
+                { node.sourceLocation() },
+                description + " has no type relation '" + relationType.description() + "'",
                 Code::TypeInferenceOperatorBinaryRelationTypeInvalid );
         }
     }
@@ -738,15 +732,15 @@ void TypeInferenceVisitor::visit( RangeExpression& node )
 
     if( lhs != rhs )
     {
-        m_log.error( { node.sourceLocation() },
-            "types of range does not match, " + lhs.description()
-                + " != " + rhs.description(),
+        m_log.error(
+            { node.sourceLocation() },
+            "types of range does not match, " + lhs.description() + " != " + rhs.description(),
             Code::TypeInferenceRangeExpressionTypeMismatch );
         return;
     }
 
-    const auto range_type = libstdhl::Memory::get< libcasm_ir::RangeType >(
-        node.left()->type()->ptr_result() );
+    const auto range_type =
+        libstdhl::Memory::get< libcasm_ir::RangeType >( node.left()->type()->ptr_result() );
 
     node.setType( range_type );
 }
@@ -762,8 +756,7 @@ void TypeInferenceVisitor::visit( LetExpression& node )
 
     if( node.variable()->type() )
     {
-        m_typeIDs[ node.initializer().get() ].emplace(
-            node.variable()->type()->id() );
+        m_typeIDs[ node.initializer().get() ].emplace( node.variable()->type()->id() );
     }
 
     node.initializer()->accept( *this );
@@ -785,15 +778,21 @@ void TypeInferenceVisitor::visit( LetExpression& node )
         node.setType( node.expression()->type() );
     }
 
-    assignment( node, *node.variable(), *node.initializer(),
+    assignment(
+        node,
+        *node.variable(),
+        *node.initializer(),
         "let variable '" + node.variable()->identifier()->name() + "'",
-        "let initializer", Code::TypeInferenceInvalidLetExpressionVariableType,
+        "let initializer",
+        Code::TypeInferenceInvalidLetExpressionVariableType,
         Code::TypeInferenceInvalidLetExpressionInitializerType,
         Code::TypeInferenceInvalidLetExpressionTypeMismatch );
 
     if( not node.expression()->type() )
     {
-        m_log.error( { node.expression()->sourceLocation() }, "no type found",
+        m_log.error(
+            { node.expression()->sourceLocation() },
+            "no type found",
             Code::TypeInferenceInvalidExpression );
     }
     else
@@ -803,9 +802,8 @@ void TypeInferenceVisitor::visit( LetExpression& node )
         {
             m_log.error(
                 { node.sourceLocation(), node.expression()->sourceLocation() },
-                node.description() + " has invalid expression type '"
-                    + exprType.description() + "' shall be '"
-                    + node.type()->description() + "'",
+                node.description() + " has invalid expression type '" + exprType.description() +
+                    "' shall be '" + node.type()->description() + "'",
                 Code::TypeInferenceInvalidLetExpressionTypeMismatch );
         }
     }
@@ -829,11 +827,12 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
     {
         if( condExpr.type()->kind() != libcasm_ir::Type::Kind::BOOLEAN )
         {
-            m_log.error( { condExpr.sourceLocation() },
+            m_log.error(
+                { condExpr.sourceLocation() },
                 "condition type of conditional expression is not of type "
                 "'Boolean', "
-                "found type '"
-                    + condExpr.type()->description() + "'",
+                "found type '" +
+                    condExpr.type()->description() + "'",
                 Code::TypeInferenceInvalidConditionalExpressionCondition );
         }
     }
@@ -847,10 +846,9 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
             m_log.error(
                 { thenExpr.sourceLocation(), elseExpr.sourceLocation() },
                 "types of conditional expression paths does not match, "
-                "found type '"
-                    + thenExpr.type()->description()
-                    + "' at 'then' path, and type '"
-                    + elseExpr.type()->description() + "' at 'else' path",
+                "found type '" +
+                    thenExpr.type()->description() + "' at 'then' path, and type '" +
+                    elseExpr.type()->description() + "' at 'else' path",
                 Code::TypeInferenceInvalidConditionalExpressionPaths );
             return;
         }
@@ -866,8 +864,8 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
         thenExpr.setType( elseExpr.type() );
     }
 
-    if( node.type() and thenExpr.id() == Node::ID::UNDEF_ATOM
-        and elseExpr.id() == Node::ID::UNDEF_ATOM )
+    if( node.type() and thenExpr.id() == Node::ID::UNDEF_ATOM and
+        elseExpr.id() == Node::ID::UNDEF_ATOM )
     {
         thenExpr.setType( node.type() );
         elseExpr.setType( node.type() );
@@ -885,8 +883,7 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
 
     if( node.variable()->type() )
     {
-        m_typeIDs[ node.universe().get() ].emplace(
-            node.variable()->type()->id() );
+        m_typeIDs[ node.universe().get() ].emplace( node.variable()->type()->id() );
     }
 
     node.universe()->accept( *this );
@@ -910,33 +907,37 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
 
     if( not node.variable()->type() )
     {
-        m_log.error( { node.variable()->sourceLocation() }, "no type found",
+        m_log.error(
+            { node.variable()->sourceLocation() },
+            "no type found",
             Code::TypeInferenceInvalidExpression );
     }
     else if( not node.universe()->type() )
     {
-        m_log.error( { node.universe()->sourceLocation() }, "no type found",
+        m_log.error(
+            { node.universe()->sourceLocation() },
+            "no type found",
             Code::TypeInferenceInvalidExpression );
     }
     else
     {
         if( *node.variable()->type() != node.universe()->type()->result() )
         {
-            m_log.error( { node.variable()->sourceLocation(),
-                             node.universe()->sourceLocation() },
-                node.description() + " variable '"
-                    + node.variable()->identifier()->name() + "' of type '"
-                    + node.variable()->type()->description()
-                    + "' does not match the universe of type '"
-                    + node.universe()->type()->result().description() + "'",
-                Code::
-                    TypeInferenceInvalidChooseExpressionVariableTypeMismatch );
+            m_log.error(
+                { node.variable()->sourceLocation(), node.universe()->sourceLocation() },
+                node.description() + " variable '" + node.variable()->identifier()->name() +
+                    "' of type '" + node.variable()->type()->description() +
+                    "' does not match the universe of type '" +
+                    node.universe()->type()->result().description() + "'",
+                Code::TypeInferenceInvalidChooseExpressionVariableTypeMismatch );
         }
     }
 
     if( not node.expression()->type() )
     {
-        m_log.error( { node.expression()->sourceLocation() }, "no type found",
+        m_log.error(
+            { node.expression()->sourceLocation() },
+            "no type found",
             Code::TypeInferenceInvalidExpression );
     }
     else
@@ -946,9 +947,8 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
         {
             m_log.error(
                 { node.sourceLocation(), node.expression()->sourceLocation() },
-                node.description() + " has invalid expression type '"
-                    + exprType.description() + "' shall be '"
-                    + node.type()->description() + "'",
+                node.description() + " has invalid expression type '" + exprType.description() +
+                    "' shall be '" + node.type()->description() + "'",
                 Code::TypeInferenceInvalidChooseExpressionTypeMismatch );
         }
     }
@@ -972,14 +972,13 @@ void TypeInferenceVisitor::visit( ConditionalRule& node )
 
     if( condExpr.type() )
     {
-        if( condExpr.type()->result().kind()
-            != libcasm_ir::Type::Kind::BOOLEAN )
+        if( condExpr.type()->result().kind() != libcasm_ir::Type::Kind::BOOLEAN )
         {
-            m_log.error( { condExpr.sourceLocation() },
-                "invalid condition type '"
-                    + condExpr.type()->result().description() + ", shall be '"
-                    + libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN )
-                    + "'",
+            m_log.error(
+                { condExpr.sourceLocation() },
+                "invalid condition type '" + condExpr.type()->result().description() +
+                    ", shall be '" + libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN ) +
+                    "'",
                 Code::TypeInferenceConditionalRuleInvalidConditionType );
         }
     }
@@ -991,8 +990,7 @@ void TypeInferenceVisitor::visit( CaseRule& node )
 
     if( node.expression()->type() )
     {
-        const auto caseExprTypeID
-            = node.expression()->type()->ptr_result()->id();
+        const auto caseExprTypeID = node.expression()->type()->ptr_result()->id();
 
         for( auto caseExpr : *node.cases() )
         {
@@ -1020,8 +1018,7 @@ void TypeInferenceVisitor::visit( LetRule& node )
 
     if( node.variable()->type() )
     {
-        m_typeIDs[ node.expression().get() ].emplace(
-            node.variable()->type()->ptr_result()->id() );
+        m_typeIDs[ node.expression().get() ].emplace( node.variable()->type()->ptr_result()->id() );
     }
 
     node.expression()->accept( *this );
@@ -1040,9 +1037,13 @@ void TypeInferenceVisitor::visit( LetRule& node )
         node.rule()->accept( *this );
     }
 
-    assignment( node, *node.variable(), *node.expression(),
+    assignment(
+        node,
+        *node.variable(),
+        *node.expression(),
         "let variable '" + node.variable()->identifier()->name() + "'",
-        "let expression", Code::TypeInferenceInvalidLetRuleVariableType,
+        "let expression",
+        Code::TypeInferenceInvalidLetRuleVariableType,
         Code::TypeInferenceInvalidLetRuleExpressionType,
         Code::TypeInferenceLetRuleTypesMismatch );
 }
@@ -1053,8 +1054,7 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 
     if( node.variable()->type() )
     {
-        m_typeIDs[ node.universe().get() ].emplace(
-            node.variable()->type()->id() );
+        m_typeIDs[ node.universe().get() ].emplace( node.variable()->type()->id() );
     }
 
     node.universe()->accept( *this );
@@ -1070,11 +1070,11 @@ void TypeInferenceVisitor::visit( ForallRule& node )
     {
         if( conditionType->result().kind() != libcasm_ir::Type::Kind::BOOLEAN )
         {
-            m_log.error( { node.condition()->sourceLocation() },
-                "invalid condition type '"
-                    + conditionType->result().description() + ", shall be '"
-                    + libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN )
-                    + "'",
+            m_log.error(
+                { node.condition()->sourceLocation() },
+                "invalid condition type '" + conditionType->result().description() +
+                    ", shall be '" + libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN ) +
+                    "'",
                 Code::TypeInferenceForallRuleInvalidConditionType );
         }
     }
@@ -1083,14 +1083,16 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 
     if( not node.variable()->type() )
     {
-        m_log.error( { node.variable()->sourceLocation() },
+        m_log.error(
+            { node.variable()->sourceLocation() },
             "no type found for 'forall' variable",
             Code::TypeInferenceForallVariableHasNoType );
     }
 
     if( not node.universe()->type() )
     {
-        m_log.error( { node.universe()->sourceLocation() },
+        m_log.error(
+            { node.universe()->sourceLocation() },
             "no type found for 'forall' universe",
             Code::TypeInferenceForallUniverseHasNoType );
     }
@@ -1099,13 +1101,12 @@ void TypeInferenceVisitor::visit( ForallRule& node )
     {
         if( *node.variable()->type() != node.universe()->type()->result() )
         {
-            m_log.error( { node.variable()->sourceLocation(),
-                             node.universe()->sourceLocation() },
-                node.description() + " variable '"
-                    + node.variable()->identifier()->name() + "' of type '"
-                    + node.variable()->type()->description()
-                    + "' does not match the universe of type '"
-                    + node.universe()->type()->result().description() + "'",
+            m_log.error(
+                { node.variable()->sourceLocation(), node.universe()->sourceLocation() },
+                node.description() + " variable '" + node.variable()->identifier()->name() +
+                    "' of type '" + node.variable()->type()->description() +
+                    "' does not match the universe of type '" +
+                    node.universe()->type()->result().description() + "'",
                 Code::TypeInferenceForallRuleTypeMismatch );
         }
     }
@@ -1117,8 +1118,7 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
 
     if( node.variable()->type() )
     {
-        m_typeIDs[ node.universe().get() ].emplace(
-            node.variable()->type()->id() );
+        m_typeIDs[ node.universe().get() ].emplace( node.variable()->type()->id() );
     }
 
     node.universe()->accept( *this );
@@ -1132,25 +1132,28 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
 
     if( not node.variable()->type() )
     {
-        m_log.error( { node.variable()->sourceLocation() }, "no type found",
+        m_log.error(
+            { node.variable()->sourceLocation() },
+            "no type found",
             Code::TypeInferenceInvalidExpression );
     }
     else if( not node.universe()->type() )
     {
-        m_log.error( { node.universe()->sourceLocation() }, "no type found",
+        m_log.error(
+            { node.universe()->sourceLocation() },
+            "no type found",
             Code::TypeInferenceInvalidExpression );
     }
     else
     {
         if( *node.variable()->type() != node.universe()->type()->result() )
         {
-            m_log.error( { node.variable()->sourceLocation(),
-                             node.universe()->sourceLocation() },
-                node.description() + " variable '"
-                    + node.variable()->identifier()->name() + "' of type '"
-                    + node.variable()->type()->description()
-                    + "' does not match the universe of type '"
-                    + node.universe()->type()->result().description() + "'",
+            m_log.error(
+                { node.variable()->sourceLocation(), node.universe()->sourceLocation() },
+                node.description() + " variable '" + node.variable()->identifier()->name() +
+                    "' of type '" + node.variable()->type()->description() +
+                    "' does not match the universe of type '" +
+                    node.universe()->type()->result().description() + "'",
                 Code::TypeInferenceInvalidChooseRuleVariableTypeMismatch );
         }
     }
@@ -1170,18 +1173,28 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
 
     node.expression()->accept( *this );
 
-    assignment( node, func, expr, "updated function", "updating expression",
+    assignment(
+        node,
+        func,
+        expr,
+        "updated function",
+        "updating expression",
         Code::TypeInferenceInvalidUpdateRuleFunctionType,
         Code::TypeInferenceInvalidUpdateRuleExpressionType,
         Code::TypeInferenceUpdateRuleTypesMismatch );
 }
 
-void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
-    TypedNode& rhs, const std::string& dst, const std::string& src,
-    const Code& dstErr, const Code& srcErr, const Code& assignmentErr )
+void TypeInferenceVisitor::assignment(
+    const Node& node,
+    TypedNode& lhs,
+    TypedNode& rhs,
+    const std::string& dst,
+    const std::string& src,
+    const Code& dstErr,
+    const Code& srcErr,
+    const Code& assignmentErr )
 {
-    if( lhs.type()
-        and not rhs.type() ) // and rhs.id() == Node::ID::UNDEF_ATOM and  )
+    if( lhs.type() and not rhs.type() )  // and rhs.id() == Node::ID::UNDEF_ATOM and  )
     {
         rhs.setType( lhs.type()->ptr_result() );
     }
@@ -1190,14 +1203,12 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
 
     if( not lhs.type() )
     {
-        m_log.error( { lhs.sourceLocation() }, "unable to infer type of " + dst,
-            dstErr );
+        m_log.error( { lhs.sourceLocation() }, "unable to infer type of " + dst, dstErr );
     }
 
     if( not rhs.type() )
     {
-        m_log.error( { rhs.sourceLocation() }, "unable to infer type of " + src,
-            srcErr );
+        m_log.error( { rhs.sourceLocation() }, "unable to infer type of " + src, srcErr );
     }
 
     if( error_count != m_log.errors() )
@@ -1215,17 +1226,15 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
             // relaxation: mixed integer with range properties are checked
             //             at run-time
         }
-        else if( tyLhs.isBit() and tyRhs.isBit()
-                 and static_cast< const libcasm_ir::BitType& >( tyLhs )
-                             .bitsize()
-                         >= static_cast< const libcasm_ir::BitType& >( tyRhs )
-                                .bitsize() )
+        else if(
+            tyLhs.isBit() and tyRhs.isBit() and
+            static_cast< const libcasm_ir::BitType& >( tyLhs ).bitsize() >=
+                static_cast< const libcasm_ir::BitType& >( tyRhs ).bitsize() )
         {
             // relaxation: mixed bit types are OK as long as
             //             bitsize(lhs) >= bitsize(rhs)
         }
-        else if( tyLhs.isBit() and tyRhs.isInteger()
-                 and rhs.id() == Node::ID::VALUE_ATOM )
+        else if( tyLhs.isBit() and tyRhs.isInteger() and rhs.id() == Node::ID::VALUE_ATOM )
         {
             // relaxation: lhs bit and rhs integer are OK as long as rhs is a
             //             integer constant with bitsize(lhs) >= bitsize(rhs)
@@ -1233,35 +1242,31 @@ void TypeInferenceVisitor::assignment( const Node& node, TypedNode& lhs,
             try
             {
                 auto& valueAtom = static_cast< ValueAtom& >( rhs );
-                assert( libcasm_ir::isa< libcasm_ir::IntegerConstant >(
-                    valueAtom.value() ) );
-                auto constant
-                    = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
-                        valueAtom.value() );
+                assert( libcasm_ir::isa< libcasm_ir::IntegerConstant >( valueAtom.value() ) );
+                auto constant =
+                    std::static_pointer_cast< libcasm_ir::IntegerConstant >( valueAtom.value() );
 
-                const auto value
-                    = libstdhl::Memory::get< libcasm_ir::BitConstant >(
-                        lhs.type()->ptr_result(),
-                        static_cast< const libstdhl::Type::Natural& >(
-                            constant->value() ) );
+                const auto value = libstdhl::Memory::get< libcasm_ir::BitConstant >(
+                    lhs.type()->ptr_result(),
+                    static_cast< const libstdhl::Type::Natural& >( constant->value() ) );
 
                 valueAtom.setValue( value );
             }
             catch( const std::exception& e )
             {
-                m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
-                    "type mismatch: " + src + " was '" + tyRhs.description()
-                        + "', but " + dst + " expects '" + tyLhs.description()
-                        + "', " + e.what(),
+                m_log.error(
+                    { lhs.sourceLocation(), rhs.sourceLocation() },
+                    "type mismatch: " + src + " was '" + tyRhs.description() + "', but " + dst +
+                        " expects '" + tyLhs.description() + "', " + e.what(),
                     assignmentErr );
             }
         }
         else
         {
-            m_log.error( { lhs.sourceLocation(), rhs.sourceLocation() },
-                "type mismatch: " + src + " was '" + tyRhs.description()
-                    + "', but " + dst + " expects '" + tyLhs.description()
-                    + "'",
+            m_log.error(
+                { lhs.sourceLocation(), rhs.sourceLocation() },
+                "type mismatch: " + src + " was '" + tyRhs.description() + "', but " + dst +
+                    " expects '" + tyLhs.description() + "'",
                 assignmentErr );
         }
     }
@@ -1274,35 +1279,34 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
 
     if( node.id() == libcasm_fe::Ast::Type::ID::UNARY_EXPRESSION )
     {
-        annotation = &libcasm_ir::Annotation::find(
-            static_cast< const UnaryExpression& >( node ).op() );
+        annotation =
+            &libcasm_ir::Annotation::find( static_cast< const UnaryExpression& >( node ).op() );
     }
     else if( node.id() == libcasm_fe::Ast::Type::ID::BINARY_EXPRESSION )
     {
-        annotation = &libcasm_ir::Annotation::find(
-            static_cast< const BinaryExpression& >( node ).op() );
+        annotation =
+            &libcasm_ir::Annotation::find( static_cast< const BinaryExpression& >( node ).op() );
     }
     else if( node.id() == libcasm_fe::Ast::Type::ID::DIRECT_CALL_EXPRESSION )
     {
         auto& directCall = static_cast< DirectCallExpression& >( node );
         const auto& path = *directCall.identifier();
 
-        assert(
-            directCall.targetType() == CallExpression::TargetType::BUILTIN );
+        assert( directCall.targetType() == CallExpression::TargetType::BUILTIN );
         assert( directCall.targetBuiltinId() != libcasm_ir::Value::ID::_SIZE_ );
 
         try
         {
-            const auto& builtin_annotation
-                = libcasm_ir::Annotation::find( directCall.targetBuiltinId() );
+            const auto& builtin_annotation =
+                libcasm_ir::Annotation::find( directCall.targetBuiltinId() );
             annotation = &builtin_annotation;
         }
         catch( const std::domain_error& e )
         {
-            m_log.error( { directCall.sourceLocation() },
-                        "unable to resolve built-in symbol '"
-                        + path.path()
-                        + "', due to missing annotation information from 'libcasm-ir'" );
+            m_log.error(
+                { directCall.sourceLocation() },
+                "unable to resolve built-in symbol '" + path.path() +
+                    "', due to missing annotation information from 'libcasm-ir'" );
             return nullptr;
         }
     }
@@ -1328,8 +1332,10 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
     return annotation;
 }
 
-void TypeInferenceVisitor::inference( const std::string& description,
-    const libcasm_ir::Annotation* annotation, TypedNode& node,
+void TypeInferenceVisitor::inference(
+    const std::string& description,
+    const libcasm_ir::Annotation* annotation,
+    TypedNode& node,
     const std::vector< Expression::Ptr >& arguments )
 {
     if( node.type() )
@@ -1373,24 +1379,23 @@ void TypeInferenceVisitor::inference( const std::string& description,
         {
             try
             {
-                const auto inferredTypeID
-                    = annotation->inference( argTypes, {} );
+                const auto inferredTypeID = annotation->inference( argTypes, {} );
                 typeIDs.insert( inferredTypeID );
             }
             catch( const libcasm_ir::TypeArgumentException& e )
             {
-                m_log.error( { arguments[ e.position() ]->sourceLocation() },
-                    "type mismatch: " + description
-                        + " argument type at position "
-                        + std::to_string( e.position() + 1 ) + ": " + e.what(),
+                m_log.error(
+                    { arguments[ e.position() ]->sourceLocation() },
+                    "type mismatch: " + description + " argument type at position " +
+                        std::to_string( e.position() + 1 ) + ": " + e.what(),
                     Code::TypeInferenceArgumentTypeMismatch );
                 return;
             }
             catch( const std::domain_error& e )
             {
-                m_log.error( { node.sourceLocation() },
-                    "unable to infer result type of " + description + ": "
-                        + e.what(),
+                m_log.error(
+                    { node.sourceLocation() },
+                    "unable to infer result type of " + description + ": " + e.what(),
                     Code::TypeInferenceNotDefinedForExpression );
             }
             catch( const std::invalid_argument& e )
@@ -1412,7 +1417,8 @@ void TypeInferenceVisitor::inference( const std::string& description,
 
     std::vector< libcasm_ir::Type::ID > tmpTypeIDs = {};
 
-    std::set_intersection( typeIDs.begin(),
+    std::set_intersection(
+        typeIDs.begin(),
         typeIDs.end(),
         topTypeIDs.begin(),
         topTypeIDs.end(),
@@ -1439,8 +1445,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
 
     if( node.predicateVariable()->type() )
     {
-        m_typeIDs[ node.universe().get() ].emplace(
-            node.predicateVariable()->type()->id() );
+        m_typeIDs[ node.universe().get() ].emplace( node.predicateVariable()->type()->id() );
     }
 
     node.universe()->accept( *this );
@@ -1449,47 +1454,48 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
 
     if( not node.predicateVariable()->type() and node.universe()->type() )
     {
-        node.predicateVariable()->setType(
-            node.universe()->type()->ptr_result() );
+        node.predicateVariable()->setType( node.universe()->type()->ptr_result() );
     }
 
     node.proposition()->accept( *this );
 
     if( not node.predicateVariable()->type() )
     {
-        m_log.error( { node.predicateVariable()->sourceLocation() },
-            "no type found", Code::TypeInferenceInvalidExpression );
+        m_log.error(
+            { node.predicateVariable()->sourceLocation() },
+            "no type found",
+            Code::TypeInferenceInvalidExpression );
     }
     else if( not node.universe()->type() )
     {
-        m_log.error( { node.universe()->sourceLocation() }, "no type found",
+        m_log.error(
+            { node.universe()->sourceLocation() },
+            "no type found",
             Code::TypeInferenceInvalidExpression );
     }
     else
     {
-        if( *node.predicateVariable()->type()
-            != node.universe()->type()->result() )
+        if( *node.predicateVariable()->type() != node.universe()->type()->result() )
         {
-            m_log.error( { node.predicateVariable()->sourceLocation(),
-                             node.universe()->sourceLocation() },
-                node.description() + " predicate variable '"
-                    + node.predicateVariable()->identifier()->name()
-                    + "' of type '"
-                    + node.predicateVariable()->type()->description()
-                    + "' does not match the universe of type '"
-                    + node.universe()->type()->result().description() + "'",
+            m_log.error(
+                { node.predicateVariable()->sourceLocation(), node.universe()->sourceLocation() },
+                node.description() + " predicate variable '" +
+                    node.predicateVariable()->identifier()->name() + "' of type '" +
+                    node.predicateVariable()->type()->description() +
+                    "' does not match the universe of type '" +
+                    node.universe()->type()->result().description() + "'",
 
                 ( node.id() == Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION )
-                    ? Code::
-                          TypeInferenceQuantifierExistentialPredicateTypeMismatch
-                    : Code::
-                          TypeInferenceQuantifierUniversalPredicateTypeMismatch );
+                    ? Code::TypeInferenceQuantifierExistentialPredicateTypeMismatch
+                    : Code::TypeInferenceQuantifierUniversalPredicateTypeMismatch );
         }
     }
 
     if( not node.proposition()->type() )
     {
-        m_log.error( { node.proposition()->sourceLocation() }, "no type found",
+        m_log.error(
+            { node.proposition()->sourceLocation() },
+            "no type found",
             Code::TypeInferenceInvalidExpression );
     }
     else
@@ -1497,17 +1503,15 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
         const auto& propType = node.proposition()->type()->result();
         if( *node.type() != propType )
         {
-            m_log.error( { node.proposition()->sourceLocation() },
+            m_log.error(
+                { node.proposition()->sourceLocation() },
 
-                node.description() + " has invalid proposition type '"
-                    + propType.description() + "' shall be '"
-                    + node.type()->description() + "'",
+                node.description() + " has invalid proposition type '" + propType.description() +
+                    "' shall be '" + node.type()->description() + "'",
 
                 ( node.id() == Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION )
-                    ? Code::
-                          TypeInferenceQuantifierExistentialPropositionTypeMismatch
-                    : Code::
-                          TypeInferenceQuantifierUniversalPropositionTypeMismatch );
+                    ? Code::TypeInferenceQuantifierExistentialPropositionTypeMismatch
+                    : Code::TypeInferenceQuantifierUniversalPropositionTypeMismatch );
         }
     }
 }

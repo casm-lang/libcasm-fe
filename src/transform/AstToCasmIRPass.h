@@ -74,7 +74,7 @@ namespace libcasm_fe
     };
 }
 
-#endif // _LIBCASM_FE_AST_TO_CASM_IR_PASS_H_
+#endif  // _LIBCASM_FE_AST_TO_CASM_IR_PASS_H_
 
 //
 //  Local variables:

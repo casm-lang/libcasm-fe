@@ -77,25 +77,23 @@ class LocationRegistry
     {
         std::size_t operator()( const LocationData& location ) const
         {
-            return libstdhl::Hash::combine( FunctionHash{}( location.first ),
-                ArgumentsHash{}( location.second ) );
+            return libstdhl::Hash::combine(
+                FunctionHash{}( location.first ), ArgumentsHash{}( location.second ) );
         }
     };
 
     struct LocationDataEquals
-    : public std::
-          binary_function< const LocationData&, const LocationData&, bool >
+    : public std::binary_function< const LocationData&, const LocationData&, bool >
     {
-        bool operator()(
-            const LocationData& lhs, const LocationData& rhs ) const
+        bool operator()( const LocationData& lhs, const LocationData& rhs ) const
         {
-            return FunctionEquals{}( lhs.first, rhs.first )
-                   and ArgumentsEquals{}( lhs.second, rhs.second );
+            return FunctionEquals{}( lhs.first, rhs.first ) and
+                   ArgumentsEquals{}( lhs.second, rhs.second );
         }
     };
 
-    using LocationDataSet = std::
-        unordered_set< LocationData, LocationDataHash, LocationDataEquals >;
+    using LocationDataSet =
+        std::unordered_set< LocationData, LocationDataHash, LocationDataEquals >;
 
   public:
     struct LocationHash;
@@ -131,13 +129,12 @@ class LocationRegistry
     {
         std::size_t operator()( const Location& ref ) const
         {
-            return ( reinterpret_cast< std::uintptr_t >( ref.m_data ) >> 4 )
-                   ^ ( reinterpret_cast< std::uintptr_t >( ref.m_data ) >> 9 );
+            return ( reinterpret_cast< std::uintptr_t >( ref.m_data ) >> 4 ) ^
+                   ( reinterpret_cast< std::uintptr_t >( ref.m_data ) >> 9 );
         }
     };
 
-    struct LocationEquals
-    : public std::binary_function< const Location&, const Location&, bool >
+    struct LocationEquals : public std::binary_function< const Location&, const Location&, bool >
     {
         bool operator()( const Location& lhs, const Location& rhs ) const
         {
@@ -220,7 +217,7 @@ class LocationRegistry
     LocationDataSet m_locations;
 };
 
-#endif // _LIBCASM_FE_LOCATION_REGISTRY_H_
+#endif  // _LIBCASM_FE_LOCATION_REGISTRY_H_
 
 //
 //  Local variables:

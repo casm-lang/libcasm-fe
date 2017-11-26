@@ -56,57 +56,48 @@ struct UpdateSetDetails
 
 using TestUpdateSet = UpdateSet< UpdateSetDetails >;
 
-TEST( UpdateSetTest,
-    forkedParallelUpdateSetShouldBeSequentialWhenRequestingSequential )
+TEST( UpdateSetTest, forkedParallelUpdateSetShouldBeSequentialWhenRequestingSequential )
 {
-    const auto updateSet = std::unique_ptr< TestUpdateSet >(
-        new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto updateSet =
+        std::unique_ptr< TestUpdateSet >( new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
     const auto forkedUpdateSet = std::unique_ptr< TestUpdateSet >(
         updateSet->fork( TestUpdateSet::Semantics::Sequential, 10UL ) );
-    EXPECT_EQ(
-        TestUpdateSet::Semantics::Sequential, forkedUpdateSet->semantics() );
+    EXPECT_EQ( TestUpdateSet::Semantics::Sequential, forkedUpdateSet->semantics() );
 }
 
-TEST( UpdateSetTest,
-    forkedParallelUpdateSetShouldBeParallelWhenRequestingParallel )
+TEST( UpdateSetTest, forkedParallelUpdateSetShouldBeParallelWhenRequestingParallel )
 {
-    const auto updateSet = std::unique_ptr< TestUpdateSet >(
-        new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto updateSet =
+        std::unique_ptr< TestUpdateSet >( new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
     const auto forkedUpdateSet = std::unique_ptr< TestUpdateSet >(
         updateSet->fork( TestUpdateSet::Semantics::Parallel, 10UL ) );
-    EXPECT_EQ(
-        TestUpdateSet::Semantics::Parallel, forkedUpdateSet->semantics() );
+    EXPECT_EQ( TestUpdateSet::Semantics::Parallel, forkedUpdateSet->semantics() );
 }
 
-TEST( UpdateSetTest,
-    forkedSequentialUpdateSetShouldBeParallelWhenRequestingParallel )
+TEST( UpdateSetTest, forkedSequentialUpdateSetShouldBeParallelWhenRequestingParallel )
 {
-    const auto updateSet = std::unique_ptr< TestUpdateSet >(
-        new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto updateSet =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
     const auto forkedUpdateSet = std::unique_ptr< TestUpdateSet >(
         updateSet->fork( TestUpdateSet::Semantics::Parallel, 10UL ) );
-    EXPECT_EQ(
-        TestUpdateSet::Semantics::Parallel, forkedUpdateSet->semantics() );
+    EXPECT_EQ( TestUpdateSet::Semantics::Parallel, forkedUpdateSet->semantics() );
 }
 
-TEST( UpdateSetTest,
-    forkedSequentialUpdateSetShouldBeSequentialWhenRequestingSequential )
+TEST( UpdateSetTest, forkedSequentialUpdateSetShouldBeSequentialWhenRequestingSequential )
 {
-    const auto updateSet = std::unique_ptr< TestUpdateSet >(
-        new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto updateSet =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
     const auto forkedUpdateSet = std::unique_ptr< TestUpdateSet >(
         updateSet->fork( TestUpdateSet::Semantics::Sequential, 10UL ) );
-    EXPECT_EQ(
-        TestUpdateSet::Semantics::Sequential, forkedUpdateSet->semantics() );
+    EXPECT_EQ( TestUpdateSet::Semantics::Sequential, forkedUpdateSet->semantics() );
 }
 
-TEST( UpdateSetTest,
-    mergeParallelUpdateSetsIntoSequentialShouldOverwriteLocationValues )
+TEST( UpdateSetTest, mergeParallelUpdateSetsIntoSequentialShouldOverwriteLocationValues )
 {
     const std::size_t location = 42UL;
 
-    const auto seqUpdateSet = std::unique_ptr< TestUpdateSet >(
-        new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto seqUpdateSet =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
     seqUpdateSet->add( location, "update 1" );
 
     const auto parUpdateSet = std::unique_ptr< TestUpdateSet >(
@@ -120,8 +111,8 @@ TEST( UpdateSetTest,
 
 TEST( UpdateSetTest, mergeUpdateSetsIntoEmptyUpdateSetsShouldSwapValues )
 {
-    const auto seqUpdateSet = std::unique_ptr< TestUpdateSet >(
-        new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto seqUpdateSet =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
 
     const auto parUpdateSet = std::unique_ptr< TestUpdateSet >(
         seqUpdateSet->fork( TestUpdateSet::Semantics::Parallel, 10UL ) );
@@ -138,13 +129,14 @@ TEST( UpdateSetTest, mergeUpdateSetsIntoEmptyUpdateSetsShouldSwapValues )
     EXPECT_EQ( 3, seqUpdateSet->size() );
 }
 
-TEST( UpdateSetTest,
+TEST(
+    UpdateSetTest,
     mergeSequentialUpdateSetsIntoParallelShouldNotThrowWhenOverwritingSameLocationWithSameValue )
 {
     const std::size_t location = 42UL;
 
-    const auto parUpdateSet = std::unique_ptr< TestUpdateSet >(
-        new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto parUpdateSet =
+        std::unique_ptr< TestUpdateSet >( new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
     parUpdateSet->add( location, "update 1" );
 
     const auto seqUpdateSet = std::unique_ptr< TestUpdateSet >(
@@ -154,13 +146,14 @@ TEST( UpdateSetTest,
     EXPECT_NO_THROW( seqUpdateSet->merge() );
 }
 
-TEST( UpdateSetTest,
+TEST(
+    UpdateSetTest,
     mergeSequentialUpdateSetsIntoParallelShouldThrowWhenOverwritingSameLocationWithDifferentValue )
 {
     const std::size_t location = 42UL;
 
-    const auto parUpdateSet = std::unique_ptr< TestUpdateSet >(
-        new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto parUpdateSet =
+        std::unique_ptr< TestUpdateSet >( new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
     parUpdateSet->add( location, "update 1" );
 
     const auto seqUpdateSet = std::unique_ptr< TestUpdateSet >(
@@ -174,8 +167,8 @@ TEST( UpdateSetTest, lookupShouldPreferUpdatesOfCurrentUpdateSet )
 {
     const std::size_t location = 42UL;
 
-    const auto seqUpdateSet1 = std::unique_ptr< TestUpdateSet >(
-        new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto seqUpdateSet1 =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
     seqUpdateSet1->add( location, "update 1" );
 
     const auto parUpdateSet = std::unique_ptr< TestUpdateSet >(
@@ -183,7 +176,7 @@ TEST( UpdateSetTest, lookupShouldPreferUpdatesOfCurrentUpdateSet )
 
     const auto seqUpdateSet2 = std::unique_ptr< TestUpdateSet >(
         parUpdateSet->fork( TestUpdateSet::Semantics::Sequential, 10UL ) );
-    seqUpdateSet2->add( location, "update 2" ); // winner
+    seqUpdateSet2->add( location, "update 2" );  // winner
 
     EXPECT_EQ( "update 2", seqUpdateSet2->lookup( location ).value() );
 }
@@ -192,8 +185,8 @@ TEST( UpdateSetTest, lookupShouldConsiderAllSequentialParentUpdateSets )
 {
     const std::size_t location = 42UL;
 
-    const auto seqUpdateSet1 = std::unique_ptr< TestUpdateSet >(
-        new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto seqUpdateSet1 =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
     seqUpdateSet1->add( location, "update 1" );
 
     const auto parUpdateSet1 = std::unique_ptr< TestUpdateSet >(
@@ -201,7 +194,7 @@ TEST( UpdateSetTest, lookupShouldConsiderAllSequentialParentUpdateSets )
 
     const auto seqUpdateSet2 = std::unique_ptr< TestUpdateSet >(
         parUpdateSet1->fork( TestUpdateSet::Semantics::Sequential, 10UL ) );
-    seqUpdateSet2->add( location, "update 2" ); // winner
+    seqUpdateSet2->add( location, "update 2" );  // winner
 
     const auto parUpdateSet2 = std::unique_ptr< TestUpdateSet >(
         seqUpdateSet2->fork( TestUpdateSet::Semantics::Parallel, 10UL ) );
@@ -215,33 +208,31 @@ TEST( UpdateSetTest, lookupShouldConsiderAllSequentialParentUpdateSets )
 
 TEST( UpdateSetTest, lookupShouldReturnEmptyOptionalWhenUpdateDoesNotExist )
 {
-    const auto seqUpdateSet = std::unique_ptr< TestUpdateSet >(
-        new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto seqUpdateSet =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
 
-    EXPECT_THROW( seqUpdateSet->lookup( 42UL ).value(),
-        std::experimental::bad_optional_access );
+    EXPECT_THROW( seqUpdateSet->lookup( 42UL ).value(), std::experimental::bad_optional_access );
 }
 
-TEST( UpdateSetTest,
-    parallelUpdateSetsShouldThrowIfAddingUpdatesWithSameLocationButDifferentValue )
+TEST( UpdateSetTest, parallelUpdateSetsShouldThrowIfAddingUpdatesWithSameLocationButDifferentValue )
 {
     const std::size_t location = 42UL;
 
-    const auto updateSet = std::unique_ptr< TestUpdateSet >(
-        new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto updateSet =
+        std::unique_ptr< TestUpdateSet >( new ParallelUpdateSet< UpdateSetDetails >( 10UL ) );
     updateSet->add( location, "update 1" );
 
-    EXPECT_THROW(
-        updateSet->add( location, "update 2" ), TestUpdateSet::Conflict );
+    EXPECT_THROW( updateSet->add( location, "update 2" ), TestUpdateSet::Conflict );
 }
 
-TEST( UpdateSetTest,
+TEST(
+    UpdateSetTest,
     sequentialUpdateSetsShouldOverwriteOldUpdatesIfAddingUpdatesWithSameLocationButDifferentValue )
 {
     const std::size_t location = 42UL;
 
-    const auto updateSet = std::unique_ptr< TestUpdateSet >(
-        new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
+    const auto updateSet =
+        std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
     updateSet->add( location, "update 1" );
     EXPECT_NO_THROW( updateSet->add( location, "update 2" ) );
 

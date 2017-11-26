@@ -61,32 +61,28 @@ TEST( AstIdentifierPath, baseNameShouldBeEqualToTheLastIdentifier )
     EXPECT_EQ( "bar", identifierPath.baseName() );
 }
 
-TEST( AstIdentifierPath,
-    baseDirShouldBeEmptyIfAbsolutePathConsistsOfOnlyOneIdentifier )
+TEST( AstIdentifierPath, baseDirShouldBeEmptyIfAbsolutePathConsistsOfOnlyOneIdentifier )
 {
     // WHEN
     const IdentifierPath identifierPath(
-        std::make_shared< Identifier >( "foo" ),
-        IdentifierPath::Type::ABSOLUTE );
+        std::make_shared< Identifier >( "foo" ), IdentifierPath::Type::ABSOLUTE );
 
     // THEN
     EXPECT_TRUE( identifierPath.baseDir().empty() );
 }
 
-TEST( AstIdentifierPath,
-    baseDirShouldBeEmptyIfRelativePathConsistsOfOnlyOneIdentifier )
+TEST( AstIdentifierPath, baseDirShouldBeEmptyIfRelativePathConsistsOfOnlyOneIdentifier )
 {
     // WHEN
     const IdentifierPath identifierPath(
-        std::make_shared< Identifier >( "foo" ),
-        IdentifierPath::Type::RELATIVE );
+        std::make_shared< Identifier >( "foo" ), IdentifierPath::Type::RELATIVE );
 
     // THEN
     EXPECT_TRUE( identifierPath.baseDir().empty() );
 }
 
-TEST( AstIdentifierPath,
-    baseDirShouldBeEqualToFirstIdentifierIfAbsolutePathConsistsOfTwoIdentifiers )
+TEST(
+    AstIdentifierPath, baseDirShouldBeEqualToFirstIdentifierIfAbsolutePathConsistsOfTwoIdentifiers )
 {
     // GIVEN
     auto identifiers = std::make_shared< Identifiers >();
@@ -94,14 +90,14 @@ TEST( AstIdentifierPath,
     identifiers->add( std::make_shared< Identifier >( "bar" ) );
 
     // WHEN
-    const IdentifierPath identifierPath(
-        identifiers, IdentifierPath::Type::ABSOLUTE );
+    const IdentifierPath identifierPath( identifiers, IdentifierPath::Type::ABSOLUTE );
 
     // THEN
     EXPECT_EQ( "foo", identifierPath.baseDir() );
 }
 
-TEST( AstIdentifierPath,
+TEST(
+    AstIdentifierPath,
     baseDirShouldBeEqualToFirstIdentifierWithLeadingDotIfRelativePathConsistsOfTwoIdentifiers )
 {
     // GIVEN
@@ -110,15 +106,13 @@ TEST( AstIdentifierPath,
     identifiers->add( std::make_shared< Identifier >( "bar" ) );
 
     // WHEN
-    const IdentifierPath identifierPath(
-        identifiers, IdentifierPath::Type::RELATIVE );
+    const IdentifierPath identifierPath( identifiers, IdentifierPath::Type::RELATIVE );
 
     // THEN
     EXPECT_EQ( ".foo", identifierPath.baseDir() );
 }
 
-TEST( AstIdentifierPath,
-    pathShouldConcatenateIdentifiersWithDotIfIdentifierPathIsAbsolute )
+TEST( AstIdentifierPath, pathShouldConcatenateIdentifiersWithDotIfIdentifierPathIsAbsolute )
 {
     // GIVEN
     auto identifiers = std::make_shared< Identifiers >();
@@ -126,14 +120,14 @@ TEST( AstIdentifierPath,
     identifiers->add( std::make_shared< Identifier >( "bar" ) );
 
     // WHEN
-    const IdentifierPath identifierPath(
-        identifiers, IdentifierPath::Type::ABSOLUTE );
+    const IdentifierPath identifierPath( identifiers, IdentifierPath::Type::ABSOLUTE );
 
     // THEN
     EXPECT_EQ( "foo.bar", identifierPath.path() );
 }
 
-TEST( AstIdentifierPath,
+TEST(
+    AstIdentifierPath,
     pathShouldConcatenateIdentifiersWithDotAndAddLeadingDotIfIdentifierPathIsRelative )
 {
     // GIVEN
@@ -142,8 +136,7 @@ TEST( AstIdentifierPath,
     identifiers->add( std::make_shared< Identifier >( "bar" ) );
 
     // WHEN
-    const IdentifierPath identifierPath(
-        identifiers, IdentifierPath::Type::RELATIVE );
+    const IdentifierPath identifierPath( identifiers, IdentifierPath::Type::RELATIVE );
 
     // THEN
     EXPECT_EQ( ".foo.bar", identifierPath.path() );

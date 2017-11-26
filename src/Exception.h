@@ -59,14 +59,20 @@ namespace libcasm_fe
     {
       public:
         Exception( const std::string& msg, Code errorCode );
-        Exception( const SourceLocation& location, const std::string& msg,
-            const std::vector< std::string >& backtrace, Code errorCode );
-        Exception( const SourceLocation& location, const std::string& msg,
+        Exception(
+            const SourceLocation& location,
+            const std::string& msg,
+            const std::vector< std::string >& backtrace,
             Code errorCode );
-        Exception( const std::vector< SourceLocation >& locations,
-            const std::string& msg, Code errorCode );
-        Exception( const std::vector< SourceLocation >& locations,
-            const std::string& msg, const std::vector< std::string >& backtrace,
+        Exception( const SourceLocation& location, const std::string& msg, Code errorCode );
+        Exception(
+            const std::vector< SourceLocation >& locations,
+            const std::string& msg,
+            Code errorCode );
+        Exception(
+            const std::vector< SourceLocation >& locations,
+            const std::string& msg,
+            const std::vector< std::string >& backtrace,
             Code errorCode );
 
         const char* what( void ) const noexcept override;
@@ -95,7 +101,7 @@ namespace libcasm_fe
     };
 }
 
-#endif // _LIBCASM_FE_EXCEPTION_H_
+#endif  // _LIBCASM_FE_EXCEPTION_H_
 
 //
 //  Local variables:

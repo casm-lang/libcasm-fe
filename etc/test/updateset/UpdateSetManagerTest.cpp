@@ -61,18 +61,15 @@ class UpdateSetManagerTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        manager = libstdhl::Memory::
-            make_unique< UpdateSetManager< TestUpdateSet > >();
+        manager = libstdhl::Memory::make_unique< UpdateSetManager< TestUpdateSet > >();
     }
 
     std::unique_ptr< UpdateSetManager< TestUpdateSet > > manager;
 };
 
-TEST_F(
-    UpdateSetManagerTest, lookupShouldReturnEmptyOptionalWhenNoUpdateSetExists )
+TEST_F( UpdateSetManagerTest, lookupShouldReturnEmptyOptionalWhenNoUpdateSetExists )
 {
-    EXPECT_THROW( manager->lookup( 42UL ).value(),
-        std::experimental::bad_optional_access );
+    EXPECT_THROW( manager->lookup( 42UL ).value(), std::experimental::bad_optional_access );
 }
 
 TEST_F( UpdateSetManagerTest, forkAndMerge )

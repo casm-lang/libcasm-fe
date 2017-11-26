@@ -59,10 +59,12 @@ using namespace Ast;
 
 char AttributionPass::id = 0;
 
-static libpass::PassRegistration< AttributionPass > PASS( "AstAttributionPass",
+static libpass::PassRegistration< AttributionPass > PASS(
+    "AstAttributionPass",
     "applies the definition attributes to the AST and performs various "
     "attribution checks",
-    "ast-attr", 0 );
+    "ast-attr",
+    0 );
 
 // attribute names (case sensitive)
 static const std::string DEPRECATED_ATTRIBUTE = "deprecated";
@@ -80,16 +82,9 @@ static const std::string DUMPS_ATTRIBUTE = "dumps";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
-    DEPRECATED_ATTRIBUTE,
-    IN_ATTRIBUTE,
-    MONITORED_ATTRIBUTE,
-    EXTERNAL_ATTRIBUTE,
-    CONTROLLED_ATTRIBUTE,
-    INTERNAL_ATTRIBUTE,
-    SHARED_ATTRIBUTE,
-    OUT_ATTRIBUTE,
-    STATIC_ATTRIBUTE,
-    SYMBOLIC_ATTRIBUTE,
+    DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE,       MONITORED_ATTRIBUTE, EXTERNAL_ATTRIBUTE,
+    CONTROLLED_ATTRIBUTE, INTERNAL_ATTRIBUTE, SHARED_ATTRIBUTE,    OUT_ATTRIBUTE,
+    STATIC_ATTRIBUTE,     SYMBOLIC_ATTRIBUTE,
 };
 
 // list of allowed expression attribute names
@@ -101,8 +96,7 @@ static const std::unordered_set< std::string > VALID_EXPRESSION_ATTRIBUTES = {
 class DefinitionAttributionVisitor final : public RecursiveVisitor
 {
   public:
-    DefinitionAttributionVisitor(
-        libcasm_fe::Logger& log, Definition& definition );
+    DefinitionAttributionVisitor( libcasm_fe::Logger& log, Definition& definition );
 
     const std::unordered_set< std::string >& attributeNames() const;
 
@@ -123,8 +117,7 @@ DefinitionAttributionVisitor::DefinitionAttributionVisitor(
 {
 }
 
-const std::unordered_set< std::string >&
-DefinitionAttributionVisitor::attributeNames() const
+const std::unordered_set< std::string >& DefinitionAttributionVisitor::attributeNames() const
 {
     return m_attributeNames;
 }
@@ -136,16 +129,14 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     // allow only basic attributes
     if( VALID_BASIC_ATTRIBUTES.count( name ) == 0 )
     {
-        m_log.error( { node.sourceLocation() },
-            "`" + name + "` is a unknown basic attribute" );
+        m_log.error( { node.sourceLocation() }, "`" + name + "` is a unknown basic attribute" );
         return;
     }
 
     // each attribute should only be used once
     if( m_attributeNames.count( name ) != 0 )
     {
-        m_log.error( { node.sourceLocation() },
-            "attribute `" + name + "` has already been used" );
+        m_log.error( { node.sourceLocation() }, "attribute `" + name + "` has already been used" );
         return;
     }
     m_attributeNames.insert( node.identifier()->name() );
@@ -153,10 +144,10 @@ void DefinitionAttributionVisitor::visit( BasicAttribute& node )
     if( name == DEPRECATED_ATTRIBUTE )
     {
         // definition has been deprecated
-        m_log.info( { m_definition.sourceLocation() },
-            m_definition.description() + " `"
-                + m_definition.identifier()->name()
-                + "` has been marked as deprecated" );
+        m_log.info(
+            { m_definition.sourceLocation() },
+            m_definition.description() + " `" + m_definition.identifier()->name() +
+                "` has been marked as deprecated" );
     }
 }
 
@@ -167,16 +158,15 @@ void DefinitionAttributionVisitor::visit( ExpressionAttribute& node )
     // allow only expression attributes
     if( VALID_EXPRESSION_ATTRIBUTES.count( name ) == 0 )
     {
-        m_log.error( { node.sourceLocation() },
-            "`" + name + "` is a unknown expression attribute" );
+        m_log.error(
+            { node.sourceLocation() }, "`" + name + "` is a unknown expression attribute" );
         return;
     }
 
     // each attribute should only be used once
     if( m_attributeNames.count( name ) != 0 )
     {
-        m_log.error( { node.sourceLocation() },
-            "attribute `" + name + "` has already been used" );
+        m_log.error( { node.sourceLocation() }, "attribute `" + name + "` has already been used" );
         return;
     }
     m_attributeNames.insert( node.identifier()->name() );
@@ -228,8 +218,7 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
         {
             node.setSymbolic( true );
         }
-        else if( name == IN_ATTRIBUTE or name == MONITORED_ATTRIBUTE
-                 or name == EXTERNAL_ATTRIBUTE )
+        else if( name == IN_ATTRIBUTE or name == MONITORED_ATTRIBUTE or name == EXTERNAL_ATTRIBUTE )
         {
             node.setClassification( Classification::IN );
         }

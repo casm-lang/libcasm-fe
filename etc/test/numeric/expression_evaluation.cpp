@@ -95,16 +95,13 @@ static value_t make_value( TypeType type )
     return value;
 }
 
-static std::unique_ptr< UnaryExpression > make_unary_expression(
-    libcasm_ir::Value::ID op )
+static std::unique_ptr< UnaryExpression > make_unary_expression( libcasm_ir::Value::ID op )
 {
     auto location = yy::location( nullptr );
-    return std::unique_ptr< UnaryExpression >(
-        new UnaryExpression( location, nullptr, op ) );
+    return std::unique_ptr< UnaryExpression >( new UnaryExpression( location, nullptr, op ) );
 }
 
-static std::unique_ptr< BinaryExpression > make_binary_expression(
-    libcasm_ir::Value::ID op )
+static std::unique_ptr< BinaryExpression > make_binary_expression( libcasm_ir::Value::ID op )
 {
     auto location = yy::location( nullptr );
     return std::unique_ptr< BinaryExpression >(
@@ -124,7 +121,7 @@ struct UnaryOpArgs
 };
 
 class numeric_una_expr_test
-    : public TestWithParam< std::tuple< libcasm_ir::Value::ID, UnaryOpArgs > >
+: public TestWithParam< std::tuple< libcasm_ir::Value::ID, UnaryOpArgs > >
 {
 };
 
@@ -160,7 +157,7 @@ struct BinaryOpArgs
 };
 
 class numeric_bin_expr_test
-    : public TestWithParam< std::tuple< libcasm_ir::Value::ID, BinaryOpArgs > >
+: public TestWithParam< std::tuple< libcasm_ir::Value::ID, BinaryOpArgs > >
 {
 };
 
@@ -197,83 +194,100 @@ static BinaryOpArgss generateNumeric_BinaryExpressionTestCases(
     for( auto type : types )
     {
         const auto instantiatedTypeTypes = testTemplate( type );
-        binOpTypeTypes.insert( binOpTypeTypes.cend(),
-            instantiatedTypeTypes.cbegin(), instantiatedTypeTypes.cend() );
+        binOpTypeTypes.insert(
+            binOpTypeTypes.cend(), instantiatedTypeTypes.cbegin(), instantiatedTypeTypes.cend() );
     }
     return binOpTypeTypes;
 }
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_una_op, numeric_una_expr_test,
-    Combine( Values( libcasm_ir::Value::NOT_INSTRUCTION ),
-        Values( UnaryOpArgs{ make_value( TypeType::UNDEF ),
-                    yields( make_value( TypeType::UNDEF ) ) },
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_una_op,
+    numeric_una_expr_test,
+    Combine(
+        Values( libcasm_ir::Value::NOT_INSTRUCTION ),
+        Values(
+            UnaryOpArgs{ make_value( TypeType::UNDEF ), yields( make_value( TypeType::UNDEF ) ) },
             UnaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
+                         yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_log_op_xor,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_log_op_xor,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::XOR_INSTRUCTION ),
-        Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                    make_value( TypeType::UNDEF ),
-                    yields( make_value( TypeType::UNDEF ) ) },
+    Combine(
+        Values( libcasm_ir::Value::XOR_INSTRUCTION ),
+        Values(
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
+            BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                          make_value( TypeType::BOOLEAN ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
+                          make_value( TypeType::BOOLEAN ),
+                          yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_log_op_and,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_log_op_and,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::AND_INSTRUCTION ),
-        Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                    make_value( TypeType::UNDEF ),
-                    yields( make_value( TypeType::UNDEF ) ) },
+    Combine(
+        Values( libcasm_ir::Value::AND_INSTRUCTION ),
+        Values(
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN, false ),
-                yields( make_value( TypeType::BOOLEAN, false ) ), true },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN, true ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::BOOLEAN, false ),
+                          yields( make_value( TypeType::BOOLEAN, false ) ),
+                          true },
+            BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                          make_value( TypeType::BOOLEAN, true ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, false ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::BOOLEAN, false ) ), true },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::BOOLEAN, false ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, true ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
+                          make_value( TypeType::BOOLEAN ),
+                          yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_log_op_or,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_log_op_or,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::OR_INSTRUCTION ),
-        Values( BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                    make_value( TypeType::UNDEF ),
-                    yields( make_value( TypeType::UNDEF ) ) },
+    Combine(
+        Values( libcasm_ir::Value::OR_INSTRUCTION ),
+        Values(
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN, false ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                make_value( TypeType::BOOLEAN, true ),
-                yields( make_value( TypeType::BOOLEAN, true ) ), true },
+                          make_value( TypeType::BOOLEAN, false ),
+                          yields( make_value( TypeType::UNDEF ) ) },
+            BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                          make_value( TypeType::BOOLEAN, true ),
+                          yields( make_value( TypeType::BOOLEAN, true ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, false ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::UNDEF ) ) },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::UNDEF ) ) },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN, true ),
-                make_value( TypeType::UNDEF ),
-                yields( make_value( TypeType::BOOLEAN, true ) ), true },
+                          make_value( TypeType::UNDEF ),
+                          yields( make_value( TypeType::BOOLEAN, true ) ),
+                          true },
             BinaryOpArgs{ make_value( TypeType::BOOLEAN ),
-                make_value( TypeType::BOOLEAN ),
-                yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
+                          make_value( TypeType::BOOLEAN ),
+                          yields( make_value( TypeType::BOOLEAN ) ) } ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_lth_gth,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_cmp_op_lth_gth,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::LTH_INSTRUCTION,
-                 libcasm_ir::Value::GTH_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::LTH_INSTRUCTION, libcasm_ir::Value::GTH_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -281,22 +295,24 @@ INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_lth_gth,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( TypeType::BOOLEAN ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_leq_geq,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_cmp_op_leq_geq,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::LEQ_INSTRUCTION,
-                 libcasm_ir::Value::GEQ_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::LEQ_INSTRUCTION, libcasm_ir::Value::GEQ_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
                 TypeType::INTEGER, TypeType::FLOATING,
@@ -304,130 +320,166 @@ INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_leq_geq,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::BOOLEAN ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( TypeType::BOOLEAN ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_equ,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_cmp_op_equ,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::EQU_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::EQU_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
-                TypeType::STRING, TypeType::INTEGER, TypeType::FLOATING,
-                TypeType::BOOLEAN, TypeType::LIST, TypeType::TUPLE,
-                TypeType::TUPLE_OR_LIST, TypeType::ENUM, TypeType::RATIONAL,
+                TypeType::STRING,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::BOOLEAN,
+                TypeType::LIST,
+                TypeType::TUPLE,
+                TypeType::TUPLE_OR_LIST,
+                TypeType::ENUM,
+                TypeType::RATIONAL,
             },
             []( TypeType literal ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::BOOLEAN, true ) ),
-                             true },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( literal ),
-                        yields( make_value( TypeType::BOOLEAN, false ) ),
-                        true },
-                    BinaryOpArgs{ make_value( literal ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::BOOLEAN, false ) ),
-                        true },
-                    BinaryOpArgs{ make_value( literal ), make_value( literal ),
-                        yields( make_value( TypeType::BOOLEAN ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN, true ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::BOOLEAN, false ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN, false ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_cmp_op_neq,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_cmp_op_neq,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::NEQ_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::NEQ_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
-                TypeType::STRING, TypeType::INTEGER, TypeType::FLOATING,
-                TypeType::BOOLEAN, TypeType::LIST, TypeType::TUPLE,
-                TypeType::TUPLE_OR_LIST, TypeType::ENUM, TypeType::RATIONAL,
+                TypeType::STRING,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::BOOLEAN,
+                TypeType::LIST,
+                TypeType::TUPLE,
+                TypeType::TUPLE_OR_LIST,
+                TypeType::ENUM,
+                TypeType::RATIONAL,
             },
             []( TypeType literal ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::BOOLEAN, false ) ),
-                             true },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( literal ),
-                        yields( make_value( TypeType::BOOLEAN, true ) ), true },
-                    BinaryOpArgs{ make_value( literal ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::BOOLEAN, true ) ), true },
-                    BinaryOpArgs{ make_value( literal ), make_value( literal ),
-                        yields( make_value( TypeType::BOOLEAN ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN, false ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::BOOLEAN, true ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::BOOLEAN, true ) ),
+                                       true },
+                         BinaryOpArgs{ make_value( literal ),
+                                       make_value( literal ),
+                                       yields( make_value( TypeType::BOOLEAN ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_arith_op_add,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_arith_op_add,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::ADD_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::ADD_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
-                TypeType::INTEGER, TypeType::FLOATING, TypeType::RATIONAL,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::RATIONAL,
                 TypeType::STRING,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( number ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( number ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_arith_op_sub_mul_div,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_arith_op_sub_mul_div,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::SUB_INSTRUCTION,
-                 libcasm_ir::Value::MUL_INSTRUCTION,
-                 libcasm_ir::Value::DIV_INSTRUCTION ),
+    Combine(
+        Values(
+            libcasm_ir::Value::SUB_INSTRUCTION,
+            libcasm_ir::Value::MUL_INSTRUCTION,
+            libcasm_ir::Value::DIV_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
-                TypeType::INTEGER, TypeType::FLOATING, TypeType::RATIONAL,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
+                TypeType::RATIONAL,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( number ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( number ) ) } };
             } ) ) ) );
 
-INSTANTIATE_TEST_CASE_P( libcasm_fe__numeric_arith_op_mod,
+INSTANTIATE_TEST_CASE_P(
+    libcasm_fe__numeric_arith_op_mod,
     numeric_bin_expr_test,
-    Combine( Values( libcasm_ir::Value::MOD_INSTRUCTION ),
+    Combine(
+        Values( libcasm_ir::Value::MOD_INSTRUCTION ),
         ValuesIn( generateNumeric_BinaryExpressionTestCases(
             {
-                TypeType::INTEGER, TypeType::FLOATING,
+                TypeType::INTEGER,
+                TypeType::FLOATING,
             },
             []( TypeType number ) -> BinaryOpArgss {
                 return { BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                             make_value( TypeType::UNDEF ),
-                             yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( TypeType::UNDEF ),
-                        make_value( number ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ),
-                        make_value( TypeType::UNDEF ),
-                        yields( make_value( TypeType::UNDEF ) ) },
-                    BinaryOpArgs{ make_value( number ), make_value( number ),
-                        yields( make_value( number ) ) } };
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( TypeType::UNDEF ),
+                                       make_value( number ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( TypeType::UNDEF ),
+                                       yields( make_value( TypeType::UNDEF ) ) },
+                         BinaryOpArgs{ make_value( number ),
+                                       make_value( number ),
+                                       yields( make_value( number ) ) } };
             } ) ) ) );

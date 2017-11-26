@@ -64,7 +64,7 @@ namespace libcasm_fe
     };
 }
 
-#endif // _LIB_CASMFE_SYMBOL_REGISTRATION_PASS_H_
+#endif  // _LIB_CASMFE_SYMBOL_REGISTRATION_PASS_H_
 
 //
 //  Local variables:

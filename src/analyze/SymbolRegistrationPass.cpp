@@ -57,13 +57,14 @@ char SymbolRegistrationPass::id = 0;
 
 static libpass::PassRegistration< SymbolRegistrationPass > PASS(
     "ASTSymbolRegistrationPass",
-    "registers declared symbols in the symbol table", "ast-sym-reg", 0 );
+    "registers declared symbols in the symbol table",
+    "ast-sym-reg",
+    0 );
 
 class SymbolRegistrationVisitor final : public RecursiveVisitor
 {
   public:
-    SymbolRegistrationVisitor(
-        libcasm_fe::Logger& log, Namespace& symboltable );
+    SymbolRegistrationVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -97,13 +98,15 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 
         if( node.uid() == FunctionDefinition::UID::PROGRAM )
         {
-            m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
+            m_log.error(
+                { node.sourceLocation(), symbol->sourceLocation() },
                 "init already defined",
                 Code::AgentInitRuleMultipleDefinitions );
         }
         else
         {
-            m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
+            m_log.error(
+                { node.sourceLocation(), symbol->sourceLocation() },
                 e.what(),
                 Code::FunctionDefinitionAlreadyUsed );
         }
@@ -124,8 +127,10 @@ void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
     {
         const auto& symbol = m_symboltable.find( name );
 
-        m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
-            e.what(), Code::DerivedDefinitionAlreadyUsed );
+        m_log.error(
+            { node.sourceLocation(), symbol->sourceLocation() },
+            e.what(),
+            Code::DerivedDefinitionAlreadyUsed );
     }
 
     RecursiveVisitor::visit( node );
@@ -143,8 +148,10 @@ void SymbolRegistrationVisitor::visit( RuleDefinition& node )
     {
         const auto& symbol = m_symboltable.find( name );
 
-        m_log.error( { node.sourceLocation(), symbol->sourceLocation() },
-            e.what(), Code::RuleDefinitionAlreadyUsed );
+        m_log.error(
+            { node.sourceLocation(), symbol->sourceLocation() },
+            e.what(),
+            Code::RuleDefinitionAlreadyUsed );
     }
 
     RecursiveVisitor::visit( node );
@@ -162,8 +169,7 @@ void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
     {
         const auto& symbol = m_symboltable.find( name );
 
-        m_log.error(
-            { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
+        m_log.error( { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
     }
 }
 
@@ -194,8 +200,7 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
     {
         const auto& symbol = m_symboltable.find( name );
 
-        m_log.error(
-            { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
+        m_log.error( { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
     }
 
     // register enumerators in a sub-namespace

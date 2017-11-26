@@ -50,9 +50,10 @@
 template < size_t BlockSize >
 class MemoryPool
 {
-    union Block {
+    union Block
+    {
         char memory[ BlockSize ];
-        Block* next; // to build a list of free blocks when block is released
+        Block* next;  // to build a list of free blocks when block is released
     };
     static_assert( BlockSize == sizeof( Block ), "Block has wrong size" );
 
@@ -107,10 +108,10 @@ class MemoryPool
     MemoryPool& operator=( MemoryPool&& ) = delete;
 
   private:
-    Block* m_nextFreeBlock = nullptr; // linked list of free memory blocks
+    Block* m_nextFreeBlock = nullptr;  // linked list of free memory blocks
 };
 
-#endif // _MEMORY_POOL_H
+#endif  // _MEMORY_POOL_H
 
 //
 //  Local variables:

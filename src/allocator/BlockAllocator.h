@@ -87,8 +87,9 @@ class BlockAllocator
 
         void reset( void* addr ) noexcept
         {
-            assert( ( ( (char*)this + sizeof( Block ) ) <= addr )
-                    and ( addr <= ( (char*)this + BlockSize ) ) );
+            assert(
+                ( ( (char*)this + sizeof( Block ) ) <= addr ) and
+                ( addr <= ( (char*)this + BlockSize ) ) );
 
             m_freePosition = (char*)addr;
         }
@@ -112,11 +113,12 @@ class BlockAllocator
   public:
     BlockAllocator()
     {
-        static_assert( BlockSize > sizeof( Block ),
+        static_assert(
+            BlockSize > sizeof( Block ),
             "block size must be larger than the management information of the "
             "block" );
-        static_assert( ( BlockSize & ( BlockSize - 1 ) ) == 0,
-            "block size must be a power of two" );
+        static_assert(
+            ( BlockSize & ( BlockSize - 1 ) ) == 0, "block size must be a power of two" );
     }
 
     BlockAllocator( BlockAllocator&& other )
@@ -139,8 +141,7 @@ class BlockAllocator
     {
         if( n > ( BlockSize - sizeof( Block ) ) )
         {
-            throw std::length_error(
-                "requested size was larger than the block size" );
+            throw std::length_error( "requested size was larger than the block size" );
         }
 
         if( ( m_topBlock == nullptr ) or ( m_topBlock->remaining() < n ) )
@@ -203,15 +204,15 @@ class BlockAllocator
     static Block* blockFor( void* addr )
     {
         return reinterpret_cast< Block* >(
-            reinterpret_cast< uintptr_t >( addr )
-            & ~reinterpret_cast< uintptr_t >( BlockSize - 1 ) );
+            reinterpret_cast< uintptr_t >( addr ) &
+            ~reinterpret_cast< uintptr_t >( BlockSize - 1 ) );
     }
 
   private:
     Block* m_topBlock = nullptr;
 };
 
-#endif // BLOCK_ALLOCATOR_H
+#endif  // BLOCK_ALLOCATOR_H
 
 //
 //  Local variables:

@@ -168,8 +168,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< DirectCallExpression >;
 
-            DirectCallExpression( const IdentifierPath::Ptr& identifier,
-                const Expressions::Ptr& arguments );
+            DirectCallExpression(
+                const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments );
 
             void setIdentifier( const IdentifierPath::Ptr& identifier );
             const IdentifierPath::Ptr& identifier( void ) const;
@@ -203,8 +203,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< IndirectCallExpression >;
 
-            IndirectCallExpression( const Expression::Ptr& expression,
-                const Expressions::Ptr& arguments );
+            IndirectCallExpression(
+                const Expression::Ptr& expression, const Expressions::Ptr& arguments );
 
             const Expression::Ptr& expression( void ) const;
 
@@ -219,8 +219,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< TypeCastingExpression >;
 
-            TypeCastingExpression( const Expression::Ptr& fromExpression,
-                const std::shared_ptr< Type >& asType );
+            TypeCastingExpression(
+                const Expression::Ptr& fromExpression, const std::shared_ptr< Type >& asType );
 
             const Expression::Ptr& fromExpression( void ) const;
 
@@ -260,8 +260,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UnaryExpression >;
 
-            UnaryExpression(
-                const Expression::Ptr& expression, libcasm_ir::Value::ID op );
+            UnaryExpression( const Expression::Ptr& expression, libcasm_ir::Value::ID op );
 
             libcasm_ir::Value::ID op( void ) const;
             const Expression::Ptr& expression( void ) const;
@@ -278,8 +277,10 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< BinaryExpression >;
 
-            BinaryExpression( const Expression::Ptr& left,
-                const Expression::Ptr& right, libcasm_ir::Value::ID op );
+            BinaryExpression(
+                const Expression::Ptr& left,
+                const Expression::Ptr& right,
+                libcasm_ir::Value::ID op );
 
             libcasm_ir::Value::ID op( void ) const;
             const Expression::Ptr& left( void ) const;
@@ -298,8 +299,7 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< RangeExpression >;
 
-            RangeExpression(
-                const Expression::Ptr& left, const Expression::Ptr& right );
+            RangeExpression( const Expression::Ptr& left, const Expression::Ptr& right );
 
             const Expression::Ptr& left( void ) const;
             const Expression::Ptr& right( void ) const;
@@ -353,7 +353,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ConditionalExpression >;
 
-            ConditionalExpression( const Expression::Ptr& condition,
+            ConditionalExpression(
+                const Expression::Ptr& condition,
                 const Expression::Ptr& thenExpression,
                 const Expression::Ptr& elseExpression );
 
@@ -396,13 +397,13 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< QuantifierExpression >;
 
-            QuantifierExpression( Node::ID id,
+            QuantifierExpression(
+                Node::ID id,
                 const std::shared_ptr< VariableDefinition >& predicateVariable,
                 const Expression::Ptr& universe,
                 const Expression::Ptr& proposition );
 
-            const std::shared_ptr< VariableDefinition >& predicateVariable(
-                void ) const;
+            const std::shared_ptr< VariableDefinition >& predicateVariable( void ) const;
             const Expression::Ptr& universe( void ) const;
             const Expression::Ptr& proposition( void ) const;
 
@@ -425,8 +426,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class ExistentialQuantifierExpression final
-        : public QuantifierExpression
+        class ExistentialQuantifierExpression final : public QuantifierExpression
         {
           public:
             using Ptr = std::shared_ptr< ExistentialQuantifierExpression >;
@@ -446,15 +446,14 @@ namespace std
     template <>
     struct hash< libcasm_fe::Ast::CallExpression::TargetType >
     {
-        inline size_t operator()(
-            const libcasm_fe::Ast::CallExpression::TargetType value ) const
+        inline size_t operator()( const libcasm_fe::Ast::CallExpression::TargetType value ) const
         {
             return static_cast< size_t >( value );
         }
     };
 }
 
-#endif // _LIBCASM_FE_EXPRESSION_H_
+#endif  // _LIBCASM_FE_EXPRESSION_H_
 
 //
 //  Local variables:

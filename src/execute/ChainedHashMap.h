@@ -62,8 +62,8 @@ namespace details
             Key key;
             Value value;
             std::size_t hashCode;
-            Entry* next; // conflict chain
-            Entry* prev; // linked-list
+            Entry* next;  // conflict chain
+            Entry* prev;  // linked-list
 
             Entry( const Key& key, const Value& value, Entry* prev )
             : key( key )
@@ -96,7 +96,8 @@ namespace details
     };
 }
 
-template < typename Key,
+template <
+    typename Key,
     typename Value,
     typename Hash = std::hash< Key >,
     typename Pred = std::equal_to< Key >,
@@ -112,8 +113,7 @@ class ChainedHashMap final : public HashMapBase< Details >
     using HashMapBase< Details >::HashMapBase;
 
   protected:
-    Entry* searchEntry( const Key& key, const std::size_t hashCode ) const
-        noexcept override
+    Entry* searchEntry( const Key& key, const std::size_t hashCode ) const noexcept override
     {
 #ifdef HASH_MAP_PERF
         HashMap::m_performanceStatistics.searched();
@@ -149,8 +149,7 @@ class ChainedHashMap final : public HashMapBase< Details >
         return nullptr;
     }
 
-    void insertEntry( Entry* entry, std::size_t hashCode ) const
-        noexcept override
+    void insertEntry( Entry* entry, std::size_t hashCode ) const noexcept override
     {
         assert( HashMap::m_buckets != nullptr );
 
@@ -179,8 +178,7 @@ class ChainedHashMap final : public HashMapBase< Details >
         HashMap::m_buckets = new Bucket[ newCapacity ];
         std::memset( HashMap::m_buckets, 0, sizeof( Bucket ) * newCapacity );
 
-        for( auto entry = HashMap::m_lastEntry; entry != nullptr;
-             entry = entry->prev )
+        for( auto entry = HashMap::m_lastEntry; entry != nullptr; entry = entry->prev )
         {
             insertEntry( entry, entry->hashCode );
         }
@@ -189,12 +187,11 @@ class ChainedHashMap final : public HashMapBase< Details >
   private:
     constexpr Bucket* bucketAt( std::size_t hashCode ) const noexcept
     {
-        return HashMap::m_buckets
-               + HashingStrategy::compress( hashCode, HashMap::m_capacity );
+        return HashMap::m_buckets + HashingStrategy::compress( hashCode, HashMap::m_capacity );
     }
 };
 
-#endif // _LIBCASM_FE_CHAINEDHASHMAP_H_
+#endif  // _LIBCASM_FE_CHAINEDHASHMAP_H_
 
 //
 //  Local variables:

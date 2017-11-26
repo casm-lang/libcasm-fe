@@ -106,7 +106,7 @@ namespace libcasm_fe
     }
 }
 
-#endif // _LIBCASM_FE_RECURSIVE_VISITOR_H_
+#endif  // _LIBCASM_FE_RECURSIVE_VISITOR_H_
 
 //
 //  Local variables:

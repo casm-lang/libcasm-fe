@@ -61,8 +61,7 @@ using namespace Ast;
 char ConsistencyCheckPass::id = 0;
 
 static libpass::PassRegistration< ConsistencyCheckPass > PASS(
-    "ASTConsistencyCheckPass",
-    "checks the consistency of the AST representation", "ast-check", 0 );
+    "ASTConsistencyCheckPass", "checks the consistency of the AST representation", "ast-check", 0 );
 
 //
 // ConsistencyCheckVisitor
@@ -117,7 +116,8 @@ void ConsistencyCheckVisitor::visit( Specification& node )
 
     if( not m_initDefinitionFound )
     {
-        m_log.error( { node.header()->sourceLocation() },
+        m_log.error(
+            { node.header()->sourceLocation() },
             "no init definition found in this specification",
             Code::AgentInitRuleNotDefined );
     }
@@ -178,8 +178,8 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto numberOfDefaultCases = std::count_if(
-        node.cases()->begin(), node.cases()->end(), []( const auto& _case ) {
+    const auto numberOfDefaultCases =
+        std::count_if( node.cases()->begin(), node.cases()->end(), []( const auto& _case ) {
             return _case->id() == Node::ID::DEFAULT_CASE;
         } );
 
@@ -189,7 +189,8 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
         {
             if( _case->id() == Node::ID::DEFAULT_CASE )
             {
-                m_log.error( { _case->sourceLocation() },
+                m_log.error(
+                    { _case->sourceLocation() },
                     "case rule contains multiple default cases",
                     Code::CaseRuleMultipleDefaultCases );
             }
@@ -199,30 +200,30 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 {
-    assert( node.targetType() != CallExpression::TargetType::UNKNOWN
-            && "all calls should have been resolved by previous passes" );
+    assert(
+        node.targetType() != CallExpression::TargetType::UNKNOWN &&
+        "all calls should have been resolved by previous passes" );
 
     RecursiveVisitor::visit( node );
 
     if( node.targetType() == CallExpression::TargetType::FUNCTION )
     {
-        const auto& function
-            = node.targetDefinition()->ptr< FunctionDefinition >();
-        if( function->classification()
-            == FunctionDefinition::Classification::OUT )
+        const auto& function = node.targetDefinition()->ptr< FunctionDefinition >();
+        if( function->classification() == FunctionDefinition::Classification::OUT )
         {
             // calling an out function isn't allowed (write-only)
-            m_log.error( { node.sourceLocation() },
-                "calling function '" + node.identifier()->path()
-                    + "' is not allowed, it is classified as '"
-                    + function->classificationName() + "' ",
+            m_log.error(
+                { node.sourceLocation() },
+                "calling function '" + node.identifier()->path() +
+                    "' is not allowed, it is classified as '" + function->classificationName() +
+                    "' ",
                 Code::DirectCallExpressionInvalidClassifier );
 
-            m_log.info( { function->sourceLocation() },
-                "function '" + node.identifier()->path()
-                    + "' is classified as '" + function->classificationName()
-                    + "', incorrect usage in line "
-                    + std::to_string( node.sourceLocation().begin.line ) );
+            m_log.info(
+                { function->sourceLocation() },
+                "function '" + node.identifier()->path() + "' is classified as '" +
+                    function->classificationName() + "', incorrect usage in line " +
+                    std::to_string( node.sourceLocation().begin.line ) );
         }
     }
 
@@ -230,9 +231,10 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
     {
         if( m_sideEffectFree )
         {
-            m_log.error( { node.sourceLocation() },
-                "calling rule '" + node.identifier()->path()
-                    + "' is not allowed inside a derived definition",
+            m_log.error(
+                { node.sourceLocation() },
+                "calling rule '" + node.identifier()->path() +
+                    "' is not allowed inside a derived definition",
                 Code::NotSideEffectFreeRuleCall );
         }
     }
@@ -245,10 +247,10 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     const auto& func = node.function();
     if( func->targetType() != CallExpression::TargetType::FUNCTION )
     {
-        m_log.error( { func->sourceLocation() },
-            "updating " + func->targetTypeName() + " '"
-                + func->identifier()->path()
-                + "' is not allowed, only function symbols are allowed",
+        m_log.error(
+            { func->sourceLocation() },
+            "updating " + func->targetTypeName() + " '" + func->identifier()->path() +
+                "' is not allowed, only function symbols are allowed",
             Code::UpdateRuleFunctionSymbolIsInvalid );
         return;
     }
@@ -277,16 +279,17 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
 
     if( not updatesAllowed )
     {
-        m_log.error( { func->sourceLocation() },
-            "updating function '" + func->identifier()->path()
-                + "' is not allowed, it is classified as '"
-                + def->classificationName() + "' ",
+        m_log.error(
+            { func->sourceLocation() },
+            "updating function '" + func->identifier()->path() +
+                "' is not allowed, it is classified as '" + def->classificationName() + "' ",
             Code::UpdateRuleInvalidClassifier );
 
-        m_log.info( { def->sourceLocation() },
-            "function '" + func->identifier()->path() + "' is classified as '"
-                + def->classificationName() + "', incorrect usage in line "
-                + std::to_string( func->sourceLocation().begin.line ) );
+        m_log.info(
+            { def->sourceLocation() },
+            "function '" + func->identifier()->path() + "' is classified as '" +
+                def->classificationName() + "', incorrect usage in line " +
+                std::to_string( func->sourceLocation().begin.line ) );
     }
 }
 
@@ -302,10 +305,12 @@ void ConsistencyCheckVisitor::visit( CallRule& node )
         {
             if( call.targetType() != CallExpression::TargetType::RULE )
             {
-                m_log.error( { node.sourceLocation() },
+                m_log.error(
+                    { node.sourceLocation() },
                     "only rules are allowed to be called",
                     Code::CallRuleOnlyRulesAllowed );
-                m_log.hint( { call.sourceLocation() },
+                m_log.hint(
+                    { call.sourceLocation() },
                     call.targetTypeName() + " has to be used without 'call'" );
             }
             break;
@@ -314,11 +319,11 @@ void ConsistencyCheckVisitor::visit( CallRule& node )
         {
             if( call.targetType() == CallExpression::TargetType::RULE )
             {
-                m_log.error( { node.sourceLocation() },
+                m_log.error(
+                    { node.sourceLocation() },
                     "rule is not allowed to be called",
                     Code::CallRuleOnlyFunctionsAllowed );
-                m_log.hint( { call.sourceLocation() },
-                    "rule has to be used with 'call'" );
+                m_log.hint( { call.sourceLocation() }, "rule has to be used with 'call'" );
             }
             break;
         }
@@ -357,7 +362,9 @@ void ConsistencyCheckVisitor::verify( const TypedNode& node )
 {
     if( not node.type() )
     {
-        m_log.error( { node.sourceLocation() }, "unable to infer type",
+        m_log.error(
+            { node.sourceLocation() },
+            "unable to infer type",
             Code::TypeInferenceUnableToInferType );
     }
 }
@@ -388,8 +395,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< ConsistencyCheckPass >(
-        libstdhl::Memory::make< Data >( specification ) );
+    pr.setResult< ConsistencyCheckPass >( libstdhl::Memory::make< Data >( specification ) );
 
     return true;
 }
