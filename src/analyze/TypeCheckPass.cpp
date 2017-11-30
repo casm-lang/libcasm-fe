@@ -83,7 +83,7 @@ TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symbolta
 
 static const std::string TYPE_STRING_VOID = "Void";
 static const std::string TYPE_STRING_BOOLEAN = "Boolean";
-static const std::string TYPE_STRING_BIT = "Bit";
+static const std::string TYPE_STRING_BINARY = "Binary";
 static const std::string TYPE_STRING_INTEGER = "Integer";
 static const std::string TYPE_STRING_STRING = "String";
 static const std::string TYPE_STRING_DECIMAL = "Decimal";
@@ -122,9 +122,9 @@ void TypeCheckVisitor::visit( BasicType& node )
     {
         node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
     }
-    else if( name == TYPE_STRING_BIT )
+    else if( name == TYPE_STRING_BINARY )  // PPA: REMOVE: drop this basic type support, use alias!
     {
-        node.setType( libstdhl::Memory::get< libcasm_ir::BitType >( 1 ) );
+        node.setType( libstdhl::Memory::get< libcasm_ir::BinaryType >( 1 ) );
     }
     else if( name == TYPE_STRING_INTEGER )
     {
@@ -306,7 +306,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
         const auto& name = node.name()->baseName();
         auto& expr = *node.size();
 
-        if( name == TYPE_STRING_BIT )
+        if( name == TYPE_STRING_BINARY )
         {
             if( expr.id() == Node::ID::VALUE_ATOM and expr.type()->isInteger() )
             {
@@ -317,19 +317,20 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
 
                 try
                 {
-                    auto type = libstdhl::Memory::get< libcasm_ir::BitType >( value );
+                    auto type = libstdhl::Memory::get< libcasm_ir::BinaryType >( value );
                     node.setType( type );
                 }
                 catch( const std::domain_error& e )
                 {
-                    m_log.error( { expr.sourceLocation() }, e.what(), Code::TypeBitSizeIsInvalid );
+                    m_log.error(
+                        { expr.sourceLocation() }, e.what(), Code::TypeBinarySizeIsInvalid );
                 }
             }
             else
             {
                 m_log.error(
                     { expr.sourceLocation() },
-                    "unsupported expr for 'Bit' type, constant Integer value "
+                    "unsupported expr for 'Binary' type, constant Integer value "
                     "expected" );
             }
         }

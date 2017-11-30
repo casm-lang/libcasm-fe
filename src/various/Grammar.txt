@@ -436,7 +436,7 @@ Literal ::= UndefinedLiteral
           | IntegerLiteral
           | RationalLiteral
           | DecimalLiteral
-          | BitLiteral
+          | BinaryLiteral
           | StringLiteral
           | ReferenceLiteral
 </code>
@@ -490,14 +490,14 @@ DecimalLiteral ::= "0[xX][0-9a-fA-F][0-9a-fA-F']*[0-9a-fA-F]*"
 {{page>:grammar:DecimalLiteral&noheader&nofooter}}
 
 
-===== BitLiteral =====
+===== BinaryLiteral =====
 
 <code>
-BitLiteral ::= "0[bB][01][01']*[01]*"
-             | "0[xX][0-9a-fA-F][0-9a-fA-F']*[0-9a-fA-F]*"
+BinaryLiteral ::= "0[bB][01][01']*[01]*"
+                | "0[xX][0-9a-fA-F][0-9a-fA-F']*[0-9a-fA-F]*"
 </code>
 
-{{page>:grammar:BitLiteral&noheader&nofooter}}
+{{page>:grammar:BinaryLiteral&noheader&nofooter}}
 
 
 ===== StringLiteral =====

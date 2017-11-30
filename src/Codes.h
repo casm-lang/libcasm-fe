@@ -241,10 +241,10 @@ namespace libcasm_fe
         OperatorInvalidOperands = 0x8001
 
         // --------------------------------------------------------- b*** ...
-        // bit type errors
+        // binary type errors
         ,
         TypeBitSyntaxError = 0xb000,
-        TypeBitSizeIsInvalid = 0xb001,
+        TypeBinarySizeIsInvalid = 0xb001,
         TypeBitSizeInvalidExpression = 0xb002
 
         ,

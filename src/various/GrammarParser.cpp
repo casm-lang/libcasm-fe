@@ -550,7 +550,7 @@ namespace libcasm_fe
             case 126:  // IntegerLiteral
             case 127:  // RationalLiteral
             case 128:  // DecimalLiteral
-            case 129:  // BitLiteral
+            case 129:  // BinaryLiteral
             case 130:  // StringLiteral
                 value.move< ValueAtom::Ptr >( that.value );
                 break;
@@ -819,7 +819,7 @@ namespace libcasm_fe
             case 126:  // IntegerLiteral
             case 127:  // RationalLiteral
             case 128:  // DecimalLiteral
-            case 129:  // BitLiteral
+            case 129:  // BinaryLiteral
             case 130:  // StringLiteral
                 value.copy< ValueAtom::Ptr >( that.value );
                 break;
@@ -1280,7 +1280,7 @@ namespace libcasm_fe
                     case 126:  // IntegerLiteral
                     case 127:  // RationalLiteral
                     case 128:  // DecimalLiteral
-                    case 129:  // BitLiteral
+                    case 129:  // BinaryLiteral
                     case 130:  // StringLiteral
                         yylhs.value.build< ValueAtom::Ptr >();
                         break;
@@ -2743,9 +2743,10 @@ namespace libcasm_fe
                         {
                             try
                             {
-                                const auto value = libstdhl::Memory::get< libcasm_ir::BitConstant >(
-                                    yystack_[ 0 ].value.as< std::string >(),
-                                    libstdhl::Type::BINARY );
+                                const auto value =
+                                    libstdhl::Memory::get< libcasm_ir::BinaryConstant >(
+                                        yystack_[ 0 ].value.as< std::string >(),
+                                        libstdhl::Type::BINARY );
                                 yylhs.value.as< ValueAtom::Ptr >() =
                                     Ast::make< ValueAtom >( yylhs.location, value );
                             }
@@ -2762,9 +2763,10 @@ namespace libcasm_fe
                         {
                             try
                             {
-                                const auto value = libstdhl::Memory::get< libcasm_ir::BitConstant >(
-                                    yystack_[ 0 ].value.as< std::string >(),
-                                    libstdhl::Type::HEXADECIMAL );
+                                const auto value =
+                                    libstdhl::Memory::get< libcasm_ir::BinaryConstant >(
+                                        yystack_[ 0 ].value.as< std::string >(),
+                                        libstdhl::Type::HEXADECIMAL );
                                 yylhs.value.as< ValueAtom::Ptr >() =
                                     Ast::make< ValueAtom >( yylhs.location, value );
                             }
@@ -4073,7 +4075,7 @@ namespace libcasm_fe
                                              "IntegerLiteral",
                                              "RationalLiteral",
                                              "DecimalLiteral",
-                                             "BitLiteral",
+                                             "BinaryLiteral",
                                              "StringLiteral",
                                              "ReferenceLiteral",
                                              "Types",

@@ -463,7 +463,7 @@ namespace libcasm_fe
             // IntegerLiteral
             // RationalLiteral
             // DecimalLiteral
-            // BitLiteral
+            // BinaryLiteral
             // StringLiteral
             char dummy54[ sizeof( ValueAtom::Ptr ) ];
 
@@ -1546,7 +1546,7 @@ namespace libcasm_fe
             case 126:  // IntegerLiteral
             case 127:  // RationalLiteral
             case 128:  // DecimalLiteral
-            case 129:  // BitLiteral
+            case 129:  // BinaryLiteral
             case 130:  // StringLiteral
                 value.copy< ValueAtom::Ptr >( other.value );
                 break;
@@ -1816,7 +1816,7 @@ namespace libcasm_fe
             case 126:  // IntegerLiteral
             case 127:  // RationalLiteral
             case 128:  // DecimalLiteral
-            case 129:  // BitLiteral
+            case 129:  // BinaryLiteral
             case 130:  // StringLiteral
                 value.copy< ValueAtom::Ptr >( v );
                 break;
@@ -2627,7 +2627,7 @@ namespace libcasm_fe
             case 126:  // IntegerLiteral
             case 127:  // RationalLiteral
             case 128:  // DecimalLiteral
-            case 129:  // BitLiteral
+            case 129:  // BinaryLiteral
             case 130:  // StringLiteral
                 value.template destroy< ValueAtom::Ptr >();
                 break;
@@ -2901,7 +2901,7 @@ namespace libcasm_fe
             case 126:  // IntegerLiteral
             case 127:  // RationalLiteral
             case 128:  // DecimalLiteral
-            case 129:  // BitLiteral
+            case 129:  // BinaryLiteral
             case 130:  // StringLiteral
                 value.move< ValueAtom::Ptr >( s.value );
                 break;
