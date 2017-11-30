@@ -122,10 +122,6 @@ void TypeCheckVisitor::visit( BasicType& node )
     {
         node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
     }
-    else if( name == TYPE_STRING_BINARY )  // PPA: REMOVE: drop this basic type support, use alias!
-    {
-        node.setType( libstdhl::Memory::get< libcasm_ir::BinaryType >( 1 ) );
-    }
     else if( name == TYPE_STRING_INTEGER )
     {
         node.setType( libstdhl::Memory::get< libcasm_ir::IntegerType >() );
