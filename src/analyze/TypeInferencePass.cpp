@@ -603,6 +603,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             // make sure that the definition has been typed
             const auto& definition = node.targetDefinition();
+            if( not definition )
+            {
+                // break inference of not defined direct calls!
+                break;
+            }
+
             definition->accept( *this );
 
             const auto& arguments = *node.arguments();
