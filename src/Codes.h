@@ -243,13 +243,7 @@ namespace libcasm_fe
         // --------------------------------------------------------- b*** ...
         // binary type errors
         ,
-        TypeBitSyntaxError = 0xb000,
-        TypeBinarySizeIsInvalid = 0xb001,
-        TypeBitSizeInvalidExpression = 0xb002
-
-        ,
-        TypeBitSizeInvalidInLetExpression = 0xb003,
-        TypeBitSizeInvalidInIninitallyExpression = 0xb004
+        TypeBinarySizeIsInvalid = 0xb001
 
         // --------------------------------------------------------- 7*** ...
         // update set errors
