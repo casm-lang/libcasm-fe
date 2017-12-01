@@ -198,7 +198,7 @@ END       0 "end of file"
 %type <Expression::Ptr> Expression Term Literal
 %type <Expressions::Ptr> Terms
 %type <TypeCastingExpression::Ptr> TypeCastingExpression
-%type <ValueAtom::Ptr> BooleanLiteral StringLiteral BitLiteral IntegerLiteral DecimalLiteral RationalLiteral
+%type <ValueAtom::Ptr> BooleanLiteral StringLiteral BinaryLiteral IntegerLiteral DecimalLiteral RationalLiteral
 %type <ReferenceAtom::Ptr> ReferenceLiteral
 %type <UndefAtom::Ptr> UndefinedLiteral
 %type <RangeExpression::Ptr> Range
@@ -1031,7 +1031,7 @@ Literal
   {
       $$ = $1;
   }
-| BitLiteral
+| BinaryLiteral
   {
       $$ = $1;
   }
@@ -1116,12 +1116,12 @@ DecimalLiteral
 ;
 
 
-BitLiteral
+BinaryLiteral
 : BINARY
   {
       try
       {
-          const auto value = libstdhl::Memory::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::BINARY );
+          const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( $1, libstdhl::Type::BINARY );
           $$ = Ast::make< ValueAtom >( @$, value );
       }
       catch( const std::domain_error& e )
@@ -1133,7 +1133,7 @@ BitLiteral
   {
       try
       {
-          const auto value = libstdhl::Memory::get< libcasm_ir::BitConstant >( $1, libstdhl::Type::HEXADECIMAL );
+          const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( $1, libstdhl::Type::HEXADECIMAL );
           $$ = Ast::make< ValueAtom >( @$, value );
       }
       catch( const std::domain_error& e )

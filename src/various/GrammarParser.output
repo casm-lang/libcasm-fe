@@ -165,7 +165,7 @@ Grammar
   118        | IntegerLiteral
   119        | RationalLiteral
   120        | DecimalLiteral
-  121        | BitLiteral
+  121        | BinaryLiteral
   122        | StringLiteral
   123        | ReferenceLiteral
 
@@ -180,8 +180,8 @@ Grammar
 
   129 DecimalLiteral: "decimal"
 
-  130 BitLiteral: "binary"
-  131           | "hexadecimal"
+  130 BinaryLiteral: "binary"
+  131              | "hexadecimal"
 
   132 StringLiteral: "string"
 
@@ -455,7 +455,7 @@ RationalLiteral (127)
     on left: 128, on right: 119
 DecimalLiteral (128)
     on left: 129, on right: 120
-BitLiteral (129)
+BinaryLiteral (129)
     on left: 130 131, on right: 121
 StringLiteral (130)
     on left: 132, on right: 122
@@ -645,7 +645,7 @@ State 7
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -928,7 +928,7 @@ State 31
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -1017,7 +1017,7 @@ State 36
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -1071,7 +1071,7 @@ State 37
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -1125,7 +1125,7 @@ State 38
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -1183,7 +1183,7 @@ State 39
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -1243,7 +1243,7 @@ State 40
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -1276,16 +1276,16 @@ State 42
 
 State 43
 
-  130 BitLiteral: "binary" .
+  130 BinaryLiteral: "binary" .
 
-    $default  reduce using rule 130 (BitLiteral)
+    $default  reduce using rule 130 (BinaryLiteral)
 
 
 State 44
 
-  131 BitLiteral: "hexadecimal" .
+  131 BinaryLiteral: "hexadecimal" .
 
-    $default  reduce using rule 131 (BitLiteral)
+    $default  reduce using rule 131 (BinaryLiteral)
 
 
 State 45
@@ -1481,7 +1481,7 @@ State 66
 
 State 67
 
-  121 Literal: BitLiteral .
+  121 Literal: BinaryLiteral .
 
     $default  reduce using rule 121 (Literal)
 
@@ -1597,7 +1597,7 @@ State 75
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     TwoOrMoreArguments               go to state 129
@@ -1906,7 +1906,7 @@ State 96
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2104,7 +2104,7 @@ State 105
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2158,7 +2158,7 @@ State 106
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2212,7 +2212,7 @@ State 107
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2266,7 +2266,7 @@ State 108
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2320,7 +2320,7 @@ State 109
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2374,7 +2374,7 @@ State 110
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2428,7 +2428,7 @@ State 111
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2482,7 +2482,7 @@ State 112
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2536,7 +2536,7 @@ State 113
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2590,7 +2590,7 @@ State 114
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2644,7 +2644,7 @@ State 115
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2698,7 +2698,7 @@ State 116
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2752,7 +2752,7 @@ State 117
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2806,7 +2806,7 @@ State 118
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2860,7 +2860,7 @@ State 119
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2914,7 +2914,7 @@ State 120
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -2968,7 +2968,7 @@ State 121
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -3027,7 +3027,7 @@ State 122
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -3118,7 +3118,7 @@ State 127
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -3355,7 +3355,7 @@ State 141
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -3409,7 +3409,7 @@ State 142
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -3463,7 +3463,7 @@ State 143
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -3517,7 +3517,7 @@ State 144
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -3571,7 +3571,7 @@ State 145
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -3696,7 +3696,7 @@ State 151
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -3750,7 +3750,7 @@ State 152
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -4546,7 +4546,7 @@ State 183
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -4600,7 +4600,7 @@ State 184
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -4654,7 +4654,7 @@ State 185
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     TwoOrMoreArguments               go to state 129
@@ -5243,7 +5243,7 @@ State 212
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -5312,7 +5312,7 @@ State 215
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -5742,7 +5742,7 @@ State 237
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -5797,7 +5797,7 @@ State 238
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -6095,7 +6095,7 @@ State 260
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -6149,7 +6149,7 @@ State 261
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -6203,7 +6203,7 @@ State 262
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -6257,7 +6257,7 @@ State 263
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -6311,7 +6311,7 @@ State 264
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -6494,7 +6494,7 @@ State 274
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -6911,7 +6911,7 @@ State 295
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -7396,7 +7396,7 @@ State 317
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -7451,7 +7451,7 @@ State 318
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -7505,7 +7505,7 @@ State 319
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -7873,7 +7873,7 @@ State 337
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -7927,7 +7927,7 @@ State 338
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -8082,7 +8082,7 @@ State 344
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -8249,7 +8249,7 @@ State 351
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     Identifier                       go to state 70
@@ -8391,7 +8391,7 @@ State 354
     IntegerLiteral                   go to state 64
     RationalLiteral                  go to state 65
     DecimalLiteral                   go to state 66
-    BitLiteral                       go to state 67
+    BinaryLiteral                    go to state 67
     StringLiteral                    go to state 68
     ReferenceLiteral                 go to state 69
     TwoOrMoreArguments               go to state 129
