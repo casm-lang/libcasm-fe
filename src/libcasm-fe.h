@@ -44,6 +44,7 @@
 #ifndef _LIBCASM_FE_H_
 #define _LIBCASM_FE_H_
 
+#include <libcasm-fe/Version>
 #include <libcasm-fe/analyze/AttributionPass>
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
