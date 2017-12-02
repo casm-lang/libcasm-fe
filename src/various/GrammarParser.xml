@@ -970,7 +970,7 @@
       <rule number="126" usefulness="useful">
         <lhs>Literal</lhs>
         <rhs>
-          <symbol>BitLiteral</symbol>
+          <symbol>BinaryLiteral</symbol>
         </rhs>
       </rule>
       <rule number="127" usefulness="useful">
@@ -1022,13 +1022,13 @@
         </rhs>
       </rule>
       <rule number="135" usefulness="useful">
-        <lhs>BitLiteral</lhs>
+        <lhs>BinaryLiteral</lhs>
         <rhs>
           <symbol>&quot;binary&quot;</symbol>
         </rhs>
       </rule>
       <rule number="136" usefulness="useful">
-        <lhs>BitLiteral</lhs>
+        <lhs>BinaryLiteral</lhs>
         <rhs>
           <symbol>&quot;hexadecimal&quot;</symbol>
         </rhs>
@@ -1553,7 +1553,7 @@
       <nonterminal symbol-number="128" name="IntegerLiteral" usefulness="useful"/>
       <nonterminal symbol-number="129" name="RationalLiteral" usefulness="useful"/>
       <nonterminal symbol-number="130" name="DecimalLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="131" name="BitLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="131" name="BinaryLiteral" usefulness="useful"/>
       <nonterminal symbol-number="132" name="StringLiteral" usefulness="useful"/>
       <nonterminal symbol-number="133" name="ReferenceLiteral" usefulness="useful"/>
       <nonterminal symbol-number="134" name="Types" usefulness="useful"/>
@@ -1865,7 +1865,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -2441,7 +2441,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -2642,7 +2642,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -2774,7 +2774,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -2906,7 +2906,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -3042,7 +3042,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -3182,7 +3182,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -3959,7 +3959,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="TwoOrMoreArguments" state="132"/>
@@ -4944,7 +4944,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -5300,7 +5300,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -5432,7 +5432,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -5564,7 +5564,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -5696,7 +5696,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -5828,7 +5828,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -5960,7 +5960,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -6092,7 +6092,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -6224,7 +6224,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -6356,7 +6356,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -6488,7 +6488,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -6620,7 +6620,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -6752,7 +6752,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -6884,7 +6884,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -7035,7 +7035,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -7167,7 +7167,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -7299,7 +7299,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -7431,7 +7431,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -7570,7 +7570,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -7752,7 +7752,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -8253,7 +8253,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -8385,7 +8385,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -8517,7 +8517,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -8649,7 +8649,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -8781,7 +8781,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -9022,7 +9022,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -9154,7 +9154,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -11975,7 +11975,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -12107,7 +12107,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -12243,7 +12243,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="TwoOrMoreArguments" state="132"/>
@@ -13240,7 +13240,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -13415,7 +13415,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -14225,7 +14225,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -14358,7 +14358,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -15029,7 +15029,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -15161,7 +15161,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -15293,7 +15293,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -15425,7 +15425,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -15557,7 +15557,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -15999,7 +15999,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -16784,7 +16784,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -17988,7 +17988,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -18121,7 +18121,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -18253,7 +18253,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -18980,7 +18980,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -19112,7 +19112,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -19450,7 +19450,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -19810,7 +19810,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="Identifier" state="72"/>
@@ -20060,7 +20060,7 @@
           <transition type="goto" symbol="IntegerLiteral" state="66"/>
           <transition type="goto" symbol="RationalLiteral" state="67"/>
           <transition type="goto" symbol="DecimalLiteral" state="68"/>
-          <transition type="goto" symbol="BitLiteral" state="69"/>
+          <transition type="goto" symbol="BinaryLiteral" state="69"/>
           <transition type="goto" symbol="StringLiteral" state="70"/>
           <transition type="goto" symbol="ReferenceLiteral" state="71"/>
           <transition type="goto" symbol="TwoOrMoreArguments" state="132"/>

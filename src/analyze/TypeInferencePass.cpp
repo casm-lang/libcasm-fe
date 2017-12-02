@@ -325,9 +325,9 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
             node.setTargetBuiltinId( libcasm_ir::Value::AS_RATIONAL_BUILTIN );
             break;
         }
-        case libcasm_ir::Type::Kind::BIT:
+        case libcasm_ir::Type::Kind::BINARY:
         {
-            node.setTargetBuiltinId( libcasm_ir::Value::AS_BIT_BUILTIN );
+            node.setTargetBuiltinId( libcasm_ir::Value::AS_BINARY_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::DECIMAL:
@@ -1299,16 +1299,16 @@ void TypeInferenceVisitor::assignment(
             //             at run-time
         }
         else if(
-            tyLhs.isBit() and tyRhs.isBit() and
-            static_cast< const libcasm_ir::BitType& >( tyLhs ).bitsize() >=
-                static_cast< const libcasm_ir::BitType& >( tyRhs ).bitsize() )
+            tyLhs.isBinary() and tyRhs.isBinary() and
+            static_cast< const libcasm_ir::BinaryType& >( tyLhs ).bitsize() >=
+                static_cast< const libcasm_ir::BinaryType& >( tyRhs ).bitsize() )
         {
-            // relaxation: mixed bit types are OK as long as
+            // relaxation: mixed binary types are OK as long as
             //             bitsize(lhs) >= bitsize(rhs)
         }
-        else if( tyLhs.isBit() and tyRhs.isInteger() and rhs.id() == Node::ID::VALUE_ATOM )
+        else if( tyLhs.isBinary() and tyRhs.isInteger() and rhs.id() == Node::ID::VALUE_ATOM )
         {
-            // relaxation: lhs bit and rhs integer are OK as long as rhs is a
+            // relaxation: lhs binary and rhs integer are OK as long as rhs is a
             //             integer constant with bitsize(lhs) >= bitsize(rhs)
 
             try
@@ -1318,7 +1318,7 @@ void TypeInferenceVisitor::assignment(
                 auto constant =
                     std::static_pointer_cast< libcasm_ir::IntegerConstant >( valueAtom.value() );
 
-                const auto value = libstdhl::Memory::get< libcasm_ir::BitConstant >(
+                const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >(
                     lhs.type()->ptr_result(),
                     static_cast< const libstdhl::Type::Natural& >( constant->value() ) );
 
