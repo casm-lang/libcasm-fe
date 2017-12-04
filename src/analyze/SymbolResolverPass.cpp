@@ -197,17 +197,17 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     const auto& identifier = node.identifier();
     const auto& identifierName = identifier->name();
 
+    if( node.baseExpression() and node.baseExpression()->id() == Node::ID::UNRESOLVED_NAMESPACE )
+    {
+        // relative method call will be resolved in the TypeInferencePass
+        return;
+    }
+
     const auto variableIt = m_variables.find( identifierName );
     if( variableIt != m_variables.cend() )
     {
         node.setTargetType( CallExpression::TargetType::VARIABLE );
         node.setTargetDefinition( variableIt->second );
-        return;
-    }
-
-    if( node.baseExpression() and node.baseExpression()->id() == Node::ID::UNRESOLVED_NAMESPACE )
-    {
-        // relative method call will be resolved in the TypeInferencePass
         return;
     }
 
