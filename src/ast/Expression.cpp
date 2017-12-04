@@ -280,27 +280,27 @@ u1 CallExpression::methodCall( void ) const
     return m_baseExpression != nullptr and targetType() == CallExpression::TargetType::BUILTIN;
 }
 
-IdentifierCallExpression::IdentifierCallExpression(
+DirectCallExpression::DirectCallExpression(
+    const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
+: DirectCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, identifier, arguments )
+{
+}
+
+DirectCallExpression::DirectCallExpression(
     const Node::ID id, const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( id, arguments )
 , m_identifier( identifier )
 {
 }
 
-void IdentifierCallExpression::setIdentifier( const Identifier::Ptr& identifier )
+void DirectCallExpression::setIdentifier( const Identifier::Ptr& identifier )
 {
     m_identifier = identifier;
 }
 
-const Identifier::Ptr& IdentifierCallExpression::identifier( void ) const
+const Identifier::Ptr& DirectCallExpression::identifier( void ) const
 {
     return m_identifier;
-}
-
-DirectCallExpression::DirectCallExpression(
-    const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
-: IdentifierCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, identifier, arguments )
-{
 }
 
 void DirectCallExpression::accept( Visitor& visitor )
@@ -353,7 +353,7 @@ MethodCallExpression::MethodCallExpression(
     const Expression::Ptr& expression,
     const Identifier::Ptr& identifier,
     const Expressions::Ptr& arguments )
-: IdentifierCallExpression( Node::ID::METHOD_CALL_EXPRESSION, identifier, arguments )
+: DirectCallExpression( Node::ID::METHOD_CALL_EXPRESSION, identifier, arguments )
 , m_expression( expression )
 {
     setBaseExpression( expression );

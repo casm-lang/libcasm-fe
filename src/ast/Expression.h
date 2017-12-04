@@ -204,12 +204,16 @@ namespace libcasm_fe
             static std::string targetTypeString( const TargetType targetType );
         };
 
-        class IdentifierCallExpression : public CallExpression
+        class DirectCallExpression : public CallExpression
         {
           public:
-            using Ptr = std::shared_ptr< IdentifierCallExpression >;
+            using Ptr = std::shared_ptr< DirectCallExpression >;
 
-            IdentifierCallExpression(
+            DirectCallExpression(
+                const Identifier::Ptr& identifier, const Expressions::Ptr& arguments );
+
+          protected:
+            DirectCallExpression(
                 const Node::ID id,
                 const Identifier::Ptr& identifier,
                 const Expressions::Ptr& arguments );
@@ -218,20 +222,10 @@ namespace libcasm_fe
             void setIdentifier( const Identifier::Ptr& identifier );
             const Identifier::Ptr& identifier( void ) const;
 
+            void accept( Visitor& visitor ) override;
+
           private:
             Identifier::Ptr m_identifier;
-        };
-
-        class DirectCallExpression final : public IdentifierCallExpression
-        {
-          public:
-            using Ptr = std::shared_ptr< DirectCallExpression >;
-
-            DirectCallExpression(
-                const Identifier::Ptr& identifier, const Expressions::Ptr& arguments );
-
-          public:
-            void accept( Visitor& visitor ) override;
         };
 
         class IndirectCallExpression final : public CallExpression
@@ -269,7 +263,7 @@ namespace libcasm_fe
             const std::shared_ptr< Type > m_asType;
         };
 
-        class MethodCallExpression final : public IdentifierCallExpression
+        class MethodCallExpression final : public DirectCallExpression
         {
           public:
             using Ptr = std::shared_ptr< MethodCallExpression >;
