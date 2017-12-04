@@ -536,7 +536,8 @@ void ExecutionVisitor::visit( TypeCastingExpression& node )
 {
     if( node.builtin() )
     {
-        m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
+        m_frameStack.push(
+            makeFrame( &node, nullptr, node.arguments()->size() + ( node.methodCall() ? 1 : 0 ) ) );
         invokeBuiltin( node, node.targetBuiltinId(), node.type() );
         m_frameStack.pop();
     }
@@ -590,7 +591,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
+            m_frameStack.push( makeFrame(
+                &node, nullptr, node.arguments()->size() + ( node.methodCall() ? 1 : 0 ) ) );
             invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
@@ -1228,7 +1230,8 @@ u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
     CallExpression* call, Node* callee, std::size_t numberOfLocals )
 {
-    std::unique_ptr< Frame > frame = nullptr;
+    std::unique_ptr< Frame > frame =
+        libstdhl::Memory::make_unique< Frame >( call, callee, numberOfLocals );
 
     if( call != nullptr )
     {
@@ -1238,17 +1241,11 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
 
         if( call->methodCall() )
         {
-            frame = libstdhl::Memory::make_unique< Frame >( call, callee, numberOfLocals + 1 );
-
             // already evaluated in the MethodCallExpression, just pop the
             // latest value from the evaluation stack!
             const auto value = m_evaluationStack.pop();
             frame->setLocal( localIndex, value );
             ++localIndex;
-        }
-        else
-        {
-            frame = libstdhl::Memory::make_unique< Frame >( call, callee, numberOfLocals );
         }
 
         for( const auto& argument : *call->arguments() )
@@ -1258,10 +1255,6 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
             frame->setLocal( localIndex, value );
             ++localIndex;
         }
-    }
-    else
-    {
-        frame = libstdhl::Memory::make_unique< Frame >( call, callee, numberOfLocals );
     }
 
     return frame;
