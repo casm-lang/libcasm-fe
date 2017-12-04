@@ -369,7 +369,7 @@ void AstDumpSourceVisitor::visit( MethodCallExpression& node )
 {
     node.expression()->accept( *this );
     m_stream << ".";
-    reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
+    node.DirectCallExpression::accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( UnaryExpression& node )

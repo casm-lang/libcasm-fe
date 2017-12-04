@@ -379,7 +379,7 @@ void SymbolResolveVisitor::visit( MethodCallExpression& node )
         node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
     }
 
-    reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
+    node.DirectCallExpression::accept( *this );
     m_symboltable = currentSymboltable;
 }
 

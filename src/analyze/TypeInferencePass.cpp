@@ -729,7 +729,7 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         node.expression()->setType( node.type() );
     }
 
-    reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
+    node.DirectCallExpression::accept( *this );
 
     if( not node.expression()->type() or not node.type() )
     {

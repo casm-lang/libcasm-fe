@@ -660,7 +660,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
 void ExecutionVisitor::visit( MethodCallExpression& node )
 {
     node.expression()->accept( *this );
-    reinterpret_cast< DirectCallExpression& >( node ).accept( *this );
+    node.DirectCallExpression::accept( *this );
 }
 
 void ExecutionVisitor::visit( UnaryExpression& node )
