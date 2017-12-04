@@ -957,7 +957,6 @@ MethodCallExpression
   }
 | Term DOT Identifier Arguments
   {
-      const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< MethodCallExpression >( @$, $1, $3, $4 );
   }
 | DOT Identifier
