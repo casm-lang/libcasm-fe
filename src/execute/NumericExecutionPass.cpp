@@ -1230,8 +1230,7 @@ u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const
 std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
     CallExpression* call, Node* callee, std::size_t numberOfLocals )
 {
-    std::unique_ptr< Frame > frame =
-        libstdhl::Memory::make_unique< Frame >( call, callee, numberOfLocals );
+    auto frame = libstdhl::Memory::make_unique< Frame >( call, callee, numberOfLocals );
 
     if( call != nullptr )
     {
