@@ -135,12 +135,6 @@
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
-    static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
-    {
-        const auto& location = identifier->sourceLocation();
-        return Ast::make< IdentifierPath >( location, identifier );
-    }
-
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
     {
         if( rule == nullptr )
@@ -203,8 +197,10 @@ END       0 "end of file"
 %type <UndefAtom::Ptr> UndefinedLiteral
 %type <RangeExpression::Ptr> Range
 %type <ListExpression::Ptr> List
+%type <CallExpression::Ptr> CallExpression
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
+%type <MethodCallExpression::Ptr> MethodCallExpression
 %type <LetExpression::Ptr> LetExpression
 %type <ConditionalExpression::Ptr> ConditionalExpression
 %type <ChooseExpression::Ptr> ChooseExpression
@@ -256,6 +252,8 @@ END       0 "end of file"
 
 // prefer absolute over relative paths
 %precedence ABSOLUTE_PATH
+%precedence CALL_EXPRESSION
+%precedence PAREN_TERM
 
 %precedence IN
 %precedence DO
@@ -266,8 +264,6 @@ END       0 "end of file"
 %precedence HOLDS WITH
 
 %precedence UPDATE
-
-%precedence DOT
 
 %precedence AS
 
@@ -289,6 +285,9 @@ END       0 "end of file"
 // prefer calls with args (starts with LPAREN) over calls without args
 %precedence CALL_WITHOUT_ARGS
 %precedence LPAREN
+
+// dot operator shall have a higher precedence than all term operator symbols
+%precedence DOT
 
 // prefer fixed sized types over composed types (start with LESSER) over basic types
 %precedence MARK
@@ -414,7 +413,7 @@ FunctionDefinition
       // apply the name of the function declaration to the initializer functions
       auto initializers = $8;
       for (auto& initializer : *initializers) {
-           initializer->function()->setIdentifier( asIdentifierPath( identifier ) );
+           initializer->function()->setIdentifier( identifier );
       }
       function->setInitializers( initializers );
 
@@ -433,14 +432,14 @@ ProgramFunctionDefinition
       const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
       auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
+          @$, singleAgentIdentifier, singleAgentArguments );
       singleAgent->setTargetType( CallExpression::TargetType::CONSTANT );
 
       auto programDefinition = createProgramFunction( @$ );
       auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       programArguments->add( singleAgent );
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
+          @$, programDefinition->identifier(), programArguments );
       program->setTargetType( CallExpression::TargetType::FUNCTION );
 
       const auto ruleReference = Ast::make< ReferenceAtom >( @$, $2 );
@@ -458,8 +457,7 @@ ProgramFunctionDefinition
       // apply the name of the program declaration to the initializer functions
       auto initializers = $3;
       for (auto& initializer : *initializers) {
-          initializer->function()->setIdentifier(
-                asIdentifierPath( programDefinition->identifier() ) );
+          initializer->function()->setIdentifier( programDefinition->identifier() );
       }
       programDefinition->setInitializers( initializers );
 
@@ -725,19 +723,11 @@ UpdateRule
 
 
 CallRule
-: CALL DirectCallExpression
+: CALL CallExpression %prec CALL_EXPRESSION
   {
       $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
   }
-| DirectCallExpression
-  {
-      $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
-  }
-| CALL IndirectCallExpression
-  {
-      $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
-  }
-| IndirectCallExpression
+| CallExpression %prec CALL_EXPRESSION
   {
       $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
   }
@@ -773,11 +763,7 @@ Term
   {
       $$ = $1;
   }
-| DirectCallExpression
-  {
-      $$ = $1;
-  }
-| IndirectCallExpression
+| CallExpression %prec CALL_EXPRESSION
   {
       $$ = $1;
   }
@@ -821,7 +807,7 @@ Term
 //
 
 Expression
-: LPAREN Term RPAREN
+: LPAREN Term RPAREN %prec PAREN_TERM
   {
       $$ = $2;
   }
@@ -920,13 +906,29 @@ TypeCastingExpression
 ;
 
 
+CallExpression
+: DirectCallExpression
+  {
+      $$ = $1;
+  }
+| IndirectCallExpression
+  {
+      $$ = $1;
+  }
+| MethodCallExpression
+  {
+      $$ = $1;
+  }
+;
+
+
 DirectCallExpression
-: IdentifierPath %prec CALL_WITHOUT_ARGS
+: Identifier %prec CALL_WITHOUT_ARGS
   {
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
   }
-| IdentifierPath Arguments
+| Identifier Arguments
   {
       $$ = Ast::make< DirectCallExpression >( @$, $1, $2 );
   }
@@ -937,6 +939,34 @@ IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
   {
       $$ = Ast::make< IndirectCallExpression >( @$, $3, $5 );
+  }
+;
+
+
+MethodCallExpression
+: LPAREN Term RPAREN DOT Identifier %prec CALL_WITHOUT_ARGS
+  {
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< MethodCallExpression >( @$, $2, $5, arguments );
+  }
+| LPAREN Term RPAREN DOT Identifier Arguments
+  {
+      $$ = Ast::make< MethodCallExpression >( @$, $2, $5, $6 );
+  }
+| CallExpression DOT Identifier %prec CALL_WITHOUT_ARGS
+  {
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $3, arguments );
+  }
+| CallExpression DOT Identifier Arguments
+  {
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $3, $4 );
+  }
+| DOT Identifier
+  {
+      const auto unresolvedNamespace = Ast::make< UnresolvedNamespace >( @$ );
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< MethodCallExpression >( @$, unresolvedNamespace, $2, arguments );
   }
 ;
 
@@ -1209,7 +1239,7 @@ Type
 
 
 BasicType
-: IdentifierPath
+: IdentifierPath %prec ABSOLUTE_PATH
   {
       $$ = Ast::make< BasicType >( @$, $1 );
   }

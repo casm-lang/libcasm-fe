@@ -61,6 +61,14 @@ namespace libcasm_fe
         IdentifierAlreadyUsed = 0x0010
 
         // --------------------------------------------------------- 05** ...
+        // attribution errors
+        ,
+        AttributionBasicAttributeUnknown = 0x0400,
+        AttributionBasicAttributeAlreadyUsed = 0x0401,
+        AttributionExpressionAttributeUnknown = 0x0410,
+        AttributionExpressionAttributeAlreadyUsed = 0x0411
+
+        // --------------------------------------------------------- 05** ...
         // symbol resolver errors
         ,
         SymbolIsUnknown = 0x0500,
@@ -175,11 +183,16 @@ namespace libcasm_fe
         TypeInferenceArgumentTypeMismatch = 0x1301,
 
         TypeInferenceFunctionArgumentTypeMismatch = 0x1302,
+        TypeInferenceFunctionDefaultValueTypeMismatch = 0x1332,
+
         TypeInferenceDerivedArgumentTypeMismatch = 0x1303,
         TypeInferenceDerivedReturnTypeMismatch = 0x1323,
+
         TypeInferenceBuiltinArgumentTypeMismatch = 0x1304,
         TypeInferenceBuiltinRelationTypeInvalid = 0x1324,
+
         TypeInferenceRuleArgumentTypeMismatch = 0x1305,
+
         TypeInferenceOperatorUnaryRelationTypeInvalid = 0x1306,
         TypeInferenceOperatorBinaryRelationTypeInvalid = 0x1307,
 
@@ -189,6 +202,8 @@ namespace libcasm_fe
         TypeInferenceQuantifierExistentialPredicateTypeMismatch = 0x1411,
 
         TypeInferenceConditionalRuleInvalidConditionType = 0x1500,
+
+        TypeInferenceInvalidMethodCallExpression = 0x1900,
 
         TypeInferenceInvalidExpression = 0x1001,
         TypeInferenceInvalidPrint = 0x1002
@@ -260,11 +275,13 @@ namespace libcasm_fe
         ChooseExpressionInvalidUniverse = 0x9003,
         ChooseRuleInvalidUniverse = 0x9004,
         ForallRuleInvalidUniverse = 0x9005,
-        ForallRuleInvalidCondition = 0x9006
+        ForallRuleInvalidCondition = 0x9006,
+
+        MethodCallExpressionInvalidBaseExpression = 0x9100,
 
         // --------------------------------------------------------- fff* ...
         // not categorized errors
-        ,
+
         TypeUnknown = 0xfffd,
         TypeUnsupported = 0xfffe
 
