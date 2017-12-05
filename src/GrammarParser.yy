@@ -252,6 +252,8 @@ END       0 "end of file"
 
 // prefer absolute over relative paths
 %precedence ABSOLUTE_PATH
+%precedence CALL_EXPRESSION
+%precedence PAREN_TERM
 
 %precedence IN
 %precedence DO
@@ -284,7 +286,7 @@ END       0 "end of file"
 %precedence CALL_WITHOUT_ARGS
 %precedence LPAREN
 
-// dot operator shall have a higher precedence than all term operator symbols  
+// dot operator shall have a higher precedence than all term operator symbols
 %precedence DOT
 
 // prefer fixed sized types over composed types (start with LESSER) over basic types
@@ -721,19 +723,11 @@ UpdateRule
 
 
 CallRule
-: CALL DirectCallExpression
+: CALL CallExpression %prec CALL_EXPRESSION
   {
       $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
   }
-| CALL IndirectCallExpression
-  {
-      $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
-  }
-| DirectCallExpression
-  {
-      $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
-  }
-| IndirectCallExpression
+| CallExpression %prec CALL_EXPRESSION
   {
       $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
   }
@@ -769,7 +763,7 @@ Term
   {
       $$ = $1;
   }
-| CallExpression
+| CallExpression %prec CALL_EXPRESSION
   {
       $$ = $1;
   }
@@ -813,7 +807,7 @@ Term
 //
 
 Expression
-: LPAREN Term RPAREN
+: LPAREN Term RPAREN %prec PAREN_TERM
   {
       $$ = $2;
   }
@@ -913,7 +907,7 @@ TypeCastingExpression
 
 
 CallExpression
-: DirectCallExpression %prec ABSOLUTE_PATH
+: DirectCallExpression
   {
       $$ = $1;
   }
@@ -950,12 +944,21 @@ IndirectCallExpression
 
 
 MethodCallExpression
-: Term DOT Identifier %prec CALL_WITHOUT_ARGS
+: LPAREN Term RPAREN DOT Identifier %prec CALL_WITHOUT_ARGS
+  {
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< MethodCallExpression >( @$, $2, $5, arguments );
+  }
+| LPAREN Term RPAREN DOT Identifier Arguments
+  {
+      $$ = Ast::make< MethodCallExpression >( @$, $2, $5, $6 );
+  }
+| CallExpression DOT Identifier %prec CALL_WITHOUT_ARGS
   {
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< MethodCallExpression >( @$, $1, $3, arguments );
   }
-| Term DOT Identifier Arguments
+| CallExpression DOT Identifier Arguments
   {
       $$ = Ast::make< MethodCallExpression >( @$, $1, $3, $4 );
   }

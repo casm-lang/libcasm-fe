@@ -268,10 +268,8 @@ UpdateRule ::= DirectCallExpression ":=" Term
 ===== CallRule =====
 
 <code>
-CallRule ::= "call" DirectCallExpression
-           | "call" IndirectCallExpression
-           | DirectCallExpression
-           | IndirectCallExpression
+CallRule ::= "call" CallExpression
+           | CallExpression
 </code>
 
 {{page>:grammar:CallRule&noheader&nofooter}}
@@ -377,8 +375,10 @@ IndirectCallExpression ::= "(" "*" Term ")" Arguments
 ===== MethodCallExpression =====
 
 <code>
-MethodCallExpression ::= Term "." Identifier
-                       | Term "." Identifier Arguments
+MethodCallExpression ::= "(" Term ")" "." Identifier
+                       | "(" Term ")" "." Identifier Arguments
+                       | CallExpression "." Identifier
+                       | CallExpression "." Identifier Arguments
                        | "." Identifier
 </code>
 
