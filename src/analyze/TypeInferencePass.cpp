@@ -364,7 +364,7 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         }
     }
 
-    if( node.builtin() )
+    if( node.isBuiltin() )
     {
         const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
 
@@ -526,7 +526,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             std::vector< libcasm_ir::Type::Ptr > argTypeList;
             auto directCallArguments = node.arguments()->data();
 
-            if( node.methodCall() )
+            if( node.isMethodCall() )
             {
                 // built-ins from the IR are defined as implementation functions
                 // with fully specified flat parameter signature, so therefore
@@ -576,7 +576,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                     return;
                 }
 
-                if( not node.methodCall() and not type->result().isVoid() )
+                if( not node.isMethodCall() and not type->result().isVoid() )
                 {
                     m_log.error(
                         { node.sourceLocation() },
@@ -632,7 +632,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
     if( node.type() )
     {
-        if( node.methodCall() )
+        if( node.isMethodCall() )
         {
             // method call arguments etc. are checked during the visiting of
             // the MethodCallExpression

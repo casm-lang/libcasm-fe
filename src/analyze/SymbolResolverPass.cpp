@@ -219,13 +219,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         const auto expectedNumberOfArguments = annotation.relations().front().argument.size();
 
-        if( ( node.arguments()->size() + ( node.methodCall() ? 1 : 0 ) ) !=
+        if( ( node.arguments()->size() + ( node.isMethodCall() ? 1 : 0 ) ) !=
             expectedNumberOfArguments )
         {
             m_log.error(
                 { node.sourceLocation() },
                 "invalid argument size: builtin '" + identifierName + "' expects " +
-                    std::to_string( expectedNumberOfArguments - ( node.methodCall() ? 1 : 0 ) ) +
+                    std::to_string( expectedNumberOfArguments - ( node.isMethodCall() ? 1 : 0 ) ) +
                     " arguments",
                 Code::SymbolArgumentSizeMismatch );
         }

@@ -534,10 +534,10 @@ void ExecutionVisitor::visit( EnumerationDefinition& node )
 
 void ExecutionVisitor::visit( TypeCastingExpression& node )
 {
-    if( node.builtin() )
+    if( node.isBuiltin() )
     {
-        m_frameStack.push(
-            makeFrame( &node, nullptr, node.arguments()->size() + ( node.methodCall() ? 1 : 0 ) ) );
+        m_frameStack.push( makeFrame(
+            &node, nullptr, node.arguments()->size() + ( node.isMethodCall() ? 1 : 0 ) ) );
         invokeBuiltin( node, node.targetBuiltinId(), node.type() );
         m_frameStack.pop();
     }
@@ -592,7 +592,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::BUILTIN:
         {
             m_frameStack.push( makeFrame(
-                &node, nullptr, node.arguments()->size() + ( node.methodCall() ? 1 : 0 ) ) );
+                &node, nullptr, node.arguments()->size() + ( node.isMethodCall() ? 1 : 0 ) ) );
             invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
@@ -1239,7 +1239,7 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
 
         std::size_t localIndex = 0;
 
-        if( call->methodCall() )
+        if( call->isMethodCall() )
         {
             // already evaluated in the MethodCallExpression, just pop the
             // latest value from the evaluation stack!

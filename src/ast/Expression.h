@@ -189,9 +189,9 @@ namespace libcasm_fe
             void setBaseExpression( const Expression::Ptr& baseExpression );
             const Expression::Ptr& baseExpression( void ) const;
 
-            u1 builtin( void ) const;
-            u1 definition( void ) const;
-            u1 methodCall( void ) const;
+            u1 isBuiltin( void ) const;
+            u1 isDefinition( void ) const;
+            u1 isMethodCall( void ) const;
 
           private:
             const Expressions::Ptr m_arguments;

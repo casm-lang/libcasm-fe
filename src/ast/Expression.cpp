@@ -263,19 +263,19 @@ const Expression::Ptr& CallExpression::baseExpression( void ) const
     return m_baseExpression;
 }
 
-u1 CallExpression::builtin( void ) const
+u1 CallExpression::isBuiltin( void ) const
 {
     return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_ and
            targetType() == CallExpression::TargetType::BUILTIN;
 }
 
-u1 CallExpression::definition( void ) const
+u1 CallExpression::isDefinition( void ) const
 {
     return m_targetDefinition != nullptr and targetType() != CallExpression::TargetType::BUILTIN and
            targetType() != CallExpression::TargetType::UNKNOWN;
 }
 
-u1 CallExpression::methodCall( void ) const
+u1 CallExpression::isMethodCall( void ) const
 {
     return m_baseExpression != nullptr and targetType() == CallExpression::TargetType::BUILTIN;
 }
