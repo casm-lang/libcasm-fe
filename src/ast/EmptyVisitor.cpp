@@ -98,6 +98,10 @@ void EmptyVisitor::visit( DirectCallExpression& )
 {
 }
 
+void EmptyVisitor::visit( MethodCallExpression& )
+{
+}
+
 void EmptyVisitor::visit( IndirectCallExpression& )
 {
 }

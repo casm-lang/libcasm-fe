@@ -261,6 +261,56 @@ void DirectCallExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+MethodCallExpression::MethodCallExpression(
+    const Expression::Ptr& object,
+    const Identifier::Ptr& methodName,
+    const Expressions::Ptr& arguments )
+: CallExpression( Node::ID::METHOD_CALL_EXPRESSION, arguments )
+, m_object( object )
+, m_methodName( methodName )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
+{
+}
+
+const Expression::Ptr& MethodCallExpression::object( void ) const
+{
+    return m_object;
+}
+
+const Identifier::Ptr& MethodCallExpression::methodName( void ) const
+{
+    return m_methodName;
+}
+
+void MethodCallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
+{
+    m_targetBuiltinId = builtinId;
+}
+
+libcasm_ir::Value::ID MethodCallExpression::targetBuiltinId( void ) const
+{
+    assert( targetType() == TargetType::BUILTIN );
+
+    return m_targetBuiltinId;
+}
+
+void MethodCallExpression::setTargetDefinition( const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+}
+
+const TypedNode::Ptr& MethodCallExpression::targetDefinition( void ) const
+{
+    assert( ( targetType() != TargetType::BUILTIN ) and ( targetType() != TargetType::UNKNOWN ) );
+
+    return m_targetDefinition;
+}
+
+void MethodCallExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 IndirectCallExpression::IndirectCallExpression(
     const Expression::Ptr& expression, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION, arguments )

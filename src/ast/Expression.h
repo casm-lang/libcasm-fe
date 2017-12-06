@@ -198,6 +198,44 @@ namespace libcasm_fe
             TypedNode::Ptr m_targetDefinition;
         };
 
+        class MethodCallExpression final : public CallExpression
+        {
+          public:
+            using Ptr = std::shared_ptr< MethodCallExpression >;
+
+            MethodCallExpression(
+                const Expression::Ptr& object,
+                const Identifier::Ptr& methodName,
+                const Expressions::Ptr& arguments );
+
+            const Expression::Ptr& object( void ) const;
+            const Identifier::Ptr& methodName( void ) const;
+
+            /**
+             * Sets the builtin id of this call.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
+
+            /**
+             *     Sets the definition of this call.
+             *
+             *     @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetDefinition( const TypedNode::Ptr& definition );
+            const TypedNode::Ptr& targetDefinition( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            Expression::Ptr m_object;
+            Identifier::Ptr m_methodName;
+            libcasm_ir::Value::ID m_targetBuiltinId;
+            TypedNode::Ptr m_targetDefinition;
+        };
+
         class IndirectCallExpression final : public CallExpression
         {
           public:

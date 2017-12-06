@@ -66,6 +66,7 @@ namespace libcasm_fe
             void visit( ReferenceAtom& node ) override;
             void visit( UndefAtom& node ) override;
             void visit( DirectCallExpression& node ) override;
+            void visit( MethodCallExpression& node ) override;
             void visit( IndirectCallExpression& node ) override;
             void visit( UnaryExpression& node ) override;
             void visit( BinaryExpression& node ) override;

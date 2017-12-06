@@ -79,6 +79,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
@@ -455,6 +456,11 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             break;
         }
     }
+}
+
+void AstToCasmIRVisitor::visit( MethodCallExpression& node )
+{
+    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( IndirectCallExpression& node )
