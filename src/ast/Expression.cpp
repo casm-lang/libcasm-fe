@@ -268,6 +268,7 @@ MethodCallExpression::MethodCallExpression(
 : CallExpression( Node::ID::METHOD_CALL_EXPRESSION, arguments )
 , m_object( object )
 , m_methodName( methodName )
+, m_methodType( MethodType::UNKNOWN )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 {
 }
@@ -282,6 +283,46 @@ const Identifier::Ptr& MethodCallExpression::methodName( void ) const
     return m_methodName;
 }
 
+void MethodCallExpression::setMethodType( MethodType methodType )
+{
+    m_methodType = methodType;
+}
+
+MethodCallExpression::MethodType MethodCallExpression::methodType( void ) const
+{
+    return m_methodType;
+}
+
+std::string MethodCallExpression::methodTypeName( void ) const
+{
+    switch( m_methodType )
+    {
+        case MethodType::FUNCTION:
+        {
+            return "function";
+        }
+        case MethodType::DERIVED:
+        {
+            return "derived";
+        }
+        case MethodType::BUILTIN:
+        {
+            return "built-in";
+        }
+        case MethodType::RULE:
+        {
+            return "rule";
+        }
+        case MethodType::UNKNOWN:
+        {
+            return "unknown";
+        }
+    }
+
+    assert( !" internal error! " );
+    return std::string();
+}
+
 void MethodCallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
 {
     m_targetBuiltinId = builtinId;
@@ -289,7 +330,7 @@ void MethodCallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
 
 libcasm_ir::Value::ID MethodCallExpression::targetBuiltinId( void ) const
 {
-    assert( targetType() == TargetType::BUILTIN );
+    assert( m_methodType == MethodType::BUILTIN );
 
     return m_targetBuiltinId;
 }
@@ -301,7 +342,7 @@ void MethodCallExpression::setTargetDefinition( const TypedNode::Ptr& definition
 
 const TypedNode::Ptr& MethodCallExpression::targetDefinition( void ) const
 {
-    assert( ( targetType() != TargetType::BUILTIN ) and ( targetType() != TargetType::UNKNOWN ) );
+    assert( ( m_methodType != MethodType::BUILTIN ) and ( m_methodType != MethodType::UNKNOWN ) );
 
     return m_targetDefinition;
 }

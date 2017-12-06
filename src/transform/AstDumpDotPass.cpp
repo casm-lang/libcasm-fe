@@ -277,7 +277,7 @@ void AstDumpDotVisitor::visit( DirectCallExpression& node )
 void AstDumpDotVisitor::visit( MethodCallExpression& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "MethodCallExpression\nTarget type: " + node.targetTypeName() );
+    dumpNode( node, "MethodCallExpression\nMethod type: " + node.methodTypeName() );
     RecursiveVisitor::visit( node );
 }
 

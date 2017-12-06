@@ -201,6 +201,15 @@ namespace libcasm_fe
         class MethodCallExpression final : public CallExpression
         {
           public:
+            enum class MethodType
+            {
+                FUNCTION,
+                DERIVED,
+                BUILTIN,
+                RULE,
+                UNKNOWN
+            };
+
             using Ptr = std::shared_ptr< MethodCallExpression >;
 
             MethodCallExpression(
@@ -210,6 +219,11 @@ namespace libcasm_fe
 
             const Expression::Ptr& object( void ) const;
             const Identifier::Ptr& methodName( void ) const;
+
+            void setMethodType( MethodType methodType );
+            MethodType methodType( void ) const;
+
+            std::string methodTypeName( void ) const;
 
             /**
              * Sets the builtin id of this call.
@@ -232,6 +246,7 @@ namespace libcasm_fe
           private:
             Expression::Ptr m_object;
             Identifier::Ptr m_methodName;
+            MethodType m_methodType;
             libcasm_ir::Value::ID m_targetBuiltinId;
             TypedNode::Ptr m_targetDefinition;
         };
