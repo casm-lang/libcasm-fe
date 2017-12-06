@@ -286,6 +286,8 @@ END       0 "end of file"
 %precedence UPLUS UMINUS
 %precedence NOT
 
+%precedence DOUBLECOLON
+
 // prefer calls with args (starts with LPAREN) over calls without args
 %precedence CALL_WITHOUT_ARGS
 %precedence LPAREN
@@ -1441,7 +1443,7 @@ IdentifierPath
   {
       $$ = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
   }
-| DOT Identifier
+| DOUBLECOLON Identifier
   {
       auto identifiers = Ast::make< Identifiers >( @$ );
       identifiers->add( $2 );
@@ -1451,7 +1453,7 @@ IdentifierPath
 
 
 DotSeparatedIdentifiers
-: DotSeparatedIdentifiers DOT Identifier
+: DotSeparatedIdentifiers DOUBLECOLON Identifier
   {
       auto identifiers = $1;
       identifiers->add( $3 );

@@ -1,3 +1,8 @@
+Terminals unused in grammar
+
+   "."
+
+
 State 158 conflicts: 1 shift/reduce
 
 
@@ -242,9 +247,9 @@ Grammar
   169           | "in"
 
   170 IdentifierPath: DotSeparatedIdentifiers
-  171               | "." Identifier
+  171               | "::" Identifier
 
-  172 DotSeparatedIdentifiers: DotSeparatedIdentifiers "." Identifier
+  172 DotSeparatedIdentifiers: DotSeparatedIdentifiers "::" Identifier
   173                        | Identifier
 
   174 Variable: TypedVariable
@@ -321,203 +326,204 @@ error (256) 8 23 43 56 57 60 61 82 114 145 155
 "{" (303) 13 20 42 43 54 56 157 159
 "}" (304) 13 20 42 43 54 56 157 159
 ":" (305) 17 44 45 46 176
-"_" (306) 45
-"@" (307) 133
-"," (308) 24 67 134 147 152 161 181
-"<" (309) 93 141 142
-">" (310) 94 141 142
-"*" (311) 87 106 148
-"/" (312) 88
-"%" (313) 89
-"^" (314) 90
-"'" (315) 143
-".." (316) 115
-"." (317) 171 172
-"->" (318) 14 16 17 142 164 165
-"=>" (319) 100
-":=" (320) 62
-"!=" (321) 91
-"<=" (322) 95
-">=" (323) 96
-"{|" (324) 58 60
-"|}" (325) 58 60
-"binary" (326) 130
-"hexadecimal" (327) 131
-"integer" (328) 127
-"rational" (329) 128
-"decimal" (330) 129
-"string" (331) 132
-"identifier" (332) 168
-ABSOLUTE_PATH (333)
-UPLUS (334)
-UMINUS (335)
-CALL_WITHOUT_ARGS (336)
+"::" (306) 171 172
+"_" (307) 45
+"@" (308) 133
+"," (309) 24 67 134 147 152 161 181
+"<" (310) 93 141 142
+">" (311) 94 141 142
+"*" (312) 87 106 148
+"/" (313) 88
+"%" (314) 89
+"^" (315) 90
+"'" (316) 143
+".." (317) 115
+"." (318)
+"->" (319) 14 16 17 142 164 165
+"=>" (320) 100
+":=" (321) 62
+"!=" (322) 91
+"<=" (323) 95
+">=" (324) 96
+"{|" (325) 58 60
+"|}" (326) 58 60
+"binary" (327) 130
+"hexadecimal" (328) 131
+"integer" (329) 127
+"rational" (330) 128
+"decimal" (331) 129
+"string" (332) 132
+"identifier" (333) 168
+ABSOLUTE_PATH (334)
+UPLUS (335)
+UMINUS (336)
+CALL_WITHOUT_ARGS (337)
 
 
 Nonterminals, with rules where they appear
 
-$accept (82)
+$accept (83)
     on left: 0
-Specification (83)
+Specification (84)
     on left: 1, on right: 0
-Header (84)
+Header (85)
     on left: 2 3, on right: 1
-Definitions (85)
+Definitions (86)
     on left: 4 5, on right: 1 4
-AttributedDefinition (86)
+AttributedDefinition (87)
     on left: 6 7 8, on right: 4 5
-Definition (87)
+Definition (88)
     on left: 9 10 11 12, on right: 6 7
-EnumerationDefinition (88)
+EnumerationDefinition (89)
     on left: 13, on right: 9
-DerivedDefinition (89)
+DerivedDefinition (90)
     on left: 14, on right: 10
-RuleDefinition (90)
+RuleDefinition (91)
     on left: 15 16, on right: 11
-FunctionDefinition (91)
+FunctionDefinition (92)
     on left: 17 18, on right: 12
-ProgramFunctionDefinition (92)
+ProgramFunctionDefinition (93)
     on left: 19 20, on right: 18
-EnumeratorDefinition (93)
+EnumeratorDefinition (94)
     on left: 21 22 23, on right: 24 25
-Enumerators (94)
+Enumerators (95)
     on left: 24 25, on right: 13 24
-Rule (95)
+Rule (96)
     on left: 26 27 28 29 30 31 32 33 34 35 36, on right: 15 16 37 38
     40 41 44 45 46 49 50 51 52 53
-Rules (96)
+Rules (97)
     on left: 37 38, on right: 37 54 55 58 59
-SkipRule (97)
+SkipRule (98)
     on left: 39, on right: 26
-ConditionalRule (98)
+ConditionalRule (99)
     on left: 40 41, on right: 27
-CaseRule (99)
+CaseRule (100)
     on left: 42 43, on right: 28
-CaseLabel (100)
+CaseLabel (101)
     on left: 44 45 46, on right: 47 48
-CaseLabels (101)
+CaseLabels (102)
     on left: 47 48, on right: 42 47
-LetRule (102)
+LetRule (103)
     on left: 49, on right: 29
-ForallRule (103)
+ForallRule (104)
     on left: 50 51, on right: 30
-ChooseRule (104)
+ChooseRule (105)
     on left: 52, on right: 31
-IterateRule (105)
+IterateRule (106)
     on left: 53, on right: 32
-BlockRule (106)
+BlockRule (107)
     on left: 54 55 56 57, on right: 33
-SequenceRule (107)
+SequenceRule (108)
     on left: 58 59 60 61, on right: 34
-UpdateRule (108)
+UpdateRule (109)
     on left: 62, on right: 35
-CallRule (109)
+CallRule (110)
     on left: 63 64 65 66, on right: 36
-Terms (110)
+Terms (111)
     on left: 67 68, on right: 67 113 144 147
-Term (111)
+Term (112)
     on left: 69 70 71 72 73 74 75 76 77 78 79 80, on right: 14 40 41
     42 43 46 49 50 51 52 62 67 68 81 83 84 85 86 87 88 89 90 91 92
     93 94 95 96 97 98 99 100 101 102 103 106 107 108 109 110 111 115
     143 147 157 163 164 165 186
-Expression (112)
+Expression (113)
     on left: 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98
     99 100 101 102, on right: 69
-TypeCastingExpression (113)
+TypeCastingExpression (114)
     on left: 103, on right: 70
-DirectCallExpression (114)
+DirectCallExpression (115)
     on left: 104 105, on right: 62 63 64 71
-IndirectCallExpression (115)
+IndirectCallExpression (116)
     on left: 106, on right: 65 66 72
-LetExpression (116)
+LetExpression (117)
     on left: 107, on right: 73
-ConditionalExpression (117)
+ConditionalExpression (118)
     on left: 108, on right: 74
-ChooseExpression (118)
+ChooseExpression (119)
     on left: 109, on right: 75
-UniversalQuantifierExpression (119)
+UniversalQuantifierExpression (120)
     on left: 110, on right: 76
-ExistentialQuantifierExpression (120)
+ExistentialQuantifierExpression (121)
     on left: 111, on right: 77
-List (121)
+List (122)
     on left: 112 113 114, on right: 78
-Range (122)
+Range (123)
     on left: 115, on right: 79
-Literal (123)
+Literal (124)
     on left: 116 117 118 119 120 121 122 123, on right: 80
-UndefinedLiteral (124)
+UndefinedLiteral (125)
     on left: 124, on right: 116
-BooleanLiteral (125)
+BooleanLiteral (126)
     on left: 125 126, on right: 117
-IntegerLiteral (126)
+IntegerLiteral (127)
     on left: 127, on right: 118
-RationalLiteral (127)
+RationalLiteral (128)
     on left: 128, on right: 119
-DecimalLiteral (128)
+DecimalLiteral (129)
     on left: 129, on right: 120
-BinaryLiteral (129)
+BinaryLiteral (130)
     on left: 130 131, on right: 121
-StringLiteral (130)
+StringLiteral (131)
     on left: 132, on right: 122
-ReferenceLiteral (131)
+ReferenceLiteral (132)
     on left: 133, on right: 123
-Types (132)
+Types (133)
     on left: 134 135, on right: 134 141
-Type (133)
+Type (134)
     on left: 136 137 138 139, on right: 14 16 17 103 134 135 142 148
     149 176
-BasicType (134)
+BasicType (135)
     on left: 140, on right: 136
-ComposedType (135)
+ComposedType (136)
     on left: 141, on right: 137
-RelationType (136)
+RelationType (137)
     on left: 142, on right: 138
-FixedSizedType (137)
+FixedSizedType (138)
     on left: 143, on right: 139
-Arguments (138)
+Arguments (139)
     on left: 144 145 146, on right: 105 106
-TwoOrMoreArguments (139)
+TwoOrMoreArguments (140)
     on left: 147, on right: 165
-FunctionParameters (140)
+FunctionParameters (141)
     on left: 148 149, on right: 148 150
-MaybeFunctionParameters (141)
+MaybeFunctionParameters (142)
     on left: 150 151, on right: 17 142
-Parameters (142)
+Parameters (143)
     on left: 152 153, on right: 152 154
-MaybeParameters (143)
+MaybeParameters (144)
     on left: 154 155 156, on right: 14 15 16
-MaybeDefined (144)
+MaybeDefined (145)
     on left: 157 158, on right: 17
-MaybeInitially (145)
+MaybeInitially (146)
     on left: 159 160, on right: 17
-Initializers (146)
+Initializers (147)
     on left: 161 162, on right: 161 166
-Initializer (147)
+Initializer (148)
     on left: 163 164 165, on right: 161 162
-MaybeInitializers (148)
+MaybeInitializers (149)
     on left: 166 167, on right: 20 159
-Identifier (149)
+Identifier (150)
     on left: 168 169, on right: 13 14 15 16 17 21 22 171 172 173 175
     176 185 186
-IdentifierPath (150)
+IdentifierPath (151)
     on left: 170 171, on right: 19 104 105 133 140 141 142 143
-DotSeparatedIdentifiers (151)
+DotSeparatedIdentifiers (152)
     on left: 172 173, on right: 170 172
-Variable (152)
+Variable (153)
     on left: 174 175, on right: 177 178
-TypedVariable (153)
+TypedVariable (154)
     on left: 176, on right: 174 179 180
-AttributedVariable (154)
+AttributedVariable (155)
     on left: 177 178, on right: 49 50 51 52 107 109 110 111
-TypedAttributedVariable (155)
+TypedAttributedVariable (156)
     on left: 179 180, on right: 152 153
-Attributes (156)
+Attributes (157)
     on left: 181 182, on right: 2 6 22 177 179 181
-Attribute (157)
+Attribute (158)
     on left: 183 184, on right: 181 182
-BasicAttribute (158)
+BasicAttribute (159)
     on left: 185, on right: 183
-ExpressionAttribute (159)
+ExpressionAttribute (160)
     on left: 186, on right: 184
 
 
@@ -615,8 +621,8 @@ State 7
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -704,7 +710,7 @@ State 14
 
     "in"          shift, and go to state 5
     "{"           shift, and go to state 75
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     Identifier               go to state 70
@@ -900,8 +906,8 @@ State 31
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -989,8 +995,8 @@ State 36
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -1043,8 +1049,8 @@ State 37
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -1097,8 +1103,8 @@ State 38
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -1154,9 +1160,9 @@ State 39
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "*"            shift, and go to state 96
-    "."            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -1214,8 +1220,8 @@ State 40
     "("            shift, and go to state 39
     "["            shift, and go to state 40
     "]"            shift, and go to state 99
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -1253,25 +1259,25 @@ State 40
 
 State 41
 
-  133 ReferenceLiteral: "@" . IdentifierPath
+  171 IdentifierPath: "::" . Identifier
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
     "identifier"  shift, and go to state 6
 
-    Identifier               go to state 70
-    IdentifierPath           go to state 102
-    DotSeparatedIdentifiers  go to state 72
+    Identifier  go to state 102
 
 
 State 42
 
-  171 IdentifierPath: "." . Identifier
+  133 ReferenceLiteral: "@" . IdentifierPath
 
     "in"          shift, and go to state 5
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
-    Identifier  go to state 103
+    Identifier               go to state 70
+    IdentifierPath           go to state 103
+    DotSeparatedIdentifiers  go to state 72
 
 
 State 43
@@ -1522,9 +1528,9 @@ State 71
 State 72
 
   170 IdentifierPath: DotSeparatedIdentifiers .
-  172 DotSeparatedIdentifiers: DotSeparatedIdentifiers . "." Identifier
+  172 DotSeparatedIdentifiers: DotSeparatedIdentifiers . "::" Identifier
 
-    "."  shift, and go to state 124
+    "::"  shift, and go to state 124
 
     $default  reduce using rule 170 (IdentifierPath)
 
@@ -1567,8 +1573,8 @@ State 75
     "-"            shift, and go to state 38
     "("            shift, and go to state 127
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -1878,8 +1884,8 @@ State 96
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2028,16 +2034,16 @@ State 101
 
 State 102
 
-  133 ReferenceLiteral: "@" IdentifierPath .
+  171 IdentifierPath: "::" Identifier .
 
-    $default  reduce using rule 133 (ReferenceLiteral)
+    $default  reduce using rule 171 (IdentifierPath)
 
 
 State 103
 
-  171 IdentifierPath: "." Identifier .
+  133 ReferenceLiteral: "@" IdentifierPath .
 
-    $default  reduce using rule 171 (IdentifierPath)
+    $default  reduce using rule 133 (ReferenceLiteral)
 
 
 State 104
@@ -2045,7 +2051,7 @@ State 104
   103 TypeCastingExpression: Term "as" . Type
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     Type                     go to state 153
@@ -2076,8 +2082,8 @@ State 105
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2130,8 +2136,8 @@ State 106
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2184,8 +2190,8 @@ State 107
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2238,8 +2244,8 @@ State 108
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2292,8 +2298,8 @@ State 109
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2346,8 +2352,8 @@ State 110
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2400,8 +2406,8 @@ State 111
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2454,8 +2460,8 @@ State 112
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2508,8 +2514,8 @@ State 113
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2562,8 +2568,8 @@ State 114
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2616,8 +2622,8 @@ State 115
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2670,8 +2676,8 @@ State 116
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2724,8 +2730,8 @@ State 117
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2778,8 +2784,8 @@ State 118
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2832,8 +2838,8 @@ State 119
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2886,8 +2892,8 @@ State 120
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2940,8 +2946,8 @@ State 121
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -2998,8 +3004,8 @@ State 122
     "("            shift, and go to state 39
     ")"            shift, and go to state 177
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -3044,7 +3050,7 @@ State 123
 
 State 124
 
-  172 DotSeparatedIdentifiers: DotSeparatedIdentifiers "." . Identifier
+  172 DotSeparatedIdentifiers: DotSeparatedIdentifiers "::" . Identifier
 
     "in"          shift, and go to state 5
     "identifier"  shift, and go to state 6
@@ -3088,9 +3094,9 @@ State 127
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "*"            shift, and go to state 96
-    "."            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -3247,7 +3253,7 @@ State 137
    17 FunctionDefinition: "function" Identifier ":" . MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     $default  reduce using rule 151 (MaybeFunctionParameters)
@@ -3296,7 +3302,7 @@ State 140
   176 TypedVariable: Identifier ":" . Type
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     Type                     go to state 202
@@ -3327,8 +3333,8 @@ State 141
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -3381,8 +3387,8 @@ State 142
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -3435,8 +3441,8 @@ State 143
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -3489,8 +3495,8 @@ State 144
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -3543,8 +3549,8 @@ State 145
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -3668,8 +3674,8 @@ State 151
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -3722,8 +3728,8 @@ State 152
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -4441,7 +4447,7 @@ State 179
 
 State 180
 
-  172 DotSeparatedIdentifiers: DotSeparatedIdentifiers "." Identifier .
+  172 DotSeparatedIdentifiers: DotSeparatedIdentifiers "::" Identifier .
 
     $default  reduce using rule 172 (DotSeparatedIdentifiers)
 
@@ -4518,8 +4524,8 @@ State 183
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -4572,8 +4578,8 @@ State 184
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -4626,8 +4632,8 @@ State 185
     "-"            shift, and go to state 38
     "("            shift, and go to state 127
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -4727,7 +4733,7 @@ State 193
    14 DerivedDefinition: "derived" Identifier MaybeParameters "->" . Type "=" Term
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     Type                     go to state 223
@@ -4771,7 +4777,7 @@ State 195
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -4799,7 +4805,7 @@ State 196
    16 RuleDefinition: "rule" Identifier MaybeParameters "->" . Type "=" Rule
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     Type                     go to state 256
@@ -5179,7 +5185,7 @@ State 211
   142 RelationType: IdentifierPath "<" . MaybeFunctionParameters "->" Type ">"
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     $default  reduce using rule 151 (MaybeFunctionParameters)
@@ -5215,8 +5221,8 @@ State 212
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -5284,8 +5290,8 @@ State 215
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -5521,7 +5527,7 @@ State 229
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -5564,7 +5570,7 @@ State 230
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -5655,7 +5661,7 @@ State 235
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -5685,7 +5691,7 @@ State 236
 
     "in"          shift, and go to state 5
     "("           shift, and go to state 239
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     DirectCallExpression     go to state 287
@@ -5714,8 +5720,8 @@ State 237
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -5769,8 +5775,8 @@ State 238
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -5831,7 +5837,7 @@ State 240
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -5874,7 +5880,7 @@ State 241
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -6011,7 +6017,7 @@ State 257
   148 FunctionParameters: FunctionParameters "*" . Type
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     Type                     go to state 297
@@ -6029,7 +6035,7 @@ State 258
    17 FunctionDefinition: "function" Identifier ":" MaybeFunctionParameters "->" . Type MaybeDefined MaybeInitially
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     Type                     go to state 298
@@ -6067,8 +6073,8 @@ State 260
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -6121,8 +6127,8 @@ State 261
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -6175,8 +6181,8 @@ State 262
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -6229,8 +6235,8 @@ State 263
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -6283,8 +6289,8 @@ State 264
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -6466,8 +6472,8 @@ State 274
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -6564,7 +6570,7 @@ State 280
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -6613,7 +6619,7 @@ State 282
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -6793,7 +6799,7 @@ State 292
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
     "}"           shift, and go to state 323
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -6841,7 +6847,7 @@ State 294
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "|}"          shift, and go to state 325
     "identifier"  shift, and go to state 6
@@ -6883,8 +6889,8 @@ State 295
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -6936,7 +6942,7 @@ State 296
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -7202,7 +7208,7 @@ State 304
   134 Types: Types "," . Type
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     Type                     go to state 330
@@ -7227,7 +7233,7 @@ State 306
   142 RelationType: IdentifierPath "<" MaybeFunctionParameters "->" . Type ">"
 
     "in"          shift, and go to state 5
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "identifier"  shift, and go to state 6
 
     Type                     go to state 331
@@ -7368,8 +7374,8 @@ State 317
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -7423,8 +7429,8 @@ State 318
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -7477,8 +7483,8 @@ State 319
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -7531,7 +7537,7 @@ State 320
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -7842,9 +7848,9 @@ State 337
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
+    "::"           shift, and go to state 41
     "_"            shift, and go to state 349
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -7899,8 +7905,8 @@ State 338
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -7973,7 +7979,7 @@ State 342
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -8013,7 +8019,7 @@ State 343
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -8054,8 +8060,8 @@ State 344
     "-"            shift, and go to state 38
     "("            shift, and go to state 39
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -8107,7 +8113,7 @@ State 345
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -8147,7 +8153,7 @@ State 346
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -8219,9 +8225,9 @@ State 351
     "("            shift, and go to state 39
     "["            shift, and go to state 40
     "}"            shift, and go to state 363
+    "::"           shift, and go to state 41
     "_"            shift, and go to state 349
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -8361,8 +8367,8 @@ State 354
     "-"            shift, and go to state 38
     "("            shift, and go to state 127
     "["            shift, and go to state 40
-    "@"            shift, and go to state 41
-    "."            shift, and go to state 42
+    "::"           shift, and go to state 41
+    "@"            shift, and go to state 42
     "binary"       shift, and go to state 43
     "hexadecimal"  shift, and go to state 44
     "integer"      shift, and go to state 45
@@ -8498,7 +8504,7 @@ State 361
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -8538,7 +8544,7 @@ State 362
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -8592,7 +8598,7 @@ State 365
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 
@@ -8646,7 +8652,7 @@ State 368
     "case"        shift, and go to state 238
     "("           shift, and go to state 239
     "{"           shift, and go to state 240
-    "."           shift, and go to state 42
+    "::"          shift, and go to state 41
     "{|"          shift, and go to state 241
     "identifier"  shift, and go to state 6
 

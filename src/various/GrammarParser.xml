@@ -1276,7 +1276,7 @@
       <rule number="171" usefulness="useful">
         <lhs>IdentifierPath</lhs>
         <rhs>
-          <symbol>&quot;.&quot;</symbol>
+          <symbol>&quot;::&quot;</symbol>
           <symbol>Identifier</symbol>
         </rhs>
       </rule>
@@ -1284,7 +1284,7 @@
         <lhs>DotSeparatedIdentifiers</lhs>
         <rhs>
           <symbol>DotSeparatedIdentifiers</symbol>
-          <symbol>&quot;.&quot;</symbol>
+          <symbol>&quot;::&quot;</symbol>
           <symbol>Identifier</symbol>
         </rhs>
       </rule>
@@ -1428,124 +1428,125 @@
       <terminal symbol-number="41" token-number="296" name="&quot;+&quot;" usefulness="useful" prec="16" assoc="left"/>
       <terminal symbol-number="42" token-number="297" name="&quot;-&quot;" usefulness="useful" prec="16" assoc="left"/>
       <terminal symbol-number="43" token-number="298" name="&quot;=&quot;" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="44" token-number="299" name="&quot;(&quot;" usefulness="useful" prec="22" assoc="precedence"/>
+      <terminal symbol-number="44" token-number="299" name="&quot;(&quot;" usefulness="useful" prec="23" assoc="precedence"/>
       <terminal symbol-number="45" token-number="300" name="&quot;)&quot;" usefulness="useful"/>
       <terminal symbol-number="46" token-number="301" name="&quot;[&quot;" usefulness="useful"/>
       <terminal symbol-number="47" token-number="302" name="&quot;]&quot;" usefulness="useful"/>
       <terminal symbol-number="48" token-number="303" name="&quot;{&quot;" usefulness="useful"/>
       <terminal symbol-number="49" token-number="304" name="&quot;}&quot;" usefulness="useful"/>
       <terminal symbol-number="50" token-number="305" name="&quot;:&quot;" usefulness="useful"/>
-      <terminal symbol-number="51" token-number="306" name="&quot;_&quot;" usefulness="useful"/>
-      <terminal symbol-number="52" token-number="307" name="&quot;@&quot;" usefulness="useful"/>
-      <terminal symbol-number="53" token-number="308" name="&quot;,&quot;" usefulness="useful"/>
-      <terminal symbol-number="54" token-number="309" name="&quot;&lt;&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="55" token-number="310" name="&quot;&gt;&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="56" token-number="311" name="&quot;*&quot;" usefulness="useful" prec="17" assoc="left"/>
-      <terminal symbol-number="57" token-number="312" name="&quot;/&quot;" usefulness="useful" prec="17" assoc="left"/>
-      <terminal symbol-number="58" token-number="313" name="&quot;%&quot;" usefulness="useful" prec="17" assoc="left"/>
-      <terminal symbol-number="59" token-number="314" name="&quot;^&quot;" usefulness="useful" prec="18" assoc="left"/>
-      <terminal symbol-number="60" token-number="315" name="&quot;'&quot;" usefulness="useful" prec="23" assoc="precedence"/>
-      <terminal symbol-number="61" token-number="316" name="&quot;..&quot;" usefulness="useful"/>
-      <terminal symbol-number="62" token-number="317" name="&quot;.&quot;" usefulness="useful" prec="8" assoc="precedence"/>
-      <terminal symbol-number="63" token-number="318" name="&quot;-&gt;&quot;" usefulness="useful"/>
-      <terminal symbol-number="64" token-number="319" name="&quot;=&gt;&quot;" usefulness="useful" prec="10" assoc="left"/>
-      <terminal symbol-number="65" token-number="320" name="&quot;:=&quot;" usefulness="useful" prec="7" assoc="precedence"/>
-      <terminal symbol-number="66" token-number="321" name="&quot;!=&quot;" usefulness="useful" prec="14" assoc="left"/>
-      <terminal symbol-number="67" token-number="322" name="&quot;&lt;=&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="68" token-number="323" name="&quot;&gt;=&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="69" token-number="324" name="&quot;{|&quot;" usefulness="useful"/>
-      <terminal symbol-number="70" token-number="325" name="&quot;|}&quot;" usefulness="useful"/>
-      <terminal symbol-number="71" token-number="326" name="&quot;binary&quot;" usefulness="useful"/>
-      <terminal symbol-number="72" token-number="327" name="&quot;hexadecimal&quot;" usefulness="useful"/>
-      <terminal symbol-number="73" token-number="328" name="&quot;integer&quot;" usefulness="useful"/>
-      <terminal symbol-number="74" token-number="329" name="&quot;rational&quot;" usefulness="useful"/>
-      <terminal symbol-number="75" token-number="330" name="&quot;decimal&quot;" usefulness="useful"/>
-      <terminal symbol-number="76" token-number="331" name="&quot;string&quot;" usefulness="useful"/>
-      <terminal symbol-number="77" token-number="332" name="&quot;identifier&quot;" usefulness="useful"/>
-      <terminal symbol-number="78" token-number="333" name="ABSOLUTE_PATH" usefulness="useful" prec="1" assoc="precedence"/>
-      <terminal symbol-number="79" token-number="334" name="UPLUS" usefulness="useful" prec="19" assoc="precedence"/>
-      <terminal symbol-number="80" token-number="335" name="UMINUS" usefulness="useful" prec="19" assoc="precedence"/>
-      <terminal symbol-number="81" token-number="336" name="CALL_WITHOUT_ARGS" usefulness="useful" prec="21" assoc="precedence"/>
+      <terminal symbol-number="51" token-number="306" name="&quot;::&quot;" usefulness="useful" prec="21" assoc="precedence"/>
+      <terminal symbol-number="52" token-number="307" name="&quot;_&quot;" usefulness="useful"/>
+      <terminal symbol-number="53" token-number="308" name="&quot;@&quot;" usefulness="useful"/>
+      <terminal symbol-number="54" token-number="309" name="&quot;,&quot;" usefulness="useful"/>
+      <terminal symbol-number="55" token-number="310" name="&quot;&lt;&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="56" token-number="311" name="&quot;&gt;&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="57" token-number="312" name="&quot;*&quot;" usefulness="useful" prec="17" assoc="left"/>
+      <terminal symbol-number="58" token-number="313" name="&quot;/&quot;" usefulness="useful" prec="17" assoc="left"/>
+      <terminal symbol-number="59" token-number="314" name="&quot;%&quot;" usefulness="useful" prec="17" assoc="left"/>
+      <terminal symbol-number="60" token-number="315" name="&quot;^&quot;" usefulness="useful" prec="18" assoc="left"/>
+      <terminal symbol-number="61" token-number="316" name="&quot;'&quot;" usefulness="useful" prec="24" assoc="precedence"/>
+      <terminal symbol-number="62" token-number="317" name="&quot;..&quot;" usefulness="useful"/>
+      <terminal symbol-number="63" token-number="318" name="&quot;.&quot;" usefulness="unused-in-grammar" prec="8" assoc="precedence"/>
+      <terminal symbol-number="64" token-number="319" name="&quot;-&gt;&quot;" usefulness="useful"/>
+      <terminal symbol-number="65" token-number="320" name="&quot;=&gt;&quot;" usefulness="useful" prec="10" assoc="left"/>
+      <terminal symbol-number="66" token-number="321" name="&quot;:=&quot;" usefulness="useful" prec="7" assoc="precedence"/>
+      <terminal symbol-number="67" token-number="322" name="&quot;!=&quot;" usefulness="useful" prec="14" assoc="left"/>
+      <terminal symbol-number="68" token-number="323" name="&quot;&lt;=&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="69" token-number="324" name="&quot;&gt;=&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="70" token-number="325" name="&quot;{|&quot;" usefulness="useful"/>
+      <terminal symbol-number="71" token-number="326" name="&quot;|}&quot;" usefulness="useful"/>
+      <terminal symbol-number="72" token-number="327" name="&quot;binary&quot;" usefulness="useful"/>
+      <terminal symbol-number="73" token-number="328" name="&quot;hexadecimal&quot;" usefulness="useful"/>
+      <terminal symbol-number="74" token-number="329" name="&quot;integer&quot;" usefulness="useful"/>
+      <terminal symbol-number="75" token-number="330" name="&quot;rational&quot;" usefulness="useful"/>
+      <terminal symbol-number="76" token-number="331" name="&quot;decimal&quot;" usefulness="useful"/>
+      <terminal symbol-number="77" token-number="332" name="&quot;string&quot;" usefulness="useful"/>
+      <terminal symbol-number="78" token-number="333" name="&quot;identifier&quot;" usefulness="useful"/>
+      <terminal symbol-number="79" token-number="334" name="ABSOLUTE_PATH" usefulness="useful" prec="1" assoc="precedence"/>
+      <terminal symbol-number="80" token-number="335" name="UPLUS" usefulness="useful" prec="19" assoc="precedence"/>
+      <terminal symbol-number="81" token-number="336" name="UMINUS" usefulness="useful" prec="19" assoc="precedence"/>
+      <terminal symbol-number="82" token-number="337" name="CALL_WITHOUT_ARGS" usefulness="useful" prec="22" assoc="precedence"/>
     </terminals>
     <nonterminals>
-      <nonterminal symbol-number="82" name="$accept" usefulness="useful"/>
-      <nonterminal symbol-number="83" name="Specification" usefulness="useful"/>
-      <nonterminal symbol-number="84" name="Header" usefulness="useful"/>
-      <nonterminal symbol-number="85" name="Definitions" usefulness="useful"/>
-      <nonterminal symbol-number="86" name="AttributedDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="87" name="Definition" usefulness="useful"/>
-      <nonterminal symbol-number="88" name="EnumerationDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="89" name="DerivedDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="90" name="RuleDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="91" name="FunctionDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="92" name="ProgramFunctionDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="93" name="EnumeratorDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="94" name="Enumerators" usefulness="useful"/>
-      <nonterminal symbol-number="95" name="Rule" usefulness="useful"/>
-      <nonterminal symbol-number="96" name="Rules" usefulness="useful"/>
-      <nonterminal symbol-number="97" name="SkipRule" usefulness="useful"/>
-      <nonterminal symbol-number="98" name="ConditionalRule" usefulness="useful"/>
-      <nonterminal symbol-number="99" name="CaseRule" usefulness="useful"/>
-      <nonterminal symbol-number="100" name="CaseLabel" usefulness="useful"/>
-      <nonterminal symbol-number="101" name="CaseLabels" usefulness="useful"/>
-      <nonterminal symbol-number="102" name="LetRule" usefulness="useful"/>
-      <nonterminal symbol-number="103" name="ForallRule" usefulness="useful"/>
-      <nonterminal symbol-number="104" name="ChooseRule" usefulness="useful"/>
-      <nonterminal symbol-number="105" name="IterateRule" usefulness="useful"/>
-      <nonterminal symbol-number="106" name="BlockRule" usefulness="useful"/>
-      <nonterminal symbol-number="107" name="SequenceRule" usefulness="useful"/>
-      <nonterminal symbol-number="108" name="UpdateRule" usefulness="useful"/>
-      <nonterminal symbol-number="109" name="CallRule" usefulness="useful"/>
-      <nonterminal symbol-number="110" name="Terms" usefulness="useful"/>
-      <nonterminal symbol-number="111" name="Term" usefulness="useful"/>
-      <nonterminal symbol-number="112" name="Expression" usefulness="useful"/>
-      <nonterminal symbol-number="113" name="TypeCastingExpression" usefulness="useful"/>
-      <nonterminal symbol-number="114" name="DirectCallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="115" name="IndirectCallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="116" name="LetExpression" usefulness="useful"/>
-      <nonterminal symbol-number="117" name="ConditionalExpression" usefulness="useful"/>
-      <nonterminal symbol-number="118" name="ChooseExpression" usefulness="useful"/>
-      <nonterminal symbol-number="119" name="UniversalQuantifierExpression" usefulness="useful"/>
-      <nonterminal symbol-number="120" name="ExistentialQuantifierExpression" usefulness="useful"/>
-      <nonterminal symbol-number="121" name="List" usefulness="useful"/>
-      <nonterminal symbol-number="122" name="Range" usefulness="useful"/>
-      <nonterminal symbol-number="123" name="Literal" usefulness="useful"/>
-      <nonterminal symbol-number="124" name="UndefinedLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="125" name="BooleanLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="126" name="IntegerLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="127" name="RationalLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="128" name="DecimalLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="129" name="BinaryLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="130" name="StringLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="131" name="ReferenceLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="132" name="Types" usefulness="useful"/>
-      <nonterminal symbol-number="133" name="Type" usefulness="useful"/>
-      <nonterminal symbol-number="134" name="BasicType" usefulness="useful"/>
-      <nonterminal symbol-number="135" name="ComposedType" usefulness="useful"/>
-      <nonterminal symbol-number="136" name="RelationType" usefulness="useful"/>
-      <nonterminal symbol-number="137" name="FixedSizedType" usefulness="useful"/>
-      <nonterminal symbol-number="138" name="Arguments" usefulness="useful"/>
-      <nonterminal symbol-number="139" name="TwoOrMoreArguments" usefulness="useful"/>
-      <nonterminal symbol-number="140" name="FunctionParameters" usefulness="useful"/>
-      <nonterminal symbol-number="141" name="MaybeFunctionParameters" usefulness="useful"/>
-      <nonterminal symbol-number="142" name="Parameters" usefulness="useful"/>
-      <nonterminal symbol-number="143" name="MaybeParameters" usefulness="useful"/>
-      <nonterminal symbol-number="144" name="MaybeDefined" usefulness="useful"/>
-      <nonterminal symbol-number="145" name="MaybeInitially" usefulness="useful"/>
-      <nonterminal symbol-number="146" name="Initializers" usefulness="useful"/>
-      <nonterminal symbol-number="147" name="Initializer" usefulness="useful"/>
-      <nonterminal symbol-number="148" name="MaybeInitializers" usefulness="useful"/>
-      <nonterminal symbol-number="149" name="Identifier" usefulness="useful"/>
-      <nonterminal symbol-number="150" name="IdentifierPath" usefulness="useful"/>
-      <nonterminal symbol-number="151" name="DotSeparatedIdentifiers" usefulness="useful"/>
-      <nonterminal symbol-number="152" name="Variable" usefulness="useful"/>
-      <nonterminal symbol-number="153" name="TypedVariable" usefulness="useful"/>
-      <nonterminal symbol-number="154" name="AttributedVariable" usefulness="useful"/>
-      <nonterminal symbol-number="155" name="TypedAttributedVariable" usefulness="useful"/>
-      <nonterminal symbol-number="156" name="Attributes" usefulness="useful"/>
-      <nonterminal symbol-number="157" name="Attribute" usefulness="useful"/>
-      <nonterminal symbol-number="158" name="BasicAttribute" usefulness="useful"/>
-      <nonterminal symbol-number="159" name="ExpressionAttribute" usefulness="useful"/>
+      <nonterminal symbol-number="83" name="$accept" usefulness="useful"/>
+      <nonterminal symbol-number="84" name="Specification" usefulness="useful"/>
+      <nonterminal symbol-number="85" name="Header" usefulness="useful"/>
+      <nonterminal symbol-number="86" name="Definitions" usefulness="useful"/>
+      <nonterminal symbol-number="87" name="AttributedDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="88" name="Definition" usefulness="useful"/>
+      <nonterminal symbol-number="89" name="EnumerationDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="90" name="DerivedDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="91" name="RuleDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="92" name="FunctionDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="93" name="ProgramFunctionDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="94" name="EnumeratorDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="95" name="Enumerators" usefulness="useful"/>
+      <nonterminal symbol-number="96" name="Rule" usefulness="useful"/>
+      <nonterminal symbol-number="97" name="Rules" usefulness="useful"/>
+      <nonterminal symbol-number="98" name="SkipRule" usefulness="useful"/>
+      <nonterminal symbol-number="99" name="ConditionalRule" usefulness="useful"/>
+      <nonterminal symbol-number="100" name="CaseRule" usefulness="useful"/>
+      <nonterminal symbol-number="101" name="CaseLabel" usefulness="useful"/>
+      <nonterminal symbol-number="102" name="CaseLabels" usefulness="useful"/>
+      <nonterminal symbol-number="103" name="LetRule" usefulness="useful"/>
+      <nonterminal symbol-number="104" name="ForallRule" usefulness="useful"/>
+      <nonterminal symbol-number="105" name="ChooseRule" usefulness="useful"/>
+      <nonterminal symbol-number="106" name="IterateRule" usefulness="useful"/>
+      <nonterminal symbol-number="107" name="BlockRule" usefulness="useful"/>
+      <nonterminal symbol-number="108" name="SequenceRule" usefulness="useful"/>
+      <nonterminal symbol-number="109" name="UpdateRule" usefulness="useful"/>
+      <nonterminal symbol-number="110" name="CallRule" usefulness="useful"/>
+      <nonterminal symbol-number="111" name="Terms" usefulness="useful"/>
+      <nonterminal symbol-number="112" name="Term" usefulness="useful"/>
+      <nonterminal symbol-number="113" name="Expression" usefulness="useful"/>
+      <nonterminal symbol-number="114" name="TypeCastingExpression" usefulness="useful"/>
+      <nonterminal symbol-number="115" name="DirectCallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="116" name="IndirectCallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="117" name="LetExpression" usefulness="useful"/>
+      <nonterminal symbol-number="118" name="ConditionalExpression" usefulness="useful"/>
+      <nonterminal symbol-number="119" name="ChooseExpression" usefulness="useful"/>
+      <nonterminal symbol-number="120" name="UniversalQuantifierExpression" usefulness="useful"/>
+      <nonterminal symbol-number="121" name="ExistentialQuantifierExpression" usefulness="useful"/>
+      <nonterminal symbol-number="122" name="List" usefulness="useful"/>
+      <nonterminal symbol-number="123" name="Range" usefulness="useful"/>
+      <nonterminal symbol-number="124" name="Literal" usefulness="useful"/>
+      <nonterminal symbol-number="125" name="UndefinedLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="126" name="BooleanLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="127" name="IntegerLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="128" name="RationalLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="129" name="DecimalLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="130" name="BinaryLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="131" name="StringLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="132" name="ReferenceLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="133" name="Types" usefulness="useful"/>
+      <nonterminal symbol-number="134" name="Type" usefulness="useful"/>
+      <nonterminal symbol-number="135" name="BasicType" usefulness="useful"/>
+      <nonterminal symbol-number="136" name="ComposedType" usefulness="useful"/>
+      <nonterminal symbol-number="137" name="RelationType" usefulness="useful"/>
+      <nonterminal symbol-number="138" name="FixedSizedType" usefulness="useful"/>
+      <nonterminal symbol-number="139" name="Arguments" usefulness="useful"/>
+      <nonterminal symbol-number="140" name="TwoOrMoreArguments" usefulness="useful"/>
+      <nonterminal symbol-number="141" name="FunctionParameters" usefulness="useful"/>
+      <nonterminal symbol-number="142" name="MaybeFunctionParameters" usefulness="useful"/>
+      <nonterminal symbol-number="143" name="Parameters" usefulness="useful"/>
+      <nonterminal symbol-number="144" name="MaybeParameters" usefulness="useful"/>
+      <nonterminal symbol-number="145" name="MaybeDefined" usefulness="useful"/>
+      <nonterminal symbol-number="146" name="MaybeInitially" usefulness="useful"/>
+      <nonterminal symbol-number="147" name="Initializers" usefulness="useful"/>
+      <nonterminal symbol-number="148" name="Initializer" usefulness="useful"/>
+      <nonterminal symbol-number="149" name="MaybeInitializers" usefulness="useful"/>
+      <nonterminal symbol-number="150" name="Identifier" usefulness="useful"/>
+      <nonterminal symbol-number="151" name="IdentifierPath" usefulness="useful"/>
+      <nonterminal symbol-number="152" name="DotSeparatedIdentifiers" usefulness="useful"/>
+      <nonterminal symbol-number="153" name="Variable" usefulness="useful"/>
+      <nonterminal symbol-number="154" name="TypedVariable" usefulness="useful"/>
+      <nonterminal symbol-number="155" name="AttributedVariable" usefulness="useful"/>
+      <nonterminal symbol-number="156" name="TypedAttributedVariable" usefulness="useful"/>
+      <nonterminal symbol-number="157" name="Attributes" usefulness="useful"/>
+      <nonterminal symbol-number="158" name="Attribute" usefulness="useful"/>
+      <nonterminal symbol-number="159" name="BasicAttribute" usefulness="useful"/>
+      <nonterminal symbol-number="160" name="ExpressionAttribute" usefulness="useful"/>
     </nonterminals>
   </grammar>
 
@@ -1797,8 +1798,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -1940,7 +1941,7 @@
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
           <transition type="shift" symbol="&quot;{&quot;" state="75"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Identifier" state="70"/>
           <transition type="goto" symbol="IdentifierPath" state="76"/>
@@ -2372,8 +2373,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -2572,8 +2573,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -2703,8 +2704,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -2834,8 +2835,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -2968,9 +2969,9 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;*&quot;" state="96"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -3107,8 +3108,8 @@
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
           <transition type="shift" symbol="&quot;]&quot;" state="99"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -3150,6 +3151,24 @@
 
     <state number="41">
       <itemset>
+        <item rule-number="168" point="0"/>
+        <item rule-number="169" point="0"/>
+        <item rule-number="171" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="&quot;in&quot;" state="5"/>
+          <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
+          <transition type="goto" symbol="Identifier" state="102"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="42">
+      <itemset>
         <item rule-number="133" point="1"/>
         <item rule-number="168" point="0"/>
         <item rule-number="169" point="0"/>
@@ -3161,29 +3180,11 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Identifier" state="70"/>
-          <transition type="goto" symbol="IdentifierPath" state="102"/>
+          <transition type="goto" symbol="IdentifierPath" state="103"/>
           <transition type="goto" symbol="DotSeparatedIdentifiers" state="72"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="42">
-      <itemset>
-        <item rule-number="168" point="0"/>
-        <item rule-number="169" point="0"/>
-        <item rule-number="171" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
-          <transition type="goto" symbol="Identifier" state="103"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -3677,6 +3678,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -3687,7 +3689,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;:=&quot;</symbol>
@@ -3810,7 +3811,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;.&quot;" state="124"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="124"/>
         </transitions>
         <errors/>
         <reductions>
@@ -3818,7 +3819,7 @@
         </reductions>
       </actions>
       <solved-conflicts>
-        <resolution rule="170" symbol="&quot;.&quot;" type="shift">ABSOLUTE_PATH &lt; &quot;.&quot;</resolution>
+        <resolution rule="170" symbol="&quot;::&quot;" type="shift">ABSOLUTE_PATH &lt; &quot;::&quot;</resolution>
       </solved-conflicts>
     </state>
 
@@ -3964,8 +3965,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="127"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -4386,6 +4387,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -4396,7 +4398,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -4497,6 +4498,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -4507,7 +4509,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -4625,6 +4626,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -4635,7 +4637,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -4805,8 +4806,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -4999,20 +5000,6 @@
 
     <state number="102">
       <itemset>
-        <item rule-number="133" point="2"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="133" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="103">
-      <itemset>
         <item rule-number="171" point="2"/>
       </itemset>
       <actions>
@@ -5020,6 +5007,20 @@
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="171" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="103">
+      <itemset>
+        <item rule-number="133" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="133" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
@@ -5046,7 +5047,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="153"/>
           <transition type="goto" symbol="BasicType" state="154"/>
@@ -5154,8 +5155,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -5285,8 +5286,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -5416,8 +5417,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -5547,8 +5548,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -5678,8 +5679,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -5809,8 +5810,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -5940,8 +5941,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -6071,8 +6072,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -6202,8 +6203,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -6333,8 +6334,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -6464,8 +6465,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -6595,8 +6596,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -6726,8 +6727,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -6857,8 +6858,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -6988,8 +6989,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -7119,8 +7120,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -7250,8 +7251,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -7387,8 +7388,8 @@
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;)&quot;" state="177"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -7585,9 +7586,9 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;*&quot;" state="96"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -7850,7 +7851,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="197"/>
           <transition type="goto" symbol="BasicType" state="154"/>
@@ -7944,7 +7945,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="202"/>
           <transition type="goto" symbol="BasicType" state="154"/>
@@ -8052,8 +8053,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -8183,8 +8184,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -8314,8 +8315,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -8445,8 +8446,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -8576,8 +8577,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -8813,8 +8814,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -8944,8 +8945,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -9107,6 +9108,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -9117,7 +9119,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -9217,11 +9218,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -9342,11 +9343,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -9473,11 +9474,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -9603,11 +9604,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -9722,13 +9723,13 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -9852,13 +9853,13 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -9985,11 +9986,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10115,13 +10116,13 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10245,13 +10246,13 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10369,6 +10370,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -10378,7 +10380,6 @@
             <symbol>&quot;/&quot;</symbol>
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10499,6 +10500,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -10508,7 +10510,6 @@
             <symbol>&quot;/&quot;</symbol>
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10629,6 +10630,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -10638,7 +10640,6 @@
             <symbol>&quot;/&quot;</symbol>
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10759,6 +10760,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -10769,7 +10771,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -10891,11 +10892,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
@@ -11015,11 +11016,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -11148,13 +11149,13 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -11278,13 +11279,13 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;&lt;&quot;</symbol>
             <symbol>&quot;&gt;&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -11621,8 +11622,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -11752,8 +11753,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -11887,8 +11888,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="127"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -12064,7 +12065,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="223"/>
           <transition type="goto" symbol="BasicType" state="154"/>
@@ -12170,7 +12171,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="242"/>
@@ -12218,7 +12219,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="256"/>
           <transition type="goto" symbol="BasicType" state="154"/>
@@ -12742,7 +12743,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Types" state="267"/>
           <transition type="goto" symbol="Type" state="268"/>
@@ -12855,8 +12856,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -13015,8 +13016,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -13415,7 +13416,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="279"/>
@@ -13509,7 +13510,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="279"/>
@@ -13695,7 +13696,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="286"/>
@@ -13740,7 +13741,7 @@
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="DirectCallExpression" state="287"/>
           <transition type="goto" symbol="IndirectCallExpression" state="288"/>
@@ -13846,8 +13847,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -13978,8 +13979,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -14098,7 +14099,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="279"/>
@@ -14192,7 +14193,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="279"/>
@@ -14426,9 +14427,9 @@
             <symbol>&quot;[&quot;</symbol>
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
             <symbol>&quot;|}&quot;</symbol>
             <symbol>&quot;binary&quot;</symbol>
@@ -14502,7 +14503,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="297"/>
           <transition type="goto" symbol="BasicType" state="154"/>
@@ -14540,7 +14541,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="298"/>
           <transition type="goto" symbol="BasicType" state="154"/>
@@ -14662,8 +14663,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -14793,8 +14794,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -14924,8 +14925,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -15055,8 +15056,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -15186,8 +15187,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -15382,6 +15383,7 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
@@ -15392,7 +15394,6 @@
             <symbol>&quot;%&quot;</symbol>
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -15621,8 +15622,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -15807,7 +15808,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="314"/>
@@ -15912,7 +15913,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="314"/>
@@ -16204,7 +16205,7 @@
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
           <transition type="shift" symbol="&quot;}&quot;" state="323"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="314"/>
@@ -16308,7 +16309,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;|}&quot;" state="325"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
@@ -16427,8 +16428,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -16529,7 +16530,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="327"/>
@@ -16664,11 +16665,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
             <symbol>&quot;|}&quot;</symbol>
@@ -16793,11 +16794,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
             <symbol>&quot;|}&quot;</symbol>
@@ -16922,11 +16923,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
             <symbol>&quot;|}&quot;</symbol>
@@ -17051,11 +17052,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
             <symbol>&quot;|}&quot;</symbol>
@@ -17180,11 +17181,11 @@
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
             <symbol>&quot;:&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
             <symbol>&quot;,&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
             <symbol>&quot;|}&quot;</symbol>
@@ -17267,7 +17268,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="330"/>
           <transition type="goto" symbol="BasicType" state="154"/>
@@ -17319,7 +17320,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="331"/>
           <transition type="goto" symbol="BasicType" state="154"/>
@@ -17619,8 +17620,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -17751,8 +17752,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -17882,8 +17883,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -17985,7 +17986,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="336"/>
@@ -18118,9 +18119,9 @@
             <symbol>&quot;[&quot;</symbol>
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
             <symbol>&quot;|}&quot;</symbol>
             <symbol>&quot;binary&quot;</symbol>
@@ -18471,9 +18472,9 @@
             <symbol>&quot;[&quot;</symbol>
             <symbol>&quot;{&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
+            <symbol>&quot;::&quot;</symbol>
             <symbol>&quot;_&quot;</symbol>
             <symbol>&quot;@&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;{|&quot;</symbol>
             <symbol>&quot;|}&quot;</symbol>
             <symbol>&quot;binary&quot;</symbol>
@@ -18600,9 +18601,9 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;_&quot;" state="349"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -18734,8 +18735,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -18878,7 +18879,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="355"/>
@@ -18967,7 +18968,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="356"/>
@@ -19085,8 +19086,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -19187,7 +19188,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="358"/>
@@ -19276,7 +19277,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="359"/>
@@ -19456,9 +19457,9 @@
           <transition type="shift" symbol="&quot;(&quot;" state="39"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
           <transition type="shift" symbol="&quot;}&quot;" state="363"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;_&quot;" state="349"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -19701,8 +19702,8 @@
           <transition type="shift" symbol="&quot;-&quot;" state="38"/>
           <transition type="shift" symbol="&quot;(&quot;" state="127"/>
           <transition type="shift" symbol="&quot;[&quot;" state="40"/>
-          <transition type="shift" symbol="&quot;@&quot;" state="41"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
+          <transition type="shift" symbol="&quot;@&quot;" state="42"/>
           <transition type="shift" symbol="&quot;binary&quot;" state="43"/>
           <transition type="shift" symbol="&quot;hexadecimal&quot;" state="44"/>
           <transition type="shift" symbol="&quot;integer&quot;" state="45"/>
@@ -19929,7 +19930,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="369"/>
@@ -20018,7 +20019,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="370"/>
@@ -20135,7 +20136,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="371"/>
@@ -20252,7 +20253,7 @@
           <transition type="shift" symbol="&quot;case&quot;" state="238"/>
           <transition type="shift" symbol="&quot;(&quot;" state="239"/>
           <transition type="shift" symbol="&quot;{&quot;" state="240"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="42"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="41"/>
           <transition type="shift" symbol="&quot;{|&quot;" state="241"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Rule" state="373"/>

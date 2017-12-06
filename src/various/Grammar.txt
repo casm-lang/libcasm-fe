@@ -700,7 +700,7 @@ Identifier ::= "[a-zA-Z_][a-zA-Z0-9_]*"
 
 <code>
 IdentifierPath ::= DotSeparatedIdentifiers
-                 | "." Identifier
+                 | "::" Identifier
 </code>
 
 {{page>:grammar:IdentifierPath&noheader&nofooter}}
@@ -709,7 +709,7 @@ IdentifierPath ::= DotSeparatedIdentifiers
 ===== DotSeparatedIdentifiers =====
 
 <code>
-DotSeparatedIdentifiers ::= DotSeparatedIdentifiers "." Identifier
+DotSeparatedIdentifiers ::= DotSeparatedIdentifiers "::" Identifier
                           | Identifier
 </code>
 
