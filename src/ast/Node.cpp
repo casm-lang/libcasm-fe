@@ -339,11 +339,13 @@ std::string IdentifierPath::baseDir( void ) const
 
 std::string IdentifierPath::path( void ) const
 {
+    static const std::string DELIMITER( "::" );
+
     std::string path;
 
     if( m_type == Type::RELATIVE )
     {
-        path += ".";
+        path += DELIMITER;
     }
 
     bool isFirstElement = true;
@@ -351,7 +353,7 @@ std::string IdentifierPath::path( void ) const
     {
         if( not isFirstElement )
         {
-            path += ".";
+            path += DELIMITER;
         }
         path += identifier->name();
         isFirstElement = false;
