@@ -195,7 +195,7 @@ END       0 "end of file"
 %type <EnumerationDefinition::Ptr> EnumerationDefinition
 
 // expressions
-%type <Expression::Ptr> Expression Term Literal
+%type <Expression::Ptr> Expression Term SimpleOrClaspedTerm Literal
 %type <Expressions::Ptr> Terms
 %type <TypeCastingExpression::Ptr> TypeCastingExpression
 %type <ValueAtom::Ptr> BooleanLiteral StringLiteral BinaryLiteral IntegerLiteral DecimalLiteral RationalLiteral
@@ -204,6 +204,7 @@ END       0 "end of file"
 %type <RangeExpression::Ptr> Range
 %type <ListExpression::Ptr> List
 %type <DirectCallExpression::Ptr> DirectCallExpression
+%type <MethodCallExpression::Ptr> MethodCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
 %type <LetExpression::Ptr> LetExpression
 %type <ConditionalExpression::Ptr> ConditionalExpression
@@ -266,8 +267,6 @@ END       0 "end of file"
 %precedence HOLDS WITH
 
 %precedence UPDATE
-
-%precedence DOT
 
 %precedence AS
 
@@ -735,6 +734,14 @@ CallRule
   {
       $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
   }
+| CALL MethodCallExpression
+  {
+      $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
+  }
+| MethodCallExpression
+  {
+      $$ = Ast::make< CallRule >( @$, $1, CallRule::Type::FUNCTION_CALL );
+  }
 | CALL IndirectCallExpression
   {
       $$ = Ast::make< CallRule >( @$, $2, CallRule::Type::RULE_CALL );
@@ -767,19 +774,11 @@ Terms
 
 
 Term
-: Expression
+: SimpleOrClaspedTerm
   {
-      $$ = $1;
+     $$ = $1;
   }
-| TypeCastingExpression
-  {
-      $$ = $1;
-  }
-| DirectCallExpression
-  {
-      $$ = $1;
-  }
-| IndirectCallExpression
+| Expression
   {
       $$ = $1;
   }
@@ -803,6 +802,34 @@ Term
   {
       $$ = $1;
   }
+| TypeCastingExpression
+  {
+      $$ = $1;
+  }
+;
+
+
+SimpleOrClaspedTerm
+: LPAREN Term RPAREN
+  {
+      $$ = $2;
+  }
+| LPAREN error RPAREN // error recovery
+  {
+      $$ = nullptr;
+  }
+| DirectCallExpression
+  {
+      $$ = $1;
+  }
+| MethodCallExpression
+  {
+      $$ = $1;
+  }
+| IndirectCallExpression
+  {
+      $$ = $1;
+  }
 | List
   {
       $$ = $1;
@@ -823,15 +850,7 @@ Term
 //
 
 Expression
-: LPAREN Term RPAREN
-  {
-      $$ = $2;
-  }
-| LPAREN error RPAREN // error recovery
-  {
-      $$ = nullptr;
-  }
-| PLUS Term %prec UPLUS
+: PLUS Term %prec UPLUS
   {
       $$ = $2;
   }
@@ -931,6 +950,19 @@ DirectCallExpression
 | IdentifierPath Arguments
   {
       $$ = Ast::make< DirectCallExpression >( @$, $1, $2 );
+  }
+;
+
+
+MethodCallExpression
+: SimpleOrClaspedTerm DOT Identifier %prec CALL_WITHOUT_ARGS
+  {
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $3, arguments );
+  }
+| SimpleOrClaspedTerm DOT Identifier Arguments
+  {
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $3, $4 );
   }
 ;
 
