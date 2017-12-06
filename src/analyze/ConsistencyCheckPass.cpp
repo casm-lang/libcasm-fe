@@ -242,7 +242,9 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 
 void ConsistencyCheckVisitor::visit( UpdateRule& node )
 {
-    RecursiveVisitor::visit( node );
+    // don't visit the function directly, as it would be treated like a function call
+
+    node.expression()->accept( *this );
 
     const auto& func = node.function();
     if( func->targetType() != CallExpression::TargetType::FUNCTION )
@@ -254,6 +256,8 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
             Code::UpdateRuleFunctionSymbolIsInvalid );
         return;
     }
+
+    func->arguments()->accept( *this );
 
     const auto& def = func->targetDefinition()->ptr< FunctionDefinition >();
 
