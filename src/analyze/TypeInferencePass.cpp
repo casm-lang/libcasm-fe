@@ -182,15 +182,14 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
     node.defaultValue()->accept( *this );
 
-    if( node.defaultValue() and node.defaultValue()->type()
-        and node.defaultValue()->type() != node.returnType()->type() )
+    if( node.defaultValue() and node.defaultValue()->type() and
+        node.defaultValue()->type() != node.returnType()->type() )
     {
-        m_log.error( { node.defaultValue()->sourceLocation(),
-                         node.returnType()->sourceLocation() },
-            "type mismatch: type of default value was '"
-                + node.defaultValue()->type()->description()
-                + "', function expects '"
-                + node.returnType()->type()->description() + "'",
+        m_log.error(
+            { node.defaultValue()->sourceLocation(), node.returnType()->sourceLocation() },
+            "type mismatch: type of default value was '" +
+                node.defaultValue()->type()->description() + "', function expects '" +
+                node.returnType()->type()->description() + "'",
             Code::TypeInferenceFunctionDefaultValueTypeMismatch );
     }
 
@@ -370,9 +369,10 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
         if( not annotation.valid( *relationType ) )
         {
-            m_log.error( { node.sourceLocation() },
-                "invalid 'as operator' type casting relation '"
-                    + relationType->description() + "' found'",
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid 'as operator' type casting relation '" + relationType->description() +
+                    "' found'",
                 Code::TypeInferenceInvalidTypeCastingExpression );
             return;
         }
