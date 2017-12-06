@@ -1421,6 +1421,7 @@ void TypeInferenceVisitor::inference(
     auto& typeIDs = m_typeIDs[&node ];
 
     std::vector< libcasm_ir::Type::Ptr > argTypes = {};
+    std::vector< libcasm_ir::Value::Ptr > argValues = {};
     for( std::size_t c = 0; c < arguments.size(); c++ )
     {
         if( arguments[ c ]->type() )
@@ -1430,6 +1431,17 @@ void TypeInferenceVisitor::inference(
         else
         {
             argTypes.emplace_back( nullptr );
+        }
+
+        if( arguments[ c ]->id() == Node::ID::VALUE_ATOM )
+        {
+            const auto argumentValue =
+                static_cast< Ast::ValueAtom* >( arguments[ c ].get() )->value();
+            argValues.emplace_back( argumentValue );
+        }
+        else
+        {
+            argValues.emplace_back( nullptr );
         }
     }
 
@@ -1454,7 +1466,7 @@ void TypeInferenceVisitor::inference(
         {
             try
             {
-                const auto inferredTypeID = annotation->inference( argTypes, {} );
+                const auto inferredTypeID = annotation->inference( argTypes, argValues );
                 typeIDs.insert( inferredTypeID );
             }
             catch( const libcasm_ir::TypeArgumentException& e )
