@@ -81,6 +81,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
@@ -643,6 +644,60 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
         }
     }
+}
+
+void TypeInferenceVisitor::visit( MethodCallExpression& node )
+{
+    const auto& methodName = node.methodName()->name();
+
+    node.object()->accept( *this );
+
+    if( not node.object()->type() )
+    {
+        m_log.error( { node.sourceLocation() }, "unable to resolve object type" );
+        return;  // the object type is essential to resolve the method
+    }
+
+    // for the time being only builtin method calls are supported
+    node.setMethodType( MethodCallExpression::MethodType::BUILTIN );
+
+    std::vector< Expression::Ptr > methodCallArguments;
+    methodCallArguments.reserve( 1 + node.arguments()->size() );
+    methodCallArguments.emplace_back( node.object() );  // pass object instance as first argument
+    methodCallArguments.insert(
+        methodCallArguments.end(), node.arguments()->begin(), node.arguments()->end() );
+
+    const auto* annotation = annotate( node, methodCallArguments );
+    if( not annotation )
+    {
+        m_log.error(
+            { node.sourceLocation() }, "unable to resolve built-in method '" + methodName + "'" );
+        return;
+    }
+
+    node.setTargetBuiltinId( annotation->valueID() );
+
+    RecursiveVisitor::visit( node );
+
+    const auto description = "built-in method '" + methodName + "'";
+    inference( description, annotation, node, methodCallArguments );
+
+    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+    argumentTypes.emplace_back( node.object()->type()->ptr_result() );
+    for( auto argumentType : *node.arguments() )
+    {
+        if( not argumentType->type() )
+        {
+            m_log.debug(
+                { argumentType->sourceLocation() },
+                "TODO: '" + methodName + "' has a non-typed argument(s)" );
+            return;
+        }
+
+        argumentTypes.emplace_back( argumentType->type()->ptr_result() );
+    }
+
+    // TODO check for arguments type mismatch
 }
 
 void TypeInferenceVisitor::visit( IndirectCallExpression& node )
@@ -1303,9 +1358,6 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         auto& directCall = static_cast< DirectCallExpression& >( node );
         const auto& path = *directCall.identifier();
 
-        assert( directCall.targetType() == CallExpression::TargetType::BUILTIN );
-        assert( directCall.targetBuiltinId() != libcasm_ir::Value::ID::_SIZE_ );
-
         try
         {
             const auto& builtin_annotation =
@@ -1318,6 +1370,24 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                 { directCall.sourceLocation() },
                 "unable to resolve built-in symbol '" + path.path() +
                     "', due to missing annotation information from 'libcasm-ir'" );
+            return nullptr;
+        }
+    }
+    else if( node.id() == libcasm_fe::Ast::Type::ID::METHOD_CALL_EXPRESSION )
+    {
+        auto& methodCall = static_cast< MethodCallExpression& >( node );
+        const auto& methodName = methodCall.methodName()->name();
+
+        assert( methodCall.methodType() == MethodCallExpression::MethodType::BUILTIN );
+        assert( methodCall.targetBuiltinId() != libcasm_ir::Value::ID::_SIZE_ );
+
+        try
+        {
+            const auto& builtin_annotation = libcasm_ir::Annotation::find( methodName );
+            annotation = &builtin_annotation;
+        }
+        catch( const std::domain_error& e )
+        {
             return nullptr;
         }
     }
