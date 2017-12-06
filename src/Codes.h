@@ -183,6 +183,7 @@ namespace libcasm_fe
         TypeInferenceArgumentTypeMismatch = 0x1301,
 
         TypeInferenceFunctionArgumentTypeMismatch = 0x1302,
+        TypeInferenceFunctionDefaultValueTypeMismatch = 0x1332,
 
         TypeInferenceDerivedArgumentTypeMismatch = 0x1303,
         TypeInferenceDerivedReturnTypeMismatch = 0x1323,
