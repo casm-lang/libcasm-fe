@@ -162,7 +162,7 @@ static std::string updateAsString( const ExecutionUpdateSet::Update& update )
     const auto& location = update.location;
     const auto& value = update.value;
 
-    auto locationStr = value.producer->function()->identifier()->path();
+    auto locationStr = value.producer->function()->identifier()->name();
 
     if( not location.arguments().empty() )
     {
@@ -540,7 +540,7 @@ void ExecutionVisitor::visit( EnumerationDefinition& node )
 
 void ExecutionVisitor::visit( TypeCastingExpression& node )
 {
-    if( node.builtin() )
+    if( node.isBuiltin() )
     {
         m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
         invokeBuiltin( node, node.targetBuiltinId(), node.type() );
@@ -625,14 +625,6 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
 {
     node.object()->accept( *this );
     const auto object = m_evaluationStack.pop();
-    if( not object.defined() )
-    {
-        throw RuntimeException(
-            node.object()->sourceLocation(),
-            "cannot call a method of an undefined object",
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::Unspecified );
-    }
 
     switch( node.methodType() )
     {
@@ -640,6 +632,15 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
         case MethodCallExpression::MethodType::DERIVED:   // [[fallthrough]]
         case MethodCallExpression::MethodType::RULE:
         {
+            if( not object.defined() )
+            {
+                throw RuntimeException(
+                    node.object()->sourceLocation(),
+                    "cannot call a method of an undefined object",
+                    m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                    Code::Unspecified );
+            }
+
             const auto& definition =
                 std::static_pointer_cast< Definition >( node.targetDefinition() );
             m_frameStack.push( makeObjectFrame(

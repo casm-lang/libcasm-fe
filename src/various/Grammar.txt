@@ -360,8 +360,8 @@ TypeCastingExpression ::= Term "as" Type
 ===== DirectCallExpression =====
 
 <code>
-DirectCallExpression ::= IdentifierPath
-                       | IdentifierPath Arguments
+DirectCallExpression ::= Identifier
+                       | Identifier Arguments
 </code>
 
 {{page>:grammar:DirectCallExpression&noheader&nofooter}}

@@ -48,6 +48,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+static const std::string DELIMITER( "::" );
+
 Node::Node( Node::ID id )
 : m_id( id )
 , m_sourceLocation()
@@ -104,6 +106,10 @@ std::string Node::description( void ) const
         case ID::TYPE_CASTING_EXPRESSION:
         {
             return "type casting expression";
+        }
+        case ID::UNRESOLVED_NAMESPACE:
+        {
+            return "unresolved namespace";
         }
         case ID::VALUE_ATOM:
         {
@@ -330,10 +336,10 @@ const std::string& IdentifierPath::baseName( void ) const
 std::string IdentifierPath::baseDir( void ) const
 {
     const auto& p = path();
-    const size_t lastDotPos = p.find_last_of( '.' );
+    const size_t lastDotPos = p.find_last_of( DELIMITER );
     if( lastDotPos != std::string::npos )
     {
-        return p.substr( 0, lastDotPos );
+        return p.substr( 0, lastDotPos - DELIMITER.size() + 1 );
     }
     else
     {
@@ -343,8 +349,6 @@ std::string IdentifierPath::baseDir( void ) const
 
 std::string IdentifierPath::path( void ) const
 {
-    static const std::string DELIMITER( "::" );
-
     std::string path;
 
     if( m_type == Type::RELATIVE )

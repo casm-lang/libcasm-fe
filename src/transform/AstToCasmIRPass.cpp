@@ -352,9 +352,9 @@ void AstToCasmIRVisitor::visit( UndefAtom& node )
 void AstToCasmIRVisitor::visit( DirectCallExpression& node )
 {
     assert( m_statement and " target statement not set " );
-
-    const auto& identifier = *node.identifier();
-    const auto& name = identifier.path();
+    assert( node.identifier() );
+    const auto& identifier = node.identifier();
+    const auto& identifierName = identifier->name();
     const auto& type = node.type();
 
     std::vector< libcasm_ir::Value::Ptr > args;
@@ -426,8 +426,7 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             m_specification->add( type );
 
             const libcasm_ir::Constant::Ptr constant =
-                libstdhl::Memory::make< libcasm_ir::EnumerationConstant >(
-                    type, identifier.baseName() );
+                libstdhl::Memory::make< libcasm_ir::EnumerationConstant >( type, identifierName );
 
             m_specification->add( constant );
             m_ast2ir.emplace( &node, constant );

@@ -76,6 +76,7 @@ class SymbolResolveVisitor final : public RecursiveVisitor
 
     void visit( ReferenceAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
@@ -192,17 +193,11 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& path = *node.identifier();
-    const auto& name = path.path();
+    assert( node.identifier() );
+    const auto& identifier = node.identifier();
+    const auto& identifierName = identifier->name();
 
-    if( path.type() == IdentifierPath::Type::RELATIVE )
-    {
-        // only absolute types can be resolved here, relative types will be
-        // resolved later in the type inference pass
-        return;
-    }
-
-    const auto variableIt = m_variables.find( name );
+    const auto variableIt = m_variables.find( identifierName );
     if( variableIt != m_variables.cend() )
     {
         node.setTargetType( CallExpression::TargetType::VARIABLE );
@@ -210,29 +205,28 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    if( libcasm_ir::Builtin::available( name ) )
+    if( libcasm_ir::Builtin::available( identifierName ) )
     {
-        const auto& annotation = libcasm_ir::Annotation::find( name );
+        const auto& annotation = libcasm_ir::Annotation::find( identifierName );
 
-        node.setTargetType( CallExpression::TargetType::BUILTIN );
         node.setTargetBuiltinId( annotation.valueID() );
 
         const auto expectedNumberOfArguments = annotation.relations().front().argument.size();
+
         if( node.arguments()->size() != expectedNumberOfArguments )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "invalid argument size: builtin '" + name + "' expects " +
+                "invalid argument size: builtin '" + identifierName + "' expects " +
                     std::to_string( expectedNumberOfArguments ) + " arguments",
                 Code::SymbolArgumentSizeMismatch );
         }
-
         return;
     }
 
     try
     {
-        const auto& symbol = m_symboltable.find( *node.identifier() );
+        const auto& symbol = m_symboltable.find( identifier );
 
         std::size_t expectedNumberOfArguments = 0;
 
@@ -284,8 +278,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "invalid argument size: " + symbol->description() + " '" + name + "' expects " +
-                    std::to_string( expectedNumberOfArguments ) + " arguments",
+                "invalid argument size: " + symbol->description() + " '" + identifierName +
+                    "' expects " + std::to_string( expectedNumberOfArguments ) + " arguments",
                 Code::SymbolArgumentSizeMismatch );
         }
     }
@@ -295,7 +289,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         static const auto AGENT( "Agent" );
         static const auto SINGLE_AGENT_CONSTANT( "$" );
 
-        if( name == SELF )
+        if( identifierName == SELF )
         {
             try
             {
@@ -310,7 +304,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         }
         // single agent execution notation --> agent type domain ==
         // Enumeration!
-        else if( name == SINGLE_AGENT_CONSTANT )
+        else if( identifierName == SINGLE_AGENT_CONSTANT )
         {
             assert( node.targetType() == CallExpression::TargetType::CONSTANT );
 
@@ -337,14 +331,112 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "unknown " + node.targetTypeName() + " symbol '" + path.path() + "' found",
+                "unknown " +
+                    ( node.targetType() != CallExpression::TargetType::UNKNOWN
+                          ? node.targetTypeName() + " "
+                          : "" ) +
+                    "symbol '" + identifierName + "' found",
                 ( node.targetType() == CallExpression::TargetType::FUNCTION )
                     ? Code::FunctionSymbolIsUnknown
                     : Code::SymbolIsUnknown );
         }
     }
 
-    m_log.debug( "call: " + path.path() + "{ " + node.targetTypeName() + " }" );
+    m_log.debug( "call: " + identifierName + "{ " + node.targetTypeName() + " }" );
+}
+
+void SymbolResolveVisitor::visit( MethodCallExpression& node )
+{
+    RecursiveVisitor::visit( node );
+
+    assert( node.methodName() );
+    const auto& methodNameIdentifier = node.methodName();
+    const auto& methodName = methodNameIdentifier->name();
+
+    if( libcasm_ir::Builtin::available( methodName ) )
+    {
+        const auto& annotation = libcasm_ir::Annotation::find( methodName );
+
+        node.setMethodType( MethodCallExpression::MethodType::BUILTIN );
+        node.setTargetBuiltinId( annotation.valueID() );
+
+        const auto expectedNumberOfArguments = annotation.relations().front().argument.size() - 1;
+
+        if( node.arguments()->size() != expectedNumberOfArguments )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid argument size: builtin '" + methodName + "' expects " +
+                    std::to_string( expectedNumberOfArguments ) + " arguments",
+                Code::SymbolArgumentSizeMismatch );
+        }
+        return;
+    }
+
+    try
+    {
+        const auto& symbol = m_symboltable.find( methodNameIdentifier );
+
+        std::size_t expectedNumberOfArguments = 0;
+
+        switch( symbol->id() )
+        {
+            case Node::ID::FUNCTION_DEFINITION:
+            {
+                node.setMethodType( MethodCallExpression::MethodType::FUNCTION );
+                const auto function = std::static_pointer_cast< FunctionDefinition >( symbol );
+                expectedNumberOfArguments = function->argumentTypes()->size();
+                break;
+            }
+            case Node::ID::DERIVED_DEFINITION:
+            {
+                node.setMethodType( MethodCallExpression::MethodType::DERIVED );
+                const auto derived = std::static_pointer_cast< DerivedDefinition >( symbol );
+                expectedNumberOfArguments = derived->arguments()->size();
+                break;
+            }
+            case Node::ID::RULE_DEFINITION:
+            {
+                node.setMethodType( MethodCallExpression::MethodType::RULE );
+                const auto rule = std::static_pointer_cast< RuleDefinition >( symbol );
+                expectedNumberOfArguments = rule->arguments()->size();
+                break;
+            }
+            default:
+            {
+                m_log.error(
+                    { methodNameIdentifier->sourceLocation() },
+                    "cannot reference '" + symbol->description() + "'" );
+                return;
+            }
+        }
+
+        node.setTargetDefinition( symbol );
+
+        if( node.arguments()->size() != expectedNumberOfArguments )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid argument size: " + symbol->description() + " '" + methodName +
+                    "' expects " + std::to_string( expectedNumberOfArguments ) + " arguments",
+                Code::SymbolArgumentSizeMismatch );
+        }
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown " +
+                ( node.targetType() != CallExpression::TargetType::UNKNOWN
+                      ? node.targetTypeName() + " "
+                      : "" ) +
+                "symbol '" + methodName + "' found",
+            ( node.targetType() == CallExpression::TargetType::FUNCTION )
+                ? Code::FunctionSymbolIsUnknown
+                : Code::SymbolIsUnknown );
+    }
+
+    m_log.debug( "call: " + methodName + "{ " + node.targetTypeName() + " }" );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )
