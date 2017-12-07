@@ -214,14 +214,14 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
             // calling an out function isn't allowed (write-only)
             m_log.error(
                 { node.sourceLocation() },
-                "calling function '" + node.identifier()->path() +
+                "calling function '" + node.identifier()->name() +
                     "' is not allowed, it is classified as '" + function->classificationName() +
                     "' ",
                 Code::DirectCallExpressionInvalidClassifier );
 
             m_log.info(
                 { function->sourceLocation() },
-                "function '" + node.identifier()->path() + "' is classified as '" +
+                "function '" + node.identifier()->name() + "' is classified as '" +
                     function->classificationName() + "', incorrect usage in line " +
                     std::to_string( node.sourceLocation().begin.line ) );
         }
@@ -233,7 +233,7 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "calling rule '" + node.identifier()->path() +
+                "calling rule '" + node.identifier()->name() +
                     "' is not allowed inside a derived definition",
                 Code::NotSideEffectFreeRuleCall );
         }
@@ -242,18 +242,22 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 
 void ConsistencyCheckVisitor::visit( UpdateRule& node )
 {
-    RecursiveVisitor::visit( node );
+    // don't visit the function directly, as it would be treated like a function call
+
+    node.expression()->accept( *this );
 
     const auto& func = node.function();
     if( func->targetType() != CallExpression::TargetType::FUNCTION )
     {
         m_log.error(
             { func->sourceLocation() },
-            "updating " + func->targetTypeName() + " '" + func->identifier()->path() +
+            "updating " + func->targetTypeName() + " '" + func->identifier()->name() +
                 "' is not allowed, only function symbols are allowed",
             Code::UpdateRuleFunctionSymbolIsInvalid );
         return;
     }
+
+    func->arguments()->accept( *this );
 
     const auto& def = func->targetDefinition()->ptr< FunctionDefinition >();
 
@@ -281,13 +285,13 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     {
         m_log.error(
             { func->sourceLocation() },
-            "updating function '" + func->identifier()->path() +
+            "updating function '" + func->identifier()->name() +
                 "' is not allowed, it is classified as '" + def->classificationName() + "' ",
             Code::UpdateRuleInvalidClassifier );
 
         m_log.info(
             { def->sourceLocation() },
-            "function '" + func->identifier()->path() + "' is classified as '" +
+            "function '" + func->identifier()->name() + "' is classified as '" +
                 def->classificationName() + "', incorrect usage in line " +
                 std::to_string( func->sourceLocation().begin.line ) );
     }

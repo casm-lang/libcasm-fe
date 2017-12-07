@@ -115,11 +115,13 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
 
     void visit( TypeCastingExpression& node ) override;
+    void visit( UnresolvedNamespace& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
@@ -245,6 +247,12 @@ void AstDumpDotVisitor::visit( TypeCastingExpression& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( UnresolvedNamespace& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "UnresolvedNamespace" );
+}
+
 void AstDumpDotVisitor::visit( ValueAtom& node )
 {
     DotLink link( this, &node );
@@ -277,6 +285,13 @@ void AstDumpDotVisitor::visit( IndirectCallExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "IndirectCallExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( MethodCallExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "MethodCallExpression\nTarget type: " + node.targetTypeName() );
     RecursiveVisitor::visit( node );
 }
 

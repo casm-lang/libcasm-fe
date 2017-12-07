@@ -110,6 +110,10 @@ void RecursiveVisitor::visit( TypeCastingExpression& node )
     node.asType()->accept( *this );
 }
 
+void RecursiveVisitor::visit( UnresolvedNamespace& node )
+{
+}
+
 void RecursiveVisitor::visit( ValueAtom& node )
 {
 }
@@ -132,6 +136,13 @@ void RecursiveVisitor::visit( DirectCallExpression& node )
 void RecursiveVisitor::visit( IndirectCallExpression& node )
 {
     node.expression()->accept( *this );
+    node.arguments()->accept( *this );
+}
+
+void RecursiveVisitor::visit( MethodCallExpression& node )
+{
+    node.expression()->accept( *this );
+    node.identifier()->accept( *this );
     node.arguments()->accept( *this );
 }
 

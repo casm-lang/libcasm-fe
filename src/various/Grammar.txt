@@ -268,10 +268,8 @@ UpdateRule ::= DirectCallExpression ":=" Term
 ===== CallRule =====
 
 <code>
-CallRule ::= "call" DirectCallExpression
-           | DirectCallExpression
-           | "call" IndirectCallExpression
-           | IndirectCallExpression
+CallRule ::= "call" CallExpression
+           | CallExpression
 </code>
 
 {{page>:grammar:CallRule&noheader&nofooter}}
@@ -292,8 +290,7 @@ Terms ::= Terms "," Term
 <code>
 Term ::= Expression
        | TypeCastingExpression
-       | DirectCallExpression
-       | IndirectCallExpression
+       | CallExpression
        | LetExpression
        | ConditionalExpression
        | ChooseExpression
@@ -345,11 +342,22 @@ TypeCastingExpression ::= Term "as" Type
 {{page>:grammar:TypeCastingExpression&noheader&nofooter}}
 
 
+===== CallExpression =====
+
+<code>
+CallExpression ::= DirectCallExpression
+                 | IndirectCallExpression
+                 | MethodCallExpression
+</code>
+
+{{page>:grammar:CallExpression&noheader&nofooter}}
+
+
 ===== DirectCallExpression =====
 
 <code>
-DirectCallExpression ::= IdentifierPath
-                       | IdentifierPath Arguments
+DirectCallExpression ::= Identifier
+                       | Identifier Arguments
 </code>
 
 {{page>:grammar:DirectCallExpression&noheader&nofooter}}
@@ -362,6 +370,19 @@ IndirectCallExpression ::= "(" "*" Term ")" Arguments
 </code>
 
 {{page>:grammar:IndirectCallExpression&noheader&nofooter}}
+
+
+===== MethodCallExpression =====
+
+<code>
+MethodCallExpression ::= "(" Term ")" "." Identifier
+                       | "(" Term ")" "." Identifier Arguments
+                       | CallExpression "." Identifier
+                       | CallExpression "." Identifier Arguments
+                       | "." Identifier
+</code>
+
+{{page>:grammar:MethodCallExpression&noheader&nofooter}}
 
 
 ===== LetExpression =====
