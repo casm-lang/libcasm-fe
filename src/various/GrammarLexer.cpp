@@ -9,7 +9,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 6
-#define YY_FLEX_SUBMINOR_VERSION 4
+#define YY_FLEX_SUBMINOR_VERSION 3
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -20,6 +20,12 @@
  * We will address this in a future release of flex, or omit the C++ scanner
  * altogether.
  */
+
+#define yyalloc yyalloc
+
+#define yyrealloc yyrealloc
+
+#define yyfree yyfree
 
 /* First, we deal with  platform-specific or compiler-specific issues. */
 
@@ -85,10 +91,6 @@ typedef unsigned int flex_uint32_t;
 #endif
 #ifndef UINT32_MAX
 #define UINT32_MAX ( 4294967295U )
-#endif
-
-#ifndef SIZE_MAX
-#define SIZE_MAX ( ~(size_t)0 )
 #endif
 
 #endif /* ! C99 */
@@ -539,11 +541,11 @@ using namespace libcasm_fe;
 // Code run each time a pattern is matched.
 #define YY_USER_ACTION loc.columns( yyleng );
 
-#line 639 "src/various/GrammarLexer.cpp"
+#line 641 "src/various/GrammarLexer.cpp"
 /* %option debug */
 #define YY_NO_INPUT 1
 
-#line 643 "src/various/GrammarLexer.cpp"
+#line 645 "src/various/GrammarLexer.cpp"
 
 #define INITIAL 0
 #define LCOMMENT 1
@@ -683,7 +685,7 @@ YY_DECL
         // Code run each time yylex is called.
         loc.step();
 
-#line 786 "src/various/GrammarLexer.cpp"
+#line 788 "src/various/GrammarLexer.cpp"
 
         while( /*CONSTCOND*/ 1 ) /* loops until end-of-file is reached */
         {
@@ -1424,7 +1426,7 @@ YY_DECL
 #line 263 "obj/src/GrammarLexer.l"
                     YY_FATAL_ERROR( "flex scanner jammed" );
                     YY_BREAK
-#line 1385 "src/various/GrammarLexer.cpp"
+#line 1387 "src/various/GrammarLexer.cpp"
                 case YY_STATE_EOF( INITIAL ):
                     yyterminate();
 
@@ -1804,8 +1806,6 @@ int yyFlexLexer::yy_get_next_buffer()
             (char *)yyrealloc( (void *)YY_CURRENT_BUFFER_LVALUE->yy_ch_buf, (yy_size_t)new_size );
         if( !YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
             YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
-        /* "- 2" to take care of EOB's */
-        YY_CURRENT_BUFFER_LVALUE->yy_buf_size = (int)( new_size - 2 );
     }
 
     ( yy_n_chars ) += number_to_move;
@@ -2003,10 +2003,6 @@ void yyFlexLexer::yyrestart( std::istream &input_file )
  */
 void yyFlexLexer::yyrestart( std::istream *input_file )
 {
-    if( !input_file )
-    {
-        input_file = &yyin;
-    }
     yyrestart( *input_file );
 }
 
@@ -2122,7 +2118,7 @@ void yyFlexLexer::yy_init_buffer( YY_BUFFER_STATE b, std::istream &file )
 
     yy_flush_buffer( b );
 
-    b->yy_input_file = file.rdbuf();
+    b->yy_input_file = ( &file == 0 ) ? NULL : file.rdbuf();
     b->yy_fill_buffer = 1;
 
     /* If b is the current buffer, then yy_init_buffer was _probably_

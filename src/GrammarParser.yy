@@ -282,8 +282,6 @@ END       0 "end of file"
 %precedence UPLUS UMINUS
 %precedence NOT
 
-%precedence DOUBLECOLON
-
 // prefer calls with args (starts with LPAREN) over calls without args
 %precedence CALL_WITHOUT_ARGS
 %precedence LPAREN
