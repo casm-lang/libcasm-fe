@@ -162,7 +162,7 @@ static std::string updateAsString( const ExecutionUpdateSet::Update& update )
     const auto& location = update.location;
     const auto& value = update.value;
 
-    auto locationStr = value.producer->function()->identifier()->path();
+    auto locationStr = value.producer->function()->identifier()->name();
 
     if( not location.arguments().empty() )
     {
@@ -310,6 +310,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( BasicType& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
@@ -533,9 +534,10 @@ void ExecutionVisitor::visit( EnumerationDefinition& node )
 
 void ExecutionVisitor::visit( TypeCastingExpression& node )
 {
-    if( node.builtin() )
+    if( node.isBuiltin() )
     {
-        m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
+        m_frameStack.push( makeFrame(
+            &node, nullptr, node.arguments()->size() + ( node.isMethodCall() ? 1 : 0 ) ) );
         invokeBuiltin( node, node.targetBuiltinId(), node.type() );
         m_frameStack.pop();
     }
@@ -589,7 +591,8 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::BUILTIN:
         {
-            m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
+            m_frameStack.push( makeFrame(
+                &node, nullptr, node.arguments()->size() + ( node.isMethodCall() ? 1 : 0 ) ) );
             invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
@@ -654,6 +657,12 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             break;
         }
     }
+}
+
+void ExecutionVisitor::visit( MethodCallExpression& node )
+{
+    node.expression()->accept( *this );
+    node.DirectCallExpression::accept( *this );
 }
 
 void ExecutionVisitor::visit( UnaryExpression& node )
@@ -1228,6 +1237,16 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
         assert( numberOfLocals >= call->arguments()->size() );
 
         std::size_t localIndex = 0;
+
+        if( call->isMethodCall() )
+        {
+            // already evaluated in the MethodCallExpression, just pop the
+            // latest value from the evaluation stack!
+            const auto value = m_evaluationStack.pop();
+            frame->setLocal( localIndex, value );
+            ++localIndex;
+        }
+
         for( const auto& argument : *call->arguments() )
         {
             argument->accept( *this );

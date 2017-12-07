@@ -82,6 +82,10 @@ void EmptyVisitor::visit( TypeCastingExpression& )
 {
 }
 
+void EmptyVisitor::visit( UnresolvedNamespace& )
+{
+}
+
 void EmptyVisitor::visit( ValueAtom& )
 {
 }
@@ -99,6 +103,10 @@ void EmptyVisitor::visit( DirectCallExpression& )
 }
 
 void EmptyVisitor::visit( IndirectCallExpression& )
+{
+}
+
+void EmptyVisitor::visit( MethodCallExpression& )
 {
 }
 

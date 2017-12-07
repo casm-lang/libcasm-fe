@@ -74,12 +74,14 @@ namespace libcasm_fe
                 ENUMERATION_DEFINITION,
 
                 // expressions
+                UNRESOLVED_NAMESPACE,
                 TYPE_CASTING_EXPRESSION,
                 VALUE_ATOM,
                 REFERENCE_ATOM,
                 UNDEF_ATOM,
                 DIRECT_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,
+                METHOD_CALL_EXPRESSION,
                 UNARY_EXPRESSION,
                 BINARY_EXPRESSION,
                 RANGE_EXPRESSION,
