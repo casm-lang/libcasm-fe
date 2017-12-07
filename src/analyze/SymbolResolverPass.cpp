@@ -76,7 +76,6 @@ class SymbolResolveVisitor final : public RecursiveVisitor
 
     void visit( ReferenceAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
-    void visit( MethodCallExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
@@ -343,100 +342,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     }
 
     m_log.debug( "call: " + identifierName + "{ " + node.targetTypeName() + " }" );
-}
-
-void SymbolResolveVisitor::visit( MethodCallExpression& node )
-{
-    RecursiveVisitor::visit( node );
-
-    assert( node.methodName() );
-    const auto& methodNameIdentifier = node.methodName();
-    const auto& methodName = methodNameIdentifier->name();
-
-    if( libcasm_ir::Builtin::available( methodName ) )
-    {
-        const auto& annotation = libcasm_ir::Annotation::find( methodName );
-
-        node.setMethodType( MethodCallExpression::MethodType::BUILTIN );
-        node.setTargetBuiltinId( annotation.valueID() );
-
-        const auto expectedNumberOfArguments = annotation.relations().front().argument.size() - 1;
-
-        if( node.arguments()->size() != expectedNumberOfArguments )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "invalid argument size: builtin '" + methodName + "' expects " +
-                    std::to_string( expectedNumberOfArguments ) + " arguments",
-                Code::SymbolArgumentSizeMismatch );
-        }
-        return;
-    }
-
-    try
-    {
-        const auto& symbol = m_symboltable.find( methodNameIdentifier );
-
-        std::size_t expectedNumberOfArguments = 0;
-
-        switch( symbol->id() )
-        {
-            case Node::ID::FUNCTION_DEFINITION:
-            {
-                node.setMethodType( MethodCallExpression::MethodType::FUNCTION );
-                const auto function = std::static_pointer_cast< FunctionDefinition >( symbol );
-                expectedNumberOfArguments = function->argumentTypes()->size();
-                break;
-            }
-            case Node::ID::DERIVED_DEFINITION:
-            {
-                node.setMethodType( MethodCallExpression::MethodType::DERIVED );
-                const auto derived = std::static_pointer_cast< DerivedDefinition >( symbol );
-                expectedNumberOfArguments = derived->arguments()->size();
-                break;
-            }
-            case Node::ID::RULE_DEFINITION:
-            {
-                node.setMethodType( MethodCallExpression::MethodType::RULE );
-                const auto rule = std::static_pointer_cast< RuleDefinition >( symbol );
-                expectedNumberOfArguments = rule->arguments()->size();
-                break;
-            }
-            default:
-            {
-                m_log.error(
-                    { methodNameIdentifier->sourceLocation() },
-                    "cannot reference '" + symbol->description() + "'" );
-                return;
-            }
-        }
-
-        node.setTargetDefinition( symbol );
-
-        if( node.arguments()->size() != expectedNumberOfArguments )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "invalid argument size: " + symbol->description() + " '" + methodName +
-                    "' expects " + std::to_string( expectedNumberOfArguments ) + " arguments",
-                Code::SymbolArgumentSizeMismatch );
-        }
-    }
-    catch( const std::domain_error& e )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown " +
-                ( node.targetType() != CallExpression::TargetType::UNKNOWN
-                      ? node.targetTypeName() + " "
-                      : "" ) +
-                "symbol '" + methodName + "' found",
-            ( node.targetType() == CallExpression::TargetType::FUNCTION )
-                ? Code::FunctionSymbolIsUnknown
-                : Code::SymbolIsUnknown );
-    }
-
-    m_log.debug( "call: " + methodName + "{ " + node.targetTypeName() + " }" );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )

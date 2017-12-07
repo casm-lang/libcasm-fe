@@ -1408,9 +1408,6 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         auto& methodCall = static_cast< MethodCallExpression& >( node );
         const auto& methodName = methodCall.methodName()->name();
 
-        assert( methodCall.methodType() == MethodCallExpression::MethodType::BUILTIN );
-        assert( methodCall.targetBuiltinId() != libcasm_ir::Value::ID::_SIZE_ );
-
         try
         {
             const auto& builtin_annotation = libcasm_ir::Annotation::find( methodName );
