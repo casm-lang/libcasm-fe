@@ -127,13 +127,13 @@ std::string Node::description( void ) const
         {
             return "direct call";
         }
-        case ID::INDIRECT_CALL_EXPRESSION:
-        {
-            return "indirect call";
-        }
         case ID::METHOD_CALL_EXPRESSION:
         {
             return "method call";
+        }
+        case ID::INDIRECT_CALL_EXPRESSION:
+        {
+            return "indirect call";
         }
         case ID::UNARY_EXPRESSION:
         {

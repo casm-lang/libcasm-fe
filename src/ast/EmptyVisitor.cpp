@@ -102,11 +102,11 @@ void EmptyVisitor::visit( DirectCallExpression& )
 {
 }
 
-void EmptyVisitor::visit( IndirectCallExpression& )
+void EmptyVisitor::visit( MethodCallExpression& )
 {
 }
 
-void EmptyVisitor::visit( MethodCallExpression& )
+void EmptyVisitor::visit( IndirectCallExpression& )
 {
 }
 

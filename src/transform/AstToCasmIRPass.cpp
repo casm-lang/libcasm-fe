@@ -79,6 +79,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
@@ -353,7 +354,7 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
     assert( m_statement and " target statement not set " );
     assert( node.identifier() );
     const auto& identifier = node.identifier();
-    const auto& identifierName = identifier->name();
+    const auto& identifierName = identifier->path();
     const auto& type = node.type();
 
     std::vector< libcasm_ir::Value::Ptr > args;
@@ -454,6 +455,11 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             break;
         }
     }
+}
+
+void AstToCasmIRVisitor::visit( MethodCallExpression& node )
+{
+    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( IndirectCallExpression& node )

@@ -190,8 +190,6 @@ namespace libcasm_fe
             const Expression::Ptr& baseExpression( void ) const;
 
             u1 isBuiltin( void ) const;
-            u1 isDefinition( void ) const;
-            u1 isMethodCall( void ) const;
 
           private:
             const Expressions::Ptr m_arguments;
@@ -210,22 +208,69 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< DirectCallExpression >;
 
             DirectCallExpression(
-                const Identifier::Ptr& identifier, const Expressions::Ptr& arguments );
-
-          protected:
-            DirectCallExpression(
-                const Node::ID id,
-                const Identifier::Ptr& identifier,
-                const Expressions::Ptr& arguments );
+                const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments );
 
           public:
-            void setIdentifier( const Identifier::Ptr& identifier );
-            const Identifier::Ptr& identifier( void ) const;
+            void setIdentifier( const IdentifierPath::Ptr& identifier );
+            const IdentifierPath::Ptr& identifier( void ) const;
 
             void accept( Visitor& visitor ) override;
 
           private:
-            Identifier::Ptr m_identifier;
+            IdentifierPath::Ptr m_identifier;
+        };
+
+        class MethodCallExpression final : public CallExpression
+        {
+          public:
+            enum class MethodType
+            {
+                FUNCTION,
+                DERIVED,
+                BUILTIN,
+                RULE,
+                UNKNOWN
+            };
+
+            using Ptr = std::shared_ptr< MethodCallExpression >;
+
+            MethodCallExpression(
+                const Expression::Ptr& object,
+                const Identifier::Ptr& methodName,
+                const Expressions::Ptr& arguments );
+
+            const Expression::Ptr& object( void ) const;
+            const Identifier::Ptr& methodName( void ) const;
+
+            void setMethodType( MethodType methodType );
+            MethodType methodType( void ) const;
+
+            std::string methodTypeName( void ) const;
+
+            /**
+             * Sets the builtin id of this call.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
+
+            /**
+             *     Sets the definition of this call.
+             *
+             *     @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetDefinition( const TypedNode::Ptr& definition );
+            const TypedNode::Ptr& targetDefinition( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            Expression::Ptr m_object;
+            Identifier::Ptr m_methodName;
+            MethodType m_methodType;
+            libcasm_ir::Value::ID m_targetBuiltinId;
+            TypedNode::Ptr m_targetDefinition;
         };
 
         class IndirectCallExpression final : public CallExpression
@@ -261,24 +306,6 @@ namespace libcasm_fe
           private:
             const Expression::Ptr m_fromExpression;
             const std::shared_ptr< Type > m_asType;
-        };
-
-        class MethodCallExpression final : public DirectCallExpression
-        {
-          public:
-            using Ptr = std::shared_ptr< MethodCallExpression >;
-
-            MethodCallExpression(
-                const Expression::Ptr& expression,
-                const Identifier::Ptr& identifier,
-                const Expressions::Ptr& arguments );
-
-            const Expression::Ptr& expression( void ) const;
-
-            void accept( Visitor& visitor ) override;
-
-          private:
-            const Expression::Ptr m_expression;
         };
 
         class UnaryExpression final : public Expression

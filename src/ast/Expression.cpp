@@ -269,41 +269,115 @@ u1 CallExpression::isBuiltin( void ) const
            targetType() == CallExpression::TargetType::BUILTIN;
 }
 
-u1 CallExpression::isDefinition( void ) const
-{
-    return m_targetDefinition != nullptr and targetType() != CallExpression::TargetType::BUILTIN and
-           targetType() != CallExpression::TargetType::UNKNOWN;
-}
-
-u1 CallExpression::isMethodCall( void ) const
-{
-    return m_baseExpression != nullptr and targetType() == CallExpression::TargetType::BUILTIN;
-}
-
 DirectCallExpression::DirectCallExpression(
-    const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
-: DirectCallExpression( Node::ID::DIRECT_CALL_EXPRESSION, identifier, arguments )
-{
-}
-
-DirectCallExpression::DirectCallExpression(
-    const Node::ID id, const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
-: CallExpression( id, arguments )
+    const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
+: CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
 , m_identifier( identifier )
 {
 }
 
-void DirectCallExpression::setIdentifier( const Identifier::Ptr& identifier )
+void DirectCallExpression::setIdentifier( const IdentifierPath::Ptr& identifier )
 {
     m_identifier = identifier;
 }
 
-const Identifier::Ptr& DirectCallExpression::identifier( void ) const
+const IdentifierPath::Ptr& DirectCallExpression::identifier( void ) const
 {
     return m_identifier;
 }
 
 void DirectCallExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+MethodCallExpression::MethodCallExpression(
+    const Expression::Ptr& object,
+    const Identifier::Ptr& methodName,
+    const Expressions::Ptr& arguments )
+: CallExpression( Node::ID::METHOD_CALL_EXPRESSION, arguments )
+, m_object( object )
+, m_methodName( methodName )
+, m_methodType( MethodType::UNKNOWN )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
+{
+}
+
+const Expression::Ptr& MethodCallExpression::object( void ) const
+{
+    return m_object;
+}
+
+const Identifier::Ptr& MethodCallExpression::methodName( void ) const
+{
+    return m_methodName;
+}
+
+void MethodCallExpression::setMethodType( MethodType methodType )
+{
+    m_methodType = methodType;
+}
+
+MethodCallExpression::MethodType MethodCallExpression::methodType( void ) const
+{
+    return m_methodType;
+}
+
+std::string MethodCallExpression::methodTypeName( void ) const
+{
+    switch( m_methodType )
+    {
+        case MethodType::FUNCTION:
+        {
+            return "function";
+        }
+        case MethodType::DERIVED:
+        {
+            return "derived";
+        }
+        case MethodType::BUILTIN:
+        {
+            return "built-in";
+        }
+        case MethodType::RULE:
+        {
+            return "rule";
+        }
+        case MethodType::UNKNOWN:
+        {
+            return "unknown";
+        }
+    }
+
+    assert( !" internal error! " );
+    return std::string();
+}
+
+void MethodCallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
+{
+    m_targetBuiltinId = builtinId;
+}
+
+libcasm_ir::Value::ID MethodCallExpression::targetBuiltinId( void ) const
+{
+    assert( m_methodType == MethodType::BUILTIN );
+
+    return m_targetBuiltinId;
+}
+
+void MethodCallExpression::setTargetDefinition( const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+}
+
+const TypedNode::Ptr& MethodCallExpression::targetDefinition( void ) const
+{
+    assert( ( m_methodType != MethodType::BUILTIN ) and ( m_methodType != MethodType::UNKNOWN ) );
+
+    return m_targetDefinition;
+}
+
+void MethodCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
@@ -345,26 +419,6 @@ const Type::Ptr& TypeCastingExpression::asType( void ) const
 }
 
 void TypeCastingExpression::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-MethodCallExpression::MethodCallExpression(
-    const Expression::Ptr& expression,
-    const Identifier::Ptr& identifier,
-    const Expressions::Ptr& arguments )
-: DirectCallExpression( Node::ID::METHOD_CALL_EXPRESSION, identifier, arguments )
-, m_expression( expression )
-{
-    setBaseExpression( expression );
-}
-
-const Expression::Ptr& MethodCallExpression::expression( void ) const
-{
-    return m_expression;
-}
-
-void MethodCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

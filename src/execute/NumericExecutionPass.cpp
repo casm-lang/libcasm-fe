@@ -162,7 +162,7 @@ static std::string updateAsString( const ExecutionUpdateSet::Update& update )
     const auto& location = update.location;
     const auto& value = update.value;
 
-    auto locationStr = value.producer->function()->identifier()->name();
+    auto locationStr = value.producer->function()->identifier()->path();
 
     if( not location.arguments().empty() )
     {
@@ -309,8 +309,8 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( UndefAtom& node ) override;
     void visit( BasicType& node ) override;
     void visit( DirectCallExpression& node ) override;
-    void visit( IndirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
@@ -337,6 +337,12 @@ class ExecutionVisitor final : public EmptyVisitor
 
     std::unique_ptr< Frame > makeFrame(
         CallExpression* call, Node* callee, std::size_t numberOfLocals );
+
+    std::unique_ptr< Frame > makeObjectFrame(
+        const IR::Constant& object,
+        CallExpression* call,
+        Node* callee,
+        std::size_t numberOfLocals );
 
     /**
      * Calls the builtin with id \a id.
@@ -536,8 +542,7 @@ void ExecutionVisitor::visit( TypeCastingExpression& node )
 {
     if( node.isBuiltin() )
     {
-        m_frameStack.push( makeFrame(
-            &node, nullptr, node.arguments()->size() + ( node.isMethodCall() ? 1 : 0 ) ) );
+        m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
         invokeBuiltin( node, node.targetBuiltinId(), node.type() );
         m_frameStack.pop();
     }
@@ -591,8 +596,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::BUILTIN:
         {
-            m_frameStack.push( makeFrame(
-                &node, nullptr, node.arguments()->size() + ( node.isMethodCall() ? 1 : 0 ) ) );
+            m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
             invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
@@ -612,6 +616,50 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::UNKNOWN:
         {
             assert( !"cannot call an unknown target" );
+            break;
+        }
+    }
+}
+
+void ExecutionVisitor::visit( MethodCallExpression& node )
+{
+    node.object()->accept( *this );
+    const auto object = m_evaluationStack.pop();
+
+    switch( node.methodType() )
+    {
+        case MethodCallExpression::MethodType::FUNCTION:  // [[fallthrough]]
+        case MethodCallExpression::MethodType::DERIVED:   // [[fallthrough]]
+        case MethodCallExpression::MethodType::RULE:
+        {
+            if( not object.defined() )
+            {
+                throw RuntimeException(
+                    node.object()->sourceLocation(),
+                    "cannot call a method of an undefined object",
+                    m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                    Code::Unspecified );
+            }
+
+            const auto& definition =
+                std::static_pointer_cast< Definition >( node.targetDefinition() );
+            m_frameStack.push( makeObjectFrame(
+                object, &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            definition->accept( *this );
+            m_frameStack.pop();
+            break;
+        }
+        case MethodCallExpression::MethodType::BUILTIN:
+        {
+            m_frameStack.push(
+                makeObjectFrame( object, &node, nullptr, node.arguments()->size() ) );
+            invokeBuiltin( node, node.targetBuiltinId(), node.type() );
+            m_frameStack.pop();
+            break;
+        }
+        case MethodCallExpression::MethodType::UNKNOWN:
+        {
+            assert( !"cannot call an unknown method" );
             break;
         }
     }
@@ -657,12 +705,6 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             break;
         }
     }
-}
-
-void ExecutionVisitor::visit( MethodCallExpression& node )
-{
-    node.expression()->accept( *this );
-    node.DirectCallExpression::accept( *this );
 }
 
 void ExecutionVisitor::visit( UnaryExpression& node )
@@ -1237,16 +1279,31 @@ std::unique_ptr< Frame > ExecutionVisitor::makeFrame(
         assert( numberOfLocals >= call->arguments()->size() );
 
         std::size_t localIndex = 0;
-
-        if( call->isMethodCall() )
+        for( const auto& argument : *call->arguments() )
         {
-            // already evaluated in the MethodCallExpression, just pop the
-            // latest value from the evaluation stack!
+            argument->accept( *this );
             const auto value = m_evaluationStack.pop();
             frame->setLocal( localIndex, value );
             ++localIndex;
         }
+    }
 
+    return frame;
+}
+
+std::unique_ptr< Frame > ExecutionVisitor::makeObjectFrame(
+    const IR::Constant& object, CallExpression* call, Node* callee, std::size_t numberOfLocals )
+{
+    auto frame = libstdhl::Memory::make_unique< Frame >(
+        call, callee, numberOfLocals + 1 );  // TODO move the +1 to the frame size determination
+
+    frame->setLocal( 0, object );
+
+    if( call != nullptr )
+    {
+        assert( numberOfLocals >= call->arguments()->size() );
+
+        std::size_t localIndex = 1;
         for( const auto& argument : *call->arguments() )
         {
             argument->accept( *this );

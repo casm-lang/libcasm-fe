@@ -268,8 +268,12 @@ UpdateRule ::= DirectCallExpression ":=" Term
 ===== CallRule =====
 
 <code>
-CallRule ::= "call" CallExpression
-           | CallExpression
+CallRule ::= "call" DirectCallExpression
+           | DirectCallExpression
+           | "call" MethodCallExpression
+           | MethodCallExpression
+           | "call" IndirectCallExpression
+           | IndirectCallExpression
 </code>
 
 {{page>:grammar:CallRule&noheader&nofooter}}
@@ -288,27 +292,38 @@ Terms ::= Terms "," Term
 ===== Term =====
 
 <code>
-Term ::= Expression
-       | TypeCastingExpression
-       | CallExpression
+Term ::= SimpleOrClaspedTerm
+       | Expression
        | LetExpression
        | ConditionalExpression
        | ChooseExpression
        | UniversalQuantifierExpression
        | ExistentialQuantifierExpression
-       | List
-       | Range
-       | Literal
+       | TypeCastingExpression
 </code>
 
 {{page>:grammar:Term&noheader&nofooter}}
 
 
+===== SimpleOrClaspedTerm =====
+
+<code>
+SimpleOrClaspedTerm ::= "(" Term ")"
+                      | DirectCallExpression
+                      | MethodCallExpression
+                      | IndirectCallExpression
+                      | List
+                      | Range
+                      | Literal
+</code>
+
+{{page>:grammar:SimpleOrClaspedTerm&noheader&nofooter}}
+
+
 ===== Expression =====
 
 <code>
-Expression ::= "(" Term ")"
-             | "+" Term
+Expression ::= "+" Term
              | "-" Term
              | Term "+" Term
              | Term "-" Term
@@ -342,25 +357,24 @@ TypeCastingExpression ::= Term "as" Type
 {{page>:grammar:TypeCastingExpression&noheader&nofooter}}
 
 
-===== CallExpression =====
-
-<code>
-CallExpression ::= DirectCallExpression
-                 | IndirectCallExpression
-                 | MethodCallExpression
-</code>
-
-{{page>:grammar:CallExpression&noheader&nofooter}}
-
-
 ===== DirectCallExpression =====
 
 <code>
-DirectCallExpression ::= Identifier
-                       | Identifier Arguments
+DirectCallExpression ::= IdentifierPath
+                       | IdentifierPath Arguments
 </code>
 
 {{page>:grammar:DirectCallExpression&noheader&nofooter}}
+
+
+===== MethodCallExpression =====
+
+<code>
+MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
+                       | SimpleOrClaspedTerm "." Identifier Arguments
+</code>
+
+{{page>:grammar:MethodCallExpression&noheader&nofooter}}
 
 
 ===== IndirectCallExpression =====
@@ -370,19 +384,6 @@ IndirectCallExpression ::= "(" "*" Term ")" Arguments
 </code>
 
 {{page>:grammar:IndirectCallExpression&noheader&nofooter}}
-
-
-===== MethodCallExpression =====
-
-<code>
-MethodCallExpression ::= "(" Term ")" "." Identifier
-                       | "(" Term ")" "." Identifier Arguments
-                       | CallExpression "." Identifier
-                       | CallExpression "." Identifier Arguments
-                       | "." Identifier
-</code>
-
-{{page>:grammar:MethodCallExpression&noheader&nofooter}}
 
 
 ===== LetExpression =====
