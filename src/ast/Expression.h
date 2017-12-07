@@ -208,16 +208,16 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< DirectCallExpression >;
 
             DirectCallExpression(
-                const Identifier::Ptr& identifier, const Expressions::Ptr& arguments );
+                const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments );
 
           public:
-            void setIdentifier( const Identifier::Ptr& identifier );
-            const Identifier::Ptr& identifier( void ) const;
+            void setIdentifier( const IdentifierPath::Ptr& identifier );
+            const IdentifierPath::Ptr& identifier( void ) const;
 
             void accept( Visitor& visitor ) override;
 
           private:
-            Identifier::Ptr m_identifier;
+            IdentifierPath::Ptr m_identifier;
         };
 
         class MethodCallExpression final : public CallExpression

@@ -528,7 +528,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             const auto* annotation = annotate( node, directCallArguments );
             RecursiveVisitor::visit( node );
-            const auto description = "built-in '" + identifier->name() + "'";
+            const auto description = "built-in '" + identifier->path() + "'";
             inference( description, annotation, node, directCallArguments );
 
             for( auto argumentType : *node.arguments() )
@@ -537,7 +537,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 {
                     m_log.debug(
                         { argumentType->sourceLocation() },
-                        "TODO: '" + identifier->name() + "' has a non-typed argument(s)" );
+                        "TODO: '" + identifier->path() + "' has a non-typed argument(s)" );
                     return;
                 }
 
@@ -555,7 +555,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 {
                     m_log.error(
                         { node.sourceLocation() },
-                        "built-in '" + identifier->name() + "' has no type relation '" +
+                        "built-in '" + identifier->path() + "' has no type relation '" +
                             type->description() + "'",
                         Code::TypeInferenceBuiltinRelationTypeInvalid );
                     return;
@@ -1398,7 +1398,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         {
             m_log.error(
                 { directCall.sourceLocation() },
-                "unable to resolve built-in symbol '" + identifier->name() +
+                "unable to resolve built-in symbol '" + identifier->path() +
                     "', due to missing annotation information from 'libcasm-ir'" );
             return nullptr;
         }

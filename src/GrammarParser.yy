@@ -135,6 +135,12 @@
         return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
     }
 
+    static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
+    {
+        const auto& location = identifier->sourceLocation();
+        return Ast::make< IdentifierPath >( location, identifier );
+    }
+
     static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
     {
         if( rule == nullptr )
@@ -251,6 +257,7 @@ END       0 "end of file"
 
 // prefer absolute over relative paths
 %precedence ABSOLUTE_PATH
+%precedence DOUBLECOLON
 
 %precedence IN
 %precedence DO
@@ -407,7 +414,7 @@ FunctionDefinition
       // apply the name of the function declaration to the initializer functions
       auto initializers = $8;
       for (auto& initializer : *initializers) {
-           initializer->function()->setIdentifier( identifier );
+          initializer->function()->setIdentifier( asIdentifierPath( identifier ) );
       }
       function->setInitializers( initializers );
 
@@ -426,14 +433,14 @@ ProgramFunctionDefinition
       const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
       auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, singleAgentIdentifier, singleAgentArguments );
+          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
       singleAgent->setTargetType( CallExpression::TargetType::CONSTANT );
 
       auto programDefinition = createProgramFunction( @$ );
       auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       programArguments->add( singleAgent );
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, programDefinition->identifier(), programArguments );
+          @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
       program->setTargetType( CallExpression::TargetType::FUNCTION );
 
       const auto ruleReference = Ast::make< ReferenceAtom >( @$, $2 );
@@ -451,7 +458,8 @@ ProgramFunctionDefinition
       // apply the name of the program declaration to the initializer functions
       auto initializers = $3;
       for (auto& initializer : *initializers) {
-          initializer->function()->setIdentifier( programDefinition->identifier() );
+          initializer->function()->setIdentifier(
+              asIdentifierPath( programDefinition->identifier() ) );
       }
       programDefinition->setInitializers( initializers );
 
@@ -933,12 +941,12 @@ TypeCastingExpression
 
 
 DirectCallExpression
-: Identifier %prec CALL_WITHOUT_ARGS
+: IdentifierPath %prec CALL_WITHOUT_ARGS
   {
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
   }
-| Identifier Arguments
+| IdentifierPath Arguments
   {
       $$ = Ast::make< DirectCallExpression >( @$, $1, $2 );
   }

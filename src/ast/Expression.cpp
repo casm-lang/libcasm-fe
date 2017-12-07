@@ -270,18 +270,18 @@ u1 CallExpression::isBuiltin( void ) const
 }
 
 DirectCallExpression::DirectCallExpression(
-    const Identifier::Ptr& identifier, const Expressions::Ptr& arguments )
+    const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
 , m_identifier( identifier )
 {
 }
 
-void DirectCallExpression::setIdentifier( const Identifier::Ptr& identifier )
+void DirectCallExpression::setIdentifier( const IdentifierPath::Ptr& identifier )
 {
     m_identifier = identifier;
 }
 
-const Identifier::Ptr& DirectCallExpression::identifier( void ) const
+const IdentifierPath::Ptr& DirectCallExpression::identifier( void ) const
 {
     return m_identifier;
 }
