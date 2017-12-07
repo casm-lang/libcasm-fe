@@ -109,7 +109,7 @@ TEST(
     const IdentifierPath identifierPath( identifiers, IdentifierPath::Type::RELATIVE );
 
     // THEN
-    EXPECT_EQ( ".foo", identifierPath.baseDir() );
+    EXPECT_EQ( "::foo", identifierPath.baseDir() );
 }
 
 TEST( AstIdentifierPath, pathShouldConcatenateIdentifiersWithDotIfIdentifierPathIsAbsolute )
@@ -123,7 +123,7 @@ TEST( AstIdentifierPath, pathShouldConcatenateIdentifiersWithDotIfIdentifierPath
     const IdentifierPath identifierPath( identifiers, IdentifierPath::Type::ABSOLUTE );
 
     // THEN
-    EXPECT_EQ( "foo.bar", identifierPath.path() );
+    EXPECT_EQ( "foo::bar", identifierPath.path() );
 }
 
 TEST(
@@ -139,5 +139,5 @@ TEST(
     const IdentifierPath identifierPath( identifiers, IdentifierPath::Type::RELATIVE );
 
     // THEN
-    EXPECT_EQ( ".foo.bar", identifierPath.path() );
+    EXPECT_EQ( "::foo::bar", identifierPath.path() );
 }
