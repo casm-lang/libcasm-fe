@@ -1471,7 +1471,7 @@ IdentifierPath
   {
       $$ = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
   }
-| DOT Identifier
+| DOUBLECOLON Identifier
   {
       auto identifiers = Ast::make< Identifiers >( @$ );
       identifiers->add( $2 );
@@ -1481,7 +1481,7 @@ IdentifierPath
 
 
 DotSeparatedIdentifiers
-: DotSeparatedIdentifiers DOT Identifier
+: DotSeparatedIdentifiers DOUBLECOLON Identifier
   {
       auto identifiers = $1;
       identifiers->add( $3 );

@@ -139,7 +139,7 @@ Ast::Definition::Ptr Namespace::find( const std::vector< std::string >& path ) c
         {
             throw std::domain_error(
                 "unable to find namespace '" + name + "' in symbol path '" +
-                libstdhl::String::join( path, "." ) + "'" );
+                libstdhl::String::join( path, "::" ) + "'" );
         }
 
         _namespace = it->second.get();
@@ -153,7 +153,7 @@ Ast::Definition::Ptr Namespace::find( const std::vector< std::string >& path ) c
     catch( const std::domain_error& e )
     {
         throw std::domain_error(
-            "unable to find symbol '" + libstdhl::String::join( path, "." ) + "'" );
+            "unable to find symbol '" + libstdhl::String::join( path, "::" ) + "'" );
     }
 }
 
@@ -177,7 +177,7 @@ std::string Namespace::dump( const std::string& indention ) const
         const auto& name = _namespace.first;
         const auto& space = _namespace.second;
 
-        s << space->dump( name + "." );
+        s << space->dump( name + "::" );
     }
 
     return s.str();

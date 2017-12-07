@@ -1320,7 +1320,7 @@
       <rule number="176" usefulness="useful">
         <lhs>IdentifierPath</lhs>
         <rhs>
-          <symbol>&quot;.&quot;</symbol>
+          <symbol>&quot;::&quot;</symbol>
           <symbol>Identifier</symbol>
         </rhs>
       </rule>
@@ -1328,7 +1328,7 @@
         <lhs>DotSeparatedIdentifiers</lhs>
         <rhs>
           <symbol>DotSeparatedIdentifiers</symbol>
-          <symbol>&quot;.&quot;</symbol>
+          <symbol>&quot;::&quot;</symbol>
           <symbol>Identifier</symbol>
         </rhs>
       </rule>
@@ -1479,121 +1479,122 @@
       <terminal symbol-number="48" token-number="303" name="&quot;{&quot;" usefulness="useful"/>
       <terminal symbol-number="49" token-number="304" name="&quot;}&quot;" usefulness="useful"/>
       <terminal symbol-number="50" token-number="305" name="&quot;:&quot;" usefulness="useful"/>
-      <terminal symbol-number="51" token-number="306" name="&quot;_&quot;" usefulness="useful"/>
-      <terminal symbol-number="52" token-number="307" name="&quot;@&quot;" usefulness="useful"/>
-      <terminal symbol-number="53" token-number="308" name="&quot;,&quot;" usefulness="useful"/>
-      <terminal symbol-number="54" token-number="309" name="&quot;&lt;&quot;" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="55" token-number="310" name="&quot;&gt;&quot;" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="56" token-number="311" name="&quot;*&quot;" usefulness="useful" prec="18" assoc="left"/>
-      <terminal symbol-number="57" token-number="312" name="&quot;/&quot;" usefulness="useful" prec="18" assoc="left"/>
-      <terminal symbol-number="58" token-number="313" name="&quot;%&quot;" usefulness="useful" prec="18" assoc="left"/>
-      <terminal symbol-number="59" token-number="314" name="&quot;^&quot;" usefulness="useful" prec="19" assoc="left"/>
-      <terminal symbol-number="60" token-number="315" name="&quot;'&quot;" usefulness="useful" prec="25" assoc="precedence"/>
-      <terminal symbol-number="61" token-number="316" name="&quot;..&quot;" usefulness="useful"/>
-      <terminal symbol-number="62" token-number="317" name="&quot;.&quot;" usefulness="useful" prec="24" assoc="precedence"/>
-      <terminal symbol-number="63" token-number="318" name="&quot;-&gt;&quot;" usefulness="useful"/>
-      <terminal symbol-number="64" token-number="319" name="&quot;=&gt;&quot;" usefulness="useful" prec="11" assoc="left"/>
-      <terminal symbol-number="65" token-number="320" name="&quot;:=&quot;" usefulness="useful" prec="9" assoc="precedence"/>
-      <terminal symbol-number="66" token-number="321" name="&quot;!=&quot;" usefulness="useful" prec="15" assoc="left"/>
-      <terminal symbol-number="67" token-number="322" name="&quot;&lt;=&quot;" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="68" token-number="323" name="&quot;&gt;=&quot;" usefulness="useful" prec="16" assoc="left"/>
-      <terminal symbol-number="69" token-number="324" name="&quot;{|&quot;" usefulness="useful"/>
-      <terminal symbol-number="70" token-number="325" name="&quot;|}&quot;" usefulness="useful"/>
-      <terminal symbol-number="71" token-number="326" name="&quot;binary&quot;" usefulness="useful"/>
-      <terminal symbol-number="72" token-number="327" name="&quot;hexadecimal&quot;" usefulness="useful"/>
-      <terminal symbol-number="73" token-number="328" name="&quot;integer&quot;" usefulness="useful"/>
-      <terminal symbol-number="74" token-number="329" name="&quot;rational&quot;" usefulness="useful"/>
-      <terminal symbol-number="75" token-number="330" name="&quot;decimal&quot;" usefulness="useful"/>
-      <terminal symbol-number="76" token-number="331" name="&quot;string&quot;" usefulness="useful"/>
-      <terminal symbol-number="77" token-number="332" name="&quot;identifier&quot;" usefulness="useful"/>
-      <terminal symbol-number="78" token-number="333" name="ABSOLUTE_PATH" usefulness="useful" prec="1" assoc="precedence"/>
-      <terminal symbol-number="79" token-number="334" name="CALL_EXPRESSION" usefulness="useful" prec="2" assoc="precedence"/>
-      <terminal symbol-number="80" token-number="335" name="PAREN_TERM" usefulness="useful" prec="3" assoc="precedence"/>
-      <terminal symbol-number="81" token-number="336" name="UPLUS" usefulness="useful" prec="20" assoc="precedence"/>
-      <terminal symbol-number="82" token-number="337" name="UMINUS" usefulness="useful" prec="20" assoc="precedence"/>
-      <terminal symbol-number="83" token-number="338" name="CALL_WITHOUT_ARGS" usefulness="useful" prec="22" assoc="precedence"/>
+      <terminal symbol-number="51" token-number="306" name="&quot;::&quot;" usefulness="useful"/>
+      <terminal symbol-number="52" token-number="307" name="&quot;_&quot;" usefulness="useful"/>
+      <terminal symbol-number="53" token-number="308" name="&quot;@&quot;" usefulness="useful"/>
+      <terminal symbol-number="54" token-number="309" name="&quot;,&quot;" usefulness="useful"/>
+      <terminal symbol-number="55" token-number="310" name="&quot;&lt;&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="56" token-number="311" name="&quot;&gt;&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="57" token-number="312" name="&quot;*&quot;" usefulness="useful" prec="18" assoc="left"/>
+      <terminal symbol-number="58" token-number="313" name="&quot;/&quot;" usefulness="useful" prec="18" assoc="left"/>
+      <terminal symbol-number="59" token-number="314" name="&quot;%&quot;" usefulness="useful" prec="18" assoc="left"/>
+      <terminal symbol-number="60" token-number="315" name="&quot;^&quot;" usefulness="useful" prec="19" assoc="left"/>
+      <terminal symbol-number="61" token-number="316" name="&quot;'&quot;" usefulness="useful" prec="25" assoc="precedence"/>
+      <terminal symbol-number="62" token-number="317" name="&quot;..&quot;" usefulness="useful"/>
+      <terminal symbol-number="63" token-number="318" name="&quot;.&quot;" usefulness="useful" prec="24" assoc="precedence"/>
+      <terminal symbol-number="64" token-number="319" name="&quot;-&gt;&quot;" usefulness="useful"/>
+      <terminal symbol-number="65" token-number="320" name="&quot;=&gt;&quot;" usefulness="useful" prec="11" assoc="left"/>
+      <terminal symbol-number="66" token-number="321" name="&quot;:=&quot;" usefulness="useful" prec="9" assoc="precedence"/>
+      <terminal symbol-number="67" token-number="322" name="&quot;!=&quot;" usefulness="useful" prec="15" assoc="left"/>
+      <terminal symbol-number="68" token-number="323" name="&quot;&lt;=&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="69" token-number="324" name="&quot;&gt;=&quot;" usefulness="useful" prec="16" assoc="left"/>
+      <terminal symbol-number="70" token-number="325" name="&quot;{|&quot;" usefulness="useful"/>
+      <terminal symbol-number="71" token-number="326" name="&quot;|}&quot;" usefulness="useful"/>
+      <terminal symbol-number="72" token-number="327" name="&quot;binary&quot;" usefulness="useful"/>
+      <terminal symbol-number="73" token-number="328" name="&quot;hexadecimal&quot;" usefulness="useful"/>
+      <terminal symbol-number="74" token-number="329" name="&quot;integer&quot;" usefulness="useful"/>
+      <terminal symbol-number="75" token-number="330" name="&quot;rational&quot;" usefulness="useful"/>
+      <terminal symbol-number="76" token-number="331" name="&quot;decimal&quot;" usefulness="useful"/>
+      <terminal symbol-number="77" token-number="332" name="&quot;string&quot;" usefulness="useful"/>
+      <terminal symbol-number="78" token-number="333" name="&quot;identifier&quot;" usefulness="useful"/>
+      <terminal symbol-number="79" token-number="334" name="ABSOLUTE_PATH" usefulness="useful" prec="1" assoc="precedence"/>
+      <terminal symbol-number="80" token-number="335" name="CALL_EXPRESSION" usefulness="useful" prec="2" assoc="precedence"/>
+      <terminal symbol-number="81" token-number="336" name="PAREN_TERM" usefulness="useful" prec="3" assoc="precedence"/>
+      <terminal symbol-number="82" token-number="337" name="UPLUS" usefulness="useful" prec="20" assoc="precedence"/>
+      <terminal symbol-number="83" token-number="338" name="UMINUS" usefulness="useful" prec="20" assoc="precedence"/>
+      <terminal symbol-number="84" token-number="339" name="CALL_WITHOUT_ARGS" usefulness="useful" prec="22" assoc="precedence"/>
     </terminals>
     <nonterminals>
-      <nonterminal symbol-number="84" name="$accept" usefulness="useful"/>
-      <nonterminal symbol-number="85" name="Specification" usefulness="useful"/>
-      <nonterminal symbol-number="86" name="Header" usefulness="useful"/>
-      <nonterminal symbol-number="87" name="Definitions" usefulness="useful"/>
-      <nonterminal symbol-number="88" name="AttributedDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="89" name="Definition" usefulness="useful"/>
-      <nonterminal symbol-number="90" name="EnumerationDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="91" name="DerivedDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="92" name="RuleDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="93" name="FunctionDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="94" name="ProgramFunctionDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="95" name="EnumeratorDefinition" usefulness="useful"/>
-      <nonterminal symbol-number="96" name="Enumerators" usefulness="useful"/>
-      <nonterminal symbol-number="97" name="Rule" usefulness="useful"/>
-      <nonterminal symbol-number="98" name="Rules" usefulness="useful"/>
-      <nonterminal symbol-number="99" name="SkipRule" usefulness="useful"/>
-      <nonterminal symbol-number="100" name="ConditionalRule" usefulness="useful"/>
-      <nonterminal symbol-number="101" name="CaseRule" usefulness="useful"/>
-      <nonterminal symbol-number="102" name="CaseLabel" usefulness="useful"/>
-      <nonterminal symbol-number="103" name="CaseLabels" usefulness="useful"/>
-      <nonterminal symbol-number="104" name="LetRule" usefulness="useful"/>
-      <nonterminal symbol-number="105" name="ForallRule" usefulness="useful"/>
-      <nonterminal symbol-number="106" name="ChooseRule" usefulness="useful"/>
-      <nonterminal symbol-number="107" name="IterateRule" usefulness="useful"/>
-      <nonterminal symbol-number="108" name="BlockRule" usefulness="useful"/>
-      <nonterminal symbol-number="109" name="SequenceRule" usefulness="useful"/>
-      <nonterminal symbol-number="110" name="UpdateRule" usefulness="useful"/>
-      <nonterminal symbol-number="111" name="CallRule" usefulness="useful"/>
-      <nonterminal symbol-number="112" name="Terms" usefulness="useful"/>
-      <nonterminal symbol-number="113" name="Term" usefulness="useful"/>
-      <nonterminal symbol-number="114" name="Expression" usefulness="useful"/>
-      <nonterminal symbol-number="115" name="TypeCastingExpression" usefulness="useful"/>
-      <nonterminal symbol-number="116" name="CallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="117" name="DirectCallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="118" name="IndirectCallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="119" name="MethodCallExpression" usefulness="useful"/>
-      <nonterminal symbol-number="120" name="LetExpression" usefulness="useful"/>
-      <nonterminal symbol-number="121" name="ConditionalExpression" usefulness="useful"/>
-      <nonterminal symbol-number="122" name="ChooseExpression" usefulness="useful"/>
-      <nonterminal symbol-number="123" name="UniversalQuantifierExpression" usefulness="useful"/>
-      <nonterminal symbol-number="124" name="ExistentialQuantifierExpression" usefulness="useful"/>
-      <nonterminal symbol-number="125" name="List" usefulness="useful"/>
-      <nonterminal symbol-number="126" name="Range" usefulness="useful"/>
-      <nonterminal symbol-number="127" name="Literal" usefulness="useful"/>
-      <nonterminal symbol-number="128" name="UndefinedLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="129" name="BooleanLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="130" name="IntegerLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="131" name="RationalLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="132" name="DecimalLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="133" name="BinaryLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="134" name="StringLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="135" name="ReferenceLiteral" usefulness="useful"/>
-      <nonterminal symbol-number="136" name="Types" usefulness="useful"/>
-      <nonterminal symbol-number="137" name="Type" usefulness="useful"/>
-      <nonterminal symbol-number="138" name="BasicType" usefulness="useful"/>
-      <nonterminal symbol-number="139" name="ComposedType" usefulness="useful"/>
-      <nonterminal symbol-number="140" name="RelationType" usefulness="useful"/>
-      <nonterminal symbol-number="141" name="FixedSizedType" usefulness="useful"/>
-      <nonterminal symbol-number="142" name="Arguments" usefulness="useful"/>
-      <nonterminal symbol-number="143" name="TwoOrMoreArguments" usefulness="useful"/>
-      <nonterminal symbol-number="144" name="FunctionParameters" usefulness="useful"/>
-      <nonterminal symbol-number="145" name="MaybeFunctionParameters" usefulness="useful"/>
-      <nonterminal symbol-number="146" name="Parameters" usefulness="useful"/>
-      <nonterminal symbol-number="147" name="MaybeParameters" usefulness="useful"/>
-      <nonterminal symbol-number="148" name="MaybeDefined" usefulness="useful"/>
-      <nonterminal symbol-number="149" name="MaybeInitially" usefulness="useful"/>
-      <nonterminal symbol-number="150" name="Initializers" usefulness="useful"/>
-      <nonterminal symbol-number="151" name="Initializer" usefulness="useful"/>
-      <nonterminal symbol-number="152" name="MaybeInitializers" usefulness="useful"/>
-      <nonterminal symbol-number="153" name="Identifier" usefulness="useful"/>
-      <nonterminal symbol-number="154" name="IdentifierPath" usefulness="useful"/>
-      <nonterminal symbol-number="155" name="DotSeparatedIdentifiers" usefulness="useful"/>
-      <nonterminal symbol-number="156" name="Variable" usefulness="useful"/>
-      <nonterminal symbol-number="157" name="TypedVariable" usefulness="useful"/>
-      <nonterminal symbol-number="158" name="AttributedVariable" usefulness="useful"/>
-      <nonterminal symbol-number="159" name="TypedAttributedVariable" usefulness="useful"/>
-      <nonterminal symbol-number="160" name="Attributes" usefulness="useful"/>
-      <nonterminal symbol-number="161" name="Attribute" usefulness="useful"/>
-      <nonterminal symbol-number="162" name="BasicAttribute" usefulness="useful"/>
-      <nonterminal symbol-number="163" name="ExpressionAttribute" usefulness="useful"/>
+      <nonterminal symbol-number="85" name="$accept" usefulness="useful"/>
+      <nonterminal symbol-number="86" name="Specification" usefulness="useful"/>
+      <nonterminal symbol-number="87" name="Header" usefulness="useful"/>
+      <nonterminal symbol-number="88" name="Definitions" usefulness="useful"/>
+      <nonterminal symbol-number="89" name="AttributedDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="90" name="Definition" usefulness="useful"/>
+      <nonterminal symbol-number="91" name="EnumerationDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="92" name="DerivedDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="93" name="RuleDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="94" name="FunctionDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="95" name="ProgramFunctionDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="96" name="EnumeratorDefinition" usefulness="useful"/>
+      <nonterminal symbol-number="97" name="Enumerators" usefulness="useful"/>
+      <nonterminal symbol-number="98" name="Rule" usefulness="useful"/>
+      <nonterminal symbol-number="99" name="Rules" usefulness="useful"/>
+      <nonterminal symbol-number="100" name="SkipRule" usefulness="useful"/>
+      <nonterminal symbol-number="101" name="ConditionalRule" usefulness="useful"/>
+      <nonterminal symbol-number="102" name="CaseRule" usefulness="useful"/>
+      <nonterminal symbol-number="103" name="CaseLabel" usefulness="useful"/>
+      <nonterminal symbol-number="104" name="CaseLabels" usefulness="useful"/>
+      <nonterminal symbol-number="105" name="LetRule" usefulness="useful"/>
+      <nonterminal symbol-number="106" name="ForallRule" usefulness="useful"/>
+      <nonterminal symbol-number="107" name="ChooseRule" usefulness="useful"/>
+      <nonterminal symbol-number="108" name="IterateRule" usefulness="useful"/>
+      <nonterminal symbol-number="109" name="BlockRule" usefulness="useful"/>
+      <nonterminal symbol-number="110" name="SequenceRule" usefulness="useful"/>
+      <nonterminal symbol-number="111" name="UpdateRule" usefulness="useful"/>
+      <nonterminal symbol-number="112" name="CallRule" usefulness="useful"/>
+      <nonterminal symbol-number="113" name="Terms" usefulness="useful"/>
+      <nonterminal symbol-number="114" name="Term" usefulness="useful"/>
+      <nonterminal symbol-number="115" name="Expression" usefulness="useful"/>
+      <nonterminal symbol-number="116" name="TypeCastingExpression" usefulness="useful"/>
+      <nonterminal symbol-number="117" name="CallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="118" name="DirectCallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="119" name="IndirectCallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="120" name="MethodCallExpression" usefulness="useful"/>
+      <nonterminal symbol-number="121" name="LetExpression" usefulness="useful"/>
+      <nonterminal symbol-number="122" name="ConditionalExpression" usefulness="useful"/>
+      <nonterminal symbol-number="123" name="ChooseExpression" usefulness="useful"/>
+      <nonterminal symbol-number="124" name="UniversalQuantifierExpression" usefulness="useful"/>
+      <nonterminal symbol-number="125" name="ExistentialQuantifierExpression" usefulness="useful"/>
+      <nonterminal symbol-number="126" name="List" usefulness="useful"/>
+      <nonterminal symbol-number="127" name="Range" usefulness="useful"/>
+      <nonterminal symbol-number="128" name="Literal" usefulness="useful"/>
+      <nonterminal symbol-number="129" name="UndefinedLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="130" name="BooleanLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="131" name="IntegerLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="132" name="RationalLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="133" name="DecimalLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="134" name="BinaryLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="135" name="StringLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="136" name="ReferenceLiteral" usefulness="useful"/>
+      <nonterminal symbol-number="137" name="Types" usefulness="useful"/>
+      <nonterminal symbol-number="138" name="Type" usefulness="useful"/>
+      <nonterminal symbol-number="139" name="BasicType" usefulness="useful"/>
+      <nonterminal symbol-number="140" name="ComposedType" usefulness="useful"/>
+      <nonterminal symbol-number="141" name="RelationType" usefulness="useful"/>
+      <nonterminal symbol-number="142" name="FixedSizedType" usefulness="useful"/>
+      <nonterminal symbol-number="143" name="Arguments" usefulness="useful"/>
+      <nonterminal symbol-number="144" name="TwoOrMoreArguments" usefulness="useful"/>
+      <nonterminal symbol-number="145" name="FunctionParameters" usefulness="useful"/>
+      <nonterminal symbol-number="146" name="MaybeFunctionParameters" usefulness="useful"/>
+      <nonterminal symbol-number="147" name="Parameters" usefulness="useful"/>
+      <nonterminal symbol-number="148" name="MaybeParameters" usefulness="useful"/>
+      <nonterminal symbol-number="149" name="MaybeDefined" usefulness="useful"/>
+      <nonterminal symbol-number="150" name="MaybeInitially" usefulness="useful"/>
+      <nonterminal symbol-number="151" name="Initializers" usefulness="useful"/>
+      <nonterminal symbol-number="152" name="Initializer" usefulness="useful"/>
+      <nonterminal symbol-number="153" name="MaybeInitializers" usefulness="useful"/>
+      <nonterminal symbol-number="154" name="Identifier" usefulness="useful"/>
+      <nonterminal symbol-number="155" name="IdentifierPath" usefulness="useful"/>
+      <nonterminal symbol-number="156" name="DotSeparatedIdentifiers" usefulness="useful"/>
+      <nonterminal symbol-number="157" name="Variable" usefulness="useful"/>
+      <nonterminal symbol-number="158" name="TypedVariable" usefulness="useful"/>
+      <nonterminal symbol-number="159" name="AttributedVariable" usefulness="useful"/>
+      <nonterminal symbol-number="160" name="TypedAttributedVariable" usefulness="useful"/>
+      <nonterminal symbol-number="161" name="Attributes" usefulness="useful"/>
+      <nonterminal symbol-number="162" name="Attribute" usefulness="useful"/>
+      <nonterminal symbol-number="163" name="BasicAttribute" usefulness="useful"/>
+      <nonterminal symbol-number="164" name="ExpressionAttribute" usefulness="useful"/>
     </nonterminals>
   </grammar>
 
@@ -1991,7 +1992,7 @@
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
           <transition type="shift" symbol="&quot;{&quot;" state="75"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Identifier" state="77"/>
           <transition type="goto" symbol="IdentifierPath" state="78"/>
@@ -3232,7 +3233,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Identifier" state="77"/>
           <transition type="goto" symbol="IdentifierPath" state="105"/>
@@ -4193,6 +4194,7 @@
             <symbol>&quot;^&quot;</symbol>
             <symbol>&quot;'&quot;</symbol>
             <symbol>&quot;..&quot;</symbol>
+            <symbol>&quot;.&quot;</symbol>
             <symbol>&quot;-&gt;&quot;</symbol>
             <symbol>&quot;=&gt;&quot;</symbol>
             <symbol>&quot;!=&quot;</symbol>
@@ -4213,16 +4215,14 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;.&quot;" state="137"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="137"/>
         </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="175" enabled="true"/>
         </reductions>
       </actions>
-      <solved-conflicts>
-        <resolution rule="175" symbol="&quot;.&quot;" type="shift">ABSOLUTE_PATH &lt; &quot;.&quot;</resolution>
-      </solved-conflicts>
+      <solved-conflicts/>
     </state>
 
     <state number="80">
@@ -5252,7 +5252,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="158"/>
           <transition type="goto" symbol="BasicType" state="159"/>
@@ -8148,7 +8148,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="203"/>
           <transition type="goto" symbol="BasicType" state="159"/>
@@ -8242,7 +8242,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="208"/>
           <transition type="goto" symbol="BasicType" state="159"/>
@@ -12575,7 +12575,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="231"/>
           <transition type="goto" symbol="BasicType" state="159"/>
@@ -12731,7 +12731,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="264"/>
           <transition type="goto" symbol="BasicType" state="159"/>
@@ -13274,7 +13274,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Types" state="276"/>
           <transition type="goto" symbol="Type" state="277"/>
@@ -15249,7 +15249,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="306"/>
           <transition type="goto" symbol="BasicType" state="159"/>
@@ -15287,7 +15287,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="307"/>
           <transition type="goto" symbol="BasicType" state="159"/>
@@ -18248,7 +18248,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="341"/>
           <transition type="goto" symbol="BasicType" state="159"/>
@@ -18300,7 +18300,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="5"/>
-          <transition type="shift" symbol="&quot;.&quot;" state="76"/>
+          <transition type="shift" symbol="&quot;::&quot;" state="76"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="6"/>
           <transition type="goto" symbol="Type" state="342"/>
           <transition type="goto" symbol="BasicType" state="159"/>

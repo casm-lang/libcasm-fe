@@ -48,6 +48,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+static const std::string DELIMITER( "::" );
+
 Node::Node( Node::ID id )
 : m_id( id )
 , m_sourceLocation()
@@ -334,10 +336,10 @@ const std::string& IdentifierPath::baseName( void ) const
 std::string IdentifierPath::baseDir( void ) const
 {
     const auto& p = path();
-    const size_t lastDotPos = p.find_last_of( '.' );
+    const size_t lastDotPos = p.find_last_of( DELIMITER );
     if( lastDotPos != std::string::npos )
     {
-        return p.substr( 0, lastDotPos );
+        return p.substr( 0, lastDotPos - DELIMITER.size() + 1 );
     }
     else
     {
@@ -351,7 +353,7 @@ std::string IdentifierPath::path( void ) const
 
     if( m_type == Type::RELATIVE )
     {
-        path += ".";
+        path += DELIMITER;
     }
 
     bool isFirstElement = true;
@@ -359,7 +361,7 @@ std::string IdentifierPath::path( void ) const
     {
         if( not isFirstElement )
         {
-            path += ".";
+            path += DELIMITER;
         }
         path += identifier->name();
         isFirstElement = false;
