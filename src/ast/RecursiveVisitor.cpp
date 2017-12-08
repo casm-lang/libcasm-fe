@@ -110,10 +110,6 @@ void RecursiveVisitor::visit( TypeCastingExpression& node )
     node.asType()->accept( *this );
 }
 
-void RecursiveVisitor::visit( UnresolvedNamespace& node )
-{
-}
-
 void RecursiveVisitor::visit( ValueAtom& node )
 {
 }

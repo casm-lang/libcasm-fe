@@ -65,16 +65,6 @@ namespace libcasm_fe
 
         using Expressions = NodeList< Expression >;
 
-        class UnresolvedNamespace final : public Expression
-        {
-          public:
-            using Ptr = std::shared_ptr< UnresolvedNamespace >;
-
-            explicit UnresolvedNamespace( void );
-
-            void accept( Visitor& visitor ) override final;
-        };
-
         class ValueAtom final : public Expression
         {
           public:
