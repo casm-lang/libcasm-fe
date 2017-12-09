@@ -312,36 +312,43 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         }
         case libcasm_ir::Type::Kind::BOOLEAN:
         {
+            node.setTargetType( CallExpression::TargetType::BUILTIN );
             node.setTargetBuiltinId( libcasm_ir::Value::AS_BOOLEAN_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::INTEGER:
         {
+            node.setTargetType( CallExpression::TargetType::BUILTIN );
             node.setTargetBuiltinId( libcasm_ir::Value::AS_INTEGER_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::RATIONAL:
         {
+            node.setTargetType( CallExpression::TargetType::BUILTIN );
             node.setTargetBuiltinId( libcasm_ir::Value::AS_RATIONAL_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::BINARY:
         {
+            node.setTargetType( CallExpression::TargetType::BUILTIN );
             node.setTargetBuiltinId( libcasm_ir::Value::AS_BINARY_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::DECIMAL:
         {
+            node.setTargetType( CallExpression::TargetType::BUILTIN );
             node.setTargetBuiltinId( libcasm_ir::Value::AS_DECIMAL_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::STRING:
         {
+            node.setTargetType( CallExpression::TargetType::BUILTIN );
             node.setTargetBuiltinId( libcasm_ir::Value::AS_STRING_BUILTIN );
             break;
         }
         case libcasm_ir::Type::Kind::ENUMERATION:
         {
+            node.setTargetType( CallExpression::TargetType::BUILTIN );
             node.setTargetBuiltinId( libcasm_ir::Value::AS_ENUMERATION_BUILTIN );
             break;
         }

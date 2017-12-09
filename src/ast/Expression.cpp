@@ -220,7 +220,6 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
 
 void CallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
 {
-    setTargetType( CallExpression::TargetType::BUILTIN );
     m_targetBuiltinId = builtinId;
 }
 
@@ -238,7 +237,6 @@ void CallExpression::setTargetDefinition( const TypedNode::Ptr& definition )
 const TypedNode::Ptr& CallExpression::targetDefinition( void ) const
 {
     assert( ( targetType() != TargetType::BUILTIN ) and ( targetType() != TargetType::UNKNOWN ) );
-
     return m_targetDefinition;
 }
 
