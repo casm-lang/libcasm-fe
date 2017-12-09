@@ -716,10 +716,6 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         argumentTypes.emplace_back( argumentType->type()->ptr_result() );
     }
 
-    // TODO check for arguments type mismatch
-
-    m_log.info( node.type()->description() );
-
     const auto type =
         libstdhl::Memory::make< libcasm_ir::RelationType >( node.type(), argumentTypes );
 
