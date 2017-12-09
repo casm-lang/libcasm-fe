@@ -62,12 +62,6 @@ namespace libcasm_fe
 
         void registerNamespace( const std::string& name, const Namespace::Ptr& _namespace );
 
-        void addNamespace( const Ast::IdentifierPath::Ptr& path, const Namespace::Ptr& _namespace );
-        void addNamespace(
-            const Ast::Identifier::Ptr& identifier, const Namespace::Ptr& _namespace );
-
-        Namespace& findNestedNamespace( const Ast::Identifier::Ptr& identifier ) const;
-
         Ast::Definition::Ptr find(
             const Ast::IdentifierPath& node, const std::size_t index = 0 ) const;
 
@@ -76,12 +70,6 @@ namespace libcasm_fe
         Ast::Definition::Ptr find( const std::vector< std::string >& path ) const;
 
         std::string dump( const std::string& indention = "" ) const;
-
-      private:
-        /**
-         * Returns an existing sub-namespace or creates and registers a new one.
-         */
-        Namespace& nestedNamespace( const Ast::Identifier::Ptr& identifier );
 
       private:
         std::unordered_map< std::string, Ast::Definition::Ptr > m_symbols;
