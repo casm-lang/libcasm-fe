@@ -169,7 +169,10 @@ void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
     {
         const auto& symbol = m_symboltable.find( name );
 
-        m_log.error( { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
+        m_log.error(
+            { node.sourceLocation(), symbol->sourceLocation() },
+            e.what(),
+            Code::EnumerationDefinitionAlreadyUsed );
     }
 }
 

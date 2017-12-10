@@ -144,6 +144,11 @@ namespace libcasm_fe
         BuiltinArgumentValueInvalid = 0x5f00,
 
         // --------------------------------------------------------- a*** ...
+        // enumeration errors
+
+        EnumerationDefinitionAlreadyUsed = 0xe000,
+
+        // --------------------------------------------------------- a*** ...
         // agent errors
 
         AgentInitRuleDoesNotExist = 0xa000,
