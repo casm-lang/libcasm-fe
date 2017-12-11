@@ -82,6 +82,7 @@ namespace libcasm_fe
         FunctionSymbolIsUnknown = 0xf000,
 
         FunctionDefinitionAlreadyUsed = 0xf010,
+        FunctionDefinitionReClassification = 0xf011,
 
         FunctionAttributeIsInvalid = 0xfa00  // fa** ... function attribute
         ,
