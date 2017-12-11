@@ -136,6 +136,10 @@ static std::string generateBuiltinTraceLine( Frame* frame )
     {
         name = call->ptr< DirectCallExpression >()->identifier()->path();
     }
+    else if( call->id() == Node::ID::TYPE_CASTING_EXPRESSION )
+    {
+        name = "operator::as" + call->ptr< TypeCastingExpression >()->type()->description();
+    }
     else
     {
         name = "UNKNOWN";
