@@ -122,7 +122,7 @@ FunctionDefinition::FunctionDefinition(
     const Types::Ptr& argumentTypes,
     const Type::Ptr& returnType )
 : Definition( Node::ID::FUNCTION_DEFINITION, identifier )
-, m_classification( Classification::CONTROLLED )
+, m_classification( Classification::UNKNOWN )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
 , m_symbolic( false )
@@ -176,8 +176,32 @@ FunctionDefinition::Classification FunctionDefinition::classification( void ) co
 
 std::string FunctionDefinition::classificationName( void ) const
 {
-    switch( classification() )
+    return toString( classification() );
+}
+
+void FunctionDefinition::setSymbolic( u1 symbolic )
+{
+    m_symbolic = symbolic;
+}
+
+u1 FunctionDefinition::symbolic( void ) const
+{
+    return m_symbolic;
+}
+
+void FunctionDefinition::setInitializers( const NodeList< UpdateRule >::Ptr& initializers )
+{
+    m_initializers = initializers;
+}
+
+std::string FunctionDefinition::toString( const Classification classification )
+{
+    switch( classification )
     {
+        case FunctionDefinition::Classification::UNKNOWN:
+        {
+            return "unknown";
+        }
         case FunctionDefinition::Classification::IN:
         {
             return "in";
@@ -202,21 +226,6 @@ std::string FunctionDefinition::classificationName( void ) const
 
     assert( !" internal error! " );
     return std::string();
-}
-
-void FunctionDefinition::setSymbolic( u1 symbolic )
-{
-    m_symbolic = symbolic;
-}
-
-u1 FunctionDefinition::symbolic( void ) const
-{
-    return m_symbolic;
-}
-
-void FunctionDefinition::setInitializers( const NodeList< UpdateRule >::Ptr& initializers )
-{
-    m_initializers = initializers;
 }
 
 const NodeList< UpdateRule >::Ptr& FunctionDefinition::initializers( void ) const

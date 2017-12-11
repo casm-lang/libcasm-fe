@@ -120,6 +120,7 @@ namespace libcasm_fe
           public:
             enum class Classification
             {
+                UNKNOWN,
                 IN,         /**< only read by an ASM, only written by its env. */
                 CONTROLLED, /**< read and written by an ASM */
                 SHARED,     /**< read and written by an ASM and its env. */
@@ -134,6 +135,8 @@ namespace libcasm_fe
                 RESULT = 3,
                 OTHER
             };
+
+            static std::string toString( const Classification classification );
 
           public:
             using Ptr = std::shared_ptr< FunctionDefinition >;
