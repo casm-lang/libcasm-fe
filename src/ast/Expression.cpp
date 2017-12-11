@@ -54,16 +54,6 @@ Expression::Expression( Node::ID id )
 {
 }
 
-UnresolvedNamespace::UnresolvedNamespace( void )
-: Expression( Node::ID::UNRESOLVED_NAMESPACE )
-{
-}
-
-void UnresolvedNamespace::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
 ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )
 : Expression( Node::ID::VALUE_ATOM )
 , m_value( value )
@@ -230,7 +220,6 @@ std::string CallExpression::targetTypeString( const TargetType targetType )
 
 void CallExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
 {
-    setTargetType( CallExpression::TargetType::BUILTIN );
     m_targetBuiltinId = builtinId;
 }
 
@@ -248,7 +237,6 @@ void CallExpression::setTargetDefinition( const TypedNode::Ptr& definition )
 const TypedNode::Ptr& CallExpression::targetDefinition( void ) const
 {
     assert( ( targetType() != TargetType::BUILTIN ) and ( targetType() != TargetType::UNKNOWN ) );
-
     return m_targetDefinition;
 }
 
