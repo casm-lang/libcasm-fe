@@ -186,12 +186,20 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     if( node.defaultValue() and node.defaultValue()->type() and
         node.defaultValue()->type() != node.returnType()->type() )
     {
-        m_log.error(
-            { node.defaultValue()->sourceLocation(), node.returnType()->sourceLocation() },
-            "type mismatch: type of default value was '" +
-                node.defaultValue()->type()->description() + "', function expects '" +
-                node.returnType()->type()->description() + "'",
-            Code::TypeInferenceFunctionDefaultValueTypeMismatch );
+        if( node.defaultValue()->type()->isInteger() == node.returnType()->type()->isInteger() )
+        {
+            // relaxation: mixed ranged and non-ranged integer types are allowed and checked in a
+            // later pass or step!
+        }
+        else
+        {
+            m_log.error(
+                { node.defaultValue()->sourceLocation(), node.returnType()->sourceLocation() },
+                "type mismatch: type of default value was '" +
+                    node.defaultValue()->type()->description() + "', function expects '" +
+                    node.returnType()->type()->description() + "'",
+                Code::TypeInferenceFunctionDefaultValueTypeMismatch );
+        }
     }
 
     node.initializers()->accept( *this );
