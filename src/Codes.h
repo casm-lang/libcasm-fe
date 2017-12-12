@@ -105,7 +105,7 @@ namespace libcasm_fe
         FunctionValueAlreadyInitializedAtInitially = 0xfd02
 
         ,
-        FunctionIdentifierIsBuiltinName = 0xf100  // f1** ... function identifer
+        FunctionDefinitionIdentifierIsBuiltinName = 0xf100  // f1** ... function identifer
 
         // --------------------------------------------------------- d*** ...
         // derived errors

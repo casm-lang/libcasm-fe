@@ -46,6 +46,8 @@
 #include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
 
+#include <libcasm-ir/Builtin>
+
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
@@ -87,6 +89,14 @@ SymbolRegistrationVisitor::SymbolRegistrationVisitor(
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
     const auto& name = node.identifier()->name();
+
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
+            Code::FunctionDefinitionIdentifierIsBuiltinName );
+    }
 
     try
     {
