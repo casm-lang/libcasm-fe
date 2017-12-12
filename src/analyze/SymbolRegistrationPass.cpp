@@ -158,6 +158,14 @@ void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
+            Code::RuleDefinitionIdentifierIsBuiltinName );
+    }
+
     try
     {
         m_symboltable.registerSymbol( name, node.ptr< Definition >() );

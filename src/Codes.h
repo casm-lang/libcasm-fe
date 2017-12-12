@@ -122,6 +122,7 @@ namespace libcasm_fe
         // rule errors
         ,
         RuleDefinitionAlreadyUsed = 0x5000,
+        RuleDefinitionIdentifierIsBuiltinName = 0x5001,
 
         NotSideEffectFreeRuleCall = 0x5100,
 
