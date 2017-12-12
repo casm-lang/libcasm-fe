@@ -96,6 +96,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
   private:
     libcasm_fe::Logger& m_log;
+    Namespace::Ptr m_symboltable;
     u1 m_functionInitially;
     u1 m_sideEffectFree;
     u1 m_initDefinitionFound;
@@ -103,6 +104,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
 ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
 : m_log( log )
+, m_symboltable()
 , m_functionInitially( false )
 , m_sideEffectFree( false )
 , m_initDefinitionFound( false )
@@ -111,6 +113,8 @@ ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
 
 void ConsistencyCheckVisitor::visit( Specification& node )
 {
+    m_symboltable = node.symboltable();
+
     node.header()->accept( *this );
     node.definitions()->accept( *this );
 
@@ -200,9 +204,53 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 {
-    assert(
-        node.targetType() != CallExpression::TargetType::UNKNOWN &&
-        "all calls should have been resolved by previous passes" );
+    if( node.targetType() == CallExpression::TargetType::UNKNOWN )
+    {
+        if( node.identifier()->type() != IdentifierPath::Type::RELATIVE )
+        {
+            m_log.error( { node.sourceLocation() }, "target type 'UNKNOWN' found!" );
+        }
+        else
+        {
+            assert( node.type() and " type shall be inferred through TypeInferencePass! " );
+
+            auto identifierPath =
+                IdentifierPath( node.identifier()->identifiers(), IdentifierPath::Type::ABSOLUTE );
+
+            identifierPath.identifiers()->add(
+                node.identifier()->identifiers()->begin(),
+                std::make_shared< Identifier >( node.type()->description() ) );
+
+            try
+            {
+                const auto& symbol = m_symboltable->find( identifierPath );
+
+                switch( symbol->id() )
+                {
+                    case Node::ID::ENUMERATOR_DEFINITION:
+                    {
+                        node.setTargetType( CallExpression::TargetType::CONSTANT );
+                        break;
+                    }
+                    default:
+                    {
+                        throw std::domain_error(
+                            "cannot reference '" + symbol->description() + "'" );
+                        break;
+                    }
+                }
+
+                node.setTargetDefinition( symbol );
+            }
+            catch( const std::domain_error& e )
+            {
+                m_log.error(
+                    { node.sourceLocation() },
+                    "unable to infer type of symbol with relative path '" +
+                        node.identifier()->path() + "'" );
+            }
+        }
+    }
 
     RecursiveVisitor::visit( node );
 
