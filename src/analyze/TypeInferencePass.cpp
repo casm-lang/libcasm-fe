@@ -127,6 +127,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
   private:
     libcasm_fe::Logger& m_log;
+
     std::unordered_map< const Node*, std::set< libcasm_ir::Type::ID > > m_typeIDs;
 };
 
