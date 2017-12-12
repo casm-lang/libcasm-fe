@@ -205,7 +205,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    // TODO: PPA: add check that non-method call built-ins reside in a certain namespace!
     if( libcasm_ir::Builtin::available( identifierBaseName ) )
     {
         const auto& annotation = libcasm_ir::Annotation::find( identifierBaseName );
