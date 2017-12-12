@@ -114,7 +114,9 @@ namespace libcasm_fe
 
         DerivedArgumentValueInvalid = 0xda00,  // da** ... derived argment
         DerivedReturnValueInvalid = 0xda01,
-        DerivedExpressionInvalidType = 0xde00  // de** ... derived expression
+        DerivedExpressionInvalidType = 0xde00,  // de** ... derived expression
+
+        DerivedDefinitionIdentifierIsBuiltinName = 0xd100  // d1** ... derived identifer
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
