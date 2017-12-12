@@ -69,7 +69,7 @@ static libpass::PassRegistration< TypeInferencePass > PASS(
 class TypeInferenceVisitor final : public RecursiveVisitor
 {
   public:
-    TypeInferenceVisitor( libcasm_fe::Logger& log );
+    TypeInferenceVisitor( libcasm_fe::Logger& log, const Namespace::Ptr& symboltable );
 
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
@@ -127,12 +127,15 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
   private:
     libcasm_fe::Logger& m_log;
+    const Namespace::Ptr& m_symboltable;
 
     std::unordered_map< const Node*, std::set< libcasm_ir::Type::ID > > m_typeIDs;
 };
 
-TypeInferenceVisitor::TypeInferenceVisitor( libcasm_fe::Logger& log )
+TypeInferenceVisitor::TypeInferenceVisitor(
+    libcasm_fe::Logger& log, const Namespace::Ptr& symboltable )
 : m_log( log )
+, m_symboltable( symboltable )
 {
 }
 
@@ -613,7 +616,54 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::UNKNOWN:
         {
-            assert( !"unknown target type!" );
+            if( identifier->type() != IdentifierPath::Type::RELATIVE )
+            {
+                m_log.error( { node.sourceLocation() }, "target type 'UNKNOWN' found!" );
+            }
+            else
+            {
+                inference( "relative path", nullptr, node );
+
+                auto identifierPath =
+                    IdentifierPath( identifier->identifiers(), IdentifierPath::Type::ABSOLUTE );
+
+                if( node.type() )
+                {
+                    identifierPath.identifiers()->add(
+                        identifierPath.identifiers()->begin(),
+                        std::make_shared< Identifier >( node.type()->description() ) );
+                }
+
+                try
+                {
+                    const auto& symbol = m_symboltable->find( identifierPath );
+
+                    switch( symbol->id() )
+                    {
+                        case Node::ID::ENUMERATOR_DEFINITION:
+                        {
+                            node.setTargetType( CallExpression::TargetType::CONSTANT );
+                            break;
+                        }
+                        default:
+                        {
+                            throw std::domain_error(
+                                "cannot reference '" + symbol->description() + "'" );
+                            break;
+                        }
+                    }
+
+                    node.setTargetDefinition( symbol );
+                }
+                catch( const std::domain_error& e )
+                {
+                    m_log.error(
+                        { node.sourceLocation() },
+                        "unable to infer type of symbol with relative path '" + identifier->path() +
+                            "'" );
+                    break;
+                }
+            }
             break;
         }
     }
@@ -1659,7 +1709,7 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     const auto data = pr.result< TypeCheckPass >();
     const auto specification = data->specification();
 
-    TypeInferenceVisitor visitor( log );
+    TypeInferenceVisitor visitor( log, specification->symboltable() );
     specification->definitions()->accept( visitor );
 
     const auto errors = log.errors();
