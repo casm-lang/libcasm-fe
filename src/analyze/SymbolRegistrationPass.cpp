@@ -206,6 +206,14 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
+            Code::EnumerationDefinitionIdentifierIsBuiltinName );
+    }
+
     m_log.debug( "creating IR enumeration type '" + name + "'" );
     const auto kind = std::make_shared< libcasm_ir::Enumeration >( name );
     for( const auto& enumerator : *node.enumerators() )

@@ -151,6 +151,7 @@ namespace libcasm_fe
         // enumeration errors
 
         EnumerationDefinitionAlreadyUsed = 0xe000,
+        EnumerationDefinitionIdentifierIsBuiltinName = 0xe100,
 
         // --------------------------------------------------------- a*** ...
         // agent errors
