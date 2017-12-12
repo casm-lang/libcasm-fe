@@ -246,8 +246,10 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
             {
                 m_log.error(
                     { node.sourceLocation() },
-                    "unable to infer type of symbol with relative path '" +
-                        node.identifier()->path() + "'" );
+                    "type '" + node.type()->description() +
+                        "' does not have a symbol with relative path '" +
+                        node.identifier()->baseName() + "'",
+                    Code::DirectCallExpressionInvalidRelativePath );
             }
         }
     }
