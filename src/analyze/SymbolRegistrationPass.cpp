@@ -237,7 +237,10 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
     {
         const auto& symbol = m_symboltable.find( name );
 
-        m_log.error( { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
+        m_log.error(
+            { node.sourceLocation(), symbol->sourceLocation() },
+            e.what(),
+            Code::EnumerationDefinitionAlreadyUsed );
     }
 
     // register enumerators in a sub-namespace
