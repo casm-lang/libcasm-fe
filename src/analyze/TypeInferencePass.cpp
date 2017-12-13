@@ -869,6 +869,9 @@ void TypeInferenceVisitor::visit( ListExpression& node )
 
 void TypeInferenceVisitor::visit( LetExpression& node )
 {
+    // annotate let expression variable with annotation information from parent expression node
+    m_typeIDs[ node.variable().get() ] = m_typeIDs[&node ];
+
     node.variable()->accept( *this );
 
     if( node.variable()->type() )
