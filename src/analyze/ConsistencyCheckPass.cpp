@@ -215,7 +215,10 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 
             std::vector< std::string > identifierPath;
             identifierPath.reserve( 2 );
-            identifierPath.emplace_back( node.type()->description() );
+            identifierPath.emplace_back( node.type()->description() );  // TODO: this will need some
+                                                                        // extra care when we add
+                                                                        // the import feature. (e.g.
+                                                                        // namespace lookup by type)
             identifierPath.emplace_back( node.identifier()->baseName() );
 
             try
