@@ -683,8 +683,12 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
 
     if( not node.object()->type() )
     {
-        m_log.error( { node.sourceLocation() }, "unable to resolve object type" );
-        return;  // the object type is essential to resolve the method
+        // the object type is essential to resolve the method
+        m_log.error(
+            { node.sourceLocation() },
+            "unable to resolve object type",
+            Code::TypeInferenceInvalidMethodCallExpression );
+        return;
     }
 
     // for the time being only builtin method calls are supported
