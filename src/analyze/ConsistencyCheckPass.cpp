@@ -70,7 +70,7 @@ static libpass::PassRegistration< ConsistencyCheckPass > PASS(
 class ConsistencyCheckVisitor final : public RecursiveVisitor
 {
   public:
-    ConsistencyCheckVisitor( libcasm_fe::Logger& m_log );
+    ConsistencyCheckVisitor( libcasm_fe::Logger& m_log, const Namespace& symboltable );
 
     void visit( Specification& node );
 
@@ -96,15 +96,16 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
   private:
     libcasm_fe::Logger& m_log;
-    Namespace::Ptr m_symboltable;
+    const Namespace& m_symboltable;
     u1 m_functionInitially;
     u1 m_sideEffectFree;
     u1 m_initDefinitionFound;
 };
 
-ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
+ConsistencyCheckVisitor::ConsistencyCheckVisitor(
+    libcasm_fe::Logger& log, const Namespace& symboltable )
 : m_log( log )
-, m_symboltable()
+, m_symboltable( symboltable )
 , m_functionInitially( false )
 , m_sideEffectFree( false )
 , m_initDefinitionFound( false )
@@ -113,8 +114,6 @@ ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
 
 void ConsistencyCheckVisitor::visit( Specification& node )
 {
-    m_symboltable = node.symboltable();
-
     node.header()->accept( *this );
     node.definitions()->accept( *this );
 
@@ -223,7 +222,7 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 
             try
             {
-                const auto& symbol = m_symboltable->find( identifierPath );
+                const auto& symbol = m_symboltable.find( identifierPath );
 
                 switch( symbol->id() )
                 {
@@ -439,7 +438,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
 
-    ConsistencyCheckVisitor visitor( log );
+    ConsistencyCheckVisitor visitor( log, *specification->symboltable() );
     visitor.visit( *specification );
 
     const auto errors = log.errors();
