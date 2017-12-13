@@ -70,7 +70,7 @@ static libpass::PassRegistration< ConsistencyCheckPass > PASS(
 class ConsistencyCheckVisitor final : public RecursiveVisitor
 {
   public:
-    ConsistencyCheckVisitor( libcasm_fe::Logger& m_log );
+    ConsistencyCheckVisitor( libcasm_fe::Logger& m_log, const Namespace& symboltable );
 
     void visit( Specification& node );
 
@@ -96,13 +96,16 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
   private:
     libcasm_fe::Logger& m_log;
+    const Namespace& m_symboltable;
     u1 m_functionInitially;
     u1 m_sideEffectFree;
     u1 m_initDefinitionFound;
 };
 
-ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
+ConsistencyCheckVisitor::ConsistencyCheckVisitor(
+    libcasm_fe::Logger& log, const Namespace& symboltable )
 : m_log( log )
+, m_symboltable( symboltable )
 , m_functionInitially( false )
 , m_sideEffectFree( false )
 , m_initDefinitionFound( false )
@@ -200,9 +203,56 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 {
-    assert(
-        node.targetType() != CallExpression::TargetType::UNKNOWN &&
-        "all calls should have been resolved by previous passes" );
+    if( node.targetType() == CallExpression::TargetType::UNKNOWN )
+    {
+        if( node.identifier()->type() != IdentifierPath::Type::RELATIVE )
+        {
+            m_log.error( { node.sourceLocation() }, "target type 'UNKNOWN' found!" );
+        }
+        else
+        {
+            assert( node.type() and " type shall be inferred through TypeInferencePass! " );
+
+            std::vector< std::string > identifierPath;
+            identifierPath.reserve( 2 );
+            identifierPath.emplace_back( node.type()->description() );  // TODO: this will need some
+                                                                        // extra care when we add
+                                                                        // the import feature. (e.g.
+                                                                        // namespace lookup by type)
+            identifierPath.emplace_back( node.identifier()->baseName() );
+
+            try
+            {
+                const auto& symbol = m_symboltable.find( identifierPath );
+
+                switch( symbol->id() )
+                {
+                    case Node::ID::ENUMERATOR_DEFINITION:
+                    {
+                        node.setTargetType( CallExpression::TargetType::CONSTANT );
+                        break;
+                    }
+                    default:
+                    {
+                        throw std::domain_error(
+                            "cannot reference '" + symbol->description() + "'" );
+                        break;
+                    }
+                }
+
+                node.setTargetDefinition( symbol );
+            }
+            catch( const std::domain_error& e )
+            {
+                m_log.error(
+                    { node.sourceLocation() },
+                    "type '" + node.type()->description() +
+                        "' does not have a symbol with relative path '" +
+                        node.identifier()->baseName() + "'",
+                    Code::DirectCallExpressionInvalidRelativePath );
+            }
+        }
+    }
 
     RecursiveVisitor::visit( node );
 
@@ -389,7 +439,7 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
     const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
 
-    ConsistencyCheckVisitor visitor( log );
+    ConsistencyCheckVisitor visitor( log, *specification->symboltable() );
     visitor.visit( *specification );
 
     const auto errors = log.errors();

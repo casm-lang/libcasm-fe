@@ -256,6 +256,7 @@ namespace libcasm_fe
 
         UpdateRuleInvalidClassifier = 0xcc00,
         DirectCallExpressionInvalidClassifier = 0xcc01,
+        DirectCallExpressionInvalidRelativePath = 0xcc11,
         CallRuleOnlyRulesAllowed = 0xcc02,
         CallRuleOnlyFunctionsAllowed = 0xcc03
 

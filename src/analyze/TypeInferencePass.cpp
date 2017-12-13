@@ -613,7 +613,14 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::UNKNOWN:
         {
-            assert( !"unknown target type!" );
+            if( identifier->type() != IdentifierPath::Type::RELATIVE )
+            {
+                m_log.error( { node.sourceLocation() }, "target type 'UNKNOWN' found!" );
+            }
+            else
+            {
+                inference( "relative path", nullptr, node );
+            }
             break;
         }
     }
