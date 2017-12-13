@@ -1376,8 +1376,22 @@ void TypeInferenceVisitor::assignment(
         }
         else
         {
+            auto lhsSourceLocation = lhs.sourceLocation();
+
+            if( lhs.id() == Node::ID::DIRECT_CALL_EXPRESSION )
+            {
+                auto directCall = static_cast< DirectCallExpression& >( lhs );
+                if( directCall.targetType() == CallExpression::TargetType::FUNCTION )
+                {
+                    auto functionDefinition = std::static_pointer_cast< FunctionDefinition >(
+                        directCall.targetDefinition() );
+
+                    lhsSourceLocation = functionDefinition->returnType()->sourceLocation();
+                }
+            }
+
             m_log.error(
-                { lhs.sourceLocation(), rhs.sourceLocation() },
+                { rhs.sourceLocation(), lhsSourceLocation },
                 "type mismatch: " + src + " was '" + tyRhs.description() + "', but " + dst +
                     " expects '" + tyLhs.description() + "'",
                 assignmentErr );
