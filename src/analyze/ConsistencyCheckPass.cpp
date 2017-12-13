@@ -213,12 +213,10 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
         {
             assert( node.type() and " type shall be inferred through TypeInferencePass! " );
 
-            auto identifierPath =
-                IdentifierPath( node.identifier()->identifiers(), IdentifierPath::Type::ABSOLUTE );
-
-            identifierPath.identifiers()->add(
-                node.identifier()->identifiers()->begin(),
-                std::make_shared< Identifier >( node.type()->description() ) );
+            std::vector< std::string > identifierPath;
+            identifierPath.reserve( 2 );
+            identifierPath.emplace_back( node.type()->description() );
+            identifierPath.emplace_back( node.identifier()->baseName() );
 
             try
             {
