@@ -59,6 +59,7 @@ ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )
 , m_value( value )
 {
     Expression::setType( value->type().ptr_type() );
+    TypedNode::setProperty( libcasm_ir::Property::PURE );
 }
 
 const libcasm_ir::Constant::Ptr& ValueAtom::value( void ) const
@@ -84,6 +85,7 @@ ReferenceAtom::ReferenceAtom( const IdentifierPath::Ptr& identifier )
 , m_reference( nullptr )
 , m_builtinId( libcasm_ir::Value::ID::_SIZE_ )
 {
+    TypedNode::setProperty( libcasm_ir::Property::PURE );
 }
 
 const IdentifierPath::Ptr& ReferenceAtom::identifier() const
@@ -135,6 +137,7 @@ void ReferenceAtom::accept( Visitor& visitor )
 UndefAtom::UndefAtom( void )
 : Expression( Node::ID::UNDEF_ATOM )
 {
+    TypedNode::setProperty( libcasm_ir::Property::PURE );
 }
 
 void UndefAtom::accept( Visitor& visitor )
