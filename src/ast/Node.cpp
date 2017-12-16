@@ -282,12 +282,17 @@ const libcasm_ir::Type::Ptr& TypedNode::type( void ) const
     return m_type;
 }
 
-void TypedNode::setProperty( const TypedNode::Property property )
+void TypedNode::setProperty( const libcasm_ir::Property property )
 {
     m_properties.set( property );
 }
 
-const TypedNode::Properties& TypedNode::properties( void ) const
+void TypedNode::setProperties( const libcasm_ir::Properties& properties )
+{
+    m_properties = properties;
+}
+
+const libcasm_ir::Properties& TypedNode::properties( void ) const
 {
     return m_properties;
 }

@@ -48,9 +48,9 @@
 #include <libcasm-fe/SourceLocation>
 #include <libcasm-fe/ast/Visitor>
 
+#include <libcasm-ir/Property>
 #include <libcasm-ir/Type>
 
-#include <libstdhl/Enum>
 #include <libstdhl/List>
 
 namespace libcasm_fe
@@ -178,14 +178,6 @@ namespace libcasm_fe
         class TypedNode : public Node
         {
           public:
-            enum class Property
-            {
-                CONSTANT,
-                PURE,
-            };
-
-            using Properties = libstdhl::Enum::Flags< Property >;
-
             using Ptr = std::shared_ptr< TypedNode >;
 
             TypedNode( Node::ID id );
@@ -193,12 +185,13 @@ namespace libcasm_fe
             void setType( const libcasm_ir::Type::Ptr& type );
             const libcasm_ir::Type::Ptr& type( void ) const;
 
-            void setProperty( const Property property );
-            const Properties& properties( void ) const;
+            void setProperty( const libcasm_ir::Property property );
+            void setProperties( const libcasm_ir::Properties& properties );
+            const libcasm_ir::Properties& properties( void ) const;
 
           private:
             libcasm_ir::Type::Ptr m_type;
-            Properties m_properties;
+            libcasm_ir::Properties m_properties;
         };
 
         class Identifier final : public Node
