@@ -41,30 +41,67 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_TYPE_CHECK_PASS_H_
-#define _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#include "PropertyResolverPass.h"
 
-#include "../analyze/PropertyResolverPass.h"
+#include "../Logger.h"
+#include "../ast/RecursiveVisitor.h"
 
-namespace libcasm_fe
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+#include <libstdhl/String>
+
+using namespace libcasm_fe;
+using namespace Ast;
+
+char PropertyResolverPass::id = 0;
+
+static libpass::PassRegistration< PropertyResolverPass > PASS(
+    "ASTPropertyResolverPass",
+    "property resolving and checking of AST representation",
+    "ast-prop-res",
+    0 );
+
+class PropertyResolverVisitor final : public RecursiveVisitor
 {
-    /**
-     * @brief Type check pass of AST
-     */
-    class TypeCheckPass final : public libpass::Pass
-    {
-      public:
-        static char id;
+  public:
+    PropertyResolverVisitor( libcasm_fe::Logger& log );
 
-        void usage( libpass::PassUsage& pu ) override;
+  private:
+    libcasm_fe::Logger& m_log;
+};
 
-        bool run( libpass::PassResult& pr ) override;
-
-        using Data = PropertyResolverPass::Data;
-    };
+PropertyResolverVisitor::PropertyResolverVisitor( libcasm_fe::Logger& log )
+: m_log( log )
+{
 }
 
-#endif  // _LIB_CASMFE_TYPE_CHECK_PASS_H_
+void PropertyResolverPass::usage( libpass::PassUsage& pu )
+{
+    pu.require< SymbolResolverPass >();
+}
+
+u1 PropertyResolverPass::run( libpass::PassResult& pr )
+{
+    libcasm_fe::Logger log( &id, stream() );
+
+    const auto data = pr.result< SymbolResolverPass >();
+    const auto specification = data->specification();
+
+    PropertyResolverVisitor visitor( log );
+    specification->definitions()->accept( visitor );
+
+    const auto errors = log.errors();
+    if( errors > 0 )
+    {
+        log.debug( "found %lu error(s) during property resolving", errors );
+        return false;
+    }
+
+    pr.setResult< PropertyResolverPass >( data );
+    return true;
+}
 
 //
 //  Local variables:
