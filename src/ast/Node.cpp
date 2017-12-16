@@ -268,6 +268,7 @@ std::string Node::description( void ) const
 TypedNode::TypedNode( Node::ID id )
 : Node( id )
 , m_type( nullptr )
+, m_properties( {} )
 {
 }
 
@@ -279,6 +280,16 @@ void TypedNode::setType( const libcasm_ir::Type::Ptr& type )
 const libcasm_ir::Type::Ptr& TypedNode::type( void ) const
 {
     return m_type;
+}
+
+void TypedNode::setProperty( const TypedNode::Property property )
+{
+    m_properties.set( property );
+}
+
+const TypedNode::Properties& TypedNode::properties( void ) const
+{
+    return m_properties;
 }
 
 Identifier::Identifier( const std::string& name )
