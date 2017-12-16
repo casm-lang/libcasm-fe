@@ -46,6 +46,8 @@
 #include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
 
+#include <libcasm-ir/Builtin>
+
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
@@ -88,6 +90,14 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
+            Code::FunctionDefinitionIdentifierIsBuiltinName );
+    }
+
     try
     {
         m_symboltable.registerSymbol( name, node.ptr< Definition >() );
@@ -119,6 +129,14 @@ void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
+            Code::DerivedDefinitionIdentifierIsBuiltinName );
+    }
+
     try
     {
         m_symboltable.registerSymbol( name, node.ptr< Definition >() );
@@ -139,6 +157,14 @@ void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 {
     const auto& name = node.identifier()->name();
+
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
+            Code::RuleDefinitionIdentifierIsBuiltinName );
+    }
 
     try
     {
@@ -180,6 +206,14 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 {
     const auto& name = node.identifier()->name();
 
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
+            Code::EnumerationDefinitionIdentifierIsBuiltinName );
+    }
+
     m_log.debug( "creating IR enumeration type '" + name + "'" );
     const auto kind = std::make_shared< libcasm_ir::Enumeration >( name );
     for( const auto& enumerator : *node.enumerators() )
@@ -203,7 +237,10 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
     {
         const auto& symbol = m_symboltable.find( name );
 
-        m_log.error( { node.sourceLocation(), symbol->sourceLocation() }, e.what() );
+        m_log.error(
+            { node.sourceLocation(), symbol->sourceLocation() },
+            e.what(),
+            Code::EnumerationDefinitionAlreadyUsed );
     }
 
     // register enumerators in a sub-namespace
