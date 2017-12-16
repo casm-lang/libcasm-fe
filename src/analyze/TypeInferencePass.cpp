@@ -1392,7 +1392,7 @@ void TypeInferenceVisitor::assignment(
         }
         else
         {
-            const auto& lhsSourceLocation = lhs.sourceLocation();
+            auto lhsSourceLocation = lhs.sourceLocation();
 
             if( lhs.id() == Node::ID::DIRECT_CALL_EXPRESSION )
             {
