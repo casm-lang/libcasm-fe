@@ -248,6 +248,21 @@ namespace libcasm_fe
           private:
             const Enumerators::Ptr m_enumerators;
         };
+
+        class UsingDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< UsingDefinition >;
+
+            UsingDefinition( const Identifier::Ptr& identifier, const Type::Ptr& type );
+
+            const Type::Ptr& type( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Type::Ptr m_type;
+        };
     }
 }
 

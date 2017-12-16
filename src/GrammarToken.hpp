@@ -48,6 +48,7 @@ INIT            "init"          { return Parser::make_INIT(loc); }
 DERIVED         "derived"       { return Parser::make_DERIVED(loc); }
 ENUMERATION     "enumeration"   { return Parser::make_ENUMERATION(loc); }
 RULE            "rule"          { return Parser::make_RULE(loc); }
+USING           "using"         { return Parser::make_USING(loc); }
 
 FUNCTION        "function"      { return Parser::make_FUNCTION(loc); }
 INITIALLY       "initially"     { return Parser::make_INITIALLY(loc); }

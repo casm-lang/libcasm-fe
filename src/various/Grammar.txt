@@ -48,6 +48,7 @@ Definition ::= EnumerationDefinition
              | DerivedDefinition
              | RuleDefinition
              | FunctionDefinition
+             | UsingDefinition
 </code>
 
 {{page>:grammar:Definition&noheader&nofooter}}
@@ -119,6 +120,15 @@ Enumerators ::= Enumerators "," EnumeratorDefinition
 </code>
 
 {{page>:grammar:Enumerators&noheader&nofooter}}
+
+
+===== UsingDefinition =====
+
+<code>
+UsingDefinition ::= "using" Identifier "=" Type
+</code>
+
+{{page>:grammar:UsingDefinition&noheader&nofooter}}
 
 
 ===== Rule =====

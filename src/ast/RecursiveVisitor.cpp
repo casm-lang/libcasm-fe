@@ -104,6 +104,13 @@ void RecursiveVisitor::visit( EnumerationDefinition& node )
     node.attributes()->accept( *this );
 }
 
+void RecursiveVisitor::visit( UsingDefinition& node )
+{
+    node.identifier()->accept( *this );
+    node.type()->accept( *this );
+    node.attributes()->accept( *this );
+}
+
 void RecursiveVisitor::visit( TypeCastingExpression& node )
 {
     node.fromExpression()->accept( *this );
