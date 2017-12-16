@@ -898,6 +898,12 @@ void TypeInferenceVisitor::visit( LetExpression& node )
         node.setType( node.expression()->type() );
     }
 
+    if( not node.variable()->type() )
+    {
+        // revisit the expression to infer again the variable type from underlying let expression
+        node.expression()->accept( *this );
+    }
+
     assignment(
         node,
         *node.variable(),
@@ -918,12 +924,12 @@ void TypeInferenceVisitor::visit( LetExpression& node )
     else
     {
         const auto& exprType = node.expression()->type()->result();
-        if( *node.type() != exprType )
+        if( node.type()->result() != exprType )
         {
             m_log.error(
                 { node.sourceLocation(), node.expression()->sourceLocation() },
                 node.description() + " has invalid expression type '" + exprType.description() +
-                    "' shall be '" + node.type()->description() + "'",
+                    "' shall be '" + node.type()->result().description() + "'",
                 Code::TypeInferenceInvalidLetExpressionTypeMismatch );
         }
     }
