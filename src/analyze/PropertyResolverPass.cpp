@@ -46,6 +46,8 @@
 #include "../Logger.h"
 #include "../ast/RecursiveVisitor.h"
 
+#include <libcasm-ir/Annotation>
+
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
@@ -148,6 +150,7 @@ void PropertyResolverVisitor::visit( FunctionDefinition& node )
 void PropertyResolverVisitor::visit( DerivedDefinition& node )
 {
     RecursiveVisitor::visit( node );
+    node.setProperty( libcasm_ir::Property::CONSTANT );
 }
 
 void PropertyResolverVisitor::visit( RuleDefinition& node )
@@ -158,11 +161,15 @@ void PropertyResolverVisitor::visit( RuleDefinition& node )
 void PropertyResolverVisitor::visit( EnumeratorDefinition& node )
 {
     RecursiveVisitor::visit( node );
+    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::PURE );
 }
 
 void PropertyResolverVisitor::visit( EnumerationDefinition& node )
 {
     RecursiveVisitor::visit( node );
+    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::PURE );
 }
 
 void PropertyResolverVisitor::visit( TypeCastingExpression& node )
@@ -173,16 +180,22 @@ void PropertyResolverVisitor::visit( TypeCastingExpression& node )
 void PropertyResolverVisitor::visit( ValueAtom& node )
 {
     RecursiveVisitor::visit( node );
+    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::PURE );
 }
 
 void PropertyResolverVisitor::visit( ReferenceAtom& node )
 {
     RecursiveVisitor::visit( node );
+    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::PURE );
 }
 
 void PropertyResolverVisitor::visit( UndefAtom& node )
 {
     RecursiveVisitor::visit( node );
+    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::PURE );
 }
 
 void PropertyResolverVisitor::visit( DirectCallExpression& node )
@@ -203,13 +216,16 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
 void PropertyResolverVisitor::visit( UnaryExpression& node )
 {
     RecursiveVisitor::visit( node );
-    node.setProperties( node.expression()->properties() );
+    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
+    node.setProperties( annotation.properties() * node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( BinaryExpression& node )
 {
     RecursiveVisitor::visit( node );
-    node.setProperties( node.left()->properties() | node.right()->properties() );
+    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
+    node.setProperties(
+        annotation.properties() * node.left()->properties() * node.right()->properties() );
 }
 
 void PropertyResolverVisitor::visit( RangeExpression& node )

@@ -258,7 +258,6 @@ DerivedDefinition::DerivedDefinition(
 , m_returnType( returnType )
 , m_expression( expression )
 {
-    TypedNode::setProperty( libcasm_ir::Property::CONSTANT );
 }
 
 const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments( void ) const
@@ -316,7 +315,6 @@ void RuleDefinition::accept( Visitor& visitor )
 EnumeratorDefinition::EnumeratorDefinition( const Identifier::Ptr& identifier )
 : Definition( Node::ID::ENUMERATOR_DEFINITION, identifier )
 {
-    TypedNode::setProperty( libcasm_ir::Property::PURE );
 }
 
 void EnumeratorDefinition::accept( Visitor& visitor )
@@ -329,7 +327,6 @@ EnumerationDefinition::EnumerationDefinition(
 : Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
-    TypedNode::setProperty( libcasm_ir::Property::PURE );
 }
 
 const Enumerators::Ptr& EnumerationDefinition::enumerators( void ) const
