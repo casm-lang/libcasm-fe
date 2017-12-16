@@ -454,7 +454,7 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
     validateArguments(
         node,
         node.type()->arguments(),
-        ValidationFlag::ValueMustBeDefined,
+        { ValidationFlag::ValueMustBeDefined },
         Code::FunctionArgumentInvalidValueAtLookup );
 
     const auto location = m_locationRegistry.lookup( node.uid(), m_frameStack.top()->locals() );
@@ -1206,7 +1206,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
         try
         {
-            validateValue( value, *argumentType, ValidationFlag::ValueMustBeDefined );
+            validateValue( value, *argumentType, { ValidationFlag::ValueMustBeDefined } );
         }
         catch( const IR::ValidationException& e )
         {
