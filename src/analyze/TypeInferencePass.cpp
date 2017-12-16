@@ -683,8 +683,12 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
 
     if( not node.object()->type() )
     {
-        m_log.error( { node.sourceLocation() }, "unable to resolve object type" );
-        return;  // the object type is essential to resolve the method
+        // the object type is essential to resolve the method
+        m_log.error(
+            { node.sourceLocation() },
+            "unable to resolve object type",
+            Code::TypeInferenceInvalidMethodCallExpression );
+        return;
     }
 
     // for the time being only builtin method calls are supported
@@ -865,6 +869,9 @@ void TypeInferenceVisitor::visit( ListExpression& node )
 
 void TypeInferenceVisitor::visit( LetExpression& node )
 {
+    // annotate let expression variable with annotation information from parent expression node
+    m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
+
     node.variable()->accept( *this );
 
     if( node.variable()->type() )
@@ -891,6 +898,12 @@ void TypeInferenceVisitor::visit( LetExpression& node )
         node.setType( node.expression()->type() );
     }
 
+    if( not node.variable()->type() )
+    {
+        // revisit the expression to infer again the variable type from underlying let expression
+        node.expression()->accept( *this );
+    }
+
     assignment(
         node,
         *node.variable(),
@@ -911,12 +924,12 @@ void TypeInferenceVisitor::visit( LetExpression& node )
     else
     {
         const auto& exprType = node.expression()->type()->result();
-        if( *node.type() != exprType )
+        if( node.type()->result() != exprType )
         {
             m_log.error(
                 { node.sourceLocation(), node.expression()->sourceLocation() },
                 node.description() + " has invalid expression type '" + exprType.description() +
-                    "' shall be '" + node.type()->description() + "'",
+                    "' shall be '" + node.type()->result().description() + "'",
                 Code::TypeInferenceInvalidLetExpressionTypeMismatch );
         }
     }
@@ -1286,6 +1299,15 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
 
     node.expression()->accept( *this );
 
+    if( func.targetType() == CallExpression::TargetType::BUILTIN )
+    {
+        m_log.error(
+            { func.sourceLocation() },
+            "performing update rule on built-in '" + func.identifier()->path() + "' is not allowed",
+            Code::TypeInferenceUpdateRuleFunctionIsBuiltin );
+        return;
+    }
+
     assignment(
         node,
         func,
@@ -1376,8 +1398,22 @@ void TypeInferenceVisitor::assignment(
         }
         else
         {
+            auto lhsSourceLocation = lhs.sourceLocation();
+
+            if( lhs.id() == Node::ID::DIRECT_CALL_EXPRESSION )
+            {
+                const auto& directCall = static_cast< DirectCallExpression& >( lhs );
+                if( directCall.targetType() == CallExpression::TargetType::FUNCTION )
+                {
+                    const auto functionDefinition = std::static_pointer_cast< FunctionDefinition >(
+                        directCall.targetDefinition() );
+
+                    lhsSourceLocation = functionDefinition->returnType()->sourceLocation();
+                }
+            }
+
             m_log.error(
-                { lhs.sourceLocation(), rhs.sourceLocation() },
+                { rhs.sourceLocation(), lhsSourceLocation },
                 "type mismatch: " + src + " was '" + tyRhs.description() + "', but " + dst +
                     " expects '" + tyLhs.description() + "'",
                 assignmentErr );
