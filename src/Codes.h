@@ -116,11 +116,13 @@ namespace libcasm_fe
         DerivedReturnValueInvalid = 0xda01,
         DerivedExpressionInvalidType = 0xde00,  // de** ... derived expression
 
-        DerivedDefinitionIdentifierIsBuiltinName = 0xd100  // d1** ... derived identifer
+        DerivedDefinitionIdentifierIsBuiltinName = 0xd100,  // d1** ... derived identifer
+
+        DerivedDefinitionExpressionIsNotConstant = 0xde00,
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
-        ,
+
         RuleDefinitionAlreadyUsed = 0x5000,
         RuleDefinitionIdentifierIsBuiltinName = 0x5001,
 
