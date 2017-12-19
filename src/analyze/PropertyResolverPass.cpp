@@ -70,8 +70,6 @@ class PropertyResolverVisitor final : public RecursiveVisitor
   public:
     PropertyResolverVisitor( libcasm_fe::Logger& log );
 
-    void visit( Specification& specification );
-
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -129,12 +127,6 @@ class PropertyResolverVisitor final : public RecursiveVisitor
 PropertyResolverVisitor::PropertyResolverVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 {
-}
-
-void PropertyResolverVisitor::visit( Specification& specification )
-{
-    specification.header()->accept( *this );
-    specification.definitions()->accept( *this );
 }
 
 void PropertyResolverVisitor::visit( VariableDefinition& node )
