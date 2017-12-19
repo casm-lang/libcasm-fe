@@ -282,6 +282,17 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
 void PropertyResolverVisitor::visit( MethodCallExpression& node )
 {
     RecursiveVisitor::visit( node );
+
+    if( node.methodType() == MethodCallExpression::MethodType::BUILTIN )
+    {
+        const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
+        node.setProperties( annotation.properties() );
+    }
+    else
+    {
+        m_log.error(
+            { node.sourceLocation() }, "method type '" + node.methodTypeName() + "' is invalid!" );
+    }
 }
 
 void PropertyResolverVisitor::visit( IndirectCallExpression& node )
