@@ -335,6 +335,7 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
 void PropertyResolverVisitor::visit( UnaryExpression& node )
 {
     RecursiveVisitor::visit( node );
+
     const auto& annotation = libcasm_ir::Annotation::find( node.op() );
     node.setProperties( annotation.properties() * node.expression()->properties() );
 }
@@ -342,6 +343,7 @@ void PropertyResolverVisitor::visit( UnaryExpression& node )
 void PropertyResolverVisitor::visit( BinaryExpression& node )
 {
     RecursiveVisitor::visit( node );
+
     const auto& annotation = libcasm_ir::Annotation::find( node.op() );
     node.setProperties(
         annotation.properties() * node.left()->properties() * node.right()->properties() );
@@ -360,18 +362,21 @@ void PropertyResolverVisitor::visit( ListExpression& node )
 void PropertyResolverVisitor::visit( LetExpression& node )
 {
     RecursiveVisitor::visit( node );
+
     node.setProperties( node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( ConditionalExpression& node )
 {
     RecursiveVisitor::visit( node );
+
     node.setProperties( node.thenExpression()->properties() * node.elseExpression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( ChooseExpression& node )
 {
     RecursiveVisitor::visit( node );
+
     node.setProperties( node.expression()->properties() );
 }
 
