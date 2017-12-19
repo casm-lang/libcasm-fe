@@ -77,12 +77,12 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
-    void visit( TypeCastingExpression& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( TypeCastingExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
@@ -213,14 +213,6 @@ void PropertyResolverVisitor::visit( EnumerationDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
-void PropertyResolverVisitor::visit( TypeCastingExpression& node )
-{
-    RecursiveVisitor::visit( node );
-
-    // propagate the fromExpression properties
-    node.setProperties( node.fromExpression()->properties() );
-}
-
 void PropertyResolverVisitor::visit( ValueAtom& node )
 {
     node.setProperty( libcasm_ir::Property::CONSTANT );
@@ -293,6 +285,14 @@ void PropertyResolverVisitor::visit( MethodCallExpression& node )
         m_log.error(
             { node.sourceLocation() }, "method type '" + node.methodTypeName() + "' is invalid!" );
     }
+}
+
+void PropertyResolverVisitor::visit( TypeCastingExpression& node )
+{
+    RecursiveVisitor::visit( node );
+
+    // propagate the fromExpression properties
+    node.setProperties( node.fromExpression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( IndirectCallExpression& node )
