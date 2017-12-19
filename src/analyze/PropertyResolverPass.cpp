@@ -141,6 +141,7 @@ void PropertyResolverVisitor::visit( VariableDefinition& node )
 {
     node.setProperty( libcasm_ir::Property::CONSTANT );
     node.setProperty( libcasm_ir::Property::PURE );
+
     RecursiveVisitor::visit( node );
 }
 
@@ -153,15 +154,21 @@ void PropertyResolverVisitor::visit( FunctionDefinition& node )
             m_log.error( { node.sourceLocation() }, "function classification 'UNKNOWN' found!" );
             break;
         }
-        case FunctionDefinition::Classification::IN:          // [fallthrough]
+        case FunctionDefinition::Classification::IN:  // [fallthrough]
+        {
+            node.setProperty( libcasm_ir::Property::CONSTANT );
+            break;
+        }
         case FunctionDefinition::Classification::CONTROLLED:  // [fallthrough]
         case FunctionDefinition::Classification::SHARED:
         {
+            node.setProperty( libcasm_ir::Property::ALTERABLE );
             node.setProperty( libcasm_ir::Property::CONSTANT );
             break;
         }
         case FunctionDefinition::Classification::OUT:
         {
+            node.setProperty( libcasm_ir::Property::ALTERABLE );
             break;
         }
         case FunctionDefinition::Classification::STATIC:
@@ -457,14 +464,14 @@ void PropertyResolverVisitor::visit( DefaultCase& node )
 
 void PropertyResolverPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SymbolResolverPass >();
+    pu.require< TypeInferencePass >();
 }
 
 u1 PropertyResolverPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< SymbolResolverPass >();
+    const auto data = pr.result< TypeInferencePass >();
     const auto specification = data->specification();
 
     PropertyResolverVisitor visitor( log );

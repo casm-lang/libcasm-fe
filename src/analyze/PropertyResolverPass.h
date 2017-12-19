@@ -44,7 +44,7 @@
 #ifndef _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
 #define _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
 
-#include "../analyze/SymbolResolverPass.h"
+#include "../analyze/TypeInferencePass.h"
 
 namespace libcasm_fe
 {
@@ -60,7 +60,7 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        using Data = SymbolResolverPass::Data;
+        using Data = TypeInferencePass::Data;
     };
 }
 
