@@ -201,6 +201,7 @@ void PropertyResolverVisitor::visit( EnumeratorDefinition& node )
 {
     node.setProperty( libcasm_ir::Property::CONSTANT );
     node.setProperty( libcasm_ir::Property::PURE );
+
     RecursiveVisitor::visit( node );
 }
 
@@ -208,35 +209,40 @@ void PropertyResolverVisitor::visit( EnumerationDefinition& node )
 {
     node.setProperty( libcasm_ir::Property::CONSTANT );
     node.setProperty( libcasm_ir::Property::PURE );
+
     RecursiveVisitor::visit( node );
 }
 
 void PropertyResolverVisitor::visit( TypeCastingExpression& node )
 {
     RecursiveVisitor::visit( node );
+
     // propagate the fromExpression properties
     node.setProperties( node.fromExpression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( ValueAtom& node )
 {
-    RecursiveVisitor::visit( node );
     node.setProperty( libcasm_ir::Property::CONSTANT );
     node.setProperty( libcasm_ir::Property::PURE );
+
+    RecursiveVisitor::visit( node );
 }
 
 void PropertyResolverVisitor::visit( ReferenceAtom& node )
 {
-    RecursiveVisitor::visit( node );
     node.setProperty( libcasm_ir::Property::CONSTANT );
     node.setProperty( libcasm_ir::Property::PURE );
+
+    RecursiveVisitor::visit( node );
 }
 
 void PropertyResolverVisitor::visit( UndefAtom& node )
 {
-    RecursiveVisitor::visit( node );
     node.setProperty( libcasm_ir::Property::CONSTANT );
     node.setProperty( libcasm_ir::Property::PURE );
+
+    RecursiveVisitor::visit( node );
 }
 
 void PropertyResolverVisitor::visit( DirectCallExpression& node )
@@ -251,27 +257,21 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
             node.setProperties( annotation.properties() );
             break;
         }
-        case CallExpression::TargetType::VARIABLE:     // [[fallthrough]]
-        case CallExpression::TargetType::FUNCTION:     // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:      // [[fallthrough]]
-        case CallExpression::TargetType::RULE:         // [[fallthrough]]
-        case CallExpression::TargetType::SELF:         // [[fallthrough]]
-        case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
-        case CallExpression::TargetType::CONSTANT:
+        case CallExpression::TargetType::VARIABLE:  // [[fallthrough]]
+        case CallExpression::TargetType::FUNCTION:  // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:   // [[fallthrough]]
+        case CallExpression::TargetType::RULE:
         {
             const auto& definition = node.targetDefinition();
-
-            // if( definition->properties().empty() )
-            // {
-            //     definition->accept( *this );
-            // }
-
+            assert( definition.get() != nullptr );
             node.setProperties( definition->properties() );
             break;
         }
+        case CallExpression::TargetType::SELF:         // [[fallthrough]]
+        case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
+        case CallExpression::TargetType::CONSTANT:     // [[fallthrough]]
         case CallExpression::TargetType::UNKNOWN:
         {
-            // PPA: assumption: relative path symbol is CONSTANT and PURE!
             node.setProperty( libcasm_ir::Property::CONSTANT );
             node.setProperty( libcasm_ir::Property::PURE );
             break;
@@ -287,6 +287,38 @@ void PropertyResolverVisitor::visit( MethodCallExpression& node )
 void PropertyResolverVisitor::visit( IndirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
+
+    switch( node.targetType() )
+    {
+        case CallExpression::TargetType::FUNCTION:
+        {
+            node.setProperty( libcasm_ir::Property::CONSTANT );
+            break;
+        }
+        case CallExpression::TargetType::RULE:
+        {
+            node.setProperty( libcasm_ir::Property::ALTERABLE );
+            node.setProperty( libcasm_ir::Property::CONSTANT );
+            break;
+        }
+        case CallExpression::TargetType::BUILTIN:      // [[fallthrough]]
+        case CallExpression::TargetType::VARIABLE:     // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:      // [[fallthrough]]
+        case CallExpression::TargetType::SELF:         // [[fallthrough]]
+        case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
+        case CallExpression::TargetType::CONSTANT:
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "target type '" + node.targetTypeName() + "' is invalid!" );
+            break;
+        }
+        case CallExpression::TargetType::UNKNOWN:
+        {
+            m_log.error( { node.sourceLocation() }, "target type 'UNKNOWN' found!" );
+            break;
+        }
+    }
 }
 
 void PropertyResolverVisitor::visit( UnaryExpression& node )
