@@ -392,8 +392,9 @@ TypeCastingExpression::TypeCastingExpression(
 : CallExpression( Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
 , m_fromExpression( fromExpression )
 , m_asType( asType )
+, m_castingType( CastingType::UNKNOWN )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 {
-    arguments()->add( fromExpression );
 }
 
 const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
@@ -404,6 +405,57 @@ const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
 const Type::Ptr& TypeCastingExpression::asType( void ) const
 {
     return m_asType;
+}
+
+void TypeCastingExpression::setCastingType( CastingType castingType )
+{
+    m_castingType = castingType;
+}
+
+TypeCastingExpression::CastingType TypeCastingExpression::castingType( void ) const
+{
+    return m_castingType;
+}
+
+std::string TypeCastingExpression::castingTypeName( void ) const
+{
+    switch( m_castingType )
+    {
+        case CastingType::BUILTIN:
+        {
+            return "built-in";
+        }
+        case CastingType::UNKNOWN:
+        {
+            return "unknown";
+        }
+    }
+
+    assert( !" internal error! " );
+    return std::string();
+}
+
+void TypeCastingExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
+{
+    m_targetBuiltinId = builtinId;
+}
+
+libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
+{
+    assert( m_castingType == CastingType::BUILTIN );
+    return m_targetBuiltinId;
+}
+
+void TypeCastingExpression::setTargetDefinition( const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+}
+
+const TypedNode::Ptr& TypeCastingExpression::targetDefinition( void ) const
+{
+    assert(
+        ( m_castingType != CastingType::BUILTIN ) and ( m_castingType != CastingType::UNKNOWN ) );
+    return m_targetDefinition;
 }
 
 void TypeCastingExpression::accept( Visitor& visitor )

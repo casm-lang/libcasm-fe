@@ -282,6 +282,12 @@ namespace libcasm_fe
         class TypeCastingExpression final : public CallExpression
         {
           public:
+            enum class CastingType
+            {
+                BUILTIN,
+                UNKNOWN
+            };
+
             using Ptr = std::shared_ptr< TypeCastingExpression >;
 
             TypeCastingExpression(
@@ -291,11 +297,34 @@ namespace libcasm_fe
 
             const std::shared_ptr< Type >& asType( void ) const;
 
+            void setCastingType( CastingType castingType );
+            CastingType castingType( void ) const;
+            std::string castingTypeName( void ) const;
+
+            /**
+             * Sets the builtin id of this call.
+             *
+             * @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
+
+            /**
+             *     Sets the definition of this call.
+             *
+             *     @note Assigned by SymbolResolved and used during execution
+             */
+            void setTargetDefinition( const TypedNode::Ptr& definition );
+            const TypedNode::Ptr& targetDefinition( void ) const;
+
             void accept( Visitor& visitor ) override;
 
           private:
             const Expression::Ptr m_fromExpression;
             const std::shared_ptr< Type > m_asType;
+            CastingType m_castingType;
+            libcasm_ir::Value::ID m_targetBuiltinId;
+            TypedNode::Ptr m_targetDefinition;
         };
 
         class UnaryExpression final : public Expression
