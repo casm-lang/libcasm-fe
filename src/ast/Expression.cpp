@@ -251,12 +251,6 @@ const Expression::Ptr& CallExpression::baseExpression( void ) const
     return m_baseExpression;
 }
 
-u1 CallExpression::isBuiltin( void ) const
-{
-    return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_ and
-           targetType() == CallExpression::TargetType::BUILTIN;
-}
-
 DirectCallExpression::DirectCallExpression(
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
