@@ -190,8 +190,6 @@ void PropertyResolverVisitor::visit( DerivedDefinition& node )
                 "' violates 'constant' property",
             Code::DerivedDefinitionExpressionIsNotConstant );
     }
-
-    node.setProperties( expressionProperties );
 }
 
 void PropertyResolverVisitor::visit( RuleDefinition& node )
