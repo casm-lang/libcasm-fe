@@ -148,7 +148,6 @@ CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 , m_targetType( TargetType::UNKNOWN )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 , m_targetDefinition()
-, m_baseExpression()
 {
 }
 
@@ -238,17 +237,6 @@ const TypedNode::Ptr& CallExpression::targetDefinition( void ) const
 {
     assert( ( targetType() != TargetType::BUILTIN ) and ( targetType() != TargetType::UNKNOWN ) );
     return m_targetDefinition;
-}
-
-void CallExpression::setBaseExpression( const Expression::Ptr& baseExpression )
-{
-    assert( baseExpression != nullptr );
-    m_baseExpression = baseExpression;
-}
-
-const Expression::Ptr& CallExpression::baseExpression( void ) const
-{
-    return m_baseExpression;
 }
 
 DirectCallExpression::DirectCallExpression(

@@ -171,20 +171,11 @@ namespace libcasm_fe
             void setTargetDefinition( const TypedNode::Ptr& definition );
             const TypedNode::Ptr& targetDefinition( void ) const;
 
-            /**
-               Sets the base expression of this call.
-
-               @note Assigned by SymbolResolved and used during execution
-             */
-            void setBaseExpression( const Expression::Ptr& baseExpression );
-            const Expression::Ptr& baseExpression( void ) const;
-
           private:
             const Expressions::Ptr m_arguments;
             TargetType m_targetType;
             libcasm_ir::Value::ID m_targetBuiltinId;
             TypedNode::Ptr m_targetDefinition;
-            Expression::Ptr m_baseExpression;
 
           public:
             static std::string targetTypeString( const TargetType targetType );
