@@ -321,14 +321,12 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
         case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
         case CallExpression::TargetType::CONSTANT:
         {
-            m_log.error(
-                { node.sourceLocation() },
-                "target type '" + node.targetTypeName() + "' is invalid!" );
+            assert( !" indirect call has invalid target type at this pass! " );
             break;
         }
         case CallExpression::TargetType::UNKNOWN:
         {
-            m_log.error( { node.sourceLocation() }, "target type 'UNKNOWN' found!" );
+            assert( !" indirect call cannot have UNKNOWN target type at this pass! " );
             break;
         }
     }
