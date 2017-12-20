@@ -285,7 +285,8 @@ void PropertyResolverVisitor::visit( MethodCallExpression& node )
     else
     {
         m_log.error(
-            { node.sourceLocation() }, "method type '" + node.methodTypeName() + "' is invalid!" );
+            { node.sourceLocation() },
+            "method type '" + node.methodTypeName() + "' is not implemented!" );
     }
 }
 
