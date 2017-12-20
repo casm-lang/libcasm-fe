@@ -52,8 +52,6 @@
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
-#include <libstdhl/String>
-
 using namespace libcasm_fe;
 using namespace Ast;
 
