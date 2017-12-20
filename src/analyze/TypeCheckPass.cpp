@@ -436,14 +436,14 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
 
 void TypeCheckPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< PropertyResolverPass >();
+    pu.require< SymbolResolverPass >();
 }
 
 u1 TypeCheckPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< PropertyResolverPass >();
+    const auto data = pr.result< SymbolResolverPass >();
     const auto specification = data->specification();
 
     TypeCheckVisitor visitor( log, *specification->symboltable() );

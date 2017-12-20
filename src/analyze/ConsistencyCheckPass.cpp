@@ -429,14 +429,14 @@ void ConsistencyCheckVisitor::verify( const TypedNode& node )
 
 void ConsistencyCheckPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeInferencePass >();
+    pu.require< PropertyResolverPass >();
 }
 
 u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< TypeInferencePass >();
+    const auto data = pr.result< PropertyResolverPass >();
     const auto specification = data->specification();
 
     ConsistencyCheckVisitor visitor( log, *specification->symboltable() );

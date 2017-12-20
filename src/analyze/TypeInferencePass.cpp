@@ -492,6 +492,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             else
             {
                 inference( "relative path", nullptr, node );
+                node.setTargetType( CallExpression::TargetType::CONSTANT );
             }
             break;
         }
@@ -677,7 +678,16 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
     const auto resultType = node.asType()->type();
     std::vector< libcasm_ir::Type::Ptr > argumentTypes;
-    argumentTypes.emplace_back( node.fromExpression()->type()->ptr_result() );
+
+    const auto& fromExpressionType = node.fromExpression()->type();
+    if( fromExpressionType->isRelation() )
+    {
+        argumentTypes.emplace_back( fromExpressionType->ptr_result() );
+    }
+    else
+    {
+        argumentTypes.emplace_back( fromExpressionType );
+    }
 
     const auto relationType =
         libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
