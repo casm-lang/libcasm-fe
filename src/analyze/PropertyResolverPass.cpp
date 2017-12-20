@@ -144,7 +144,7 @@ void PropertyResolverVisitor::visit( FunctionDefinition& node )
             m_log.error( { node.sourceLocation() }, "function classification 'UNKNOWN' found!" );
             break;
         }
-        case FunctionDefinition::Classification::IN:  // [fallthrough]
+        case FunctionDefinition::Classification::IN:
         {
             node.setProperty( libcasm_ir::Property::CONSTANT );
             break;
