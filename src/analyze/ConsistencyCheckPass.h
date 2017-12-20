@@ -44,7 +44,7 @@
 #ifndef _LIBCASM_FE_CONSISTENCY_CHECK_PASS_H_
 #define _LIBCASM_FE_CONSISTENCY_CHECK_PASS_H_
 
-#include <libcasm-fe/analyze/TypeInferencePass>
+#include <libcasm-fe/analyze/PropertyResolverPass>
 
 namespace libcasm_fe
 {
@@ -60,7 +60,7 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        using Data = TypeInferencePass::Data;
+        using Data = PropertyResolverPass::Data;
     };
 }
 
