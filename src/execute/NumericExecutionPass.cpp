@@ -692,14 +692,14 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
 void ExecutionVisitor::visit( TypeCastingExpression& node )
 {
     node.fromExpression()->accept( *this );
-    const auto fromExpression = m_evaluationStack.pop();
+    const auto object = m_evaluationStack.pop();
 
     switch( node.castingType() )
     {
         case TypeCastingExpression::CastingType::BUILTIN:
         {
             m_frameStack.push(
-                makeObjectFrame( fromExpression, &node, nullptr, node.arguments()->size() ) );
+                makeObjectFrame( object, &node, nullptr, node.arguments()->size() ) );
             invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
