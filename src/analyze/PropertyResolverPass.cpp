@@ -259,11 +259,15 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::SELF:         // [[fallthrough]]
         case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
-        case CallExpression::TargetType::CONSTANT:     // [[fallthrough]]
-        case CallExpression::TargetType::UNKNOWN:
+        case CallExpression::TargetType::CONSTANT:
         {
             node.setProperty( libcasm_ir::Property::CONSTANT );
             node.setProperty( libcasm_ir::Property::PURE );
+            break;
+        }
+        case CallExpression::TargetType::UNKNOWN:
+        {
+            assert( !" direct call cannot have UNKNOWN target type at this pass! " );
             break;
         }
     }
