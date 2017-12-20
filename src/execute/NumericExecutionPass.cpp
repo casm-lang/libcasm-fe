@@ -303,7 +303,6 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
-    void visit( TypeCastingExpression& node ) override;
     void visit( ValueAtom& node ) override;
     void visit( ReferenceAtom& node ) override;
     void visit( UndefAtom& node ) override;
@@ -311,6 +310,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
     void visit( RangeExpression& node ) override;
@@ -454,7 +454,7 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
     validateArguments(
         node,
         node.type()->arguments(),
-        ValidationFlag::ValueMustBeDefined,
+        { ValidationFlag::ValueMustBeDefined },
         Code::FunctionArgumentInvalidValueAtLookup );
 
     const auto location = m_locationRegistry.lookup( node.uid(), m_frameStack.top()->locals() );
@@ -536,24 +536,6 @@ void ExecutionVisitor::visit( EnumerationDefinition& node )
     assert( node.type()->isEnumeration() );
     const auto& enumType = std::static_pointer_cast< IR::EnumerationType >( node.type() );
     m_evaluationStack.push( IR::EnumerationConstant( enumType ) );
-}
-
-void ExecutionVisitor::visit( TypeCastingExpression& node )
-{
-    if( node.isBuiltin() )
-    {
-        m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
-        invokeBuiltin( node, node.targetBuiltinId(), node.type() );
-        m_frameStack.pop();
-    }
-    else
-    {
-        const auto& definition = std::static_pointer_cast< Definition >( node.targetDefinition() );
-        m_frameStack.push(
-            makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
-        definition->accept( *this );
-        m_frameStack.pop();
-    }
 }
 
 void ExecutionVisitor::visit( ValueAtom& node )
@@ -702,6 +684,29 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         case ReferenceAtom::ReferenceType::UNKNOWN:
         {
             assert( !"cannot call an unknown target" );
+            break;
+        }
+    }
+}
+
+void ExecutionVisitor::visit( TypeCastingExpression& node )
+{
+    node.fromExpression()->accept( *this );
+    const auto object = m_evaluationStack.pop();
+
+    switch( node.castingType() )
+    {
+        case TypeCastingExpression::CastingType::BUILTIN:
+        {
+            m_frameStack.push(
+                makeObjectFrame( object, &node, nullptr, node.arguments()->size() ) );
+            invokeBuiltin( node, node.targetBuiltinId(), node.type() );
+            m_frameStack.pop();
+            break;
+        }
+        case TypeCastingExpression::CastingType::UNKNOWN:
+        {
+            assert( !"cannot call an unknown method" );
             break;
         }
     }
@@ -1206,7 +1211,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
         try
         {
-            validateValue( value, *argumentType, ValidationFlag::ValueMustBeDefined );
+            validateValue( value, *argumentType, { ValidationFlag::ValueMustBeDefined } );
         }
         catch( const IR::ValidationException& e )
         {

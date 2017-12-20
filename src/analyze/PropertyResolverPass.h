@@ -41,17 +41,17 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_TYPE_CHECK_PASS_H_
-#define _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#ifndef _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
+#define _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
 
-#include "../analyze/PropertyResolverPass.h"
+#include "../analyze/SymbolResolverPass.h"
 
 namespace libcasm_fe
 {
     /**
-     * @brief Type check pass of AST
+     * @brief Property resolver pass of AST
      */
-    class TypeCheckPass final : public libpass::Pass
+    class PropertyResolverPass final : public libpass::Pass
     {
       public:
         static char id;
@@ -60,11 +60,11 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        using Data = PropertyResolverPass::Data;
+        using Data = SymbolResolverPass::Data;
     };
 }
 
-#endif  // _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#endif  // _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
 
 //
 //  Local variables:
