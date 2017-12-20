@@ -118,7 +118,6 @@ static std::string generateBuiltinTraceLine( Frame* frame )
 {
     const auto call = frame->call();
     assert( call != nullptr );
-    assert( call->targetType() == CallExpression::TargetType::BUILTIN );
 
     std::string args;
     const auto numberOfArguments = call->arguments()->size();

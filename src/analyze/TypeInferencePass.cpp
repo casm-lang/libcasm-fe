@@ -504,9 +504,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     {
         const auto& call_type_args = node.type()->arguments();
         const auto& call_expr_args = *node.arguments();
-        assert( call_type_args.size() == call_expr_args.size() );
 
-        for( std::size_t pos = 0; pos < call_type_args.size(); pos++ )
+        for( std::size_t pos = 0; pos < call_expr_args.size(); pos++ )
         {
             const auto& exprArg = call_expr_args.at( pos );
             if( not exprArg->type() )
