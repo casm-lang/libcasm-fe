@@ -620,6 +620,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             else
             {
                 inference( "relative path", nullptr, node );
+                node.setTargetType( CallExpression::TargetType::CONSTANT );
             }
             break;
         }
