@@ -492,7 +492,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             else
             {
                 inference( "relative path", nullptr, node );
-                node.setTargetType( CallExpression::TargetType::CONSTANT );
             }
             break;
         }
@@ -1699,6 +1698,87 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
     }
 }
 
+class TypeResolveVisitor final : public RecursiveVisitor
+{
+  public:
+    TypeResolveVisitor( libcasm_fe::Logger& log, const Namespace& symboltable );
+
+    void visit( DirectCallExpression& node ) override;
+
+  private:
+    libcasm_fe::Logger& m_log;
+    const Namespace& m_symboltable;
+};
+
+TypeResolveVisitor::TypeResolveVisitor( libcasm_fe::Logger& log, const Namespace& symboltable )
+: m_log( log )
+, m_symboltable( symboltable )
+{
+}
+
+void TypeResolveVisitor::visit( DirectCallExpression& node )
+{
+    RecursiveVisitor::visit( node );
+
+    if( node.targetType() != CallExpression::TargetType::UNKNOWN )
+    {
+        return;
+    }
+
+    if( node.identifier()->type() != IdentifierPath::Type::RELATIVE )
+    {
+        m_log.debug( { node.sourceLocation() }, "target type 'UNKNOWN' found!" );
+        return;
+    }
+
+    if( not node.type() )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unable to infer type of relative path '" + node.identifier()->baseName() + "'",
+            Code::DirectCallExpressionInvalidRelativePath );
+        return;
+    }
+
+    std::vector< std::string > identifierPath;
+    identifierPath.reserve( 2 );
+    identifierPath.emplace_back( node.type()->description() );  // TODO: this will need some extra
+                                                                // care when we add the import
+                                                                // feature. (e.g. namespace lookup
+                                                                // by type)
+    identifierPath.emplace_back( node.identifier()->baseName() );
+
+    try
+    {
+        const auto& symbol = m_symboltable.find( identifierPath );
+
+        switch( symbol->id() )
+        {
+            case Node::ID::ENUMERATOR_DEFINITION:
+            {
+                node.setTargetType( CallExpression::TargetType::CONSTANT );
+                break;
+            }
+            default:
+            {
+                throw std::domain_error( "cannot reference '" + symbol->description() + "'" );
+                break;
+            }
+        }
+
+        node.setTargetDefinition( symbol );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "type '" + node.type()->description() +
+                "' does not have a symbol with relative path '" + node.identifier()->baseName() +
+                "'",
+            Code::DirectCallExpressionInvalidRelativePath );
+    }
+}
+
 void TypeInferencePass::usage( libpass::PassUsage& pu )
 {
     pu.require< TypeCheckPass >();
@@ -1711,8 +1791,11 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
     const auto data = pr.result< TypeCheckPass >();
     const auto specification = data->specification();
 
-    TypeInferenceVisitor visitor( log );
-    specification->definitions()->accept( visitor );
+    TypeInferenceVisitor typeInferenceVisitor( log );
+    specification->definitions()->accept( typeInferenceVisitor );
+
+    TypeResolveVisitor typeResolveVisitor( log, *specification->symboltable() );
+    specification->definitions()->accept( typeResolveVisitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
