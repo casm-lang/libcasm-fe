@@ -311,8 +311,7 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
         }
         case CallExpression::TargetType::RULE:
         {
-            node.setProperty( libcasm_ir::Property::ALTERABLE );
-            node.setProperty( libcasm_ir::Property::CONSTANT );
+            // indirect rule calls have no properties so far
             break;
         }
         case CallExpression::TargetType::BUILTIN:      // [[fallthrough]]
