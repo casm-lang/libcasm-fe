@@ -775,10 +775,10 @@ void ExecutionVisitor::visit( LetExpression& node )
     const auto value = m_evaluationStack.pop();
 
     // validate value
-    const auto& variableType = node.variable()->type()->result();
+    const auto& variableType = node.variable()->type();
     try
     {
-        validateValue( value, variableType );
+        validateValue( value, *variableType );
     }
     catch( const IR::ValidationException& e )
     {
@@ -1023,10 +1023,10 @@ void ExecutionVisitor::visit( LetRule& node )
     const auto value = m_evaluationStack.pop();
 
     // validate value
-    const auto& variableType = node.variable()->type()->result();
+    const auto& variableType = node.variable()->type();
     try
     {
-        validateValue( value, variableType );
+        validateValue( value, *variableType );
     }
     catch( const IR::ValidationException& e )
     {
