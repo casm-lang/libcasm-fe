@@ -884,7 +884,15 @@ void TypeInferenceVisitor::visit( LetExpression& node )
 
     if( node.variable()->type() )
     {
-        m_typeIDs[ node.initializer().get() ].emplace( node.variable()->type()->id() );
+        auto& variableType = node.variable()->type();
+        if( variableType->isRelation() )
+        {
+            m_typeIDs[ node.initializer().get() ].emplace( variableType->ptr_result()->id() );
+        }
+        else
+        {
+            m_typeIDs[ node.initializer().get() ].emplace( variableType->id() );
+        }
     }
 
     node.initializer()->accept( *this );
@@ -1152,7 +1160,15 @@ void TypeInferenceVisitor::visit( LetRule& node )
 
     if( node.variable()->type() )
     {
-        m_typeIDs[ node.expression().get() ].emplace( node.variable()->type()->ptr_result()->id() );
+        auto& variableType = node.variable()->type();
+        if( variableType->isRelation() )
+        {
+            m_typeIDs[ node.expression().get() ].emplace( variableType->ptr_result()->id() );
+        }
+        else
+        {
+            m_typeIDs[ node.expression().get() ].emplace( variableType->id() );
+        }
     }
 
     node.expression()->accept( *this );
@@ -1339,7 +1355,14 @@ void TypeInferenceVisitor::assignment(
 {
     if( lhs.type() and not rhs.type() )  // and rhs.id() == Node::ID::UNDEF_ATOM and  )
     {
-        rhs.setType( lhs.type()->ptr_result() );
+        if( lhs.type()->isRelation() )
+        {
+            rhs.setType( lhs.type()->ptr_result() );
+        }
+        else
+        {
+            rhs.setType( lhs.type() );
+        }
     }
 
     const auto error_count = m_log.errors();
