@@ -82,6 +82,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( ValueAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
+    void visit( ListExpression& node ) override;
 
     void visit( CaseRule& node ) override;
     void visit( UpdateRule& node ) override;
@@ -236,6 +237,11 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
                 Code::NotSideEffectFreeRuleCall );
         }
     }
+}
+
+void ConsistencyCheckVisitor::visit( ListExpression& node )
+{
+    assert( node.type()->isList() );
 }
 
 void ConsistencyCheckVisitor::visit( UpdateRule& node )
