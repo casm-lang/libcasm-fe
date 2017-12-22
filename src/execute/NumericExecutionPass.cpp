@@ -766,7 +766,19 @@ void ExecutionVisitor::visit( RangeExpression& node )
 
 void ExecutionVisitor::visit( ListExpression& node )
 {
-    // TODO
+    assert( node.type()->isList() );
+    const auto listType = std::static_pointer_cast< IR::ListType >( node.type() );
+    auto list = std::make_shared< IR::List >( listType );
+
+    node.expressions()->accept( *this );
+    for( const auto& expression : *node.expressions() )
+    {
+        expression->accept( *this );
+        const auto constantElement = m_evaluationStack.pop();
+        list->append( constantElement );
+    }
+
+    m_evaluationStack.push( IR::ListConstant( listType, list ) );
 }
 
 void ExecutionVisitor::visit( LetExpression& node )
