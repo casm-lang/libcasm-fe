@@ -194,6 +194,7 @@ class DefinitionVisitor final : public RecursiveVisitor
     void visit( RuleDefinition& node ) override;
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
+    void visit( UsingDefinition& node ) override;
 
   private:
     libcasm_fe::Logger& m_log;
@@ -277,6 +278,14 @@ void DefinitionVisitor::visit( EnumeratorDefinition& node )
 }
 
 void DefinitionVisitor::visit( EnumerationDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    DefinitionAttributionVisitor visitor( m_log, node );
+    node.attributes()->accept( visitor );
+}
+
+void DefinitionVisitor::visit( UsingDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
