@@ -197,6 +197,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     const auto& identifierPath = identifier->path();
     const auto& identifierBaseName = identifier->baseName();
 
+    if( identifier->type() == IdentifierPath::Type::RELATIVE )
+    {
+        // only absolute types can be resolved here, relative types will be
+        // resolved later in the type inference pass
+        return;
+    }
+
     const auto variableIt = m_variables.find( identifierBaseName );
     if( variableIt != m_variables.cend() and identifierPath == identifierBaseName )
     {
@@ -205,7 +212,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    // TODO: PPA: add check that non-method call built-ins reside in a certain namespace!
     if( libcasm_ir::Builtin::available( identifierBaseName ) )
     {
         const auto& annotation = libcasm_ir::Annotation::find( identifierBaseName );

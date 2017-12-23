@@ -82,6 +82,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( ValueAtom& node ) override;
     void visit( UndefAtom& node ) override;
     void visit( DirectCallExpression& node ) override;
+    void visit( ListExpression& node ) override;
 
     void visit( CaseRule& node ) override;
     void visit( UpdateRule& node ) override;
@@ -200,9 +201,7 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 {
-    assert(
-        node.targetType() != CallExpression::TargetType::UNKNOWN &&
-        "all calls should have been resolved by previous passes" );
+    assert( node.targetType() != CallExpression::TargetType::UNKNOWN );
 
     RecursiveVisitor::visit( node );
 
@@ -238,6 +237,11 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
                 Code::NotSideEffectFreeRuleCall );
         }
     }
+}
+
+void ConsistencyCheckVisitor::visit( ListExpression& node )
+{
+    assert( node.type()->isList() );
 }
 
 void ConsistencyCheckVisitor::visit( UpdateRule& node )
@@ -379,14 +383,14 @@ void ConsistencyCheckVisitor::verify( const TypedNode& node )
 
 void ConsistencyCheckPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeInferencePass >();
+    pu.require< PropertyResolverPass >();
 }
 
 u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< TypeInferencePass >();
+    const auto data = pr.result< PropertyResolverPass >();
     const auto specification = data->specification();
 
     ConsistencyCheckVisitor visitor( log );

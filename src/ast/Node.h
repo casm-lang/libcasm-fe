@@ -48,6 +48,7 @@
 #include <libcasm-fe/SourceLocation>
 #include <libcasm-fe/ast/Visitor>
 
+#include <libcasm-ir/Property>
 #include <libcasm-ir/Type>
 
 #include <libstdhl/List>
@@ -184,8 +185,13 @@ namespace libcasm_fe
             void setType( const libcasm_ir::Type::Ptr& type );
             const libcasm_ir::Type::Ptr& type( void ) const;
 
+            void setProperty( const libcasm_ir::Property property );
+            void setProperties( const libcasm_ir::Properties& properties );
+            const libcasm_ir::Properties& properties( void ) const;
+
           private:
             libcasm_ir::Type::Ptr m_type;
+            libcasm_ir::Properties m_properties;
         };
 
         class Identifier final : public Node
