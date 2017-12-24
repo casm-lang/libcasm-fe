@@ -73,6 +73,7 @@ namespace libcasm_fe
                 RULE_DEFINITION,
                 ENUMERATOR_DEFINITION,
                 ENUMERATION_DEFINITION,
+                USING_DEFINITION,
 
                 // expressions
                 TYPE_CASTING_EXPRESSION,

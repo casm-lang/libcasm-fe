@@ -338,3 +338,19 @@ void EnumerationDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+UsingDefinition::UsingDefinition( const Identifier::Ptr& identifier, const Type::Ptr& type )
+: Definition( Node::ID::USING_DEFINITION, identifier )
+, m_type( type )
+{
+}
+
+const Type::Ptr& UsingDefinition::type( void ) const
+{
+    return m_type;
+}
+
+void UsingDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}

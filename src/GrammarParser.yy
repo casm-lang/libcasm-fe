@@ -193,6 +193,7 @@ END       0 "end of file"
 %type <EnumeratorDefinition::Ptr> EnumeratorDefinition
 %type <Enumerators::Ptr> Enumerators
 %type <EnumerationDefinition::Ptr> EnumerationDefinition
+%type <UsingDefinition::Ptr> UsingDefinition
 
 // expressions
 %type <Expression::Ptr> Expression Term SimpleOrClaspedTerm Literal
@@ -370,6 +371,10 @@ Definition
   {
       $$ = $1;
   }
+| UsingDefinition
+  {
+      $$ = $1;
+  }
 ;
 
 
@@ -498,6 +503,14 @@ Enumerators
       auto enumerators = Ast::make< Enumerators >( @$ );
       enumerators->add( $1 );
       $$ = enumerators;
+  }
+;
+
+
+UsingDefinition
+: USING Identifier EQUAL Type
+  {
+      $$ = Ast::make< UsingDefinition >( @$, $2, $4 );
   }
 ;
 

@@ -65,6 +65,8 @@ class TypeCheckVisitor final : public RecursiveVisitor
   public:
     TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symboltable );
 
+    void visit( UsingDefinition& node ) override;
+
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
     void visit( RelationType& node ) override;
@@ -79,6 +81,12 @@ TypeCheckVisitor::TypeCheckVisitor( libcasm_fe::Logger& log, Namespace& symbolta
 : m_log( log )
 , m_symboltable( symboltable )
 {
+}
+
+void TypeCheckVisitor::visit( UsingDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+    node.setType( node.type()->type() );  // TODO top-sort using definitions
 }
 
 static const std::string TYPE_STRING_VOID = "Void";
@@ -165,6 +173,7 @@ void TypeCheckVisitor::visit( BasicType& node )
 
             switch( symbol->id() )
             {
+                case Node::ID::USING_DEFINITION:  // [[fallthrough]]
                 case Node::ID::ENUMERATION_DEFINITION:
                 {
                     break;
@@ -173,7 +182,8 @@ void TypeCheckVisitor::visit( BasicType& node )
                 {
                     m_log.error(
                         { node.sourceLocation() },
-                        "cannot use " + symbol->description() + " '" + name + "' as type" );
+                        "cannot use " + symbol->description() + " '" + name + "' as type",
+                        Code::TypeAnnotationInvalidBasicTypeName );
                     return;
                 }
             }

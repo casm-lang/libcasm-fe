@@ -73,6 +73,7 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
     void visit( RuleDefinition& node ) override;
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
+    void visit( UsingDefinition& node ) override;
 
   private:
     libcasm_fe::Logger& m_log;
@@ -256,6 +257,27 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
     {
         m_log.error( { node.sourceLocation() }, e.what() );
     }
+}
+
+void SymbolRegistrationVisitor::visit( UsingDefinition& node )
+{
+    const auto& name = node.identifier()->name();
+
+    try
+    {
+        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
+    }
+    catch( const std::domain_error& e )
+    {
+        const auto& symbol = m_symboltable.find( name );
+
+        m_log.error(
+            { node.sourceLocation(), symbol->sourceLocation() },
+            e.what(),
+            Code::SymbolAlreadyDefined );
+    }
+
+    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationPass::usage( libpass::PassUsage& pu )

@@ -155,6 +155,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( RuleDefinition& node ) override;
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
+    void visit( UsingDefinition& node ) override;
 
     void visit( TypeCastingExpression& node ) override;
     void visit( ValueAtom& node ) override;
@@ -314,6 +315,16 @@ void AstDumpSourceVisitor::visit( EnumerationDefinition& node )
     m_stream << " = {";
     dumpNodes( *node.enumerators(), ", " );
     m_stream << "}";
+}
+
+void AstDumpSourceVisitor::visit( UsingDefinition& node )
+{
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "using ";
+    node.identifier()->accept( *this );
+    m_stream << " = ";
+    node.type()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( TypeCastingExpression& node )

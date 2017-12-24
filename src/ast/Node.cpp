@@ -103,6 +103,10 @@ std::string Node::description( void ) const
         {
             return "enumeration";
         }
+        case ID::USING_DEFINITION:
+        {
+            return "using";
+        }
         case ID::TYPE_CASTING_EXPRESSION:
         {
             return "type casting expression";

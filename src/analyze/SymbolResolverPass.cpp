@@ -89,6 +89,14 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void pushVariable( const VariableDefinition::Ptr& variable );
     void popVariable( const VariableDefinition::Ptr& variable );
 
+    /**
+     * If the \a definition is a type alias, it will be resolved and the aliased
+     * definition will be returned. Otherwise the given \a definition will be
+     * returned.
+     */
+    Definition::Ptr resolveIfAlias( const Definition::Ptr& definition ) const;
+
+  private:
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 
@@ -234,7 +242,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
     try
     {
-        const auto& symbol = m_symboltable.find( *identifier );
+        auto symbol = m_symboltable.find( *identifier );
+        symbol = resolveIfAlias( symbol );
 
         std::size_t expectedNumberOfArguments = 0;
 
@@ -440,6 +449,18 @@ void SymbolResolveVisitor::popVariable( const VariableDefinition::Ptr& variable 
 {
     const auto& name = variable->identifier()->name();
     m_variables.erase( name );
+}
+
+Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& definition ) const
+{
+    if( definition->id() != Node::ID::USING_DEFINITION )
+    {
+        return definition;
+    }
+
+    const auto usingDefinition = std::static_pointer_cast< UsingDefinition >( definition );
+    const auto symbol = m_symboltable.find( *usingDefinition->type()->name() );
+    return resolveIfAlias( symbol ); // resolve again, the symbol may be another alias
 }
 
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
