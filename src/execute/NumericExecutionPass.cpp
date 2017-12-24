@@ -770,7 +770,6 @@ void ExecutionVisitor::visit( ListExpression& node )
     const auto listType = std::static_pointer_cast< IR::ListType >( node.type() );
     auto list = std::make_shared< IR::List >( listType );
 
-    node.expressions()->accept( *this );
     for( const auto& expression : *node.expressions() )
     {
         expression->accept( *this );
