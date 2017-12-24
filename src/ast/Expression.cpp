@@ -148,7 +148,6 @@ CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 , m_targetType( TargetType::UNKNOWN )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 , m_targetDefinition()
-, m_baseExpression()
 {
 }
 
@@ -238,23 +237,6 @@ const TypedNode::Ptr& CallExpression::targetDefinition( void ) const
 {
     assert( ( targetType() != TargetType::BUILTIN ) and ( targetType() != TargetType::UNKNOWN ) );
     return m_targetDefinition;
-}
-
-void CallExpression::setBaseExpression( const Expression::Ptr& baseExpression )
-{
-    assert( baseExpression != nullptr );
-    m_baseExpression = baseExpression;
-}
-
-const Expression::Ptr& CallExpression::baseExpression( void ) const
-{
-    return m_baseExpression;
-}
-
-u1 CallExpression::isBuiltin( void ) const
-{
-    return m_targetBuiltinId != libcasm_ir::Value::ID::_SIZE_ and
-           targetType() == CallExpression::TargetType::BUILTIN;
 }
 
 DirectCallExpression::DirectCallExpression(
@@ -392,8 +374,9 @@ TypeCastingExpression::TypeCastingExpression(
 : CallExpression( Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
 , m_fromExpression( fromExpression )
 , m_asType( asType )
+, m_castingType( CastingType::UNKNOWN )
+, m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 {
-    arguments()->add( fromExpression );
 }
 
 const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
@@ -404,6 +387,57 @@ const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
 const Type::Ptr& TypeCastingExpression::asType( void ) const
 {
     return m_asType;
+}
+
+void TypeCastingExpression::setCastingType( CastingType castingType )
+{
+    m_castingType = castingType;
+}
+
+TypeCastingExpression::CastingType TypeCastingExpression::castingType( void ) const
+{
+    return m_castingType;
+}
+
+std::string TypeCastingExpression::castingTypeName( void ) const
+{
+    switch( m_castingType )
+    {
+        case CastingType::BUILTIN:
+        {
+            return "built-in";
+        }
+        case CastingType::UNKNOWN:
+        {
+            return "unknown";
+        }
+    }
+
+    assert( !" internal error! " );
+    return std::string();
+}
+
+void TypeCastingExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )
+{
+    m_targetBuiltinId = builtinId;
+}
+
+libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
+{
+    assert( m_castingType == CastingType::BUILTIN );
+    return m_targetBuiltinId;
+}
+
+void TypeCastingExpression::setTargetDefinition( const TypedNode::Ptr& definition )
+{
+    m_targetDefinition = definition;
+}
+
+const TypedNode::Ptr& TypeCastingExpression::targetDefinition( void ) const
+{
+    assert(
+        ( m_castingType != CastingType::BUILTIN ) and ( m_castingType != CastingType::UNKNOWN ) );
+    return m_targetDefinition;
 }
 
 void TypeCastingExpression::accept( Visitor& visitor )

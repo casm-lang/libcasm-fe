@@ -568,6 +568,23 @@ void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
             m_stream << "UNRESOLVED";
         }
     }
+
+    if( true )  // m_dumpProperties
+    {
+        m_stream << "\n{ ";
+
+        if( node.properties().isSet( libcasm_ir::Property::CONSTANT ) )
+        {
+            m_stream << "C ";
+        }
+
+        if( node.properties().isSet( libcasm_ir::Property::PURE ) )
+        {
+            m_stream << "P ";
+        }
+
+        m_stream << "}";
+    }
 }
 
 void AstDumpDotVisitor::dumpLink( void* from, void* to )

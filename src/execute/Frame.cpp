@@ -118,7 +118,6 @@ static std::string generateBuiltinTraceLine( Frame* frame )
 {
     const auto call = frame->call();
     assert( call != nullptr );
-    assert( call->targetType() == CallExpression::TargetType::BUILTIN );
 
     std::string args;
     const auto numberOfArguments = call->arguments()->size();
@@ -135,6 +134,10 @@ static std::string generateBuiltinTraceLine( Frame* frame )
     if( call->id() == Node::ID::DIRECT_CALL_EXPRESSION )
     {
         name = call->ptr< DirectCallExpression >()->identifier()->path();
+    }
+    else if( call->id() == Node::ID::TYPE_CASTING_EXPRESSION )
+    {
+        name = "operator::as" + call->ptr< TypeCastingExpression >()->type()->description();
     }
     else
     {

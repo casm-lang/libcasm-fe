@@ -104,11 +104,14 @@ static const std::unordered_set< std::string > TYPE_STRINGS_FOR_REFERENCE_TYPES 
     TYPE_STRING_RULEREF, TYPE_STRING_FUNCREF
 };
 
+static const std::string TYPE_STRING_RANGE = "Range";
 static const std::string TYPE_STRING_TUPLE = "Tuple";
 static const std::string TYPE_STRING_LIST = "List";
+static const std::string TYPE_STRING_FILE = "File";
+static const std::string TYPE_STRING_PORT = "Port";
 
 static const std::unordered_set< std::string > TYPE_STRINGS_FOR_COMPOSED_TYPES = {
-    TYPE_STRING_TUPLE, TYPE_STRING_LIST
+    TYPE_STRING_RANGE, TYPE_STRING_TUPLE, TYPE_STRING_LIST, TYPE_STRING_FILE, TYPE_STRING_PORT
 };
 
 void TypeCheckVisitor::visit( BasicType& node )
@@ -222,7 +225,21 @@ void TypeCheckVisitor::visit( ComposedType& node )
         subTypeList.add( subType->type() );
     }
 
-    if( name == TYPE_STRING_TUPLE )
+    if( name == TYPE_STRING_RANGE )
+    {
+        if( subTypeList.size() == 1 )
+        {
+            const auto type = libstdhl::Memory::make< libcasm_ir::RangeType >( subTypeList[ 0 ] );
+            node.setType( type );
+        }
+        else
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "composed type '" + name + "' can only have one sub-type" );
+        }
+    }
+    else if( name == TYPE_STRING_TUPLE )
     {
         const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
         node.setType( type );
@@ -232,6 +249,38 @@ void TypeCheckVisitor::visit( ComposedType& node )
         if( subTypeList.size() == 1 )
         {
             const auto type = libstdhl::Memory::make< libcasm_ir::ListType >( subTypeList[ 0 ] );
+            node.setType( type );
+        }
+        else
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "composed type '" + name + "' can only have one sub-type" );
+        }
+    }
+    else if( name == TYPE_STRING_FILE )
+    {
+        if( subTypeList.size() == 1 )
+        {
+            m_log.info( { node.sourceLocation() }, "composed type '" + name + "' is experimental" );
+
+            const auto type = libstdhl::Memory::make< libcasm_ir::FileType >( subTypeList[ 0 ] );
+            node.setType( type );
+        }
+        else
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "composed type '" + name + "' can only have one sub-type" );
+        }
+    }
+    else if( name == TYPE_STRING_PORT )
+    {
+        if( subTypeList.size() == 1 )
+        {
+            m_log.info( { node.sourceLocation() }, "composed type '" + name + "' is experimental" );
+
+            const auto type = libstdhl::Memory::make< libcasm_ir::PortType >( subTypeList[ 0 ] );
             node.setType( type );
         }
         else

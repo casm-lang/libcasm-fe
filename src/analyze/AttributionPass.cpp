@@ -219,12 +219,13 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
 
     DefinitionAttributionVisitor visitor{ m_log, node };
     node.attributes()->accept( visitor );
-
     const auto& attributeNames = visitor.attributeNames();
+
+    using Classification = FunctionDefinition::Classification;
 
     for( const auto& name : attributeNames )
     {
-        using Classification = FunctionDefinition::Classification;
+        Classification classification = Classification::UNKNOWN;
 
         if( name == SYMBOLIC_ATTRIBUTE )
         {
@@ -232,24 +233,47 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
         }
         else if( name == IN_ATTRIBUTE or name == MONITORED_ATTRIBUTE or name == EXTERNAL_ATTRIBUTE )
         {
-            node.setClassification( Classification::IN );
+            classification = Classification::IN;
         }
         else if( name == CONTROLLED_ATTRIBUTE or name == INTERNAL_ATTRIBUTE )
         {
-            node.setClassification( Classification::CONTROLLED );
+            classification = Classification::CONTROLLED;
         }
         else if( name == SHARED_ATTRIBUTE )
         {
-            node.setClassification( Classification::SHARED );
+            classification = Classification::SHARED;
         }
         else if( name == OUT_ATTRIBUTE )
         {
-            node.setClassification( Classification::OUT );
+            classification = Classification::OUT;
         }
         else if( name == STATIC_ATTRIBUTE )
         {
-            node.setClassification( Classification::STATIC );
+            classification = Classification::STATIC;
         }
+
+        if( classification != Classification::UNKNOWN )
+        {
+            if( node.classification() != Classification::UNKNOWN )
+            {
+                m_log.error(
+                    { node.attributes()->sourceLocation() },
+                    "function '" + node.identifier()->name() + "' classified as '" +
+                        node.classificationName() + "' cannot be re-classified as '" +
+                        FunctionDefinition::toString( classification ) + "'",
+                    Code::FunctionDefinitionReClassification );
+            }
+            else
+            {
+                node.setClassification( classification );
+            }
+        }
+    }
+
+    if( node.classification() == Classification::UNKNOWN )
+    {
+        // if function classification is provided, all ASM functions are controlled by default
+        node.setClassification( Classification::CONTROLLED );
     }
 }
 

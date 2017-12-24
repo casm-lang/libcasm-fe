@@ -48,6 +48,7 @@
 #include <libcasm-fe/analyze/AttributionPass>
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
+#include <libcasm-fe/analyze/PropertyResolverPass>
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
 #include <libcasm-fe/analyze/SymbolResolverPass>
 #include <libcasm-fe/analyze/TypeCheckPass>

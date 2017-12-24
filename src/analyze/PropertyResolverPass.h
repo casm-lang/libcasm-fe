@@ -41,17 +41,17 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_CONSISTENCY_CHECK_PASS_H_
-#define _LIBCASM_FE_CONSISTENCY_CHECK_PASS_H_
+#ifndef _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
+#define _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
 
-#include <libcasm-fe/analyze/PropertyResolverPass>
+#include "../analyze/TypeInferencePass.h"
 
 namespace libcasm_fe
 {
     /**
-     * @brief checks the consistency and certain properties of the parsed AST
+     * @brief Property resolver pass of AST
      */
-    class ConsistencyCheckPass final : public libpass::Pass
+    class PropertyResolverPass final : public libpass::Pass
     {
       public:
         static char id;
@@ -60,11 +60,11 @@ namespace libcasm_fe
 
         bool run( libpass::PassResult& pr ) override;
 
-        using Data = PropertyResolverPass::Data;
+        using Data = TypeInferencePass::Data;
     };
 }
 
-#endif  // _LIBCASM_FE_CONSISTENCY_CHECK_PASS_H_
+#endif  // _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
 
 //
 //  Local variables:

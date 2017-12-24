@@ -82,6 +82,7 @@ namespace libcasm_fe
         FunctionSymbolIsUnknown = 0xf000,
 
         FunctionDefinitionAlreadyUsed = 0xf010,
+        FunctionDefinitionReClassification = 0xf011,
 
         FunctionAttributeIsInvalid = 0xfa00  // fa** ... function attribute
         ,
@@ -104,7 +105,7 @@ namespace libcasm_fe
         FunctionValueAlreadyInitializedAtInitially = 0xfd02
 
         ,
-        FunctionIdentifierIsBuiltinName = 0xf100  // f1** ... function identifer
+        FunctionDefinitionIdentifierIsBuiltinName = 0xf100  // f1** ... function identifer
 
         // --------------------------------------------------------- d*** ...
         // derived errors
@@ -113,12 +114,17 @@ namespace libcasm_fe
 
         DerivedArgumentValueInvalid = 0xda00,  // da** ... derived argment
         DerivedReturnValueInvalid = 0xda01,
-        DerivedExpressionInvalidType = 0xde00  // de** ... derived expression
+        DerivedExpressionInvalidType = 0xde00,  // de** ... derived expression
+
+        DerivedDefinitionIdentifierIsBuiltinName = 0xd100,  // d1** ... derived identifer
+
+        DerivedDefinitionExpressionIsNotConstant = 0xde00,
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
-        ,
+
         RuleDefinitionAlreadyUsed = 0x5000,
+        RuleDefinitionIdentifierIsBuiltinName = 0x5001,
 
         NotSideEffectFreeRuleCall = 0x5100,
 
@@ -142,6 +148,12 @@ namespace libcasm_fe
 
         ,
         BuiltinArgumentValueInvalid = 0x5f00,
+
+        // --------------------------------------------------------- a*** ...
+        // enumeration errors
+
+        EnumerationDefinitionAlreadyUsed = 0xe000,
+        EnumerationDefinitionIdentifierIsBuiltinName = 0xe100,
 
         // --------------------------------------------------------- a*** ...
         // agent errors
@@ -178,6 +190,7 @@ namespace libcasm_fe
         TypeInferenceInvalidUpdateRuleFunctionType = 0x1203,
         TypeInferenceInvalidUpdateRuleExpressionType = 0x1204,
         TypeInferenceUpdateRuleTypesMismatch = 0x1205,
+        TypeInferenceUpdateRuleFunctionIsBuiltin = 0x1206,
 
         TypeInferenceNotDefinedForExpression = 0x1300,
         TypeInferenceArgumentTypeMismatch = 0x1301,
@@ -215,6 +228,7 @@ namespace libcasm_fe
         TypeInferenceForallUniverseHasNoType = 0x1014,
         TypeInferenceForallRuleTypeMismatch = 0x1024,
         TypeInferenceForallRuleInvalidConditionType = 0x1025,
+        TypeInferenceForallRuleInvalidUniverseType = 0x1026,
 
         TypeInferenceInvalidConditionalExpressionCondition = 0x1005,
         TypeInferenceInvalidConditionalExpressionPaths = 0x1006
@@ -246,6 +260,7 @@ namespace libcasm_fe
 
         UpdateRuleInvalidClassifier = 0xcc00,
         DirectCallExpressionInvalidClassifier = 0xcc01,
+        DirectCallExpressionInvalidRelativePath = 0xcc11,
         CallRuleOnlyRulesAllowed = 0xcc02,
         CallRuleOnlyFunctionsAllowed = 0xcc03
 
