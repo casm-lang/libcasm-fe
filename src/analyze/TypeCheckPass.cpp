@@ -182,7 +182,8 @@ void TypeCheckVisitor::visit( BasicType& node )
                 {
                     m_log.error(
                         { node.sourceLocation() },
-                        "cannot use " + symbol->description() + " '" + name + "' as type" );
+                        "cannot use " + symbol->description() + " '" + name + "' as type",
+                        Code::TypeAnnotationInvalidBasicTypeName );
                     return;
                 }
             }
