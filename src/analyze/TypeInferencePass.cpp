@@ -1141,6 +1141,27 @@ void TypeInferenceVisitor::visit( CaseRule& node )
     }
 
     node.cases()->accept( *this );
+
+    if( not node.expression()->type() )
+    {
+        // if CaseRule expression is still not typed, try to infer the type from the ExpressionCase
+        // types
+        for( auto _case : *node.cases() )
+        {
+            if( _case->id() == Node::ID::EXPRESSION_CASE )
+            {
+                const auto& expressionCase = std::static_pointer_cast< ExpressionCase >( _case );
+                if( expressionCase->expression()->type() )
+                {
+                    m_typeIDs[ node.expression().get() ].emplace(
+                        expressionCase->expression()->type()->id() );
+                }
+            }
+        }
+
+        // re-run the inference of the CaseRule expression
+        node.expression()->accept( *this );
+    }
 }
 
 void TypeInferenceVisitor::visit( ExpressionCase& node )
