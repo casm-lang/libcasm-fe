@@ -41,10 +41,10 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
-#define _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
+#ifndef _LIBCASM_FE_PROPERTY_RESOLVER_PASS_H_
+#define _LIBCASM_FE_PROPERTY_RESOLVER_PASS_H_
 
-#include "../analyze/TypeInferencePass.h"
+#include <libpass/Pass>
 
 namespace libcasm_fe
 {
@@ -59,12 +59,10 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
-
-        using Data = TypeInferencePass::Data;
     };
 }
 
-#endif  // _LIB_CASMFE_PROPERTY_RESOLVER_PASS_H_
+#endif  // _LIBCASM_FE_PROPERTY_RESOLVER_PASS_H_
 
 //
 //  Local variables:

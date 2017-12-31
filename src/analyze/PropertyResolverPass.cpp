@@ -43,8 +43,13 @@
 
 #include "PropertyResolverPass.h"
 
-#include "../Logger.h"
-#include "../ast/RecursiveVisitor.h"
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
+#include <libcasm-fe/analyze/TypeInferencePass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Annotation>
 
@@ -502,14 +507,15 @@ void PropertyResolverVisitor::visit( DefaultCase& node )
 
 void PropertyResolverPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeInferencePass >();
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< TypeInferencePass >();
 }
 
 u1 PropertyResolverPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< TypeInferencePass >();
+    const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
     PropertyResolverVisitor visitor( log );
@@ -522,7 +528,6 @@ u1 PropertyResolverPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< PropertyResolverPass >( data );
     return true;
 }
 
