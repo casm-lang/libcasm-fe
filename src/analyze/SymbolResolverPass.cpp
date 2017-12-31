@@ -43,9 +43,13 @@
 
 #include "SymbolResolverPass.h"
 
-#include "../Logger.h"
-#include "../analyze/AttributionPass.h"
-#include "../ast/RecursiveVisitor.h"
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
+#include <libcasm-fe/analyze/SymbolRegistrationPass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Builtin>
 
@@ -460,19 +464,20 @@ Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& def
 
     const auto usingDefinition = std::static_pointer_cast< UsingDefinition >( definition );
     const auto symbol = m_symboltable.find( *usingDefinition->type()->name() );
-    return resolveIfAlias( symbol ); // resolve again, the symbol may be another alias
+    return resolveIfAlias( symbol );  // resolve again, the symbol may be another alias
 }
 
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SymbolRegistrationPass >();
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< SymbolRegistrationPass >();
 }
 
 u1 SymbolResolverPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< SymbolRegistrationPass >();
+    const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
     SymbolResolveVisitor visitor( log, *specification->symboltable() );
@@ -488,8 +493,6 @@ u1 SymbolResolverPass::run( libpass::PassResult& pr )
         log.debug( "found %lu error(s) during symbol resolving", errors );
         return false;
     }
-
-    pr.setResult< SymbolResolverPass >( data );
 
     return true;
 }

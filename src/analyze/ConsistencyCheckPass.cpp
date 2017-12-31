@@ -43,9 +43,13 @@
 
 #include "ConsistencyCheckPass.h"
 
-#include "../Logger.h"
-#include "../Namespace.h"
-#include "../ast/RecursiveVisitor.h"
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
+#include <libcasm-fe/analyze/PropertyResolverPass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Builtin>
 
@@ -383,14 +387,15 @@ void ConsistencyCheckVisitor::verify( const TypedNode& node )
 
 void ConsistencyCheckPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< PropertyResolverPass >();
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< PropertyResolverPass >();
 }
 
 u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< PropertyResolverPass >();
+    const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
     ConsistencyCheckVisitor visitor( log );
@@ -402,8 +407,6 @@ u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
         log.debug( "found %lu error(s) during consistency checking", errors );
         return false;
     }
-
-    pr.setResult< ConsistencyCheckPass >( libstdhl::Memory::make< Data >( specification ) );
 
     return true;
 }

@@ -41,10 +41,10 @@
 //  statement from your version.
 //
 
-#ifndef _LIB_CASMFE_TYPE_CHECK_PASS_H_
-#define _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#ifndef _LIBCASM_FE_TYPE_CHECK_PASS_H_
+#define _LIBCASM_FE_TYPE_CHECK_PASS_H_
 
-#include "../analyze/SymbolResolverPass.h"
+#include <libpass/Pass>
 
 namespace libcasm_fe
 {
@@ -59,12 +59,10 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
-
-        using Data = SymbolResolverPass::Data;
     };
 }
 
-#endif  // _LIB_CASMFE_TYPE_CHECK_PASS_H_
+#endif  // _LIBCASM_FE_TYPE_CHECK_PASS_H_
 
 //
 //  Local variables:

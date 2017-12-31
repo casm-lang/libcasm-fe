@@ -43,8 +43,13 @@
 
 #include "SymbolRegistrationPass.h"
 
-#include "../Logger.h"
-#include "../ast/RecursiveVisitor.h"
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
+#include <libcasm-fe/analyze/AttributionPass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Builtin>
 
@@ -282,14 +287,15 @@ void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 
 void SymbolRegistrationPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< AttributionPass >();
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< AttributionPass >();
 }
 
 u1 SymbolRegistrationPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< AttributionPass >();
+    const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
     SymbolRegistrationVisitor visitor( log, *specification->symboltable() );
@@ -305,8 +311,6 @@ u1 SymbolRegistrationPass::run( libpass::PassResult& pr )
         log.debug( "found %lu error(s) during symbol table creation", errors );
         return false;
     }
-
-    pr.setResult< SymbolRegistrationPass >( data );
 
     return true;
 }

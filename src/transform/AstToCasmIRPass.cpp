@@ -43,15 +43,20 @@
 
 #include "AstToCasmIRPass.h"
 
-#include "../Logger.h"
-#include "../Specification.h"
-#include "../ast/Definition.h"
-#include "../ast/Expression.h"
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Rule.h"
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
+#include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Specification>
 #include <libcasm-ir/analyze/ConsistencyCheckPass>
+
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -709,7 +714,9 @@ libcasm_ir::Specification::Ptr AstToCasmIRVisitor::specification( void ) const
 
 void AstToCasmIRPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< ConsistencyCheckPass >();
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< ConsistencyCheckPass >();
+
     pu.provide< libcasm_ir::ConsistencyCheckPass >();
 }
 
@@ -717,7 +724,7 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto& data = pr.result< ConsistencyCheckPass >();
+    const auto& data = pr.output< SourceToAstPass >();
     const auto& specification = data->specification();
 
     AstToCasmIRVisitor visitor{ log };
@@ -729,10 +736,7 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< libcasm_ir::ConsistencyCheckPass >(
-        libstdhl::Memory::make< libcasm_ir::ConsistencyCheckPass::Data >(
-            visitor.specification() ) );
-
+    pr.setInput< libcasm_ir::ConsistencyCheckPass >( visitor.specification() );
     return true;
 }
 

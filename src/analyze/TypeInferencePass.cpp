@@ -43,8 +43,13 @@
 
 #include "TypeInferencePass.h"
 
-#include "../Logger.h"
-#include "../ast/RecursiveVisitor.h"
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
+#include <libcasm-fe/analyze/TypeCheckPass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Builtin>
 #include <libcasm-ir/Exception>
@@ -1838,14 +1843,15 @@ void TypeResolveVisitor::visit( DirectCallExpression& node )
 
 void TypeInferencePass::usage( libpass::PassUsage& pu )
 {
-    pu.require< TypeCheckPass >();
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< TypeCheckPass >();
 }
 
 u1 TypeInferencePass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< TypeCheckPass >();
+    const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
     TypeInferenceVisitor typeInferenceVisitor( log );
@@ -1860,8 +1866,6 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
         log.debug( "found %lu error(s) during type inference", errors );
         return false;
     }
-
-    pr.setResult< TypeInferencePass >( data );
 
     return true;
 }

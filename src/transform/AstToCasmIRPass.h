@@ -44,20 +44,13 @@
 #ifndef _LIBCASM_FE_AST_TO_CASM_IR_PASS_H_
 #define _LIBCASM_FE_AST_TO_CASM_IR_PASS_H_
 
-#include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libpass/Pass>
 
 /**
    @brief    TODO
 
    TODO
 */
-
-namespace libcasm_ir
-{
-    class Value;
-    class Specification;
-    class ExecutionSemanticsBlock;
-}
 
 namespace libcasm_fe
 {
@@ -69,8 +62,6 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
-
-        using Data = ConsistencyCheckPass::Data;
     };
 }
 

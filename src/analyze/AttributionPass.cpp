@@ -43,12 +43,12 @@
 
 #include "AttributionPass.h"
 
-#include "../Logger.h"
-#include "../Specification.h"
-#include "../ast/Definition.h"
-#include "../ast/Expression.h"
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Rule.h"
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
@@ -326,7 +326,7 @@ u1 AttributionPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< SourceToAstPass >();
+    const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
     DefinitionVisitor visitor( log );
@@ -338,8 +338,6 @@ u1 AttributionPass::run( libpass::PassResult& pr )
         log.debug( "found %lu error(s) during attribution", errors );
         return false;
     }
-
-    pr.setResult< AttributionPass >( data );
 
     return true;
 }
