@@ -44,14 +44,19 @@
 #include "SourceToAstPass.h"
 
 #include "../Lexer.h"
-#include "../Logger.h"
-#include "../Specification.h"
 #include "../various/GrammarParser.tab.h"
+
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
+#include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
-#include <libpass/analyze/LoadFilePass>
 
 using namespace libcasm_fe;
 
@@ -69,7 +74,7 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< libpass::LoadFilePass >();
+    const auto data = pr.output< libpass::LoadFilePass >();
     const auto filePath = data->filename();
     auto& fileStream = data->stream();
 
@@ -91,8 +96,7 @@ u1 SourceToAstPass::run( libpass::PassResult& pr )
         return false;
     }
 
-    pr.setResult< SourceToAstPass >( libstdhl::Memory::make< Data >( specification ) );
-
+    pr.setOutput< SourceToAstPass >( specification );
     return true;
 }
 

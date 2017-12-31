@@ -47,7 +47,7 @@
 #include <libcasm-fe/Specification>
 
 #include <libpass/Pass>
-#include <libpass/PassData>
+#include <libpass/analyze/LoadFilePass>
 
 /**
    @brief    TODO
@@ -72,12 +72,14 @@ namespace libcasm_fe
         u1 m_debug = false;
 
       public:
-        class Data : public libpass::PassData
+        using Input = libpass::LoadFilePass::Output;
+
+        class Output : public libpass::PassData
         {
           public:
-            using Ptr = std::shared_ptr< Data >;
+            using Ptr = std::shared_ptr< Output >;
 
-            Data( const Specification::Ptr& specification )
+            Output( const Specification::Ptr& specification )
             : m_specification( specification )
             {
             }
