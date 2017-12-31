@@ -43,21 +43,23 @@
 
 #include "NumericExecutionPass.h"
 
-#include "../Exception.h"
-#include "../Logger.h"
-#include "../Specification.h"
-#include "../analyze/FrameSizeDeterminationPass.h"
-#include "../ast/Definition.h"
-#include "../ast/EmptyVisitor.h"
-#include "../ast/Expression.h"
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Rule.h"
-#include "Frame.h"
-#include "FunctionState.h"
-#include "LocationRegistry.h"
-#include "ReferenceConstant.h"
-#include "Stack.h"
-#include "UpdateSet.h"
+#include <libcasm-fe/Exception>
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/EmptyVisitor>
+#include <libcasm-fe/ast/Expression>
+#include <libcasm-fe/ast/RecursiveVisitor>
+#include <libcasm-fe/ast/Rule>
+#include <libcasm-fe/execute/Frame>
+#include <libcasm-fe/execute/FunctionState>
+#include <libcasm-fe/execute/LocationRegistry>
+#include <libcasm-fe/execute/ReferenceConstant>
+#include <libcasm-fe/execute/Stack>
+#include <libcasm-fe/execute/UpdateSet>
+
+#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-rt/Value>
 
@@ -1711,14 +1713,15 @@ void AgentScheduler::fireUpdates( void )
 
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< FrameSizeDeterminationPass >();
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< FrameSizeDeterminationPass >();
 }
 
 u1 NumericExecutionPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< FrameSizeDeterminationPass >();
+    const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
     ExecutionLocationRegistry locationRegistry;
