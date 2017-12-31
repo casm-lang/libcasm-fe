@@ -44,7 +44,7 @@
 #ifndef _LIBCASM_FE_ATTRIBUTION_PASS_H_
 #define _LIBCASM_FE_ATTRIBUTION_PASS_H_
 
-#include <libcasm-fe/transform/SourceToAstPass>
+#include <libpass/Pass>
 
 namespace libcasm_fe
 {
@@ -60,8 +60,6 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         u1 run( libpass::PassResult& pr ) override;
-
-        using Data = SourceToAstPass::Data;
     };
 }
 
