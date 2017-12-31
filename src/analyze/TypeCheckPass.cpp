@@ -43,8 +43,13 @@
 
 #include "TypeCheckPass.h"
 
-#include "../Logger.h"
-#include "../ast/RecursiveVisitor.h"
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
+#include <libcasm-fe/analyze/SymbolResolverPass>
+#include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
@@ -446,14 +451,15 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
 
 void TypeCheckPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< SymbolResolverPass >();
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< SymbolResolverPass >();
 }
 
 u1 TypeCheckPass::run( libpass::PassResult& pr )
 {
     libcasm_fe::Logger log( &id, stream() );
 
-    const auto data = pr.result< SymbolResolverPass >();
+    const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
     TypeCheckVisitor visitor( log, *specification->symboltable() );
@@ -469,8 +475,6 @@ u1 TypeCheckPass::run( libpass::PassResult& pr )
         log.debug( "found %lu error(s) during type checking", errors );
         return false;
     }
-
-    pr.setResult< TypeCheckPass >( data );
 
     return true;
 }
