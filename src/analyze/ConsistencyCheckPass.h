@@ -44,7 +44,7 @@
 #ifndef _LIBCASM_FE_CONSISTENCY_CHECK_PASS_H_
 #define _LIBCASM_FE_CONSISTENCY_CHECK_PASS_H_
 
-#include <libcasm-fe/analyze/PropertyResolverPass>
+#include <libpass/Pass>
 
 namespace libcasm_fe
 {
@@ -59,8 +59,6 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         bool run( libpass::PassResult& pr ) override;
-
-        using Data = PropertyResolverPass::Data;
     };
 }
 
