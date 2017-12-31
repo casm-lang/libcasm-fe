@@ -43,15 +43,14 @@
 
 #include "AstDumpDotPass.h"
 
-#include "../Logger.h"
-#include "../Specification.h"
-#include "../analyze/ConsistencyCheckPass.h"
-#include "../ast/Definition.h"
-#include "../ast/Expression.h"
-#include "../ast/RecursiveVisitor.h"
-#include "../ast/Rule.h"
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
 
-#include <libpass/PassLogger>
+#include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/transform/SourceToAstPass>
+
 #include <libpass/PassRegistry>
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
@@ -594,14 +593,14 @@ void AstDumpDotVisitor::dumpLink( void* from, void* to )
 
 void AstDumpDotPass::usage( libpass::PassUsage& pu )
 {
-    pu.require< ConsistencyCheckPass >();
+    pu.require< SourceToAstPass >();
 }
 
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
 {
     Logger log( &id, stream() );
 
-    const auto& data = pr.result< ConsistencyCheckPass >();
+    const auto& data = pr.output< SourceToAstPass >();
     const auto& specification = data->specification();
 
     const std::string outputFilePath = "./obj/out.dot";  // TODO: add command-line switch
