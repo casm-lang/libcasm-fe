@@ -201,10 +201,8 @@ void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
     {
         const auto& symbol = m_symboltable.find( name );
 
-        m_log.error(
-            { node.sourceLocation(), symbol->sourceLocation() },
-            e.what(),
-            Code::EnumerationDefinitionAlreadyUsed );
+        m_log.error( { node.sourceLocation() }, e.what(), Code::EnumeratorDefinitionAlreadyUsed );
+        m_log.info( { symbol->sourceLocation() }, e.what() );
     }
 }
 
@@ -224,7 +222,14 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
     const auto kind = std::make_shared< libcasm_ir::Enumeration >( name );
     for( const auto& enumerator : *node.enumerators() )
     {
-        kind->add( enumerator->identifier()->name() );
+        try
+        {
+            kind->add( enumerator->identifier()->name() );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.debug( { enumerator->sourceLocation() }, e.what() );
+        }
     }
 
     const auto type = std::make_shared< libcasm_ir::EnumerationType >( kind );
@@ -243,10 +248,8 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
     {
         const auto& symbol = m_symboltable.find( name );
 
-        m_log.error(
-            { node.sourceLocation(), symbol->sourceLocation() },
-            e.what(),
-            Code::EnumerationDefinitionAlreadyUsed );
+        m_log.error( { node.sourceLocation() }, e.what(), Code::EnumerationDefinitionAlreadyUsed );
+        m_log.info( { symbol->sourceLocation() }, e.what() );
     }
 
     // register enumerators in a sub-namespace
@@ -260,7 +263,7 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        m_log.error( { node.sourceLocation() }, e.what() );
+        m_log.debug( { node.sourceLocation() }, e.what() );
     }
 }
 
