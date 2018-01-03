@@ -304,12 +304,12 @@ Terms ::= Terms "," Term
 <code>
 Term ::= SimpleOrClaspedTerm
        | Expression
+       | TypeCastingExpression
        | LetExpression
        | ConditionalExpression
        | ChooseExpression
        | UniversalQuantifierExpression
        | ExistentialQuantifierExpression
-       | TypeCastingExpression
 </code>
 
 {{page>:grammar:Term&noheader&nofooter}}
@@ -322,8 +322,6 @@ SimpleOrClaspedTerm ::= "(" Term ")"
                       | DirectCallExpression
                       | MethodCallExpression
                       | IndirectCallExpression
-                      | List
-                      | Range
                       | Literal
 </code>
 
@@ -358,15 +356,6 @@ Expression ::= "+" Term
 {{page>:grammar:Expression&noheader&nofooter}}
 
 
-===== TypeCastingExpression =====
-
-<code>
-TypeCastingExpression ::= Term "as" Type
-</code>
-
-{{page>:grammar:TypeCastingExpression&noheader&nofooter}}
-
-
 ===== DirectCallExpression =====
 
 <code>
@@ -394,6 +383,15 @@ IndirectCallExpression ::= "(" "*" Term ")" Arguments
 </code>
 
 {{page>:grammar:IndirectCallExpression&noheader&nofooter}}
+
+
+===== TypeCastingExpression =====
+
+<code>
+TypeCastingExpression ::= Term "as" Type
+</code>
+
+{{page>:grammar:TypeCastingExpression&noheader&nofooter}}
 
 
 ===== LetExpression =====
@@ -441,25 +439,6 @@ ExistentialQuantifierExpression ::= "exists" AttributedVariable "in" Term "with"
 {{page>:grammar:ExistentialQuantifierExpression&noheader&nofooter}}
 
 
-===== List =====
-
-<code>
-List ::= "[" "]"
-       | "[" Terms "]"
-</code>
-
-{{page>:grammar:List&noheader&nofooter}}
-
-
-===== Range =====
-
-<code>
-Range ::= "[" Term ".." Term "]"
-</code>
-
-{{page>:grammar:Range&noheader&nofooter}}
-
-
 ===== Literal =====
 
 <code>
@@ -471,6 +450,8 @@ Literal ::= UndefinedLiteral
           | BinaryLiteral
           | StringLiteral
           | ReferenceLiteral
+          | ListLiteral
+          | RangeLiteral
 </code>
 
 {{page>:grammar:Literal&noheader&nofooter}}
@@ -548,6 +529,25 @@ ReferenceLiteral ::= "@" IdentifierPath
 </code>
 
 {{page>:grammar:ReferenceLiteral&noheader&nofooter}}
+
+
+===== ListLiteral =====
+
+<code>
+ListLiteral ::= "[" "]"
+              | "[" Terms "]"
+</code>
+
+{{page>:grammar:ListLiteral&noheader&nofooter}}
+
+
+===== RangeLiteral =====
+
+<code>
+RangeLiteral ::= "[" Term ".." Term "]"
+</code>
+
+{{page>:grammar:RangeLiteral&noheader&nofooter}}
 
 
 ===== Types =====

@@ -195,18 +195,21 @@ END       0 "end of file"
 %type <EnumerationDefinition::Ptr> EnumerationDefinition
 %type <UsingDefinition::Ptr> UsingDefinition
 
+// literals
+%type <Expression::Ptr> Literal
+%type <UndefLiteral::Ptr> UndefinedLiteral
+%type <ValueLiteral::Ptr> BooleanLiteral StringLiteral BinaryLiteral IntegerLiteral DecimalLiteral RationalLiteral
+%type <ReferenceLiteral::Ptr> ReferenceLiteral
+%type <ListLiteral::Ptr> ListLiteral
+%type <RangeLiteral::Ptr> RangeLiteral
+
 // expressions
-%type <Expression::Ptr> Expression Term SimpleOrClaspedTerm Literal
+%type <Expression::Ptr> Term SimpleOrClaspedTerm OperatorExpression
 %type <Expressions::Ptr> Terms
-%type <TypeCastingExpression::Ptr> TypeCastingExpression
-%type <ValueAtom::Ptr> BooleanLiteral StringLiteral BinaryLiteral IntegerLiteral DecimalLiteral RationalLiteral
-%type <ReferenceAtom::Ptr> ReferenceLiteral
-%type <UndefAtom::Ptr> UndefinedLiteral
-%type <RangeExpression::Ptr> Range
-%type <ListExpression::Ptr> List
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <MethodCallExpression::Ptr> MethodCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
+%type <TypeCastingExpression::Ptr> TypeCastingExpression
 %type <LetExpression::Ptr> LetExpression
 %type <ConditionalExpression::Ptr> ConditionalExpression
 %type <ChooseExpression::Ptr> ChooseExpression
@@ -448,7 +451,7 @@ ProgramFunctionDefinition
           @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
       program->setTargetType( CallExpression::TargetType::FUNCTION );
 
-      const auto ruleReference = Ast::make< ReferenceAtom >( @$, $2 );
+      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, $2 );
 
       auto initializers = Ast::make< NodeList< UpdateRule > >( @$ );
       initializers->add( Ast::make< UpdateRule >( @$, program, ruleReference ) );
@@ -790,7 +793,11 @@ Term
   {
      $$ = $1;
   }
-| Expression
+| TypeCastingExpression
+  {
+      $$ = $1;
+  }
+| OperatorExpression
   {
       $$ = $1;
   }
@@ -811,10 +818,6 @@ Term
       $$ = $1;
   }
 | ExistentialQuantifierExpression
-  {
-      $$ = $1;
-  }
-| TypeCastingExpression
   {
       $$ = $1;
   }
@@ -842,14 +845,6 @@ SimpleOrClaspedTerm
   {
       $$ = $1;
   }
-| List
-  {
-      $$ = $1;
-  }
-| Range
-  {
-      $$ = $1;
-  }
 | Literal
   {
       $$ = $1;
@@ -858,10 +853,10 @@ SimpleOrClaspedTerm
 
 
 //
-// Expressions
+// Operator Expression
 //
 
-Expression
+OperatorExpression
 : PLUS Term %prec UPLUS
   {
       $$ = $2;
@@ -945,14 +940,6 @@ Expression
 ;
 
 
-TypeCastingExpression
-: Term AS Type
-  {
-      $$ = Ast::make< TypeCastingExpression >( @$, $1, $3 );
-  }
-;
-
-
 DirectCallExpression
 : IdentifierPath %prec CALL_WITHOUT_ARGS
   {
@@ -983,6 +970,14 @@ IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
   {
       $$ = Ast::make< IndirectCallExpression >( @$, $3, $5 );
+  }
+;
+
+
+TypeCastingExpression
+: Term AS Type
+  {
+      $$ = Ast::make< TypeCastingExpression >( @$, $1, $3 );
   }
 ;
 
@@ -1026,32 +1021,7 @@ ExistentialQuantifierExpression
   }
 ;
 
-
-List
-: LSQPAREN RSQPAREN
-  {
-      const auto expressions = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< ListExpression >( @$, expressions );
-  }
-| LSQPAREN Terms RSQPAREN
-  {
-      $$ = Ast::make< ListExpression >( @$, $2 );
-  }
-| LSQPAREN error RSQPAREN // error recovery
-  {
-      $$ = nullptr;
-  }
-;
-
-
-Range
-: LSQPAREN Term DOTDOT Term RSQPAREN
-  {
-      $$ = Ast::make< RangeExpression >( @$, $2, $4 );
-  }
-;
-
-
+//
 //
 // Literals
 //
@@ -1089,13 +1059,21 @@ Literal
   {
       $$ = $1;
   }
+| ListLiteral
+  {
+      $$ = $1;
+  }
+| RangeLiteral
+  {
+      $$ = $1;
+  }
 ;
 
 
 UndefinedLiteral
 : UNDEF
   {
-      $$ = Ast::make< UndefAtom >( @$ );
+      $$ = Ast::make< UndefLiteral >( @$ );
   }
 ;
 
@@ -1104,12 +1082,12 @@ BooleanLiteral
 : TRUE
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
-      $$ = Ast::make< ValueAtom >( @$, value );
+      $$ = Ast::make< ValueLiteral >( @$, value );
   }
 | FALSE
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( false );
-      $$ = Ast::make< ValueAtom >( @$, value );
+      $$ = Ast::make< ValueLiteral >( @$, value );
   }
 ;
 
@@ -1120,7 +1098,7 @@ IntegerLiteral
       try
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
-          $$ = Ast::make< ValueAtom >( @$, value );
+          $$ = Ast::make< ValueLiteral >( @$, value );
       }
       catch( const std::domain_error& e )
       {
@@ -1136,7 +1114,7 @@ RationalLiteral
       try
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::RationalConstant >( $1 );
-          $$ = Ast::make< ValueAtom >( @$, value );
+          $$ = Ast::make< ValueLiteral >( @$, value );
       }
       catch( const std::domain_error& e )
       {
@@ -1152,7 +1130,7 @@ DecimalLiteral
       try
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( $1 );
-          $$ = Ast::make< ValueAtom >( @$, value );
+          $$ = Ast::make< ValueLiteral >( @$, value );
       }
       catch( const std::domain_error& e )
       {
@@ -1168,7 +1146,7 @@ BinaryLiteral
       try
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( $1, libstdhl::Type::BINARY );
-          $$ = Ast::make< ValueAtom >( @$, value );
+          $$ = Ast::make< ValueLiteral >( @$, value );
       }
       catch( const std::domain_error& e )
       {
@@ -1180,7 +1158,7 @@ BinaryLiteral
       try
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( $1, libstdhl::Type::HEXADECIMAL );
-          $$ = Ast::make< ValueAtom >( @$, value );
+          $$ = Ast::make< ValueLiteral >( @$, value );
       }
       catch( const std::domain_error& e )
       {
@@ -1196,7 +1174,7 @@ StringLiteral
       try
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::StringConstant >( $1 );
-          $$ = Ast::make< ValueAtom >( @$, value );
+          $$ = Ast::make< ValueLiteral >( @$, value );
       }
       catch( const std::domain_error& e )
       {
@@ -1209,11 +1187,36 @@ StringLiteral
 ReferenceLiteral
 : AT IdentifierPath
   {
-      $$ = Ast::make< ReferenceAtom >( @$, $2 );
+      $$ = Ast::make< ReferenceLiteral >( @$, $2 );
   }
 ;
 
 
+ListLiteral
+: LSQPAREN RSQPAREN
+  {
+      const auto expressions = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< ListLiteral >( @$, expressions );
+  }
+| LSQPAREN Terms RSQPAREN
+  {
+      $$ = Ast::make< ListLiteral >( @$, $2 );
+  }
+| LSQPAREN error RSQPAREN // error recovery
+  {
+      $$ = nullptr;
+  }
+;
+
+
+RangeLiteral
+: LSQPAREN Term DOTDOT Term RSQPAREN
+  {
+      $$ = Ast::make< RangeLiteral >( @$, $2, $4 );
+  }
+;
+
+//
 //
 // Types
 //
@@ -1392,7 +1395,7 @@ MaybeDefined
   }
 | %empty
   {
-      $$ = Ast::make< UndefAtom >( @$ );
+      $$ = Ast::make< UndefLiteral >( @$ );
   }
 ;
 

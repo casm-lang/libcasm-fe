@@ -75,18 +75,20 @@ namespace libcasm_fe
                 ENUMERATION_DEFINITION,
                 USING_DEFINITION,
 
+                // literals
+                UNDEF_LITERAL,
+                VALUE_LITERAL,
+                REFERENCE_LITERAL,
+                LIST_LITERAL,
+                RANGE_LITERAL,
+
                 // expressions
-                TYPE_CASTING_EXPRESSION,
-                VALUE_ATOM,
-                REFERENCE_ATOM,
-                UNDEF_ATOM,
                 DIRECT_CALL_EXPRESSION,
                 METHOD_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,
+                TYPE_CASTING_EXPRESSION,
                 UNARY_EXPRESSION,
                 BINARY_EXPRESSION,
-                RANGE_EXPRESSION,
-                LIST_EXPRESSION,
                 LET_EXPRESSION,
                 CONDITIONAL_EXPRESSION,
                 CHOOSE_EXPRESSION,

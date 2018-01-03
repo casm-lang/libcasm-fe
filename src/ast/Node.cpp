@@ -107,21 +107,26 @@ std::string Node::description( void ) const
         {
             return "using";
         }
-        case ID::TYPE_CASTING_EXPRESSION:
+            // literals
+        case ID::UNDEF_LITERAL:
         {
-            return "type casting expression";
+            return "undef";
         }
-        case ID::VALUE_ATOM:
+        case ID::VALUE_LITERAL:
         {
             return "value";
         }
-        case ID::REFERENCE_ATOM:
+        case ID::REFERENCE_LITERAL:
         {
             return "reference";
         }
-        case ID::UNDEF_ATOM:
+        case ID::RANGE_LITERAL:
         {
-            return "undef";
+            return "range";
+        }
+        case ID::LIST_LITERAL:
+        {
+            return "list";
         }
         case ID::DIRECT_CALL_EXPRESSION:
         {
@@ -135,6 +140,10 @@ std::string Node::description( void ) const
         {
             return "indirect call";
         }
+        case ID::TYPE_CASTING_EXPRESSION:
+        {
+            return "type casting expression";
+        }
         case ID::UNARY_EXPRESSION:
         {
             return "expression";
@@ -142,14 +151,6 @@ std::string Node::description( void ) const
         case ID::BINARY_EXPRESSION:
         {
             return "expression";
-        }
-        case ID::RANGE_EXPRESSION:
-        {
-            return "range";
-        }
-        case ID::LIST_EXPRESSION:
-        {
-            return "list";
         }
         case ID::LET_EXPRESSION:
         {

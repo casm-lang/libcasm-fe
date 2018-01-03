@@ -82,11 +82,12 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
 
-    void visit( ReferenceAtom& node ) override;
-    void visit( ValueAtom& node ) override;
-    void visit( UndefAtom& node ) override;
+    void visit( UndefLiteral& node ) override;
+    void visit( ValueLiteral& node ) override;
+    void visit( ReferenceLiteral& node ) override;
+    void visit( ListLiteral& node ) override;
+
     void visit( DirectCallExpression& node ) override;
-    void visit( ListExpression& node ) override;
 
     void visit( CaseRule& node ) override;
     void visit( UpdateRule& node ) override;
@@ -161,22 +162,27 @@ void ConsistencyCheckVisitor::visit( DerivedDefinition& node )
     m_sideEffectFree = false;
 }
 
-void ConsistencyCheckVisitor::visit( ReferenceAtom& node )
+void ConsistencyCheckVisitor::visit( UndefLiteral& node )
 {
     RecursiveVisitor::visit( node );
     verify( node );
 }
 
-void ConsistencyCheckVisitor::visit( ValueAtom& node )
+void ConsistencyCheckVisitor::visit( ValueLiteral& node )
 {
     RecursiveVisitor::visit( node );
     verify( node );
 }
 
-void ConsistencyCheckVisitor::visit( UndefAtom& node )
+void ConsistencyCheckVisitor::visit( ReferenceLiteral& node )
 {
     RecursiveVisitor::visit( node );
     verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( ListLiteral& node )
+{
+    assert( node.type()->isList() );
 }
 
 void ConsistencyCheckVisitor::visit( CaseRule& node )
@@ -241,11 +247,6 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
                 Code::NotSideEffectFreeRuleCall );
         }
     }
-}
-
-void ConsistencyCheckVisitor::visit( ListExpression& node )
-{
-    assert( node.type()->isList() );
 }
 
 void ConsistencyCheckVisitor::visit( UpdateRule& node )

@@ -246,7 +246,7 @@ namespace libcasm_fe
         TypeInferenceInvalidLetExpressionInitializerType = 0x1011,
         TypeInferenceInvalidLetExpressionTypeMismatch = 0x1012,
 
-        TypeInferenceRangeExpressionTypeMismatch = 0x1600,
+        TypeInferenceRangeLiteralTypeMismatch = 0x1600,
 
         TypeInferenceInvalidTypeCastingExpression = 0x1700,
         TypeInferenceTypeCastingExpressionFromHasNoType = 0x1701,

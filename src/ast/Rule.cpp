@@ -189,7 +189,8 @@ ForallRule::ForallRule(
 : ForallRule(
       variable,
       universe,
-      std::make_shared< ValueAtom >( libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true ) ),
+      std::make_shared< ValueLiteral >(
+          libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true ) ),
       rule )
 {
 }

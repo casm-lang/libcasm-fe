@@ -49,13 +49,13 @@ static const auto registration = libcasm_ir::Constant::registerConstant< Referen
 
 static const auto VOID = libstdhl::Memory::get< libcasm_ir::VoidType >();
 
-ReferenceConstant::ReferenceConstant( const Ast::ReferenceAtom* atom )
-: libcasm_ir::ReferenceConstant< Ast::ReferenceAtom >( VOID, atom, classid() )
+ReferenceConstant::ReferenceConstant( const Ast::ReferenceLiteral* literal )
+: libcasm_ir::ReferenceConstant< Ast::ReferenceLiteral >( VOID, literal, classid() )
 {
 }
 
 ReferenceConstant::ReferenceConstant( void )
-: libcasm_ir::ReferenceConstant< Ast::ReferenceAtom >( VOID, classid() )
+: libcasm_ir::ReferenceConstant< Ast::ReferenceLiteral >( VOID, classid() )
 {
 }
 

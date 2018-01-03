@@ -54,31 +54,41 @@ Expression::Expression( Node::ID id )
 {
 }
 
-ValueAtom::ValueAtom( const libcasm_ir::Constant::Ptr& value )
-: Expression( Node::ID::VALUE_ATOM )
+UndefLiteral::UndefLiteral( void )
+: Expression( Node::ID::UNDEF_LITERAL )
+{
+}
+
+void UndefLiteral::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+ValueLiteral::ValueLiteral( const libcasm_ir::Constant::Ptr& value )
+: Expression( Node::ID::VALUE_LITERAL )
 , m_value( value )
 {
     Expression::setType( value->type().ptr_type() );
 }
 
-const libcasm_ir::Constant::Ptr& ValueAtom::value( void ) const
+const libcasm_ir::Constant::Ptr& ValueLiteral::value( void ) const
 {
     return m_value;
 }
 
-void ValueAtom::setValue( const libcasm_ir::Constant::Ptr& value )
+void ValueLiteral::setValue( const libcasm_ir::Constant::Ptr& value )
 {
     m_value = value;
     Expression::setType( m_value->type().ptr_type() );
 }
 
-void ValueAtom::accept( Visitor& visitor )
+void ValueLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-ReferenceAtom::ReferenceAtom( const IdentifierPath::Ptr& identifier )
-: Expression( Node::ID::REFERENCE_ATOM )
+ReferenceLiteral::ReferenceLiteral( const IdentifierPath::Ptr& identifier )
+: Expression( Node::ID::REFERENCE_LITERAL )
 , m_identifier( identifier )
 , m_referenceType( ReferenceType::UNKNOWN )
 , m_reference( nullptr )
@@ -86,27 +96,27 @@ ReferenceAtom::ReferenceAtom( const IdentifierPath::Ptr& identifier )
 {
 }
 
-const IdentifierPath::Ptr& ReferenceAtom::identifier() const
+const IdentifierPath::Ptr& ReferenceLiteral::identifier() const
 {
     return m_identifier;
 }
 
-void ReferenceAtom::setReferenceType( ReferenceType referenceType )
+void ReferenceLiteral::setReferenceType( ReferenceType referenceType )
 {
     m_referenceType = referenceType;
 }
 
-ReferenceAtom::ReferenceType ReferenceAtom::referenceType( void ) const
+ReferenceLiteral::ReferenceType ReferenceLiteral::referenceType( void ) const
 {
     return m_referenceType;
 }
 
-void ReferenceAtom::setReference( const TypedNode::Ptr& reference )
+void ReferenceLiteral::setReference( const TypedNode::Ptr& reference )
 {
     m_reference = reference;
 }
 
-const TypedNode::Ptr& ReferenceAtom::reference( void ) const
+const TypedNode::Ptr& ReferenceLiteral::reference( void ) const
 {
     assert(
         ( m_referenceType != ReferenceType::BUILTIN ) and
@@ -115,29 +125,57 @@ const TypedNode::Ptr& ReferenceAtom::reference( void ) const
     return m_reference;
 }
 
-void ReferenceAtom::setBuiltinId( libcasm_ir::Value::ID builtinId )
+void ReferenceLiteral::setBuiltinId( libcasm_ir::Value::ID builtinId )
 {
     m_builtinId = builtinId;
 }
 
-libcasm_ir::Value::ID ReferenceAtom::builtinId( void ) const
+libcasm_ir::Value::ID ReferenceLiteral::builtinId( void ) const
 {
     assert( m_referenceType == ReferenceType::BUILTIN );
 
     return m_builtinId;
 }
 
-void ReferenceAtom::accept( Visitor& visitor )
+void ReferenceLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-UndefAtom::UndefAtom( void )
-: Expression( Node::ID::UNDEF_ATOM )
+ListLiteral::ListLiteral( const Expressions::Ptr& expressions )
+: Expression( Node::ID::LIST_LITERAL )
+, m_expressions( expressions )
 {
 }
 
-void UndefAtom::accept( Visitor& visitor )
+const Expressions::Ptr& ListLiteral::expressions( void ) const
+{
+    return m_expressions;
+}
+
+void ListLiteral::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+RangeLiteral::RangeLiteral( const Expression::Ptr& left, const Expression::Ptr& right )
+: Expression( Node::ID::RANGE_LITERAL )
+, m_left( left )
+, m_right( right )
+{
+}
+
+const Expression::Ptr& RangeLiteral::left( void ) const
+{
+    return m_left;
+}
+
+const Expression::Ptr& RangeLiteral::right( void ) const
+{
+    return m_right;
+}
+
+void RangeLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
@@ -492,44 +530,6 @@ const Expression::Ptr& BinaryExpression::right( void ) const
 }
 
 void BinaryExpression::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-RangeExpression::RangeExpression( const Expression::Ptr& left, const Expression::Ptr& right )
-: Expression( Node::ID::RANGE_EXPRESSION )
-, m_left( left )
-, m_right( right )
-{
-}
-
-const Expression::Ptr& RangeExpression::left( void ) const
-{
-    return m_left;
-}
-
-const Expression::Ptr& RangeExpression::right( void ) const
-{
-    return m_right;
-}
-
-void RangeExpression::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-ListExpression::ListExpression( const Expressions::Ptr& expressions )
-: Expression( Node::ID::LIST_EXPRESSION )
-, m_expressions( expressions )
-{
-}
-
-const Expressions::Ptr& ListExpression::expressions( void ) const
-{
-    return m_expressions;
-}
-
-void ListExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

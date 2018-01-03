@@ -57,18 +57,18 @@ namespace libcasm_fe
         class EnumerationDefinition;
         class UsingDefinition;
 
-        class TypeCastingExpression;
-        class ValueAtom;
-        class ReferenceAtom;
-        class UndefAtom;
+        class UndefLiteral;
+        class ValueLiteral;
+        class ReferenceLiteral;
+        class ListLiteral;
+        class RangeLiteral;
+
         class DirectCallExpression;
         class MethodCallExpression;
         class IndirectCallExpression;
-        class MethodCallExpression;
+        class TypeCastingExpression;
         class UnaryExpression;
         class BinaryExpression;
-        class RangeExpression;
-        class ListExpression;
         class LetExpression;
         class ConditionalExpression;
         class ChooseExpression;
@@ -118,17 +118,18 @@ namespace libcasm_fe
             virtual void visit( EnumerationDefinition& node ) = 0;
             virtual void visit( UsingDefinition& node ) = 0;
 
-            virtual void visit( TypeCastingExpression& node ) = 0;
-            virtual void visit( ValueAtom& node ) = 0;
-            virtual void visit( ReferenceAtom& node ) = 0;
-            virtual void visit( UndefAtom& node ) = 0;
+            virtual void visit( UndefLiteral& node ) = 0;
+            virtual void visit( ValueLiteral& node ) = 0;
+            virtual void visit( ReferenceLiteral& node ) = 0;
+            virtual void visit( ListLiteral& node ) = 0;
+            virtual void visit( RangeLiteral& node ) = 0;
+
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( MethodCallExpression& node ) = 0;
             virtual void visit( IndirectCallExpression& node ) = 0;
+            virtual void visit( TypeCastingExpression& node ) = 0;
             virtual void visit( UnaryExpression& node ) = 0;
             virtual void visit( BinaryExpression& node ) = 0;
-            virtual void visit( RangeExpression& node ) = 0;
-            virtual void visit( ListExpression& node ) = 0;
             virtual void visit( LetExpression& node ) = 0;
             virtual void visit( ConditionalExpression& node ) = 0;
             virtual void visit( ChooseExpression& node ) = 0;

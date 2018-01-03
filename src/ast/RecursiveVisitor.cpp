@@ -111,23 +111,28 @@ void RecursiveVisitor::visit( UsingDefinition& node )
     node.attributes()->accept( *this );
 }
 
-void RecursiveVisitor::visit( TypeCastingExpression& node )
-{
-    node.fromExpression()->accept( *this );
-    node.asType()->accept( *this );
-}
-
-void RecursiveVisitor::visit( ValueAtom& node )
+void RecursiveVisitor::visit( UndefLiteral& node )
 {
 }
 
-void RecursiveVisitor::visit( ReferenceAtom& node )
+void RecursiveVisitor::visit( ValueLiteral& node )
+{
+}
+
+void RecursiveVisitor::visit( ReferenceLiteral& node )
 {
     node.identifier()->accept( *this );
 }
 
-void RecursiveVisitor::visit( UndefAtom& node )
+void RecursiveVisitor::visit( ListLiteral& node )
 {
+    node.expressions()->accept( *this );
+}
+
+void RecursiveVisitor::visit( RangeLiteral& node )
+{
+    node.left()->accept( *this );
+    node.right()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DirectCallExpression& node )
@@ -149,6 +154,12 @@ void RecursiveVisitor::visit( IndirectCallExpression& node )
     node.arguments()->accept( *this );
 }
 
+void RecursiveVisitor::visit( TypeCastingExpression& node )
+{
+    node.fromExpression()->accept( *this );
+    node.asType()->accept( *this );
+}
+
 void RecursiveVisitor::visit( UnaryExpression& node )
 {
     node.expression()->accept( *this );
@@ -158,17 +169,6 @@ void RecursiveVisitor::visit( BinaryExpression& node )
 {
     node.left()->accept( *this );
     node.right()->accept( *this );
-}
-
-void RecursiveVisitor::visit( RangeExpression& node )
-{
-    node.left()->accept( *this );
-    node.right()->accept( *this );
-}
-
-void RecursiveVisitor::visit( ListExpression& node )
-{
-    node.expressions()->accept( *this );
 }
 
 void RecursiveVisitor::visit( LetExpression& node )

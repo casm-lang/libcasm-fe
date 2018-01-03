@@ -62,17 +62,18 @@ namespace libcasm_fe
             void visit( EnumerationDefinition& node ) override;
             void visit( UsingDefinition& node ) override;
 
-            void visit( TypeCastingExpression& node ) override;
-            void visit( ValueAtom& node ) override;
-            void visit( ReferenceAtom& node ) override;
-            void visit( UndefAtom& node ) override;
+            void visit( UndefLiteral& node ) override;
+            void visit( ValueLiteral& node ) override;
+            void visit( ReferenceLiteral& node ) override;
+            void visit( ListLiteral& node ) override;
+            void visit( RangeLiteral& node ) override;
+
             void visit( DirectCallExpression& node ) override;
             void visit( MethodCallExpression& node ) override;
             void visit( IndirectCallExpression& node ) override;
+            void visit( TypeCastingExpression& node ) override;
             void visit( UnaryExpression& node ) override;
             void visit( BinaryExpression& node ) override;
-            void visit( RangeExpression& node ) override;
-            void visit( ListExpression& node ) override;
             void visit( LetExpression& node ) override;
             void visit( ConditionalExpression& node ) override;
             void visit( ChooseExpression& node ) override;

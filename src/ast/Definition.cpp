@@ -127,7 +127,7 @@ FunctionDefinition::FunctionDefinition(
 , m_returnType( returnType )
 , m_symbolic( false )
 , m_initializers( std::make_shared< NodeList< UpdateRule > >() )
-, m_defaultValue( std::make_shared< UndefAtom >() )
+, m_defaultValue( std::make_shared< UndefLiteral >() )
 {
     const auto& name = identifier->name();
     if( name == "self" )

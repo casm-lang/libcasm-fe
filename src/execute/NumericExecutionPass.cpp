@@ -293,7 +293,7 @@ class ExecutionVisitor final : public EmptyVisitor
      *
      * @note It only support rules without arguments.
      *
-     * @param value Rule reference (must be defined and the atom reference type
+     * @param value Rule reference (must be defined and the literal reference type
      *        must be RULE)
      */
     void execute( const ReferenceConstant& value );
@@ -305,9 +305,12 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
-    void visit( ValueAtom& node ) override;
-    void visit( ReferenceAtom& node ) override;
-    void visit( UndefAtom& node ) override;
+    void visit( UndefLiteral& node ) override;
+    void visit( ValueLiteral& node ) override;
+    void visit( ReferenceLiteral& node ) override;
+    void visit( ListLiteral& node ) override;
+    void visit( RangeLiteral& node ) override;
+
     void visit( BasicType& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
@@ -315,8 +318,6 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
-    void visit( RangeExpression& node ) override;
-    void visit( ListExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
@@ -432,12 +433,12 @@ void ExecutionVisitor::execute( const ReferenceConstant& value )
 {
     assert( value.defined() && "Reference must be defined" );
 
-    const auto& atom = value.value();
+    const auto& literal = value.value();
     assert(
-        ( atom->referenceType() == ReferenceAtom::ReferenceType::RULE ) &&
+        ( literal->referenceType() == ReferenceLiteral::ReferenceType::RULE ) &&
         "Must be a rule reference" );
 
-    const auto& rule = std::static_pointer_cast< RuleDefinition >( atom->reference() );
+    const auto& rule = std::static_pointer_cast< RuleDefinition >( literal->reference() );
     assert( ( rule->arguments()->size() == 0 ) && "Only parameter-less rules are supported" );
 
     m_frameStack.push( makeFrame( nullptr, rule.get(), rule->maximumNumberOfLocals() ) );
@@ -540,19 +541,46 @@ void ExecutionVisitor::visit( EnumerationDefinition& node )
     m_evaluationStack.push( IR::EnumerationConstant( enumType ) );
 }
 
-void ExecutionVisitor::visit( ValueAtom& node )
+void ExecutionVisitor::visit( UndefLiteral& node )
+{
+    m_evaluationStack.push( IR::Constant::undef( node.type() ) );
+}
+
+void ExecutionVisitor::visit( ValueLiteral& node )
 {
     m_evaluationStack.push( *node.value() );
 }
 
-void ExecutionVisitor::visit( ReferenceAtom& node )
+void ExecutionVisitor::visit( ReferenceLiteral& node )
 {
     m_evaluationStack.push( ReferenceConstant( &node ) );
 }
 
-void ExecutionVisitor::visit( UndefAtom& node )
+void ExecutionVisitor::visit( ListLiteral& node )
 {
-    m_evaluationStack.push( IR::Constant::undef( node.type() ) );
+    assert( node.type()->isList() );
+    const auto listType = std::static_pointer_cast< IR::ListType >( node.type() );
+    auto list = std::make_shared< IR::List >( listType );
+
+    for( const auto& expression : *node.expressions() )
+    {
+        expression->accept( *this );
+        const auto constantElement = m_evaluationStack.pop();
+        list->append( constantElement );
+    }
+
+    m_evaluationStack.push( IR::ListConstant( listType, list ) );
+}
+
+void ExecutionVisitor::visit( RangeLiteral& node )
+{
+    node.left()->accept( *this );
+    const auto lhs = m_evaluationStack.pop();
+
+    node.right()->accept( *this );
+    const auto rhs = m_evaluationStack.pop();
+
+    m_evaluationStack.push( IR::RangeConstant( node.type(), lhs, rhs ) );
 }
 
 void ExecutionVisitor::visit( BasicType& node )
@@ -662,28 +690,28 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
             Code::Unspecified );
     }
 
-    const auto& atom = value.value();
-    switch( atom->referenceType() )
+    const auto& literal = value.value();
+    switch( literal->referenceType() )
     {
-        case ReferenceAtom::ReferenceType::FUNCTION:  // [[fallthrough]]
-        case ReferenceAtom::ReferenceType::DERIVED:   // [[fallthrough]]
-        case ReferenceAtom::ReferenceType::RULE:
+        case ReferenceLiteral::ReferenceType::FUNCTION:  // [[fallthrough]]
+        case ReferenceLiteral::ReferenceType::DERIVED:   // [[fallthrough]]
+        case ReferenceLiteral::ReferenceType::RULE:
         {
-            const auto& definition = std::static_pointer_cast< Definition >( atom->reference() );
+            const auto& definition = std::static_pointer_cast< Definition >( literal->reference() );
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
             m_frameStack.pop();
             break;
         }
-        case ReferenceAtom::ReferenceType::BUILTIN:
+        case ReferenceLiteral::ReferenceType::BUILTIN:
         {
             m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
-            invokeBuiltin( node, atom->builtinId(), node.type() );
+            invokeBuiltin( node, literal->builtinId(), node.type() );
             m_frameStack.pop();
             break;
         }
-        case ReferenceAtom::ReferenceType::UNKNOWN:
+        case ReferenceLiteral::ReferenceType::UNKNOWN:
         {
             assert( !"cannot call an unknown target" );
             break;
@@ -753,33 +781,6 @@ void ExecutionVisitor::visit( BinaryExpression& node )
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
             Code::Unspecified );
     }
-}
-
-void ExecutionVisitor::visit( RangeExpression& node )
-{
-    node.left()->accept( *this );
-    const auto lhs = m_evaluationStack.pop();
-
-    node.right()->accept( *this );
-    const auto rhs = m_evaluationStack.pop();
-
-    m_evaluationStack.push( IR::RangeConstant( node.type(), lhs, rhs ) );
-}
-
-void ExecutionVisitor::visit( ListExpression& node )
-{
-    assert( node.type()->isList() );
-    const auto listType = std::static_pointer_cast< IR::ListType >( node.type() );
-    auto list = std::make_shared< IR::List >( listType );
-
-    for( const auto& expression : *node.expressions() )
-    {
-        expression->accept( *this );
-        const auto constantElement = m_evaluationStack.pop();
-        list->append( constantElement );
-    }
-
-    m_evaluationStack.push( IR::ListConstant( listType, list ) );
 }
 
 void ExecutionVisitor::visit( LetExpression& node )

@@ -81,17 +81,18 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
 
-    void visit( UndefAtom& node ) override;
-    void visit( ValueAtom& node ) override;
-    void visit( ReferenceAtom& node ) override;
+    void visit( UndefLiteral& node ) override;
+    void visit( ValueLiteral& node ) override;
+    void visit( ReferenceLiteral& node ) override;
+    void visit( ListLiteral& node ) override;
+    void visit( RangeLiteral& node ) override;
+
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
-    void visit( RangeExpression& node ) override;
-    void visit( ListExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
@@ -285,23 +286,23 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
     node.rule()->accept( *this );
 }
 
-void TypeInferenceVisitor::visit( UndefAtom& node )
+void TypeInferenceVisitor::visit( UndefLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    inference( "undef atom", nullptr, node );
+    inference( "undef literal", nullptr, node );
 }
 
-void TypeInferenceVisitor::visit( ValueAtom& node )
+void TypeInferenceVisitor::visit( ValueLiteral& node )
 {
     assert( node.value() and node.type() );
     m_typeIDs[&node ] = { node.type()->id() };
 
     RecursiveVisitor::visit( node );
 
-    inference( "value atom", nullptr, node );
+    inference( "value literal", nullptr, node );
 }
 
-void TypeInferenceVisitor::visit( ReferenceAtom& node )
+void TypeInferenceVisitor::visit( ReferenceLiteral& node )
 {
     if( node.type() )
     {
@@ -309,12 +310,12 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
     }
 
     RecursiveVisitor::visit( node );
-    inference( "reference atom", nullptr, node );
+    inference( "reference literal", nullptr, node );
 
     switch( node.referenceType() )
     {
-        case ReferenceAtom::ReferenceType::FUNCTION:  // [[fallthrough]]
-        case ReferenceAtom::ReferenceType::DERIVED:
+        case ReferenceLiteral::ReferenceType::FUNCTION:  // [[fallthrough]]
+        case ReferenceLiteral::ReferenceType::DERIVED:
         {
             // make sure that the reference has been typed
             node.reference()->accept( *this );
@@ -324,7 +325,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             node.setType( type );
             break;
         }
-        case ReferenceAtom::ReferenceType::BUILTIN:
+        case ReferenceLiteral::ReferenceType::BUILTIN:
         {
             libcasm_ir::Annotation const* annotation = nullptr;
             try
@@ -374,7 +375,7 @@ void TypeInferenceVisitor::visit( ReferenceAtom& node )
             }
             break;
         }
-        case ReferenceAtom::ReferenceType::RULE:
+        case ReferenceLiteral::ReferenceType::RULE:
         {
             // make sure that the reference has been typed
             node.reference()->accept( *this );
@@ -853,7 +854,12 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
     }
 }
 
-void TypeInferenceVisitor::visit( RangeExpression& node )
+void TypeInferenceVisitor::visit( ListLiteral& node )
+{
+    RecursiveVisitor::visit( node );
+}
+
+void TypeInferenceVisitor::visit( RangeLiteral& node )
 {
     RecursiveVisitor::visit( node );
 
@@ -865,7 +871,7 @@ void TypeInferenceVisitor::visit( RangeExpression& node )
         m_log.error(
             { node.sourceLocation() },
             "types of range does not match, " + lhs.description() + " != " + rhs.description(),
-            Code::TypeInferenceRangeExpressionTypeMismatch );
+            Code::TypeInferenceRangeLiteralTypeMismatch );
         return;
     }
 
@@ -873,11 +879,6 @@ void TypeInferenceVisitor::visit( RangeExpression& node )
         libstdhl::Memory::get< libcasm_ir::RangeType >( node.left()->type()->ptr_result() );
 
     node.setType( range_type );
-}
-
-void TypeInferenceVisitor::visit( ListExpression& node )
-{
-    RecursiveVisitor::visit( node );
 }
 
 void TypeInferenceVisitor::visit( LetExpression& node )
@@ -1001,18 +1002,18 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
         }
     }
 
-    if( thenExpr.type() and elseExpr.id() == Node::ID::UNDEF_ATOM )
+    if( thenExpr.type() and elseExpr.id() == Node::ID::UNDEF_LITERAL )
     {
         elseExpr.setType( thenExpr.type() );
     }
 
-    if( thenExpr.id() == Node::ID::UNDEF_ATOM and elseExpr.type() )
+    if( thenExpr.id() == Node::ID::UNDEF_LITERAL and elseExpr.type() )
     {
         thenExpr.setType( elseExpr.type() );
     }
 
-    if( node.type() and thenExpr.id() == Node::ID::UNDEF_ATOM and
-        elseExpr.id() == Node::ID::UNDEF_ATOM )
+    if( node.type() and thenExpr.id() == Node::ID::UNDEF_LITERAL and
+        elseExpr.id() == Node::ID::UNDEF_LITERAL )
     {
         thenExpr.setType( node.type() );
         elseExpr.setType( node.type() );
@@ -1392,7 +1393,7 @@ void TypeInferenceVisitor::assignment(
     const Code& srcErr,
     const Code& assignmentErr )
 {
-    if( lhs.type() and not rhs.type() )  // and rhs.id() == Node::ID::UNDEF_ATOM and  )
+    if( lhs.type() and not rhs.type() )  // and rhs.id() == Node::ID::UNDEF_LITERAL and  )
     {
         if( lhs.type()->isRelation() )
         {
@@ -1439,23 +1440,23 @@ void TypeInferenceVisitor::assignment(
             // relaxation: mixed binary types are OK as long as
             //             bitsize(lhs) >= bitsize(rhs)
         }
-        else if( tyLhs.isBinary() and tyRhs.isInteger() and rhs.id() == Node::ID::VALUE_ATOM )
+        else if( tyLhs.isBinary() and tyRhs.isInteger() and rhs.id() == Node::ID::VALUE_LITERAL )
         {
             // relaxation: lhs binary and rhs integer are OK as long as rhs is a
             //             integer constant with bitsize(lhs) >= bitsize(rhs)
 
             try
             {
-                auto& valueAtom = static_cast< ValueAtom& >( rhs );
-                assert( libcasm_ir::isa< libcasm_ir::IntegerConstant >( valueAtom.value() ) );
+                auto& valueLiteral = static_cast< ValueLiteral& >( rhs );
+                assert( libcasm_ir::isa< libcasm_ir::IntegerConstant >( valueLiteral.value() ) );
                 auto constant =
-                    std::static_pointer_cast< libcasm_ir::IntegerConstant >( valueAtom.value() );
+                    std::static_pointer_cast< libcasm_ir::IntegerConstant >( valueLiteral.value() );
 
                 const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >(
                     lhs.type()->ptr_result(),
                     static_cast< const libstdhl::Type::Natural& >( constant->value() ) );
 
-                valueAtom.setValue( value );
+                valueLiteral.setValue( value );
             }
             catch( const std::exception& e )
             {
@@ -1590,10 +1591,10 @@ void TypeInferenceVisitor::inference(
             argTypes.emplace_back( nullptr );
         }
 
-        if( arguments[ c ]->id() == Node::ID::VALUE_ATOM )
+        if( arguments[ c ]->id() == Node::ID::VALUE_LITERAL )
         {
             const auto argumentValue =
-                static_cast< Ast::ValueAtom* >( arguments[ c ].get() )->value();
+                static_cast< Ast::ValueLiteral* >( arguments[ c ].get() )->value();
             argValues.emplace_back( argumentValue );
         }
         else

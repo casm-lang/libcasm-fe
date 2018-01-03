@@ -78,7 +78,8 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
 
-    void visit( ReferenceAtom& node ) override;
+    void visit( ReferenceLiteral& node ) override;
+
     void visit( DirectCallExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ChooseExpression& node ) override;
@@ -146,7 +147,7 @@ void SymbolResolveVisitor::visit( RuleDefinition& node )
     }
 }
 
-void SymbolResolveVisitor::visit( ReferenceAtom& node )
+void SymbolResolveVisitor::visit( ReferenceLiteral& node )
 {
     RecursiveVisitor::visit( node );
 
@@ -154,7 +155,7 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
 
     if( libcasm_ir::Builtin::available( name ) )
     {
-        node.setReferenceType( ReferenceAtom::ReferenceType::BUILTIN );
+        node.setReferenceType( ReferenceLiteral::ReferenceType::BUILTIN );
         node.setBuiltinId( libcasm_ir::Annotation::find( name ).valueID() );
         return;
     }
@@ -167,19 +168,19 @@ void SymbolResolveVisitor::visit( ReferenceAtom& node )
         {
             case Node::ID::FUNCTION_DEFINITION:
             {
-                node.setReferenceType( ReferenceAtom::ReferenceType::FUNCTION );
+                node.setReferenceType( ReferenceLiteral::ReferenceType::FUNCTION );
                 node.setReference( symbol );
                 break;
             }
             case Node::ID::DERIVED_DEFINITION:
             {
-                node.setReferenceType( ReferenceAtom::ReferenceType::DERIVED );
+                node.setReferenceType( ReferenceLiteral::ReferenceType::DERIVED );
                 node.setReference( symbol );
                 break;
             }
             case Node::ID::RULE_DEFINITION:
             {
-                node.setReferenceType( ReferenceAtom::ReferenceType::RULE );
+                node.setReferenceType( ReferenceLiteral::ReferenceType::RULE );
                 node.setReference( symbol );
                 break;
             }

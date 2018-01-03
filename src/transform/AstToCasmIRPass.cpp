@@ -80,16 +80,17 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
-    void visit( ValueAtom& node ) override;
-    void visit( ReferenceAtom& node ) override;
-    void visit( UndefAtom& node ) override;
+    void visit( UndefLiteral& node ) override;
+    void visit( ValueLiteral& node ) override;
+    void visit( ReferenceLiteral& node ) override;
+    void visit( ListLiteral& node ) override;
+    void visit( RangeLiteral& node ) override;
+
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
-    void visit( RangeExpression& node ) override;
-    void visit( ListExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
@@ -282,7 +283,19 @@ void AstToCasmIRVisitor::visit( EnumerationDefinition& node )
     m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
-void AstToCasmIRVisitor::visit( ValueAtom& node )
+void AstToCasmIRVisitor::visit( UndefLiteral& node )
+{
+    assert( node.type() );
+
+    const libcasm_ir::Constant::Ptr& constant = libstdhl::Memory::make< libcasm_ir::Constant >(
+        libcasm_ir::Constant::undef( node.type() ) );
+
+    auto result = m_ast2ir.emplace( &node, constant );
+    assert( result.second and " reference already exists " );
+    m_specification->add( constant );
+}
+
+void AstToCasmIRVisitor::visit( ValueLiteral& node )
 {
     assert( node.type() );
     assert( node.value() );
@@ -294,28 +307,28 @@ void AstToCasmIRVisitor::visit( ValueAtom& node )
     m_specification->add( constant );
 }
 
-void AstToCasmIRVisitor::visit( ReferenceAtom& node )
+void AstToCasmIRVisitor::visit( ReferenceLiteral& node )
 {
     libcasm_ir::Constant::Ptr constant = nullptr;
 
     switch( node.referenceType() )
     {
-        case ReferenceAtom::ReferenceType::FUNCTION:
+        case ReferenceLiteral::ReferenceType::FUNCTION:
         {
             m_log.error( { node.sourceLocation() }, "TODO" );
             break;
         }
-        case ReferenceAtom::ReferenceType::DERIVED:
+        case ReferenceLiteral::ReferenceType::DERIVED:
         {
             m_log.error( { node.sourceLocation() }, "TODO" );
             break;
         }
-        case ReferenceAtom::ReferenceType::BUILTIN:
+        case ReferenceLiteral::ReferenceType::BUILTIN:
         {
             m_log.error( { node.sourceLocation() }, "TODO" );
             break;
         }
-        case ReferenceAtom::ReferenceType::RULE:
+        case ReferenceLiteral::ReferenceType::RULE:
         {
             assert( node.reference() );
             const auto def = static_cast< RuleDefinition* >( node.reference().get() );
@@ -329,29 +342,27 @@ void AstToCasmIRVisitor::visit( ReferenceAtom& node )
             constant = libstdhl::Memory::make< libcasm_ir::RuleReferenceConstant >( rule );
             break;
         }
-        case ReferenceAtom::ReferenceType::UNKNOWN:
+        case ReferenceLiteral::ReferenceType::UNKNOWN:
         {
             m_log.error( { node.sourceLocation() }, "TODO" );
             break;
         }
     }
 
-    assert( constant and " unimplemented reference atom " );
+    assert( constant and " unimplemented reference literal " );
     m_specification->add( constant );
     auto result = m_ast2ir.emplace( &node, constant );
     assert( result.second and " reference already exists " );
 }
 
-void AstToCasmIRVisitor::visit( UndefAtom& node )
+void AstToCasmIRVisitor::visit( ListLiteral& node )
 {
-    assert( node.type() );
+    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
+}
 
-    const libcasm_ir::Constant::Ptr& constant = libstdhl::Memory::make< libcasm_ir::Constant >(
-        libcasm_ir::Constant::undef( node.type() ) );
-
-    auto result = m_ast2ir.emplace( &node, constant );
-    assert( result.second and " reference already exists " );
-    m_specification->add( constant );
+void AstToCasmIRVisitor::visit( RangeLiteral& node )
+{
+    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( DirectCallExpression& node )
@@ -478,16 +489,6 @@ void AstToCasmIRVisitor::visit( UnaryExpression& node )
 }
 
 void AstToCasmIRVisitor::visit( BinaryExpression& node )
-{
-    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
-}
-
-void AstToCasmIRVisitor::visit( RangeExpression& node )
-{
-    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
-}
-
-void AstToCasmIRVisitor::visit( ListExpression& node )
 {
     m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }

@@ -82,19 +82,23 @@ void EmptyVisitor::visit( UsingDefinition& )
 {
 }
 
-void EmptyVisitor::visit( TypeCastingExpression& )
+void EmptyVisitor::visit( UndefLiteral& )
 {
 }
 
-void EmptyVisitor::visit( ValueAtom& )
+void EmptyVisitor::visit( ValueLiteral& )
 {
 }
 
-void EmptyVisitor::visit( ReferenceAtom& )
+void EmptyVisitor::visit( ReferenceLiteral& )
 {
 }
 
-void EmptyVisitor::visit( UndefAtom& )
+void EmptyVisitor::visit( ListLiteral& )
+{
+}
+
+void EmptyVisitor::visit( RangeLiteral& )
 {
 }
 
@@ -110,19 +114,15 @@ void EmptyVisitor::visit( IndirectCallExpression& )
 {
 }
 
+void EmptyVisitor::visit( TypeCastingExpression& )
+{
+}
+
 void EmptyVisitor::visit( UnaryExpression& )
 {
 }
 
 void EmptyVisitor::visit( BinaryExpression& )
-{
-}
-
-void EmptyVisitor::visit( RangeExpression& )
-{
-}
-
-void EmptyVisitor::visit( ListExpression& )
 {
 }
 

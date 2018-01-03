@@ -157,17 +157,18 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( EnumerationDefinition& node ) override;
     void visit( UsingDefinition& node ) override;
 
-    void visit( TypeCastingExpression& node ) override;
-    void visit( ValueAtom& node ) override;
-    void visit( ReferenceAtom& node ) override;
-    void visit( UndefAtom& node ) override;
+    void visit( UndefLiteral& node ) override;
+    void visit( ValueLiteral& node ) override;
+    void visit( ReferenceLiteral& node ) override;
+    void visit( ListLiteral& node ) override;
+    void visit( RangeLiteral& node ) override;
+
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
-    void visit( RangeExpression& node ) override;
-    void visit( ListExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
@@ -327,27 +328,36 @@ void AstDumpSourceVisitor::visit( UsingDefinition& node )
     node.type()->accept( *this );
 }
 
-void AstDumpSourceVisitor::visit( TypeCastingExpression& node )
+void AstDumpSourceVisitor::visit( UndefLiteral& node )
 {
-    node.fromExpression()->accept( *this );
-    m_stream << " as ";
-    node.asType()->accept( *this );
+    m_stream << "undef";
 }
 
-void AstDumpSourceVisitor::visit( ValueAtom& node )
+void AstDumpSourceVisitor::visit( ValueLiteral& node )
 {
     m_stream << node.value()->name();
 }
 
-void AstDumpSourceVisitor::visit( ReferenceAtom& node )
+void AstDumpSourceVisitor::visit( ReferenceLiteral& node )
 {
     m_stream << "@";
     node.identifier()->accept( *this );
 }
 
-void AstDumpSourceVisitor::visit( UndefAtom& node )
+void AstDumpSourceVisitor::visit( ListLiteral& node )
 {
-    m_stream << "undef";
+    m_stream << "[";
+    dumpNodes( *node.expressions(), ", " );
+    m_stream << "]";
+}
+
+void AstDumpSourceVisitor::visit( RangeLiteral& node )
+{
+    m_stream << "[";
+    node.left()->accept( *this );
+    m_stream << "..";
+    node.right()->accept( *this );
+    m_stream << "]";
 }
 
 void AstDumpSourceVisitor::visit( DirectCallExpression& node )
@@ -385,6 +395,13 @@ void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
     m_stream << ")";
 }
 
+void AstDumpSourceVisitor::visit( TypeCastingExpression& node )
+{
+    node.fromExpression()->accept( *this );
+    m_stream << " as ";
+    node.asType()->accept( *this );
+}
+
 void AstDumpSourceVisitor::visit( UnaryExpression& node )
 {
     m_stream << ir::Value::token( node.op() );
@@ -398,22 +415,6 @@ void AstDumpSourceVisitor::visit( BinaryExpression& node )
     m_stream << " " << ir::Value::token( node.op() ) << " ";
     node.right()->accept( *this );
     m_stream << ")";
-}
-
-void AstDumpSourceVisitor::visit( RangeExpression& node )
-{
-    m_stream << "[";
-    node.left()->accept( *this );
-    m_stream << "..";
-    node.right()->accept( *this );
-    m_stream << "]";
-}
-
-void AstDumpSourceVisitor::visit( ListExpression& node )
-{
-    m_stream << "[";
-    dumpNodes( *node.expressions(), ", " );
-    m_stream << "]";
 }
 
 void AstDumpSourceVisitor::visit( LetExpression& node )

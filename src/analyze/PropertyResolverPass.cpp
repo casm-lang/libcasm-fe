@@ -80,17 +80,18 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
 
-    void visit( ValueAtom& node ) override;
-    void visit( ReferenceAtom& node ) override;
-    void visit( UndefAtom& node ) override;
+    void visit( UndefLiteral& node ) override;
+    void visit( ValueLiteral& node ) override;
+    void visit( ReferenceLiteral& node ) override;
+    void visit( ListLiteral& node ) override;
+    void visit( RangeLiteral& node ) override;
+
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
-    void visit( RangeExpression& node ) override;
-    void visit( ListExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
@@ -216,7 +217,7 @@ void PropertyResolverVisitor::visit( EnumerationDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
-void PropertyResolverVisitor::visit( ValueAtom& node )
+void PropertyResolverVisitor::visit( UndefLiteral& node )
 {
     node.setProperty( libcasm_ir::Property::CONSTANT );
     node.setProperty( libcasm_ir::Property::PURE );
@@ -224,7 +225,7 @@ void PropertyResolverVisitor::visit( ValueAtom& node )
     RecursiveVisitor::visit( node );
 }
 
-void PropertyResolverVisitor::visit( ReferenceAtom& node )
+void PropertyResolverVisitor::visit( ValueLiteral& node )
 {
     node.setProperty( libcasm_ir::Property::CONSTANT );
     node.setProperty( libcasm_ir::Property::PURE );
@@ -232,11 +233,21 @@ void PropertyResolverVisitor::visit( ReferenceAtom& node )
     RecursiveVisitor::visit( node );
 }
 
-void PropertyResolverVisitor::visit( UndefAtom& node )
+void PropertyResolverVisitor::visit( ReferenceLiteral& node )
 {
     node.setProperty( libcasm_ir::Property::CONSTANT );
     node.setProperty( libcasm_ir::Property::PURE );
 
+    RecursiveVisitor::visit( node );
+}
+
+void PropertyResolverVisitor::visit( ListLiteral& node )
+{
+    RecursiveVisitor::visit( node );
+}
+
+void PropertyResolverVisitor::visit( RangeLiteral& node )
+{
     RecursiveVisitor::visit( node );
 }
 
@@ -352,16 +363,6 @@ void PropertyResolverVisitor::visit( BinaryExpression& node )
     const auto& annotation = libcasm_ir::Annotation::find( node.op() );
     node.setProperties(
         annotation.properties() * node.left()->properties() * node.right()->properties() );
-}
-
-void PropertyResolverVisitor::visit( RangeExpression& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( ListExpression& node )
-{
-    RecursiveVisitor::visit( node );
 }
 
 void PropertyResolverVisitor::visit( LetExpression& node )

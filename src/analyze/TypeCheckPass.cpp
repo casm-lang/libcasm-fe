@@ -368,12 +368,12 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
 
         if( name == TYPE_STRING_BINARY )
         {
-            if( expr.id() == Node::ID::VALUE_ATOM and expr.type()->isInteger() )
+            if( expr.id() == Node::ID::VALUE_LITERAL and expr.type()->isInteger() )
             {
-                const auto& atom = static_cast< const ValueAtom& >( expr );
+                const auto& literal = static_cast< const ValueLiteral& >( expr );
 
                 const auto value =
-                    std::static_pointer_cast< libcasm_ir::IntegerConstant >( atom.value() );
+                    std::static_pointer_cast< libcasm_ir::IntegerConstant >( literal.value() );
 
                 try
                 {
@@ -396,21 +396,21 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
         }
         else if( name == TYPE_STRING_INTEGER )
         {
-            if( expr.id() == Node::ID::RANGE_EXPRESSION )
+            if( expr.id() == Node::ID::RANGE_LITERAL )
             {
-                const auto& range_expr = static_cast< const RangeExpression& >( expr );
+                const auto& range_expr = static_cast< const RangeLiteral& >( expr );
 
                 const auto& lhs = *range_expr.left();
                 const auto& rhs = *range_expr.right();
 
-                if( lhs.id() == Node::ID::VALUE_ATOM and lhs.type()->isInteger() and
-                    rhs.id() == Node::ID::VALUE_ATOM and rhs.type()->isInteger() )
+                if( lhs.id() == Node::ID::VALUE_LITERAL and lhs.type()->isInteger() and
+                    rhs.id() == Node::ID::VALUE_LITERAL and rhs.type()->isInteger() )
                 {
                     const auto ir_lhs = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
-                        static_cast< const ValueAtom& >( lhs ).value() );
+                        static_cast< const ValueLiteral& >( lhs ).value() );
 
                     const auto ir_rhs = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
-                        static_cast< const ValueAtom& >( rhs ).value() );
+                        static_cast< const ValueLiteral& >( rhs ).value() );
 
                     auto range = libstdhl::Memory::make< libcasm_ir::Range >( ir_lhs, ir_rhs );
 

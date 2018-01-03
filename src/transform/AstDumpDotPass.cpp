@@ -114,17 +114,18 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( EnumerationDefinition& node ) override;
     void visit( UsingDefinition& node ) override;
 
-    void visit( TypeCastingExpression& node ) override;
-    void visit( ValueAtom& node ) override;
-    void visit( ReferenceAtom& node ) override;
-    void visit( UndefAtom& node ) override;
+    void visit( ValueLiteral& node ) override;
+    void visit( ReferenceLiteral& node ) override;
+    void visit( UndefLiteral& node ) override;
+    void visit( ListLiteral& node ) override;
+    void visit( RangeLiteral& node ) override;
+
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
-    void visit( RangeExpression& node ) override;
-    void visit( ListExpression& node ) override;
     void visit( LetExpression& node ) override;
     void visit( ConditionalExpression& node ) override;
     void visit( ChooseExpression& node ) override;
@@ -246,31 +247,38 @@ void AstDumpDotVisitor::visit( UsingDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( TypeCastingExpression& node )
+void AstDumpDotVisitor::visit( UndefLiteral& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "TypeCastingExpression" );
+    dumpNode( node, "UndefLiteral" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ValueAtom& node )
+void AstDumpDotVisitor::visit( ValueLiteral& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "ValueAtom: " + node.value()->name() );
+    dumpNode( node, "ValueLiteral: " + node.value()->name() );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ReferenceAtom& node )
+void AstDumpDotVisitor::visit( ReferenceLiteral& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "ReferenceAtom" );
+    dumpNode( node, "ReferenceLiteral" );
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( UndefAtom& node )
+void AstDumpDotVisitor::visit( ListLiteral& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "UndefAtom" );
+    dumpNode( node, "ListLiteral" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( RangeLiteral& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "RangeLiteral" );
     RecursiveVisitor::visit( node );
 }
 
@@ -295,6 +303,13 @@ void AstDumpDotVisitor::visit( IndirectCallExpression& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( TypeCastingExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "TypeCastingExpression" );
+    RecursiveVisitor::visit( node );
+}
+
 void AstDumpDotVisitor::visit( UnaryExpression& node )
 {
     DotLink link( this, &node );
@@ -306,20 +321,6 @@ void AstDumpDotVisitor::visit( BinaryExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "BinaryExpression\n" + libcasm_ir::Value::token( node.op() ) );
-    RecursiveVisitor::visit( node );
-}
-
-void AstDumpDotVisitor::visit( RangeExpression& node )
-{
-    DotLink link( this, &node );
-    dumpNode( node, "RangeExpression" );
-    RecursiveVisitor::visit( node );
-}
-
-void AstDumpDotVisitor::visit( ListExpression& node )
-{
-    DotLink link( this, &node );
-    dumpNode( node, "ListExpression" );
     RecursiveVisitor::visit( node );
 }
 

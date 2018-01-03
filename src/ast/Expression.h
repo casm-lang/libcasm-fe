@@ -65,12 +65,22 @@ namespace libcasm_fe
 
         using Expressions = NodeList< Expression >;
 
-        class ValueAtom final : public Expression
+        class UndefLiteral final : public Expression
         {
           public:
-            using Ptr = std::shared_ptr< ValueAtom >;
+            using Ptr = std::shared_ptr< UndefLiteral >;
 
-            explicit ValueAtom( const libcasm_ir::Constant::Ptr& value );
+            explicit UndefLiteral( void );
+
+            void accept( Visitor& visitor ) override final;
+        };
+
+        class ValueLiteral final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< ValueLiteral >;
+
+            explicit ValueLiteral( const libcasm_ir::Constant::Ptr& value );
 
             const libcasm_ir::Constant::Ptr& value( void ) const;
 
@@ -82,7 +92,7 @@ namespace libcasm_fe
             libcasm_ir::Constant::Ptr m_value;
         };
 
-        class ReferenceAtom final : public Expression
+        class ReferenceLiteral final : public Expression
         {
           public:
             enum class ReferenceType
@@ -94,9 +104,9 @@ namespace libcasm_fe
                 UNKNOWN
             };
 
-            using Ptr = std::shared_ptr< ReferenceAtom >;
+            using Ptr = std::shared_ptr< ReferenceLiteral >;
 
-            explicit ReferenceAtom( const IdentifierPath::Ptr& identifier );
+            explicit ReferenceLiteral( const IdentifierPath::Ptr& identifier );
 
             const IdentifierPath::Ptr& identifier( void ) const;
 
@@ -118,14 +128,36 @@ namespace libcasm_fe
             libcasm_ir::Value::ID m_builtinId;
         };
 
-        class UndefAtom final : public Expression
+        class ListLiteral final : public Expression
         {
           public:
-            using Ptr = std::shared_ptr< UndefAtom >;
+            using Ptr = std::shared_ptr< ListLiteral >;
 
-            explicit UndefAtom( void );
+            explicit ListLiteral( const Expressions::Ptr& expressions );
+
+            const Expressions::Ptr& expressions( void ) const;
 
             void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expressions::Ptr m_expressions;
+        };
+
+        class RangeLiteral final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< RangeLiteral >;
+
+            RangeLiteral( const Expression::Ptr& left, const Expression::Ptr& right );
+
+            const Expression::Ptr& left( void ) const;
+            const Expression::Ptr& right( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_left;
+            const Expression::Ptr m_right;
         };
 
         class CallExpression : public Expression
@@ -353,38 +385,6 @@ namespace libcasm_fe
             const libcasm_ir::Value::ID m_op;
             const Expression::Ptr m_left;
             const Expression::Ptr m_right;
-        };
-
-        class RangeExpression final : public Expression
-        {
-          public:
-            using Ptr = std::shared_ptr< RangeExpression >;
-
-            RangeExpression( const Expression::Ptr& left, const Expression::Ptr& right );
-
-            const Expression::Ptr& left( void ) const;
-            const Expression::Ptr& right( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Expression::Ptr m_left;
-            const Expression::Ptr m_right;
-        };
-
-        class ListExpression final : public Expression
-        {
-          public:
-            using Ptr = std::shared_ptr< ListExpression >;
-
-            explicit ListExpression( const Expressions::Ptr& expressions );
-
-            const Expressions::Ptr& expressions( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Expressions::Ptr m_expressions;
         };
 
         class LetExpression final : public Expression
