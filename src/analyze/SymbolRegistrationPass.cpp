@@ -83,6 +83,7 @@ class SymbolRegistrationVisitor final : public EmptyVisitor
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
     void visit( UsingDefinition& node ) override;
+    void visit( StructureDefinition& node ) override;
 
   private:
     void registerSymbol( Definition& node );
@@ -345,6 +346,45 @@ void SymbolRegistrationVisitor::registerSymbol( Definition& node )
         const auto& symbol = m_symboltable.findSymbol( name );
         m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
         m_log.info( { symbol->sourceLocation() }, e.what() );
+    }
+}
+
+void SymbolRegistrationVisitor::visit( StructureDefinition& node )
+{
+    const auto& name = node.identifier()->name();
+
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
+            Code::StructureDefinitionIdentifierIsBuiltinName );
+    }
+
+    try
+    {
+        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
+    }
+    catch( const std::domain_error& e )
+    {
+        const auto& symbol = m_symboltable.findSymbol( name );
+
+        m_log.error( { node.sourceLocation() }, e.what(), Code::StructureDefinitionAlreadyUsed );
+        m_log.info( { symbol->sourceLocation() }, e.what() );
+    }
+
+    // register structure definitions in a sub-namespace
+    const auto structureNamespace = std::make_shared< Namespace >();
+    SymbolRegistrationVisitor structureVisitor( m_log, *structureNamespace );
+    node.functions()->accept( structureVisitor );
+
+    try
+    {
+        m_symboltable.registerNamespace( name, structureNamespace );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.debug( { node.sourceLocation() }, e.what() );
     }
 }
 

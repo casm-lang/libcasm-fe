@@ -122,8 +122,13 @@ namespace libcasm_fe
         // invariant errors
         InvariantDefinitionInvalidExpression = 0x4e00,
         InvariantDefinitionInvariantViolated = 0x4e01,
-
         InvariantDefinitionExpressionInvalidProperty = 0x4e02,
+
+        // ---------------------------------------------------------
+        // structure errors
+
+        StructureDefinitionAlreadyUsed = 0x5500,
+        StructureDefinitionIdentifierIsBuiltinName = 0x5510,
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
