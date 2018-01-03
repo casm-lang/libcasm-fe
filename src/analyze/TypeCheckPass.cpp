@@ -75,6 +75,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
 
     void visit( InitDefinition& node ) override;
     void visit( UsingDefinition& node ) override;
+    void visit( StructureDefinition& node ) override;
 
     void visit( BasicType& node ) override;
     void visit( TupleType& node ) override;
@@ -104,6 +105,23 @@ void TypeCheckVisitor::visit( UsingDefinition& node )
 {
     RecursiveVisitor::visit( node );
     node.setType( node.type()->type() );  // TODO top-sort using definitions
+}
+
+void TypeCheckVisitor::visit( StructureDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& name = node.identifier()->name();
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    m_log.debug( "creating IR structure type '" + name + "'" );
+    const auto structure = std::make_shared< libcasm_ir::Structure >( name );
+    const auto type = std::make_shared< libcasm_ir::StructureType >( structure );
+    node.setType( type );
 }
 
 void TypeCheckVisitor::visit( BasicType& node )
@@ -144,8 +162,9 @@ void TypeCheckVisitor::visit( BasicType& node )
 
         switch( symbol->id() )
         {
-            case Node::ID::USING_DEFINITION:  // [[fallthrough]]
-            case Node::ID::ENUMERATION_DEFINITION:
+            case Node::ID::USING_DEFINITION:        // [[fallthrough]]
+            case Node::ID::ENUMERATION_DEFINITION:  // [[fallthrough]]
+            case Node::ID::STRUCTURE_DEFINITION:
             {
                 break;
             }
