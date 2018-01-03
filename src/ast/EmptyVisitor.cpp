@@ -156,6 +156,10 @@ void EmptyVisitor::visit( EmbracedExpression& )
 {
 }
 
+void EmptyVisitor::visit( StructureLiteral& )
+{
+}
+
 void EmptyVisitor::visit( NamedExpression& )
 {
 }
@@ -185,10 +189,6 @@ void EmptyVisitor::visit( UnaryExpression& )
 }
 
 void EmptyVisitor::visit( BinaryExpression& )
-{
-}
-
-void EmptyVisitor::visit( StructureLiteral& )
 {
 }
 
