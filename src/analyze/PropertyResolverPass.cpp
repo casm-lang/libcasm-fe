@@ -235,6 +235,12 @@ void PropertyResolverVisitor::visit( MethodCallExpression& node )
         const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
         callProperties = annotation.properties();
     }
+    else if( node.methodType() == MethodCallExpression::MethodType::FUNCTION )
+    {
+        const auto& definition = node.targetDefinition();
+        assert( definition.get() != nullptr );
+        node.setProperties( definition->properties() );
+    }
     else
     {
         m_log.error(
