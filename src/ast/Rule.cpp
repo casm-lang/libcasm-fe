@@ -621,7 +621,15 @@ UpdateRule::UpdateRule(
 {
 }
 
-const DirectCallExpression::Ptr& UpdateRule::function( void ) const
+UpdateRule::UpdateRule(
+    const MethodCallExpression::Ptr& function, const Expression::Ptr& expression )
+: Rule( Node::ID::UPDATE_RULE )
+, m_function( function )
+, m_expression( expression )
+{
+}
+
+const CallExpression::Ptr& UpdateRule::function( void ) const
 {
     return m_function;
 }
