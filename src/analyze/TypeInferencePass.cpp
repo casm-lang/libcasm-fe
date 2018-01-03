@@ -729,6 +729,54 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         return;
     }
 
+    const auto& methodType = node.object()->type()->result().description();
+
+    std::vector< std::string > identifierPath;
+    identifierPath.reserve( 2 );
+    identifierPath.emplace_back( methodType );
+    identifierPath.emplace_back( methodName );
+
+    try
+    {
+        const auto& symbol = m_symboltable.find( identifierPath );
+
+        switch( symbol->id() )
+        {
+            case Node::ID::FUNCTION_DEFINITION:
+            {
+                node.setMethodType( MethodCallExpression::MethodType::FUNCTION );
+                break;
+            }
+            default:
+            {
+                throw std::domain_error( "invalid symbol '" + symbol->description() + "'" );
+                break;
+            }
+        }
+
+        node.setTargetDefinition( symbol );
+
+        // make sure that the definition has been typed
+        const auto& definition = node.targetDefinition();
+        assert( definition );
+        definition->accept( *this );
+
+        const auto& arguments = *node.arguments();
+        const auto& argumentTypes = definition->type()->arguments();
+        for( std::size_t i = 0; i < arguments.size(); i++ )
+        {
+            m_typeIDs[ arguments.at( i ).get() ].emplace( argumentTypes.at( i )->id() );
+        }
+
+        node.setType( definition->type() );
+    }
+    catch( const std::domain_error& e )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "type '" + methodType + "' does not have a symbol '" + methodName + "'" );
+    }
+
     std::vector< Expression::Ptr > methodCallArguments;
     methodCallArguments.reserve( 1 + node.arguments()->size() );
     methodCallArguments.emplace_back( node.object() );  // pass object instance as first argument
@@ -736,16 +784,24 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         methodCallArguments.end(), node.arguments()->begin(), node.arguments()->end() );
 
     const auto* annotation = annotate( node, methodCallArguments );
-    if( not annotation )
+    if( annotation )
+    {
+        // if annotation is found it is a built-in method call
+        node.setMethodType( MethodCallExpression::MethodType::BUILTIN );
+        node.setTargetBuiltinId( annotation->valueID() );
+    }
+
+    RecursiveVisitor::visit( node );
+
+    if( node.type() )
     {
         return;
     }
 
-    // for the time being only builtin method calls are supported
-    node.setMethodType( MethodCallExpression::MethodType::BUILTIN );
-    node.setTargetBuiltinId( annotation->valueID() );
-
-    RecursiveVisitor::visit( node );
+    if( not annotation )
+    {
+        return;
+    }
 
     const auto description = "built-in method '" + methodName + "'";
     inference( description, annotation, node, methodCallArguments );
@@ -1658,12 +1714,12 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
 
 void TypeInferenceVisitor::visit( UpdateRule& node )
 {
-    auto& func = *node.function();
-    auto& expr = *node.expression();
+    const auto& func = node.function();
+    const auto& expr = node.expression();
 
-    func.accept( *this );
+    func->accept( *this );
 
-    if( func.type() )
+    if( func->type() )
     {
         m_typeIDs[&expr ].emplace( func.type()->id() );
     }
@@ -2208,6 +2264,8 @@ class CallTargetCheckVisitor final : public RecursiveVisitor
   public:
     CallTargetCheckVisitor( libcasm_fe::Logger& log );
 
+    void visit( UpdateRule& node ) override;
+
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
 
@@ -2218,6 +2276,38 @@ class CallTargetCheckVisitor final : public RecursiveVisitor
 CallTargetCheckVisitor::CallTargetCheckVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 {
+}
+
+void CallTargetCheckVisitor::visit( UpdateRule& node )
+{
+    const auto& func = node.function();
+
+    if( func->id() == Node::ID::DIRECT_CALL_EXPRESSION )
+    {
+        const auto& funcDirectCall = std::static_pointer_cast< DirectCallExpression >( func );
+        const auto& funcName = funcDirectCall->identifier()->path();
+        if( funcDirectCall->targetType() == CallExpression::TargetType::BUILTIN )
+        {
+            m_log.error(
+                { func->sourceLocation() },
+                "performing update rule on built-in '" + funcName + "' is not allowed",
+                Code::TypeInferenceUpdateRuleFunctionIsBuiltin );
+            return;
+        }
+    }
+    else if( func->id() == Node::ID::METHOD_CALL_EXPRESSION )
+    {
+        const auto& funcMethodCall = std::static_pointer_cast< MethodCallExpression >( func );
+        const auto funcName = funcMethodCall->methodName()->name();
+        if( funcMethodCall->methodType() == MethodCallExpression::MethodType::BUILTIN )
+        {
+            m_log.error(
+                { func->sourceLocation() },
+                "performing update rule on built-in '" + funcName + "' is not allowed",
+                Code::TypeInferenceUpdateRuleFunctionIsBuiltin );
+            return;
+        }
+    }
 }
 
 void CallTargetCheckVisitor::visit( DirectCallExpression& node )
@@ -2256,6 +2346,10 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
 
     TypeInferenceVisitor typeInferenceVisitor( log, *specification->symboltable() );
     specification->definitions()->accept( typeInferenceVisitor );
+
+#ifndef NDEBUG
+    log.debug( "symbol table = \n" + specification->symboltable()->dump() );
+#endif
 
 #ifndef NDEBUG
     log.debug( "symbol table = \n" + specification->symboltable()->dump() );
