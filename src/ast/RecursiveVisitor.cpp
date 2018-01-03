@@ -311,6 +311,12 @@ void RecursiveVisitor::visit( EmbracedExpression& node )
     node.rightBraceToken()->accept( *this );
 }
 
+void RecursiveVisitor::visit( StructureLiteral& node )
+{
+    node.identifier()->accept( *this );
+    node.expression()->accept( *this );
+}
+
 void RecursiveVisitor::visit( NamedExpression& node )
 {
     node.delimiterToken()->accept( *this );

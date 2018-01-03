@@ -134,7 +134,6 @@ END       0 "end of file"
 %type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
 %type <VariableDefinitions::Ptr> TypedVariables
 %type <FunctionDefinition::Ptr> FunctionDefinition
-%type <FunctionDefinitions::Ptr> FunctionDefinitions
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
 %type <EnumeratorDefinition::Ptr> EnumeratorDefinition
@@ -164,6 +163,7 @@ END       0 "end of file"
 %type <RangeLiteral::Ptr> RangeLiteral
 %type <TupleLiteral::Ptr> TupleLiteral
 %type <RecordLiteral::Ptr> RecordLiteral
+%type <StructureLiteral::Ptr> StructureLiteral
 
 // expressions
 %type <Expression::Ptr> Term SimpleOrClaspedTerm OperatorExpression
@@ -389,10 +389,51 @@ InitDefinition
 : INIT IdentifierPath
   {
       $$ = Ast::make< InitDefinition >( @$, $1, $2 );
+
+      const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
+      auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
+          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
+      singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
+
+      auto programFunction = createProgramFunction( @$ );
+      auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      programArguments->add( singleAgent );
+
+      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, uToken, $2 );
+      const auto initializers = Ast::make< Initializers >( @$ );
+      const auto initializer = Ast::make< Initializer >(
+          @$, uToken, programArguments, uToken, uToken, ruleReference );
+      initializers->add( initializer );
+
+      // apply the name of the program declaration to the initializer functions
+      for( auto& initializer : *initializers )
+      {
+          // TODO: FIXME: @ppaulweber: ENABLE THIS AFTER REBASE
+          // initializer->updateRule()->function()->setIdentifier(
+          //     asIdentifierPath( programFunction->identifier() ) );
+      }
+
+      programFunction->setInitializers( initializers );
+      $$->setProgramFunction( programFunction );
   }
 | INIT LCURPAREN Initializers RCURPAREN
   {
       $$ = Ast::make< InitDefinition >( @$, $1, $2, $3, $4 );
+
+      auto programFunction = createProgramFunction( @$ );
+
+      // apply the name of the program declaration to the initializer functions
+      auto initializers = $3;
+      for( auto& initializer : *initializers )
+      {
+          // TODO: FIXME: @ppaulweber: ENABLE THIS AFTER REBASE
+          // initializer->updateRule()->function()->setIdentifier(
+          //     asIdentifierPath( programFunction->identifier() ) );
+      }
+
+      programFunction->setInitializers( initializers );
+      $$->setProgramFunction( programFunction );
   }
 ;
 
@@ -460,22 +501,6 @@ RuleDefinition
 ;
 
 
-FunctionDefinitions
-: FunctionDefinitions FunctionDefinition
-  {
-      auto functions = $1;
-      functions->add( $2 );
-      $$ = functions;
-  }
-| FunctionDefinition
-  {
-      auto functions = Ast::make< FunctionDefinitions >( @$ );
-      functions->add( $1 );
-      $$ = functions;
-  }
-;
-
-
 FunctionDefinition
 : FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
@@ -485,7 +510,8 @@ FunctionDefinition
       const auto initially = $$->initially();
       for( auto& initializer : *initially->initializers() )
       {
-          initializer->setFunction( $$ );
+          // TODO: FIXME: @ppaulweber: ENABLE THIS AFTER REBASE
+          // initializer->updateRule()->function()->setIdentifier( IdentifierPath::fromIdentifier( $2 ) );
       }
   }
 ;
@@ -983,6 +1009,12 @@ UpdateRule
   {
       $$ = Ast::make< UpdateRule >( @$, $1, $2, $3 );
   }
+| MethodCallExpression UPDATE Term
+  {
+      const auto function = $1;
+      function->setMethodType( MethodCallExpression::MethodType::FUNCTION );
+      $$ = Ast::make< UpdateRule >( @$, function, $3 );
+  }
 ;
 
 
@@ -1327,7 +1359,6 @@ CardinalityExpression
   }
 ;
 
-
 //
 //
 // Literals
@@ -1379,6 +1410,10 @@ Literal
       $$ = $1;
   }
 | RecordLiteral
+  {
+      $$ = $1;
+  }
+| StructureLiteral
   {
       $$ = $1;
   }
@@ -1492,6 +1527,7 @@ RangeLiteral
   }
 ;
 
+
 TupleLiteral
 : LPAREN Terms COMMA Term RPAREN
   {
@@ -1503,6 +1539,7 @@ TupleLiteral
       $$->setRightBracket( $5 );
   }
 
+
 RecordLiteral
 : LPAREN Assignments RPAREN
   {
@@ -1511,6 +1548,27 @@ RecordLiteral
       $$->setRightBracket( $3 );
   }
 ;
+
+//
+//
+// Structure Literal
+//
+
+StructureLiteral
+: Identifier TupleLiteral
+  {
+      $$ = Ast::make< StructureLiteral >( @$, $1, $2 );
+  }
+| Identifier RecordLiteral
+  {
+      $$ = Ast::make< StructureLiteral >( @$, $1, $2 );
+  }
+;
+
+//
+//
+// Assignments
+//
 
 Assignments
 : Assignments COMMA Assignment

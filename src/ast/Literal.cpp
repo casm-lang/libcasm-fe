@@ -50,7 +50,6 @@
 #include <libcasm-fe/ast/Token>
 
 #include "Definition.h"
-#include "Type.h"
 
 #include <libstdhl/File>
 #include <libstdhl/String>
@@ -323,6 +322,34 @@ const NamedExpressions::Ptr& RecordLiteral::namedExpressions( void ) const
 }
 
 void RecordLiteral::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
+// StructureLiteral
+//
+
+StructureLiteral::StructureLiteral(
+    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
+: Literal( Node::ID::STRUCTURE_LITERAL )
+, m_identifier( identifier )
+, m_expression( expression )
+{
+}
+
+const Identifier::Ptr& StructureLiteral::identifier( void ) const
+{
+    return m_identifier;
+}
+
+const Expression::Ptr& StructureLiteral::expression( void ) const
+{
+    return m_expression;
+}
+
+void StructureLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

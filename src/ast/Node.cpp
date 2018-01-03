@@ -172,6 +172,10 @@ std::string Node::description( void ) const
         {
             return "record";
         }
+        case ID::STRUCTURE_LITERAL:
+        {
+            return "structure literal";
+        }
         case ID::EMBRACED_EXPRESSION:
         {
             return "embraced expression";

@@ -131,7 +131,6 @@ GREATEREQ       ">="
 SEQ_BRACKET     "{|"
 ENDSEQ_BRACKET  "|}"
 
-
 //  
 //  Local variables:
 //  mode: c++

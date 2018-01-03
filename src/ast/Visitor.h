@@ -76,6 +76,7 @@ namespace libcasm_fe
         class RangeLiteral;
         class TupleLiteral;
         class RecordLiteral;
+        class StructureLiteral;
 
         class EmbracedExpression;
         class NamedExpression;
@@ -162,6 +163,7 @@ namespace libcasm_fe
             virtual void visit( RangeLiteral& node ) = 0;
             virtual void visit( TupleLiteral& node ) = 0;
             virtual void visit( RecordLiteral& node ) = 0;
+            virtual void visit( StructureLiteral& node ) = 0;
 
             virtual void visit( EmbracedExpression& node ) = 0;
             virtual void visit( NamedExpression& node ) = 0;

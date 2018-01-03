@@ -188,6 +188,10 @@ void EmptyVisitor::visit( BinaryExpression& )
 {
 }
 
+void EmptyVisitor::visit( StructureLiteral& )
+{
+}
+
 void EmptyVisitor::visit( LetExpression& )
 {
 }

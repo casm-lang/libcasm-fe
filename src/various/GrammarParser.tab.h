@@ -707,37 +707,40 @@ namespace libcasm_fe {
       // StructureDefinition
       char dummy67[sizeof (StructureDefinition::Ptr)];
 
+      // StructureLiteral
+      char dummy68[sizeof (StructureLiteral::Ptr)];
+
       // TemplateType
-      char dummy68[sizeof (TemplateType::Ptr)];
+      char dummy69[sizeof (TemplateType::Ptr)];
 
       // TupleLiteral
-      char dummy69[sizeof (TupleLiteral::Ptr)];
+      char dummy70[sizeof (TupleLiteral::Ptr)];
 
       // TupleType
-      char dummy70[sizeof (TupleType::Ptr)];
+      char dummy71[sizeof (TupleType::Ptr)];
 
       // TypeCastingExpression
-      char dummy71[sizeof (TypeCastingExpression::Ptr)];
+      char dummy72[sizeof (TypeCastingExpression::Ptr)];
 
       // Types
       // FunctionParameters
       // MaybeFunctionParameters
-      char dummy72[sizeof (Types::Ptr)];
+      char dummy73[sizeof (Types::Ptr)];
 
       // UndefinedLiteral
-      char dummy73[sizeof (UndefLiteral::Ptr)];
+      char dummy74[sizeof (UndefLiteral::Ptr)];
 
       // UniversalQuantifierExpression
-      char dummy74[sizeof (UniversalQuantifierExpression::Ptr)];
+      char dummy75[sizeof (UniversalQuantifierExpression::Ptr)];
 
       // UpdateRule
-      char dummy75[sizeof (UpdateRule::Ptr)];
+      char dummy76[sizeof (UpdateRule::Ptr)];
 
       // UsingDefinition
-      char dummy76[sizeof (UsingDefinition::Ptr)];
+      char dummy77[sizeof (UsingDefinition::Ptr)];
 
       // UsingPathDefinition
-      char dummy77[sizeof (UsingPathDefinition::Ptr)];
+      char dummy78[sizeof (UsingPathDefinition::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -751,30 +754,30 @@ namespace libcasm_fe {
       // DecimalLiteral
       // BinaryLiteral
       // StringLiteral
-      char dummy78[sizeof (ValueLiteral::Ptr)];
+      char dummy79[sizeof (ValueLiteral::Ptr)];
 
       // VariableBinding
-      char dummy79[sizeof (VariableBinding::Ptr)];
+      char dummy80[sizeof (VariableBinding::Ptr)];
 
       // VariableBindings
-      char dummy80[sizeof (VariableBindings::Ptr)];
+      char dummy81[sizeof (VariableBindings::Ptr)];
 
       // Variable
       // TypedVariable
       // AttributedVariable
       // TypedAttributedVariable
-      char dummy81[sizeof (VariableDefinition::Ptr)];
+      char dummy82[sizeof (VariableDefinition::Ptr)];
 
       // Parameters
       // AttributedVariables
       // TypedVariables
-      char dummy82[sizeof (VariableDefinitions::Ptr)];
+      char dummy83[sizeof (VariableDefinitions::Ptr)];
 
       // WhileRule
-      char dummy83[sizeof (WhileRule::Ptr)];
+      char dummy84[sizeof (WhileRule::Ptr)];
 
       // Type
-      char dummy84[sizeof (libcasm_fe::Ast::Type::Ptr)];
+      char dummy85[sizeof (libcasm_fe::Ast::Type::Ptr)];
     };
 
     /// The size of the largest semantic type.
@@ -1100,40 +1103,41 @@ namespace libcasm_fe {
         S_RangeLiteral = 163,                    // RangeLiteral
         S_TupleLiteral = 164,                    // TupleLiteral
         S_RecordLiteral = 165,                   // RecordLiteral
-        S_Assignments = 166,                     // Assignments
-        S_Assignment = 167,                      // Assignment
-        S_Types = 168,                           // Types
-        S_Type = 169,                            // Type
-        S_BasicType = 170,                       // BasicType
-        S_TupleType = 171,                       // TupleType
-        S_RecordType = 172,                      // RecordType
-        S_TemplateType = 173,                    // TemplateType
-        S_RelationType = 174,                    // RelationType
-        S_FixedSizedType = 175,                  // FixedSizedType
-        S_FunctionParameters = 176,              // FunctionParameters
-        S_MaybeFunctionParameters = 177,         // MaybeFunctionParameters
-        S_Parameters = 178,                      // Parameters
-        S_MaybeDefined = 179,                    // MaybeDefined
-        S_MaybeInitially = 180,                  // MaybeInitially
-        S_Initializers = 181,                    // Initializers
-        S_Initializer = 182,                     // Initializer
-        S_Identifier = 183,                      // Identifier
-        S_IdentifierPath = 184,                  // IdentifierPath
-        S_Variable = 185,                        // Variable
-        S_AttributedVariables = 186,             // AttributedVariables
-        S_TypedVariables = 187,                  // TypedVariables
-        S_TypedVariable = 188,                   // TypedVariable
-        S_AttributedVariable = 189,              // AttributedVariable
-        S_TypedAttributedVariable = 190,         // TypedAttributedVariable
-        S_VariableBindings = 191,                // VariableBindings
-        S_VariableBinding = 192,                 // VariableBinding
-        S_LocalFunctionDefinitions = 193,        // LocalFunctionDefinitions
-        S_AttributedLocalFunctionDefinition = 194, // AttributedLocalFunctionDefinition
-        S_LocalFunctionDefinition = 195,         // LocalFunctionDefinition
-        S_Attributes = 196,                      // Attributes
-        S_Attribute = 197,                       // Attribute
-        S_BasicAttribute = 198,                  // BasicAttribute
-        S_ExpressionAttribute = 199              // ExpressionAttribute
+        S_StructureLiteral = 166,                // StructureLiteral
+        S_Assignments = 167,                     // Assignments
+        S_Assignment = 168,                      // Assignment
+        S_Types = 169,                           // Types
+        S_Type = 170,                            // Type
+        S_BasicType = 171,                       // BasicType
+        S_TupleType = 172,                       // TupleType
+        S_RecordType = 173,                      // RecordType
+        S_TemplateType = 174,                    // TemplateType
+        S_RelationType = 175,                    // RelationType
+        S_FixedSizedType = 176,                  // FixedSizedType
+        S_FunctionParameters = 177,              // FunctionParameters
+        S_MaybeFunctionParameters = 178,         // MaybeFunctionParameters
+        S_Parameters = 179,                      // Parameters
+        S_MaybeDefined = 180,                    // MaybeDefined
+        S_MaybeInitially = 181,                  // MaybeInitially
+        S_Initializers = 182,                    // Initializers
+        S_Initializer = 183,                     // Initializer
+        S_Identifier = 184,                      // Identifier
+        S_IdentifierPath = 185,                  // IdentifierPath
+        S_Variable = 186,                        // Variable
+        S_AttributedVariables = 187,             // AttributedVariables
+        S_TypedVariables = 188,                  // TypedVariables
+        S_TypedVariable = 189,                   // TypedVariable
+        S_AttributedVariable = 190,              // AttributedVariable
+        S_TypedAttributedVariable = 191,         // TypedAttributedVariable
+        S_VariableBindings = 192,                // VariableBindings
+        S_VariableBinding = 193,                 // VariableBinding
+        S_LocalFunctionDefinitions = 194,        // LocalFunctionDefinitions
+        S_AttributedLocalFunctionDefinition = 195, // AttributedLocalFunctionDefinition
+        S_LocalFunctionDefinition = 196,         // LocalFunctionDefinition
+        S_Attributes = 197,                      // Attributes
+        S_Attribute = 198,                       // Attribute
+        S_BasicAttribute = 199,                  // BasicAttribute
+        S_ExpressionAttribute = 200              // ExpressionAttribute
       };
     };
 
@@ -1525,6 +1529,10 @@ namespace libcasm_fe {
 
       case symbol_kind::S_StructureDefinition: // StructureDefinition
         value.move< StructureDefinition::Ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_StructureLiteral: // StructureLiteral
+        value.move< StructureLiteral::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -2575,6 +2583,20 @@ namespace libcasm_fe {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, StructureLiteral::Ptr&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const StructureLiteral::Ptr& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, TemplateType::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
@@ -3189,6 +3211,10 @@ switch (yykind)
 
       case symbol_kind::S_StructureDefinition: // StructureDefinition
         value.template destroy< StructureDefinition::Ptr > ();
+        break;
+
+      case symbol_kind::S_StructureLiteral: // StructureLiteral
+        value.template destroy< StructureLiteral::Ptr > ();
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -5178,8 +5204,8 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 2754,     ///< Last index in yytable_.
-      yynnts_ = 107,  ///< Number of nonterminal symbols.
+      yylast_ = 2866,     ///< Last index in yytable_.
+      yynnts_ = 108,  ///< Number of nonterminal symbols.
       yyfinal_ = 13 ///< Termination state number.
     };
 
@@ -5612,6 +5638,10 @@ switch (yykind)
 
       case symbol_kind::S_StructureDefinition: // StructureDefinition
         value.copy< StructureDefinition::Ptr > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_StructureLiteral: // StructureLiteral
+        value.copy< StructureLiteral::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_TemplateType: // TemplateType
@@ -6086,6 +6116,10 @@ switch (yykind)
         value.move< StructureDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
+      case symbol_kind::S_StructureLiteral: // StructureLiteral
+        value.move< StructureLiteral::Ptr > (YY_MOVE (s.value));
+        break;
+
       case symbol_kind::S_TemplateType: // TemplateType
         value.move< TemplateType::Ptr > (YY_MOVE (s.value));
         break;
@@ -6235,7 +6269,7 @@ switch (yykind)
 
 #line 51 "../../obj/src/GrammarParser.y"
 } // libcasm_fe
-#line 6239 "GrammarParser.tab.h"
+#line 6273 "GrammarParser.tab.h"
 
 
 

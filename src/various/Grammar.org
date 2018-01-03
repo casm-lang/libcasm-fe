@@ -426,6 +426,7 @@ SequenceRule ::= "{|" Rules "|}"
 
 #+begin_src
 UpdateRule ::= DirectCallExpression ":=" Term
+             | MethodCallExpression ":=" Term
 #+end_src
 
 #+html: {{page>.:grammar:UpdateRule&noheader&nofooter}}
@@ -646,6 +647,7 @@ Literal ::= UndefinedLiteral
           | RangeLiteral
           | TupleLiteral
           | RecordLiteral
+          | StructureLiteral
 #+end_src
 
 #+html: {{page>.:grammar:Literal&noheader&nofooter}}
@@ -760,6 +762,16 @@ RecordLiteral ::= "(" Assignments ")"
 #+end_src
 
 #+html: {{page>.:grammar:RecordLiteral&noheader&nofooter}}
+
+
+** StructureLiteral
+
+#+begin_src
+StructureLiteral ::= Identifier TupleLiteral
+                   | Identifier RecordLiteral
+#+end_src
+
+#+html: {{page>.:grammar:StructureLiteral&noheader&nofooter}}
 
 
 ** Assignments

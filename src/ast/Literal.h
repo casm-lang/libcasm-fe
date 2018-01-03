@@ -219,6 +219,24 @@ namespace libcasm_fe
           private:
             const NamedExpressions::Ptr m_namedExpressions;
         };
+
+        class StructureLiteral final : public Literal
+        {
+          public:
+            using Ptr = std::shared_ptr< StructureLiteral >;
+
+            StructureLiteral( const Identifier::Ptr& identifier, const Expression::Ptr& expression );
+
+            const Identifier::Ptr& identifier( void ) const;
+
+            const Expression::Ptr& expression( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Identifier::Ptr m_identifier;
+            const Expression::Ptr m_expression;
+        };
     }
 }
 

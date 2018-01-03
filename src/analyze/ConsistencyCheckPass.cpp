@@ -393,20 +393,24 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
 
     node.expression()->accept( *this );
 
-    const auto& func = node.function();
-    if( func->targetType() != DirectCallExpression::TargetType::FUNCTION )
+    const auto& function = node.function();
+    assert( function->id() == Node::ID::DIRECT_CALL_EXPRESSION );
+    const auto& directCallfunction = std::static_pointer_cast< DirectCallExpression >( function );
+
+    if( directCallfunction->targetType() != DirectCallExpression::TargetType::FUNCTION )
     {
         m_log.error(
-            { func->sourceLocation() },
-            "updating " + func->targetTypeName() + " '" + func->identifier()->path() +
+            { directCallfunction->sourceLocation() },
+            "updating " + directCallfunction->targetTypeName() + " '" +
+                directCallfunction->identifier()->path() +
                 "' is not allowed, only function symbols are allowed",
             Code::UpdateRuleFunctionSymbolIsInvalid );
         return;
     }
 
-    func->arguments()->accept( *this );
+    directCallfunction->arguments()->accept( *this );
 
-    const auto& def = func->targetDefinition()->ptr< FunctionDefinition >();
+    const auto& def = directCallfunction->targetDefinition()->ptr< FunctionDefinition >();
 
     bool updatesAllowed;
     switch( def->classification() )
@@ -426,16 +430,16 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     if( not updatesAllowed )
     {
         m_log.error(
-            { func->sourceLocation() },
-            "updating function '" + func->identifier()->path() +
+            { directCallfunction->sourceLocation() },
+            "updating function '" + directCallfunction->identifier()->path() +
                 "' is not allowed, it is classified as '" + def->classificationName() + "' ",
             Code::UpdateRuleInvalidClassifier );
 
         m_log.info(
             { def->sourceLocation() },
-            "function '" + func->identifier()->path() + "' is classified as '" +
+            "function '" + directCallfunction->identifier()->path() + "' is classified as '" +
                 def->classificationName() + "', incorrect usage in line " +
-                std::to_string( func->sourceLocation().begin.line ) );
+                std::to_string( directCallfunction->sourceLocation().begin.line ) );
     }
 }
 
