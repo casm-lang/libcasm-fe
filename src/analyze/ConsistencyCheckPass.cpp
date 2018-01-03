@@ -393,27 +393,49 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
 
     node.expression()->accept( *this );
 
+    FunctionDefinition::Ptr functionDefinition = nullptr;
+    std::string functionName = "";
     const auto& function = node.function();
     assert( function->id() == Node::ID::DIRECT_CALL_EXPRESSION );
     const auto& directCallfunction = std::static_pointer_cast< DirectCallExpression >( function );
 
     if( directCallfunction->targetType() != DirectCallExpression::TargetType::FUNCTION )
     {
-        m_log.error(
-            { directCallfunction->sourceLocation() },
-            "updating " + directCallfunction->targetTypeName() + " '" +
-                directCallfunction->identifier()->path() +
-                "' is not allowed, only function symbols are allowed",
-            Code::UpdateRuleFunctionSymbolIsInvalid );
-        return;
+        const auto& funcDirectCall = std::static_pointer_cast< DirectCallExpression >( function );
+        functionDefinition = funcDirectCall->targetDefinition()->ptr< FunctionDefinition >();
+        functionName = funcDirectCall->identifier()->path();
+        if( funcDirectCall->targetType() != DirectCallExpression::TargetType::FUNCTION )
+        {
+            m_log.error(
+                { funcDirectCall->sourceLocation() },
+                "updating " + funcDirectCall->targetTypeName() + " '" + functionName +
+                    "' is not allowed, only function symbols are allowed",
+                Code::UpdateRuleFunctionSymbolIsInvalid );
+            return;
+        }
+    }
+    else
+    {
+        assert( function->id() == Node::ID::METHOD_CALL_EXPRESSION );
+        const auto& funcMethodCall = std::static_pointer_cast< MethodCallExpression >( function );
+        functionDefinition = funcMethodCall->targetDefinition()->ptr< FunctionDefinition >();
+        functionName =
+            funcMethodCall->type()->description() + "::" + funcMethodCall->methodName()->name();
+        if( funcMethodCall->methodType() != MethodCallExpression::MethodType::FUNCTION )
+        {
+            m_log.error(
+                { funcMethodCall->sourceLocation() },
+                "updating " + funcMethodCall->methodTypeName() + " '" + functionName +
+                    "' is not allowed, only function symbols are allowed",
+                Code::UpdateRuleFunctionSymbolIsInvalid );
+            return;
+        }
     }
 
-    directCallfunction->arguments()->accept( *this );
-
-    const auto& def = directCallfunction->targetDefinition()->ptr< FunctionDefinition >();
+    function->arguments()->accept( *this );
 
     bool updatesAllowed;
-    switch( def->classification() )
+    switch( functionDefinition->classification() )
     {
         case FunctionDefinition::Classification::IN:  // [fallthrough]
         case FunctionDefinition::Classification::STATIC:
@@ -430,16 +452,16 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     if( not updatesAllowed )
     {
         m_log.error(
-            { directCallfunction->sourceLocation() },
-            "updating function '" + directCallfunction->identifier()->path() +
-                "' is not allowed, it is classified as '" + def->classificationName() + "' ",
+            { function->sourceLocation() },
+            "updating function '" + functionName + "' is not allowed, it is classified as '" +
+                functionDefinition->classificationName() + "' ",
             Code::UpdateRuleInvalidClassifier );
 
         m_log.info(
-            { def->sourceLocation() },
-            "function '" + directCallfunction->identifier()->path() + "' is classified as '" +
-                def->classificationName() + "', incorrect usage in line " +
-                std::to_string( directCallfunction->sourceLocation().begin.line ) );
+            { functionDefinition->sourceLocation() },
+            "function '" + functionName + "' is classified as '" +
+                functionDefinition->classificationName() + "', incorrect usage in line " +
+                std::to_string( function->sourceLocation().begin.line ) );
     }
 }
 

@@ -731,14 +731,14 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
 
     const auto& methodType = node.object()->type()->result().description();
 
-    std::vector< std::string > identifierPath;
-    identifierPath.reserve( 2 );
-    identifierPath.emplace_back( methodType );
-    identifierPath.emplace_back( methodName );
+    const auto identifierMethodType = std::make_shared< Identifier >( methodType );
+    const auto identifierMethodName = std::make_shared< Identifier >( methodName );
+    auto identifierPath = IdentifierPath( identifierMethodType );
+    identifierPath.addIdentifier( identifierMethodName );
 
     try
     {
-        const auto& symbol = m_symboltable.find( identifierPath );
+        const auto& symbol = m_symboltable.findSymbol( identifierPath );
 
         switch( symbol->id() )
         {
@@ -1721,14 +1721,14 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
 
     if( func->type() )
     {
-        m_typeIDs[&expr ].emplace( func.type()->id() );
+        m_typeIDs[ expr.get() ].emplace( func->type()->id() );
     }
 
     node.expression()->accept( *this );
 
     assignment(
-        func,
-        expr,
+        *func,
+        *expr,
         "updated function",
         "updating expression",
         Code::TypeInferenceUpdateRuleTypesMismatch );
@@ -2286,7 +2286,7 @@ void CallTargetCheckVisitor::visit( UpdateRule& node )
     {
         const auto& funcDirectCall = std::static_pointer_cast< DirectCallExpression >( func );
         const auto& funcName = funcDirectCall->identifier()->path();
-        if( funcDirectCall->targetType() == CallExpression::TargetType::BUILTIN )
+        if( funcDirectCall->targetType() == DirectCallExpression::TargetType::BUILTIN )
         {
             m_log.error(
                 { func->sourceLocation() },
