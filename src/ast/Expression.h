@@ -65,6 +65,27 @@ namespace libcasm_fe
 
         using Expressions = NodeList< Expression >;
 
+        class NamedExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< NamedExpression >;
+
+            explicit NamedExpression(
+                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
+
+            const Identifier::Ptr& identifier( void ) const;
+
+            const Expression::Ptr& expression( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Identifier::Ptr m_identifier;
+            const Expression::Ptr m_expression;
+        };
+
+        using NamedExpressions = NodeList< NamedExpression >;
+
         class UndefLiteral final : public Expression
         {
           public:
@@ -158,6 +179,36 @@ namespace libcasm_fe
           private:
             const Expression::Ptr m_left;
             const Expression::Ptr m_right;
+        };
+
+        class TupleLiteral final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< TupleLiteral >;
+
+            TupleLiteral( const Expressions::Ptr& expressions );
+
+            const Expressions::Ptr& expressions( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expressions::Ptr m_expressions;
+        };
+
+        class NamedTupleLiteral final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< NamedTupleLiteral >;
+
+            NamedTupleLiteral( const NamedExpressions::Ptr& namedExpressions );
+
+            const NamedExpressions::Ptr& namedExpressions( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const NamedExpressions::Ptr m_namedExpressions;
         };
 
         class CallExpression : public Expression

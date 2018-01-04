@@ -54,6 +54,34 @@ Expression::Expression( Node::ID id )
 {
 }
 
+//
+//
+// NamedExpression
+//
+
+NamedExpression::NamedExpression(
+    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
+: Expression( Node::ID::NAMED_EXPRESSION )
+, m_identifier( identifier )
+, m_expression( expression )
+{
+}
+
+const Identifier::Ptr& NamedExpression::identifier( void ) const
+{
+    return m_identifier;
+}
+
+const Expression::Ptr& NamedExpression::expression( void ) const
+{
+    return m_expression;
+}
+
+void NamedExpression::accept( Visitor& visitor )
+{
+    // TODO: PPA: visitor.visit( *this );
+}
+
 UndefLiteral::UndefLiteral( void )
 : Expression( Node::ID::UNDEF_LITERAL )
 {
@@ -178,6 +206,48 @@ const Expression::Ptr& RangeLiteral::right( void ) const
 void RangeLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
+}
+
+//
+//
+// TupleLiteral
+//
+
+TupleLiteral::TupleLiteral( const Expressions::Ptr& expressions )
+: Expression( Node::ID::TUPLE_LITERAL )
+, m_expressions( expressions )
+{
+}
+
+const Expressions::Ptr& TupleLiteral::expressions( void ) const
+{
+    return m_expressions;
+}
+
+void TupleLiteral::accept( Visitor& visitor )
+{
+    // TODO: PPA: visitor.visit( *this );
+}
+
+//
+//
+// NamedTupleLiteral
+//
+
+NamedTupleLiteral::NamedTupleLiteral( const NamedExpressions::Ptr& namedExpressions )
+: Expression( Node::ID::NAMED_TUPLE_LITERAL )
+, m_namedExpressions( namedExpressions )
+{
+}
+
+const NamedExpressions::Ptr& NamedTupleLiteral::namedExpressions( void ) const
+{
+    return m_namedExpressions;
+}
+
+void NamedTupleLiteral::accept( Visitor& visitor )
+{
+    // TODO: PPA: visitor.visit( *this );
 }
 
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
