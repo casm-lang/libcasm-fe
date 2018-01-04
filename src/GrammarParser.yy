@@ -202,6 +202,8 @@ END       0 "end of file"
 %type <ReferenceLiteral::Ptr> ReferenceLiteral
 %type <ListLiteral::Ptr> ListLiteral
 %type <RangeLiteral::Ptr> RangeLiteral
+%type <TupleLiteral::Ptr> TupleLiteral
+%type <NamedTupleLiteral::Ptr> NamedTupleLiteral
 
 // expressions
 %type <Expression::Ptr> Term SimpleOrClaspedTerm OperatorExpression
@@ -231,6 +233,10 @@ END       0 "end of file"
 %type <UpdateRule::Ptr> UpdateRule
 %type <CallRule::Ptr> CallRule
 
+// assignments
+%type <NamedExpression::Ptr> Assignment
+%type <NamedExpressions::Ptr> Assignments
+
 // types
 %type <libcasm_fe::Ast::Type::Ptr> Type
 %type <Types::Ptr> Types
@@ -239,7 +245,7 @@ END       0 "end of file"
 %type <RelationType::Ptr> RelationType
 %type <FixedSizedType::Ptr> FixedSizedType
 
-// types
+// attributes
 %type <Attribute::Ptr> Attribute
 %type <Attributes::Ptr> Attributes
 %type <BasicAttribute::Ptr> BasicAttribute
@@ -253,7 +259,7 @@ END       0 "end of file"
 %type <UpdateRules::Ptr> Initializers MaybeInitializers MaybeInitially
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
-%type <Expressions::Ptr> Arguments TwoOrMoreArguments
+%type <Expressions::Ptr> Arguments
 %type <NodeList< VariableDefinition >::Ptr> Parameters MaybeParameters
 
 
@@ -1067,6 +1073,14 @@ Literal
   {
       $$ = $1;
   }
+| TupleLiteral
+  {
+      $$ = $1;
+  }
+| NamedTupleLiteral
+  {
+      $$ = $1;
+  }
 ;
 
 
@@ -1216,6 +1230,43 @@ RangeLiteral
   }
 ;
 
+TupleLiteral
+: LPAREN Terms COMMA Term RPAREN
+  {
+      const auto expressions = $2;
+      expressions->add( $4 );
+      $$ = Ast::make< TupleLiteral >( @$, expressions );
+  }
+
+NamedTupleLiteral
+: LPAREN Assignments RPAREN
+  {
+      $$ = Ast::make< NamedTupleLiteral >( @$, $2 );
+  }
+;
+
+Assignments
+: Assignments COMMA Assignment
+  {
+      auto assignments = $1;
+      assignments->add( $3 );
+      $$ = assignments;
+  }
+| Assignment
+  {
+      auto assignments = Ast::make< NamedExpressions >( @$ );
+      assignments->add( $1 );
+      $$ = assignments;
+  }
+;
+
+Assignment
+: Identifier COLON Term
+  {
+      $$ = Ast::make< NamedExpression >( @$, $1, $3 );
+  }
+;
+
 //
 //
 // Types
@@ -1309,15 +1360,6 @@ Arguments
   }
 ;
 
-
-TwoOrMoreArguments
-: LPAREN Terms COMMA Term RPAREN
-  {
-      const auto expressions = $2;
-      expressions->add( $4 );
-      $$ = expressions;
-  }
-;
 
 
 //
@@ -1447,10 +1489,10 @@ Initializer
       function->setTargetType( CallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
-| TwoOrMoreArguments MAPS Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
+| TupleLiteral MAPS Term
   {
       // the unknown function identifier will be replaced in FunctionDefinition
-      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1 );
+      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1->expressions() );
       function->setTargetType( CallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
@@ -1566,7 +1608,6 @@ TypedAttributedVariable
       $$ = $1;
   }
 ;
-
 
 //
 // Attributes
