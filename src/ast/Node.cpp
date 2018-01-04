@@ -128,6 +128,18 @@ std::string Node::description( void ) const
         {
             return "list";
         }
+        case ID::TUPLE_LITERAL:
+        {
+            return "tuple";
+        }
+        case ID::NAMED_TUPLE_LITERAL:
+        {
+            return "named tuple";
+        }
+        case ID::NAMED_EXPRESSION:
+        {
+            return "named expression";
+        }
         case ID::DIRECT_CALL_EXPRESSION:
         {
             return "direct call";

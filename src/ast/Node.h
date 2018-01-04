@@ -81,8 +81,11 @@ namespace libcasm_fe
                 REFERENCE_LITERAL,
                 LIST_LITERAL,
                 RANGE_LITERAL,
+                TUPLE_LITERAL,
+                NAMED_TUPLE_LITERAL,
 
                 // expressions
+                NAMED_EXPRESSION,
                 DIRECT_CALL_EXPRESSION,
                 METHOD_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,
