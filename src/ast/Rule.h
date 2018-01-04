@@ -291,6 +291,8 @@ namespace libcasm_fe
             const Expression::Ptr m_expression;
         };
 
+        using UpdateRules = NodeList< UpdateRule >;
+
         class CallRule final : public Rule
         {
           public:
