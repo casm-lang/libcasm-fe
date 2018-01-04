@@ -366,7 +366,6 @@ namespace libcasm_fe
 
             // Terms
             // Arguments
-            // TwoOrMoreArguments
             char dummy25[ sizeof( Expressions::Ptr ) ];
 
             // FixedSizedType
@@ -409,62 +408,74 @@ namespace libcasm_fe
             // MethodCallExpression
             char dummy38[ sizeof( MethodCallExpression::Ptr ) ];
 
-            // MaybeInitially
-            // Initializers
-            // MaybeInitializers
-            char dummy39[ sizeof( NodeList< UpdateRule >::Ptr ) ];
+            // Assignment
+            char dummy39[ sizeof( NamedExpression::Ptr ) ];
+
+            // Assignments
+            char dummy40[ sizeof( NamedExpressions::Ptr ) ];
+
+            // NamedTupleLiteral
+            char dummy41[ sizeof( NamedTupleLiteral::Ptr ) ];
 
             // Parameters
             // MaybeParameters
-            char dummy40[ sizeof( NodeList< VariableDefinition >::Ptr ) ];
+            char dummy42[ sizeof( NodeList< VariableDefinition >::Ptr ) ];
 
             // RangeLiteral
-            char dummy41[ sizeof( RangeLiteral::Ptr ) ];
+            char dummy43[ sizeof( RangeLiteral::Ptr ) ];
 
             // ReferenceLiteral
-            char dummy42[ sizeof( ReferenceLiteral::Ptr ) ];
+            char dummy44[ sizeof( ReferenceLiteral::Ptr ) ];
 
             // RelationType
-            char dummy43[ sizeof( RelationType::Ptr ) ];
+            char dummy45[ sizeof( RelationType::Ptr ) ];
 
             // Rule
-            char dummy44[ sizeof( Rule::Ptr ) ];
+            char dummy46[ sizeof( Rule::Ptr ) ];
 
             // RuleDefinition
-            char dummy45[ sizeof( RuleDefinition::Ptr ) ];
+            char dummy47[ sizeof( RuleDefinition::Ptr ) ];
 
             // Rules
-            char dummy46[ sizeof( Rules::Ptr ) ];
+            char dummy48[ sizeof( Rules::Ptr ) ];
 
             // SequenceRule
-            char dummy47[ sizeof( SequenceRule::Ptr ) ];
+            char dummy49[ sizeof( SequenceRule::Ptr ) ];
 
             // SkipRule
-            char dummy48[ sizeof( SkipRule::Ptr ) ];
+            char dummy50[ sizeof( SkipRule::Ptr ) ];
 
             // Specification
-            char dummy49[ sizeof( Specification::Ptr ) ];
+            char dummy51[ sizeof( Specification::Ptr ) ];
+
+            // TupleLiteral
+            char dummy52[ sizeof( TupleLiteral::Ptr ) ];
 
             // TypeCastingExpression
-            char dummy50[ sizeof( TypeCastingExpression::Ptr ) ];
+            char dummy53[ sizeof( TypeCastingExpression::Ptr ) ];
 
             // Types
             // FunctionParameters
             // MaybeFunctionParameters
-            char dummy51[ sizeof( Types::Ptr ) ];
+            char dummy54[ sizeof( Types::Ptr ) ];
 
             // UndefinedLiteral
-            char dummy52[ sizeof( UndefLiteral::Ptr ) ];
+            char dummy55[ sizeof( UndefLiteral::Ptr ) ];
 
             // UniversalQuantifierExpression
-            char dummy53[ sizeof( UniversalQuantifierExpression::Ptr ) ];
+            char dummy56[ sizeof( UniversalQuantifierExpression::Ptr ) ];
 
             // UpdateRule
             // Initializer
-            char dummy54[ sizeof( UpdateRule::Ptr ) ];
+            char dummy57[ sizeof( UpdateRule::Ptr ) ];
+
+            // MaybeInitially
+            // Initializers
+            // MaybeInitializers
+            char dummy58[ sizeof( UpdateRules::Ptr ) ];
 
             // UsingDefinition
-            char dummy55[ sizeof( UsingDefinition::Ptr ) ];
+            char dummy59[ sizeof( UsingDefinition::Ptr ) ];
 
             // BooleanLiteral
             // IntegerLiteral
@@ -472,16 +483,16 @@ namespace libcasm_fe
             // DecimalLiteral
             // BinaryLiteral
             // StringLiteral
-            char dummy56[ sizeof( ValueLiteral::Ptr ) ];
+            char dummy60[ sizeof( ValueLiteral::Ptr ) ];
 
             // Variable
             // TypedVariable
             // AttributedVariable
             // TypedAttributedVariable
-            char dummy57[ sizeof( VariableDefinition::Ptr ) ];
+            char dummy61[ sizeof( VariableDefinition::Ptr ) ];
 
             // Type
-            char dummy58[ sizeof( libcasm_fe::Ast::Type::Ptr ) ];
+            char dummy62[ sizeof( libcasm_fe::Ast::Type::Ptr ) ];
 
             // "binary"
             // "hexadecimal"
@@ -490,7 +501,7 @@ namespace libcasm_fe
             // "decimal"
             // "string"
             // "identifier"
-            char dummy59[ sizeof( std::string ) ];
+            char dummy63[ sizeof( std::string ) ];
         };
 
         /// Symbol semantic values.
@@ -768,8 +779,14 @@ namespace libcasm_fe
                 const location_type& l );
 
             basic_symbol(
+                typename Base::kind_type t, const NamedExpression::Ptr v, const location_type& l );
+
+            basic_symbol(
+                typename Base::kind_type t, const NamedExpressions::Ptr v, const location_type& l );
+
+            basic_symbol(
                 typename Base::kind_type t,
-                const NodeList< UpdateRule >::Ptr v,
+                const NamedTupleLiteral::Ptr v,
                 const location_type& l );
 
             basic_symbol(
@@ -803,6 +820,9 @@ namespace libcasm_fe
                 typename Base::kind_type t, const Specification::Ptr v, const location_type& l );
 
             basic_symbol(
+                typename Base::kind_type t, const TupleLiteral::Ptr v, const location_type& l );
+
+            basic_symbol(
                 typename Base::kind_type t,
                 const TypeCastingExpression::Ptr v,
                 const location_type& l );
@@ -819,6 +839,9 @@ namespace libcasm_fe
 
             basic_symbol(
                 typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l );
+
+            basic_symbol(
+                typename Base::kind_type t, const UpdateRules::Ptr v, const location_type& l );
 
             basic_symbol(
                 typename Base::kind_type t, const UsingDefinition::Ptr v, const location_type& l );
@@ -1271,8 +1294,8 @@ namespace libcasm_fe
         enum
         {
             yyeof_ = 0,
-            yylast_ = 2399,  ///< Last index in yytable_.
-            yynnts_ = 81,    ///< Number of nonterminal symbols.
+            yylast_ = 2358,  ///< Last index in yytable_.
+            yynnts_ = 84,    ///< Number of nonterminal symbols.
             yyfinal_ = 12,   ///< Termination state number.
             yyterror_ = 1,
             yyerrcode_ = 256,
@@ -1338,19 +1361,19 @@ namespace libcasm_fe
     {
         switch( other.type_get() )
         {
-            case 162:  // Attribute
+            case 165:  // Attribute
                 value.copy< Attribute::Ptr >( other.value );
                 break;
 
-            case 161:  // Attributes
+            case 164:  // Attributes
                 value.copy< Attributes::Ptr >( other.value );
                 break;
 
-            case 163:  // BasicAttribute
+            case 166:  // BasicAttribute
                 value.copy< BasicAttribute::Ptr >( other.value );
                 break;
 
-            case 139:  // BasicType
+            case 143:  // BasicType
                 value.copy< BasicType::Ptr >( other.value );
                 break;
 
@@ -1382,7 +1405,7 @@ namespace libcasm_fe
                 value.copy< ChooseRule::Ptr >( other.value );
                 break;
 
-            case 140:  // ComposedType
+            case 144:  // ComposedType
                 value.copy< ComposedType::Ptr >( other.value );
                 break;
 
@@ -1431,21 +1454,20 @@ namespace libcasm_fe
             case 115:  // SimpleOrClaspedTerm
             case 116:  // OperatorExpression
             case 126:  // Literal
-            case 149:  // MaybeDefined
+            case 152:  // MaybeDefined
                 value.copy< Expression::Ptr >( other.value );
                 break;
 
-            case 164:  // ExpressionAttribute
+            case 167:  // ExpressionAttribute
                 value.copy< ExpressionAttribute::Ptr >( other.value );
                 break;
 
             case 113:  // Terms
-            case 143:  // Arguments
-            case 144:  // TwoOrMoreArguments
+            case 147:  // Arguments
                 value.copy< Expressions::Ptr >( other.value );
                 break;
 
-            case 142:  // FixedSizedType
+            case 146:  // FixedSizedType
                 value.copy< FixedSizedType::Ptr >( other.value );
                 break;
 
@@ -1462,15 +1484,15 @@ namespace libcasm_fe
                 value.copy< HeaderDefinition::Ptr >( other.value );
                 break;
 
-            case 154:  // Identifier
+            case 157:  // Identifier
                 value.copy< Identifier::Ptr >( other.value );
                 break;
 
-            case 155:  // IdentifierPath
+            case 158:  // IdentifierPath
                 value.copy< IdentifierPath::Ptr >( other.value );
                 break;
 
-            case 156:  // DotSeparatedIdentifiers
+            case 159:  // DotSeparatedIdentifiers
                 value.copy< Identifiers::Ptr >( other.value );
                 break;
 
@@ -1498,14 +1520,20 @@ namespace libcasm_fe
                 value.copy< MethodCallExpression::Ptr >( other.value );
                 break;
 
-            case 150:  // MaybeInitially
-            case 151:  // Initializers
-            case 153:  // MaybeInitializers
-                value.copy< NodeList< UpdateRule >::Ptr >( other.value );
+            case 140:  // Assignment
+                value.copy< NamedExpression::Ptr >( other.value );
                 break;
 
-            case 147:  // Parameters
-            case 148:  // MaybeParameters
+            case 139:  // Assignments
+                value.copy< NamedExpressions::Ptr >( other.value );
+                break;
+
+            case 138:  // NamedTupleLiteral
+                value.copy< NamedTupleLiteral::Ptr >( other.value );
+                break;
+
+            case 150:  // Parameters
+            case 151:  // MaybeParameters
                 value.copy< NodeList< VariableDefinition >::Ptr >( other.value );
                 break;
 
@@ -1517,7 +1545,7 @@ namespace libcasm_fe
                 value.copy< ReferenceLiteral::Ptr >( other.value );
                 break;
 
-            case 141:  // RelationType
+            case 145:  // RelationType
                 value.copy< RelationType::Ptr >( other.value );
                 break;
 
@@ -1545,13 +1573,17 @@ namespace libcasm_fe
                 value.copy< Specification::Ptr >( other.value );
                 break;
 
+            case 137:  // TupleLiteral
+                value.copy< TupleLiteral::Ptr >( other.value );
+                break;
+
             case 120:  // TypeCastingExpression
                 value.copy< TypeCastingExpression::Ptr >( other.value );
                 break;
 
-            case 137:  // Types
-            case 145:  // FunctionParameters
-            case 146:  // MaybeFunctionParameters
+            case 141:  // Types
+            case 148:  // FunctionParameters
+            case 149:  // MaybeFunctionParameters
                 value.copy< Types::Ptr >( other.value );
                 break;
 
@@ -1564,8 +1596,14 @@ namespace libcasm_fe
                 break;
 
             case 111:  // UpdateRule
-            case 152:  // Initializer
+            case 155:  // Initializer
                 value.copy< UpdateRule::Ptr >( other.value );
+                break;
+
+            case 153:  // MaybeInitially
+            case 154:  // Initializers
+            case 156:  // MaybeInitializers
+                value.copy< UpdateRules::Ptr >( other.value );
                 break;
 
             case 97:  // UsingDefinition
@@ -1581,14 +1619,14 @@ namespace libcasm_fe
                 value.copy< ValueLiteral::Ptr >( other.value );
                 break;
 
-            case 157:  // Variable
-            case 158:  // TypedVariable
-            case 159:  // AttributedVariable
-            case 160:  // TypedAttributedVariable
+            case 160:  // Variable
+            case 161:  // TypedVariable
+            case 162:  // AttributedVariable
+            case 163:  // TypedAttributedVariable
                 value.copy< VariableDefinition::Ptr >( other.value );
                 break;
 
-            case 138:  // Type
+            case 142:  // Type
                 value.copy< libcasm_fe::Ast::Type::Ptr >( other.value );
                 break;
 
@@ -1617,19 +1655,19 @@ namespace libcasm_fe
         (void)v;
         switch( this->type_get() )
         {
-            case 162:  // Attribute
+            case 165:  // Attribute
                 value.copy< Attribute::Ptr >( v );
                 break;
 
-            case 161:  // Attributes
+            case 164:  // Attributes
                 value.copy< Attributes::Ptr >( v );
                 break;
 
-            case 163:  // BasicAttribute
+            case 166:  // BasicAttribute
                 value.copy< BasicAttribute::Ptr >( v );
                 break;
 
-            case 139:  // BasicType
+            case 143:  // BasicType
                 value.copy< BasicType::Ptr >( v );
                 break;
 
@@ -1661,7 +1699,7 @@ namespace libcasm_fe
                 value.copy< ChooseRule::Ptr >( v );
                 break;
 
-            case 140:  // ComposedType
+            case 144:  // ComposedType
                 value.copy< ComposedType::Ptr >( v );
                 break;
 
@@ -1710,21 +1748,20 @@ namespace libcasm_fe
             case 115:  // SimpleOrClaspedTerm
             case 116:  // OperatorExpression
             case 126:  // Literal
-            case 149:  // MaybeDefined
+            case 152:  // MaybeDefined
                 value.copy< Expression::Ptr >( v );
                 break;
 
-            case 164:  // ExpressionAttribute
+            case 167:  // ExpressionAttribute
                 value.copy< ExpressionAttribute::Ptr >( v );
                 break;
 
             case 113:  // Terms
-            case 143:  // Arguments
-            case 144:  // TwoOrMoreArguments
+            case 147:  // Arguments
                 value.copy< Expressions::Ptr >( v );
                 break;
 
-            case 142:  // FixedSizedType
+            case 146:  // FixedSizedType
                 value.copy< FixedSizedType::Ptr >( v );
                 break;
 
@@ -1741,15 +1778,15 @@ namespace libcasm_fe
                 value.copy< HeaderDefinition::Ptr >( v );
                 break;
 
-            case 154:  // Identifier
+            case 157:  // Identifier
                 value.copy< Identifier::Ptr >( v );
                 break;
 
-            case 155:  // IdentifierPath
+            case 158:  // IdentifierPath
                 value.copy< IdentifierPath::Ptr >( v );
                 break;
 
-            case 156:  // DotSeparatedIdentifiers
+            case 159:  // DotSeparatedIdentifiers
                 value.copy< Identifiers::Ptr >( v );
                 break;
 
@@ -1777,14 +1814,20 @@ namespace libcasm_fe
                 value.copy< MethodCallExpression::Ptr >( v );
                 break;
 
-            case 150:  // MaybeInitially
-            case 151:  // Initializers
-            case 153:  // MaybeInitializers
-                value.copy< NodeList< UpdateRule >::Ptr >( v );
+            case 140:  // Assignment
+                value.copy< NamedExpression::Ptr >( v );
                 break;
 
-            case 147:  // Parameters
-            case 148:  // MaybeParameters
+            case 139:  // Assignments
+                value.copy< NamedExpressions::Ptr >( v );
+                break;
+
+            case 138:  // NamedTupleLiteral
+                value.copy< NamedTupleLiteral::Ptr >( v );
+                break;
+
+            case 150:  // Parameters
+            case 151:  // MaybeParameters
                 value.copy< NodeList< VariableDefinition >::Ptr >( v );
                 break;
 
@@ -1796,7 +1839,7 @@ namespace libcasm_fe
                 value.copy< ReferenceLiteral::Ptr >( v );
                 break;
 
-            case 141:  // RelationType
+            case 145:  // RelationType
                 value.copy< RelationType::Ptr >( v );
                 break;
 
@@ -1824,13 +1867,17 @@ namespace libcasm_fe
                 value.copy< Specification::Ptr >( v );
                 break;
 
+            case 137:  // TupleLiteral
+                value.copy< TupleLiteral::Ptr >( v );
+                break;
+
             case 120:  // TypeCastingExpression
                 value.copy< TypeCastingExpression::Ptr >( v );
                 break;
 
-            case 137:  // Types
-            case 145:  // FunctionParameters
-            case 146:  // MaybeFunctionParameters
+            case 141:  // Types
+            case 148:  // FunctionParameters
+            case 149:  // MaybeFunctionParameters
                 value.copy< Types::Ptr >( v );
                 break;
 
@@ -1843,8 +1890,14 @@ namespace libcasm_fe
                 break;
 
             case 111:  // UpdateRule
-            case 152:  // Initializer
+            case 155:  // Initializer
                 value.copy< UpdateRule::Ptr >( v );
+                break;
+
+            case 153:  // MaybeInitially
+            case 154:  // Initializers
+            case 156:  // MaybeInitializers
+                value.copy< UpdateRules::Ptr >( v );
                 break;
 
             case 97:  // UsingDefinition
@@ -1860,14 +1913,14 @@ namespace libcasm_fe
                 value.copy< ValueLiteral::Ptr >( v );
                 break;
 
-            case 157:  // Variable
-            case 158:  // TypedVariable
-            case 159:  // AttributedVariable
-            case 160:  // TypedAttributedVariable
+            case 160:  // Variable
+            case 161:  // TypedVariable
+            case 162:  // AttributedVariable
+            case 163:  // TypedAttributedVariable
                 value.copy< VariableDefinition::Ptr >( v );
                 break;
 
-            case 138:  // Type
+            case 142:  // Type
                 value.copy< libcasm_fe::Ast::Type::Ptr >( v );
                 break;
 
@@ -2242,7 +2295,25 @@ namespace libcasm_fe
 
     template < typename Base >
     Parser::basic_symbol< Base >::basic_symbol(
-        typename Base::kind_type t, const NodeList< UpdateRule >::Ptr v, const location_type& l )
+        typename Base::kind_type t, const NamedExpression::Ptr v, const location_type& l )
+    : Base( t )
+    , value( v )
+    , location( l )
+    {
+    }
+
+    template < typename Base >
+    Parser::basic_symbol< Base >::basic_symbol(
+        typename Base::kind_type t, const NamedExpressions::Ptr v, const location_type& l )
+    : Base( t )
+    , value( v )
+    , location( l )
+    {
+    }
+
+    template < typename Base >
+    Parser::basic_symbol< Base >::basic_symbol(
+        typename Base::kind_type t, const NamedTupleLiteral::Ptr v, const location_type& l )
     : Base( t )
     , value( v )
     , location( l )
@@ -2343,6 +2414,15 @@ namespace libcasm_fe
 
     template < typename Base >
     Parser::basic_symbol< Base >::basic_symbol(
+        typename Base::kind_type t, const TupleLiteral::Ptr v, const location_type& l )
+    : Base( t )
+    , value( v )
+    , location( l )
+    {
+    }
+
+    template < typename Base >
+    Parser::basic_symbol< Base >::basic_symbol(
         typename Base::kind_type t, const TypeCastingExpression::Ptr v, const location_type& l )
     : Base( t )
     , value( v )
@@ -2382,6 +2462,15 @@ namespace libcasm_fe
     template < typename Base >
     Parser::basic_symbol< Base >::basic_symbol(
         typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l )
+    : Base( t )
+    , value( v )
+    , location( l )
+    {
+    }
+
+    template < typename Base >
+    Parser::basic_symbol< Base >::basic_symbol(
+        typename Base::kind_type t, const UpdateRules::Ptr v, const location_type& l )
     : Base( t )
     , value( v )
     , location( l )
@@ -2455,19 +2544,19 @@ namespace libcasm_fe
         // Type destructor.
         switch( yytype )
         {
-            case 162:  // Attribute
+            case 165:  // Attribute
                 value.template destroy< Attribute::Ptr >();
                 break;
 
-            case 161:  // Attributes
+            case 164:  // Attributes
                 value.template destroy< Attributes::Ptr >();
                 break;
 
-            case 163:  // BasicAttribute
+            case 166:  // BasicAttribute
                 value.template destroy< BasicAttribute::Ptr >();
                 break;
 
-            case 139:  // BasicType
+            case 143:  // BasicType
                 value.template destroy< BasicType::Ptr >();
                 break;
 
@@ -2499,7 +2588,7 @@ namespace libcasm_fe
                 value.template destroy< ChooseRule::Ptr >();
                 break;
 
-            case 140:  // ComposedType
+            case 144:  // ComposedType
                 value.template destroy< ComposedType::Ptr >();
                 break;
 
@@ -2548,21 +2637,20 @@ namespace libcasm_fe
             case 115:  // SimpleOrClaspedTerm
             case 116:  // OperatorExpression
             case 126:  // Literal
-            case 149:  // MaybeDefined
+            case 152:  // MaybeDefined
                 value.template destroy< Expression::Ptr >();
                 break;
 
-            case 164:  // ExpressionAttribute
+            case 167:  // ExpressionAttribute
                 value.template destroy< ExpressionAttribute::Ptr >();
                 break;
 
             case 113:  // Terms
-            case 143:  // Arguments
-            case 144:  // TwoOrMoreArguments
+            case 147:  // Arguments
                 value.template destroy< Expressions::Ptr >();
                 break;
 
-            case 142:  // FixedSizedType
+            case 146:  // FixedSizedType
                 value.template destroy< FixedSizedType::Ptr >();
                 break;
 
@@ -2579,15 +2667,15 @@ namespace libcasm_fe
                 value.template destroy< HeaderDefinition::Ptr >();
                 break;
 
-            case 154:  // Identifier
+            case 157:  // Identifier
                 value.template destroy< Identifier::Ptr >();
                 break;
 
-            case 155:  // IdentifierPath
+            case 158:  // IdentifierPath
                 value.template destroy< IdentifierPath::Ptr >();
                 break;
 
-            case 156:  // DotSeparatedIdentifiers
+            case 159:  // DotSeparatedIdentifiers
                 value.template destroy< Identifiers::Ptr >();
                 break;
 
@@ -2615,14 +2703,20 @@ namespace libcasm_fe
                 value.template destroy< MethodCallExpression::Ptr >();
                 break;
 
-            case 150:  // MaybeInitially
-            case 151:  // Initializers
-            case 153:  // MaybeInitializers
-                value.template destroy< NodeList< UpdateRule >::Ptr >();
+            case 140:  // Assignment
+                value.template destroy< NamedExpression::Ptr >();
                 break;
 
-            case 147:  // Parameters
-            case 148:  // MaybeParameters
+            case 139:  // Assignments
+                value.template destroy< NamedExpressions::Ptr >();
+                break;
+
+            case 138:  // NamedTupleLiteral
+                value.template destroy< NamedTupleLiteral::Ptr >();
+                break;
+
+            case 150:  // Parameters
+            case 151:  // MaybeParameters
                 value.template destroy< NodeList< VariableDefinition >::Ptr >();
                 break;
 
@@ -2634,7 +2728,7 @@ namespace libcasm_fe
                 value.template destroy< ReferenceLiteral::Ptr >();
                 break;
 
-            case 141:  // RelationType
+            case 145:  // RelationType
                 value.template destroy< RelationType::Ptr >();
                 break;
 
@@ -2662,13 +2756,17 @@ namespace libcasm_fe
                 value.template destroy< Specification::Ptr >();
                 break;
 
+            case 137:  // TupleLiteral
+                value.template destroy< TupleLiteral::Ptr >();
+                break;
+
             case 120:  // TypeCastingExpression
                 value.template destroy< TypeCastingExpression::Ptr >();
                 break;
 
-            case 137:  // Types
-            case 145:  // FunctionParameters
-            case 146:  // MaybeFunctionParameters
+            case 141:  // Types
+            case 148:  // FunctionParameters
+            case 149:  // MaybeFunctionParameters
                 value.template destroy< Types::Ptr >();
                 break;
 
@@ -2681,8 +2779,14 @@ namespace libcasm_fe
                 break;
 
             case 111:  // UpdateRule
-            case 152:  // Initializer
+            case 155:  // Initializer
                 value.template destroy< UpdateRule::Ptr >();
+                break;
+
+            case 153:  // MaybeInitially
+            case 154:  // Initializers
+            case 156:  // MaybeInitializers
+                value.template destroy< UpdateRules::Ptr >();
                 break;
 
             case 97:  // UsingDefinition
@@ -2698,14 +2802,14 @@ namespace libcasm_fe
                 value.template destroy< ValueLiteral::Ptr >();
                 break;
 
-            case 157:  // Variable
-            case 158:  // TypedVariable
-            case 159:  // AttributedVariable
-            case 160:  // TypedAttributedVariable
+            case 160:  // Variable
+            case 161:  // TypedVariable
+            case 162:  // AttributedVariable
+            case 163:  // TypedAttributedVariable
                 value.template destroy< VariableDefinition::Ptr >();
                 break;
 
-            case 138:  // Type
+            case 142:  // Type
                 value.template destroy< libcasm_fe::Ast::Type::Ptr >();
                 break;
 
@@ -2738,19 +2842,19 @@ namespace libcasm_fe
         super_type::move( s );
         switch( this->type_get() )
         {
-            case 162:  // Attribute
+            case 165:  // Attribute
                 value.move< Attribute::Ptr >( s.value );
                 break;
 
-            case 161:  // Attributes
+            case 164:  // Attributes
                 value.move< Attributes::Ptr >( s.value );
                 break;
 
-            case 163:  // BasicAttribute
+            case 166:  // BasicAttribute
                 value.move< BasicAttribute::Ptr >( s.value );
                 break;
 
-            case 139:  // BasicType
+            case 143:  // BasicType
                 value.move< BasicType::Ptr >( s.value );
                 break;
 
@@ -2782,7 +2886,7 @@ namespace libcasm_fe
                 value.move< ChooseRule::Ptr >( s.value );
                 break;
 
-            case 140:  // ComposedType
+            case 144:  // ComposedType
                 value.move< ComposedType::Ptr >( s.value );
                 break;
 
@@ -2831,21 +2935,20 @@ namespace libcasm_fe
             case 115:  // SimpleOrClaspedTerm
             case 116:  // OperatorExpression
             case 126:  // Literal
-            case 149:  // MaybeDefined
+            case 152:  // MaybeDefined
                 value.move< Expression::Ptr >( s.value );
                 break;
 
-            case 164:  // ExpressionAttribute
+            case 167:  // ExpressionAttribute
                 value.move< ExpressionAttribute::Ptr >( s.value );
                 break;
 
             case 113:  // Terms
-            case 143:  // Arguments
-            case 144:  // TwoOrMoreArguments
+            case 147:  // Arguments
                 value.move< Expressions::Ptr >( s.value );
                 break;
 
-            case 142:  // FixedSizedType
+            case 146:  // FixedSizedType
                 value.move< FixedSizedType::Ptr >( s.value );
                 break;
 
@@ -2862,15 +2965,15 @@ namespace libcasm_fe
                 value.move< HeaderDefinition::Ptr >( s.value );
                 break;
 
-            case 154:  // Identifier
+            case 157:  // Identifier
                 value.move< Identifier::Ptr >( s.value );
                 break;
 
-            case 155:  // IdentifierPath
+            case 158:  // IdentifierPath
                 value.move< IdentifierPath::Ptr >( s.value );
                 break;
 
-            case 156:  // DotSeparatedIdentifiers
+            case 159:  // DotSeparatedIdentifiers
                 value.move< Identifiers::Ptr >( s.value );
                 break;
 
@@ -2898,14 +3001,20 @@ namespace libcasm_fe
                 value.move< MethodCallExpression::Ptr >( s.value );
                 break;
 
-            case 150:  // MaybeInitially
-            case 151:  // Initializers
-            case 153:  // MaybeInitializers
-                value.move< NodeList< UpdateRule >::Ptr >( s.value );
+            case 140:  // Assignment
+                value.move< NamedExpression::Ptr >( s.value );
                 break;
 
-            case 147:  // Parameters
-            case 148:  // MaybeParameters
+            case 139:  // Assignments
+                value.move< NamedExpressions::Ptr >( s.value );
+                break;
+
+            case 138:  // NamedTupleLiteral
+                value.move< NamedTupleLiteral::Ptr >( s.value );
+                break;
+
+            case 150:  // Parameters
+            case 151:  // MaybeParameters
                 value.move< NodeList< VariableDefinition >::Ptr >( s.value );
                 break;
 
@@ -2917,7 +3026,7 @@ namespace libcasm_fe
                 value.move< ReferenceLiteral::Ptr >( s.value );
                 break;
 
-            case 141:  // RelationType
+            case 145:  // RelationType
                 value.move< RelationType::Ptr >( s.value );
                 break;
 
@@ -2945,13 +3054,17 @@ namespace libcasm_fe
                 value.move< Specification::Ptr >( s.value );
                 break;
 
+            case 137:  // TupleLiteral
+                value.move< TupleLiteral::Ptr >( s.value );
+                break;
+
             case 120:  // TypeCastingExpression
                 value.move< TypeCastingExpression::Ptr >( s.value );
                 break;
 
-            case 137:  // Types
-            case 145:  // FunctionParameters
-            case 146:  // MaybeFunctionParameters
+            case 141:  // Types
+            case 148:  // FunctionParameters
+            case 149:  // MaybeFunctionParameters
                 value.move< Types::Ptr >( s.value );
                 break;
 
@@ -2964,8 +3077,14 @@ namespace libcasm_fe
                 break;
 
             case 111:  // UpdateRule
-            case 152:  // Initializer
+            case 155:  // Initializer
                 value.move< UpdateRule::Ptr >( s.value );
+                break;
+
+            case 153:  // MaybeInitially
+            case 154:  // Initializers
+            case 156:  // MaybeInitializers
+                value.move< UpdateRules::Ptr >( s.value );
                 break;
 
             case 97:  // UsingDefinition
@@ -2981,14 +3100,14 @@ namespace libcasm_fe
                 value.move< ValueLiteral::Ptr >( s.value );
                 break;
 
-            case 157:  // Variable
-            case 158:  // TypedVariable
-            case 159:  // AttributedVariable
-            case 160:  // TypedAttributedVariable
+            case 160:  // Variable
+            case 161:  // TypedVariable
+            case 162:  // AttributedVariable
+            case 163:  // TypedAttributedVariable
                 value.move< VariableDefinition::Ptr >( s.value );
                 break;
 
-            case 138:  // Type
+            case 142:  // Type
                 value.move< libcasm_fe::Ast::Type::Ptr >( s.value );
                 break;
 
@@ -3467,6 +3586,6 @@ namespace libcasm_fe
 
 #line 49 "../../obj/src/GrammarParser.yy"  // lalr1.cc:377
 }  // libcasm_fe
-#line 3575 "GrammarParser.tab.h"  // lalr1.cc:377
+#line 3682 "GrammarParser.tab.h"  // lalr1.cc:377
 
 #endif  // !YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
