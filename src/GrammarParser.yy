@@ -250,7 +250,7 @@ END       0 "end of file"
 %type <Case::Ptr> CaseLabel
 %type <Cases::Ptr> CaseLabels
 %type <UpdateRule::Ptr> Initializer
-%type <NodeList< UpdateRule >::Ptr> Initializers MaybeInitializers MaybeInitially
+%type <UpdateRules::Ptr> Initializers MaybeInitializers MaybeInitially
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <Expressions::Ptr> Arguments TwoOrMoreArguments
@@ -453,7 +453,7 @@ ProgramFunctionDefinition
 
       const auto ruleReference = Ast::make< ReferenceLiteral >( @$, $2 );
 
-      auto initializers = Ast::make< NodeList< UpdateRule > >( @$ );
+      auto initializers = Ast::make< UpdateRules >( @$ );
       initializers->add( Ast::make< UpdateRule >( @$, program, ruleReference ) );
       programDefinition->setInitializers( initializers );
 
@@ -1407,7 +1407,7 @@ MaybeInitially
   }
 | %empty
   {
-      $$ = Ast::make< NodeList< UpdateRule > >( @$ );
+      $$ = Ast::make< UpdateRules >( @$ );
   }
 ;
 
@@ -1421,7 +1421,7 @@ Initializers
   }
 | Initializer
   {
-      auto initializers = Ast::make< NodeList< UpdateRule > >( @$ );
+      auto initializers = Ast::make< UpdateRules >( @$ );
       initializers->add( $1 );
       $$ = initializers;
   }
@@ -1464,7 +1464,7 @@ MaybeInitializers
   }
 | %empty
   {
-      $$ = Ast::make< NodeList< UpdateRule > >( @$ );
+      $$ = Ast::make< UpdateRules >( @$ );
   }
 ;
 
