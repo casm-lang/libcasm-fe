@@ -100,6 +100,21 @@ namespace libcasm_fe
             const Types::Ptr m_subTypes;
         };
 
+        class TemplateType final : public Type
+        {
+          public:
+            using Ptr = std::shared_ptr< TemplateType >;
+
+            TemplateType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes );
+
+            const Types::Ptr& subTypes( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Types::Ptr m_subTypes;
+        };
+
         class FixedSizedType final : public Type
         {
           public:

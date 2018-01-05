@@ -169,10 +169,11 @@ namespace libcasm_fe
         TypeAnnotationInvalidBasicTypeName = 0x0100,
         TypeAnnotationInvalidFixedSizeTypeName = 0x0101,
         TypeAnnotationInvalidComposedTypeName = 0x0102,
-        TypeAnnotationInvalidRelationTypeName = 0x0103,
+        TypeAnnotationInvalidTemplateTypeName = 0x0103,
+        TypeAnnotationInvalidRelationTypeName = 0x0104,
 
-        TypeAnnotationComposedTypeHasNoSubType = 0x0112,
-        TypeAnnotationRelationTypeHasNoSubType = 0x0113,
+        TypeAnnotationTemplateTypeHasNoSubType = 0x0113,
+        TypeAnnotationRelationTypeHasNoSubType = 0x0114,
 
         // --------------------------------------------------------- 1*** ...
         // type inference errors

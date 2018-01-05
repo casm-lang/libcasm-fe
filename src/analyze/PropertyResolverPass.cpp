@@ -113,6 +113,7 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     void visit( UnresolvedType& node ) override;
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
+    void visit( TemplateType& node ) override;
     void visit( FixedSizedType& node ) override;
     void visit( RelationType& node ) override;
 
@@ -462,6 +463,11 @@ void PropertyResolverVisitor::visit( BasicType& node )
 }
 
 void PropertyResolverVisitor::visit( ComposedType& node )
+{
+    RecursiveVisitor::visit( node );
+}
+
+void PropertyResolverVisitor::visit( TemplateType& node )
 {
     RecursiveVisitor::visit( node );
 }

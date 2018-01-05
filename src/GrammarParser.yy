@@ -242,6 +242,7 @@ END       0 "end of file"
 %type <Types::Ptr> Types
 %type <BasicType::Ptr> BasicType
 %type <ComposedType::Ptr> ComposedType
+%type <TemplateType::Ptr> TemplateType
 %type <RelationType::Ptr> RelationType
 %type <FixedSizedType::Ptr> FixedSizedType
 
@@ -1297,6 +1298,10 @@ Type
   {
       $$ = $1;
   }
+| TemplateType
+  {
+      $$ = $1;
+  }
 | RelationType
   {
       $$ = $1;
@@ -1317,9 +1322,20 @@ BasicType
 
 
 ComposedType
+: LPAREN Types COMMA Type RPAREN
+  {
+      const auto identifier = Ast::make< Identifier >( @$, "Tuple" );
+      auto types = $2;
+      types->add( $4 );
+      $$ = Ast::make< ComposedType >( @$, asIdentifierPath( identifier ), types );
+  }
+;
+
+
+TemplateType
 : IdentifierPath LESSER Types GREATER
   {
-      $$ = Ast::make< ComposedType >( @$, $1, $3 );
+      $$ = Ast::make< TemplateType >( @$, $1, $3 );
   }
 ;
 

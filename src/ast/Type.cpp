@@ -98,6 +98,22 @@ void ComposedType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+TemplateType::TemplateType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
+: Type( Node::ID::TEMPLATE_TYPE, identifier )
+, m_subTypes( subTypes )
+{
+}
+
+const Types::Ptr& TemplateType::subTypes( void ) const
+{
+    return m_subTypes;
+}
+
+void TemplateType::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
 FixedSizedType::FixedSizedType( const IdentifierPath::Ptr& identifier, const Expression::Ptr& size )
 : Type( Node::ID::FIXED_SIZED_TYPE, identifier )
 , m_size( size )

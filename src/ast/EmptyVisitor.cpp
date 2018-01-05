@@ -202,6 +202,10 @@ void EmptyVisitor::visit( ComposedType& )
 {
 }
 
+void EmptyVisitor::visit( TemplateType& )
+{
+}
+
 void EmptyVisitor::visit( FixedSizedType& )
 {
 }

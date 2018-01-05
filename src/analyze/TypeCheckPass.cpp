@@ -74,6 +74,7 @@ class TypeCheckVisitor final : public RecursiveVisitor
 
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
+    void visit( TemplateType& node ) override;
     void visit( RelationType& node ) override;
     void visit( FixedSizedType& node ) override;
 
@@ -94,6 +95,7 @@ void TypeCheckVisitor::visit( UsingDefinition& node )
     node.setType( node.type()->type() );  // TODO top-sort using definitions
 }
 
+// basic types
 static const std::string TYPE_STRING_VOID = "Void";
 static const std::string TYPE_STRING_BOOLEAN = "Boolean";
 static const std::string TYPE_STRING_BINARY = "Binary";
@@ -102,21 +104,25 @@ static const std::string TYPE_STRING_STRING = "String";
 static const std::string TYPE_STRING_DECIMAL = "Decimal";
 static const std::string TYPE_STRING_RATIONAL = "Rational";
 
+// composed types
+static const std::string TYPE_STRING_TUPLE = "Tuple";
+
+// template types
+static const std::string TYPE_STRING_LIST = "List";
+static const std::string TYPE_STRING_RANGE = "Range";
+static const std::string TYPE_STRING_FILE = "File";
+static const std::string TYPE_STRING_PORT = "Port";
+
+static const std::unordered_set< std::string > TYPE_STRINGS_FOR_TEMPLATE_TYPES = {
+    TYPE_STRING_LIST, TYPE_STRING_RANGE, TYPE_STRING_FILE, TYPE_STRING_PORT
+};
+
+// reference types
 static const std::string TYPE_STRING_RULEREF = "RuleRef";
 static const std::string TYPE_STRING_FUNCREF = "FuncRef";
 
 static const std::unordered_set< std::string > TYPE_STRINGS_FOR_REFERENCE_TYPES = {
     TYPE_STRING_RULEREF, TYPE_STRING_FUNCREF
-};
-
-static const std::string TYPE_STRING_RANGE = "Range";
-static const std::string TYPE_STRING_TUPLE = "Tuple";
-static const std::string TYPE_STRING_LIST = "List";
-static const std::string TYPE_STRING_FILE = "File";
-static const std::string TYPE_STRING_PORT = "Port";
-
-static const std::unordered_set< std::string > TYPE_STRINGS_FOR_COMPOSED_TYPES = {
-    TYPE_STRING_RANGE, TYPE_STRING_TUPLE, TYPE_STRING_LIST, TYPE_STRING_FILE, TYPE_STRING_PORT
 };
 
 void TypeCheckVisitor::visit( BasicType& node )
@@ -162,13 +168,13 @@ void TypeCheckVisitor::visit( BasicType& node )
                 "< /* relation type */  >'",
             Code::TypeAnnotationRelationTypeHasNoSubType );
     }
-    else if( TYPE_STRINGS_FOR_COMPOSED_TYPES.count( name ) )
+    else if( TYPE_STRINGS_FOR_TEMPLATE_TYPES.count( name ) )
     {
         m_log.error(
             { node.sourceLocation() },
-            "composed type '" + name + "' defined without sub-types, use '" + name +
+            "template type '" + name + "' defined without sub-types, use '" + name +
                 "< /* sub-type(s) */  >'",
-            Code::TypeAnnotationComposedTypeHasNoSubType );
+            Code::TypeAnnotationTemplateTypeHasNoSubType );
     }
     else
     {
@@ -231,6 +237,45 @@ void TypeCheckVisitor::visit( ComposedType& node )
         subTypeList.add( subType->type() );
     }
 
+    if( name == TYPE_STRING_TUPLE )
+    {
+        assert( subTypeList.size() >= 2 );
+        const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
+        node.setType( type );
+    }
+    else
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown composed type '" + name + "' found",
+            Code::TypeAnnotationInvalidComposedTypeName );
+    }
+}
+
+void TypeCheckVisitor::visit( TemplateType& node )
+{
+    RecursiveVisitor::visit( node );
+
+    if( node.type() )
+    {
+        return;
+    }
+
+    const auto& name = node.name()->baseName();
+
+    libcasm_ir::Types subTypeList;
+    for( auto subType : *node.subTypes() )
+    {
+        if( not subType->type() )
+        {
+            m_log.info(
+                { subType->sourceLocation() }, "TODO: '" + name + "' has a non-typed sub type" );
+            return;
+        }
+
+        subTypeList.add( subType->type() );
+    }
+
     if( name == TYPE_STRING_RANGE )
     {
         if( subTypeList.size() == 1 )
@@ -242,7 +287,7 @@ void TypeCheckVisitor::visit( ComposedType& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "composed type '" + name + "' can only have one sub-type" );
+                "template type '" + name + "' can only have one sub-type" );
         }
     }
     else if( name == TYPE_STRING_TUPLE )
@@ -261,14 +306,14 @@ void TypeCheckVisitor::visit( ComposedType& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "composed type '" + name + "' can only have one sub-type" );
+                "template type '" + name + "' can only have one sub-type" );
         }
     }
     else if( name == TYPE_STRING_FILE )
     {
         if( subTypeList.size() == 1 )
         {
-            m_log.info( { node.sourceLocation() }, "composed type '" + name + "' is experimental" );
+            m_log.info( { node.sourceLocation() }, "template type '" + name + "' is experimental" );
 
             const auto type = libstdhl::Memory::make< libcasm_ir::FileType >( subTypeList[ 0 ] );
             node.setType( type );
@@ -277,14 +322,14 @@ void TypeCheckVisitor::visit( ComposedType& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "composed type '" + name + "' can only have one sub-type" );
+                "template type '" + name + "' can only have one sub-type" );
         }
     }
     else if( name == TYPE_STRING_PORT )
     {
         if( subTypeList.size() == 1 )
         {
-            m_log.info( { node.sourceLocation() }, "composed type '" + name + "' is experimental" );
+            m_log.info( { node.sourceLocation() }, "template type '" + name + "' is experimental" );
 
             const auto type = libstdhl::Memory::make< libcasm_ir::PortType >( subTypeList[ 0 ] );
             node.setType( type );
@@ -293,15 +338,15 @@ void TypeCheckVisitor::visit( ComposedType& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "composed type '" + name + "' can only have one sub-type" );
+                "template type '" + name + "' can only have one sub-type" );
         }
     }
     else
     {
         m_log.error(
             { node.sourceLocation() },
-            "unknown composed type '" + name + "' found",
-            Code::TypeAnnotationInvalidComposedTypeName );
+            "unknown template type '" + name + "' found",
+            Code::TypeAnnotationInvalidTemplateTypeName );
     }
 }
 

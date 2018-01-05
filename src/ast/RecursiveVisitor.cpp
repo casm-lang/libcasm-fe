@@ -287,6 +287,12 @@ void RecursiveVisitor::visit( ComposedType& node )
     node.subTypes()->accept( *this );
 }
 
+void RecursiveVisitor::visit( TemplateType& node )
+{
+    node.name()->accept( *this );
+    node.subTypes()->accept( *this );
+}
+
 void RecursiveVisitor::visit( FixedSizedType& node )
 {
     node.name()->accept( *this );
