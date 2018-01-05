@@ -230,7 +230,7 @@ void TypeCheckVisitor::visit( ComposedType& node )
         if( not subType->type() )
         {
             m_log.info(
-                { subType->sourceLocation() }, "TODO: '" + name + "' has a non-typed sub type" );
+                { subType->sourceLocation() }, "TODO: '" + name + "' has a non-typed sub-type" );
             return;
         }
 
@@ -269,7 +269,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
         if( not subType->type() )
         {
             m_log.info(
-                { subType->sourceLocation() }, "TODO: '" + name + "' has a non-typed sub type" );
+                { subType->sourceLocation() }, "TODO: '" + name + "' has a non-typed sub-type" );
             return;
         }
 
@@ -292,8 +292,26 @@ void TypeCheckVisitor::visit( TemplateType& node )
     }
     else if( name == TYPE_STRING_TUPLE )
     {
-        const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
-        node.setType( type );
+        if( subTypeList.size() >= 2 )
+        {
+            const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
+            m_log.error(
+                { node.sourceLocation() },
+                "'" + name + "' is a built-in composed type, use syntax '" + type->description() +
+                    "'",
+                Code::TypeAnnotationInvalidTemplateTypeName );
+        }
+        else
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "'" + name + "' is a built-in composed type, use syntax '(" +
+                    subTypeList[ 0 ]->description() + ", ...)'",
+                Code::TypeAnnotationInvalidTemplateTypeName );
+            m_log.info(
+                { node.sourceLocation() },
+                "'" + name + "' is a built-in composed type, and needs at least 2 sub-types" );
+        }
     }
     else if( name == TYPE_STRING_LIST )
     {
