@@ -604,6 +604,7 @@ Types ::= Types "," Type
 <code>
 Type ::= BasicType
        | ComposedType
+       | TemplateType
        | RelationType
        | FixedSizedType
 </code>
@@ -623,10 +624,19 @@ BasicType ::= IdentifierPath
 ===== ComposedType =====
 
 <code>
-ComposedType ::= IdentifierPath "<" Types ">"
+ComposedType ::= "(" Types "," Type ")"
 </code>
 
 {{page>:grammar:ComposedType&noheader&nofooter}}
+
+
+===== TemplateType =====
+
+<code>
+TemplateType ::= IdentifierPath "<" Types ">"
+</code>
+
+{{page>:grammar:TemplateType&noheader&nofooter}}
 
 
 ===== RelationType =====
