@@ -240,6 +240,10 @@ std::string Node::description( void ) const
         {
             return "composed type";
         }
+        case ID::TEMPLATE_TYPE:
+        {
+            return "template type";
+        }
         case ID::FIXED_SIZED_TYPE:
         {
             return "fixed sized type";

@@ -115,6 +115,7 @@ namespace libcasm_fe
                 UNRESOLVED_TYPE,
                 BASIC_TYPE,
                 COMPOSED_TYPE,
+                TEMPLATE_TYPE,
                 FIXED_SIZED_TYPE,
                 RELATION_TYPE,
 
