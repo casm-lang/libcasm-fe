@@ -287,7 +287,8 @@ void TypeCheckVisitor::visit( TemplateType& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "template type '" + name + "' can only have one sub-type" );
+                "template type '" + name + "' can only have one sub-type",
+                Code::TypeAnnotationInvalidTemplateTypeSize );
         }
     }
     else if( name == TYPE_STRING_TUPLE )
@@ -324,7 +325,8 @@ void TypeCheckVisitor::visit( TemplateType& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "template type '" + name + "' can only have one sub-type" );
+                "template type '" + name + "' can only have one sub-type",
+                Code::TypeAnnotationInvalidTemplateTypeSize );
         }
     }
     else if( name == TYPE_STRING_FILE )
@@ -340,7 +342,8 @@ void TypeCheckVisitor::visit( TemplateType& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "template type '" + name + "' can only have one sub-type" );
+                "template type '" + name + "' can only have one sub-type",
+                Code::TypeAnnotationInvalidTemplateTypeSize );
         }
     }
     else if( name == TYPE_STRING_PORT )
@@ -356,7 +359,8 @@ void TypeCheckVisitor::visit( TemplateType& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "template type '" + name + "' can only have one sub-type" );
+                "template type '" + name + "' can only have one sub-type",
+                Code::TypeAnnotationInvalidTemplateTypeSize );
         }
     }
     else
