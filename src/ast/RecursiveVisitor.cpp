@@ -135,6 +135,16 @@ void RecursiveVisitor::visit( RangeLiteral& node )
     node.right()->accept( *this );
 }
 
+void RecursiveVisitor::visit( TupleLiteral& node )
+{
+    node.expressions()->accept( *this );
+}
+
+void RecursiveVisitor::visit( NamedTupleLiteral& node )
+{
+    node.namedExpressions()->accept( *this );
+}
+
 void RecursiveVisitor::visit( DirectCallExpression& node )
 {
     node.identifier()->accept( *this );

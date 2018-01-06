@@ -162,6 +162,8 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( ReferenceLiteral& node ) override;
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
+    void visit( TupleLiteral& node ) override;
+    void visit( NamedTupleLiteral& node ) override;
 
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
@@ -359,6 +361,20 @@ void AstDumpSourceVisitor::visit( RangeLiteral& node )
     m_stream << "..";
     node.right()->accept( *this );
     m_stream << "]";
+}
+
+void AstDumpSourceVisitor::visit( TupleLiteral& node )
+{
+    m_stream << "(";
+    dumpNodes( *node.expressions(), ", " );
+    m_stream << ")";
+}
+
+void AstDumpSourceVisitor::visit( NamedTupleLiteral& node )
+{
+    m_stream << "(";
+    dumpNodes( *node.namedExpressions(), ", " );
+    m_stream << ")";
 }
 
 void AstDumpSourceVisitor::visit( DirectCallExpression& node )

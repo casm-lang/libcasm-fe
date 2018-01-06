@@ -226,7 +226,7 @@ const Expressions::Ptr& TupleLiteral::expressions( void ) const
 
 void TupleLiteral::accept( Visitor& visitor )
 {
-    // TODO: PPA: visitor.visit( *this );
+    visitor.visit( *this );
 }
 
 //
@@ -247,7 +247,7 @@ const NamedExpressions::Ptr& NamedTupleLiteral::namedExpressions( void ) const
 
 void NamedTupleLiteral::accept( Visitor& visitor )
 {
-    // TODO: PPA: visitor.visit( *this );
+    visitor.visit( *this );
 }
 
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )

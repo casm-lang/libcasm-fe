@@ -102,6 +102,14 @@ void EmptyVisitor::visit( RangeLiteral& )
 {
 }
 
+void EmptyVisitor::visit( TupleLiteral& )
+{
+}
+
+void EmptyVisitor::visit( NamedTupleLiteral& )
+{
+}
+
 void EmptyVisitor::visit( DirectCallExpression& )
 {
 }
