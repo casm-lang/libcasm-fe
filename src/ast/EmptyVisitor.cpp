@@ -110,6 +110,10 @@ void EmptyVisitor::visit( NamedTupleLiteral& )
 {
 }
 
+void EmptyVisitor::visit( NamedExpression& )
+{
+}
+
 void EmptyVisitor::visit( DirectCallExpression& )
 {
 }

@@ -122,6 +122,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( TupleLiteral& node ) override;
     void visit( NamedTupleLiteral& node ) override;
 
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
@@ -296,6 +297,13 @@ void AstDumpDotVisitor::visit( NamedTupleLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "NamedTupleLiteral" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( NamedExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "NamedExpression" );
     RecursiveVisitor::visit( node );
 }
 

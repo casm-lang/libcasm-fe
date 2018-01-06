@@ -65,6 +65,7 @@ namespace libcasm_fe
         class TupleLiteral;
         class NamedTupleLiteral;
 
+        class NamedExpression;
         class DirectCallExpression;
         class MethodCallExpression;
         class IndirectCallExpression;
@@ -129,6 +130,7 @@ namespace libcasm_fe
             virtual void visit( TupleLiteral& node ) = 0;
             virtual void visit( NamedTupleLiteral& node ) = 0;
 
+            virtual void visit( NamedExpression& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( MethodCallExpression& node ) = 0;
             virtual void visit( IndirectCallExpression& node ) = 0;

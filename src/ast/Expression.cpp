@@ -79,7 +79,7 @@ const Expression::Ptr& NamedExpression::expression( void ) const
 
 void NamedExpression::accept( Visitor& visitor )
 {
-    // TODO: PPA: visitor.visit( *this );
+    visitor.visit( *this );
 }
 
 UndefLiteral::UndefLiteral( void )
