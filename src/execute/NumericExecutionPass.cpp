@@ -310,6 +310,8 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( ReferenceLiteral& node ) override;
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
+    void visit( TupleLiteral& node ) override;
+    void visit( NamedTupleLiteral& node ) override;
 
     void visit( BasicType& node ) override;
     void visit( DirectCallExpression& node ) override;
@@ -581,6 +583,31 @@ void ExecutionVisitor::visit( RangeLiteral& node )
     const auto rhs = m_evaluationStack.pop();
 
     m_evaluationStack.push( IR::RangeConstant( node.type(), lhs, rhs ) );
+}
+
+void ExecutionVisitor::visit( TupleLiteral& node )
+{
+    assert( node.type()->isTuple() );
+    const auto tupleType = std::static_pointer_cast< IR::TupleType >( node.type() );
+
+    const auto tupleSize = node.expressions()->size();
+    std::vector< IR::Constant > tupleElements;
+    tupleElements.reserve( tupleSize );
+
+    for( std::size_t index = 0; index < tupleSize; index++ )
+    {
+        const auto& expression = ( *node.expressions() )[ index ];
+        expression->accept( *this );
+        const auto constantElement = m_evaluationStack.pop();
+        tupleElements.emplace_back( constantElement );
+    }
+
+    m_evaluationStack.push( IR::TupleConstant( tupleType, tupleElements ) );
+}
+
+void ExecutionVisitor::visit( NamedTupleLiteral& node )
+{
+    // TODO: PPA:
 }
 
 void ExecutionVisitor::visit( BasicType& node )
