@@ -57,6 +57,7 @@ add_library( ${PROJECT}-cpp OBJECT
   ast/Attribute.cpp
   ast/Definition.cpp
   ast/Expression.cpp
+  ast/Literal.cpp
   ast/Node.cpp
   ast/Rule.cpp
   ast/Type.cpp
@@ -232,6 +233,7 @@ ecm_generate_headers( ${PROJECT}_AST_HEADERS_CPP
     Definition
     EmptyVisitor
     Expression
+    Literal
     Node
     RecursiveVisitor
     Rule
