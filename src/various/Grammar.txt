@@ -625,6 +625,7 @@ BasicType ::= IdentifierPath
 
 <code>
 ComposedType ::= "(" Types "," Type ")"
+               | "(" TypedVariables "," TypedVariable ")"
 </code>
 
 {{page>:grammar:ComposedType&noheader&nofooter}}
@@ -796,6 +797,16 @@ Variable ::= TypedVariable
 </code>
 
 {{page>:grammar:Variable&noheader&nofooter}}
+
+
+===== TypedVariables =====
+
+<code>
+TypedVariables ::= TypedVariables "," TypedVariable
+                 | TypedVariable
+</code>
+
+{{page>:grammar:TypedVariables&noheader&nofooter}}
 
 
 ===== TypedVariable =====
