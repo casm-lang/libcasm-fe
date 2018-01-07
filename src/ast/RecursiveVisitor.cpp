@@ -45,6 +45,7 @@
 
 #include "Definition.h"
 #include "Expression.h"
+#include "Literal.h"
 #include "Rule.h"
 
 using namespace libcasm_fe;

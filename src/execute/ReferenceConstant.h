@@ -44,8 +44,7 @@
 #ifndef _LIBCASM_FE_REFERENCE_CONSTANT_H_
 #define _LIBCASM_FE_REFERENCE_CONSTANT_H_
 
-#include <libcasm-fe/ast/Expression>
-#include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Literal>
 
 #include <libcasm-ir/Constant>
 
