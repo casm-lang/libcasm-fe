@@ -314,6 +314,8 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( NamedTupleLiteral& node ) override;
 
     void visit( BasicType& node ) override;
+
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
@@ -607,7 +609,19 @@ void ExecutionVisitor::visit( TupleLiteral& node )
 
 void ExecutionVisitor::visit( NamedTupleLiteral& node )
 {
-    // TODO: PPA:
+    assert( node.type()->isTuple() );
+    const auto tupleType = std::static_pointer_cast< IR::TupleType >( node.type() );
+
+    // iterate through the in-order, out-of-order, or partial named expressions and assign the
+    // appropriate index with the given expression
+    std::unordered_map< std::string, IR::Constant > tupleElements;
+    for( const auto& namedExpression : *node.namedExpressions() )
+    {
+        namedExpression->accept( *this );
+        tupleElements.emplace( namedExpression->identifier()->name(), m_evaluationStack.pop() );
+    }
+
+    m_evaluationStack.push( IR::TupleConstant( tupleType, tupleElements ) );
 }
 
 void ExecutionVisitor::visit( BasicType& node )
@@ -615,6 +629,12 @@ void ExecutionVisitor::visit( BasicType& node )
     const auto rangeType = std::make_shared< IR::RangeType >( node.type() );
     const auto range = std::make_shared< IR::Range >( rangeType );
     m_evaluationStack.push( IR::RangeConstant( rangeType, range ) );
+}
+
+void ExecutionVisitor::visit( NamedExpression& node )
+{
+    // just evaluate the named expression and push it to the stack
+    node.expression()->accept( *this );
 }
 
 void ExecutionVisitor::visit( DirectCallExpression& node )
