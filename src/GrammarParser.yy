@@ -197,7 +197,7 @@ END       0 "end of file"
 %type <UsingDefinition::Ptr> UsingDefinition
 
 // literals
-%type <Expression::Ptr> Literal
+%type <Literal::Ptr> Literal
 %type <UndefLiteral::Ptr> UndefinedLiteral
 %type <ValueLiteral::Ptr> BooleanLiteral StringLiteral BinaryLiteral IntegerLiteral DecimalLiteral RationalLiteral
 %type <ReferenceLiteral::Ptr> ReferenceLiteral
@@ -211,6 +211,7 @@ END       0 "end of file"
 %type <Expressions::Ptr> Terms
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <MethodCallExpression::Ptr> MethodCallExpression
+%type <LiteralCallExpression::Ptr> LiteralCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
 %type <TypeCastingExpression::Ptr> TypeCastingExpression
 %type <LetExpression::Ptr> LetExpression
@@ -849,6 +850,10 @@ SimpleOrClaspedTerm
   {
       $$ = $1;
   }
+| LiteralCallExpression
+  {
+      $$ = $1;
+  }
 | IndirectCallExpression
   {
       $$ = $1;
@@ -970,6 +975,14 @@ MethodCallExpression
 | SimpleOrClaspedTerm DOT Identifier Arguments
   {
       $$ = Ast::make< MethodCallExpression >( @$, $1, $3, $4 );
+  }
+;
+
+
+LiteralCallExpression
+: SimpleOrClaspedTerm DOT IntegerLiteral
+  {
+      $$ = Ast::make< LiteralCallExpression >( @$, $1, $3 );
   }
 ;
 
