@@ -148,6 +148,10 @@ std::string Node::description( void ) const
         {
             return "method call";
         }
+        case ID::LITERAL_CALL_EXPRESSION:
+        {
+            return "literal call";
+        }
         case ID::INDIRECT_CALL_EXPRESSION:
         {
             return "indirect call";

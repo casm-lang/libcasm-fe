@@ -53,6 +53,7 @@ namespace libcasm_fe
     namespace Ast
     {
         class Type;
+        class Literal;
         class VariableDefinition;
 
         class Expression : public TypedNode
@@ -208,6 +209,24 @@ namespace libcasm_fe
             MethodType m_methodType;
             libcasm_ir::Value::ID m_targetBuiltinId;
             TypedNode::Ptr m_targetDefinition;
+        };
+
+        class LiteralCallExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< LiteralCallExpression >;
+
+            LiteralCallExpression(
+                const Expression::Ptr& object, const std::shared_ptr< Literal >& literal );
+
+            const Expression::Ptr& object( void ) const;
+            const std::shared_ptr< Literal >& literal( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_object;
+            const std::shared_ptr< Literal > m_literal;
         };
 
         class IndirectCallExpression final : public CallExpression

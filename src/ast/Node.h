@@ -88,6 +88,7 @@ namespace libcasm_fe
                 NAMED_EXPRESSION,
                 DIRECT_CALL_EXPRESSION,
                 METHOD_CALL_EXPRESSION,
+                LITERAL_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,
                 TYPE_CASTING_EXPRESSION,
                 UNARY_EXPRESSION,

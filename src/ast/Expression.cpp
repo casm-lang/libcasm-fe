@@ -43,11 +43,17 @@
 
 #include "Expression.h"
 
-#include "Definition.h"
-#include "Type.h"
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/ast/Type>
 
 using namespace libcasm_fe;
 using namespace Ast;
+
+//
+//
+// Expression
+//
 
 Expression::Expression( Node::ID id )
 : TypedNode( id )
@@ -81,6 +87,11 @@ void NamedExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// CallExpression
+//
 
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
@@ -179,6 +190,11 @@ const TypedNode::Ptr& CallExpression::targetDefinition( void ) const
     return m_targetDefinition;
 }
 
+//
+//
+// DirectCallExpression
+//
+
 DirectCallExpression::DirectCallExpression(
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
@@ -200,6 +216,11 @@ void DirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// MethodCallExpression
+//
 
 MethodCallExpression::MethodCallExpression(
     const Expression::Ptr& object,
@@ -292,6 +313,39 @@ void MethodCallExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// LiteralCallExpression
+//
+
+LiteralCallExpression::LiteralCallExpression(
+    const Expression::Ptr& object, const std::shared_ptr< Literal >& literal )
+: Expression( Node::ID::LITERAL_CALL_EXPRESSION )
+, m_object( object )
+, m_literal( literal )
+{
+}
+
+const Expression::Ptr& LiteralCallExpression::object( void ) const
+{
+    return m_object;
+}
+
+const std::shared_ptr< Literal >& LiteralCallExpression::literal( void ) const
+{
+    return m_literal;
+}
+
+void LiteralCallExpression::accept( Visitor& visitor )
+{
+    // TODO: PPA: visitor.visit( *this );
+}
+
+//
+//
+// IndirectCallExpression
+//
+
 IndirectCallExpression::IndirectCallExpression(
     const Expression::Ptr& expression, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION, arguments )
@@ -308,6 +362,11 @@ void IndirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// TypeCastingExpression
+//
 
 TypeCastingExpression::TypeCastingExpression(
     const Expression::Ptr& fromExpression, const Type::Ptr& asType )
@@ -385,6 +444,11 @@ void TypeCastingExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// UnaryExpression
+//
+
 UnaryExpression::UnaryExpression( const Expression::Ptr& expression, libcasm_ir::Value::ID op )
 : Expression( Node::ID::UNARY_EXPRESSION )
 , m_op( op )
@@ -406,6 +470,11 @@ void UnaryExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// BinaryExpression
+//
 
 BinaryExpression::BinaryExpression(
     const Expression::Ptr& left, const Expression::Ptr& right, libcasm_ir::Value::ID op )
@@ -435,6 +504,11 @@ void BinaryExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// LetExpression
+//
 
 LetExpression::LetExpression(
     const VariableDefinition::Ptr& variable,
@@ -467,6 +541,11 @@ void LetExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// ConditionalExpression
+//
+
 ConditionalExpression::ConditionalExpression(
     const Expression::Ptr& condition,
     const Expression::Ptr& thenExpression,
@@ -497,6 +576,11 @@ void ConditionalExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// ChooseExpression
+//
 
 ChooseExpression::ChooseExpression(
     const VariableDefinition::Ptr& variable,
@@ -529,6 +613,11 @@ void ChooseExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// QuantifierExpression
+//
+
 QuantifierExpression::QuantifierExpression(
     Node::ID id,
     const VariableDefinition::Ptr& predicateVariable,
@@ -556,6 +645,11 @@ const Expression::Ptr& QuantifierExpression::proposition( void ) const
     return m_proposition;
 }
 
+//
+//
+// UniversalQuantifierExpression
+//
+
 UniversalQuantifierExpression::UniversalQuantifierExpression(
     const std::shared_ptr< VariableDefinition >& predicateVariable,
     const Expression::Ptr& universe,
@@ -569,6 +663,11 @@ void UniversalQuantifierExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// ExistentialQuantifierExpression
+//
 
 ExistentialQuantifierExpression::ExistentialQuantifierExpression(
     const std::shared_ptr< VariableDefinition >& predicateVariable,
