@@ -300,6 +300,10 @@ void RecursiveVisitor::visit( BasicType& node )
 void RecursiveVisitor::visit( ComposedType& node )
 {
     node.name()->accept( *this );
+    if( node.isNamed() )
+    {
+        node.subTypeIdentifiers()->accept( *this );
+    }
     node.subTypes()->accept( *this );
 }
 

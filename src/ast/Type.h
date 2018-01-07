@@ -92,12 +92,22 @@ namespace libcasm_fe
 
             ComposedType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes );
 
+            ComposedType(
+                const IdentifierPath::Ptr& identifier,
+                const Types::Ptr& subTypes,
+                const Identifiers::Ptr& subTypeIdentifiers );
+
             const Types::Ptr& subTypes( void ) const;
+
+            const Identifiers::Ptr& subTypeIdentifiers( void ) const;
+
+            u1 isNamed( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Types::Ptr m_subTypes;
+            const Identifiers::Ptr m_subTypeIdentifiers;
         };
 
         class TemplateType final : public Type

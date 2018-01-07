@@ -634,7 +634,25 @@ void AstDumpSourceVisitor::visit( BasicType& node )
 void AstDumpSourceVisitor::visit( ComposedType& node )
 {
     m_stream << "(";
-    dumpNodes( *node.subTypes(), ", " );
+    if( not node.isNamed() )
+    {
+        dumpNodes( *node.subTypes(), ", " );
+    }
+    else
+    {
+        u1 firstNode = true;
+        for( std::size_t index = 0; index < node.subTypes()->size(); index++ )
+        {
+            if( not firstNode )
+            {
+                m_stream << ", ";
+            }
+            (*node.subTypeIdentifiers())[ index ]->accept( *this );
+            m_stream << " : ";
+            (*node.subTypes())[ index ]->accept( *this );
+            firstNode = false;
+        }
+    }
     m_stream << ")";
 }
 
