@@ -240,8 +240,25 @@ void TypeCheckVisitor::visit( ComposedType& node )
     if( name == TYPE_STRING_TUPLE )
     {
         assert( subTypeList.size() >= 2 );
-        const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
-        node.setType( type );
+
+        if( not node.isNamed() )
+        {
+            const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
+            node.setType( type );
+        }
+        else
+        {
+            std::vector< std::string > subTypeNames;
+            subTypeNames.reserve( node.subTypeIdentifiers()->size() );
+            for( const auto& subTypeIdentifier : *node.subTypeIdentifiers() )
+            {
+                subTypeNames.emplace_back( subTypeIdentifier->name() );
+            }
+
+            const auto type =
+                libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList, subTypeNames );
+            node.setType( type );
+        }
     }
     else
     {
