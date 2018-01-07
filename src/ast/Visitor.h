@@ -68,6 +68,7 @@ namespace libcasm_fe
         class NamedExpression;
         class DirectCallExpression;
         class MethodCallExpression;
+        class LiteralCallExpression;
         class IndirectCallExpression;
         class TypeCastingExpression;
         class UnaryExpression;
@@ -133,6 +134,7 @@ namespace libcasm_fe
             virtual void visit( NamedExpression& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( MethodCallExpression& node ) = 0;
+            virtual void visit( LiteralCallExpression& node ) = 0;
             virtual void visit( IndirectCallExpression& node ) = 0;
             virtual void visit( TypeCastingExpression& node ) = 0;
             virtual void visit( UnaryExpression& node ) = 0;

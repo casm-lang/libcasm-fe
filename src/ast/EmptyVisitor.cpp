@@ -122,6 +122,10 @@ void EmptyVisitor::visit( MethodCallExpression& )
 {
 }
 
+void EmptyVisitor::visit( LiteralCallExpression& )
+{
+}
+
 void EmptyVisitor::visit( IndirectCallExpression& )
 {
 }

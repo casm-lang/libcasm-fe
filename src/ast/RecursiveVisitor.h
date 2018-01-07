@@ -73,6 +73,7 @@ namespace libcasm_fe
             void visit( NamedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;
             void visit( MethodCallExpression& node ) override;
+            void visit( LiteralCallExpression& node ) override;
             void visit( IndirectCallExpression& node ) override;
             void visit( TypeCastingExpression& node ) override;
             void visit( UnaryExpression& node ) override;

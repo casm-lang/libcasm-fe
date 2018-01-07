@@ -338,7 +338,7 @@ const std::shared_ptr< Literal >& LiteralCallExpression::literal( void ) const
 
 void LiteralCallExpression::accept( Visitor& visitor )
 {
-    // TODO: PPA: visitor.visit( *this );
+    visitor.visit( *this );
 }
 
 //

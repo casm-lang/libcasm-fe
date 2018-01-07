@@ -168,6 +168,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -409,6 +410,13 @@ void AstDumpSourceVisitor::visit( MethodCallExpression& node )
         dumpNodes( *node.arguments(), ", " );
         m_stream << ")";
     }
+}
+
+void AstDumpSourceVisitor::visit( LiteralCallExpression& node )
+{
+    node.object()->accept( *this );
+    m_stream << ".";
+    node.literal()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
