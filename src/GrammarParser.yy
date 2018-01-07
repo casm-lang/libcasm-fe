@@ -187,6 +187,7 @@ END       0 "end of file"
 %type <Definitions::Ptr> Definitions
 %type <HeaderDefinition::Ptr> Header
 %type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
+%type <VariableDefinitions::Ptr> TypedVariables
 %type <FunctionDefinition::Ptr> FunctionDefinition
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
@@ -261,7 +262,7 @@ END       0 "end of file"
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <Expressions::Ptr> Arguments
-%type <NodeList< VariableDefinition >::Ptr> Parameters MaybeParameters
+%type <VariableDefinitions::Ptr> Parameters MaybeParameters
 
 
 %start Specification
@@ -1325,9 +1326,25 @@ ComposedType
 : LPAREN Types COMMA Type RPAREN
   {
       const auto identifier = Ast::make< Identifier >( @$, "Tuple" );
-      auto types = $2;
-      types->add( $4 );
-      $$ = Ast::make< ComposedType >( @$, asIdentifierPath( identifier ), types );
+      auto subTypes = $2;
+      subTypes->add( $4 );
+      $$ = Ast::make< ComposedType >( @$, asIdentifierPath( identifier ), subTypes );
+  }
+| LPAREN TypedVariables COMMA TypedVariable RPAREN
+  {
+      const auto identifier = Ast::make< Identifier >( @$, "Tuple" );
+      auto namedSubTypes = $2;
+      namedSubTypes->add( $4 );
+
+      auto identifiers = Ast::make< Identifiers >( @$ );
+      auto subTypes = Ast::make< Types >( @$ );
+      for( const auto& namedSubType : *namedSubTypes )
+      {
+          identifiers->add( namedSubType->identifier() );
+          subTypes->add( namedSubType->variableType() );
+      }
+
+      $$ = Ast::make< ComposedType >( @$, asIdentifierPath( identifier ), subTypes, identifiers );
   }
 ;
 
@@ -1586,6 +1603,22 @@ Variable
   {
       const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
       $$ = Ast::make< VariableDefinition >( @$, $1, unresolvedType );
+  }
+;
+
+
+TypedVariables
+: TypedVariables COMMA TypedVariable
+  {
+      auto typedVariables = $1;
+      typedVariables->add( $3 );
+      $$ = typedVariables;
+  }
+| TypedVariable
+  {
+      auto typedVariables = Ast::make< VariableDefinitions >( @$ );
+      typedVariables->add( $1 );
+      $$ = typedVariables;
   }
 ;
 
