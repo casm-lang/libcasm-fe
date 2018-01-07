@@ -321,6 +321,7 @@ Term ::= SimpleOrClaspedTerm
 SimpleOrClaspedTerm ::= "(" Term ")"
                       | DirectCallExpression
                       | MethodCallExpression
+                      | LiteralCallExpression
                       | IndirectCallExpression
                       | Literal
 </code>
@@ -374,6 +375,15 @@ MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
 </code>
 
 {{page>:grammar:MethodCallExpression&noheader&nofooter}}
+
+
+===== LiteralCallExpression =====
+
+<code>
+LiteralCallExpression ::= SimpleOrClaspedTerm "." IntegerLiteral
+</code>
+
+{{page>:grammar:LiteralCallExpression&noheader&nofooter}}
 
 
 ===== IndirectCallExpression =====
