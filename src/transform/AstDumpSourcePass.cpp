@@ -647,9 +647,9 @@ void AstDumpSourceVisitor::visit( ComposedType& node )
             {
                 m_stream << ", ";
             }
-            (*node.subTypeIdentifiers())[ index ]->accept( *this );
+            ( *node.subTypeIdentifiers() )[ index ]->accept( *this );
             m_stream << " : ";
-            (*node.subTypes())[ index ]->accept( *this );
+            ( *node.subTypes() )[ index ]->accept( *this );
             firstNode = false;
         }
     }
