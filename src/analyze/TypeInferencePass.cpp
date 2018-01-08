@@ -89,6 +89,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -625,6 +626,56 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
     else
     {
         node.setType( type );
+    }
+}
+
+void TypeInferenceVisitor::visit( LiteralCallExpression& node )
+{
+    node.object()->accept( *this );
+
+    const auto& objectType = node.object()->type();
+    if( not objectType )
+    {
+        // the object type is essential to resolve the literal access
+        m_log.error(
+            { node.sourceLocation() },
+            "unable to resolve object type",
+            Code::TypeInferenceInvalidLiteralCallExpression );
+        return;
+    }
+
+    node.literal()->accept( *this );
+
+    const auto& literalType = node.literal()->type();
+    if( not literalType )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unable to resolve literal type",
+            Code::TypeInferenceInvalidLiteralCallExpression );
+        return;
+    }
+
+    if( objectType->isTuple() and literalType->isInteger() )
+    {
+        const auto& literal = static_cast< const ValueLiteral& >( *node.literal() );
+        const auto& constant =
+            static_cast< const libcasm_ir::IntegerConstant& >( *literal.value() );
+        const auto& value = static_cast< const libstdhl::Type::Integer& >( constant.value() );
+
+        if( value >= 0 and value < objectType->arguments().size() )
+        {
+            assert( value.trivial() );
+
+            const auto& resultType = objectType->arguments()[ value.value() ];
+            std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+            argumentTypes.emplace_back( objectType->ptr_result() );
+            argumentTypes.emplace_back( literalType->ptr_result() );
+
+            const auto type =
+                libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
+            node.setType( type );
+        }
     }
 }
 
