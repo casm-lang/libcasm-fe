@@ -88,7 +88,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
     void visit( TupleLiteral& node ) override;
-    void visit( NamedTupleLiteral& node ) override;
+    void visit( RecordLiteral& node ) override;
 
     void visit( DirectCallExpression& node ) override;
 
@@ -199,9 +199,9 @@ void ConsistencyCheckVisitor::visit( TupleLiteral& node )
     assert( node.type()->isTuple() );
 }
 
-void ConsistencyCheckVisitor::visit( NamedTupleLiteral& node )
+void ConsistencyCheckVisitor::visit( RecordLiteral& node )
 {
-    assert( node.type()->isTuple() );
+    assert( node.type()->isRecord() );
 }
 
 void ConsistencyCheckVisitor::visit( CaseRule& node )
