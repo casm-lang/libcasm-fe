@@ -106,7 +106,7 @@ void EmptyVisitor::visit( TupleLiteral& )
 {
 }
 
-void EmptyVisitor::visit( NamedTupleLiteral& )
+void EmptyVisitor::visit( RecordLiteral& )
 {
 }
 

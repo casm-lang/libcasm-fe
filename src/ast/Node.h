@@ -82,7 +82,7 @@ namespace libcasm_fe
                 LIST_LITERAL,
                 RANGE_LITERAL,
                 TUPLE_LITERAL,
-                NAMED_TUPLE_LITERAL,
+                RECORD_LITERAL,
 
                 // expressions
                 NAMED_EXPRESSION,

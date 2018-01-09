@@ -132,9 +132,9 @@ std::string Node::description( void ) const
         {
             return "tuple";
         }
-        case ID::NAMED_TUPLE_LITERAL:
+        case ID::RECORD_LITERAL:
         {
-            return "named tuple";
+            return "record";
         }
         case ID::NAMED_EXPRESSION:
         {

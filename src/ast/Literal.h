@@ -172,12 +172,12 @@ namespace libcasm_fe
             const Expressions::Ptr m_expressions;
         };
 
-        class NamedTupleLiteral final : public Literal
+        class RecordLiteral final : public Literal
         {
           public:
-            using Ptr = std::shared_ptr< NamedTupleLiteral >;
+            using Ptr = std::shared_ptr< RecordLiteral >;
 
-            NamedTupleLiteral( const NamedExpressions::Ptr& namedExpressions );
+            RecordLiteral( const NamedExpressions::Ptr& namedExpressions );
 
             const NamedExpressions::Ptr& namedExpressions( void ) const;
 

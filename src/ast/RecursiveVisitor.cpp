@@ -141,7 +141,7 @@ void RecursiveVisitor::visit( TupleLiteral& node )
     node.expressions()->accept( *this );
 }
 
-void RecursiveVisitor::visit( NamedTupleLiteral& node )
+void RecursiveVisitor::visit( RecordLiteral& node )
 {
     node.namedExpressions()->accept( *this );
 }

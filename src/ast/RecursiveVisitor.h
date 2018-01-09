@@ -68,7 +68,7 @@ namespace libcasm_fe
             void visit( ListLiteral& node ) override;
             void visit( RangeLiteral& node ) override;
             void visit( TupleLiteral& node ) override;
-            void visit( NamedTupleLiteral& node ) override;
+            void visit( RecordLiteral& node ) override;
 
             void visit( NamedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;

@@ -228,21 +228,21 @@ void TupleLiteral::accept( Visitor& visitor )
 
 //
 //
-// NamedTupleLiteral
+// RecordLiteral
 //
 
-NamedTupleLiteral::NamedTupleLiteral( const NamedExpressions::Ptr& namedExpressions )
-: Literal( Node::ID::NAMED_TUPLE_LITERAL )
+RecordLiteral::RecordLiteral( const NamedExpressions::Ptr& namedExpressions )
+: Literal( Node::ID::RECORD_LITERAL )
 , m_namedExpressions( namedExpressions )
 {
 }
 
-const NamedExpressions::Ptr& NamedTupleLiteral::namedExpressions( void ) const
+const NamedExpressions::Ptr& RecordLiteral::namedExpressions( void ) const
 {
     return m_namedExpressions;
 }
 
-void NamedTupleLiteral::accept( Visitor& visitor )
+void RecordLiteral::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
