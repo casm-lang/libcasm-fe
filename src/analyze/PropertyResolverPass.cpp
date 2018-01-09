@@ -88,6 +88,7 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     void visit( TupleLiteral& node ) override;
     void visit( NamedTupleLiteral& node ) override;
 
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
@@ -278,6 +279,16 @@ void PropertyResolverVisitor::visit( NamedTupleLiteral& node )
     {
         node.setProperties( node.properties() * namedExpression->properties() );
     }
+}
+
+void PropertyResolverVisitor::visit( NamedExpression& node )
+{
+    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::PURE );
+
+    RecursiveVisitor::visit( node );
+
+    node.setProperties( node.properties() * node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( DirectCallExpression& node )
