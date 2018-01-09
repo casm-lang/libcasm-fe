@@ -204,7 +204,7 @@ END       0 "end of file"
 %type <ListLiteral::Ptr> ListLiteral
 %type <RangeLiteral::Ptr> RangeLiteral
 %type <TupleLiteral::Ptr> TupleLiteral
-%type <NamedTupleLiteral::Ptr> NamedTupleLiteral
+%type <RecordLiteral::Ptr> RecordLiteral
 
 // expressions
 %type <Expression::Ptr> Term SimpleOrClaspedTerm OperatorExpression
@@ -243,7 +243,7 @@ END       0 "end of file"
 %type <libcasm_fe::Ast::Type::Ptr> Type
 %type <Types::Ptr> Types
 %type <BasicType::Ptr> BasicType
-%type <ComposedType::Ptr> ComposedType
+%type <ComposedType::Ptr> ComposedType TupleType RecordType
 %type <TemplateType::Ptr> TemplateType
 %type <RelationType::Ptr> RelationType
 %type <FixedSizedType::Ptr> FixedSizedType
@@ -1092,7 +1092,7 @@ Literal
   {
       $$ = $1;
   }
-| NamedTupleLiteral
+| RecordLiteral
   {
       $$ = $1;
   }
@@ -1253,10 +1253,10 @@ TupleLiteral
       $$ = Ast::make< TupleLiteral >( @$, expressions );
   }
 
-NamedTupleLiteral
+RecordLiteral
 : LPAREN Assignments RPAREN
   {
-      $$ = Ast::make< NamedTupleLiteral >( @$, $2 );
+      $$ = Ast::make< RecordLiteral >( @$, $2 );
   }
 ;
 
@@ -1336,6 +1336,17 @@ BasicType
 
 
 ComposedType
+: TupleType
+  {
+      $$ = $1;
+  }
+| RecordType
+  {
+      $$ = $1;
+  }
+;
+
+TupleType
 : LPAREN Types COMMA Type RPAREN
   {
       const auto identifier = Ast::make< Identifier >( @$, "Tuple" );
@@ -1343,9 +1354,12 @@ ComposedType
       subTypes->add( $4 );
       $$ = Ast::make< ComposedType >( @$, asIdentifierPath( identifier ), subTypes );
   }
-| LPAREN TypedVariables COMMA TypedVariable RPAREN
+;
+
+RecordType
+: LPAREN TypedVariables COMMA TypedVariable RPAREN
   {
-      const auto identifier = Ast::make< Identifier >( @$, "Tuple" );
+      const auto identifier = Ast::make< Identifier >( @$, "Record" );
       auto namedSubTypes = $2;
       namedSubTypes->add( $4 );
 
