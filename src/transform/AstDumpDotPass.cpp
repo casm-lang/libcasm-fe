@@ -595,6 +595,7 @@ void AstDumpDotVisitor::dumpLink( void* from, void* to )
 void AstDumpDotPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
+    pu.repeatUntil< ConsistencyCheckPass >();
 }
 
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
@@ -604,8 +605,10 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     const auto& data = pr.output< SourceToAstPass >();
     const auto& specification = data->specification();
 
-    const std::string outputFilePath = "./obj/out.dot";  // TODO: add command-line switch
-    const u1 dumpNodeLocation = true;                    // TODO: add command-line switch
+    const auto previousPass = libpass::PassRegistry::passInfo( pr.previousPass() );
+    const std::string outputFilePath =
+        "./obj/out." + previousPass.name() + ".dot";  // TODO: add command-line switch
+    const u1 dumpNodeLocation = true;                 // TODO: add command-line switch
 
     const auto printDotGraph = [&]( std::ostream& out ) {
         out << "digraph \"main\" {\n";
