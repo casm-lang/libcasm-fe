@@ -311,7 +311,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
     void visit( TupleLiteral& node ) override;
-    void visit( NamedTupleLiteral& node ) override;
+    void visit( RecordLiteral& node ) override;
 
     void visit( BasicType& node ) override;
 
@@ -607,21 +607,21 @@ void ExecutionVisitor::visit( TupleLiteral& node )
     m_evaluationStack.push( IR::TupleConstant( tupleType, tupleElements ) );
 }
 
-void ExecutionVisitor::visit( NamedTupleLiteral& node )
+void ExecutionVisitor::visit( RecordLiteral& node )
 {
-    assert( node.type()->isTuple() );
-    const auto tupleType = std::static_pointer_cast< IR::TupleType >( node.type() );
+    assert( node.type()->isRecord() );
+    const auto recordType = std::static_pointer_cast< IR::RecordType >( node.type() );
 
     // iterate through the in-order, out-of-order, or partial named expressions and assign the
-    // appropriate index with the given expression
-    std::unordered_map< std::string, IR::Constant > tupleElements;
+    // element name with the given expression
+    std::unordered_map< std::string, IR::Constant > recordElements;
     for( const auto& namedExpression : *node.namedExpressions() )
     {
         namedExpression->accept( *this );
-        tupleElements.emplace( namedExpression->identifier()->name(), m_evaluationStack.pop() );
+        recordElements.emplace( namedExpression->identifier()->name(), m_evaluationStack.pop() );
     }
 
-    m_evaluationStack.push( IR::TupleConstant( tupleType, tupleElements ) );
+    m_evaluationStack.push( IR::RecordConstant( recordType, recordElements ) );
 }
 
 void ExecutionVisitor::visit( BasicType& node )
