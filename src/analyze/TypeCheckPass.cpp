@@ -106,6 +106,11 @@ static const std::string TYPE_STRING_RATIONAL = "Rational";
 
 // composed types
 static const std::string TYPE_STRING_TUPLE = "Tuple";
+static const std::string TYPE_STRING_RECORD = "Record";
+
+static const std::unordered_set< std::string > TYPE_STRINGS_FOR_COMPOSED_TYPES = {
+    TYPE_STRING_TUPLE, TYPE_STRING_RECORD
+};
 
 // template types
 static const std::string TYPE_STRING_LIST = "List";
@@ -239,26 +244,26 @@ void TypeCheckVisitor::visit( ComposedType& node )
 
     if( name == TYPE_STRING_TUPLE )
     {
-        assert( subTypeList.size() >= 2 );
+        assert( subTypeList.size() >= 2 );  // constrain from parser
+        assert( not node.isNamed() );       // constrain from parser
 
-        if( not node.isNamed() )
-        {
-            const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
-            node.setType( type );
-        }
-        else
-        {
-            std::vector< std::string > subTypeNames;
-            subTypeNames.reserve( node.subTypeIdentifiers()->size() );
-            for( const auto& subTypeIdentifier : *node.subTypeIdentifiers() )
-            {
-                subTypeNames.emplace_back( subTypeIdentifier->name() );
-            }
+        const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
+        node.setType( type );
+    }
+    else if( name == TYPE_STRING_RECORD )
+    {
+        assert( subTypeList.size() >= 2 );  // constrain from parser
+        assert( node.isNamed() );           // constrain from parser
 
-            const auto type =
-                libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList, subTypeNames );
-            node.setType( type );
+        std::vector< std::string > recordIdentifiers;
+        for( const auto& subTypeIdentifier : *node.subTypeIdentifiers() )
+        {
+            recordIdentifiers.emplace_back( subTypeIdentifier->name() );
         }
+
+        const auto type =
+            libstdhl::Memory::make< libcasm_ir::RecordType >( subTypeList, recordIdentifiers );
+        node.setType( type );
     }
     else
     {
