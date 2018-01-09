@@ -86,6 +86,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ReferenceLiteral& node ) override;
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
+    void visit( TupleLiteral& node ) override;
+    void visit( NamedTupleLiteral& node ) override;
 
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
@@ -937,6 +939,49 @@ void TypeInferenceVisitor::visit( RangeLiteral& node )
         libstdhl::Memory::get< libcasm_ir::RangeType >( node.left()->type()->ptr_result() );
 
     node.setType( range_type );
+}
+
+void TypeInferenceVisitor::visit( TupleLiteral& node )
+{
+    RecursiveVisitor::visit( node );
+
+    libcasm_ir::Types expressionTypes;
+    for( auto expression : *node.expressions() )
+    {
+        if( not expression->type() )
+        {
+            m_log.info( { expression->sourceLocation() }, "TODO: has a non-typed sub-type" );
+            return;
+        }
+
+        expressionTypes.add( expression->type() );
+    }
+
+    const auto type = libstdhl::Memory::get< libcasm_ir::TupleType >( expressionTypes );
+    node.setType( type );
+}
+
+void TypeInferenceVisitor::visit( NamedTupleLiteral& node )
+{
+    RecursiveVisitor::visit( node );
+
+    libcasm_ir::Types namedExpressionTypes;
+    std::vector< std::string > namedExpressionIdentifiers;
+    for( auto namedExpression : *node.namedExpressions() )
+    {
+        if( not namedExpression->type() )
+        {
+            m_log.info( { namedExpression->sourceLocation() }, "TODO: has a non-typed sub-type" );
+            return;
+        }
+
+        namedExpressionTypes.add( namedExpression->type() );
+        namedExpressionIdentifiers.emplace_back( namedExpression->identifier()->name() );
+    }
+
+    const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >(
+        namedExpressionTypes, namedExpressionIdentifiers );
+    node.setType( type );
 }
 
 void TypeInferenceVisitor::visit( LetExpression& node )
