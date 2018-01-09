@@ -87,6 +87,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
 
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( LiteralCallExpression& node ) override;
@@ -391,6 +392,12 @@ void TypeInferenceVisitor::visit( ReferenceLiteral& node )
             assert( !" unknown reference type! " );
         }
     }
+}
+
+void TypeInferenceVisitor::visit( NamedExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    node.setType( node.expression()->type() );
 }
 
 void TypeInferenceVisitor::visit( DirectCallExpression& node )
