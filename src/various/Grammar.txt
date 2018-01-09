@@ -463,7 +463,7 @@ Literal ::= UndefinedLiteral
           | ListLiteral
           | RangeLiteral
           | TupleLiteral
-          | NamedTupleLiteral
+          | RecordLiteral
 </code>
 
 {{page>:grammar:Literal&noheader&nofooter}}
@@ -571,13 +571,13 @@ TupleLiteral ::= "(" Terms "," Term ")"
 {{page>:grammar:TupleLiteral&noheader&nofooter}}
 
 
-===== NamedTupleLiteral =====
+===== RecordLiteral =====
 
 <code>
-NamedTupleLiteral ::= "(" Assignments ")"
+RecordLiteral ::= "(" Assignments ")"
 </code>
 
-{{page>:grammar:NamedTupleLiteral&noheader&nofooter}}
+{{page>:grammar:RecordLiteral&noheader&nofooter}}
 
 
 ===== Assignments =====
@@ -634,11 +634,29 @@ BasicType ::= IdentifierPath
 ===== ComposedType =====
 
 <code>
-ComposedType ::= "(" Types "," Type ")"
-               | "(" TypedVariables "," TypedVariable ")"
+ComposedType ::= TupleType
+               | RecordType
 </code>
 
 {{page>:grammar:ComposedType&noheader&nofooter}}
+
+
+===== TupleType =====
+
+<code>
+TupleType ::= "(" Types "," Type ")"
+</code>
+
+{{page>:grammar:TupleType&noheader&nofooter}}
+
+
+===== RecordType =====
+
+<code>
+RecordType ::= "(" TypedVariables "," TypedVariable ")"
+</code>
+
+{{page>:grammar:RecordType&noheader&nofooter}}
 
 
 ===== TemplateType =====
