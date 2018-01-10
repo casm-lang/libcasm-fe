@@ -725,7 +725,14 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 
 void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 {
-    RecursiveVisitor::visit( node );
+    node.asType()->accept( *this );
+
+    if( node.asType()->type() )
+    {
+        m_typeIDs[ node.fromExpression().get() ].emplace( node.asType()->type()->id() );
+    }
+
+    node.fromExpression()->accept( *this );
 
     if( not node.fromExpression()->type() )
     {
