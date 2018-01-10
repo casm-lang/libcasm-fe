@@ -318,6 +318,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -722,6 +723,31 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
             break;
         }
     }
+}
+
+void ExecutionVisitor::visit( LiteralCallExpression& node )
+{
+    node.object()->accept( *this );
+    const auto object = m_evaluationStack.pop();
+    node.literal()->accept( *this );
+    const auto literal = m_evaluationStack.pop();
+    assert( literal.defined() );  // constrain from parser
+
+    if( not object.defined() )
+    {
+        m_evaluationStack.push( IR::Constant::undef( node.type()->ptr_result() ) );
+        return;
+    }
+
+    assert( object.typeId().kind() == IR::Type::Kind::TUPLE );
+    assert( literal.typeId().kind() == IR::Type::Kind::INTEGER );
+
+    const auto* tuple = static_cast< const IR::TupleConstant& >( object ).value();
+    assert( tuple != nullptr );
+    const auto& index = static_cast< const IR::IntegerConstant& >( literal ).value();
+    const auto& element = tuple->elements()[ index.value() - 1 ];
+
+    m_evaluationStack.push( element );
 }
 
 void ExecutionVisitor::visit( IndirectCallExpression& node )
