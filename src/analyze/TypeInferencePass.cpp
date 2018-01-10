@@ -642,7 +642,7 @@ void TypeInferenceVisitor::visit( LiteralCallExpression& node )
 {
     node.object()->accept( *this );
 
-    const auto& objectType = node.object()->type();
+    const auto& objectType = node.object()->type()->ptr_result();
     if( not objectType )
     {
         // the object type is essential to resolve the literal access
@@ -672,11 +672,11 @@ void TypeInferenceVisitor::visit( LiteralCallExpression& node )
             static_cast< const libcasm_ir::IntegerConstant& >( *literal.value() );
         const auto& value = static_cast< const libstdhl::Type::Integer& >( constant.value() );
 
-        if( value >= 0 and value < objectType->arguments().size() )
+        if( value >= 1 and value <= objectType->arguments().size() )
         {
             assert( value.trivial() );
 
-            const auto& resultType = objectType->arguments()[ value.value() ];
+            const auto& resultType = objectType->arguments()[ value.value() - 1 ];
             std::vector< libcasm_ir::Type::Ptr > argumentTypes;
             argumentTypes.emplace_back( objectType->ptr_result() );
             argumentTypes.emplace_back( literalType->ptr_result() );
