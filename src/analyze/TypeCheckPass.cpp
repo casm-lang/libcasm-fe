@@ -205,10 +205,8 @@ void TypeCheckVisitor::visit( BasicType& node )
             }
 
             const auto& type = symbol->type();
-            if( type )
-            {
-                node.setType( type );
-            }
+            assert( type );
+            node.setType( type );
         }
         catch( const std::domain_error& e )
         {
