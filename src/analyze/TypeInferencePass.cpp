@@ -698,7 +698,7 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
             { node.sourceLocation() }, "unable to resolve type of indirect call expression" );
     }
 
-    node.setType( node.expression()->type() );
+    node.setType( node.expression()->type()->ptr_result() );
 
     assert( node.type()->isReference() );
 
