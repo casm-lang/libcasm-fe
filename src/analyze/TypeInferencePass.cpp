@@ -962,34 +962,53 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
             {
                 if( *expression->type() != type->result() )
                 {
+                    m_log.error(
+                        { node.sourceLocation(), expression->sourceLocation() },
+                        "list literal element type does not match list literal type '" +
+                            type->description() + "'",
+                        Code::TypeInferenceListLiteralTypeMismatch );
                     return;
                 }
             }
 
             node.setType( type );
         }
+        else
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid list literal type '" + type->description() + "' found",
+                Code::TypeInferenceInvalidListLiteralType );
+        }
     }
     else
     {
         // no type inferred, try to find one from the expression types
-        libcasm_ir::Type::Ptr listInnerType = nullptr;
+        Ast::Expression::Ptr listInnerType = nullptr;
 
         for( auto expression : *node.expressions() )
         {
             if( not listInnerType )
             {
-                listInnerType = expression->type();
+                listInnerType = expression;
             }
 
-            if( *listInnerType != *expression->type() )
+            if( *listInnerType->type() != *expression->type() )
             {
+                m_log.error(
+                    { listInnerType->sourceLocation(), expression->sourceLocation() },
+                    "list literal element type '" + expression->type()->description() +
+                        "' does not match first list literal element type '" +
+                        listInnerType->type()->description() + "'",
+                    Code::TypeInferenceListLiteralTypeMismatch );
                 return;
             }
         }
 
         if( listInnerType )
         {
-            const auto listType = libstdhl::Memory::get< libcasm_ir::ListType >( listInnerType );
+            const auto listType =
+                libstdhl::Memory::get< libcasm_ir::ListType >( listInnerType->type() );
             node.setType( listType );
         }
     }
