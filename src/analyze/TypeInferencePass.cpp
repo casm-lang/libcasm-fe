@@ -686,6 +686,14 @@ void TypeInferenceVisitor::visit( LiteralCallExpression& node )
             node.setType( type );
         }
     }
+    else
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unsupported literal call expression of '" + objectType->description() + "' and '" +
+                literalType->description() + "'",
+            Code::TypeInferenceInvalidLiteralCallExpression );
+    }
 }
 
 void TypeInferenceVisitor::visit( IndirectCallExpression& node )
