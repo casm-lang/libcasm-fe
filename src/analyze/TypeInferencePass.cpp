@@ -674,8 +674,6 @@ void TypeInferenceVisitor::visit( LiteralCallExpression& node )
 
         if( value >= 1 and value <= objectType->arguments().size() )
         {
-            assert( value.trivial() );
-
             const auto& resultType = objectType->arguments()[ value.value() - 1 ];
             std::vector< libcasm_ir::Type::Ptr > argumentTypes;
             argumentTypes.emplace_back( objectType->ptr_result() );
