@@ -685,6 +685,14 @@ void TypeInferenceVisitor::visit( LiteralCallExpression& node )
                 libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
             node.setType( type );
         }
+        else
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "element access of '" + objectType->description() + "' at position '" +
+                    value.to_string() + "' is out-of-bounds",
+                Code::TypeInferenceInvalidLiteralCallExpression );
+        }
     }
     else
     {
