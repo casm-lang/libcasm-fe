@@ -119,9 +119,13 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( UndefLiteral& node ) override;
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
+    void visit( TupleLiteral& node ) override;
+    void visit( RecordLiteral& node ) override;
 
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -147,6 +151,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( UnresolvedType& node ) override;
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
+    void visit( TemplateType& node ) override;
     void visit( FixedSizedType& node ) override;
     void visit( RelationType& node ) override;
 
@@ -282,6 +287,27 @@ void AstDumpDotVisitor::visit( RangeLiteral& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( TupleLiteral& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "TupleLiteral" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( RecordLiteral& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "RecordLiteral" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( NamedExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "NamedExpression" );
+    RecursiveVisitor::visit( node );
+}
+
 void AstDumpDotVisitor::visit( DirectCallExpression& node )
 {
     DotLink link( this, &node );
@@ -293,6 +319,13 @@ void AstDumpDotVisitor::visit( MethodCallExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "MethodCallExpression\nMethod type: " + node.methodTypeName() );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( LiteralCallExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "LiteralCallExpression" );
     RecursiveVisitor::visit( node );
 }
 
@@ -456,6 +489,13 @@ void AstDumpDotVisitor::visit( ComposedType& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( TemplateType& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "TemplateType" );
+    RecursiveVisitor::visit( node );
+}
+
 void AstDumpDotVisitor::visit( FixedSizedType& node )
 {
     DotLink link( this, &node );
@@ -595,6 +635,7 @@ void AstDumpDotVisitor::dumpLink( void* from, void* to )
 void AstDumpDotPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
+    pu.repeatUntil< ConsistencyCheckPass >();
 }
 
 u1 AstDumpDotPass::run( libpass::PassResult& pr )
@@ -604,8 +645,10 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     const auto& data = pr.output< SourceToAstPass >();
     const auto& specification = data->specification();
 
-    const std::string outputFilePath = "./obj/out.dot";  // TODO: add command-line switch
-    const u1 dumpNodeLocation = true;                    // TODO: add command-line switch
+    const auto previousPass = libpass::PassRegistry::passInfo( pr.previousPass() );
+    const std::string outputFilePath =
+        "./obj/out." + previousPass.name() + ".dot";  // TODO: add command-line switch
+    const u1 dumpNodeLocation = true;                 // TODO: add command-line switch
 
     const auto printDotGraph = [&]( std::ostream& out ) {
         out << "digraph \"main\" {\n";

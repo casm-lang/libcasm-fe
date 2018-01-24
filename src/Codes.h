@@ -169,10 +169,13 @@ namespace libcasm_fe
         TypeAnnotationInvalidBasicTypeName = 0x0100,
         TypeAnnotationInvalidFixedSizeTypeName = 0x0101,
         TypeAnnotationInvalidComposedTypeName = 0x0102,
-        TypeAnnotationInvalidRelationTypeName = 0x0103,
+        TypeAnnotationInvalidTemplateTypeName = 0x0103,
+        TypeAnnotationInvalidRelationTypeName = 0x0104,
 
-        TypeAnnotationComposedTypeHasNoSubType = 0x0112,
-        TypeAnnotationRelationTypeHasNoSubType = 0x0113,
+        TypeAnnotationTemplateTypeHasNoSubType = 0x0113,
+        TypeAnnotationRelationTypeHasNoSubType = 0x0114,
+
+        TypeAnnotationInvalidTemplateTypeSize = 0x0123,
 
         // --------------------------------------------------------- 1*** ...
         // type inference errors
@@ -218,6 +221,7 @@ namespace libcasm_fe
         TypeInferenceConditionalRuleInvalidConditionType = 0x1500,
 
         TypeInferenceInvalidMethodCallExpression = 0x1900,
+        TypeInferenceInvalidLiteralCallExpression = 0x1a00,
 
         TypeInferenceInvalidExpression = 0x1001,
         TypeInferenceInvalidPrint = 0x1002
@@ -247,6 +251,8 @@ namespace libcasm_fe
         TypeInferenceInvalidLetExpressionTypeMismatch = 0x1012,
 
         TypeInferenceRangeLiteralTypeMismatch = 0x1600,
+        TypeInferenceInvalidListLiteralType = 0x1610,
+        TypeInferenceListLiteralTypeMismatch = 0x1611,
 
         TypeInferenceInvalidTypeCastingExpression = 0x1700,
         TypeInferenceTypeCastingExpressionFromHasNoType = 0x1701,

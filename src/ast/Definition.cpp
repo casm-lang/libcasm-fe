@@ -43,6 +43,8 @@
 
 #include "Definition.h"
 
+#include <libcasm-fe/ast/Literal>
+
 using namespace libcasm_fe;
 using namespace Ast;
 

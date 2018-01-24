@@ -83,9 +83,20 @@ void BasicType::accept( Visitor& visitor )
 }
 
 ComposedType::ComposedType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
+: ComposedType( identifier, subTypes, nullptr )
+{
+}
+
+ComposedType::ComposedType(
+    const IdentifierPath::Ptr& identifier,
+    const Types::Ptr& subTypes,
+    const Identifiers::Ptr& subTypeIdentifiers )
 : Type( Node::ID::COMPOSED_TYPE, identifier )
 , m_subTypes( subTypes )
+, m_subTypeIdentifiers( subTypeIdentifiers )
 {
+    assert( subTypes );
+    assert( not subTypeIdentifiers or subTypes->size() == subTypeIdentifiers->size() );
 }
 
 const Types::Ptr& ComposedType::subTypes( void ) const
@@ -93,7 +104,33 @@ const Types::Ptr& ComposedType::subTypes( void ) const
     return m_subTypes;
 }
 
+const Identifiers::Ptr& ComposedType::subTypeIdentifiers( void ) const
+{
+    return m_subTypeIdentifiers;
+}
+
+u1 ComposedType::isNamed( void ) const
+{
+    return m_subTypeIdentifiers != nullptr;
+}
+
 void ComposedType::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+TemplateType::TemplateType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
+: Type( Node::ID::TEMPLATE_TYPE, identifier )
+, m_subTypes( subTypes )
+{
+}
+
+const Types::Ptr& TemplateType::subTypes( void ) const
+{
+    return m_subTypes;
+}
+
+void TemplateType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

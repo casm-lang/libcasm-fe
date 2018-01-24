@@ -62,9 +62,13 @@ namespace libcasm_fe
         class ReferenceLiteral;
         class ListLiteral;
         class RangeLiteral;
+        class TupleLiteral;
+        class RecordLiteral;
 
+        class NamedExpression;
         class DirectCallExpression;
         class MethodCallExpression;
+        class LiteralCallExpression;
         class IndirectCallExpression;
         class TypeCastingExpression;
         class UnaryExpression;
@@ -90,6 +94,7 @@ namespace libcasm_fe
         class UnresolvedType;
         class BasicType;
         class ComposedType;
+        class TemplateType;
         class FixedSizedType;
         class RelationType;
 
@@ -123,9 +128,13 @@ namespace libcasm_fe
             virtual void visit( ReferenceLiteral& node ) = 0;
             virtual void visit( ListLiteral& node ) = 0;
             virtual void visit( RangeLiteral& node ) = 0;
+            virtual void visit( TupleLiteral& node ) = 0;
+            virtual void visit( RecordLiteral& node ) = 0;
 
+            virtual void visit( NamedExpression& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( MethodCallExpression& node ) = 0;
+            virtual void visit( LiteralCallExpression& node ) = 0;
             virtual void visit( IndirectCallExpression& node ) = 0;
             virtual void visit( TypeCastingExpression& node ) = 0;
             virtual void visit( UnaryExpression& node ) = 0;
@@ -151,6 +160,7 @@ namespace libcasm_fe
             virtual void visit( UnresolvedType& node ) = 0;
             virtual void visit( BasicType& node ) = 0;
             virtual void visit( ComposedType& node ) = 0;
+            virtual void visit( TemplateType& node ) = 0;
             virtual void visit( FixedSizedType& node ) = 0;
             virtual void visit( RelationType& node ) = 0;
 

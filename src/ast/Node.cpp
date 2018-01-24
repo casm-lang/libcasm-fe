@@ -128,6 +128,18 @@ std::string Node::description( void ) const
         {
             return "list";
         }
+        case ID::TUPLE_LITERAL:
+        {
+            return "tuple";
+        }
+        case ID::RECORD_LITERAL:
+        {
+            return "record";
+        }
+        case ID::NAMED_EXPRESSION:
+        {
+            return "named expression";
+        }
         case ID::DIRECT_CALL_EXPRESSION:
         {
             return "direct call";
@@ -135,6 +147,10 @@ std::string Node::description( void ) const
         case ID::METHOD_CALL_EXPRESSION:
         {
             return "method call";
+        }
+        case ID::LITERAL_CALL_EXPRESSION:
+        {
+            return "literal call";
         }
         case ID::INDIRECT_CALL_EXPRESSION:
         {
@@ -227,6 +243,10 @@ std::string Node::description( void ) const
         case ID::COMPOSED_TYPE:
         {
             return "composed type";
+        }
+        case ID::TEMPLATE_TYPE:
+        {
+            return "template type";
         }
         case ID::FIXED_SIZED_TYPE:
         {

@@ -115,6 +115,8 @@ namespace libcasm_fe
             std::size_t m_localIndex;
         };
 
+        using VariableDefinitions = NodeList< VariableDefinition >;
+
         class FunctionDefinition final : public Definition
         {
           public:

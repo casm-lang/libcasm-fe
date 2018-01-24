@@ -86,9 +86,13 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ReferenceLiteral& node ) override;
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
+    void visit( TupleLiteral& node ) override;
+    void visit( RecordLiteral& node ) override;
 
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -392,6 +396,12 @@ void TypeInferenceVisitor::visit( ReferenceLiteral& node )
     }
 }
 
+void TypeInferenceVisitor::visit( NamedExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    node.setType( node.expression()->type() );
+}
+
 void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
     assert( node.identifier() );
@@ -628,6 +638,70 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
     }
 }
 
+void TypeInferenceVisitor::visit( LiteralCallExpression& node )
+{
+    node.object()->accept( *this );
+
+    const auto& objectType = node.object()->type()->ptr_result();
+    if( not objectType )
+    {
+        // the object type is essential to resolve the literal access
+        m_log.error(
+            { node.sourceLocation() },
+            "unable to resolve object type",
+            Code::TypeInferenceInvalidLiteralCallExpression );
+        return;
+    }
+
+    node.literal()->accept( *this );
+
+    const auto& literalType = node.literal()->type();
+    if( not literalType )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unable to resolve literal type",
+            Code::TypeInferenceInvalidLiteralCallExpression );
+        return;
+    }
+
+    if( objectType->isTuple() and literalType->isInteger() )
+    {
+        const auto& literal = static_cast< const ValueLiteral& >( *node.literal() );
+        const auto& constant =
+            static_cast< const libcasm_ir::IntegerConstant& >( *literal.value() );
+        const auto& value = static_cast< const libstdhl::Type::Integer& >( constant.value() );
+
+        if( value >= 1 and value <= objectType->arguments().size() )
+        {
+            const auto& resultType = objectType->arguments()[ value.value() - 1 ];
+            std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+            argumentTypes.emplace_back( objectType->ptr_result() );
+            argumentTypes.emplace_back( literalType->ptr_result() );
+
+            const auto type =
+                libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
+            node.setType( type );
+        }
+        else
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "element access of '" + objectType->description() + "' at position '" +
+                    value.to_string() + "' is out-of-bounds",
+                Code::TypeInferenceInvalidLiteralCallExpression );
+        }
+    }
+    else
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unsupported literal call expression of '" + objectType->description() + "' and '" +
+                literalType->description() + "'",
+            Code::TypeInferenceInvalidLiteralCallExpression );
+    }
+}
+
 void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
@@ -638,7 +712,7 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
             { node.sourceLocation() }, "unable to resolve type of indirect call expression" );
     }
 
-    node.setType( node.expression()->type() );
+    node.setType( node.expression()->type()->ptr_result() );
 
     assert( node.type()->isReference() );
 
@@ -665,7 +739,14 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 
 void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 {
-    RecursiveVisitor::visit( node );
+    node.asType()->accept( *this );
+
+    if( node.asType()->type() )
+    {
+        m_typeIDs[ node.fromExpression().get() ].emplace( node.asType()->type()->id() );
+    }
+
+    node.fromExpression()->accept( *this );
 
     if( not node.fromExpression()->type() )
     {
@@ -754,6 +835,7 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         }
         case libcasm_ir::Type::Kind::RANGE:               // [fallthrough]
         case libcasm_ir::Type::Kind::TUPLE:               // [fallthrough]
+        case libcasm_ir::Type::Kind::RECORD:              // [fallthrough]
         case libcasm_ir::Type::Kind::LIST:                // [fallthrough]
         case libcasm_ir::Type::Kind::RULE_REFERENCE:      // [fallthrough]
         case libcasm_ir::Type::Kind::FUNCTION_REFERENCE:  // [fallthrough]
@@ -857,6 +939,79 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 void TypeInferenceVisitor::visit( ListLiteral& node )
 {
     RecursiveVisitor::visit( node );
+
+    for( auto expression : *node.expressions() )
+    {
+        if( not expression->type() )
+        {
+            m_log.info( { expression->sourceLocation() }, "TODO: has a non-typed sub-type" );
+            return;
+        }
+    }
+
+    const auto& typeIDs = m_typeIDs[&node ];
+    if( typeIDs.size() == 1 )
+    {
+        // there is a type inferred, check if the list expression types match!
+        const auto typeID = *typeIDs.begin();
+        const auto type = libcasm_ir::Type::fromID( typeID );
+
+        if( type->isList() )
+        {
+            for( auto expression : *node.expressions() )
+            {
+                if( *expression->type() != type->result() )
+                {
+                    m_log.error(
+                        { node.sourceLocation(), expression->sourceLocation() },
+                        "list literal element type does not match list literal type '" +
+                            type->description() + "'",
+                        Code::TypeInferenceListLiteralTypeMismatch );
+                    return;
+                }
+            }
+
+            node.setType( type );
+        }
+        else
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid list literal type '" + type->description() + "' found",
+                Code::TypeInferenceInvalidListLiteralType );
+        }
+    }
+    else
+    {
+        // no type inferred, try to find one from the expression types
+        Ast::Expression::Ptr listInnerType = nullptr;
+
+        for( auto expression : *node.expressions() )
+        {
+            if( not listInnerType )
+            {
+                listInnerType = expression;
+            }
+
+            if( *listInnerType->type() != *expression->type() )
+            {
+                m_log.error(
+                    { listInnerType->sourceLocation(), expression->sourceLocation() },
+                    "list literal element type '" + expression->type()->description() +
+                        "' does not match first list literal element type '" +
+                        listInnerType->type()->description() + "'",
+                    Code::TypeInferenceListLiteralTypeMismatch );
+                return;
+            }
+        }
+
+        if( listInnerType )
+        {
+            const auto listType =
+                libstdhl::Memory::get< libcasm_ir::ListType >( listInnerType->type() );
+            node.setType( listType );
+        }
+    }
 }
 
 void TypeInferenceVisitor::visit( RangeLiteral& node )
@@ -879,6 +1034,68 @@ void TypeInferenceVisitor::visit( RangeLiteral& node )
         libstdhl::Memory::get< libcasm_ir::RangeType >( node.left()->type()->ptr_result() );
 
     node.setType( range_type );
+}
+
+void TypeInferenceVisitor::visit( TupleLiteral& node )
+{
+    RecursiveVisitor::visit( node );
+
+    assert( node.expressions()->size() >= 2 );  // constrain from parser
+    libcasm_ir::Types expressionTypes;
+    for( auto expression : *node.expressions() )
+    {
+        if( not expression->type() )
+        {
+            m_log.info( { expression->sourceLocation() }, "TODO: has a non-typed sub-type" );
+            return;
+        }
+
+        expressionTypes.add( expression->type() );
+    }
+
+    const auto type = libstdhl::Memory::get< libcasm_ir::TupleType >( expressionTypes );
+    node.setType( type );
+}
+
+void TypeInferenceVisitor::visit( RecordLiteral& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& typeIDs = m_typeIDs[&node ];
+    if( typeIDs.size() == 1 )
+    {
+        const auto typeID = *typeIDs.begin();
+        const auto type = libcasm_ir::Type::fromID( typeID );
+
+        if( type->isRecord() )
+        {
+            const auto recordType = std::static_pointer_cast< libcasm_ir::RecordType >( type );
+            assert( node.namedExpressions()->size() >= 1 );  // constrain from parser
+            for( auto namedExpression : *node.namedExpressions() )
+            {
+                if( not namedExpression->type() )
+                {
+                    m_log.info(
+                        { namedExpression->sourceLocation() }, "TODO: has a non-typed sub-type" );
+                    return;
+                }
+
+                const auto expressionName = namedExpression->identifier()->name();
+                const auto& expressionType = namedExpression->type();
+
+                const auto it = recordType->elements().find( expressionName );
+                if( it != recordType->elements().cend() )
+                {
+                    if( *expressionType != *( recordType->arguments()[ it->second ] ) )
+                    {
+                        return;
+                    }
+                }
+            }
+
+            node.setType( type );
+        }
+    }
 }
 
 void TypeInferenceVisitor::visit( LetExpression& node )
@@ -1393,7 +1610,7 @@ void TypeInferenceVisitor::assignment(
     const Code& srcErr,
     const Code& assignmentErr )
 {
-    if( lhs.type() and not rhs.type() )  // and rhs.id() == Node::ID::UNDEF_LITERAL and  )
+    if( lhs.type() and not rhs.type() and rhs.id() == Node::ID::UNDEF_LITERAL )
     {
         if( lhs.type()->isRelation() )
         {
@@ -1427,10 +1644,12 @@ void TypeInferenceVisitor::assignment(
 
     if( tyLhs != tyRhs )
     {
+        u1 mismatch = true;
         if( tyLhs.isInteger() and tyRhs.isInteger() )
         {
             // relaxation: mixed integer with range properties are checked
             //             at run-time
+            mismatch = false;
         }
         else if(
             tyLhs.isBinary() and tyRhs.isBinary() and
@@ -1439,11 +1658,13 @@ void TypeInferenceVisitor::assignment(
         {
             // relaxation: mixed binary types are OK as long as
             //             bitsize(lhs) >= bitsize(rhs)
+            mismatch = false;
         }
         else if( tyLhs.isBinary() and tyRhs.isInteger() and rhs.id() == Node::ID::VALUE_LITERAL )
         {
             // relaxation: lhs binary and rhs integer are OK as long as rhs is a
             //             integer constant with bitsize(lhs) >= bitsize(rhs)
+            mismatch = false;
 
             try
             {
@@ -1460,14 +1681,32 @@ void TypeInferenceVisitor::assignment(
             }
             catch( const std::exception& e )
             {
-                m_log.error(
-                    { lhs.sourceLocation(), rhs.sourceLocation() },
-                    "type mismatch: " + src + " was '" + tyRhs.description() + "', but " + dst +
-                        " expects '" + tyLhs.description() + "', " + e.what(),
-                    assignmentErr );
+                mismatch = true;
             }
         }
-        else
+        else if( tyLhs.isRecord() and tyRhs.isTuple() )
+        {
+            const auto& recordTyLhs = static_cast< const libcasm_ir::RecordType& >( tyLhs );
+            const auto& tupleTyRhs = static_cast< const libcasm_ir::TupleType& >( tyRhs );
+
+            const auto tupleTyLhs = libcasm_ir::TupleType( recordTyLhs.arguments() );
+            if( tupleTyLhs == tupleTyRhs )
+            {
+                mismatch = false;
+            }
+        }
+        else if( tyLhs.isRecord() and tyRhs.isRecord() )
+        {
+            const auto& recordTyLhs = static_cast< const libcasm_ir::RecordType& >( tyLhs );
+            const auto& recordTyRhs = static_cast< const libcasm_ir::RecordType& >( tyRhs );
+
+            if( recordTyLhs.identifiers().size() > recordTyRhs.identifiers().size() )
+            {
+                // TODO
+            }
+        }
+
+        if( mismatch )
         {
             auto lhsSourceLocation = lhs.sourceLocation();
 

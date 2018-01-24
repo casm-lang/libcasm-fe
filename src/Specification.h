@@ -46,7 +46,10 @@
 
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/Expression>
+#include <libcasm-fe/ast/Literal>
 #include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Rule>
 
 namespace libcasm_fe
 {

@@ -67,9 +67,13 @@ namespace libcasm_fe
             void visit( ReferenceLiteral& node ) override;
             void visit( ListLiteral& node ) override;
             void visit( RangeLiteral& node ) override;
+            void visit( TupleLiteral& node ) override;
+            void visit( RecordLiteral& node ) override;
 
+            void visit( NamedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;
             void visit( MethodCallExpression& node ) override;
+            void visit( LiteralCallExpression& node ) override;
             void visit( IndirectCallExpression& node ) override;
             void visit( TypeCastingExpression& node ) override;
             void visit( UnaryExpression& node ) override;
@@ -95,6 +99,7 @@ namespace libcasm_fe
             void visit( UnresolvedType& node ) override;
             void visit( BasicType& node ) override;
             void visit( ComposedType& node ) override;
+            void visit( TemplateType& node ) override;
             void visit( FixedSizedType& node ) override;
             void visit( RelationType& node ) override;
 

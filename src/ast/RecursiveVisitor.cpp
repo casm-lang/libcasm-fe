@@ -45,6 +45,7 @@
 
 #include "Definition.h"
 #include "Expression.h"
+#include "Literal.h"
 #include "Rule.h"
 
 using namespace libcasm_fe;
@@ -135,6 +136,22 @@ void RecursiveVisitor::visit( RangeLiteral& node )
     node.right()->accept( *this );
 }
 
+void RecursiveVisitor::visit( TupleLiteral& node )
+{
+    node.expressions()->accept( *this );
+}
+
+void RecursiveVisitor::visit( RecordLiteral& node )
+{
+    node.namedExpressions()->accept( *this );
+}
+
+void RecursiveVisitor::visit( NamedExpression& node )
+{
+    node.identifier()->accept( *this );
+    node.expression()->accept( *this );
+}
+
 void RecursiveVisitor::visit( DirectCallExpression& node )
 {
     node.identifier()->accept( *this );
@@ -146,6 +163,12 @@ void RecursiveVisitor::visit( MethodCallExpression& node )
     node.object()->accept( *this );
     node.methodName()->accept( *this );
     node.arguments()->accept( *this );
+}
+
+void RecursiveVisitor::visit( LiteralCallExpression& node )
+{
+    node.object()->accept( *this );
+    node.literal()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IndirectCallExpression& node )
@@ -282,6 +305,16 @@ void RecursiveVisitor::visit( BasicType& node )
 }
 
 void RecursiveVisitor::visit( ComposedType& node )
+{
+    node.name()->accept( *this );
+    if( node.isNamed() )
+    {
+        node.subTypeIdentifiers()->accept( *this );
+    }
+    node.subTypes()->accept( *this );
+}
+
+void RecursiveVisitor::visit( TemplateType& node )
 {
     node.name()->accept( *this );
     node.subTypes()->accept( *this );

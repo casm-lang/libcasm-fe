@@ -53,6 +53,7 @@ namespace libcasm_fe
     namespace Ast
     {
         class Type;
+        class Literal;
         class VariableDefinition;
 
         class Expression : public TypedNode
@@ -65,100 +66,26 @@ namespace libcasm_fe
 
         using Expressions = NodeList< Expression >;
 
-        class UndefLiteral final : public Expression
+        class NamedExpression final : public Expression
         {
           public:
-            using Ptr = std::shared_ptr< UndefLiteral >;
+            using Ptr = std::shared_ptr< NamedExpression >;
 
-            explicit UndefLiteral( void );
+            explicit NamedExpression(
+                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
 
-            void accept( Visitor& visitor ) override final;
-        };
+            const Identifier::Ptr& identifier( void ) const;
 
-        class ValueLiteral final : public Expression
-        {
-          public:
-            using Ptr = std::shared_ptr< ValueLiteral >;
-
-            explicit ValueLiteral( const libcasm_ir::Constant::Ptr& value );
-
-            const libcasm_ir::Constant::Ptr& value( void ) const;
-
-            void setValue( const libcasm_ir::Constant::Ptr& value );
+            const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            libcasm_ir::Constant::Ptr m_value;
+            const Identifier::Ptr m_identifier;
+            const Expression::Ptr m_expression;
         };
 
-        class ReferenceLiteral final : public Expression
-        {
-          public:
-            enum class ReferenceType
-            {
-                FUNCTION,
-                DERIVED,
-                BUILTIN,
-                RULE,
-                UNKNOWN
-            };
-
-            using Ptr = std::shared_ptr< ReferenceLiteral >;
-
-            explicit ReferenceLiteral( const IdentifierPath::Ptr& identifier );
-
-            const IdentifierPath::Ptr& identifier( void ) const;
-
-            void setReferenceType( ReferenceType referenceType );
-            ReferenceType referenceType( void ) const;
-
-            void setReference( const TypedNode::Ptr& reference );
-            const TypedNode::Ptr& reference( void ) const;
-
-            void setBuiltinId( libcasm_ir::Value::ID builtinId );
-            libcasm_ir::Value::ID builtinId( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const IdentifierPath::Ptr m_identifier;
-            ReferenceType m_referenceType;
-            TypedNode::Ptr m_reference;
-            libcasm_ir::Value::ID m_builtinId;
-        };
-
-        class ListLiteral final : public Expression
-        {
-          public:
-            using Ptr = std::shared_ptr< ListLiteral >;
-
-            explicit ListLiteral( const Expressions::Ptr& expressions );
-
-            const Expressions::Ptr& expressions( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Expressions::Ptr m_expressions;
-        };
-
-        class RangeLiteral final : public Expression
-        {
-          public:
-            using Ptr = std::shared_ptr< RangeLiteral >;
-
-            RangeLiteral( const Expression::Ptr& left, const Expression::Ptr& right );
-
-            const Expression::Ptr& left( void ) const;
-            const Expression::Ptr& right( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Expression::Ptr m_left;
-            const Expression::Ptr m_right;
-        };
+        using NamedExpressions = NodeList< NamedExpression >;
 
         class CallExpression : public Expression
         {
@@ -282,6 +209,24 @@ namespace libcasm_fe
             MethodType m_methodType;
             libcasm_ir::Value::ID m_targetBuiltinId;
             TypedNode::Ptr m_targetDefinition;
+        };
+
+        class LiteralCallExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< LiteralCallExpression >;
+
+            LiteralCallExpression(
+                const Expression::Ptr& object, const std::shared_ptr< Literal >& literal );
+
+            const Expression::Ptr& object( void ) const;
+            const std::shared_ptr< Literal >& literal( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_object;
+            const std::shared_ptr< Literal > m_literal;
         };
 
         class IndirectCallExpression final : public CallExpression

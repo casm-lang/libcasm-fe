@@ -187,6 +187,7 @@ END       0 "end of file"
 %type <Definitions::Ptr> Definitions
 %type <HeaderDefinition::Ptr> Header
 %type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
+%type <VariableDefinitions::Ptr> TypedVariables
 %type <FunctionDefinition::Ptr> FunctionDefinition
 %type <DerivedDefinition::Ptr> DerivedDefinition
 %type <RuleDefinition::Ptr> RuleDefinition
@@ -196,18 +197,21 @@ END       0 "end of file"
 %type <UsingDefinition::Ptr> UsingDefinition
 
 // literals
-%type <Expression::Ptr> Literal
+%type <Literal::Ptr> Literal
 %type <UndefLiteral::Ptr> UndefinedLiteral
 %type <ValueLiteral::Ptr> BooleanLiteral StringLiteral BinaryLiteral IntegerLiteral DecimalLiteral RationalLiteral
 %type <ReferenceLiteral::Ptr> ReferenceLiteral
 %type <ListLiteral::Ptr> ListLiteral
 %type <RangeLiteral::Ptr> RangeLiteral
+%type <TupleLiteral::Ptr> TupleLiteral
+%type <RecordLiteral::Ptr> RecordLiteral
 
 // expressions
 %type <Expression::Ptr> Term SimpleOrClaspedTerm OperatorExpression
 %type <Expressions::Ptr> Terms
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <MethodCallExpression::Ptr> MethodCallExpression
+%type <LiteralCallExpression::Ptr> LiteralCallExpression
 %type <IndirectCallExpression::Ptr> IndirectCallExpression
 %type <TypeCastingExpression::Ptr> TypeCastingExpression
 %type <LetExpression::Ptr> LetExpression
@@ -231,15 +235,20 @@ END       0 "end of file"
 %type <UpdateRule::Ptr> UpdateRule
 %type <CallRule::Ptr> CallRule
 
+// assignments
+%type <NamedExpression::Ptr> Assignment
+%type <NamedExpressions::Ptr> Assignments
+
 // types
 %type <libcasm_fe::Ast::Type::Ptr> Type
 %type <Types::Ptr> Types
 %type <BasicType::Ptr> BasicType
-%type <ComposedType::Ptr> ComposedType
+%type <ComposedType::Ptr> ComposedType TupleType RecordType
+%type <TemplateType::Ptr> TemplateType
 %type <RelationType::Ptr> RelationType
 %type <FixedSizedType::Ptr> FixedSizedType
 
-// types
+// attributes
 %type <Attribute::Ptr> Attribute
 %type <Attributes::Ptr> Attributes
 %type <BasicAttribute::Ptr> BasicAttribute
@@ -253,8 +262,8 @@ END       0 "end of file"
 %type <UpdateRules::Ptr> Initializers MaybeInitializers MaybeInitially
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
-%type <Expressions::Ptr> Arguments TwoOrMoreArguments
-%type <NodeList< VariableDefinition >::Ptr> Parameters MaybeParameters
+%type <Expressions::Ptr> Arguments
+%type <VariableDefinitions::Ptr> Parameters MaybeParameters
 
 
 %start Specification
@@ -841,6 +850,10 @@ SimpleOrClaspedTerm
   {
       $$ = $1;
   }
+| LiteralCallExpression
+  {
+      $$ = $1;
+  }
 | IndirectCallExpression
   {
       $$ = $1;
@@ -966,6 +979,14 @@ MethodCallExpression
 ;
 
 
+LiteralCallExpression
+: SimpleOrClaspedTerm DOT IntegerLiteral
+  {
+      $$ = Ast::make< LiteralCallExpression >( @$, $1, $3 );
+  }
+;
+
+
 IndirectCallExpression
 : LPAREN ASTERIX Term RPAREN Arguments
   {
@@ -1064,6 +1085,14 @@ Literal
       $$ = $1;
   }
 | RangeLiteral
+  {
+      $$ = $1;
+  }
+| TupleLiteral
+  {
+      $$ = $1;
+  }
+| RecordLiteral
   {
       $$ = $1;
   }
@@ -1216,6 +1245,43 @@ RangeLiteral
   }
 ;
 
+TupleLiteral
+: LPAREN Terms COMMA Term RPAREN
+  {
+      const auto expressions = $2;
+      expressions->add( $4 );
+      $$ = Ast::make< TupleLiteral >( @$, expressions );
+  }
+
+RecordLiteral
+: LPAREN Assignments RPAREN
+  {
+      $$ = Ast::make< RecordLiteral >( @$, $2 );
+  }
+;
+
+Assignments
+: Assignments COMMA Assignment
+  {
+      auto assignments = $1;
+      assignments->add( $3 );
+      $$ = assignments;
+  }
+| Assignment
+  {
+      auto assignments = Ast::make< NamedExpressions >( @$ );
+      assignments->add( $1 );
+      $$ = assignments;
+  }
+;
+
+Assignment
+: Identifier COLON Term
+  {
+      $$ = Ast::make< NamedExpression >( @$, $1, $3 );
+  }
+;
+
 //
 //
 // Types
@@ -1246,6 +1312,10 @@ Type
   {
       $$ = $1;
   }
+| TemplateType
+  {
+      $$ = $1;
+  }
 | RelationType
   {
       $$ = $1;
@@ -1266,9 +1336,50 @@ BasicType
 
 
 ComposedType
+: TupleType
+  {
+      $$ = $1;
+  }
+| RecordType
+  {
+      $$ = $1;
+  }
+;
+
+TupleType
+: LPAREN Types COMMA Type RPAREN
+  {
+      const auto identifier = Ast::make< Identifier >( @$, "Tuple" );
+      auto subTypes = $2;
+      subTypes->add( $4 );
+      $$ = Ast::make< ComposedType >( @$, asIdentifierPath( identifier ), subTypes );
+  }
+;
+
+RecordType
+: LPAREN TypedVariables COMMA TypedVariable RPAREN
+  {
+      const auto identifier = Ast::make< Identifier >( @$, "Record" );
+      auto namedSubTypes = $2;
+      namedSubTypes->add( $4 );
+
+      auto identifiers = Ast::make< Identifiers >( @$ );
+      auto subTypes = Ast::make< Types >( @$ );
+      for( const auto& namedSubType : *namedSubTypes )
+      {
+          identifiers->add( namedSubType->identifier() );
+          subTypes->add( namedSubType->variableType() );
+      }
+
+      $$ = Ast::make< ComposedType >( @$, asIdentifierPath( identifier ), subTypes, identifiers );
+  }
+;
+
+
+TemplateType
 : IdentifierPath LESSER Types GREATER
   {
-      $$ = Ast::make< ComposedType >( @$, $1, $3 );
+      $$ = Ast::make< TemplateType >( @$, $1, $3 );
   }
 ;
 
@@ -1309,15 +1420,6 @@ Arguments
   }
 ;
 
-
-TwoOrMoreArguments
-: LPAREN Terms COMMA Term RPAREN
-  {
-      const auto expressions = $2;
-      expressions->add( $4 );
-      $$ = expressions;
-  }
-;
 
 
 //
@@ -1447,10 +1549,10 @@ Initializer
       function->setTargetType( CallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
-| TwoOrMoreArguments MAPS Term // the rule above can be (arg)->... so force >=2 args here to avoid a shift/reduce conflict
+| TupleLiteral MAPS Term
   {
       // the unknown function identifier will be replaced in FunctionDefinition
-      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1 );
+      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1->expressions() );
       function->setTargetType( CallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
@@ -1532,6 +1634,22 @@ Variable
 ;
 
 
+TypedVariables
+: TypedVariables COMMA TypedVariable
+  {
+      auto typedVariables = $1;
+      typedVariables->add( $3 );
+      $$ = typedVariables;
+  }
+| TypedVariable
+  {
+      auto typedVariables = Ast::make< VariableDefinitions >( @$ );
+      typedVariables->add( $1 );
+      $$ = typedVariables;
+  }
+;
+
+
 TypedVariable
 : Identifier COLON Type
   {
@@ -1566,7 +1684,6 @@ TypedAttributedVariable
       $$ = $1;
   }
 ;
-
 
 //
 // Attributes

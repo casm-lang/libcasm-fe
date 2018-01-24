@@ -303,8 +303,8 @@ Terms ::= Terms "," Term
 
 <code>
 Term ::= SimpleOrClaspedTerm
-       | Expression
        | TypeCastingExpression
+       | OperatorExpression
        | LetExpression
        | ConditionalExpression
        | ChooseExpression
@@ -321,6 +321,7 @@ Term ::= SimpleOrClaspedTerm
 SimpleOrClaspedTerm ::= "(" Term ")"
                       | DirectCallExpression
                       | MethodCallExpression
+                      | LiteralCallExpression
                       | IndirectCallExpression
                       | Literal
 </code>
@@ -328,32 +329,32 @@ SimpleOrClaspedTerm ::= "(" Term ")"
 {{page>:grammar:SimpleOrClaspedTerm&noheader&nofooter}}
 
 
-===== Expression =====
+===== OperatorExpression =====
 
 <code>
-Expression ::= "+" Term
-             | "-" Term
-             | Term "+" Term
-             | Term "-" Term
-             | Term "*" Term
-             | Term "/" Term
-             | Term "%" Term
-             | Term "^" Term
-             | Term "!=" Term
-             | Term "=" Term
-             | Term "<" Term
-             | Term ">" Term
-             | Term "<=" Term
-             | Term ">=" Term
-             | Term "or" Term
-             | Term "xor" Term
-             | Term "and" Term
-             | Term "=>" Term
-             | Term "implies" Term
-             | "not" Term
+OperatorExpression ::= "+" Term
+                     | "-" Term
+                     | Term "+" Term
+                     | Term "-" Term
+                     | Term "*" Term
+                     | Term "/" Term
+                     | Term "%" Term
+                     | Term "^" Term
+                     | Term "!=" Term
+                     | Term "=" Term
+                     | Term "<" Term
+                     | Term ">" Term
+                     | Term "<=" Term
+                     | Term ">=" Term
+                     | Term "or" Term
+                     | Term "xor" Term
+                     | Term "and" Term
+                     | Term "=>" Term
+                     | Term "implies" Term
+                     | "not" Term
 </code>
 
-{{page>:grammar:Expression&noheader&nofooter}}
+{{page>:grammar:OperatorExpression&noheader&nofooter}}
 
 
 ===== DirectCallExpression =====
@@ -374,6 +375,15 @@ MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
 </code>
 
 {{page>:grammar:MethodCallExpression&noheader&nofooter}}
+
+
+===== LiteralCallExpression =====
+
+<code>
+LiteralCallExpression ::= SimpleOrClaspedTerm "." IntegerLiteral
+</code>
+
+{{page>:grammar:LiteralCallExpression&noheader&nofooter}}
 
 
 ===== IndirectCallExpression =====
@@ -452,6 +462,8 @@ Literal ::= UndefinedLiteral
           | ReferenceLiteral
           | ListLiteral
           | RangeLiteral
+          | TupleLiteral
+          | RecordLiteral
 </code>
 
 {{page>:grammar:Literal&noheader&nofooter}}
@@ -550,6 +562,43 @@ RangeLiteral ::= "[" Term ".." Term "]"
 {{page>:grammar:RangeLiteral&noheader&nofooter}}
 
 
+===== TupleLiteral =====
+
+<code>
+TupleLiteral ::= "(" Terms "," Term ")"
+</code>
+
+{{page>:grammar:TupleLiteral&noheader&nofooter}}
+
+
+===== RecordLiteral =====
+
+<code>
+RecordLiteral ::= "(" Assignments ")"
+</code>
+
+{{page>:grammar:RecordLiteral&noheader&nofooter}}
+
+
+===== Assignments =====
+
+<code>
+Assignments ::= Assignments "," Assignment
+              | Assignment
+</code>
+
+{{page>:grammar:Assignments&noheader&nofooter}}
+
+
+===== Assignment =====
+
+<code>
+Assignment ::= Identifier ":" Term
+</code>
+
+{{page>:grammar:Assignment&noheader&nofooter}}
+
+
 ===== Types =====
 
 <code>
@@ -565,6 +614,7 @@ Types ::= Types "," Type
 <code>
 Type ::= BasicType
        | ComposedType
+       | TemplateType
        | RelationType
        | FixedSizedType
 </code>
@@ -584,10 +634,38 @@ BasicType ::= IdentifierPath
 ===== ComposedType =====
 
 <code>
-ComposedType ::= IdentifierPath "<" Types ">"
+ComposedType ::= TupleType
+               | RecordType
 </code>
 
 {{page>:grammar:ComposedType&noheader&nofooter}}
+
+
+===== TupleType =====
+
+<code>
+TupleType ::= "(" Types "," Type ")"
+</code>
+
+{{page>:grammar:TupleType&noheader&nofooter}}
+
+
+===== RecordType =====
+
+<code>
+RecordType ::= "(" TypedVariables "," TypedVariable ")"
+</code>
+
+{{page>:grammar:RecordType&noheader&nofooter}}
+
+
+===== TemplateType =====
+
+<code>
+TemplateType ::= IdentifierPath "<" Types ">"
+</code>
+
+{{page>:grammar:TemplateType&noheader&nofooter}}
 
 
 ===== RelationType =====
@@ -616,15 +694,6 @@ Arguments ::= "(" Terms ")"
 </code>
 
 {{page>:grammar:Arguments&noheader&nofooter}}
-
-
-===== TwoOrMoreArguments =====
-
-<code>
-TwoOrMoreArguments ::= "(" Terms "," Term ")"
-</code>
-
-{{page>:grammar:TwoOrMoreArguments&noheader&nofooter}}
 
 
 ===== FunctionParameters =====
@@ -702,7 +771,7 @@ Initializers ::= Initializers "," Initializer
 <code>
 Initializer ::= Term
               | Term "->" Term
-              | TwoOrMoreArguments "->" Term
+              | TupleLiteral "->" Term
 </code>
 
 {{page>:grammar:Initializer&noheader&nofooter}}
@@ -756,6 +825,16 @@ Variable ::= TypedVariable
 </code>
 
 {{page>:grammar:Variable&noheader&nofooter}}
+
+
+===== TypedVariables =====
+
+<code>
+TypedVariables ::= TypedVariables "," TypedVariable
+                 | TypedVariable
+</code>
+
+{{page>:grammar:TypedVariables&noheader&nofooter}}
 
 
 ===== TypedVariable =====

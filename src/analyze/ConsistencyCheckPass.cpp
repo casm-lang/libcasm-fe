@@ -86,6 +86,9 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( ValueLiteral& node ) override;
     void visit( ReferenceLiteral& node ) override;
     void visit( ListLiteral& node ) override;
+    void visit( RangeLiteral& node ) override;
+    void visit( TupleLiteral& node ) override;
+    void visit( RecordLiteral& node ) override;
 
     void visit( DirectCallExpression& node ) override;
 
@@ -95,6 +98,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
+    void visit( TemplateType& node ) override;
     void visit( FixedSizedType& node ) override;
     void visit( RelationType& node ) override;
 
@@ -183,6 +187,21 @@ void ConsistencyCheckVisitor::visit( ReferenceLiteral& node )
 void ConsistencyCheckVisitor::visit( ListLiteral& node )
 {
     assert( node.type()->isList() );
+}
+
+void ConsistencyCheckVisitor::visit( RangeLiteral& node )
+{
+    assert( node.type()->isRange() );
+}
+
+void ConsistencyCheckVisitor::visit( TupleLiteral& node )
+{
+    assert( node.type()->isTuple() );
+}
+
+void ConsistencyCheckVisitor::visit( RecordLiteral& node )
+{
+    assert( node.type()->isRecord() );
 }
 
 void ConsistencyCheckVisitor::visit( CaseRule& node )
@@ -354,6 +373,12 @@ void ConsistencyCheckVisitor::visit( BasicType& node )
 }
 
 void ConsistencyCheckVisitor::visit( ComposedType& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( TemplateType& node )
 {
     RecursiveVisitor::visit( node );
     verify( node );

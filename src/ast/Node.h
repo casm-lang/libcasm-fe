@@ -81,10 +81,14 @@ namespace libcasm_fe
                 REFERENCE_LITERAL,
                 LIST_LITERAL,
                 RANGE_LITERAL,
+                TUPLE_LITERAL,
+                RECORD_LITERAL,
 
                 // expressions
+                NAMED_EXPRESSION,
                 DIRECT_CALL_EXPRESSION,
                 METHOD_CALL_EXPRESSION,
+                LITERAL_CALL_EXPRESSION,
                 INDIRECT_CALL_EXPRESSION,
                 TYPE_CASTING_EXPRESSION,
                 UNARY_EXPRESSION,
@@ -112,6 +116,7 @@ namespace libcasm_fe
                 UNRESOLVED_TYPE,
                 BASIC_TYPE,
                 COMPOSED_TYPE,
+                TEMPLATE_TYPE,
                 FIXED_SIZED_TYPE,
                 RELATION_TYPE,
 

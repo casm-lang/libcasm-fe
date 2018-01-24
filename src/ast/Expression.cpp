@@ -43,142 +43,55 @@
 
 #include "Expression.h"
 
-#include "Definition.h"
-#include "Type.h"
+#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/ast/Type>
 
 using namespace libcasm_fe;
 using namespace Ast;
+
+//
+//
+// Expression
+//
 
 Expression::Expression( Node::ID id )
 : TypedNode( id )
 {
 }
 
-UndefLiteral::UndefLiteral( void )
-: Expression( Node::ID::UNDEF_LITERAL )
-{
-}
+//
+//
+// NamedExpression
+//
 
-void UndefLiteral::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-ValueLiteral::ValueLiteral( const libcasm_ir::Constant::Ptr& value )
-: Expression( Node::ID::VALUE_LITERAL )
-, m_value( value )
-{
-    Expression::setType( value->type().ptr_type() );
-}
-
-const libcasm_ir::Constant::Ptr& ValueLiteral::value( void ) const
-{
-    return m_value;
-}
-
-void ValueLiteral::setValue( const libcasm_ir::Constant::Ptr& value )
-{
-    m_value = value;
-    Expression::setType( m_value->type().ptr_type() );
-}
-
-void ValueLiteral::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-ReferenceLiteral::ReferenceLiteral( const IdentifierPath::Ptr& identifier )
-: Expression( Node::ID::REFERENCE_LITERAL )
+NamedExpression::NamedExpression(
+    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
+: Expression( Node::ID::NAMED_EXPRESSION )
 , m_identifier( identifier )
-, m_referenceType( ReferenceType::UNKNOWN )
-, m_reference( nullptr )
-, m_builtinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_expression( expression )
 {
 }
 
-const IdentifierPath::Ptr& ReferenceLiteral::identifier() const
+const Identifier::Ptr& NamedExpression::identifier( void ) const
 {
     return m_identifier;
 }
 
-void ReferenceLiteral::setReferenceType( ReferenceType referenceType )
+const Expression::Ptr& NamedExpression::expression( void ) const
 {
-    m_referenceType = referenceType;
+    return m_expression;
 }
 
-ReferenceLiteral::ReferenceType ReferenceLiteral::referenceType( void ) const
-{
-    return m_referenceType;
-}
-
-void ReferenceLiteral::setReference( const TypedNode::Ptr& reference )
-{
-    m_reference = reference;
-}
-
-const TypedNode::Ptr& ReferenceLiteral::reference( void ) const
-{
-    assert(
-        ( m_referenceType != ReferenceType::BUILTIN ) and
-        ( m_referenceType != ReferenceType::UNKNOWN ) );
-
-    return m_reference;
-}
-
-void ReferenceLiteral::setBuiltinId( libcasm_ir::Value::ID builtinId )
-{
-    m_builtinId = builtinId;
-}
-
-libcasm_ir::Value::ID ReferenceLiteral::builtinId( void ) const
-{
-    assert( m_referenceType == ReferenceType::BUILTIN );
-
-    return m_builtinId;
-}
-
-void ReferenceLiteral::accept( Visitor& visitor )
+void NamedExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-ListLiteral::ListLiteral( const Expressions::Ptr& expressions )
-: Expression( Node::ID::LIST_LITERAL )
-, m_expressions( expressions )
-{
-}
-
-const Expressions::Ptr& ListLiteral::expressions( void ) const
-{
-    return m_expressions;
-}
-
-void ListLiteral::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-RangeLiteral::RangeLiteral( const Expression::Ptr& left, const Expression::Ptr& right )
-: Expression( Node::ID::RANGE_LITERAL )
-, m_left( left )
-, m_right( right )
-{
-}
-
-const Expression::Ptr& RangeLiteral::left( void ) const
-{
-    return m_left;
-}
-
-const Expression::Ptr& RangeLiteral::right( void ) const
-{
-    return m_right;
-}
-
-void RangeLiteral::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
+//
+//
+// CallExpression
+//
 
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
@@ -277,6 +190,11 @@ const TypedNode::Ptr& CallExpression::targetDefinition( void ) const
     return m_targetDefinition;
 }
 
+//
+//
+// DirectCallExpression
+//
+
 DirectCallExpression::DirectCallExpression(
     const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::DIRECT_CALL_EXPRESSION, arguments )
@@ -298,6 +216,11 @@ void DirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// MethodCallExpression
+//
 
 MethodCallExpression::MethodCallExpression(
     const Expression::Ptr& object,
@@ -390,6 +313,39 @@ void MethodCallExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// LiteralCallExpression
+//
+
+LiteralCallExpression::LiteralCallExpression(
+    const Expression::Ptr& object, const std::shared_ptr< Literal >& literal )
+: Expression( Node::ID::LITERAL_CALL_EXPRESSION )
+, m_object( object )
+, m_literal( literal )
+{
+}
+
+const Expression::Ptr& LiteralCallExpression::object( void ) const
+{
+    return m_object;
+}
+
+const std::shared_ptr< Literal >& LiteralCallExpression::literal( void ) const
+{
+    return m_literal;
+}
+
+void LiteralCallExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
+// IndirectCallExpression
+//
+
 IndirectCallExpression::IndirectCallExpression(
     const Expression::Ptr& expression, const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::INDIRECT_CALL_EXPRESSION, arguments )
@@ -406,6 +362,11 @@ void IndirectCallExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// TypeCastingExpression
+//
 
 TypeCastingExpression::TypeCastingExpression(
     const Expression::Ptr& fromExpression, const Type::Ptr& asType )
@@ -483,6 +444,11 @@ void TypeCastingExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// UnaryExpression
+//
+
 UnaryExpression::UnaryExpression( const Expression::Ptr& expression, libcasm_ir::Value::ID op )
 : Expression( Node::ID::UNARY_EXPRESSION )
 , m_op( op )
@@ -504,6 +470,11 @@ void UnaryExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// BinaryExpression
+//
 
 BinaryExpression::BinaryExpression(
     const Expression::Ptr& left, const Expression::Ptr& right, libcasm_ir::Value::ID op )
@@ -533,6 +504,11 @@ void BinaryExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// LetExpression
+//
 
 LetExpression::LetExpression(
     const VariableDefinition::Ptr& variable,
@@ -565,6 +541,11 @@ void LetExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// ConditionalExpression
+//
+
 ConditionalExpression::ConditionalExpression(
     const Expression::Ptr& condition,
     const Expression::Ptr& thenExpression,
@@ -595,6 +576,11 @@ void ConditionalExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// ChooseExpression
+//
 
 ChooseExpression::ChooseExpression(
     const VariableDefinition::Ptr& variable,
@@ -627,6 +613,11 @@ void ChooseExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// QuantifierExpression
+//
+
 QuantifierExpression::QuantifierExpression(
     Node::ID id,
     const VariableDefinition::Ptr& predicateVariable,
@@ -654,6 +645,11 @@ const Expression::Ptr& QuantifierExpression::proposition( void ) const
     return m_proposition;
 }
 
+//
+//
+// UniversalQuantifierExpression
+//
+
 UniversalQuantifierExpression::UniversalQuantifierExpression(
     const std::shared_ptr< VariableDefinition >& predicateVariable,
     const Expression::Ptr& universe,
@@ -668,6 +664,11 @@ void UniversalQuantifierExpression::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// ExistentialQuantifierExpression
+//
+
 ExistentialQuantifierExpression::ExistentialQuantifierExpression(
     const std::shared_ptr< VariableDefinition >& predicateVariable,
     const Expression::Ptr& universe,
@@ -681,3 +682,13 @@ void ExistentialQuantifierExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

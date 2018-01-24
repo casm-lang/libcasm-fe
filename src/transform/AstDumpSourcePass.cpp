@@ -162,9 +162,13 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( ReferenceLiteral& node ) override;
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
+    void visit( TupleLiteral& node ) override;
+    void visit( RecordLiteral& node ) override;
 
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -190,6 +194,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( UnresolvedType& node ) override;
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
+    void visit( TemplateType& node ) override;
     void visit( FixedSizedType& node ) override;
     void visit( RelationType& node ) override;
 
@@ -360,6 +365,27 @@ void AstDumpSourceVisitor::visit( RangeLiteral& node )
     m_stream << "]";
 }
 
+void AstDumpSourceVisitor::visit( TupleLiteral& node )
+{
+    m_stream << "(";
+    dumpNodes( *node.expressions(), ", " );
+    m_stream << ")";
+}
+
+void AstDumpSourceVisitor::visit( RecordLiteral& node )
+{
+    m_stream << "(";
+    dumpNodes( *node.namedExpressions(), ", " );
+    m_stream << ")";
+}
+
+void AstDumpSourceVisitor::visit( NamedExpression& node )
+{
+    node.identifier()->accept( *this );
+    m_stream << " : ";
+    node.expression()->accept( *this );
+}
+
 void AstDumpSourceVisitor::visit( DirectCallExpression& node )
 {
     node.identifier()->accept( *this );
@@ -384,6 +410,13 @@ void AstDumpSourceVisitor::visit( MethodCallExpression& node )
         dumpNodes( *node.arguments(), ", " );
         m_stream << ")";
     }
+}
+
+void AstDumpSourceVisitor::visit( LiteralCallExpression& node )
+{
+    node.object()->accept( *this );
+    m_stream << ".";
+    node.literal()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
@@ -607,6 +640,31 @@ void AstDumpSourceVisitor::visit( BasicType& node )
 }
 
 void AstDumpSourceVisitor::visit( ComposedType& node )
+{
+    m_stream << "(";
+    if( not node.isNamed() )
+    {
+        dumpNodes( *node.subTypes(), ", " );
+    }
+    else
+    {
+        u1 firstNode = true;
+        for( std::size_t index = 0; index < node.subTypes()->size(); index++ )
+        {
+            if( not firstNode )
+            {
+                m_stream << ", ";
+            }
+            ( *node.subTypeIdentifiers() )[ index ]->accept( *this );
+            m_stream << " : ";
+            ( *node.subTypes() )[ index ]->accept( *this );
+            firstNode = false;
+        }
+    }
+    m_stream << ")";
+}
+
+void AstDumpSourceVisitor::visit( TemplateType& node )
 {
     node.name()->accept( *this );
     m_stream << "<";

@@ -102,11 +102,27 @@ void EmptyVisitor::visit( RangeLiteral& )
 {
 }
 
+void EmptyVisitor::visit( TupleLiteral& )
+{
+}
+
+void EmptyVisitor::visit( RecordLiteral& )
+{
+}
+
+void EmptyVisitor::visit( NamedExpression& )
+{
+}
+
 void EmptyVisitor::visit( DirectCallExpression& )
 {
 }
 
 void EmptyVisitor::visit( MethodCallExpression& )
+{
+}
+
+void EmptyVisitor::visit( LiteralCallExpression& )
 {
 }
 
@@ -199,6 +215,10 @@ void EmptyVisitor::visit( BasicType& )
 }
 
 void EmptyVisitor::visit( ComposedType& )
+{
+}
+
+void EmptyVisitor::visit( TemplateType& )
 {
 }
 

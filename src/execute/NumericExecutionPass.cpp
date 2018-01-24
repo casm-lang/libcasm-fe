@@ -310,10 +310,15 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( ReferenceLiteral& node ) override;
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
+    void visit( TupleLiteral& node ) override;
+    void visit( RecordLiteral& node ) override;
 
     void visit( BasicType& node ) override;
+
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
     void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
@@ -583,11 +588,54 @@ void ExecutionVisitor::visit( RangeLiteral& node )
     m_evaluationStack.push( IR::RangeConstant( node.type(), lhs, rhs ) );
 }
 
+void ExecutionVisitor::visit( TupleLiteral& node )
+{
+    assert( node.type()->isTuple() );
+    const auto tupleType = std::static_pointer_cast< IR::TupleType >( node.type() );
+
+    const auto tupleSize = node.expressions()->size();
+    std::vector< IR::Constant > tupleElements;
+    tupleElements.reserve( tupleSize );
+
+    for( std::size_t index = 0; index < tupleSize; index++ )
+    {
+        const auto& expression = ( *node.expressions() )[ index ];
+        expression->accept( *this );
+        const auto constantElement = m_evaluationStack.pop();
+        tupleElements.emplace_back( constantElement );
+    }
+
+    m_evaluationStack.push( IR::TupleConstant( tupleType, tupleElements ) );
+}
+
+void ExecutionVisitor::visit( RecordLiteral& node )
+{
+    assert( node.type()->isRecord() );
+    const auto recordType = std::static_pointer_cast< IR::RecordType >( node.type() );
+
+    // iterate through the in-order, out-of-order, or partial named expressions and assign the
+    // element name with the given expression
+    std::unordered_map< std::string, IR::Constant > recordElements;
+    for( const auto& namedExpression : *node.namedExpressions() )
+    {
+        namedExpression->accept( *this );
+        recordElements.emplace( namedExpression->identifier()->name(), m_evaluationStack.pop() );
+    }
+
+    m_evaluationStack.push( IR::RecordConstant( recordType, recordElements ) );
+}
+
 void ExecutionVisitor::visit( BasicType& node )
 {
     const auto rangeType = std::make_shared< IR::RangeType >( node.type() );
     const auto range = std::make_shared< IR::Range >( rangeType );
     m_evaluationStack.push( IR::RangeConstant( rangeType, range ) );
+}
+
+void ExecutionVisitor::visit( NamedExpression& node )
+{
+    // just evaluate the named expression and push it to the stack
+    node.expression()->accept( *this );
 }
 
 void ExecutionVisitor::visit( DirectCallExpression& node )
@@ -675,6 +723,31 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
             break;
         }
     }
+}
+
+void ExecutionVisitor::visit( LiteralCallExpression& node )
+{
+    node.object()->accept( *this );
+    const auto object = m_evaluationStack.pop();
+    node.literal()->accept( *this );
+    const auto literal = m_evaluationStack.pop();
+    assert( literal.defined() );  // constrain from parser
+
+    if( not object.defined() )
+    {
+        m_evaluationStack.push( IR::Constant::undef( node.type()->ptr_result() ) );
+        return;
+    }
+
+    assert( object.typeId().kind() == IR::Type::Kind::TUPLE );
+    assert( literal.typeId().kind() == IR::Type::Kind::INTEGER );
+
+    const auto* tuple = static_cast< const IR::TupleConstant& >( object ).value();
+    assert( tuple != nullptr );
+    const auto& index = static_cast< const IR::IntegerConstant& >( literal ).value();
+    const auto& element = tuple->elements()[ index.value() - 1 ];
+
+    m_evaluationStack.push( element );
 }
 
 void ExecutionVisitor::visit( IndirectCallExpression& node )
