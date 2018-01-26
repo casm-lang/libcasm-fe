@@ -53,6 +53,11 @@ void libcasm_fe_main_dummy( void )
 
 TEST( libcasm_fe_main, empty )
 {
+    std::cout << libcasm_fe::REVTAG << "\n";
+    std::cout << libcasm_fe::COMMIT << "\n";
+    std::cout << libcasm_fe::BRANCH << "\n";
+    std::cout << libcasm_fe::LICENSE << "\n";
+    std::cout << libcasm_fe::NOTICE << "\n";
 }
 
 //
