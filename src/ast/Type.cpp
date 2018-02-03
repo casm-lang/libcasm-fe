@@ -55,6 +55,9 @@ Type::Type( Node::ID id, const IdentifierPath::Ptr& name )
 : TypedNode( id )
 , m_name( name )
 {
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::CALLABLE );
+    setProperty( libcasm_ir::Property::PURE );
 }
 
 const IdentifierPath::Ptr& Type::name( void ) const

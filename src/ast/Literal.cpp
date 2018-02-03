@@ -52,6 +52,9 @@ using namespace Ast;
 Literal::Literal( Node::ID id )
 : Expression( id )
 {
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::CALLABLE );
+    setProperty( libcasm_ir::Property::PURE );
 }
 
 //

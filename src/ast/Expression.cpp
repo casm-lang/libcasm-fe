@@ -47,6 +47,8 @@
 #include <libcasm-fe/ast/Literal>
 #include <libcasm-fe/ast/Type>
 
+#include <libcasm-ir/Annotation>
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -454,6 +456,8 @@ UnaryExpression::UnaryExpression( const Expression::Ptr& expression, libcasm_ir:
 , m_op( op )
 , m_expression( expression )
 {
+    const auto& annotation = libcasm_ir::Annotation::find( op );
+    setProperties( annotation.properties() );
 }
 
 libcasm_ir::Value::ID UnaryExpression::op( void ) const
@@ -483,6 +487,8 @@ BinaryExpression::BinaryExpression(
 , m_left( left )
 , m_right( right )
 {
+    const auto& annotation = libcasm_ir::Annotation::find( op );
+    setProperties( annotation.properties() );
 }
 
 libcasm_ir::Value::ID BinaryExpression::op( void ) const
