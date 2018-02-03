@@ -282,8 +282,6 @@ END       0 "end of file"
 
 %precedence UPDATE
 
-%precedence AS
-
 %left IMPLIES ARROW
 %left OR
 %left XOR
@@ -996,7 +994,7 @@ IndirectCallExpression
 
 
 TypeCastingExpression
-: Term AS Type
+: SimpleOrClaspedTerm AS Type
   {
       $$ = Ast::make< TypeCastingExpression >( @$, $1, $3 );
   }
