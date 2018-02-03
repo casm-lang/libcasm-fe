@@ -139,7 +139,8 @@ PropertyResolverVisitor::PropertyResolverVisitor( libcasm_fe::Logger& log )
 
 void PropertyResolverVisitor::visit( VariableDefinition& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -147,6 +148,8 @@ void PropertyResolverVisitor::visit( VariableDefinition& node )
 
 void PropertyResolverVisitor::visit( FunctionDefinition& node )
 {
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+
     switch( node.classification() )
     {
         case FunctionDefinition::Classification::UNKNOWN:
@@ -156,24 +159,24 @@ void PropertyResolverVisitor::visit( FunctionDefinition& node )
         }
         case FunctionDefinition::Classification::IN:
         {
-            node.setProperty( libcasm_ir::Property::CONSTANT );
+            node.setProperty( libcasm_ir::Property::CALLABLE );
             break;
         }
         case FunctionDefinition::Classification::CONTROLLED:  // [fallthrough]
         case FunctionDefinition::Classification::SHARED:
         {
-            node.setProperty( libcasm_ir::Property::ALTERABLE );
-            node.setProperty( libcasm_ir::Property::CONSTANT );
+            node.setProperty( libcasm_ir::Property::UPDATEABLE );
+            node.setProperty( libcasm_ir::Property::CALLABLE );
             break;
         }
         case FunctionDefinition::Classification::OUT:
         {
-            node.setProperty( libcasm_ir::Property::ALTERABLE );
+            node.setProperty( libcasm_ir::Property::UPDATEABLE );
             break;
         }
         case FunctionDefinition::Classification::STATIC:
         {
-            node.setProperty( libcasm_ir::Property::CONSTANT );
+            node.setProperty( libcasm_ir::Property::CALLABLE );
             node.setProperty( libcasm_ir::Property::PURE );
             break;
         }
@@ -184,30 +187,33 @@ void PropertyResolverVisitor::visit( FunctionDefinition& node )
 
 void PropertyResolverVisitor::visit( DerivedDefinition& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
 
     RecursiveVisitor::visit( node );
 
     const auto& expressionProperties = node.expression()->properties();
 
-    if( not expressionProperties.isSet( libcasm_ir::Property::CONSTANT ) )
+    if( not expressionProperties.isSet( libcasm_ir::Property::CALLABLE ) )
     {
         m_log.error(
             { node.expression()->sourceLocation() },
             "expression of " + node.description() + " '" + node.identifier()->name() +
-                "' violates 'constant' property",
+                "' violates 'callable' property",
             Code::DerivedDefinitionExpressionIsNotConstant );
     }
 }
 
 void PropertyResolverVisitor::visit( RuleDefinition& node )
 {
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     RecursiveVisitor::visit( node );
 }
 
 void PropertyResolverVisitor::visit( EnumeratorDefinition& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -215,7 +221,8 @@ void PropertyResolverVisitor::visit( EnumeratorDefinition& node )
 
 void PropertyResolverVisitor::visit( EnumerationDefinition& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -223,7 +230,8 @@ void PropertyResolverVisitor::visit( EnumerationDefinition& node )
 
 void PropertyResolverVisitor::visit( UndefLiteral& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -231,7 +239,8 @@ void PropertyResolverVisitor::visit( UndefLiteral& node )
 
 void PropertyResolverVisitor::visit( ValueLiteral& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -239,7 +248,8 @@ void PropertyResolverVisitor::visit( ValueLiteral& node )
 
 void PropertyResolverVisitor::visit( ReferenceLiteral& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -247,17 +257,34 @@ void PropertyResolverVisitor::visit( ReferenceLiteral& node )
 
 void PropertyResolverVisitor::visit( ListLiteral& node )
 {
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
+    node.setProperty( libcasm_ir::Property::PURE );
+
     RecursiveVisitor::visit( node );
+
+    for( auto const& expression : *node.expressions() )
+    {
+        node.setProperties( node.properties() * expression->properties() );
+    }
 }
 
 void PropertyResolverVisitor::visit( RangeLiteral& node )
 {
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
+    node.setProperty( libcasm_ir::Property::PURE );
+
     RecursiveVisitor::visit( node );
+
+    node.setProperties(
+        node.properties() * node.left()->properties() * node.right()->properties() );
 }
 
 void PropertyResolverVisitor::visit( TupleLiteral& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -270,7 +297,8 @@ void PropertyResolverVisitor::visit( TupleLiteral& node )
 
 void PropertyResolverVisitor::visit( RecordLiteral& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -283,7 +311,8 @@ void PropertyResolverVisitor::visit( RecordLiteral& node )
 
 void PropertyResolverVisitor::visit( NamedExpression& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -317,7 +346,8 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
         case CallExpression::TargetType::CONSTANT:
         {
-            node.setProperty( libcasm_ir::Property::CONSTANT );
+            node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+            node.setProperty( libcasm_ir::Property::CALLABLE );
             node.setProperty( libcasm_ir::Property::PURE );
             break;
         }
@@ -362,12 +392,13 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
     {
         case CallExpression::TargetType::FUNCTION:
         {
-            node.setProperty( libcasm_ir::Property::CONSTANT );
+            node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+            node.setProperty( libcasm_ir::Property::CALLABLE );
             break;
         }
         case CallExpression::TargetType::RULE:
         {
-            // indirect rule calls have no properties so far
+            node.setProperty( libcasm_ir::Property::CALLABLE );
             break;
         }
         case CallExpression::TargetType::BUILTIN:      // [[fallthrough]]
@@ -498,7 +529,8 @@ void PropertyResolverVisitor::visit( UnresolvedType& node )
 
 void PropertyResolverVisitor::visit( BasicType& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -506,7 +538,8 @@ void PropertyResolverVisitor::visit( BasicType& node )
 
 void PropertyResolverVisitor::visit( ComposedType& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -519,7 +552,8 @@ void PropertyResolverVisitor::visit( ComposedType& node )
 
 void PropertyResolverVisitor::visit( TemplateType& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -532,7 +566,8 @@ void PropertyResolverVisitor::visit( TemplateType& node )
 
 void PropertyResolverVisitor::visit( FixedSizedType& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
@@ -542,7 +577,8 @@ void PropertyResolverVisitor::visit( FixedSizedType& node )
 
 void PropertyResolverVisitor::visit( RelationType& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
+    node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    node.setProperty( libcasm_ir::Property::CALLABLE );
     node.setProperty( libcasm_ir::Property::PURE );
 
     RecursiveVisitor::visit( node );
