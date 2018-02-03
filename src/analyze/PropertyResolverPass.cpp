@@ -63,10 +63,7 @@ using namespace Ast;
 char PropertyResolverPass::id = 0;
 
 static libpass::PassRegistration< PropertyResolverPass > PASS(
-    "ASTPropertyResolverPass",
-    "property resolving and checking of AST representation",
-    "ast-prop-res",
-    0 );
+    "ASTPropertyResolverPass", "property resolving of AST representation", "ast-prop-res", 0 );
 
 class PropertyResolverVisitor final : public RecursiveVisitor
 {
@@ -132,6 +129,11 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     libcasm_fe::Logger& m_log;
 };
 
+//
+//
+// PropertyResolverVisitor
+//
+
 PropertyResolverVisitor::PropertyResolverVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 {
@@ -191,22 +193,12 @@ void PropertyResolverVisitor::visit( DerivedDefinition& node )
     node.setProperty( libcasm_ir::Property::CALLABLE );
 
     RecursiveVisitor::visit( node );
-
-    const auto& expressionProperties = node.expression()->properties();
-
-    if( not expressionProperties.isSet( libcasm_ir::Property::CALLABLE ) )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "expression of " + node.description() + " '" + node.identifier()->name() +
-                "' violates 'callable' property",
-            Code::DerivedDefinitionExpressionIsNotConstant );
-    }
 }
 
 void PropertyResolverVisitor::visit( RuleDefinition& node )
 {
     node.setProperty( libcasm_ir::Property::CALLABLE );
+
     RecursiveVisitor::visit( node );
 }
 
@@ -619,6 +611,11 @@ void PropertyResolverVisitor::visit( DefaultCase& node )
 {
     RecursiveVisitor::visit( node );
 }
+
+//
+//
+// PropertyResolverPass
+//
 
 void PropertyResolverPass::usage( libpass::PassUsage& pu )
 {
