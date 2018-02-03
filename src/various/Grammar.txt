@@ -398,7 +398,7 @@ IndirectCallExpression ::= "(" "*" Term ")" Arguments
 ===== TypeCastingExpression =====
 
 <code>
-TypeCastingExpression ::= Term "as" Type
+TypeCastingExpression ::= SimpleOrClaspedTerm "as" Type
 </code>
 
 {{page>:grammar:TypeCastingExpression&noheader&nofooter}}

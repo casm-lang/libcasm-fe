@@ -154,7 +154,7 @@ Grammar
 
   113 IndirectCallExpression: "(" "*" Term ")" Arguments
 
-  114 TypeCastingExpression: Term "as" Type
+  114 TypeCastingExpression: SimpleOrClaspedTerm "as" Type
 
   115 LetExpression: "let" AttributedVariable "=" Term "in" Term
 
@@ -456,10 +456,10 @@ Terms (113)
 Term (114)
     on left: 73 74 75 76 77 78 79 80, on right: 15 42 43 44 45 48 51
     52 53 54 64 71 72 81 88 89 90 91 92 93 94 95 96 97 98 99 100 101
-    102 103 104 105 106 107 113 114 115 116 117 118 119 145 146 150
-    165 178 184 185 186 209
+    102 103 104 105 106 107 113 115 116 117 118 119 145 146 150 165
+    178 184 185 186 209
 SimpleOrClaspedTerm (115)
-    on left: 81 82 83 84 85 86 87, on right: 73 110 111 112
+    on left: 81 82 83 84 85 86 87, on right: 73 110 111 112 114
 OperatorExpression (116)
     on left: 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104
     105 106 107, on right: 75
@@ -1455,27 +1455,25 @@ State 51
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   209 ExpressionAttribute: Identifier Term .
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 209 (ExpressionAttribute)
 
@@ -1486,8 +1484,10 @@ State 52
   110 MethodCallExpression: SimpleOrClaspedTerm . "." Identifier
   111                     | SimpleOrClaspedTerm . "." Identifier Arguments
   112 LiteralCallExpression: SimpleOrClaspedTerm . "." IntegerLiteral
+  114 TypeCastingExpression: SimpleOrClaspedTerm . "as" Type
 
-    "."  shift, and go to state 134
+    "as"  shift, and go to state 133
+    "."   shift, and go to state 134
 
     $default  reduce using rule 73 (Term)
 
@@ -1918,28 +1918,26 @@ State 98
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   116 ConditionalExpression: "if" Term . "then" Term "else" Term
 
     "then"     shift, and go to state 157
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 99
@@ -1969,7 +1967,6 @@ State 100
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
   107                   | "not" Term .
-  114 TypeCastingExpression: Term . "as" Type
 
     $default  reduce using rule 107 (OperatorExpression)
 
@@ -1994,7 +1991,6 @@ State 101
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
     $default  reduce using rule 88 (OperatorExpression)
 
@@ -2019,7 +2015,6 @@ State 102
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
     $default  reduce using rule 89 (OperatorExpression)
 
@@ -2119,27 +2114,25 @@ State 106
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
     ")"        shift, and go to state 162
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 72 (Terms)
 
@@ -2213,28 +2206,26 @@ State 113
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   145 RangeLiteral: "[" Term . ".." Term "]"
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
     ".."       shift, and go to state 169
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 72 (Terms)
 
@@ -2255,29 +2246,597 @@ State 115
 
 State 116
 
-  114 TypeCastingExpression: Term "as" . Type
+  104 OperatorExpression: Term "and" . Term
 
-    "in"          shift, and go to state 5
-    "("           shift, and go to state 170
-    "::"          shift, and go to state 43
-    "identifier"  shift, and go to state 6
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
 
-    Type                     go to state 171
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
-    Identifier               go to state 77
-    IdentifierPath           go to state 179
-    DotSeparatedIdentifiers  go to state 79
+    Term                             go to state 170
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
 
 
 State 117
 
-  104 OperatorExpression: Term "and" . Term
+  102 OperatorExpression: Term "or" . Term
+
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
+
+    Term                             go to state 171
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
+
+
+State 118
+
+  103 OperatorExpression: Term "xor" . Term
+
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
+
+    Term                             go to state 172
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
+
+
+State 119
+
+  106 OperatorExpression: Term "implies" . Term
+
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
+
+    Term                             go to state 173
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
+
+
+State 120
+
+   90 OperatorExpression: Term "+" . Term
+
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
+
+    Term                             go to state 174
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
+
+
+State 121
+
+   91 OperatorExpression: Term "-" . Term
+
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
+
+    Term                             go to state 175
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
+
+
+State 122
+
+   97 OperatorExpression: Term "=" . Term
+
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
+
+    Term                             go to state 176
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
+
+
+State 123
+
+   98 OperatorExpression: Term "<" . Term
+
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
+
+    Term                             go to state 177
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
+
+
+State 124
+
+   99 OperatorExpression: Term ">" . Term
+
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
+
+    Term                             go to state 178
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
+
+
+State 125
+
+   92 OperatorExpression: Term "*" . Term
+
+    "let"          shift, and go to state 30
+    "in"           shift, and go to state 5
+    "forall"       shift, and go to state 31
+    "choose"       shift, and go to state 32
+    "if"           shift, and go to state 33
+    "exists"       shift, and go to state 34
+    "undef"        shift, and go to state 35
+    "false"        shift, and go to state 36
+    "true"         shift, and go to state 37
+    "not"          shift, and go to state 38
+    "+"            shift, and go to state 39
+    "-"            shift, and go to state 40
+    "("            shift, and go to state 41
+    "["            shift, and go to state 42
+    "::"           shift, and go to state 43
+    "@"            shift, and go to state 44
+    "binary"       shift, and go to state 45
+    "hexadecimal"  shift, and go to state 46
+    "integer"      shift, and go to state 47
+    "rational"     shift, and go to state 48
+    "decimal"      shift, and go to state 49
+    "string"       shift, and go to state 50
+    "identifier"   shift, and go to state 6
+
+    Term                             go to state 179
+    SimpleOrClaspedTerm              go to state 52
+    OperatorExpression               go to state 53
+    DirectCallExpression             go to state 54
+    MethodCallExpression             go to state 55
+    LiteralCallExpression            go to state 56
+    IndirectCallExpression           go to state 57
+    TypeCastingExpression            go to state 58
+    LetExpression                    go to state 59
+    ConditionalExpression            go to state 60
+    ChooseExpression                 go to state 61
+    UniversalQuantifierExpression    go to state 62
+    ExistentialQuantifierExpression  go to state 63
+    Literal                          go to state 64
+    UndefinedLiteral                 go to state 65
+    BooleanLiteral                   go to state 66
+    IntegerLiteral                   go to state 67
+    RationalLiteral                  go to state 68
+    DecimalLiteral                   go to state 69
+    BinaryLiteral                    go to state 70
+    StringLiteral                    go to state 71
+    ReferenceLiteral                 go to state 72
+    ListLiteral                      go to state 73
+    RangeLiteral                     go to state 74
+    TupleLiteral                     go to state 75
+    RecordLiteral                    go to state 76
+    Identifier                       go to state 77
+    IdentifierPath                   go to state 78
+    DotSeparatedIdentifiers          go to state 79
+
+
+State 126
+
+   93 OperatorExpression: Term "/" . Term
 
     "let"          shift, and go to state 30
     "in"           shift, and go to state 5
@@ -2334,9 +2893,9 @@ State 117
     DotSeparatedIdentifiers          go to state 79
 
 
-State 118
+State 127
 
-  102 OperatorExpression: Term "or" . Term
+   94 OperatorExpression: Term "%" . Term
 
     "let"          shift, and go to state 30
     "in"           shift, and go to state 5
@@ -2393,9 +2952,9 @@ State 118
     DotSeparatedIdentifiers          go to state 79
 
 
-State 119
+State 128
 
-  103 OperatorExpression: Term "xor" . Term
+   95 OperatorExpression: Term "^" . Term
 
     "let"          shift, and go to state 30
     "in"           shift, and go to state 5
@@ -2452,9 +3011,9 @@ State 119
     DotSeparatedIdentifiers          go to state 79
 
 
-State 120
+State 129
 
-  106 OperatorExpression: Term "implies" . Term
+  105 OperatorExpression: Term "=>" . Term
 
     "let"          shift, and go to state 30
     "in"           shift, and go to state 5
@@ -2511,9 +3070,9 @@ State 120
     DotSeparatedIdentifiers          go to state 79
 
 
-State 121
+State 130
 
-   90 OperatorExpression: Term "+" . Term
+   96 OperatorExpression: Term "!=" . Term
 
     "let"          shift, and go to state 30
     "in"           shift, and go to state 5
@@ -2570,9 +3129,9 @@ State 121
     DotSeparatedIdentifiers          go to state 79
 
 
-State 122
+State 131
 
-   91 OperatorExpression: Term "-" . Term
+  100 OperatorExpression: Term "<=" . Term
 
     "let"          shift, and go to state 30
     "in"           shift, and go to state 5
@@ -2629,9 +3188,9 @@ State 122
     DotSeparatedIdentifiers          go to state 79
 
 
-State 123
+State 132
 
-   97 OperatorExpression: Term "=" . Term
+  101 OperatorExpression: Term ">=" . Term
 
     "let"          shift, and go to state 30
     "in"           shift, and go to state 5
@@ -2688,594 +3247,26 @@ State 123
     DotSeparatedIdentifiers          go to state 79
 
 
-State 124
-
-   98 OperatorExpression: Term "<" . Term
-
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
-
-    Term                             go to state 187
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
-
-
-State 125
-
-   99 OperatorExpression: Term ">" . Term
-
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
-
-    Term                             go to state 188
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
-
-
-State 126
-
-   92 OperatorExpression: Term "*" . Term
-
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
-
-    Term                             go to state 189
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
-
-
-State 127
-
-   93 OperatorExpression: Term "/" . Term
-
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
-
-    Term                             go to state 190
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
-
-
-State 128
-
-   94 OperatorExpression: Term "%" . Term
-
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
-
-    Term                             go to state 191
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
-
-
-State 129
-
-   95 OperatorExpression: Term "^" . Term
-
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
-
-    Term                             go to state 192
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
-
-
-State 130
-
-  105 OperatorExpression: Term "=>" . Term
-
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
-
-    Term                             go to state 193
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
-
-
-State 131
-
-   96 OperatorExpression: Term "!=" . Term
-
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
-
-    Term                             go to state 194
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
-
-
-State 132
-
-  100 OperatorExpression: Term "<=" . Term
-
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
-
-    Term                             go to state 195
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
-
-
 State 133
 
-  101 OperatorExpression: Term ">=" . Term
+  114 TypeCastingExpression: SimpleOrClaspedTerm "as" . Type
 
-    "let"          shift, and go to state 30
-    "in"           shift, and go to state 5
-    "forall"       shift, and go to state 31
-    "choose"       shift, and go to state 32
-    "if"           shift, and go to state 33
-    "exists"       shift, and go to state 34
-    "undef"        shift, and go to state 35
-    "false"        shift, and go to state 36
-    "true"         shift, and go to state 37
-    "not"          shift, and go to state 38
-    "+"            shift, and go to state 39
-    "-"            shift, and go to state 40
-    "("            shift, and go to state 41
-    "["            shift, and go to state 42
-    "::"           shift, and go to state 43
-    "@"            shift, and go to state 44
-    "binary"       shift, and go to state 45
-    "hexadecimal"  shift, and go to state 46
-    "integer"      shift, and go to state 47
-    "rational"     shift, and go to state 48
-    "decimal"      shift, and go to state 49
-    "string"       shift, and go to state 50
-    "identifier"   shift, and go to state 6
+    "in"          shift, and go to state 5
+    "("           shift, and go to state 187
+    "::"          shift, and go to state 43
+    "identifier"  shift, and go to state 6
 
-    Term                             go to state 196
-    SimpleOrClaspedTerm              go to state 52
-    OperatorExpression               go to state 53
-    DirectCallExpression             go to state 54
-    MethodCallExpression             go to state 55
-    LiteralCallExpression            go to state 56
-    IndirectCallExpression           go to state 57
-    TypeCastingExpression            go to state 58
-    LetExpression                    go to state 59
-    ConditionalExpression            go to state 60
-    ChooseExpression                 go to state 61
-    UniversalQuantifierExpression    go to state 62
-    ExistentialQuantifierExpression  go to state 63
-    Literal                          go to state 64
-    UndefinedLiteral                 go to state 65
-    BooleanLiteral                   go to state 66
-    IntegerLiteral                   go to state 67
-    RationalLiteral                  go to state 68
-    DecimalLiteral                   go to state 69
-    BinaryLiteral                    go to state 70
-    StringLiteral                    go to state 71
-    ReferenceLiteral                 go to state 72
-    ListLiteral                      go to state 73
-    RangeLiteral                     go to state 74
-    TupleLiteral                     go to state 75
-    RecordLiteral                    go to state 76
-    Identifier                       go to state 77
-    IdentifierPath                   go to state 78
-    DotSeparatedIdentifiers          go to state 79
+    Type                     go to state 188
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
+    Identifier               go to state 77
+    IdentifierPath           go to state 196
+    DotSeparatedIdentifiers  go to state 79
 
 
 State 134
@@ -3406,29 +3397,27 @@ State 140
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   184 Initializer: Term .
   185            | Term . "->" Term
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
     "->"       shift, and go to state 204
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 184 (Initializer)
 
@@ -3512,20 +3501,20 @@ State 149
    27 UsingDefinition: "using" Identifier "=" . Type
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     Type                     go to state 218
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -3534,24 +3523,24 @@ State 150
    18 FunctionDefinition: "function" Identifier ":" . MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     $default  reduce using rule 172 (MaybeFunctionParameters)
 
     Type                     go to state 219
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     FunctionParameters       go to state 220
     MaybeFunctionParameters  go to state 221
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -3589,20 +3578,20 @@ State 153
   199 TypedVariable: Identifier ":" . Type
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     Type                     go to state 224
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -3928,27 +3917,25 @@ State 160
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
   113 IndirectCallExpression: "(" "*" Term . ")" Arguments
-  114 TypeCastingExpression: Term . "as" Type
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
     ")"        shift, and go to state 230
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 161
@@ -4229,101 +4216,6 @@ State 169
 
 State 170
 
-  161 TupleType: "(" . Types "," Type ")"
-  162 RecordType: "(" . TypedVariables "," TypedVariable ")"
-
-    "in"          shift, and go to state 5
-    "("           shift, and go to state 170
-    "::"          shift, and go to state 43
-    "identifier"  shift, and go to state 6
-
-    Types                    go to state 237
-    Type                     go to state 238
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
-    Identifier               go to state 239
-    IdentifierPath           go to state 179
-    DotSeparatedIdentifiers  go to state 79
-    TypedVariables           go to state 240
-    TypedVariable            go to state 241
-
-
-State 171
-
-  114 TypeCastingExpression: Term "as" Type .
-
-    $default  reduce using rule 114 (TypeCastingExpression)
-
-
-State 172
-
-  153 Type: BasicType .
-
-    $default  reduce using rule 153 (Type)
-
-
-State 173
-
-  154 Type: ComposedType .
-
-    $default  reduce using rule 154 (Type)
-
-
-State 174
-
-  159 ComposedType: TupleType .
-
-    $default  reduce using rule 159 (ComposedType)
-
-
-State 175
-
-  160 ComposedType: RecordType .
-
-    $default  reduce using rule 160 (ComposedType)
-
-
-State 176
-
-  155 Type: TemplateType .
-
-    $default  reduce using rule 155 (Type)
-
-
-State 177
-
-  156 Type: RelationType .
-
-    $default  reduce using rule 156 (Type)
-
-
-State 178
-
-  157 Type: FixedSizedType .
-
-    $default  reduce using rule 157 (Type)
-
-
-State 179
-
-  158 BasicType: IdentifierPath .
-  163 TemplateType: IdentifierPath . "<" Types ">"
-  164 RelationType: IdentifierPath . "<" MaybeFunctionParameters "->" Type ">"
-  165 FixedSizedType: IdentifierPath . "'" Term
-
-    "<"  shift, and go to state 242
-    "'"  shift, and go to state 243
-
-    $default  reduce using rule 158 (BasicType)
-
-
-State 180
-
    90 OperatorExpression: Term . "+" Term
    91                   | Term . "-" Term
    92                   | Term . "*" Term
@@ -4342,25 +4234,24 @@ State 180
   104                   | Term "and" Term .
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "+"   shift, and go to state 121
-    "-"   shift, and go to state 122
-    "="   shift, and go to state 123
-    "<"   shift, and go to state 124
-    ">"   shift, and go to state 125
-    "*"   shift, and go to state 126
-    "/"   shift, and go to state 127
-    "%"   shift, and go to state 128
-    "^"   shift, and go to state 129
-    "!="  shift, and go to state 131
-    "<="  shift, and go to state 132
-    ">="  shift, and go to state 133
+    "+"   shift, and go to state 120
+    "-"   shift, and go to state 121
+    "="   shift, and go to state 122
+    "<"   shift, and go to state 123
+    ">"   shift, and go to state 124
+    "*"   shift, and go to state 125
+    "/"   shift, and go to state 126
+    "%"   shift, and go to state 127
+    "^"   shift, and go to state 128
+    "!="  shift, and go to state 130
+    "<="  shift, and go to state 131
+    ">="  shift, and go to state 132
 
     $default  reduce using rule 104 (OperatorExpression)
 
 
-State 181
+State 171
 
    90 OperatorExpression: Term . "+" Term
    91                   | Term . "-" Term
@@ -4380,27 +4271,26 @@ State 181
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "and"  shift, and go to state 117
-    "xor"  shift, and go to state 119
-    "+"    shift, and go to state 121
-    "-"    shift, and go to state 122
-    "="    shift, and go to state 123
-    "<"    shift, and go to state 124
-    ">"    shift, and go to state 125
-    "*"    shift, and go to state 126
-    "/"    shift, and go to state 127
-    "%"    shift, and go to state 128
-    "^"    shift, and go to state 129
-    "!="   shift, and go to state 131
-    "<="   shift, and go to state 132
-    ">="   shift, and go to state 133
+    "and"  shift, and go to state 116
+    "xor"  shift, and go to state 118
+    "+"    shift, and go to state 120
+    "-"    shift, and go to state 121
+    "="    shift, and go to state 122
+    "<"    shift, and go to state 123
+    ">"    shift, and go to state 124
+    "*"    shift, and go to state 125
+    "/"    shift, and go to state 126
+    "%"    shift, and go to state 127
+    "^"    shift, and go to state 128
+    "!="   shift, and go to state 130
+    "<="   shift, and go to state 131
+    ">="   shift, and go to state 132
 
     $default  reduce using rule 102 (OperatorExpression)
 
 
-State 182
+State 172
 
    90 OperatorExpression: Term . "+" Term
    91                   | Term . "-" Term
@@ -4420,23 +4310,319 @@ State 182
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "and"  shift, and go to state 117
-    "+"    shift, and go to state 121
-    "-"    shift, and go to state 122
-    "="    shift, and go to state 123
-    "<"    shift, and go to state 124
-    ">"    shift, and go to state 125
-    "*"    shift, and go to state 126
-    "/"    shift, and go to state 127
-    "%"    shift, and go to state 128
-    "^"    shift, and go to state 129
-    "!="   shift, and go to state 131
-    "<="   shift, and go to state 132
-    ">="   shift, and go to state 133
+    "and"  shift, and go to state 116
+    "+"    shift, and go to state 120
+    "-"    shift, and go to state 121
+    "="    shift, and go to state 122
+    "<"    shift, and go to state 123
+    ">"    shift, and go to state 124
+    "*"    shift, and go to state 125
+    "/"    shift, and go to state 126
+    "%"    shift, and go to state 127
+    "^"    shift, and go to state 128
+    "!="   shift, and go to state 130
+    "<="   shift, and go to state 131
+    ">="   shift, and go to state 132
 
     $default  reduce using rule 103 (OperatorExpression)
+
+
+State 173
+
+   90 OperatorExpression: Term . "+" Term
+   91                   | Term . "-" Term
+   92                   | Term . "*" Term
+   93                   | Term . "/" Term
+   94                   | Term . "%" Term
+   95                   | Term . "^" Term
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   98                   | Term . "<" Term
+   99                   | Term . ">" Term
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+  106                   | Term "implies" Term .
+
+    "and"  shift, and go to state 116
+    "or"   shift, and go to state 117
+    "xor"  shift, and go to state 118
+    "+"    shift, and go to state 120
+    "-"    shift, and go to state 121
+    "="    shift, and go to state 122
+    "<"    shift, and go to state 123
+    ">"    shift, and go to state 124
+    "*"    shift, and go to state 125
+    "/"    shift, and go to state 126
+    "%"    shift, and go to state 127
+    "^"    shift, and go to state 128
+    "!="   shift, and go to state 130
+    "<="   shift, and go to state 131
+    ">="   shift, and go to state 132
+
+    $default  reduce using rule 106 (OperatorExpression)
+
+
+State 174
+
+   90 OperatorExpression: Term . "+" Term
+   90                   | Term "+" Term .
+   91                   | Term . "-" Term
+   92                   | Term . "*" Term
+   93                   | Term . "/" Term
+   94                   | Term . "%" Term
+   95                   | Term . "^" Term
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   98                   | Term . "<" Term
+   99                   | Term . ">" Term
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+
+    "*"  shift, and go to state 125
+    "/"  shift, and go to state 126
+    "%"  shift, and go to state 127
+    "^"  shift, and go to state 128
+
+    $default  reduce using rule 90 (OperatorExpression)
+
+
+State 175
+
+   90 OperatorExpression: Term . "+" Term
+   91                   | Term . "-" Term
+   91                   | Term "-" Term .
+   92                   | Term . "*" Term
+   93                   | Term . "/" Term
+   94                   | Term . "%" Term
+   95                   | Term . "^" Term
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   98                   | Term . "<" Term
+   99                   | Term . ">" Term
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+
+    "*"  shift, and go to state 125
+    "/"  shift, and go to state 126
+    "%"  shift, and go to state 127
+    "^"  shift, and go to state 128
+
+    $default  reduce using rule 91 (OperatorExpression)
+
+
+State 176
+
+   90 OperatorExpression: Term . "+" Term
+   91                   | Term . "-" Term
+   92                   | Term . "*" Term
+   93                   | Term . "/" Term
+   94                   | Term . "%" Term
+   95                   | Term . "^" Term
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   97                   | Term "=" Term .
+   98                   | Term . "<" Term
+   99                   | Term . ">" Term
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+
+    "+"   shift, and go to state 120
+    "-"   shift, and go to state 121
+    "<"   shift, and go to state 123
+    ">"   shift, and go to state 124
+    "*"   shift, and go to state 125
+    "/"   shift, and go to state 126
+    "%"   shift, and go to state 127
+    "^"   shift, and go to state 128
+    "<="  shift, and go to state 131
+    ">="  shift, and go to state 132
+
+    $default  reduce using rule 97 (OperatorExpression)
+
+
+State 177
+
+   90 OperatorExpression: Term . "+" Term
+   91                   | Term . "-" Term
+   92                   | Term . "*" Term
+   93                   | Term . "/" Term
+   94                   | Term . "%" Term
+   95                   | Term . "^" Term
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   98                   | Term . "<" Term
+   98                   | Term "<" Term .
+   99                   | Term . ">" Term
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+
+    "+"  shift, and go to state 120
+    "-"  shift, and go to state 121
+    "*"  shift, and go to state 125
+    "/"  shift, and go to state 126
+    "%"  shift, and go to state 127
+    "^"  shift, and go to state 128
+
+    $default  reduce using rule 98 (OperatorExpression)
+
+
+State 178
+
+   90 OperatorExpression: Term . "+" Term
+   91                   | Term . "-" Term
+   92                   | Term . "*" Term
+   93                   | Term . "/" Term
+   94                   | Term . "%" Term
+   95                   | Term . "^" Term
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   98                   | Term . "<" Term
+   99                   | Term . ">" Term
+   99                   | Term ">" Term .
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+
+    "+"  shift, and go to state 120
+    "-"  shift, and go to state 121
+    "*"  shift, and go to state 125
+    "/"  shift, and go to state 126
+    "%"  shift, and go to state 127
+    "^"  shift, and go to state 128
+
+    $default  reduce using rule 99 (OperatorExpression)
+
+
+State 179
+
+   90 OperatorExpression: Term . "+" Term
+   91                   | Term . "-" Term
+   92                   | Term . "*" Term
+   92                   | Term "*" Term .
+   93                   | Term . "/" Term
+   94                   | Term . "%" Term
+   95                   | Term . "^" Term
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   98                   | Term . "<" Term
+   99                   | Term . ">" Term
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+
+    "^"  shift, and go to state 128
+
+    $default  reduce using rule 92 (OperatorExpression)
+
+
+State 180
+
+   90 OperatorExpression: Term . "+" Term
+   91                   | Term . "-" Term
+   92                   | Term . "*" Term
+   93                   | Term . "/" Term
+   93                   | Term "/" Term .
+   94                   | Term . "%" Term
+   95                   | Term . "^" Term
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   98                   | Term . "<" Term
+   99                   | Term . ">" Term
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+
+    "^"  shift, and go to state 128
+
+    $default  reduce using rule 93 (OperatorExpression)
+
+
+State 181
+
+   90 OperatorExpression: Term . "+" Term
+   91                   | Term . "-" Term
+   92                   | Term . "*" Term
+   93                   | Term . "/" Term
+   94                   | Term . "%" Term
+   94                   | Term "%" Term .
+   95                   | Term . "^" Term
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   98                   | Term . "<" Term
+   99                   | Term . ">" Term
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+
+    "^"  shift, and go to state 128
+
+    $default  reduce using rule 94 (OperatorExpression)
+
+
+State 182
+
+   90 OperatorExpression: Term . "+" Term
+   91                   | Term . "-" Term
+   92                   | Term . "*" Term
+   93                   | Term . "/" Term
+   94                   | Term . "%" Term
+   95                   | Term . "^" Term
+   95                   | Term "^" Term .
+   96                   | Term . "!=" Term
+   97                   | Term . "=" Term
+   98                   | Term . "<" Term
+   99                   | Term . ">" Term
+  100                   | Term . "<=" Term
+  101                   | Term . ">=" Term
+  102                   | Term . "or" Term
+  103                   | Term . "xor" Term
+  104                   | Term . "and" Term
+  105                   | Term . "=>" Term
+  106                   | Term . "implies" Term
+
+    $default  reduce using rule 95 (OperatorExpression)
 
 
 State 183
@@ -4457,337 +4643,29 @@ State 183
   103                   | Term . "xor" Term
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  106                   | Term "implies" Term .
-  114 TypeCastingExpression: Term . "as" Type
-
-    "and"  shift, and go to state 117
-    "or"   shift, and go to state 118
-    "xor"  shift, and go to state 119
-    "+"    shift, and go to state 121
-    "-"    shift, and go to state 122
-    "="    shift, and go to state 123
-    "<"    shift, and go to state 124
-    ">"    shift, and go to state 125
-    "*"    shift, and go to state 126
-    "/"    shift, and go to state 127
-    "%"    shift, and go to state 128
-    "^"    shift, and go to state 129
-    "!="   shift, and go to state 131
-    "<="   shift, and go to state 132
-    ">="   shift, and go to state 133
-
-    $default  reduce using rule 106 (OperatorExpression)
-
-
-State 184
-
-   90 OperatorExpression: Term . "+" Term
-   90                   | Term "+" Term .
-   91                   | Term . "-" Term
-   92                   | Term . "*" Term
-   93                   | Term . "/" Term
-   94                   | Term . "%" Term
-   95                   | Term . "^" Term
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   98                   | Term . "<" Term
-   99                   | Term . ">" Term
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
-
-    "*"  shift, and go to state 126
-    "/"  shift, and go to state 127
-    "%"  shift, and go to state 128
-    "^"  shift, and go to state 129
-
-    $default  reduce using rule 90 (OperatorExpression)
-
-
-State 185
-
-   90 OperatorExpression: Term . "+" Term
-   91                   | Term . "-" Term
-   91                   | Term "-" Term .
-   92                   | Term . "*" Term
-   93                   | Term . "/" Term
-   94                   | Term . "%" Term
-   95                   | Term . "^" Term
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   98                   | Term . "<" Term
-   99                   | Term . ">" Term
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
-
-    "*"  shift, and go to state 126
-    "/"  shift, and go to state 127
-    "%"  shift, and go to state 128
-    "^"  shift, and go to state 129
-
-    $default  reduce using rule 91 (OperatorExpression)
-
-
-State 186
-
-   90 OperatorExpression: Term . "+" Term
-   91                   | Term . "-" Term
-   92                   | Term . "*" Term
-   93                   | Term . "/" Term
-   94                   | Term . "%" Term
-   95                   | Term . "^" Term
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   97                   | Term "=" Term .
-   98                   | Term . "<" Term
-   99                   | Term . ">" Term
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
-
-    "+"   shift, and go to state 121
-    "-"   shift, and go to state 122
-    "<"   shift, and go to state 124
-    ">"   shift, and go to state 125
-    "*"   shift, and go to state 126
-    "/"   shift, and go to state 127
-    "%"   shift, and go to state 128
-    "^"   shift, and go to state 129
-    "<="  shift, and go to state 132
-    ">="  shift, and go to state 133
-
-    $default  reduce using rule 97 (OperatorExpression)
-
-
-State 187
-
-   90 OperatorExpression: Term . "+" Term
-   91                   | Term . "-" Term
-   92                   | Term . "*" Term
-   93                   | Term . "/" Term
-   94                   | Term . "%" Term
-   95                   | Term . "^" Term
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   98                   | Term . "<" Term
-   98                   | Term "<" Term .
-   99                   | Term . ">" Term
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
-
-    "+"  shift, and go to state 121
-    "-"  shift, and go to state 122
-    "*"  shift, and go to state 126
-    "/"  shift, and go to state 127
-    "%"  shift, and go to state 128
-    "^"  shift, and go to state 129
-
-    $default  reduce using rule 98 (OperatorExpression)
-
-
-State 188
-
-   90 OperatorExpression: Term . "+" Term
-   91                   | Term . "-" Term
-   92                   | Term . "*" Term
-   93                   | Term . "/" Term
-   94                   | Term . "%" Term
-   95                   | Term . "^" Term
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   98                   | Term . "<" Term
-   99                   | Term . ">" Term
-   99                   | Term ">" Term .
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
-
-    "+"  shift, and go to state 121
-    "-"  shift, and go to state 122
-    "*"  shift, and go to state 126
-    "/"  shift, and go to state 127
-    "%"  shift, and go to state 128
-    "^"  shift, and go to state 129
-
-    $default  reduce using rule 99 (OperatorExpression)
-
-
-State 189
-
-   90 OperatorExpression: Term . "+" Term
-   91                   | Term . "-" Term
-   92                   | Term . "*" Term
-   92                   | Term "*" Term .
-   93                   | Term . "/" Term
-   94                   | Term . "%" Term
-   95                   | Term . "^" Term
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   98                   | Term . "<" Term
-   99                   | Term . ">" Term
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
-
-    "^"  shift, and go to state 129
-
-    $default  reduce using rule 92 (OperatorExpression)
-
-
-State 190
-
-   90 OperatorExpression: Term . "+" Term
-   91                   | Term . "-" Term
-   92                   | Term . "*" Term
-   93                   | Term . "/" Term
-   93                   | Term "/" Term .
-   94                   | Term . "%" Term
-   95                   | Term . "^" Term
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   98                   | Term . "<" Term
-   99                   | Term . ">" Term
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
-
-    "^"  shift, and go to state 129
-
-    $default  reduce using rule 93 (OperatorExpression)
-
-
-State 191
-
-   90 OperatorExpression: Term . "+" Term
-   91                   | Term . "-" Term
-   92                   | Term . "*" Term
-   93                   | Term . "/" Term
-   94                   | Term . "%" Term
-   94                   | Term "%" Term .
-   95                   | Term . "^" Term
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   98                   | Term . "<" Term
-   99                   | Term . ">" Term
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
-
-    "^"  shift, and go to state 129
-
-    $default  reduce using rule 94 (OperatorExpression)
-
-
-State 192
-
-   90 OperatorExpression: Term . "+" Term
-   91                   | Term . "-" Term
-   92                   | Term . "*" Term
-   93                   | Term . "/" Term
-   94                   | Term . "%" Term
-   95                   | Term . "^" Term
-   95                   | Term "^" Term .
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   98                   | Term . "<" Term
-   99                   | Term . ">" Term
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
-  106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
-
-    $default  reduce using rule 95 (OperatorExpression)
-
-
-State 193
-
-   90 OperatorExpression: Term . "+" Term
-   91                   | Term . "-" Term
-   92                   | Term . "*" Term
-   93                   | Term . "/" Term
-   94                   | Term . "%" Term
-   95                   | Term . "^" Term
-   96                   | Term . "!=" Term
-   97                   | Term . "=" Term
-   98                   | Term . "<" Term
-   99                   | Term . ">" Term
-  100                   | Term . "<=" Term
-  101                   | Term . ">=" Term
-  102                   | Term . "or" Term
-  103                   | Term . "xor" Term
-  104                   | Term . "and" Term
-  105                   | Term . "=>" Term
   105                   | Term "=>" Term .
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "and"  shift, and go to state 117
-    "or"   shift, and go to state 118
-    "xor"  shift, and go to state 119
-    "+"    shift, and go to state 121
-    "-"    shift, and go to state 122
-    "="    shift, and go to state 123
-    "<"    shift, and go to state 124
-    ">"    shift, and go to state 125
-    "*"    shift, and go to state 126
-    "/"    shift, and go to state 127
-    "%"    shift, and go to state 128
-    "^"    shift, and go to state 129
-    "!="   shift, and go to state 131
-    "<="   shift, and go to state 132
-    ">="   shift, and go to state 133
+    "and"  shift, and go to state 116
+    "or"   shift, and go to state 117
+    "xor"  shift, and go to state 118
+    "+"    shift, and go to state 120
+    "-"    shift, and go to state 121
+    "="    shift, and go to state 122
+    "<"    shift, and go to state 123
+    ">"    shift, and go to state 124
+    "*"    shift, and go to state 125
+    "/"    shift, and go to state 126
+    "%"    shift, and go to state 127
+    "^"    shift, and go to state 128
+    "!="   shift, and go to state 130
+    "<="   shift, and go to state 131
+    ">="   shift, and go to state 132
 
     $default  reduce using rule 105 (OperatorExpression)
 
 
-State 194
+State 184
 
    90 OperatorExpression: Term . "+" Term
    91                   | Term . "-" Term
@@ -4807,23 +4685,22 @@ State 194
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "+"   shift, and go to state 121
-    "-"   shift, and go to state 122
-    "<"   shift, and go to state 124
-    ">"   shift, and go to state 125
-    "*"   shift, and go to state 126
-    "/"   shift, and go to state 127
-    "%"   shift, and go to state 128
-    "^"   shift, and go to state 129
-    "<="  shift, and go to state 132
-    ">="  shift, and go to state 133
+    "+"   shift, and go to state 120
+    "-"   shift, and go to state 121
+    "<"   shift, and go to state 123
+    ">"   shift, and go to state 124
+    "*"   shift, and go to state 125
+    "/"   shift, and go to state 126
+    "%"   shift, and go to state 127
+    "^"   shift, and go to state 128
+    "<="  shift, and go to state 131
+    ">="  shift, and go to state 132
 
     $default  reduce using rule 96 (OperatorExpression)
 
 
-State 195
+State 185
 
    90 OperatorExpression: Term . "+" Term
    91                   | Term . "-" Term
@@ -4843,19 +4720,18 @@ State 195
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "+"  shift, and go to state 121
-    "-"  shift, and go to state 122
-    "*"  shift, and go to state 126
-    "/"  shift, and go to state 127
-    "%"  shift, and go to state 128
-    "^"  shift, and go to state 129
+    "+"  shift, and go to state 120
+    "-"  shift, and go to state 121
+    "*"  shift, and go to state 125
+    "/"  shift, and go to state 126
+    "%"  shift, and go to state 127
+    "^"  shift, and go to state 128
 
     $default  reduce using rule 100 (OperatorExpression)
 
 
-State 196
+State 186
 
    90 OperatorExpression: Term . "+" Term
    91                   | Term . "-" Term
@@ -4875,16 +4751,110 @@ State 196
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "+"  shift, and go to state 121
-    "-"  shift, and go to state 122
-    "*"  shift, and go to state 126
-    "/"  shift, and go to state 127
-    "%"  shift, and go to state 128
-    "^"  shift, and go to state 129
+    "+"  shift, and go to state 120
+    "-"  shift, and go to state 121
+    "*"  shift, and go to state 125
+    "/"  shift, and go to state 126
+    "%"  shift, and go to state 127
+    "^"  shift, and go to state 128
 
     $default  reduce using rule 101 (OperatorExpression)
+
+
+State 187
+
+  161 TupleType: "(" . Types "," Type ")"
+  162 RecordType: "(" . TypedVariables "," TypedVariable ")"
+
+    "in"          shift, and go to state 5
+    "("           shift, and go to state 187
+    "::"          shift, and go to state 43
+    "identifier"  shift, and go to state 6
+
+    Types                    go to state 237
+    Type                     go to state 238
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
+    Identifier               go to state 239
+    IdentifierPath           go to state 196
+    DotSeparatedIdentifiers  go to state 79
+    TypedVariables           go to state 240
+    TypedVariable            go to state 241
+
+
+State 188
+
+  114 TypeCastingExpression: SimpleOrClaspedTerm "as" Type .
+
+    $default  reduce using rule 114 (TypeCastingExpression)
+
+
+State 189
+
+  153 Type: BasicType .
+
+    $default  reduce using rule 153 (Type)
+
+
+State 190
+
+  154 Type: ComposedType .
+
+    $default  reduce using rule 154 (Type)
+
+
+State 191
+
+  159 ComposedType: TupleType .
+
+    $default  reduce using rule 159 (ComposedType)
+
+
+State 192
+
+  160 ComposedType: RecordType .
+
+    $default  reduce using rule 160 (ComposedType)
+
+
+State 193
+
+  155 Type: TemplateType .
+
+    $default  reduce using rule 155 (Type)
+
+
+State 194
+
+  156 Type: RelationType .
+
+    $default  reduce using rule 156 (Type)
+
+
+State 195
+
+  157 Type: FixedSizedType .
+
+    $default  reduce using rule 157 (Type)
+
+
+State 196
+
+  158 BasicType: IdentifierPath .
+  163 TemplateType: IdentifierPath . "<" Types ">"
+  164 RelationType: IdentifierPath . "<" MaybeFunctionParameters "->" Type ">"
+  165 FixedSizedType: IdentifierPath . "'" Term
+
+    "<"  shift, and go to state 242
+    "'"  shift, and go to state 243
+
+    $default  reduce using rule 158 (BasicType)
 
 
 State 197
@@ -4949,26 +4919,24 @@ State 202
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 72 (Terms)
 
@@ -5221,20 +5189,20 @@ State 214
    15 DerivedDefinition: "derived" Identifier MaybeParameters "->" . Type "=" Term
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     Type                     go to state 254
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -5324,20 +5292,20 @@ State 217
    17 RuleDefinition: "rule" Identifier MaybeParameters "->" . Type "=" Rule
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     Type                     go to state 288
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -5417,28 +5385,26 @@ State 225
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   115 LetExpression: "let" AttributedVariable "=" Term . "in" Term
 
     "in"       shift, and go to state 292
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 226
@@ -5460,28 +5426,26 @@ State 226
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   118 UniversalQuantifierExpression: "forall" AttributedVariable "in" Term . "holds" Term
 
     "holds"    shift, and go to state 293
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 227
@@ -5503,28 +5467,26 @@ State 227
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   117 ChooseExpression: "choose" AttributedVariable "in" Term . "do" Term
 
     "do"       shift, and go to state 294
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 228
@@ -5546,28 +5508,26 @@ State 228
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   116 ConditionalExpression: "if" Term "then" Term . "else" Term
 
     "else"     shift, and go to state 295
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 229
@@ -5589,28 +5549,26 @@ State 229
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   119 ExistentialQuantifierExpression: "exists" AttributedVariable "in" Term . "with" Term
 
     "with"     shift, and go to state 296
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 230
@@ -5642,28 +5600,26 @@ State 231
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   146 TupleLiteral: "(" Terms "," Term . ")"
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
     ")"        shift, and go to state 298
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 71 (Terms)
 
@@ -5701,27 +5657,25 @@ State 234
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   150 Assignment: Identifier ":" Term .
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 150 (Assignment)
 
@@ -5746,26 +5700,24 @@ State 235
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 71 (Terms)
 
@@ -5789,28 +5741,26 @@ State 236
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   145 RangeLiteral: "[" Term ".." Term . "]"
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
     "]"        shift, and go to state 299
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 237
@@ -5859,7 +5809,7 @@ State 242
   164 RelationType: IdentifierPath "<" . MaybeFunctionParameters "->" Type ">"
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
@@ -5867,17 +5817,17 @@ State 242
 
     Types                    go to state 302
     Type                     go to state 303
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     FunctionParameters       go to state 220
     MaybeFunctionParameters  go to state 304
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -5980,27 +5930,25 @@ State 247
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   185 Initializer: Term "->" Term .
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 185 (Initializer)
 
@@ -6024,27 +5972,25 @@ State 248
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   186 Initializer: TupleLiteral "->" Term .
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 186 (Initializer)
 
@@ -6840,20 +6786,20 @@ State 289
   169 FunctionParameters: FunctionParameters "*" . Type
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     Type                     go to state 332
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -6862,20 +6808,20 @@ State 290
    18 FunctionDefinition: "function" Identifier ":" MaybeFunctionParameters "->" . Type MaybeDefined MaybeInitially
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     Type                     go to state 333
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -7208,20 +7154,20 @@ State 300
   161 TupleType: "(" Types "," . Type ")"
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     Type                     go to state 339
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -7282,7 +7228,6 @@ State 305
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   165 FixedSizedType: IdentifierPath "'" Term .
 
     $default  reduce using rule 165 (FixedSizedType)
@@ -7630,27 +7575,25 @@ State 324
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
     "then"     shift, and go to state 356
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 325
@@ -7674,27 +7617,25 @@ State 325
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
     "of"       shift, and go to state 357
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 326
@@ -8012,27 +7953,25 @@ State 334
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   115 LetExpression: "let" AttributedVariable "=" Term "in" Term .
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 115 (LetExpression)
 
@@ -8056,27 +7995,25 @@ State 335
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   118 UniversalQuantifierExpression: "forall" AttributedVariable "in" Term "holds" Term .
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 118 (UniversalQuantifierExpression)
 
@@ -8100,27 +8037,25 @@ State 336
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   117 ChooseExpression: "choose" AttributedVariable "in" Term "do" Term .
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 117 (ChooseExpression)
 
@@ -8144,27 +8079,25 @@ State 337
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   116 ConditionalExpression: "if" Term "then" Term "else" Term .
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 116 (ConditionalExpression)
 
@@ -8188,27 +8121,25 @@ State 338
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   119 ExistentialQuantifierExpression: "exists" AttributedVariable "in" Term "with" Term .
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 119 (ExistentialQuantifierExpression)
 
@@ -8238,20 +8169,20 @@ State 341
   151 Types: Types "," . Type
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     Type                     go to state 368
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -8267,20 +8198,20 @@ State 343
   164 RelationType: IdentifierPath "<" MaybeFunctionParameters "->" . Type ">"
 
     "in"          shift, and go to state 5
-    "("           shift, and go to state 170
+    "("           shift, and go to state 187
     "::"          shift, and go to state 43
     "identifier"  shift, and go to state 6
 
     Type                     go to state 369
-    BasicType                go to state 172
-    ComposedType             go to state 173
-    TupleType                go to state 174
-    RecordType               go to state 175
-    TemplateType             go to state 176
-    RelationType             go to state 177
-    FixedSizedType           go to state 178
+    BasicType                go to state 189
+    ComposedType             go to state 190
+    TupleType                go to state 191
+    RecordType               go to state 192
+    TemplateType             go to state 193
+    RelationType             go to state 194
+    FixedSizedType           go to state 195
     Identifier               go to state 77
-    IdentifierPath           go to state 179
+    IdentifierPath           go to state 196
     DotSeparatedIdentifiers  go to state 79
 
 
@@ -8311,26 +8242,24 @@ State 345
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 15 (DerivedDefinition)
 
@@ -8689,26 +8618,24 @@ State 362
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
     $default  reduce using rule 64 (UpdateRule)
 
@@ -8793,27 +8720,25 @@ State 371
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
     "in"       shift, and go to state 380
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 372
@@ -8837,28 +8762,26 @@ State 372
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
     "do"       shift, and go to state 381
     "with"     shift, and go to state 382
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 373
@@ -8881,27 +8804,25 @@ State 373
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
     "do"       shift, and go to state 383
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 374
@@ -9498,27 +9419,25 @@ State 390
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
     ":"        shift, and go to state 403
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 391
@@ -9540,28 +9459,26 @@ State 391
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
   178 MaybeDefined: "defined" "{" Term . "}"
 
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
     "}"        shift, and go to state 404
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 392
@@ -9662,27 +9579,25 @@ State 395
   104                   | Term . "and" Term
   105                   | Term . "=>" Term
   106                   | Term . "implies" Term
-  114 TypeCastingExpression: Term . "as" Type
 
     "do"       shift, and go to state 406
-    "as"       shift, and go to state 116
-    "and"      shift, and go to state 117
-    "or"       shift, and go to state 118
-    "xor"      shift, and go to state 119
-    "implies"  shift, and go to state 120
-    "+"        shift, and go to state 121
-    "-"        shift, and go to state 122
-    "="        shift, and go to state 123
-    "<"        shift, and go to state 124
-    ">"        shift, and go to state 125
-    "*"        shift, and go to state 126
-    "/"        shift, and go to state 127
-    "%"        shift, and go to state 128
-    "^"        shift, and go to state 129
-    "=>"       shift, and go to state 130
-    "!="       shift, and go to state 131
-    "<="       shift, and go to state 132
-    ">="       shift, and go to state 133
+    "and"      shift, and go to state 116
+    "or"       shift, and go to state 117
+    "xor"      shift, and go to state 118
+    "implies"  shift, and go to state 119
+    "+"        shift, and go to state 120
+    "-"        shift, and go to state 121
+    "="        shift, and go to state 122
+    "<"        shift, and go to state 123
+    ">"        shift, and go to state 124
+    "*"        shift, and go to state 125
+    "/"        shift, and go to state 126
+    "%"        shift, and go to state 127
+    "^"        shift, and go to state 128
+    "=>"       shift, and go to state 129
+    "!="       shift, and go to state 130
+    "<="       shift, and go to state 131
+    ">="       shift, and go to state 132
 
 
 State 396
