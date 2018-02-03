@@ -459,6 +459,8 @@ void PropertyResolverVisitor::visit( UniversalQuantifierExpression& node )
 void PropertyResolverVisitor::visit( ExistentialQuantifierExpression& node )
 {
     RecursiveVisitor::visit( node );
+
+    node.setProperties( node.universe()->properties() * node.proposition()->properties() );
 }
 
 void PropertyResolverVisitor::visit( SkipRule& node )
