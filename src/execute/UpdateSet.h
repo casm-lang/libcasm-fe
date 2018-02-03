@@ -673,14 +673,14 @@ class UpdateSetTransaction
         typename UpdateSet::Semantics semantics,
         std::size_t initialSize )
     : m_manager( manager )
-    , m_forked( true )
+    , m_dangling( true )
     {
         manager->fork( semantics, initialSize );
     }
 
     ~UpdateSetTransaction()
     {
-        if( m_forked )
+        if( m_dangling )
         {
             rollback();
         }
@@ -688,25 +688,29 @@ class UpdateSetTransaction
 
     void merge( void )
     {
-        if( m_forked )
+        if( not m_dangling )
         {
-            m_manager->merge();
-            m_forked = false;
+            return;
         }
+
+        m_manager->merge();
+        m_dangling = false;
     }
 
     void rollback( void )
     {
-        if( m_forked )
+        if( not m_dangling )
         {
-            m_manager->rollback();
-            m_forked = false;
+            return;
         }
+
+        m_manager->rollback();
+        m_dangling = false;
     }
 
   private:
     UpdateSetManager< UpdateSet >* m_manager;
-    bool m_forked;
+    bool m_dangling;
 };
 
 #endif  // _LIBCASM_FE_UPDATESET_H_

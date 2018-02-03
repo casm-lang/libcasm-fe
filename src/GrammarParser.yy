@@ -317,10 +317,10 @@ Specification
 
 
 Header
-: LSQPAREN Attributes RSQPAREN CASM
+: Attributes CASM
   {
       auto definition = Ast::make< HeaderDefinition >( @$, @$ );
-      definition->setAttributes( $2 );
+      definition->setAttributes( $1 );
       $$ = definition;
   }
 | CASM
@@ -347,10 +347,10 @@ Definitions
 
 
 AttributedDefinition
-: LSQPAREN Attributes RSQPAREN Definition
+: Attributes Definition
   {
-      auto definition = $4;
-      definition->setAttributes( $2 );
+      auto definition = $2;
+      definition->setAttributes( $1 );
       $$ = definition;
   }
 | Definition
@@ -488,10 +488,10 @@ EnumeratorDefinition
   {
       $$ = Ast::make< EnumeratorDefinition >( @$, $1 );
   }
-| LSQPAREN Attributes RSQPAREN Identifier
+| Attributes Identifier
   {
-      auto enumerator = Ast::make< EnumeratorDefinition >( @$, $4 );
-      enumerator->setAttributes( $2 );
+      auto enumerator = Ast::make< EnumeratorDefinition >( @$, $2 );
+      enumerator->setAttributes( $1 );
       $$ = enumerator;
   }
 | error // error recovery
@@ -1657,10 +1657,10 @@ TypedVariable
 
 
 AttributedVariable
-: LSQPAREN Attributes RSQPAREN Variable
+: Attributes Variable
   {
-      auto variable = $4;
-      variable->setAttributes( $2 );
+      auto variable = $2;
+      variable->setAttributes( $1 );
       $$ = variable;
   }
 | Variable
@@ -1671,10 +1671,10 @@ AttributedVariable
 
 
 TypedAttributedVariable
-: LSQPAREN Attributes RSQPAREN TypedVariable
+: Attributes TypedVariable
   {
-      auto variable = $4;
-      variable->setAttributes( $2 );
+      auto variable = $2;
+      variable->setAttributes( $1 );
       $$ = variable;
   }
 | TypedVariable
@@ -1688,10 +1688,10 @@ TypedAttributedVariable
 //
 
 Attributes
-: Attributes COMMA Attribute
+: Attributes Attribute
   {
       auto attributes = $1;
-      attributes->add( $3 );
+      attributes->add( $2 );
       $$ = attributes;
   }
 | Attribute
@@ -1702,14 +1702,19 @@ Attributes
   }
 ;
 
+
 Attribute
-: BasicAttribute
+: LSQPAREN BasicAttribute RSQPAREN
   {
-      $$ = $1;
+      $$ = $2;
   }
-| ExpressionAttribute
+| LSQPAREN ExpressionAttribute RSQPAREN
   {
-      $$ = $1;
+      $$ = $2;
+  }
+| LSQPAREN error RSQPAREN // error recovery
+  {
+      $$ = nullptr;
   }
 ;
 

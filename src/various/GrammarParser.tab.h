@@ -1402,9 +1402,9 @@ namespace libcasm_fe {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 2419,     ///< Last index in yytable_.
+      yylast_ = 2273,     ///< Last index in yytable_.
       yynnts_ = 89,  ///< Number of nonterminal symbols.
-      yyfinal_ = 12, ///< Termination state number.
+      yyfinal_ = 13, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
       yyntokens_ = 84  ///< Number of tokens.

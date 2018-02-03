@@ -14,7 +14,7 @@ Specification ::= Header Definitions
 ===== Header =====
 
 <code>
-Header ::= "[" Attributes "]" "CASM"
+Header ::= Attributes "CASM"
          | "CASM"
 </code>
 
@@ -34,7 +34,7 @@ Definitions ::= Definitions AttributedDefinition
 ===== AttributedDefinition =====
 
 <code>
-AttributedDefinition ::= "[" Attributes "]" Definition
+AttributedDefinition ::= Attributes Definition
                        | Definition
 </code>
 
@@ -106,7 +106,7 @@ ProgramFunctionDefinition ::= "init" IdentifierPath
 
 <code>
 EnumeratorDefinition ::= Identifier
-                       | "[" Attributes "]" Identifier
+                       | Attributes Identifier
 </code>
 
 {{page>:grammar:EnumeratorDefinition&noheader&nofooter}}
@@ -849,7 +849,7 @@ TypedVariable ::= Identifier ":" Type
 ===== AttributedVariable =====
 
 <code>
-AttributedVariable ::= "[" Attributes "]" Variable
+AttributedVariable ::= Attributes Variable
                      | Variable
 </code>
 
@@ -859,7 +859,7 @@ AttributedVariable ::= "[" Attributes "]" Variable
 ===== TypedAttributedVariable =====
 
 <code>
-TypedAttributedVariable ::= "[" Attributes "]" TypedVariable
+TypedAttributedVariable ::= Attributes TypedVariable
                           | TypedVariable
 </code>
 
@@ -869,7 +869,7 @@ TypedAttributedVariable ::= "[" Attributes "]" TypedVariable
 ===== Attributes =====
 
 <code>
-Attributes ::= Attributes "," Attribute
+Attributes ::= Attributes Attribute
              | Attribute
 </code>
 
@@ -879,8 +879,8 @@ Attributes ::= Attributes "," Attribute
 ===== Attribute =====
 
 <code>
-Attribute ::= BasicAttribute
-            | ExpressionAttribute
+Attribute ::= "[" BasicAttribute "]"
+            | "[" ExpressionAttribute "]"
 </code>
 
 {{page>:grammar:Attribute&noheader&nofooter}}
