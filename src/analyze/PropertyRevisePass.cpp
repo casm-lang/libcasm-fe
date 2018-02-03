@@ -100,7 +100,15 @@ void PropertyReviseVisitor::visit( DerivedDefinition& node )
             { node.expression()->sourceLocation() },
             "expression of " + node.description() + " '" + node.identifier()->name() +
                 "' violates 'callable' property",
-            Code::DerivedDefinitionExpressionIsNotConstant );
+            Code::DerivedDefinitionExpressionIsNotCallable );
+    }
+    if( not expressionProperties.isSet( libcasm_ir::Property::SIDE_EFFECT_FREE ) )
+    {
+        m_log.error(
+            { node.expression()->sourceLocation() },
+            "expression of " + node.description() + " '" + node.identifier()->name() +
+                "' violates 'side effect free' property",
+            Code::DerivedDefinitionExpressionIsNotSideEffectFree );
     }
 }
 

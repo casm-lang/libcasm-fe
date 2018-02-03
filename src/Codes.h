@@ -118,7 +118,8 @@ namespace libcasm_fe
 
         DerivedDefinitionIdentifierIsBuiltinName = 0xd100,  // d1** ... derived identifer
 
-        DerivedDefinitionExpressionIsNotConstant = 0xde00,
+        DerivedDefinitionExpressionIsNotCallable = 0xde00,
+        DerivedDefinitionExpressionIsNotSideEffectFree = 0xde01,
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
