@@ -613,11 +613,18 @@ void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
     {
         m_stream << "\n{ ";
 
-        if( node.properties().isSet( libcasm_ir::Property::CONSTANT ) )
+        if( node.properties().isSet( libcasm_ir::Property::UPDATEABLE ) )
+        {
+            m_stream << "U ";
+        }
+        if( node.properties().isSet( libcasm_ir::Property::CALLABLE ) )
         {
             m_stream << "C ";
         }
-
+        if( node.properties().isSet( libcasm_ir::Property::SIDE_EFFECT_FREE ) )
+        {
+            m_stream << "S ";
+        }
         if( node.properties().isSet( libcasm_ir::Property::PURE ) )
         {
             m_stream << "P ";
