@@ -528,13 +528,24 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 continue;
             }
 
-            const auto& callArgType = call_type_args.at( pos );
-            if( callArgType->isInteger() and exprArg->type()->result().isInteger() )
+            auto exprArgType = exprArg->type();
+            if( exprArgType->isRelation() )
+            {
+                exprArgType = exprArgType->ptr_result();
+            }
+
+            auto callArgType = call_type_args.at( pos );
+            if( callArgType->isRelation() )
+            {
+                callArgType = callArgType->ptr_result();
+            }
+
+            if( callArgType->isInteger() and exprArgType->isInteger() )
             {
                 continue;
             }
 
-            if( *callArgType != exprArg->type()->result() )
+            if( *callArgType != *exprArgType )
             {
                 const std::unordered_map< CallExpression::TargetType, Code > codes = {
                     { CallExpression::TargetType::FUNCTION,
@@ -553,8 +564,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
                 m_log.error(
                     { exprArg->sourceLocation() },
                     "type mismatch: " + node.targetTypeName() + " argument type at position " +
-                        std::to_string( pos + 1 ) + " was '" + exprArg->type()->description() +
-                        "', " + node.targetTypeName() + " definition expects '" +
+                        std::to_string( pos + 1 ) + " was '" + exprArgType->description() + "', " +
+                        node.targetTypeName() + " definition expects '" +
                         callArgType->description() + "'",
                     code->second );
             }
