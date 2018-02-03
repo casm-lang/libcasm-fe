@@ -41,32 +41,99 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_H_
-#define _LIBCASM_FE_H_
+#include "PropertyRevisePass.h"
 
-#include <libcasm-fe/Version>
-#include <libcasm-fe/analyze/AttributionPass>
-#include <libcasm-fe/analyze/ConsistencyCheckPass>
-#include <libcasm-fe/analyze/FrameSizeDeterminationPass>
+#include <libcasm-fe/Logger>
+#include <libcasm-fe/Namespace>
+#include <libcasm-fe/Specification>
+#include <libcasm-fe/ast/RecursiveVisitor>
+
 #include <libcasm-fe/analyze/PropertyResolverPass>
-#include <libcasm-fe/analyze/PropertyRevisePass>
-#include <libcasm-fe/analyze/SymbolRegistrationPass>
-#include <libcasm-fe/analyze/SymbolResolverPass>
-#include <libcasm-fe/analyze/TypeCheckPass>
-#include <libcasm-fe/analyze/TypeInferencePass>
-#include <libcasm-fe/execute/NumericExecutionPass>
-#include <libcasm-fe/execute/UpdateSet>
-//#include <libcasm-fe/execute/SymbolicExecutionPass>
-#include <libcasm-fe/transform/AstDumpDotPass>
-#include <libcasm-fe/transform/AstDumpSourcePass>
-#include <libcasm-fe/transform/AstToCasmIRPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
-namespace libcasm_fe
+#include <libcasm-ir/Annotation>
+
+#include <libpass/PassRegistry>
+#include <libpass/PassResult>
+#include <libpass/PassUsage>
+
+using namespace libcasm_fe;
+using namespace Ast;
+
+char PropertyRevisePass::id = 0;
+
+static libpass::PassRegistration< PropertyRevisePass > PASS(
+    "ASTPropertyRevisePass",
+    "property revise (checking) of AST representation",
+    "ast-prop-rev",
+    0 );
+
+class PropertyReviseVisitor final : public RecursiveVisitor
+{
+  public:
+    PropertyReviseVisitor( libcasm_fe::Logger& log );
+
+    void visit( DerivedDefinition& node ) override;
+
+  private:
+    libcasm_fe::Logger& m_log;
+};
+
+//
+//
+// PropertyReviseVisitor
+//
+
+PropertyReviseVisitor::PropertyReviseVisitor( libcasm_fe::Logger& log )
+: m_log( log )
 {
 }
 
-#endif  // _LIBCASM_FE_H_
+void PropertyReviseVisitor::visit( DerivedDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& expressionProperties = node.expression()->properties();
+    if( not expressionProperties.isSet( libcasm_ir::Property::CALLABLE ) )
+    {
+        m_log.error(
+            { node.expression()->sourceLocation() },
+            "expression of " + node.description() + " '" + node.identifier()->name() +
+                "' violates 'callable' property",
+            Code::DerivedDefinitionExpressionIsNotConstant );
+    }
+}
+
+//
+//
+// PropertyRevisePass
+//
+
+void PropertyRevisePass::usage( libpass::PassUsage& pu )
+{
+    pu.require< SourceToAstPass >();
+    pu.scheduleAfter< PropertyResolverPass >();
+}
+
+u1 PropertyRevisePass::run( libpass::PassResult& pr )
+{
+    libcasm_fe::Logger log( &id, stream() );
+
+    const auto data = pr.output< SourceToAstPass >();
+    const auto specification = data->specification();
+
+    PropertyReviseVisitor visitor( log );
+    specification->definitions()->accept( visitor );
+
+    const auto errors = log.errors();
+    if( errors > 0 )
+    {
+        log.debug( "found %lu error(s) during property resolving", errors );
+        return false;
+    }
+
+    return true;
+}
 
 //
 //  Local variables:
