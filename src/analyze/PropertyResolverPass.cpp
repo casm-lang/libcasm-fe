@@ -269,21 +269,23 @@ void PropertyResolverVisitor::visit( LetExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.expression()->properties() );
+    node.setProperties( node.initializer()->properties() * node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( ConditionalExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.thenExpression()->properties() * node.elseExpression()->properties() );
+    node.setProperties(
+        node.condition()->properties() * node.thenExpression()->properties() *
+        node.elseExpression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( ChooseExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.expression()->properties() );
+    node.setProperties( node.universe()->properties() * node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( UniversalQuantifierExpression& node )
