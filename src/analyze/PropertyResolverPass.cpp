@@ -252,15 +252,17 @@ void PropertyResolverVisitor::visit( UnaryExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.properties() * node.expression()->properties() );
+    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
+    node.setProperties( annotation.properties() * node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( BinaryExpression& node )
 {
     RecursiveVisitor::visit( node );
 
+    const auto& annotation = libcasm_ir::Annotation::find( node.op() );
     node.setProperties(
-        node.properties() * node.left()->properties() * node.right()->properties() );
+        annotation.properties() * node.left()->properties() * node.right()->properties() );
 }
 
 void PropertyResolverVisitor::visit( LetExpression& node )
