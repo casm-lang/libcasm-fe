@@ -90,17 +90,17 @@ TypeInfo::TypeInfo( void )
 
 void TypeInfo::setType( const std::string& name, const libcasm_ir::Type::Ptr& type )
 {
-    auto result = m_typeName2typePtr.emplace( name, type );
+    const auto result = m_typeName2typePtr.emplace( name, type );
     if( not result.second )
     {
         throw std::domain_error( "already set ptr of type with name '" + name + "'" );
     }
 }
 
-libcasm_ir::Type::Ptr TypeInfo::getType( const std::string& name )
+libcasm_ir::Type::Ptr TypeInfo::getType( const std::string& name ) const
 {
-    auto it = m_typeName2typePtr.find( name );
-    if( it == m_typeName2typePtr.end() )
+    const auto it = m_typeName2typePtr.find( name );
+    if( it == m_typeName2typePtr.cend() )
     {
         throw std::domain_error( "could not find type with name '" + name + "'" );
     }
@@ -108,42 +108,34 @@ libcasm_ir::Type::Ptr TypeInfo::getType( const std::string& name )
     return it->second;
 }
 
-u1 TypeInfo::hasType( const std::string& name )
+u1 TypeInfo::hasType( const std::string& name ) const
 {
-    try
-    {
-        getType( name );
-    }
-    catch( const std::exception& e )
-    {
-        return false;
-    }
-
-    return true;
+    const auto it = m_typeName2typePtr.find( name );
+    return it != m_typeName2typePtr.cend();
 }
 
-u1 TypeInfo::isBasicType( const std::string& name )
+u1 TypeInfo::isBasicType( const std::string& name ) const
 {
-    auto it = TYPE_NAMES_FOR_BASIC_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_BASIC_TYPES.end();
+    const auto it = TYPE_NAMES_FOR_BASIC_TYPES.find( name );
+    return it != TYPE_NAMES_FOR_BASIC_TYPES.cend();
 }
 
-u1 TypeInfo::isComposedType( const std::string& name )
+u1 TypeInfo::isComposedType( const std::string& name ) const
 {
-    auto it = TYPE_NAMES_FOR_COMPOSED_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_COMPOSED_TYPES.end();
+    const auto it = TYPE_NAMES_FOR_COMPOSED_TYPES.find( name );
+    return it != TYPE_NAMES_FOR_COMPOSED_TYPES.cend();
 }
 
-u1 TypeInfo::isTemplateType( const std::string& name )
+u1 TypeInfo::isTemplateType( const std::string& name ) const
 {
-    auto it = TYPE_NAMES_FOR_TEMPLATE_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_TEMPLATE_TYPES.end();
+    const auto it = TYPE_NAMES_FOR_TEMPLATE_TYPES.find( name );
+    return it != TYPE_NAMES_FOR_TEMPLATE_TYPES.cend();
 }
 
-u1 TypeInfo::isReferenceType( const std::string& name )
+u1 TypeInfo::isReferenceType( const std::string& name ) const
 {
-    auto it = TYPE_NAMES_FOR_REFERENCE_TYPES.find( name );
-    return it != TYPE_NAMES_FOR_REFERENCE_TYPES.end();
+    const auto it = TYPE_NAMES_FOR_REFERENCE_TYPES.find( name );
+    return it != TYPE_NAMES_FOR_REFERENCE_TYPES.cend();
 }
 
 //

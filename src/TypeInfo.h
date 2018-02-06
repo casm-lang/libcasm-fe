@@ -44,7 +44,8 @@
 #ifndef _LIBCASM_FE_TYPE_INFO_H_
 #define _LIBCASM_FE_TYPE_INFO_H_
 
-#include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/CasmFE>
+#include <libcasm-ir/Type>
 
 namespace libcasm_fe
 {
@@ -54,21 +55,22 @@ namespace libcasm_fe
     class TypeInfo
     {
       public:
-        TypeInfo( void );
-
         void setType( const std::string& name, const libcasm_ir::Type::Ptr& type );
 
-        libcasm_ir::Type::Ptr getType( const std::string& name );
+        libcasm_ir::Type::Ptr getType( const std::string& name ) const;
 
-        u1 hasType( const std::string& name );
+        u1 hasType( const std::string& name ) const;
 
-        u1 isBasicType( const std::string& name );
+        u1 isBasicType( const std::string& name ) const;
 
-        u1 isComposedType( const std::string& name );
+        u1 isComposedType( const std::string& name ) const;
 
-        u1 isTemplateType( const std::string& name );
+        u1 isTemplateType( const std::string& name ) const;
 
-        u1 isReferenceType( const std::string& name );
+        u1 isReferenceType( const std::string& name ) const;
+
+      protected:
+        TypeInfo( void );
 
       public:
         // basic types
