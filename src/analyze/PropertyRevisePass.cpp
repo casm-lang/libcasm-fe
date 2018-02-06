@@ -75,6 +75,15 @@ class PropertyReviseVisitor final : public RecursiveVisitor
 
     void visit( DerivedDefinition& node ) override;
 
+    void visit( BasicType& node ) override;
+    void visit( ComposedType& node ) override;
+    void visit( TemplateType& node ) override;
+    void visit( FixedSizedType& node ) override;
+    void visit( RelationType& node ) override;
+
+  private:
+    void revise( Ast::Type& node );
+
   private:
     libcasm_fe::Logger& m_log;
 };
@@ -102,6 +111,43 @@ void PropertyReviseVisitor::visit( DerivedDefinition& node )
                 "' violates 'side effect free' property",
             Code::DerivedDefinitionExpressionIsNotSideEffectFree );
     }
+}
+
+void PropertyReviseVisitor::visit( BasicType& node )
+{
+    RecursiveVisitor::visit( node );
+}
+void PropertyReviseVisitor::visit( ComposedType& node )
+{
+    RecursiveVisitor::visit( node );
+}
+void PropertyReviseVisitor::visit( TemplateType& node )
+{
+    RecursiveVisitor::visit( node );
+}
+void PropertyReviseVisitor::visit( FixedSizedType& node )
+{
+    RecursiveVisitor::visit( node );
+}
+void PropertyReviseVisitor::visit( RelationType& node )
+{
+    RecursiveVisitor::visit( node );
+}
+
+void PropertyReviseVisitor::revise( Ast::Type& node )
+{
+    const auto properties = libcasm_ir::Properties{ libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                                    libcasm_ir::Property::PURE };
+
+    properties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
+        if( not node.properties().isSet( property ) )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "type violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property" );
+        }
+        return true;
+    } );
 }
 
 //
