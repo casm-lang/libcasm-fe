@@ -72,6 +72,11 @@ namespace libcasm_fe
       protected:
         TypeInfo( void );
 
+        TypeInfo( TypeInfo const& ) = delete;
+        TypeInfo( TypeInfo&& ) = delete;
+        TypeInfo& operator=( TypeInfo const& ) = delete;
+        TypeInfo& operator=( TypeInfo&& ) = delete;
+
       public:
         // basic types
         static constexpr const char* TYPE_NAME_VOID = "Void";
