@@ -52,8 +52,6 @@ using namespace Ast;
 Literal::Literal( Node::ID id )
 : Expression( id )
 {
-    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-    setProperty( libcasm_ir::Property::PURE );
 }
 
 //
@@ -64,6 +62,8 @@ Literal::Literal( Node::ID id )
 UndefLiteral::UndefLiteral( void )
 : Literal( Node::ID::UNDEF_LITERAL )
 {
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::PURE );
 }
 
 void UndefLiteral::accept( Visitor& visitor )
@@ -81,6 +81,9 @@ ValueLiteral::ValueLiteral( const libcasm_ir::Constant::Ptr& value )
 , m_value( value )
 {
     Expression::setType( value->type().ptr_type() );
+
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::PURE );
 }
 
 const libcasm_ir::Constant::Ptr& ValueLiteral::value( void ) const
@@ -111,6 +114,8 @@ ReferenceLiteral::ReferenceLiteral( const IdentifierPath::Ptr& identifier )
 , m_reference( nullptr )
 , m_builtinId( libcasm_ir::Value::ID::_SIZE_ )
 {
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::PURE );
 }
 
 const IdentifierPath::Ptr& ReferenceLiteral::identifier() const

@@ -111,45 +111,77 @@ void PropertyResolverVisitor::visit( ListLiteral& node )
 {
     RecursiveVisitor::visit( node );
 
+    u1 first = true;
+    libcasm_ir::Properties properties;
+
     for( auto const& expression : *node.expressions() )
     {
-        node.setProperties( node.properties() * expression->properties() );
+        if( first )
+        {
+            properties = expression->properties();
+            first = false;
+            continue;
+        }
+        properties = properties * expression->properties();
     }
+
+    node.setProperties( properties );
 }
 
 void PropertyResolverVisitor::visit( RangeLiteral& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties(
-        node.properties() * node.left()->properties() * node.right()->properties() );
+    node.setProperties( node.left()->properties() * node.right()->properties() );
 }
 
 void PropertyResolverVisitor::visit( TupleLiteral& node )
 {
     RecursiveVisitor::visit( node );
 
+    u1 first = true;
+    libcasm_ir::Properties properties;
+
     for( auto const& expression : *node.expressions() )
     {
-        node.setProperties( node.properties() * expression->properties() );
+        if( first )
+        {
+            properties = expression->properties();
+            first = false;
+            continue;
+        }
+        properties = properties * expression->properties();
     }
+
+    node.setProperties( properties );
 }
 
 void PropertyResolverVisitor::visit( RecordLiteral& node )
 {
     RecursiveVisitor::visit( node );
 
+    u1 first = true;
+    libcasm_ir::Properties properties;
+
     for( auto const& namedExpression : *node.namedExpressions() )
     {
-        node.setProperties( node.properties() * namedExpression->properties() );
+        if( first )
+        {
+            properties = namedExpression->properties();
+            first = false;
+            continue;
+        }
+        properties = properties * namedExpression->properties();
     }
+
+    node.setProperties( properties );
 }
 
 void PropertyResolverVisitor::visit( NamedExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.properties() * node.expression()->properties() );
+    node.setProperties( node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( DirectCallExpression& node )
