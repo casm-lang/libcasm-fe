@@ -46,6 +46,7 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
+#include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/analyze/AttributionPass>
@@ -81,6 +82,11 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
     void visit( UsingDefinition& node ) override;
 
   private:
+    void validateSymbol(
+        const Definition& node, const Code errorCodeIsBuiltin, const Code errorCodeIsType );
+    void registerSymbol( Definition& node, const Code errorCodeAlreadyRegistered );
+
+  private:
     libcasm_fe::Logger& m_log;
     Namespace& m_symboltable;
 };
@@ -94,16 +100,12 @@ SymbolRegistrationVisitor::SymbolRegistrationVisitor(
 
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
+    validateSymbol(
+        node,
+        Code::FunctionDefinitionIdentifierIsBuiltinName,
+        Code::FunctionDefinitionIdentifierIsTypeName );
+
     const auto& name = node.identifier()->name();
-
-    if( libcasm_ir::Builtin::available( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            Code::FunctionDefinitionIdentifierIsBuiltinName );
-    }
-
     try
     {
         m_symboltable.registerSymbol( name, node.ptr< Definition >() );
@@ -133,91 +135,39 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 
 void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 {
-    const auto& name = node.identifier()->name();
-
-    if( libcasm_ir::Builtin::available( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            Code::DerivedDefinitionIdentifierIsBuiltinName );
-    }
-
-    try
-    {
-        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( name );
-
-        m_log.error(
-            { node.sourceLocation(), symbol->sourceLocation() },
-            e.what(),
-            Code::DerivedDefinitionAlreadyUsed );
-    }
+    validateSymbol(
+        node,
+        Code::DerivedDefinitionIdentifierIsBuiltinName,
+        Code::DerivedDefinitionIdentifierIsTypeName );
+    registerSymbol( node, Code::DerivedDefinitionAlreadyUsed );
 
     RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 {
-    const auto& name = node.identifier()->name();
-
-    if( libcasm_ir::Builtin::available( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            Code::RuleDefinitionIdentifierIsBuiltinName );
-    }
-
-    try
-    {
-        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( name );
-
-        m_log.error(
-            { node.sourceLocation(), symbol->sourceLocation() },
-            e.what(),
-            Code::RuleDefinitionAlreadyUsed );
-    }
+    validateSymbol(
+        node,
+        Code::RuleDefinitionIdentifierIsBuiltinName,
+        Code::RuleDefinitionIdentifierIsTypeName );
+    registerSymbol( node, Code::RuleDefinitionAlreadyUsed );
 
     RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
 {
-    const auto& name = node.identifier()->name();
-
-    try
-    {
-        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( name );
-
-        m_log.error( { node.sourceLocation() }, e.what(), Code::EnumeratorDefinitionAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
-    }
+    registerSymbol( node, Code::EnumeratorDefinitionAlreadyUsed );
 }
 
 void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 {
+    validateSymbol(
+        node,
+        Code::EnumerationDefinitionIdentifierIsBuiltinName,
+        Code::EnumerationDefinitionIdentifierIsTypeName );
+
     const auto& name = node.identifier()->name();
-
-    if( libcasm_ir::Builtin::available( name ) )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            Code::EnumerationDefinitionIdentifierIsBuiltinName );
-    }
-
     m_log.debug( "creating IR enumeration type '" + name + "'" );
     const auto kind = std::make_shared< libcasm_ir::Enumeration >( name );
     for( const auto& enumerator : *node.enumerators() )
@@ -240,17 +190,7 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
         enumerator->setType( type );
     }
 
-    try
-    {
-        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.find( name );
-
-        m_log.error( { node.sourceLocation() }, e.what(), Code::EnumerationDefinitionAlreadyUsed );
-        m_log.info( { symbol->sourceLocation() }, e.what() );
-    }
+    registerSymbol( node, Code::EnumerationDefinitionAlreadyUsed );
 
     // register enumerators in a sub-namespace
     const auto enumeratorNamespace = std::make_shared< Namespace >();
@@ -269,8 +209,41 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 
 void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 {
+    validateSymbol(
+        node,
+        Code::UsingDefinitionIdentifierIsBuiltinName,
+        Code::UsingDefinitionIdentifierIsTypeName );
+    registerSymbol( node, Code::UsingDefinitionAlreadyUsed );
+
+    RecursiveVisitor::visit( node );
+}
+
+void SymbolRegistrationVisitor::validateSymbol(
+    const Definition& node, const Code errorCodeIsBuiltin, const Code errorCodeIsType )
+{
     const auto& name = node.identifier()->name();
 
+    if( libcasm_ir::Builtin::available( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
+            errorCodeIsBuiltin );
+    }
+
+    if( TypeInfo::instance().hasType( name ) )
+    {
+        m_log.error(
+            { node.identifier()->sourceLocation() },
+            "cannot use type name '" + name + "' as " + node.description() + " symbol",
+            errorCodeIsType );
+    }
+}
+
+void SymbolRegistrationVisitor::registerSymbol(
+    Definition& node, const Code errorCodeAlreadyRegistered )
+{
+    const auto& name = node.identifier()->name();
     try
     {
         m_symboltable.registerSymbol( name, node.ptr< Definition >() );
@@ -278,14 +251,9 @@ void SymbolRegistrationVisitor::visit( UsingDefinition& node )
     catch( const std::domain_error& e )
     {
         const auto& symbol = m_symboltable.find( name );
-
-        m_log.error(
-            { node.sourceLocation(), symbol->sourceLocation() },
-            e.what(),
-            Code::SymbolAlreadyDefined );
+        m_log.error( { node.sourceLocation() }, e.what(), errorCodeAlreadyRegistered );
+        m_log.info( { symbol->sourceLocation() }, e.what() );
     }
-
-    RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationPass::usage( libpass::PassUsage& pu )
