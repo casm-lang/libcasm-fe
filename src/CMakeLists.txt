@@ -53,6 +53,7 @@ add_library( ${PROJECT}-cpp OBJECT
   Logger.cpp
   Namespace.cpp
   Specification.cpp
+  TypeInfo.cpp
 
   ast/Attribute.cpp
   ast/Definition.cpp
@@ -118,6 +119,7 @@ ecm_generate_headers( ${PROJECT}_HEADERS_CPP
     Namespace
     SourceLocation
     Specification
+    TypeInfo
   PREFIX
     ${PROJECT}
   REQUIRED_HEADERS

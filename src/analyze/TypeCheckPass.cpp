@@ -46,6 +46,7 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
+#include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/analyze/SymbolResolverPass>
@@ -95,41 +96,6 @@ void TypeCheckVisitor::visit( UsingDefinition& node )
     node.setType( node.type()->type() );  // TODO top-sort using definitions
 }
 
-// basic types
-static const std::string TYPE_STRING_VOID = "Void";
-static const std::string TYPE_STRING_BOOLEAN = "Boolean";
-static const std::string TYPE_STRING_BINARY = "Binary";
-static const std::string TYPE_STRING_INTEGER = "Integer";
-static const std::string TYPE_STRING_STRING = "String";
-static const std::string TYPE_STRING_DECIMAL = "Decimal";
-static const std::string TYPE_STRING_RATIONAL = "Rational";
-
-// composed types
-static const std::string TYPE_STRING_TUPLE = "Tuple";
-static const std::string TYPE_STRING_RECORD = "Record";
-
-static const std::unordered_set< std::string > TYPE_STRINGS_FOR_COMPOSED_TYPES = {
-    TYPE_STRING_TUPLE, TYPE_STRING_RECORD
-};
-
-// template types
-static const std::string TYPE_STRING_LIST = "List";
-static const std::string TYPE_STRING_RANGE = "Range";
-static const std::string TYPE_STRING_FILE = "File";
-static const std::string TYPE_STRING_PORT = "Port";
-
-static const std::unordered_set< std::string > TYPE_STRINGS_FOR_TEMPLATE_TYPES = {
-    TYPE_STRING_LIST, TYPE_STRING_RANGE, TYPE_STRING_FILE, TYPE_STRING_PORT
-};
-
-// reference types
-static const std::string TYPE_STRING_RULEREF = "RuleRef";
-static const std::string TYPE_STRING_FUNCREF = "FuncRef";
-
-static const std::unordered_set< std::string > TYPE_STRINGS_FOR_REFERENCE_TYPES = {
-    TYPE_STRING_RULEREF, TYPE_STRING_FUNCREF
-};
-
 void TypeCheckVisitor::visit( BasicType& node )
 {
     RecursiveVisitor::visit( node );
@@ -141,45 +107,26 @@ void TypeCheckVisitor::visit( BasicType& node )
 
     const auto& name = node.name()->path();
 
-    if( name == TYPE_STRING_VOID )
+    if( TypeInfo::instance().isBasicType( name ) )
     {
-        node.setType( libstdhl::Memory::get< libcasm_ir::VoidType >() );
+        assert( TypeInfo::instance().hasType( name ) );
+        node.setType( TypeInfo::instance().getType( name ) );
     }
-    else if( name == TYPE_STRING_BOOLEAN )
-    {
-        node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
-    }
-    else if( name == TYPE_STRING_INTEGER )
-    {
-        node.setType( libstdhl::Memory::get< libcasm_ir::IntegerType >() );
-    }
-    else if( name == TYPE_STRING_STRING )
-    {
-        node.setType( libstdhl::Memory::get< libcasm_ir::StringType >() );
-    }
-    else if( name == TYPE_STRING_DECIMAL )
-    {
-        node.setType( libstdhl::Memory::get< libcasm_ir::DecimalType >() );
-    }
-    else if( name == TYPE_STRING_RATIONAL )
-    {
-        node.setType( libstdhl::Memory::get< libcasm_ir::RationalType >() );
-    }
-    else if( TYPE_STRINGS_FOR_REFERENCE_TYPES.count( name ) )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "reference type '" + name + "' defined without a relation, use '" + name +
-                "< /* relation type */  >'",
-            Code::TypeAnnotationRelationTypeHasNoSubType );
-    }
-    else if( TYPE_STRINGS_FOR_TEMPLATE_TYPES.count( name ) )
+    else if( TypeInfo::instance().isTemplateType( name ) )
     {
         m_log.error(
             { node.sourceLocation() },
             "template type '" + name + "' defined without sub-types, use '" + name +
                 "< /* sub-type(s) */  >'",
             Code::TypeAnnotationTemplateTypeHasNoSubType );
+    }
+    else if( TypeInfo::instance().isReferenceType( name ) )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "reference type '" + name + "' defined without a relation, use '" + name +
+                "< /* relation type */  >'",
+            Code::TypeAnnotationRelationTypeHasNoSubType );
     }
     else
     {
@@ -242,7 +189,7 @@ void TypeCheckVisitor::visit( ComposedType& node )
         subTypeList.add( subType->type() );
     }
 
-    if( name == TYPE_STRING_TUPLE )
+    if( name == TypeInfo::TYPE_NAME_TUPLE )
     {
         assert( subTypeList.size() >= 2 );  // constrain from parser
         assert( not node.isNamed() );       // constrain from parser
@@ -250,7 +197,7 @@ void TypeCheckVisitor::visit( ComposedType& node )
         const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
         node.setType( type );
     }
-    else if( name == TYPE_STRING_RECORD )
+    else if( name == TypeInfo::TYPE_NAME_RECORD )
     {
         assert( subTypeList.size() >= 2 );  // constrain from parser
         assert( node.isNamed() );           // constrain from parser
@@ -298,7 +245,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
         subTypeList.add( subType->type() );
     }
 
-    if( name == TYPE_STRING_RANGE )
+    if( name == TypeInfo::TYPE_NAME_RANGE )
     {
         if( subTypeList.size() == 1 )
         {
@@ -313,7 +260,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
                 Code::TypeAnnotationInvalidTemplateTypeSize );
         }
     }
-    else if( name == TYPE_STRING_TUPLE )
+    else if( name == TypeInfo::TYPE_NAME_TUPLE )
     {
         if( subTypeList.size() >= 2 )
         {
@@ -336,7 +283,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
                 "'" + name + "' is a built-in composed type, and needs at least 2 sub-types" );
         }
     }
-    else if( name == TYPE_STRING_LIST )
+    else if( name == TypeInfo::TYPE_NAME_LIST )
     {
         if( subTypeList.size() == 1 )
         {
@@ -351,7 +298,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
                 Code::TypeAnnotationInvalidTemplateTypeSize );
         }
     }
-    else if( name == TYPE_STRING_FILE )
+    else if( name == TypeInfo::TYPE_NAME_FILE )
     {
         if( subTypeList.size() == 1 )
         {
@@ -368,7 +315,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
                 Code::TypeAnnotationInvalidTemplateTypeSize );
         }
     }
-    else if( name == TYPE_STRING_PORT )
+    else if( name == TypeInfo::TYPE_NAME_PORT )
     {
         if( subTypeList.size() == 1 )
         {
@@ -419,7 +366,7 @@ void TypeCheckVisitor::visit( RelationType& node )
         argTypeList.emplace_back( argumentType->type() );
     }
 
-    if( name == TYPE_STRING_RULEREF )
+    if( name == TypeInfo::TYPE_NAME_RULEREF )
     {
         if( node.returnType()->type() )
         {
@@ -428,7 +375,7 @@ void TypeCheckVisitor::visit( RelationType& node )
             node.setType( type );
         }
     }
-    else if( name == TYPE_STRING_FUNCREF )
+    else if( name == TypeInfo::TYPE_NAME_FUNCREF )
     {
         if( node.returnType()->type() )
         {
@@ -455,7 +402,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
         const auto& name = node.name()->baseName();
         auto& expr = *node.size();
 
-        if( name == TYPE_STRING_BINARY )
+        if( name == TypeInfo::TYPE_NAME_BINARY )
         {
             if( expr.id() == Node::ID::VALUE_LITERAL and expr.type()->isInteger() )
             {
@@ -483,7 +430,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
                     "expected" );
             }
         }
-        else if( name == TYPE_STRING_INTEGER )
+        else if( name == TypeInfo::TYPE_NAME_INTEGER )
         {
             if( expr.id() == Node::ID::RANGE_LITERAL )
             {

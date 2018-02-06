@@ -102,14 +102,13 @@ namespace libcasm_fe
         FunctionUpdateInvalidValueAtUpdate = 0xfd00  // fd** ... function value
         ,
         FunctionValueInvalidRangeAtInitially = 0xfd01,
-        FunctionValueAlreadyInitializedAtInitially = 0xfd02
+        FunctionValueAlreadyInitializedAtInitially = 0xfd02,
 
-        ,
-        FunctionDefinitionIdentifierIsBuiltinName = 0xf100  // f1** ... function identifer
+        FunctionDefinitionIdentifierIsBuiltinName = 0xf100,  // f1** ... function identifer
+        FunctionDefinitionIdentifierIsTypeName = 0xf200,
 
         // --------------------------------------------------------- d*** ...
         // derived errors
-        ,
         DerivedDefinitionAlreadyUsed = 0xd000,
 
         DerivedArgumentValueInvalid = 0xda00,  // da** ... derived argment
@@ -117,6 +116,7 @@ namespace libcasm_fe
         DerivedExpressionInvalidType = 0xde00,  // de** ... derived expression
 
         DerivedDefinitionIdentifierIsBuiltinName = 0xd100,  // d1** ... derived identifer
+        DerivedDefinitionIdentifierIsTypeName = 0xd200,
 
         DerivedDefinitionExpressionIsNotCallable = 0xde00,
         DerivedDefinitionExpressionIsNotSideEffectFree = 0xde01,
@@ -126,6 +126,7 @@ namespace libcasm_fe
 
         RuleDefinitionAlreadyUsed = 0x5000,
         RuleDefinitionIdentifierIsBuiltinName = 0x5001,
+        RuleDefinitionIdentifierIsTypeName = 0x5002,
 
         NotSideEffectFreeRuleCall = 0x5100,
 
@@ -155,7 +156,13 @@ namespace libcasm_fe
 
         EnumerationDefinitionAlreadyUsed = 0xe000,
         EnumerationDefinitionIdentifierIsBuiltinName = 0xe100,
+        EnumerationDefinitionIdentifierIsTypeName = 0xe200,
         EnumeratorDefinitionAlreadyUsed = 0xe001,
+
+        // using errors
+        UsingDefinitionAlreadyUsed = 0x6000,
+        UsingDefinitionIdentifierIsBuiltinName = 0x6001,
+        UsingDefinitionIdentifierIsTypeName = 0x6002,
 
         // --------------------------------------------------------- a*** ...
         // agent errors
