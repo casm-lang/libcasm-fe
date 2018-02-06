@@ -98,7 +98,6 @@ VariableDefinition::VariableDefinition(
 , m_localIndex( 0 )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-    setProperty( libcasm_ir::Property::CALLABLE );
     setProperty( libcasm_ir::Property::PURE );
 }
 
@@ -266,7 +265,6 @@ DerivedDefinition::DerivedDefinition(
 , m_expression( expression )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-    setProperty( libcasm_ir::Property::CALLABLE );
 }
 
 const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments( void ) const
@@ -299,7 +297,6 @@ RuleDefinition::RuleDefinition(
 , m_returnType( returnType )
 , m_rule( rule )
 {
-    setProperty( libcasm_ir::Property::CALLABLE );
 }
 
 const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments( void ) const
@@ -326,7 +323,6 @@ EnumeratorDefinition::EnumeratorDefinition( const Identifier::Ptr& identifier )
 : Definition( Node::ID::ENUMERATOR_DEFINITION, identifier )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-    setProperty( libcasm_ir::Property::CALLABLE );
     setProperty( libcasm_ir::Property::PURE );
 }
 
@@ -341,7 +337,6 @@ EnumerationDefinition::EnumerationDefinition(
 , m_enumerators( enumerators )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-    setProperty( libcasm_ir::Property::CALLABLE );
     setProperty( libcasm_ir::Property::PURE );
 }
 

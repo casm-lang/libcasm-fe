@@ -277,36 +277,12 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
     }
 
     // set classification specific properties
-    switch( node.classification() )
+    assert(
+        node.classification() != FunctionDefinition::Classification::UNKNOWN and
+        " inconsistent function classification! " );
+    if( node.classification() == FunctionDefinition::Classification::STATIC )
     {
-        case FunctionDefinition::Classification::UNKNOWN:
-        {
-            assert( !" inconsistent function classification " );
-            break;
-        }
-        case FunctionDefinition::Classification::IN:
-        {
-            node.setProperty( libcasm_ir::Property::CALLABLE );
-            break;
-        }
-        case FunctionDefinition::Classification::CONTROLLED:  // [fallthrough]
-        case FunctionDefinition::Classification::SHARED:
-        {
-            node.setProperty( libcasm_ir::Property::UPDATEABLE );
-            node.setProperty( libcasm_ir::Property::CALLABLE );
-            break;
-        }
-        case FunctionDefinition::Classification::OUT:
-        {
-            node.setProperty( libcasm_ir::Property::UPDATEABLE );
-            break;
-        }
-        case FunctionDefinition::Classification::STATIC:
-        {
-            node.setProperty( libcasm_ir::Property::CALLABLE );
-            node.setProperty( libcasm_ir::Property::PURE );
-            break;
-        }
+        node.setProperty( libcasm_ir::Property::PURE );
     }
 }
 

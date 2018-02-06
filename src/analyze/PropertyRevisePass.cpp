@@ -94,14 +94,6 @@ void PropertyReviseVisitor::visit( DerivedDefinition& node )
     RecursiveVisitor::visit( node );
 
     const auto& expressionProperties = node.expression()->properties();
-    if( not expressionProperties.isSet( libcasm_ir::Property::CALLABLE ) )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "expression of " + node.description() + " '" + node.identifier()->name() +
-                "' violates 'callable' property",
-            Code::DerivedDefinitionExpressionIsNotCallable );
-    }
     if( not expressionProperties.isSet( libcasm_ir::Property::SIDE_EFFECT_FREE ) )
     {
         m_log.error(

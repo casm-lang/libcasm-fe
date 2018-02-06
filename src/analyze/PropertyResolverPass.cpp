@@ -179,7 +179,6 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::CONSTANT:
         {
             node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-            node.setProperty( libcasm_ir::Property::CALLABLE );
             node.setProperty( libcasm_ir::Property::PURE );
             break;
         }
@@ -225,12 +224,10 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
         case CallExpression::TargetType::FUNCTION:
         {
             node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-            node.setProperty( libcasm_ir::Property::CALLABLE );
             break;
         }
         case CallExpression::TargetType::RULE:
         {
-            node.setProperty( libcasm_ir::Property::CALLABLE );
             break;
         }
         case CallExpression::TargetType::BUILTIN:      // [[fallthrough]]
