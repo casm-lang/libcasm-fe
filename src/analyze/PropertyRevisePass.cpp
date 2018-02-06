@@ -103,14 +103,18 @@ void PropertyReviseVisitor::visit( DerivedDefinition& node )
     RecursiveVisitor::visit( node );
 
     const auto& expressionProperties = node.expression()->properties();
-    if( not expressionProperties.isSet( libcasm_ir::Property::SIDE_EFFECT_FREE ) )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "expression of " + node.description() + " '" + node.identifier()->name() +
-                "' violates 'side effect free' property",
-            Code::DerivedDefinitionExpressionIsNotSideEffectFree );
-    }
+
+    node.properties().foreach( [&]( const libcasm_ir::Property property ) -> u1 {
+        if( not expressionProperties.isSet( property ) )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "expression of " + node.description() + " '" + node.identifier()->name() +
+                    "' violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
+                Code::TypeInvalidProperty );
+        }
+        return true;
+    } );
 }
 
 void PropertyReviseVisitor::visit( BasicType& node )
@@ -144,7 +148,8 @@ void PropertyReviseVisitor::revise( Ast::Type& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "type violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property" );
+                "type violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
+                Code::TypeInvalidProperty );
         }
         return true;
     } );
