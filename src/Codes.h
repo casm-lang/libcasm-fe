@@ -118,7 +118,7 @@ namespace libcasm_fe
         DerivedDefinitionIdentifierIsBuiltinName = 0xd100,  // d1** ... derived identifer
         DerivedDefinitionIdentifierIsTypeName = 0xd200,
 
-        DerivedDefinitionExpressionIsNotConstant = 0xde00,
+        DerivedDefinitionExpressionInvalidProperty = 0xdede,
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
@@ -169,6 +169,9 @@ namespace libcasm_fe
         AgentInitRuleDoesNotExist = 0xa000,
         AgentInitRuleMultipleDefinitions = 0xa001,
         AgentInitRuleNotDefined = 0xa002,
+
+        // type errors
+        TypeInvalidProperty = 0x10de,
 
         // --------------------------------------------------------- 01** ...
         // type annotation errors

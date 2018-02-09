@@ -270,10 +270,17 @@ void DefinitionVisitor::visit( FunctionDefinition& node )
         }
     }
 
+    // ensure controlled classification if classification is unknown!
     if( node.classification() == Classification::UNKNOWN )
     {
         // if function classification is provided, all ASM functions are controlled by default
         node.setClassification( Classification::CONTROLLED );
+    }
+
+    // set classification specific properties
+    if( node.classification() == FunctionDefinition::Classification::STATIC )
+    {
+        node.setProperty( libcasm_ir::Property::PURE );
     }
 }
 

@@ -290,10 +290,14 @@ std::string Node::description( void ) const
     return std::string();
 }
 
+//
+//
+// TypedNode
+//
+
 TypedNode::TypedNode( Node::ID id )
 : Node( id )
 , m_type( nullptr )
-, m_properties( {} )
 {
 }
 
@@ -307,20 +311,36 @@ const libcasm_ir::Type::Ptr& TypedNode::type( void ) const
     return m_type;
 }
 
-void TypedNode::setProperty( const libcasm_ir::Property property )
+//
+//
+// TypedPropertyNode
+//
+
+TypedPropertyNode::TypedPropertyNode( Node::ID id )
+: TypedNode( id )
+, m_properties( {} )
+{
+}
+
+void TypedPropertyNode::setProperty( const libcasm_ir::Property property )
 {
     m_properties.set( property );
 }
 
-void TypedNode::setProperties( const libcasm_ir::Properties& properties )
+void TypedPropertyNode::setProperties( const libcasm_ir::Properties& properties )
 {
     m_properties = properties;
 }
 
-const libcasm_ir::Properties& TypedNode::properties( void ) const
+const libcasm_ir::Properties& TypedPropertyNode::properties( void ) const
 {
     return m_properties;
 }
+
+//
+//
+// Identifier
+//
 
 Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )

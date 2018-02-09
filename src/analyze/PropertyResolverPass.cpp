@@ -63,26 +63,13 @@ using namespace Ast;
 char PropertyResolverPass::id = 0;
 
 static libpass::PassRegistration< PropertyResolverPass > PASS(
-    "ASTPropertyResolverPass",
-    "property resolving and checking of AST representation",
-    "ast-prop-res",
-    0 );
+    "ASTPropertyResolverPass", "property resolving of AST representation", "ast-prop-res", 0 );
 
 class PropertyResolverVisitor final : public RecursiveVisitor
 {
   public:
     PropertyResolverVisitor( libcasm_fe::Logger& log );
 
-    void visit( VariableDefinition& node ) override;
-    void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
-    void visit( RuleDefinition& node ) override;
-    void visit( EnumeratorDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
-
-    void visit( UndefLiteral& node ) override;
-    void visit( ValueLiteral& node ) override;
-    void visit( ReferenceLiteral& node ) override;
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
     void visit( TupleLiteral& node ) override;
@@ -91,8 +78,9 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
-    void visit( TypeCastingExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
     void visit( LetExpression& node ) override;
@@ -101,224 +89,107 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
-    void visit( SkipRule& node ) override;
-    void visit( ConditionalRule& node ) override;
-    void visit( CaseRule& node ) override;
-    void visit( LetRule& node ) override;
-    void visit( ForallRule& node ) override;
-    void visit( ChooseRule& node ) override;
-    void visit( IterateRule& node ) override;
-    void visit( BlockRule& node ) override;
-    void visit( SequenceRule& node ) override;
-    void visit( UpdateRule& node ) override;
-    void visit( CallRule& node ) override;
-
-    void visit( UnresolvedType& node ) override;
-    void visit( BasicType& node ) override;
-    void visit( ComposedType& node ) override;
-    void visit( TemplateType& node ) override;
-    void visit( FixedSizedType& node ) override;
-    void visit( RelationType& node ) override;
-
-    void visit( BasicAttribute& node ) override;
-    void visit( ExpressionAttribute& node ) override;
-
-    void visit( Identifier& node ) override;
-    void visit( IdentifierPath& node ) override;
-    void visit( ExpressionCase& node ) override;
-    void visit( DefaultCase& node ) override;
-
   private:
     libcasm_fe::Logger& m_log;
 };
+
+//
+//
+// PropertyResolverVisitor
+//
 
 PropertyResolverVisitor::PropertyResolverVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 {
 }
 
-void PropertyResolverVisitor::visit( VariableDefinition& node )
+template < class T >
+static libcasm_ir::Properties intersectPropertiesOf( const T& expressions )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
+    libcasm_ir::Properties properties;
 
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( FunctionDefinition& node )
-{
-    switch( node.classification() )
+    u1 first = true;
+    for( auto const& expression : expressions )
     {
-        case FunctionDefinition::Classification::UNKNOWN:
+        if( first )
         {
-            m_log.error( { node.sourceLocation() }, "function classification 'UNKNOWN' found!" );
-            break;
+            properties = expression->properties();
+            first = false;
+            continue;
         }
-        case FunctionDefinition::Classification::IN:
-        {
-            node.setProperty( libcasm_ir::Property::CONSTANT );
-            break;
-        }
-        case FunctionDefinition::Classification::CONTROLLED:  // [fallthrough]
-        case FunctionDefinition::Classification::SHARED:
-        {
-            node.setProperty( libcasm_ir::Property::ALTERABLE );
-            node.setProperty( libcasm_ir::Property::CONSTANT );
-            break;
-        }
-        case FunctionDefinition::Classification::OUT:
-        {
-            node.setProperty( libcasm_ir::Property::ALTERABLE );
-            break;
-        }
-        case FunctionDefinition::Classification::STATIC:
-        {
-            node.setProperty( libcasm_ir::Property::CONSTANT );
-            node.setProperty( libcasm_ir::Property::PURE );
-            break;
-        }
+        properties = properties * expression->properties();
     }
 
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( DerivedDefinition& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-
-    RecursiveVisitor::visit( node );
-
-    const auto& expressionProperties = node.expression()->properties();
-
-    if( not expressionProperties.isSet( libcasm_ir::Property::CONSTANT ) )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "expression of " + node.description() + " '" + node.identifier()->name() +
-                "' violates 'constant' property",
-            Code::DerivedDefinitionExpressionIsNotConstant );
-    }
-}
-
-void PropertyResolverVisitor::visit( RuleDefinition& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( EnumeratorDefinition& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( EnumerationDefinition& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( UndefLiteral& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( ValueLiteral& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( ReferenceLiteral& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
+    return properties;
 }
 
 void PropertyResolverVisitor::visit( ListLiteral& node )
 {
     RecursiveVisitor::visit( node );
+
+    const auto properties = intersectPropertiesOf< Expressions >( *node.expressions() );
+    node.setProperties( properties );
 }
 
 void PropertyResolverVisitor::visit( RangeLiteral& node )
 {
     RecursiveVisitor::visit( node );
+
+    node.setProperties( node.left()->properties() * node.right()->properties() );
 }
 
 void PropertyResolverVisitor::visit( TupleLiteral& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
     RecursiveVisitor::visit( node );
 
-    for( auto const& expression : *node.expressions() )
-    {
-        node.setProperties( node.properties() * expression->properties() );
-    }
+    const auto properties = intersectPropertiesOf< Expressions >( *node.expressions() );
+    node.setProperties( properties );
 }
 
 void PropertyResolverVisitor::visit( RecordLiteral& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
     RecursiveVisitor::visit( node );
 
-    for( auto const& namedExpression : *node.namedExpressions() )
-    {
-        node.setProperties( node.properties() * namedExpression->properties() );
-    }
+    const auto properties = intersectPropertiesOf< NamedExpressions >( *node.namedExpressions() );
+    node.setProperties( properties );
 }
 
 void PropertyResolverVisitor::visit( NamedExpression& node )
 {
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.properties() * node.expression()->properties() );
+    node.setProperties( node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( DirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
+    libcasm_ir::Properties callProperties;
     switch( node.targetType() )
     {
         case CallExpression::TargetType::BUILTIN:
         {
             const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-            node.setProperties( annotation.properties() );
+            callProperties = annotation.properties();
             break;
         }
-        case CallExpression::TargetType::VARIABLE:  // [[fallthrough]]
-        case CallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:   // [[fallthrough]]
-        case CallExpression::TargetType::RULE:
-        {
-            const auto& definition = node.targetDefinition();
-            assert( definition.get() != nullptr );
-            node.setProperties( definition->properties() );
-            break;
-        }
-        case CallExpression::TargetType::SELF:         // [[fallthrough]]
+        case CallExpression::TargetType::VARIABLE:     // [[fallthrough]]
+        case CallExpression::TargetType::FUNCTION:     // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:      // [[fallthrough]]
+        case CallExpression::TargetType::RULE:         // [[fallthrough]]
         case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
         case CallExpression::TargetType::CONSTANT:
         {
-            node.setProperty( libcasm_ir::Property::CONSTANT );
-            node.setProperty( libcasm_ir::Property::PURE );
+            const auto& definition = node.targetDefinition();
+            assert( definition.get() != nullptr );
+            callProperties = definition->properties();
+            break;
+        }
+        case CallExpression::TargetType::SELF:
+        {
+            callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
+            callProperties.set( libcasm_ir::Property::PURE );
             break;
         }
         case CallExpression::TargetType::UNKNOWN:
@@ -327,52 +198,73 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
             break;
         }
     }
+
+    if( node.arguments()->size() > 0 )
+    {
+        const auto argumentProperties = intersectPropertiesOf< Expressions >( *node.arguments() );
+        node.setProperties( callProperties * argumentProperties );
+    }
+    else
+    {
+        node.setProperties( callProperties );
+    }
 }
 
 void PropertyResolverVisitor::visit( MethodCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
+    libcasm_ir::Properties callProperties;
     if( node.methodType() == MethodCallExpression::MethodType::BUILTIN )
     {
         const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-        node.setProperties( annotation.properties() );
+        callProperties = annotation.properties();
     }
     else
     {
         m_log.error(
             { node.sourceLocation() },
             "method type '" + node.methodTypeName() + "' is not implemented!" );
+        return;
+    }
+
+    if( node.arguments()->size() > 0 )
+    {
+        const auto argumentProperties = intersectPropertiesOf< Expressions >( *node.arguments() );
+        node.setProperties( callProperties * argumentProperties );
+    }
+    else
+    {
+        node.setProperties( callProperties );
     }
 }
 
-void PropertyResolverVisitor::visit( TypeCastingExpression& node )
+void PropertyResolverVisitor::visit( LiteralCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    // propagate the fromExpression properties
-    node.setProperties( node.fromExpression()->properties() );
+    node.setProperties( node.object()->properties() * node.literal()->properties() );
 }
 
 void PropertyResolverVisitor::visit( IndirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
+    libcasm_ir::Properties callProperties;
     switch( node.targetType() )
     {
+        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
+        case CallExpression::TargetType::BUILTIN:  // [[fallthrough]]
         case CallExpression::TargetType::FUNCTION:
         {
-            node.setProperty( libcasm_ir::Property::CONSTANT );
+            callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
             break;
         }
         case CallExpression::TargetType::RULE:
         {
-            // indirect rule calls have no properties so far
             break;
         }
-        case CallExpression::TargetType::BUILTIN:      // [[fallthrough]]
         case CallExpression::TargetType::VARIABLE:     // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:      // [[fallthrough]]
         case CallExpression::TargetType::SELF:         // [[fallthrough]]
         case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
         case CallExpression::TargetType::CONSTANT:
@@ -386,6 +278,24 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
             break;
         }
     }
+
+    if( node.arguments()->size() > 0 )
+    {
+        const auto argumentProperties = intersectPropertiesOf< Expressions >( *node.arguments() );
+        node.setProperties( callProperties * argumentProperties );
+    }
+    else
+    {
+        node.setProperties( callProperties );
+    }
+}
+
+void PropertyResolverVisitor::visit( TypeCastingExpression& node )
+{
+    RecursiveVisitor::visit( node );
+
+    // propagate the fromExpression properties
+    node.setProperties( node.fromExpression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( UnaryExpression& node )
@@ -409,180 +319,43 @@ void PropertyResolverVisitor::visit( LetExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.expression()->properties() );
+    node.setProperties( node.initializer()->properties() * node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( ConditionalExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.thenExpression()->properties() * node.elseExpression()->properties() );
+    node.setProperties(
+        node.condition()->properties() * node.thenExpression()->properties() *
+        node.elseExpression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( ChooseExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.expression()->properties() );
+    node.setProperties( node.universe()->properties() * node.expression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( UniversalQuantifierExpression& node )
 {
     RecursiveVisitor::visit( node );
+
+    node.setProperties( node.universe()->properties() * node.proposition()->properties() );
 }
 
 void PropertyResolverVisitor::visit( ExistentialQuantifierExpression& node )
 {
     RecursiveVisitor::visit( node );
+
+    node.setProperties( node.universe()->properties() * node.proposition()->properties() );
 }
 
-void PropertyResolverVisitor::visit( SkipRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( ConditionalRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( CaseRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( LetRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( ForallRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( ChooseRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( IterateRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( BlockRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( SequenceRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( UpdateRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( CallRule& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( UnresolvedType& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( BasicType& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( ComposedType& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
-
-    for( auto const& subType : *node.subTypes() )
-    {
-        node.setProperties( node.properties() * subType->properties() );
-    }
-}
-
-void PropertyResolverVisitor::visit( TemplateType& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
-
-    for( auto const& subType : *node.subTypes() )
-    {
-        node.setProperties( node.properties() * subType->properties() );
-    }
-}
-
-void PropertyResolverVisitor::visit( FixedSizedType& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
-
-    node.setProperties( node.properties() * node.size()->properties() );
-}
-
-void PropertyResolverVisitor::visit( RelationType& node )
-{
-    node.setProperty( libcasm_ir::Property::CONSTANT );
-    node.setProperty( libcasm_ir::Property::PURE );
-
-    RecursiveVisitor::visit( node );
-
-    for( auto const& argumentType : *node.argumentTypes() )
-    {
-        node.setProperties( node.properties() * argumentType->properties() );
-    }
-    node.setProperties( node.properties() * node.returnType()->properties() );
-}
-
-void PropertyResolverVisitor::visit( BasicAttribute& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( ExpressionAttribute& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( Identifier& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( IdentifierPath& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( ExpressionCase& node )
-{
-    RecursiveVisitor::visit( node );
-}
-
-void PropertyResolverVisitor::visit( DefaultCase& node )
-{
-    RecursiveVisitor::visit( node );
-}
+//
+//
+// PropertyResolverPass
+//
 
 void PropertyResolverPass::usage( libpass::PassUsage& pu )
 {

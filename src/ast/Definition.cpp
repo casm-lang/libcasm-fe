@@ -49,7 +49,7 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
-: TypedNode( type )
+: TypedPropertyNode( type )
 , m_identifier( identifier )
 , m_attributes( std::make_shared< Attributes >() )
 , m_maxNumberOfLocals( 0 )
@@ -97,6 +97,8 @@ VariableDefinition::VariableDefinition(
 , m_variableType( variableType )
 , m_localIndex( 0 )
 {
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::PURE );
 }
 
 const Type::Ptr& VariableDefinition::variableType( void ) const
@@ -149,6 +151,8 @@ FunctionDefinition::FunctionDefinition(
         static auto uidGenerator = static_cast< std::size_t >( UID::OTHER );
         m_uid = static_cast< UID >( uidGenerator++ );
     }
+
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
 }
 
 FunctionDefinition::UID FunctionDefinition::uid( void ) const
@@ -260,6 +264,7 @@ DerivedDefinition::DerivedDefinition(
 , m_returnType( returnType )
 , m_expression( expression )
 {
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
 }
 
 const NodeList< VariableDefinition >::Ptr& DerivedDefinition::arguments( void ) const
@@ -317,6 +322,8 @@ void RuleDefinition::accept( Visitor& visitor )
 EnumeratorDefinition::EnumeratorDefinition( const Identifier::Ptr& identifier )
 : Definition( Node::ID::ENUMERATOR_DEFINITION, identifier )
 {
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::PURE );
 }
 
 void EnumeratorDefinition::accept( Visitor& visitor )
@@ -329,6 +336,8 @@ EnumerationDefinition::EnumerationDefinition(
 : Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
 {
+    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+    setProperty( libcasm_ir::Property::PURE );
 }
 
 const Enumerators::Ptr& EnumerationDefinition::enumerators( void ) const
