@@ -165,12 +165,13 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
+    libcasm_ir::Properties callProperties;
     switch( node.targetType() )
     {
         case CallExpression::TargetType::BUILTIN:
         {
             const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-            node.setProperties( annotation.properties() );
+            callProperties = annotation.properties();
             break;
         }
         case CallExpression::TargetType::VARIABLE:     // [[fallthrough]]
@@ -182,13 +183,13 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
         {
             const auto& definition = node.targetDefinition();
             assert( definition.get() != nullptr );
-            node.setProperties( definition->properties() );
+            callProperties = definition->properties();
             break;
         }
         case CallExpression::TargetType::SELF:
         {
-            node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-            node.setProperty( libcasm_ir::Property::PURE );
+            callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
+            callProperties.set( libcasm_ir::Property::PURE );
             break;
         }
         case CallExpression::TargetType::UNKNOWN:
@@ -197,22 +198,44 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
             break;
         }
     }
+
+    if( node.arguments()->size() > 0 )
+    {
+        const auto argumentProperties = intersectPropertiesOf< Expressions >( *node.arguments() );
+        node.setProperties( callProperties * argumentProperties );
+    }
+    else
+    {
+        node.setProperties( callProperties );
+    }
 }
 
 void PropertyResolverVisitor::visit( MethodCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
+    libcasm_ir::Properties callProperties;
     if( node.methodType() == MethodCallExpression::MethodType::BUILTIN )
     {
         const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
-        node.setProperties( annotation.properties() );
+        callProperties = annotation.properties();
     }
     else
     {
         m_log.error(
             { node.sourceLocation() },
             "method type '" + node.methodTypeName() + "' is not implemented!" );
+        return;
+    }
+
+    if( node.arguments()->size() > 0 )
+    {
+        const auto argumentProperties = intersectPropertiesOf< Expressions >( *node.arguments() );
+        node.setProperties( callProperties * argumentProperties );
+    }
+    else
+    {
+        node.setProperties( callProperties );
     }
 }
 
@@ -227,13 +250,14 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
+    libcasm_ir::Properties callProperties;
     switch( node.targetType() )
     {
         case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
         case CallExpression::TargetType::BUILTIN:  // [[fallthrough]]
         case CallExpression::TargetType::FUNCTION:
         {
-            node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
+            callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
             break;
         }
         case CallExpression::TargetType::RULE:
@@ -253,6 +277,16 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
             assert( !" indirect call cannot have UNKNOWN target type at this pass! " );
             break;
         }
+    }
+
+    if( node.arguments()->size() > 0 )
+    {
+        const auto argumentProperties = intersectPropertiesOf< Expressions >( *node.arguments() );
+        node.setProperties( callProperties * argumentProperties );
+    }
+    else
+    {
+        node.setProperties( callProperties );
     }
 }
 
