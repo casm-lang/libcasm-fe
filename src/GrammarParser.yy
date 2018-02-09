@@ -209,6 +209,7 @@ END       0 "end of file"
 // expressions
 %type <Expression::Ptr> Term SimpleOrClaspedTerm OperatorExpression
 %type <Expressions::Ptr> Terms
+%type <CallExpression::Ptr> CallExpression
 %type <DirectCallExpression::Ptr> DirectCallExpression
 %type <MethodCallExpression::Ptr> MethodCallExpression
 %type <LiteralCallExpression::Ptr> LiteralCallExpression
@@ -280,6 +281,7 @@ END       0 "end of file"
 
 %precedence HOLDS WITH
 
+%precedence CALL
 %precedence UPDATE
 
 %left IMPLIES ARROW
@@ -748,15 +750,7 @@ UpdateRule
 
 
 CallRule
-: DirectCallExpression
-  {
-      $$ = Ast::make< CallRule >( @$, $1 );
-  }
-| MethodCallExpression
-  {
-      $$ = Ast::make< CallRule >( @$, $1 );
-  }
-| IndirectCallExpression
+: CallExpression %prec CALL
   {
       $$ = Ast::make< CallRule >( @$, $1 );
   }
@@ -828,19 +822,11 @@ SimpleOrClaspedTerm
   {
       $$ = nullptr;
   }
-| DirectCallExpression
-  {
-      $$ = $1;
-  }
-| MethodCallExpression
+| CallExpression %prec CALL
   {
       $$ = $1;
   }
 | LiteralCallExpression
-  {
-      $$ = $1;
-  }
-| IndirectCallExpression
   {
       $$ = $1;
   }
@@ -939,6 +925,22 @@ OperatorExpression
 ;
 
 
+CallExpression
+: DirectCallExpression
+  {
+      $$ = $1;
+  }
+| MethodCallExpression
+  {
+      $$ = $1;
+  }
+| IndirectCallExpression
+  {
+      $$ = $1;
+  }
+;
+
+
 DirectCallExpression
 : IdentifierPath %prec CALL_WITHOUT_ARGS
   {
@@ -974,9 +976,9 @@ LiteralCallExpression
 
 
 IndirectCallExpression
-: LPAREN ASTERIX Term RPAREN Arguments
+: CallExpression Arguments
   {
-      $$ = Ast::make< IndirectCallExpression >( @$, $3, $5 );
+      $$ = Ast::make< IndirectCallExpression >( @$, $1, $2 );
   }
 ;
 
