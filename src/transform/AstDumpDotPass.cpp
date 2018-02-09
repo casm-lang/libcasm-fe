@@ -168,6 +168,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void dumpNode( const TypedNode& node, const std::string& name );
     void dumpLabel( const Node& node );
     void dumpLabel( const TypedNode& node );
+    void dumpLabel( const TypedPropertyNode& node );
     void dumpLink( void* from, void* to );
 
   private:
@@ -608,6 +609,11 @@ void AstDumpDotVisitor::dumpLabel( const TypedNode& node )
             m_stream << "UNRESOLVED";
         }
     }
+}
+
+void AstDumpDotVisitor::dumpLabel( const TypedPropertyNode& node )
+{
+    dumpLabel( static_cast< const TypedNode& >( node ) );
 
     if( true )  // m_dumpProperties
     {

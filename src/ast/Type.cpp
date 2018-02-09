@@ -75,8 +75,6 @@ void UnresolvedType::accept( Visitor& visitor )
 BasicType::BasicType( const IdentifierPath::Ptr& identifier )
 : Type( Node::ID::BASIC_TYPE, identifier )
 {
-    setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
-    setProperty( libcasm_ir::Property::PURE );
 }
 
 void BasicType::accept( Visitor& visitor )

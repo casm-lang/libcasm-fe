@@ -49,7 +49,7 @@ using namespace libcasm_fe;
 using namespace Ast;
 
 Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
-: TypedNode( type )
+: TypedPropertyNode( type )
 , m_identifier( identifier )
 , m_attributes( std::make_shared< Attributes >() )
 , m_maxNumberOfLocals( 0 )

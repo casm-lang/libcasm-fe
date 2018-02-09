@@ -193,12 +193,22 @@ namespace libcasm_fe
             void setType( const libcasm_ir::Type::Ptr& type );
             const libcasm_ir::Type::Ptr& type( void ) const;
 
+          private:
+            libcasm_ir::Type::Ptr m_type;
+        };
+
+        class TypedPropertyNode : public TypedNode
+        {
+          public:
+            using Ptr = std::shared_ptr< TypedPropertyNode >;
+
+            TypedPropertyNode( Node::ID id );
+
             void setProperty( const libcasm_ir::Property property );
             void setProperties( const libcasm_ir::Properties& properties );
             const libcasm_ir::Properties& properties( void ) const;
 
           private:
-            libcasm_ir::Type::Ptr m_type;
             libcasm_ir::Properties m_properties;
         };
 

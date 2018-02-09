@@ -646,8 +646,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case CallExpression::TargetType::DERIVED:   // [[fallthrough]]
         case CallExpression::TargetType::RULE:
         {
-            const auto& definition =
-                std::static_pointer_cast< Definition >( node.targetDefinition() );
+            const auto& definition = node.targetDefinition();
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );
@@ -701,8 +700,7 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
                     Code::Unspecified );
             }
 
-            const auto& definition =
-                std::static_pointer_cast< Definition >( node.targetDefinition() );
+            const auto& definition = node.targetDefinition();
             m_frameStack.push( makeObjectFrame(
                 object, &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );

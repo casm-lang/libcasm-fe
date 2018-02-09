@@ -56,7 +56,7 @@ using namespace Ast;
 //
 
 Expression::Expression( Node::ID id )
-: TypedNode( id )
+: TypedPropertyNode( id )
 {
 }
 
@@ -179,12 +179,12 @@ libcasm_ir::Value::ID CallExpression::targetBuiltinId( void ) const
     return m_targetBuiltinId;
 }
 
-void CallExpression::setTargetDefinition( const TypedNode::Ptr& definition )
+void CallExpression::setTargetDefinition( const Definition::Ptr& definition )
 {
     m_targetDefinition = definition;
 }
 
-const TypedNode::Ptr& CallExpression::targetDefinition( void ) const
+const Definition::Ptr& CallExpression::targetDefinition( void ) const
 {
     assert( ( targetType() != TargetType::BUILTIN ) and ( targetType() != TargetType::UNKNOWN ) );
     return m_targetDefinition;
@@ -296,12 +296,12 @@ libcasm_ir::Value::ID MethodCallExpression::targetBuiltinId( void ) const
     return m_targetBuiltinId;
 }
 
-void MethodCallExpression::setTargetDefinition( const TypedNode::Ptr& definition )
+void MethodCallExpression::setTargetDefinition( const Definition::Ptr& definition )
 {
     m_targetDefinition = definition;
 }
 
-const TypedNode::Ptr& MethodCallExpression::targetDefinition( void ) const
+const Definition::Ptr& MethodCallExpression::targetDefinition( void ) const
 {
     assert( ( m_methodType != MethodType::BUILTIN ) and ( m_methodType != MethodType::UNKNOWN ) );
 
@@ -427,12 +427,12 @@ libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
     return m_targetBuiltinId;
 }
 
-void TypeCastingExpression::setTargetDefinition( const TypedNode::Ptr& definition )
+void TypeCastingExpression::setTargetDefinition( const Definition::Ptr& definition )
 {
     m_targetDefinition = definition;
 }
 
-const TypedNode::Ptr& TypeCastingExpression::targetDefinition( void ) const
+const Definition::Ptr& TypeCastingExpression::targetDefinition( void ) const
 {
     assert(
         ( m_castingType != CastingType::BUILTIN ) and ( m_castingType != CastingType::UNKNOWN ) );

@@ -54,9 +54,10 @@ namespace libcasm_fe
     {
         class Type;
         class Literal;
+        class Definition;
         class VariableDefinition;
 
-        class Expression : public TypedNode
+        class Expression : public TypedPropertyNode
         {
           public:
             using Ptr = std::shared_ptr< Expression >;
@@ -127,14 +128,14 @@ namespace libcasm_fe
 
                @note Assigned by SymbolResolved and used during execution
              */
-            void setTargetDefinition( const TypedNode::Ptr& definition );
-            const TypedNode::Ptr& targetDefinition( void ) const;
+            void setTargetDefinition( const std::shared_ptr< Definition >& definition );
+            const std::shared_ptr< Definition >& targetDefinition( void ) const;
 
           private:
             const Expressions::Ptr m_arguments;
             TargetType m_targetType;
             libcasm_ir::Value::ID m_targetBuiltinId;
-            TypedNode::Ptr m_targetDefinition;
+            std::shared_ptr< Definition > m_targetDefinition;
 
           public:
             static std::string targetTypeString( const TargetType targetType );
@@ -198,8 +199,8 @@ namespace libcasm_fe
              *
              *     @note Assigned by SymbolResolved and used during execution
              */
-            void setTargetDefinition( const TypedNode::Ptr& definition );
-            const TypedNode::Ptr& targetDefinition( void ) const;
+            void setTargetDefinition( const std::shared_ptr< Definition >& definition );
+            const std::shared_ptr< Definition >& targetDefinition( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -208,7 +209,7 @@ namespace libcasm_fe
             Identifier::Ptr m_methodName;
             MethodType m_methodType;
             libcasm_ir::Value::ID m_targetBuiltinId;
-            TypedNode::Ptr m_targetDefinition;
+            std::shared_ptr< Definition > m_targetDefinition;
         };
 
         class LiteralCallExpression final : public Expression
@@ -280,8 +281,8 @@ namespace libcasm_fe
              *
              *     @note Assigned by SymbolResolved and used during execution
              */
-            void setTargetDefinition( const TypedNode::Ptr& definition );
-            const TypedNode::Ptr& targetDefinition( void ) const;
+            void setTargetDefinition( const std::shared_ptr< Definition >& definition );
+            const std::shared_ptr< Definition >& targetDefinition( void ) const;
 
             void accept( Visitor& visitor ) override;
 
@@ -290,7 +291,7 @@ namespace libcasm_fe
             const std::shared_ptr< Type > m_asType;
             CastingType m_castingType;
             libcasm_ir::Value::ID m_targetBuiltinId;
-            TypedNode::Ptr m_targetDefinition;
+            std::shared_ptr< Definition > m_targetDefinition;
         };
 
         class UnaryExpression final : public Expression
