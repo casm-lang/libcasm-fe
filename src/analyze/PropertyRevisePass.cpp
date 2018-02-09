@@ -104,7 +104,7 @@ void PropertyReviseVisitor::visit( DerivedDefinition& node )
         if( not expressionProperties.isSet( property ) )
         {
             m_log.error(
-                { node.sourceLocation() },
+                { node.expression()->sourceLocation() },
                 "expression of " + node.description() + " '" + node.identifier()->name() +
                     "' violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
                 Code::DerivedDefinitionExpressionInvalidProperty );
