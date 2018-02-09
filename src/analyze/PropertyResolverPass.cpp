@@ -79,8 +79,8 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
     void visit( LiteralCallExpression& node ) override;
-    void visit( TypeCastingExpression& node ) override;
     void visit( IndirectCallExpression& node ) override;
+    void visit( TypeCastingExpression& node ) override;
     void visit( UnaryExpression& node ) override;
     void visit( BinaryExpression& node ) override;
     void visit( LetExpression& node ) override;
@@ -247,14 +247,6 @@ void PropertyResolverVisitor::visit( LiteralCallExpression& node )
     node.setProperties( node.object()->properties() * node.literal()->properties() );
 }
 
-void PropertyResolverVisitor::visit( TypeCastingExpression& node )
-{
-    RecursiveVisitor::visit( node );
-
-    // propagate the fromExpression properties
-    node.setProperties( node.fromExpression()->properties() );
-}
-
 void PropertyResolverVisitor::visit( IndirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
@@ -286,6 +278,14 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
             break;
         }
     }
+}
+
+void PropertyResolverVisitor::visit( TypeCastingExpression& node )
+{
+    RecursiveVisitor::visit( node );
+
+    // propagate the fromExpression properties
+    node.setProperties( node.fromExpression()->properties() );
 }
 
 void PropertyResolverVisitor::visit( UnaryExpression& node )
