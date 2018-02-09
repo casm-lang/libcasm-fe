@@ -89,11 +89,6 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
 
-    void visit( ComposedType& node ) override;
-    void visit( TemplateType& node ) override;
-    void visit( FixedSizedType& node ) override;
-    void visit( RelationType& node ) override;
-
   private:
     libcasm_fe::Logger& m_log;
 };
@@ -253,8 +248,8 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
 
     switch( node.targetType() )
     {
-        case CallExpression::TargetType::DERIVED:      // [[fallthrough]]
-        case CallExpression::TargetType::BUILTIN:      // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
+        case CallExpression::TargetType::BUILTIN:  // [[fallthrough]]
         case CallExpression::TargetType::FUNCTION:
         {
             node.setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
@@ -340,69 +335,6 @@ void PropertyResolverVisitor::visit( ExistentialQuantifierExpression& node )
     RecursiveVisitor::visit( node );
 
     node.setProperties( node.universe()->properties() * node.proposition()->properties() );
-}
-
-void PropertyResolverVisitor::visit( ComposedType& node )
-{
-    RecursiveVisitor::visit( node );
-
-    u1 first = true;
-    libcasm_ir::Properties properties;
-
-    for( auto const& subType : *node.subTypes() )
-    {
-        if( first )
-        {
-            properties = subType->properties();
-            first = false;
-            continue;
-        }
-        properties = properties * subType->properties();
-    }
-
-    node.setProperties( properties );
-}
-
-void PropertyResolverVisitor::visit( TemplateType& node )
-{
-    RecursiveVisitor::visit( node );
-
-    u1 first = true;
-    libcasm_ir::Properties properties;
-
-    for( auto const& subType : *node.subTypes() )
-    {
-        if( first )
-        {
-            properties = subType->properties();
-            first = false;
-            continue;
-        }
-        properties = properties * subType->properties();
-    }
-
-    node.setProperties( properties );
-}
-
-void PropertyResolverVisitor::visit( FixedSizedType& node )
-{
-    RecursiveVisitor::visit( node );
-
-    node.setProperties( node.size()->properties() );
-}
-
-void PropertyResolverVisitor::visit( RelationType& node )
-{
-    RecursiveVisitor::visit( node );
-
-    auto properties = node.returnType()->properties();
-
-    for( auto const& argumentType : *node.argumentTypes() )
-    {
-        properties = properties * argumentType->properties();
-    }
-
-    node.setProperties( properties );
 }
 
 //
