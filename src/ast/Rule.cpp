@@ -336,21 +336,15 @@ void UpdateRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-CallRule::CallRule( const CallExpression::Ptr& call, Type type )
+CallRule::CallRule( const CallExpression::Ptr& call )
 : Rule( Node::ID::CALL_RULE )
 , m_call( call )
-, m_type( type )
 {
 }
 
 const CallExpression::Ptr& CallRule::call( void ) const
 {
     return m_call;
-}
-
-CallRule::Type CallRule::type( void ) const
-{
-    return m_type;
 }
 
 void CallRule::accept( Visitor& visitor )

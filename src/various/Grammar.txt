@@ -278,11 +278,8 @@ UpdateRule ::= DirectCallExpression ":=" Term
 ===== CallRule =====
 
 <code>
-CallRule ::= "call" DirectCallExpression
-           | DirectCallExpression
-           | "call" MethodCallExpression
+CallRule ::= DirectCallExpression
            | MethodCallExpression
-           | "call" IndirectCallExpression
            | IndirectCallExpression
 </code>
 

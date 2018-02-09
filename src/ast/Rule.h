@@ -296,25 +296,16 @@ namespace libcasm_fe
         class CallRule final : public Rule
         {
           public:
-            enum class Type
-            {
-                RULE_CALL,
-                FUNCTION_CALL,
-            };
-
-          public:
             using Ptr = std::shared_ptr< CallRule >;
 
-            CallRule( const CallExpression::Ptr& call, Type type );
+            CallRule( const CallExpression::Ptr& call );
 
             const CallExpression::Ptr& call( void ) const;
-            Type type( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const CallExpression::Ptr m_call;
-            const Type m_type;
         };
     }
 }

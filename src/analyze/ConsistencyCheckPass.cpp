@@ -94,7 +94,6 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
     void visit( CaseRule& node ) override;
     void visit( UpdateRule& node ) override;
-    void visit( CallRule& node ) override;
 
     void visit( BasicType& node ) override;
     void visit( ComposedType& node ) override;
@@ -322,47 +321,6 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
             "function '" + func->identifier()->path() + "' is classified as '" +
                 def->classificationName() + "', incorrect usage in line " +
                 std::to_string( func->sourceLocation().begin.line ) );
-    }
-}
-
-void ConsistencyCheckVisitor::visit( CallRule& node )
-{
-    RecursiveVisitor::visit( node );
-
-    const auto& call = *node.call();
-
-    switch( node.type() )
-    {
-        case CallRule::Type::RULE_CALL:
-        {
-            if( call.targetType() != CallExpression::TargetType::RULE )
-            {
-                m_log.error(
-                    { node.sourceLocation() },
-                    "only rules are allowed to be called",
-                    Code::CallRuleOnlyRulesAllowed );
-                m_log.hint(
-                    { call.sourceLocation() },
-                    call.targetTypeName() + " has to be used without 'call'" );
-            }
-            break;
-        }
-        case CallRule::Type::FUNCTION_CALL:
-        {
-            if( call.targetType() == CallExpression::TargetType::RULE )
-            {
-                m_log.error(
-                    { node.sourceLocation() },
-                    "rule is not allowed to be called",
-                    Code::CallRuleOnlyFunctionsAllowed );
-                m_log.hint( { call.sourceLocation() }, "rule has to be used with 'call'" );
-            }
-            break;
-        }
-        default:
-        {
-            assert( !"unknown call rule type" );
-        }
     }
 }
 
