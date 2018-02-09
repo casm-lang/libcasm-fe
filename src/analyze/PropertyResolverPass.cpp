@@ -103,14 +103,13 @@ PropertyResolverVisitor::PropertyResolverVisitor( libcasm_fe::Logger& log )
 {
 }
 
-void PropertyResolverVisitor::visit( ListLiteral& node )
+template < class T >
+static libcasm_ir::Properties intersectPropertiesOf( const T& expressions )
 {
-    RecursiveVisitor::visit( node );
-
-    u1 first = true;
     libcasm_ir::Properties properties;
 
-    for( auto const& expression : *node.expressions() )
+    u1 first = true;
+    for( auto const& expression : expressions )
     {
         if( first )
         {
@@ -121,6 +120,14 @@ void PropertyResolverVisitor::visit( ListLiteral& node )
         properties = properties * expression->properties();
     }
 
+    return properties;
+}
+
+void PropertyResolverVisitor::visit( ListLiteral& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto properties = intersectPropertiesOf< Expressions >( *node.expressions() );
     node.setProperties( properties );
 }
 
@@ -135,20 +142,7 @@ void PropertyResolverVisitor::visit( TupleLiteral& node )
 {
     RecursiveVisitor::visit( node );
 
-    u1 first = true;
-    libcasm_ir::Properties properties;
-
-    for( auto const& expression : *node.expressions() )
-    {
-        if( first )
-        {
-            properties = expression->properties();
-            first = false;
-            continue;
-        }
-        properties = properties * expression->properties();
-    }
-
+    const auto properties = intersectPropertiesOf< Expressions >( *node.expressions() );
     node.setProperties( properties );
 }
 
@@ -156,20 +150,7 @@ void PropertyResolverVisitor::visit( RecordLiteral& node )
 {
     RecursiveVisitor::visit( node );
 
-    u1 first = true;
-    libcasm_ir::Properties properties;
-
-    for( auto const& namedExpression : *node.namedExpressions() )
-    {
-        if( first )
-        {
-            properties = namedExpression->properties();
-            first = false;
-            continue;
-        }
-        properties = properties * namedExpression->properties();
-    }
-
+    const auto properties = intersectPropertiesOf< NamedExpressions >( *node.namedExpressions() );
     node.setProperties( properties );
 }
 
