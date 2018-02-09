@@ -115,14 +115,14 @@ void PropertyReviseVisitor::visit( DerivedDefinition& node )
 
 void PropertyReviseVisitor::visit( FixedSizedType& node )
 {
-    const auto properties = libcasm_ir::Properties{ libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                                    libcasm_ir::Property::PURE };
+    const auto sizeProperties = libcasm_ir::Properties{ libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                                        libcasm_ir::Property::PURE };
 
-    properties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
-        if( not node.properties().isSet( property ) )
+    sizeProperties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
+        if( not node.size()->properties().isSet( property ) )
         {
             m_log.error(
-                { node.sourceLocation() },
+                { node.size()->sourceLocation() },
                 "type violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
                 Code::TypeInvalidProperty );
         }
