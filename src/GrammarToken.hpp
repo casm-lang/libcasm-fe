@@ -66,7 +66,6 @@ FORALL          "forall"        { return Parser::make_FORALL(loc); }
 CHOOSE          "choose"        { return Parser::make_CHOOSE(loc); }
 ITERATE         "iterate"       { return Parser::make_ITERATE(loc); }
 DO              "do"            { return Parser::make_DO(loc); }
-CALL            "call"          { return Parser::make_CALL(loc); }
 IF              "if"            { return Parser::make_IF(loc); }
 THEN            "then"          { return Parser::make_THEN(loc); }
 ELSE            "else"          { return Parser::make_ELSE(loc); }
