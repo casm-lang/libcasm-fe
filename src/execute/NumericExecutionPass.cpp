@@ -660,8 +660,12 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             m_frameStack.pop();
             break;
         }
-        case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
-        case CallExpression::TargetType::CONSTANT:     // [[fallthrough]]
+        case CallExpression::TargetType::TYPE_DOMAIN:
+        {
+            m_evaluationStack.push( IR::DomainConstant( node.type(), true ) );
+            break;
+        }
+        case CallExpression::TargetType::CONSTANT:  // [[fallthrough]]
         case CallExpression::TargetType::VARIABLE:
         {
             node.targetDefinition()->accept( *this );
