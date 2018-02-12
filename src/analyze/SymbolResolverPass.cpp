@@ -46,6 +46,7 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
+#include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/analyze/SymbolRegistrationPass>
@@ -348,6 +349,10 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
             node.setTargetDefinition( agent );
             node.setType( type );
+        }
+        else if( TypeInfo::instance().hasType( identifierPath ) )
+        {
+            node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
         }
         else
         {
