@@ -767,7 +767,7 @@ Initializers ::= Initializers "," Initializer
 
 <code>
 Initializer ::= Term
-              | Term "->" Term
+              | "(" Term ")" "->" Term
               | TupleLiteral "->" Term
 </code>
 

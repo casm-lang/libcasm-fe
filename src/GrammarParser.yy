@@ -1525,15 +1525,15 @@ Initializer
       function->setTargetType( CallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $1 );
   }
-| Term MAPS Term
+| LPAREN Term RPAREN MAPS Term
   {
       auto arguments = Ast::make< Expressions >( @$ );
-      arguments->add( $1 );
+      arguments->add( $2 );
 
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
       function->setTargetType( CallExpression::TargetType::FUNCTION );
-      $$ = Ast::make< UpdateRule >( @$, function, $3 );
+      $$ = Ast::make< UpdateRule >( @$, function, $5 );
   }
 | TupleLiteral MAPS Term
   {
