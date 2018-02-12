@@ -46,6 +46,7 @@
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
+#include <libcasm-fe/TypeInfo>
 #include <libcasm-fe/ast/RecursiveVisitor>
 
 #include <libcasm-fe/analyze/TypeCheckPass>
@@ -467,11 +468,10 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             break;
         }
-        case CallExpression::TargetType::DERIVED:      // [[fallthrough]]
-        case CallExpression::TargetType::FUNCTION:     // [[fallthrough]]
-        case CallExpression::TargetType::RULE:         // [[fallthrough]]
-        case CallExpression::TargetType::SELF:         // [[fallthrough]]
-        case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
+        case CallExpression::TargetType::DERIVED:   // [[fallthrough]]
+        case CallExpression::TargetType::FUNCTION:  // [[fallthrough]]
+        case CallExpression::TargetType::RULE:      // [[fallthrough]]
+        case CallExpression::TargetType::SELF:      // [[fallthrough]]
         case CallExpression::TargetType::CONSTANT:
         {
             if( node.type() )
@@ -497,6 +497,19 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
 
             node.setType( definition->type() );
+            break;
+        }
+        case CallExpression::TargetType::TYPE_DOMAIN:
+        {
+            try
+            {
+                const auto& typeDomain = TypeInfo::instance().getType( identifier->path() );
+                node.setType( typeDomain );
+            }
+            catch( const std::domain_error& e )
+            {
+                m_log.error( { node.sourceLocation() }, e.what() );
+            }
             break;
         }
         case CallExpression::TargetType::UNKNOWN:
@@ -1519,7 +1532,7 @@ void TypeInferenceVisitor::visit( ForallRule& node )
     if( node.universe()->type() )
     {
         const auto& universeType = node.universe()->type();
-        if( universeType->isPrimitive() )
+        if( universeType->isInteger() )
         {
             m_log.error(
                 { node.universe()->sourceLocation() },
