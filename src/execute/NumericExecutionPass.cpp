@@ -543,7 +543,7 @@ void ExecutionVisitor::visit( EnumerationDefinition& node )
 {
     assert( node.type()->isEnumeration() );
     const auto& enumType = node.type();
-    m_evaluationStack.push( IR::DomainConstant( enumType, true ) );
+    m_evaluationStack.push( IR::DomainConstant( enumType ) );
 }
 
 void ExecutionVisitor::visit( UndefLiteral& node )
@@ -662,7 +662,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::TYPE_DOMAIN:
         {
-            m_evaluationStack.push( IR::DomainConstant( node.type(), true ) );
+            m_evaluationStack.push( IR::DomainConstant( node.type() ) );
             break;
         }
         case CallExpression::TargetType::CONSTANT:  // [[fallthrough]]
