@@ -303,7 +303,6 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
     void visit( EnumeratorDefinition& node ) override;
-    void visit( EnumerationDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -537,13 +536,6 @@ void ExecutionVisitor::visit( EnumeratorDefinition& node )
     assert( node.type()->isEnumeration() );
     const auto& enumType = std::static_pointer_cast< IR::EnumerationType >( node.type() );
     m_evaluationStack.push( IR::EnumerationConstant( enumType, node.identifier()->name() ) );
-}
-
-void ExecutionVisitor::visit( EnumerationDefinition& node )
-{
-    assert( node.type()->isEnumeration() );
-    const auto& enumType = node.type();
-    m_evaluationStack.push( IR::DomainConstant( enumType ) );
 }
 
 void ExecutionVisitor::visit( UndefLiteral& node )
