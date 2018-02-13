@@ -501,6 +501,23 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case CallExpression::TargetType::TYPE_DOMAIN:
         {
+            if( node.type() )
+            {
+                break;
+            }
+
+            assert( node.arguments()->size() == 0 );
+
+            // if the type domain has FE definition use this type!
+            const auto& definition = node.targetDefinition();
+            if( definition )
+            {
+                definition->accept( *this );
+                assert( definition->type()->arguments().size() == 0 );
+                node.setType( definition->type() );
+                break;
+            }
+
             try
             {
                 const auto& typeDomain = TypeInfo::instance().getType( identifier->path() );
