@@ -115,6 +115,7 @@ DirectCallExpression::DirectCallExpression(
 , m_identifier( identifier )
 , m_targetType( TargetType::UNKNOWN )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_targetBuiltinType()
 , m_targetDefinition()
 {
 }
@@ -201,6 +202,17 @@ libcasm_ir::Value::ID DirectCallExpression::targetBuiltinId( void ) const
     return m_targetBuiltinId;
 }
 
+void DirectCallExpression::setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType )
+{
+    m_targetBuiltinType = builtinType;
+}
+
+const libcasm_ir::RelationType::Ptr& DirectCallExpression::targetBuiltinType( void ) const
+{
+    assert( targetType() == TargetType::BUILTIN );
+    return m_targetBuiltinType;
+}
+
 void DirectCallExpression::setTargetDefinition( const Definition::Ptr& definition )
 {
     m_targetDefinition = definition;
@@ -231,6 +243,7 @@ MethodCallExpression::MethodCallExpression(
 , m_methodName( methodName )
 , m_methodType( MethodType::UNKNOWN )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_targetBuiltinType( nullptr )
 {
 }
 
@@ -294,6 +307,17 @@ libcasm_ir::Value::ID MethodCallExpression::targetBuiltinId( void ) const
     assert( m_methodType == MethodType::BUILTIN );
 
     return m_targetBuiltinId;
+}
+
+void MethodCallExpression::setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType )
+{
+    m_targetBuiltinType = builtinType;
+}
+
+const libcasm_ir::RelationType::Ptr& MethodCallExpression::targetBuiltinType( void ) const
+{
+    assert( m_methodType == MethodType::BUILTIN );
+    return m_targetBuiltinType;
 }
 
 void MethodCallExpression::setTargetDefinition( const Definition::Ptr& definition )
@@ -385,6 +409,7 @@ TypeCastingExpression::TypeCastingExpression(
 , m_asType( asType )
 , m_castingType( CastingType::UNKNOWN )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
+, m_targetBuiltinType( nullptr )
 {
 }
 
@@ -435,6 +460,17 @@ libcasm_ir::Value::ID TypeCastingExpression::targetBuiltinId( void ) const
 {
     assert( m_castingType == CastingType::BUILTIN );
     return m_targetBuiltinId;
+}
+
+void TypeCastingExpression::setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType )
+{
+    m_targetBuiltinType = builtinType;
+}
+
+const libcasm_ir::RelationType::Ptr& TypeCastingExpression::targetBuiltinType( void ) const
+{
+    assert( m_castingType == CastingType::BUILTIN );
+    return m_targetBuiltinType;
 }
 
 void TypeCastingExpression::setTargetDefinition( const Definition::Ptr& definition )
