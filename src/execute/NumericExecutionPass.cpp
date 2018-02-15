@@ -648,7 +648,7 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::BUILTIN:
         {
             m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
-            invokeBuiltin( node, node.targetBuiltinId(), node.type() );
+            invokeBuiltin( node, node.targetBuiltinId(), node.targetBuiltinType() );
             m_frameStack.pop();
             break;
         }
@@ -707,7 +707,7 @@ void ExecutionVisitor::visit( MethodCallExpression& node )
         {
             m_frameStack.push(
                 makeObjectFrame( object, &node, nullptr, node.arguments()->size() ) );
-            invokeBuiltin( node, node.targetBuiltinId(), node.type() );
+            invokeBuiltin( node, node.targetBuiltinId(), node.targetBuiltinType() );
             m_frameStack.pop();
             break;
         }
@@ -729,7 +729,7 @@ void ExecutionVisitor::visit( LiteralCallExpression& node )
 
     if( not object.defined() )
     {
-        m_evaluationStack.push( IR::Constant::undef( node.type()->ptr_result() ) );
+        m_evaluationStack.push( IR::Constant::undef( node.type() ) );
         return;
     }
 
@@ -774,7 +774,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         case ReferenceLiteral::ReferenceType::BUILTIN:
         {
             m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
-            invokeBuiltin( node, literal->builtinId(), node.type() );
+            invokeBuiltin( node, literal->builtinId(), literal->type() );
             m_frameStack.pop();
             break;
         }
@@ -797,7 +797,7 @@ void ExecutionVisitor::visit( TypeCastingExpression& node )
         {
             m_frameStack.push(
                 makeObjectFrame( object, &node, nullptr, node.arguments()->size() ) );
-            invokeBuiltin( node, node.targetBuiltinId(), node.type() );
+            invokeBuiltin( node, node.targetBuiltinId(), node.targetBuiltinType() );
             m_frameStack.pop();
             break;
         }
@@ -1279,7 +1279,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
 
     // evaluate function arguments
     const auto& arguments = function->arguments();
-    const auto& argumentTypes = function->type()->arguments();
+    const auto& argumentTypes = function->targetDefinition()->type()->arguments();
     std::vector< IR::Constant > argumentValues;
     argumentValues.reserve( arguments->size() );
     for( std::size_t i = 0; i < arguments->size(); ++i )
