@@ -79,12 +79,13 @@ static const std::string STATIC_ATTRIBUTE = "static";
 static const std::string VARIANT_ATTRIBUTE = "variant";
 static const std::string SYMBOLIC_ATTRIBUTE = "symbolic";
 static const std::string DUMPS_ATTRIBUTE = "dumps";
+static const std::string PURE_ATTRIBUTE = "pure";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
     DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE,       MONITORED_ATTRIBUTE, EXTERNAL_ATTRIBUTE,
     CONTROLLED_ATTRIBUTE, INTERNAL_ATTRIBUTE, SHARED_ATTRIBUTE,    OUT_ATTRIBUTE,
-    STATIC_ATTRIBUTE,     SYMBOLIC_ATTRIBUTE,
+    STATIC_ATTRIBUTE,     SYMBOLIC_ATTRIBUTE, PURE_ATTRIBUTE,
 };
 
 // list of allowed expression attribute names
@@ -290,6 +291,15 @@ void DefinitionVisitor::visit( DerivedDefinition& node )
 
     DefinitionAttributionVisitor visitor( m_log, node );
     node.attributes()->accept( visitor );
+    const auto& attributeNames = visitor.attributeNames();
+
+    for( const auto& name : attributeNames )
+    {
+        if( name == PURE_ATTRIBUTE )
+        {
+            node.setProperty( libcasm_ir::Property::PURE );
+        }
+    }
 }
 
 void DefinitionVisitor::visit( RuleDefinition& node )
