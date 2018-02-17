@@ -2083,15 +2083,19 @@ void TypeResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    std::vector< std::string > identifierPath;
-    identifierPath.reserve( 2 );
-    identifierPath.emplace_back( node.type()->description() );  // TODO: this will need some extra
-                                                                // care when we add the import
-                                                                // feature. (e.g. namespace lookup
-                                                                // by type)
-    identifierPath.emplace_back( node.identifier()->baseName() );
+    // TODO: this will need some extra care when we add the import feature. (e.g. namespace lookup
+    // by type)
+    const auto typeNamespace = m_symboltable.findNamespace( node.type()->description() );
+    if( not typeNamespace )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "type '" + node.type()->description() + "' does not have a namespace",
+            Code::DirectCallExpressionInvalidRelativePath );
+        return;
+    }
 
-    const auto symbol = m_symboltable.findSymbol( identifierPath );
+    const auto symbol = typeNamespace->findSymbol( node.identifier()->baseName() );
     if( not symbol )
     {
         m_log.error(
