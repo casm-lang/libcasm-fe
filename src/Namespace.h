@@ -77,13 +77,6 @@ namespace libcasm_fe
         Ast::Definition::Ptr findSymbol( const std::string& name ) const;
 
         /**
-         * Searches for a symbol with path @p path.
-         *
-         * @return The symbol or nullptr if absent.
-         */
-        Ast::Definition::Ptr findSymbol( const std::vector< std::string >& path ) const;
-
-        /**
          * Searches for a sub-namespace named @p name in the current namespace.
          *
          * @return The sub-namespace or nullptr if absent.

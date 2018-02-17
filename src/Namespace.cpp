@@ -85,30 +85,6 @@ Ast::Definition::Ptr Namespace::findSymbol( const std::string& name ) const
     return it->second;
 }
 
-Ast::Definition::Ptr Namespace::findSymbol( const std::vector< std::string >& path ) const
-{
-    assert( path.size() > 0 );
-
-    auto* _namespace = this;
-    u64 pos = 0;
-
-    while( ( pos + 1 ) != path.size() )
-    {
-        const auto& name = path[ pos ];
-
-        const auto subNamespace = findNamespace( name );
-        if( not subNamespace )
-        {
-            return nullptr;
-        }
-
-        _namespace = subNamespace.get();
-        pos++;
-    }
-
-    return _namespace->findSymbol( path[ pos ] );
-}
-
 std::string Namespace::dump( const std::string& indention ) const
 {
     std::stringstream s;
