@@ -576,7 +576,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             if( *callArgType != *exprArgType )
             {
-                const std::unordered_map< DirectCallExpression::TargetType, Code > codes = {
+                const std::map< DirectCallExpression::TargetType, Code > codes = {
                     { DirectCallExpression::TargetType::FUNCTION,
                       Code::TypeInferenceFunctionArgumentTypeMismatch },
                     { DirectCallExpression::TargetType::DERIVED,

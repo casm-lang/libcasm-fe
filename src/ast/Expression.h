@@ -449,19 +449,6 @@ namespace libcasm_fe
     }
 }
 
-namespace std
-{
-    template <>
-    struct hash< libcasm_fe::Ast::DirectCallExpression::TargetType >
-    {
-        inline size_t operator()(
-            const libcasm_fe::Ast::DirectCallExpression::TargetType value ) const
-        {
-            return static_cast< size_t >( value );
-        }
-    };
-}
-
 #endif  // _LIBCASM_FE_EXPRESSION_H_
 
 //
