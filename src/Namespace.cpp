@@ -74,7 +74,7 @@ void Namespace::registerNamespace( const std::string& name, const Namespace::Ptr
     }
 }
 
-Ast::Definition::Ptr Namespace::find( const std::string& name ) const
+Ast::Definition::Ptr Namespace::findSymbol( const std::string& name ) const
 {
     const auto it = m_symbols.find( name );
     if( it == m_symbols.end() )
@@ -85,7 +85,7 @@ Ast::Definition::Ptr Namespace::find( const std::string& name ) const
     return it->second;
 }
 
-Ast::Definition::Ptr Namespace::find( const std::vector< std::string >& path ) const
+Ast::Definition::Ptr Namespace::findSymbol( const std::vector< std::string >& path ) const
 {
     assert( path.size() > 0 );
 
@@ -106,7 +106,7 @@ Ast::Definition::Ptr Namespace::find( const std::vector< std::string >& path ) c
         pos++;
     }
 
-    return find( path[ pos ] );
+    return _namespace->findSymbol( path[ pos ] );
 }
 
 std::string Namespace::dump( const std::string& indention ) const
@@ -135,7 +135,8 @@ std::string Namespace::dump( const std::string& indention ) const
     return s.str();
 }
 
-Ast::Definition::Ptr Namespace::find( const IdentifierPath& node, const std::size_t index ) const
+Ast::Definition::Ptr Namespace::findSymbol(
+    const IdentifierPath& node, const std::size_t index ) const
 {
     const auto& path = *node.identifiers();
 
@@ -153,13 +154,13 @@ Ast::Definition::Ptr Namespace::find( const IdentifierPath& node, const std::siz
             return nullptr;
         }
 
-        return subNamespace->find( node, index + 1 );
+        return subNamespace->findSymbol( node, index + 1 );
     }
     else
     {
         // search for identifier/symbol in this namespace
         const auto& name = path[ index ]->name();
-        return find( name );
+        return findSymbol( name );
     }
 }
 

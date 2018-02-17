@@ -2091,7 +2091,7 @@ void TypeResolveVisitor::visit( DirectCallExpression& node )
                                                                 // by type)
     identifierPath.emplace_back( node.identifier()->baseName() );
 
-    const auto symbol = m_symboltable.find( identifierPath );
+    const auto symbol = m_symboltable.findSymbol( identifierPath );
     if( not symbol )
     {
         m_log.error(

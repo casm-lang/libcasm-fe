@@ -112,7 +112,7 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( name );
+        const auto& symbol = m_symboltable.findSymbol( name );
 
         if( node.uid() == FunctionDefinition::UID::PROGRAM )
         {
@@ -250,7 +250,7 @@ void SymbolRegistrationVisitor::registerSymbol(
     }
     catch( const std::domain_error& e )
     {
-        const auto& symbol = m_symboltable.find( name );
+        const auto& symbol = m_symboltable.findSymbol( name );
         m_log.error( { node.sourceLocation() }, e.what(), errorCodeAlreadyRegistered );
         m_log.info( { symbol->sourceLocation() }, e.what() );
     }

@@ -114,7 +114,7 @@ void TypeCheckVisitor::visit( BasicType& node )
         return;
     }
 
-    const auto symbol = m_symboltable.find( *node.name() );
+    const auto symbol = m_symboltable.findSymbol( *node.name() );
     if( symbol )
     {
         switch( symbol->id() )
