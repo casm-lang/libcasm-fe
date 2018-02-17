@@ -106,7 +106,7 @@ Ast::Definition::Ptr Namespace::find( const std::vector< std::string >& path ) c
         pos++;
     }
 
-    return _namespace->find( path[ pos ] );
+    return find( path[ pos ] );
 }
 
 std::string Namespace::dump( const std::string& indention ) const
@@ -159,15 +159,7 @@ Ast::Definition::Ptr Namespace::find( const IdentifierPath& node, const std::siz
     else
     {
         // search for identifier/symbol in this namespace
-
         const auto& name = path[ index ]->name();
-
-        const auto it = m_symbols.find( name );
-        if( it == m_symbols.end() )
-        {
-            return nullptr;
-        }
-
-        return it->second;
+        return find( name );
     }
 }
