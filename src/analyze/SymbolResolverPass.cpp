@@ -206,8 +206,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
     assert( node.identifier() );
     const auto& identifier = node.identifier();
-    const auto& identifierPath = identifier->path();
-    const auto& identifierBaseName = identifier->baseName();
+    const auto& name = identifier->path();
 
     if( identifier->type() == IdentifierPath::Type::RELATIVE )
     {
@@ -222,14 +221,14 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         {
             m_log.error(
                 { node.sourceLocation() },
-                "invalid argument size: " + description + " '" + identifierPath + "' expects " +
+                "invalid argument size: " + description + " '" + name + "' expects " +
                     std::to_string( expectedNumberOfArguments ) + " arguments",
                 Code::SymbolArgumentSizeMismatch );
         }
     };
 
-    const auto variableIt = m_variables.find( identifierBaseName );
-    if( variableIt != m_variables.cend() and identifierPath == identifierBaseName )
+    const auto variableIt = m_variables.find( name );
+    if( variableIt != m_variables.cend() )
     {
         node.setTargetType( DirectCallExpression::TargetType::VARIABLE );
         node.setTargetDefinition( variableIt->second );
@@ -237,9 +236,9 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    if( libcasm_ir::Builtin::available( identifierBaseName ) )
+    if( libcasm_ir::Builtin::available( name ) )
     {
-        const auto& annotation = libcasm_ir::Annotation::find( identifierBaseName );
+        const auto& annotation = libcasm_ir::Annotation::find( name );
 
         node.setTargetType( DirectCallExpression::TargetType::BUILTIN );
         node.setTargetBuiltinId( annotation.valueID() );
@@ -305,7 +304,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     static const auto AGENT( "Agent" );
     static const auto SINGLE_AGENT_CONSTANT( "$" );
 
-    if( identifierPath == SELF )
+    if( name == SELF )
     {
         const auto agentSymbol = m_symboltable.findSymbol( AGENT );
         if( not agentSymbol )
@@ -320,7 +319,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     }
     // single agent execution notation --> agent type domain ==
     // Enumeration!
-    else if( identifierPath == SINGLE_AGENT_CONSTANT )
+    else if( name == SINGLE_AGENT_CONSTANT )
     {
         assert( node.targetType() == DirectCallExpression::TargetType::CONSTANT );
 
@@ -344,7 +343,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         node.setType( type );
         validateArgumentsCount( agent->description(), 0 );
     }
-    else if( TypeInfo::instance().hasType( identifierPath ) )
+    else if( TypeInfo::instance().hasType( name ) )
     {
         node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
         validateArgumentsCount( "type", 0 );
@@ -357,13 +356,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 ( node.targetType() != DirectCallExpression::TargetType::UNKNOWN
                       ? node.targetTypeName() + " "
                       : "" ) +
-                "symbol '" + identifierPath + "' found",
+                "symbol '" + name + "' found",
             ( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
                 ? Code::FunctionSymbolIsUnknown
                 : Code::SymbolIsUnknown );
     }
 
-    m_log.debug( "call: " + identifierPath + "{ " + node.targetTypeName() + " }" );
+    m_log.debug( "call: " + name + "{ " + node.targetTypeName() + " }" );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )
