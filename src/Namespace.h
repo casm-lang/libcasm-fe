@@ -62,11 +62,26 @@ namespace libcasm_fe
 
         void registerNamespace( const std::string& name, const Namespace::Ptr& _namespace );
 
+        /**
+         * Searches for a symbol with identifier @p path.
+         *
+         * @return The symbol or nullptr if absent.
+         */
         Ast::Definition::Ptr find(
-            const Ast::IdentifierPath& node, const std::size_t index = 0 ) const;
+            const Ast::IdentifierPath& path, const std::size_t index = 0 ) const;
 
+        /**
+         * Searches for a symbol named @p name in the current namespace.
+         *
+         * @return The symbol or nullptr if absent.
+         */
         Ast::Definition::Ptr find( const std::string& name ) const;
 
+        /**
+         * Searches for a symbol with path @p path.
+         *
+         * @return The symbol or nullptr if absent.
+         */
         Ast::Definition::Ptr find( const std::vector< std::string >& path ) const;
 
         std::string dump( const std::string& indention = "" ) const;

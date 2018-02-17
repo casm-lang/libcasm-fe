@@ -2091,27 +2091,8 @@ void TypeResolveVisitor::visit( DirectCallExpression& node )
                                                                 // by type)
     identifierPath.emplace_back( node.identifier()->baseName() );
 
-    try
-    {
-        const auto& symbol = m_symboltable.find( identifierPath );
-
-        switch( symbol->id() )
-        {
-            case Node::ID::ENUMERATOR_DEFINITION:
-            {
-                node.setTargetType( CallExpression::TargetType::CONSTANT );
-                break;
-            }
-            default:
-            {
-                throw std::domain_error( "cannot reference '" + symbol->description() + "'" );
-                break;
-            }
-        }
-
-        node.setTargetDefinition( symbol );
-    }
-    catch( const std::domain_error& e )
+    const auto symbol = m_symboltable.find( identifierPath );
+    if( not symbol )
     {
         m_log.error(
             { node.sourceLocation() },
@@ -2119,7 +2100,24 @@ void TypeResolveVisitor::visit( DirectCallExpression& node )
                 "' does not have a symbol with relative path '" + node.identifier()->baseName() +
                 "'",
             Code::DirectCallExpressionInvalidRelativePath );
+        return;
     }
+
+    switch( symbol->id() )
+    {
+        case Node::ID::ENUMERATOR_DEFINITION:
+        {
+            node.setTargetType( CallExpression::TargetType::CONSTANT );
+            break;
+        }
+        default:
+        {
+            throw std::domain_error( "cannot reference '" + symbol->description() + "'" );
+            break;
+        }
+    }
+
+    node.setTargetDefinition( symbol );
 }
 
 void TypeInferencePass::usage( libpass::PassUsage& pu )

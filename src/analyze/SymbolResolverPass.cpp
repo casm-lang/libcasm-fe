@@ -161,10 +161,9 @@ void SymbolResolveVisitor::visit( ReferenceLiteral& node )
         return;
     }
 
-    try
+    const auto symbol = m_symboltable.find( *node.identifier() );
+    if( symbol )
     {
-        const auto symbol = m_symboltable.find( *node.identifier() );
-
         switch( symbol->id() )
         {
             case Node::ID::FUNCTION_DEFINITION:
@@ -192,14 +191,13 @@ void SymbolResolveVisitor::visit( ReferenceLiteral& node )
                     "cannot reference '" + symbol->description() + "'" );
             }
         }
+        return;
     }
-    catch( const std::domain_error& e )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "'" + name + "' has not been defined",
-            Code::SymbolIsUnknown );
-    }
+
+    m_log.error(
+        { node.identifier()->sourceLocation() },
+        "'" + name + "' has not been defined",
+        Code::SymbolIsUnknown );
 }
 
 void SymbolResolveVisitor::visit( DirectCallExpression& node )
@@ -246,9 +244,9 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    try
+    auto symbol = m_symboltable.find( *node.identifier() );
+    if( symbol )
     {
-        auto symbol = m_symboltable.find( *identifier );
         symbol = resolveIfAlias( symbol );
 
         std::size_t expectedNumberOfArguments = 0;
@@ -305,68 +303,67 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                     "' expects " + std::to_string( expectedNumberOfArguments ) + " arguments",
                 Code::SymbolArgumentSizeMismatch );
         }
+
+        return;
     }
-    catch( const std::domain_error& e )
+
+    static const auto SELF( "self" );
+    static const auto AGENT( "Agent" );
+    static const auto SINGLE_AGENT_CONSTANT( "$" );
+
+    if( identifierPath == SELF )
     {
-        static const auto SELF( "self" );
-        static const auto AGENT( "Agent" );
-        static const auto SINGLE_AGENT_CONSTANT( "$" );
-
-        if( identifierPath == SELF )
+        const auto agentSymbol = m_symboltable.find( AGENT );
+        if( not agentSymbol )
         {
-            try
-            {
-                const auto& symbol = m_symboltable.find( AGENT );
-                node.setTargetType( CallExpression::TargetType::SELF );
-                node.setTargetDefinition( symbol );
-            }
-            catch( const std::domain_error& e )
-            {
-                m_log.error( { node.sourceLocation() }, "unable to find 'Agent' symbol" );
-            }
+            m_log.error( { node.sourceLocation() }, "unable to find 'Agent' symbol" );
+            return;
         }
-        // single agent execution notation --> agent type domain ==
-        // Enumeration!
-        else if( identifierPath == SINGLE_AGENT_CONSTANT )
-        {
-            assert( node.targetType() == CallExpression::TargetType::CONSTANT );
 
-            const auto agent = std::make_shared< EnumeratorDefinition >(
-                std::make_shared< Identifier >( SINGLE_AGENT_CONSTANT ) );
-            const auto agentEnumerators = std::make_shared< Enumerators >();
-            agentEnumerators->add( agent );
-            const auto agentEnum = std::make_shared< EnumerationDefinition >(
-                std::make_shared< Identifier >( AGENT ), agentEnumerators );
+        node.setTargetType( CallExpression::TargetType::SELF );
+        node.setTargetDefinition( agentSymbol );
+    }
+    // single agent execution notation --> agent type domain ==
+    // Enumeration!
+    else if( identifierPath == SINGLE_AGENT_CONSTANT )
+    {
+        assert( node.targetType() == CallExpression::TargetType::CONSTANT );
 
-            const auto kind = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
-            kind->add( SINGLE_AGENT_CONSTANT );
+        const auto agent = std::make_shared< EnumeratorDefinition >(
+            std::make_shared< Identifier >( SINGLE_AGENT_CONSTANT ) );
+        const auto agentEnumerators = std::make_shared< Enumerators >();
+        agentEnumerators->add( agent );
+        const auto agentEnum = std::make_shared< EnumerationDefinition >(
+            std::make_shared< Identifier >( AGENT ), agentEnumerators );
 
-            const auto type = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
-            agent->setType( type );
-            agentEnum->setType( type );
+        const auto kind = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
+        kind->add( SINGLE_AGENT_CONSTANT );
 
-            m_symboltable.registerSymbol( AGENT, agentEnum );
+        const auto type = libstdhl::Memory::make< libcasm_ir::EnumerationType >( kind );
+        agent->setType( type );
+        agentEnum->setType( type );
 
-            node.setTargetDefinition( agent );
-            node.setType( type );
-        }
-        else if( TypeInfo::instance().hasType( identifierPath ) )
-        {
-            node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
-        }
-        else
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "unknown " +
-                    ( node.targetType() != CallExpression::TargetType::UNKNOWN
-                          ? node.targetTypeName() + " "
-                          : "" ) +
-                    "symbol '" + identifierPath + "' found",
-                ( node.targetType() == CallExpression::TargetType::FUNCTION )
-                    ? Code::FunctionSymbolIsUnknown
-                    : Code::SymbolIsUnknown );
-        }
+        m_symboltable.registerSymbol( AGENT, agentEnum );
+
+        node.setTargetDefinition( agent );
+        node.setType( type );
+    }
+    else if( TypeInfo::instance().hasType( identifierPath ) )
+    {
+        node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
+    }
+    else
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown " +
+                ( node.targetType() != CallExpression::TargetType::UNKNOWN
+                      ? node.targetTypeName() + " "
+                      : "" ) +
+                "symbol '" + identifierPath + "' found",
+            ( node.targetType() == CallExpression::TargetType::FUNCTION )
+                ? Code::FunctionSymbolIsUnknown
+                : Code::SymbolIsUnknown );
     }
 
     m_log.debug( "call: " + identifierPath + "{ " + node.targetTypeName() + " }" );

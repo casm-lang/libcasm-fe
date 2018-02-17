@@ -79,7 +79,7 @@ Ast::Definition::Ptr Namespace::find( const std::string& name ) const
     const auto it = m_symbols.find( name );
     if( it == m_symbols.end() )
     {
-        throw std::domain_error( "unable to find symbol '" + name + "'" );
+        return nullptr;
     }
 
     return it->second;
@@ -99,24 +99,14 @@ Ast::Definition::Ptr Namespace::find( const std::vector< std::string >& path ) c
         const auto it = m_namespaces.find( name );
         if( it == m_namespaces.end() )
         {
-            throw std::domain_error(
-                "unable to find namespace '" + name + "' in symbol path '" +
-                libstdhl::String::join( path, "::" ) + "'" );
+            return nullptr;
         }
 
         _namespace = it->second.get();
         pos++;
     }
 
-    try
-    {
-        return _namespace->find( path[ pos ] );
-    }
-    catch( const std::domain_error& e )
-    {
-        throw std::domain_error(
-            "unable to find symbol '" + libstdhl::String::join( path, "::" ) + "'" );
-    }
+    return _namespace->find( path[ pos ] );
 }
 
 std::string Namespace::dump( const std::string& indention ) const
@@ -161,8 +151,7 @@ Ast::Definition::Ptr Namespace::find( const IdentifierPath& node, const std::siz
         const auto it = m_namespaces.find( name );
         if( it == m_namespaces.end() )
         {
-            throw std::domain_error(
-                "unable to find namespace '" + name + "' in symbol path '" + node.path() + "'" );
+            return nullptr;
         }
 
         return it->second->find( node, index + 1 );
@@ -176,7 +165,7 @@ Ast::Definition::Ptr Namespace::find( const IdentifierPath& node, const std::siz
         const auto it = m_symbols.find( name );
         if( it == m_symbols.end() )
         {
-            throw std::domain_error( "unable to find symbol '" + node.path() + "'" );
+            return nullptr;
         }
 
         return it->second;
