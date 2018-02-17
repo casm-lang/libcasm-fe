@@ -1620,15 +1620,6 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
 
     node.expression()->accept( *this );
 
-    if( func.targetType() == CallExpression::TargetType::BUILTIN )
-    {
-        m_log.error(
-            { func.sourceLocation() },
-            "performing update rule on built-in '" + func.identifier()->path() + "' is not allowed",
-            Code::TypeInferenceUpdateRuleFunctionIsBuiltin );
-        return;
-    }
-
     assignment(
         node,
         func,
