@@ -229,11 +229,11 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 {
-    assert( node.targetType() != CallExpression::TargetType::UNKNOWN );
+    assert( node.targetType() != DirectCallExpression::TargetType::UNKNOWN );
 
     RecursiveVisitor::visit( node );
 
-    if( node.targetType() == CallExpression::TargetType::FUNCTION )
+    if( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
     {
         const auto& function = node.targetDefinition()->ptr< FunctionDefinition >();
         if( function->classification() == FunctionDefinition::Classification::OUT )
@@ -254,7 +254,7 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
         }
     }
 
-    if( node.targetType() == CallExpression::TargetType::RULE )
+    if( node.targetType() == DirectCallExpression::TargetType::RULE )
     {
         if( m_sideEffectFree )
         {
@@ -274,7 +274,7 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     node.expression()->accept( *this );
 
     const auto& func = node.function();
-    if( func->targetType() != CallExpression::TargetType::FUNCTION )
+    if( func->targetType() != DirectCallExpression::TargetType::FUNCTION )
     {
         m_log.error(
             { func->sourceLocation() },

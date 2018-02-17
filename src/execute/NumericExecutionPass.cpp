@@ -634,9 +634,9 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
 {
     switch( node.targetType() )
     {
-        case CallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:   // [[fallthrough]]
-        case CallExpression::TargetType::RULE:
+        case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
+        case DirectCallExpression::TargetType::RULE:
         {
             const auto& definition = node.targetDefinition();
             m_frameStack.push(
@@ -645,30 +645,30 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
             m_frameStack.pop();
             break;
         }
-        case CallExpression::TargetType::BUILTIN:
+        case DirectCallExpression::TargetType::BUILTIN:
         {
             m_frameStack.push( makeFrame( &node, nullptr, node.arguments()->size() ) );
             invokeBuiltin( node, node.targetBuiltinId(), node.type() );
             m_frameStack.pop();
             break;
         }
-        case CallExpression::TargetType::TYPE_DOMAIN:
+        case DirectCallExpression::TargetType::TYPE_DOMAIN:
         {
             m_evaluationStack.push( IR::DomainConstant( node.type() ) );
             break;
         }
-        case CallExpression::TargetType::CONSTANT:  // [[fallthrough]]
-        case CallExpression::TargetType::VARIABLE:
+        case DirectCallExpression::TargetType::CONSTANT:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::VARIABLE:
         {
             node.targetDefinition()->accept( *this );
             break;
         }
-        case CallExpression::TargetType::SELF:
+        case DirectCallExpression::TargetType::SELF:
         {
             m_evaluationStack.push( m_agentId );
             break;
         }
-        case CallExpression::TargetType::UNKNOWN:
+        case DirectCallExpression::TargetType::UNKNOWN:
         {
             assert( !"cannot call an unknown target" );
             break;
@@ -1306,7 +1306,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
         argumentValues.emplace_back( value );
     }
 
-    assert( node.function()->targetType() == CallExpression::TargetType::FUNCTION );
+    assert( node.function()->targetType() == DirectCallExpression::TargetType::FUNCTION );
     const auto& functionDefintion =
         std::static_pointer_cast< FunctionDefinition >( node.function()->targetDefinition() );
 

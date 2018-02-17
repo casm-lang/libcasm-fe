@@ -394,7 +394,7 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
 
     switch( node.targetType() )
     {
-        case CallExpression::TargetType::FUNCTION:
+        case DirectCallExpression::TargetType::FUNCTION:
         {
             const auto def = static_cast< FunctionDefinition* >( node.targetDefinition().get() );
 
@@ -410,12 +410,12 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             }
             break;
         }
-        case CallExpression::TargetType::DERIVED:
+        case DirectCallExpression::TargetType::DERIVED:
         {
             assert( not" unimplemented direct expr call " );
             break;
         }
-        case CallExpression::TargetType::BUILTIN:
+        case DirectCallExpression::TargetType::BUILTIN:
         {
             const auto id = node.targetBuiltinId();
             const auto builtin = libcasm_ir::Builtin::create( id, type );
@@ -423,17 +423,17 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             m_specification->add( builtin );
             break;
         }
-        case CallExpression::TargetType::RULE:
+        case DirectCallExpression::TargetType::RULE:
         {
             assert( not" unimplemented direct expr call " );
             break;
         }
-        case CallExpression::TargetType::TYPE_DOMAIN:
+        case DirectCallExpression::TargetType::TYPE_DOMAIN:
         {
             assert( not" unimplemented direct expr call " );
             break;
         }
-        case CallExpression::TargetType::CONSTANT:
+        case DirectCallExpression::TargetType::CONSTANT:
         {
             assert( node.type()->isEnumeration() );
 
@@ -449,12 +449,12 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             m_ast2ir.emplace( &node, constant );
             break;
         }
-        case CallExpression::TargetType::VARIABLE:
+        case DirectCallExpression::TargetType::VARIABLE:
         {
             assert( not" unimplemented direct expr call " );
             break;
         }
-        case CallExpression::TargetType::SELF:
+        case DirectCallExpression::TargetType::SELF:
         {
             const auto& type = std::static_pointer_cast< libcasm_ir::EnumerationType >(
                 m_specification->agent()->type().ptr_type() );
@@ -466,7 +466,7 @@ void AstToCasmIRVisitor::visit( DirectCallExpression& node )
             m_ast2ir.emplace( &node, constant );
             break;
         }
-        case CallExpression::TargetType::UNKNOWN:
+        case DirectCallExpression::TargetType::UNKNOWN:
         {
             assert( not" unimplemented direct expr call " );
             break;

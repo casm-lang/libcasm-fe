@@ -409,7 +409,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
     switch( node.targetType() )
     {
-        case CallExpression::TargetType::VARIABLE:
+        case DirectCallExpression::TargetType::VARIABLE:
         {
             const auto& variable = node.targetDefinition();
 
@@ -419,7 +419,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             node.setType( variable->type() );
             break;
         }
-        case CallExpression::TargetType::BUILTIN:
+        case DirectCallExpression::TargetType::BUILTIN:
         {
             if( node.type() )
             {
@@ -467,11 +467,11 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             break;
         }
-        case CallExpression::TargetType::DERIVED:   // [[fallthrough]]
-        case CallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case CallExpression::TargetType::RULE:      // [[fallthrough]]
-        case CallExpression::TargetType::SELF:      // [[fallthrough]]
-        case CallExpression::TargetType::CONSTANT:
+        case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
+        case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::RULE:      // [[fallthrough]]
+        case DirectCallExpression::TargetType::SELF:      // [[fallthrough]]
+        case DirectCallExpression::TargetType::CONSTANT:
         {
             if( node.type() )
             {
@@ -498,7 +498,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             node.setType( definition->type() );
             break;
         }
-        case CallExpression::TargetType::TYPE_DOMAIN:
+        case DirectCallExpression::TargetType::TYPE_DOMAIN:
         {
             if( node.type() )
             {
@@ -528,7 +528,7 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
             break;
         }
-        case CallExpression::TargetType::UNKNOWN:
+        case DirectCallExpression::TargetType::UNKNOWN:
         {
             if( identifier->type() != IdentifierPath::Type::RELATIVE )
             {
@@ -576,14 +576,14 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
             if( *callArgType != *exprArgType )
             {
-                const std::unordered_map< CallExpression::TargetType, Code > codes = {
-                    { CallExpression::TargetType::FUNCTION,
+                const std::unordered_map< DirectCallExpression::TargetType, Code > codes = {
+                    { DirectCallExpression::TargetType::FUNCTION,
                       Code::TypeInferenceFunctionArgumentTypeMismatch },
-                    { CallExpression::TargetType::DERIVED,
+                    { DirectCallExpression::TargetType::DERIVED,
                       Code::TypeInferenceDerivedArgumentTypeMismatch },
-                    { CallExpression::TargetType::BUILTIN,
+                    { DirectCallExpression::TargetType::BUILTIN,
                       Code::TypeInferenceBuiltinArgumentTypeMismatch },
-                    { CallExpression::TargetType::RULE,
+                    { DirectCallExpression::TargetType::RULE,
                       Code::TypeInferenceRuleArgumentTypeMismatch },
                 };
 
@@ -755,23 +755,6 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
     node.setType( node.expression()->type()->ptr_result() );
 
     assert( node.type()->isReference() );
-
-    if( node.type()->isRuleReference() )
-    {
-        node.setTargetType( CallExpression::TargetType::RULE );
-    }
-    else if( node.type()->isFunctionReference() )
-    {
-        node.setTargetType( CallExpression::TargetType::FUNCTION );
-    }
-    else
-    {
-        m_log.debug(
-            { node.expression()->sourceLocation() },
-            "unable to set indirect call expression target type for expression "
-            "kind of '" +
-                node.expression()->description() + "'" );
-    }
 
     const auto& refType = std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
     node.setType( refType->dereference() );
@@ -1744,7 +1727,7 @@ void TypeInferenceVisitor::assignment(
             if( lhs.id() == Node::ID::DIRECT_CALL_EXPRESSION )
             {
                 const auto& directCall = static_cast< DirectCallExpression& >( lhs );
-                if( directCall.targetType() == CallExpression::TargetType::FUNCTION )
+                if( directCall.targetType() == DirectCallExpression::TargetType::FUNCTION )
                 {
                     const auto functionDefinition = std::static_pointer_cast< FunctionDefinition >(
                         directCall.targetDefinition() );
@@ -2053,7 +2036,7 @@ void TypeResolveVisitor::visit( DirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    if( node.targetType() != CallExpression::TargetType::UNKNOWN )
+    if( node.targetType() != DirectCallExpression::TargetType::UNKNOWN )
     {
         return;
     }
@@ -2101,7 +2084,7 @@ void TypeResolveVisitor::visit( DirectCallExpression& node )
     {
         case Node::ID::ENUMERATOR_DEFINITION:
         {
-            node.setTargetType( CallExpression::TargetType::CONSTANT );
+            node.setTargetType( DirectCallExpression::TargetType::CONSTANT );
             break;
         }
         default:
