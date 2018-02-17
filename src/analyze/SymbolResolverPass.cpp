@@ -161,7 +161,7 @@ void SymbolResolveVisitor::visit( ReferenceLiteral& node )
         return;
     }
 
-    const auto symbol = m_symboltable.find( *node.identifier() );
+    const auto symbol = m_symboltable.findSymbol( *node.identifier() );
     if( symbol )
     {
         switch( symbol->id() )
@@ -244,7 +244,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    auto symbol = m_symboltable.find( *node.identifier() );
+    auto symbol = m_symboltable.findSymbol( *node.identifier() );
     if( symbol )
     {
         symbol = resolveIfAlias( symbol );
@@ -313,7 +313,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
     if( identifierPath == SELF )
     {
-        const auto agentSymbol = m_symboltable.find( AGENT );
+        const auto agentSymbol = m_symboltable.findSymbol( AGENT );
         if( not agentSymbol )
         {
             m_log.error( { node.sourceLocation() }, "unable to find 'Agent' symbol" );
@@ -466,7 +466,7 @@ Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& def
     }
 
     const auto usingDefinition = std::static_pointer_cast< UsingDefinition >( definition );
-    const auto symbol = m_symboltable.find( *usingDefinition->type()->name() );
+    const auto symbol = m_symboltable.findSymbol( *usingDefinition->type()->name() );
     return resolveIfAlias( symbol );  // resolve again, the symbol may be another alias
 }
 

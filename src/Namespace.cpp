@@ -74,7 +74,7 @@ void Namespace::registerNamespace( const std::string& name, const Namespace::Ptr
     }
 }
 
-Ast::Definition::Ptr Namespace::find( const std::string& name ) const
+Ast::Definition::Ptr Namespace::findSymbol( const std::string& name ) const
 {
     const auto it = m_symbols.find( name );
     if( it == m_symbols.end() )
@@ -83,30 +83,6 @@ Ast::Definition::Ptr Namespace::find( const std::string& name ) const
     }
 
     return it->second;
-}
-
-Ast::Definition::Ptr Namespace::find( const std::vector< std::string >& path ) const
-{
-    assert( path.size() > 0 );
-
-    auto* _namespace = this;
-    u64 pos = 0;
-
-    while( ( pos + 1 ) != path.size() )
-    {
-        const auto& name = path[ pos ];
-
-        const auto it = m_namespaces.find( name );
-        if( it == m_namespaces.end() )
-        {
-            return nullptr;
-        }
-
-        _namespace = it->second.get();
-        pos++;
-    }
-
-    return _namespace->find( path[ pos ] );
 }
 
 std::string Namespace::dump( const std::string& indention ) const
@@ -135,39 +111,33 @@ std::string Namespace::dump( const std::string& indention ) const
     return s.str();
 }
 
-Ast::Definition::Ptr Namespace::find( const IdentifierPath& node, const std::size_t index ) const
+Ast::Definition::Ptr Namespace::findSymbol( const IdentifierPath& path ) const
 {
-    const auto& path = *node.identifiers();
+    const auto& pathSegments = *path.identifiers();
 
-    assert( path.size() > 0 );
-    assert( path.size() > index );
-
-    if( ( index + 1 ) < path.size() )
+    auto* _namespace = this;
+    for( u64 i = 0; i < ( pathSegments.size() - 1 ); i++ )
     {
-        // search in sub-namespaces
+        const auto& name = pathSegments[ i ]->name();
 
-        const auto& name = path[ index ]->name();
-
-        const auto it = m_namespaces.find( name );
-        if( it == m_namespaces.end() )
+        const auto subNamespace = findNamespace( name );
+        if( not subNamespace )
         {
             return nullptr;
         }
-
-        return it->second->find( node, index + 1 );
+        _namespace = subNamespace.get();
     }
-    else
+
+    return _namespace->findSymbol( path.baseName() );
+}
+
+Namespace::Ptr Namespace::findNamespace( const std::string& name ) const
+{
+    const auto it = m_namespaces.find( name );
+    if( it == m_namespaces.end() )
     {
-        // search for identifier/symbol in this namespace
-
-        const auto& name = path[ index ]->name();
-
-        const auto it = m_symbols.find( name );
-        if( it == m_symbols.end() )
-        {
-            return nullptr;
-        }
-
-        return it->second;
+        return nullptr;
     }
+
+    return it->second;
 }

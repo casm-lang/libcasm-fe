@@ -67,22 +67,21 @@ namespace libcasm_fe
          *
          * @return The symbol or nullptr if absent.
          */
-        Ast::Definition::Ptr find(
-            const Ast::IdentifierPath& path, const std::size_t index = 0 ) const;
+        Ast::Definition::Ptr findSymbol( const Ast::IdentifierPath& path ) const;
 
         /**
          * Searches for a symbol named @p name in the current namespace.
          *
          * @return The symbol or nullptr if absent.
          */
-        Ast::Definition::Ptr find( const std::string& name ) const;
+        Ast::Definition::Ptr findSymbol( const std::string& name ) const;
 
         /**
-         * Searches for a symbol with path @p path.
+         * Searches for a sub-namespace named @p name in the current namespace.
          *
-         * @return The symbol or nullptr if absent.
+         * @return The sub-namespace or nullptr if absent.
          */
-        Ast::Definition::Ptr find( const std::vector< std::string >& path ) const;
+        Namespace::Ptr findNamespace( const std::string& name ) const;
 
         std::string dump( const std::string& indention = "" ) const;
 
