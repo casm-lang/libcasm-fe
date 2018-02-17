@@ -111,8 +111,37 @@ void TypeCheckVisitor::visit( BasicType& node )
     {
         assert( TypeInfo::instance().hasType( name ) );
         node.setType( TypeInfo::instance().getType( name ) );
+        return;
     }
-    else if( TypeInfo::instance().isTemplateType( name ) )
+
+    const auto symbol = m_symboltable.find( *node.name() );
+    if( symbol )
+    {
+        switch( symbol->id() )
+        {
+            case Node::ID::USING_DEFINITION:  // [[fallthrough]]
+            case Node::ID::ENUMERATION_DEFINITION:
+            {
+                break;
+            }
+            default:
+            {
+                m_log.error(
+                    { node.sourceLocation() },
+                    "cannot use " + symbol->description() + " '" + name + "' as type",
+                    Code::TypeAnnotationInvalidBasicTypeName );
+                return;
+            }
+        }
+
+        const auto& type = symbol->type();
+        assert( type );
+        node.setType( type );
+        return;
+    }
+
+    // error handling
+    if( TypeInfo::instance().isTemplateType( name ) )
     {
         m_log.error(
             { node.sourceLocation() },
@@ -130,38 +159,10 @@ void TypeCheckVisitor::visit( BasicType& node )
     }
     else
     {
-        try
-        {
-            const auto symbol = m_symboltable.find( *node.name() );
-
-            switch( symbol->id() )
-            {
-                case Node::ID::USING_DEFINITION:  // [[fallthrough]]
-                case Node::ID::ENUMERATION_DEFINITION:
-                {
-                    break;
-                }
-                default:
-                {
-                    m_log.error(
-                        { node.sourceLocation() },
-                        "cannot use " + symbol->description() + " '" + name + "' as type",
-                        Code::TypeAnnotationInvalidBasicTypeName );
-                    return;
-                }
-            }
-
-            const auto& type = symbol->type();
-            assert( type );
-            node.setType( type );
-        }
-        catch( const std::domain_error& e )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "unknown type '" + name + "' found",
-                Code::TypeAnnotationInvalidBasicTypeName );
-        }
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown type '" + name + "' found",
+            Code::TypeAnnotationInvalidBasicTypeName );
     }
 }
 
