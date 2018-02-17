@@ -96,13 +96,13 @@ Ast::Definition::Ptr Namespace::find( const std::vector< std::string >& path ) c
     {
         const auto& name = path[ pos ];
 
-        const auto it = m_namespaces.find( name );
-        if( it == m_namespaces.end() )
+        const auto subNamespace = findNamespace( name );
+        if( not subNamespace )
         {
             return nullptr;
         }
 
-        _namespace = it->second.get();
+        _namespace = subNamespace.get();
         pos++;
     }
 
@@ -147,14 +147,13 @@ Ast::Definition::Ptr Namespace::find( const IdentifierPath& node, const std::siz
         // search in sub-namespaces
 
         const auto& name = path[ index ]->name();
-
-        const auto it = m_namespaces.find( name );
-        if( it == m_namespaces.end() )
+        const auto subNamespace = findNamespace( name );
+        if( not subNamespace )
         {
             return nullptr;
         }
 
-        return it->second->find( node, index + 1 );
+        return subNamespace->find( node, index + 1 );
     }
     else
     {
@@ -162,4 +161,15 @@ Ast::Definition::Ptr Namespace::find( const IdentifierPath& node, const std::siz
         const auto& name = path[ index ]->name();
         return find( name );
     }
+}
+
+Namespace::Ptr Namespace::findNamespace( const std::string& name ) const
+{
+    const auto it = m_namespaces.find( name );
+    if( it == m_namespaces.end() )
+    {
+        return nullptr;
+    }
+
+    return it->second;
 }

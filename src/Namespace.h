@@ -84,6 +84,13 @@ namespace libcasm_fe
          */
         Ast::Definition::Ptr find( const std::vector< std::string >& path ) const;
 
+        /**
+         * Searches for a sub-namespace named @p name in the current namespace.
+         *
+         * @return The sub-namespace or nullptr if absent.
+         */
+        Namespace::Ptr findNamespace( const std::string& name ) const;
+
         std::string dump( const std::string& indention = "" ) const;
 
       private:
