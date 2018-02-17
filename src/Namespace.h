@@ -67,8 +67,7 @@ namespace libcasm_fe
          *
          * @return The symbol or nullptr if absent.
          */
-        Ast::Definition::Ptr findSymbol(
-            const Ast::IdentifierPath& path, const std::size_t index = 0 ) const;
+        Ast::Definition::Ptr findSymbol( const Ast::IdentifierPath& path ) const;
 
         /**
          * Searches for a symbol named @p name in the current namespace.

@@ -135,33 +135,30 @@ std::string Namespace::dump( const std::string& indention ) const
     return s.str();
 }
 
-Ast::Definition::Ptr Namespace::findSymbol(
-    const IdentifierPath& node, const std::size_t index ) const
+Ast::Definition::Ptr Namespace::findSymbol( const IdentifierPath& node ) const
 {
     const auto& path = *node.identifiers();
 
     assert( path.size() > 0 );
-    assert( path.size() > index );
 
-    if( ( index + 1 ) < path.size() )
+    auto* _namespace = this;
+    u64 pos = 0;
+
+    while( ( pos + 1 ) != path.size() )
     {
-        // search in sub-namespaces
+        const auto& name = path[ pos ]->name();
 
-        const auto& name = path[ index ]->name();
         const auto subNamespace = findNamespace( name );
         if( not subNamespace )
         {
             return nullptr;
         }
 
-        return subNamespace->findSymbol( node, index + 1 );
+        _namespace = subNamespace.get();
+        pos++;
     }
-    else
-    {
-        // search for identifier/symbol in this namespace
-        const auto& name = path[ index ]->name();
-        return findSymbol( name );
-    }
+
+    return _namespace->findSymbol( path[ pos ]->name() );
 }
 
 Namespace::Ptr Namespace::findNamespace( const std::string& name ) const
