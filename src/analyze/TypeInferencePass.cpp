@@ -194,8 +194,7 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
     node.defaultValue()->accept( *this );
 
-    if( node.defaultValue() and node.defaultValue()->type() and
-        node.defaultValue()->type() != node.returnType()->type() )
+    if( node.defaultValue()->type() and node.defaultValue()->type() != node.returnType()->type() )
     {
         if( node.defaultValue()->type()->isInteger() == node.returnType()->type()->isInteger() )
         {
