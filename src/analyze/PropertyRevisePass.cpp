@@ -81,6 +81,12 @@ class PropertyReviseVisitor final : public RecursiveVisitor
   private:
     void revise( Ast::Type& node );
 
+    void checkIfPropertiesHold(
+        const TypedPropertyNode& node,
+        const libcasm_ir::Properties& requiredProperties,
+        const std::string& errorDescription,
+        const Code errorCode ) const;
+
   private:
     libcasm_fe::Logger& m_log;
 };
@@ -89,6 +95,8 @@ class PropertyReviseVisitor final : public RecursiveVisitor
 //
 // PropertyReviseVisitor
 //
+
+using Property = libcasm_ir::Property;
 
 PropertyReviseVisitor::PropertyReviseVisitor( libcasm_fe::Logger& log )
 : m_log( log )
@@ -99,54 +107,47 @@ void PropertyReviseVisitor::visit( FunctionDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto defaultValueProperties =
-        libcasm_ir::Properties{ libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                libcasm_ir::Property::PURE };
-
-    defaultValueProperties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
-        if( not node.defaultValue()->properties().isSet( property ) )
-        {
-            m_log.error(
-                { node.defaultValue()->sourceLocation() },
-                "default value of " + node.description() + " '" + node.identifier()->name() +
-                    "' violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
-                Code::FunctionDefinitionDefaultValueInvalidProperty );
-        }
-        return true;
-    } );
+    checkIfPropertiesHold(
+        *node.defaultValue(),
+        { Property::SIDE_EFFECT_FREE, Property::PURE },
+        "default value of " + node.description() + " '" + node.identifier()->name() + "'",
+        Code::FunctionDefinitionDefaultValueInvalidProperty );
 }
 
 void PropertyReviseVisitor::visit( DerivedDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& expressionProperties = node.expression()->properties();
-
-    node.properties().foreach( [&]( const libcasm_ir::Property property ) -> u1 {
-        if( not expressionProperties.isSet( property ) )
-        {
-            m_log.error(
-                { node.expression()->sourceLocation() },
-                "expression of " + node.description() + " '" + node.identifier()->name() +
-                    "' violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
-                Code::DerivedDefinitionExpressionInvalidProperty );
-        }
-        return true;
-    } );
+    checkIfPropertiesHold(
+        *node.expression(),
+        node.properties(),
+        "expression of " + node.description() + " '" + node.identifier()->name() + "'",
+        Code::DerivedDefinitionExpressionInvalidProperty );
 }
 
 void PropertyReviseVisitor::visit( FixedSizedType& node )
 {
-    const auto sizeProperties = libcasm_ir::Properties{ libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                                        libcasm_ir::Property::PURE };
+    checkIfPropertiesHold(
+        *node.size(),
+        { Property::SIDE_EFFECT_FREE, Property::PURE },
+        "type",
+        Code::TypeInvalidProperty );
+}
 
-    sizeProperties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
-        if( not node.size()->properties().isSet( property ) )
+void PropertyReviseVisitor::checkIfPropertiesHold(
+    const TypedPropertyNode& node,
+    const libcasm_ir::Properties& requiredProperties,
+    const std::string& errorDescription,
+    const Code errorCode ) const
+{
+    requiredProperties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
+        if( not node.properties().isSet( property ) )
         {
             m_log.error(
-                { node.size()->sourceLocation() },
-                "type violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
-                Code::TypeInvalidProperty );
+                { node.sourceLocation() },
+                errorDescription + " violates '" + libcasm_ir::PropertyInfo::toString( property ) +
+                    "' property",
+                errorCode );
         }
         return true;
     } );
