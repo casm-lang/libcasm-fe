@@ -80,6 +80,7 @@ class PropertyReviseVisitor final : public RecursiveVisitor
     void visit( ForallRule& node ) override;
     void visit( ChooseRule& node ) override;
     void visit( UpdateRule& node ) override;
+    void visit( CallRule& node ) override;
 
     void visit( FixedSizedType& node ) override;
 
@@ -187,6 +188,20 @@ void PropertyReviseVisitor::visit( UpdateRule& node )
         { Property::SIDE_EFFECT_FREE },
         "update expression",
         Code::UpdateRuleUpdateExpressionInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( CallRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    for( const auto& argument : *node.call()->arguments() )
+    {
+        checkIfPropertiesHold(
+            *argument,
+            { Property::SIDE_EFFECT_FREE },
+            "argument",
+            Code::CallRuleArgumentInvalidProperty );
+    }
 }
 
 void PropertyReviseVisitor::visit( FixedSizedType& node )
