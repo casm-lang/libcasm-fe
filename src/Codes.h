@@ -153,7 +153,9 @@ namespace libcasm_fe
         BuiltinArgumentValueInvalid = 0x5f00
 
         ,
-        ConditionalRuleConditionInvalidProperty = 0x5f01
+        ConditionalRuleConditionInvalidProperty = 0x5f01,
+        ForallRuleUniverseInvalidProperty = 0x5f02,
+        ForallRuleConditionInvalidProperty = 0x5f03
 
         // --------------------------------------------------------- a*** ...
         // enumeration errors
