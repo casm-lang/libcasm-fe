@@ -1792,6 +1792,9 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
+    auto constantHandler = std::make_unique< ConstantHandler >();
+    IR::ConstantHandlerManager::instance().registerConstantHandler( std::move( constantHandler ) );
+
     ExecutionLocationRegistry locationRegistry;
     Storage globalState;
 
