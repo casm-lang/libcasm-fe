@@ -150,11 +150,15 @@ namespace libcasm_fe
         LetAssignedValueInvalid = 0x5d00
 
         ,
-        BuiltinArgumentValueInvalid = 0x5f00,
+        BuiltinArgumentValueInvalid = 0x5f00
+
+        ,
+        ConditionalRuleConditionInvalidProperty = 0x5f01
 
         // --------------------------------------------------------- a*** ...
         // enumeration errors
 
+        ,
         EnumerationDefinitionAlreadyUsed = 0xe000,
         EnumerationDefinitionIdentifierIsBuiltinName = 0xe100,
         EnumerationDefinitionIdentifierIsTypeName = 0xe200,

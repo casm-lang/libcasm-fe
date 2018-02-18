@@ -76,6 +76,8 @@ class PropertyReviseVisitor final : public RecursiveVisitor
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
 
+    void visit( ConditionalRule& node ) override;
+
     void visit( FixedSizedType& node ) override;
 
   private:
@@ -123,6 +125,17 @@ void PropertyReviseVisitor::visit( DerivedDefinition& node )
         node.properties(),
         "expression of " + node.description() + " '" + node.identifier()->name() + "'",
         Code::DerivedDefinitionExpressionInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( ConditionalRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.condition(),
+        { Property::SIDE_EFFECT_FREE },
+        "condition",
+        Code::ConditionalRuleConditionInvalidProperty );
 }
 
 void PropertyReviseVisitor::visit( FixedSizedType& node )
