@@ -73,6 +73,7 @@ class PropertyReviseVisitor final : public RecursiveVisitor
   public:
     PropertyReviseVisitor( libcasm_fe::Logger& log );
 
+    void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
 
     void visit( FixedSizedType& node ) override;
@@ -92,6 +93,27 @@ class PropertyReviseVisitor final : public RecursiveVisitor
 PropertyReviseVisitor::PropertyReviseVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 {
+}
+
+void PropertyReviseVisitor::visit( FunctionDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto defaultValueProperties =
+        libcasm_ir::Properties{ libcasm_ir::Property::SIDE_EFFECT_FREE,
+                                libcasm_ir::Property::PURE };
+
+    defaultValueProperties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
+        if( not node.defaultValue()->properties().isSet( property ) )
+        {
+            m_log.error(
+                { node.defaultValue()->sourceLocation() },
+                "default value of " + node.description() + " '" + node.identifier()->name() +
+                    "' violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
+                Code::FunctionDefinitionDefaultValueInvalidProperty );
+        }
+        return true;
+    } );
 }
 
 void PropertyReviseVisitor::visit( DerivedDefinition& node )
