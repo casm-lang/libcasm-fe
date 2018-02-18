@@ -85,6 +85,8 @@ class PropertyReviseVisitor final : public RecursiveVisitor
 
     void visit( FixedSizedType& node ) override;
 
+    void visit( ExpressionCase& node ) override;
+
   private:
     void checkIfPropertiesHold(
         const TypedPropertyNode& node,
@@ -148,7 +150,7 @@ void PropertyReviseVisitor::visit( CaseRule& node )
     checkIfPropertiesHold(
         *node.expression(),
         { Property::SIDE_EFFECT_FREE },
-        "case expression",
+        "expression",
         Code::CaseRuleExpressionInvalidProperty );
 }
 
@@ -221,6 +223,17 @@ void PropertyReviseVisitor::visit( FixedSizedType& node )
         { Property::SIDE_EFFECT_FREE, Property::PURE },
         "type",
         Code::TypeInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( ExpressionCase& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.expression(),
+        { Property::SIDE_EFFECT_FREE },
+        "case expression",
+        Code::ExpressionCaseInvalidProperty );
 }
 
 void PropertyReviseVisitor::checkIfPropertiesHold(

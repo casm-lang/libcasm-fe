@@ -160,7 +160,8 @@ namespace libcasm_fe
         UpdateRuleFunctionArgumentInvalidProperty = 0x5f05,
         UpdateRuleUpdateExpressionInvalidProperty = 0x5f06,
         CallRuleArgumentInvalidProperty = 0x5f07,
-        CaseRuleExpressionInvalidProperty = 0x5f08
+        CaseRuleExpressionInvalidProperty = 0x5f08,
+        ExpressionCaseInvalidProperty = 0x5f09
 
         // --------------------------------------------------------- a*** ...
         // enumeration errors
