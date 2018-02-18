@@ -80,7 +80,6 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
-    void visit( DerivedDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -106,14 +105,12 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
   private:
     libcasm_fe::Logger& m_log;
     u1 m_functionInitially;
-    u1 m_sideEffectFree;
     u1 m_initDefinitionFound;
 };
 
 ConsistencyCheckVisitor::ConsistencyCheckVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 , m_functionInitially( false )
-, m_sideEffectFree( false )
 , m_initDefinitionFound( false )
 {
 }
@@ -154,15 +151,6 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     {
         m_initDefinitionFound = true;
     }
-}
-
-void ConsistencyCheckVisitor::visit( DerivedDefinition& node )
-{
-    m_sideEffectFree = true;
-
-    RecursiveVisitor::visit( node );
-
-    m_sideEffectFree = false;
 }
 
 void ConsistencyCheckVisitor::visit( UndefLiteral& node )
@@ -251,18 +239,6 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
                 "function '" + node.identifier()->path() + "' is classified as '" +
                     function->classificationName() + "', incorrect usage in line " +
                     std::to_string( node.sourceLocation().begin.line ) );
-        }
-    }
-
-    if( node.targetType() == DirectCallExpression::TargetType::RULE )
-    {
-        if( m_sideEffectFree )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "calling rule '" + node.identifier()->path() +
-                    "' is not allowed inside a derived definition",
-                Code::NotSideEffectFreeRuleCall );
         }
     }
 }
