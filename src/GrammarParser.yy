@@ -296,6 +296,7 @@ END       0 "end of file"
 %left PERCENT SLASH ASTERIX
 %left CARET
 
+%precedence DOT
 %precedence UPLUS UMINUS
 %precedence NOT
 
@@ -834,6 +835,14 @@ SimpleOrClaspedTerm
   {
       $$ = $1;
   }
+| PLUS SimpleOrClaspedTerm %prec UPLUS
+  {
+      $$ = $2;
+  }
+| MINUS SimpleOrClaspedTerm %prec UMINUS
+  {
+      $$ = Ast::make< UnaryExpression >( @$, $2, libcasm_ir::Value::INV_INSTRUCTION );
+  }
 ;
 
 
@@ -842,15 +851,7 @@ SimpleOrClaspedTerm
 //
 
 OperatorExpression
-: PLUS Term %prec UPLUS
-  {
-      $$ = $2;
-  }
-| MINUS Term %prec UMINUS
-  {
-      $$ = Ast::make< UnaryExpression >( @$, $2, libcasm_ir::Value::INV_INSTRUCTION );
-  }
-| Term PLUS Term
+: Term PLUS Term
   {
       $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
   }
