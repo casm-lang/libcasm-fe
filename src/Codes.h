@@ -129,8 +129,6 @@ namespace libcasm_fe
         RuleDefinitionIdentifierIsBuiltinName = 0x5001,
         RuleDefinitionIdentifierIsTypeName = 0x5002,
 
-        NotSideEffectFreeRuleCall = 0x5100,
-
         RuleArgumentValueInvalid = 0x5e00  // 5e** ... rule argument
         ,
         RuleArgumentsSizeInvalidAtCall = 0x5e01,
