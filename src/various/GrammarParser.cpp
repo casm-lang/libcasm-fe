@@ -1660,14 +1660,14 @@ namespace libcasm_fe {
       auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( yylhs.location );
       const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
           yylhs.location, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
-      singleAgent->setTargetType( CallExpression::TargetType::CONSTANT );
+      singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
 
       auto programDefinition = createProgramFunction( yylhs.location );
       auto programArguments = libcasm_fe::Ast::make< Expressions >( yylhs.location );
       programArguments->add( singleAgent );
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
           yylhs.location, asIdentifierPath( programDefinition->identifier() ), programArguments );
-      program->setTargetType( CallExpression::TargetType::FUNCTION );
+      program->setTargetType( DirectCallExpression::TargetType::FUNCTION );
 
       const auto ruleReference = Ast::make< ReferenceLiteral >( yylhs.location, yystack_[0].value.as< IdentifierPath::Ptr > () );
 
@@ -2056,7 +2056,7 @@ namespace libcasm_fe {
 #line 824 "../../obj/src/GrammarParser.yy" // lalr1.cc:859
     {
       const auto function = yystack_[2].value.as< DirectCallExpression::Ptr > ();
-      function->setTargetType( CallExpression::TargetType::FUNCTION );
+      function->setTargetType( DirectCallExpression::TargetType::FUNCTION );
       yylhs.value.as< UpdateRule::Ptr > () = Ast::make< UpdateRule >( yylhs.location, function, yystack_[0].value.as< Expression::Ptr > () );
   }
 #line 2063 "GrammarParser.cpp" // lalr1.cc:859
@@ -3083,7 +3083,7 @@ namespace libcasm_fe {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       const auto function = Ast::make< DirectCallExpression >( yylhs.location, nullptr, arguments );
-      function->setTargetType( CallExpression::TargetType::FUNCTION );
+      function->setTargetType( DirectCallExpression::TargetType::FUNCTION );
       yylhs.value.as< UpdateRule::Ptr > () = Ast::make< UpdateRule >( yylhs.location, function, yystack_[0].value.as< Expression::Ptr > () );
   }
 #line 3090 "GrammarParser.cpp" // lalr1.cc:859
@@ -3097,7 +3097,7 @@ namespace libcasm_fe {
 
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( yylhs.location, nullptr, arguments );
-      function->setTargetType( CallExpression::TargetType::FUNCTION );
+      function->setTargetType( DirectCallExpression::TargetType::FUNCTION );
       yylhs.value.as< UpdateRule::Ptr > () = Ast::make< UpdateRule >( yylhs.location, function, yystack_[0].value.as< Expression::Ptr > () );
   }
 #line 3104 "GrammarParser.cpp" // lalr1.cc:859
@@ -3108,7 +3108,7 @@ namespace libcasm_fe {
     {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( yylhs.location, nullptr, yystack_[2].value.as< TupleLiteral::Ptr > ()->expressions() );
-      function->setTargetType( CallExpression::TargetType::FUNCTION );
+      function->setTargetType( DirectCallExpression::TargetType::FUNCTION );
       yylhs.value.as< UpdateRule::Ptr > () = Ast::make< UpdateRule >( yylhs.location, function, yystack_[0].value.as< Expression::Ptr > () );
   }
 #line 3115 "GrammarParser.cpp" // lalr1.cc:859

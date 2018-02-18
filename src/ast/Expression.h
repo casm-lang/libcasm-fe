@@ -91,6 +91,19 @@ namespace libcasm_fe
         class CallExpression : public Expression
         {
           public:
+            using Ptr = std::shared_ptr< CallExpression >;
+
+            CallExpression( Node::ID id, const Expressions::Ptr& arguments );
+
+            const Expressions::Ptr& arguments( void ) const;
+
+          private:
+            const Expressions::Ptr m_arguments;
+        };
+
+        class DirectCallExpression : public CallExpression
+        {
+          public:
             enum class TargetType
             {
                 FUNCTION,
@@ -104,11 +117,13 @@ namespace libcasm_fe
                 UNKNOWN
             };
 
-            using Ptr = std::shared_ptr< CallExpression >;
+            using Ptr = std::shared_ptr< DirectCallExpression >;
 
-            CallExpression( Node::ID id, const Expressions::Ptr& arguments );
+            DirectCallExpression(
+                const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments );
 
-            const Expressions::Ptr& arguments( void ) const;
+            void setIdentifier( const IdentifierPath::Ptr& identifier );
+            const IdentifierPath::Ptr& identifier( void ) const;
 
             void setTargetType( TargetType targetType );
             TargetType targetType( void ) const;
@@ -124,39 +139,22 @@ namespace libcasm_fe
             libcasm_ir::Value::ID targetBuiltinId( void ) const;
 
             /**
-               Sets the definition of this call.
-
-               @note Assigned by SymbolResolved and used during execution
+             * Sets the definition of this call.
+             *
+             * @note Assigned by SymbolResolved and used during execution
              */
             void setTargetDefinition( const std::shared_ptr< Definition >& definition );
             const std::shared_ptr< Definition >& targetDefinition( void ) const;
 
-          private:
-            const Expressions::Ptr m_arguments;
-            TargetType m_targetType;
-            libcasm_ir::Value::ID m_targetBuiltinId;
-            std::shared_ptr< Definition > m_targetDefinition;
-
-          public:
-            static std::string targetTypeString( const TargetType targetType );
-        };
-
-        class DirectCallExpression : public CallExpression
-        {
-          public:
-            using Ptr = std::shared_ptr< DirectCallExpression >;
-
-            DirectCallExpression(
-                const IdentifierPath::Ptr& identifier, const Expressions::Ptr& arguments );
-
-          public:
-            void setIdentifier( const IdentifierPath::Ptr& identifier );
-            const IdentifierPath::Ptr& identifier( void ) const;
-
             void accept( Visitor& visitor ) override;
+
+            static std::string targetTypeString( const TargetType targetType );
 
           private:
             IdentifierPath::Ptr m_identifier;
+            TargetType m_targetType;
+            libcasm_ir::Value::ID m_targetBuiltinId;
+            std::shared_ptr< Definition > m_targetDefinition;
         };
 
         class MethodCallExpression final : public CallExpression
@@ -239,6 +237,9 @@ namespace libcasm_fe
                 const Expression::Ptr& expression, const Expressions::Ptr& arguments );
 
             const Expression::Ptr& expression( void ) const;
+
+            bool isRuleCall( void ) const;
+            bool isFunctionCall( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -446,18 +447,6 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
     }
-}
-
-namespace std
-{
-    template <>
-    struct hash< libcasm_fe::Ast::CallExpression::TargetType >
-    {
-        inline size_t operator()( const libcasm_fe::Ast::CallExpression::TargetType value ) const
-        {
-            return static_cast< size_t >( value );
-        }
-    };
 }
 
 #endif  // _LIBCASM_FE_EXPRESSION_H_

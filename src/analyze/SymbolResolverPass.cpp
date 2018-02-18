@@ -231,7 +231,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     const auto variableIt = m_variables.find( identifierBaseName );
     if( variableIt != m_variables.cend() and identifierPath == identifierBaseName )
     {
-        node.setTargetType( CallExpression::TargetType::VARIABLE );
+        node.setTargetType( DirectCallExpression::TargetType::VARIABLE );
         node.setTargetDefinition( variableIt->second );
         validateArgumentsCount( "variable", 0 );
         return;
@@ -241,7 +241,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     {
         const auto& annotation = libcasm_ir::Annotation::find( identifierBaseName );
 
-        node.setTargetType( CallExpression::TargetType::BUILTIN );
+        node.setTargetType( DirectCallExpression::TargetType::BUILTIN );
         node.setTargetBuiltinId( annotation.valueID() );
         validateArgumentsCount( "builtin", annotation.relations().front().argument.size() );
         return;
@@ -258,33 +258,33 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         {
             case Node::ID::FUNCTION_DEFINITION:
             {
-                node.setTargetType( CallExpression::TargetType::FUNCTION );
+                node.setTargetType( DirectCallExpression::TargetType::FUNCTION );
                 const auto function = std::static_pointer_cast< FunctionDefinition >( symbol );
                 expectedNumberOfArguments = function->argumentTypes()->size();
                 break;
             }
             case Node::ID::DERIVED_DEFINITION:
             {
-                node.setTargetType( CallExpression::TargetType::DERIVED );
+                node.setTargetType( DirectCallExpression::TargetType::DERIVED );
                 const auto derived = std::static_pointer_cast< DerivedDefinition >( symbol );
                 expectedNumberOfArguments = derived->arguments()->size();
                 break;
             }
             case Node::ID::RULE_DEFINITION:
             {
-                node.setTargetType( CallExpression::TargetType::RULE );
+                node.setTargetType( DirectCallExpression::TargetType::RULE );
                 const auto rule = std::static_pointer_cast< RuleDefinition >( symbol );
                 expectedNumberOfArguments = rule->arguments()->size();
                 break;
             }
             case Node::ID::ENUMERATOR_DEFINITION:
             {
-                node.setTargetType( CallExpression::TargetType::CONSTANT );
+                node.setTargetType( DirectCallExpression::TargetType::CONSTANT );
                 break;
             }
             case Node::ID::ENUMERATION_DEFINITION:
             {
-                node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
+                node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
                 break;
             }
             default:
@@ -314,7 +314,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
             return;
         }
 
-        node.setTargetType( CallExpression::TargetType::SELF );
+        node.setTargetType( DirectCallExpression::TargetType::SELF );
         node.setTargetDefinition( agentSymbol );
         validateArgumentsCount( "", 0 );
     }
@@ -322,7 +322,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     // Enumeration!
     else if( identifierPath == SINGLE_AGENT_CONSTANT )
     {
-        assert( node.targetType() == CallExpression::TargetType::CONSTANT );
+        assert( node.targetType() == DirectCallExpression::TargetType::CONSTANT );
 
         const auto agent = std::make_shared< EnumeratorDefinition >(
             std::make_shared< Identifier >( SINGLE_AGENT_CONSTANT ) );
@@ -346,7 +346,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     }
     else if( TypeInfo::instance().hasType( identifierPath ) )
     {
-        node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
+        node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
         validateArgumentsCount( "type", 0 );
     }
     else
@@ -354,11 +354,11 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         m_log.error(
             { node.sourceLocation() },
             "unknown " +
-                ( node.targetType() != CallExpression::TargetType::UNKNOWN
+                ( node.targetType() != DirectCallExpression::TargetType::UNKNOWN
                       ? node.targetTypeName() + " "
                       : "" ) +
                 "symbol '" + identifierPath + "' found",
-            ( node.targetType() == CallExpression::TargetType::FUNCTION )
+            ( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
                 ? Code::FunctionSymbolIsUnknown
                 : Code::SymbolIsUnknown );
     }

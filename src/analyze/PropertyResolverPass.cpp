@@ -168,36 +168,36 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
     libcasm_ir::Properties callProperties;
     switch( node.targetType() )
     {
-        case CallExpression::TargetType::BUILTIN:
+        case DirectCallExpression::TargetType::BUILTIN:
         {
             const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
             callProperties = annotation.properties();
             break;
         }
-        case CallExpression::TargetType::VARIABLE:  // [[fallthrough]]
-        case CallExpression::TargetType::FUNCTION:  // [[fallthrough]]
-        case CallExpression::TargetType::DERIVED:   // [[fallthrough]]
-        case CallExpression::TargetType::RULE:      // [[fallthrough]]
-        case CallExpression::TargetType::CONSTANT:
+        case DirectCallExpression::TargetType::VARIABLE:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::FUNCTION:  // [[fallthrough]]
+        case DirectCallExpression::TargetType::DERIVED:   // [[fallthrough]]
+        case DirectCallExpression::TargetType::RULE:      // [[fallthrough]]
+        case DirectCallExpression::TargetType::CONSTANT:
         {
             const auto& definition = node.targetDefinition();
             assert( definition.get() != nullptr );
             callProperties = definition->properties();
             break;
         }
-        case CallExpression::TargetType::TYPE_DOMAIN:
+        case DirectCallExpression::TargetType::TYPE_DOMAIN:
         {
             callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
             callProperties.set( libcasm_ir::Property::PURE );
             break;
         }
-        case CallExpression::TargetType::SELF:
+        case DirectCallExpression::TargetType::SELF:
         {
             callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
             callProperties.set( libcasm_ir::Property::PURE );
             break;
         }
-        case CallExpression::TargetType::UNKNOWN:
+        case DirectCallExpression::TargetType::UNKNOWN:
         {
             assert( !" direct call cannot have UNKNOWN target type at this pass! " );
             break;
@@ -256,32 +256,9 @@ void PropertyResolverVisitor::visit( IndirectCallExpression& node )
     RecursiveVisitor::visit( node );
 
     libcasm_ir::Properties callProperties;
-    switch( node.targetType() )
+    if( node.isFunctionCall() )
     {
-        case CallExpression::TargetType::DERIVED:  // [[fallthrough]]
-        case CallExpression::TargetType::BUILTIN:  // [[fallthrough]]
-        case CallExpression::TargetType::FUNCTION:
-        {
-            callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
-            break;
-        }
-        case CallExpression::TargetType::RULE:
-        {
-            break;
-        }
-        case CallExpression::TargetType::VARIABLE:     // [[fallthrough]]
-        case CallExpression::TargetType::SELF:         // [[fallthrough]]
-        case CallExpression::TargetType::TYPE_DOMAIN:  // [[fallthrough]]
-        case CallExpression::TargetType::CONSTANT:
-        {
-            assert( !" indirect call has invalid target type at this pass! " );
-            break;
-        }
-        case CallExpression::TargetType::UNKNOWN:
-        {
-            assert( !" indirect call cannot have UNKNOWN target type at this pass! " );
-            break;
-        }
+        callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
     }
 
     if( node.arguments()->size() > 0 )
