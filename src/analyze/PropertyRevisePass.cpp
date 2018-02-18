@@ -73,12 +73,26 @@ class PropertyReviseVisitor final : public RecursiveVisitor
   public:
     PropertyReviseVisitor( libcasm_fe::Logger& log );
 
+    void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
+
+    void visit( ConditionalRule& node ) override;
+    void visit( CaseRule& node ) override;
+    void visit( ForallRule& node ) override;
+    void visit( ChooseRule& node ) override;
+    void visit( UpdateRule& node ) override;
+    void visit( CallRule& node ) override;
 
     void visit( FixedSizedType& node ) override;
 
+    void visit( ExpressionCase& node ) override;
+
   private:
-    void revise( Ast::Type& node );
+    void checkIfPropertiesHold(
+        const TypedPropertyNode& node,
+        const libcasm_ir::Properties& requiredProperties,
+        const std::string& errorDescription,
+        const Code errorCode ) const;
 
   private:
     libcasm_fe::Logger& m_log;
@@ -89,42 +103,153 @@ class PropertyReviseVisitor final : public RecursiveVisitor
 // PropertyReviseVisitor
 //
 
+using Property = libcasm_ir::Property;
+
 PropertyReviseVisitor::PropertyReviseVisitor( libcasm_fe::Logger& log )
 : m_log( log )
 {
+}
+
+void PropertyReviseVisitor::visit( FunctionDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.defaultValue(),
+        { Property::SIDE_EFFECT_FREE, Property::PURE },
+        "default value of " + node.description() + " '" + node.identifier()->name() + "'",
+        Code::FunctionDefinitionDefaultValueInvalidProperty );
 }
 
 void PropertyReviseVisitor::visit( DerivedDefinition& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& expressionProperties = node.expression()->properties();
+    checkIfPropertiesHold(
+        *node.expression(),
+        node.properties(),
+        "expression of " + node.description() + " '" + node.identifier()->name() + "'",
+        Code::DerivedDefinitionExpressionInvalidProperty );
+}
 
-    node.properties().foreach( [&]( const libcasm_ir::Property property ) -> u1 {
-        if( not expressionProperties.isSet( property ) )
-        {
-            m_log.error(
-                { node.expression()->sourceLocation() },
-                "expression of " + node.description() + " '" + node.identifier()->name() +
-                    "' violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
-                Code::DerivedDefinitionExpressionInvalidProperty );
-        }
-        return true;
-    } );
+void PropertyReviseVisitor::visit( ConditionalRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.condition(),
+        { Property::SIDE_EFFECT_FREE },
+        "condition",
+        Code::ConditionalRuleConditionInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( CaseRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.expression(),
+        { Property::SIDE_EFFECT_FREE },
+        "expression",
+        Code::CaseRuleExpressionInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( ForallRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.universe(),
+        { Property::SIDE_EFFECT_FREE },
+        "universe",
+        Code::ForallRuleUniverseInvalidProperty );
+
+    checkIfPropertiesHold(
+        *node.condition(),
+        { Property::SIDE_EFFECT_FREE },
+        "condition",
+        Code::ForallRuleConditionInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( ChooseRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.universe(),
+        { Property::SIDE_EFFECT_FREE },
+        "universe",
+        Code::ChooseRuleConditionInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( UpdateRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    for( const auto& argument : *node.function()->arguments() )
+    {
+        checkIfPropertiesHold(
+            *argument,
+            { Property::SIDE_EFFECT_FREE },
+            "function argument",
+            Code::UpdateRuleFunctionArgumentInvalidProperty );
+    }
+
+    checkIfPropertiesHold(
+        *node.expression(),
+        { Property::SIDE_EFFECT_FREE },
+        "update expression",
+        Code::UpdateRuleUpdateExpressionInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( CallRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    for( const auto& argument : *node.call()->arguments() )
+    {
+        checkIfPropertiesHold(
+            *argument,
+            { Property::SIDE_EFFECT_FREE },
+            "argument",
+            Code::CallRuleArgumentInvalidProperty );
+    }
 }
 
 void PropertyReviseVisitor::visit( FixedSizedType& node )
 {
-    const auto sizeProperties = libcasm_ir::Properties{ libcasm_ir::Property::SIDE_EFFECT_FREE,
-                                                        libcasm_ir::Property::PURE };
+    checkIfPropertiesHold(
+        *node.size(),
+        { Property::SIDE_EFFECT_FREE, Property::PURE },
+        "type",
+        Code::TypeInvalidProperty );
+}
 
-    sizeProperties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
-        if( not node.size()->properties().isSet( property ) )
+void PropertyReviseVisitor::visit( ExpressionCase& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.expression(),
+        { Property::SIDE_EFFECT_FREE },
+        "case expression",
+        Code::ExpressionCaseInvalidProperty );
+}
+
+void PropertyReviseVisitor::checkIfPropertiesHold(
+    const TypedPropertyNode& node,
+    const libcasm_ir::Properties& requiredProperties,
+    const std::string& errorDescription,
+    const Code errorCode ) const
+{
+    requiredProperties.foreach( [&]( const libcasm_ir::Property property ) -> u1 {
+        if( not node.properties().isSet( property ) )
         {
             m_log.error(
-                { node.size()->sourceLocation() },
-                "type violates '" + libcasm_ir::PropertyInfo::toString( property ) + "' property",
-                Code::TypeInvalidProperty );
+                { node.sourceLocation() },
+                errorDescription + " violates '" + libcasm_ir::PropertyInfo::toString( property ) +
+                    "' property",
+                errorCode );
         }
         return true;
     } );

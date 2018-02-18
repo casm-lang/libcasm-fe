@@ -107,6 +107,8 @@ namespace libcasm_fe
         FunctionDefinitionIdentifierIsBuiltinName = 0xf100,  // f1** ... function identifer
         FunctionDefinitionIdentifierIsTypeName = 0xf200,
 
+        FunctionDefinitionDefaultValueInvalidProperty = 0xf301,
+
         // --------------------------------------------------------- d*** ...
         // derived errors
         DerivedDefinitionAlreadyUsed = 0xd000,
@@ -148,11 +150,23 @@ namespace libcasm_fe
         LetAssignedValueInvalid = 0x5d00
 
         ,
-        BuiltinArgumentValueInvalid = 0x5f00,
+        BuiltinArgumentValueInvalid = 0x5f00
+
+        ,
+        ConditionalRuleConditionInvalidProperty = 0x5f01,
+        ForallRuleUniverseInvalidProperty = 0x5f02,
+        ForallRuleConditionInvalidProperty = 0x5f03,
+        ChooseRuleConditionInvalidProperty = 0x5f04,
+        UpdateRuleFunctionArgumentInvalidProperty = 0x5f05,
+        UpdateRuleUpdateExpressionInvalidProperty = 0x5f06,
+        CallRuleArgumentInvalidProperty = 0x5f07,
+        CaseRuleExpressionInvalidProperty = 0x5f08,
+        ExpressionCaseInvalidProperty = 0x5f09
 
         // --------------------------------------------------------- a*** ...
         // enumeration errors
 
+        ,
         EnumerationDefinitionAlreadyUsed = 0xe000,
         EnumerationDefinitionIdentifierIsBuiltinName = 0xe100,
         EnumerationDefinitionIdentifierIsTypeName = 0xe200,
