@@ -86,8 +86,6 @@ class PropertyReviseVisitor final : public RecursiveVisitor
     void visit( FixedSizedType& node ) override;
 
   private:
-    void revise( Ast::Type& node );
-
     void checkIfPropertiesHold(
         const TypedPropertyNode& node,
         const libcasm_ir::Properties& requiredProperties,
