@@ -194,8 +194,7 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
     node.defaultValue()->accept( *this );
 
-    if( node.defaultValue() and node.defaultValue()->type() and
-        node.defaultValue()->type() != node.returnType()->type() )
+    if( node.defaultValue()->type() and node.defaultValue()->type() != node.returnType()->type() )
     {
         if( node.defaultValue()->type()->isInteger() == node.returnType()->type()->isInteger() )
         {
@@ -1620,15 +1619,6 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
     }
 
     node.expression()->accept( *this );
-
-    if( func.targetType() == CallExpression::TargetType::BUILTIN )
-    {
-        m_log.error(
-            { func.sourceLocation() },
-            "performing update rule on built-in '" + func.identifier()->path() + "' is not allowed",
-            Code::TypeInferenceUpdateRuleFunctionIsBuiltin );
-        return;
-    }
 
     assignment(
         node,
