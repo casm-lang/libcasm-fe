@@ -139,9 +139,21 @@ namespace libcasm_fe
             libcasm_ir::Value::ID targetBuiltinId( void ) const;
 
             /**
-             * Sets the definition of this call.
+             * Sets the builtin type of this call.
              *
-             * @note Assigned by SymbolResolved and used during execution
+             * This is required in addition to the builtin id, because builtins
+             * allow overloading and thus a simple id to relation type mapping
+             * is not possible.
+             *
+             * @note Assigned by TypeInference and used during execution
+             */
+            void setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType );
+            const libcasm_ir::RelationType::Ptr& targetBuiltinType( void ) const;
+
+            /**
+               Sets the definition of this call.
+
+               @note Assigned by SymbolResolved and used during execution
              */
             void setTargetDefinition( const std::shared_ptr< Definition >& definition );
             const std::shared_ptr< Definition >& targetDefinition( void ) const;
@@ -154,6 +166,7 @@ namespace libcasm_fe
             IdentifierPath::Ptr m_identifier;
             TargetType m_targetType;
             libcasm_ir::Value::ID m_targetBuiltinId;
+            libcasm_ir::RelationType::Ptr m_targetBuiltinType;
             std::shared_ptr< Definition > m_targetDefinition;
         };
 
@@ -193,6 +206,18 @@ namespace libcasm_fe
             libcasm_ir::Value::ID targetBuiltinId( void ) const;
 
             /**
+             * Sets the builtin type of this call.
+             *
+             * This is required in addition to the builtin id, because builtins
+             * allow overloading and thus a simple id to relation type mapping
+             * is not possible.
+             *
+             * @note Assigned by TypeInference and used during execution
+             */
+            void setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType );
+            const libcasm_ir::RelationType::Ptr& targetBuiltinType( void ) const;
+
+            /**
              *     Sets the definition of this call.
              *
              *     @note Assigned by SymbolResolved and used during execution
@@ -207,6 +232,7 @@ namespace libcasm_fe
             Identifier::Ptr m_methodName;
             MethodType m_methodType;
             libcasm_ir::Value::ID m_targetBuiltinId;
+            libcasm_ir::RelationType::Ptr m_targetBuiltinType;
             std::shared_ptr< Definition > m_targetDefinition;
         };
 
@@ -278,6 +304,18 @@ namespace libcasm_fe
             libcasm_ir::Value::ID targetBuiltinId( void ) const;
 
             /**
+             * Sets the builtin type of this call.
+             *
+             * This is required in addition to the builtin id, because builtins
+             * allow overloading and thus a simple id to relation type mapping
+             * is not possible.
+             *
+             * @note Assigned by TypeInference and used during execution
+             */
+            void setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType );
+            const libcasm_ir::RelationType::Ptr& targetBuiltinType( void ) const;
+
+            /**
              *     Sets the definition of this call.
              *
              *     @note Assigned by SymbolResolved and used during execution
@@ -292,6 +330,7 @@ namespace libcasm_fe
             const std::shared_ptr< Type > m_asType;
             CastingType m_castingType;
             libcasm_ir::Value::ID m_targetBuiltinId;
+            libcasm_ir::RelationType::Ptr m_targetBuiltinType;
             std::shared_ptr< Definition > m_targetDefinition;
         };
 
