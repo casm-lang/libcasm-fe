@@ -64,7 +64,7 @@ ReferenceConstant::ReferenceConstant( void )
 {
 }
 
-std::string ReferenceConstant::name( void ) const
+std::string ReferenceConstant::toString( void ) const
 {
     if( defined() )
     {
@@ -122,7 +122,7 @@ u1 ConstantHandler::name( const libcasm_ir::Constant& constant, std::string& res
     if( libcasm_ir::isa< ReferenceConstant >( constant ) )
     {
         const auto referenceConstant = static_cast< const ReferenceConstant& >( constant );
-        result = referenceConstant.name();
+        result = referenceConstant.toString();
         return true;
     }
     else

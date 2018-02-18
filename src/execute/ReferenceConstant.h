@@ -57,11 +57,11 @@ namespace libcasm_fe
 
         explicit ReferenceConstant( void );
 
-        std::string name( void ) const override;
+        std::string toString( void ) const;
 
-        std::size_t hash( void ) const override;
+        std::size_t hash( void ) const;
 
-        u1 operator==( const Value& rhs ) const override;
+        u1 operator==( const Value& rhs ) const;
 
         static inline Value::ID classid( void )
         {
