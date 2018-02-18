@@ -1484,19 +1484,6 @@ void TypeInferenceVisitor::visit( ForallRule& node )
                 Code::TypeInferenceForallRuleTypeMismatch );
         }
     }
-
-    if( node.universe()->type() )
-    {
-        const auto& universeType = node.universe()->type();
-        if( universeType->isInteger() )
-        {
-            m_log.error(
-                { node.universe()->sourceLocation() },
-                node.description() + " has an invalid universe type '" +
-                    universeType->description() + "'",
-                Code::TypeInferenceForallRuleInvalidUniverseType );
-        }
-    }
 }
 
 void TypeInferenceVisitor::visit( ChooseRule& node )
