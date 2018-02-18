@@ -317,6 +317,8 @@ SimpleOrClaspedTerm ::= "(" Term ")"
                       | CallExpression
                       | LiteralCallExpression
                       | Literal
+                      | "+" SimpleOrClaspedTerm
+                      | "-" SimpleOrClaspedTerm
 </code>
 
 {{page>:grammar:SimpleOrClaspedTerm&noheader&nofooter}}
@@ -325,9 +327,7 @@ SimpleOrClaspedTerm ::= "(" Term ")"
 ===== OperatorExpression =====
 
 <code>
-OperatorExpression ::= "+" Term
-                     | "-" Term
-                     | Term "+" Term
+OperatorExpression ::= Term "+" Term
                      | Term "-" Term
                      | Term "*" Term
                      | Term "/" Term
