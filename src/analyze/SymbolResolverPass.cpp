@@ -216,11 +216,24 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
+    const auto validateArgumentsCount = [&]( const std::string& description,
+                                             std::size_t expectedNumberOfArguments ) {
+        if( node.arguments()->size() != expectedNumberOfArguments )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid argument size: " + description + " '" + identifierPath + "' expects " +
+                    std::to_string( expectedNumberOfArguments ) + " arguments",
+                Code::SymbolArgumentSizeMismatch );
+        }
+    };
+
     const auto variableIt = m_variables.find( identifierBaseName );
     if( variableIt != m_variables.cend() and identifierPath == identifierBaseName )
     {
         node.setTargetType( CallExpression::TargetType::VARIABLE );
         node.setTargetDefinition( variableIt->second );
+        validateArgumentsCount( "variable", 0 );
         return;
     }
 
@@ -230,17 +243,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         node.setTargetType( CallExpression::TargetType::BUILTIN );
         node.setTargetBuiltinId( annotation.valueID() );
-
-        const auto expectedNumberOfArguments = annotation.relations().front().argument.size();
-
-        if( node.arguments()->size() != expectedNumberOfArguments )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "invalid argument size: builtin '" + identifierPath + "' expects " +
-                    std::to_string( expectedNumberOfArguments ) + " arguments",
-                Code::SymbolArgumentSizeMismatch );
-        }
+        validateArgumentsCount( "builtin", annotation.relations().front().argument.size() );
         return;
     }
 
@@ -294,16 +297,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         }
 
         node.setTargetDefinition( symbol );
-
-        if( node.arguments()->size() != expectedNumberOfArguments )
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "invalid argument size: " + symbol->description() + " '" + identifierPath +
-                    "' expects " + std::to_string( expectedNumberOfArguments ) + " arguments",
-                Code::SymbolArgumentSizeMismatch );
-        }
-
+        validateArgumentsCount( symbol->description(), expectedNumberOfArguments );
         return;
     }
 
@@ -322,6 +316,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         node.setTargetType( CallExpression::TargetType::SELF );
         node.setTargetDefinition( agentSymbol );
+        validateArgumentsCount( "", 0 );
     }
     // single agent execution notation --> agent type domain ==
     // Enumeration!
@@ -347,10 +342,12 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
         node.setTargetDefinition( agent );
         node.setType( type );
+        validateArgumentsCount( agent->description(), 0 );
     }
     else if( TypeInfo::instance().hasType( identifierPath ) )
     {
         node.setTargetType( CallExpression::TargetType::TYPE_DOMAIN );
+        validateArgumentsCount( "type", 0 );
     }
     else
     {
