@@ -1,5 +1,0 @@
-init main
-
-rule main = { 
-    assert undef = 1//~ Assertion failed
-}

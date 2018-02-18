@@ -1,6 +1,0 @@
-function(static) a: Integer * Integer -> Integer initially { [1, 1, 1] -> 1 }
-//~^ type of initializer arguments of function `a` is Tuple (Integer,Integer,Integer,) but should be Tuple (Integer,Integer,)
-
-
-rule main = skip
-init main

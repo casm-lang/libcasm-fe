@@ -1,7 +1,0 @@
-CASM foo
-
-init initR
-
-rule initR = {
-    call foo //~ no rule with name `foo` found
-}

@@ -1,7 +1,0 @@
-function func: foo * enum12 -> Int
-//~^ unknown type foo
-//~^^ unknown type enum12
-
-rule main = program(self) := undef
-
-init main

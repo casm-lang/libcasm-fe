@@ -1,7 +1,0 @@
-CASM foo
-
-init main
-
-rule main = {
-    call (1+1) //~ Indirect target must be a `Ruleref` but was `Integer`
-}

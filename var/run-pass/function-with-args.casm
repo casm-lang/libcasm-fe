@@ -1,9 +1,0 @@
-function x : Int * Int -> Int
-
-init main
-
-rule main = { 
-    x(1, 1) := 1
-    if x(1,1) = 1 then
-        program(self) := undef
-}

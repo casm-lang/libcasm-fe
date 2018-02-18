@@ -1,7 +1,0 @@
-function x : -> RuleRef
-
-init main
-
-rule main = { 
-    x := @foobar //~ no rule with name `foobar` found
-}

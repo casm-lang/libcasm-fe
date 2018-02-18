@@ -1,6 +1,0 @@
-enum en = {foo, bar}
-
-rule main = assert en != bar
-//~^  `en` is an enum, not a member of an enum
-
-init main

@@ -1,9 +1,0 @@
-function f: Integer * Integer(1..5) * Integer -> Integer
-
-init main
-
-rule main = {|
-    f(-100, 2, 100) := 2
-    assert f(-100, 2, 100) = 2
-    program(self) := undef
-|}

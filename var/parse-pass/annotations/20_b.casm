@@ -1,8 +1,0 @@
-rule main = {
-    let x = undef in
-        let y:Integer = undef in
-            let z = x + y in assert z = undef
-
-    program( self ) := undef
-}
-init main

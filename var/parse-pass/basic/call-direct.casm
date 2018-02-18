@@ -1,7 +1,0 @@
-CASM cd
-
-init initR
-
-rule initR = call foo(1,2,3,4,"foo",6)
-
-rule foo(a:Integer, b:Integer, c:Integer, d:Integer, e:String, f:Integer) = program(self) := undef

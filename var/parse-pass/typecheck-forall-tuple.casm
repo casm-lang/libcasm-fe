@@ -1,9 +1,0 @@
-
-rule main = {
-    forall x in ["hallo", 1] do
-    //~^ expression must be a List, an Integer or enum, but is Tuple (String,Integer,)
-    //~^^ type inference for `x` failed
-
-        assert false
-}
-init main

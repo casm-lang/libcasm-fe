@@ -1,9 +1,0 @@
-// error program
-
-derived x( a : List() ) = a + ( b + c )
-//~^ syntax error, unexpected )
-
-rule main = {
-  program( self ) := undef
-}
-init main

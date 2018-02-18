@@ -1,7 +1,0 @@
-function(static) a: Integer * Integer -> Integer initially { [1.0, 1] -> 1 }
-//~^ type of initializer arguments of function `a` is Tuple (Floating,Integer,) but should be Tuple (Integer,Integer,)
-
-
-
-rule main = skip
-init main

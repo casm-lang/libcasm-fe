@@ -1,6 +1,0 @@
-function f : -> Integer initially { 2.0 }
-//~^ type of initializer of function `f` is Floating but should be Integer
-
-init main
-
-rule main = skip

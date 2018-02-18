@@ -1,7 +1,0 @@
-function x : -> Floating
-
-init main
-
-rule main = { 
-    x := 1 //~ type `Floating` of `x` does not match type `Integer` of expression
-}

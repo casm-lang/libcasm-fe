@@ -1,5 +1,0 @@
-CASM foo
-
-init main
-
-rule main = assert 1 != 1 //~ Assertion failed

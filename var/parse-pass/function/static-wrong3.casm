@@ -1,8 +1,0 @@
-// error annotation
-
-function (static) a: Integer * Integer -> Integer initially { 2 -> 3 }
-//~^ type of initializer arguments of function `a` is Integer but should be Tuple (Integer,Integer,)
-
-rule main = {
-  program( self ) := undef
-}

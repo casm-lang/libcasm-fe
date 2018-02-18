@@ -1,9 +1,0 @@
-CASM double
-
-init initR
-
-
-rule initR = call foo(1)
-//~^ rule `foo` expects 2 arguments but 1 where provided
-
-rule foo(a:Integer, b:Integer) = program(self) := undef

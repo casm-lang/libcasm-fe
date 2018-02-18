@@ -1,5 +1,0 @@
-CASM impossible_
-
-init initR
-
-rule initR = impossible //~ `impossible` executed

@@ -1,8 +1,0 @@
-function y : -> List(Integer)
-
-init main
-
-rule main = { 
-    x := 1 //~ use of undefined function `x`
-           //~^ type `Invalid` of `x` does not match type `Integer` of expression
-}

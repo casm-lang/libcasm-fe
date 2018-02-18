@@ -1,9 +1,0 @@
-function a: -> List(Integer)
-
-rule main = {
-    let x = [] in {
-        a := x
-    }
-    program( self ) := undef
-}
-init main

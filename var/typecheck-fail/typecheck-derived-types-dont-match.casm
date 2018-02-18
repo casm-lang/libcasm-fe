@@ -1,8 +1,0 @@
-CASM foo
-
-init main
-
-derived dev1: Floating = 2
-//~^ type of derived expression was `Integer` but should be `Floating`
-
-rule main = skip

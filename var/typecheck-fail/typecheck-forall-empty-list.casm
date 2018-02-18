@@ -1,8 +1,0 @@
-function a: -> List(Integer)
-
-rule main = {
-    forall x in [] do
-    //~^ type inference for `x` failed
-        assert false
-}
-init main

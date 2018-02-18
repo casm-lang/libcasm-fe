@@ -1,8 +1,0 @@
-rule main = {
-	program( self ) := undef
-}
-
-rule test3 = seq skip endseq
-rule test4 = {| skip |}
-rule test5 = par skip endpar
-init main

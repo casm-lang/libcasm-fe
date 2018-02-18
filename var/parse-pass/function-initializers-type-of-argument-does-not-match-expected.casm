@@ -1,6 +1,0 @@
-function(static) a: Integer -> Integer initially { 1.0 -> 1 }
-//~^ type of initializer argument of function `a` is Floating but should be Integer
-
-
-rule main = skip
-init main
