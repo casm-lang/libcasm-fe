@@ -286,6 +286,13 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
                 node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
                 break;
             }
+            case Node::ID::USING_DEFINITION:
+            {
+                // if the using definition points to an IR type then the alias resolving fails,
+                // because there is no definition which can be resolved, and we end up here
+                node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
+                break;
+            }
             default:
             {
                 m_log.error(
@@ -457,7 +464,14 @@ Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& def
 
     const auto usingDefinition = std::static_pointer_cast< UsingDefinition >( definition );
     const auto symbol = m_symboltable.findSymbol( *usingDefinition->type()->name() );
-    return resolveIfAlias( symbol );  // resolve again, the symbol may be another alias
+    if( symbol )
+    {
+        return resolveIfAlias( symbol );  // resolve again, the symbol may be another alias
+    }
+    else
+    {
+        return definition;
+    }
 }
 
 void SymbolResolverPass::usage( libpass::PassUsage& pu )
