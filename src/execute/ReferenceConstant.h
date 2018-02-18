@@ -59,12 +59,37 @@ namespace libcasm_fe
 
         std::string name( void ) const override;
 
+        std::size_t hash( void ) const override;
+
+        u1 operator==( const Value& rhs ) const override;
+
         static inline Value::ID classid( void )
         {
             return static_cast< Value::ID >( -1 );
         }
 
         static u1 classof( Value const* obj );
+    };
+
+    class ConstantHandler final : public libcasm_ir::ConstantHandler
+    {
+      public:
+        u1 name( const libcasm_ir::Constant& constant, std::string& result ) const override;
+
+        u1 foreach(
+            const libcasm_ir::Constant& constant,
+            const std::function< void( const libcasm_ir::Constant& constant ) >& callback )
+            const override;
+
+        u1 choose(
+            const libcasm_ir::Constant& constant, libcasm_ir::Constant& result ) const override;
+
+        u1 hash( const libcasm_ir::Constant& constant, std::size_t& result ) const override;
+
+        u1 compare(
+            const libcasm_ir::Constant& constant,
+            const libcasm_ir::Value& value,
+            u1& result ) const override;
     };
 }
 

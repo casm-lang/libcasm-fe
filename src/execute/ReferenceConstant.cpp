@@ -43,11 +43,16 @@
 
 #include "ReferenceConstant.h"
 
+#include <libcasm-fe/ast/Node>
+
 using namespace libcasm_fe;
 
-static const auto registration = libcasm_ir::Constant::registerConstant< ReferenceConstant >();
-
 static const auto VOID = libstdhl::Memory::get< libcasm_ir::VoidType >();
+
+//
+//
+// ReferenceConstant
+//
 
 ReferenceConstant::ReferenceConstant( const Ast::ReferenceLiteral* literal )
 : libcasm_ir::ReferenceConstant< Ast::ReferenceLiteral >( VOID, literal, classid() )
@@ -71,12 +76,117 @@ std::string ReferenceConstant::name( void ) const
     }
 }
 
+std::size_t ReferenceConstant::hash( void ) const
+{
+    if( defined() )
+    {
+        return std::hash< Ast::TypedNode* >()( value()->reference().get() );
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+u1 ReferenceConstant::operator==( const Value& rhs ) const
+{
+    if( this == &rhs )
+    {
+        return true;
+    }
+
+    if( not libcasm_ir::Value::operator==( rhs ) )
+    {
+        return false;
+    }
+
+    const auto& other = static_cast< const ReferenceConstant& >( rhs );
+    return this->hash() == other.hash();
+}
+
 u1 ReferenceConstant::classof( Value const* obj )
 {
     return obj->id() == classid() or libcasm_ir::RuleReferenceConstant::classof( obj )
         // or libcasm_ir::FunctionReferenceConstant::classof( obj )
         // TODO: enable if FuncRef constant and type is ready
         ;
+}
+
+//
+//
+// ConstantHandler
+//
+
+u1 ConstantHandler::name( const libcasm_ir::Constant& constant, std::string& result ) const
+{
+    if( libcasm_ir::isa< ReferenceConstant >( constant ) )
+    {
+        const auto referenceConstant = static_cast< const ReferenceConstant& >( constant );
+        result = referenceConstant.name();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+u1 ConstantHandler::foreach(
+    const libcasm_ir::Constant& constant,
+    const std::function< void( const libcasm_ir::Constant& constant ) >& callback ) const
+{
+    if( libcasm_ir::isa< ReferenceConstant >( constant ) )
+    {
+        callback( constant );
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+u1 ConstantHandler::choose(
+    const libcasm_ir::Constant& constant, libcasm_ir::Constant& result ) const
+{
+    if( libcasm_ir::isa< ReferenceConstant >( constant ) )
+    {
+        result = constant;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+u1 ConstantHandler::hash( const libcasm_ir::Constant& constant, std::size_t& result ) const
+{
+    if( libcasm_ir::isa< ReferenceConstant >( constant ) )
+    {
+        const auto referenceConstant = static_cast< const ReferenceConstant& >( constant );
+        result = referenceConstant.hash();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+u1 ConstantHandler::compare(
+    const libcasm_ir::Constant& constant, const libcasm_ir::Value& value, u1& result ) const
+{
+    if( libcasm_ir::isa< ReferenceConstant >( constant ) )
+    {
+        const auto referenceConstant = static_cast< const ReferenceConstant& >( constant );
+        result = referenceConstant.operator==( value );
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 //
