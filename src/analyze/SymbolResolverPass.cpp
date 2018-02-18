@@ -352,14 +352,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
     {
         m_log.error(
             { node.sourceLocation() },
-            "unknown " +
-                ( node.targetType() != DirectCallExpression::TargetType::UNKNOWN
-                      ? node.targetTypeName() + " "
-                      : "" ) +
-                "symbol '" + name + "' found",
-            ( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
-                ? Code::FunctionSymbolIsUnknown
-                : Code::SymbolIsUnknown );
+            "unknown symbol '" + name + "' found",
+            Code::SymbolIsUnknown );
     }
 
     m_log.debug( "call: " + name + "{ " + node.targetTypeName() + " }" );

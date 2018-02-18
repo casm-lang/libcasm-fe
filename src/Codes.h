@@ -79,8 +79,6 @@ namespace libcasm_fe
         // --------------------------------------------------------- f*** ...
         // function errors
         ,
-        FunctionSymbolIsUnknown = 0xf000,
-
         FunctionDefinitionAlreadyUsed = 0xf010,
         FunctionDefinitionReClassification = 0xf011,
 
