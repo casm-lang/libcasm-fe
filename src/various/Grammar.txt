@@ -278,9 +278,7 @@ UpdateRule ::= DirectCallExpression ":=" Term
 ===== CallRule =====
 
 <code>
-CallRule ::= DirectCallExpression
-           | MethodCallExpression
-           | IndirectCallExpression
+CallRule ::= CallExpression
 </code>
 
 {{page>:grammar:CallRule&noheader&nofooter}}
@@ -316,10 +314,8 @@ Term ::= SimpleOrClaspedTerm
 
 <code>
 SimpleOrClaspedTerm ::= "(" Term ")"
-                      | DirectCallExpression
-                      | MethodCallExpression
+                      | CallExpression
                       | LiteralCallExpression
-                      | IndirectCallExpression
                       | Literal
 </code>
 
@@ -354,6 +350,17 @@ OperatorExpression ::= "+" Term
 {{page>:grammar:OperatorExpression&noheader&nofooter}}
 
 
+===== CallExpression =====
+
+<code>
+CallExpression ::= DirectCallExpression
+                 | MethodCallExpression
+                 | IndirectCallExpression
+</code>
+
+{{page>:grammar:CallExpression&noheader&nofooter}}
+
+
 ===== DirectCallExpression =====
 
 <code>
@@ -386,7 +393,7 @@ LiteralCallExpression ::= SimpleOrClaspedTerm "." IntegerLiteral
 ===== IndirectCallExpression =====
 
 <code>
-IndirectCallExpression ::= "(" "*" Term ")" Arguments
+IndirectCallExpression ::= CallExpression Arguments
 </code>
 
 {{page>:grammar:IndirectCallExpression&noheader&nofooter}}
