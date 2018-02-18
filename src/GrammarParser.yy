@@ -459,7 +459,6 @@ ProgramFunctionDefinition
       programArguments->add( singleAgent );
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
           @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
-      program->setTargetType( DirectCallExpression::TargetType::FUNCTION );
 
       const auto ruleReference = Ast::make< ReferenceLiteral >( @$, $2 );
 
@@ -743,9 +742,7 @@ SequenceRule
 UpdateRule
 : DirectCallExpression UPDATE Term
   {
-      const auto function = $1;
-      function->setTargetType( DirectCallExpression::TargetType::FUNCTION );
-      $$ = Ast::make< UpdateRule >( @$, function, $3 );
+      $$ = Ast::make< UpdateRule >( @$, $1, $3 );
   }
 ;
 
@@ -1525,7 +1522,6 @@ Initializer
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto arguments = Ast::make< Expressions >( @$ );
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
-      function->setTargetType( DirectCallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $1 );
   }
 | LPAREN Term RPAREN MAPS Term
@@ -1535,14 +1531,12 @@ Initializer
 
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
-      function->setTargetType( DirectCallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $5 );
   }
 | TupleLiteral MAPS Term
   {
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1->expressions() );
-      function->setTargetType( DirectCallExpression::TargetType::FUNCTION );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
 ;
