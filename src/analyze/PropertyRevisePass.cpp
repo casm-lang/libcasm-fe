@@ -77,6 +77,7 @@ class PropertyReviseVisitor final : public RecursiveVisitor
     void visit( DerivedDefinition& node ) override;
 
     void visit( ConditionalRule& node ) override;
+    void visit( CaseRule& node ) override;
     void visit( ForallRule& node ) override;
     void visit( ChooseRule& node ) override;
     void visit( UpdateRule& node ) override;
@@ -140,6 +141,17 @@ void PropertyReviseVisitor::visit( ConditionalRule& node )
         { Property::SIDE_EFFECT_FREE },
         "condition",
         Code::ConditionalRuleConditionInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( CaseRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.expression(),
+        { Property::SIDE_EFFECT_FREE },
+        "case expression",
+        Code::CaseRuleExpressionInvalidProperty );
 }
 
 void PropertyReviseVisitor::visit( ForallRule& node )
