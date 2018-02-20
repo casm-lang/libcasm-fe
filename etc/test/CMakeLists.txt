@@ -52,6 +52,7 @@ include_directories(
 
 add_library( ${PROJECT}-test OBJECT
   main.cpp
+  GrammarParserHelperTest.cpp
   ast/NodeTest.cpp
   main.cpp
 #  numeric/expression_evaluation.cpp  # TODO: FIXME: PPA: EPE we should enable this test ASAP
