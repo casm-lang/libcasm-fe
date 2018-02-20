@@ -814,7 +814,7 @@ IdentifierPath ::= AbsoluteIdentifierPath
 ===== AbsoluteIdentifierPath =====
 
 <code>
-AbsoluteIdentifierPath ::= ( { IDENTIFIER } "::" )+ { IDENTIFIER }
+AbsoluteIdentifierPath ::= ( Identifier "::" )+ Identifier
                          | Identifier
 </code>
 
@@ -824,7 +824,7 @@ AbsoluteIdentifierPath ::= ( { IDENTIFIER } "::" )+ { IDENTIFIER }
 ===== RelativeIdentifierPath =====
 
 <code>
-RelativeIdentifierPath ::= "::" { Identifier }
+RelativeIdentifierPath ::= "::" Identifier
 </code>
 
 {{page>:grammar:RelativeIdentifierPath&noheader&nofooter}}
