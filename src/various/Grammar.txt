@@ -804,21 +804,30 @@ Identifier ::= "[a-zA-Z_][a-zA-Z0-9_]*"
 ===== IdentifierPath =====
 
 <code>
-IdentifierPath ::= DotSeparatedIdentifiers
-                 | "::" Identifier
+IdentifierPath ::= AbsoluteIdentifierPath
+                 | RelativeIdentifierPath
 </code>
 
 {{page>:grammar:IdentifierPath&noheader&nofooter}}
 
 
-===== DotSeparatedIdentifiers =====
+===== AbsoluteIdentifierPath =====
 
 <code>
-DotSeparatedIdentifiers ::= DotSeparatedIdentifiers "::" Identifier
-                          | Identifier
+AbsoluteIdentifierPath ::= ( Identifier "::" )+ Identifier
+                         | Identifier
 </code>
 
-{{page>:grammar:DotSeparatedIdentifiers&noheader&nofooter}}
+{{page>:grammar:AbsoluteIdentifierPath&noheader&nofooter}}
+
+
+===== RelativeIdentifierPath =====
+
+<code>
+RelativeIdentifierPath ::= "::" Identifier
+</code>
+
+{{page>:grammar:RelativeIdentifierPath&noheader&nofooter}}
 
 
 ===== Variable =====
