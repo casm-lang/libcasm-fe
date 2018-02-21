@@ -156,7 +156,7 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9\_]*
     BEGIN( STRING );
     strbuf.clear();
 }
-<STRING>[^\\\"\n]* { /* eat all tokens */
+<STRING>[^\\"\n]* { /* eat all tokens */
     strbuf.append( yytext );
 }
 <STRING>\n {
@@ -168,11 +168,11 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9\_]*
 <STRING>\\t {
     strbuf.append( "\t" );
 }
-<STRING>\\\" {
-    strbuf.append( "\"" );
+<STRING>\\["\\] {
+    strbuf.append( yytext + 1 );
 }
-<STRING>\\' {
-    strbuf.append( "\'" );
+<STRING>\\. {
+    log.error( {loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
 }
 <STRING><<EOF>> {
     BEGIN( INITIAL );
