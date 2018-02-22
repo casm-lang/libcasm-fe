@@ -43,7 +43,7 @@
 
 #include "main.h"
 
-#include <libcasm-fe/GrammarParserHelper>
+#include "../../src/GrammarParserHelper.h"
 
 using namespace libcasm_fe;
 
