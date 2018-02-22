@@ -140,7 +140,7 @@ namespace libcasm_fe
         CaseRuleMultipleDefaultCases = 0x5c00  // 5c** ... case errors
 
         ,
-        AssertInvalidExpression = 0x5a00  // 5a** ... assert errors
+        RuntimeException = 0x5a00
 
         ,
         LetAssignedValueInvalid = 0x5d00

@@ -429,9 +429,10 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
 
             auto directCallArguments = node.arguments()->data();
-
             const auto* annotation = annotate( node, directCallArguments );
+
             RecursiveVisitor::visit( node );
+
             const auto description = "built-in '" + identifier->path() + "'";
             inference( description, annotation, node, directCallArguments );
 
@@ -541,6 +542,11 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
             break;
         }
+    }
+
+    if( node.type() )
+    {
+        m_typeIDs[&node ].emplace( node.type()->id() );
     }
 
     RecursiveVisitor::visit( node );
@@ -1815,7 +1821,7 @@ void TypeInferenceVisitor::inference(
             try
             {
                 const auto inferredTypeID = annotation->inference( argTypes, argValues );
-                typeIDs.insert( inferredTypeID );
+                typeIDs = { inferredTypeID };
             }
             catch( const libcasm_ir::TypeArgumentException& e )
             {
@@ -1869,6 +1875,12 @@ void TypeInferenceVisitor::inference(
     {
         const auto typeID = *typeIDs.begin();
         node.setType( libcasm_ir::Type::fromID( typeID ) );
+    }
+
+    if( topTypeIDs.size() == 1 and typeIDs.size() == 0 )
+    {
+        const auto topTypeID = *topTypeIDs.begin();
+        node.setType( libcasm_ir::Type::fromID( topTypeID ) );
     }
 }
 

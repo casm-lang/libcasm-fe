@@ -1427,7 +1427,7 @@ void ExecutionVisitor::invokeBuiltin(
             node.sourceLocation(),
             "builtin has thrown an exception: " + std::string( e.what() ),
             m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::AssertInvalidExpression );
+            Code::RuntimeException );
     }
 }
 
