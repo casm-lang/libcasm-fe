@@ -429,9 +429,10 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             }
 
             auto directCallArguments = node.arguments()->data();
-
             const auto* annotation = annotate( node, directCallArguments );
+
             RecursiveVisitor::visit( node );
+
             const auto description = "built-in '" + identifier->path() + "'";
             inference( description, annotation, node, directCallArguments );
 
@@ -1869,6 +1870,12 @@ void TypeInferenceVisitor::inference(
     {
         const auto typeID = *typeIDs.begin();
         node.setType( libcasm_ir::Type::fromID( typeID ) );
+    }
+
+    if( topTypeIDs.size() == 1 and typeIDs.size() == 0 )
+    {
+        const auto topTypeID = *topTypeIDs.begin();
+        node.setType( libcasm_ir::Type::fromID( topTypeID ) );
     }
 }
 
