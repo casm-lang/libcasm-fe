@@ -544,6 +544,11 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
     }
 
+    if( node.type() )
+    {
+        m_typeIDs[&node ].emplace( node.type()->id() );
+    }
+
     RecursiveVisitor::visit( node );
 
     const auto& arguments = *node.arguments();
@@ -1816,7 +1821,7 @@ void TypeInferenceVisitor::inference(
             try
             {
                 const auto inferredTypeID = annotation->inference( argTypes, argValues );
-                typeIDs.insert( inferredTypeID );
+                typeIDs = { inferredTypeID };
             }
             catch( const libcasm_ir::TypeArgumentException& e )
             {
