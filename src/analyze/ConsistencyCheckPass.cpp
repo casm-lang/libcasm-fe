@@ -228,6 +228,7 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
     assert( node.targetType() != DirectCallExpression::TargetType::UNKNOWN );
 
     RecursiveVisitor::visit( node );
+    verify( node );
 
     if( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
     {
