@@ -121,7 +121,6 @@ ecm_generate_headers( ${PROJECT}_HEADERS_CPP
     SourceLocation
     Specification
     TypeInfo
-    GrammarParserHelper
   PREFIX
     ${PROJECT}
   REQUIRED_HEADERS
