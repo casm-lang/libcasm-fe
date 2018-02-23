@@ -194,7 +194,6 @@ void PropertyResolverVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::SELF:
         {
             callProperties.set( libcasm_ir::Property::SIDE_EFFECT_FREE );
-            callProperties.set( libcasm_ir::Property::PURE );
             break;
         }
         case DirectCallExpression::TargetType::UNKNOWN:
