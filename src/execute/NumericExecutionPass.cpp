@@ -339,6 +339,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( SequenceRule& node ) override;
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
+    void visit( WhileRule& node ) override;
 
   private:
     u1 hasEmptyUpdateSet( void ) const;
@@ -1348,6 +1349,52 @@ void ExecutionVisitor::visit( CallRule& node )
     if( not returnType.isVoid() )
     {
         m_evaluationStack.pop();  // drop return value
+    }
+}
+
+void ExecutionVisitor::visit( WhileRule& node )
+{
+    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100UL );
+
+    while( true )
+    {
+        node.condition()->accept( *this );
+        const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
+
+        if( not condition.defined() )
+        {
+            throw RuntimeException(
+                node.condition()->sourceLocation(),
+                "condition must be true or false but was undefined",
+                m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+                Code::WhileRuleInvalidCondition );
+        }
+        else if( condition.value() == false )
+        {
+            break;
+        }
+
+        // uses a new parallel update set on each iteration only to check if the
+        // current iteration actually produced any updates
+        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100UL );
+        node.rule()->accept( *this );
+        if( hasEmptyUpdateSet() )
+        {
+            // the current iteration hasn't produced any updates -> done
+            break;
+        }
+        parTrans.merge();  // should not throw a merge conflict because of the
+                           // surrounding sequential block, thus no conflict
+                           // handling required
+    }
+
+    try
+    {
+        seqTrans.merge();
+    }
+    catch( const ExecutionUpdateSet::Conflict& conflict )
+    {
+        handleMergeConflict( node, conflict );
     }
 }
 

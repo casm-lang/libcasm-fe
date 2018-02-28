@@ -351,3 +351,25 @@ void CallRule::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+WhileRule::WhileRule( const Expression::Ptr& condition, const Rule::Ptr& rule )
+: Rule( Node::ID::WHILE_RULE )
+, m_condition( condition )
+, m_rule( rule )
+{
+}
+
+const Expression::Ptr& WhileRule::condition( void ) const
+{
+    return m_condition;
+}
+
+const Rule::Ptr& WhileRule::rule( void ) const
+{
+    return m_rule;
+}
+
+void WhileRule::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}

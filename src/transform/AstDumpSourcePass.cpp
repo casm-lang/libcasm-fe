@@ -190,6 +190,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( SequenceRule& node ) override;
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
+    void visit( WhileRule& node ) override;
 
     void visit( UnresolvedType& node ) override;
     void visit( BasicType& node ) override;
@@ -627,6 +628,17 @@ void AstDumpSourceVisitor::visit( CallRule& node )
 {
     m_stream << m_indentation << "call ";
     node.call()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( WhileRule& node )
+{
+    m_stream << m_indentation << "while ";
+    node.condition()->accept( *this );
+    m_stream << " do\n";
+    {
+        const Indentation::NextLevel level( m_indentation );
+        node.rule()->accept( *this );
+    }
 }
 
 void AstDumpSourceVisitor::visit( UnresolvedType& node )

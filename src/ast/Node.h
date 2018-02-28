@@ -111,6 +111,7 @@ namespace libcasm_fe
                 SEQUENCE_RULE,
                 UPDATE_RULE,
                 CALL_RULE,
+                WHILE_RULE,
 
                 // types
                 UNRESOLVED_TYPE,

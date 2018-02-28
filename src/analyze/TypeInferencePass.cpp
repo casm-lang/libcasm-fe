@@ -105,6 +105,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ExistentialQuantifierExpression& node ) override;
 
     void visit( ConditionalRule& node ) override;
+    void visit( WhileRule& node ) override;
 
     void visit( CaseRule& node ) override;
     void visit( ExpressionCase& node ) override;
@@ -1339,6 +1340,25 @@ void TypeInferenceVisitor::visit( ConditionalRule& node )
                 "invalid condition type '" + condExpr.type()->description() + ", shall be '" +
                     libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN ) + "'",
                 Code::TypeInferenceConditionalRuleInvalidConditionType );
+        }
+    }
+}
+
+void TypeInferenceVisitor::visit( WhileRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& condExpr = *node.condition();
+
+    if( condExpr.type() )
+    {
+        if( condExpr.type()->kind() != libcasm_ir::Type::Kind::BOOLEAN )
+        {
+            m_log.error(
+                { condExpr.sourceLocation() },
+                "invalid condition type '" + condExpr.type()->description() + ", shall be '" +
+                    libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN ) + "'",
+                Code::TypeInferenceWhileRuleInvalidConditionType );
         }
     }
 }

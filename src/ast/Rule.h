@@ -307,6 +307,23 @@ namespace libcasm_fe
           private:
             const CallExpression::Ptr m_call;
         };
+
+        class WhileRule final : public Rule
+        {
+          public:
+            using Ptr = std::shared_ptr< WhileRule >;
+
+            explicit WhileRule( const Expression::Ptr& condition, const Rule::Ptr& rule );
+
+            const Expression::Ptr& condition( void ) const;
+            const Rule::Ptr& rule( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_condition;
+            const Rule::Ptr m_rule;
+        };
     }
 }
 

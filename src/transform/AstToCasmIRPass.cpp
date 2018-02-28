@@ -108,6 +108,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( SequenceRule& node ) override;
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
+    void visit( WhileRule& node ) override;
 
     void visit( UnresolvedType& node ) override;
     void visit( BasicType& node ) override;
@@ -652,6 +653,11 @@ void AstToCasmIRVisitor::visit( CallRule& node )
     node.call()->accept( *this );
 
     m_statement = nullptr;
+}
+
+void AstToCasmIRVisitor::visit( WhileRule& node )
+{
+    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }
 
 void AstToCasmIRVisitor::visit( UnresolvedType& node )

@@ -232,6 +232,10 @@ std::string Node::description( void ) const
         {
             return "call";
         }
+        case ID::WHILE_RULE:
+        {
+            return "while";
+        }
         case ID::UNRESOLVED_TYPE:
         {
             return "unresolved type";
