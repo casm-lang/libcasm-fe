@@ -1658,39 +1658,6 @@ void TypeInferenceVisitor::assignment(
             //             at run-time
             mismatch = false;
         }
-        else if(
-            tyLhs.isBinary() and tyRhs.isBinary() and
-            static_cast< const libcasm_ir::BinaryType& >( tyLhs ).bitsize() >=
-                static_cast< const libcasm_ir::BinaryType& >( tyRhs ).bitsize() )
-        {
-            // relaxation: mixed binary types are OK as long as
-            //             bitsize(lhs) >= bitsize(rhs)
-            mismatch = false;
-        }
-        else if( tyLhs.isBinary() and tyRhs.isInteger() and rhs.id() == Node::ID::VALUE_LITERAL )
-        {
-            // relaxation: lhs binary and rhs integer are OK as long as rhs is a
-            //             integer constant with bitsize(lhs) >= bitsize(rhs)
-            mismatch = false;
-
-            try
-            {
-                auto& valueLiteral = static_cast< ValueLiteral& >( rhs );
-                assert( libcasm_ir::isa< libcasm_ir::IntegerConstant >( valueLiteral.value() ) );
-                auto constant =
-                    std::static_pointer_cast< libcasm_ir::IntegerConstant >( valueLiteral.value() );
-
-                const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >(
-                    lhs.type(),
-                    static_cast< const libstdhl::Type::Natural& >( constant->value() ) );
-
-                valueLiteral.setValue( value );
-            }
-            catch( const std::exception& e )
-            {
-                mismatch = true;
-            }
-        }
         else if( tyLhs.isRecord() and tyRhs.isTuple() )
         {
             const auto& recordTyLhs = static_cast< const libcasm_ir::RecordType& >( tyLhs );
