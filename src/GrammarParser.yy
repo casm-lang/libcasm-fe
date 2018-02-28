@@ -237,6 +237,7 @@ END       0 "end of file"
 %type <SequenceRule::Ptr> SequenceRule
 %type <UpdateRule::Ptr> UpdateRule
 %type <CallRule::Ptr> CallRule
+%type <WhileRule::Ptr> WhileRule
 
 // assignments
 %type <NamedExpression::Ptr> Assignment
@@ -577,6 +578,10 @@ Rule
   {
       $$ = $1;
   }
+| WhileRule
+  {
+      $$ = $1;
+  }
 ;
 
 
@@ -752,6 +757,14 @@ CallRule
 : CallExpression %prec CALL
   {
       $$ = Ast::make< CallRule >( @$, $1 );
+  }
+;
+
+
+WhileRule
+: WHILE Term DO Rule
+  {
+      $$ = Ast::make< WhileRule >( @$, $2, $4 );
   }
 ;
 

@@ -90,6 +90,7 @@ namespace libcasm_fe
         class SequenceRule;
         class UpdateRule;
         class CallRule;
+        class WhileRule;
 
         class UnresolvedType;
         class BasicType;
@@ -156,6 +157,7 @@ namespace libcasm_fe
             virtual void visit( SequenceRule& node ) = 0;
             virtual void visit( UpdateRule& node ) = 0;
             virtual void visit( CallRule& node ) = 0;
+            virtual void visit( WhileRule& node ) = 0;
 
             virtual void visit( UnresolvedType& node ) = 0;
             virtual void visit( BasicType& node ) = 0;

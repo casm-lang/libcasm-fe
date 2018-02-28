@@ -76,6 +76,7 @@ HOLDS           "holds"         { return Parser::make_HOLDS(loc); }
 EXISTS          "exists"        { return Parser::make_EXISTS(loc); }
 WITH            "with"          { return Parser::make_WITH(loc); }
 AS              "as"            { return Parser::make_AS(loc); }
+WHILE           "while"         { return Parser::make_WHILE(loc); }
 
 UNDEF           "undef"         { return Parser::make_UNDEF(loc); }
 FALSE           "false"         { return Parser::make_FALSE(loc); }

@@ -82,6 +82,7 @@ class PropertyReviseVisitor final : public RecursiveVisitor
     void visit( ChooseRule& node ) override;
     void visit( UpdateRule& node ) override;
     void visit( CallRule& node ) override;
+    void visit( WhileRule& node ) override;
 
     void visit( FixedSizedType& node ) override;
 
@@ -214,6 +215,17 @@ void PropertyReviseVisitor::visit( CallRule& node )
             "argument",
             Code::CallRuleArgumentInvalidProperty );
     }
+}
+
+void PropertyReviseVisitor::visit( WhileRule& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.condition(),
+        { Property::SIDE_EFFECT_FREE },
+        "condition",
+        Code::WhileRuleConditionInvalidProperty );
 }
 
 void PropertyReviseVisitor::visit( FixedSizedType& node )

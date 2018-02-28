@@ -145,6 +145,7 @@ Rule ::= SkipRule
        | SequenceRule
        | UpdateRule
        | CallRule
+       | WhileRule
 </code>
 
 {{page>:grammar:Rule&noheader&nofooter}}
@@ -282,6 +283,15 @@ CallRule ::= CallExpression
 </code>
 
 {{page>:grammar:CallRule&noheader&nofooter}}
+
+
+===== WhileRule =====
+
+<code>
+WhileRule ::= "while" Term "do" Rule
+</code>
+
+{{page>:grammar:WhileRule&noheader&nofooter}}
 
 
 ===== Terms =====

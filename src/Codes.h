@@ -157,7 +157,8 @@ namespace libcasm_fe
         UpdateRuleUpdateExpressionInvalidProperty = 0x5f06,
         CallRuleArgumentInvalidProperty = 0x5f07,
         CaseRuleExpressionInvalidProperty = 0x5f08,
-        ExpressionCaseInvalidProperty = 0x5f09
+        ExpressionCaseInvalidProperty = 0x5f09,
+        WhileRuleConditionInvalidProperty = 0x5f10
 
         // --------------------------------------------------------- a*** ...
         // enumeration errors
@@ -240,6 +241,8 @@ namespace libcasm_fe
 
         TypeInferenceConditionalRuleInvalidConditionType = 0x1500,
 
+        TypeInferenceWhileRuleInvalidConditionType = 0x1501,
+
         TypeInferenceInvalidMethodCallExpression = 0x1900,
         TypeInferenceInvalidLiteralCallExpression = 0x1a00,
 
@@ -315,6 +318,7 @@ namespace libcasm_fe
         ChooseRuleInvalidUniverse = 0x9004,
         ForallRuleInvalidUniverse = 0x9005,
         ForallRuleInvalidCondition = 0x9006,
+        WhileRuleInvalidCondition = 0x9007,
 
         MethodCallExpressionInvalidBaseExpression = 0x9100,
 

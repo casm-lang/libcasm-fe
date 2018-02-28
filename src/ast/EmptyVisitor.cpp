@@ -206,6 +206,10 @@ void EmptyVisitor::visit( CallRule& )
 {
 }
 
+void EmptyVisitor::visit( WhileRule& )
+{
+}
+
 void EmptyVisitor::visit( UnresolvedType& )
 {
 }

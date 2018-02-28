@@ -95,6 +95,7 @@ namespace libcasm_fe
             void visit( SequenceRule& node ) override;
             void visit( UpdateRule& node ) override;
             void visit( CallRule& node ) override;
+            void visit( WhileRule& node ) override;
 
             void visit( UnresolvedType& node ) override;
             void visit( BasicType& node ) override;
