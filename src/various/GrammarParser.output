@@ -78,7 +78,7 @@ Grammar
    53 ForallRule: "forall" AttributedVariable "in" Term "do" Rule
    54           | "forall" AttributedVariable "in" Term "with" Term "do" Rule
 
-   55 ChooseRule: "choose" AttributedVariable "in" Term "do" Rule
+   55 ChooseRule: "choose" AttributedVariables "in" Term "do" Rule
 
    56 IterateRule: "iterate" Rule
 
@@ -280,33 +280,36 @@ Grammar
   194 Variable: TypedVariable
   195         | Identifier
 
-  196 TypedVariables: TypedVariables "," TypedVariable
-  197               | TypedVariable
+  196 AttributedVariables: AttributedVariables "," AttributedVariable
+  197                    | AttributedVariable
 
-  198 TypedVariable: Identifier ":" Type
+  198 TypedVariables: TypedVariables "," TypedVariable
+  199               | TypedVariable
 
-  199 AttributedVariable: Attributes Variable
-  200                   | Variable
+  200 TypedVariable: Identifier ":" Type
 
-  201 TypedAttributedVariable: Attributes TypedVariable
-  202                        | TypedVariable
+  201 AttributedVariable: Attributes Variable
+  202                   | Variable
 
-  203 Attributes: Attributes Attribute
-  204           | Attribute
+  203 TypedAttributedVariable: Attributes TypedVariable
+  204                        | TypedVariable
 
-  205 Attribute: "[" BasicAttribute "]"
-  206          | "[" ExpressionAttribute "]"
-  207          | "[" error "]"
+  205 Attributes: Attributes Attribute
+  206           | Attribute
 
-  208 BasicAttribute: Identifier
+  207 Attribute: "[" BasicAttribute "]"
+  208          | "[" ExpressionAttribute "]"
+  209          | "[" error "]"
 
-  209 ExpressionAttribute: Identifier Term
+  210 BasicAttribute: Identifier
+
+  211 ExpressionAttribute: Identifier Term
 
 
 Terminals, with rules where they appear
 
 "end of file" (0) 0
-error (256) 8 24 46 59 60 63 64 79 142 165 174 207
+error (256) 8 24 46 59 60 63 64 79 142 165 174 209
 "CASM" (258) 2 3
 "init" (259) 20 21
 "derived" (260) 15
@@ -351,14 +354,14 @@ error (256) 8 24 46 59 60 63 64 79 142 165 174 207
 "=" (299) 14 15 16 17 27 52 92 113
 "(" (300) 78 79 144 145 159 160 164 165 166 173 174 183
 ")" (301) 78 79 144 145 159 160 164 165 166 173 174 183
-"[" (302) 140 141 142 143 205 206 207
-"]" (303) 140 141 142 143 205 206 207
+"[" (302) 140 141 142 143 207 208 209
+"]" (303) 140 141 142 143 207 208 209
 "{" (304) 14 21 45 46 57 59 176 178
 "}" (305) 14 21 45 46 57 59 176 178
-":" (306) 18 47 48 49 148 198
+":" (306) 18 47 48 49 148 200
 "_" (307) 48
 "@" (308) 139
-"," (309) 25 68 144 146 149 159 160 171 180 196
+"," (309) 25 68 144 146 149 159 160 171 180 196 198
 "<" (310) 93 161 162
 ">" (311) 94 161 162
 "*" (312) 87 167
@@ -461,7 +464,7 @@ Term (117)
     on left: 70 71 72 73 74 75 76 77, on right: 15 43 44 45 46 49 52
     53 54 55 65 67 68 69 78 85 86 87 88 89 90 91 92 93 94 95 96 97
     98 99 100 101 102 113 114 115 116 117 143 144 148 163 176 182 183
-    184 209
+    184 211
 SimpleOrClaspedTerm (118)
     on left: 78 79 80 81 82 83 84, on right: 70 83 84 108 109 110 112
 OperatorExpression (119)
@@ -524,7 +527,7 @@ Types (146)
     on left: 149 150, on right: 149 159 161
 Type (147)
     on left: 151 152 153 154 155, on right: 15 17 18 27 112 149 150
-    159 162 167 168 198
+    159 162 167 168 200
 BasicType (148)
     on left: 156, on right: 151
 ComposedType (149)
@@ -561,7 +564,7 @@ MaybeInitializers (164)
     on left: 185 186, on right: 21 178
 Identifier (165)
     on left: 187 188, on right: 14 15 16 17 18 22 23 27 108 109 148
-    192 195 198 208 209
+    192 195 200 210 211
 IdentifierPath (166)
     on left: 189 190, on right: 20 106 107 139 156 161 162 163
 AbsoluteIdentifierPath (167)
@@ -569,23 +572,25 @@ AbsoluteIdentifierPath (167)
 RelativeIdentifierPath (168)
     on left: 193, on right: 190
 Variable (169)
-    on left: 194 195, on right: 199 200
-TypedVariables (170)
-    on left: 196 197, on right: 160 196
-TypedVariable (171)
-    on left: 198, on right: 160 194 196 197 201 202
-AttributedVariable (172)
-    on left: 199 200, on right: 52 53 54 55 113 115 116 117
-TypedAttributedVariable (173)
-    on left: 201 202, on right: 171 172
-Attributes (174)
-    on left: 203 204, on right: 2 6 23 199 201 203
-Attribute (175)
-    on left: 205 206 207, on right: 203 204
-BasicAttribute (176)
-    on left: 208, on right: 205
-ExpressionAttribute (177)
-    on left: 209, on right: 206
+    on left: 194 195, on right: 201 202
+AttributedVariables (170)
+    on left: 196 197, on right: 55 196
+TypedVariables (171)
+    on left: 198 199, on right: 160 198
+TypedVariable (172)
+    on left: 200, on right: 160 194 198 199 203 204
+AttributedVariable (173)
+    on left: 201 202, on right: 52 53 54 113 115 116 117 196 197
+TypedAttributedVariable (174)
+    on left: 203 204, on right: 171 172
+Attributes (175)
+    on left: 205 206, on right: 2 6 23 201 203 205
+Attribute (176)
+    on left: 207 208 209, on right: 205 206
+BasicAttribute (177)
+    on left: 210, on right: 207
+ExpressionAttribute (178)
+    on left: 211, on right: 208
 
 
 State 0
@@ -610,9 +615,9 @@ State 1
 
 State 2
 
-  205 Attribute: "[" . BasicAttribute "]"
-  206          | "[" . ExpressionAttribute "]"
-  207          | "[" . error "]"
+  207 Attribute: "[" . BasicAttribute "]"
+  208          | "[" . ExpressionAttribute "]"
+  209          | "[" . error "]"
 
     error         shift, and go to state 7
     "in"          shift, and go to state 8
@@ -659,7 +664,7 @@ State 4
 State 5
 
     2 Header: Attributes . "CASM"
-  203 Attributes: Attributes . Attribute
+  205 Attributes: Attributes . Attribute
 
     "CASM"  shift, and go to state 31
     "["     shift, and go to state 2
@@ -669,14 +674,14 @@ State 5
 
 State 6
 
-  204 Attributes: Attribute .
+  206 Attributes: Attribute .
 
-    $default  reduce using rule 204 (Attributes)
+    $default  reduce using rule 206 (Attributes)
 
 
 State 7
 
-  207 Attribute: "[" error . "]"
+  209 Attribute: "[" error . "]"
 
     "]"  shift, and go to state 33
 
@@ -697,8 +702,8 @@ State 9
 
 State 10
 
-  208 BasicAttribute: Identifier .
-  209 ExpressionAttribute: Identifier . Term
+  210 BasicAttribute: Identifier .
+  211 ExpressionAttribute: Identifier . Term
 
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
@@ -725,7 +730,7 @@ State 10
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    $default  reduce using rule 208 (BasicAttribute)
+    $default  reduce using rule 210 (BasicAttribute)
 
     Term                             go to state 56
     SimpleOrClaspedTerm              go to state 57
@@ -762,14 +767,14 @@ State 10
 
 State 11
 
-  205 Attribute: "[" BasicAttribute . "]"
+  207 Attribute: "[" BasicAttribute . "]"
 
     "]"  shift, and go to state 87
 
 
 State 12
 
-  206 Attribute: "[" ExpressionAttribute . "]"
+  208 Attribute: "[" ExpressionAttribute . "]"
 
     "]"  shift, and go to state 88
 
@@ -943,7 +948,7 @@ State 29
 State 30
 
     6 AttributedDefinition: Attributes . Definition
-  203 Attributes: Attributes . Attribute
+  205 Attributes: Attributes . Attribute
 
     "init"         shift, and go to state 15
     "derived"      shift, and go to state 16
@@ -972,16 +977,16 @@ State 31
 
 State 32
 
-  203 Attributes: Attributes Attribute .
+  205 Attributes: Attributes Attribute .
 
-    $default  reduce using rule 203 (Attributes)
+    $default  reduce using rule 205 (Attributes)
 
 
 State 33
 
-  207 Attribute: "[" error "]" .
+  209 Attribute: "[" error "]" .
 
-    $default  reduce using rule 207 (Attribute)
+    $default  reduce using rule 209 (Attribute)
 
 
 State 34
@@ -1516,7 +1521,7 @@ State 56
    99                   | Term . "and" Term
   100                   | Term . "=>" Term
   101                   | Term . "implies" Term
-  209 ExpressionAttribute: Identifier Term .
+  211 ExpressionAttribute: Identifier Term .
 
     "and"      shift, and go to state 121
     "or"       shift, and go to state 122
@@ -1536,7 +1541,7 @@ State 56
     "<="       shift, and go to state 136
     ">="       shift, and go to state 137
 
-    $default  reduce using rule 209 (ExpressionAttribute)
+    $default  reduce using rule 211 (ExpressionAttribute)
 
 
 State 57
@@ -1768,16 +1773,16 @@ State 86
 
 State 87
 
-  205 Attribute: "[" BasicAttribute "]" .
+  207 Attribute: "[" BasicAttribute "]" .
 
-    $default  reduce using rule 205 (Attribute)
+    $default  reduce using rule 207 (Attribute)
 
 
 State 88
 
-  206 Attribute: "[" ExpressionAttribute "]" .
+  208 Attribute: "[" ExpressionAttribute "]" .
 
-    $default  reduce using rule 206 (Attribute)
+    $default  reduce using rule 208 (Attribute)
 
 
 State 89
@@ -1915,7 +1920,7 @@ State 97
 State 98
 
   195 Variable: Identifier .
-  198 TypedVariable: Identifier . ":" Type
+  200 TypedVariable: Identifier . ":" Type
 
     ":"  shift, and go to state 155
 
@@ -1924,9 +1929,9 @@ State 98
 
 State 99
 
-  200 AttributedVariable: Variable .
+  202 AttributedVariable: Variable .
 
-    $default  reduce using rule 200 (AttributedVariable)
+    $default  reduce using rule 202 (AttributedVariable)
 
 
 State 100
@@ -1945,8 +1950,8 @@ State 101
 
 State 102
 
-  199 AttributedVariable: Attributes . Variable
-  203 Attributes: Attributes . Attribute
+  201 AttributedVariable: Attributes . Variable
+  205 Attributes: Attributes . Attribute
 
     "in"          shift, and go to state 8
     "["           shift, and go to state 2
@@ -3637,7 +3642,7 @@ State 154
 
 State 155
 
-  198 TypedVariable: Identifier ":" . Type
+  200 TypedVariable: Identifier ":" . Type
 
     "in"                      shift, and go to state 8
     "("                       shift, and go to state 189
@@ -3723,9 +3728,9 @@ State 156
 
 State 157
 
-  199 AttributedVariable: Attributes Variable .
+  201 AttributedVariable: Attributes Variable .
 
-    $default  reduce using rule 199 (AttributedVariable)
+    $default  reduce using rule 201 (AttributedVariable)
 
 
 State 158
@@ -5195,16 +5200,16 @@ State 210
 
 State 211
 
-  198 TypedVariable: Identifier . ":" Type
+  200 TypedVariable: Identifier . ":" Type
 
     ":"  shift, and go to state 155
 
 
 State 212
 
-  202 TypedAttributedVariable: TypedVariable .
+  204 TypedAttributedVariable: TypedVariable .
 
-    $default  reduce using rule 202 (TypedAttributedVariable)
+    $default  reduce using rule 204 (TypedAttributedVariable)
 
 
 State 213
@@ -5216,8 +5221,8 @@ State 213
 
 State 214
 
-  201 TypedAttributedVariable: Attributes . TypedVariable
-  203 Attributes: Attributes . Attribute
+  203 TypedAttributedVariable: Attributes . TypedVariable
+  205 Attributes: Attributes . Attribute
 
     "in"          shift, and go to state 8
     "["           shift, and go to state 2
@@ -5398,9 +5403,9 @@ State 222
 
 State 223
 
-  198 TypedVariable: Identifier ":" Type .
+  200 TypedVariable: Identifier ":" Type .
 
-    $default  reduce using rule 198 (TypedVariable)
+    $default  reduce using rule 200 (TypedVariable)
 
 
 State 224
@@ -5809,7 +5814,7 @@ State 236
 State 237
 
   192 AbsoluteIdentifierPath: Identifier .
-  198 TypedVariable: Identifier . ":" Type
+  200 TypedVariable: Identifier . ":" Type
 
     ":"  shift, and go to state 155
 
@@ -5819,16 +5824,16 @@ State 237
 State 238
 
   160 RecordType: "(" TypedVariables . "," TypedVariable ")"
-  196 TypedVariables: TypedVariables . "," TypedVariable
+  198 TypedVariables: TypedVariables . "," TypedVariable
 
     ","  shift, and go to state 297
 
 
 State 239
 
-  197 TypedVariables: TypedVariable .
+  199 TypedVariables: TypedVariable .
 
-    $default  reduce using rule 197 (TypedVariables)
+    $default  reduce using rule 199 (TypedVariables)
 
 
 State 240
@@ -6034,9 +6039,9 @@ State 250
 
 State 251
 
-  201 TypedAttributedVariable: Attributes TypedVariable .
+  203 TypedAttributedVariable: Attributes TypedVariable .
 
-    $default  reduce using rule 201 (TypedAttributedVariable)
+    $default  reduce using rule 203 (TypedAttributedVariable)
 
 
 State 252
@@ -6079,7 +6084,7 @@ State 256
 State 257
 
    23 EnumeratorDefinition: Attributes . Identifier
-  203 Attributes: Attributes . Attribute
+  205 Attributes: Attributes . Attribute
 
     "in"          shift, and go to state 8
     "["           shift, and go to state 2
@@ -6283,18 +6288,19 @@ State 262
 
 State 263
 
-   55 ChooseRule: "choose" . AttributedVariable "in" Term "do" Rule
+   55 ChooseRule: "choose" . AttributedVariables "in" Term "do" Rule
 
     "in"          shift, and go to state 8
     "["           shift, and go to state 2
     "identifier"  shift, and go to state 9
 
-    Identifier          go to state 98
-    Variable            go to state 99
-    TypedVariable       go to state 100
-    AttributedVariable  go to state 315
-    Attributes          go to state 102
-    Attribute           go to state 6
+    Identifier           go to state 98
+    Variable             go to state 99
+    AttributedVariables  go to state 315
+    TypedVariable        go to state 100
+    AttributedVariable   go to state 316
+    Attributes           go to state 102
+    Attribute            go to state 6
 
 
 State 264
@@ -6332,7 +6338,7 @@ State 264
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Rule                    go to state 316
+    Rule                    go to state 317
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -6400,7 +6406,7 @@ State 265
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 317
+    Term                             go to state 318
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -6463,7 +6469,7 @@ State 266
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 318
+    Term                             go to state 319
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -6525,7 +6531,7 @@ State 267
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 319
+    Term                             go to state 320
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -6563,7 +6569,7 @@ State 268
    57 BlockRule: "{" . Rules "}"
    59          | "{" . error "}"
 
-    error                     shift, and go to state 320
+    error                     shift, and go to state 321
     "seq"                     shift, and go to state 258
     "par"                     shift, and go to state 259
     "skip"                    shift, and go to state 260
@@ -6596,7 +6602,7 @@ State 268
     "relativeIdentifierPath"  shift, and go to state 55
 
     Rule                    go to state 309
-    Rules                   go to state 321
+    Rules                   go to state 322
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -6639,7 +6645,7 @@ State 269
    61 SequenceRule: "{|" . Rules "|}"
    63             | "{|" . error "|}"
 
-    error                     shift, and go to state 322
+    error                     shift, and go to state 323
     "seq"                     shift, and go to state 258
     "par"                     shift, and go to state 259
     "skip"                    shift, and go to state 260
@@ -6672,7 +6678,7 @@ State 269
     "relativeIdentifierPath"  shift, and go to state 55
 
     Rule                    go to state 309
-    Rules                   go to state 323
+    Rules                   go to state 324
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -6829,7 +6835,7 @@ State 285
    65 UpdateRule: DirectCallExpression . ":=" Term
   103 CallExpression: DirectCallExpression .
 
-    ":="  shift, and go to state 324
+    ":="  shift, and go to state 325
 
     $default  reduce using rule 103 (CallExpression)
 
@@ -6838,7 +6844,7 @@ State 286
 
    17 RuleDefinition: "rule" Identifier MaybeParameters "->" Type . "=" Rule
 
-    "="  shift, and go to state 325
+    "="  shift, and go to state 326
 
 
 State 287
@@ -6851,7 +6857,7 @@ State 287
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Type                    go to state 326
+    Type                    go to state 327
     BasicType               go to state 191
     ComposedType            go to state 192
     TupleType               go to state 193
@@ -6875,7 +6881,7 @@ State 288
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Type                    go to state 327
+    Type                    go to state 328
     BasicType               go to state 191
     ComposedType            go to state 192
     TupleType               go to state 193
@@ -6918,7 +6924,7 @@ State 289
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 328
+    Term                             go to state 329
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -6980,7 +6986,7 @@ State 290
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 329
+    Term                             go to state 330
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -7042,7 +7048,7 @@ State 291
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 330
+    Term                             go to state 331
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -7104,7 +7110,7 @@ State 292
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 331
+    Term                             go to state 332
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -7166,7 +7172,7 @@ State 293
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 332
+    Term                             go to state 333
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -7224,7 +7230,7 @@ State 296
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Type                    go to state 333
+    Type                    go to state 334
     BasicType               go to state 191
     ComposedType            go to state 192
     TupleType               go to state 193
@@ -7241,13 +7247,13 @@ State 296
 State 297
 
   160 RecordType: "(" TypedVariables "," . TypedVariable ")"
-  196 TypedVariables: TypedVariables "," . TypedVariable
+  198 TypedVariables: TypedVariables "," . TypedVariable
 
     "in"          shift, and go to state 8
     "identifier"  shift, and go to state 9
 
     Identifier     go to state 211
-    TypedVariable  go to state 334
+    TypedVariable  go to state 335
 
 
 State 298
@@ -7255,8 +7261,8 @@ State 298
   149 Types: Types . "," Type
   161 TemplateType: IdentifierPath "<" Types . ">"
 
-    ","  shift, and go to state 335
-    ">"  shift, and go to state 336
+    ","  shift, and go to state 336
+    ">"  shift, and go to state 337
 
 
 State 299
@@ -7273,7 +7279,7 @@ State 300
 
   162 RelationType: IdentifierPath "<" MaybeFunctionParameters . "->" Type ">"
 
-    "->"  shift, and go to state 337
+    "->"  shift, and go to state 338
 
 
 State 301
@@ -7329,7 +7335,7 @@ State 302
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 338
+    Term                             go to state 339
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -7398,7 +7404,7 @@ State 304
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 339
+    Term                             go to state 340
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -7447,7 +7453,7 @@ State 306
     "["           shift, and go to state 2
     "identifier"  shift, and go to state 9
 
-    EnumeratorDefinition  go to state 340
+    EnumeratorDefinition  go to state 341
     Identifier            go to state 256
     Attributes            go to state 257
     Attribute             go to state 6
@@ -7464,7 +7470,7 @@ State 308
 
    64 SequenceRule: "seq" error . "endseq"
 
-    "endseq"  shift, and go to state 341
+    "endseq"  shift, and go to state 342
 
 
 State 309
@@ -7480,7 +7486,7 @@ State 310
    62 SequenceRule: "seq" Rules . "endseq"
 
     "seq"                     shift, and go to state 258
-    "endseq"                  shift, and go to state 342
+    "endseq"                  shift, and go to state 343
     "par"                     shift, and go to state 259
     "skip"                    shift, and go to state 260
     "let"                     shift, and go to state 261
@@ -7511,7 +7517,7 @@ State 310
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Rule                    go to state 343
+    Rule                    go to state 344
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -7553,7 +7559,7 @@ State 311
 
    60 BlockRule: "par" error . "endpar"
 
-    "endpar"  shift, and go to state 344
+    "endpar"  shift, and go to state 345
 
 
 State 312
@@ -7563,7 +7569,7 @@ State 312
 
     "seq"                     shift, and go to state 258
     "par"                     shift, and go to state 259
-    "endpar"                  shift, and go to state 345
+    "endpar"                  shift, and go to state 346
     "skip"                    shift, and go to state 260
     "let"                     shift, and go to state 261
     "in"                      shift, and go to state 8
@@ -7593,7 +7599,7 @@ State 312
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Rule                    go to state 343
+    Rule                    go to state 344
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -7635,7 +7641,7 @@ State 313
 
    52 LetRule: "let" AttributedVariable . "=" Term "in" Rule
 
-    "="  shift, and go to state 346
+    "="  shift, and go to state 347
 
 
 State 314
@@ -7643,24 +7649,33 @@ State 314
    53 ForallRule: "forall" AttributedVariable . "in" Term "do" Rule
    54           | "forall" AttributedVariable . "in" Term "with" Term "do" Rule
 
-    "in"  shift, and go to state 347
+    "in"  shift, and go to state 348
 
 
 State 315
 
-   55 ChooseRule: "choose" AttributedVariable . "in" Term "do" Rule
+   55 ChooseRule: "choose" AttributedVariables . "in" Term "do" Rule
+  196 AttributedVariables: AttributedVariables . "," AttributedVariable
 
-    "in"  shift, and go to state 348
+    "in"  shift, and go to state 349
+    ","   shift, and go to state 350
 
 
 State 316
+
+  197 AttributedVariables: AttributedVariable .
+
+    $default  reduce using rule 197 (AttributedVariables)
+
+
+State 317
 
    56 IterateRule: "iterate" Rule .
 
     $default  reduce using rule 56 (IterateRule)
 
 
-State 317
+State 318
 
    43 ConditionalRule: "if" Term . "then" Rule
    44                | "if" Term . "then" Rule "else" Rule
@@ -7682,49 +7697,7 @@ State 317
   100                   | Term . "=>" Term
   101                   | Term . "implies" Term
 
-    "then"     shift, and go to state 349
-    "and"      shift, and go to state 121
-    "or"       shift, and go to state 122
-    "xor"      shift, and go to state 123
-    "implies"  shift, and go to state 124
-    "+"        shift, and go to state 125
-    "-"        shift, and go to state 126
-    "="        shift, and go to state 127
-    "<"        shift, and go to state 128
-    ">"        shift, and go to state 129
-    "*"        shift, and go to state 130
-    "/"        shift, and go to state 131
-    "%"        shift, and go to state 132
-    "^"        shift, and go to state 133
-    "=>"       shift, and go to state 134
-    "!="       shift, and go to state 135
-    "<="       shift, and go to state 136
-    ">="       shift, and go to state 137
-
-
-State 318
-
-   45 CaseRule: "case" Term . "of" "{" CaseLabels "}"
-   46         | "case" Term . "of" "{" error "}"
-   85 OperatorExpression: Term . "+" Term
-   86                   | Term . "-" Term
-   87                   | Term . "*" Term
-   88                   | Term . "/" Term
-   89                   | Term . "%" Term
-   90                   | Term . "^" Term
-   91                   | Term . "!=" Term
-   92                   | Term . "=" Term
-   93                   | Term . "<" Term
-   94                   | Term . ">" Term
-   95                   | Term . "<=" Term
-   96                   | Term . ">=" Term
-   97                   | Term . "or" Term
-   98                   | Term . "xor" Term
-   99                   | Term . "and" Term
-  100                   | Term . "=>" Term
-  101                   | Term . "implies" Term
-
-    "of"       shift, and go to state 350
+    "then"     shift, and go to state 351
     "and"      shift, and go to state 121
     "or"       shift, and go to state 122
     "xor"      shift, and go to state 123
@@ -7746,7 +7719,8 @@ State 318
 
 State 319
 
-   67 WhileRule: "while" Term . "do" Rule
+   45 CaseRule: "case" Term . "of" "{" CaseLabels "}"
+   46         | "case" Term . "of" "{" error "}"
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
    87                   | Term . "*" Term
@@ -7765,7 +7739,7 @@ State 319
   100                   | Term . "=>" Term
   101                   | Term . "implies" Term
 
-    "do"       shift, and go to state 351
+    "of"       shift, and go to state 352
     "and"      shift, and go to state 121
     "or"       shift, and go to state 122
     "xor"      shift, and go to state 123
@@ -7787,12 +7761,53 @@ State 319
 
 State 320
 
-   59 BlockRule: "{" error . "}"
+   67 WhileRule: "while" Term . "do" Rule
+   85 OperatorExpression: Term . "+" Term
+   86                   | Term . "-" Term
+   87                   | Term . "*" Term
+   88                   | Term . "/" Term
+   89                   | Term . "%" Term
+   90                   | Term . "^" Term
+   91                   | Term . "!=" Term
+   92                   | Term . "=" Term
+   93                   | Term . "<" Term
+   94                   | Term . ">" Term
+   95                   | Term . "<=" Term
+   96                   | Term . ">=" Term
+   97                   | Term . "or" Term
+   98                   | Term . "xor" Term
+   99                   | Term . "and" Term
+  100                   | Term . "=>" Term
+  101                   | Term . "implies" Term
 
-    "}"  shift, and go to state 352
+    "do"       shift, and go to state 353
+    "and"      shift, and go to state 121
+    "or"       shift, and go to state 122
+    "xor"      shift, and go to state 123
+    "implies"  shift, and go to state 124
+    "+"        shift, and go to state 125
+    "-"        shift, and go to state 126
+    "="        shift, and go to state 127
+    "<"        shift, and go to state 128
+    ">"        shift, and go to state 129
+    "*"        shift, and go to state 130
+    "/"        shift, and go to state 131
+    "%"        shift, and go to state 132
+    "^"        shift, and go to state 133
+    "=>"       shift, and go to state 134
+    "!="       shift, and go to state 135
+    "<="       shift, and go to state 136
+    ">="       shift, and go to state 137
 
 
 State 321
+
+   59 BlockRule: "{" error . "}"
+
+    "}"  shift, and go to state 354
+
+
+State 322
 
    40 Rules: Rules . Rule
    57 BlockRule: "{" Rules . "}"
@@ -7816,7 +7831,7 @@ State 321
     "("                       shift, and go to state 45
     "["                       shift, and go to state 46
     "{"                       shift, and go to state 268
-    "}"                       shift, and go to state 353
+    "}"                       shift, and go to state 355
     "@"                       shift, and go to state 47
     "{|"                      shift, and go to state 269
     "binary"                  shift, and go to state 48
@@ -7829,7 +7844,7 @@ State 321
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Rule                    go to state 343
+    Rule                    go to state 344
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -7867,14 +7882,14 @@ State 321
     RelativeIdentifierPath  go to state 86
 
 
-State 322
+State 323
 
    63 SequenceRule: "{|" error . "|}"
 
-    "|}"  shift, and go to state 354
+    "|}"  shift, and go to state 356
 
 
-State 323
+State 324
 
    40 Rules: Rules . Rule
    61 SequenceRule: "{|" Rules . "|}"
@@ -7900,7 +7915,7 @@ State 323
     "{"                       shift, and go to state 268
     "@"                       shift, and go to state 47
     "{|"                      shift, and go to state 269
-    "|}"                      shift, and go to state 355
+    "|}"                      shift, and go to state 357
     "binary"                  shift, and go to state 48
     "hexadecimal"             shift, and go to state 49
     "integer"                 shift, and go to state 50
@@ -7911,7 +7926,7 @@ State 323
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Rule                    go to state 343
+    Rule                    go to state 344
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -7949,7 +7964,7 @@ State 323
     RelativeIdentifierPath  go to state 86
 
 
-State 324
+State 325
 
    65 UpdateRule: DirectCallExpression ":=" . Term
 
@@ -7978,7 +7993,7 @@ State 324
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 356
+    Term                             go to state 358
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -8011,7 +8026,7 @@ State 324
     RelativeIdentifierPath           go to state 86
 
 
-State 325
+State 326
 
    17 RuleDefinition: "rule" Identifier MaybeParameters "->" Type "=" . Rule
 
@@ -8046,7 +8061,7 @@ State 325
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Rule                    go to state 357
+    Rule                    go to state 359
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -8084,25 +8099,25 @@ State 325
     RelativeIdentifierPath  go to state 86
 
 
-State 326
+State 327
 
   167 FunctionParameters: FunctionParameters "*" Type .
 
     $default  reduce using rule 167 (FunctionParameters)
 
 
-State 327
+State 328
 
    18 FunctionDefinition: "function" Identifier ":" MaybeFunctionParameters "->" Type . MaybeDefined MaybeInitially
 
-    "defined"  shift, and go to state 358
+    "defined"  shift, and go to state 360
 
     $default  reduce using rule 177 (MaybeDefined)
 
-    MaybeDefined  go to state 359
+    MaybeDefined  go to state 361
 
 
-State 328
+State 329
 
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
@@ -8144,7 +8159,7 @@ State 328
     $default  reduce using rule 113 (LetExpression)
 
 
-State 329
+State 330
 
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
@@ -8186,7 +8201,7 @@ State 329
     $default  reduce using rule 116 (UniversalQuantifierExpression)
 
 
-State 330
+State 331
 
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
@@ -8228,7 +8243,7 @@ State 330
     $default  reduce using rule 115 (ChooseExpression)
 
 
-State 331
+State 332
 
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
@@ -8270,7 +8285,7 @@ State 331
     $default  reduce using rule 114 (ConditionalExpression)
 
 
-State 332
+State 333
 
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
@@ -8312,27 +8327,27 @@ State 332
     $default  reduce using rule 117 (ExistentialQuantifierExpression)
 
 
-State 333
+State 334
 
   149 Types: Types "," Type .
   159 TupleType: "(" Types "," Type . ")"
 
-    ")"  shift, and go to state 360
+    ")"  shift, and go to state 362
 
     $default  reduce using rule 149 (Types)
 
 
-State 334
+State 335
 
   160 RecordType: "(" TypedVariables "," TypedVariable . ")"
-  196 TypedVariables: TypedVariables "," TypedVariable .
+  198 TypedVariables: TypedVariables "," TypedVariable .
 
-    ")"  shift, and go to state 361
+    ")"  shift, and go to state 363
 
-    $default  reduce using rule 196 (TypedVariables)
+    $default  reduce using rule 198 (TypedVariables)
 
 
-State 335
+State 336
 
   149 Types: Types "," . Type
 
@@ -8342,7 +8357,7 @@ State 335
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Type                    go to state 362
+    Type                    go to state 364
     BasicType               go to state 191
     ComposedType            go to state 192
     TupleType               go to state 193
@@ -8356,14 +8371,14 @@ State 335
     RelativeIdentifierPath  go to state 86
 
 
-State 336
+State 337
 
   161 TemplateType: IdentifierPath "<" Types ">" .
 
     $default  reduce using rule 161 (TemplateType)
 
 
-State 337
+State 338
 
   162 RelationType: IdentifierPath "<" MaybeFunctionParameters "->" . Type ">"
 
@@ -8373,7 +8388,7 @@ State 337
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Type                    go to state 363
+    Type                    go to state 365
     BasicType               go to state 191
     ComposedType            go to state 192
     TupleType               go to state 193
@@ -8387,7 +8402,7 @@ State 337
     RelativeIdentifierPath  go to state 86
 
 
-State 338
+State 339
 
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
@@ -8429,7 +8444,7 @@ State 338
     $default  reduce using rule 183 (Initializer)
 
 
-State 339
+State 340
 
    15 DerivedDefinition: "derived" Identifier MaybeParameters "->" Type "=" Term .
    85 OperatorExpression: Term . "+" Term
@@ -8471,176 +8486,51 @@ State 339
     $default  reduce using rule 15 (DerivedDefinition)
 
 
-State 340
+State 341
 
    25 Enumerators: Enumerators "," EnumeratorDefinition .
 
     $default  reduce using rule 25 (Enumerators)
 
 
-State 341
+State 342
 
    64 SequenceRule: "seq" error "endseq" .
 
     $default  reduce using rule 64 (SequenceRule)
 
 
-State 342
+State 343
 
    62 SequenceRule: "seq" Rules "endseq" .
 
     $default  reduce using rule 62 (SequenceRule)
 
 
-State 343
+State 344
 
    40 Rules: Rules Rule .
 
     $default  reduce using rule 40 (Rules)
 
 
-State 344
+State 345
 
    60 BlockRule: "par" error "endpar" .
 
     $default  reduce using rule 60 (BlockRule)
 
 
-State 345
+State 346
 
    58 BlockRule: "par" Rules "endpar" .
 
     $default  reduce using rule 58 (BlockRule)
 
 
-State 346
-
-   52 LetRule: "let" AttributedVariable "=" . Term "in" Rule
-
-    "let"                     shift, and go to state 34
-    "in"                      shift, and go to state 8
-    "forall"                  shift, and go to state 35
-    "choose"                  shift, and go to state 36
-    "if"                      shift, and go to state 37
-    "exists"                  shift, and go to state 38
-    "undef"                   shift, and go to state 39
-    "false"                   shift, and go to state 40
-    "true"                    shift, and go to state 41
-    "not"                     shift, and go to state 42
-    "+"                       shift, and go to state 43
-    "-"                       shift, and go to state 44
-    "("                       shift, and go to state 45
-    "["                       shift, and go to state 46
-    "@"                       shift, and go to state 47
-    "binary"                  shift, and go to state 48
-    "hexadecimal"             shift, and go to state 49
-    "integer"                 shift, and go to state 50
-    "rational"                shift, and go to state 51
-    "decimal"                 shift, and go to state 52
-    "string"                  shift, and go to state 53
-    "identifier"              shift, and go to state 9
-    "absoluteIdentifierPath"  shift, and go to state 54
-    "relativeIdentifierPath"  shift, and go to state 55
-
-    Term                             go to state 364
-    SimpleOrClaspedTerm              go to state 57
-    OperatorExpression               go to state 58
-    CallExpression                   go to state 59
-    DirectCallExpression             go to state 60
-    MethodCallExpression             go to state 61
-    LiteralCallExpression            go to state 62
-    IndirectCallExpression           go to state 63
-    TypeCastingExpression            go to state 64
-    LetExpression                    go to state 65
-    ConditionalExpression            go to state 66
-    ChooseExpression                 go to state 67
-    UniversalQuantifierExpression    go to state 68
-    ExistentialQuantifierExpression  go to state 69
-    Literal                          go to state 70
-    UndefinedLiteral                 go to state 71
-    BooleanLiteral                   go to state 72
-    IntegerLiteral                   go to state 73
-    RationalLiteral                  go to state 74
-    DecimalLiteral                   go to state 75
-    BinaryLiteral                    go to state 76
-    StringLiteral                    go to state 77
-    ReferenceLiteral                 go to state 78
-    ListLiteral                      go to state 79
-    RangeLiteral                     go to state 80
-    TupleLiteral                     go to state 81
-    RecordLiteral                    go to state 82
-    Identifier                       go to state 83
-    IdentifierPath                   go to state 84
-    AbsoluteIdentifierPath           go to state 85
-    RelativeIdentifierPath           go to state 86
-
-
 State 347
 
-   53 ForallRule: "forall" AttributedVariable "in" . Term "do" Rule
-   54           | "forall" AttributedVariable "in" . Term "with" Term "do" Rule
-
-    "let"                     shift, and go to state 34
-    "in"                      shift, and go to state 8
-    "forall"                  shift, and go to state 35
-    "choose"                  shift, and go to state 36
-    "if"                      shift, and go to state 37
-    "exists"                  shift, and go to state 38
-    "undef"                   shift, and go to state 39
-    "false"                   shift, and go to state 40
-    "true"                    shift, and go to state 41
-    "not"                     shift, and go to state 42
-    "+"                       shift, and go to state 43
-    "-"                       shift, and go to state 44
-    "("                       shift, and go to state 45
-    "["                       shift, and go to state 46
-    "@"                       shift, and go to state 47
-    "binary"                  shift, and go to state 48
-    "hexadecimal"             shift, and go to state 49
-    "integer"                 shift, and go to state 50
-    "rational"                shift, and go to state 51
-    "decimal"                 shift, and go to state 52
-    "string"                  shift, and go to state 53
-    "identifier"              shift, and go to state 9
-    "absoluteIdentifierPath"  shift, and go to state 54
-    "relativeIdentifierPath"  shift, and go to state 55
-
-    Term                             go to state 365
-    SimpleOrClaspedTerm              go to state 57
-    OperatorExpression               go to state 58
-    CallExpression                   go to state 59
-    DirectCallExpression             go to state 60
-    MethodCallExpression             go to state 61
-    LiteralCallExpression            go to state 62
-    IndirectCallExpression           go to state 63
-    TypeCastingExpression            go to state 64
-    LetExpression                    go to state 65
-    ConditionalExpression            go to state 66
-    ChooseExpression                 go to state 67
-    UniversalQuantifierExpression    go to state 68
-    ExistentialQuantifierExpression  go to state 69
-    Literal                          go to state 70
-    UndefinedLiteral                 go to state 71
-    BooleanLiteral                   go to state 72
-    IntegerLiteral                   go to state 73
-    RationalLiteral                  go to state 74
-    DecimalLiteral                   go to state 75
-    BinaryLiteral                    go to state 76
-    StringLiteral                    go to state 77
-    ReferenceLiteral                 go to state 78
-    ListLiteral                      go to state 79
-    RangeLiteral                     go to state 80
-    TupleLiteral                     go to state 81
-    RecordLiteral                    go to state 82
-    Identifier                       go to state 83
-    IdentifierPath                   go to state 84
-    AbsoluteIdentifierPath           go to state 85
-    RelativeIdentifierPath           go to state 86
-
-
-State 348
-
-   55 ChooseRule: "choose" AttributedVariable "in" . Term "do" Rule
+   52 LetRule: "let" AttributedVariable "=" . Term "in" Rule
 
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
@@ -8700,7 +8590,148 @@ State 348
     RelativeIdentifierPath           go to state 86
 
 
+State 348
+
+   53 ForallRule: "forall" AttributedVariable "in" . Term "do" Rule
+   54           | "forall" AttributedVariable "in" . Term "with" Term "do" Rule
+
+    "let"                     shift, and go to state 34
+    "in"                      shift, and go to state 8
+    "forall"                  shift, and go to state 35
+    "choose"                  shift, and go to state 36
+    "if"                      shift, and go to state 37
+    "exists"                  shift, and go to state 38
+    "undef"                   shift, and go to state 39
+    "false"                   shift, and go to state 40
+    "true"                    shift, and go to state 41
+    "not"                     shift, and go to state 42
+    "+"                       shift, and go to state 43
+    "-"                       shift, and go to state 44
+    "("                       shift, and go to state 45
+    "["                       shift, and go to state 46
+    "@"                       shift, and go to state 47
+    "binary"                  shift, and go to state 48
+    "hexadecimal"             shift, and go to state 49
+    "integer"                 shift, and go to state 50
+    "rational"                shift, and go to state 51
+    "decimal"                 shift, and go to state 52
+    "string"                  shift, and go to state 53
+    "identifier"              shift, and go to state 9
+    "absoluteIdentifierPath"  shift, and go to state 54
+    "relativeIdentifierPath"  shift, and go to state 55
+
+    Term                             go to state 367
+    SimpleOrClaspedTerm              go to state 57
+    OperatorExpression               go to state 58
+    CallExpression                   go to state 59
+    DirectCallExpression             go to state 60
+    MethodCallExpression             go to state 61
+    LiteralCallExpression            go to state 62
+    IndirectCallExpression           go to state 63
+    TypeCastingExpression            go to state 64
+    LetExpression                    go to state 65
+    ConditionalExpression            go to state 66
+    ChooseExpression                 go to state 67
+    UniversalQuantifierExpression    go to state 68
+    ExistentialQuantifierExpression  go to state 69
+    Literal                          go to state 70
+    UndefinedLiteral                 go to state 71
+    BooleanLiteral                   go to state 72
+    IntegerLiteral                   go to state 73
+    RationalLiteral                  go to state 74
+    DecimalLiteral                   go to state 75
+    BinaryLiteral                    go to state 76
+    StringLiteral                    go to state 77
+    ReferenceLiteral                 go to state 78
+    ListLiteral                      go to state 79
+    RangeLiteral                     go to state 80
+    TupleLiteral                     go to state 81
+    RecordLiteral                    go to state 82
+    Identifier                       go to state 83
+    IdentifierPath                   go to state 84
+    AbsoluteIdentifierPath           go to state 85
+    RelativeIdentifierPath           go to state 86
+
+
 State 349
+
+   55 ChooseRule: "choose" AttributedVariables "in" . Term "do" Rule
+
+    "let"                     shift, and go to state 34
+    "in"                      shift, and go to state 8
+    "forall"                  shift, and go to state 35
+    "choose"                  shift, and go to state 36
+    "if"                      shift, and go to state 37
+    "exists"                  shift, and go to state 38
+    "undef"                   shift, and go to state 39
+    "false"                   shift, and go to state 40
+    "true"                    shift, and go to state 41
+    "not"                     shift, and go to state 42
+    "+"                       shift, and go to state 43
+    "-"                       shift, and go to state 44
+    "("                       shift, and go to state 45
+    "["                       shift, and go to state 46
+    "@"                       shift, and go to state 47
+    "binary"                  shift, and go to state 48
+    "hexadecimal"             shift, and go to state 49
+    "integer"                 shift, and go to state 50
+    "rational"                shift, and go to state 51
+    "decimal"                 shift, and go to state 52
+    "string"                  shift, and go to state 53
+    "identifier"              shift, and go to state 9
+    "absoluteIdentifierPath"  shift, and go to state 54
+    "relativeIdentifierPath"  shift, and go to state 55
+
+    Term                             go to state 368
+    SimpleOrClaspedTerm              go to state 57
+    OperatorExpression               go to state 58
+    CallExpression                   go to state 59
+    DirectCallExpression             go to state 60
+    MethodCallExpression             go to state 61
+    LiteralCallExpression            go to state 62
+    IndirectCallExpression           go to state 63
+    TypeCastingExpression            go to state 64
+    LetExpression                    go to state 65
+    ConditionalExpression            go to state 66
+    ChooseExpression                 go to state 67
+    UniversalQuantifierExpression    go to state 68
+    ExistentialQuantifierExpression  go to state 69
+    Literal                          go to state 70
+    UndefinedLiteral                 go to state 71
+    BooleanLiteral                   go to state 72
+    IntegerLiteral                   go to state 73
+    RationalLiteral                  go to state 74
+    DecimalLiteral                   go to state 75
+    BinaryLiteral                    go to state 76
+    StringLiteral                    go to state 77
+    ReferenceLiteral                 go to state 78
+    ListLiteral                      go to state 79
+    RangeLiteral                     go to state 80
+    TupleLiteral                     go to state 81
+    RecordLiteral                    go to state 82
+    Identifier                       go to state 83
+    IdentifierPath                   go to state 84
+    AbsoluteIdentifierPath           go to state 85
+    RelativeIdentifierPath           go to state 86
+
+
+State 350
+
+  196 AttributedVariables: AttributedVariables "," . AttributedVariable
+
+    "in"          shift, and go to state 8
+    "["           shift, and go to state 2
+    "identifier"  shift, and go to state 9
+
+    Identifier          go to state 98
+    Variable            go to state 99
+    TypedVariable       go to state 100
+    AttributedVariable  go to state 369
+    Attributes          go to state 102
+    Attribute           go to state 6
+
+
+State 351
 
    43 ConditionalRule: "if" Term "then" . Rule
    44                | "if" Term "then" . Rule "else" Rule
@@ -8736,88 +8767,7 @@ State 349
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Rule                    go to state 367
-    SkipRule                go to state 271
-    ConditionalRule         go to state 272
-    CaseRule                go to state 273
-    LetRule                 go to state 274
-    ForallRule              go to state 275
-    ChooseRule              go to state 276
-    IterateRule             go to state 277
-    BlockRule               go to state 278
-    SequenceRule            go to state 279
-    UpdateRule              go to state 280
-    CallRule                go to state 281
-    WhileRule               go to state 282
-    SimpleOrClaspedTerm     go to state 283
-    CallExpression          go to state 284
-    DirectCallExpression    go to state 285
-    MethodCallExpression    go to state 61
-    LiteralCallExpression   go to state 62
-    IndirectCallExpression  go to state 63
-    Literal                 go to state 70
-    UndefinedLiteral        go to state 71
-    BooleanLiteral          go to state 72
-    IntegerLiteral          go to state 73
-    RationalLiteral         go to state 74
-    DecimalLiteral          go to state 75
-    BinaryLiteral           go to state 76
-    StringLiteral           go to state 77
-    ReferenceLiteral        go to state 78
-    ListLiteral             go to state 79
-    RangeLiteral            go to state 80
-    TupleLiteral            go to state 81
-    RecordLiteral           go to state 82
-    Identifier              go to state 83
-    IdentifierPath          go to state 84
-    AbsoluteIdentifierPath  go to state 85
-    RelativeIdentifierPath  go to state 86
-
-
-State 350
-
-   45 CaseRule: "case" Term "of" . "{" CaseLabels "}"
-   46         | "case" Term "of" . "{" error "}"
-
-    "{"  shift, and go to state 368
-
-
-State 351
-
-   67 WhileRule: "while" Term "do" . Rule
-
-    "seq"                     shift, and go to state 258
-    "par"                     shift, and go to state 259
-    "skip"                    shift, and go to state 260
-    "let"                     shift, and go to state 261
-    "in"                      shift, and go to state 8
-    "forall"                  shift, and go to state 262
-    "choose"                  shift, and go to state 263
-    "iterate"                 shift, and go to state 264
-    "if"                      shift, and go to state 265
-    "case"                    shift, and go to state 266
-    "while"                   shift, and go to state 267
-    "undef"                   shift, and go to state 39
-    "false"                   shift, and go to state 40
-    "true"                    shift, and go to state 41
-    "+"                       shift, and go to state 43
-    "-"                       shift, and go to state 44
-    "("                       shift, and go to state 45
-    "["                       shift, and go to state 46
-    "{"                       shift, and go to state 268
-    "@"                       shift, and go to state 47
-    "{|"                      shift, and go to state 269
-    "binary"                  shift, and go to state 48
-    "hexadecimal"             shift, and go to state 49
-    "integer"                 shift, and go to state 50
-    "rational"                shift, and go to state 51
-    "decimal"                 shift, and go to state 52
-    "string"                  shift, and go to state 53
-    "identifier"              shift, and go to state 9
-    "absoluteIdentifierPath"  shift, and go to state 54
-    "relativeIdentifierPath"  shift, and go to state 55
-
-    Rule                    go to state 369
+    Rule                    go to state 370
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -8857,33 +8807,114 @@ State 351
 
 State 352
 
+   45 CaseRule: "case" Term "of" . "{" CaseLabels "}"
+   46         | "case" Term "of" . "{" error "}"
+
+    "{"  shift, and go to state 371
+
+
+State 353
+
+   67 WhileRule: "while" Term "do" . Rule
+
+    "seq"                     shift, and go to state 258
+    "par"                     shift, and go to state 259
+    "skip"                    shift, and go to state 260
+    "let"                     shift, and go to state 261
+    "in"                      shift, and go to state 8
+    "forall"                  shift, and go to state 262
+    "choose"                  shift, and go to state 263
+    "iterate"                 shift, and go to state 264
+    "if"                      shift, and go to state 265
+    "case"                    shift, and go to state 266
+    "while"                   shift, and go to state 267
+    "undef"                   shift, and go to state 39
+    "false"                   shift, and go to state 40
+    "true"                    shift, and go to state 41
+    "+"                       shift, and go to state 43
+    "-"                       shift, and go to state 44
+    "("                       shift, and go to state 45
+    "["                       shift, and go to state 46
+    "{"                       shift, and go to state 268
+    "@"                       shift, and go to state 47
+    "{|"                      shift, and go to state 269
+    "binary"                  shift, and go to state 48
+    "hexadecimal"             shift, and go to state 49
+    "integer"                 shift, and go to state 50
+    "rational"                shift, and go to state 51
+    "decimal"                 shift, and go to state 52
+    "string"                  shift, and go to state 53
+    "identifier"              shift, and go to state 9
+    "absoluteIdentifierPath"  shift, and go to state 54
+    "relativeIdentifierPath"  shift, and go to state 55
+
+    Rule                    go to state 372
+    SkipRule                go to state 271
+    ConditionalRule         go to state 272
+    CaseRule                go to state 273
+    LetRule                 go to state 274
+    ForallRule              go to state 275
+    ChooseRule              go to state 276
+    IterateRule             go to state 277
+    BlockRule               go to state 278
+    SequenceRule            go to state 279
+    UpdateRule              go to state 280
+    CallRule                go to state 281
+    WhileRule               go to state 282
+    SimpleOrClaspedTerm     go to state 283
+    CallExpression          go to state 284
+    DirectCallExpression    go to state 285
+    MethodCallExpression    go to state 61
+    LiteralCallExpression   go to state 62
+    IndirectCallExpression  go to state 63
+    Literal                 go to state 70
+    UndefinedLiteral        go to state 71
+    BooleanLiteral          go to state 72
+    IntegerLiteral          go to state 73
+    RationalLiteral         go to state 74
+    DecimalLiteral          go to state 75
+    BinaryLiteral           go to state 76
+    StringLiteral           go to state 77
+    ReferenceLiteral        go to state 78
+    ListLiteral             go to state 79
+    RangeLiteral            go to state 80
+    TupleLiteral            go to state 81
+    RecordLiteral           go to state 82
+    Identifier              go to state 83
+    IdentifierPath          go to state 84
+    AbsoluteIdentifierPath  go to state 85
+    RelativeIdentifierPath  go to state 86
+
+
+State 354
+
    59 BlockRule: "{" error "}" .
 
     $default  reduce using rule 59 (BlockRule)
 
 
-State 353
+State 355
 
    57 BlockRule: "{" Rules "}" .
 
     $default  reduce using rule 57 (BlockRule)
 
 
-State 354
+State 356
 
    63 SequenceRule: "{|" error "|}" .
 
     $default  reduce using rule 63 (SequenceRule)
 
 
-State 355
+State 357
 
    61 SequenceRule: "{|" Rules "|}" .
 
     $default  reduce using rule 61 (SequenceRule)
 
 
-State 356
+State 358
 
    65 UpdateRule: DirectCallExpression ":=" Term .
    85 OperatorExpression: Term . "+" Term
@@ -8925,60 +8956,60 @@ State 356
     $default  reduce using rule 65 (UpdateRule)
 
 
-State 357
+State 359
 
    17 RuleDefinition: "rule" Identifier MaybeParameters "->" Type "=" Rule .
 
     $default  reduce using rule 17 (RuleDefinition)
 
 
-State 358
+State 360
 
   176 MaybeDefined: "defined" . "{" Term "}"
 
-    "{"  shift, and go to state 370
+    "{"  shift, and go to state 373
 
 
-State 359
+State 361
 
    18 FunctionDefinition: "function" Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined . MaybeInitially
 
-    "initially"  shift, and go to state 371
+    "initially"  shift, and go to state 374
 
     $default  reduce using rule 179 (MaybeInitially)
 
-    MaybeInitially  go to state 372
+    MaybeInitially  go to state 375
 
 
-State 360
+State 362
 
   159 TupleType: "(" Types "," Type ")" .
 
     $default  reduce using rule 159 (TupleType)
 
 
-State 361
+State 363
 
   160 RecordType: "(" TypedVariables "," TypedVariable ")" .
 
     $default  reduce using rule 160 (RecordType)
 
 
-State 362
+State 364
 
   149 Types: Types "," Type .
 
     $default  reduce using rule 149 (Types)
 
 
-State 363
+State 365
 
   162 RelationType: IdentifierPath "<" MaybeFunctionParameters "->" Type . ">"
 
-    ">"  shift, and go to state 373
+    ">"  shift, and go to state 376
 
 
-State 364
+State 366
 
    52 LetRule: "let" AttributedVariable "=" Term . "in" Rule
    85 OperatorExpression: Term . "+" Term
@@ -8999,91 +9030,7 @@ State 364
   100                   | Term . "=>" Term
   101                   | Term . "implies" Term
 
-    "in"       shift, and go to state 374
-    "and"      shift, and go to state 121
-    "or"       shift, and go to state 122
-    "xor"      shift, and go to state 123
-    "implies"  shift, and go to state 124
-    "+"        shift, and go to state 125
-    "-"        shift, and go to state 126
-    "="        shift, and go to state 127
-    "<"        shift, and go to state 128
-    ">"        shift, and go to state 129
-    "*"        shift, and go to state 130
-    "/"        shift, and go to state 131
-    "%"        shift, and go to state 132
-    "^"        shift, and go to state 133
-    "=>"       shift, and go to state 134
-    "!="       shift, and go to state 135
-    "<="       shift, and go to state 136
-    ">="       shift, and go to state 137
-
-
-State 365
-
-   53 ForallRule: "forall" AttributedVariable "in" Term . "do" Rule
-   54           | "forall" AttributedVariable "in" Term . "with" Term "do" Rule
-   85 OperatorExpression: Term . "+" Term
-   86                   | Term . "-" Term
-   87                   | Term . "*" Term
-   88                   | Term . "/" Term
-   89                   | Term . "%" Term
-   90                   | Term . "^" Term
-   91                   | Term . "!=" Term
-   92                   | Term . "=" Term
-   93                   | Term . "<" Term
-   94                   | Term . ">" Term
-   95                   | Term . "<=" Term
-   96                   | Term . ">=" Term
-   97                   | Term . "or" Term
-   98                   | Term . "xor" Term
-   99                   | Term . "and" Term
-  100                   | Term . "=>" Term
-  101                   | Term . "implies" Term
-
-    "do"       shift, and go to state 375
-    "with"     shift, and go to state 376
-    "and"      shift, and go to state 121
-    "or"       shift, and go to state 122
-    "xor"      shift, and go to state 123
-    "implies"  shift, and go to state 124
-    "+"        shift, and go to state 125
-    "-"        shift, and go to state 126
-    "="        shift, and go to state 127
-    "<"        shift, and go to state 128
-    ">"        shift, and go to state 129
-    "*"        shift, and go to state 130
-    "/"        shift, and go to state 131
-    "%"        shift, and go to state 132
-    "^"        shift, and go to state 133
-    "=>"       shift, and go to state 134
-    "!="       shift, and go to state 135
-    "<="       shift, and go to state 136
-    ">="       shift, and go to state 137
-
-
-State 366
-
-   55 ChooseRule: "choose" AttributedVariable "in" Term . "do" Rule
-   85 OperatorExpression: Term . "+" Term
-   86                   | Term . "-" Term
-   87                   | Term . "*" Term
-   88                   | Term . "/" Term
-   89                   | Term . "%" Term
-   90                   | Term . "^" Term
-   91                   | Term . "!=" Term
-   92                   | Term . "=" Term
-   93                   | Term . "<" Term
-   94                   | Term . ">" Term
-   95                   | Term . "<=" Term
-   96                   | Term . ">=" Term
-   97                   | Term . "or" Term
-   98                   | Term . "xor" Term
-   99                   | Term . "and" Term
-  100                   | Term . "=>" Term
-  101                   | Term . "implies" Term
-
-    "do"       shift, and go to state 377
+    "in"       shift, and go to state 377
     "and"      shift, and go to state 121
     "or"       shift, and go to state 122
     "xor"      shift, and go to state 123
@@ -9105,26 +9052,117 @@ State 366
 
 State 367
 
-   43 ConditionalRule: "if" Term "then" Rule .
-   44                | "if" Term "then" Rule . "else" Rule
+   53 ForallRule: "forall" AttributedVariable "in" Term . "do" Rule
+   54           | "forall" AttributedVariable "in" Term . "with" Term "do" Rule
+   85 OperatorExpression: Term . "+" Term
+   86                   | Term . "-" Term
+   87                   | Term . "*" Term
+   88                   | Term . "/" Term
+   89                   | Term . "%" Term
+   90                   | Term . "^" Term
+   91                   | Term . "!=" Term
+   92                   | Term . "=" Term
+   93                   | Term . "<" Term
+   94                   | Term . ">" Term
+   95                   | Term . "<=" Term
+   96                   | Term . ">=" Term
+   97                   | Term . "or" Term
+   98                   | Term . "xor" Term
+   99                   | Term . "and" Term
+  100                   | Term . "=>" Term
+  101                   | Term . "implies" Term
 
-    "else"  shift, and go to state 378
-
-    $default  reduce using rule 43 (ConditionalRule)
+    "do"       shift, and go to state 378
+    "with"     shift, and go to state 379
+    "and"      shift, and go to state 121
+    "or"       shift, and go to state 122
+    "xor"      shift, and go to state 123
+    "implies"  shift, and go to state 124
+    "+"        shift, and go to state 125
+    "-"        shift, and go to state 126
+    "="        shift, and go to state 127
+    "<"        shift, and go to state 128
+    ">"        shift, and go to state 129
+    "*"        shift, and go to state 130
+    "/"        shift, and go to state 131
+    "%"        shift, and go to state 132
+    "^"        shift, and go to state 133
+    "=>"       shift, and go to state 134
+    "!="       shift, and go to state 135
+    "<="       shift, and go to state 136
+    ">="       shift, and go to state 137
 
 
 State 368
 
+   55 ChooseRule: "choose" AttributedVariables "in" Term . "do" Rule
+   85 OperatorExpression: Term . "+" Term
+   86                   | Term . "-" Term
+   87                   | Term . "*" Term
+   88                   | Term . "/" Term
+   89                   | Term . "%" Term
+   90                   | Term . "^" Term
+   91                   | Term . "!=" Term
+   92                   | Term . "=" Term
+   93                   | Term . "<" Term
+   94                   | Term . ">" Term
+   95                   | Term . "<=" Term
+   96                   | Term . ">=" Term
+   97                   | Term . "or" Term
+   98                   | Term . "xor" Term
+   99                   | Term . "and" Term
+  100                   | Term . "=>" Term
+  101                   | Term . "implies" Term
+
+    "do"       shift, and go to state 380
+    "and"      shift, and go to state 121
+    "or"       shift, and go to state 122
+    "xor"      shift, and go to state 123
+    "implies"  shift, and go to state 124
+    "+"        shift, and go to state 125
+    "-"        shift, and go to state 126
+    "="        shift, and go to state 127
+    "<"        shift, and go to state 128
+    ">"        shift, and go to state 129
+    "*"        shift, and go to state 130
+    "/"        shift, and go to state 131
+    "%"        shift, and go to state 132
+    "^"        shift, and go to state 133
+    "=>"       shift, and go to state 134
+    "!="       shift, and go to state 135
+    "<="       shift, and go to state 136
+    ">="       shift, and go to state 137
+
+
+State 369
+
+  196 AttributedVariables: AttributedVariables "," AttributedVariable .
+
+    $default  reduce using rule 196 (AttributedVariables)
+
+
+State 370
+
+   43 ConditionalRule: "if" Term "then" Rule .
+   44                | "if" Term "then" Rule . "else" Rule
+
+    "else"  shift, and go to state 381
+
+    $default  reduce using rule 43 (ConditionalRule)
+
+
+State 371
+
    45 CaseRule: "case" Term "of" "{" . CaseLabels "}"
    46         | "case" Term "of" "{" . error "}"
 
-    error                     shift, and go to state 379
+    error                     shift, and go to state 382
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
     "forall"                  shift, and go to state 35
     "choose"                  shift, and go to state 36
     "if"                      shift, and go to state 37
-    "default"                 shift, and go to state 380
+    "default"                 shift, and go to state 383
     "exists"                  shift, and go to state 38
     "undef"                   shift, and go to state 39
     "false"                   shift, and go to state 40
@@ -9134,7 +9172,7 @@ State 368
     "-"                       shift, and go to state 44
     "("                       shift, and go to state 45
     "["                       shift, and go to state 46
-    "_"                       shift, and go to state 381
+    "_"                       shift, and go to state 384
     "@"                       shift, and go to state 47
     "binary"                  shift, and go to state 48
     "hexadecimal"             shift, and go to state 49
@@ -9146,9 +9184,9 @@ State 368
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    CaseLabel                        go to state 382
-    CaseLabels                       go to state 383
-    Term                             go to state 384
+    CaseLabel                        go to state 385
+    CaseLabels                       go to state 386
+    Term                             go to state 387
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -9181,14 +9219,14 @@ State 368
     RelativeIdentifierPath           go to state 86
 
 
-State 369
+State 372
 
    67 WhileRule: "while" Term "do" Rule .
 
     $default  reduce using rule 67 (WhileRule)
 
 
-State 370
+State 373
 
   176 MaybeDefined: "defined" "{" . Term "}"
 
@@ -9217,7 +9255,7 @@ State 370
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 385
+    Term                             go to state 388
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -9250,238 +9288,30 @@ State 370
     RelativeIdentifierPath           go to state 86
 
 
-State 371
+State 374
 
   178 MaybeInitially: "initially" . "{" MaybeInitializers "}"
 
-    "{"  shift, and go to state 386
+    "{"  shift, and go to state 389
 
 
-State 372
+State 375
 
    18 FunctionDefinition: "function" Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially .
 
     $default  reduce using rule 18 (FunctionDefinition)
 
 
-State 373
+State 376
 
   162 RelationType: IdentifierPath "<" MaybeFunctionParameters "->" Type ">" .
 
     $default  reduce using rule 162 (RelationType)
 
 
-State 374
-
-   52 LetRule: "let" AttributedVariable "=" Term "in" . Rule
-
-    "seq"                     shift, and go to state 258
-    "par"                     shift, and go to state 259
-    "skip"                    shift, and go to state 260
-    "let"                     shift, and go to state 261
-    "in"                      shift, and go to state 8
-    "forall"                  shift, and go to state 262
-    "choose"                  shift, and go to state 263
-    "iterate"                 shift, and go to state 264
-    "if"                      shift, and go to state 265
-    "case"                    shift, and go to state 266
-    "while"                   shift, and go to state 267
-    "undef"                   shift, and go to state 39
-    "false"                   shift, and go to state 40
-    "true"                    shift, and go to state 41
-    "+"                       shift, and go to state 43
-    "-"                       shift, and go to state 44
-    "("                       shift, and go to state 45
-    "["                       shift, and go to state 46
-    "{"                       shift, and go to state 268
-    "@"                       shift, and go to state 47
-    "{|"                      shift, and go to state 269
-    "binary"                  shift, and go to state 48
-    "hexadecimal"             shift, and go to state 49
-    "integer"                 shift, and go to state 50
-    "rational"                shift, and go to state 51
-    "decimal"                 shift, and go to state 52
-    "string"                  shift, and go to state 53
-    "identifier"              shift, and go to state 9
-    "absoluteIdentifierPath"  shift, and go to state 54
-    "relativeIdentifierPath"  shift, and go to state 55
-
-    Rule                    go to state 387
-    SkipRule                go to state 271
-    ConditionalRule         go to state 272
-    CaseRule                go to state 273
-    LetRule                 go to state 274
-    ForallRule              go to state 275
-    ChooseRule              go to state 276
-    IterateRule             go to state 277
-    BlockRule               go to state 278
-    SequenceRule            go to state 279
-    UpdateRule              go to state 280
-    CallRule                go to state 281
-    WhileRule               go to state 282
-    SimpleOrClaspedTerm     go to state 283
-    CallExpression          go to state 284
-    DirectCallExpression    go to state 285
-    MethodCallExpression    go to state 61
-    LiteralCallExpression   go to state 62
-    IndirectCallExpression  go to state 63
-    Literal                 go to state 70
-    UndefinedLiteral        go to state 71
-    BooleanLiteral          go to state 72
-    IntegerLiteral          go to state 73
-    RationalLiteral         go to state 74
-    DecimalLiteral          go to state 75
-    BinaryLiteral           go to state 76
-    StringLiteral           go to state 77
-    ReferenceLiteral        go to state 78
-    ListLiteral             go to state 79
-    RangeLiteral            go to state 80
-    TupleLiteral            go to state 81
-    RecordLiteral           go to state 82
-    Identifier              go to state 83
-    IdentifierPath          go to state 84
-    AbsoluteIdentifierPath  go to state 85
-    RelativeIdentifierPath  go to state 86
-
-
-State 375
-
-   53 ForallRule: "forall" AttributedVariable "in" Term "do" . Rule
-
-    "seq"                     shift, and go to state 258
-    "par"                     shift, and go to state 259
-    "skip"                    shift, and go to state 260
-    "let"                     shift, and go to state 261
-    "in"                      shift, and go to state 8
-    "forall"                  shift, and go to state 262
-    "choose"                  shift, and go to state 263
-    "iterate"                 shift, and go to state 264
-    "if"                      shift, and go to state 265
-    "case"                    shift, and go to state 266
-    "while"                   shift, and go to state 267
-    "undef"                   shift, and go to state 39
-    "false"                   shift, and go to state 40
-    "true"                    shift, and go to state 41
-    "+"                       shift, and go to state 43
-    "-"                       shift, and go to state 44
-    "("                       shift, and go to state 45
-    "["                       shift, and go to state 46
-    "{"                       shift, and go to state 268
-    "@"                       shift, and go to state 47
-    "{|"                      shift, and go to state 269
-    "binary"                  shift, and go to state 48
-    "hexadecimal"             shift, and go to state 49
-    "integer"                 shift, and go to state 50
-    "rational"                shift, and go to state 51
-    "decimal"                 shift, and go to state 52
-    "string"                  shift, and go to state 53
-    "identifier"              shift, and go to state 9
-    "absoluteIdentifierPath"  shift, and go to state 54
-    "relativeIdentifierPath"  shift, and go to state 55
-
-    Rule                    go to state 388
-    SkipRule                go to state 271
-    ConditionalRule         go to state 272
-    CaseRule                go to state 273
-    LetRule                 go to state 274
-    ForallRule              go to state 275
-    ChooseRule              go to state 276
-    IterateRule             go to state 277
-    BlockRule               go to state 278
-    SequenceRule            go to state 279
-    UpdateRule              go to state 280
-    CallRule                go to state 281
-    WhileRule               go to state 282
-    SimpleOrClaspedTerm     go to state 283
-    CallExpression          go to state 284
-    DirectCallExpression    go to state 285
-    MethodCallExpression    go to state 61
-    LiteralCallExpression   go to state 62
-    IndirectCallExpression  go to state 63
-    Literal                 go to state 70
-    UndefinedLiteral        go to state 71
-    BooleanLiteral          go to state 72
-    IntegerLiteral          go to state 73
-    RationalLiteral         go to state 74
-    DecimalLiteral          go to state 75
-    BinaryLiteral           go to state 76
-    StringLiteral           go to state 77
-    ReferenceLiteral        go to state 78
-    ListLiteral             go to state 79
-    RangeLiteral            go to state 80
-    TupleLiteral            go to state 81
-    RecordLiteral           go to state 82
-    Identifier              go to state 83
-    IdentifierPath          go to state 84
-    AbsoluteIdentifierPath  go to state 85
-    RelativeIdentifierPath  go to state 86
-
-
-State 376
-
-   54 ForallRule: "forall" AttributedVariable "in" Term "with" . Term "do" Rule
-
-    "let"                     shift, and go to state 34
-    "in"                      shift, and go to state 8
-    "forall"                  shift, and go to state 35
-    "choose"                  shift, and go to state 36
-    "if"                      shift, and go to state 37
-    "exists"                  shift, and go to state 38
-    "undef"                   shift, and go to state 39
-    "false"                   shift, and go to state 40
-    "true"                    shift, and go to state 41
-    "not"                     shift, and go to state 42
-    "+"                       shift, and go to state 43
-    "-"                       shift, and go to state 44
-    "("                       shift, and go to state 45
-    "["                       shift, and go to state 46
-    "@"                       shift, and go to state 47
-    "binary"                  shift, and go to state 48
-    "hexadecimal"             shift, and go to state 49
-    "integer"                 shift, and go to state 50
-    "rational"                shift, and go to state 51
-    "decimal"                 shift, and go to state 52
-    "string"                  shift, and go to state 53
-    "identifier"              shift, and go to state 9
-    "absoluteIdentifierPath"  shift, and go to state 54
-    "relativeIdentifierPath"  shift, and go to state 55
-
-    Term                             go to state 389
-    SimpleOrClaspedTerm              go to state 57
-    OperatorExpression               go to state 58
-    CallExpression                   go to state 59
-    DirectCallExpression             go to state 60
-    MethodCallExpression             go to state 61
-    LiteralCallExpression            go to state 62
-    IndirectCallExpression           go to state 63
-    TypeCastingExpression            go to state 64
-    LetExpression                    go to state 65
-    ConditionalExpression            go to state 66
-    ChooseExpression                 go to state 67
-    UniversalQuantifierExpression    go to state 68
-    ExistentialQuantifierExpression  go to state 69
-    Literal                          go to state 70
-    UndefinedLiteral                 go to state 71
-    BooleanLiteral                   go to state 72
-    IntegerLiteral                   go to state 73
-    RationalLiteral                  go to state 74
-    DecimalLiteral                   go to state 75
-    BinaryLiteral                    go to state 76
-    StringLiteral                    go to state 77
-    ReferenceLiteral                 go to state 78
-    ListLiteral                      go to state 79
-    RangeLiteral                     go to state 80
-    TupleLiteral                     go to state 81
-    RecordLiteral                    go to state 82
-    Identifier                       go to state 83
-    IdentifierPath                   go to state 84
-    AbsoluteIdentifierPath           go to state 85
-    RelativeIdentifierPath           go to state 86
-
-
 State 377
 
-   55 ChooseRule: "choose" AttributedVariable "in" Term "do" . Rule
+   52 LetRule: "let" AttributedVariable "=" Term "in" . Rule
 
     "seq"                     shift, and go to state 258
     "par"                     shift, and go to state 259
@@ -9554,7 +9384,7 @@ State 377
 
 State 378
 
-   44 ConditionalRule: "if" Term "then" Rule "else" . Rule
+   53 ForallRule: "forall" AttributedVariable "in" Term "do" . Rule
 
     "seq"                     shift, and go to state 258
     "par"                     shift, and go to state 259
@@ -9627,43 +9457,13 @@ State 378
 
 State 379
 
-   46 CaseRule: "case" Term "of" "{" error . "}"
-
-    "}"  shift, and go to state 392
-
-
-State 380
-
-   47 CaseLabel: "default" . ":" Rule
-
-    ":"  shift, and go to state 393
-
-
-State 381
-
-   48 CaseLabel: "_" . ":" Rule
-
-    ":"  shift, and go to state 394
-
-
-State 382
-
-   51 CaseLabels: CaseLabel .
-
-    $default  reduce using rule 51 (CaseLabels)
-
-
-State 383
-
-   45 CaseRule: "case" Term "of" "{" CaseLabels . "}"
-   50 CaseLabels: CaseLabels . CaseLabel
+   54 ForallRule: "forall" AttributedVariable "in" Term "with" . Term "do" Rule
 
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
     "forall"                  shift, and go to state 35
     "choose"                  shift, and go to state 36
     "if"                      shift, and go to state 37
-    "default"                 shift, and go to state 380
     "exists"                  shift, and go to state 38
     "undef"                   shift, and go to state 39
     "false"                   shift, and go to state 40
@@ -9673,8 +9473,6 @@ State 383
     "-"                       shift, and go to state 44
     "("                       shift, and go to state 45
     "["                       shift, and go to state 46
-    "}"                       shift, and go to state 395
-    "_"                       shift, and go to state 381
     "@"                       shift, and go to state 47
     "binary"                  shift, and go to state 48
     "hexadecimal"             shift, and go to state 49
@@ -9686,8 +9484,7 @@ State 383
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    CaseLabel                        go to state 396
-    Term                             go to state 384
+    Term                             go to state 392
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -9720,7 +9517,248 @@ State 383
     RelativeIdentifierPath           go to state 86
 
 
+State 380
+
+   55 ChooseRule: "choose" AttributedVariables "in" Term "do" . Rule
+
+    "seq"                     shift, and go to state 258
+    "par"                     shift, and go to state 259
+    "skip"                    shift, and go to state 260
+    "let"                     shift, and go to state 261
+    "in"                      shift, and go to state 8
+    "forall"                  shift, and go to state 262
+    "choose"                  shift, and go to state 263
+    "iterate"                 shift, and go to state 264
+    "if"                      shift, and go to state 265
+    "case"                    shift, and go to state 266
+    "while"                   shift, and go to state 267
+    "undef"                   shift, and go to state 39
+    "false"                   shift, and go to state 40
+    "true"                    shift, and go to state 41
+    "+"                       shift, and go to state 43
+    "-"                       shift, and go to state 44
+    "("                       shift, and go to state 45
+    "["                       shift, and go to state 46
+    "{"                       shift, and go to state 268
+    "@"                       shift, and go to state 47
+    "{|"                      shift, and go to state 269
+    "binary"                  shift, and go to state 48
+    "hexadecimal"             shift, and go to state 49
+    "integer"                 shift, and go to state 50
+    "rational"                shift, and go to state 51
+    "decimal"                 shift, and go to state 52
+    "string"                  shift, and go to state 53
+    "identifier"              shift, and go to state 9
+    "absoluteIdentifierPath"  shift, and go to state 54
+    "relativeIdentifierPath"  shift, and go to state 55
+
+    Rule                    go to state 393
+    SkipRule                go to state 271
+    ConditionalRule         go to state 272
+    CaseRule                go to state 273
+    LetRule                 go to state 274
+    ForallRule              go to state 275
+    ChooseRule              go to state 276
+    IterateRule             go to state 277
+    BlockRule               go to state 278
+    SequenceRule            go to state 279
+    UpdateRule              go to state 280
+    CallRule                go to state 281
+    WhileRule               go to state 282
+    SimpleOrClaspedTerm     go to state 283
+    CallExpression          go to state 284
+    DirectCallExpression    go to state 285
+    MethodCallExpression    go to state 61
+    LiteralCallExpression   go to state 62
+    IndirectCallExpression  go to state 63
+    Literal                 go to state 70
+    UndefinedLiteral        go to state 71
+    BooleanLiteral          go to state 72
+    IntegerLiteral          go to state 73
+    RationalLiteral         go to state 74
+    DecimalLiteral          go to state 75
+    BinaryLiteral           go to state 76
+    StringLiteral           go to state 77
+    ReferenceLiteral        go to state 78
+    ListLiteral             go to state 79
+    RangeLiteral            go to state 80
+    TupleLiteral            go to state 81
+    RecordLiteral           go to state 82
+    Identifier              go to state 83
+    IdentifierPath          go to state 84
+    AbsoluteIdentifierPath  go to state 85
+    RelativeIdentifierPath  go to state 86
+
+
+State 381
+
+   44 ConditionalRule: "if" Term "then" Rule "else" . Rule
+
+    "seq"                     shift, and go to state 258
+    "par"                     shift, and go to state 259
+    "skip"                    shift, and go to state 260
+    "let"                     shift, and go to state 261
+    "in"                      shift, and go to state 8
+    "forall"                  shift, and go to state 262
+    "choose"                  shift, and go to state 263
+    "iterate"                 shift, and go to state 264
+    "if"                      shift, and go to state 265
+    "case"                    shift, and go to state 266
+    "while"                   shift, and go to state 267
+    "undef"                   shift, and go to state 39
+    "false"                   shift, and go to state 40
+    "true"                    shift, and go to state 41
+    "+"                       shift, and go to state 43
+    "-"                       shift, and go to state 44
+    "("                       shift, and go to state 45
+    "["                       shift, and go to state 46
+    "{"                       shift, and go to state 268
+    "@"                       shift, and go to state 47
+    "{|"                      shift, and go to state 269
+    "binary"                  shift, and go to state 48
+    "hexadecimal"             shift, and go to state 49
+    "integer"                 shift, and go to state 50
+    "rational"                shift, and go to state 51
+    "decimal"                 shift, and go to state 52
+    "string"                  shift, and go to state 53
+    "identifier"              shift, and go to state 9
+    "absoluteIdentifierPath"  shift, and go to state 54
+    "relativeIdentifierPath"  shift, and go to state 55
+
+    Rule                    go to state 394
+    SkipRule                go to state 271
+    ConditionalRule         go to state 272
+    CaseRule                go to state 273
+    LetRule                 go to state 274
+    ForallRule              go to state 275
+    ChooseRule              go to state 276
+    IterateRule             go to state 277
+    BlockRule               go to state 278
+    SequenceRule            go to state 279
+    UpdateRule              go to state 280
+    CallRule                go to state 281
+    WhileRule               go to state 282
+    SimpleOrClaspedTerm     go to state 283
+    CallExpression          go to state 284
+    DirectCallExpression    go to state 285
+    MethodCallExpression    go to state 61
+    LiteralCallExpression   go to state 62
+    IndirectCallExpression  go to state 63
+    Literal                 go to state 70
+    UndefinedLiteral        go to state 71
+    BooleanLiteral          go to state 72
+    IntegerLiteral          go to state 73
+    RationalLiteral         go to state 74
+    DecimalLiteral          go to state 75
+    BinaryLiteral           go to state 76
+    StringLiteral           go to state 77
+    ReferenceLiteral        go to state 78
+    ListLiteral             go to state 79
+    RangeLiteral            go to state 80
+    TupleLiteral            go to state 81
+    RecordLiteral           go to state 82
+    Identifier              go to state 83
+    IdentifierPath          go to state 84
+    AbsoluteIdentifierPath  go to state 85
+    RelativeIdentifierPath  go to state 86
+
+
+State 382
+
+   46 CaseRule: "case" Term "of" "{" error . "}"
+
+    "}"  shift, and go to state 395
+
+
+State 383
+
+   47 CaseLabel: "default" . ":" Rule
+
+    ":"  shift, and go to state 396
+
+
 State 384
+
+   48 CaseLabel: "_" . ":" Rule
+
+    ":"  shift, and go to state 397
+
+
+State 385
+
+   51 CaseLabels: CaseLabel .
+
+    $default  reduce using rule 51 (CaseLabels)
+
+
+State 386
+
+   45 CaseRule: "case" Term "of" "{" CaseLabels . "}"
+   50 CaseLabels: CaseLabels . CaseLabel
+
+    "let"                     shift, and go to state 34
+    "in"                      shift, and go to state 8
+    "forall"                  shift, and go to state 35
+    "choose"                  shift, and go to state 36
+    "if"                      shift, and go to state 37
+    "default"                 shift, and go to state 383
+    "exists"                  shift, and go to state 38
+    "undef"                   shift, and go to state 39
+    "false"                   shift, and go to state 40
+    "true"                    shift, and go to state 41
+    "not"                     shift, and go to state 42
+    "+"                       shift, and go to state 43
+    "-"                       shift, and go to state 44
+    "("                       shift, and go to state 45
+    "["                       shift, and go to state 46
+    "}"                       shift, and go to state 398
+    "_"                       shift, and go to state 384
+    "@"                       shift, and go to state 47
+    "binary"                  shift, and go to state 48
+    "hexadecimal"             shift, and go to state 49
+    "integer"                 shift, and go to state 50
+    "rational"                shift, and go to state 51
+    "decimal"                 shift, and go to state 52
+    "string"                  shift, and go to state 53
+    "identifier"              shift, and go to state 9
+    "absoluteIdentifierPath"  shift, and go to state 54
+    "relativeIdentifierPath"  shift, and go to state 55
+
+    CaseLabel                        go to state 399
+    Term                             go to state 387
+    SimpleOrClaspedTerm              go to state 57
+    OperatorExpression               go to state 58
+    CallExpression                   go to state 59
+    DirectCallExpression             go to state 60
+    MethodCallExpression             go to state 61
+    LiteralCallExpression            go to state 62
+    IndirectCallExpression           go to state 63
+    TypeCastingExpression            go to state 64
+    LetExpression                    go to state 65
+    ConditionalExpression            go to state 66
+    ChooseExpression                 go to state 67
+    UniversalQuantifierExpression    go to state 68
+    ExistentialQuantifierExpression  go to state 69
+    Literal                          go to state 70
+    UndefinedLiteral                 go to state 71
+    BooleanLiteral                   go to state 72
+    IntegerLiteral                   go to state 73
+    RationalLiteral                  go to state 74
+    DecimalLiteral                   go to state 75
+    BinaryLiteral                    go to state 76
+    StringLiteral                    go to state 77
+    ReferenceLiteral                 go to state 78
+    ListLiteral                      go to state 79
+    RangeLiteral                     go to state 80
+    TupleLiteral                     go to state 81
+    RecordLiteral                    go to state 82
+    Identifier                       go to state 83
+    IdentifierPath                   go to state 84
+    AbsoluteIdentifierPath           go to state 85
+    RelativeIdentifierPath           go to state 86
+
+
+State 387
 
    49 CaseLabel: Term . ":" Rule
    85 OperatorExpression: Term . "+" Term
@@ -9748,7 +9786,7 @@ State 384
     "+"        shift, and go to state 125
     "-"        shift, and go to state 126
     "="        shift, and go to state 127
-    ":"        shift, and go to state 397
+    ":"        shift, and go to state 400
     "<"        shift, and go to state 128
     ">"        shift, and go to state 129
     "*"        shift, and go to state 130
@@ -9761,7 +9799,7 @@ State 384
     ">="       shift, and go to state 137
 
 
-State 385
+State 388
 
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
@@ -9789,7 +9827,7 @@ State 385
     "+"        shift, and go to state 125
     "-"        shift, and go to state 126
     "="        shift, and go to state 127
-    "}"        shift, and go to state 398
+    "}"        shift, and go to state 401
     "<"        shift, and go to state 128
     ">"        shift, and go to state 129
     "*"        shift, and go to state 130
@@ -9802,7 +9840,7 @@ State 385
     ">="       shift, and go to state 137
 
 
-State 386
+State 389
 
   178 MaybeInitially: "initially" "{" . MaybeInitializers "}"
 
@@ -9862,28 +9900,28 @@ State 386
     RecordLiteral                    go to state 82
     Initializers                     go to state 146
     Initializer                      go to state 147
-    MaybeInitializers                go to state 399
+    MaybeInitializers                go to state 402
     Identifier                       go to state 83
     IdentifierPath                   go to state 84
     AbsoluteIdentifierPath           go to state 85
     RelativeIdentifierPath           go to state 86
 
 
-State 387
+State 390
 
    52 LetRule: "let" AttributedVariable "=" Term "in" Rule .
 
     $default  reduce using rule 52 (LetRule)
 
 
-State 388
+State 391
 
    53 ForallRule: "forall" AttributedVariable "in" Term "do" Rule .
 
     $default  reduce using rule 53 (ForallRule)
 
 
-State 389
+State 392
 
    54 ForallRule: "forall" AttributedVariable "in" Term "with" Term . "do" Rule
    85 OperatorExpression: Term . "+" Term
@@ -9904,7 +9942,7 @@ State 389
   100                   | Term . "=>" Term
   101                   | Term . "implies" Term
 
-    "do"       shift, and go to state 400
+    "do"       shift, and go to state 403
     "and"      shift, and go to state 121
     "or"       shift, and go to state 122
     "xor"      shift, and go to state 123
@@ -9924,28 +9962,28 @@ State 389
     ">="       shift, and go to state 137
 
 
-State 390
+State 393
 
-   55 ChooseRule: "choose" AttributedVariable "in" Term "do" Rule .
+   55 ChooseRule: "choose" AttributedVariables "in" Term "do" Rule .
 
     $default  reduce using rule 55 (ChooseRule)
 
 
-State 391
+State 394
 
    44 ConditionalRule: "if" Term "then" Rule "else" Rule .
 
     $default  reduce using rule 44 (ConditionalRule)
 
 
-State 392
+State 395
 
    46 CaseRule: "case" Term "of" "{" error "}" .
 
     $default  reduce using rule 46 (CaseRule)
 
 
-State 393
+State 396
 
    47 CaseLabel: "default" ":" . Rule
 
@@ -9980,7 +10018,7 @@ State 393
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Rule                    go to state 401
+    Rule                    go to state 404
     SkipRule                go to state 271
     ConditionalRule         go to state 272
     CaseRule                go to state 273
@@ -10016,185 +10054,11 @@ State 393
     IdentifierPath          go to state 84
     AbsoluteIdentifierPath  go to state 85
     RelativeIdentifierPath  go to state 86
-
-
-State 394
-
-   48 CaseLabel: "_" ":" . Rule
-
-    "seq"                     shift, and go to state 258
-    "par"                     shift, and go to state 259
-    "skip"                    shift, and go to state 260
-    "let"                     shift, and go to state 261
-    "in"                      shift, and go to state 8
-    "forall"                  shift, and go to state 262
-    "choose"                  shift, and go to state 263
-    "iterate"                 shift, and go to state 264
-    "if"                      shift, and go to state 265
-    "case"                    shift, and go to state 266
-    "while"                   shift, and go to state 267
-    "undef"                   shift, and go to state 39
-    "false"                   shift, and go to state 40
-    "true"                    shift, and go to state 41
-    "+"                       shift, and go to state 43
-    "-"                       shift, and go to state 44
-    "("                       shift, and go to state 45
-    "["                       shift, and go to state 46
-    "{"                       shift, and go to state 268
-    "@"                       shift, and go to state 47
-    "{|"                      shift, and go to state 269
-    "binary"                  shift, and go to state 48
-    "hexadecimal"             shift, and go to state 49
-    "integer"                 shift, and go to state 50
-    "rational"                shift, and go to state 51
-    "decimal"                 shift, and go to state 52
-    "string"                  shift, and go to state 53
-    "identifier"              shift, and go to state 9
-    "absoluteIdentifierPath"  shift, and go to state 54
-    "relativeIdentifierPath"  shift, and go to state 55
-
-    Rule                    go to state 402
-    SkipRule                go to state 271
-    ConditionalRule         go to state 272
-    CaseRule                go to state 273
-    LetRule                 go to state 274
-    ForallRule              go to state 275
-    ChooseRule              go to state 276
-    IterateRule             go to state 277
-    BlockRule               go to state 278
-    SequenceRule            go to state 279
-    UpdateRule              go to state 280
-    CallRule                go to state 281
-    WhileRule               go to state 282
-    SimpleOrClaspedTerm     go to state 283
-    CallExpression          go to state 284
-    DirectCallExpression    go to state 285
-    MethodCallExpression    go to state 61
-    LiteralCallExpression   go to state 62
-    IndirectCallExpression  go to state 63
-    Literal                 go to state 70
-    UndefinedLiteral        go to state 71
-    BooleanLiteral          go to state 72
-    IntegerLiteral          go to state 73
-    RationalLiteral         go to state 74
-    DecimalLiteral          go to state 75
-    BinaryLiteral           go to state 76
-    StringLiteral           go to state 77
-    ReferenceLiteral        go to state 78
-    ListLiteral             go to state 79
-    RangeLiteral            go to state 80
-    TupleLiteral            go to state 81
-    RecordLiteral           go to state 82
-    Identifier              go to state 83
-    IdentifierPath          go to state 84
-    AbsoluteIdentifierPath  go to state 85
-    RelativeIdentifierPath  go to state 86
-
-
-State 395
-
-   45 CaseRule: "case" Term "of" "{" CaseLabels "}" .
-
-    $default  reduce using rule 45 (CaseRule)
-
-
-State 396
-
-   50 CaseLabels: CaseLabels CaseLabel .
-
-    $default  reduce using rule 50 (CaseLabels)
 
 
 State 397
 
-   49 CaseLabel: Term ":" . Rule
-
-    "seq"                     shift, and go to state 258
-    "par"                     shift, and go to state 259
-    "skip"                    shift, and go to state 260
-    "let"                     shift, and go to state 261
-    "in"                      shift, and go to state 8
-    "forall"                  shift, and go to state 262
-    "choose"                  shift, and go to state 263
-    "iterate"                 shift, and go to state 264
-    "if"                      shift, and go to state 265
-    "case"                    shift, and go to state 266
-    "while"                   shift, and go to state 267
-    "undef"                   shift, and go to state 39
-    "false"                   shift, and go to state 40
-    "true"                    shift, and go to state 41
-    "+"                       shift, and go to state 43
-    "-"                       shift, and go to state 44
-    "("                       shift, and go to state 45
-    "["                       shift, and go to state 46
-    "{"                       shift, and go to state 268
-    "@"                       shift, and go to state 47
-    "{|"                      shift, and go to state 269
-    "binary"                  shift, and go to state 48
-    "hexadecimal"             shift, and go to state 49
-    "integer"                 shift, and go to state 50
-    "rational"                shift, and go to state 51
-    "decimal"                 shift, and go to state 52
-    "string"                  shift, and go to state 53
-    "identifier"              shift, and go to state 9
-    "absoluteIdentifierPath"  shift, and go to state 54
-    "relativeIdentifierPath"  shift, and go to state 55
-
-    Rule                    go to state 403
-    SkipRule                go to state 271
-    ConditionalRule         go to state 272
-    CaseRule                go to state 273
-    LetRule                 go to state 274
-    ForallRule              go to state 275
-    ChooseRule              go to state 276
-    IterateRule             go to state 277
-    BlockRule               go to state 278
-    SequenceRule            go to state 279
-    UpdateRule              go to state 280
-    CallRule                go to state 281
-    WhileRule               go to state 282
-    SimpleOrClaspedTerm     go to state 283
-    CallExpression          go to state 284
-    DirectCallExpression    go to state 285
-    MethodCallExpression    go to state 61
-    LiteralCallExpression   go to state 62
-    IndirectCallExpression  go to state 63
-    Literal                 go to state 70
-    UndefinedLiteral        go to state 71
-    BooleanLiteral          go to state 72
-    IntegerLiteral          go to state 73
-    RationalLiteral         go to state 74
-    DecimalLiteral          go to state 75
-    BinaryLiteral           go to state 76
-    StringLiteral           go to state 77
-    ReferenceLiteral        go to state 78
-    ListLiteral             go to state 79
-    RangeLiteral            go to state 80
-    TupleLiteral            go to state 81
-    RecordLiteral           go to state 82
-    Identifier              go to state 83
-    IdentifierPath          go to state 84
-    AbsoluteIdentifierPath  go to state 85
-    RelativeIdentifierPath  go to state 86
-
-
-State 398
-
-  176 MaybeDefined: "defined" "{" Term "}" .
-
-    $default  reduce using rule 176 (MaybeDefined)
-
-
-State 399
-
-  178 MaybeInitially: "initially" "{" MaybeInitializers . "}"
-
-    "}"  shift, and go to state 404
-
-
-State 400
-
-   54 ForallRule: "forall" AttributedVariable "in" Term "with" Term "do" . Rule
+   48 CaseLabel: "_" ":" . Rule
 
     "seq"                     shift, and go to state 258
     "par"                     shift, and go to state 259
@@ -10265,35 +10129,209 @@ State 400
     RelativeIdentifierPath  go to state 86
 
 
+State 398
+
+   45 CaseRule: "case" Term "of" "{" CaseLabels "}" .
+
+    $default  reduce using rule 45 (CaseRule)
+
+
+State 399
+
+   50 CaseLabels: CaseLabels CaseLabel .
+
+    $default  reduce using rule 50 (CaseLabels)
+
+
+State 400
+
+   49 CaseLabel: Term ":" . Rule
+
+    "seq"                     shift, and go to state 258
+    "par"                     shift, and go to state 259
+    "skip"                    shift, and go to state 260
+    "let"                     shift, and go to state 261
+    "in"                      shift, and go to state 8
+    "forall"                  shift, and go to state 262
+    "choose"                  shift, and go to state 263
+    "iterate"                 shift, and go to state 264
+    "if"                      shift, and go to state 265
+    "case"                    shift, and go to state 266
+    "while"                   shift, and go to state 267
+    "undef"                   shift, and go to state 39
+    "false"                   shift, and go to state 40
+    "true"                    shift, and go to state 41
+    "+"                       shift, and go to state 43
+    "-"                       shift, and go to state 44
+    "("                       shift, and go to state 45
+    "["                       shift, and go to state 46
+    "{"                       shift, and go to state 268
+    "@"                       shift, and go to state 47
+    "{|"                      shift, and go to state 269
+    "binary"                  shift, and go to state 48
+    "hexadecimal"             shift, and go to state 49
+    "integer"                 shift, and go to state 50
+    "rational"                shift, and go to state 51
+    "decimal"                 shift, and go to state 52
+    "string"                  shift, and go to state 53
+    "identifier"              shift, and go to state 9
+    "absoluteIdentifierPath"  shift, and go to state 54
+    "relativeIdentifierPath"  shift, and go to state 55
+
+    Rule                    go to state 406
+    SkipRule                go to state 271
+    ConditionalRule         go to state 272
+    CaseRule                go to state 273
+    LetRule                 go to state 274
+    ForallRule              go to state 275
+    ChooseRule              go to state 276
+    IterateRule             go to state 277
+    BlockRule               go to state 278
+    SequenceRule            go to state 279
+    UpdateRule              go to state 280
+    CallRule                go to state 281
+    WhileRule               go to state 282
+    SimpleOrClaspedTerm     go to state 283
+    CallExpression          go to state 284
+    DirectCallExpression    go to state 285
+    MethodCallExpression    go to state 61
+    LiteralCallExpression   go to state 62
+    IndirectCallExpression  go to state 63
+    Literal                 go to state 70
+    UndefinedLiteral        go to state 71
+    BooleanLiteral          go to state 72
+    IntegerLiteral          go to state 73
+    RationalLiteral         go to state 74
+    DecimalLiteral          go to state 75
+    BinaryLiteral           go to state 76
+    StringLiteral           go to state 77
+    ReferenceLiteral        go to state 78
+    ListLiteral             go to state 79
+    RangeLiteral            go to state 80
+    TupleLiteral            go to state 81
+    RecordLiteral           go to state 82
+    Identifier              go to state 83
+    IdentifierPath          go to state 84
+    AbsoluteIdentifierPath  go to state 85
+    RelativeIdentifierPath  go to state 86
+
+
 State 401
+
+  176 MaybeDefined: "defined" "{" Term "}" .
+
+    $default  reduce using rule 176 (MaybeDefined)
+
+
+State 402
+
+  178 MaybeInitially: "initially" "{" MaybeInitializers . "}"
+
+    "}"  shift, and go to state 407
+
+
+State 403
+
+   54 ForallRule: "forall" AttributedVariable "in" Term "with" Term "do" . Rule
+
+    "seq"                     shift, and go to state 258
+    "par"                     shift, and go to state 259
+    "skip"                    shift, and go to state 260
+    "let"                     shift, and go to state 261
+    "in"                      shift, and go to state 8
+    "forall"                  shift, and go to state 262
+    "choose"                  shift, and go to state 263
+    "iterate"                 shift, and go to state 264
+    "if"                      shift, and go to state 265
+    "case"                    shift, and go to state 266
+    "while"                   shift, and go to state 267
+    "undef"                   shift, and go to state 39
+    "false"                   shift, and go to state 40
+    "true"                    shift, and go to state 41
+    "+"                       shift, and go to state 43
+    "-"                       shift, and go to state 44
+    "("                       shift, and go to state 45
+    "["                       shift, and go to state 46
+    "{"                       shift, and go to state 268
+    "@"                       shift, and go to state 47
+    "{|"                      shift, and go to state 269
+    "binary"                  shift, and go to state 48
+    "hexadecimal"             shift, and go to state 49
+    "integer"                 shift, and go to state 50
+    "rational"                shift, and go to state 51
+    "decimal"                 shift, and go to state 52
+    "string"                  shift, and go to state 53
+    "identifier"              shift, and go to state 9
+    "absoluteIdentifierPath"  shift, and go to state 54
+    "relativeIdentifierPath"  shift, and go to state 55
+
+    Rule                    go to state 408
+    SkipRule                go to state 271
+    ConditionalRule         go to state 272
+    CaseRule                go to state 273
+    LetRule                 go to state 274
+    ForallRule              go to state 275
+    ChooseRule              go to state 276
+    IterateRule             go to state 277
+    BlockRule               go to state 278
+    SequenceRule            go to state 279
+    UpdateRule              go to state 280
+    CallRule                go to state 281
+    WhileRule               go to state 282
+    SimpleOrClaspedTerm     go to state 283
+    CallExpression          go to state 284
+    DirectCallExpression    go to state 285
+    MethodCallExpression    go to state 61
+    LiteralCallExpression   go to state 62
+    IndirectCallExpression  go to state 63
+    Literal                 go to state 70
+    UndefinedLiteral        go to state 71
+    BooleanLiteral          go to state 72
+    IntegerLiteral          go to state 73
+    RationalLiteral         go to state 74
+    DecimalLiteral          go to state 75
+    BinaryLiteral           go to state 76
+    StringLiteral           go to state 77
+    ReferenceLiteral        go to state 78
+    ListLiteral             go to state 79
+    RangeLiteral            go to state 80
+    TupleLiteral            go to state 81
+    RecordLiteral           go to state 82
+    Identifier              go to state 83
+    IdentifierPath          go to state 84
+    AbsoluteIdentifierPath  go to state 85
+    RelativeIdentifierPath  go to state 86
+
+
+State 404
 
    47 CaseLabel: "default" ":" Rule .
 
     $default  reduce using rule 47 (CaseLabel)
 
 
-State 402
+State 405
 
    48 CaseLabel: "_" ":" Rule .
 
     $default  reduce using rule 48 (CaseLabel)
 
 
-State 403
+State 406
 
    49 CaseLabel: Term ":" Rule .
 
     $default  reduce using rule 49 (CaseLabel)
 
 
-State 404
+State 407
 
   178 MaybeInitially: "initially" "{" MaybeInitializers "}" .
 
     $default  reduce using rule 178 (MaybeInitially)
 
 
-State 405
+State 408
 
    54 ForallRule: "forall" AttributedVariable "in" Term "with" Term "do" Rule .
 

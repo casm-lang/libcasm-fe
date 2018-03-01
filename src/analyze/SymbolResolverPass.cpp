@@ -409,9 +409,9 @@ void SymbolResolveVisitor::visit( ChooseRule& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.variable() );
+    pushVariables( node.variables() );
     node.rule()->accept( *this );
-    popVariable( node.variable() );
+    popVariables( node.variables() );
 }
 
 void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable )

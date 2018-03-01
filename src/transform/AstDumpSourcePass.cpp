@@ -567,7 +567,7 @@ void AstDumpSourceVisitor::visit( ForallRule& node )
 void AstDumpSourceVisitor::visit( ChooseRule& node )
 {
     m_stream << m_indentation << "choose ";
-    node.variable()->accept( *this );
+    dumpNodes( *node.variables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " do\n";

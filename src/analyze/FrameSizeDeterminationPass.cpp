@@ -222,9 +222,9 @@ void FrameSizeDeterminationVisitor::visit( ChooseRule& node )
 {
     node.universe()->accept( *this );
 
-    pushLocal( *node.variable() );
+    pushLocals( *node.variables() );
     node.rule()->accept( *this );
-    popLocal();
+    popLocals( node.variables()->size() );
 }
 
 void FrameSizeDeterminationVisitor::pushLocal( VariableDefinition& variable )

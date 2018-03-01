@@ -235,19 +235,19 @@ void ForallRule::accept( Visitor& visitor )
 }
 
 ChooseRule::ChooseRule(
-    const VariableDefinition::Ptr& variable,
+    const VariableDefinitions::Ptr& variables,
     const Expression::Ptr& universe,
     const Rule::Ptr& rule )
 : Rule( Node::ID::CHOOSE_RULE )
-, m_variable( variable )
+, m_variables( variables )
 , m_universe( universe )
 , m_rule( rule )
 {
 }
 
-const VariableDefinition::Ptr& ChooseRule::variable( void ) const
+const VariableDefinitions::Ptr& ChooseRule::variables( void ) const
 {
-    return m_variable;
+    return m_variables;
 }
 
 const Expression::Ptr& ChooseRule::universe( void ) const

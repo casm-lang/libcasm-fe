@@ -54,6 +54,7 @@ namespace libcasm_fe
     namespace Ast
     {
         class VariableDefinition;
+        using VariableDefinitions = NodeList< VariableDefinition >;
 
         class Rule : public Node
         {
@@ -212,18 +213,18 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< ChooseRule >;
 
             ChooseRule(
-                const std::shared_ptr< VariableDefinition >& variable,
+                const std::shared_ptr< VariableDefinitions >& variables,
                 const Expression::Ptr& universe,
                 const Rule::Ptr& rule );
 
-            const std::shared_ptr< VariableDefinition >& variable( void ) const;
+            const std::shared_ptr< VariableDefinitions >& variables( void ) const;
             const Expression::Ptr& universe( void ) const;
             const Rule::Ptr& rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const std::shared_ptr< VariableDefinition > m_variable;
+            const std::shared_ptr< VariableDefinitions > m_variables;
             const Expression::Ptr m_universe;
             const Rule::Ptr m_rule;
         };
