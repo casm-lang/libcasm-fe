@@ -44,6 +44,7 @@
 
 include_directories(
   ${PROJECT_BINARY_DIR}/src
+  ${PROJECT_SOURCE_DIR}/src
   ${LIBGTEST_INCLUDE_DIR}
   ${LIBSTDHL_INCLUDE_DIR}
   ${LIBPASS_INCLUDE_DIR}
@@ -54,6 +55,7 @@ include_directories(
 add_library( ${PROJECT}-test OBJECT
   main.cpp
   passes.cpp
+  LexerTest.cpp
   ast/NodeTest.cpp
   ast/literal.cpp
   ast/span.cpp
