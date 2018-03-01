@@ -87,7 +87,8 @@ class FrameSizeDeterminationVisitor final : public RecursiveVisitor
     void visit( ChooseRule& node ) override;
 
   private:
-    void pushLocal( VariableDefinition& identifier );
+    void pushLocal( VariableDefinition& variable );
+    void pushLocals( VariableDefinitions& variables );
     void popLocal( void );
     void popLocals( std::size_t count );
 
@@ -124,10 +125,7 @@ void FrameSizeDeterminationVisitor::visit( DerivedDefinition& node )
 {
     m_maxNumberOfLocals = 0;
 
-    for( const auto& argument : *node.arguments() )
-    {
-        pushLocal( *argument );
-    }
+    pushLocals( *node.arguments() );
 
     node.expression()->accept( *this );
 
@@ -148,10 +146,7 @@ void FrameSizeDeterminationVisitor::visit( RuleDefinition& node )
 {
     m_maxNumberOfLocals = 0;
 
-    for( const auto& argument : *node.arguments() )
-    {
-        pushLocal( *argument );
-    }
+    pushLocals( *node.arguments() );
 
     node.rule()->accept( *this );
 
@@ -232,13 +227,21 @@ void FrameSizeDeterminationVisitor::visit( ChooseRule& node )
     popLocal();
 }
 
-void FrameSizeDeterminationVisitor::pushLocal( VariableDefinition& node )
+void FrameSizeDeterminationVisitor::pushLocal( VariableDefinition& variable )
 {
     const std::size_t localIndex = m_numberOfLocals;
-    node.setLocalIndex( localIndex );
+    variable.setLocalIndex( localIndex );
 
     ++m_numberOfLocals;
     m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_numberOfLocals );
+}
+
+void FrameSizeDeterminationVisitor::pushLocals( VariableDefinitions& variables )
+{
+    for( auto& variable : variables )
+    {
+        pushLocal( *variable );
+    }
 }
 
 void FrameSizeDeterminationVisitor::popLocal( void )
