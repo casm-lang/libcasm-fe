@@ -121,4 +121,9 @@ INSTANTIATE_TEST_SUITE_P(
         IdentifierTestRow{ "_a_b__c_", 8 },  // underlines everywhere
         IdentifierTestRow{ "abcdefghijklmnopqrstuvwxyz", 26 },
         IdentifierTestRow{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 26 },
-        IdentifierTestRow{ "_0123456789", 11 } ) );
+        IdentifierTestRow{ "_0123456789", 11 },
+        IdentifierTestRow{ "ä", 1 },
+        IdentifierTestRow{ "➊", 1 },
+        IdentifierTestRow{ "🤤", 1 },
+        IdentifierTestRow{ "κόσμε", 5 }  // greek letters
+        ) );
