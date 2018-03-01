@@ -222,8 +222,8 @@ LetRule ::= "let" AttributedVariable "=" Term "in" Rule
 ===== ForallRule =====
 
 <code>
-ForallRule ::= "forall" AttributedVariable "in" Term "do" Rule
-             | "forall" AttributedVariable "in" Term "with" Term "do" Rule
+ForallRule ::= "forall" AttributedVariables "in" Term "do" Rule
+             | "forall" AttributedVariables "in" Term "with" Term "do" Rule
 </code>
 
 {{page>:grammar:ForallRule&noheader&nofooter}}

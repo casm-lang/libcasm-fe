@@ -552,7 +552,7 @@ void AstDumpSourceVisitor::visit( LetRule& node )
 void AstDumpSourceVisitor::visit( ForallRule& node )
 {
     m_stream << m_indentation << "forall ";
-    node.variable()->accept( *this );
+    dumpNodes( *node.variables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " with ";

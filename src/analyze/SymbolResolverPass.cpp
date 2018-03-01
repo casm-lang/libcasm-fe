@@ -399,10 +399,10 @@ void SymbolResolveVisitor::visit( ForallRule& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.variable() );
+    pushVariables( node.variables() );
     node.condition()->accept( *this );
     node.rule()->accept( *this );
-    popVariable( node.variable() );
+    popVariables( node.variables() );
 }
 
 void SymbolResolveVisitor::visit( ChooseRule& node )

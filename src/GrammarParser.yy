@@ -674,11 +674,11 @@ LetRule
 
 
 ForallRule
-: FORALL AttributedVariable IN Term DO Rule
+: FORALL AttributedVariables IN Term DO Rule
   {
       $$ = Ast::make< ForallRule >( @$, $2, $4, $6 );
   }
-| FORALL AttributedVariable IN Term WITH Term DO Rule
+| FORALL AttributedVariables IN Term WITH Term DO Rule
   {
       $$ = Ast::make< ForallRule >( @$, $2, $4, $6, $8 );
   }

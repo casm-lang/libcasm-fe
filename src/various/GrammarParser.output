@@ -75,8 +75,8 @@ Grammar
 
    52 LetRule: "let" AttributedVariable "=" Term "in" Rule
 
-   53 ForallRule: "forall" AttributedVariable "in" Term "do" Rule
-   54           | "forall" AttributedVariable "in" Term "with" Term "do" Rule
+   53 ForallRule: "forall" AttributedVariables "in" Term "do" Rule
+   54           | "forall" AttributedVariables "in" Term "with" Term "do" Rule
 
    55 ChooseRule: "choose" AttributedVariables "in" Term "do" Rule
 
@@ -574,13 +574,13 @@ RelativeIdentifierPath (168)
 Variable (169)
     on left: 194 195, on right: 201 202
 AttributedVariables (170)
-    on left: 196 197, on right: 55 115 196
+    on left: 196 197, on right: 53 54 55 115 196
 TypedVariables (171)
     on left: 198 199, on right: 160 198
 TypedVariable (172)
     on left: 200, on right: 160 194 198 199 203 204
 AttributedVariable (173)
-    on left: 201 202, on right: 52 53 54 113 116 117 196 197
+    on left: 201 202, on right: 52 113 116 117 196 197
 TypedAttributedVariable (174)
     on left: 203 204, on right: 171 172
 Attributes (175)
@@ -6304,19 +6304,20 @@ State 264
 
 State 265
 
-   53 ForallRule: "forall" . AttributedVariable "in" Term "do" Rule
-   54           | "forall" . AttributedVariable "in" Term "with" Term "do" Rule
+   53 ForallRule: "forall" . AttributedVariables "in" Term "do" Rule
+   54           | "forall" . AttributedVariables "in" Term "with" Term "do" Rule
 
     "in"          shift, and go to state 8
     "["           shift, and go to state 2
     "identifier"  shift, and go to state 9
 
-    Identifier          go to state 98
-    Variable            go to state 99
-    TypedVariable       go to state 100
-    AttributedVariable  go to state 317
-    Attributes          go to state 102
-    Attribute           go to state 6
+    Identifier           go to state 98
+    Variable             go to state 99
+    AttributedVariables  go to state 317
+    TypedVariable        go to state 100
+    AttributedVariable   go to state 105
+    Attributes           go to state 102
+    Attribute            go to state 6
 
 
 State 266
@@ -7679,10 +7680,12 @@ State 316
 
 State 317
 
-   53 ForallRule: "forall" AttributedVariable . "in" Term "do" Rule
-   54           | "forall" AttributedVariable . "in" Term "with" Term "do" Rule
+   53 ForallRule: "forall" AttributedVariables . "in" Term "do" Rule
+   54           | "forall" AttributedVariables . "in" Term "with" Term "do" Rule
+  196 AttributedVariables: AttributedVariables . "," AttributedVariable
 
     "in"  shift, and go to state 350
+    ","   shift, and go to state 161
 
 
 State 318
@@ -8618,8 +8621,8 @@ State 349
 
 State 350
 
-   53 ForallRule: "forall" AttributedVariable "in" . Term "do" Rule
-   54           | "forall" AttributedVariable "in" . Term "with" Term "do" Rule
+   53 ForallRule: "forall" AttributedVariables "in" . Term "do" Rule
+   54           | "forall" AttributedVariables "in" . Term "with" Term "do" Rule
 
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
@@ -9062,8 +9065,8 @@ State 367
 
 State 368
 
-   53 ForallRule: "forall" AttributedVariable "in" Term . "do" Rule
-   54           | "forall" AttributedVariable "in" Term . "with" Term "do" Rule
+   53 ForallRule: "forall" AttributedVariables "in" Term . "do" Rule
+   54           | "forall" AttributedVariables "in" Term . "with" Term "do" Rule
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
    87                   | Term . "*" Term
@@ -9387,7 +9390,7 @@ State 377
 
 State 378
 
-   53 ForallRule: "forall" AttributedVariable "in" Term "do" . Rule
+   53 ForallRule: "forall" AttributedVariables "in" Term "do" . Rule
 
     "seq"                     shift, and go to state 261
     "par"                     shift, and go to state 262
@@ -9460,7 +9463,7 @@ State 378
 
 State 379
 
-   54 ForallRule: "forall" AttributedVariable "in" Term "with" . Term "do" Rule
+   54 ForallRule: "forall" AttributedVariables "in" Term "with" . Term "do" Rule
 
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
@@ -9919,14 +9922,14 @@ State 390
 
 State 391
 
-   53 ForallRule: "forall" AttributedVariable "in" Term "do" Rule .
+   53 ForallRule: "forall" AttributedVariables "in" Term "do" Rule .
 
     $default  reduce using rule 53 (ForallRule)
 
 
 State 392
 
-   54 ForallRule: "forall" AttributedVariable "in" Term "with" Term . "do" Rule
+   54 ForallRule: "forall" AttributedVariables "in" Term "with" Term . "do" Rule
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
    87                   | Term . "*" Term
@@ -10235,7 +10238,7 @@ State 402
 
 State 403
 
-   54 ForallRule: "forall" AttributedVariable "in" Term "with" Term "do" . Rule
+   54 ForallRule: "forall" AttributedVariables "in" Term "with" Term "do" . Rule
 
     "seq"                     shift, and go to state 261
     "par"                     shift, and go to state 262
@@ -10336,6 +10339,6 @@ State 407
 
 State 408
 
-   54 ForallRule: "forall" AttributedVariable "in" Term "with" Term "do" Rule .
+   54 ForallRule: "forall" AttributedVariables "in" Term "with" Term "do" Rule .
 
     $default  reduce using rule 54 (ForallRule)

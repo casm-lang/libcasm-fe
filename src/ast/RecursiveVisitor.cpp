@@ -255,7 +255,7 @@ void RecursiveVisitor::visit( LetRule& node )
 
 void RecursiveVisitor::visit( ForallRule& node )
 {
-    node.variable()->accept( *this );
+    node.variables()->accept( *this );
     node.universe()->accept( *this );
     node.condition()->accept( *this );
     node.rule()->accept( *this );
