@@ -439,7 +439,7 @@ ConditionalExpression ::= "if" Term "then" Term "else" Term
 ===== ChooseExpression =====
 
 <code>
-ChooseExpression ::= "choose" AttributedVariable "in" Term "do" Term
+ChooseExpression ::= "choose" AttributedVariables "in" Term "do" Term
 </code>
 
 {{page>:grammar:ChooseExpression&noheader&nofooter}}

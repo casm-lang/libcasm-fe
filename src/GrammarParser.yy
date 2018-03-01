@@ -1020,7 +1020,7 @@ ConditionalExpression
 
 
 ChooseExpression
-: CHOOSE AttributedVariable IN Term DO Term
+: CHOOSE AttributedVariables IN Term DO Term
   {
       $$ = Ast::make< ChooseExpression >( @$, $2, $4, $6 );
   }

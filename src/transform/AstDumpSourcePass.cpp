@@ -474,7 +474,7 @@ void AstDumpSourceVisitor::visit( ConditionalExpression& node )
 void AstDumpSourceVisitor::visit( ChooseExpression& node )
 {
     m_stream << "choose ";
-    node.variable()->accept( *this );
+    dumpNodes( *node.variables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " do ";

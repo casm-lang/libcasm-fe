@@ -363,9 +363,9 @@ void SymbolResolveVisitor::visit( ChooseExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.variable() );
+    pushVariables( node.variables() );
     node.expression()->accept( *this );
-    popVariable( node.variable() );
+    popVariables( node.variables() );
 }
 
 void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )

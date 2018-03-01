@@ -904,9 +904,6 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
 
 void ExecutionVisitor::visit( ChooseExpression& node )
 {
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.variable()->localIndex();
-
     node.universe()->accept( *this );
     const auto universe = m_evaluationStack.pop();
 
@@ -919,7 +916,14 @@ void ExecutionVisitor::visit( ChooseExpression& node )
             Code::ChooseExpressionInvalidUniverse );
     }
 
-    frame->setLocal( variableIndex, universe.choose() );
+    auto* frame = m_frameStack.top();
+
+    for( const auto& variable : *node.variables() )
+    {
+        const auto variableIndex = variable->localIndex();
+        frame->setLocal( variableIndex, universe.choose() );
+    }
+
     node.expression()->accept( *this );
 }
 

@@ -176,9 +176,9 @@ void FrameSizeDeterminationVisitor::visit( ChooseExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushLocal( *node.variable() );
+    pushLocals( *node.variables() );
     node.expression()->accept( *this );
-    popLocal();
+    popLocals( node.variables()->size() );
 }
 
 void FrameSizeDeterminationVisitor::visit( UniversalQuantifierExpression& node )

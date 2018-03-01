@@ -629,19 +629,19 @@ void ConditionalExpression::accept( Visitor& visitor )
 //
 
 ChooseExpression::ChooseExpression(
-    const VariableDefinition::Ptr& variable,
+    const VariableDefinitions::Ptr& variables,
     const Expression::Ptr& universe,
     const Expression::Ptr& expression )
 : Expression( Node::ID::CHOOSE_EXPRESSION )
-, m_variable( variable )
+, m_variables( variables )
 , m_universe( universe )
 , m_expression( expression )
 {
 }
 
-const VariableDefinition::Ptr& ChooseExpression::variable( void ) const
+const VariableDefinitions::Ptr& ChooseExpression::variables( void ) const
 {
-    return m_variable;
+    return m_variables;
 }
 
 const Expression::Ptr& ChooseExpression::universe( void ) const
