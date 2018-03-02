@@ -210,21 +210,21 @@ void RecursiveVisitor::visit( ConditionalExpression& node )
 
 void RecursiveVisitor::visit( ChooseExpression& node )
 {
-    node.variable()->accept( *this );
+    node.variables()->accept( *this );
     node.universe()->accept( *this );
     node.expression()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UniversalQuantifierExpression& node )
 {
-    node.predicateVariable()->accept( *this );
+    node.predicateVariables()->accept( *this );
     node.universe()->accept( *this );
     node.proposition()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ExistentialQuantifierExpression& node )
 {
-    node.predicateVariable()->accept( *this );
+    node.predicateVariables()->accept( *this );
     node.universe()->accept( *this );
     node.proposition()->accept( *this );
 }
@@ -255,7 +255,7 @@ void RecursiveVisitor::visit( LetRule& node )
 
 void RecursiveVisitor::visit( ForallRule& node )
 {
-    node.variable()->accept( *this );
+    node.variables()->accept( *this );
     node.universe()->accept( *this );
     node.condition()->accept( *this );
     node.rule()->accept( *this );
@@ -263,7 +263,7 @@ void RecursiveVisitor::visit( ForallRule& node )
 
 void RecursiveVisitor::visit( ChooseRule& node )
 {
-    node.variable()->accept( *this );
+    node.variables()->accept( *this );
     node.universe()->accept( *this );
     node.rule()->accept( *this );
 }

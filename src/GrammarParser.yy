@@ -267,7 +267,7 @@ END       0 "end of file"
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <Expressions::Ptr> Arguments
-%type <VariableDefinitions::Ptr> Parameters MaybeParameters
+%type <VariableDefinitions::Ptr> Parameters MaybeParameters AttributedVariables
 
 
 %start Specification
@@ -674,11 +674,11 @@ LetRule
 
 
 ForallRule
-: FORALL AttributedVariable IN Term DO Rule
+: FORALL AttributedVariables IN Term DO Rule
   {
       $$ = Ast::make< ForallRule >( @$, $2, $4, $6 );
   }
-| FORALL AttributedVariable IN Term WITH Term DO Rule
+| FORALL AttributedVariables IN Term WITH Term DO Rule
   {
       $$ = Ast::make< ForallRule >( @$, $2, $4, $6, $8 );
   }
@@ -686,7 +686,7 @@ ForallRule
 
 
 ChooseRule
-: CHOOSE AttributedVariable IN Term DO Rule
+: CHOOSE AttributedVariables IN Term DO Rule
   {
       $$ = Ast::make< ChooseRule >( @$, $2, $4, $6 );
   }
@@ -1020,7 +1020,7 @@ ConditionalExpression
 
 
 ChooseExpression
-: CHOOSE AttributedVariable IN Term DO Term
+: CHOOSE AttributedVariables IN Term DO Term
   {
       $$ = Ast::make< ChooseExpression >( @$, $2, $4, $6 );
   }
@@ -1028,7 +1028,7 @@ ChooseExpression
 
 
 UniversalQuantifierExpression
-: FORALL AttributedVariable IN Term HOLDS Term
+: FORALL AttributedVariables IN Term HOLDS Term
   {
       $$ = Ast::make< UniversalQuantifierExpression >( @$, $2, $4, $6 );
   }
@@ -1036,7 +1036,7 @@ UniversalQuantifierExpression
 
 
 ExistentialQuantifierExpression
-: EXISTS AttributedVariable IN Term WITH Term
+: EXISTS AttributedVariables IN Term WITH Term
   {
       $$ = Ast::make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
   }
@@ -1629,6 +1629,22 @@ Variable
   {
       const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
       $$ = Ast::make< VariableDefinition >( @$, $1, unresolvedType );
+  }
+;
+
+
+AttributedVariables
+: AttributedVariables COMMA AttributedVariable
+  {
+      auto variables = $1;
+      variables->add( $3 );
+      $$ = variables;
+  }
+| AttributedVariable
+  {
+      auto variables = Ast::make< VariableDefinitions >( @$ );
+      variables->add( $1 );
+      $$ = variables;
   }
 ;
 

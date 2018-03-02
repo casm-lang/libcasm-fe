@@ -93,7 +93,9 @@ class SymbolResolveVisitor final : public RecursiveVisitor
 
   private:
     void pushVariable( const VariableDefinition::Ptr& variable );
+    void pushVariables( const VariableDefinitions::Ptr& variables );
     void popVariable( const VariableDefinition::Ptr& variable );
+    void popVariables( const VariableDefinitions::Ptr& variables );
 
     /**
      * If the \a definition is a type alias, it will be resolved and the aliased
@@ -118,34 +120,16 @@ SymbolResolveVisitor::SymbolResolveVisitor( libcasm_fe::Logger& log, Namespace& 
 
 void SymbolResolveVisitor::visit( DerivedDefinition& node )
 {
-    for( const auto& argument : *node.arguments() )
-    {
-        pushVariable( argument );
-    }
-
+    pushVariables( node.arguments() );
     node.expression()->accept( *this );
-
-    const auto end = node.arguments()->rend();
-    for( auto it = node.arguments()->rbegin(); it != end; ++it )
-    {
-        popVariable( *it );
-    }
+    popVariables( node.arguments() );
 }
 
 void SymbolResolveVisitor::visit( RuleDefinition& node )
 {
-    for( const auto& argument : *node.arguments() )
-    {
-        pushVariable( argument );
-    }
-
+    pushVariables( node.arguments() );
     node.rule()->accept( *this );
-
-    const auto end = node.arguments()->rend();
-    for( auto it = node.arguments()->rbegin(); it != end; ++it )
-    {
-        popVariable( *it );
-    }
+    popVariables( node.arguments() );
 }
 
 void SymbolResolveVisitor::visit( ReferenceLiteral& node )
@@ -379,27 +363,27 @@ void SymbolResolveVisitor::visit( ChooseExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.variable() );
+    pushVariables( node.variables() );
     node.expression()->accept( *this );
-    popVariable( node.variable() );
+    popVariables( node.variables() );
 }
 
 void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.predicateVariable() );
+    pushVariables( node.predicateVariables() );
     node.proposition()->accept( *this );
-    popVariable( node.predicateVariable() );
+    popVariables( node.predicateVariables() );
 }
 
 void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.predicateVariable() );
+    pushVariables( node.predicateVariables() );
     node.proposition()->accept( *this );
-    popVariable( node.predicateVariable() );
+    popVariables( node.predicateVariables() );
 }
 
 void SymbolResolveVisitor::visit( LetRule& node )
@@ -415,19 +399,19 @@ void SymbolResolveVisitor::visit( ForallRule& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.variable() );
+    pushVariables( node.variables() );
     node.condition()->accept( *this );
     node.rule()->accept( *this );
-    popVariable( node.variable() );
+    popVariables( node.variables() );
 }
 
 void SymbolResolveVisitor::visit( ChooseRule& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.variable() );
+    pushVariables( node.variables() );
     node.rule()->accept( *this );
-    popVariable( node.variable() );
+    popVariables( node.variables() );
 }
 
 void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable )
@@ -449,10 +433,26 @@ void SymbolResolveVisitor::pushVariable( const VariableDefinition::Ptr& variable
     }
 }
 
+void SymbolResolveVisitor::pushVariables( const VariableDefinitions::Ptr& variables )
+{
+    for( const auto& variable : *variables )
+    {
+        pushVariable( variable );
+    }
+}
+
 void SymbolResolveVisitor::popVariable( const VariableDefinition::Ptr& variable )
 {
     const auto& name = variable->identifier()->name();
     m_variables.erase( name );
+}
+
+void SymbolResolveVisitor::popVariables( const VariableDefinitions::Ptr& variables )
+{
+    for( const auto& variable : *variables )
+    {
+        popVariable( variable );
+    }
 }
 
 Definition::Ptr SymbolResolveVisitor::resolveIfAlias( const Definition::Ptr& definition ) const

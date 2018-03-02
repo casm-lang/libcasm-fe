@@ -518,6 +518,7 @@ namespace libcasm_fe {
 
       // Parameters
       // MaybeParameters
+      // AttributedVariables
       // TypedVariables
       char dummy64[sizeof(VariableDefinitions::Ptr)];
 
@@ -1422,8 +1423,8 @@ namespace libcasm_fe {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 2481,     ///< Last index in yytable_.
-      yynnts_ = 92,  ///< Number of nonterminal symbols.
+      yylast_ = 2458,     ///< Last index in yytable_.
+      yynnts_ = 93,  ///< Number of nonterminal symbols.
       yyfinal_ = 13, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -1515,15 +1516,15 @@ namespace libcasm_fe {
   {
       switch (other.type_get ())
     {
-      case 175: // Attribute
+      case 176: // Attribute
         value.copy< Attribute::Ptr > (other.value);
         break;
 
-      case 174: // Attributes
+      case 175: // Attributes
         value.copy< Attributes::Ptr > (other.value);
         break;
 
-      case 176: // BasicAttribute
+      case 177: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (other.value);
         break;
 
@@ -1617,7 +1618,7 @@ namespace libcasm_fe {
         value.copy< Expression::Ptr > (other.value);
         break;
 
-      case 177: // ExpressionAttribute
+      case 178: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (other.value);
         break;
 
@@ -1784,15 +1785,16 @@ namespace libcasm_fe {
         break;
 
       case 169: // Variable
-      case 171: // TypedVariable
-      case 172: // AttributedVariable
-      case 173: // TypedAttributedVariable
+      case 172: // TypedVariable
+      case 173: // AttributedVariable
+      case 174: // TypedAttributedVariable
         value.copy< VariableDefinition::Ptr > (other.value);
         break;
 
       case 158: // Parameters
       case 159: // MaybeParameters
-      case 170: // TypedVariables
+      case 170: // AttributedVariables
+      case 171: // TypedVariables
         value.copy< VariableDefinitions::Ptr > (other.value);
         break;
 
@@ -1833,15 +1835,15 @@ namespace libcasm_fe {
     (void) v;
       switch (this->type_get ())
     {
-      case 175: // Attribute
+      case 176: // Attribute
         value.copy< Attribute::Ptr > (v);
         break;
 
-      case 174: // Attributes
+      case 175: // Attributes
         value.copy< Attributes::Ptr > (v);
         break;
 
-      case 176: // BasicAttribute
+      case 177: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (v);
         break;
 
@@ -1935,7 +1937,7 @@ namespace libcasm_fe {
         value.copy< Expression::Ptr > (v);
         break;
 
-      case 177: // ExpressionAttribute
+      case 178: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (v);
         break;
 
@@ -2102,15 +2104,16 @@ namespace libcasm_fe {
         break;
 
       case 169: // Variable
-      case 171: // TypedVariable
-      case 172: // AttributedVariable
-      case 173: // TypedAttributedVariable
+      case 172: // TypedVariable
+      case 173: // AttributedVariable
+      case 174: // TypedAttributedVariable
         value.copy< VariableDefinition::Ptr > (v);
         break;
 
       case 158: // Parameters
       case 159: // MaybeParameters
-      case 170: // TypedVariables
+      case 170: // AttributedVariables
+      case 171: // TypedVariables
         value.copy< VariableDefinitions::Ptr > (v);
         break;
 
@@ -2644,15 +2647,15 @@ namespace libcasm_fe {
     // Type destructor.
     switch (yytype)
     {
-      case 175: // Attribute
+      case 176: // Attribute
         value.template destroy< Attribute::Ptr > ();
         break;
 
-      case 174: // Attributes
+      case 175: // Attributes
         value.template destroy< Attributes::Ptr > ();
         break;
 
-      case 176: // BasicAttribute
+      case 177: // BasicAttribute
         value.template destroy< BasicAttribute::Ptr > ();
         break;
 
@@ -2746,7 +2749,7 @@ namespace libcasm_fe {
         value.template destroy< Expression::Ptr > ();
         break;
 
-      case 177: // ExpressionAttribute
+      case 178: // ExpressionAttribute
         value.template destroy< ExpressionAttribute::Ptr > ();
         break;
 
@@ -2913,15 +2916,16 @@ namespace libcasm_fe {
         break;
 
       case 169: // Variable
-      case 171: // TypedVariable
-      case 172: // AttributedVariable
-      case 173: // TypedAttributedVariable
+      case 172: // TypedVariable
+      case 173: // AttributedVariable
+      case 174: // TypedAttributedVariable
         value.template destroy< VariableDefinition::Ptr > ();
         break;
 
       case 158: // Parameters
       case 159: // MaybeParameters
-      case 170: // TypedVariables
+      case 170: // AttributedVariables
+      case 171: // TypedVariables
         value.template destroy< VariableDefinitions::Ptr > ();
         break;
 
@@ -2968,15 +2972,15 @@ namespace libcasm_fe {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 175: // Attribute
+      case 176: // Attribute
         value.move< Attribute::Ptr > (s.value);
         break;
 
-      case 174: // Attributes
+      case 175: // Attributes
         value.move< Attributes::Ptr > (s.value);
         break;
 
-      case 176: // BasicAttribute
+      case 177: // BasicAttribute
         value.move< BasicAttribute::Ptr > (s.value);
         break;
 
@@ -3070,7 +3074,7 @@ namespace libcasm_fe {
         value.move< Expression::Ptr > (s.value);
         break;
 
-      case 177: // ExpressionAttribute
+      case 178: // ExpressionAttribute
         value.move< ExpressionAttribute::Ptr > (s.value);
         break;
 
@@ -3237,15 +3241,16 @@ namespace libcasm_fe {
         break;
 
       case 169: // Variable
-      case 171: // TypedVariable
-      case 172: // AttributedVariable
-      case 173: // TypedAttributedVariable
+      case 172: // TypedVariable
+      case 173: // AttributedVariable
+      case 174: // TypedAttributedVariable
         value.move< VariableDefinition::Ptr > (s.value);
         break;
 
       case 158: // Parameters
       case 159: // MaybeParameters
-      case 170: // TypedVariables
+      case 170: // AttributedVariables
+      case 171: // TypedVariables
         value.move< VariableDefinitions::Ptr > (s.value);
         break;
 
@@ -3844,7 +3849,7 @@ namespace libcasm_fe {
 
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 } // libcasm_fe
-#line 3848 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3853 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

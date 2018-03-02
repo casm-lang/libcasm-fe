@@ -411,6 +411,11 @@ class ExecutionVisitor final : public EmptyVisitor
     void handleMergeConflict(
         const Node& node, const ExecutionUpdateSet::Conflict& conflict ) const;
 
+    void foreachInUniverse(
+        const VariableDefinitions& variables,
+        const IR::Constant& universe,
+        const std::function< void() >& subRule ) const;
+
   private:
     const Storage& m_globalState;
     ExecutionLocationRegistry& m_locationRegistry;
@@ -904,9 +909,6 @@ void ExecutionVisitor::visit( ConditionalExpression& node )
 
 void ExecutionVisitor::visit( ChooseExpression& node )
 {
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.variable()->localIndex();
-
     node.universe()->accept( *this );
     const auto universe = m_evaluationStack.pop();
 
@@ -919,7 +921,14 @@ void ExecutionVisitor::visit( ChooseExpression& node )
             Code::ChooseExpressionInvalidUniverse );
     }
 
-    frame->setLocal( variableIndex, universe.choose() );
+    auto* frame = m_frameStack.top();
+
+    for( const auto& variable : *node.variables() )
+    {
+        const auto variableIndex = variable->localIndex();
+        frame->setLocal( variableIndex, universe.choose() );
+    }
+
     node.expression()->accept( *this );
 }
 
@@ -927,9 +936,6 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
 {
     bool result = true;
     bool defined = true;
-
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.predicateVariable()->localIndex();
 
     node.universe()->accept( *this );
     const auto universe = m_evaluationStack.pop();
@@ -943,9 +949,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    universe.foreach( [&]( const IR::Constant& value ) {
-        frame->setLocal( variableIndex, value );
-
+    foreachInUniverse( *node.predicateVariables(), universe, [&]() {
         node.proposition()->accept( *this );
         const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
@@ -982,9 +986,6 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     bool result = false;
     bool defined = true;
 
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.predicateVariable()->localIndex();
-
     node.universe()->accept( *this );
     const auto universe = m_evaluationStack.pop();
 
@@ -997,9 +998,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    universe.foreach( [&]( const IR::Constant& value ) {
-        frame->setLocal( variableIndex, value );
-
+    foreachInUniverse( *node.predicateVariables(), universe, [&]() {
         node.proposition()->accept( *this );
         const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
@@ -1131,9 +1130,6 @@ void ExecutionVisitor::visit( ForallRule& node )
 {
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
 
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.variable()->localIndex();
-
     node.universe()->accept( *this );
     const auto universe = m_evaluationStack.pop();
 
@@ -1146,10 +1142,8 @@ void ExecutionVisitor::visit( ForallRule& node )
             Code::ForallRuleInvalidUniverse );
     }
 
-    universe.foreach( [&]( const IR::Constant& value ) {
-        frame->setLocal( variableIndex, value );
-
-        // check if value satisfies the condition
+    foreachInUniverse( *node.variables(), universe, [&]() {
+        // check if values satisfy the condition
         node.condition()->accept( *this );
         const auto condition = m_evaluationStack.pop< IR::BooleanConstant >();
 
@@ -1157,7 +1151,7 @@ void ExecutionVisitor::visit( ForallRule& node )
         {
             throw RuntimeException(
                 node.condition()->sourceLocation(),
-                "condition must be true or false but was undefined for '" + value.name() + "'",
+                "condition must be true or false but was undefined",
                 m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
                 Code::ForallRuleInvalidCondition );
         }
@@ -1179,9 +1173,6 @@ void ExecutionVisitor::visit( ForallRule& node )
 
 void ExecutionVisitor::visit( ChooseRule& node )
 {
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.variable()->localIndex();
-
     node.universe()->accept( *this );
     const auto universe = m_evaluationStack.pop();
 
@@ -1194,7 +1185,14 @@ void ExecutionVisitor::visit( ChooseRule& node )
             Code::ChooseRuleInvalidUniverse );
     }
 
-    frame->setLocal( variableIndex, universe.choose() );
+    auto* frame = m_frameStack.top();
+
+    for( const auto& variable : *node.variables() )
+    {
+        const auto variableIndex = variable->localIndex();
+        frame->setLocal( variableIndex, universe.choose() );
+    }
+
     node.rule()->accept( *this );
 }
 
@@ -1538,6 +1536,44 @@ void ExecutionVisitor::handleMergeConflict(
         info,
         m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
         libcasm_fe::Code::UpdateSetMergeConflict );
+}
+
+void ExecutionVisitor::foreachInUniverse(
+    const VariableDefinitions& variables,
+    const IR::Constant& universe,
+    const std::function< void() >& subRule ) const
+{
+    auto* frame = m_frameStack.top();
+
+    // Handle multiple forall variables by creating a lambda-function chain
+    // e.g. forall x, y in U do
+    //          subRule()
+    // becomes:
+    //      U.foreach(v -> x := v;
+    //          U.foreach(w -> y := w;
+    //              subRule()))
+    std::function< void( const IR::Constant& ) > chain = nullptr;
+    for( const auto& variable : variables )
+    {
+        const auto variableIndex = variable->localIndex();
+
+        if( chain == nullptr )
+        {
+            chain = [frame, variableIndex, subRule]( const IR::Constant& value ) {
+                frame->setLocal( variableIndex, value );
+                subRule();
+            };
+        }
+        else
+        {
+            chain = [frame, variableIndex, chain, &universe]( const IR::Constant& value ) {
+                frame->setLocal( variableIndex, value );
+                universe.foreach( chain );
+            };
+        }
+    }
+
+    universe.foreach( chain );
 }
 
 class StateInitializationVisitor final : public EmptyVisitor

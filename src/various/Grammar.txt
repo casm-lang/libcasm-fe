@@ -222,8 +222,8 @@ LetRule ::= "let" AttributedVariable "=" Term "in" Rule
 ===== ForallRule =====
 
 <code>
-ForallRule ::= "forall" AttributedVariable "in" Term "do" Rule
-             | "forall" AttributedVariable "in" Term "with" Term "do" Rule
+ForallRule ::= "forall" AttributedVariables "in" Term "do" Rule
+             | "forall" AttributedVariables "in" Term "with" Term "do" Rule
 </code>
 
 {{page>:grammar:ForallRule&noheader&nofooter}}
@@ -232,7 +232,7 @@ ForallRule ::= "forall" AttributedVariable "in" Term "do" Rule
 ===== ChooseRule =====
 
 <code>
-ChooseRule ::= "choose" AttributedVariable "in" Term "do" Rule
+ChooseRule ::= "choose" AttributedVariables "in" Term "do" Rule
 </code>
 
 {{page>:grammar:ChooseRule&noheader&nofooter}}
@@ -439,7 +439,7 @@ ConditionalExpression ::= "if" Term "then" Term "else" Term
 ===== ChooseExpression =====
 
 <code>
-ChooseExpression ::= "choose" AttributedVariable "in" Term "do" Term
+ChooseExpression ::= "choose" AttributedVariables "in" Term "do" Term
 </code>
 
 {{page>:grammar:ChooseExpression&noheader&nofooter}}
@@ -448,7 +448,7 @@ ChooseExpression ::= "choose" AttributedVariable "in" Term "do" Term
 ===== UniversalQuantifierExpression =====
 
 <code>
-UniversalQuantifierExpression ::= "forall" AttributedVariable "in" Term "holds" Term
+UniversalQuantifierExpression ::= "forall" AttributedVariables "in" Term "holds" Term
 </code>
 
 {{page>:grammar:UniversalQuantifierExpression&noheader&nofooter}}
@@ -457,7 +457,7 @@ UniversalQuantifierExpression ::= "forall" AttributedVariable "in" Term "holds" 
 ===== ExistentialQuantifierExpression =====
 
 <code>
-ExistentialQuantifierExpression ::= "exists" AttributedVariable "in" Term "with" Term
+ExistentialQuantifierExpression ::= "exists" AttributedVariables "in" Term "with" Term
 </code>
 
 {{page>:grammar:ExistentialQuantifierExpression&noheader&nofooter}}
@@ -848,6 +848,16 @@ Variable ::= TypedVariable
 </code>
 
 {{page>:grammar:Variable&noheader&nofooter}}
+
+
+===== AttributedVariables =====
+
+<code>
+AttributedVariables ::= AttributedVariables "," AttributedVariable
+                      | AttributedVariable
+</code>
+
+{{page>:grammar:AttributedVariables&noheader&nofooter}}
 
 
 ===== TypedVariables =====

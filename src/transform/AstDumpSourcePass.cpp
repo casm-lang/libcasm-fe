@@ -474,7 +474,7 @@ void AstDumpSourceVisitor::visit( ConditionalExpression& node )
 void AstDumpSourceVisitor::visit( ChooseExpression& node )
 {
     m_stream << "choose ";
-    node.variable()->accept( *this );
+    dumpNodes( *node.variables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " do ";
@@ -484,7 +484,7 @@ void AstDumpSourceVisitor::visit( ChooseExpression& node )
 void AstDumpSourceVisitor::visit( UniversalQuantifierExpression& node )
 {
     m_stream << "forall ";
-    node.predicateVariable()->accept( *this );
+    dumpNodes( *node.predicateVariables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " holds ";
@@ -494,7 +494,7 @@ void AstDumpSourceVisitor::visit( UniversalQuantifierExpression& node )
 void AstDumpSourceVisitor::visit( ExistentialQuantifierExpression& node )
 {
     m_stream << "exists ";
-    node.predicateVariable()->accept( *this );
+    dumpNodes( *node.predicateVariables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " with ";
@@ -552,7 +552,7 @@ void AstDumpSourceVisitor::visit( LetRule& node )
 void AstDumpSourceVisitor::visit( ForallRule& node )
 {
     m_stream << m_indentation << "forall ";
-    node.variable()->accept( *this );
+    dumpNodes( *node.variables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " with ";
@@ -567,7 +567,7 @@ void AstDumpSourceVisitor::visit( ForallRule& node )
 void AstDumpSourceVisitor::visit( ChooseRule& node )
 {
     m_stream << m_indentation << "choose ";
-    node.variable()->accept( *this );
+    dumpNodes( *node.variables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " do\n";

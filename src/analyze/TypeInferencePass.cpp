@@ -1240,18 +1240,27 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
 void TypeInferenceVisitor::visit( ChooseExpression& node )
 {
-    node.variable()->accept( *this );
+    node.variables()->accept( *this );
 
-    if( node.variable()->type() )
+    for( const auto& variable : *node.variables() )
     {
-        m_typeIDs[ node.universe().get() ].emplace( node.variable()->type()->id() );
+        if( variable->type() )
+        {
+            m_typeIDs[ node.universe().get() ].emplace( variable->type()->id() );
+        }
     }
 
     node.universe()->accept( *this );
 
-    if( not node.variable()->type() and node.universe()->type() )
+    if( node.universe()->type() )
     {
-        node.variable()->setType( node.universe()->type()->ptr_result() );
+        for( const auto& variable : *node.variables() )
+        {
+            if( not variable->type() )
+            {
+                variable->setType( node.universe()->type()->ptr_result() );
+            }
+        }
     }
 
     if( node.type() )
@@ -1266,31 +1275,44 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
         node.setType( node.expression()->type() );
     }
 
-    if( not node.variable()->type() )
+    for( const auto& variable : *node.variables() )
     {
-        m_log.error(
-            { node.variable()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
+        if( not variable->type() )
+        {
+            m_log.error(
+                { variable->sourceLocation() },
+                "no type found",
+                Code::TypeInferenceInvalidExpression );
+        }
     }
-    else if( not node.universe()->type() )
+
+    if( not node.universe()->type() )
     {
         m_log.error(
             { node.universe()->sourceLocation() },
             "no type found",
             Code::TypeInferenceInvalidExpression );
     }
-    else
+
+    if( node.universe()->type() )
     {
-        if( *node.variable()->type() != node.universe()->type()->result() )
+        for( const auto& variable : *node.variables() )
         {
-            m_log.error(
-                { node.variable()->sourceLocation(), node.universe()->sourceLocation() },
-                node.description() + " variable '" + node.variable()->identifier()->name() +
-                    "' of type '" + node.variable()->type()->description() +
-                    "' does not match the universe of type '" +
-                    node.universe()->type()->description() + "'",
-                Code::TypeInferenceInvalidChooseExpressionVariableTypeMismatch );
+            if( not variable->type() )
+            {
+                continue;
+            }
+
+            if( *variable->type() != node.universe()->type()->result() )
+            {
+                m_log.error(
+                    { variable->sourceLocation(), node.universe()->sourceLocation() },
+                    node.description() + " variable '" + variable->identifier()->name() +
+                        "' of type '" + variable->type()->description() +
+                        "' does not match the universe of type '" +
+                        node.universe()->type()->description() + "'",
+                    Code::TypeInferenceInvalidChooseExpressionVariableTypeMismatch );
+            }
         }
     }
 
@@ -1451,18 +1473,27 @@ void TypeInferenceVisitor::visit( LetRule& node )
 
 void TypeInferenceVisitor::visit( ForallRule& node )
 {
-    node.variable()->accept( *this );
+    node.variables()->accept( *this );
 
-    if( node.variable()->type() )
+    for( const auto& variable : *node.variables() )
     {
-        m_typeIDs[ node.universe().get() ].emplace( node.variable()->type()->id() );
+        if( variable->type() )
+        {
+            m_typeIDs[ node.universe().get() ].emplace( variable->type()->id() );
+        }
     }
 
     node.universe()->accept( *this );
 
-    if( not node.variable()->type() and node.universe()->type() )
+    if( node.universe()->type() )
     {
-        node.variable()->setType( node.universe()->type()->ptr_result() );
+        for( const auto& variable : *node.variables() )
+        {
+            if( not variable->type() )
+            {
+                variable->setType( node.universe()->type()->ptr_result() );
+            }
+        }
     }
 
     node.condition()->accept( *this );
@@ -1481,12 +1512,15 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 
     node.rule()->accept( *this );
 
-    if( not node.variable()->type() )
+    for( const auto& variable : *node.variables() )
     {
-        m_log.error(
-            { node.variable()->sourceLocation() },
-            "no type found for 'forall' variable",
-            Code::TypeInferenceForallVariableHasNoType );
+        if( not variable->type() )
+        {
+            m_log.error(
+                { variable->sourceLocation() },
+                "no type found for 'forall' variable",
+                Code::TypeInferenceForallVariableHasNoType );
+        }
     }
 
     if( not node.universe()->type() )
@@ -1497,64 +1531,94 @@ void TypeInferenceVisitor::visit( ForallRule& node )
             Code::TypeInferenceForallUniverseHasNoType );
     }
 
-    if( node.variable()->type() and node.universe()->type() )
+    if( node.universe()->type() )
     {
-        if( *node.variable()->type() != node.universe()->type()->result() )
+        for( const auto& variable : *node.variables() )
         {
-            m_log.error(
-                { node.variable()->sourceLocation(), node.universe()->sourceLocation() },
-                node.description() + " variable '" + node.variable()->identifier()->name() +
-                    "' of type '" + node.variable()->type()->description() +
-                    "' does not match the universe of type '" +
-                    node.universe()->type()->description() + "'",
-                Code::TypeInferenceForallRuleTypeMismatch );
+            if( not variable->type() )
+            {
+                continue;
+            }
+
+            if( *variable->type() != node.universe()->type()->result() )
+            {
+                m_log.error(
+                    { variable->sourceLocation(), node.universe()->sourceLocation() },
+                    node.description() + " variable '" + variable->identifier()->name() +
+                        "' of type '" + variable->type()->description() +
+                        "' does not match the universe of type '" +
+                        node.universe()->type()->description() + "'",
+                    Code::TypeInferenceForallRuleTypeMismatch );
+            }
         }
     }
 }
 
 void TypeInferenceVisitor::visit( ChooseRule& node )
 {
-    node.variable()->accept( *this );
+    node.variables()->accept( *this );
 
-    if( node.variable()->type() )
+    for( const auto& variable : *node.variables() )
     {
-        m_typeIDs[ node.universe().get() ].emplace( node.variable()->type()->id() );
+        if( variable->type() )
+        {
+            m_typeIDs[ node.universe().get() ].emplace( variable->type()->id() );
+        }
     }
 
     node.universe()->accept( *this );
 
-    if( not node.variable()->type() and node.universe()->type() )
+    if( node.universe()->type() )
     {
-        node.variable()->setType( node.universe()->type()->ptr_result() );
+        for( const auto& variable : *node.variables() )
+        {
+            if( not variable->type() )
+            {
+                variable->setType( node.universe()->type()->ptr_result() );
+            }
+        }
     }
 
     node.rule()->accept( *this );
 
-    if( not node.variable()->type() )
+    for( const auto& variable : *node.variables() )
     {
-        m_log.error(
-            { node.variable()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
+        if( not variable->type() )
+        {
+            m_log.error(
+                { variable->sourceLocation() },
+                "no type found",
+                Code::TypeInferenceInvalidExpression );
+        }
     }
-    else if( not node.universe()->type() )
+
+    if( not node.universe()->type() )
     {
         m_log.error(
             { node.universe()->sourceLocation() },
             "no type found",
             Code::TypeInferenceInvalidExpression );
     }
-    else
+
+    if( node.universe()->type() )
     {
-        if( *node.variable()->type() != node.universe()->type()->result() )
+        for( const auto& variable : *node.variables() )
         {
-            m_log.error(
-                { node.variable()->sourceLocation(), node.universe()->sourceLocation() },
-                node.description() + " variable '" + node.variable()->identifier()->name() +
-                    "' of type '" + node.variable()->type()->description() +
-                    "' does not match the universe of type '" +
-                    node.universe()->type()->description() + "'",
-                Code::TypeInferenceInvalidChooseRuleVariableTypeMismatch );
+            if( not variable->type() )
+            {
+                continue;
+            }
+
+            if( *variable->type() != node.universe()->type()->result() )
+            {
+                m_log.error(
+                    { variable->sourceLocation(), node.universe()->sourceLocation() },
+                    node.description() + " variable '" + variable->identifier()->name() +
+                        "' of type '" + variable->type()->description() +
+                        "' does not match the universe of type '" +
+                        node.universe()->type()->description() + "'",
+                    Code::TypeInferenceInvalidChooseRuleVariableTypeMismatch );
+            }
         }
     }
 }
@@ -1910,51 +1974,73 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
 
     m_typeIDs[ node.proposition().get() ].emplace( node.type()->id() );
 
-    if( node.predicateVariable()->type() )
+    for( const auto& predicateVariable : *node.predicateVariables() )
     {
-        m_typeIDs[ node.universe().get() ].emplace( node.predicateVariable()->type()->id() );
+        if( predicateVariable->type() )
+        {
+            m_typeIDs[ node.universe().get() ].emplace( predicateVariable->type()->id() );
+        }
     }
 
     node.universe()->accept( *this );
 
-    node.predicateVariable()->accept( *this );
+    node.predicateVariables()->accept( *this );
 
-    if( not node.predicateVariable()->type() and node.universe()->type() )
+    if( node.universe()->type() )
     {
-        node.predicateVariable()->setType( node.universe()->type()->ptr_result() );
+        for( const auto& predicateVariable : *node.predicateVariables() )
+        {
+            if( not predicateVariable->type() )
+            {
+                predicateVariable->setType( node.universe()->type()->ptr_result() );
+            }
+        }
     }
 
     node.proposition()->accept( *this );
 
-    if( not node.predicateVariable()->type() )
+    for( const auto& predicateVariable : *node.predicateVariables() )
     {
-        m_log.error(
-            { node.predicateVariable()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
+        if( not predicateVariable->type() )
+        {
+            m_log.error(
+                { predicateVariable->sourceLocation() },
+                "no type found",
+                Code::TypeInferenceInvalidExpression );
+        }
     }
-    else if( not node.universe()->type() )
+
+    if( not node.universe()->type() )
     {
         m_log.error(
             { node.universe()->sourceLocation() },
             "no type found",
             Code::TypeInferenceInvalidExpression );
     }
-    else
-    {
-        if( *node.predicateVariable()->type() != node.universe()->type()->result() )
-        {
-            m_log.error(
-                { node.predicateVariable()->sourceLocation(), node.universe()->sourceLocation() },
-                node.description() + " predicate variable '" +
-                    node.predicateVariable()->identifier()->name() + "' of type '" +
-                    node.predicateVariable()->type()->description() +
-                    "' does not match the universe of type '" +
-                    node.universe()->type()->description() + "'",
 
-                ( node.id() == Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION )
-                    ? Code::TypeInferenceQuantifierExistentialPredicateTypeMismatch
-                    : Code::TypeInferenceQuantifierUniversalPredicateTypeMismatch );
+    if( node.universe()->type() )
+    {
+        for( const auto& predicateVariable : *node.predicateVariables() )
+        {
+            if( not predicateVariable->type() )
+            {
+                continue;
+            }
+
+            if( *predicateVariable->type() != node.universe()->type()->result() )
+            {
+                m_log.error(
+                    { predicateVariable->sourceLocation(), node.universe()->sourceLocation() },
+                    node.description() + " predicate variable '" +
+                        predicateVariable->identifier()->name() + "' of type '" +
+                        predicateVariable->type()->description() +
+                        "' does not match the universe of type '" +
+                        node.universe()->type()->description() + "'",
+
+                    ( node.id() == Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION )
+                        ? Code::TypeInferenceQuantifierExistentialPredicateTypeMismatch
+                        : Code::TypeInferenceQuantifierUniversalPredicateTypeMismatch );
+            }
         }
     }
 
@@ -2025,8 +2111,8 @@ void TypeResolveVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    // TODO: this will need some extra care when we add the import feature. (e.g. namespace lookup
-    // by type)
+    // TODO: this will need some extra care when we add the import feature. (e.g. namespace
+    // lookup by type)
     const auto typeNamespace = m_symboltable.findNamespace( node.type()->description() );
     if( not typeNamespace )
     {

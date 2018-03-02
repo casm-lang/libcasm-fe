@@ -629,19 +629,19 @@ void ConditionalExpression::accept( Visitor& visitor )
 //
 
 ChooseExpression::ChooseExpression(
-    const VariableDefinition::Ptr& variable,
+    const VariableDefinitions::Ptr& variables,
     const Expression::Ptr& universe,
     const Expression::Ptr& expression )
 : Expression( Node::ID::CHOOSE_EXPRESSION )
-, m_variable( variable )
+, m_variables( variables )
 , m_universe( universe )
 , m_expression( expression )
 {
 }
 
-const VariableDefinition::Ptr& ChooseExpression::variable( void ) const
+const VariableDefinitions::Ptr& ChooseExpression::variables( void ) const
 {
-    return m_variable;
+    return m_variables;
 }
 
 const Expression::Ptr& ChooseExpression::universe( void ) const
@@ -666,19 +666,19 @@ void ChooseExpression::accept( Visitor& visitor )
 
 QuantifierExpression::QuantifierExpression(
     Node::ID id,
-    const VariableDefinition::Ptr& predicateVariable,
+    const VariableDefinitions::Ptr& predicateVariables,
     const Expression::Ptr& universe,
     const Expression::Ptr& proposition )
 : Expression( id )
-, m_predicateVariable( predicateVariable )
+, m_predicateVariables( predicateVariables )
 , m_universe( universe )
 , m_proposition( proposition )
 {
 }
 
-const VariableDefinition::Ptr& QuantifierExpression::predicateVariable( void ) const
+const VariableDefinitions::Ptr& QuantifierExpression::predicateVariables( void ) const
 {
-    return m_predicateVariable;
+    return m_predicateVariables;
 }
 
 const Expression::Ptr& QuantifierExpression::universe( void ) const
@@ -697,11 +697,11 @@ const Expression::Ptr& QuantifierExpression::proposition( void ) const
 //
 
 UniversalQuantifierExpression::UniversalQuantifierExpression(
-    const std::shared_ptr< VariableDefinition >& predicateVariable,
+    const std::shared_ptr< VariableDefinitions >& predicateVariables,
     const Expression::Ptr& universe,
     const Expression::Ptr& proposition )
 : QuantifierExpression(
-      Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION, predicateVariable, universe, proposition )
+      Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION, predicateVariables, universe, proposition )
 {
 }
 
@@ -716,11 +716,11 @@ void UniversalQuantifierExpression::accept( Visitor& visitor )
 //
 
 ExistentialQuantifierExpression::ExistentialQuantifierExpression(
-    const std::shared_ptr< VariableDefinition >& predicateVariable,
+    const std::shared_ptr< VariableDefinitions >& predicateVariables,
     const Expression::Ptr& universe,
     const Expression::Ptr& proposition )
 : QuantifierExpression(
-      Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION, predicateVariable, universe, proposition )
+      Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION, predicateVariables, universe, proposition )
 {
 }
 

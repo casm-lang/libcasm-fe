@@ -56,6 +56,7 @@ namespace libcasm_fe
         class Literal;
         class Definition;
         class VariableDefinition;
+        using VariableDefinitions = NodeList< VariableDefinition >;
 
         class Expression : public TypedPropertyNode
         {
@@ -423,18 +424,18 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< ChooseExpression >;
 
             ChooseExpression(
-                const std::shared_ptr< VariableDefinition >& variable,
+                const std::shared_ptr< VariableDefinitions >& variables,
                 const Expression::Ptr& universe,
                 const Expression::Ptr& expression );
 
-            const std::shared_ptr< VariableDefinition >& variable( void ) const;
+            const std::shared_ptr< VariableDefinitions >& variables( void ) const;
             const Expression::Ptr& universe( void ) const;
             const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const std::shared_ptr< VariableDefinition > m_variable;
+            const std::shared_ptr< VariableDefinitions > m_variables;
             const Expression::Ptr m_universe;
             const Expression::Ptr m_expression;
         };
@@ -446,16 +447,16 @@ namespace libcasm_fe
 
             QuantifierExpression(
                 Node::ID id,
-                const std::shared_ptr< VariableDefinition >& predicateVariable,
+                const std::shared_ptr< VariableDefinitions >& predicateVariables,
                 const Expression::Ptr& universe,
                 const Expression::Ptr& proposition );
 
-            const std::shared_ptr< VariableDefinition >& predicateVariable( void ) const;
+            const std::shared_ptr< VariableDefinitions >& predicateVariables( void ) const;
             const Expression::Ptr& universe( void ) const;
             const Expression::Ptr& proposition( void ) const;
 
           private:
-            const std::shared_ptr< VariableDefinition > m_predicateVariable;
+            const std::shared_ptr< VariableDefinitions > m_predicateVariables;
             const Expression::Ptr m_universe;
             const Expression::Ptr m_proposition;
         };
@@ -466,7 +467,7 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< UniversalQuantifierExpression >;
 
             UniversalQuantifierExpression(
-                const std::shared_ptr< VariableDefinition >& predicateVariable,
+                const std::shared_ptr< VariableDefinitions >& predicateVariables,
                 const Expression::Ptr& universe,
                 const Expression::Ptr& proposition );
 
@@ -479,7 +480,7 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< ExistentialQuantifierExpression >;
 
             ExistentialQuantifierExpression(
-                const std::shared_ptr< VariableDefinition >& predicateVariable,
+                const std::shared_ptr< VariableDefinitions >& predicateVariables,
                 const Expression::Ptr& universe,
                 const Expression::Ptr& proposition );
 
