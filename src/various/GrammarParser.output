@@ -159,9 +159,9 @@ Grammar
 
   115 ChooseExpression: "choose" AttributedVariables "in" Term "do" Term
 
-  116 UniversalQuantifierExpression: "forall" AttributedVariable "in" Term "holds" Term
+  116 UniversalQuantifierExpression: "forall" AttributedVariables "in" Term "holds" Term
 
-  117 ExistentialQuantifierExpression: "exists" AttributedVariable "in" Term "with" Term
+  117 ExistentialQuantifierExpression: "exists" AttributedVariables "in" Term "with" Term
 
   118 Literal: UndefinedLiteral
   119        | BooleanLiteral
@@ -574,13 +574,13 @@ RelativeIdentifierPath (168)
 Variable (169)
     on left: 194 195, on right: 201 202
 AttributedVariables (170)
-    on left: 196 197, on right: 53 54 55 115 196
+    on left: 196 197, on right: 53 54 55 115 116 117 196
 TypedVariables (171)
     on left: 198 199, on right: 160 198
 TypedVariable (172)
     on left: 200, on right: 160 194 198 199 203 204
 AttributedVariable (173)
-    on left: 201 202, on right: 52 113 116 117 196 197
+    on left: 201 202, on right: 52 113 196 197
 TypedAttributedVariable (174)
     on left: 203 204, on right: 171 172
 Attributes (175)
@@ -1007,18 +1007,19 @@ State 34
 
 State 35
 
-  116 UniversalQuantifierExpression: "forall" . AttributedVariable "in" Term "holds" Term
+  116 UniversalQuantifierExpression: "forall" . AttributedVariables "in" Term "holds" Term
 
     "in"          shift, and go to state 8
     "["           shift, and go to state 2
     "identifier"  shift, and go to state 9
 
-    Identifier          go to state 98
-    Variable            go to state 99
-    TypedVariable       go to state 100
-    AttributedVariable  go to state 103
-    Attributes          go to state 102
-    Attribute           go to state 6
+    Identifier           go to state 98
+    Variable             go to state 99
+    AttributedVariables  go to state 103
+    TypedVariable        go to state 100
+    AttributedVariable   go to state 104
+    Attributes           go to state 102
+    Attribute            go to state 6
 
 
 State 36
@@ -1031,9 +1032,9 @@ State 36
 
     Identifier           go to state 98
     Variable             go to state 99
-    AttributedVariables  go to state 104
+    AttributedVariables  go to state 105
     TypedVariable        go to state 100
-    AttributedVariable   go to state 105
+    AttributedVariable   go to state 104
     Attributes           go to state 102
     Attribute            go to state 6
 
@@ -1102,18 +1103,19 @@ State 37
 
 State 38
 
-  117 ExistentialQuantifierExpression: "exists" . AttributedVariable "in" Term "with" Term
+  117 ExistentialQuantifierExpression: "exists" . AttributedVariables "in" Term "with" Term
 
     "in"          shift, and go to state 8
     "["           shift, and go to state 2
     "identifier"  shift, and go to state 9
 
-    Identifier          go to state 98
-    Variable            go to state 99
-    TypedVariable       go to state 100
-    AttributedVariable  go to state 107
-    Attributes          go to state 102
-    Attribute           go to state 6
+    Identifier           go to state 98
+    Variable             go to state 99
+    AttributedVariables  go to state 107
+    TypedVariable        go to state 100
+    AttributedVariable   go to state 104
+    Attributes           go to state 102
+    Attribute            go to state 6
 
 
 State 39
@@ -1966,25 +1968,27 @@ State 102
 
 State 103
 
-  116 UniversalQuantifierExpression: "forall" AttributedVariable . "in" Term "holds" Term
+  116 UniversalQuantifierExpression: "forall" AttributedVariables . "in" Term "holds" Term
+  196 AttributedVariables: AttributedVariables . "," AttributedVariable
 
     "in"  shift, and go to state 159
+    ","   shift, and go to state 160
 
 
 State 104
 
-  115 ChooseExpression: "choose" AttributedVariables . "in" Term "do" Term
-  196 AttributedVariables: AttributedVariables . "," AttributedVariable
+  197 AttributedVariables: AttributedVariable .
 
-    "in"  shift, and go to state 160
-    ","   shift, and go to state 161
+    $default  reduce using rule 197 (AttributedVariables)
 
 
 State 105
 
-  197 AttributedVariables: AttributedVariable .
+  115 ChooseExpression: "choose" AttributedVariables . "in" Term "do" Term
+  196 AttributedVariables: AttributedVariables . "," AttributedVariable
 
-    $default  reduce using rule 197 (AttributedVariables)
+    "in"  shift, and go to state 161
+    ","   shift, and go to state 160
 
 
 State 106
@@ -2030,9 +2034,11 @@ State 106
 
 State 107
 
-  117 ExistentialQuantifierExpression: "exists" AttributedVariable . "in" Term "with" Term
+  117 ExistentialQuantifierExpression: "exists" AttributedVariables . "in" Term "with" Term
+  196 AttributedVariables: AttributedVariables . "," AttributedVariable
 
     "in"  shift, and go to state 163
+    ","   shift, and go to state 160
 
 
 State 108
@@ -3745,7 +3751,7 @@ State 158
 
 State 159
 
-  116 UniversalQuantifierExpression: "forall" AttributedVariable "in" . Term "holds" Term
+  116 UniversalQuantifierExpression: "forall" AttributedVariables "in" . Term "holds" Term
 
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
@@ -3807,6 +3813,22 @@ State 159
 
 State 160
 
+  196 AttributedVariables: AttributedVariables "," . AttributedVariable
+
+    "in"          shift, and go to state 8
+    "["           shift, and go to state 2
+    "identifier"  shift, and go to state 9
+
+    Identifier          go to state 98
+    Variable            go to state 99
+    TypedVariable       go to state 100
+    AttributedVariable  go to state 228
+    Attributes          go to state 102
+    Attribute           go to state 6
+
+
+State 161
+
   115 ChooseExpression: "choose" AttributedVariables "in" . Term "do" Term
 
     "let"                     shift, and go to state 34
@@ -3834,7 +3856,7 @@ State 160
     "absoluteIdentifierPath"  shift, and go to state 54
     "relativeIdentifierPath"  shift, and go to state 55
 
-    Term                             go to state 228
+    Term                             go to state 229
     SimpleOrClaspedTerm              go to state 57
     OperatorExpression               go to state 58
     CallExpression                   go to state 59
@@ -3865,22 +3887,6 @@ State 160
     IdentifierPath                   go to state 84
     AbsoluteIdentifierPath           go to state 85
     RelativeIdentifierPath           go to state 86
-
-
-State 161
-
-  196 AttributedVariables: AttributedVariables "," . AttributedVariable
-
-    "in"          shift, and go to state 8
-    "["           shift, and go to state 2
-    "identifier"  shift, and go to state 9
-
-    Identifier          go to state 98
-    Variable            go to state 99
-    TypedVariable       go to state 100
-    AttributedVariable  go to state 229
-    Attributes          go to state 102
-    Attribute           go to state 6
 
 
 State 162
@@ -3947,7 +3953,7 @@ State 162
 
 State 163
 
-  117 ExistentialQuantifierExpression: "exists" AttributedVariable "in" . Term "with" Term
+  117 ExistentialQuantifierExpression: "exists" AttributedVariables "in" . Term "with" Term
 
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
@@ -5494,7 +5500,7 @@ State 227
    99                   | Term . "and" Term
   100                   | Term . "=>" Term
   101                   | Term . "implies" Term
-  116 UniversalQuantifierExpression: "forall" AttributedVariable "in" Term . "holds" Term
+  116 UniversalQuantifierExpression: "forall" AttributedVariables "in" Term . "holds" Term
 
     "holds"    shift, and go to state 293
     "and"      shift, and go to state 122
@@ -5517,6 +5523,13 @@ State 227
 
 
 State 228
+
+  196 AttributedVariables: AttributedVariables "," AttributedVariable .
+
+    $default  reduce using rule 196 (AttributedVariables)
+
+
+State 229
 
    85 OperatorExpression: Term . "+" Term
    86                   | Term . "-" Term
@@ -5555,13 +5568,6 @@ State 228
     "!="       shift, and go to state 136
     "<="       shift, and go to state 137
     ">="       shift, and go to state 138
-
-
-State 229
-
-  196 AttributedVariables: AttributedVariables "," AttributedVariable .
-
-    $default  reduce using rule 196 (AttributedVariables)
 
 
 State 230
@@ -5624,7 +5630,7 @@ State 231
    99                   | Term . "and" Term
   100                   | Term . "=>" Term
   101                   | Term . "implies" Term
-  117 ExistentialQuantifierExpression: "exists" AttributedVariable "in" Term . "with" Term
+  117 ExistentialQuantifierExpression: "exists" AttributedVariables "in" Term . "with" Term
 
     "with"     shift, and go to state 296
     "and"      shift, and go to state 122
@@ -6315,7 +6321,7 @@ State 265
     Variable             go to state 99
     AttributedVariables  go to state 317
     TypedVariable        go to state 100
-    AttributedVariable   go to state 105
+    AttributedVariable   go to state 104
     Attributes           go to state 102
     Attribute            go to state 6
 
@@ -6332,7 +6338,7 @@ State 266
     Variable             go to state 99
     AttributedVariables  go to state 318
     TypedVariable        go to state 100
-    AttributedVariable   go to state 105
+    AttributedVariable   go to state 104
     Attributes           go to state 102
     Attribute            go to state 6
 
@@ -6993,7 +6999,7 @@ State 292
 
 State 293
 
-  116 UniversalQuantifierExpression: "forall" AttributedVariable "in" Term "holds" . Term
+  116 UniversalQuantifierExpression: "forall" AttributedVariables "in" Term "holds" . Term
 
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
@@ -7179,7 +7185,7 @@ State 295
 
 State 296
 
-  117 ExistentialQuantifierExpression: "exists" AttributedVariable "in" Term "with" . Term
+  117 ExistentialQuantifierExpression: "exists" AttributedVariables "in" Term "with" . Term
 
     "let"                     shift, and go to state 34
     "in"                      shift, and go to state 8
@@ -7685,7 +7691,7 @@ State 317
   196 AttributedVariables: AttributedVariables . "," AttributedVariable
 
     "in"  shift, and go to state 350
-    ","   shift, and go to state 161
+    ","   shift, and go to state 160
 
 
 State 318
@@ -7694,7 +7700,7 @@ State 318
   196 AttributedVariables: AttributedVariables . "," AttributedVariable
 
     "in"  shift, and go to state 351
-    ","   shift, and go to state 161
+    ","   shift, and go to state 160
 
 
 State 319
@@ -8207,7 +8213,7 @@ State 332
    99                   | Term . "and" Term
   100                   | Term . "=>" Term
   101                   | Term . "implies" Term
-  116 UniversalQuantifierExpression: "forall" AttributedVariable "in" Term "holds" Term .
+  116 UniversalQuantifierExpression: "forall" AttributedVariables "in" Term "holds" Term .
 
     "and"      shift, and go to state 122
     "or"       shift, and go to state 123
@@ -8333,7 +8339,7 @@ State 335
    99                   | Term . "and" Term
   100                   | Term . "=>" Term
   101                   | Term . "implies" Term
-  117 ExistentialQuantifierExpression: "exists" AttributedVariable "in" Term "with" Term .
+  117 ExistentialQuantifierExpression: "exists" AttributedVariables "in" Term "with" Term .
 
     "and"      shift, and go to state 122
     "or"       shift, and go to state 123

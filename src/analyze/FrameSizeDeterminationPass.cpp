@@ -185,18 +185,18 @@ void FrameSizeDeterminationVisitor::visit( UniversalQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushLocal( *node.predicateVariable() );
+    pushLocals( *node.predicateVariables() );
     node.proposition()->accept( *this );
-    popLocal();
+    popLocals( node.predicateVariables()->size() );
 }
 
 void FrameSizeDeterminationVisitor::visit( ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushLocal( *node.predicateVariable() );
+    pushLocals( *node.predicateVariables() );
     node.proposition()->accept( *this );
-    popLocal();
+    popLocals( node.predicateVariables()->size() );
 }
 
 void FrameSizeDeterminationVisitor::visit( LetRule& node )

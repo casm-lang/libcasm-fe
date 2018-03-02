@@ -372,18 +372,18 @@ void SymbolResolveVisitor::visit( UniversalQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.predicateVariable() );
+    pushVariables( node.predicateVariables() );
     node.proposition()->accept( *this );
-    popVariable( node.predicateVariable() );
+    popVariables( node.predicateVariables() );
 }
 
 void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
 {
     node.universe()->accept( *this );
 
-    pushVariable( node.predicateVariable() );
+    pushVariables( node.predicateVariables() );
     node.proposition()->accept( *this );
-    popVariable( node.predicateVariable() );
+    popVariables( node.predicateVariables() );
 }
 
 void SymbolResolveVisitor::visit( LetRule& node )

@@ -448,7 +448,7 @@ ChooseExpression ::= "choose" AttributedVariables "in" Term "do" Term
 ===== UniversalQuantifierExpression =====
 
 <code>
-UniversalQuantifierExpression ::= "forall" AttributedVariable "in" Term "holds" Term
+UniversalQuantifierExpression ::= "forall" AttributedVariables "in" Term "holds" Term
 </code>
 
 {{page>:grammar:UniversalQuantifierExpression&noheader&nofooter}}
@@ -457,7 +457,7 @@ UniversalQuantifierExpression ::= "forall" AttributedVariable "in" Term "holds" 
 ===== ExistentialQuantifierExpression =====
 
 <code>
-ExistentialQuantifierExpression ::= "exists" AttributedVariable "in" Term "with" Term
+ExistentialQuantifierExpression ::= "exists" AttributedVariables "in" Term "with" Term
 </code>
 
 {{page>:grammar:ExistentialQuantifierExpression&noheader&nofooter}}

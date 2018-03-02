@@ -937,9 +937,6 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
     bool result = true;
     bool defined = true;
 
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.predicateVariable()->localIndex();
-
     node.universe()->accept( *this );
     const auto universe = m_evaluationStack.pop();
 
@@ -952,9 +949,7 @@ void ExecutionVisitor::visit( UniversalQuantifierExpression& node )
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    universe.foreach( [&]( const IR::Constant& value ) {
-        frame->setLocal( variableIndex, value );
-
+    foreachInUniverse( *node.predicateVariables(), universe, [&]() {
         node.proposition()->accept( *this );
         const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 
@@ -991,9 +986,6 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
     bool result = false;
     bool defined = true;
 
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.predicateVariable()->localIndex();
-
     node.universe()->accept( *this );
     const auto universe = m_evaluationStack.pop();
 
@@ -1006,9 +998,7 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
             Code::QuantifierExpressionInvalidUniverse );
     }
 
-    universe.foreach( [&]( const IR::Constant& value ) {
-        frame->setLocal( variableIndex, value );
-
+    foreachInUniverse( *node.predicateVariables(), universe, [&]() {
         node.proposition()->accept( *this );
         const auto prop = m_evaluationStack.pop< IR::BooleanConstant >();
 

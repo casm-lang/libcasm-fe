@@ -1028,7 +1028,7 @@ ChooseExpression
 
 
 UniversalQuantifierExpression
-: FORALL AttributedVariable IN Term HOLDS Term
+: FORALL AttributedVariables IN Term HOLDS Term
   {
       $$ = Ast::make< UniversalQuantifierExpression >( @$, $2, $4, $6 );
   }
@@ -1036,7 +1036,7 @@ UniversalQuantifierExpression
 
 
 ExistentialQuantifierExpression
-: EXISTS AttributedVariable IN Term WITH Term
+: EXISTS AttributedVariables IN Term WITH Term
   {
       $$ = Ast::make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
   }

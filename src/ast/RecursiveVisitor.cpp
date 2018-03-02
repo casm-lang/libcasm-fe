@@ -217,14 +217,14 @@ void RecursiveVisitor::visit( ChooseExpression& node )
 
 void RecursiveVisitor::visit( UniversalQuantifierExpression& node )
 {
-    node.predicateVariable()->accept( *this );
+    node.predicateVariables()->accept( *this );
     node.universe()->accept( *this );
     node.proposition()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ExistentialQuantifierExpression& node )
 {
-    node.predicateVariable()->accept( *this );
+    node.predicateVariables()->accept( *this );
     node.universe()->accept( *this );
     node.proposition()->accept( *this );
 }

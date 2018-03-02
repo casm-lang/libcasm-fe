@@ -484,7 +484,7 @@ void AstDumpSourceVisitor::visit( ChooseExpression& node )
 void AstDumpSourceVisitor::visit( UniversalQuantifierExpression& node )
 {
     m_stream << "forall ";
-    node.predicateVariable()->accept( *this );
+    dumpNodes( *node.predicateVariables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " holds ";
@@ -494,7 +494,7 @@ void AstDumpSourceVisitor::visit( UniversalQuantifierExpression& node )
 void AstDumpSourceVisitor::visit( ExistentialQuantifierExpression& node )
 {
     m_stream << "exists ";
-    node.predicateVariable()->accept( *this );
+    dumpNodes( *node.predicateVariables(), ", " );
     m_stream << " in ";
     node.universe()->accept( *this );
     m_stream << " with ";

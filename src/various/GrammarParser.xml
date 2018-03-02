@@ -888,7 +888,7 @@
         <lhs>UniversalQuantifierExpression</lhs>
         <rhs>
           <symbol>&quot;forall&quot;</symbol>
-          <symbol>AttributedVariable</symbol>
+          <symbol>AttributedVariables</symbol>
           <symbol>&quot;in&quot;</symbol>
           <symbol>Term</symbol>
           <symbol>&quot;holds&quot;</symbol>
@@ -899,7 +899,7 @@
         <lhs>ExistentialQuantifierExpression</lhs>
         <rhs>
           <symbol>&quot;exists&quot;</symbol>
-          <symbol>AttributedVariable</symbol>
+          <symbol>AttributedVariables</symbol>
           <symbol>&quot;in&quot;</symbol>
           <symbol>Term</symbol>
           <symbol>&quot;with&quot;</symbol>
@@ -2588,6 +2588,8 @@
         <item rule-number="188" point="0"/>
         <item rule-number="194" point="0"/>
         <item rule-number="195" point="0"/>
+        <item rule-number="196" point="0"/>
+        <item rule-number="197" point="0"/>
         <item rule-number="200" point="0"/>
         <item rule-number="201" point="0"/>
         <item rule-number="202" point="0"/>
@@ -2604,8 +2606,9 @@
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
           <transition type="goto" symbol="Identifier" state="98"/>
           <transition type="goto" symbol="Variable" state="99"/>
+          <transition type="goto" symbol="AttributedVariables" state="103"/>
           <transition type="goto" symbol="TypedVariable" state="100"/>
-          <transition type="goto" symbol="AttributedVariable" state="103"/>
+          <transition type="goto" symbol="AttributedVariable" state="104"/>
           <transition type="goto" symbol="Attributes" state="102"/>
           <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
@@ -2640,9 +2643,9 @@
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
           <transition type="goto" symbol="Identifier" state="98"/>
           <transition type="goto" symbol="Variable" state="99"/>
-          <transition type="goto" symbol="AttributedVariables" state="104"/>
+          <transition type="goto" symbol="AttributedVariables" state="105"/>
           <transition type="goto" symbol="TypedVariable" state="100"/>
-          <transition type="goto" symbol="AttributedVariable" state="105"/>
+          <transition type="goto" symbol="AttributedVariable" state="104"/>
           <transition type="goto" symbol="Attributes" state="102"/>
           <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
@@ -2810,6 +2813,8 @@
         <item rule-number="188" point="0"/>
         <item rule-number="194" point="0"/>
         <item rule-number="195" point="0"/>
+        <item rule-number="196" point="0"/>
+        <item rule-number="197" point="0"/>
         <item rule-number="200" point="0"/>
         <item rule-number="201" point="0"/>
         <item rule-number="202" point="0"/>
@@ -2826,8 +2831,9 @@
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
           <transition type="goto" symbol="Identifier" state="98"/>
           <transition type="goto" symbol="Variable" state="99"/>
+          <transition type="goto" symbol="AttributedVariables" state="107"/>
           <transition type="goto" symbol="TypedVariable" state="100"/>
-          <transition type="goto" symbol="AttributedVariable" state="107"/>
+          <transition type="goto" symbol="AttributedVariable" state="104"/>
           <transition type="goto" symbol="Attributes" state="102"/>
           <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
@@ -4863,10 +4869,12 @@
     <state number="103">
       <itemset>
         <item rule-number="116" point="2"/>
+        <item rule-number="196" point="1"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="159"/>
+          <transition type="shift" symbol="&quot;,&quot;" state="160"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -4876,22 +4884,6 @@
 
     <state number="104">
       <itemset>
-        <item rule-number="115" point="2"/>
-        <item rule-number="196" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;in&quot;" state="160"/>
-          <transition type="shift" symbol="&quot;,&quot;" state="161"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="105">
-      <itemset>
         <item rule-number="197" point="1"/>
       </itemset>
       <actions>
@@ -4900,6 +4892,22 @@
         <reductions>
           <reduction symbol="$default" rule="197" enabled="true"/>
         </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="105">
+      <itemset>
+        <item rule-number="115" point="2"/>
+        <item rule-number="196" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="&quot;in&quot;" state="161"/>
+          <transition type="shift" symbol="&quot;,&quot;" state="160"/>
+        </transitions>
+        <errors/>
+        <reductions/>
       </actions>
       <solved-conflicts/>
     </state>
@@ -4955,10 +4963,12 @@
     <state number="107">
       <itemset>
         <item rule-number="117" point="2"/>
+        <item rule-number="196" point="1"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="163"/>
+          <transition type="shift" symbol="&quot;,&quot;" state="160"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -9255,6 +9265,40 @@
 
     <state number="160">
       <itemset>
+        <item rule-number="187" point="0"/>
+        <item rule-number="188" point="0"/>
+        <item rule-number="194" point="0"/>
+        <item rule-number="195" point="0"/>
+        <item rule-number="196" point="2"/>
+        <item rule-number="200" point="0"/>
+        <item rule-number="201" point="0"/>
+        <item rule-number="202" point="0"/>
+        <item rule-number="205" point="0"/>
+        <item rule-number="206" point="0"/>
+        <item rule-number="207" point="0"/>
+        <item rule-number="208" point="0"/>
+        <item rule-number="209" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="&quot;in&quot;" state="8"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
+          <transition type="goto" symbol="Identifier" state="98"/>
+          <transition type="goto" symbol="Variable" state="99"/>
+          <transition type="goto" symbol="TypedVariable" state="100"/>
+          <transition type="goto" symbol="AttributedVariable" state="228"/>
+          <transition type="goto" symbol="Attributes" state="102"/>
+          <transition type="goto" symbol="Attribute" state="6"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="161">
+      <itemset>
         <item rule-number="70" point="0"/>
         <item rule-number="71" point="0"/>
         <item rule-number="72" point="0"/>
@@ -9366,7 +9410,7 @@
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
           <transition type="shift" symbol="&quot;absoluteIdentifierPath&quot;" state="54"/>
           <transition type="shift" symbol="&quot;relativeIdentifierPath&quot;" state="55"/>
-          <transition type="goto" symbol="Term" state="228"/>
+          <transition type="goto" symbol="Term" state="229"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="57"/>
           <transition type="goto" symbol="OperatorExpression" state="58"/>
           <transition type="goto" symbol="CallExpression" state="59"/>
@@ -9397,40 +9441,6 @@
           <transition type="goto" symbol="IdentifierPath" state="84"/>
           <transition type="goto" symbol="AbsoluteIdentifierPath" state="85"/>
           <transition type="goto" symbol="RelativeIdentifierPath" state="86"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="161">
-      <itemset>
-        <item rule-number="187" point="0"/>
-        <item rule-number="188" point="0"/>
-        <item rule-number="194" point="0"/>
-        <item rule-number="195" point="0"/>
-        <item rule-number="196" point="2"/>
-        <item rule-number="200" point="0"/>
-        <item rule-number="201" point="0"/>
-        <item rule-number="202" point="0"/>
-        <item rule-number="205" point="0"/>
-        <item rule-number="206" point="0"/>
-        <item rule-number="207" point="0"/>
-        <item rule-number="208" point="0"/>
-        <item rule-number="209" point="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;in&quot;" state="8"/>
-          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
-          <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Identifier" state="98"/>
-          <transition type="goto" symbol="Variable" state="99"/>
-          <transition type="goto" symbol="TypedVariable" state="100"/>
-          <transition type="goto" symbol="AttributedVariable" state="229"/>
-          <transition type="goto" symbol="Attributes" state="102"/>
-          <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -14040,6 +14050,20 @@
 
     <state number="228">
       <itemset>
+        <item rule-number="196" point="3"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="196" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="229">
+      <itemset>
         <item rule-number="85" point="1"/>
         <item rule-number="86" point="1"/>
         <item rule-number="87" point="1"/>
@@ -14082,20 +14106,6 @@
         </transitions>
         <errors/>
         <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="229">
-      <itemset>
-        <item rule-number="196" point="3"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="196" enabled="true"/>
-        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -15466,7 +15476,7 @@
           <transition type="goto" symbol="Variable" state="99"/>
           <transition type="goto" symbol="AttributedVariables" state="317"/>
           <transition type="goto" symbol="TypedVariable" state="100"/>
-          <transition type="goto" symbol="AttributedVariable" state="105"/>
+          <transition type="goto" symbol="AttributedVariable" state="104"/>
           <transition type="goto" symbol="Attributes" state="102"/>
           <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
@@ -15503,7 +15513,7 @@
           <transition type="goto" symbol="Variable" state="99"/>
           <transition type="goto" symbol="AttributedVariables" state="318"/>
           <transition type="goto" symbol="TypedVariable" state="100"/>
-          <transition type="goto" symbol="AttributedVariable" state="105"/>
+          <transition type="goto" symbol="AttributedVariable" state="104"/>
           <transition type="goto" symbol="Attributes" state="102"/>
           <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
@@ -18734,7 +18744,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="350"/>
-          <transition type="shift" symbol="&quot;,&quot;" state="161"/>
+          <transition type="shift" symbol="&quot;,&quot;" state="160"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -18750,7 +18760,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="351"/>
-          <transition type="shift" symbol="&quot;,&quot;" state="161"/>
+          <transition type="shift" symbol="&quot;,&quot;" state="160"/>
         </transitions>
         <errors/>
         <reductions/>
