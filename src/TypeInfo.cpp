@@ -51,9 +51,8 @@ using namespace libcasm_fe;
 
 // basic types
 static const std::unordered_set< std::string > TYPE_NAMES_FOR_BASIC_TYPES = {
-    TypeInfo::TYPE_NAME_VOID,     TypeInfo::TYPE_NAME_BOOLEAN, TypeInfo::TYPE_NAME_BINARY,
-    TypeInfo::TYPE_NAME_INTEGER,  TypeInfo::TYPE_NAME_STRING,  TypeInfo::TYPE_NAME_DECIMAL,
-    TypeInfo::TYPE_NAME_RATIONAL,
+    TypeInfo::TYPE_NAME_VOID,   TypeInfo::TYPE_NAME_BOOLEAN, TypeInfo::TYPE_NAME_INTEGER,
+    TypeInfo::TYPE_NAME_STRING, TypeInfo::TYPE_NAME_DECIMAL, TypeInfo::TYPE_NAME_RATIONAL,
 };
 
 // composed types
