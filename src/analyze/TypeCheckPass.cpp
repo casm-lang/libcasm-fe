@@ -174,7 +174,7 @@ void TypeCheckVisitor::visit( ComposedType& node )
         return;
     }
 
-    const auto& name = node.name()->baseName();
+    const auto& name = node.name()->path();
 
     libcasm_ir::Types subTypeList;
     for( auto subType : *node.subTypes() )
@@ -230,7 +230,7 @@ void TypeCheckVisitor::visit( TemplateType& node )
         return;
     }
 
-    const auto& name = node.name()->baseName();
+    const auto& name = node.name()->path();
 
     libcasm_ir::Types subTypeList;
     for( auto subType : *node.subTypes() )
@@ -350,7 +350,7 @@ void TypeCheckVisitor::visit( RelationType& node )
         return;
     }
 
-    const auto& name = node.name()->baseName();
+    const auto& name = node.name()->path();
 
     std::vector< libcasm_ir::Type::Ptr > argTypeList;
     for( auto argumentType : *node.argumentTypes() )
@@ -399,7 +399,7 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
 
     if( not node.type() )
     {
-        const auto& name = node.name()->baseName();
+        const auto& name = node.name()->path();
         auto& expr = *node.size();
 
         if( name == TypeInfo::TYPE_NAME_BINARY )
