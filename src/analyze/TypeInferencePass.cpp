@@ -408,6 +408,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     assert( node.identifier() );
     const auto identifier = node.identifier();
 
+    if( identifier->type() == IdentifierPath::Type::RELATIVE )
+    {
+        inference( "relative path", nullptr, node );
+        return;
+    }
+
     std::vector< libcasm_ir::Type::Ptr > argumentTypes;
 
     switch( node.targetType() )
@@ -533,15 +539,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case DirectCallExpression::TargetType::UNKNOWN:
         {
-            if( identifier->type() != IdentifierPath::Type::RELATIVE )
-            {
-                m_log.error( { node.sourceLocation() }, "target type 'UNKNOWN' found!" );
-            }
-            else
-            {
-                inference( "relative path", nullptr, node );
-            }
-            break;
+            assert( !"unknown target type" );
+            return;
         }
     }
 
