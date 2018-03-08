@@ -397,91 +397,99 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
 {
     RecursiveVisitor::visit( node );
 
-    if( not node.type() )
+    if( node.type() )
     {
-        const auto& name = node.name()->path();
-        auto& expr = *node.size();
+        return;
+    }
 
-        if( name == TypeInfo::TYPE_NAME_BINARY )
-        {
-            if( expr.id() == Node::ID::VALUE_LITERAL and expr.type()->isInteger() )
-            {
-                const auto& literal = static_cast< const ValueLiteral& >( expr );
+    const auto& name = node.name()->path();
+    auto& expr = *node.size();
 
-                const auto value =
-                    std::static_pointer_cast< libcasm_ir::IntegerConstant >( literal.value() );
-
-                try
-                {
-                    auto type = libstdhl::Memory::get< libcasm_ir::BinaryType >( value );
-                    node.setType( type );
-                }
-                catch( const std::domain_error& e )
-                {
-                    m_log.error(
-                        { expr.sourceLocation() }, e.what(), Code::TypeBinarySizeIsInvalid );
-                }
-            }
-            else
-            {
-                m_log.error(
-                    { expr.sourceLocation() },
-                    "unsupported expr for 'Binary' type, constant Integer value "
-                    "expected" );
-            }
-        }
-        else if( name == TypeInfo::TYPE_NAME_INTEGER )
-        {
-            if( expr.id() == Node::ID::RANGE_LITERAL )
-            {
-                const auto& range_expr = static_cast< const RangeLiteral& >( expr );
-
-                const auto& lhs = *range_expr.left();
-                const auto& rhs = *range_expr.right();
-
-                if( lhs.id() == Node::ID::VALUE_LITERAL and lhs.type()->isInteger() and
-                    rhs.id() == Node::ID::VALUE_LITERAL and rhs.type()->isInteger() )
-                {
-                    const auto ir_lhs = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
-                        static_cast< const ValueLiteral& >( lhs ).value() );
-
-                    const auto ir_rhs = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
-                        static_cast< const ValueLiteral& >( rhs ).value() );
-
-                    auto range = libstdhl::Memory::make< libcasm_ir::Range >( ir_lhs, ir_rhs );
-
-                    auto range_type = libstdhl::Memory::get< libcasm_ir::RangeType >( range );
-
-                    assert( not expr.type() );
-                    expr.setType( range_type );
-
-                    try
-                    {
-                        auto type = libstdhl::Memory::get< libcasm_ir::IntegerType >( range_type );
-
-                        node.setType( type );
-                    }
-                    catch( const std::domain_error& e )
-                    {
-                        m_log.error( { expr.sourceLocation() }, e.what() );
-                    }
-                }
-            }
-            else
-            {
-                m_log.error(
-                    { expr.sourceLocation() },
-                    "unsupported expr for 'Integer' type, only range "
-                    "expressions are allowed, e.g. `Integer'[5..10]`" );
-            }
-        }
-        else
+    if( name == TypeInfo::TYPE_NAME_BINARY )
+    {
+        if( not( expr.id() == Node::ID::VALUE_LITERAL and expr.type()->isInteger() ) )
         {
             m_log.error(
-                { node.sourceLocation() },
-                "unknown type '" + name + "' found",
-                Code::TypeAnnotationInvalidFixedSizeTypeName );
+                { expr.sourceLocation() },
+                "unsupported expr for 'Binary' type, constant Integer value "
+                "expected" );
+            return;
         }
+
+        const auto& literal = static_cast< const ValueLiteral& >( expr );
+        const auto value =
+            std::static_pointer_cast< libcasm_ir::IntegerConstant >( literal.value() );
+
+        try
+        {
+            auto type = libstdhl::Memory::get< libcasm_ir::BinaryType >( value );
+            node.setType( type );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.error( { expr.sourceLocation() }, e.what(), Code::TypeBinarySizeIsInvalid );
+        }
+    }
+    else if( name == TypeInfo::TYPE_NAME_INTEGER )
+    {
+        if( expr.id() != Node::ID::RANGE_LITERAL )
+        {
+            m_log.error(
+                { expr.sourceLocation() },
+                "unsupported expr for 'Integer' type, only range "
+                "expressions are allowed, e.g. `Integer'[5..10]`" );
+
+            return;
+        }
+
+        const auto& rangeExpr = static_cast< const RangeLiteral& >( expr );
+
+        const auto& lhs = *rangeExpr.left();
+        if( not( lhs.id() == Node::ID::VALUE_LITERAL and lhs.type()->isInteger() ) )
+        {
+            m_log.error(
+                { rangeExpr.left()->sourceLocation() },
+                "unsupported expr for ranged expression, constant Integer value "
+                "expected" );
+            return;
+        }
+
+        const auto& rhs = *rangeExpr.right();
+        if( not( rhs.id() == Node::ID::VALUE_LITERAL and rhs.type()->isInteger() ) )
+        {
+            m_log.error(
+                { rangeExpr.right()->sourceLocation() },
+                "unsupported expr for ranged expression, constant Integer value "
+                "expected" );
+            return;
+        }
+
+        const auto lhsValue = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
+            static_cast< const ValueLiteral& >( lhs ).value() );
+        const auto rhsValue = std::static_pointer_cast< libcasm_ir::IntegerConstant >(
+            static_cast< const ValueLiteral& >( rhs ).value() );
+        auto range = libstdhl::Memory::make< libcasm_ir::Range >( lhsValue, rhsValue );
+
+        auto rangeType = libstdhl::Memory::get< libcasm_ir::RangeType >( range );
+        assert( not expr.type() );
+        expr.setType( rangeType );
+
+        try
+        {
+            auto type = libstdhl::Memory::get< libcasm_ir::IntegerType >( rangeType );
+            node.setType( type );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.error( { expr.sourceLocation() }, e.what() );
+        }
+    }
+    else
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown type '" + name + "' found",
+            Code::TypeAnnotationInvalidFixedSizeTypeName );
     }
 }
 
