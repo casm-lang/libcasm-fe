@@ -735,17 +735,26 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    if( not node.expression()->type() )
+    const auto& expressionType = node.expression()->type();
+
+    if( not expressionType )
     {
         m_log.error(
-            { node.sourceLocation() }, "unable to resolve type of indirect call expression" );
+            { node.expression()->sourceLocation() },
+            "unable to resolve type of indirect call expression" );
+        return;
     }
 
-    node.setType( node.expression()->type() );
+    if( not expressionType->isReference() )
+    {
+        m_log.error(
+            { node.expression()->sourceLocation() },
+            "expression is not a reference",
+            Code::TypeInferenceInvalidIndirectCallExpression );
+        return;
+    }
 
-    assert( node.type()->isReference() );
-
-    const auto& refType = std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
+    const auto& refType = std::static_pointer_cast< libcasm_ir::ReferenceType >( expressionType );
     node.setType( refType->dereference() );
 }
 
