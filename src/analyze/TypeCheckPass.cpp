@@ -135,7 +135,6 @@ void TypeCheckVisitor::visit( BasicType& node )
         }
 
         const auto& type = symbol->type();
-        assert( type );
         node.setType( type );
         return;
     }
