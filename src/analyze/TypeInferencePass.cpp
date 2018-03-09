@@ -1818,7 +1818,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
     }
     else if( node.id() == libcasm_fe::Ast::Type::ID::METHOD_CALL_EXPRESSION )
     {
-        auto& methodCall = static_cast< MethodCallExpression& >( node );
+        const auto& methodCall = static_cast< MethodCallExpression& >( node );
         const auto& methodName = methodCall.methodName()->name();
 
         try
@@ -1830,6 +1830,17 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         {
             return nullptr;
         }
+
+        const auto expectedNumberOfArguments = annotation->relations().front().argument.size();
+        if( expressions.size() != expectedNumberOfArguments )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid argument size: method '" + methodName + "' expects " +
+                    std::to_string( expectedNumberOfArguments - 1 ) + " arguments",
+                Code::SymbolArgumentSizeMismatch );
+            return nullptr;
+        }
     }
     else
     {
@@ -1837,6 +1848,9 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         return nullptr;
     }
 
+    assert( annotation != nullptr );
+
+    assert( expressions.size() == annotation->relations().front().argument.size() );
     for( std::size_t c = 0; c < expressions.size(); c++ )
     {
         for( auto argumentTypeID : annotation->argumentTypeIDs( c ) )
