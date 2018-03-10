@@ -1028,23 +1028,40 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
 
 void TypeInferenceVisitor::visit( RangeLiteral& node )
 {
-    RecursiveVisitor::visit( node );
+    node.left()->accept( *this );
 
-    const auto& lhs = *node.left()->type();
-    const auto& rhs = *node.right()->type();
+    if( node.left()->type() )
+    {
+        m_typeIDs[ node.right().get() ].emplace( node.left()->type()->id() );
+    }
 
-    if( lhs != rhs )
+    node.right()->accept( *this );
+
+    if( node.right()->type() and not node.left()->type() )
+    {
+        m_typeIDs[ node.left().get() ].emplace( node.right()->type()->id() );
+        node.left()->accept( *this );
+    }
+
+    const auto lhsType = node.left()->type();
+    const auto rhsType = node.right()->type();
+    if( not( lhsType and rhsType ) )
+    {
+        return;
+    }
+
+    if( *lhsType != *rhsType )
     {
         m_log.error(
             { node.sourceLocation() },
-            "types of range does not match, " + lhs.description() + " != " + rhs.description(),
+            "types of range does not match, " + lhsType->description() +
+                " != " + rhsType->description(),
             Code::TypeInferenceRangeLiteralTypeMismatch );
         return;
     }
 
-    const auto range_type = libstdhl::Memory::get< libcasm_ir::RangeType >( node.left()->type() );
-
-    node.setType( range_type );
+    const auto rangeType = libstdhl::Memory::get< libcasm_ir::RangeType >( lhsType );
+    node.setType( rangeType );
 }
 
 void TypeInferenceVisitor::visit( TupleLiteral& node )
