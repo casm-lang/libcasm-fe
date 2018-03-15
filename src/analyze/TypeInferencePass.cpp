@@ -116,6 +116,8 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ChooseRule& node ) override;
     void visit( UpdateRule& node ) override;
 
+    void visit( VariableBinding& node ) override;
+
     void assignment(
         const Node& node,
         TypedNode& lhs,
@@ -1131,20 +1133,7 @@ void TypeInferenceVisitor::visit( LetExpression& node )
     // annotate let expression variable with annotation information from parent expression node
     m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
 
-    node.variable()->accept( *this );
-
-    if( node.variable()->type() )
-    {
-        auto& variableType = node.variable()->type();
-        m_typeIDs[ node.initializer().get() ].emplace( variableType->id() );
-    }
-
-    node.initializer()->accept( *this );
-
-    if( not node.variable()->type() and node.initializer()->type() )
-    {
-        node.variable()->setType( node.initializer()->type() );
-    }
+    node.variableBindings()->accept( *this );
 
     if( node.type() )
     {
@@ -1158,21 +1147,8 @@ void TypeInferenceVisitor::visit( LetExpression& node )
         node.setType( node.expression()->type() );
     }
 
-    if( not node.variable()->type() )
-    {
-        // revisit the expression to infer again the variable type from underlying let expression
-        node.expression()->accept( *this );
-    }
-
-    assignment(
-        node,
-        *node.variable(),
-        *node.initializer(),
-        "let variable '" + node.variable()->identifier()->name() + "'",
-        "let initializer",
-        Code::TypeInferenceInvalidLetExpressionVariableType,
-        Code::TypeInferenceInvalidLetExpressionInitializerType,
-        Code::TypeInferenceInvalidLetExpressionTypeMismatch );
+    // revisit the variable bindings to infer again the variable type from underlying let expression
+    node.variableBindings()->accept( *this );
 
     if( not node.expression()->type() )
     {
@@ -1461,39 +1437,12 @@ void TypeInferenceVisitor::visit( DefaultCase& node )
 
 void TypeInferenceVisitor::visit( LetRule& node )
 {
-    node.variable()->accept( *this );
-
-    if( node.variable()->type() )
-    {
-        auto& variableType = node.variable()->type();
-        m_typeIDs[ node.expression().get() ].emplace( variableType->id() );
-    }
-
-    node.expression()->accept( *this );
-
-    if( not node.variable()->type() and node.expression()->type() )
-    {
-        node.variable()->setType( node.expression()->type() );
-    }
+    node.variableBindings()->accept( *this );
 
     node.rule()->accept( *this );
 
-    if( not node.variable()->type() )
-    {
-        // revisit the rule to infer again the variable type from underlying let
-        // definitions or rules
-        node.rule()->accept( *this );
-    }
-
-    assignment(
-        node,
-        *node.variable(),
-        *node.expression(),
-        "let variable '" + node.variable()->identifier()->name() + "'",
-        "let expression",
-        Code::TypeInferenceInvalidLetRuleVariableType,
-        Code::TypeInferenceInvalidLetRuleExpressionType,
-        Code::TypeInferenceLetRuleTypesMismatch );
+    // revisit the variable bindings to infer again the variable type from underlying let rule
+    node.variableBindings()->accept( *this );
 }
 
 void TypeInferenceVisitor::visit( ForallRule& node )
@@ -1671,6 +1620,37 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
         Code::TypeInferenceInvalidUpdateRuleFunctionType,
         Code::TypeInferenceInvalidUpdateRuleExpressionType,
         Code::TypeInferenceUpdateRuleTypesMismatch );
+}
+
+void TypeInferenceVisitor::visit( VariableBinding& node )
+{
+    node.variable()->accept( *this );
+
+    if( node.variable()->type() )
+    {
+        auto& variableType = node.variable()->type();
+        m_typeIDs[ node.expression().get() ].emplace( variableType->id() );
+    }
+
+    node.expression()->accept( *this );
+
+    if( not node.variable()->type() and node.expression()->type() )
+    {
+        node.variable()->setType( node.expression()->type() );
+    }
+
+    if( node.variable()->type() or node.expression()->type() )
+    {
+        assignment(
+            node,
+            *node.variable(),
+            *node.expression(),
+            "variable '" + node.variable()->identifier()->name() + "'",
+            "expression",
+            Code::TypeInferenceInvalidVariableBindingVariableType,
+            Code::TypeInferenceInvalidVariableBindingExpressionType,
+            Code::TypeInferenceInvalidVariableBindingTypeMismatch );
+    }
 }
 
 void TypeInferenceVisitor::assignment(

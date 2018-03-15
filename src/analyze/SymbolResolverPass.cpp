@@ -97,6 +97,9 @@ class SymbolResolveVisitor final : public RecursiveVisitor
     void popVariable( const VariableDefinition::Ptr& variable );
     void popVariables( const VariableDefinitions::Ptr& variables );
 
+    void pushVariableBindings( const VariableBindings::Ptr& variableBindings );
+    void popVariableBindings( const VariableBindings::Ptr& variableBindings );
+
     /**
      * If the \a definition is a type alias, it will be resolved and the aliased
      * definition will be returned. Otherwise the given \a definition will be
@@ -352,11 +355,9 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 
 void SymbolResolveVisitor::visit( LetExpression& node )
 {
-    node.initializer()->accept( *this );
-
-    pushVariable( node.variable() );
+    pushVariableBindings( node.variableBindings() );
     node.expression()->accept( *this );
-    popVariable( node.variable() );
+    popVariableBindings( node.variableBindings() );
 }
 
 void SymbolResolveVisitor::visit( ChooseExpression& node )
@@ -388,11 +389,9 @@ void SymbolResolveVisitor::visit( ExistentialQuantifierExpression& node )
 
 void SymbolResolveVisitor::visit( LetRule& node )
 {
-    node.expression()->accept( *this );
-
-    pushVariable( node.variable() );
+    pushVariableBindings( node.variableBindings() );
     node.rule()->accept( *this );
-    popVariable( node.variable() );
+    popVariableBindings( node.variableBindings() );
 }
 
 void SymbolResolveVisitor::visit( ForallRule& node )
@@ -452,6 +451,23 @@ void SymbolResolveVisitor::popVariables( const VariableDefinitions::Ptr& variabl
     for( const auto& variable : *variables )
     {
         popVariable( variable );
+    }
+}
+
+void SymbolResolveVisitor::pushVariableBindings( const VariableBindings::Ptr& variableBindings )
+{
+    for( const auto& variableBinding : *variableBindings )
+    {
+        variableBinding->expression()->accept( *this );
+        pushVariable( variableBinding->variable() );
+    }
+}
+
+void SymbolResolveVisitor::popVariableBindings( const VariableBindings::Ptr& variableBindings )
+{
+    for( const auto& variableBinding : *variableBindings )
+    {
+        popVariable( variableBinding->variable() );
     }
 }
 

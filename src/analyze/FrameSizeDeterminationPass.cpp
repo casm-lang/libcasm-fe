@@ -86,6 +86,12 @@ class FrameSizeDeterminationVisitor final : public RecursiveVisitor
     void visit( ForallRule& node ) override;
     void visit( ChooseRule& node ) override;
 
+    /**
+     * Visits the expression and then pushes the variable onto the stack.
+     * @note The caller needs to pop the variable again!
+     */
+    void visit( VariableBinding& node ) override;
+
   private:
     void pushLocal( VariableDefinition& variable );
     void pushLocals( VariableDefinitions& variables );
@@ -165,11 +171,9 @@ void FrameSizeDeterminationVisitor::visit( RuleDefinition& node )
 
 void FrameSizeDeterminationVisitor::visit( LetExpression& node )
 {
-    node.initializer()->accept( *this );
-
-    pushLocal( *node.variable() );
+    node.variableBindings()->accept( *this );  // pushes all variables
     node.expression()->accept( *this );
-    popLocal();
+    popLocals( node.variableBindings()->size() );
 }
 
 void FrameSizeDeterminationVisitor::visit( ChooseExpression& node )
@@ -201,11 +205,9 @@ void FrameSizeDeterminationVisitor::visit( ExistentialQuantifierExpression& node
 
 void FrameSizeDeterminationVisitor::visit( LetRule& node )
 {
-    node.expression()->accept( *this );
-
-    pushLocal( *node.variable() );
+    node.variableBindings()->accept( *this );  // pushes all variables
     node.rule()->accept( *this );
-    popLocal();
+    popLocals( node.variableBindings()->size() );
 }
 
 void FrameSizeDeterminationVisitor::visit( ForallRule& node )
@@ -225,6 +227,12 @@ void FrameSizeDeterminationVisitor::visit( ChooseRule& node )
     pushLocals( *node.variables() );
     node.rule()->accept( *this );
     popLocals( node.variables()->size() );
+}
+
+void FrameSizeDeterminationVisitor::visit( VariableBinding& node )
+{
+    node.expression()->accept( *this );
+    pushLocal( *node.variable() );
 }
 
 void FrameSizeDeterminationVisitor::pushLocal( VariableDefinition& variable )

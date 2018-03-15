@@ -213,7 +213,7 @@ CaseLabels ::= CaseLabels CaseLabel
 ===== LetRule =====
 
 <code>
-LetRule ::= "let" AttributedVariable "=" Term "in" Rule
+LetRule ::= "let" VariableBindings "in" Rule
 </code>
 
 {{page>:grammar:LetRule&noheader&nofooter}}
@@ -421,7 +421,7 @@ TypeCastingExpression ::= SimpleOrClaspedTerm "as" Type
 ===== LetExpression =====
 
 <code>
-LetExpression ::= "let" AttributedVariable "=" Term "in" Term
+LetExpression ::= "let" VariableBindings "in" Term
 </code>
 
 {{page>:grammar:LetExpression&noheader&nofooter}}
@@ -897,6 +897,25 @@ TypedAttributedVariable ::= Attributes TypedVariable
 </code>
 
 {{page>:grammar:TypedAttributedVariable&noheader&nofooter}}
+
+
+===== VariableBinding =====
+
+<code>
+VariableBinding ::= AttributedVariable "=" Term
+</code>
+
+{{page>:grammar:VariableBinding&noheader&nofooter}}
+
+
+===== VariableBindings =====
+
+<code>
+VariableBindings ::= VariableBindings "," VariableBinding
+                   | VariableBinding
+</code>
+
+{{page>:grammar:VariableBindings&noheader&nofooter}}
 
 
 ===== Attributes =====

@@ -131,6 +131,7 @@ namespace libcasm_fe
                 IDENTIFIER_PATH,
                 EXPRESSION_CASE,
                 DEFAULT_CASE,
+                VARIABLE_BINDING,
             };
 
           public:

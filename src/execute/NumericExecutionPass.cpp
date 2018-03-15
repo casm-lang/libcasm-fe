@@ -341,6 +341,8 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( CallRule& node ) override;
     void visit( WhileRule& node ) override;
 
+    void visit( VariableBinding& node ) override;
+
   private:
     u1 hasEmptyUpdateSet( void ) const;
 
@@ -859,28 +861,7 @@ void ExecutionVisitor::visit( BinaryExpression& node )
 
 void ExecutionVisitor::visit( LetExpression& node )
 {
-    node.initializer()->accept( *this );
-    const auto value = m_evaluationStack.pop();
-
-    // validate value
-    const auto& variableType = node.variable()->type();
-    try
-    {
-        validateValue( value, *variableType );
-    }
-    catch( const IR::ValidationException& e )
-    {
-        throw RuntimeException(
-            { node.initializer()->sourceLocation() },
-            e.what(),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::LetAssignedValueInvalid );
-    }
-
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.variable()->localIndex();
-    frame->setLocal( variableIndex, value );
-
+    node.variableBindings()->accept( *this );
     node.expression()->accept( *this );
 }
 
@@ -1101,28 +1082,7 @@ void ExecutionVisitor::visit( CaseRule& node )
 
 void ExecutionVisitor::visit( LetRule& node )
 {
-    node.expression()->accept( *this );
-    const auto value = m_evaluationStack.pop();
-
-    // validate value
-    const auto& variableType = node.variable()->type();
-    try
-    {
-        validateValue( value, *variableType );
-    }
-    catch( const IR::ValidationException& e )
-    {
-        throw RuntimeException(
-            { node.expression()->sourceLocation() },
-            e.what(),
-            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-            Code::LetAssignedValueInvalid );
-    }
-
-    auto* frame = m_frameStack.top();
-    const auto variableIndex = node.variable()->localIndex();
-    frame->setLocal( variableIndex, value );
-
+    node.variableBindings()->accept( *this );
     node.rule()->accept( *this );
 }
 
@@ -1394,6 +1354,31 @@ void ExecutionVisitor::visit( WhileRule& node )
     {
         handleMergeConflict( node, conflict );
     }
+}
+
+void ExecutionVisitor::visit( VariableBinding& node )
+{
+    node.expression()->accept( *this );
+    const auto value = m_evaluationStack.pop();
+
+    // validate value
+    const auto& variableType = node.variable()->type();
+    try
+    {
+        validateValue( value, *variableType );
+    }
+    catch( const IR::ValidationException& e )
+    {
+        throw RuntimeException(
+            { node.expression()->sourceLocation() },
+            e.what(),
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::LetAssignedValueInvalid );
+    }
+
+    auto* frame = m_frameStack.top();
+    const auto variableIndex = node.variable()->localIndex();
+    frame->setLocal( variableIndex, value );
 }
 
 u1 ExecutionVisitor::hasEmptyUpdateSet( void ) const

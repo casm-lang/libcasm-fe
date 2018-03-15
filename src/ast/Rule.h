@@ -161,20 +161,15 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< LetRule >;
 
-            LetRule(
-                const std::shared_ptr< VariableDefinition >& variable,
-                const Expression::Ptr& expression,
-                const Rule::Ptr& rule );
+            LetRule( const VariableBindings::Ptr& variableBindings, const Rule::Ptr& rule );
 
-            const std::shared_ptr< VariableDefinition >& variable( void ) const;
-            const Expression::Ptr& expression( void ) const;
+            const VariableBindings::Ptr& variableBindings( void ) const;
             const Rule::Ptr& rule( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const std::shared_ptr< VariableDefinition > m_variable;
-            const Expression::Ptr m_expression;
+            const VariableBindings::Ptr m_variableBindings;
             const Rule::Ptr m_rule;
         };
 

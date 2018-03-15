@@ -268,6 +268,8 @@ END       0 "end of file"
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <Expressions::Ptr> Arguments
 %type <VariableDefinitions::Ptr> Parameters MaybeParameters AttributedVariables
+%type <VariableBinding::Ptr> VariableBinding
+%type <VariableBindings::Ptr> VariableBindings
 
 
 %start Specification
@@ -666,9 +668,9 @@ CaseLabels
 
 
 LetRule
-: LET AttributedVariable EQUAL Term IN Rule
+: LET VariableBindings IN Rule
   {
-      $$ = Ast::make< LetRule >( @$, $2, $4, $6 );
+      $$ = Ast::make< LetRule >( @$, $2, $4 );
   }
 ;
 
@@ -1004,9 +1006,9 @@ TypeCastingExpression
 
 
 LetExpression
-: LET AttributedVariable EQUAL Term IN Term
+: LET VariableBindings IN Term
   {
-      $$ = Ast::make< LetExpression >( @$, $2, $4, $6 );
+      $$ = Ast::make< LetExpression >( @$, $2, $4 );
   }
 ;
 
@@ -1699,6 +1701,31 @@ TypedAttributedVariable
       $$ = $1;
   }
 ;
+
+
+VariableBinding
+: AttributedVariable EQUAL Term
+  {
+      $$ = Ast::make< VariableBinding >( @$, $1, $3 );
+  }
+;
+
+
+VariableBindings
+: VariableBindings COMMA VariableBinding
+  {
+      auto variableBindings = $1;
+      variableBindings->add( $3 );
+      $$ = variableBindings;
+  }
+| VariableBinding
+  {
+      auto variableBindings = Ast::make< VariableBindings >( @$ );
+      variableBindings->add( $1 );
+      $$ = variableBindings;
+  }
+;
+
 
 //
 // Attributes

@@ -300,7 +300,12 @@ void PropertyResolverVisitor::visit( LetExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.initializer()->properties() * node.expression()->properties() );
+    auto properties = node.expression()->properties();
+    for( auto const& variableBinding : *node.variableBindings() )
+    {
+        properties = properties * variableBinding->expression()->properties();
+    }
+    node.setProperties( properties );
 }
 
 void PropertyResolverVisitor::visit( ConditionalExpression& node )

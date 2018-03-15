@@ -510,23 +510,29 @@ namespace libcasm_fe {
       // StringLiteral
       char dummy62[sizeof(ValueLiteral::Ptr)];
 
+      // VariableBinding
+      char dummy63[sizeof(VariableBinding::Ptr)];
+
+      // VariableBindings
+      char dummy64[sizeof(VariableBindings::Ptr)];
+
       // Variable
       // TypedVariable
       // AttributedVariable
       // TypedAttributedVariable
-      char dummy63[sizeof(VariableDefinition::Ptr)];
+      char dummy65[sizeof(VariableDefinition::Ptr)];
 
       // Parameters
       // MaybeParameters
       // AttributedVariables
       // TypedVariables
-      char dummy64[sizeof(VariableDefinitions::Ptr)];
+      char dummy66[sizeof(VariableDefinitions::Ptr)];
 
       // WhileRule
-      char dummy65[sizeof(WhileRule::Ptr)];
+      char dummy67[sizeof(WhileRule::Ptr)];
 
       // Type
-      char dummy66[sizeof(libcasm_fe::Ast::Type::Ptr)];
+      char dummy68[sizeof(libcasm_fe::Ast::Type::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -537,7 +543,7 @@ namespace libcasm_fe {
       // "identifier"
       // "absoluteIdentifierPath"
       // "relativeIdentifierPath"
-      char dummy67[sizeof(std::string)];
+      char dummy69[sizeof(std::string)];
 };
 
     /// Symbol semantic values.
@@ -804,6 +810,10 @@ namespace libcasm_fe {
   basic_symbol (typename Base::kind_type t, const UsingDefinition::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const ValueLiteral::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const VariableBinding::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const VariableBindings::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr v, const location_type& l);
 
@@ -1423,8 +1433,8 @@ namespace libcasm_fe {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 2458,     ///< Last index in yytable_.
-      yynnts_ = 93,  ///< Number of nonterminal symbols.
+      yylast_ = 2340,     ///< Last index in yytable_.
+      yynnts_ = 95,  ///< Number of nonterminal symbols.
       yyfinal_ = 13, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -1516,15 +1526,15 @@ namespace libcasm_fe {
   {
       switch (other.type_get ())
     {
-      case 176: // Attribute
+      case 178: // Attribute
         value.copy< Attribute::Ptr > (other.value);
         break;
 
-      case 175: // Attributes
+      case 177: // Attributes
         value.copy< Attributes::Ptr > (other.value);
         break;
 
-      case 177: // BasicAttribute
+      case 179: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (other.value);
         break;
 
@@ -1618,7 +1628,7 @@ namespace libcasm_fe {
         value.copy< Expression::Ptr > (other.value);
         break;
 
-      case 178: // ExpressionAttribute
+      case 180: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (other.value);
         break;
 
@@ -1784,6 +1794,14 @@ namespace libcasm_fe {
         value.copy< ValueLiteral::Ptr > (other.value);
         break;
 
+      case 175: // VariableBinding
+        value.copy< VariableBinding::Ptr > (other.value);
+        break;
+
+      case 176: // VariableBindings
+        value.copy< VariableBindings::Ptr > (other.value);
+        break;
+
       case 169: // Variable
       case 172: // TypedVariable
       case 173: // AttributedVariable
@@ -1835,15 +1853,15 @@ namespace libcasm_fe {
     (void) v;
       switch (this->type_get ())
     {
-      case 176: // Attribute
+      case 178: // Attribute
         value.copy< Attribute::Ptr > (v);
         break;
 
-      case 175: // Attributes
+      case 177: // Attributes
         value.copy< Attributes::Ptr > (v);
         break;
 
-      case 177: // BasicAttribute
+      case 179: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (v);
         break;
 
@@ -1937,7 +1955,7 @@ namespace libcasm_fe {
         value.copy< Expression::Ptr > (v);
         break;
 
-      case 178: // ExpressionAttribute
+      case 180: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (v);
         break;
 
@@ -2101,6 +2119,14 @@ namespace libcasm_fe {
       case 137: // BinaryLiteral
       case 138: // StringLiteral
         value.copy< ValueLiteral::Ptr > (v);
+        break;
+
+      case 175: // VariableBinding
+        value.copy< VariableBinding::Ptr > (v);
+        break;
+
+      case 176: // VariableBindings
+        value.copy< VariableBindings::Ptr > (v);
         break;
 
       case 169: // Variable
@@ -2587,6 +2613,20 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableBinding::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableBindings::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -2647,15 +2687,15 @@ namespace libcasm_fe {
     // Type destructor.
     switch (yytype)
     {
-      case 176: // Attribute
+      case 178: // Attribute
         value.template destroy< Attribute::Ptr > ();
         break;
 
-      case 175: // Attributes
+      case 177: // Attributes
         value.template destroy< Attributes::Ptr > ();
         break;
 
-      case 177: // BasicAttribute
+      case 179: // BasicAttribute
         value.template destroy< BasicAttribute::Ptr > ();
         break;
 
@@ -2749,7 +2789,7 @@ namespace libcasm_fe {
         value.template destroy< Expression::Ptr > ();
         break;
 
-      case 178: // ExpressionAttribute
+      case 180: // ExpressionAttribute
         value.template destroy< ExpressionAttribute::Ptr > ();
         break;
 
@@ -2915,6 +2955,14 @@ namespace libcasm_fe {
         value.template destroy< ValueLiteral::Ptr > ();
         break;
 
+      case 175: // VariableBinding
+        value.template destroy< VariableBinding::Ptr > ();
+        break;
+
+      case 176: // VariableBindings
+        value.template destroy< VariableBindings::Ptr > ();
+        break;
+
       case 169: // Variable
       case 172: // TypedVariable
       case 173: // AttributedVariable
@@ -2972,15 +3020,15 @@ namespace libcasm_fe {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 176: // Attribute
+      case 178: // Attribute
         value.move< Attribute::Ptr > (s.value);
         break;
 
-      case 175: // Attributes
+      case 177: // Attributes
         value.move< Attributes::Ptr > (s.value);
         break;
 
-      case 177: // BasicAttribute
+      case 179: // BasicAttribute
         value.move< BasicAttribute::Ptr > (s.value);
         break;
 
@@ -3074,7 +3122,7 @@ namespace libcasm_fe {
         value.move< Expression::Ptr > (s.value);
         break;
 
-      case 178: // ExpressionAttribute
+      case 180: // ExpressionAttribute
         value.move< ExpressionAttribute::Ptr > (s.value);
         break;
 
@@ -3238,6 +3286,14 @@ namespace libcasm_fe {
       case 137: // BinaryLiteral
       case 138: // StringLiteral
         value.move< ValueLiteral::Ptr > (s.value);
+        break;
+
+      case 175: // VariableBinding
+        value.move< VariableBinding::Ptr > (s.value);
+        break;
+
+      case 176: // VariableBindings
+        value.move< VariableBindings::Ptr > (s.value);
         break;
 
       case 169: // Variable
@@ -3849,7 +3905,7 @@ namespace libcasm_fe {
 
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
 } // libcasm_fe
-#line 3853 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3909 "GrammarParser.tab.h" // lalr1.cc:377
 
 
 

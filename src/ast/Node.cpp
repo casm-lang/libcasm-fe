@@ -288,6 +288,10 @@ std::string Node::description( void ) const
         {
             return "default case";
         }
+        case ID::VARIABLE_BINDING:
+        {
+            return "variable binding";
+        }
     }
 
     assert( !" internal error! " );

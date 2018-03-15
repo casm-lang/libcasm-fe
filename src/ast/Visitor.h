@@ -106,6 +106,7 @@ namespace libcasm_fe
         class IdentifierPath;
         class ExpressionCase;
         class DefaultCase;
+        class VariableBinding;
 
         /**
          * @extends CasmFE
@@ -173,6 +174,7 @@ namespace libcasm_fe
             virtual void visit( IdentifierPath& node ) = 0;
             virtual void visit( ExpressionCase& node ) = 0;
             virtual void visit( DefaultCase& node ) = 0;
+            virtual void visit( VariableBinding& node ) = 0;
         };
     }
 }
