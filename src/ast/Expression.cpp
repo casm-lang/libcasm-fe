@@ -553,28 +553,48 @@ void BinaryExpression::accept( Visitor& visitor )
 
 //
 //
-// LetExpression
+// VariableBinding
 //
 
-LetExpression::LetExpression(
-    const VariableDefinition::Ptr& variable,
-    const Expression::Ptr& initializer,
-    const Expression::Ptr& expression )
-: Expression( Node::ID::LET_EXPRESSION )
+VariableBinding::VariableBinding(
+    const VariableDefinition::Ptr& variable, const Expression::Ptr& expression )
+: Node( Node::ID::VARIABLE_BINDING )
 , m_variable( variable )
-, m_initializer( initializer )
 , m_expression( expression )
 {
 }
 
-const VariableDefinition::Ptr& LetExpression::variable( void ) const
+const VariableDefinition::Ptr& VariableBinding::variable( void ) const
 {
     return m_variable;
 }
 
-const Expression::Ptr& LetExpression::initializer( void ) const
+const Expression::Ptr& VariableBinding::expression( void ) const
 {
-    return m_initializer;
+    return m_expression;
+}
+
+void VariableBinding::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
+// LetExpression
+//
+
+LetExpression::LetExpression(
+    const VariableBindings::Ptr& variableBindings, const Expression::Ptr& expression )
+: Expression( Node::ID::LET_EXPRESSION )
+, m_variableBindings( variableBindings )
+, m_expression( expression )
+{
+}
+
+const VariableBindings::Ptr& LetExpression::variableBindings( void ) const
+{
+    return m_variableBindings;
 }
 
 const Expression::Ptr& LetExpression::expression( void ) const

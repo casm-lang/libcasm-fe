@@ -374,25 +374,42 @@ namespace libcasm_fe
             const Expression::Ptr m_right;
         };
 
-        class LetExpression final : public Expression
+        class VariableBinding : public Node
         {
           public:
-            using Ptr = std::shared_ptr< LetExpression >;
+            using Ptr = std::shared_ptr< VariableBinding >;
 
-            LetExpression(
+            VariableBinding(
                 const std::shared_ptr< VariableDefinition >& variable,
-                const Expression::Ptr& initializer,
                 const Expression::Ptr& expression );
 
             const std::shared_ptr< VariableDefinition >& variable( void ) const;
-            const Expression::Ptr& initializer( void ) const;
             const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const std::shared_ptr< VariableDefinition > m_variable;
-            const Expression::Ptr m_initializer;
+            const Expression::Ptr m_expression;
+        };
+
+        using VariableBindings = NodeList< VariableBinding >;
+
+        class LetExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< LetExpression >;
+
+            LetExpression(
+                const VariableBindings::Ptr& variableBindings, const Expression::Ptr& expression );
+
+            const VariableBindings::Ptr& variableBindings( void ) const;
+            const Expression::Ptr& expression( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const VariableBindings::Ptr m_variableBindings;
             const Expression::Ptr m_expression;
         };
 

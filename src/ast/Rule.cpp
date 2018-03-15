@@ -152,25 +152,16 @@ void CaseRule::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-LetRule::LetRule(
-    const VariableDefinition::Ptr& variable,
-    const Expression::Ptr& expression,
-    const Rule::Ptr& rule )
+LetRule::LetRule( const VariableBindings::Ptr& variableBindings, const Rule::Ptr& rule )
 : Rule( Node::ID::LET_RULE )
-, m_variable( variable )
-, m_expression( expression )
+, m_variableBindings( variableBindings )
 , m_rule( rule )
 {
 }
 
-const VariableDefinition::Ptr& LetRule::variable( void ) const
+const VariableBindings::Ptr& LetRule::variableBindings( void ) const
 {
-    return m_variable;
-}
-
-const Expression::Ptr& LetRule::expression( void ) const
-{
-    return m_expression;
+    return m_variableBindings;
 }
 
 const Rule::Ptr& LetRule::rule( void ) const

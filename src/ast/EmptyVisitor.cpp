@@ -258,6 +258,10 @@ void EmptyVisitor::visit( DefaultCase& )
 {
 }
 
+void EmptyVisitor::visit( VariableBinding& )
+{
+}
+
 //
 //  Local variables:
 //  mode: c++

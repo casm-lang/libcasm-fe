@@ -196,8 +196,7 @@ void RecursiveVisitor::visit( BinaryExpression& node )
 
 void RecursiveVisitor::visit( LetExpression& node )
 {
-    node.variable()->accept( *this );
-    node.initializer()->accept( *this );
+    node.variableBindings()->accept( *this );
     node.expression()->accept( *this );
 }
 
@@ -248,8 +247,7 @@ void RecursiveVisitor::visit( CaseRule& node )
 
 void RecursiveVisitor::visit( LetRule& node )
 {
-    node.variable()->accept( *this );
-    node.expression()->accept( *this );
+    node.variableBindings()->accept( *this );
     node.rule()->accept( *this );
 }
 
@@ -368,6 +366,12 @@ void RecursiveVisitor::visit( ExpressionCase& node )
 void RecursiveVisitor::visit( DefaultCase& node )
 {
     node.rule()->accept( *this );
+}
+
+void RecursiveVisitor::visit( VariableBinding& node )
+{
+    node.variable()->accept( *this );
+    node.expression()->accept( *this );
 }
 
 //

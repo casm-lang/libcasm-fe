@@ -111,6 +111,7 @@ namespace libcasm_fe
             void visit( IdentifierPath& node ) override;
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
+            void visit( VariableBinding& node ) override;
         };
     }
 }

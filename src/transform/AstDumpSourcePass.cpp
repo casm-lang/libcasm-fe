@@ -206,6 +206,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( IdentifierPath& node ) override;
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
+    void visit( VariableBinding& node ) override;
 
   private:
     void dumpAttributes( Attributes& attributes );
@@ -454,9 +455,7 @@ void AstDumpSourceVisitor::visit( BinaryExpression& node )
 void AstDumpSourceVisitor::visit( LetExpression& node )
 {
     m_stream << "let ";
-    node.variable()->accept( *this );
-    m_stream << " = ";
-    node.initializer()->accept( *this );
+    dumpNodes( *node.variableBindings(), ", " );
     m_stream << " in ";
     node.expression()->accept( *this );
 }
@@ -539,9 +538,7 @@ void AstDumpSourceVisitor::visit( CaseRule& node )
 void AstDumpSourceVisitor::visit( LetRule& node )
 {
     m_stream << m_indentation << "let ";
-    node.variable()->accept( *this );
-    m_stream << " = ";
-    node.expression()->accept( *this );
+    dumpNodes( *node.variableBindings(), ", " );
     m_stream << " in\n";
     {
         const Indentation::NextLevel level( m_indentation );
@@ -739,6 +736,13 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 
     const Indentation::NextLevel level( m_indentation );
     node.rule()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( VariableBinding& node )
+{
+    node.variable()->accept( *this );
+    m_stream << " = ";
+    node.expression()->accept( *this );
 }
 
 void AstDumpSourceVisitor::dumpAttributes( Attributes& attributes )

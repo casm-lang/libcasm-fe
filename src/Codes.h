@@ -208,10 +208,6 @@ namespace libcasm_fe
         TypeInferenceFoundMultipleResultTypes = 0x1101,
         TypeInferenceFoundNoArgumentType = 0x1102,
 
-        TypeInferenceInvalidLetRuleVariableType = 0x1200,
-        TypeInferenceInvalidLetRuleExpressionType = 0x1201,
-        TypeInferenceLetRuleTypesMismatch = 0x1202,
-
         TypeInferenceInvalidUpdateRuleFunctionType = 0x1203,
         TypeInferenceInvalidUpdateRuleExpressionType = 0x1204,
         TypeInferenceUpdateRuleTypesMismatch = 0x1205,
@@ -269,9 +265,11 @@ namespace libcasm_fe
         TypeInferenceInvalidChooseRuleVariableTypeMismatch = 0x1009
 
         ,
-        TypeInferenceInvalidLetExpressionVariableType = 0x1010,
-        TypeInferenceInvalidLetExpressionInitializerType = 0x1011,
-        TypeInferenceInvalidLetExpressionTypeMismatch = 0x1012,
+        TypeInferenceInvalidVariableBindingVariableType = 0x1010,
+        TypeInferenceInvalidVariableBindingExpressionType = 0x1011,
+        TypeInferenceInvalidVariableBindingTypeMismatch = 0x1012,
+
+        TypeInferenceInvalidLetExpressionTypeMismatch = 0x1013,
 
         TypeInferenceRangeLiteralTypeMismatch = 0x1600,
         TypeInferenceInvalidListLiteralType = 0x1610,
