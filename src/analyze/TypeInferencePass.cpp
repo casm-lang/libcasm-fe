@@ -408,6 +408,12 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     assert( node.identifier() );
     const auto identifier = node.identifier();
 
+    if( identifier->type() == IdentifierPath::Type::RELATIVE )
+    {
+        inference( "relative path", nullptr, node );
+        return;
+    }
+
     std::vector< libcasm_ir::Type::Ptr > argumentTypes;
 
     switch( node.targetType() )
@@ -533,15 +539,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case DirectCallExpression::TargetType::UNKNOWN:
         {
-            if( identifier->type() != IdentifierPath::Type::RELATIVE )
-            {
-                m_log.error( { node.sourceLocation() }, "target type 'UNKNOWN' found!" );
-            }
-            else
-            {
-                inference( "relative path", nullptr, node );
-            }
-            break;
+            assert( !"unknown target type" );
+            return;
         }
     }
 
@@ -735,17 +734,26 @@ void TypeInferenceVisitor::visit( IndirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    if( not node.expression()->type() )
+    const auto& expressionType = node.expression()->type();
+
+    if( not expressionType )
     {
         m_log.error(
-            { node.sourceLocation() }, "unable to resolve type of indirect call expression" );
+            { node.expression()->sourceLocation() },
+            "unable to resolve type of indirect call expression" );
+        return;
     }
 
-    node.setType( node.expression()->type() );
+    if( not expressionType->isReference() )
+    {
+        m_log.error(
+            { node.expression()->sourceLocation() },
+            "expression is not a reference",
+            Code::TypeInferenceInvalidIndirectCallExpression );
+        return;
+    }
 
-    assert( node.type()->isReference() );
-
-    const auto& refType = std::static_pointer_cast< libcasm_ir::ReferenceType >( node.type() );
+    const auto& refType = std::static_pointer_cast< libcasm_ir::ReferenceType >( expressionType );
     node.setType( refType->dereference() );
 }
 
@@ -1020,23 +1028,40 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
 
 void TypeInferenceVisitor::visit( RangeLiteral& node )
 {
-    RecursiveVisitor::visit( node );
+    node.left()->accept( *this );
 
-    const auto& lhs = *node.left()->type();
-    const auto& rhs = *node.right()->type();
+    if( node.left()->type() )
+    {
+        m_typeIDs[ node.right().get() ].emplace( node.left()->type()->id() );
+    }
 
-    if( lhs != rhs )
+    node.right()->accept( *this );
+
+    if( node.right()->type() and not node.left()->type() )
+    {
+        m_typeIDs[ node.left().get() ].emplace( node.right()->type()->id() );
+        node.left()->accept( *this );
+    }
+
+    const auto lhsType = node.left()->type();
+    const auto rhsType = node.right()->type();
+    if( not( lhsType and rhsType ) )
+    {
+        return;
+    }
+
+    if( *lhsType != *rhsType )
     {
         m_log.error(
             { node.sourceLocation() },
-            "types of range does not match, " + lhs.description() + " != " + rhs.description(),
+            "types of range does not match, " + lhsType->description() +
+                " != " + rhsType->description(),
             Code::TypeInferenceRangeLiteralTypeMismatch );
         return;
     }
 
-    const auto range_type = libstdhl::Memory::get< libcasm_ir::RangeType >( node.left()->type() );
-
-    node.setType( range_type );
+    const auto rangeType = libstdhl::Memory::get< libcasm_ir::RangeType >( lhsType );
+    node.setType( rangeType );
 }
 
 void TypeInferenceVisitor::visit( TupleLiteral& node )
@@ -1810,7 +1835,7 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
     }
     else if( node.id() == libcasm_fe::Ast::Type::ID::METHOD_CALL_EXPRESSION )
     {
-        auto& methodCall = static_cast< MethodCallExpression& >( node );
+        const auto& methodCall = static_cast< MethodCallExpression& >( node );
         const auto& methodName = methodCall.methodName()->name();
 
         try
@@ -1822,6 +1847,17 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         {
             return nullptr;
         }
+
+        const auto expectedNumberOfArguments = annotation->relations().front().argument.size();
+        if( expressions.size() != expectedNumberOfArguments )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "invalid argument size: method '" + methodName + "' expects " +
+                    std::to_string( expectedNumberOfArguments - 1 ) + " arguments",
+                Code::SymbolArgumentSizeMismatch );
+            return nullptr;
+        }
     }
     else
     {
@@ -1829,6 +1865,9 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
         return nullptr;
     }
 
+    assert( annotation != nullptr );
+
+    assert( expressions.size() == annotation->relations().front().argument.size() );
     for( std::size_t c = 0; c < expressions.size(); c++ )
     {
         for( auto argumentTypeID : annotation->argumentTypeIDs( c ) )
