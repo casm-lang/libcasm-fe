@@ -625,13 +625,13 @@ static const flex_int16_t yy_chk[631] =
 #define YY_RESTORE_YY_MORE_OFFSET
 #line 1 "obj/src/GrammarLexer.l"
 #line 2 "obj/src/GrammarLexer.l"
-//  Copyright (c) 2014-2017 CASM Organization
+//  Copyright (C) 2014-2018 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
 //                Florian Hahn
-//                https://github.com/casm-lang/libcasm-fe
+//                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
 //
