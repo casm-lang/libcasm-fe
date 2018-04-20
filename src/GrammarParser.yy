@@ -179,7 +179,6 @@ END       0 "end of file"
 %type <Specification::Ptr> Specification
 
 %type <Identifier::Ptr> Identifier
-%type <Identifiers::Ptr> DotSeparatedIdentifiers
 %type <IdentifierPath::Ptr> IdentifierPath
 
 // definitions
@@ -272,9 +271,8 @@ END       0 "end of file"
 
 %start Specification
 
-// prefer absolute over relative paths
-%precedence ABSOLUTE_PATH
-%precedence DOUBLECOLON
+// prefer basic types over the other types
+%precedence BASIC_TYPE
 
 %precedence IN
 %precedence DO
@@ -1329,7 +1327,7 @@ Type
 
 
 BasicType
-: IdentifierPath %prec ABSOLUTE_PATH
+: IdentifierPath %prec BASIC_TYPE
   {
       $$ = Ast::make< BasicType >( @$, $1 );
   }
@@ -1586,31 +1584,15 @@ Identifier
 
 
 IdentifierPath
-: DotSeparatedIdentifiers %prec ABSOLUTE_PATH
+: IdentifierPath DOUBLECOLON Identifier
   {
-      $$ = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
-  }
-| DOUBLECOLON Identifier
-  {
-      auto identifiers = Ast::make< Identifiers >( @$ );
-      identifiers->add( $2 );
-      $$ = Ast::make< IdentifierPath >( @$, identifiers, IdentifierPath::Type::RELATIVE );
-  }
-;
-
-
-DotSeparatedIdentifiers
-: DotSeparatedIdentifiers DOUBLECOLON Identifier
-  {
-      auto identifiers = $1;
-      identifiers->add( $3 );
-      $$ = identifiers;
+      auto path = $1;
+      path->addIdentifier( $3 );
+      $$ = path;
   }
 | Identifier
   {
-      auto identifiers = Ast::make< Identifiers >( @$ );
-      identifiers->add( $1 );
-      $$ = identifiers;
+      $$ = Ast::make< IdentifierPath >( @$, $1 );
   }
 ;
 

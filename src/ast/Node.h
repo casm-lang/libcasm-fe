@@ -266,6 +266,8 @@ namespace libcasm_fe
              */
             IdentifierPath( const Identifiers::Ptr& identifiers, Type type = Type::ABSOLUTE );
 
+            void addIdentifier( const Identifier::Ptr& identifier );
+
             Identifiers::Ptr identifiers( void ) const;
             Type type( void ) const;
 
