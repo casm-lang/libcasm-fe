@@ -98,6 +98,7 @@ RSQPAREN        "]"             { return Parser::make_RSQPAREN(loc); }
 LCURPAREN       "{"             { return Parser::make_LCURPAREN(loc); }
 RCURPAREN       "}"             { return Parser::make_RCURPAREN(loc); }
 COLON           ":"             { return Parser::make_COLON(loc); }
+DOUBLECOLON     "::"            { return Parser::make_DOUBLECOLON(loc); }
 UNDERLINE       "_"             { return Parser::make_UNDERLINE(loc); }
 AT              "@"             { return Parser::make_AT(loc); }
 COMMA           ","             { return Parser::make_COMMA(loc); }

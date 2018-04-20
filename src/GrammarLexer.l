@@ -72,8 +72,6 @@ using namespace libcasm_fe;
 %x COMMENT
 %x STRING
 
-IDENTIFIER [a-zA-Z_][a-zA-Z0-9\_]*
-
 %%
 %{
     // Code run each time yylex is called.
@@ -102,15 +100,7 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9\_]*
 
 {{grammartoken}}
 
-({IDENTIFIER}::)+{IDENTIFIER} {
-    return Parser::make_ABSOLUTE_IDENTIFIER_PATH( yytext, loc );
-}
-
-::{IDENTIFIER} {
-    return Parser::make_RELATIVE_IDENTIFIER_PATH( yytext, loc );
-}
-
-{IDENTIFIER} {
+[a-zA-Z_][a-zA-Z0-9\_]* {
     return Parser::make_IDENTIFIER( yytext, loc );
 }
 

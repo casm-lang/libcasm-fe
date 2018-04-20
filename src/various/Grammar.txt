@@ -804,7 +804,7 @@ MaybeInitializers ::= Initializers
 ===== Identifier =====
 
 <code>
-Identifier ::= ""
+Identifier ::= "[a-zA-Z_][a-zA-Z0-9_]*"
              | "in"
 </code>
 
@@ -814,30 +814,21 @@ Identifier ::= ""
 ===== IdentifierPath =====
 
 <code>
-IdentifierPath ::= AbsoluteIdentifierPath
-                 | RelativeIdentifierPath
+IdentifierPath ::= DotSeparatedIdentifiers
+                 | "::" Identifier
 </code>
 
 {{page>:grammar:IdentifierPath&noheader&nofooter}}
 
 
-===== AbsoluteIdentifierPath =====
+===== DotSeparatedIdentifiers =====
 
 <code>
-AbsoluteIdentifierPath ::= "absoluteIdentifierPath"
-                         | Identifier
+DotSeparatedIdentifiers ::= DotSeparatedIdentifiers "::" Identifier
+                          | Identifier
 </code>
 
-{{page>:grammar:AbsoluteIdentifierPath&noheader&nofooter}}
-
-
-===== RelativeIdentifierPath =====
-
-<code>
-RelativeIdentifierPath ::= "relativeIdentifierPath"
-</code>
-
-{{page>:grammar:RelativeIdentifierPath&noheader&nofooter}}
+{{page>:grammar:DotSeparatedIdentifiers&noheader&nofooter}}
 
 
 ===== Variable =====

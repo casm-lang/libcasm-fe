@@ -68,7 +68,6 @@
         class SourceLocation;
     }
 
-    #include "GrammarParserHelper.h"
     #include "Specification.h"
     #include "ast/Definition.h"
     #include "ast/Expression.h"
@@ -176,13 +175,12 @@ END       0 "end of file"
 %token <std::string> DECIMAL     "decimal"
 %token <std::string> STRING      "string"
 %token <std::string> IDENTIFIER  "identifier"
-%token <std::string> ABSOLUTE_IDENTIFIER_PATH  "absoluteIdentifierPath"
-%token <std::string> RELATIVE_IDENTIFIER_PATH  "relativeIdentifierPath"
 
 %type <Specification::Ptr> Specification
 
 %type <Identifier::Ptr> Identifier
-%type <IdentifierPath::Ptr> IdentifierPath AbsoluteIdentifierPath RelativeIdentifierPath
+%type <Identifiers::Ptr> DotSeparatedIdentifiers
+%type <IdentifierPath::Ptr> IdentifierPath
 
 // definitions
 %type <Definition::Ptr> Definition AttributedDefinition
@@ -276,6 +274,7 @@ END       0 "end of file"
 
 // prefer absolute over relative paths
 %precedence ABSOLUTE_PATH
+%precedence DOUBLECOLON
 
 %precedence IN
 %precedence DO
@@ -1587,33 +1586,31 @@ Identifier
 
 
 IdentifierPath
-: AbsoluteIdentifierPath
+: DotSeparatedIdentifiers %prec ABSOLUTE_PATH
   {
-      $$ = $1;
+      $$ = Ast::make< IdentifierPath >( @$, $1, IdentifierPath::Type::ABSOLUTE );
   }
-| RelativeIdentifierPath
+| DOUBLECOLON Identifier
   {
-      $$ = $1;
+      auto identifiers = Ast::make< Identifiers >( @$ );
+      identifiers->add( $2 );
+      $$ = Ast::make< IdentifierPath >( @$, identifiers, IdentifierPath::Type::RELATIVE );
   }
 ;
 
 
-AbsoluteIdentifierPath
-: ABSOLUTE_IDENTIFIER_PATH
+DotSeparatedIdentifiers
+: DotSeparatedIdentifiers DOUBLECOLON Identifier
   {
-      $$ = Ast::make< IdentifierPath >( @$, GrammarParser::parseIdentifierPath( @$, $1 ), IdentifierPath::Type::ABSOLUTE );
+      auto identifiers = $1;
+      identifiers->add( $3 );
+      $$ = identifiers;
   }
 | Identifier
   {
-      $$ = asIdentifierPath( $1 );
-  }
-;
-
-
-RelativeIdentifierPath
-: RELATIVE_IDENTIFIER_PATH
-  {
-      $$ = Ast::make< IdentifierPath >( @$, GrammarParser::parseIdentifierPath( @$, $1 ), IdentifierPath::Type::RELATIVE );
+      auto identifiers = Ast::make< Identifiers >( @$ );
+      identifiers->add( $1 );
+      $$ = identifiers;
   }
 ;
 
