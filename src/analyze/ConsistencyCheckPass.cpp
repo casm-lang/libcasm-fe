@@ -89,7 +89,19 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( TupleLiteral& node ) override;
     void visit( RecordLiteral& node ) override;
 
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
+    void visit( IndirectCallExpression& node ) override;
+    void visit( TypeCastingExpression& node ) override;
+    void visit( UnaryExpression& node ) override;
+    void visit( BinaryExpression& node ) override;
+    void visit( LetExpression& node ) override;
+    void visit( ConditionalExpression& node ) override;
+    void visit( ChooseExpression& node ) override;
+    void visit( UniversalQuantifierExpression& node ) override;
+    void visit( ExistentialQuantifierExpression& node ) override;
 
     void visit( CaseRule& node ) override;
     void visit( UpdateRule& node ) override;
@@ -197,6 +209,78 @@ void ConsistencyCheckVisitor::visit( RecordLiteral& node )
     RecursiveVisitor::visit( node );
     verify( node );
     assert( node.type()->isRecord() );
+}
+
+void ConsistencyCheckVisitor::visit( NamedExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( MethodCallExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( LiteralCallExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( IndirectCallExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( TypeCastingExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( UnaryExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( BinaryExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( LetExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( ConditionalExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( ChooseExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( UniversalQuantifierExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
+}
+
+void ConsistencyCheckVisitor::visit( ExistentialQuantifierExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verify( node );
 }
 
 void ConsistencyCheckVisitor::visit( CaseRule& node )
