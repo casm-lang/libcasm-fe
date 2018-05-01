@@ -140,26 +140,6 @@
         const auto& location = identifier->sourceLocation();
         return Ast::make< IdentifierPath >( location, identifier );
     }
-
-    static Rule::Ptr wrapInBlockRule( const Rule::Ptr& rule )
-    {
-        if( rule == nullptr )
-        {
-            // this can happen while recovering from a syntax error
-            return nullptr;
-        }
-
-        if( (rule->id() == Node::ID::BLOCK_RULE )
-                or (rule->id() == Node::ID::SEQUENCE_RULE ) )
-        {
-            return rule; // no need to wrap it
-        }
-
-        const auto& sourceLocation = rule->sourceLocation();
-        const auto rules = Ast::make< Rules >( sourceLocation );
-        rules->add( rule );
-        return Ast::make< BlockRule >( sourceLocation, rules );
-    }
 }
 
 
@@ -411,13 +391,11 @@ DerivedDefinition
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
   {
-      $$ = Ast::make< RuleDefinition >( @$, $2, $3, createVoidType( @$ ),
-                                   wrapInBlockRule( $5 ) );
+      $$ = Ast::make< RuleDefinition >( @$, $2, $3, createVoidType( @$ ), $5 );
   }
 | RULE Identifier MaybeParameters MAPS Type EQUAL Rule
   {
-      $$ = Ast::make< RuleDefinition >( @$, $2, $3, $5,
-                                   wrapInBlockRule( $7 ) );
+      $$ = Ast::make< RuleDefinition >( @$, $2, $3, $5, $7 );
   }
 ;
 
