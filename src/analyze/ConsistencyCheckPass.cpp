@@ -48,7 +48,7 @@
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/ast/RecursiveVisitor>
 
-#include <libcasm-fe/analyze/PropertyRevisePass>
+#include <libcasm-fe/analyze/TypeInferencePass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Builtin>
@@ -225,9 +225,17 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 {
-    assert( node.targetType() != DirectCallExpression::TargetType::UNKNOWN );
-
     RecursiveVisitor::visit( node );
+
+    if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown symbol '" + node.identifier()->path() + "' found",
+            Code::SymbolIsUnknown );
+        return;
+    }
+
     verify( node );
 
     if( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
@@ -357,7 +365,7 @@ void ConsistencyCheckVisitor::verify( const TypedNode& node )
 void ConsistencyCheckPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
-    pu.scheduleAfter< PropertyRevisePass >();
+    pu.scheduleAfter< TypeInferencePass >();
 }
 
 u1 ConsistencyCheckPass::run( libpass::PassResult& pr )

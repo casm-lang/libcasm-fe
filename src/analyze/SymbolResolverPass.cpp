@@ -191,16 +191,7 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    assert( node.identifier() );
-    const auto& identifier = node.identifier();
-    const auto& name = identifier->path();
-
-    if( identifier->type() == IdentifierPath::Type::RELATIVE )
-    {
-        // only absolute types can be resolved here, relative types will be
-        // resolved later in the type inference pass
-        return;
-    }
+    const auto& name = node.identifier()->path();
 
     const auto validateArgumentsCount = [&]( const std::string& description,
                                              std::size_t expectedNumberOfArguments ) {
@@ -342,15 +333,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
         validateArgumentsCount( "type", 0 );
     }
-    else
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown symbol '" + name + "' found",
-            Code::SymbolIsUnknown );
-    }
-
-    m_log.debug( "call: " + name + "{ " + node.targetTypeName() + " }" );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )

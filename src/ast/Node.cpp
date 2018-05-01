@@ -382,6 +382,11 @@ IdentifierPath::IdentifierPath( const Identifiers::Ptr& identifiers, Type type )
     assert( not identifiers->empty() && "identifiers must not be empty" );
 }
 
+void IdentifierPath::addIdentifier( const Identifier::Ptr& identifier )
+{
+    m_identifiers->add( identifier );
+}
+
 Identifiers::Ptr IdentifierPath::identifiers( void ) const
 {
     return m_identifiers;

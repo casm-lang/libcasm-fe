@@ -48,7 +48,7 @@
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/ast/RecursiveVisitor>
 
-#include <libcasm-fe/analyze/TypeInferencePass>
+#include <libcasm-fe/analyze/ConsistencyCheckPass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Annotation>
@@ -346,7 +346,7 @@ void PropertyResolverVisitor::visit( ExistentialQuantifierExpression& node )
 void PropertyResolverPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
-    pu.scheduleAfter< TypeInferencePass >();
+    pu.scheduleAfter< ConsistencyCheckPass >();
 }
 
 u1 PropertyResolverPass::run( libpass::PassResult& pr )

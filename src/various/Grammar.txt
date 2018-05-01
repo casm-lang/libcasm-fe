@@ -814,30 +814,11 @@ Identifier ::= "[a-zA-Z_][a-zA-Z0-9_]*"
 ===== IdentifierPath =====
 
 <code>
-IdentifierPath ::= AbsoluteIdentifierPath
-                 | RelativeIdentifierPath
+IdentifierPath ::= IdentifierPath "::" Identifier
+                 | Identifier
 </code>
 
 {{page>:grammar:IdentifierPath&noheader&nofooter}}
-
-
-===== AbsoluteIdentifierPath =====
-
-<code>
-AbsoluteIdentifierPath ::= ( Identifier "::" )+ Identifier
-                         | Identifier
-</code>
-
-{{page>:grammar:AbsoluteIdentifierPath&noheader&nofooter}}
-
-
-===== RelativeIdentifierPath =====
-
-<code>
-RelativeIdentifierPath ::= "::" Identifier
-</code>
-
-{{page>:grammar:RelativeIdentifierPath&noheader&nofooter}}
 
 
 ===== Variable =====

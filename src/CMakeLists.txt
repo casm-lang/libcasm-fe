@@ -54,7 +54,6 @@ add_library( ${PROJECT}-cpp OBJECT
   Namespace.cpp
   Specification.cpp
   TypeInfo.cpp
-  GrammarParserHelper.cpp
 
   ast/Attribute.cpp
   ast/Definition.cpp

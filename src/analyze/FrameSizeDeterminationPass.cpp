@@ -48,7 +48,7 @@
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/ast/RecursiveVisitor>
 
-#include <libcasm-fe/analyze/ConsistencyCheckPass>
+#include <libcasm-fe/analyze/PropertyRevisePass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libpass/PassRegistry>
@@ -267,7 +267,7 @@ void FrameSizeDeterminationVisitor::popLocals( std::size_t count )
 void FrameSizeDeterminationPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
-    pu.scheduleAfter< ConsistencyCheckPass >();
+    pu.scheduleAfter< PropertyRevisePass >();
 }
 
 u1 FrameSizeDeterminationPass::run( libpass::PassResult& pr )

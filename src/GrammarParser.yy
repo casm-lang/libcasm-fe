@@ -68,7 +68,6 @@
         class SourceLocation;
     }
 
-    #include "GrammarParserHelper.h"
     #include "Specification.h"
     #include "ast/Definition.h"
     #include "ast/Expression.h"
@@ -176,13 +175,11 @@ END       0 "end of file"
 %token <std::string> DECIMAL     "decimal"
 %token <std::string> STRING      "string"
 %token <std::string> IDENTIFIER  "identifier"
-%token <std::string> ABSOLUTE_IDENTIFIER_PATH  "absoluteIdentifierPath"
-%token <std::string> RELATIVE_IDENTIFIER_PATH  "relativeIdentifierPath"
 
 %type <Specification::Ptr> Specification
 
 %type <Identifier::Ptr> Identifier
-%type <IdentifierPath::Ptr> IdentifierPath AbsoluteIdentifierPath RelativeIdentifierPath
+%type <IdentifierPath::Ptr> IdentifierPath
 
 // definitions
 %type <Definition::Ptr> Definition AttributedDefinition
@@ -274,8 +271,8 @@ END       0 "end of file"
 
 %start Specification
 
-// prefer absolute over relative paths
-%precedence ABSOLUTE_PATH
+// prefer basic types over the other types
+%precedence BASIC_TYPE
 
 %precedence IN
 %precedence DO
@@ -1330,7 +1327,7 @@ Type
 
 
 BasicType
-: IdentifierPath %prec ABSOLUTE_PATH
+: IdentifierPath %prec BASIC_TYPE
   {
       $$ = Ast::make< BasicType >( @$, $1 );
   }
@@ -1587,33 +1584,15 @@ Identifier
 
 
 IdentifierPath
-: AbsoluteIdentifierPath
+: IdentifierPath DOUBLECOLON Identifier
   {
-      $$ = $1;
-  }
-| RelativeIdentifierPath
-  {
-      $$ = $1;
-  }
-;
-
-
-AbsoluteIdentifierPath
-: ABSOLUTE_IDENTIFIER_PATH
-  {
-      $$ = Ast::make< IdentifierPath >( @$, GrammarParser::parseIdentifierPath( @$, $1 ), IdentifierPath::Type::ABSOLUTE );
+      auto path = $1;
+      path->addIdentifier( $3 );
+      $$ = path;
   }
 | Identifier
   {
-      $$ = asIdentifierPath( $1 );
-  }
-;
-
-
-RelativeIdentifierPath
-: RELATIVE_IDENTIFIER_PATH
-  {
-      $$ = Ast::make< IdentifierPath >( @$, GrammarParser::parseIdentifierPath( @$, $1 ), IdentifierPath::Type::RELATIVE );
+      $$ = Ast::make< IdentifierPath >( @$, $1 );
   }
 ;
 
