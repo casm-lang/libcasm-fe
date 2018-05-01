@@ -418,10 +418,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
     {
         inference( "direct call", nullptr, node );
-        if( not node.type() )
-        {
-            return;
-        }
         if( not tryResolveCallInTypeNamespace( node ) )
         {
             // unable to resolve the call -> not enough information to continue
@@ -1674,7 +1670,10 @@ void TypeInferenceVisitor::visit( VariableBinding& node )
 
 bool TypeInferenceVisitor::tryResolveCallInTypeNamespace( DirectCallExpression& node ) const
 {
-    assert( node.type() && "node must have a type" );
+    if( not node.type() )
+    {
+        return false;
+    }
 
     const auto& name = node.identifier()->path();
     const auto& typeName = node.type()->description();
@@ -1684,10 +1683,6 @@ bool TypeInferenceVisitor::tryResolveCallInTypeNamespace( DirectCallExpression& 
     const auto typeNamespace = m_symboltable.findNamespace( typeName );
     if( not typeNamespace )
     {
-        m_log.error(
-            { node.sourceLocation() },
-            "type '" + typeName + "' does not have a namespace",
-            Code::DirectCallExpressionInvalidRelativePath );
         return false;
     }
 
