@@ -1655,6 +1655,8 @@ ExecutionUpdateSet* Agent::updateSet( void ) const
 class DispatchStrategy
 {
   public:
+    virtual ~DispatchStrategy() = default;
+
     virtual void dispatch( std::vector< Agent >& agents ) = 0;
 };
 
