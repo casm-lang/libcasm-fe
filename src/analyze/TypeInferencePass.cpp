@@ -418,6 +418,10 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
     if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
     {
         inference( "direct call", nullptr, node );
+        if( not node.type() )
+        {
+            return;
+        }
         if( not tryResolveCallInTypeNamespace( node ) )
         {
             // unable to resolve the call -> not enough information to continue
@@ -919,6 +923,8 @@ void TypeInferenceVisitor::visit( UnaryExpression& node )
     const auto description = "unary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
     inference( description, annotation, node, { node.expression() } );
 
+    RecursiveVisitor::visit( node );
+
     if( node.type() and node.expression()->type() )
     {
         const std::vector< libcasm_ir::Type::Ptr > argTypeList{ node.expression()->type() };
@@ -943,6 +949,8 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 
     const auto description = "binary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
     inference( description, annotation, node, { node.left(), node.right() } );
+
+    RecursiveVisitor::visit( node );
 
     if( node.type() and node.left()->type() and node.right()->type() )
     {
@@ -1666,17 +1674,9 @@ void TypeInferenceVisitor::visit( VariableBinding& node )
 
 bool TypeInferenceVisitor::tryResolveCallInTypeNamespace( DirectCallExpression& node ) const
 {
+    assert( node.type() && "node must have a type" );
+
     const auto& name = node.identifier()->path();
-
-    if( not node.type() )
-    {
-        m_log.error(
-            { node.identifier()->sourceLocation() },
-            "cannot resolve '" + name + "' because no type is given",
-            Code::DirectCallExpressionInvalidRelativePath );
-        return false;
-    }
-
     const auto& typeName = node.type()->description();
 
     // TODO: this will need some extra care when we add the import feature. (e.g. namespace
