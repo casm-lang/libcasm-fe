@@ -82,8 +82,7 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
     void visit( UsingDefinition& node ) override;
 
   private:
-    void validateSymbol( const Definition& node );
-    void registerSymbol( Definition& node );
+    void registerSymbol( const Definition& node );
 
   private:
     libcasm_fe::Logger& m_log;
@@ -99,7 +98,6 @@ SymbolRegistrationVisitor::SymbolRegistrationVisitor(
 
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
-    validateSymbol( node );
     registerSymbol( node );
 
     RecursiveVisitor::visit( node );
@@ -107,7 +105,6 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 
 void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 {
-    validateSymbol( node );
     registerSymbol( node );
 
     RecursiveVisitor::visit( node );
@@ -115,7 +112,6 @@ void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 
 void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 {
-    validateSymbol( node );
     registerSymbol( node );
 
     RecursiveVisitor::visit( node );
@@ -128,8 +124,6 @@ void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
 
 void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 {
-    validateSymbol( node );
-
     const auto& name = node.identifier()->name();
     m_log.debug( "creating IR enumeration type '" + name + "'" );
     const auto kind = std::make_shared< libcasm_ir::Enumeration >( name );
@@ -172,13 +166,12 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 
 void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 {
-    validateSymbol( node );
     registerSymbol( node );
 
     RecursiveVisitor::visit( node );
 }
 
-void SymbolRegistrationVisitor::validateSymbol( const Definition& node )
+void SymbolRegistrationVisitor::registerSymbol( const Definition& node )
 {
     const auto& name = node.identifier()->name();
 
@@ -188,6 +181,7 @@ void SymbolRegistrationVisitor::validateSymbol( const Definition& node )
             { node.identifier()->sourceLocation() },
             "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
             Code::IdentifierIsBuiltinName );
+        return;
     }
 
     if( TypeInfo::instance().hasType( name ) )
@@ -196,12 +190,9 @@ void SymbolRegistrationVisitor::validateSymbol( const Definition& node )
             { node.identifier()->sourceLocation() },
             "cannot use type name '" + name + "' as " + node.description() + " symbol",
             Code::IdentifierIsTypeName );
+        return;
     }
-}
 
-void SymbolRegistrationVisitor::registerSymbol( Definition& node )
-{
-    const auto& name = node.identifier()->name();
     try
     {
         m_symboltable.registerSymbol( name, node.ptr< Definition >() );
