@@ -74,7 +74,10 @@ namespace libcasm_fe
         SymbolIsUnknown = 0x0500,
         UpdateRuleFunctionSymbolIsInvalid = 0x0501,
         SymbolAlreadyDefined = 0x0502,
-        SymbolArgumentSizeMismatch = 0x0503
+        SymbolArgumentSizeMismatch = 0x0503,
+
+        IdentifierIsBuiltinName = 0x0504,
+        IdentifierIsTypeName = 0x0505
 
         // --------------------------------------------------------- f*** ...
         // function errors
@@ -102,9 +105,6 @@ namespace libcasm_fe
         FunctionValueInvalidRangeAtInitially = 0xfd01,
         FunctionValueAlreadyInitializedAtInitially = 0xfd02,
 
-        FunctionDefinitionIdentifierIsBuiltinName = 0xf100,  // f1** ... function identifer
-        FunctionDefinitionIdentifierIsTypeName = 0xf200,
-
         FunctionDefinitionDefaultValueInvalidProperty = 0xf301,
 
         // --------------------------------------------------------- d*** ...
@@ -115,17 +115,12 @@ namespace libcasm_fe
         DerivedReturnValueInvalid = 0xda01,
         DerivedExpressionInvalidType = 0xde00,  // de** ... derived expression
 
-        DerivedDefinitionIdentifierIsBuiltinName = 0xd100,  // d1** ... derived identifer
-        DerivedDefinitionIdentifierIsTypeName = 0xd200,
-
         DerivedDefinitionExpressionInvalidProperty = 0xdede,
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
 
         RuleDefinitionAlreadyUsed = 0x5000,
-        RuleDefinitionIdentifierIsBuiltinName = 0x5001,
-        RuleDefinitionIdentifierIsTypeName = 0x5002,
 
         RuleArgumentValueInvalid = 0x5e00  // 5e** ... rule argument
         ,
@@ -165,14 +160,10 @@ namespace libcasm_fe
 
         ,
         EnumerationDefinitionAlreadyUsed = 0xe000,
-        EnumerationDefinitionIdentifierIsBuiltinName = 0xe100,
-        EnumerationDefinitionIdentifierIsTypeName = 0xe200,
         EnumeratorDefinitionAlreadyUsed = 0xe001,
 
         // using errors
         UsingDefinitionAlreadyUsed = 0x6000,
-        UsingDefinitionIdentifierIsBuiltinName = 0x6001,
-        UsingDefinitionIdentifierIsTypeName = 0x6002,
 
         // --------------------------------------------------------- a*** ...
         // agent errors

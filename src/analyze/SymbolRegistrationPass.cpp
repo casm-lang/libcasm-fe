@@ -82,8 +82,7 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
     void visit( UsingDefinition& node ) override;
 
   private:
-    void validateSymbol(
-        const Definition& node, const Code errorCodeIsBuiltin, const Code errorCodeIsType );
+    void validateSymbol( const Definition& node );
     void registerSymbol( Definition& node, const Code errorCodeAlreadyRegistered );
 
   private:
@@ -100,10 +99,7 @@ SymbolRegistrationVisitor::SymbolRegistrationVisitor(
 
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::FunctionDefinitionIdentifierIsBuiltinName,
-        Code::FunctionDefinitionIdentifierIsTypeName );
+    validateSymbol( node );
 
     const auto& name = node.identifier()->name();
     try
@@ -135,10 +131,7 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 
 void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::DerivedDefinitionIdentifierIsBuiltinName,
-        Code::DerivedDefinitionIdentifierIsTypeName );
+    validateSymbol( node );
     registerSymbol( node, Code::DerivedDefinitionAlreadyUsed );
 
     RecursiveVisitor::visit( node );
@@ -146,10 +139,7 @@ void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 
 void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::RuleDefinitionIdentifierIsBuiltinName,
-        Code::RuleDefinitionIdentifierIsTypeName );
+    validateSymbol( node );
     registerSymbol( node, Code::RuleDefinitionAlreadyUsed );
 
     RecursiveVisitor::visit( node );
@@ -162,10 +152,7 @@ void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
 
 void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::EnumerationDefinitionIdentifierIsBuiltinName,
-        Code::EnumerationDefinitionIdentifierIsTypeName );
+    validateSymbol( node );
 
     const auto& name = node.identifier()->name();
     m_log.debug( "creating IR enumeration type '" + name + "'" );
@@ -209,17 +196,13 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 
 void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::UsingDefinitionIdentifierIsBuiltinName,
-        Code::UsingDefinitionIdentifierIsTypeName );
+    validateSymbol( node );
     registerSymbol( node, Code::UsingDefinitionAlreadyUsed );
 
     RecursiveVisitor::visit( node );
 }
 
-void SymbolRegistrationVisitor::validateSymbol(
-    const Definition& node, const Code errorCodeIsBuiltin, const Code errorCodeIsType )
+void SymbolRegistrationVisitor::validateSymbol( const Definition& node )
 {
     const auto& name = node.identifier()->name();
 
@@ -228,7 +211,7 @@ void SymbolRegistrationVisitor::validateSymbol(
         m_log.error(
             { node.identifier()->sourceLocation() },
             "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            errorCodeIsBuiltin );
+            Code::IdentifierIsBuiltinName );
     }
 
     if( TypeInfo::instance().hasType( name ) )
@@ -236,7 +219,7 @@ void SymbolRegistrationVisitor::validateSymbol(
         m_log.error(
             { node.identifier()->sourceLocation() },
             "cannot use type name '" + name + "' as " + node.description() + " symbol",
-            errorCodeIsType );
+            Code::IdentifierIsTypeName );
     }
 }
 
