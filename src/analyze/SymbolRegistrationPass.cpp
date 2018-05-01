@@ -100,31 +100,7 @@ SymbolRegistrationVisitor::SymbolRegistrationVisitor(
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
     validateSymbol( node );
-
-    const auto& name = node.identifier()->name();
-    try
-    {
-        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.findSymbol( name );
-
-        if( node.uid() == FunctionDefinition::UID::PROGRAM )
-        {
-            m_log.error(
-                { node.sourceLocation(), symbol->sourceLocation() },
-                "init already defined",
-                Code::AgentInitRuleMultipleDefinitions );
-        }
-        else
-        {
-            m_log.error(
-                { node.sourceLocation(), symbol->sourceLocation() },
-                e.what(),
-                Code::IdentifierIsAlreadyUsed );
-        }
-    }
+    registerSymbol( node );
 
     RecursiveVisitor::visit( node );
 }
