@@ -48,7 +48,7 @@
 #include <libcasm-fe/Specification>
 #include <libcasm-fe/ast/RecursiveVisitor>
 
-#include <libcasm-fe/analyze/PropertyRevisePass>
+#include <libcasm-fe/analyze/TypeInferencePass>
 #include <libcasm-fe/transform/SourceToAstPass>
 
 #include <libcasm-ir/Builtin>
@@ -362,7 +362,7 @@ void ConsistencyCheckVisitor::verify( const TypedNode& node )
 void ConsistencyCheckPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
-    pu.scheduleAfter< PropertyRevisePass >();
+    pu.scheduleAfter< TypeInferencePass >();
 }
 
 u1 ConsistencyCheckPass::run( libpass::PassResult& pr )
