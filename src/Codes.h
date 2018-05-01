@@ -57,9 +57,6 @@ namespace libcasm_fe
         SyntaxErrorInvalidStatement = 0x0003,
         SyntaxErrorUnclosedComment = 0x0004
 
-        ,
-        IdentifierAlreadyUsed = 0x0010
-
         // --------------------------------------------------------- 05** ...
         // attribution errors
         ,
@@ -74,12 +71,15 @@ namespace libcasm_fe
         SymbolIsUnknown = 0x0500,
         UpdateRuleFunctionSymbolIsInvalid = 0x0501,
         SymbolAlreadyDefined = 0x0502,
-        SymbolArgumentSizeMismatch = 0x0503
+        SymbolArgumentSizeMismatch = 0x0503,
+
+        IdentifierIsBuiltinName = 0x0504,
+        IdentifierIsTypeName = 0x0505,
+        IdentifierIsAlreadyUsed = 0x0506
 
         // --------------------------------------------------------- f*** ...
         // function errors
         ,
-        FunctionDefinitionAlreadyUsed = 0xf010,
         FunctionDefinitionReClassification = 0xf011,
 
         FunctionAttributeIsInvalid = 0xfa00  // fa** ... function attribute
@@ -102,30 +102,18 @@ namespace libcasm_fe
         FunctionValueInvalidRangeAtInitially = 0xfd01,
         FunctionValueAlreadyInitializedAtInitially = 0xfd02,
 
-        FunctionDefinitionIdentifierIsBuiltinName = 0xf100,  // f1** ... function identifer
-        FunctionDefinitionIdentifierIsTypeName = 0xf200,
-
         FunctionDefinitionDefaultValueInvalidProperty = 0xf301,
 
         // --------------------------------------------------------- d*** ...
         // derived errors
-        DerivedDefinitionAlreadyUsed = 0xd000,
-
         DerivedArgumentValueInvalid = 0xda00,  // da** ... derived argment
         DerivedReturnValueInvalid = 0xda01,
         DerivedExpressionInvalidType = 0xde00,  // de** ... derived expression
-
-        DerivedDefinitionIdentifierIsBuiltinName = 0xd100,  // d1** ... derived identifer
-        DerivedDefinitionIdentifierIsTypeName = 0xd200,
 
         DerivedDefinitionExpressionInvalidProperty = 0xdede,
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
-
-        RuleDefinitionAlreadyUsed = 0x5000,
-        RuleDefinitionIdentifierIsBuiltinName = 0x5001,
-        RuleDefinitionIdentifierIsTypeName = 0x5002,
 
         RuleArgumentValueInvalid = 0x5e00  // 5e** ... rule argument
         ,
@@ -158,21 +146,7 @@ namespace libcasm_fe
         CallRuleArgumentInvalidProperty = 0x5f07,
         CaseRuleExpressionInvalidProperty = 0x5f08,
         ExpressionCaseInvalidProperty = 0x5f09,
-        WhileRuleConditionInvalidProperty = 0x5f10
-
-        // --------------------------------------------------------- a*** ...
-        // enumeration errors
-
-        ,
-        EnumerationDefinitionAlreadyUsed = 0xe000,
-        EnumerationDefinitionIdentifierIsBuiltinName = 0xe100,
-        EnumerationDefinitionIdentifierIsTypeName = 0xe200,
-        EnumeratorDefinitionAlreadyUsed = 0xe001,
-
-        // using errors
-        UsingDefinitionAlreadyUsed = 0x6000,
-        UsingDefinitionIdentifierIsBuiltinName = 0x6001,
-        UsingDefinitionIdentifierIsTypeName = 0x6002,
+        WhileRuleConditionInvalidProperty = 0x5f10,
 
         // --------------------------------------------------------- a*** ...
         // agent errors

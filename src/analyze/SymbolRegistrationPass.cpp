@@ -82,9 +82,7 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
     void visit( UsingDefinition& node ) override;
 
   private:
-    void validateSymbol(
-        const Definition& node, const Code errorCodeIsBuiltin, const Code errorCodeIsType );
-    void registerSymbol( Definition& node, const Code errorCodeAlreadyRegistered );
+    void registerSymbol( const Definition& node );
 
   private:
     libcasm_fe::Logger& m_log;
@@ -100,73 +98,32 @@ SymbolRegistrationVisitor::SymbolRegistrationVisitor(
 
 void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::FunctionDefinitionIdentifierIsBuiltinName,
-        Code::FunctionDefinitionIdentifierIsTypeName );
-
-    const auto& name = node.identifier()->name();
-    try
-    {
-        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
-    }
-    catch( const std::domain_error& e )
-    {
-        const auto& symbol = m_symboltable.findSymbol( name );
-
-        if( node.uid() == FunctionDefinition::UID::PROGRAM )
-        {
-            m_log.error(
-                { node.sourceLocation(), symbol->sourceLocation() },
-                "init already defined",
-                Code::AgentInitRuleMultipleDefinitions );
-        }
-        else
-        {
-            m_log.error(
-                { node.sourceLocation(), symbol->sourceLocation() },
-                e.what(),
-                Code::FunctionDefinitionAlreadyUsed );
-        }
-    }
+    registerSymbol( node );
 
     RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::DerivedDefinitionIdentifierIsBuiltinName,
-        Code::DerivedDefinitionIdentifierIsTypeName );
-    registerSymbol( node, Code::DerivedDefinitionAlreadyUsed );
+    registerSymbol( node );
 
     RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::RuleDefinitionIdentifierIsBuiltinName,
-        Code::RuleDefinitionIdentifierIsTypeName );
-    registerSymbol( node, Code::RuleDefinitionAlreadyUsed );
+    registerSymbol( node );
 
     RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
 {
-    registerSymbol( node, Code::EnumeratorDefinitionAlreadyUsed );
+    registerSymbol( node );
 }
 
 void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::EnumerationDefinitionIdentifierIsBuiltinName,
-        Code::EnumerationDefinitionIdentifierIsTypeName );
-
     const auto& name = node.identifier()->name();
     m_log.debug( "creating IR enumeration type '" + name + "'" );
     const auto kind = std::make_shared< libcasm_ir::Enumeration >( name );
@@ -190,7 +147,7 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
         enumerator->setType( type );
     }
 
-    registerSymbol( node, Code::EnumerationDefinitionAlreadyUsed );
+    registerSymbol( node );
 
     // register enumerators in a sub-namespace
     const auto enumeratorNamespace = std::make_shared< Namespace >();
@@ -209,17 +166,12 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 
 void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 {
-    validateSymbol(
-        node,
-        Code::UsingDefinitionIdentifierIsBuiltinName,
-        Code::UsingDefinitionIdentifierIsTypeName );
-    registerSymbol( node, Code::UsingDefinitionAlreadyUsed );
+    registerSymbol( node );
 
     RecursiveVisitor::visit( node );
 }
 
-void SymbolRegistrationVisitor::validateSymbol(
-    const Definition& node, const Code errorCodeIsBuiltin, const Code errorCodeIsType )
+void SymbolRegistrationVisitor::registerSymbol( const Definition& node )
 {
     const auto& name = node.identifier()->name();
 
@@ -228,7 +180,8 @@ void SymbolRegistrationVisitor::validateSymbol(
         m_log.error(
             { node.identifier()->sourceLocation() },
             "cannot use built-in name '" + name + "' as " + node.description() + " symbol",
-            errorCodeIsBuiltin );
+            Code::IdentifierIsBuiltinName );
+        return;
     }
 
     if( TypeInfo::instance().hasType( name ) )
@@ -236,14 +189,10 @@ void SymbolRegistrationVisitor::validateSymbol(
         m_log.error(
             { node.identifier()->sourceLocation() },
             "cannot use type name '" + name + "' as " + node.description() + " symbol",
-            errorCodeIsType );
+            Code::IdentifierIsTypeName );
+        return;
     }
-}
 
-void SymbolRegistrationVisitor::registerSymbol(
-    Definition& node, const Code errorCodeAlreadyRegistered )
-{
-    const auto& name = node.identifier()->name();
     try
     {
         m_symboltable.registerSymbol( name, node.ptr< Definition >() );
@@ -251,7 +200,7 @@ void SymbolRegistrationVisitor::registerSymbol(
     catch( const std::domain_error& e )
     {
         const auto& symbol = m_symboltable.findSymbol( name );
-        m_log.error( { node.sourceLocation() }, e.what(), errorCodeAlreadyRegistered );
+        m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
         m_log.info( { symbol->sourceLocation() }, e.what() );
     }
 }
