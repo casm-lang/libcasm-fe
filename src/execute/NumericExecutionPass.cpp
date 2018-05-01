@@ -1642,9 +1642,11 @@ Agent::Agent(
 
 void Agent::run( void )
 {
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
     ExecutionVisitor executionVisitor(
         m_locationRegistry, m_globalState, m_updateSetManager, m_agentId );
     executionVisitor.execute( m_rule );
+    transaction.merge();
 }
 
 ExecutionUpdateSet* Agent::updateSet( void ) const
