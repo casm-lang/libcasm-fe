@@ -226,6 +226,16 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 {
     RecursiveVisitor::visit( node );
+
+    if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown symbol '" + node.identifier()->path() + "' found",
+            Code::SymbolIsUnknown );
+        return;
+    }
+
     verify( node );
 
     if( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
@@ -247,13 +257,6 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
                     function->classificationName() + "', incorrect usage in line " +
                     std::to_string( node.sourceLocation().begin.line ) );
         }
-    }
-    else if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown symbol '" + node.identifier()->path() + "' found",
-            Code::SymbolIsUnknown );
     }
 }
 
