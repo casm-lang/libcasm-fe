@@ -333,15 +333,6 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         node.setTargetType( DirectCallExpression::TargetType::TYPE_DOMAIN );
         validateArgumentsCount( "type", 0 );
     }
-    else
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown symbol '" + name + "' found",
-            Code::SymbolIsUnknown );
-    }
-
-    m_log.debug( "call: " + name + "{ " + node.targetTypeName() + " }" );
 }
 
 void SymbolResolveVisitor::visit( LetExpression& node )
