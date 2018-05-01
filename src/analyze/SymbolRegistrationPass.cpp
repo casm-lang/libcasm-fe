@@ -83,7 +83,7 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
 
   private:
     void validateSymbol( const Definition& node );
-    void registerSymbol( Definition& node, const Code errorCodeAlreadyRegistered );
+    void registerSymbol( Definition& node );
 
   private:
     libcasm_fe::Logger& m_log;
@@ -122,7 +122,7 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
             m_log.error(
                 { node.sourceLocation(), symbol->sourceLocation() },
                 e.what(),
-                Code::FunctionDefinitionAlreadyUsed );
+                Code::IdentifierIsAlreadyUsed );
         }
     }
 
@@ -132,7 +132,7 @@ void SymbolRegistrationVisitor::visit( FunctionDefinition& node )
 void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 {
     validateSymbol( node );
-    registerSymbol( node, Code::DerivedDefinitionAlreadyUsed );
+    registerSymbol( node );
 
     RecursiveVisitor::visit( node );
 }
@@ -140,14 +140,14 @@ void SymbolRegistrationVisitor::visit( DerivedDefinition& node )
 void SymbolRegistrationVisitor::visit( RuleDefinition& node )
 {
     validateSymbol( node );
-    registerSymbol( node, Code::RuleDefinitionAlreadyUsed );
+    registerSymbol( node );
 
     RecursiveVisitor::visit( node );
 }
 
 void SymbolRegistrationVisitor::visit( EnumeratorDefinition& node )
 {
-    registerSymbol( node, Code::EnumeratorDefinitionAlreadyUsed );
+    registerSymbol( node );
 }
 
 void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
@@ -177,7 +177,7 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
         enumerator->setType( type );
     }
 
-    registerSymbol( node, Code::EnumerationDefinitionAlreadyUsed );
+    registerSymbol( node );
 
     // register enumerators in a sub-namespace
     const auto enumeratorNamespace = std::make_shared< Namespace >();
@@ -197,7 +197,7 @@ void SymbolRegistrationVisitor::visit( EnumerationDefinition& node )
 void SymbolRegistrationVisitor::visit( UsingDefinition& node )
 {
     validateSymbol( node );
-    registerSymbol( node, Code::UsingDefinitionAlreadyUsed );
+    registerSymbol( node );
 
     RecursiveVisitor::visit( node );
 }
@@ -223,8 +223,7 @@ void SymbolRegistrationVisitor::validateSymbol( const Definition& node )
     }
 }
 
-void SymbolRegistrationVisitor::registerSymbol(
-    Definition& node, const Code errorCodeAlreadyRegistered )
+void SymbolRegistrationVisitor::registerSymbol( Definition& node )
 {
     const auto& name = node.identifier()->name();
     try
@@ -234,7 +233,7 @@ void SymbolRegistrationVisitor::registerSymbol(
     catch( const std::domain_error& e )
     {
         const auto& symbol = m_symboltable.findSymbol( name );
-        m_log.error( { node.sourceLocation() }, e.what(), errorCodeAlreadyRegistered );
+        m_log.error( { node.sourceLocation() }, e.what(), Code::IdentifierIsAlreadyUsed );
         m_log.info( { symbol->sourceLocation() }, e.what() );
     }
 }

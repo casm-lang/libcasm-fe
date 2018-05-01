@@ -57,9 +57,6 @@ namespace libcasm_fe
         SyntaxErrorInvalidStatement = 0x0003,
         SyntaxErrorUnclosedComment = 0x0004
 
-        ,
-        IdentifierAlreadyUsed = 0x0010
-
         // --------------------------------------------------------- 05** ...
         // attribution errors
         ,
@@ -77,12 +74,12 @@ namespace libcasm_fe
         SymbolArgumentSizeMismatch = 0x0503,
 
         IdentifierIsBuiltinName = 0x0504,
-        IdentifierIsTypeName = 0x0505
+        IdentifierIsTypeName = 0x0505,
+        IdentifierIsAlreadyUsed = 0x0506
 
         // --------------------------------------------------------- f*** ...
         // function errors
         ,
-        FunctionDefinitionAlreadyUsed = 0xf010,
         FunctionDefinitionReClassification = 0xf011,
 
         FunctionAttributeIsInvalid = 0xfa00  // fa** ... function attribute
@@ -109,8 +106,6 @@ namespace libcasm_fe
 
         // --------------------------------------------------------- d*** ...
         // derived errors
-        DerivedDefinitionAlreadyUsed = 0xd000,
-
         DerivedArgumentValueInvalid = 0xda00,  // da** ... derived argment
         DerivedReturnValueInvalid = 0xda01,
         DerivedExpressionInvalidType = 0xde00,  // de** ... derived expression
@@ -119,8 +114,6 @@ namespace libcasm_fe
 
         // --------------------------------------------------------- 5*** ...
         // rule errors
-
-        RuleDefinitionAlreadyUsed = 0x5000,
 
         RuleArgumentValueInvalid = 0x5e00  // 5e** ... rule argument
         ,
@@ -153,17 +146,7 @@ namespace libcasm_fe
         CallRuleArgumentInvalidProperty = 0x5f07,
         CaseRuleExpressionInvalidProperty = 0x5f08,
         ExpressionCaseInvalidProperty = 0x5f09,
-        WhileRuleConditionInvalidProperty = 0x5f10
-
-        // --------------------------------------------------------- a*** ...
-        // enumeration errors
-
-        ,
-        EnumerationDefinitionAlreadyUsed = 0xe000,
-        EnumeratorDefinitionAlreadyUsed = 0xe001,
-
-        // using errors
-        UsingDefinitionAlreadyUsed = 0x6000,
+        WhileRuleConditionInvalidProperty = 0x5f10,
 
         // --------------------------------------------------------- a*** ...
         // agent errors
