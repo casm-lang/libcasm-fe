@@ -62,6 +62,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+namespace IR = libcasm_ir;
+
 char ConsistencyCheckPass::id = 0;
 
 static libpass::PassRegistration< ConsistencyCheckPass > PASS(
@@ -80,6 +82,8 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
 
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
+    void visit( DerivedDefinition& node ) override;
+    void visit( RuleDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -89,7 +93,19 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( TupleLiteral& node ) override;
     void visit( RecordLiteral& node ) override;
 
+    void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
+    void visit( LiteralCallExpression& node ) override;
+    void visit( IndirectCallExpression& node ) override;
+    void visit( TypeCastingExpression& node ) override;
+    void visit( UnaryExpression& node ) override;
+    void visit( BinaryExpression& node ) override;
+    void visit( LetExpression& node ) override;
+    void visit( ConditionalExpression& node ) override;
+    void visit( ChooseExpression& node ) override;
+    void visit( UniversalQuantifierExpression& node ) override;
+    void visit( ExistentialQuantifierExpression& node ) override;
 
     void visit( CaseRule& node ) override;
     void visit( UpdateRule& node ) override;
@@ -100,7 +116,8 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( FixedSizedType& node ) override;
     void visit( RelationType& node ) override;
 
-    void verify( const TypedNode& node );
+    void verifyHasType( const TypedNode& node );
+    void verifyHasTypeOfKind( const TypedNode& node, const IR::Type::Kind expectedKind );
 
   private:
     libcasm_fe::Logger& m_log;
@@ -132,7 +149,7 @@ void ConsistencyCheckVisitor::visit( Specification& node )
 void ConsistencyCheckVisitor::visit( VariableDefinition& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
+    verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
@@ -151,52 +168,134 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     {
         m_initDefinitionFound = true;
     }
+
+    verifyHasTypeOfKind( node, IR::Type::Kind::RELATION );
+}
+
+void ConsistencyCheckVisitor::visit( DerivedDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasTypeOfKind( node, IR::Type::Kind::RELATION );
+}
+
+void ConsistencyCheckVisitor::visit( RuleDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasTypeOfKind( node, IR::Type::Kind::RELATION );
 }
 
 void ConsistencyCheckVisitor::visit( UndefLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
+    verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( ValueLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
+    verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( ReferenceLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
+    verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( ListLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
-    assert( node.type()->isList() );
+    verifyHasTypeOfKind( node, IR::Type::Kind::LIST );
 }
 
 void ConsistencyCheckVisitor::visit( RangeLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
-    assert( node.type()->isRange() );
+    verifyHasTypeOfKind( node, IR::Type::Kind::RANGE );
 }
 
 void ConsistencyCheckVisitor::visit( TupleLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
-    assert( node.type()->isTuple() );
+    verifyHasTypeOfKind( node, IR::Type::Kind::TUPLE );
 }
 
 void ConsistencyCheckVisitor::visit( RecordLiteral& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
-    assert( node.type()->isRecord() );
+    verifyHasTypeOfKind( node, IR::Type::Kind::RECORD );
+}
+
+void ConsistencyCheckVisitor::visit( NamedExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( MethodCallExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( LiteralCallExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( IndirectCallExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( TypeCastingExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( UnaryExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( BinaryExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( LetExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( ConditionalExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( ChooseExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( UniversalQuantifierExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasTypeOfKind( node, IR::Type::Kind::BOOLEAN );
+}
+
+void ConsistencyCheckVisitor::visit( ExistentialQuantifierExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasTypeOfKind( node, IR::Type::Kind::BOOLEAN );
 }
 
 void ConsistencyCheckVisitor::visit( CaseRule& node )
@@ -236,7 +335,7 @@ void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
         return;
     }
 
-    verify( node );
+    verifyHasType( node );
 
     if( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
     {
@@ -320,40 +419,55 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
 void ConsistencyCheckVisitor::visit( BasicType& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
+    verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( ComposedType& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
+    verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( TemplateType& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
+    verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( FixedSizedType& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
+    verifyHasType( node );
 }
 
 void ConsistencyCheckVisitor::visit( RelationType& node )
 {
     RecursiveVisitor::visit( node );
-    verify( node );
+    verifyHasTypeOfKind( node, IR::Type::Kind::RELATION );
 }
 
-void ConsistencyCheckVisitor::verify( const TypedNode& node )
+void ConsistencyCheckVisitor::verifyHasType( const TypedNode& node )
 {
     if( not node.type() )
     {
         m_log.error(
             { node.sourceLocation() },
             "unable to infer type",
+            Code::TypeInferenceUnableToInferType );
+    }
+}
+
+void ConsistencyCheckVisitor::verifyHasTypeOfKind(
+    const TypedNode& node, const IR::Type::Kind expectedKind )
+{
+    verifyHasType( node );
+
+    if( node.type() and node.type()->kind() != expectedKind )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "expected a type of kind '" + IR::Type::token( expectedKind ) + "' but got type '" +
+                node.type()->description() + "'",
             Code::TypeInferenceUnableToInferType );
     }
 }
