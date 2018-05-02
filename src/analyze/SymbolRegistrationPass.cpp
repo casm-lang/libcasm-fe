@@ -82,7 +82,7 @@ class SymbolRegistrationVisitor final : public RecursiveVisitor
     void visit( UsingDefinition& node ) override;
 
   private:
-    void registerSymbol( const Definition& node );
+    void registerSymbol( Definition& node );
 
   private:
     libcasm_fe::Logger& m_log;
@@ -171,7 +171,7 @@ void SymbolRegistrationVisitor::visit( UsingDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
-void SymbolRegistrationVisitor::registerSymbol( const Definition& node )
+void SymbolRegistrationVisitor::registerSymbol( Definition& node )
 {
     const auto& name = node.identifier()->name();
 
