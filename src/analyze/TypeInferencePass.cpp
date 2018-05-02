@@ -142,6 +142,9 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
     void inference( QuantifierExpression& node );
 
+    template < typename T >
+    void annotateNodes( const NodeList< T >& nodes, const libcasm_ir::Type::ID typeId );
+
   private:
     libcasm_fe::Logger& m_log;
     const Namespace& m_symboltable;
@@ -1254,10 +1257,7 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
     if( node.universe()->type() )
     {
         const auto universeTypeId = node.universe()->type()->ptr_result()->id();
-        for( const auto& variable : *node.variables() )
-        {
-            m_typeIDs[ variable.get() ].emplace( universeTypeId );
-        }
+        annotateNodes( *node.variables(), universeTypeId );
     }
 
     node.variables()->accept( *this );
@@ -1365,11 +1365,7 @@ void TypeInferenceVisitor::visit( CaseRule& node )
     if( node.expression()->type() )
     {
         const auto caseExprTypeID = node.expression()->type()->id();
-
-        for( auto caseExpr : *node.cases() )
-        {
-            m_typeIDs[ caseExpr.get() ].emplace( caseExprTypeID );
-        }
+        annotateNodes( *node.cases(), caseExprTypeID );
     }
 
     node.cases()->accept( *this );
@@ -1434,10 +1430,7 @@ void TypeInferenceVisitor::visit( ForallRule& node )
     if( node.universe()->type() )
     {
         const auto universeTypeId = node.universe()->type()->ptr_result()->id();
-        for( const auto& variable : *node.variables() )
-        {
-            m_typeIDs[ variable.get() ].emplace( universeTypeId );
-        }
+        annotateNodes( *node.variables(), universeTypeId );
     }
 
     node.variables()->accept( *this );
@@ -1517,10 +1510,7 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
     if( node.universe()->type() )
     {
         const auto universeTypeId = node.universe()->type()->ptr_result()->id();
-        for( const auto& variable : *node.variables() )
-        {
-            m_typeIDs[ variable.get() ].emplace( universeTypeId );
-        }
+        annotateNodes( *node.variables(), universeTypeId );
     }
 
     node.variables()->accept( *this );
@@ -2023,10 +2013,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
     if( node.universe()->type() )
     {
         const auto universeTypeId = node.universe()->type()->ptr_result()->id();
-        for( const auto& predicateVariable : *node.predicateVariables() )
-        {
-            m_typeIDs[ predicateVariable.get() ].emplace( universeTypeId );
-        }
+        annotateNodes( *node.predicateVariables(), universeTypeId );
     }
 
     node.predicateVariables()->accept( *this );
@@ -2076,6 +2063,16 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
                     ? Code::TypeInferenceQuantifierExistentialPropositionTypeMismatch
                     : Code::TypeInferenceQuantifierUniversalPropositionTypeMismatch );
         }
+    }
+}
+
+template < typename T >
+void TypeInferenceVisitor::annotateNodes(
+    const NodeList< T >& nodes, const libcasm_ir::Type::ID typeId )
+{
+    for( const auto& node : nodes )
+    {
+        m_typeIDs[ node.get() ].emplace( typeId );
     }
 }
 
