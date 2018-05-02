@@ -1180,11 +1180,25 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
         m_typeIDs[ node.elseExpression().get() ].emplace( typeID );
     }
 
+    inference( "conditional expression", nullptr, node );
+
     RecursiveVisitor::visit( node );
 
     const auto& condExpr = *node.condition();
-    auto& thenExpr = *node.thenExpression();
-    auto& elseExpr = *node.elseExpression();
+    const auto& thenExpr = *node.thenExpression();
+    const auto& elseExpr = *node.elseExpression();
+
+    if( thenExpr.type() )
+    {
+        m_typeIDs[&elseExpr ].emplace( thenExpr.type()->id() );
+    }
+
+    if( elseExpr.type() )
+    {
+        m_typeIDs[&thenExpr ].emplace( elseExpr.type()->id() );
+    }
+
+    RecursiveVisitor::visit( node );
 
     if( condExpr.type() )
     {
@@ -1200,8 +1214,6 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
         }
     }
 
-    inference( "conditional expression", nullptr, node );
-
     if( thenExpr.type() and elseExpr.type() )
     {
         if( *thenExpr.type() != *elseExpr.type() )
@@ -1213,25 +1225,7 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
                     thenExpr.type()->description() + "' at 'then' path, and type '" +
                     elseExpr.type()->description() + "' at 'else' path",
                 Code::TypeInferenceInvalidConditionalExpressionPaths );
-            return;
         }
-    }
-
-    if( thenExpr.type() and elseExpr.id() == Node::ID::UNDEF_LITERAL )
-    {
-        elseExpr.setType( thenExpr.type() );
-    }
-
-    if( thenExpr.id() == Node::ID::UNDEF_LITERAL and elseExpr.type() )
-    {
-        thenExpr.setType( elseExpr.type() );
-    }
-
-    if( node.type() and thenExpr.id() == Node::ID::UNDEF_LITERAL and
-        elseExpr.id() == Node::ID::UNDEF_LITERAL )
-    {
-        thenExpr.setType( node.type() );
-        elseExpr.setType( node.type() );
     }
 
     if( not node.type() )
