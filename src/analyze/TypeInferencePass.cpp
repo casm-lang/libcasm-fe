@@ -1253,14 +1253,14 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
 
     if( node.universe()->type() )
     {
+        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
         for( const auto& variable : *node.variables() )
         {
-            if( not variable->type() )
-            {
-                variable->setType( node.universe()->type()->ptr_result() );
-            }
+            m_typeIDs[ variable.get() ].emplace( universeTypeId );
         }
     }
+
+    node.variables()->accept( *this );
 
     if( node.type() )
     {
@@ -1433,14 +1433,14 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 
     if( node.universe()->type() )
     {
+        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
         for( const auto& variable : *node.variables() )
         {
-            if( not variable->type() )
-            {
-                variable->setType( node.universe()->type()->ptr_result() );
-            }
+            m_typeIDs[ variable.get() ].emplace( universeTypeId );
         }
     }
+
+    node.variables()->accept( *this );
 
     node.condition()->accept( *this );
     const auto& conditionType = node.condition()->type();
@@ -1516,14 +1516,14 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
 
     if( node.universe()->type() )
     {
+        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
         for( const auto& variable : *node.variables() )
         {
-            if( not variable->type() )
-            {
-                variable->setType( node.universe()->type()->ptr_result() );
-            }
+            m_typeIDs[ variable.get() ].emplace( universeTypeId );
         }
     }
+
+    node.variables()->accept( *this );
 
     node.rule()->accept( *this );
 
@@ -1581,16 +1581,19 @@ void TypeInferenceVisitor::visit( VariableBinding& node )
 
     if( node.variable()->type() )
     {
-        auto& variableType = node.variable()->type();
-        m_typeIDs[ node.expression().get() ].emplace( variableType->id() );
+        const auto variableTypeId = node.variable()->type()->id();
+        m_typeIDs[ node.expression().get() ].emplace( variableTypeId );
     }
 
     node.expression()->accept( *this );
 
-    if( not node.variable()->type() and node.expression()->type() )
+    if( node.expression()->type() )
     {
-        node.variable()->setType( node.expression()->type() );
+        const auto expressionTypeId = node.expression()->type()->id();
+        m_typeIDs[ node.variable().get() ].emplace( expressionTypeId );
     }
+
+    node.variable()->accept( *this );
 
     if( node.variable()->type() or node.expression()->type() )
     {
