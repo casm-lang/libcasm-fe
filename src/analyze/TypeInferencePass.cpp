@@ -412,6 +412,11 @@ void TypeInferenceVisitor::visit( NamedExpression& node )
 
 void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     assert( node.identifier() );
     const auto identifier = node.identifier();
 
@@ -443,11 +448,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case DirectCallExpression::TargetType::BUILTIN:
         {
-            if( node.type() )
-            {
-                return;
-            }
-
             auto directCallArguments = node.arguments()->data();
             const auto* annotation = annotate( node, directCallArguments );
 
@@ -495,11 +495,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::SELF:      // [[fallthrough]]
         case DirectCallExpression::TargetType::CONSTANT:
         {
-            if( node.type() )
-            {
-                return;
-            }
-
             // make sure that the definition has been typed
             const auto& definition = node.targetDefinition();
             if( not definition )
@@ -522,11 +517,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case DirectCallExpression::TargetType::TYPE_DOMAIN:
         {
-            if( node.type() )
-            {
-                return;
-            }
-
             assert( node.arguments()->size() == 0 );
 
             // if the type domain has FE definition use this type!
