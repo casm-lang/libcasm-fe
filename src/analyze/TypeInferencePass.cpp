@@ -2070,6 +2070,33 @@ void TypeInferenceVisitor::annotateNodes(
     }
 }
 
+class CallTargetCheckVisitor final : public RecursiveVisitor
+{
+  public:
+    CallTargetCheckVisitor( libcasm_fe::Logger& log );
+
+    void visit( DirectCallExpression& node ) override;
+
+  private:
+    libcasm_fe::Logger& m_log;
+};
+
+CallTargetCheckVisitor::CallTargetCheckVisitor( libcasm_fe::Logger& log )
+: m_log( log )
+{
+}
+
+void CallTargetCheckVisitor::visit( DirectCallExpression& node )
+{
+    if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown symbol '" + node.identifier()->path() + "' found",
+            Code::SymbolIsUnknown );
+    }
+}
+
 void TypeInferencePass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
@@ -2085,6 +2112,9 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
 
     TypeInferenceVisitor typeInferenceVisitor( log, *specification->symboltable() );
     specification->definitions()->accept( typeInferenceVisitor );
+
+    CallTargetCheckVisitor callTargetCheckVisitor( log );
+    specification->definitions()->accept( callTargetCheckVisitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
