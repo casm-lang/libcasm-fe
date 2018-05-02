@@ -2005,7 +2005,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
 {
     node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
 
-    m_typeIDs[ node.proposition().get() ].emplace( node.type()->id() );
+    node.predicateVariables()->accept( *this );
 
     for( const auto& predicateVariable : *node.predicateVariables() )
     {
@@ -2017,18 +2017,18 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
 
     node.universe()->accept( *this );
 
-    node.predicateVariables()->accept( *this );
-
     if( node.universe()->type() )
     {
+        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
         for( const auto& predicateVariable : *node.predicateVariables() )
         {
-            if( not predicateVariable->type() )
-            {
-                predicateVariable->setType( node.universe()->type()->ptr_result() );
-            }
+            m_typeIDs[ predicateVariable.get() ].emplace( universeTypeId );
         }
     }
+
+    node.predicateVariables()->accept( *this );
+
+    m_typeIDs[ node.proposition().get() ].emplace( node.type()->id() );
 
     node.proposition()->accept( *this );
 
