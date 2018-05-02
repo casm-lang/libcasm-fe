@@ -1135,6 +1135,11 @@ void TypeInferenceVisitor::visit( RecordLiteral& node )
 
 void TypeInferenceVisitor::visit( LetExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
 
     node.variableBindings()->accept( *this );
@@ -1149,6 +1154,11 @@ void TypeInferenceVisitor::visit( LetExpression& node )
 
 void TypeInferenceVisitor::visit( ConditionalExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     m_typeIDs[ node.thenExpression().get() ] = m_typeIDs[&node ];
     m_typeIDs[ node.elseExpression().get() ] = m_typeIDs[&node ];
 
@@ -1207,6 +1217,11 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
 void TypeInferenceVisitor::visit( ChooseExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
 
     node.variables()->accept( *this );
@@ -1258,11 +1273,21 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
 
 void TypeInferenceVisitor::visit( UniversalQuantifierExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     inference( node );
 }
 
 void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     inference( node );
 }
 
