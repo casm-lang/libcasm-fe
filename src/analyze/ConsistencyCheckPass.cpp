@@ -324,17 +324,9 @@ void ConsistencyCheckVisitor::visit( CaseRule& node )
 
 void ConsistencyCheckVisitor::visit( DirectCallExpression& node )
 {
+    assert( node.targetType() != DirectCallExpression::TargetType::UNKNOWN );
+
     RecursiveVisitor::visit( node );
-
-    if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown symbol '" + node.identifier()->path() + "' found",
-            Code::SymbolIsUnknown );
-        return;
-    }
-
     verifyHasType( node );
 
     if( node.targetType() == DirectCallExpression::TargetType::FUNCTION )
