@@ -1135,38 +1135,16 @@ void TypeInferenceVisitor::visit( RecordLiteral& node )
 
 void TypeInferenceVisitor::visit( LetExpression& node )
 {
-    // annotate let expression variable with annotation information from parent expression node
     m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
 
     node.variableBindings()->accept( *this );
 
-    if( node.type() )
-    {
-        m_typeIDs[ node.expression().get() ].emplace( node.type()->id() );
-    }
-
     node.expression()->accept( *this );
-
-    if( not node.type() )
-    {
-        node.setType( node.expression()->type() );
-    }
 
     // revisit the variable bindings to infer again the variable type from underlying let expression
     node.variableBindings()->accept( *this );
 
-    if( node.expression()->type() )
-    {
-        const auto& exprType = *node.expression()->type();
-        if( *node.type() != exprType )
-        {
-            m_log.error(
-                { node.sourceLocation(), node.expression()->sourceLocation() },
-                node.description() + " has invalid expression type '" + exprType.description() +
-                    "' shall be '" + node.type()->description() + "'",
-                Code::TypeInferenceInvalidLetExpressionTypeMismatch );
-        }
-    }
+    node.setType( node.expression()->type() );
 }
 
 void TypeInferenceVisitor::visit( ConditionalExpression& node )

@@ -244,8 +244,6 @@ namespace libcasm_fe
         TypeInferenceInvalidVariableBindingExpressionType = 0x1011,
         TypeInferenceInvalidVariableBindingTypeMismatch = 0x1012,
 
-        TypeInferenceInvalidLetExpressionTypeMismatch = 0x1013,
-
         TypeInferenceRangeLiteralTypeMismatch = 0x1600,
         TypeInferenceInvalidListLiteralType = 0x1610,
         TypeInferenceListLiteralTypeMismatch = 0x1611,
