@@ -234,8 +234,7 @@ namespace libcasm_fe
         TypeInferenceInvalidConditionalExpressionPaths = 0x1006
 
         ,
-        TypeInferenceInvalidChooseExpressionVariableTypeMismatch = 0x1007,
-        TypeInferenceInvalidChooseExpressionTypeMismatch = 0x1008
+        TypeInferenceInvalidChooseExpressionVariableTypeMismatch = 0x1007
 
         ,
         TypeInferenceInvalidChooseRuleVariableTypeMismatch = 0x1009

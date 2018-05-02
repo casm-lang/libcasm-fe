@@ -1233,6 +1233,8 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
 void TypeInferenceVisitor::visit( ChooseExpression& node )
 {
+    m_typeIDs[ node.expression().get() ] = m_typeIDs[&node ];
+
     node.variables()->accept( *this );
 
     for( const auto& variable : *node.variables() )
@@ -1253,17 +1255,7 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
 
     node.variables()->accept( *this );
 
-    if( node.type() )
-    {
-        m_typeIDs[ node.expression().get() ].emplace( node.type()->id() );
-    }
-
     node.expression()->accept( *this );
-
-    if( not node.type() )
-    {
-        node.setType( node.expression()->type() );
-    }
 
     if( node.universe()->type() )
     {
@@ -1287,18 +1279,7 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
         }
     }
 
-    if( node.expression()->type() )
-    {
-        const auto& exprType = *node.expression()->type();
-        if( *node.type() != exprType )
-        {
-            m_log.error(
-                { node.sourceLocation(), node.expression()->sourceLocation() },
-                node.description() + " has invalid expression type '" + exprType.description() +
-                    "' shall be '" + node.type()->description() + "'",
-                Code::TypeInferenceInvalidChooseExpressionTypeMismatch );
-        }
-    }
+    node.setType( node.expression()->type() );
 }
 
 void TypeInferenceVisitor::visit( UniversalQuantifierExpression& node )
