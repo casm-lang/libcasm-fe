@@ -1174,23 +1174,27 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
     m_typeIDs[ node.thenExpression().get() ] = m_typeIDs[&node ];
     m_typeIDs[ node.elseExpression().get() ] = m_typeIDs[&node ];
 
-    RecursiveVisitor::visit( node );
-
     const auto& condExpr = *node.condition();
     const auto& thenExpr = *node.thenExpression();
     const auto& elseExpr = *node.elseExpression();
+
+    node.thenExpression()->accept( *this );
 
     if( thenExpr.type() )
     {
         m_typeIDs[&elseExpr ].emplace( thenExpr.type()->id() );
     }
 
+    node.elseExpression()->accept( *this );
+
     if( elseExpr.type() )
     {
         m_typeIDs[&thenExpr ].emplace( elseExpr.type()->id() );
     }
 
-    RecursiveVisitor::visit( node );
+    node.thenExpression()->accept( *this );
+
+    node.condition()->accept( *this );
 
     if( condExpr.type() )
     {
