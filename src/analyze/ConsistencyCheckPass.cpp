@@ -443,7 +443,22 @@ void ConsistencyCheckVisitor::visit( FixedSizedType& node )
 void ConsistencyCheckVisitor::visit( RelationType& node )
 {
     RecursiveVisitor::visit( node );
-    verifyHasTypeOfKind( node, IR::Type::Kind::RELATION );
+
+    if( node.type() )
+    {
+        if( node.type()->kind() == IR::Type::Kind::RULE_REFERENCE )
+        {
+            verifyHasTypeOfKind( node, IR::Type::Kind::RULE_REFERENCE );
+        }
+        else
+        {
+            verifyHasTypeOfKind( node, IR::Type::Kind::RELATION );
+        }
+    }
+    else
+    {
+        verifyHasType( node );
+    }
 }
 
 void ConsistencyCheckVisitor::verifyHasType( const TypedNode& node )
