@@ -1171,13 +1171,8 @@ void TypeInferenceVisitor::visit( LetExpression& node )
 
 void TypeInferenceVisitor::visit( ConditionalExpression& node )
 {
-    for( auto typeID : m_typeIDs[&node ] )
-    {
-        m_typeIDs[ node.thenExpression().get() ].emplace( typeID );
-        m_typeIDs[ node.elseExpression().get() ].emplace( typeID );
-    }
-
-    inference( "conditional expression", nullptr, node );
+    m_typeIDs[ node.thenExpression().get() ] = m_typeIDs[&node ];
+    m_typeIDs[ node.elseExpression().get() ] = m_typeIDs[&node ];
 
     RecursiveVisitor::visit( node );
 
@@ -1225,10 +1220,7 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
         }
     }
 
-    if( not node.type() )
-    {
-        node.setType( thenExpr.type() );
-    }
+    node.setType( thenExpr.type() );
 }
 
 void TypeInferenceVisitor::visit( ChooseExpression& node )
