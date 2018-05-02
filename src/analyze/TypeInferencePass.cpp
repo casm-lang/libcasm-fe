@@ -1165,14 +1165,7 @@ void TypeInferenceVisitor::visit( LetExpression& node )
     // revisit the variable bindings to infer again the variable type from underlying let expression
     node.variableBindings()->accept( *this );
 
-    if( not node.expression()->type() )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-    else
+    if( node.expression()->type() )
     {
         const auto& exprType = *node.expression()->type();
         if( *node.type() != exprType )
@@ -1291,25 +1284,6 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
         node.setType( node.expression()->type() );
     }
 
-    for( const auto& variable : *node.variables() )
-    {
-        if( not variable->type() )
-        {
-            m_log.error(
-                { variable->sourceLocation() },
-                "no type found",
-                Code::TypeInferenceInvalidExpression );
-        }
-    }
-
-    if( not node.universe()->type() )
-    {
-        m_log.error(
-            { node.universe()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-
     if( node.universe()->type() )
     {
         for( const auto& variable : *node.variables() )
@@ -1332,14 +1306,7 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
         }
     }
 
-    if( not node.expression()->type() )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-    else
+    if( node.expression()->type() )
     {
         const auto& exprType = *node.expression()->type();
         if( *node.type() != exprType )
@@ -1569,25 +1536,6 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
     }
 
     node.rule()->accept( *this );
-
-    for( const auto& variable : *node.variables() )
-    {
-        if( not variable->type() )
-        {
-            m_log.error(
-                { variable->sourceLocation() },
-                "no type found",
-                Code::TypeInferenceInvalidExpression );
-        }
-    }
-
-    if( not node.universe()->type() )
-    {
-        m_log.error(
-            { node.universe()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
 
     if( node.universe()->type() )
     {
@@ -2094,25 +2042,6 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
 
     node.proposition()->accept( *this );
 
-    for( const auto& predicateVariable : *node.predicateVariables() )
-    {
-        if( not predicateVariable->type() )
-        {
-            m_log.error(
-                { predicateVariable->sourceLocation() },
-                "no type found",
-                Code::TypeInferenceInvalidExpression );
-        }
-    }
-
-    if( not node.universe()->type() )
-    {
-        m_log.error(
-            { node.universe()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-
     if( node.universe()->type() )
     {
         for( const auto& predicateVariable : *node.predicateVariables() )
@@ -2139,14 +2068,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
         }
     }
 
-    if( not node.proposition()->type() )
-    {
-        m_log.error(
-            { node.proposition()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-    else
+    if( node.proposition()->type() )
     {
         const auto& propType = *node.proposition()->type();
         if( *node.type() != propType )
