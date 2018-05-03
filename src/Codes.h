@@ -173,6 +173,7 @@ namespace libcasm_fe
         TypeAnnotationRelationTypeHasNoSubType = 0x0114,
 
         TypeAnnotationInvalidTemplateTypeSize = 0x0123,
+        TypeAnnotationInvalidFixedSizeExpression = 0x0124,
 
         // --------------------------------------------------------- 1*** ...
         // type inference errors
