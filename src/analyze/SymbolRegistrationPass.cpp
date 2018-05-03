@@ -195,8 +195,7 @@ void SymbolRegistrationVisitor::registerSymbol( Definition& node )
 
     try
     {
-        m_symboltable.registerSymbol(
-            name, const_cast< Definition& >( node ).ptr< Definition >() );
+        m_symboltable.registerSymbol( name, node.ptr< Definition >() );
     }
     catch( const std::domain_error& e )
     {
