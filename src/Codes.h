@@ -217,7 +217,6 @@ namespace libcasm_fe
         TypeInferenceInvalidIndirectCallExpression = 0x1901,
         TypeInferenceInvalidLiteralCallExpression = 0x1a00,
 
-        TypeInferenceInvalidExpression = 0x1001,
         TypeInferenceInvalidPrint = 0x1002
 
         ,

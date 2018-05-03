@@ -142,6 +142,9 @@ class TypeInferenceVisitor final : public RecursiveVisitor
 
     void inference( QuantifierExpression& node );
 
+    template < typename T >
+    void annotateNodes( const NodeList< T >& nodes, const libcasm_ir::Type::ID typeId );
+
   private:
     libcasm_fe::Logger& m_log;
     const Namespace& m_symboltable;
@@ -412,6 +415,11 @@ void TypeInferenceVisitor::visit( NamedExpression& node )
 
 void TypeInferenceVisitor::visit( DirectCallExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     assert( node.identifier() );
     const auto identifier = node.identifier();
 
@@ -443,11 +451,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case DirectCallExpression::TargetType::BUILTIN:
         {
-            if( node.type() )
-            {
-                return;
-            }
-
             auto directCallArguments = node.arguments()->data();
             const auto* annotation = annotate( node, directCallArguments );
 
@@ -495,11 +498,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::SELF:      // [[fallthrough]]
         case DirectCallExpression::TargetType::CONSTANT:
         {
-            if( node.type() )
-            {
-                return;
-            }
-
             // make sure that the definition has been typed
             const auto& definition = node.targetDefinition();
             if( not definition )
@@ -522,11 +520,6 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
         }
         case DirectCallExpression::TargetType::TYPE_DOMAIN:
         {
-            if( node.type() )
-            {
-                return;
-            }
-
             assert( node.arguments()->size() == 0 );
 
             // if the type domain has FE definition use this type!
@@ -1165,14 +1158,7 @@ void TypeInferenceVisitor::visit( LetExpression& node )
     // revisit the variable bindings to infer again the variable type from underlying let expression
     node.variableBindings()->accept( *this );
 
-    if( not node.expression()->type() )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-    else
+    if( node.expression()->type() )
     {
         const auto& exprType = *node.expression()->type();
         if( *node.type() != exprType )
@@ -1194,11 +1180,25 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
         m_typeIDs[ node.elseExpression().get() ].emplace( typeID );
     }
 
+    inference( "conditional expression", nullptr, node );
+
     RecursiveVisitor::visit( node );
 
     const auto& condExpr = *node.condition();
-    auto& thenExpr = *node.thenExpression();
-    auto& elseExpr = *node.elseExpression();
+    const auto& thenExpr = *node.thenExpression();
+    const auto& elseExpr = *node.elseExpression();
+
+    if( thenExpr.type() )
+    {
+        m_typeIDs[&elseExpr ].emplace( thenExpr.type()->id() );
+    }
+
+    if( elseExpr.type() )
+    {
+        m_typeIDs[&thenExpr ].emplace( elseExpr.type()->id() );
+    }
+
+    RecursiveVisitor::visit( node );
 
     if( condExpr.type() )
     {
@@ -1214,8 +1214,6 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
         }
     }
 
-    inference( "conditional expression", nullptr, node );
-
     if( thenExpr.type() and elseExpr.type() )
     {
         if( *thenExpr.type() != *elseExpr.type() )
@@ -1227,25 +1225,7 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
                     thenExpr.type()->description() + "' at 'then' path, and type '" +
                     elseExpr.type()->description() + "' at 'else' path",
                 Code::TypeInferenceInvalidConditionalExpressionPaths );
-            return;
         }
-    }
-
-    if( thenExpr.type() and elseExpr.id() == Node::ID::UNDEF_LITERAL )
-    {
-        elseExpr.setType( thenExpr.type() );
-    }
-
-    if( thenExpr.id() == Node::ID::UNDEF_LITERAL and elseExpr.type() )
-    {
-        thenExpr.setType( elseExpr.type() );
-    }
-
-    if( node.type() and thenExpr.id() == Node::ID::UNDEF_LITERAL and
-        elseExpr.id() == Node::ID::UNDEF_LITERAL )
-    {
-        thenExpr.setType( node.type() );
-        elseExpr.setType( node.type() );
     }
 
     if( not node.type() )
@@ -1270,14 +1250,11 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
 
     if( node.universe()->type() )
     {
-        for( const auto& variable : *node.variables() )
-        {
-            if( not variable->type() )
-            {
-                variable->setType( node.universe()->type()->ptr_result() );
-            }
-        }
+        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
+        annotateNodes( *node.variables(), universeTypeId );
     }
+
+    node.variables()->accept( *this );
 
     if( node.type() )
     {
@@ -1289,25 +1266,6 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
     if( not node.type() )
     {
         node.setType( node.expression()->type() );
-    }
-
-    for( const auto& variable : *node.variables() )
-    {
-        if( not variable->type() )
-        {
-            m_log.error(
-                { variable->sourceLocation() },
-                "no type found",
-                Code::TypeInferenceInvalidExpression );
-        }
-    }
-
-    if( not node.universe()->type() )
-    {
-        m_log.error(
-            { node.universe()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
     }
 
     if( node.universe()->type() )
@@ -1332,14 +1290,7 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
         }
     }
 
-    if( not node.expression()->type() )
-    {
-        m_log.error(
-            { node.expression()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-    else
+    if( node.expression()->type() )
     {
         const auto& exprType = *node.expression()->type();
         if( *node.type() != exprType )
@@ -1408,11 +1359,7 @@ void TypeInferenceVisitor::visit( CaseRule& node )
     if( node.expression()->type() )
     {
         const auto caseExprTypeID = node.expression()->type()->id();
-
-        for( auto caseExpr : *node.cases() )
-        {
-            m_typeIDs[ caseExpr.get() ].emplace( caseExprTypeID );
-        }
+        annotateNodes( *node.cases(), caseExprTypeID );
     }
 
     node.cases()->accept( *this );
@@ -1476,14 +1423,11 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 
     if( node.universe()->type() )
     {
-        for( const auto& variable : *node.variables() )
-        {
-            if( not variable->type() )
-            {
-                variable->setType( node.universe()->type()->ptr_result() );
-            }
-        }
+        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
+        annotateNodes( *node.variables(), universeTypeId );
     }
+
+    node.variables()->accept( *this );
 
     node.condition()->accept( *this );
     const auto& conditionType = node.condition()->type();
@@ -1559,35 +1503,13 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
 
     if( node.universe()->type() )
     {
-        for( const auto& variable : *node.variables() )
-        {
-            if( not variable->type() )
-            {
-                variable->setType( node.universe()->type()->ptr_result() );
-            }
-        }
+        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
+        annotateNodes( *node.variables(), universeTypeId );
     }
+
+    node.variables()->accept( *this );
 
     node.rule()->accept( *this );
-
-    for( const auto& variable : *node.variables() )
-    {
-        if( not variable->type() )
-        {
-            m_log.error(
-                { variable->sourceLocation() },
-                "no type found",
-                Code::TypeInferenceInvalidExpression );
-        }
-    }
-
-    if( not node.universe()->type() )
-    {
-        m_log.error(
-            { node.universe()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
 
     if( node.universe()->type() )
     {
@@ -1643,16 +1565,19 @@ void TypeInferenceVisitor::visit( VariableBinding& node )
 
     if( node.variable()->type() )
     {
-        auto& variableType = node.variable()->type();
-        m_typeIDs[ node.expression().get() ].emplace( variableType->id() );
+        const auto variableTypeId = node.variable()->type()->id();
+        m_typeIDs[ node.expression().get() ].emplace( variableTypeId );
     }
 
     node.expression()->accept( *this );
 
-    if( not node.variable()->type() and node.expression()->type() )
+    if( node.expression()->type() )
     {
-        node.variable()->setType( node.expression()->type() );
+        const auto expressionTypeId = node.expression()->type()->id();
+        m_typeIDs[ node.variable().get() ].emplace( expressionTypeId );
     }
+
+    node.variable()->accept( *this );
 
     if( node.variable()->type() or node.expression()->type() )
     {
@@ -2067,7 +1992,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
 {
     node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
 
-    m_typeIDs[ node.proposition().get() ].emplace( node.type()->id() );
+    node.predicateVariables()->accept( *this );
 
     for( const auto& predicateVariable : *node.predicateVariables() )
     {
@@ -2079,39 +2004,17 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
 
     node.universe()->accept( *this );
 
-    node.predicateVariables()->accept( *this );
-
     if( node.universe()->type() )
     {
-        for( const auto& predicateVariable : *node.predicateVariables() )
-        {
-            if( not predicateVariable->type() )
-            {
-                predicateVariable->setType( node.universe()->type()->ptr_result() );
-            }
-        }
+        const auto universeTypeId = node.universe()->type()->ptr_result()->id();
+        annotateNodes( *node.predicateVariables(), universeTypeId );
     }
+
+    node.predicateVariables()->accept( *this );
+
+    m_typeIDs[ node.proposition().get() ].emplace( node.type()->id() );
 
     node.proposition()->accept( *this );
-
-    for( const auto& predicateVariable : *node.predicateVariables() )
-    {
-        if( not predicateVariable->type() )
-        {
-            m_log.error(
-                { predicateVariable->sourceLocation() },
-                "no type found",
-                Code::TypeInferenceInvalidExpression );
-        }
-    }
-
-    if( not node.universe()->type() )
-    {
-        m_log.error(
-            { node.universe()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
 
     if( node.universe()->type() )
     {
@@ -2139,14 +2042,7 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
         }
     }
 
-    if( not node.proposition()->type() )
-    {
-        m_log.error(
-            { node.proposition()->sourceLocation() },
-            "no type found",
-            Code::TypeInferenceInvalidExpression );
-    }
-    else
+    if( node.proposition()->type() )
     {
         const auto& propType = *node.proposition()->type();
         if( *node.type() != propType )
@@ -2161,6 +2057,43 @@ void TypeInferenceVisitor::inference( QuantifierExpression& node )
                     ? Code::TypeInferenceQuantifierExistentialPropositionTypeMismatch
                     : Code::TypeInferenceQuantifierUniversalPropositionTypeMismatch );
         }
+    }
+}
+
+template < typename T >
+void TypeInferenceVisitor::annotateNodes(
+    const NodeList< T >& nodes, const libcasm_ir::Type::ID typeId )
+{
+    for( const auto& node : nodes )
+    {
+        m_typeIDs[ node.get() ].emplace( typeId );
+    }
+}
+
+class CallTargetCheckVisitor final : public RecursiveVisitor
+{
+  public:
+    CallTargetCheckVisitor( libcasm_fe::Logger& log );
+
+    void visit( DirectCallExpression& node ) override;
+
+  private:
+    libcasm_fe::Logger& m_log;
+};
+
+CallTargetCheckVisitor::CallTargetCheckVisitor( libcasm_fe::Logger& log )
+: m_log( log )
+{
+}
+
+void CallTargetCheckVisitor::visit( DirectCallExpression& node )
+{
+    if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "unknown symbol '" + node.identifier()->path() + "' found",
+            Code::SymbolIsUnknown );
     }
 }
 
@@ -2179,6 +2112,9 @@ u1 TypeInferencePass::run( libpass::PassResult& pr )
 
     TypeInferenceVisitor typeInferenceVisitor( log, *specification->symboltable() );
     specification->definitions()->accept( typeInferenceVisitor );
+
+    CallTargetCheckVisitor callTargetCheckVisitor( log );
+    specification->definitions()->accept( callTargetCheckVisitor );
 
     const auto errors = log.errors();
     if( errors > 0 )
