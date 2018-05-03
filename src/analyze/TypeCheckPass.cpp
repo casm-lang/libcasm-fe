@@ -450,7 +450,8 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
             m_log.error(
                 { rangeExpr.left()->sourceLocation() },
                 "unsupported expr for ranged expression, constant Integer value "
-                "expected" );
+                "expected",
+                Code::TypeAnnotationInvalidFixedSizeExpression );
             return;
         }
 
@@ -460,7 +461,8 @@ void TypeCheckVisitor::visit( FixedSizedType& node )
             m_log.error(
                 { rangeExpr.right()->sourceLocation() },
                 "unsupported expr for ranged expression, constant Integer value "
-                "expected" );
+                "expected",
+                Code::TypeAnnotationInvalidFixedSizeExpression );
             return;
         }
 

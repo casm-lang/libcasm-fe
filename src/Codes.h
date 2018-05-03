@@ -75,7 +75,9 @@ namespace libcasm_fe
 
         IdentifierIsBuiltinName = 0x0504,
         IdentifierIsTypeName = 0x0505,
-        IdentifierIsAlreadyUsed = 0x0506
+        IdentifierIsAlreadyUsed = 0x0506,
+
+        MethodIsUnknown = 0x0507
 
         // --------------------------------------------------------- f*** ...
         // function errors
@@ -171,6 +173,7 @@ namespace libcasm_fe
         TypeAnnotationRelationTypeHasNoSubType = 0x0114,
 
         TypeAnnotationInvalidTemplateTypeSize = 0x0123,
+        TypeAnnotationInvalidFixedSizeExpression = 0x0124,
 
         // --------------------------------------------------------- 1*** ...
         // type inference errors

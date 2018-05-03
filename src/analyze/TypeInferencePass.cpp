@@ -619,9 +619,6 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         return;
     }
 
-    // for the time being only builtin method calls are supported
-    node.setMethodType( MethodCallExpression::MethodType::BUILTIN );
-
     std::vector< Expression::Ptr > methodCallArguments;
     methodCallArguments.reserve( 1 + node.arguments()->size() );
     methodCallArguments.emplace_back( node.object() );  // pass object instance as first argument
@@ -631,11 +628,11 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
     const auto* annotation = annotate( node, methodCallArguments );
     if( not annotation )
     {
-        m_log.error(
-            { node.sourceLocation() }, "unable to resolve built-in method '" + methodName + "'" );
         return;
     }
 
+    // for the time being only builtin method calls are supported
+    node.setMethodType( MethodCallExpression::MethodType::BUILTIN );
     node.setTargetBuiltinId( annotation->valueID() );
 
     RecursiveVisitor::visit( node );
@@ -2076,6 +2073,7 @@ class CallTargetCheckVisitor final : public RecursiveVisitor
     CallTargetCheckVisitor( libcasm_fe::Logger& log );
 
     void visit( DirectCallExpression& node ) override;
+    void visit( MethodCallExpression& node ) override;
 
   private:
     libcasm_fe::Logger& m_log;
@@ -2094,6 +2092,17 @@ void CallTargetCheckVisitor::visit( DirectCallExpression& node )
             { node.sourceLocation() },
             "unknown symbol '" + node.identifier()->path() + "' found",
             Code::SymbolIsUnknown );
+    }
+}
+
+void CallTargetCheckVisitor::visit( MethodCallExpression& node )
+{
+    if( node.methodType() == MethodCallExpression::MethodType::UNKNOWN )
+    {
+        m_log.error(
+            { node.methodName()->sourceLocation() },
+            "unknown method '" + node.methodName()->name() + "' found",
+            Code::MethodIsUnknown );
     }
 }
 
