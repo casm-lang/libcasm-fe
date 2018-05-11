@@ -467,6 +467,8 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
             const auto description = "built-in '" + identifier->path() + "'";
             inference( description, annotation, node, directCallArguments );
 
+            RecursiveVisitor::visit( node );
+
             for( auto argumentType : *node.arguments() )
             {
                 if( not argumentType->type() )
@@ -613,6 +615,11 @@ void TypeInferenceVisitor::visit( DirectCallExpression& node )
 
 void TypeInferenceVisitor::visit( MethodCallExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     const auto& methodName = node.methodName()->name();
 
     node.object()->accept( *this );
@@ -645,13 +652,10 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
 
     RecursiveVisitor::visit( node );
 
-    if( node.type() )
-    {
-        return;
-    }
-
     const auto description = "built-in method '" + methodName + "'";
     inference( description, annotation, node, methodCallArguments );
+
+    RecursiveVisitor::visit( node );
 
     std::vector< libcasm_ir::Type::Ptr > argumentTypes;
     argumentTypes.emplace_back( node.object()->type() );
@@ -1807,7 +1811,6 @@ void TypeInferenceVisitor::inference(
             }
 
             m_typeIDs[ arguments[ c ].get() ].emplace( argTypes[ c ]->id() );
-            inference( description, nullptr, *arguments[ c ] );
         }
 
         if( unknownTypeArgCnt == 0 )
