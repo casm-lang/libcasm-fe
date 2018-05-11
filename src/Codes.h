@@ -225,8 +225,6 @@ namespace libcasm_fe
         ,
         TypeInferenceInvalidIfExpression = 0x1003,
 
-        TypeInferenceForallVariableHasNoType = 0x1004,
-        TypeInferenceForallUniverseHasNoType = 0x1014,
         TypeInferenceForallRuleTypeMismatch = 0x1024,
         TypeInferenceForallRuleInvalidConditionType = 0x1025,
 

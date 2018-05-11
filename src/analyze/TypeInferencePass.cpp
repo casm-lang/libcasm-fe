@@ -1412,25 +1412,6 @@ void TypeInferenceVisitor::visit( ForallRule& node )
 
     node.rule()->accept( *this );
 
-    for( const auto& variable : *node.variables() )
-    {
-        if( not variable->type() )
-        {
-            m_log.error(
-                { variable->sourceLocation() },
-                "no type found for 'forall' variable",
-                Code::TypeInferenceForallVariableHasNoType );
-        }
-    }
-
-    if( not node.universe()->type() )
-    {
-        m_log.error(
-            { node.universe()->sourceLocation() },
-            "no type found for 'forall' universe",
-            Code::TypeInferenceForallUniverseHasNoType );
-    }
-
     if( node.universe()->type() )
     {
         for( const auto& variable : *node.variables() )
