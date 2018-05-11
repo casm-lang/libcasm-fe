@@ -1079,23 +1079,51 @@ void TypeInferenceVisitor::visit( RangeLiteral& node )
 
 void TypeInferenceVisitor::visit( TupleLiteral& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
+    // propagate type annotation to all tuple elements
+    for( const auto typeId : m_typeIDs[&node ] )
+    {
+        const auto type = libcasm_ir::Type::fromID( typeId );
+        if( not type->isTuple() )
+        {
+            continue;
+        }
+
+        const auto tupleType = std::static_pointer_cast< libcasm_ir::TupleType >( type );
+        const auto& expressionTypes = tupleType->arguments();
+        if( expressionTypes.size() != node.expressions()->size() )
+        {
+            continue;
+        }
+
+        for( std::size_t i = 0; i < expressionTypes.size(); i++ )
+        {
+            const auto& expression = node.expressions()->at( i );
+            const auto& expressionType = expressionTypes.at( i );
+            m_typeIDs[ expression.get() ].emplace( expressionType->id() );
+        }
+    }
+
     RecursiveVisitor::visit( node );
 
-    assert( node.expressions()->size() >= 2 );  // constrain from parser
     libcasm_ir::Types expressionTypes;
-    for( auto expression : *node.expressions() )
+    for( const auto& expression : *node.expressions() )
     {
         if( not expression->type() )
         {
-            m_log.info( { expression->sourceLocation() }, "TODO: has a non-typed sub-type" );
+            // cannot create a tuple type if not all element types are known, thus the return
             return;
         }
 
         expressionTypes.add( expression->type() );
     }
 
-    const auto type = libstdhl::Memory::get< libcasm_ir::TupleType >( expressionTypes );
-    node.setType( type );
+    const auto tupleType = libstdhl::Memory::get< libcasm_ir::TupleType >( expressionTypes );
+    node.setType( tupleType );
 }
 
 void TypeInferenceVisitor::visit( RecordLiteral& node )
