@@ -1962,8 +1962,6 @@ void TypeInferenceVisitor::inferenceQuantifierExpression( QuantifierExpression& 
         return;
     }
 
-    node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
-
     node.predicateVariables()->accept( *this );
 
     for( const auto& predicateVariable : *node.predicateVariables() )
@@ -1984,7 +1982,7 @@ void TypeInferenceVisitor::inferenceQuantifierExpression( QuantifierExpression& 
 
     node.predicateVariables()->accept( *this );
 
-    m_typeIDs[ node.proposition().get() ].emplace( node.type()->id() );
+    m_typeIDs[ node.proposition().get() ].emplace( libcasm_ir::Type::Kind::BOOLEAN );
 
     node.proposition()->accept( *this );
 
@@ -2014,22 +2012,23 @@ void TypeInferenceVisitor::inferenceQuantifierExpression( QuantifierExpression& 
         }
     }
 
-    if( node.proposition()->type() )
+    const auto& propositionType = node.proposition()->type();
+    if( propositionType )
     {
-        const auto& propType = *node.proposition()->type();
-        if( *node.type() != propType )
+        if( propositionType->kind() != libcasm_ir::Type::Kind::BOOLEAN )
         {
             m_log.error(
                 { node.proposition()->sourceLocation() },
-
-                node.description() + " has invalid proposition type '" + propType.description() +
-                    "' shall be '" + node.type()->description() + "'",
-
+                node.description() + " has invalid proposition type '" +
+                    propositionType->description() + "' shall be '" +
+                    libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN ) + "'",
                 ( node.id() == Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION )
                     ? Code::TypeInferenceQuantifierExistentialPropositionTypeMismatch
                     : Code::TypeInferenceQuantifierUniversalPropositionTypeMismatch );
         }
     }
+
+    node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
 }
 
 template < typename T >
