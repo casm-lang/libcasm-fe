@@ -1078,15 +1078,13 @@ void TypeInferenceVisitor::visit( TupleLiteral& node )
         return;
     }
 
+    filterAnnotationsByKind( node, libcasm_ir::Type::Kind::TUPLE );
+
     // propagate type annotation to all tuple elements
     for( const auto typeId : m_typeIDs[&node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
-        if( not type->isTuple() )
-        {
-            continue;
-        }
-
+        assert( type->isTuple() );
         const auto tupleType = std::static_pointer_cast< libcasm_ir::TupleType >( type );
         const auto& expressionTypes = tupleType->arguments();
         if( expressionTypes.size() != node.expressions()->size() )
