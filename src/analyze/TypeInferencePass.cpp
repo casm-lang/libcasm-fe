@@ -963,78 +963,69 @@ void TypeInferenceVisitor::visit( BinaryExpression& node )
 
 void TypeInferenceVisitor::visit( ListLiteral& node )
 {
-    RecursiveVisitor::visit( node );
-
-    for( auto expression : *node.expressions() )
+    if( node.type() )
     {
-        if( not expression->type() )
+        return;
+    }
+
+    // propagate type annotation to all list elements
+    for( const auto typeId : m_typeIDs[&node ] )
+    {
+        const auto type = libcasm_ir::Type::fromID( typeId );
+        if( not type->isList() )
         {
-            m_log.info( { expression->sourceLocation() }, "TODO: has a non-typed sub-type" );
-            return;
+            continue;
+        }
+
+        const auto listType = std::static_pointer_cast< libcasm_ir::ListType >( type );
+        annotateNodes( *node.expressions(), listType->ptr_result()->id() );
+    }
+
+    node.expressions()->accept( *this );
+
+    for( const auto& expression : *node.expressions() )
+    {
+        if( expression->type() )
+        {
+            annotateNodes( *node.expressions(), expression->type()->id() );
         }
     }
 
-    const auto& typeIDs = m_typeIDs[&node ];
-    if( typeIDs.size() == 1 )
+    node.expressions()->accept( *this );
+
+    inference( "list literal", nullptr, node );
+    if( not node.type() )
     {
-        // there is a type inferred, check if the list expression types match!
-        const auto typeID = *typeIDs.begin();
-        const auto type = libcasm_ir::Type::fromID( typeID );
-
-        if( type->isList() )
+        // inference failed, use type of first typed expression instead
+        for( const auto& expression : *node.expressions() )
         {
-            for( auto expression : *node.expressions() )
+            if( expression->type() )
             {
-                if( *expression->type() != type->result() )
-                {
-                    m_log.error(
-                        { node.sourceLocation(), expression->sourceLocation() },
-                        "list literal element type does not match list literal type '" +
-                            type->description() + "'",
-                        Code::TypeInferenceListLiteralTypeMismatch );
-                    return;
-                }
+                const auto listType =
+                    libstdhl::Memory::get< libcasm_ir::ListType >( expression->type() );
+                node.setType( listType );
+                break;
             }
-
-            node.setType( type );
-        }
-        else
-        {
-            m_log.error(
-                { node.sourceLocation() },
-                "invalid list literal type '" + type->description() + "' found",
-                Code::TypeInferenceInvalidListLiteralType );
         }
     }
-    else
-    {
-        // no type inferred, try to find one from the expression types
-        Ast::Expression::Ptr listInnerType = nullptr;
 
-        for( auto expression : *node.expressions() )
+    if( node.type() )
+    {
+        for( const auto& expression : *node.expressions() )
         {
-            if( not listInnerType )
+            if( not expression->type() )
             {
-                listInnerType = expression;
+                continue;
             }
 
-            if( *listInnerType->type() != *expression->type() )
+            if( *expression->type() != node.type()->result() )
             {
                 m_log.error(
-                    { listInnerType->sourceLocation(), expression->sourceLocation() },
-                    "list literal element type '" + expression->type()->description() +
-                        "' does not match first list literal element type '" +
-                        listInnerType->type()->description() + "'",
+                    { expression->sourceLocation() },
+                    "list element has invalid type '" + expression->type()->description() +
+                        "', expected '" + node.type()->result().description() + "'",
                     Code::TypeInferenceListLiteralTypeMismatch );
-                return;
             }
-        }
-
-        if( listInnerType )
-        {
-            const auto listType =
-                libstdhl::Memory::get< libcasm_ir::ListType >( listInnerType->type() );
-            node.setType( listType );
         }
     }
 }
