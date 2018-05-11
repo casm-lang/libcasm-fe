@@ -1188,6 +1188,8 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
     node.thenExpression()->accept( *this );
 
+    m_typeIDs[ node.condition().get() ].emplace( libcasm_ir::Type::Kind::BOOLEAN );
+
     node.condition()->accept( *this );
 
     checkIfNodeHasTypeOfKind(
@@ -1281,6 +1283,8 @@ void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
 
 void TypeInferenceVisitor::visit( ConditionalRule& node )
 {
+    m_typeIDs[ node.condition().get() ].emplace( libcasm_ir::Type::Kind::BOOLEAN );
+
     RecursiveVisitor::visit( node );
 
     checkIfNodeHasTypeOfKind(
@@ -1292,6 +1296,8 @@ void TypeInferenceVisitor::visit( ConditionalRule& node )
 
 void TypeInferenceVisitor::visit( WhileRule& node )
 {
+    m_typeIDs[ node.condition().get() ].emplace( libcasm_ir::Type::Kind::BOOLEAN );
+
     RecursiveVisitor::visit( node );
 
     checkIfNodeHasTypeOfKind(
@@ -1377,6 +1383,8 @@ void TypeInferenceVisitor::visit( ForallRule& node )
     }
 
     node.variables()->accept( *this );
+
+    m_typeIDs[ node.condition().get() ].emplace( libcasm_ir::Type::Kind::BOOLEAN );
 
     node.condition()->accept( *this );
 
