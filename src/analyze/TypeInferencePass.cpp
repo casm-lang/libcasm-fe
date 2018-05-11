@@ -122,14 +122,11 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     bool tryResolveCallInTypeNamespace( DirectCallExpression& node ) const;
 
     void assignment(
-        const Node& node,
         TypedNode& lhs,
         TypedNode& rhs,
         const std::string& dst,
         const std::string& src,
-        const Code& dstErr,
-        const Code& srcErr,
-        const Code& assignmentErr );
+        const Code assignmentErr );
 
     const libcasm_ir::Annotation* annotate(
         Node& node, const std::vector< Expression::Ptr >& expressions = {} );
@@ -1078,15 +1075,13 @@ void TypeInferenceVisitor::visit( TupleLiteral& node )
         return;
     }
 
+    filterAnnotationsByKind( node, libcasm_ir::Type::Kind::TUPLE );
+
     // propagate type annotation to all tuple elements
     for( const auto typeId : m_typeIDs[&node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
-        if( not type->isTuple() )
-        {
-            continue;
-        }
-
+        assert( type->isTuple() );
         const auto tupleType = std::static_pointer_cast< libcasm_ir::TupleType >( type );
         const auto& expressionTypes = tupleType->arguments();
         if( expressionTypes.size() != node.expressions()->size() )
@@ -1503,13 +1498,10 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
     node.expression()->accept( *this );
 
     assignment(
-        node,
         func,
         expr,
         "updated function",
         "updating expression",
-        Code::TypeInferenceInvalidUpdateRuleFunctionType,
-        Code::TypeInferenceInvalidUpdateRuleExpressionType,
         Code::TypeInferenceUpdateRuleTypesMismatch );
 }
 
@@ -1536,13 +1528,10 @@ void TypeInferenceVisitor::visit( VariableBinding& node )
     if( node.variable()->type() or node.expression()->type() )
     {
         assignment(
-            node,
             *node.variable(),
             *node.expression(),
             "variable '" + node.variable()->identifier()->name() + "'",
             "expression",
-            Code::TypeInferenceInvalidVariableBindingVariableType,
-            Code::TypeInferenceInvalidVariableBindingExpressionType,
             Code::TypeInferenceInvalidVariableBindingTypeMismatch );
     }
 }
@@ -1609,33 +1598,13 @@ bool TypeInferenceVisitor::tryResolveCallInTypeNamespace( DirectCallExpression& 
 }
 
 void TypeInferenceVisitor::assignment(
-    const Node& node,
     TypedNode& lhs,
     TypedNode& rhs,
     const std::string& dst,
     const std::string& src,
-    const Code& dstErr,
-    const Code& srcErr,
-    const Code& assignmentErr )
+    const Code assignmentErr )
 {
-    if( lhs.type() and not rhs.type() and rhs.id() == Node::ID::UNDEF_LITERAL )
-    {
-        rhs.setType( lhs.type() );
-    }
-
-    const auto error_count = m_log.errors();
-
-    if( not lhs.type() )
-    {
-        m_log.error( { lhs.sourceLocation() }, "unable to infer type of " + dst, dstErr );
-    }
-
-    if( not rhs.type() )
-    {
-        m_log.error( { rhs.sourceLocation() }, "unable to infer type of " + src, srcErr );
-    }
-
-    if( error_count != m_log.errors() )
+    if( not lhs.type() or not rhs.type() )
     {
         return;
     }
