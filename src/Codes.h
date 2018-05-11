@@ -225,8 +225,6 @@ namespace libcasm_fe
         ,
         TypeInferenceInvalidIfExpression = 0x1003,
 
-        TypeInferenceForallVariableHasNoType = 0x1004,
-        TypeInferenceForallUniverseHasNoType = 0x1014,
         TypeInferenceForallRuleTypeMismatch = 0x1024,
         TypeInferenceForallRuleInvalidConditionType = 0x1025,
 
@@ -234,8 +232,7 @@ namespace libcasm_fe
         TypeInferenceInvalidConditionalExpressionPaths = 0x1006
 
         ,
-        TypeInferenceInvalidChooseExpressionVariableTypeMismatch = 0x1007,
-        TypeInferenceInvalidChooseExpressionTypeMismatch = 0x1008
+        TypeInferenceInvalidChooseExpressionVariableTypeMismatch = 0x1007
 
         ,
         TypeInferenceInvalidChooseRuleVariableTypeMismatch = 0x1009
@@ -244,8 +241,6 @@ namespace libcasm_fe
         TypeInferenceInvalidVariableBindingVariableType = 0x1010,
         TypeInferenceInvalidVariableBindingExpressionType = 0x1011,
         TypeInferenceInvalidVariableBindingTypeMismatch = 0x1012,
-
-        TypeInferenceInvalidLetExpressionTypeMismatch = 0x1013,
 
         TypeInferenceRangeLiteralTypeMismatch = 0x1600,
         TypeInferenceInvalidListLiteralType = 0x1610,
