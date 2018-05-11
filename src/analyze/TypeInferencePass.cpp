@@ -122,14 +122,11 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     bool tryResolveCallInTypeNamespace( DirectCallExpression& node ) const;
 
     void assignment(
-        const Node& node,
         TypedNode& lhs,
         TypedNode& rhs,
         const std::string& dst,
         const std::string& src,
-        const Code& dstErr,
-        const Code& srcErr,
-        const Code& assignmentErr );
+        const Code assignmentErr );
 
     const libcasm_ir::Annotation* annotate(
         Node& node, const std::vector< Expression::Ptr >& expressions = {} );
@@ -1501,13 +1498,10 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
     node.expression()->accept( *this );
 
     assignment(
-        node,
         func,
         expr,
         "updated function",
         "updating expression",
-        Code::TypeInferenceInvalidUpdateRuleFunctionType,
-        Code::TypeInferenceInvalidUpdateRuleExpressionType,
         Code::TypeInferenceUpdateRuleTypesMismatch );
 }
 
@@ -1534,13 +1528,10 @@ void TypeInferenceVisitor::visit( VariableBinding& node )
     if( node.variable()->type() or node.expression()->type() )
     {
         assignment(
-            node,
             *node.variable(),
             *node.expression(),
             "variable '" + node.variable()->identifier()->name() + "'",
             "expression",
-            Code::TypeInferenceInvalidVariableBindingVariableType,
-            Code::TypeInferenceInvalidVariableBindingExpressionType,
             Code::TypeInferenceInvalidVariableBindingTypeMismatch );
     }
 }
@@ -1607,28 +1598,13 @@ bool TypeInferenceVisitor::tryResolveCallInTypeNamespace( DirectCallExpression& 
 }
 
 void TypeInferenceVisitor::assignment(
-    const Node& node,
     TypedNode& lhs,
     TypedNode& rhs,
     const std::string& dst,
     const std::string& src,
-    const Code& dstErr,
-    const Code& srcErr,
-    const Code& assignmentErr )
+    const Code assignmentErr )
 {
-    const auto error_count = m_log.errors();
-
-    if( not lhs.type() )
-    {
-        m_log.error( { lhs.sourceLocation() }, "unable to infer type of " + dst, dstErr );
-    }
-
-    if( not rhs.type() )
-    {
-        m_log.error( { rhs.sourceLocation() }, "unable to infer type of " + src, srcErr );
-    }
-
-    if( error_count != m_log.errors() )
+    if( not lhs.type() or not rhs.type() )
     {
         return;
     }
