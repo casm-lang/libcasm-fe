@@ -145,6 +145,11 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     template < typename T >
     void annotateNodes( const NodeList< T >& nodes, const libcasm_ir::Type::ID typeId );
 
+    /**
+     * Removes all annotations of \a node from m_typeIDs which are not of kind \a kind.
+     */
+    void filterAnnotationsByKind( const Node& node, const libcasm_ir::Type::Kind kind );
+
     void checkIfNodeHasTypeOfKind(
         const TypedNode& node,
         const libcasm_ir::Type::Kind expectedKind,
@@ -968,15 +973,13 @@ void TypeInferenceVisitor::visit( ListLiteral& node )
         return;
     }
 
+    filterAnnotationsByKind( node, libcasm_ir::Type::Kind::LIST );
+
     // propagate type annotation to all list elements
     for( const auto typeId : m_typeIDs[&node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
-        if( not type->isList() )
-        {
-            continue;
-        }
-
+        assert( type->isList() );
         const auto listType = std::static_pointer_cast< libcasm_ir::ListType >( type );
         annotateNodes( *node.expressions(), listType->ptr_result()->id() );
     }
@@ -1981,6 +1984,25 @@ void TypeInferenceVisitor::annotateNodes(
     for( const auto& node : nodes )
     {
         m_typeIDs[ node.get() ].emplace( typeId );
+    }
+}
+
+void TypeInferenceVisitor::filterAnnotationsByKind(
+    const Node& node, const libcasm_ir::Type::Kind kind )
+{
+    auto& annotations = m_typeIDs[&node ];
+
+    for( auto it = annotations.begin(); it != annotations.end(); )
+    {
+        const auto type = libcasm_ir::Type::fromID( *it );
+        if( type->kind() != kind )
+        {
+            it = annotations.erase( it );
+        }
+        else
+        {
+            ++it;
+        }
     }
 }
 
