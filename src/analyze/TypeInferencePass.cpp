@@ -140,7 +140,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
         TypedNode& node,
         const std::vector< Expression::Ptr >& arguments = {} );
 
-    void inference( QuantifierExpression& node );
+    void inferenceQuantifierExpression( QuantifierExpression& node );
 
     template < typename T >
     void annotateNodes( const NodeList< T >& nodes, const libcasm_ir::Type::ID typeId );
@@ -1273,22 +1273,12 @@ void TypeInferenceVisitor::visit( ChooseExpression& node )
 
 void TypeInferenceVisitor::visit( UniversalQuantifierExpression& node )
 {
-    if( node.type() )
-    {
-        return;
-    }
-
-    inference( node );
+    inferenceQuantifierExpression( node );
 }
 
 void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
 {
-    if( node.type() )
-    {
-        return;
-    }
-
-    inference( node );
+    inferenceQuantifierExpression( node );
 }
 
 void TypeInferenceVisitor::visit( ConditionalRule& node )
@@ -1965,8 +1955,13 @@ void TypeInferenceVisitor::inference(
     }
 }
 
-void TypeInferenceVisitor::inference( QuantifierExpression& node )
+void TypeInferenceVisitor::inferenceQuantifierExpression( QuantifierExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
 
     node.predicateVariables()->accept( *this );
