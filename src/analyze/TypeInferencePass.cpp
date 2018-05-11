@@ -145,6 +145,12 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     template < typename T >
     void annotateNodes( const NodeList< T >& nodes, const libcasm_ir::Type::ID typeId );
 
+    void checkIfNodeHasTypeOfKind(
+        const TypedNode& node,
+        const libcasm_ir::Type::Kind expectedKind,
+        const std::string& errorDescription,
+        const Code errorCode ) const;
+
   private:
     libcasm_fe::Logger& m_log;
     const Namespace& m_symboltable;
@@ -1184,19 +1190,11 @@ void TypeInferenceVisitor::visit( ConditionalExpression& node )
 
     node.condition()->accept( *this );
 
-    if( condExpr.type() )
-    {
-        if( condExpr.type()->kind() != libcasm_ir::Type::Kind::BOOLEAN )
-        {
-            m_log.error(
-                { condExpr.sourceLocation() },
-                "condition type of conditional expression is not of type "
-                "'Boolean', "
-                "found type '" +
-                    condExpr.type()->description() + "'",
-                Code::TypeInferenceInvalidConditionalExpressionCondition );
-        }
-    }
+    checkIfNodeHasTypeOfKind(
+        *node.condition(),
+        libcasm_ir::Type::Kind::BOOLEAN,
+        "condition",
+        Code::TypeInferenceInvalidConditionalExpressionCondition );
 
     if( thenExpr.type() and elseExpr.type() )
     {
@@ -1285,38 +1283,22 @@ void TypeInferenceVisitor::visit( ConditionalRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& condExpr = *node.condition();
-
-    if( condExpr.type() )
-    {
-        if( condExpr.type()->kind() != libcasm_ir::Type::Kind::BOOLEAN )
-        {
-            m_log.error(
-                { condExpr.sourceLocation() },
-                "invalid condition type '" + condExpr.type()->description() + ", shall be '" +
-                    libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN ) + "'",
-                Code::TypeInferenceConditionalRuleInvalidConditionType );
-        }
-    }
+    checkIfNodeHasTypeOfKind(
+        *node.condition(),
+        libcasm_ir::Type::Kind::BOOLEAN,
+        "condition",
+        Code::TypeInferenceConditionalRuleInvalidConditionType );
 }
 
 void TypeInferenceVisitor::visit( WhileRule& node )
 {
     RecursiveVisitor::visit( node );
 
-    const auto& condExpr = *node.condition();
-
-    if( condExpr.type() )
-    {
-        if( condExpr.type()->kind() != libcasm_ir::Type::Kind::BOOLEAN )
-        {
-            m_log.error(
-                { condExpr.sourceLocation() },
-                "invalid condition type '" + condExpr.type()->description() + ", shall be '" +
-                    libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN ) + "'",
-                Code::TypeInferenceWhileRuleInvalidConditionType );
-        }
-    }
+    checkIfNodeHasTypeOfKind(
+        *node.condition(),
+        libcasm_ir::Type::Kind::BOOLEAN,
+        "condition",
+        Code::TypeInferenceWhileRuleInvalidConditionType );
 }
 
 void TypeInferenceVisitor::visit( CaseRule& node )
@@ -1397,18 +1379,6 @@ void TypeInferenceVisitor::visit( ForallRule& node )
     node.variables()->accept( *this );
 
     node.condition()->accept( *this );
-    const auto& conditionType = node.condition()->type();
-    if( conditionType )
-    {
-        if( conditionType->kind() != libcasm_ir::Type::Kind::BOOLEAN )
-        {
-            m_log.error(
-                { node.condition()->sourceLocation() },
-                "invalid condition type '" + conditionType->description() + ", shall be '" +
-                    libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN ) + "'",
-                Code::TypeInferenceForallRuleInvalidConditionType );
-        }
-    }
 
     node.rule()->accept( *this );
 
@@ -1433,6 +1403,12 @@ void TypeInferenceVisitor::visit( ForallRule& node )
             }
         }
     }
+
+    checkIfNodeHasTypeOfKind(
+        *node.condition(),
+        libcasm_ir::Type::Kind::BOOLEAN,
+        "condition",
+        Code::TypeInferenceForallRuleInvalidConditionType );
 }
 
 void TypeInferenceVisitor::visit( ChooseRule& node )
@@ -1993,21 +1969,13 @@ void TypeInferenceVisitor::inferenceQuantifierExpression( QuantifierExpression& 
         }
     }
 
-    const auto& propositionType = node.proposition()->type();
-    if( propositionType )
-    {
-        if( propositionType->kind() != libcasm_ir::Type::Kind::BOOLEAN )
-        {
-            m_log.error(
-                { node.proposition()->sourceLocation() },
-                node.description() + " has invalid proposition type '" +
-                    propositionType->description() + "' shall be '" +
-                    libcasm_ir::Type::token( libcasm_ir::Type::Kind::BOOLEAN ) + "'",
-                ( node.id() == Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION )
-                    ? Code::TypeInferenceQuantifierExistentialPropositionTypeMismatch
-                    : Code::TypeInferenceQuantifierUniversalPropositionTypeMismatch );
-        }
-    }
+    checkIfNodeHasTypeOfKind(
+        *node.proposition(),
+        libcasm_ir::Type::Kind::BOOLEAN,
+        "proposition",
+        ( node.id() == Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION )
+            ? Code::TypeInferenceQuantifierExistentialPropositionTypeMismatch
+            : Code::TypeInferenceQuantifierUniversalPropositionTypeMismatch );
 
     node.setType( libstdhl::Memory::get< libcasm_ir::BooleanType >() );
 }
@@ -2019,6 +1987,26 @@ void TypeInferenceVisitor::annotateNodes(
     for( const auto& node : nodes )
     {
         m_typeIDs[ node.get() ].emplace( typeId );
+    }
+}
+
+void TypeInferenceVisitor::checkIfNodeHasTypeOfKind(
+    const TypedNode& node,
+    const libcasm_ir::Type::Kind expectedKind,
+    const std::string& errorDescription,
+    const Code errorCode ) const
+{
+    const auto& actualType = node.type();
+    if( actualType )
+    {
+        if( actualType->kind() != expectedKind )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                errorDescription + " has invalid type '" + actualType->description() +
+                    "', expected '" + libcasm_ir::Type::token( expectedKind ) + "'",
+                errorCode );
+        }
     }
 }
 
