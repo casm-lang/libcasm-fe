@@ -1126,15 +1126,13 @@ void TypeInferenceVisitor::visit( RecordLiteral& node )
         return;
     }
 
+    filterAnnotationsByKind( node, libcasm_ir::Type::Kind::RECORD );
+
     // propagate type annotation to all record elements
     for( const auto typeId : m_typeIDs[&node ] )
     {
         const auto type = libcasm_ir::Type::fromID( typeId );
-        if( not type->isRecord() )
-        {
-            continue;
-        }
-
+        assert( type->isRecord() );
         const auto recordType = std::static_pointer_cast< libcasm_ir::RecordType >( type );
         const auto& expressionTypes = recordType->arguments();
         if( expressionTypes.size() != node.namedExpressions()->size() )
