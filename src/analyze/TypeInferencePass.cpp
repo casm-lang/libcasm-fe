@@ -1616,11 +1616,6 @@ void TypeInferenceVisitor::assignment(
     const Code& srcErr,
     const Code& assignmentErr )
 {
-    if( lhs.type() and not rhs.type() and rhs.id() == Node::ID::UNDEF_LITERAL )
-    {
-        rhs.setType( lhs.type() );
-    }
-
     const auto error_count = m_log.errors();
 
     if( not lhs.type() )
