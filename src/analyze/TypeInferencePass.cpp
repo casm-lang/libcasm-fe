@@ -1652,9 +1652,9 @@ void TypeInferenceVisitor::assignment(
             const auto& recordTyLhs = static_cast< const libcasm_ir::RecordType& >( tyLhs );
             const auto& recordTyRhs = static_cast< const libcasm_ir::RecordType& >( tyRhs );
 
-            if( recordTyLhs.identifiers().size() > recordTyRhs.identifiers().size() )
+            if( recordTyLhs.contains( recordTyRhs ) )
             {
-                // TODO
+                mismatch = false;
             }
         }
 
