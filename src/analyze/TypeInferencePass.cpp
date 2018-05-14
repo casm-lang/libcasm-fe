@@ -1121,43 +1121,52 @@ void TypeInferenceVisitor::visit( TupleLiteral& node )
 
 void TypeInferenceVisitor::visit( RecordLiteral& node )
 {
-    RecursiveVisitor::visit( node );
-
-    const auto& typeIDs = m_typeIDs[&node ];
-    if( typeIDs.size() == 1 )
+    if( node.type() )
     {
-        const auto typeID = *typeIDs.begin();
-        const auto type = libcasm_ir::Type::fromID( typeID );
+        return;
+    }
 
-        if( type->isRecord() )
+    filterAnnotationsByKind( node, libcasm_ir::Type::Kind::RECORD );
+
+    // propagate type annotation to all record elements
+    for( const auto typeId : m_typeIDs[&node ] )
+    {
+        const auto type = libcasm_ir::Type::fromID( typeId );
+        assert( type->isRecord() );
+        const auto recordType = std::static_pointer_cast< libcasm_ir::RecordType >( type );
+        const auto& expressionTypes = recordType->arguments();
+        if( expressionTypes.size() != node.namedExpressions()->size() )
         {
-            const auto recordType = std::static_pointer_cast< libcasm_ir::RecordType >( type );
-            assert( node.namedExpressions()->size() >= 1 );  // constrain from parser
-            for( auto namedExpression : *node.namedExpressions() )
-            {
-                if( not namedExpression->type() )
-                {
-                    m_log.info(
-                        { namedExpression->sourceLocation() }, "TODO: has a non-typed sub-type" );
-                    return;
-                }
+            continue;
+        }
 
-                const auto expressionName = namedExpression->identifier()->name();
-                const auto& expressionType = namedExpression->type();
-
-                const auto it = recordType->elements().find( expressionName );
-                if( it != recordType->elements().cend() )
-                {
-                    if( *expressionType != *( recordType->arguments()[ it->second ] ) )
-                    {
-                        return;
-                    }
-                }
-            }
-
-            node.setType( type );
+        for( std::size_t i = 0; i < expressionTypes.size(); i++ )
+        {
+            const auto& expression = node.namedExpressions()->at( i );
+            const auto& expressionType = expressionTypes.at( i );
+            m_typeIDs[ expression.get() ].emplace( expressionType->id() );
         }
     }
+
+    RecursiveVisitor::visit( node );
+
+    std::vector< std::string > expressionNames;
+    libcasm_ir::Types expressionTypes;
+    for( const auto& namedExpression : *node.namedExpressions() )
+    {
+        if( not namedExpression->type() )
+        {
+            // cannot create a record type if not all element types are known, thus the return
+            return;
+        }
+
+        expressionTypes.add( namedExpression->type() );
+        expressionNames.emplace_back( namedExpression->identifier()->name() );
+    }
+
+    const auto recordType =
+        libstdhl::Memory::get< libcasm_ir::RecordType >( expressionTypes, expressionNames );
+    node.setType( recordType );
 }
 
 void TypeInferenceVisitor::visit( LetExpression& node )
@@ -1641,9 +1650,9 @@ void TypeInferenceVisitor::assignment(
             const auto& recordTyLhs = static_cast< const libcasm_ir::RecordType& >( tyLhs );
             const auto& recordTyRhs = static_cast< const libcasm_ir::RecordType& >( tyRhs );
 
-            if( recordTyLhs.identifiers().size() > recordTyRhs.identifiers().size() )
+            if( recordTyLhs.contains( recordTyRhs ) )
             {
-                // TODO
+                mismatch = false;
             }
         }
 
