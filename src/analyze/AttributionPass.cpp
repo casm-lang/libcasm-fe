@@ -80,12 +80,15 @@ static const std::string VARIANT_ATTRIBUTE = "variant";
 static const std::string SYMBOLIC_ATTRIBUTE = "symbolic";
 static const std::string DUMPS_ATTRIBUTE = "dumps";
 static const std::string PURE_ATTRIBUTE = "pure";
+static const std::string SYNCHRONOUS_ATTRIBUTE = "synchronous";
+static const std::string ASYNCHRONOUS_ATTRIBUTE = "asynchronous";
 
 // list of allowed basic attribute names
 static const std::unordered_set< std::string > VALID_BASIC_ATTRIBUTES = {
-    DEPRECATED_ATTRIBUTE, IN_ATTRIBUTE,       MONITORED_ATTRIBUTE, EXTERNAL_ATTRIBUTE,
-    CONTROLLED_ATTRIBUTE, INTERNAL_ATTRIBUTE, SHARED_ATTRIBUTE,    OUT_ATTRIBUTE,
-    STATIC_ATTRIBUTE,     SYMBOLIC_ATTRIBUTE, PURE_ATTRIBUTE,
+    DEPRECATED_ATTRIBUTE,  IN_ATTRIBUTE,       MONITORED_ATTRIBUTE, EXTERNAL_ATTRIBUTE,
+    CONTROLLED_ATTRIBUTE,  INTERNAL_ATTRIBUTE, SHARED_ATTRIBUTE,    OUT_ATTRIBUTE,
+    STATIC_ATTRIBUTE,      SYMBOLIC_ATTRIBUTE, PURE_ATTRIBUTE,      SYNCHRONOUS_ATTRIBUTE,
+    ASYNCHRONOUS_ATTRIBUTE
 };
 
 // list of allowed expression attribute names
@@ -334,6 +337,45 @@ void DefinitionVisitor::visit( UsingDefinition& node )
     node.attributes()->accept( visitor );
 }
 
+class HeaderVisitor final : public RecursiveVisitor
+{
+  public:
+    HeaderVisitor( libcasm_fe::Logger& log, Specification& specification );
+
+    void visit( HeaderDefinition& node ) override;
+
+  private:
+    libcasm_fe::Logger& m_log;
+    Specification& m_specification;
+};
+
+HeaderVisitor::HeaderVisitor( libcasm_fe::Logger& log, Specification& specification )
+: m_log( log )
+, m_specification( specification )
+{
+}
+
+void HeaderVisitor::visit( HeaderDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    DefinitionAttributionVisitor visitor{ m_log, node };
+    node.attributes()->accept( visitor );
+    const auto& attributeNames = visitor.attributeNames();
+
+    for( const auto& name : attributeNames )
+    {
+        if( name == SYNCHRONOUS_ATTRIBUTE )
+        {
+            m_specification.setAsmType( Specification::AsmType::SYNCHRONOUS );
+        }
+        else if( name == ASYNCHRONOUS_ATTRIBUTE )
+        {
+            m_specification.setAsmType( Specification::AsmType::ASYNCHRONOUS );
+        }
+    }
+}
+
 void AttributionPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
@@ -346,8 +388,11 @@ u1 AttributionPass::run( libpass::PassResult& pr )
     const auto data = pr.output< SourceToAstPass >();
     const auto specification = data->specification();
 
-    DefinitionVisitor visitor( log );
-    specification->definitions()->accept( visitor );
+    DefinitionVisitor definitionVisitor( log );
+    specification->definitions()->accept( definitionVisitor );
+
+    HeaderVisitor headerVisitor( log, *specification );
+    specification->header()->accept( headerVisitor );
 
     const auto errors = log.errors();
     if( errors > 0 )

@@ -56,9 +56,19 @@ namespace libcasm_fe
     class Specification
     {
       public:
+        enum class AsmType
+        {
+            SYNCHRONOUS,  // lock-step
+            ASYNCHRONOUS  // randomly pick a single agent
+        };
+
+      public:
         using Ptr = std::shared_ptr< Specification >;
 
         explicit Specification( void );
+
+        void setAsmType( const AsmType asmType );
+        AsmType asmType( void ) const;
 
         void setName( const std::string& name );
 
@@ -75,6 +85,7 @@ namespace libcasm_fe
         const Namespace::Ptr& symboltable( void ) const;
 
       private:
+        AsmType m_asmType;
         std::string m_name;
         Ast::HeaderDefinition::Ptr m_header;
         Ast::Definitions::Ptr m_definitions;
