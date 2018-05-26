@@ -73,6 +73,7 @@
 
 #include <libstdhl/Enum>
 #include <libstdhl/Hash>
+#include <libstdhl/Random>
 
 #include <mutex>
 #include <stdexcept>
@@ -1703,12 +1704,52 @@ void SequentialDispatchStrategy::dispatch( std::vector< Agent >& agents )
     }
 }
 
+class SelectionStrategy
+{
+  public:
+    virtual ~SelectionStrategy() = default;
+
+    /**
+     * Selects the agents from \a agents which should be executed, by removing
+     * all agents which should not be executed.
+     *
+     * @param agents List of available agents (non-empty)
+     */
+    virtual void selectAgents( std::vector< Agent >& agents ) const = 0;
+};
+
+class AllAgentsSelectionStrategy final : public SelectionStrategy
+{
+  public:
+    void selectAgents( std::vector< Agent >& agents ) const override;
+};
+
+void AllAgentsSelectionStrategy::selectAgents( std::vector< Agent >& agents ) const
+{
+}
+
+class SingleRandomAgentSelectionStrategy final : public SelectionStrategy
+{
+  public:
+    void selectAgents( std::vector< Agent >& agents ) const override;
+};
+
+void SingleRandomAgentSelectionStrategy::selectAgents( std::vector< Agent >& agents ) const
+{
+    assert( not agents.empty() );
+    const auto randomIndex = libstdhl::Random::uniform< std::size_t >( 0, agents.size() - 1 );
+    auto selectedAgent = std::move( agents[ randomIndex ] );
+    agents.clear();
+    agents.push_back( std::move( selectedAgent ) );
+}
+
 class AgentScheduler
 {
   public:
     AgentScheduler( ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
     void setDispatchStrategy( std::unique_ptr< DispatchStrategy > dispatchStrategy );
+    void setAgentSelectionStrategy( std::unique_ptr< SelectionStrategy > selectionStrategy );
 
     /**
      * Performs an ASM step.
@@ -1725,12 +1766,14 @@ class AgentScheduler
 
   private:
     std::vector< Agent > collectAgents( void ) const;
+    void selectAgents( std::vector< Agent >& agents );
     void dispatch( std::vector< Agent >& agents );
     void collectUpdates( const std::vector< Agent >& agents );
     void fireUpdates( void );
 
   private:
     std::unique_ptr< DispatchStrategy > m_dispatchStrategy;
+    std::unique_ptr< SelectionStrategy > m_selectionStrategy;
     Storage& m_globalState;
     ExecutionLocationRegistry& m_locationRegistry;
     ParallelUpdateSet< UpdateSetDetails > m_collectedUpdates;
@@ -1740,6 +1783,7 @@ class AgentScheduler
 
 AgentScheduler::AgentScheduler( ExecutionLocationRegistry& locationRegistry, Storage& globalState )
 : m_dispatchStrategy( libstdhl::Memory::make_unique< SequentialDispatchStrategy >() )
+, m_selectionStrategy( nullptr )
 , m_globalState( globalState )
 , m_locationRegistry( locationRegistry )
 , m_collectedUpdates()
@@ -1753,9 +1797,17 @@ void AgentScheduler::setDispatchStrategy( std::unique_ptr< DispatchStrategy > di
     m_dispatchStrategy = std::move( dispatchStrategy );
 }
 
+void AgentScheduler::setAgentSelectionStrategy(
+    std::unique_ptr< SelectionStrategy > selectionStrategy )
+{
+    m_selectionStrategy = std::move( selectionStrategy );
+}
+
 void AgentScheduler::step( void )
 {
     auto agents = collectAgents();
+    selectAgents( agents );
+
     if( agents.empty() )
     {
         m_done = true;
@@ -1804,6 +1856,15 @@ std::vector< Agent > AgentScheduler::collectAgents( void ) const
     }
 
     return agents;
+}
+
+void AgentScheduler::selectAgents( std::vector< Agent >& agents )
+{
+    assert( m_selectionStrategy && "agent selection strategy must be set" );
+    if( not agents.empty() )
+    {
+        m_selectionStrategy->selectAgents( agents );
+    }
 }
 
 void AgentScheduler::dispatch( std::vector< Agent >& agents )
@@ -1878,6 +1939,22 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
     AgentScheduler scheduler( locationRegistry, globalState );
     /*scheduler.setDispatchStrategy(
         libstdhl::Memory::make_unique< ParallelDispatchStrategy >() );*/
+
+    switch( specification->asmType() )
+    {
+        case Specification::AsmType::SYNCHRONOUS:
+        {
+            scheduler.setAgentSelectionStrategy(
+                libstdhl::Memory::make_unique< AllAgentsSelectionStrategy >() );
+            break;
+        }
+        case Specification::AsmType::ASYNCHRONOUS:
+        {
+            scheduler.setAgentSelectionStrategy(
+                libstdhl::Memory::make_unique< SingleRandomAgentSelectionStrategy >() );
+            break;
+        }
+    }
 
     try
     {

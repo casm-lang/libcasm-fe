@@ -46,11 +46,22 @@
 using namespace libcasm_fe;
 
 Specification::Specification( void )
-: m_name()
+: m_asmType( AsmType::SYNCHRONOUS )
+, m_name()
 , m_header()
 , m_definitions()
 , m_symboltable( std::make_shared< Namespace >() )
 {
+}
+
+void Specification::setAsmType( const AsmType asmType )
+{
+    m_asmType = asmType;
+}
+
+Specification::AsmType Specification::asmType( void ) const
+{
+    return m_asmType;
 }
 
 void Specification::setName( const std::string& name )
