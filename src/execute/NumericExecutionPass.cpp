@@ -1713,7 +1713,7 @@ class SelectionStrategy
      * Selects the agents from \a agents which should be executed, by removing
      * all agents which should not be executed.
      *
-     * @param agents List of available agents (non-empty)
+     * @param agents List of available agents
      */
     virtual void selectAgents( std::vector< Agent >& agents ) const = 0;
 };
@@ -1736,7 +1736,11 @@ class SingleRandomAgentSelectionStrategy final : public SelectionStrategy
 
 void SingleRandomAgentSelectionStrategy::selectAgents( std::vector< Agent >& agents ) const
 {
-    assert( not agents.empty() );
+    if( agents.size() < 2 )
+    {
+        return;
+    }
+
     const auto randomIndex = libstdhl::Random::uniform< std::size_t >( 0, agents.size() - 1 );
     auto selectedAgent = std::move( agents[ randomIndex ] );
     agents.clear();
@@ -1861,10 +1865,7 @@ std::vector< Agent > AgentScheduler::collectAgents( void ) const
 void AgentScheduler::selectAgents( std::vector< Agent >& agents )
 {
     assert( m_selectionStrategy && "agent selection strategy must be set" );
-    if( not agents.empty() )
-    {
-        m_selectionStrategy->selectAgents( agents );
-    }
+    m_selectionStrategy->selectAgents( agents );
 }
 
 void AgentScheduler::dispatch( std::vector< Agent >& agents )
