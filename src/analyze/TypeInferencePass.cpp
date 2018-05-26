@@ -83,7 +83,6 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( RuleDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
-    void visit( ValueLiteral& node ) override;
     void visit( ReferenceLiteral& node ) override;
     void visit( ListLiteral& node ) override;
     void visit( RangeLiteral& node ) override;
@@ -313,16 +312,6 @@ void TypeInferenceVisitor::visit( UndefLiteral& node )
 {
     RecursiveVisitor::visit( node );
     inference( "undef literal", nullptr, node );
-}
-
-void TypeInferenceVisitor::visit( ValueLiteral& node )
-{
-    assert( node.value() and node.type() );
-    m_typeIDs[&node ] = { node.type()->id() };
-
-    RecursiveVisitor::visit( node );
-
-    inference( "value literal", nullptr, node );
 }
 
 void TypeInferenceVisitor::visit( ReferenceLiteral& node )
