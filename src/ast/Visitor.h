@@ -78,6 +78,7 @@ namespace libcasm_fe
         class ChooseExpression;
         class UniversalQuantifierExpression;
         class ExistentialQuantifierExpression;
+        class CardinalityExpression;
 
         class SkipRule;
         class ConditionalRule;
@@ -146,6 +147,7 @@ namespace libcasm_fe
             virtual void visit( ChooseExpression& node ) = 0;
             virtual void visit( UniversalQuantifierExpression& node ) = 0;
             virtual void visit( ExistentialQuantifierExpression& node ) = 0;
+            virtual void visit( CardinalityExpression& node ) = 0;
 
             virtual void visit( SkipRule& node ) = 0;
             virtual void visit( ConditionalRule& node ) = 0;

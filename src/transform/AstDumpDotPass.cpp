@@ -135,6 +135,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
+    void visit( CardinalityExpression& node ) override;
 
     void visit( SkipRule& node ) override;
     void visit( ConditionalRule& node ) override;
@@ -392,6 +393,13 @@ void AstDumpDotVisitor::visit( ExistentialQuantifierExpression& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "ExistentialQuantifierExpression" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( CardinalityExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "CardinalityExpression" );
     RecursiveVisitor::visit( node );
 }
 

@@ -199,6 +199,7 @@ END       0 "end of file"
 %type <ChooseExpression::Ptr> ChooseExpression
 %type <UniversalQuantifierExpression::Ptr> UniversalQuantifierExpression
 %type <ExistentialQuantifierExpression::Ptr> ExistentialQuantifierExpression
+%type <CardinalityExpression::Ptr> CardinalityExpression
 
 // rules
 %type <Rule::Ptr> Rule
@@ -799,6 +800,10 @@ Term
   {
       $$ = $1;
   }
+| CardinalityExpression
+  {
+      $$ = $1;
+  }
 ;
 
 
@@ -1018,6 +1023,15 @@ ExistentialQuantifierExpression
       $$ = Ast::make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
   }
 ;
+
+
+CardinalityExpression
+: VERTICAL_BAR SimpleOrClaspedTerm VERTICAL_BAR
+  {
+      $$ = Ast::make< CardinalityExpression >( @$, $2 );
+  }
+;
+
 
 //
 //

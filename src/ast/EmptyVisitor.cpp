@@ -162,6 +162,10 @@ void EmptyVisitor::visit( ExistentialQuantifierExpression& )
 {
 }
 
+void EmptyVisitor::visit( CardinalityExpression& )
+{
+}
+
 void EmptyVisitor::visit( SkipRule& )
 {
 }

@@ -503,6 +503,39 @@ namespace libcasm_fe
 
             void accept( Visitor& visitor ) override final;
         };
+
+        class CardinalityExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< CardinalityExpression >;
+
+            CardinalityExpression( const Expression::Ptr& expression );
+
+            const Expression::Ptr& expression( void ) const;
+
+            /**
+               Sets the builtin id of this call.
+             */
+            void setTargetBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
+
+            /**
+               Sets the builtin type of this call.
+
+               This is required in addition to the builtin id, because builtins
+               allow overloading and thus a simple id to relation type mapping
+               is not possible.
+            */
+            void setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType );
+            const libcasm_ir::RelationType::Ptr& targetBuiltinType( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_expression;
+            libcasm_ir::Value::ID m_targetBuiltinId;
+            libcasm_ir::RelationType::Ptr m_targetBuiltinType;
+        };
     }
 }
 

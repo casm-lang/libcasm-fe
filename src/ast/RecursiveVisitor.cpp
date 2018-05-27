@@ -228,6 +228,11 @@ void RecursiveVisitor::visit( ExistentialQuantifierExpression& node )
     node.proposition()->accept( *this );
 }
 
+void RecursiveVisitor::visit( CardinalityExpression& node )
+{
+    node.expression()->accept( *this );
+}
+
 void RecursiveVisitor::visit( SkipRule& node )
 {
 }
