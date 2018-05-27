@@ -100,7 +100,7 @@ RCURPAREN       "}"             { return Parser::make_RCURPAREN(loc); }
 COLON           ":"             { return Parser::make_COLON(loc); }
 DOUBLECOLON     "::"            { return Parser::make_DOUBLECOLON(loc); }
 UNDERLINE       "_"             { return Parser::make_UNDERLINE(loc); }
-VERTICAL_BAR    "|"             { return Parser::make_UNDERLINE(loc); }
+VERTICAL_BAR    "|"             { return Parser::make_VERTICAL_BAR(loc); }
 AT              "@"             { return Parser::make_AT(loc); }
 COMMA           ","             { return Parser::make_COMMA(loc); }
 LESSER          "<"             { return Parser::make_LESSER(loc); }

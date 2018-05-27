@@ -1133,7 +1133,7 @@ YY_RULE_SETUP
 case 57:
 YY_RULE_SETUP
 #line 162 "obj/src/GrammarLexer.l"
-{ return Parser::make_UNDERLINE(loc); }
+{ return Parser::make_VERTICAL_BAR(loc); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
