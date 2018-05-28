@@ -321,7 +321,9 @@ void PropertyResolverVisitor::visit( ChooseExpression& node )
 {
     RecursiveVisitor::visit( node );
 
-    node.setProperties( node.universe()->properties() * node.expression()->properties() );
+    auto properties = node.universe()->properties() * node.expression()->properties();
+    properties.unset( libcasm_ir::Property::PURE );  // randomness is in-pure
+    node.setProperties( properties );
 }
 
 void PropertyResolverVisitor::visit( UniversalQuantifierExpression& node )
