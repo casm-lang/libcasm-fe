@@ -1303,6 +1303,11 @@ void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
 
 void TypeInferenceVisitor::visit( CardinalityExpression& node )
 {
+    if( node.type() )
+    {
+        return;
+    }
+
     RecursiveVisitor::visit( node );
 
     const std::string description = "cardinality operator";
@@ -1312,6 +1317,7 @@ void TypeInferenceVisitor::visit( CardinalityExpression& node )
             { node.expression()->sourceLocation() },
             "unable to infer expression type of '" + description + "'",
             Code::TypeInferenceCardinalityExpressionHasNoType );
+        return;
     }
 
     // FIXME: TODO: for now we only support IR built-in size calculation
