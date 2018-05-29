@@ -329,6 +329,7 @@ class ExecutionVisitor final : public EmptyVisitor
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
+    void visit( CardinalityExpression& node ) override;
 
     void visit( ConditionalRule& node ) override;
     void visit( CaseRule& node ) override;
@@ -1010,6 +1011,18 @@ void ExecutionVisitor::visit( ExistentialQuantifierExpression& node )
             m_evaluationStack.push( IR::BooleanConstant() );
         }
     }
+}
+
+void ExecutionVisitor::visit( CardinalityExpression& node )
+{
+    node.expression()->accept( *this );
+    const auto object = m_evaluationStack.pop();
+
+    assert( node.cardinalityType() == CardinalityExpression::CardinalityType::BUILTIN );
+
+    m_frameStack.push( makeObjectFrame( object, &node, nullptr, node.arguments()->size() ) );
+    invokeBuiltin( node, node.targetBuiltinId(), node.targetBuiltinType() );
+    m_frameStack.pop();
 }
 
 void ExecutionVisitor::visit( ConditionalRule& node )
