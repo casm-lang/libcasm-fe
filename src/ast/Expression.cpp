@@ -755,14 +755,43 @@ void ExistentialQuantifierExpression::accept( Visitor& visitor )
 //
 
 CardinalityExpression::CardinalityExpression( const Expression::Ptr& expression )
-: Expression( Node::ID::CHOOSE_EXPRESSION )
+: CallExpression( Node::ID::CARDINALITY_EXPRESSION, std::make_shared< Expressions >() )
 , m_expression( expression )
+, m_cardinalityType( CardinalityType::UNKNOWN )
 {
 }
 
 const Expression::Ptr& CardinalityExpression::expression( void ) const
 {
     return m_expression;
+}
+
+void CardinalityExpression::setCardinalityType( const CardinalityType cardinalityType )
+{
+    m_cardinalityType = cardinalityType;
+}
+
+CardinalityExpression::CardinalityType CardinalityExpression::cardinalityType( void ) const
+{
+    return m_cardinalityType;
+}
+
+std::string CardinalityExpression::cardinalityTypeName( void ) const
+{
+    switch( cardinalityType() )
+    {
+        case CardinalityExpression::CardinalityType::BUILTIN:
+        {
+            return "built-in";
+        }
+        case CardinalityExpression::CardinalityType::UNKNOWN:
+        {
+            return "unknown";
+        }
+    }
+
+    assert( !" internal error! " );
+    return std::string();
 }
 
 void CardinalityExpression::setTargetBuiltinId( libcasm_ir::Value::ID builtinId )

@@ -292,7 +292,7 @@ namespace libcasm_fe
 
             const std::shared_ptr< Type >& asType( void ) const;
 
-            void setCastingType( CastingType castingType );
+            void setCastingType( const CastingType castingType );
             CastingType castingType( void ) const;
             std::string castingTypeName( void ) const;
 
@@ -504,14 +504,24 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class CardinalityExpression final : public Expression
+        class CardinalityExpression final : public CallExpression
         {
           public:
             using Ptr = std::shared_ptr< CardinalityExpression >;
 
+            enum class CardinalityType
+            {
+                BUILTIN,
+                UNKNOWN
+            };
+
             CardinalityExpression( const Expression::Ptr& expression );
 
             const Expression::Ptr& expression( void ) const;
+
+            void setCardinalityType( CardinalityType cardinalityType );
+            CardinalityType cardinalityType( void ) const;
+            std::string cardinalityTypeName( void ) const;
 
             /**
                Sets the builtin id of this call.
@@ -533,6 +543,7 @@ namespace libcasm_fe
 
           private:
             const Expression::Ptr m_expression;
+            CardinalityType m_cardinalityType;
             libcasm_ir::Value::ID m_targetBuiltinId;
             libcasm_ir::RelationType::Ptr m_targetBuiltinType;
         };

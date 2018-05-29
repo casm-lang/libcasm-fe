@@ -98,6 +98,7 @@ namespace libcasm_fe
                 CHOOSE_EXPRESSION,
                 UNIVERSAL_QUANTIFIER_EXPRESSION,
                 EXISTENTIAL_QUANTIFIER_EXPRESSION,
+                CARDINALITY_EXPRESSION,
 
                 // rules
                 SKIP_RULE,
