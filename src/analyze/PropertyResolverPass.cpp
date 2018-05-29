@@ -88,6 +88,7 @@ class PropertyResolverVisitor final : public RecursiveVisitor
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
+    void visit( CardinalityExpression& node ) override;
 
   private:
     libcasm_fe::Logger& m_log;
@@ -338,6 +339,14 @@ void PropertyResolverVisitor::visit( ExistentialQuantifierExpression& node )
     RecursiveVisitor::visit( node );
 
     node.setProperties( node.universe()->properties() * node.proposition()->properties() );
+}
+
+void PropertyResolverVisitor::visit( CardinalityExpression& node )
+{
+    RecursiveVisitor::visit( node );
+
+    const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
+    node.setProperties( annotation.properties() * node.expression()->properties() );
 }
 
 //
