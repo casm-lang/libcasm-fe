@@ -66,7 +66,7 @@ char AstDumpDotPass::id = 0;
 
 static libpass::PassRegistration< AstDumpDotPass > PASS(
     "AstDumpDotPass",
-    "generates a DOT graph of the AST and dumps it to './out.dot' for now",
+    "generates a DOT graph of the AST and dumps it to './out/*' for now",
     "ast-dump-dot",
     0 );
 
