@@ -148,8 +148,7 @@ FunctionDefinition::FunctionDefinition(
     }
     else
     {
-        static auto uidGenerator = static_cast< std::size_t >( UID::OTHER );
-        m_uid = static_cast< UID >( uidGenerator++ );
+        m_uid = UID::OTHER;
     }
 
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );

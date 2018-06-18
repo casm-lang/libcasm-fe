@@ -138,7 +138,7 @@ struct UpdateEquals : public std::binary_function< const Update&, const Update&,
 
 struct LocationRegistryDetails
 {
-    using Function = FunctionDefinition::UID;
+    using Function = FunctionDefinition*;
     using FunctionHash = std::hash< Function >;
     using FunctionEquals = std::equal_to< Function >;
     using Arguments = std::vector< IR::Constant >;
@@ -166,7 +166,7 @@ static std::string updateAsString( const ExecutionUpdateSet::Update& update )
     const auto& location = update.location;
     const auto& value = update.value;
 
-    auto locationStr = value.producer->function()->identifier()->path();
+    auto locationStr = location.function()->identifier()->name();
 
     if( not location.arguments().empty() )
     {
@@ -242,7 +242,7 @@ void Storage::fireUpdateSet( ExecutionUpdateSet* updateSet )
 
 void Storage::set( const Location& location, const Value& value )
 {
-    if( location.function() == FunctionDefinition::UID::PROGRAM )
+    if( location.function()->uid() == FunctionDefinition::UID::PROGRAM )
     {
         m_programState.set( location, value );
     }
@@ -254,7 +254,7 @@ void Storage::set( const Location& location, const Value& value )
 
 void Storage::remove( const Location& location )
 {
-    if( location.function() == FunctionDefinition::UID::PROGRAM )
+    if( location.function()->uid() == FunctionDefinition::UID::PROGRAM )
     {
         m_programState.remove( location );
     }
@@ -266,7 +266,7 @@ void Storage::remove( const Location& location )
 
 std::experimental::optional< Storage::Value > Storage::get( const Location& location ) const
 {
-    if( location.function() == FunctionDefinition::UID::PROGRAM )
+    if( location.function()->uid() == FunctionDefinition::UID::PROGRAM )
     {
         return m_programState.get( location );
     }
@@ -474,7 +474,7 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
         { ValidationFlag::ValueMustBeDefined },
         Code::FunctionArgumentInvalidValueAtLookup );
 
-    const auto location = m_locationRegistry.lookup( node.uid(), m_frameStack.top()->locals() );
+    const auto location = m_locationRegistry.lookup( &node, m_frameStack.top()->locals() );
     if( location )
     {
         const auto update = m_updateSetManager.lookup( *location );
@@ -1271,7 +1271,7 @@ void ExecutionVisitor::visit( UpdateRule& node )
     const auto& functionDefintion =
         std::static_pointer_cast< FunctionDefinition >( node.function()->targetDefinition() );
 
-    const auto location = m_locationRegistry.get( functionDefintion->uid(), argumentValues );
+    const auto location = m_locationRegistry.get( functionDefintion.get(), argumentValues );
     const Update update{ updateValue, &node, m_agentId };
 
     try
