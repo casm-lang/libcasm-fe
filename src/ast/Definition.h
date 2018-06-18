@@ -130,14 +130,6 @@ namespace libcasm_fe
                 STATIC
             };
 
-            enum class UID
-            {
-                SELF = 1,
-                PROGRAM = 2,
-                RESULT = 3,
-                OTHER
-            };
-
             static std::string toString( const Classification classification );
 
           public:
@@ -148,7 +140,7 @@ namespace libcasm_fe
                 const Types::Ptr& argumentTypes,
                 const Type::Ptr& returnType );
 
-            UID uid() const;
+            bool isProgram( void ) const;
 
             const Types::Ptr& argumentTypes( void ) const;
             const Type::Ptr& returnType( void ) const;
@@ -175,7 +167,7 @@ namespace libcasm_fe
             u1 m_symbolic;
             NodeList< UpdateRule >::Ptr m_initializers;
             Expression::Ptr m_defaultValue;
-            UID m_uid;
+            const bool m_isProgram;
         };
 
         class DerivedDefinition final : public Definition
@@ -269,18 +261,6 @@ namespace libcasm_fe
             const Type::Ptr m_type;
         };
     }
-}
-
-namespace std
-{
-    template <>
-    struct hash< libcasm_fe::Ast::FunctionDefinition::UID >
-    {
-        std::size_t operator()( libcasm_fe::Ast::FunctionDefinition::UID uid ) const
-        {
-            return static_cast< std::size_t >( uid );
-        }
-    };
 }
 
 #endif  // _LIBCASM_FE_DEFINITION_H_

@@ -242,7 +242,7 @@ void Storage::fireUpdateSet( ExecutionUpdateSet* updateSet )
 
 void Storage::set( const Location& location, const Value& value )
 {
-    if( location.function()->uid() == FunctionDefinition::UID::PROGRAM )
+    if( location.function()->isProgram() )
     {
         m_programState.set( location, value );
     }
@@ -254,7 +254,7 @@ void Storage::set( const Location& location, const Value& value )
 
 void Storage::remove( const Location& location )
 {
-    if( location.function()->uid() == FunctionDefinition::UID::PROGRAM )
+    if( location.function()->isProgram() )
     {
         m_programState.remove( location );
     }
@@ -266,7 +266,7 @@ void Storage::remove( const Location& location )
 
 std::experimental::optional< Storage::Value > Storage::get( const Location& location ) const
 {
-    if( location.function()->uid() == FunctionDefinition::UID::PROGRAM )
+    if( location.function()->isProgram() )
     {
         return m_programState.get( location );
     }
