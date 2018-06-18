@@ -427,6 +427,10 @@ class ExecutionVisitor final : public EmptyVisitor
 
     ConstantStack m_evaluationStack;
     FrameStack m_frameStack;
+
+    bool m_evaluateUpdateLocation; /**< Controls if FunctionDefinition visit should evaluate the
+                                      update location or perform a normal function call */
+    ExecutionLocationRegistry::Location m_updateLocation;
 };
 
 ExecutionVisitor::ExecutionVisitor(
@@ -440,6 +444,8 @@ ExecutionVisitor::ExecutionVisitor(
 , m_agentId( agentId )
 , m_evaluationStack()
 , m_frameStack()
+, m_evaluateUpdateLocation( false )
+, m_updateLocation( ExecutionLocationRegistry::Location::invalid() )
 {
 }
 
@@ -468,31 +474,44 @@ void ExecutionVisitor::visit( VariableDefinition& node )
 
 void ExecutionVisitor::visit( FunctionDefinition& node )
 {
-    validateArguments(
-        node,
-        node.type()->arguments(),
-        { ValidationFlag::ValueMustBeDefined },
-        Code::FunctionArgumentInvalidValueAtLookup );
-
-    const auto location = m_locationRegistry.lookup( &node, m_frameStack.top()->locals() );
-    if( location )
+    if( m_evaluateUpdateLocation )
     {
-        const auto update = m_updateSetManager.lookup( *location );
-        if( update )
-        {
-            m_evaluationStack.push( update->value );
-            return;
-        }
+        validateArguments(
+            node,
+            node.type()->arguments(),
+            { ValidationFlag::ValueMustBeDefined },
+            Code::FunctionArgumentInvalidValueAtUpdate );
 
-        const auto function = m_globalState.get( *location );
-        if( function )
-        {
-            m_evaluationStack.push( function.value() );
-            return;
-        }
+        m_updateLocation = m_locationRegistry.get( &node, m_frameStack.top()->locals() );
     }
+    else
+    {
+        validateArguments(
+            node,
+            node.type()->arguments(),
+            { ValidationFlag::ValueMustBeDefined },
+            Code::FunctionArgumentInvalidValueAtLookup );
 
-    node.defaultValue()->accept( *this );  // return value already on stack
+        const auto location = m_locationRegistry.lookup( &node, m_frameStack.top()->locals() );
+        if( location )
+        {
+            const auto update = m_updateSetManager.lookup( *location );
+            if( update )
+            {
+                m_evaluationStack.push( update->value );
+                return;
+            }
+
+            const auto function = m_globalState.get( *location );
+            if( function )
+            {
+                m_evaluationStack.push( function.value() );
+                return;
+            }
+        }
+
+        node.defaultValue()->accept( *this );  // return value already on stack
+    }
 }
 
 void ExecutionVisitor::visit( DerivedDefinition& node )
@@ -1238,45 +1257,15 @@ void ExecutionVisitor::visit( UpdateRule& node )
             Code::FunctionUpdateInvalidValueAtUpdate );
     }
 
-    // evaluate function arguments
-    const auto& arguments = function->arguments();
-    const auto& argumentTypes = function->targetDefinition()->type()->arguments();
-    std::vector< IR::Constant > argumentValues;
-    argumentValues.reserve( arguments->size() );
-    for( std::size_t i = 0; i < arguments->size(); ++i )
-    {
-        const auto& argument = arguments->at( i );
-        const auto& argumentType = argumentTypes.at( i );
-
-        argument->accept( *this );
-        const auto value = m_evaluationStack.pop();
-
-        try
-        {
-            validateValue( value, *argumentType, { ValidationFlag::ValueMustBeDefined } );
-        }
-        catch( const IR::ValidationException& e )
-        {
-            throw RuntimeException(
-                { argument->sourceLocation() },
-                e.what(),
-                m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
-                Code::FunctionArgumentInvalidValueAtUpdate );
-        }
-
-        argumentValues.emplace_back( value );
-    }
-
-    assert( node.function()->targetType() == DirectCallExpression::TargetType::FUNCTION );
-    const auto& functionDefintion =
-        std::static_pointer_cast< FunctionDefinition >( node.function()->targetDefinition() );
-
-    const auto location = m_locationRegistry.get( functionDefintion.get(), argumentValues );
-    const Update update{ updateValue, &node, m_agentId };
+    m_evaluateUpdateLocation = true;
+    function->accept( *this );
+    m_evaluateUpdateLocation = false;
+    assert( m_updateLocation.isValid() );
 
     try
     {
-        m_updateSetManager.add( location, update );
+        const Update update{ updateValue, &node, m_agentId };
+        m_updateSetManager.add( m_updateLocation, update );
     }
     catch( const ExecutionUpdateSet::Conflict& conflict )
     {
