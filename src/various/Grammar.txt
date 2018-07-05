@@ -315,6 +315,7 @@ Term ::= SimpleOrClaspedTerm
        | ChooseExpression
        | UniversalQuantifierExpression
        | ExistentialQuantifierExpression
+       | CardinalityExpression
 </code>
 
 {{page>:grammar:Term&noheader&nofooter}}
@@ -461,6 +462,15 @@ ExistentialQuantifierExpression ::= "exists" AttributedVariables "in" Term "with
 </code>
 
 {{page>:grammar:ExistentialQuantifierExpression&noheader&nofooter}}
+
+
+===== CardinalityExpression =====
+
+<code>
+CardinalityExpression ::= "|" SimpleOrClaspedTerm "|"
+</code>
+
+{{page>:grammar:CardinalityExpression&noheader&nofooter}}
 
 
 ===== Literal =====

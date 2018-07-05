@@ -109,6 +109,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
+    void visit( CardinalityExpression& node ) override;
 
     void visit( CaseRule& node ) override;
     void visit( UpdateRule& node ) override;
@@ -317,6 +318,12 @@ void ConsistencyCheckVisitor::visit( ExistentialQuantifierExpression& node )
 {
     RecursiveVisitor::visit( node );
     verifyHasTypeOfKind( node, IR::Type::Kind::BOOLEAN );
+}
+
+void ConsistencyCheckVisitor::visit( CardinalityExpression& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasTypeOfKind( node, IR::Type::Kind::INTEGER );
 }
 
 void ConsistencyCheckVisitor::visit( CaseRule& node )

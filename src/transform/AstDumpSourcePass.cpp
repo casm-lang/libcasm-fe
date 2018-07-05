@@ -178,6 +178,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
+    void visit( CardinalityExpression& node ) override;
 
     void visit( SkipRule& node ) override;
     void visit( ConditionalRule& node ) override;
@@ -498,6 +499,13 @@ void AstDumpSourceVisitor::visit( ExistentialQuantifierExpression& node )
     node.universe()->accept( *this );
     m_stream << " with ";
     node.proposition()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( CardinalityExpression& node )
+{
+    m_stream << "| ";
+    node.expression()->accept( *this );
+    m_stream << " |";
 }
 
 void AstDumpSourceVisitor::visit( SkipRule& node )

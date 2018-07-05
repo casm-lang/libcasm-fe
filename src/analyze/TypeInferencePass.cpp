@@ -102,6 +102,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( ChooseExpression& node ) override;
     void visit( UniversalQuantifierExpression& node ) override;
     void visit( ExistentialQuantifierExpression& node ) override;
+    void visit( CardinalityExpression& node ) override;
 
     void visit( ConditionalRule& node ) override;
     void visit( WhileRule& node ) override;
@@ -1300,6 +1301,60 @@ void TypeInferenceVisitor::visit( ExistentialQuantifierExpression& node )
     inferenceQuantifierExpression( node );
 }
 
+void TypeInferenceVisitor::visit( CardinalityExpression& node )
+{
+    if( node.type() )
+    {
+        return;
+    }
+
+    RecursiveVisitor::visit( node );
+
+    const std::string description = "cardinality operator";
+    if( not node.expression()->type() )
+    {
+        m_log.error(
+            { node.expression()->sourceLocation() },
+            "unable to infer expression type of '" + description + "'",
+            Code::TypeInferenceCardinalityExpressionHasNoType );
+        return;
+    }
+
+    // FIXME: TODO: for now we only support IR built-in size calculation
+    node.setCardinalityType( CardinalityExpression::CardinalityType::BUILTIN );
+    node.setTargetBuiltinId( libcasm_ir::Value::SIZE_BUILTIN );
+
+    // if it is a IR built-in, we can annotate it and due to the annotation, we can infer the
+    // resulting type of this expression
+    const auto expression = { node.expression() };
+    inference( description, annotate( node, expression ), node, expression );
+
+    if( not node.type() )
+    {
+        return;
+    }
+
+    const auto resultType = node.type();
+    std::vector< libcasm_ir::Type::Ptr > argumentTypes;
+    argumentTypes.emplace_back( node.expression()->type() );
+
+    const auto relationType =
+        libstdhl::Memory::make< libcasm_ir::RelationType >( resultType, argumentTypes );
+
+    const auto& annotation = libcasm_ir::Annotation::find( node.targetBuiltinId() );
+    if( not annotation.valid( *relationType ) )
+    {
+        m_log.error(
+            { node.sourceLocation() },
+            "invalid '" + description + "' type relation '" + relationType->description() +
+                "' found'",
+            Code::TypeInferenceCardinalityExpressionInvalid );
+        return;
+    }
+
+    node.setTargetBuiltinType( relationType );
+}
+
 void TypeInferenceVisitor::visit( ConditionalRule& node )
 {
     m_typeIDs[ node.condition().get() ].emplace( libcasm_ir::Type::Kind::BOOLEAN );
@@ -1729,6 +1784,23 @@ const libcasm_ir::Annotation* TypeInferenceVisitor::annotate(
                 "invalid argument size: method '" + methodName + "' expects " +
                     std::to_string( expectedNumberOfArguments - 1 ) + " arguments",
                 Code::SymbolArgumentSizeMismatch );
+            return nullptr;
+        }
+    }
+    else if( node.id() == libcasm_fe::Ast::Type::ID::CARDINALITY_EXPRESSION )
+    {
+        const auto& cardinalityExpression = static_cast< CardinalityExpression& >( node );
+
+        if( cardinalityExpression.cardinalityType() ==
+            CardinalityExpression::CardinalityType::BUILTIN )
+        {
+            assert( cardinalityExpression.targetBuiltinId() );
+            const auto& builtin_annotation =
+                libcasm_ir::Annotation::find( cardinalityExpression.targetBuiltinId() );
+            annotation = &builtin_annotation;
+        }
+        else
+        {
             return nullptr;
         }
     }

@@ -292,7 +292,7 @@ namespace libcasm_fe
 
             const std::shared_ptr< Type >& asType( void ) const;
 
-            void setCastingType( CastingType castingType );
+            void setCastingType( const CastingType castingType );
             CastingType castingType( void ) const;
             std::string castingTypeName( void ) const;
 
@@ -502,6 +502,50 @@ namespace libcasm_fe
                 const Expression::Ptr& proposition );
 
             void accept( Visitor& visitor ) override final;
+        };
+
+        class CardinalityExpression final : public CallExpression
+        {
+          public:
+            using Ptr = std::shared_ptr< CardinalityExpression >;
+
+            enum class CardinalityType
+            {
+                BUILTIN,
+                UNKNOWN
+            };
+
+            CardinalityExpression( const Expression::Ptr& expression );
+
+            const Expression::Ptr& expression( void ) const;
+
+            void setCardinalityType( CardinalityType cardinalityType );
+            CardinalityType cardinalityType( void ) const;
+            std::string cardinalityTypeName( void ) const;
+
+            /**
+               Sets the builtin id of this call.
+             */
+            void setTargetBuiltinId( libcasm_ir::Value::ID builtinId );
+            libcasm_ir::Value::ID targetBuiltinId( void ) const;
+
+            /**
+               Sets the builtin type of this call.
+
+               This is required in addition to the builtin id, because builtins
+               allow overloading and thus a simple id to relation type mapping
+               is not possible.
+            */
+            void setTargetBuiltinType( const libcasm_ir::RelationType::Ptr& builtinType );
+            const libcasm_ir::RelationType::Ptr& targetBuiltinType( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_expression;
+            CardinalityType m_cardinalityType;
+            libcasm_ir::Value::ID m_targetBuiltinId;
+            libcasm_ir::RelationType::Ptr m_targetBuiltinType;
         };
     }
 }

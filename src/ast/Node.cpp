@@ -188,6 +188,10 @@ std::string Node::description( void ) const
         {
             return "existential quantifier";
         }
+        case ID::CARDINALITY_EXPRESSION:
+        {
+            return "cardinality expression";
+        }
         case ID::SKIP_RULE:
         {
             return "skip";

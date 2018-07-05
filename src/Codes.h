@@ -245,6 +245,9 @@ namespace libcasm_fe
         TypeInferenceTypeCastingExpressionFromHasNoType = 0x1701,
         TypeInferenceTypeCastingExpressionAsHasInvalidType = 0x1702,
 
+        TypeInferenceCardinalityExpressionInvalid = 0x1800,
+        TypeInferenceCardinalityExpressionHasNoType = 0x1801,
+
         TypeCheckUseOfUndeclaredFunctionInInitially = 0xc000,
 
         TypeIntegerRangedInvalidInterval = 0x2000,  // 2*** ... Integer type error
