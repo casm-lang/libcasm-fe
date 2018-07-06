@@ -960,6 +960,7 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
         case libcasm_ir::Type::Kind::TUPLE:               // [fallthrough]
         case libcasm_ir::Type::Kind::RECORD:              // [fallthrough]
         case libcasm_ir::Type::Kind::LIST:                // [fallthrough]
+        case libcasm_ir::Type::Kind::STRUCTURE:           // [fallthrough]
         case libcasm_ir::Type::Kind::RULE_REFERENCE:      // [fallthrough]
         case libcasm_ir::Type::Kind::FUNCTION_REFERENCE:  // [fallthrough]
         case libcasm_ir::Type::Kind::FILE:                // [fallthrough]
