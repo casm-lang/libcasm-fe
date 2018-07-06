@@ -790,6 +790,52 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         node.setMethodType( MethodCallExpression::MethodType::BUILTIN );
         node.setTargetBuiltinId( annotation->valueID() );
     }
+    else
+    {
+        const auto& methodType = node.object()->type()->result().description();
+
+        try
+        {
+            const auto& nspace = m_symboltable.findNamespace( methodType );
+            const auto& symbol = nspace->findSymbol( methodName );
+
+            switch( symbol->id() )
+            {
+                case Node::ID::FUNCTION_DEFINITION:
+                {
+                    node.setMethodType( MethodCallExpression::MethodType::FUNCTION );
+                    break;
+                }
+                default:
+                {
+                    throw std::domain_error( "invalid symbol '" + symbol->description() + "'" );
+                    break;
+                }
+            }
+
+            node.setTargetDefinition( symbol );
+
+            // make sure that the definition has been typed
+            const auto& definition = node.targetDefinition();
+            assert( definition );
+            definition->accept( *this );
+
+            const auto& arguments = *node.arguments();
+            const auto& argumentTypes = definition->type()->arguments();
+            for( std::size_t i = 0; i < arguments.size(); i++ )
+            {
+                m_typeIDs[ arguments.at( i ).get() ].emplace( argumentTypes.at( i )->id() );
+            }
+
+            node.setType( definition->type() );
+        }
+        catch( const std::domain_error& e )
+        {
+            m_log.error(
+                { node.sourceLocation() },
+                "type '" + methodType + "' does not have a symbol '" + methodName + "'" );
+        }
+    }
 
     RecursiveVisitor::visit( node );
 
@@ -1724,7 +1770,7 @@ void TypeInferenceVisitor::visit( UpdateRule& node )
         m_typeIDs[ expr.get() ].emplace( func->type()->id() );
     }
 
-    node.expression()->accept( *this );
+    expr->accept( *this );
 
     assignment(
         *func,
@@ -2308,6 +2354,8 @@ void CallTargetCheckVisitor::visit( UpdateRule& node )
             return;
         }
     }
+
+    RecursiveVisitor::visit( node );
 }
 
 void CallTargetCheckVisitor::visit( DirectCallExpression& node )
@@ -2319,6 +2367,8 @@ void CallTargetCheckVisitor::visit( DirectCallExpression& node )
             "unknown symbol '" + node.identifier()->path() + "' found",
             Code::SymbolIsUnknown );
     }
+
+    RecursiveVisitor::visit( node );
 }
 
 void CallTargetCheckVisitor::visit( MethodCallExpression& node )
@@ -2330,6 +2380,8 @@ void CallTargetCheckVisitor::visit( MethodCallExpression& node )
             "unknown method '" + node.methodName()->name() + "' found",
             Code::MethodIsUnknown );
     }
+
+    RecursiveVisitor::visit( node );
 }
 
 void TypeInferencePass::usage( libpass::PassUsage& pu )
