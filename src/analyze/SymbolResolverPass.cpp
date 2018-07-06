@@ -462,7 +462,10 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         const auto agentSymbol = m_symboltable.findSymbol( AGENT );
         if( not agentSymbol )
         {
-            m_log.error( { node.sourceLocation() }, "unable to find '" + AGENT + "' symbol" );
+            m_log.error(
+                { node.sourceLocation() },
+                "unable to find '" + AGENT + "' symbol",
+                Code::SymbolIsUnknown );
             return;
         }
 
