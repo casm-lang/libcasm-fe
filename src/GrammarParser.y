@@ -1555,11 +1555,11 @@ RecordLiteral
 //
 
 StructureLiteral
-: Identifier TupleLiteral
+: BasicType TupleLiteral
   {
       $$ = Ast::make< StructureLiteral >( @$, $1, $2 );
   }
-| Identifier RecordLiteral
+| BasicType RecordLiteral
   {
       $$ = Ast::make< StructureLiteral >( @$, $1, $2 );
   }
