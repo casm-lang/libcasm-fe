@@ -48,6 +48,7 @@
 
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Token>
+#include <libcasm-fe/ast/Type>
 
 #include <libcasm-ir/Constant>
 
@@ -225,16 +226,16 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< StructureLiteral >;
 
-            StructureLiteral( const Identifier::Ptr& identifier, const Expression::Ptr& expression );
+            StructureLiteral( const Type::Ptr& type, const Expression::Ptr& expression );
 
-            const Identifier::Ptr& identifier( void ) const;
+            const Type::Ptr& type( void ) const;
 
             const Expression::Ptr& expression( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const Identifier::Ptr m_identifier;
+            const Type::Ptr m_type;
             const Expression::Ptr m_expression;
         };
     }

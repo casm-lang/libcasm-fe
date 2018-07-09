@@ -313,7 +313,7 @@ void RecursiveVisitor::visit( EmbracedExpression& node )
 
 void RecursiveVisitor::visit( StructureLiteral& node )
 {
-    node.identifier()->accept( *this );
+    node.type()->accept( *this );
     node.expression()->accept( *this );
 }
 

@@ -331,17 +331,16 @@ void RecordLiteral::accept( Visitor& visitor )
 // StructureLiteral
 //
 
-StructureLiteral::StructureLiteral(
-    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
+StructureLiteral::StructureLiteral( const Type::Ptr& type, const Expression::Ptr& expression )
 : Literal( Node::ID::STRUCTURE_LITERAL )
-, m_identifier( identifier )
+, m_type( type )
 , m_expression( expression )
 {
 }
 
-const Identifier::Ptr& StructureLiteral::identifier( void ) const
+const Type::Ptr& StructureLiteral::type( void ) const
 {
-    return m_identifier;
+    return m_type;
 }
 
 const Expression::Ptr& StructureLiteral::expression( void ) const

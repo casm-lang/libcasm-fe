@@ -3,10 +3,6 @@ Terminals unused in grammar
     "this"
 
 
-State 95 conflicts: 1 shift/reduce
-State 136 conflicts: 1 shift/reduce
-
-
 Grammar
 
     0 $accept: Specification "end of file"
@@ -281,8 +277,8 @@ Grammar
 
   198 RecordLiteral: "(" Assignments ")"
 
-  199 StructureLiteral: Identifier TupleLiteral
-  200                 | Identifier RecordLiteral
+  199 StructureLiteral: BasicType TupleLiteral
+  200                 | BasicType RecordLiteral
 
   201 Assignments: Assignments "," Assignment
   202            | Assignment
@@ -715,7 +711,7 @@ Nonterminals, with rules where they appear
         on right: 24 25 26 28 30 32 33 39 67 68 163 204 205 213 216 218 219 243 256
     BasicType <BasicType::Ptr> (171)
         on left: 212
-        on right: 206
+        on right: 199 200 206
     TupleType <TupleType::Ptr> (172)
         on left: 213
         on right: 207
@@ -754,7 +750,7 @@ Nonterminals, with rules where they appear
         on right: 228 229
     Identifier <Identifier::Ptr> (184)
         on left: 233 234
-        on right: 23 24 25 26 27 28 29 30 31 32 33 34 35 39 42 44 45 50 59 60 67 68 155 156 157 158 199 200 203 235 236 238 243 256 262 263
+        on right: 23 24 25 26 27 28 29 30 31 32 33 34 35 39 42 44 45 50 59 60 67 68 155 156 157 158 203 235 236 238 243 256 262 263
     IdentifierPath <IdentifierPath::Ptr> (185)
         on left: 235 236
         on right: 21 40 41 43 44 59 151 152 153 154 192 212 215 216 217 235
@@ -983,22 +979,23 @@ State 10
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 11
 
   259 Attribute: "[" BasicAttribute • "]"
 
-    "]"  shift, and go to state 97
+    "]"  shift, and go to state 98
 
 
 State 12
 
   260 Attribute: "[" ExpressionAttribute • "]"
 
-    "]"  shift, and go to state 98
+    "]"  shift, and go to state 99
 
 
 State 13
@@ -1021,10 +1018,10 @@ State 15
    22               | "init" • "{" Initializers "}"
 
     "in"          shift, and go to state 8
-    "{"           shift, and go to state 99
+    "{"           shift, and go to state 100
     "identifier"  shift, and go to state 9
 
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 101
 
 
@@ -1096,7 +1093,7 @@ State 21
     "in"          shift, and go to state 8
     "identifier"  shift, and go to state 9
 
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 108
 
 
@@ -1443,8 +1440,9 @@ State 48
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 49
@@ -1542,8 +1540,9 @@ State 53
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 54
@@ -1587,8 +1586,9 @@ State 54
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 55
@@ -1632,8 +1632,9 @@ State 55
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 56
@@ -1700,8 +1701,9 @@ State 56
     StructureLiteral                 go to state 94
     Assignments                      go to state 134
     Assignment                       go to state 135
+    BasicType                        go to state 95
     Identifier                       go to state 136
-    IdentifierPath                   go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 57
@@ -1767,8 +1769,9 @@ State 57
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 58
@@ -1812,8 +1815,9 @@ State 58
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 59
@@ -1823,7 +1827,7 @@ State 59
     "in"          shift, and go to state 8
     "identifier"  shift, and go to state 9
 
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 142
 
 
@@ -2123,14 +2127,10 @@ State 94
 
 State 95
 
-  199 StructureLiteral: Identifier • TupleLiteral
-  200                 | Identifier • RecordLiteral
-  236 IdentifierPath: Identifier •
+  199 StructureLiteral: BasicType • TupleLiteral
+  200                 | BasicType • RecordLiteral
 
     "("  shift, and go to state 163
-
-    "("       [reduce using rule 236 (IdentifierPath)]
-    $default  reduce using rule 236 (IdentifierPath)
 
     TupleLiteral   go to state 164
     RecordLiteral  go to state 165
@@ -2138,10 +2138,18 @@ State 95
 
 State 96
 
+  236 IdentifierPath: Identifier •
+
+    $default  reduce using rule 236 (IdentifierPath)
+
+
+State 97
+
   151 DirectCallExpression: IdentifierPath •
   152                     | IdentifierPath • "(" ")"
   153                     | IdentifierPath • "(" Terms ")"
   154                     | IdentifierPath • "(" error ")"
+  212 BasicType: IdentifierPath •
   235 IdentifierPath: IdentifierPath • "::" Identifier
 
     "("   shift, and go to state 166
@@ -2150,21 +2158,21 @@ State 96
     $default  reduce using rule 151 (DirectCallExpression)
 
 
-State 97
+State 98
 
   259 Attribute: "[" BasicAttribute "]" •
 
     $default  reduce using rule 259 (Attribute)
 
 
-State 98
+State 99
 
   260 Attribute: "[" ExpressionAttribute "]" •
 
     $default  reduce using rule 260 (Attribute)
 
 
-State 99
+State 100
 
    22 InitDefinition: "init" "{" • Initializers "}"
 
@@ -2221,17 +2229,11 @@ State 99
     TupleLiteral                     go to state 170
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
+    BasicType                        go to state 95
     Initializers                     go to state 171
     Initializer                      go to state 172
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
-
-
-State 100
-
-  236 IdentifierPath: Identifier •
-
-    $default  reduce using rule 236 (IdentifierPath)
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 101
@@ -2631,19 +2633,12 @@ State 135
 
 State 136
 
-  199 StructureLiteral: Identifier • TupleLiteral
-  200                 | Identifier • RecordLiteral
   203 Assignment: Identifier • ":" Term
   236 IdentifierPath: Identifier •
 
-    "("  shift, and go to state 163
     ":"  shift, and go to state 203
 
-    "("       [reduce using rule 236 (IdentifierPath)]
     $default  reduce using rule 236 (IdentifierPath)
-
-    TupleLiteral   go to state 164
-    RecordLiteral  go to state 165
 
 
 State 137
@@ -2793,8 +2788,9 @@ State 143
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 144
@@ -2854,8 +2850,9 @@ State 144
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 145
@@ -2915,8 +2912,9 @@ State 145
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 146
@@ -2976,8 +2974,9 @@ State 146
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 147
@@ -3037,8 +3036,9 @@ State 147
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 148
@@ -3098,8 +3098,9 @@ State 148
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 149
@@ -3159,8 +3160,9 @@ State 149
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 150
@@ -3220,8 +3222,9 @@ State 150
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 151
@@ -3281,8 +3284,9 @@ State 151
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 152
@@ -3342,8 +3346,9 @@ State 152
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 153
@@ -3403,8 +3408,9 @@ State 153
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 154
@@ -3464,8 +3470,9 @@ State 154
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 155
@@ -3525,8 +3532,9 @@ State 155
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 156
@@ -3586,8 +3594,9 @@ State 156
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 157
@@ -3647,8 +3656,9 @@ State 157
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 158
@@ -3708,8 +3718,9 @@ State 158
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 159
@@ -3769,8 +3780,9 @@ State 159
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 160
@@ -3788,7 +3800,7 @@ State 160
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -3870,8 +3882,9 @@ State 162
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 163
@@ -3935,20 +3948,21 @@ State 163
     StructureLiteral                 go to state 94
     Assignments                      go to state 134
     Assignment                       go to state 135
+    BasicType                        go to state 95
     Identifier                       go to state 136
-    IdentifierPath                   go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 164
 
-  199 StructureLiteral: Identifier TupleLiteral •
+  199 StructureLiteral: BasicType TupleLiteral •
 
     $default  reduce using rule 199 (StructureLiteral)
 
 
 State 165
 
-  200 StructureLiteral: Identifier RecordLiteral •
+  200 StructureLiteral: BasicType RecordLiteral •
 
     $default  reduce using rule 200 (StructureLiteral)
 
@@ -4015,8 +4029,9 @@ State 166
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 167
@@ -4094,8 +4109,9 @@ State 168
     StructureLiteral                 go to state 94
     Assignments                      go to state 134
     Assignment                       go to state 135
+    BasicType                        go to state 95
     Identifier                       go to state 136
-    IdentifierPath                   go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 169
@@ -4199,7 +4215,7 @@ State 174
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -4278,8 +4294,9 @@ State 176
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 177
@@ -4317,7 +4334,7 @@ State 178
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -4336,7 +4353,7 @@ State 179
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -4409,8 +4426,9 @@ State 181
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 182
@@ -4473,7 +4491,7 @@ State 187
     FixedSizedType           go to state 233
     FunctionParameters       go to state 300
     MaybeFunctionParameters  go to state 301
-    Identifier               go to state 100
+    Identifier               go to state 96
     IdentifierPath           go to state 234
 
 
@@ -4492,7 +4510,7 @@ State 188
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -4553,8 +4571,9 @@ State 189
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 190
@@ -4614,8 +4633,9 @@ State 190
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 191
@@ -4699,8 +4719,9 @@ State 193
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 194
@@ -4776,8 +4797,9 @@ State 195
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 196
@@ -4837,8 +4859,9 @@ State 196
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 197
@@ -4898,8 +4921,9 @@ State 197
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 198
@@ -4967,8 +4991,9 @@ State 199
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 200
@@ -5053,8 +5078,9 @@ State 203
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 204
@@ -5128,8 +5154,9 @@ State 206
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 207
@@ -5189,8 +5216,9 @@ State 207
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 208
@@ -6051,8 +6079,9 @@ State 246
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 247
@@ -6119,9 +6148,10 @@ State 248
     TupleLiteral                     go to state 170
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
+    BasicType                        go to state 95
     Initializer                      go to state 331
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 249
@@ -6269,8 +6299,9 @@ State 257
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 258
@@ -6344,8 +6375,9 @@ State 258
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 259
@@ -6493,8 +6525,9 @@ State 264
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 265
@@ -6555,8 +6588,9 @@ State 265
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 266
@@ -6617,8 +6651,9 @@ State 266
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 267
@@ -6678,8 +6713,9 @@ State 267
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 268
@@ -6753,8 +6789,9 @@ State 268
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 269
@@ -6828,8 +6865,9 @@ State 269
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 270
@@ -7648,7 +7686,7 @@ State 322
     FixedSizedType           go to state 233
     FunctionParameters       go to state 300
     MaybeFunctionParameters  go to state 399
-    Identifier               go to state 100
+    Identifier               go to state 96
     IdentifierPath           go to state 234
 
 
@@ -7709,8 +7747,9 @@ State 323
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 324
@@ -7775,8 +7814,9 @@ State 324
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 325
@@ -7959,8 +7999,9 @@ State 336
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 337
@@ -8083,8 +8124,9 @@ State 343
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 344
@@ -8171,8 +8213,9 @@ State 346
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 347
@@ -8463,8 +8506,9 @@ State 361
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 362
@@ -8544,8 +8588,9 @@ State 363
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 364
@@ -8605,8 +8650,9 @@ State 364
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 365
@@ -8666,8 +8712,9 @@ State 365
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 366
@@ -8756,8 +8803,9 @@ State 368
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 369
@@ -8951,7 +8999,7 @@ State 387
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -8970,7 +9018,7 @@ State 388
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -9031,8 +9079,9 @@ State 389
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 390
@@ -9092,8 +9141,9 @@ State 390
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 391
@@ -9153,8 +9203,9 @@ State 391
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 392
@@ -9214,8 +9265,9 @@ State 392
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 393
@@ -9248,7 +9300,7 @@ State 395
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -9394,8 +9446,9 @@ State 404
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 405
@@ -9413,7 +9466,7 @@ State 405
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -9432,7 +9485,7 @@ State 406
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -9617,8 +9670,9 @@ State 417
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 418
@@ -9640,7 +9694,7 @@ State 418
     FixedSizedType           go to state 233
     FunctionParameters       go to state 300
     MaybeFunctionParameters  go to state 468
-    Identifier               go to state 100
+    Identifier               go to state 96
     IdentifierPath           go to state 234
 
 
@@ -9712,8 +9766,9 @@ State 419
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 420
@@ -9797,8 +9852,9 @@ State 422
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 423
@@ -9858,8 +9914,9 @@ State 423
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 424
@@ -9931,8 +9988,9 @@ State 424
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 425
@@ -10011,8 +10069,9 @@ State 426
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 427
@@ -10195,8 +10254,9 @@ State 433
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 434
@@ -10214,7 +10274,7 @@ State 434
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -10286,8 +10346,9 @@ State 435
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 436
@@ -10305,7 +10366,7 @@ State 436
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -10657,7 +10718,7 @@ State 458
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -10683,7 +10744,7 @@ State 460
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -10949,8 +11010,9 @@ State 474
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 475
@@ -11016,7 +11078,7 @@ State 481
     FixedSizedType           go to state 233
     FunctionParameters       go to state 300
     MaybeFunctionParameters  go to state 508
-    Identifier               go to state 100
+    Identifier               go to state 96
     IdentifierPath           go to state 234
 
 
@@ -11039,7 +11101,7 @@ State 482
     FixedSizedType           go to state 233
     FunctionParameters       go to state 300
     MaybeFunctionParameters  go to state 509
-    Identifier               go to state 100
+    Identifier               go to state 96
     IdentifierPath           go to state 234
 
 
@@ -11187,8 +11249,9 @@ State 492
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 493
@@ -11248,8 +11311,9 @@ State 493
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 494
@@ -11267,7 +11331,7 @@ State 494
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -11339,8 +11403,9 @@ State 495
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 496
@@ -11400,8 +11465,9 @@ State 496
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 497
@@ -11472,8 +11538,9 @@ State 497
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 498
@@ -11544,8 +11611,9 @@ State 498
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 499
@@ -11631,8 +11699,9 @@ State 502
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 503
@@ -11751,8 +11820,9 @@ State 505
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 506
@@ -11823,8 +11893,9 @@ State 506
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 507
@@ -11947,8 +12018,9 @@ State 516
     TupleLiteral                     go to state 92
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    BasicType                        go to state 95
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 517
@@ -12204,8 +12276,9 @@ State 528
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 529
@@ -12276,8 +12349,9 @@ State 529
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 530
@@ -12362,8 +12436,9 @@ State 532
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 533
@@ -12395,7 +12470,7 @@ State 535
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -12414,7 +12489,7 @@ State 536
     TemplateType    go to state 231
     RelationType    go to state 232
     FixedSizedType  go to state 233
-    Identifier      go to state 100
+    Identifier      go to state 96
     IdentifierPath  go to state 234
 
 
@@ -12516,10 +12591,11 @@ State 538
     TupleLiteral                     go to state 170
     RecordLiteral                    go to state 93
     StructureLiteral                 go to state 94
+    BasicType                        go to state 95
     Initializers                     go to state 547
     Initializer                      go to state 172
-    Identifier                       go to state 95
-    IdentifierPath                   go to state 96
+    Identifier                       go to state 96
+    IdentifierPath                   go to state 97
 
 
 State 539
@@ -12601,8 +12677,9 @@ State 540
     TupleLiteral            go to state 92
     RecordLiteral           go to state 93
     StructureLiteral        go to state 94
-    Identifier              go to state 95
-    IdentifierPath          go to state 96
+    BasicType               go to state 95
+    Identifier              go to state 96
+    IdentifierPath          go to state 97
 
 
 State 541

@@ -1544,14 +1544,14 @@
       <rule number="199" usefulness="useful">
         <lhs>StructureLiteral</lhs>
         <rhs>
-          <symbol>Identifier</symbol>
+          <symbol>BasicType</symbol>
           <symbol>TupleLiteral</symbol>
         </rhs>
       </rule>
       <rule number="200" usefulness="useful">
         <lhs>StructureLiteral</lhs>
         <rhs>
-          <symbol>Identifier</symbol>
+          <symbol>BasicType</symbol>
           <symbol>RecordLiteral</symbol>
         </rhs>
       </rule>
@@ -2548,6 +2548,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -2613,8 +2614,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions>
@@ -2630,7 +2632,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;]&quot;" state="97"/>
+          <transition type="shift" symbol="&quot;]&quot;" state="98"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -2644,7 +2646,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;]&quot;" state="98"/>
+          <transition type="shift" symbol="&quot;]&quot;" state="99"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -2692,9 +2694,9 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
-          <transition type="shift" symbol="&quot;{&quot;" state="99"/>
+          <transition type="shift" symbol="&quot;{&quot;" state="100"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="101"/>
         </transitions>
         <errors/>
@@ -2818,7 +2820,7 @@
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="108"/>
         </transitions>
         <errors/>
@@ -3514,6 +3516,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -3573,8 +3576,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -3751,6 +3755,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -3810,8 +3815,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -3875,6 +3881,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -3918,8 +3925,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -3983,6 +3991,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -4026,8 +4035,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -4133,6 +4143,7 @@
         <item rule-number="201" dot="0"/>
         <item rule-number="202" dot="0"/>
         <item rule-number="203" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -4196,8 +4207,9 @@
           <transition type="goto" symbol="StructureLiteral" state="94"/>
           <transition type="goto" symbol="Assignments" state="134"/>
           <transition type="goto" symbol="Assignment" state="135"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
           <transition type="goto" symbol="Identifier" state="136"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -4300,6 +4312,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -4362,8 +4375,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -4427,6 +4441,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -4470,8 +4485,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -4491,7 +4507,7 @@
         <transitions>
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="142"/>
         </transitions>
         <errors/>
@@ -5216,93 +5232,6 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="1"/>
         <item rule-number="200" dot="1"/>
-        <item rule-number="236" dot="1">
-          <lookaheads>
-            <symbol>&quot;end of file&quot;</symbol>
-            <symbol>error</symbol>
-            <symbol>&quot;init&quot;</symbol>
-            <symbol>&quot;derived&quot;</symbol>
-            <symbol>&quot;enumeration&quot;</symbol>
-            <symbol>&quot;rule&quot;</symbol>
-            <symbol>&quot;using&quot;</symbol>
-            <symbol>&quot;invariant&quot;</symbol>
-            <symbol>&quot;import&quot;</symbol>
-            <symbol>&quot;structure&quot;</symbol>
-            <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
-            <symbol>&quot;function&quot;</symbol>
-            <symbol>&quot;defined&quot;</symbol>
-            <symbol>&quot;seq&quot;</symbol>
-            <symbol>&quot;endseq&quot;</symbol>
-            <symbol>&quot;par&quot;</symbol>
-            <symbol>&quot;endpar&quot;</symbol>
-            <symbol>&quot;skip&quot;</symbol>
-            <symbol>&quot;let&quot;</symbol>
-            <symbol>&quot;local&quot;</symbol>
-            <symbol>&quot;in&quot;</symbol>
-            <symbol>&quot;forall&quot;</symbol>
-            <symbol>&quot;choose&quot;</symbol>
-            <symbol>&quot;iterate&quot;</symbol>
-            <symbol>&quot;do&quot;</symbol>
-            <symbol>&quot;if&quot;</symbol>
-            <symbol>&quot;then&quot;</symbol>
-            <symbol>&quot;else&quot;</symbol>
-            <symbol>&quot;case&quot;</symbol>
-            <symbol>&quot;of&quot;</symbol>
-            <symbol>&quot;default&quot;</symbol>
-            <symbol>&quot;holds&quot;</symbol>
-            <symbol>&quot;exists&quot;</symbol>
-            <symbol>&quot;with&quot;</symbol>
-            <symbol>&quot;as&quot;</symbol>
-            <symbol>&quot;while&quot;</symbol>
-            <symbol>&quot;undef&quot;</symbol>
-            <symbol>&quot;false&quot;</symbol>
-            <symbol>&quot;true&quot;</symbol>
-            <symbol>&quot;and&quot;</symbol>
-            <symbol>&quot;or&quot;</symbol>
-            <symbol>&quot;xor&quot;</symbol>
-            <symbol>&quot;implies&quot;</symbol>
-            <symbol>&quot;not&quot;</symbol>
-            <symbol>&quot;+&quot;</symbol>
-            <symbol>&quot;-&quot;</symbol>
-            <symbol>&quot;=&quot;</symbol>
-            <symbol>&quot;(&quot;</symbol>
-            <symbol>&quot;)&quot;</symbol>
-            <symbol>&quot;[&quot;</symbol>
-            <symbol>&quot;]&quot;</symbol>
-            <symbol>&quot;{&quot;</symbol>
-            <symbol>&quot;}&quot;</symbol>
-            <symbol>&quot;:&quot;</symbol>
-            <symbol>&quot;::&quot;</symbol>
-            <symbol>&quot;_&quot;</symbol>
-            <symbol>&quot;|&quot;</symbol>
-            <symbol>&quot;@&quot;</symbol>
-            <symbol>&quot;,&quot;</symbol>
-            <symbol>&quot;&lt;&quot;</symbol>
-            <symbol>&quot;&gt;&quot;</symbol>
-            <symbol>&quot;*&quot;</symbol>
-            <symbol>&quot;/&quot;</symbol>
-            <symbol>&quot;%&quot;</symbol>
-            <symbol>&quot;^&quot;</symbol>
-            <symbol>&quot;..&quot;</symbol>
-            <symbol>&quot;.&quot;</symbol>
-            <symbol>&quot;-&gt;&quot;</symbol>
-            <symbol>&quot;=&gt;&quot;</symbol>
-            <symbol>&quot;:=&quot;</symbol>
-            <symbol>&quot;!=&quot;</symbol>
-            <symbol>&quot;&lt;=&quot;</symbol>
-            <symbol>&quot;&gt;=&quot;</symbol>
-            <symbol>&quot;{|&quot;</symbol>
-            <symbol>&quot;|}&quot;</symbol>
-            <symbol>&quot;binary&quot;</symbol>
-            <symbol>&quot;hexadecimal&quot;</symbol>
-            <symbol>&quot;integer&quot;</symbol>
-            <symbol>&quot;rational&quot;</symbol>
-            <symbol>&quot;decimal&quot;</symbol>
-            <symbol>&quot;string&quot;</symbol>
-            <symbol>&quot;identifier&quot;</symbol>
-          </lookaheads>
-        </item>
       </itemset>
       <actions>
         <transitions>
@@ -5311,15 +5240,26 @@
           <transition type="goto" symbol="RecordLiteral" state="165"/>
         </transitions>
         <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="96">
+      <itemset>
+        <item rule-number="236" dot="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
         <reductions>
-          <reduction symbol="&quot;(&quot;" rule="236" enabled="false"/>
           <reduction symbol="$default" rule="236" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
     </state>
 
-    <state number="96">
+    <state number="97">
       <itemset>
         <item rule-number="151" dot="1">
           <lookaheads>
@@ -5409,6 +5349,10 @@
         <item rule-number="152" dot="1"/>
         <item rule-number="153" dot="1"/>
         <item rule-number="154" dot="1"/>
+        <item rule-number="212" dot="1">
+          <lookaheads>
+          </lookaheads>
+        </item>
         <item rule-number="235" dot="1"/>
       </itemset>
       <actions>
@@ -5423,10 +5367,11 @@
       </actions>
       <solved-conflicts>
         <resolution rule="151" symbol="&quot;(&quot;" type="shift">CALL_WITHOUT_ARGS &lt; &quot;(&quot;</resolution>
+        <resolution rule="212" symbol="&quot;(&quot;" type="shift">BASIC_TYPE &lt; &quot;(&quot;</resolution>
       </solved-conflicts>
     </state>
 
-    <state number="97">
+    <state number="98">
       <itemset>
         <item rule-number="259" dot="3"/>
       </itemset>
@@ -5440,7 +5385,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="98">
+    <state number="99">
       <itemset>
         <item rule-number="260" dot="3"/>
       </itemset>
@@ -5454,7 +5399,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="99">
+    <state number="100">
       <itemset>
         <item rule-number="22" dot="2"/>
         <item rule-number="114" dot="0"/>
@@ -5544,6 +5489,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="228" dot="0"/>
         <item rule-number="229" dot="0"/>
         <item rule-number="230" dot="0"/>
@@ -5608,27 +5554,14 @@
           <transition type="goto" symbol="TupleLiteral" state="170"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
           <transition type="goto" symbol="Initializers" state="171"/>
           <transition type="goto" symbol="Initializer" state="172"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="100">
-      <itemset>
-        <item rule-number="236" dot="1"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="236" enabled="true"/>
-        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -6638,10 +6571,6 @@
 
     <state number="136">
       <itemset>
-        <item rule-number="197" dot="0"/>
-        <item rule-number="198" dot="0"/>
-        <item rule-number="199" dot="1"/>
-        <item rule-number="200" dot="1"/>
         <item rule-number="203" dot="1"/>
         <item rule-number="236" dot="1">
           <lookaheads>
@@ -6673,14 +6602,10 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;(&quot;" state="163"/>
           <transition type="shift" symbol="&quot;:&quot;" state="203"/>
-          <transition type="goto" symbol="TupleLiteral" state="164"/>
-          <transition type="goto" symbol="RecordLiteral" state="165"/>
         </transitions>
         <errors/>
         <reductions>
-          <reduction symbol="&quot;(&quot;" rule="236" enabled="false"/>
           <reduction symbol="$default" rule="236" enabled="true"/>
         </reductions>
       </actions>
@@ -6998,6 +6923,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -7057,8 +6983,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -7156,6 +7083,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -7215,8 +7143,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -7314,6 +7243,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -7373,8 +7303,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -7472,6 +7403,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -7531,8 +7463,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -7630,6 +7563,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -7689,8 +7623,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -7788,6 +7723,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -7847,8 +7783,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -7946,6 +7883,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -8005,8 +7943,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -8104,6 +8043,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -8163,8 +8103,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -8262,6 +8203,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -8321,8 +8263,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -8420,6 +8363,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -8479,8 +8423,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -8578,6 +8523,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -8637,8 +8583,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -8736,6 +8683,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -8795,8 +8743,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -8894,6 +8843,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -8953,8 +8903,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -9052,6 +9003,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -9111,8 +9063,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -9210,6 +9163,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -9269,8 +9223,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -9368,6 +9323,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -9427,8 +9383,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -9526,6 +9483,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -9585,8 +9543,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -9626,7 +9585,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -9754,6 +9713,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -9816,8 +9776,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -9921,6 +9882,7 @@
         <item rule-number="201" dot="0"/>
         <item rule-number="202" dot="0"/>
         <item rule-number="203" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -9983,8 +9945,9 @@
           <transition type="goto" symbol="StructureLiteral" state="94"/>
           <transition type="goto" symbol="Assignments" state="134"/>
           <transition type="goto" symbol="Assignment" state="135"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
           <transition type="goto" symbol="Identifier" state="136"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -10114,6 +10077,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -10176,8 +10140,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -10301,6 +10266,7 @@
         <item rule-number="201" dot="0"/>
         <item rule-number="202" dot="0"/>
         <item rule-number="203" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="231" dot="1"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
@@ -10365,8 +10331,9 @@
           <transition type="goto" symbol="StructureLiteral" state="94"/>
           <transition type="goto" symbol="Assignments" state="134"/>
           <transition type="goto" symbol="Assignment" state="135"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
           <transition type="goto" symbol="Identifier" state="136"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -10567,7 +10534,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -10682,6 +10649,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -10752,8 +10720,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -10831,7 +10800,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -10872,7 +10841,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -10991,6 +10960,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -11050,8 +11020,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -11179,7 +11150,7 @@
           <transition type="goto" symbol="FixedSizedType" state="233"/>
           <transition type="goto" symbol="FunctionParameters" state="300"/>
           <transition type="goto" symbol="MaybeFunctionParameters" state="301"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -11222,7 +11193,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -11320,6 +11291,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -11380,8 +11352,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -11479,6 +11452,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -11538,8 +11512,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -11687,6 +11662,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -11746,8 +11722,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -11879,6 +11856,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -11938,8 +11916,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -12037,6 +12016,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -12096,8 +12076,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -12195,6 +12176,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -12254,8 +12236,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -12368,6 +12351,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -12427,8 +12411,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -12574,6 +12559,7 @@
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
         <item rule-number="203" dot="2"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -12633,8 +12619,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -12760,6 +12747,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -12819,8 +12807,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -12918,6 +12907,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -12977,8 +12967,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -15916,6 +15907,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="232" dot="2"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
@@ -15976,8 +15968,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -16088,6 +16081,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="228" dot="2"/>
         <item rule-number="230" dot="0"/>
         <item rule-number="231" dot="0"/>
@@ -16151,9 +16145,10 @@
           <transition type="goto" symbol="TupleLiteral" state="170"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
           <transition type="goto" symbol="Initializer" state="331"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -16402,6 +16397,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -16474,8 +16470,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -16578,6 +16575,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -16650,8 +16648,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -16915,6 +16914,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -16985,8 +16985,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -17085,6 +17086,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -17144,8 +17146,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -17244,6 +17247,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -17303,8 +17307,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -17402,6 +17407,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -17461,8 +17467,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -17565,6 +17572,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -17637,8 +17645,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -17741,6 +17750,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -17813,8 +17823,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -19366,7 +19377,7 @@
           <transition type="goto" symbol="FixedSizedType" state="233"/>
           <transition type="goto" symbol="FunctionParameters" state="300"/>
           <transition type="goto" symbol="MaybeFunctionParameters" state="399"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -19466,6 +19477,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="217" dot="2"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
@@ -19526,8 +19538,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -19629,6 +19642,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -19691,8 +19705,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -20028,6 +20043,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -20087,8 +20103,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -20285,6 +20302,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -20356,8 +20374,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -20486,6 +20505,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -20557,8 +20577,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -20980,6 +21001,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -21051,8 +21073,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21167,6 +21190,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -21238,8 +21262,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21337,6 +21362,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -21396,8 +21422,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21495,6 +21522,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -21554,8 +21582,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21687,6 +21716,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -21757,8 +21787,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -22144,7 +22175,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -22185,7 +22216,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -22284,6 +22315,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -22343,8 +22375,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -22442,6 +22475,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -22501,8 +22535,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -22600,6 +22635,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -22659,8 +22695,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -22758,6 +22795,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -22817,8 +22855,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -22887,7 +22926,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -23238,6 +23277,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="231" dot="4"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
@@ -23298,8 +23338,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -23339,7 +23380,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -23380,7 +23421,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -23691,6 +23732,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -23761,8 +23803,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -23812,7 +23855,7 @@
           <transition type="goto" symbol="FixedSizedType" state="233"/>
           <transition type="goto" symbol="FunctionParameters" state="300"/>
           <transition type="goto" symbol="MaybeFunctionParameters" state="468"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -23915,6 +23958,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -23985,8 +24029,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -24132,6 +24177,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -24191,8 +24237,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -24290,6 +24337,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -24349,8 +24397,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -24451,6 +24500,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -24521,8 +24571,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -24637,6 +24688,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -24707,8 +24759,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -25074,6 +25127,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -25144,8 +25198,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -25185,7 +25240,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -25286,6 +25341,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -25356,8 +25412,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -25397,7 +25454,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -26298,7 +26355,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -26353,7 +26410,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -26809,6 +26866,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -26873,8 +26931,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -27010,7 +27069,7 @@
           <transition type="goto" symbol="FixedSizedType" state="233"/>
           <transition type="goto" symbol="FunctionParameters" state="300"/>
           <transition type="goto" symbol="MaybeFunctionParameters" state="508"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -27063,7 +27122,7 @@
           <transition type="goto" symbol="FixedSizedType" state="233"/>
           <transition type="goto" symbol="FunctionParameters" state="300"/>
           <transition type="goto" symbol="MaybeFunctionParameters" state="509"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -27363,6 +27422,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -27422,8 +27482,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -27521,6 +27582,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -27580,8 +27642,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -27621,7 +27684,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -27722,6 +27785,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -27792,8 +27856,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -27891,6 +27956,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -27950,8 +28016,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -28051,6 +28118,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -28121,8 +28189,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -28222,6 +28291,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -28292,8 +28362,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -28437,6 +28508,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -28500,8 +28572,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -28663,6 +28736,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -28733,8 +28807,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -28834,6 +28909,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -28904,8 +28980,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -29128,6 +29205,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="224" dot="2"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
@@ -29188,8 +29266,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -29594,6 +29673,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -29664,8 +29744,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -29765,6 +29846,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -29835,8 +29917,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -29964,6 +30047,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -30034,8 +30118,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -30103,7 +30188,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -30144,7 +30229,7 @@
           <transition type="goto" symbol="TemplateType" state="231"/>
           <transition type="goto" symbol="RelationType" state="232"/>
           <transition type="goto" symbol="FixedSizedType" state="233"/>
-          <transition type="goto" symbol="Identifier" state="100"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="234"/>
         </transitions>
         <errors/>
@@ -30290,6 +30375,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="226" dot="2"/>
         <item rule-number="228" dot="0"/>
         <item rule-number="229" dot="0"/>
@@ -30355,10 +30441,11 @@
           <transition type="goto" symbol="TupleLiteral" state="170"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
           <transition type="goto" symbol="Initializers" state="547"/>
           <transition type="goto" symbol="Initializer" state="172"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -30482,6 +30569,7 @@
         <item rule-number="198" dot="0"/>
         <item rule-number="199" dot="0"/>
         <item rule-number="200" dot="0"/>
+        <item rule-number="212" dot="0"/>
         <item rule-number="233" dot="0"/>
         <item rule-number="234" dot="0"/>
         <item rule-number="235" dot="0"/>
@@ -30552,8 +30640,9 @@
           <transition type="goto" symbol="TupleLiteral" state="92"/>
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
-          <transition type="goto" symbol="Identifier" state="95"/>
-          <transition type="goto" symbol="IdentifierPath" state="96"/>
+          <transition type="goto" symbol="BasicType" state="95"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="97"/>
         </transitions>
         <errors/>
         <reductions/>
