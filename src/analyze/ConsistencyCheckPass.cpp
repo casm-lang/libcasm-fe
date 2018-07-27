@@ -168,7 +168,7 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     node.defaultValue()->accept( *this );
     node.attributes()->accept( *this );
 
-    if( node.uid() == FunctionDefinition::UID::PROGRAM )
+    if( node.isProgram() )
     {
         m_initDefinitionFound = true;
     }

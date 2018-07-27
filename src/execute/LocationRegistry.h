@@ -105,7 +105,6 @@ class LocationRegistry
         explicit Location( const LocationData* data )
         : m_data( data )
         {
-            assert( m_data != nullptr );
         }
 
         const Function& function() const
@@ -116,6 +115,19 @@ class LocationRegistry
         const Arguments& arguments() const
         {
             return m_data->second;
+        }
+
+        bool isValid() const
+        {
+            return m_data != nullptr;
+        }
+
+        /**
+         * Is used to indicate an invalid location.
+         */
+        static constexpr Location invalid()
+        {
+            return Location( nullptr );
         }
 
         friend struct LocationHash;
