@@ -1,6 +1,6 @@
-#line 2 "src/various/GrammarLexer.cpp"
+#line 1 "src/various/GrammarLexer.cpp"
 
-#line 4 "src/various/GrammarLexer.cpp"
+#line 3 "src/various/GrammarLexer.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -9,7 +9,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 6
-#define YY_FLEX_SUBMINOR_VERSION 0
+#define YY_FLEX_SUBMINOR_VERSION 4
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -88,68 +88,54 @@ typedef unsigned int flex_uint32_t;
 #define UINT32_MAX             (4294967295U)
 #endif
 
+#ifndef SIZE_MAX
+#define SIZE_MAX               (~(size_t)0)
+#endif
+
 #endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
 /* begin standard C++ headers. */
-#include <iostream> 
+#include <iostream>
 #include <errno.h>
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
 /* end standard C++ headers. */
 
-#ifdef __cplusplus
-
-/* The "const" storage-class-modifier is valid. */
-#define YY_USE_CONST
-
-#else	/* ! __cplusplus */
-
-/* C99 requires __STDC__ to be defined as 1. */
-#if defined (__STDC__)
-
-#define YY_USE_CONST
-
-#endif	/* defined (__STDC__) */
-#endif	/* ! __cplusplus */
-
-#ifdef YY_USE_CONST
+/* TODO: this is always defined, so inline it */
 #define yyconst const
+
+#if defined(__GNUC__) && __GNUC__ >= 3
+#define yynoreturn __attribute__((__noreturn__))
 #else
-#define yyconst
+#define yynoreturn
 #endif
 
 /* Returned upon end-of-file. */
 #define YY_NULL 0
 
-/* Promotes a possibly negative, possibly signed char to an unsigned
- * integer for use as an array index.  If the signed char is negative,
- * we want to instead treat it as an 8-bit unsigned char, hence the
- * double cast.
+/* Promotes a possibly negative, possibly signed char to an
+ *   integer in range [0..255] for use as an array index.
  */
-#define YY_SC_TO_UI(c) ((unsigned int) (unsigned char) c)
+#define YY_SC_TO_UI(c) ((YY_CHAR) (c))
 
 /* Enter a start condition.  This macro really ought to take a parameter,
  * but we do it the disgusting crufty way forced on us by the ()-less
  * definition of BEGIN.
  */
 #define BEGIN (yy_start) = 1 + 2 *
-
 /* Translate the current start state into a value that can be later handed
  * to BEGIN to return to the state.  The YYSTATE alias is for lex
  * compatibility.
  */
 #define YY_START (((yy_start) - 1) / 2)
 #define YYSTATE YY_START
-
 /* Action number for EOF rule of a given start state. */
 #define YY_STATE_EOF(state) (YY_END_OF_BUFFER + state + 1)
-
 /* Special action meaning "start processing a new file". */
 #define YY_NEW_FILE yyrestart( yyin  )
-
 #define YY_END_OF_BUFFER_CHAR 0
 
 /* Size of default input buffer. */
@@ -179,12 +165,12 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 typedef size_t yy_size_t;
 #endif
 
-extern yy_size_t yyleng;
+extern int yyleng;
 
 #define EOB_ACT_CONTINUE_SCAN 0
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
-
+    
     #define YY_LESS_LINENO(n)
     #define YY_LINENO_REWIND_TO(ptr)
     
@@ -201,7 +187,6 @@ extern yy_size_t yyleng;
 		YY_DO_BEFORE_ACTION; /* set up yytext again */ \
 		} \
 	while ( 0 )
-
 #define unput(c) yyunput( c, (yytext_ptr)  )
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
@@ -209,7 +194,7 @@ extern yy_size_t yyleng;
 struct yy_buffer_state
 	{
 
-	std::streambuf* yy_input_file; 
+	std::streambuf* yy_input_file;
 
 	char *yy_ch_buf;		/* input buffer */
 	char *yy_buf_pos;		/* current position in input buffer */
@@ -217,7 +202,7 @@ struct yy_buffer_state
 	/* Size of input buffer in bytes, not including room for EOB
 	 * characters.
 	 */
-	yy_size_t yy_buf_size;
+	int yy_buf_size;
 
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
@@ -245,7 +230,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-    
+
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -279,18 +264,16 @@ struct yy_buffer_state
 #define YY_CURRENT_BUFFER ( (yy_buffer_stack) \
                           ? (yy_buffer_stack)[(yy_buffer_stack_top)] \
                           : NULL)
-
 /* Same as previous macro, but useful when we know that the buffer stack is not
  * NULL or when we need an lvalue. For internal use only.
  */
 #define YY_CURRENT_BUFFER_LVALUE (yy_buffer_stack)[(yy_buffer_stack_top)]
 
-void *yyalloc (yy_size_t  );
-void *yyrealloc (void *,yy_size_t  );
-void yyfree (void *  );
+void *yyalloc ( yy_size_t  );
+void *yyrealloc ( void *, yy_size_t  );
+void yyfree ( void *  );
 
 #define yy_new_buffer yy_create_buffer
-
 #define yy_set_interactive(is_interactive) \
 	{ \
 	if ( ! YY_CURRENT_BUFFER ){ \
@@ -300,7 +283,6 @@ void yyfree (void *  );
 	} \
 	YY_CURRENT_BUFFER_LVALUE->yy_is_interactive = is_interactive; \
 	}
-
 #define yy_set_bol(at_bol) \
 	{ \
 	if ( ! YY_CURRENT_BUFFER ){\
@@ -310,13 +292,11 @@ void yyfree (void *  );
 	} \
 	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = at_bol; \
 	}
-
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
 #define YY_SKIP_YYWRAP
-
-typedef unsigned char YY_CHAR;
+typedef flex_uint8_t YY_CHAR;
 
 #define yytext_ptr yytext
 
@@ -336,11 +316,10 @@ int yyFlexLexer::yylex()
  */
 #define YY_DO_BEFORE_ACTION \
 	(yytext_ptr) = yy_bp; \
-	yyleng = (size_t) (yy_cp - yy_bp); \
+	yyleng = (int) (yy_cp - yy_bp); \
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-
 #define YY_NUM_RULES 97
 #define YY_END_OF_BUFFER 98
 /* This struct is not used in this scanner,
@@ -350,7 +329,7 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[258] =
+static const flex_int16_t yy_accept[258] =
     {   0,
         0,    0,    0,    0,    0,    0,   89,   89,   98,   96,
        79,   80,   96,   88,   65,   67,   49,   50,   63,   46,
@@ -382,7 +361,7 @@ static yyconst flex_int16_t yy_accept[258] =
        78,   78,   14,   12,   78,    9,    0
     } ;
 
-static yyconst YY_CHAR yy_ec[256] =
+static const YY_CHAR yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    4,    1,    1,    1,    1,    1,    1,    1,
@@ -414,7 +393,7 @@ static yyconst YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst YY_CHAR yy_meta[66] =
+static const YY_CHAR yy_meta[66] =
     {   0,
         1,    1,    2,    1,    1,    3,    1,    4,    1,    1,
         5,    1,    1,    1,    1,    1,    6,    6,    6,    1,
@@ -425,7 +404,7 @@ static yyconst YY_CHAR yy_meta[66] =
         7,    7,    1,    1,    1
     } ;
 
-static yyconst flex_uint16_t yy_base[267] =
+static const flex_int16_t yy_base[267] =
     {   0,
         0,    0,  382,  381,   63,   65,   67,   69,  383,  386,
        75,  379,  359,  386,  386,  386,  386,  386,  386,  386,
@@ -458,7 +437,7 @@ static yyconst flex_uint16_t yy_base[267] =
       246,  253,  260,  267,   65,  271
     } ;
 
-static yyconst flex_int16_t yy_def[267] =
+static const flex_int16_t yy_def[267] =
     {   0,
       257,    1,  258,  258,  259,  259,  260,  260,  257,  257,
       257,  257,  257,  257,  257,  257,  257,  257,  257,  257,
@@ -491,7 +470,7 @@ static yyconst flex_int16_t yy_def[267] =
       257,  257,  257,  257,  257,  257
     } ;
 
-static yyconst flex_uint16_t yy_nxt[452] =
+static const flex_int16_t yy_nxt[452] =
     {   0,
        10,   11,   12,   11,   13,   14,   15,   16,   17,   18,
        19,   20,   21,   22,   23,   24,   25,   26,   26,   27,
@@ -545,7 +524,7 @@ static yyconst flex_uint16_t yy_nxt[452] =
       257
     } ;
 
-static yyconst flex_int16_t yy_chk[452] =
+static const flex_int16_t yy_chk[452] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -666,12 +645,11 @@ using namespace libcasm_fe;
 // Code run each time a pattern is matched.
 #define YY_USER_ACTION loc.columns( yyleng );
 
+#line 648 "src/various/GrammarLexer.cpp"
 /* %option debug */
 #define YY_NO_INPUT 1
 
-
-
-#line 675 "src/various/GrammarLexer.cpp"
+#line 652 "src/various/GrammarLexer.cpp"
 
 #define INITIAL 0
 #define LCOMMENT 1
@@ -691,11 +669,11 @@ using namespace libcasm_fe;
 #endif
 
 #ifndef yytext_ptr
-static void yy_flex_strncpy (char *,yyconst char *,int );
+static void yy_flex_strncpy ( char *, const char *, int );
 #endif
 
 #ifdef YY_NEED_STRLEN
-static int yy_flex_strlen (yyconst char * );
+static int yy_flex_strlen ( const char * );
 #endif
 
 #ifndef YY_NO_INPUT
@@ -809,11 +787,12 @@ YY_DECL
 #line 75 "obj/src/GrammarLexer.l"
 
 
+#line 78 "obj/src/GrammarLexer.l"
     // Code run each time yylex is called.
     loc.step();
 
 
-#line 817 "src/various/GrammarLexer.cpp"
+#line 795 "src/various/GrammarLexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -841,9 +820,9 @@ yy_match:
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
 				if ( yy_current_state >= 258 )
-					yy_c = yy_meta[(unsigned int) yy_c];
+					yy_c = yy_meta[yy_c];
 				}
-			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
 		while ( yy_current_state != 257 );
@@ -868,409 +847,409 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 81 "obj/src/GrammarLexer.l"
+#line 82 "obj/src/GrammarLexer.l"
 {
     return Parser::make_BINARY( yytext + 2, loc );
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 85 "obj/src/GrammarLexer.l"
+#line 86 "obj/src/GrammarLexer.l"
 {
     return Parser::make_HEXADECIMAL( yytext + 2, loc );
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 89 "obj/src/GrammarLexer.l"
+#line 90 "obj/src/GrammarLexer.l"
 {
     return Parser::make_RATIONAL( yytext + 2, loc );
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 93 "obj/src/GrammarLexer.l"
+#line 94 "obj/src/GrammarLexer.l"
 {
     return Parser::make_INTEGER( yytext, loc );
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 97 "obj/src/GrammarLexer.l"
+#line 98 "obj/src/GrammarLexer.l"
 {
     return Parser::make_DECIMAL( yytext, loc );
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 103 "obj/src/GrammarLexer.l"
+#line 104 "obj/src/GrammarLexer.l"
 { return Parser::make_CASM(loc); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 104 "obj/src/GrammarLexer.l"
+#line 105 "obj/src/GrammarLexer.l"
 { return Parser::make_INIT(loc); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 106 "obj/src/GrammarLexer.l"
+#line 107 "obj/src/GrammarLexer.l"
 { return Parser::make_DERIVED(loc); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 107 "obj/src/GrammarLexer.l"
+#line 108 "obj/src/GrammarLexer.l"
 { return Parser::make_ENUMERATION(loc); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 108 "obj/src/GrammarLexer.l"
+#line 109 "obj/src/GrammarLexer.l"
 { return Parser::make_RULE(loc); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 109 "obj/src/GrammarLexer.l"
+#line 110 "obj/src/GrammarLexer.l"
 { return Parser::make_USING(loc); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 110 "obj/src/GrammarLexer.l"
+#line 111 "obj/src/GrammarLexer.l"
 { return Parser::make_INVARIANT(loc); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 112 "obj/src/GrammarLexer.l"
+#line 113 "obj/src/GrammarLexer.l"
 { return Parser::make_FUNCTION(loc); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 113 "obj/src/GrammarLexer.l"
+#line 114 "obj/src/GrammarLexer.l"
 { return Parser::make_INITIALLY(loc); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 114 "obj/src/GrammarLexer.l"
+#line 115 "obj/src/GrammarLexer.l"
 { return Parser::make_DEFINED(loc); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 116 "obj/src/GrammarLexer.l"
+#line 117 "obj/src/GrammarLexer.l"
 { return Parser::make_SEQ(loc); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 117 "obj/src/GrammarLexer.l"
+#line 118 "obj/src/GrammarLexer.l"
 { return Parser::make_ENDSEQ(loc); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 118 "obj/src/GrammarLexer.l"
+#line 119 "obj/src/GrammarLexer.l"
 { return Parser::make_PAR(loc); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 119 "obj/src/GrammarLexer.l"
+#line 120 "obj/src/GrammarLexer.l"
 { return Parser::make_ENDPAR(loc); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 121 "obj/src/GrammarLexer.l"
+#line 122 "obj/src/GrammarLexer.l"
 { return Parser::make_SKIP(loc); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 122 "obj/src/GrammarLexer.l"
+#line 123 "obj/src/GrammarLexer.l"
 { return Parser::make_LET(loc); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 123 "obj/src/GrammarLexer.l"
+#line 124 "obj/src/GrammarLexer.l"
 { return Parser::make_IN(loc); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 124 "obj/src/GrammarLexer.l"
+#line 125 "obj/src/GrammarLexer.l"
 { return Parser::make_FORALL(loc); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 125 "obj/src/GrammarLexer.l"
+#line 126 "obj/src/GrammarLexer.l"
 { return Parser::make_CHOOSE(loc); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 126 "obj/src/GrammarLexer.l"
+#line 127 "obj/src/GrammarLexer.l"
 { return Parser::make_ITERATE(loc); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 127 "obj/src/GrammarLexer.l"
+#line 128 "obj/src/GrammarLexer.l"
 { return Parser::make_DO(loc); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 128 "obj/src/GrammarLexer.l"
+#line 129 "obj/src/GrammarLexer.l"
 { return Parser::make_IF(loc); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 129 "obj/src/GrammarLexer.l"
+#line 130 "obj/src/GrammarLexer.l"
 { return Parser::make_THEN(loc); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 130 "obj/src/GrammarLexer.l"
+#line 131 "obj/src/GrammarLexer.l"
 { return Parser::make_ELSE(loc); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 131 "obj/src/GrammarLexer.l"
+#line 132 "obj/src/GrammarLexer.l"
 { return Parser::make_CASE(loc); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 132 "obj/src/GrammarLexer.l"
+#line 133 "obj/src/GrammarLexer.l"
 { return Parser::make_OF(loc); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 133 "obj/src/GrammarLexer.l"
+#line 134 "obj/src/GrammarLexer.l"
 { return Parser::make_DEFAULT(loc); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 134 "obj/src/GrammarLexer.l"
+#line 135 "obj/src/GrammarLexer.l"
 { return Parser::make_HOLDS(loc); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 135 "obj/src/GrammarLexer.l"
+#line 136 "obj/src/GrammarLexer.l"
 { return Parser::make_EXISTS(loc); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 136 "obj/src/GrammarLexer.l"
+#line 137 "obj/src/GrammarLexer.l"
 { return Parser::make_WITH(loc); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 137 "obj/src/GrammarLexer.l"
+#line 138 "obj/src/GrammarLexer.l"
 { return Parser::make_AS(loc); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 138 "obj/src/GrammarLexer.l"
+#line 139 "obj/src/GrammarLexer.l"
 { return Parser::make_WHILE(loc); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 140 "obj/src/GrammarLexer.l"
+#line 141 "obj/src/GrammarLexer.l"
 { return Parser::make_UNDEF(loc); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 141 "obj/src/GrammarLexer.l"
+#line 142 "obj/src/GrammarLexer.l"
 { return Parser::make_FALSE(loc); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 142 "obj/src/GrammarLexer.l"
+#line 143 "obj/src/GrammarLexer.l"
 { return Parser::make_TRUE(loc); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 144 "obj/src/GrammarLexer.l"
+#line 145 "obj/src/GrammarLexer.l"
 { return Parser::make_AND(loc); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 145 "obj/src/GrammarLexer.l"
+#line 146 "obj/src/GrammarLexer.l"
 { return Parser::make_OR(loc); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 146 "obj/src/GrammarLexer.l"
+#line 147 "obj/src/GrammarLexer.l"
 { return Parser::make_XOR(loc); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 147 "obj/src/GrammarLexer.l"
+#line 148 "obj/src/GrammarLexer.l"
 { return Parser::make_IMPLIES(loc); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 148 "obj/src/GrammarLexer.l"
+#line 149 "obj/src/GrammarLexer.l"
 { return Parser::make_NOT(loc); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 150 "obj/src/GrammarLexer.l"
+#line 151 "obj/src/GrammarLexer.l"
 { return Parser::make_PLUS(loc); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 151 "obj/src/GrammarLexer.l"
+#line 152 "obj/src/GrammarLexer.l"
 { return Parser::make_MINUS(loc); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 152 "obj/src/GrammarLexer.l"
+#line 153 "obj/src/GrammarLexer.l"
 { return Parser::make_EQUAL(loc); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 153 "obj/src/GrammarLexer.l"
+#line 154 "obj/src/GrammarLexer.l"
 { return Parser::make_LPAREN(loc); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 154 "obj/src/GrammarLexer.l"
+#line 155 "obj/src/GrammarLexer.l"
 { return Parser::make_RPAREN(loc); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 155 "obj/src/GrammarLexer.l"
+#line 156 "obj/src/GrammarLexer.l"
 { return Parser::make_LSQPAREN(loc); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 156 "obj/src/GrammarLexer.l"
+#line 157 "obj/src/GrammarLexer.l"
 { return Parser::make_RSQPAREN(loc); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 157 "obj/src/GrammarLexer.l"
+#line 158 "obj/src/GrammarLexer.l"
 { return Parser::make_LCURPAREN(loc); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 158 "obj/src/GrammarLexer.l"
+#line 159 "obj/src/GrammarLexer.l"
 { return Parser::make_RCURPAREN(loc); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 159 "obj/src/GrammarLexer.l"
+#line 160 "obj/src/GrammarLexer.l"
 { return Parser::make_COLON(loc); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 160 "obj/src/GrammarLexer.l"
+#line 161 "obj/src/GrammarLexer.l"
 { return Parser::make_DOUBLECOLON(loc); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 161 "obj/src/GrammarLexer.l"
+#line 162 "obj/src/GrammarLexer.l"
 { return Parser::make_UNDERLINE(loc); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 162 "obj/src/GrammarLexer.l"
+#line 163 "obj/src/GrammarLexer.l"
 { return Parser::make_VERTICAL_BAR(loc); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 163 "obj/src/GrammarLexer.l"
+#line 164 "obj/src/GrammarLexer.l"
 { return Parser::make_AT(loc); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 164 "obj/src/GrammarLexer.l"
+#line 165 "obj/src/GrammarLexer.l"
 { return Parser::make_COMMA(loc); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 165 "obj/src/GrammarLexer.l"
+#line 166 "obj/src/GrammarLexer.l"
 { return Parser::make_LESSER(loc); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 166 "obj/src/GrammarLexer.l"
+#line 167 "obj/src/GrammarLexer.l"
 { return Parser::make_GREATER(loc); }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 167 "obj/src/GrammarLexer.l"
+#line 168 "obj/src/GrammarLexer.l"
 { return Parser::make_ASTERIX(loc); }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 168 "obj/src/GrammarLexer.l"
+#line 169 "obj/src/GrammarLexer.l"
 { return Parser::make_SLASH(loc); }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 169 "obj/src/GrammarLexer.l"
+#line 170 "obj/src/GrammarLexer.l"
 { return Parser::make_PERCENT(loc); }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 170 "obj/src/GrammarLexer.l"
+#line 171 "obj/src/GrammarLexer.l"
 { return Parser::make_CARET(loc); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 171 "obj/src/GrammarLexer.l"
+#line 172 "obj/src/GrammarLexer.l"
 { return Parser::make_MARK(loc); }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 173 "obj/src/GrammarLexer.l"
+#line 174 "obj/src/GrammarLexer.l"
 { return Parser::make_DOTDOT(loc); }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 174 "obj/src/GrammarLexer.l"
+#line 175 "obj/src/GrammarLexer.l"
 { return Parser::make_DOT(loc); }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 175 "obj/src/GrammarLexer.l"
+#line 176 "obj/src/GrammarLexer.l"
 { return Parser::make_MAPS(loc); }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 176 "obj/src/GrammarLexer.l"
+#line 177 "obj/src/GrammarLexer.l"
 { return Parser::make_ARROW(loc); }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 177 "obj/src/GrammarLexer.l"
+#line 178 "obj/src/GrammarLexer.l"
 { return Parser::make_UPDATE(loc); }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 178 "obj/src/GrammarLexer.l"
+#line 179 "obj/src/GrammarLexer.l"
 { return Parser::make_NEQUAL(loc); }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 179 "obj/src/GrammarLexer.l"
+#line 180 "obj/src/GrammarLexer.l"
 { return Parser::make_LESSEQ(loc); }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 180 "obj/src/GrammarLexer.l"
+#line 181 "obj/src/GrammarLexer.l"
 { return Parser::make_GREATEREQ(loc); }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 181 "obj/src/GrammarLexer.l"
+#line 182 "obj/src/GrammarLexer.l"
 { return Parser::make_SEQ_BRACKET(loc); }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 182 "obj/src/GrammarLexer.l"
+#line 183 "obj/src/GrammarLexer.l"
 { return Parser::make_ENDSEQ_BRACKET(loc); }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 186 "obj/src/GrammarLexer.l"
+#line 187 "obj/src/GrammarLexer.l"
 {
     return Parser::make_IDENTIFIER( yytext, loc );
 }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 190 "obj/src/GrammarLexer.l"
+#line 191 "obj/src/GrammarLexer.l"
 { // ignore spaces
     loc.step();
 }
@@ -1278,7 +1257,7 @@ YY_RULE_SETUP
 case 80:
 /* rule 80 can match eol */
 YY_RULE_SETUP
-#line 194 "obj/src/GrammarLexer.l"
+#line 195 "obj/src/GrammarLexer.l"
 { // ignore newlines
     loc.lines( yyleng );
     loc.step();
@@ -1286,61 +1265,76 @@ YY_RULE_SETUP
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 199 "obj/src/GrammarLexer.l"
+#line 200 "obj/src/GrammarLexer.l"
 { // single-line comments
+    log.debug( {loc}, "comment SL start" );
+    strbuf.clear();
+    strbuf.append( yytext );
     BEGIN( LCOMMENT );
 }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 202 "obj/src/GrammarLexer.l"
-
+#line 206 "obj/src/GrammarLexer.l"
+{
+    strbuf.append( yytext );
+}
 	YY_BREAK
 case 83:
 /* rule 83 can match eol */
 YY_RULE_SETUP
-#line 203 "obj/src/GrammarLexer.l"
+#line 209 "obj/src/GrammarLexer.l"
 {
+    log.debug( {loc}, "comment SL end: '" + strbuf + "'" );
     BEGIN( INITIAL );
     loc.lines( 1 );
     loc.step();
 }
 	YY_BREAK
 case YY_STATE_EOF(LCOMMENT):
-#line 208 "obj/src/GrammarLexer.l"
+#line 215 "obj/src/GrammarLexer.l"
 {
+    log.debug( {loc}, "comment SL eof: '" + strbuf + "'" );
     BEGIN( INITIAL );
 }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 212 "obj/src/GrammarLexer.l"
+#line 220 "obj/src/GrammarLexer.l"
 { // multi-line comments
+    log.debug( {loc}, "comment ML start" );
+    strbuf.clear();
+    strbuf.append( yytext );
     BEGIN( COMMENT );
 }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 215 "obj/src/GrammarLexer.l"
+#line 226 "obj/src/GrammarLexer.l"
 {
+    strbuf.append( yytext );
+    log.debug( {loc}, "comment ML end: '" + strbuf + "'" );
     BEGIN( INITIAL );
 }
 	YY_BREAK
 case 86:
 /* rule 86 can match eol */
 YY_RULE_SETUP
-#line 218 "obj/src/GrammarLexer.l"
+#line 231 "obj/src/GrammarLexer.l"
 {
+    strbuf.append( yytext );
     loc.lines( 1 );
 }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 221 "obj/src/GrammarLexer.l"
-
+#line 235 "obj/src/GrammarLexer.l"
+{
+    strbuf.append( yytext );
+}
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 222 "obj/src/GrammarLexer.l"
+#line 238 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     log.error( {loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
@@ -1349,7 +1343,7 @@ case YY_STATE_EOF(COMMENT):
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 228 "obj/src/GrammarLexer.l"
+#line 244 "obj/src/GrammarLexer.l"
 { // strings
     BEGIN( STRING );
     strbuf.clear();
@@ -1357,7 +1351,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 232 "obj/src/GrammarLexer.l"
+#line 248 "obj/src/GrammarLexer.l"
 { /* eat all tokens */
     strbuf.append( yytext );
 }
@@ -1365,41 +1359,41 @@ YY_RULE_SETUP
 case 90:
 /* rule 90 can match eol */
 YY_RULE_SETUP
-#line 235 "obj/src/GrammarLexer.l"
+#line 251 "obj/src/GrammarLexer.l"
 {
     loc.lines( 1 );
 }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 238 "obj/src/GrammarLexer.l"
+#line 254 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\n" );
 }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 241 "obj/src/GrammarLexer.l"
+#line 257 "obj/src/GrammarLexer.l"
 {
     strbuf.append( "\t" );
 }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 244 "obj/src/GrammarLexer.l"
+#line 260 "obj/src/GrammarLexer.l"
 {
     strbuf.append( yytext + 1 );
 }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 247 "obj/src/GrammarLexer.l"
+#line 263 "obj/src/GrammarLexer.l"
 {
     log.error( {loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 250 "obj/src/GrammarLexer.l"
+#line 266 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     log.error( {loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
@@ -1408,7 +1402,7 @@ case YY_STATE_EOF(STRING):
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 255 "obj/src/GrammarLexer.l"
+#line 271 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     return Parser::make_STRING( strbuf, loc );
@@ -1416,7 +1410,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 260 "obj/src/GrammarLexer.l"
+#line 276 "obj/src/GrammarLexer.l"
 {
     log.error( {loc}, "unrecognized character `" + std::string( yytext ) + "`",
         Code::SyntaxErrorUnrecognizedCharacter );
@@ -1424,10 +1418,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 265 "obj/src/GrammarLexer.l"
+#line 281 "obj/src/GrammarLexer.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1431 "src/various/GrammarLexer.cpp"
+#line 1424 "src/various/GrammarLexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1566,7 +1560,7 @@ case YY_STATE_EOF(INITIAL):
  * This constructor simply maintains backward compatibility.
  * DEPRECATED
  */
-yyFlexLexer::yyFlexLexer( FLEX_STD istream* arg_yyin, FLEX_STD ostream* arg_yyout ):
+yyFlexLexer::yyFlexLexer( std::istream* arg_yyin, std::ostream* arg_yyout ):
 	yyin(arg_yyin ? arg_yyin->rdbuf() : std::cin.rdbuf()),
 	yyout(arg_yyout ? arg_yyout->rdbuf() : std::cout.rdbuf())
 {
@@ -1602,7 +1596,7 @@ void yyFlexLexer::ctor_common()
 	yy_start_stack_ptr = yy_start_stack_depth = 0;
 	yy_start_stack = NULL;
 
-	yy_buffer_stack = 0;
+	yy_buffer_stack = NULL;
 	yy_buffer_stack_top = 0;
 	yy_buffer_stack_max = 0;
 
@@ -1615,9 +1609,9 @@ void yyFlexLexer::ctor_common()
 yyFlexLexer::~yyFlexLexer()
 {
 	delete [] yy_state_buf;
-	yyfree(yy_start_stack  );
+	yyfree( yy_start_stack  );
 	yy_delete_buffer( YY_CURRENT_BUFFER );
-	yyfree(yy_buffer_stack  );
+	yyfree( yy_buffer_stack  );
 }
 
 /* The contents of this function are C++ specific, so the () macro is not used.
@@ -1693,7 +1687,7 @@ int yyFlexLexer::yy_get_next_buffer()
 {
     	char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
 	char *source = (yytext_ptr);
-	yy_size_t number_to_move, i;
+	int number_to_move, i;
 	int ret_val;
 
 	if ( (yy_c_buf_p) > &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars) + 1] )
@@ -1722,7 +1716,7 @@ int yyFlexLexer::yy_get_next_buffer()
 	/* Try to read more data. */
 
 	/* First move last chars to start of buffer. */
-	number_to_move = (yy_size_t) ((yy_c_buf_p) - (yytext_ptr)) - 1;
+	number_to_move = (int) ((yy_c_buf_p) - (yytext_ptr) - 1);
 
 	for ( i = 0; i < number_to_move; ++i )
 		*(dest++) = *(source++);
@@ -1735,7 +1729,7 @@ int yyFlexLexer::yy_get_next_buffer()
 
 	else
 		{
-			yy_size_t num_to_read =
+			int num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
@@ -1749,7 +1743,7 @@ int yyFlexLexer::yy_get_next_buffer()
 
 			if ( b->yy_is_our_buffer )
 				{
-				yy_size_t new_size = b->yy_buf_size * 2;
+				int new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -1758,11 +1752,12 @@ int yyFlexLexer::yy_get_next_buffer()
 
 				b->yy_ch_buf = (char *)
 					/* Include room in for 2 EOB chars. */
-					yyrealloc((void *) b->yy_ch_buf,b->yy_buf_size + 2  );
+					yyrealloc( (void *) b->yy_ch_buf,
+							 (yy_size_t) (b->yy_buf_size + 2)  );
 				}
 			else
 				/* Can't grow it, we don't own it. */
-				b->yy_ch_buf = 0;
+				b->yy_ch_buf = NULL;
 
 			if ( ! b->yy_ch_buf )
 				YY_FATAL_ERROR(
@@ -1804,12 +1799,15 @@ int yyFlexLexer::yy_get_next_buffer()
 	else
 		ret_val = EOB_ACT_CONTINUE_SCAN;
 
-	if ((int) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
+	if (((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
 		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
-		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,new_size  );
+		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc(
+			(void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf, (yy_size_t) new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
 			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
+		/* "- 2" to take care of EOB's */
+		YY_CURRENT_BUFFER_LVALUE->yy_buf_size = (int) (new_size - 2);
 	}
 
 	(yy_n_chars) += number_to_move;
@@ -1842,9 +1840,9 @@ int yyFlexLexer::yy_get_next_buffer()
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
 			if ( yy_current_state >= 258 )
-				yy_c = yy_meta[(unsigned int) yy_c];
+				yy_c = yy_meta[yy_c];
 			}
-		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 		}
 
 	return yy_current_state;
@@ -1870,9 +1868,9 @@ int yyFlexLexer::yy_get_next_buffer()
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
 		if ( yy_current_state >= 258 )
-			yy_c = yy_meta[(unsigned int) yy_c];
+			yy_c = yy_meta[yy_c];
 		}
-	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 	yy_is_jam = (yy_current_state == 257);
 
 		return yy_is_jam ? 0 : yy_current_state;
@@ -1891,7 +1889,7 @@ int yyFlexLexer::yy_get_next_buffer()
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		yy_size_t number_to_move = (yy_n_chars) + 2;
+		int number_to_move = (yy_n_chars) + 2;
 		char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
 		char *source =
@@ -1903,7 +1901,7 @@ int yyFlexLexer::yy_get_next_buffer()
 		yy_cp += (int) (dest - source);
 		yy_bp += (int) (dest - source);
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars =
-			(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
+			(yy_n_chars) = (int) YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
 
 		if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 			YY_FATAL_ERROR( "flex scanner push-back overflow" );
@@ -1935,7 +1933,7 @@ int yyFlexLexer::yy_get_next_buffer()
 
 		else
 			{ /* need more input */
-			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
+			int offset = (int) ((yy_c_buf_p) - (yytext_ptr));
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -1959,7 +1957,7 @@ int yyFlexLexer::yy_get_next_buffer()
 				case EOB_ACT_END_OF_FILE:
 					{
 					if ( yywrap(  ) )
-						return EOF;
+						return 0;
 
 					if ( ! (yy_did_buffer_switch_on_eof) )
 						YY_NEW_FILE;
@@ -2009,6 +2007,9 @@ int yyFlexLexer::yy_get_next_buffer()
  */
 void yyFlexLexer::yyrestart( std::istream* input_file )
 {
+	if( ! input_file ) {
+		input_file = &yyin;
+	}
 	yyrestart( *input_file );
 }
 
@@ -2065,16 +2066,16 @@ void yyFlexLexer::yyrestart( std::istream* input_file )
 {
 	YY_BUFFER_STATE b;
     
-	b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state )  );
+	b = (YY_BUFFER_STATE) yyalloc( sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
-	b->yy_buf_size = (yy_size_t)size;
+	b->yy_buf_size = size;
 
 	/* yy_ch_buf has to be 2 characters longer than the size given because
 	 * we need to put in 2 end-of-buffer characters.
 	 */
-	b->yy_ch_buf = (char *) yyalloc(b->yy_buf_size + 2  );
+	b->yy_ch_buf = (char *) yyalloc( (yy_size_t) (b->yy_buf_size + 2)  );
 	if ( ! b->yy_ch_buf )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
@@ -2110,9 +2111,9 @@ void yyFlexLexer::yyrestart( std::istream* input_file )
 		YY_CURRENT_BUFFER_LVALUE = (YY_BUFFER_STATE) 0;
 
 	if ( b->yy_is_our_buffer )
-		yyfree((void *) b->yy_ch_buf  );
+		yyfree( (void *) b->yy_ch_buf  );
 
-	yyfree((void *) b  );
+	yyfree( (void *) b  );
 }
 
 /* Initializes or reinitializes a buffer.
@@ -2234,15 +2235,15 @@ void yyFlexLexer::yyensure_buffer_stack(void)
 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
 		 * immediate realloc on the next call.
          */
-		num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
+      num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
 		(yy_buffer_stack) = (struct yy_buffer_state**)yyalloc
 								(num_to_alloc * sizeof(struct yy_buffer_state*)
 								);
 		if ( ! (yy_buffer_stack) )
 			YY_FATAL_ERROR( "out of dynamic memory in yyensure_buffer_stack()" );
-								  
+
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
-				
+
 		(yy_buffer_stack_max) = num_to_alloc;
 		(yy_buffer_stack_top) = 0;
 		return;
@@ -2274,13 +2275,14 @@ void yyFlexLexer::yyensure_buffer_stack(void)
 		yy_size_t new_size;
 
 		(yy_start_stack_depth) += YY_START_STACK_INCR;
-		new_size = (yy_start_stack_depth) * sizeof( int );
+		new_size = (yy_size_t) (yy_start_stack_depth) * sizeof( int );
 
 		if ( ! (yy_start_stack) )
-			(yy_start_stack) = (int *) yyalloc(new_size  );
+			(yy_start_stack) = (int *) yyalloc( new_size  );
 
 		else
-			(yy_start_stack) = (int *) yyrealloc((void *) (yy_start_stack),new_size  );
+			(yy_start_stack) = (int *) yyrealloc(
+					(void *) (yy_start_stack), new_size  );
 
 		if ( ! (yy_start_stack) )
 			YY_FATAL_ERROR( "out of memory expanding start-condition stack" );
@@ -2308,7 +2310,7 @@ void yyFlexLexer::yyensure_buffer_stack(void)
 #define YY_EXIT_FAILURE 2
 #endif
 
-void yyFlexLexer::LexerError( yyconst char msg[] )
+void yyFlexLexer::LexerError( const char* msg )
 {
     	std::cerr << msg << std::endl;
 	exit( YY_EXIT_FAILURE );
@@ -2338,7 +2340,7 @@ void yyFlexLexer::LexerError( yyconst char msg[] )
  */
 
 #ifndef yytext_ptr
-static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
+static void yy_flex_strncpy (char* s1, const char * s2, int n )
 {
 		
 	int i;
@@ -2348,7 +2350,7 @@ static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 #endif
 
 #ifdef YY_NEED_STRLEN
-static int yy_flex_strlen (yyconst char * s )
+static int yy_flex_strlen (const char * s )
 {
 	int n;
 	for ( n = 0; s[n]; ++n )
@@ -2360,7 +2362,7 @@ static int yy_flex_strlen (yyconst char * s )
 
 void *yyalloc (yy_size_t  size )
 {
-			return (void *) malloc( size );
+			return malloc(size);
 }
 
 void *yyrealloc  (void * ptr, yy_size_t  size )
@@ -2373,7 +2375,7 @@ void *yyrealloc  (void * ptr, yy_size_t  size )
 	 * any pointer type to void*, and deal with argument conversions
 	 * as though doing an assignment.
 	 */
-	return (void *) realloc( (char *) ptr, size );
+	return realloc(ptr, size);
 }
 
 void yyfree (void * ptr )
@@ -2383,8 +2385,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 265 "obj/src/GrammarLexer.l"
-
+#line 281 "obj/src/GrammarLexer.l"
 
 
 Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )

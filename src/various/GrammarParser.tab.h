@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.0.4.
+// A Bison parser, made by GNU Bison 3.0.5.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
-// Copyright (C) 2002-2015 Free Software Foundation, Inc.
+// Copyright (C) 2002-2015, 2018 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 63 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+#line 63 "../../obj/src/GrammarParser.yy" // lalr1.cc:379
 
     namespace libcasm_fe
     {
@@ -59,7 +59,7 @@
 
     #define YY_NULLPTR nullptr
 
-#line 63 "GrammarParser.tab.h" // lalr1.cc:377
+#line 63 "GrammarParser.tab.h" // lalr1.cc:379
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -134,9 +134,9 @@
 # define YYDEBUG 1
 #endif
 
-#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:379
 namespace libcasm_fe {
-#line 140 "GrammarParser.tab.h" // lalr1.cc:377
+#line 140 "GrammarParser.tab.h" // lalr1.cc:379
 
 
 
@@ -1409,6 +1409,8 @@ namespace libcasm_fe {
       typedef basic_symbol<by_state> super_type;
       /// Construct an empty symbol.
       stack_symbol_type ();
+      /// Copy construct.
+      stack_symbol_type (const stack_symbol_type& that);
       /// Steal the contents from \a sym to build this.
       stack_symbol_type (state_type s, symbol_type& sym);
       /// Assignment, needed by push_back.
@@ -1437,7 +1439,7 @@ namespace libcasm_fe {
     void yypush_ (const char* m, state_type s, symbol_type& sym);
 
     /// Pop \a n symbols the three stacks.
-    void yypop_ (unsigned int n = 1);
+    void yypop_ (unsigned n = 1);
 
     /// Constants.
     enum
@@ -1503,12 +1505,12 @@ namespace libcasm_fe {
       75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
       85,    86
     };
-    const unsigned int user_token_number_max_ = 341;
+    const unsigned user_token_number_max_ = 341;
     const token_number_type undef_token_ = 2;
 
-    if (static_cast<int>(t) <= yyeof_)
+    if (static_cast<int> (t) <= yyeof_)
       return yyeof_;
-    else if (static_cast<unsigned int> (t) <= user_token_number_max_)
+    else if (static_cast<unsigned> (t) <= user_token_number_max_)
       return translate_table[t];
     else
       return undef_token_;
@@ -1522,19 +1524,17 @@ namespace libcasm_fe {
 
   // basic_symbol.
   template <typename Base>
-  inline
   Parser::basic_symbol<Base>::basic_symbol ()
     : value ()
   {}
 
   template <typename Base>
-  inline
   Parser::basic_symbol<Base>::basic_symbol (const basic_symbol& other)
     : Base (other)
     , value ()
     , location (other.location)
   {
-      switch (other.type_get ())
+    switch (other.type_get ())
     {
       case 179: // Attribute
         value.copy< Attribute::Ptr > (other.value);
@@ -1856,16 +1856,14 @@ namespace libcasm_fe {
 
   }
 
-
   template <typename Base>
-  inline
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const semantic_type& v, const location_type& l)
     : Base (t)
     , value ()
     , location (l)
   {
     (void) v;
-      switch (this->type_get ())
+    switch (this->type_get ())
     {
       case 179: // Attribute
         value.copy< Attribute::Ptr > (v);
@@ -2695,14 +2693,12 @@ namespace libcasm_fe {
 
 
   template <typename Base>
-  inline
   Parser::basic_symbol<Base>::~basic_symbol ()
   {
     clear ();
   }
 
   template <typename Base>
-  inline
   void
   Parser::basic_symbol<Base>::clear ()
   {
@@ -2717,7 +2713,7 @@ namespace libcasm_fe {
     }
 
     // Type destructor.
-    switch (yytype)
+  switch (yytype)
     {
       case 179: // Attribute
         value.template destroy< Attribute::Ptr > ();
@@ -3041,7 +3037,6 @@ namespace libcasm_fe {
   }
 
   template <typename Base>
-  inline
   bool
   Parser::basic_symbol<Base>::empty () const
   {
@@ -3049,12 +3044,11 @@ namespace libcasm_fe {
   }
 
   template <typename Base>
-  inline
   void
   Parser::basic_symbol<Base>::move (basic_symbol& s)
   {
-    super_type::move(s);
-      switch (this->type_get ())
+    super_type::move (s);
+    switch (this->type_get ())
     {
       case 179: // Attribute
         value.move< Attribute::Ptr > (s.value);
@@ -3949,9 +3943,9 @@ namespace libcasm_fe {
   }
 
 
-#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:377
+#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:379
 } // libcasm_fe
-#line 3955 "GrammarParser.tab.h" // lalr1.cc:377
+#line 3949 "GrammarParser.tab.h" // lalr1.cc:379
 
 
 
