@@ -114,28 +114,43 @@ using namespace libcasm_fe;
 }
 
 "//" { // single-line comments
+    log.debug( {loc}, "comment SL start" );
+    strbuf.clear();
+    strbuf.append( yytext );
     BEGIN( LCOMMENT );
 }
-<LCOMMENT>.
+<LCOMMENT>. {
+    strbuf.append( yytext );
+}
 <LCOMMENT>\n {
+    log.debug( {loc}, "comment SL end: '" + strbuf + "'" );
     BEGIN( INITIAL );
     loc.lines( 1 );
     loc.step();
 }
 <LCOMMENT><<EOF>> {
+    log.debug( {loc}, "comment SL eof: '" + strbuf + "'" );
     BEGIN( INITIAL );
 }
 
 "/*" { // multi-line comments
+    log.debug( {loc}, "comment ML start" );
+    strbuf.clear();
+    strbuf.append( yytext );
     BEGIN( COMMENT );
 }
 <COMMENT>"*/" {
+    strbuf.append( yytext );
+    log.debug( {loc}, "comment ML end: '" + strbuf + "'" );
     BEGIN( INITIAL );
 }
 <COMMENT>\n {
+    strbuf.append( yytext );
     loc.lines( 1 );
 }
-<COMMENT>([^*\n]|\r)+|.
+<COMMENT>([^*\n]|\r)+|. {
+    strbuf.append( yytext );
+}
 <COMMENT><<EOF>> {
     BEGIN( INITIAL );
     log.error( {loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
