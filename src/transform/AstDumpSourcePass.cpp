@@ -657,7 +657,7 @@ void AstDumpSourceVisitor::visit( UpdateRule& node )
 
 void AstDumpSourceVisitor::visit( CallRule& node )
 {
-    m_stream << m_indentation << "call ";
+    m_stream << m_indentation;
     node.call()->accept( *this );
 }
 
