@@ -114,6 +114,13 @@ namespace libcasm_fe
 
         DerivedDefinitionExpressionInvalidProperty = 0xdede,
 
+        // --------------------------------------------------------- 4*** ...
+        // invariant errors
+        InvariantDefinitionInvalidExpression = 0x4e00,
+        InvariantDefinitionInvariantViolated = 0x4e01,
+
+        InvariantDefinitionExpressionInvalidProperty = 0x4e02,
+
         // --------------------------------------------------------- 5*** ...
         // rule errors
 

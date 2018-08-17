@@ -79,6 +79,7 @@ class AstToCasmIRVisitor final : public RecursiveVisitor
     void visit( RuleDefinition& node ) override;
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
+    void visit( InvariantDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -281,6 +282,11 @@ void AstToCasmIRVisitor::visit( EnumeratorDefinition& node )
 }
 
 void AstToCasmIRVisitor::visit( EnumerationDefinition& node )
+{
+    m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
+}
+
+void AstToCasmIRVisitor::visit( InvariantDefinition& node )
 {
     m_log.info( "%s:%i: TODO %s", __FILE__, __LINE__, node.description().c_str() );
 }

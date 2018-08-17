@@ -112,6 +112,13 @@ void RecursiveVisitor::visit( UsingDefinition& node )
     node.attributes()->accept( *this );
 }
 
+void RecursiveVisitor::visit( InvariantDefinition& node )
+{
+    node.identifier()->accept( *this );
+    node.expression()->accept( *this );
+    node.attributes()->accept( *this );
+}
+
 void RecursiveVisitor::visit( UndefLiteral& node )
 {
 }

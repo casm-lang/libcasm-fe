@@ -107,6 +107,10 @@ std::string Node::description( void ) const
         {
             return "using";
         }
+        case ID::INVARIANT_DEFINITION:
+        {
+            return "invariant";
+        }
             // literals
         case ID::UNDEF_LITERAL:
         {

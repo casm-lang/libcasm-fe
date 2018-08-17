@@ -73,8 +73,11 @@ class PropertyReviseVisitor final : public RecursiveVisitor
   public:
     PropertyReviseVisitor( libcasm_fe::Logger& log );
 
+    void visit( Specification& node );
+
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
+    void visit( InvariantDefinition& node ) override;
 
     void visit( ConditionalRule& node ) override;
     void visit( CaseRule& node ) override;
@@ -111,6 +114,12 @@ PropertyReviseVisitor::PropertyReviseVisitor( libcasm_fe::Logger& log )
 {
 }
 
+void PropertyReviseVisitor::visit( Specification& node )
+{
+    node.header()->accept( *this );
+    node.definitions()->accept( *this );
+}
+
 void PropertyReviseVisitor::visit( FunctionDefinition& node )
 {
     RecursiveVisitor::visit( node );
@@ -131,6 +140,17 @@ void PropertyReviseVisitor::visit( DerivedDefinition& node )
         node.properties(),
         "expression of " + node.description() + " '" + node.identifier()->name() + "'",
         Code::DerivedDefinitionExpressionInvalidProperty );
+}
+
+void PropertyReviseVisitor::visit( InvariantDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+
+    checkIfPropertiesHold(
+        *node.expression(),
+        { Property::SIDE_EFFECT_FREE },
+        "expression of " + node.description() + " '" + node.identifier()->name() + "'",
+        Code::InvariantDefinitionExpressionInvalidProperty );
 }
 
 void PropertyReviseVisitor::visit( ConditionalRule& node )
@@ -286,7 +306,7 @@ u1 PropertyRevisePass::run( libpass::PassResult& pr )
     const auto specification = data->specification();
 
     PropertyReviseVisitor visitor( log );
-    specification->definitions()->accept( visitor );
+    visitor.visit( *specification );
 
     const auto errors = log.errors();
     if( errors > 0 )

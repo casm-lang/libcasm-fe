@@ -156,6 +156,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
     void visit( UsingDefinition& node ) override;
+    void visit( InvariantDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -334,6 +335,19 @@ void AstDumpSourceVisitor::visit( UsingDefinition& node )
     node.identifier()->accept( *this );
     m_stream << " = ";
     node.type()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( InvariantDefinition& node )
+{
+    m_stream << m_indentation;
+    dumpAttributes( *node.attributes() );
+    m_stream << "\n" << m_indentation << "invariant ";
+    node.identifier()->accept( *this );
+    m_stream << " =\n" << m_indentation;
+
+    const Indentation::NextLevel level( m_indentation );
+    m_stream << m_indentation;
+    node.expression()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( UndefLiteral& node )

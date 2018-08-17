@@ -56,6 +56,7 @@ namespace libcasm_fe
         class EnumeratorDefinition;
         class EnumerationDefinition;
         class UsingDefinition;
+        class InvariantDefinition;
 
         class UndefLiteral;
         class ValueLiteral;
@@ -125,6 +126,7 @@ namespace libcasm_fe
             virtual void visit( EnumeratorDefinition& node ) = 0;
             virtual void visit( EnumerationDefinition& node ) = 0;
             virtual void visit( UsingDefinition& node ) = 0;
+            virtual void visit( InvariantDefinition& node ) = 0;
 
             virtual void visit( UndefLiteral& node ) = 0;
             virtual void visit( ValueLiteral& node ) = 0;

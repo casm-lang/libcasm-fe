@@ -82,6 +82,10 @@ void EmptyVisitor::visit( UsingDefinition& )
 {
 }
 
+void EmptyVisitor::visit( InvariantDefinition& )
+{
+}
+
 void EmptyVisitor::visit( UndefLiteral& )
 {
 }

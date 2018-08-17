@@ -347,3 +347,20 @@ void UsingDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+InvariantDefinition::InvariantDefinition(
+    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
+: Definition( Node::ID::INVARIANT_DEFINITION, identifier )
+, m_expression( expression )
+{
+}
+
+const Expression::Ptr& InvariantDefinition::expression( void ) const
+{
+    return m_expression;
+}
+
+void InvariantDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}

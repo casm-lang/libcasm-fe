@@ -174,6 +174,7 @@ END       0 "end of file"
 %type <Enumerators::Ptr> Enumerators
 %type <EnumerationDefinition::Ptr> EnumerationDefinition
 %type <UsingDefinition::Ptr> UsingDefinition
+%type <InvariantDefinition::Ptr> InvariantDefinition
 
 // literals
 %type <Literal::Ptr> Literal
@@ -370,6 +371,10 @@ Definition
   {
       $$ = $1;
   }
+| InvariantDefinition
+  {
+      $$ = $1;
+  }
 ;
 
 
@@ -503,6 +508,14 @@ UsingDefinition
 : USING Identifier EQUAL Type
   {
       $$ = Ast::make< UsingDefinition >( @$, $2, $4 );
+  }
+;
+
+
+InvariantDefinition
+: INVARIANT Identifier EQUAL Term
+  {
+      $$ = Ast::make< InvariantDefinition >( @$, $2, $4 );
   }
 ;
 

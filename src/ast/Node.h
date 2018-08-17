@@ -74,6 +74,7 @@ namespace libcasm_fe
                 ENUMERATOR_DEFINITION,
                 ENUMERATION_DEFINITION,
                 USING_DEFINITION,
+                INVARIANT_DEFINITION,
 
                 // literals
                 UNDEF_LITERAL,
