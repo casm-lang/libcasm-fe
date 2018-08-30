@@ -114,42 +114,42 @@ using namespace libcasm_fe;
 }
 
 "//" { // single-line comments
-    log.debug( {loc}, "comment SL start" );
-    strbuf.clear();
-    strbuf.append( yytext );
+    m_strbuf.clear();
+    m_strbuf.append( yytext );
     BEGIN( LCOMMENT );
 }
 <LCOMMENT>. {
-    strbuf.append( yytext );
+    m_strbuf.append( yytext );
 }
 <LCOMMENT>\n {
-    log.debug( {loc}, "comment SL end: '" + strbuf + "'" );
+    unput( *yytext );
+    log.debug( {loc}, "span comment SL '" + m_strbuf + "'" );
     BEGIN( INITIAL );
     loc.lines( 1 );
     loc.step();
 }
 <LCOMMENT><<EOF>> {
-    log.debug( {loc}, "comment SL eof: '" + strbuf + "'" );
+    log.debug( {loc}, "span comment SL '" + m_strbuf + "' (EOF)" );
     BEGIN( INITIAL );
 }
 
 "/*" { // multi-line comments
-    log.debug( {loc}, "comment ML start" );
-    strbuf.clear();
-    strbuf.append( yytext );
+    m_strbuf.clear();
+    m_strbuf.append( yytext );
     BEGIN( COMMENT );
 }
 <COMMENT>"*/" {
-    strbuf.append( yytext );
-    log.debug( {loc}, "comment ML end: '" + strbuf + "'" );
+    log.debug( {loc}, "span comment ML '" + m_strbuf + "'" );
+    m_strbuf.append( yytext );
+    loc.step();
     BEGIN( INITIAL );
 }
 <COMMENT>\n {
-    strbuf.append( yytext );
+    m_strbuf.append( yytext );
     loc.lines( 1 );
 }
 <COMMENT>([^*\n]|\r)+|. {
-    strbuf.append( yytext );
+    m_strbuf.append( yytext );
 }
 <COMMENT><<EOF>> {
     BEGIN( INITIAL );
@@ -159,22 +159,22 @@ using namespace libcasm_fe;
 
 \" { // strings
     BEGIN( STRING );
-    strbuf.clear();
+    m_strbuf.clear();
 }
 <STRING>[^\\"\n]* { /* eat all tokens */
-    strbuf.append( yytext );
+    m_strbuf.append( yytext );
 }
 <STRING>\n {
     loc.lines( 1 );
 }
 <STRING>\\n {
-    strbuf.append( "\n" );
+    m_strbuf.append( "\n" );
 }
 <STRING>\\t {
-    strbuf.append( "\t" );
+    m_strbuf.append( "\t" );
 }
 <STRING>\\["\\] {
-    strbuf.append( yytext + 1 );
+    m_strbuf.append( yytext + 1 );
 }
 <STRING>\\. {
     log.error( {loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
@@ -186,7 +186,7 @@ using namespace libcasm_fe;
 }
 <STRING>\" {
     BEGIN( INITIAL );
-    return Parser::make_STRING( strbuf, loc );
+    return Parser::make_STRING( m_strbuf, loc );
 }
 
 . {
@@ -200,7 +200,7 @@ Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
 : yyFlexLexer( in, out )
 , log(log)
 , loc()
-, strbuf()
+, m_strbuf()
 {
 }
 

@@ -69,7 +69,7 @@ namespace libcasm_fe
       private:
         Logger& log;
         SourceLocation loc;
-        std::string strbuf;
+        std::string m_strbuf;
     };
 }
 
