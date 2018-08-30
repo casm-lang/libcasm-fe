@@ -52,10 +52,10 @@ using namespace libcasm_fe;
 #undef YY_DECL
 #define YY_DECL Parser::symbol_type Lexer::nextToken()
 
-#define yyterminate() return( Parser::make_END(loc) )
+#define yyterminate() return( Parser::make_END(m_loc) )
 
 // Code run each time a pattern is matched.
-#define YY_USER_ACTION loc.columns( yyleng );
+#define YY_USER_ACTION m_loc.columns( yyleng );
 
 %}
 
@@ -75,42 +75,55 @@ using namespace libcasm_fe;
 %%
 %{
     // Code run each time yylex is called.
-    loc.step();
+    m_loc.step();
 %}
 
 0[bB][01][01\']*[01]* {
-    return Parser::make_BINARY( yytext + 2, loc );
+    return Parser::make_BINARY( yytext + 2, m_loc );
 }
 
 0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
-    return Parser::make_HEXADECIMAL( yytext + 2, loc );
+    return Parser::make_HEXADECIMAL( yytext + 2, m_loc );
 }
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
-    return Parser::make_RATIONAL( yytext + 2, loc );
+    return Parser::make_RATIONAL( yytext + 2, m_loc );
 }
 
 [0-9][0-9\']*[0-9]* {
-    return Parser::make_INTEGER( yytext, loc );
+    return Parser::make_INTEGER( yytext, m_loc );
 }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
-    return Parser::make_DECIMAL( yytext, loc );
+    return Parser::make_DECIMAL( yytext, m_loc );
 }
 
 {{grammartoken}}
 
 [a-zA-Z_][a-zA-Z0-9\_]* {
-    return Parser::make_IDENTIFIER( yytext, loc );
+    return Parser::make_IDENTIFIER( yytext, m_loc );
 }
 
-[ \t\r]+ { // ignore spaces
-    loc.step();
+[\x20]+ { // space
+    m_log.debug( {m_loc}, "space" );
+    m_loc.step();
 }
 
-\n+ { // ignore newlines
-    loc.lines( yyleng );
-    loc.step();
+[\r]+ { // cariage return
+    m_log.debug( {m_loc}, "cariage return" );
+    m_loc.step();
+}
+
+[\t]+ { // tabulator
+    m_loc.columns( yyleng * (4-1) ); // tab character length - 1
+    m_log.debug( {m_loc}, "span tabulator: " + std::to_string( yyleng ) );
+    m_loc.step();
+}
+
+[\n]+ { // newline
+    m_loc.lines( yyleng );
+    m_log.debug( {m_loc}, "span newline" );
+    m_loc.step();
 }
 
 "//" { // single-line comments
@@ -123,13 +136,13 @@ using namespace libcasm_fe;
 }
 <LCOMMENT>\n {
     unput( *yytext );
-    log.debug( {loc}, "span comment SL '" + m_strbuf + "'" );
+    m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "'" );
     BEGIN( INITIAL );
-    loc.lines( 1 );
-    loc.step();
+    //m_loc.lines( 1 );
+    m_loc.step();
 }
 <LCOMMENT><<EOF>> {
-    log.debug( {loc}, "span comment SL '" + m_strbuf + "' (EOF)" );
+    m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "' (EOF)" );
     BEGIN( INITIAL );
 }
 
@@ -139,21 +152,21 @@ using namespace libcasm_fe;
     BEGIN( COMMENT );
 }
 <COMMENT>"*/" {
-    log.debug( {loc}, "span comment ML '" + m_strbuf + "'" );
+    m_log.debug( {m_loc}, "span comment ML '" + m_strbuf + "'" );
     m_strbuf.append( yytext );
-    loc.step();
+    m_loc.step();
     BEGIN( INITIAL );
 }
 <COMMENT>\n {
     m_strbuf.append( yytext );
-    loc.lines( 1 );
+    m_loc.lines( 1 );
 }
 <COMMENT>([^*\n]|\r)+|. {
     m_strbuf.append( yytext );
 }
 <COMMENT><<EOF>> {
     BEGIN( INITIAL );
-    log.error( {loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
+    m_log.error( {m_loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
     yyterminate();
 }
 
@@ -165,7 +178,7 @@ using namespace libcasm_fe;
     m_strbuf.append( yytext );
 }
 <STRING>\n {
-    loc.lines( 1 );
+    m_loc.lines( 1 );
 }
 <STRING>\\n {
     m_strbuf.append( "\n" );
@@ -177,20 +190,20 @@ using namespace libcasm_fe;
     m_strbuf.append( yytext + 1 );
 }
 <STRING>\\. {
-    log.error( {loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
+    m_log.error( {m_loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
 }
 <STRING><<EOF>> {
     BEGIN( INITIAL );
-    log.error( {loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
+    m_log.error( {m_loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
     yyterminate();
 }
 <STRING>\" {
     BEGIN( INITIAL );
-    return Parser::make_STRING( m_strbuf, loc );
+    return Parser::make_STRING( m_strbuf, m_loc );
 }
 
 . {
-    log.error( {loc}, "unrecognized character `" + std::string( yytext ) + "`",
+    m_log.error( {m_loc}, "unrecognized character `" + std::string( yytext ) + "`",
         Code::SyntaxErrorUnrecognizedCharacter );
 }
 
@@ -198,20 +211,20 @@ using namespace libcasm_fe;
 
 Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
 : yyFlexLexer( in, out )
-, log(log)
-, loc()
+, m_log(log)
+, m_loc()
 , m_strbuf()
 {
 }
 
 void Lexer::setFileName( const std::string& fileName )
 {
-    loc.begin.fileName = loc.end.fileName = std::make_shared< std::string >( fileName );
+    m_loc.begin.fileName = m_loc.end.fileName = std::make_shared< std::string >( fileName );
 }
 
 void Lexer::LexerError( const char* msg )
 {
-    log.error( {loc}, msg, Code::SyntaxError );
+    m_log.error( {m_loc}, msg, Code::SyntaxError );
 }
 
 //  

@@ -79,7 +79,7 @@
     #define YY_NULLPTR nullptr
 }
 
-%parse-param { Logger& log }
+%parse-param { Logger& m_log }
 %parse-param { Lexer& lexer }
 %parse-param { Specification& specification }
 
@@ -1766,7 +1766,7 @@ ExpressionAttribute
 
 void Parser::error( const SourceLocation& location, const std::string& message )
 {
-    log.error( {location}, message, Code::SyntaxError );
+    m_log.error( {location}, message, Code::SyntaxError );
 }
 
 //

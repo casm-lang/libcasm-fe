@@ -42,86 +42,86 @@
 //
 
 
-CASM            "CASM"          { return Parser::make_CASM(loc); }
-INIT            "init"          { return Parser::make_INIT(loc); }
+CASM            "CASM"          { return Parser::make_CASM(m_loc); }
+INIT            "init"          { return Parser::make_INIT(m_loc); }
 
-DERIVED         "derived"       { return Parser::make_DERIVED(loc); }
-ENUMERATION     "enumeration"   { return Parser::make_ENUMERATION(loc); }
-RULE            "rule"          { return Parser::make_RULE(loc); }
-USING           "using"         { return Parser::make_USING(loc); }
+DERIVED         "derived"       { return Parser::make_DERIVED(m_loc); }
+ENUMERATION     "enumeration"   { return Parser::make_ENUMERATION(m_loc); }
+RULE            "rule"          { return Parser::make_RULE(m_loc); }
+USING           "using"         { return Parser::make_USING(m_loc); }
 INVARIANT       "invariant"     { return Parser::make_INVARIANT(loc); }
 
-FUNCTION        "function"      { return Parser::make_FUNCTION(loc); }
-INITIALLY       "initially"     { return Parser::make_INITIALLY(loc); }
-DEFINED         "defined"       { return Parser::make_DEFINED(loc); }
+FUNCTION        "function"      { return Parser::make_FUNCTION(m_loc); }
+INITIALLY       "initially"     { return Parser::make_INITIALLY(m_loc); }
+DEFINED         "defined"       { return Parser::make_DEFINED(m_loc); }
 
-SEQ             "seq"           { return Parser::make_SEQ(loc); }
-ENDSEQ          "endseq"        { return Parser::make_ENDSEQ(loc); }
-PAR             "par"           { return Parser::make_PAR(loc); }
-ENDPAR          "endpar"        { return Parser::make_ENDPAR(loc); }
+SEQ             "seq"           { return Parser::make_SEQ(m_loc); }
+ENDSEQ          "endseq"        { return Parser::make_ENDSEQ(m_loc); }
+PAR             "par"           { return Parser::make_PAR(m_loc); }
+ENDPAR          "endpar"        { return Parser::make_ENDPAR(m_loc); }
 
-SKIP            "skip"          { return Parser::make_SKIP(loc); }
-LET             "let"           { return Parser::make_LET(loc); }
-IN              "in"            { return Parser::make_IN(loc); }
-FORALL          "forall"        { return Parser::make_FORALL(loc); }
-CHOOSE          "choose"        { return Parser::make_CHOOSE(loc); }
-ITERATE         "iterate"       { return Parser::make_ITERATE(loc); }
-DO              "do"            { return Parser::make_DO(loc); }
-IF              "if"            { return Parser::make_IF(loc); }
-THEN            "then"          { return Parser::make_THEN(loc); }
-ELSE            "else"          { return Parser::make_ELSE(loc); }
-CASE            "case"          { return Parser::make_CASE(loc); }
-OF              "of"            { return Parser::make_OF(loc); }
-DEFAULT         "default"       { return Parser::make_DEFAULT(loc); }
-HOLDS           "holds"         { return Parser::make_HOLDS(loc); }
-EXISTS          "exists"        { return Parser::make_EXISTS(loc); }
-WITH            "with"          { return Parser::make_WITH(loc); }
-AS              "as"            { return Parser::make_AS(loc); }
-WHILE           "while"         { return Parser::make_WHILE(loc); }
+SKIP            "skip"          { return Parser::make_SKIP(m_loc); }
+LET             "let"           { return Parser::make_LET(m_loc); }
+IN              "in"            { return Parser::make_IN(m_loc); }
+FORALL          "forall"        { return Parser::make_FORALL(m_loc); }
+CHOOSE          "choose"        { return Parser::make_CHOOSE(m_loc); }
+ITERATE         "iterate"       { return Parser::make_ITERATE(m_loc); }
+DO              "do"            { return Parser::make_DO(m_loc); }
+IF              "if"            { return Parser::make_IF(m_loc); }
+THEN            "then"          { return Parser::make_THEN(m_loc); }
+ELSE            "else"          { return Parser::make_ELSE(m_loc); }
+CASE            "case"          { return Parser::make_CASE(m_loc); }
+OF              "of"            { return Parser::make_OF(m_loc); }
+DEFAULT         "default"       { return Parser::make_DEFAULT(m_loc); }
+HOLDS           "holds"         { return Parser::make_HOLDS(m_loc); }
+EXISTS          "exists"        { return Parser::make_EXISTS(m_loc); }
+WITH            "with"          { return Parser::make_WITH(m_loc); }
+AS              "as"            { return Parser::make_AS(m_loc); }
+WHILE           "while"         { return Parser::make_WHILE(m_loc); }
 
-UNDEF           "undef"         { return Parser::make_UNDEF(loc); }
-FALSE           "false"         { return Parser::make_FALSE(loc); }
-TRUE            "true"          { return Parser::make_TRUE(loc); }
+UNDEF           "undef"         { return Parser::make_UNDEF(m_loc); }
+FALSE           "false"         { return Parser::make_FALSE(m_loc); }
+TRUE            "true"          { return Parser::make_TRUE(m_loc); }
 
-AND             "and"           { return Parser::make_AND(loc); }
-OR              "or"            { return Parser::make_OR(loc); }
-XOR             "xor"           { return Parser::make_XOR(loc); }
-IMPLIES         "implies"       { return Parser::make_IMPLIES(loc); }
-NOT             "not"           { return Parser::make_NOT(loc); }
+AND             "and"           { return Parser::make_AND(m_loc); }
+OR              "or"            { return Parser::make_OR(m_loc); }
+XOR             "xor"           { return Parser::make_XOR(m_loc); }
+IMPLIES         "implies"       { return Parser::make_IMPLIES(m_loc); }
+NOT             "not"           { return Parser::make_NOT(m_loc); }
 
-PLUS            "+"             { return Parser::make_PLUS(loc); }
-MINUS           "-"             { return Parser::make_MINUS(loc); }
-EQUAL           "="             { return Parser::make_EQUAL(loc); }
-LPAREN          "("             { return Parser::make_LPAREN(loc); }
-RPAREN          ")"             { return Parser::make_RPAREN(loc); }
-LSQPAREN        "["             { return Parser::make_LSQPAREN(loc); }
-RSQPAREN        "]"             { return Parser::make_RSQPAREN(loc); }
-LCURPAREN       "{"             { return Parser::make_LCURPAREN(loc); }
-RCURPAREN       "}"             { return Parser::make_RCURPAREN(loc); }
-COLON           ":"             { return Parser::make_COLON(loc); }
-DOUBLECOLON     "::"            { return Parser::make_DOUBLECOLON(loc); }
-UNDERLINE       "_"             { return Parser::make_UNDERLINE(loc); }
-VERTICAL_BAR    "|"             { return Parser::make_VERTICAL_BAR(loc); }
-AT              "@"             { return Parser::make_AT(loc); }
-COMMA           ","             { return Parser::make_COMMA(loc); }
-LESSER          "<"             { return Parser::make_LESSER(loc); }
-GREATER         ">"             { return Parser::make_GREATER(loc); }
-ASTERIX         "*"             { return Parser::make_ASTERIX(loc); }
-SLASH           "/"             { return Parser::make_SLASH(loc); }
-PERCENT         "%"             { return Parser::make_PERCENT(loc); }
-CARET           "^"             { return Parser::make_CARET(loc); }
-MARK            "'"             { return Parser::make_MARK(loc); }
+PLUS            "+"             { return Parser::make_PLUS(m_loc); }
+MINUS           "-"             { return Parser::make_MINUS(m_loc); }
+EQUAL           "="             { return Parser::make_EQUAL(m_loc); }
+LPAREN          "("             { return Parser::make_LPAREN(m_loc); }
+RPAREN          ")"             { return Parser::make_RPAREN(m_loc); }
+LSQPAREN        "["             { return Parser::make_LSQPAREN(m_loc); }
+RSQPAREN        "]"             { return Parser::make_RSQPAREN(m_loc); }
+LCURPAREN       "{"             { return Parser::make_LCURPAREN(m_loc); }
+RCURPAREN       "}"             { return Parser::make_RCURPAREN(m_loc); }
+COLON           ":"             { return Parser::make_COLON(m_loc); }
+DOUBLECOLON     "::"            { return Parser::make_DOUBLECOLON(m_loc); }
+UNDERLINE       "_"             { return Parser::make_UNDERLINE(m_loc); }
+VERTICAL_BAR    "|"             { return Parser::make_VERTICAL_BAR(m_loc); }
+AT              "@"             { return Parser::make_AT(m_loc); }
+COMMA           ","             { return Parser::make_COMMA(m_loc); }
+LESSER          "<"             { return Parser::make_LESSER(m_loc); }
+GREATER         ">"             { return Parser::make_GREATER(m_loc); }
+ASTERIX         "*"             { return Parser::make_ASTERIX(m_loc); }
+SLASH           "/"             { return Parser::make_SLASH(m_loc); }
+PERCENT         "%"             { return Parser::make_PERCENT(m_loc); }
+CARET           "^"             { return Parser::make_CARET(m_loc); }
+MARK            "'"             { return Parser::make_MARK(m_loc); }
 
-DOTDOT          ".."            { return Parser::make_DOTDOT(loc); }
-DOT             "."             { return Parser::make_DOT(loc); }
-MAPS            "->"            { return Parser::make_MAPS(loc); }
-ARROW           "=>"            { return Parser::make_ARROW(loc); }
-UPDATE          ":="            { return Parser::make_UPDATE(loc); }
-NEQUAL          "!="            { return Parser::make_NEQUAL(loc); }
-LESSEQ          "<="            { return Parser::make_LESSEQ(loc); }
-GREATEREQ       ">="            { return Parser::make_GREATEREQ(loc); }
-SEQ_BRACKET     "{|"            { return Parser::make_SEQ_BRACKET(loc); }
-ENDSEQ_BRACKET  "|}"            { return Parser::make_ENDSEQ_BRACKET(loc); }
+DOTDOT          ".."            { return Parser::make_DOTDOT(m_loc); }
+DOT             "."             { return Parser::make_DOT(m_loc); }
+MAPS            "->"            { return Parser::make_MAPS(m_loc); }
+ARROW           "=>"            { return Parser::make_ARROW(m_loc); }
+UPDATE          ":="            { return Parser::make_UPDATE(m_loc); }
+NEQUAL          "!="            { return Parser::make_NEQUAL(m_loc); }
+LESSEQ          "<="            { return Parser::make_LESSEQ(m_loc); }
+GREATEREQ       ">="            { return Parser::make_GREATEREQ(m_loc); }
+SEQ_BRACKET     "{|"            { return Parser::make_SEQ_BRACKET(m_loc); }
+ENDSEQ_BRACKET  "|}"            { return Parser::make_ENDSEQ_BRACKET(m_loc); }
 
 
 //  

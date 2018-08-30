@@ -67,8 +67,8 @@ namespace libcasm_fe
         void LexerError( const char* msg ) override;
 
       private:
-        Logger& log;
-        SourceLocation loc;
+        Logger& m_log;
+        SourceLocation m_loc;
         std::string m_strbuf;
     };
 }
