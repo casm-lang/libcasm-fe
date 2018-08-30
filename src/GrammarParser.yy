@@ -80,8 +80,8 @@
 }
 
 %parse-param { Logger& m_log }
-%parse-param { Lexer& lexer }
-%parse-param { Specification& specification }
+%parse-param { Lexer& m_lexer }
+%parse-param { Specification& m_specification }
 
 %code
 {
@@ -93,7 +93,7 @@
     #include <libstdhl/Type>
 
     #undef yylex
-    #define yylex lexer.nextToken
+    #define yylex m_lexer.nextToken
 
     static BasicType::Ptr createVoidType( SourceLocation& sourceLocation )
     {
@@ -296,8 +296,8 @@ END       0 "end of file"
 Specification
 : Header Definitions
   {
-      specification.setHeader( $1 );
-      specification.setDefinitions( $2 );
+      m_specification.setHeader( $1 );
+      m_specification.setDefinitions( $2 );
   }
 ;
 
