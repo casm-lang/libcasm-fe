@@ -300,6 +300,10 @@ std::string Node::description( void ) const
         {
             return "variable binding";
         }
+        case ID::TOKEN:
+        {
+            return "token";
+        }
     }
 
     assert( !" internal error! " );

@@ -57,13 +57,14 @@ add_library( ${PROJECT}-cpp OBJECT
 
   ast/Attribute.cpp
   ast/Definition.cpp
+  ast/EmptyVisitor.cpp
   ast/Expression.cpp
   ast/Literal.cpp
   ast/Node.cpp
-  ast/Rule.cpp
-  ast/Type.cpp
   ast/RecursiveVisitor.cpp
-  ast/EmptyVisitor.cpp
+  ast/Rule.cpp
+  ast/Token.cpp
+  ast/Type.cpp
 
   analyze/ConsistencyCheckPass.cpp
   analyze/TypeCheckPass.cpp
