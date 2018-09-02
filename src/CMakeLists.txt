@@ -253,6 +253,7 @@ ecm_generate_headers( ${PROJECT}_AST_HEADERS_CPP
     Node
     RecursiveVisitor
     Rule
+    Token
     Type
     Visitor
   PREFIX

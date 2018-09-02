@@ -43,8 +43,7 @@
 
 #include "Token.h"
 
-// #include "Definition.h"
-// #include "Type.h"
+#include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
 using namespace Ast;

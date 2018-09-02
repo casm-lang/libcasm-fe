@@ -61,11 +61,13 @@ function generate_token
     echo "#ifndef _LIBCASM_FE_GRAMMAR_TOKEN_H_" >> $dst
     echo "#define _LIBCASM_FE_GRAMMAR_TOKEN_H_" >> $dst
     echo "" >> $dst
+    echo "#include <libcasm-fe/CasmFE>" >> $dst
+    echo "" >> $dst
     echo "namespace libcasm_fe" >> $dst
     echo "{" >> $dst
     echo "    namespace Grammar" >> $dst
     echo "    {" >> $dst
-    echo "        enum class Token" >> $dst
+    echo "        enum class Token : u8" >> $dst
     echo "        {" >> $dst
 
     local tokens=`cat $src | grep '.*\"' | sed 's/{ return.*//g' | sed 's/{ YY_.*//g'`

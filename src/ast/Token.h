@@ -46,10 +46,13 @@
 
 #include <libcasm-fe/ast/Node>
 
-#include "../various/GrammarToken.h"
-
 namespace libcasm_fe
 {
+    namespace Grammar
+    {
+        enum class Token : u8;
+    }
+
     namespace Ast
     {
         class Token final : public Node
