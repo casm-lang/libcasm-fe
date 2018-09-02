@@ -270,6 +270,10 @@ void EmptyVisitor::visit( VariableBinding& )
 {
 }
 
+void EmptyVisitor::visit( Token& )
+{
+}
+
 //
 //  Local variables:
 //  mode: c++

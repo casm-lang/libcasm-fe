@@ -71,7 +71,7 @@ std::string Token::tokenString( void ) const
 
 void Token::accept( Visitor& visitor )
 {
-    // visitor.visit( *this ); // TODO: FIXME: @ppaulweber
+    visitor.visit( *this );
 }
 
 //

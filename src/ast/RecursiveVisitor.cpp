@@ -351,13 +351,17 @@ void RecursiveVisitor::visit( RelationType& node )
 
 void RecursiveVisitor::visit( BasicAttribute& node )
 {
+    node.leftBrace()->accept( *this );
     node.identifier()->accept( *this );
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ExpressionAttribute& node )
 {
+    node.leftBrace()->accept( *this );
     node.identifier()->accept( *this );
     node.expression()->accept( *this );
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( Identifier& node )
@@ -384,6 +388,10 @@ void RecursiveVisitor::visit( VariableBinding& node )
 {
     node.variable()->accept( *this );
     node.expression()->accept( *this );
+}
+
+void RecursiveVisitor::visit( Token& node )
+{
 }
 
 //

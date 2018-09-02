@@ -209,6 +209,7 @@ class AstDumpSourceVisitor final : public Visitor
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
     void visit( VariableBinding& node ) override;
+    void visit( Token& node ) override;
 
   private:
     void dumpAttributes( Attributes& attributes );
@@ -777,6 +778,11 @@ void AstDumpSourceVisitor::visit( VariableBinding& node )
     node.variable()->accept( *this );
     m_stream << " = ";
     node.expression()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( Token& node )
+{
+    m_stream << node.tokenString();
 }
 
 void AstDumpSourceVisitor::dumpAttributes( Attributes& attributes )
