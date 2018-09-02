@@ -1686,14 +1686,10 @@ TypedAttributedVariable
   }
 ;
 
-
-VariableBinding
-: AttributedVariable EQUAL Term
-  {
-      $$ = Ast::make< VariableBinding >( @$, $1, $2, $3 );
-  }
-;
-
+//
+//
+// VariableBindings
+//
 
 VariableBindings
 : VariableBindings COMMA VariableBinding
@@ -1711,7 +1707,14 @@ VariableBindings
   }
 ;
 
+VariableBinding
+: AttributedVariable EQUAL Term
+  {
+      $$ = Ast::make< VariableBinding >( @$, $1, $2, $3 );
+  }
+;
 
+//
 //
 // Attributes
 //
@@ -1730,7 +1733,6 @@ Attributes
       $$ = attributes;
   }
 ;
-
 
 Attribute
 : LSQPAREN BasicAttribute RSQPAREN
@@ -1753,14 +1755,12 @@ Attribute
   }
 ;
 
-
 BasicAttribute
 : Identifier
   {
       $$ = Ast::make< BasicAttribute >( @$, $1 );
   }
 ;
-
 
 ExpressionAttribute
 : Identifier Term
