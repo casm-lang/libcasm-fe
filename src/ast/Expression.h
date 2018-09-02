@@ -44,6 +44,7 @@
 #ifndef _LIBCASM_FE_EXPRESSION_H_
 #define _LIBCASM_FE_EXPRESSION_H_
 
+#include <libcasm-fe/ast/Identifier>
 #include <libcasm-fe/ast/Node>
 #include <libcasm-fe/ast/Token>
 

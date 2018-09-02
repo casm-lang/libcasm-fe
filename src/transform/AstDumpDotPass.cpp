@@ -572,7 +572,7 @@ void AstDumpDotVisitor::visit( IdentifierPath& node )
             name = "Relative";
             break;
     }
-    name += " IdentifierPath";
+    name += "\nIdentifierPath";
 
     dumpNode( node, name );
     RecursiveVisitor::visit( node );

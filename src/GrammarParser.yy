@@ -1592,6 +1592,7 @@ IdentifierPath
 : IdentifierPath DOUBLECOLON Identifier
   {
       auto path = $1;
+      $3->setDoubleColon( $2 );
       path->addIdentifier( $3 );
       $$ = path;
   }

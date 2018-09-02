@@ -749,12 +749,13 @@ void AstDumpSourceVisitor::visit( ExpressionAttribute& node )
 
 void AstDumpSourceVisitor::visit( Identifier& node )
 {
+    node.doubleColon()->accept( *this );
     m_stream << node.name();
 }
 
 void AstDumpSourceVisitor::visit( IdentifierPath& node )
 {
-    m_stream << node.path();
+    node.identifiers()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( ExpressionCase& node )

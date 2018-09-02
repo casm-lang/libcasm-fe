@@ -368,6 +368,7 @@ void RecursiveVisitor::visit( ExpressionAttribute& node )
 
 void RecursiveVisitor::visit( Identifier& node )
 {
+    node.doubleColon()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IdentifierPath& node )
