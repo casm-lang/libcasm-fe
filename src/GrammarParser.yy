@@ -1624,6 +1624,7 @@ AttributedVariables
 : AttributedVariables COMMA AttributedVariable
   {
       auto variables = $1;
+      $3->setComma( $2 );
       variables->add( $3 );
       $$ = variables;
   }
