@@ -115,10 +115,21 @@ add_custom_command(
   COMMENT        ""
   )
 
+set( DEF_GRAMMAR_TOKEN "${CMAKE_CURRENT_SOURCE_DIR}/src/GrammarToken.hpp" )
+set( CXX_GRAMMAR_TOKEN "${CMAKE_CURRENT_BINARY_DIR}/src/various/GrammarToken.h" )
+
+add_custom_command(
+  OUTPUT         ${CXX_GRAMMAR_TOKEN}
+  COMMAND        make -C ${CMAKE_CURRENT_SOURCE_DIR} ${CXX_GRAMMAR_TOKEN}
+  DEPENDS        ${DEF_GRAMMAR_TOKEN}
+  COMMENT        ""
+  )
+
 add_custom_target( ${PROJECT}-grammar ALL
   DEPENDS
     ${CXX_GRAMMAR_PARSER}
     ${CXX_GRAMMAR_LEXER}
+    ${CXX_GRAMMAR_TOKEN}
   )
 
 add_dependencies( ${PROJECT}-cpp
