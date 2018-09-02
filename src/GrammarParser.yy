@@ -72,6 +72,7 @@
     #include "ast/Definition.h"
     #include "ast/Expression.h"
     #include "ast/Rule.h"
+    #include "ast/Token.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
@@ -146,7 +147,6 @@
 %token
 END       0 "end of file"
 {{grammartoken}}
-;
 
 %token <std::string> BINARY      "binary"
 %token <std::string> HEXADECIMAL "hexadecimal"

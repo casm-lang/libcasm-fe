@@ -88,11 +88,7 @@ src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
 	cp -f $< $@
 
 src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hpp
-	mkdir -p `dirname obj/$<`
-	head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	cat $(filter %.hpp,$^) | sed "/^\/\//d" | sed "s/{ /\/\/ {/g"         >> obj/$< 
-	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
-	sed -i "/^{{grammartoken}}/d" obj/$<
+	etc/script.sh generate-parser `pwd`/$< `pwd`/obj/$< $(filter %.hpp,$^)
 	cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
 
 

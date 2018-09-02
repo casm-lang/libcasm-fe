@@ -26,7 +26,7 @@ APP=`basename $0`
 
 function usage
 {
-    echo "usage: $APP <generate-token>"
+    echo "usage: $APP <generate-token|generate-parser>"
     exit -1
 }
 
@@ -48,7 +48,7 @@ function generate_token
     echo "        enum class Token" >> $dst
     echo "        {" >> $dst
 
-    local tokens=`cat $src | grep '.*\"' | sed 's/{ return.*//g'`
+    local tokens=`cat $src | grep '.*\"' | sed 's/{ return.*//g' | sed 's/{ YY_.*//g'`
     local mode=name
     declare -i uid=0
     for element in $tokens; do
@@ -106,13 +106,48 @@ function generate_token
     exit 0
 }
 
+function generate_parser
+{
+    local src=$1
+    local dst=$2
+    local grammartoken=$3
+    
+    mkdir -p `dirname $src`
+    
+	head -n +`grep -n "{{grammartoken}}" $src | grep -o "[0-9]*"` $src | cat  > $dst
+	cat $grammartoken | sed "/^\/\//d" | sed "s/{ /\/\/ {/g"                 >> $dst
+
+    local tokens=`cat $grammartoken | grep '.*\"' | sed 's/{ return.*//g' | sed 's/{ YY_.*//g'`
+    local mode=name
+    declare -i uid=0
+    for element in $tokens; do
+        #printf "%2i -> %s\n" $uid $element
+	    if [ "$mode" = "name" ]; then
+	        echo "%type <Ast::Token::Ptr> $element" >> $dst
+	        mode=token
+	    else
+	        # mode token
+	        mode=name
+            uid+=1
+	    fi
+    done
+
+	tail -n +`grep -n "{{grammartoken}}" $src | grep -o "[0-9]*"` $src | cat >> $dst
+	sed -i "/^{{grammartoken}}/d" $dst
+
+    exit 0
+}
+
 
 if [ -z "$1" ]; then
     usage
+    exit -1
 fi
 
 if [ "$1" = "generate-token" ]; then
     generate_token $2 $3
+elif [ "$1" = "generate-parser" ]; then
+    generate_parser $2 $3 $4
 else
     usage
 fi

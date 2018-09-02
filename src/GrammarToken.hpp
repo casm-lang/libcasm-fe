@@ -42,86 +42,86 @@
 //
 
 
-CASM            "CASM"          { return Parser::make_CASM(m_loc); }
-INIT            "init"          { return Parser::make_INIT(m_loc); }
+CASM            "CASM"          { YY_TOKEN_ACTION( CASM ) }
+INIT            "init"          { YY_TOKEN_ACTION( INIT ) }
 
-DERIVED         "derived"       { return Parser::make_DERIVED(m_loc); }
-ENUMERATION     "enumeration"   { return Parser::make_ENUMERATION(m_loc); }
-RULE            "rule"          { return Parser::make_RULE(m_loc); }
-USING           "using"         { return Parser::make_USING(m_loc); }
-INVARIANT       "invariant"     { return Parser::make_INVARIANT(loc); }
+DERIVED         "derived"       { YY_TOKEN_ACTION( DERIVED ) }
+ENUMERATION     "enumeration"   { YY_TOKEN_ACTION( ENUMERATION ) }
+RULE            "rule"          { YY_TOKEN_ACTION( RULE ) }
+USING           "using"         { YY_TOKEN_ACTION( USING ) }
+INVARIANT       "invariant"     { YY_TOKEN_ACTION( INVARIANT ) }
 
-FUNCTION        "function"      { return Parser::make_FUNCTION(m_loc); }
-INITIALLY       "initially"     { return Parser::make_INITIALLY(m_loc); }
-DEFINED         "defined"       { return Parser::make_DEFINED(m_loc); }
+FUNCTION        "function"      { YY_TOKEN_ACTION( FUNCTION ) }
+INITIALLY       "initially"     { YY_TOKEN_ACTION( INITIALLY ) }
+DEFINED         "defined"       { YY_TOKEN_ACTION( DEFINED ) }
 
-SEQ             "seq"           { return Parser::make_SEQ(m_loc); }
-ENDSEQ          "endseq"        { return Parser::make_ENDSEQ(m_loc); }
-PAR             "par"           { return Parser::make_PAR(m_loc); }
-ENDPAR          "endpar"        { return Parser::make_ENDPAR(m_loc); }
+SEQ             "seq"           { YY_TOKEN_ACTION( SEQ ) }
+ENDSEQ          "endseq"        { YY_TOKEN_ACTION( ENDSEQ ) }
+PAR             "par"           { YY_TOKEN_ACTION( PAR ) }
+ENDPAR          "endpar"        { YY_TOKEN_ACTION( ENDPAR ) }
 
-SKIP            "skip"          { return Parser::make_SKIP(m_loc); }
-LET             "let"           { return Parser::make_LET(m_loc); }
-IN              "in"            { return Parser::make_IN(m_loc); }
-FORALL          "forall"        { return Parser::make_FORALL(m_loc); }
-CHOOSE          "choose"        { return Parser::make_CHOOSE(m_loc); }
-ITERATE         "iterate"       { return Parser::make_ITERATE(m_loc); }
-DO              "do"            { return Parser::make_DO(m_loc); }
-IF              "if"            { return Parser::make_IF(m_loc); }
-THEN            "then"          { return Parser::make_THEN(m_loc); }
-ELSE            "else"          { return Parser::make_ELSE(m_loc); }
-CASE            "case"          { return Parser::make_CASE(m_loc); }
-OF              "of"            { return Parser::make_OF(m_loc); }
-DEFAULT         "default"       { return Parser::make_DEFAULT(m_loc); }
-HOLDS           "holds"         { return Parser::make_HOLDS(m_loc); }
-EXISTS          "exists"        { return Parser::make_EXISTS(m_loc); }
-WITH            "with"          { return Parser::make_WITH(m_loc); }
-AS              "as"            { return Parser::make_AS(m_loc); }
-WHILE           "while"         { return Parser::make_WHILE(m_loc); }
+SKIP            "skip"          { YY_TOKEN_ACTION( SKIP ) }
+LET             "let"           { YY_TOKEN_ACTION( LET ) }
+IN              "in"            { YY_TOKEN_ACTION( IN ) }
+FORALL          "forall"        { YY_TOKEN_ACTION( FORALL ) }
+CHOOSE          "choose"        { YY_TOKEN_ACTION( CHOOSE ) }
+ITERATE         "iterate"       { YY_TOKEN_ACTION( ITERATE ) }
+DO              "do"            { YY_TOKEN_ACTION( DO ) }
+IF              "if"            { YY_TOKEN_ACTION( IF ) }
+THEN            "then"          { YY_TOKEN_ACTION( THEN ) }
+ELSE            "else"          { YY_TOKEN_ACTION( ELSE ) }
+CASE            "case"          { YY_TOKEN_ACTION( CASE ) }
+OF              "of"            { YY_TOKEN_ACTION( OF ) }
+DEFAULT         "default"       { YY_TOKEN_ACTION( DEFAULT ) }
+HOLDS           "holds"         { YY_TOKEN_ACTION( HOLDS ) }
+EXISTS          "exists"        { YY_TOKEN_ACTION( EXISTS ) }
+WITH            "with"          { YY_TOKEN_ACTION( WITH ) }
+AS              "as"            { YY_TOKEN_ACTION( AS ) }
+WHILE           "while"         { YY_TOKEN_ACTION( WHILE ) }
 
-UNDEF           "undef"         { return Parser::make_UNDEF(m_loc); }
-FALSE           "false"         { return Parser::make_FALSE(m_loc); }
-TRUE            "true"          { return Parser::make_TRUE(m_loc); }
+UNDEF           "undef"         { YY_TOKEN_ACTION( UNDEF ) }
+FALSE           "false"         { YY_TOKEN_ACTION( FALSE ) }
+TRUE            "true"          { YY_TOKEN_ACTION( TRUE ) }
 
-AND             "and"           { return Parser::make_AND(m_loc); }
-OR              "or"            { return Parser::make_OR(m_loc); }
-XOR             "xor"           { return Parser::make_XOR(m_loc); }
-IMPLIES         "implies"       { return Parser::make_IMPLIES(m_loc); }
-NOT             "not"           { return Parser::make_NOT(m_loc); }
+AND             "and"           { YY_TOKEN_ACTION( AND ) }
+OR              "or"            { YY_TOKEN_ACTION( OR ) }
+XOR             "xor"           { YY_TOKEN_ACTION( XOR ) }
+IMPLIES         "implies"       { YY_TOKEN_ACTION( IMPLIES ) }
+NOT             "not"           { YY_TOKEN_ACTION( NOT ) }
 
-PLUS            "+"             { return Parser::make_PLUS(m_loc); }
-MINUS           "-"             { return Parser::make_MINUS(m_loc); }
-EQUAL           "="             { return Parser::make_EQUAL(m_loc); }
-LPAREN          "("             { return Parser::make_LPAREN(m_loc); }
-RPAREN          ")"             { return Parser::make_RPAREN(m_loc); }
-LSQPAREN        "["             { return Parser::make_LSQPAREN(m_loc); }
-RSQPAREN        "]"             { return Parser::make_RSQPAREN(m_loc); }
-LCURPAREN       "{"             { return Parser::make_LCURPAREN(m_loc); }
-RCURPAREN       "}"             { return Parser::make_RCURPAREN(m_loc); }
-COLON           ":"             { return Parser::make_COLON(m_loc); }
-DOUBLECOLON     "::"            { return Parser::make_DOUBLECOLON(m_loc); }
-UNDERLINE       "_"             { return Parser::make_UNDERLINE(m_loc); }
-VERTICAL_BAR    "|"             { return Parser::make_VERTICAL_BAR(m_loc); }
-AT              "@"             { return Parser::make_AT(m_loc); }
-COMMA           ","             { return Parser::make_COMMA(m_loc); }
-LESSER          "<"             { return Parser::make_LESSER(m_loc); }
-GREATER         ">"             { return Parser::make_GREATER(m_loc); }
-ASTERIX         "*"             { return Parser::make_ASTERIX(m_loc); }
-SLASH           "/"             { return Parser::make_SLASH(m_loc); }
-PERCENT         "%"             { return Parser::make_PERCENT(m_loc); }
-CARET           "^"             { return Parser::make_CARET(m_loc); }
-MARK            "'"             { return Parser::make_MARK(m_loc); }
+PLUS            "+"             { YY_TOKEN_ACTION( PLUS ) }
+MINUS           "-"             { YY_TOKEN_ACTION( MINUS ) }
+EQUAL           "="             { YY_TOKEN_ACTION( EQUAL ) }
+LPAREN          "("             { YY_TOKEN_ACTION( LPAREN ) }
+RPAREN          ")"             { YY_TOKEN_ACTION( RPAREN ) }
+LSQPAREN        "["             { YY_TOKEN_ACTION( LSQPAREN ) }
+RSQPAREN        "]"             { YY_TOKEN_ACTION( RSQPAREN ) }
+LCURPAREN       "{"             { YY_TOKEN_ACTION( LCURPAREN ) }
+RCURPAREN       "}"             { YY_TOKEN_ACTION( RCURPAREN ) }
+COLON           ":"             { YY_TOKEN_ACTION( COLON ) }
+DOUBLECOLON     "::"            { YY_TOKEN_ACTION( DOUBLECOLON ) }
+UNDERLINE       "_"             { YY_TOKEN_ACTION( UNDERLINE ) }
+VERTICAL_BAR    "|"             { YY_TOKEN_ACTION( VERTICAL_BAR ) }
+AT              "@"             { YY_TOKEN_ACTION( AT ) }
+COMMA           ","             { YY_TOKEN_ACTION( COMMA ) }
+LESSER          "<"             { YY_TOKEN_ACTION( LESSER ) }
+GREATER         ">"             { YY_TOKEN_ACTION( GREATER ) }
+ASTERIX         "*"             { YY_TOKEN_ACTION( ASTERIX ) }
+SLASH           "/"             { YY_TOKEN_ACTION( SLASH ) }
+PERCENT         "%"             { YY_TOKEN_ACTION( PERCENT ) }
+CARET           "^"             { YY_TOKEN_ACTION( CARET ) }
+MARK            "'"             { YY_TOKEN_ACTION( MARK ) }
 
-DOTDOT          ".."            { return Parser::make_DOTDOT(m_loc); }
-DOT             "."             { return Parser::make_DOT(m_loc); }
-MAPS            "->"            { return Parser::make_MAPS(m_loc); }
-ARROW           "=>"            { return Parser::make_ARROW(m_loc); }
-UPDATE          ":="            { return Parser::make_UPDATE(m_loc); }
-NEQUAL          "!="            { return Parser::make_NEQUAL(m_loc); }
-LESSEQ          "<="            { return Parser::make_LESSEQ(m_loc); }
-GREATEREQ       ">="            { return Parser::make_GREATEREQ(m_loc); }
-SEQ_BRACKET     "{|"            { return Parser::make_SEQ_BRACKET(m_loc); }
-ENDSEQ_BRACKET  "|}"            { return Parser::make_ENDSEQ_BRACKET(m_loc); }
+DOTDOT          ".."            { YY_TOKEN_ACTION( DOTDOT ) }
+DOT             "."             { YY_TOKEN_ACTION( DOT ) }
+MAPS            "->"            { YY_TOKEN_ACTION( MAPS ) }
+ARROW           "=>"            { YY_TOKEN_ACTION( ARROW ) }
+UPDATE          ":="            { YY_TOKEN_ACTION( UPDATE ) }
+NEQUAL          "!="            { YY_TOKEN_ACTION( NEQUAL ) }
+LESSEQ          "<="            { YY_TOKEN_ACTION( LESSEQ ) }
+GREATEREQ       ">="            { YY_TOKEN_ACTION( GREATEREQ ) }
+SEQ_BRACKET     "{|"            { YY_TOKEN_ACTION( SEQ_BRACKET ) }
+ENDSEQ_BRACKET  "|}"            { YY_TOKEN_ACTION( ENDSEQ_BRACKET ) }
 
 
 //  
