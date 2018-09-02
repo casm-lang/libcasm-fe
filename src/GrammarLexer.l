@@ -105,24 +105,27 @@ using namespace libcasm_fe;
 }
 
 [\x20]+ { // space
-    m_log.debug( {m_loc}, "space" );
+    m_log.debug( {m_loc}, "span space: " + std::to_string( yyleng ) );
+    // TODO: @moiova add span space creation of length yyleng here
     m_loc.step();
 }
 
-[\r]+ { // cariage return
-    m_log.debug( {m_loc}, "cariage return" );
+[\r]+ { // carriage return
+    m_log.debug( {m_loc}, "span carriage return: "+ std::to_string( yyleng ) );
+    // TODO: @moiova add span carriage return creation of length yyleng here
     m_loc.step();
 }
 
 [\t]+ { // tabulator
-    m_loc.columns( yyleng * (4-1) ); // tab character length - 1
     m_log.debug( {m_loc}, "span tabulator: " + std::to_string( yyleng ) );
+    // TODO: @moiova add span tabulator creation of length yyleng here
     m_loc.step();
 }
 
 [\n]+ { // newline
     m_loc.lines( yyleng );
-    m_log.debug( {m_loc}, "span newline" );
+    m_log.debug( {m_loc}, "span newline: " + std::to_string( yyleng ) );
+    // TODO: @moiova add span newline creation of length yyleng here
     m_loc.step();
 }
 
@@ -136,13 +139,15 @@ using namespace libcasm_fe;
 }
 <LCOMMENT>\n {
     unput( *yytext );
+    m_loc.columns( -1 );
     m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "'" );
-    BEGIN( INITIAL );
-    //m_loc.lines( 1 );
+    // TODO: @moiova add span single line comment creation of m_strbuf here
     m_loc.step();
+    BEGIN( INITIAL );
 }
 <LCOMMENT><<EOF>> {
     m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "' (EOF)" );
+    // TODO: @moiova add span single line comment creation of m_strbuf here
     BEGIN( INITIAL );
 }
 
@@ -152,8 +157,9 @@ using namespace libcasm_fe;
     BEGIN( COMMENT );
 }
 <COMMENT>"*/" {
-    m_log.debug( {m_loc}, "span comment ML '" + m_strbuf + "'" );
     m_strbuf.append( yytext );
+    m_log.debug( {m_loc}, "span comment ML '" + m_strbuf + "'" );
+    // TODO: @moiova add span single line comment creation of m_strbuf here
     m_loc.step();
     BEGIN( INITIAL );
 }
@@ -165,14 +171,14 @@ using namespace libcasm_fe;
     m_strbuf.append( yytext );
 }
 <COMMENT><<EOF>> {
-    BEGIN( INITIAL );
     m_log.error( {m_loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
+    BEGIN( INITIAL );
     yyterminate();
 }
 
 \" { // strings
-    BEGIN( STRING );
     m_strbuf.clear();
+    BEGIN( STRING );
 }
 <STRING>[^\\"\n]* { /* eat all tokens */
     m_strbuf.append( yytext );
@@ -193,8 +199,8 @@ using namespace libcasm_fe;
     m_log.error( {m_loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
 }
 <STRING><<EOF>> {
-    BEGIN( INITIAL );
     m_log.error( {m_loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
+    BEGIN( INITIAL );
     yyterminate();
 }
 <STRING>\" {
@@ -205,13 +211,14 @@ using namespace libcasm_fe;
 . {
     m_log.error( {m_loc}, "unrecognized character `" + std::string( yytext ) + "`",
         Code::SyntaxErrorUnrecognizedCharacter );
+    m_loc.step();
 }
 
 %%
 
 Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
 : yyFlexLexer( in, out )
-, m_log(log)
+, m_log( log )
 , m_loc()
 , m_strbuf()
 {
