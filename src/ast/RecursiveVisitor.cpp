@@ -386,7 +386,12 @@ void RecursiveVisitor::visit( DefaultCase& node )
 
 void RecursiveVisitor::visit( VariableBinding& node )
 {
+    if( node.comma() )
+    {
+        node.comma()->accept( *this );
+    }
     node.variable()->accept( *this );
+    node.equal()->accept( *this );
     node.expression()->accept( *this );
 }
 

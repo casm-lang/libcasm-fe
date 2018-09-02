@@ -1690,7 +1690,7 @@ TypedAttributedVariable
 VariableBinding
 : AttributedVariable EQUAL Term
   {
-      $$ = Ast::make< VariableBinding >( @$, $1, $3 );
+      $$ = Ast::make< VariableBinding >( @$, $1, $2, $3 );
   }
 ;
 
@@ -1699,6 +1699,7 @@ VariableBindings
 : VariableBindings COMMA VariableBinding
   {
       auto variableBindings = $1;
+      $3->setComma( $2 );
       variableBindings->add( $3 );
       $$ = variableBindings;
   }

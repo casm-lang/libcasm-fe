@@ -775,8 +775,12 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 
 void AstDumpSourceVisitor::visit( VariableBinding& node )
 {
+    if( node.comma() )
+    {        
+        node.comma()->accept( *this );
+    }
     node.variable()->accept( *this );
-    m_stream << " = ";
+    node.equal()->accept( *this );
     node.expression()->accept( *this );
 }
 

@@ -45,6 +45,7 @@
 #define _LIBCASM_FE_EXPRESSION_H_
 
 #include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Token>
 
 #include <libcasm-ir/Constant>
 
@@ -381,16 +382,24 @@ namespace libcasm_fe
 
             VariableBinding(
                 const std::shared_ptr< VariableDefinition >& variable,
+                const Token::Ptr& equal,
                 const Expression::Ptr& expression );
 
             const std::shared_ptr< VariableDefinition >& variable( void ) const;
             const Expression::Ptr& expression( void ) const;
+
+            const Token::Ptr& equal( void ) const;
+
+            void setComma( const Token::Ptr& comma );
+            const Token::Ptr& comma( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const std::shared_ptr< VariableDefinition > m_variable;
             const Expression::Ptr m_expression;
+            const Token::Ptr m_equal;
+            Token::Ptr m_comma;
         };
 
         using VariableBindings = NodeList< VariableBinding >;

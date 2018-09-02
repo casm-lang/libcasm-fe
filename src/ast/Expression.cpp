@@ -557,10 +557,14 @@ void BinaryExpression::accept( Visitor& visitor )
 //
 
 VariableBinding::VariableBinding(
-    const VariableDefinition::Ptr& variable, const Expression::Ptr& expression )
+    const VariableDefinition::Ptr& variable,
+    const Token::Ptr& equal,
+    const Expression::Ptr& expression )
 : Node( Node::ID::VARIABLE_BINDING )
 , m_variable( variable )
 , m_expression( expression )
+, m_equal( equal )
+, m_comma()
 {
 }
 
@@ -572,6 +576,22 @@ const VariableDefinition::Ptr& VariableBinding::variable( void ) const
 const Expression::Ptr& VariableBinding::expression( void ) const
 {
     return m_expression;
+}
+
+const Token::Ptr& VariableBinding::equal( void ) const
+{
+    return m_equal;
+}
+
+void VariableBinding::setComma( const Token::Ptr& comma )
+{
+    assert( m_comma == nullptr );
+    m_comma = comma;
+}
+
+const Token::Ptr& VariableBinding::comma( void ) const
+{
+    return m_comma;
 }
 
 void VariableBinding::accept( Visitor& visitor )
