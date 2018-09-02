@@ -43,6 +43,8 @@
 
 #include "Expression.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Literal>
 #include <libcasm-fe/ast/Type>
@@ -566,6 +568,7 @@ VariableBinding::VariableBinding(
 , m_equal( equal )
 , m_comma()
 {
+    m_comma = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 const VariableDefinition::Ptr& VariableBinding::variable( void ) const
@@ -585,7 +588,7 @@ const Token::Ptr& VariableBinding::equal( void ) const
 
 void VariableBinding::setComma( const Token::Ptr& comma )
 {
-    assert( m_comma == nullptr );
+    assert( m_comma->token() == Grammar::Token::UNRESOLVED );
     m_comma = comma;
 }
 

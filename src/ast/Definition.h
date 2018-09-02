@@ -47,6 +47,7 @@
 #include <libcasm-fe/ast/Attribute>
 #include <libcasm-fe/ast/Node>
 #include <libcasm-fe/ast/Rule>
+#include <libcasm-fe/ast/Token>
 #include <libcasm-fe/ast/Type>
 
 namespace libcasm_fe
@@ -96,9 +97,17 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< VariableDefinition >;
 
-            VariableDefinition( const Identifier::Ptr& identifier, const Type::Ptr& variableType );
+            VariableDefinition(
+                const Identifier::Ptr& identifier,
+                const Token::Ptr& colon,
+                const Type::Ptr& variableType );
 
             const Type::Ptr& variableType( void ) const;
+
+            const Token::Ptr& colon( void ) const;
+
+            void setComma( const Token::Ptr& comma );
+            const Token::Ptr& comma( void ) const;
 
             /**
              * Sets the frame local index of the variable.
@@ -112,6 +121,8 @@ namespace libcasm_fe
 
           private:
             const Type::Ptr m_variableType;
+            Token::Ptr m_colon;
+            Token::Ptr m_comma;
             std::size_t m_localIndex;
         };
 

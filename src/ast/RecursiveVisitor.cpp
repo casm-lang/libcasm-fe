@@ -59,9 +59,11 @@ void RecursiveVisitor::visit( HeaderDefinition& node )
 
 void RecursiveVisitor::visit( VariableDefinition& node )
 {
-    node.identifier()->accept( *this );
-    node.variableType()->accept( *this );
+    node.comma()->accept( *this );
     node.attributes()->accept( *this );
+    node.identifier()->accept( *this );
+    node.colon()->accept( *this );
+    node.variableType()->accept( *this );
 }
 
 void RecursiveVisitor::visit( FunctionDefinition& node )
@@ -386,10 +388,7 @@ void RecursiveVisitor::visit( DefaultCase& node )
 
 void RecursiveVisitor::visit( VariableBinding& node )
 {
-    if( node.comma() )
-    {
-        node.comma()->accept( *this );
-    }
+    node.comma()->accept( *this );
     node.variable()->accept( *this );
     node.equal()->accept( *this );
     node.expression()->accept( *this );

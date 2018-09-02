@@ -43,6 +43,8 @@
 
 #include "AstDumpSourcePass.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
@@ -249,10 +251,11 @@ void AstDumpSourceVisitor::visit( HeaderDefinition& node )
 
 void AstDumpSourceVisitor::visit( VariableDefinition& node )
 {
+    node.comma()->accept( *this );
     dumpAttributes( *node.attributes() );
     m_stream << " ";
     node.identifier()->accept( *this );
-    m_stream << " : ";
+    node.colon()->accept( *this );
     node.variableType()->accept( *this );
 }
 
@@ -675,7 +678,6 @@ void AstDumpSourceVisitor::visit( WhileRule& node )
 
 void AstDumpSourceVisitor::visit( UnresolvedType& node )
 {
-    node.name()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( BasicType& node )
@@ -775,10 +777,7 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 
 void AstDumpSourceVisitor::visit( VariableBinding& node )
 {
-    if( node.comma() )
-    {        
-        node.comma()->accept( *this );
-    }
+    node.comma()->accept( *this );
     node.variable()->accept( *this );
     node.equal()->accept( *this );
     node.expression()->accept( *this );
@@ -786,7 +785,10 @@ void AstDumpSourceVisitor::visit( VariableBinding& node )
 
 void AstDumpSourceVisitor::visit( Token& node )
 {
-    m_stream << node.tokenString();
+    if( node.token() != Grammar::Token::UNRESOLVED )
+    {
+        m_stream << node.tokenString();
+    }
 }
 
 void AstDumpSourceVisitor::dumpAttributes( Attributes& attributes )

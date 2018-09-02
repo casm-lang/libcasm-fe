@@ -69,10 +69,11 @@ function generate_token
     echo "    {" >> $dst
     echo "        enum class Token : u8" >> $dst
     echo "        {" >> $dst
+	echo "            /*  0 */ UNRESOLVED," >> $dst
 
     local tokens=`cat $src | grep '.*\"' | sed 's/{ return.*//g' | sed 's/{ YY_.*//g'`
     local mode=name
-    declare -i uid=0
+    declare -i uid=1
     for element in $tokens; do
         #printf "%2i -> %s\n" $uid $element
 	if [ "$mode" = "name" ]; then
@@ -91,9 +92,13 @@ function generate_token
     echo "        {" >> $dst
     echo "            switch( token )" >> $dst
     echo "            {" >> $dst
+    echo "                case /*  0 */ Token::UNRESOLVED:" >> $dst
+	echo "                {" >> $dst
+	echo "                    return \"\$unresolved\$\";" >> $dst
+	echo "                }" >> $dst
 
     mode=name
-    uid=0
+    uid=1
     for element in $tokens; do
 	if [ "$mode" = "name" ]; then
 	    printf "                case /* %2i */ Token::$element:\n" $uid >> $dst
@@ -141,7 +146,7 @@ function generate_parser
 
     local tokens=`cat $grammartoken | grep '.*\"' | sed 's/{ return.*//g' | sed 's/{ YY_.*//g'`
     local mode=name
-    declare -i uid=0
+    declare -i uid=1
     for element in $tokens; do
         #printf "%2i -> %s\n" $uid $element
 	    if [ "$mode" = "name" ]; then

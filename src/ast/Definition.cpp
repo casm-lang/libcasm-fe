@@ -43,6 +43,8 @@
 
 #include "Definition.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/ast/Literal>
 
 using namespace libcasm_fe;
@@ -92,11 +94,15 @@ void HeaderDefinition::accept( Visitor& visitor )
 }
 
 VariableDefinition::VariableDefinition(
-    const Identifier::Ptr& identifier, const Type::Ptr& variableType )
+    const Identifier::Ptr& identifier, const Token::Ptr& colon, const Type::Ptr& variableType )
 : Definition( Node::ID::VARIABLE_DEFINITION, identifier )
 , m_variableType( variableType )
+, m_colon( colon )
+, m_comma()
 , m_localIndex( 0 )
 {
+    m_comma = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
+
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
     setProperty( libcasm_ir::Property::PURE );
 }
@@ -104,6 +110,22 @@ VariableDefinition::VariableDefinition(
 const Type::Ptr& VariableDefinition::variableType( void ) const
 {
     return m_variableType;
+}
+
+const Token::Ptr& VariableDefinition::colon( void ) const
+{
+    return m_colon;
+}
+
+void VariableDefinition::setComma( const Token::Ptr& comma )
+{
+    assert( m_comma->token() == Grammar::Token::UNRESOLVED );
+    m_comma = comma;
+}
+
+const Token::Ptr& VariableDefinition::comma( void ) const
+{
+    return m_comma;
 }
 
 void VariableDefinition::setLocalIndex( std::size_t localIndex )

@@ -90,7 +90,7 @@
     #include "Lexer.h"
     #include "Exception.h"
     #include "Logger.h"
-
+    #include "various/GrammarToken.h"
     #include <libstdhl/Type>
 
     #undef yylex
@@ -1613,8 +1613,9 @@ Variable
   }
 | Identifier
   {
+      const auto unresolvedToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
       const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
-      $$ = Ast::make< VariableDefinition >( @$, $1, unresolvedType );
+      $$ = Ast::make< VariableDefinition >( @$, $1, unresolvedToken, unresolvedType );
   }
 ;
 
@@ -1639,6 +1640,7 @@ TypedVariables
 : TypedVariables COMMA TypedVariable
   {
       auto typedVariables = $1;
+      $3->setComma( $2 );
       typedVariables->add( $3 );
       $$ = typedVariables;
   }
@@ -1654,7 +1656,8 @@ TypedVariables
 TypedVariable
 : Identifier COLON Type
   {
-      $$ = Ast::make< VariableDefinition >( @$, $1, $3 );
+      auto variable = Ast::make< VariableDefinition >( @$, $1, $2, $3 );
+      $$ = variable;
   }
 ;
 
