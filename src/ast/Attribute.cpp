@@ -43,6 +43,8 @@
 
 #include "Attribute.h"
 
+#include "../various/GrammarToken.h"
+
 #include <cassert>
 
 using namespace libcasm_fe;
@@ -54,6 +56,8 @@ Attribute::Attribute( Node::ID type, const Identifier::Ptr& identifier )
 , m_leftBrace()
 , m_rightBrace()
 {
+    m_leftBrace = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
+    m_rightBrace = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 const Identifier::Ptr& Attribute::identifier( void ) const
@@ -63,7 +67,7 @@ const Identifier::Ptr& Attribute::identifier( void ) const
 
 void Attribute::setLeftBrace( const Token::Ptr& leftBrace )
 {
-    assert( m_leftBrace == nullptr );
+    assert( m_leftBrace->token() == Grammar::Token::UNRESOLVED );
     m_leftBrace = leftBrace;
 }
 
@@ -74,7 +78,7 @@ const Token::Ptr& Attribute::leftBrace( void ) const
 
 void Attribute::setRightBrace( const Token::Ptr& rightBrace )
 {
-    assert( m_rightBrace == nullptr );
+    assert( m_rightBrace->token() == Grammar::Token::UNRESOLVED );
     m_rightBrace = rightBrace;
 }
 
