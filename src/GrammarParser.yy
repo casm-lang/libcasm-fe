@@ -1734,11 +1734,17 @@ Attributes
 Attribute
 : LSQPAREN BasicAttribute RSQPAREN
   {
-      $$ = $2;
+      auto attribute = $2;
+      $2->setLeftBrace( $1 );
+      $2->setRightBrace( $3 );
+      $$ = attribute;
   }
 | LSQPAREN ExpressionAttribute RSQPAREN
   {
-      $$ = $2;
+      auto attribute = $2;
+      $2->setLeftBrace( $1 );
+      $2->setRightBrace( $3 );
+      $$ = attribute;
   }
 | LSQPAREN error RSQPAREN // error recovery
   {

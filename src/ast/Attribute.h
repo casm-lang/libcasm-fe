@@ -46,6 +46,7 @@
 
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Token>
 
 namespace libcasm_fe
 {
@@ -60,8 +61,16 @@ namespace libcasm_fe
 
             const Identifier::Ptr& identifier( void ) const;
 
+            void setLeftBrace( const Token::Ptr& leftBrace );
+            const Token::Ptr& leftBrace( void ) const;
+
+            void setRightBrace( const Token::Ptr& rightBrace );
+            const Token::Ptr& rightBrace( void ) const;
+
           private:
             const Identifier::Ptr m_identifier;
+            Token::Ptr m_leftBrace;
+            Token::Ptr m_rightBrace;
         };
 
         using Attributes = NodeList< Attribute >;

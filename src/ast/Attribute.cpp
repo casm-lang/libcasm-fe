@@ -43,18 +43,44 @@
 
 #include "Attribute.h"
 
+#include <cassert>
+
 using namespace libcasm_fe;
 using namespace Ast;
 
 Attribute::Attribute( Node::ID type, const Identifier::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
+, m_leftBrace()
+, m_rightBrace()
 {
 }
 
 const Identifier::Ptr& Attribute::identifier( void ) const
 {
     return m_identifier;
+}
+
+void Attribute::setLeftBrace( const Token::Ptr& leftBrace )
+{
+    assert( m_leftBrace == nullptr );
+    m_leftBrace = leftBrace;
+}
+
+const Token::Ptr& Attribute::leftBrace( void ) const
+{
+    return m_leftBrace;
+}
+
+void Attribute::setRightBrace( const Token::Ptr& rightBrace )
+{
+    assert( m_rightBrace == nullptr );
+    m_rightBrace = rightBrace;
+}
+
+const Token::Ptr& Attribute::rightBrace( void ) const
+{
+    return m_rightBrace;
 }
 
 BasicAttribute::BasicAttribute( const Identifier::Ptr& identifier )
