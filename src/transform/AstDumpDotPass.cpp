@@ -43,6 +43,8 @@
 
 #include "AstDumpDotPass.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
@@ -601,8 +603,11 @@ void AstDumpDotVisitor::visit( VariableBinding& node )
 
 void AstDumpDotVisitor::visit( Token& node )
 {
-    DotLink link( this, &node );
-    dumpNode( node, "Token\n" + node.tokenString() );
+    if( node.token() != Grammar::Token::UNRESOLVED )
+    {
+        DotLink link( this, &node );
+        dumpNode( node, "Token\n" + node.tokenString() );
+    }
     RecursiveVisitor::visit( node );
 }
 
