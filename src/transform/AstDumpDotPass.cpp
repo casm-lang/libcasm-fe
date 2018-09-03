@@ -618,7 +618,14 @@ void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
 
     dumpLabel( node );
 
-    m_stream << "\"];\n";
+    m_stream << "\"";
+
+    if( node.id() == Node::ID::TOKEN )
+    {
+        m_stream << " shape=box";
+    }
+
+    m_stream << "];\n";
 }
 
 void AstDumpDotVisitor::dumpNode( const TypedNode& node, const std::string& name )
