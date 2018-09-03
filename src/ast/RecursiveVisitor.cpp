@@ -60,7 +60,7 @@ using namespace Ast;
 void RecursiveVisitor::visit( HeaderDefinition& node )
 {
     node.attributes()->accept( *this );
-    node.identifier()->accept( *this );
+    node.headerToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( VariableDefinition& node )
@@ -68,56 +68,72 @@ void RecursiveVisitor::visit( VariableDefinition& node )
     node.delimiter()->accept( *this );
     node.attributes()->accept( *this );
     node.identifier()->accept( *this );
-    node.colon()->accept( *this );
+    node.colonToken()->accept( *this );
     node.variableType()->accept( *this );
 }
 
 void RecursiveVisitor::visit( FunctionDefinition& node )
 {
+    node.attributes()->accept( *this );
+    node.functionToken()->accept( *this );
     node.identifier()->accept( *this );
+    node.colonToken()->accept( *this );
     node.argumentTypes()->accept( *this );
+    node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
     node.initializers()->accept( *this );
     node.defaultValue()->accept( *this );
-    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DerivedDefinition& node )
 {
+    node.attributes()->accept( *this );
+    node.derivedToken()->accept( *this );
     node.identifier()->accept( *this );
     node.arguments()->accept( *this );
+    node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
+    node.assignmentToken()->accept( *this );
     node.expression()->accept( *this );
-    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RuleDefinition& node )
 {
+    node.attributes()->accept( *this );
+    node.ruleToken()->accept( *this );
     node.identifier()->accept( *this );
     node.arguments()->accept( *this );
+    node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
+    node.assignmentToken()->accept( *this );
     node.rule()->accept( *this );
-    node.attributes()->accept( *this );
 }
 
 void RecursiveVisitor::visit( EnumeratorDefinition& node )
 {
-    node.identifier()->accept( *this );
+    node.delimiter()->accept( *this );
     node.attributes()->accept( *this );
+    node.identifier()->accept( *this );
 }
 
 void RecursiveVisitor::visit( EnumerationDefinition& node )
 {
-    node.identifier()->accept( *this );
-    node.enumerators()->accept( *this );
     node.attributes()->accept( *this );
+    node.enumerationToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.assignmentToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.enumerators()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UsingDefinition& node )
 {
-    node.identifier()->accept( *this );
-    node.type()->accept( *this );
     node.attributes()->accept( *this );
+    node.usingToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.assignmentToken()->accept( *this );
+    node.type()->accept( *this );
 }
 
 void RecursiveVisitor::visit( InvariantDefinition& node )

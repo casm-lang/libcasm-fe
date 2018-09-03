@@ -50,12 +50,19 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+//
+//
+// Definition
+//
+
 Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 : TypedPropertyNode( type )
 , m_identifier( identifier )
 , m_attributes( std::make_shared< Attributes >() )
+, m_delimiter()
 , m_maxNumberOfLocals( 0 )
 {
+    m_delimiter = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 const Identifier::Ptr& Definition::identifier( void ) const
@@ -73,6 +80,17 @@ const Attributes::Ptr& Definition::attributes( void ) const
     return m_attributes;
 }
 
+void Definition::setDelimiter( const Token::Ptr& delimiter )
+{
+    assert( m_delimiter->token() == Grammar::Token::UNRESOLVED );
+    m_delimiter = delimiter;
+}
+
+const Token::Ptr& Definition::delimiter( void ) const
+{
+    return m_delimiter;
+}
+
 void Definition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )
 {
     m_maxNumberOfLocals = maxNumberOfLocals;
@@ -83,9 +101,20 @@ std::size_t Definition::maximumNumberOfLocals( void ) const
     return m_maxNumberOfLocals;
 }
 
-HeaderDefinition::HeaderDefinition( const SourceLocation& sourceLocation )
-: Definition( Node::ID::HEADER_DEFINITION, Ast::make< Identifier >( sourceLocation, "CASM" ) )
+//
+//
+// HeaderDefinition
+//
+
+HeaderDefinition::HeaderDefinition( const Token::Ptr& headerToken )
+: Definition( Node::ID::HEADER_DEFINITION, std::make_shared< Identifier >( "$header$" ) )
+, m_headerToken( headerToken )
 {
+}
+
+const Token::Ptr& HeaderDefinition::headerToken( void ) const
+{
+    return m_headerToken;
 }
 
 void HeaderDefinition::accept( Visitor& visitor )
@@ -93,16 +122,18 @@ void HeaderDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// VariableDefinition
+//
+
 VariableDefinition::VariableDefinition(
-    const Identifier::Ptr& identifier, const Token::Ptr& colon, const Type::Ptr& variableType )
+    const Identifier::Ptr& identifier, const Token::Ptr& colonToken, const Type::Ptr& variableType )
 : Definition( Node::ID::VARIABLE_DEFINITION, identifier )
 , m_variableType( variableType )
-, m_colon( colon )
-, m_delimiter()
+, m_colonToken( colonToken )
 , m_localIndex( 0 )
 {
-    m_delimiter = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
-
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
     setProperty( libcasm_ir::Property::PURE );
 }
@@ -112,20 +143,9 @@ const Type::Ptr& VariableDefinition::variableType( void ) const
     return m_variableType;
 }
 
-const Token::Ptr& VariableDefinition::colon( void ) const
+const Token::Ptr& VariableDefinition::colonToken( void ) const
 {
-    return m_colon;
-}
-
-void VariableDefinition::setDelimiter( const Token::Ptr& delimiter )
-{
-    assert( m_delimiter->token() == Grammar::Token::UNRESOLVED );
-    m_delimiter = delimiter;
-}
-
-const Token::Ptr& VariableDefinition::delimiter( void ) const
-{
-    return m_delimiter;
+    return m_colonToken;
 }
 
 void VariableDefinition::setLocalIndex( std::size_t localIndex )
@@ -143,14 +163,25 @@ void VariableDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// FunctionDefinition
+//
+
 FunctionDefinition::FunctionDefinition(
+    const Token::Ptr& functionToken,
     const Identifier::Ptr& identifier,
+    const Token::Ptr& colonToken,
     const Types::Ptr& argumentTypes,
+    const Token::Ptr& mapsToken,
     const Type::Ptr& returnType )
 : Definition( Node::ID::FUNCTION_DEFINITION, identifier )
-, m_classification( Classification::UNKNOWN )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
+, m_functionToken( functionToken )
+, m_mapsToken( mapsToken )
+, m_colonToken( colonToken )
+, m_classification( Classification::UNKNOWN )
 , m_symbolic( false )
 , m_initializers( std::make_shared< NodeList< UpdateRule > >() )
 , m_defaultValue( std::make_shared< UndefLiteral >() )
@@ -172,6 +203,21 @@ const Types::Ptr& FunctionDefinition::argumentTypes( void ) const
 const Type::Ptr& FunctionDefinition::returnType( void ) const
 {
     return m_returnType;
+}
+
+const Token::Ptr& FunctionDefinition::functionToken( void ) const
+{
+    return m_functionToken;
+}
+
+const Token::Ptr& FunctionDefinition::colonToken( void ) const
+{
+    return m_colonToken;
+}
+
+const Token::Ptr& FunctionDefinition::mapsToken( void ) const
+{
+    return m_mapsToken;
 }
 
 void FunctionDefinition::setClassification( FunctionDefinition::Classification classification )
@@ -258,15 +304,26 @@ void FunctionDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// DerivedDefinition
+//
+
 DerivedDefinition::DerivedDefinition(
+    const Token::Ptr& derivedToken,
     const Identifier::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
+    const Token::Ptr& mapsToken,
     const Type::Ptr& returnType,
+    const Token::Ptr& assignmentToken,
     const Expression::Ptr& expression )
 : Definition( Node::ID::DERIVED_DEFINITION, identifier )
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_expression( expression )
+, m_derivedToken( derivedToken )
+, m_mapsToken( mapsToken )
+, m_assignmentToken( assignmentToken )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
 }
@@ -286,20 +343,46 @@ const Expression::Ptr& DerivedDefinition::expression( void ) const
     return m_expression;
 }
 
+const Token::Ptr& DerivedDefinition::derivedToken( void ) const
+{
+    return m_derivedToken;
+}
+
+const Token::Ptr& DerivedDefinition::mapsToken( void ) const
+{
+    return m_mapsToken;
+}
+
+const Token::Ptr& DerivedDefinition::assignmentToken( void ) const
+{
+    return m_assignmentToken;
+}
+
 void DerivedDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
+//
+//
+// RuleDefinition
+//
+
 RuleDefinition::RuleDefinition(
+    const Token::Ptr& ruleToken,
     const Identifier::Ptr& identifier,
     const NodeList< VariableDefinition >::Ptr& arguments,
+    const Token::Ptr& mapsToken,
     const Type::Ptr& returnType,
+    const Token::Ptr& assignmentToken,
     const Rule::Ptr& rule )
 : Definition( Node::ID::RULE_DEFINITION, identifier )
 , m_arguments( arguments )
 , m_returnType( returnType )
 , m_rule( rule )
+, m_ruleToken( ruleToken )
+, m_mapsToken( mapsToken )
+, m_assignmentToken( assignmentToken )
 {
 }
 
@@ -318,10 +401,30 @@ const Rule::Ptr& RuleDefinition::rule( void ) const
     return m_rule;
 }
 
+const Token::Ptr& RuleDefinition::ruleToken( void ) const
+{
+    return m_ruleToken;
+}
+
+const Token::Ptr& RuleDefinition::mapsToken( void ) const
+{
+    return m_mapsToken;
+}
+
+const Token::Ptr& RuleDefinition::assignmentToken( void ) const
+{
+    return m_assignmentToken;
+}
+
 void RuleDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// EnumeratorDefinition
+//
 
 EnumeratorDefinition::EnumeratorDefinition( const Identifier::Ptr& identifier )
 : Definition( Node::ID::ENUMERATOR_DEFINITION, identifier )
@@ -335,10 +438,24 @@ void EnumeratorDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// EnumerationDefinition
+//
+
 EnumerationDefinition::EnumerationDefinition(
-    const Identifier::Ptr& identifier, const Enumerators::Ptr& enumerators )
+    const Token::Ptr& enumerationToken,
+    const Identifier::Ptr& identifier,
+    const Token::Ptr& assignmentToken,
+    const Token::Ptr& leftBraceToken,
+    const Enumerators::Ptr& enumerators,
+    const Token::Ptr& rightBraceToken )
 : Definition( Node::ID::ENUMERATION_DEFINITION, identifier )
 , m_enumerators( enumerators )
+, m_enumerationToken( enumerationToken )
+, m_assignmentToken( assignmentToken )
+, m_leftBraceToken( leftBraceToken )
+, m_rightBraceToken( rightBraceToken )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
     setProperty( libcasm_ir::Property::PURE );
@@ -349,20 +466,61 @@ const Enumerators::Ptr& EnumerationDefinition::enumerators( void ) const
     return m_enumerators;
 }
 
+const Token::Ptr& EnumerationDefinition::enumerationToken( void ) const
+{
+    return m_enumerationToken;
+}
+
+const Token::Ptr& EnumerationDefinition::assignmentToken( void ) const
+{
+    return m_assignmentToken;
+}
+
+const Token::Ptr& EnumerationDefinition::leftBraceToken( void ) const
+{
+    return m_leftBraceToken;
+}
+
+const Token::Ptr& EnumerationDefinition::rightBraceToken( void ) const
+{
+    return m_rightBraceToken;
+}
+
 void EnumerationDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-UsingDefinition::UsingDefinition( const Identifier::Ptr& identifier, const Type::Ptr& type )
+//
+//
+// UsingDefinition
+//
+
+UsingDefinition::UsingDefinition(
+    const Token::Ptr& usingToken,
+    const Identifier::Ptr& identifier,
+    const Token::Ptr& assignmentToken,
+    const Type::Ptr& type )
 : Definition( Node::ID::USING_DEFINITION, identifier )
 , m_type( type )
+, m_usingToken( usingToken )
+, m_assignmentToken( assignmentToken )
 {
 }
 
 const Type::Ptr& UsingDefinition::type( void ) const
 {
     return m_type;
+}
+
+const Token::Ptr& UsingDefinition::usingToken( void ) const
+{
+    return m_usingToken;
+}
+
+const Token::Ptr& UsingDefinition::assignmentToken( void ) const
+{
+    return m_assignmentToken;
 }
 
 void UsingDefinition::accept( Visitor& visitor )
@@ -386,3 +544,13 @@ void InvariantDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

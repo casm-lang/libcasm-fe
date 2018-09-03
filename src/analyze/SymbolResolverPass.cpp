@@ -43,6 +43,8 @@
 
 #include "SymbolResolverPass.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
@@ -313,7 +315,12 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         const auto agentEnumerators = std::make_shared< Enumerators >();
         agentEnumerators->add( agent );
         const auto agentEnum = std::make_shared< EnumerationDefinition >(
-            std::make_shared< Identifier >( AGENT ), agentEnumerators );
+            std::make_shared< Token >( Grammar::Token::UNRESOLVED ),
+            std::make_shared< Identifier >( AGENT ),
+            std::make_shared< Token >( Grammar::Token::UNRESOLVED ),
+            std::make_shared< Token >( Grammar::Token::UNRESOLVED ),
+            agentEnumerators,
+            std::make_shared< Token >( Grammar::Token::UNRESOLVED ) );
 
         const auto kind = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
         kind->add( SINGLE_AGENT_CONSTANT );

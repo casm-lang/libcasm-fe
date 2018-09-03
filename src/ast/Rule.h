@@ -293,11 +293,11 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< ChooseRule >;
 
             ChooseRule(
-                const Token::Ptr& m_chooseToken,
+                const Token::Ptr& chooseToken,
                 const std::shared_ptr< VariableDefinitions >& variables,
-                const Token::Ptr& m_inToken,
+                const Token::Ptr& inToken,
                 const Expression::Ptr& universe,
-                const Token::Ptr& m_doToken,
+                const Token::Ptr& doToken,
                 const Rule::Ptr& rule );
 
             const std::shared_ptr< VariableDefinitions >& variables( void ) const;

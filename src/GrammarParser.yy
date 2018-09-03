@@ -133,7 +133,17 @@
         argTypes->add( agentType );
 
         const auto program = Ast::make< Identifier >( sourceLocation, "program" );
-        return Ast::make< FunctionDefinition >( sourceLocation, program, argTypes, ruleRefType );
+        return Ast::make< FunctionDefinition >(
+            sourceLocation,
+            std::make_shared< Token >(
+                Grammar::Token::UNRESOLVED ),
+            program,
+            std::make_shared< Token >(
+                Grammar::Token::UNRESOLVED ),
+            argTypes,
+            std::make_shared< Token >(
+                Grammar::Token::UNRESOLVED ),
+            ruleRefType );
     }
 
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
@@ -305,13 +315,13 @@ Specification
 Header
 : Attributes CASM
   {
-      auto definition = Ast::make< HeaderDefinition >( @$, @$ );
+      auto definition = Ast::make< HeaderDefinition >( @$, $2 );
       definition->setAttributes( $1 );
       $$ = definition;
   }
 | CASM
   {
-      $$ = Ast::make< HeaderDefinition >( @$, @$ );
+      $$ = Ast::make< HeaderDefinition >( @$, $1 );
   }
 ;
 
@@ -381,7 +391,7 @@ Definition
 EnumerationDefinition
 : ENUMERATION Identifier EQUAL LCURPAREN Enumerators RCURPAREN
   {
-      $$ = Ast::make< EnumerationDefinition >( @$, $2, $5 );
+      $$ = Ast::make< EnumerationDefinition >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 
@@ -389,7 +399,7 @@ EnumerationDefinition
 DerivedDefinition
 : DERIVED Identifier MaybeParameters MAPS Type EQUAL Term
   {
-      $$ = Ast::make< DerivedDefinition >( @$, $2, $3, $5, $7 );
+      $$ = Ast::make< DerivedDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
   }
 ;
 
@@ -397,11 +407,13 @@ DerivedDefinition
 RuleDefinition
 : RULE Identifier MaybeParameters EQUAL Rule
   {
-      $$ = Ast::make< RuleDefinition >( @$, $2, $3, createVoidType( @$ ), $5 );
+      const auto unresolvedToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
+      const auto voidType = createVoidType( @$ );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $3, unresolvedToken, voidType, $4, $5 );
   }
 | RULE Identifier MaybeParameters MAPS Type EQUAL Rule
   {
-      $$ = Ast::make< RuleDefinition >( @$, $2, $3, $5, $7 );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
   }
 ;
 
@@ -409,22 +421,19 @@ RuleDefinition
 FunctionDefinition
 : FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
-      const auto identifier = $2;
-
-      auto function = Ast::make< FunctionDefinition >( @$, identifier, $4, $6 );
-      function->setDefaultValue( $7 );
+      $$ = Ast::make< FunctionDefinition >( @$, $1, $2, $3, $4, $5, $6 );
+      $$->setDefaultValue( $7 );
 
       // apply the name of the function declaration to the initializer functions
       auto initializers = $8;
       for (auto& initializer : *initializers) {
-          initializer->function()->setIdentifier( asIdentifierPath( identifier ) );
+          initializer->function()->setIdentifier( asIdentifierPath( $2 ) );
       }
-      function->setInitializers( initializers );
-
-      $$ = function;
+      $$->setInitializers( initializers );
   }
 | ProgramFunctionDefinition
   {
+      // TODO: FIXME: @ppaulweber: split up into an InitDefinition Ast::Node
       $$ = $1; // `init` special case
   }
 ;
@@ -433,6 +442,7 @@ FunctionDefinition
 ProgramFunctionDefinition
 : INIT IdentifierPath
   {
+      // TODO: FIXME: @ppaulweber: handle token $1
       const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
       auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
@@ -456,6 +466,7 @@ ProgramFunctionDefinition
   }
 | INIT LCURPAREN MaybeInitializers RCURPAREN
   {
+      // TODO: FIXME: @ppaulweber: handle token $1, $2, and $4
       auto programDefinition = createProgramFunction( @$ );
 
       // apply the name of the program declaration to the initializer functions
@@ -493,6 +504,7 @@ Enumerators
 : Enumerators COMMA EnumeratorDefinition
   {
       auto enumerators = $1;
+      $3->setDelimiter( $2 );
       enumerators->add( $3 );
       $$ = enumerators;
   }
@@ -508,7 +520,7 @@ Enumerators
 UsingDefinition
 : USING Identifier EQUAL Type
   {
-      $$ = Ast::make< UsingDefinition >( @$, $2, $4 );
+      $$ = Ast::make< UsingDefinition >( @$, $1, $2, $3, $4 );
   }
 ;
 

@@ -245,8 +245,7 @@ AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 void AstDumpSourceVisitor::visit( HeaderDefinition& node )
 {
     node.attributes()->accept( *this );
-    m_stream << " ";
-    node.identifier()->accept( *this );
+    node.headerToken()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( VariableDefinition& node )
@@ -255,7 +254,7 @@ void AstDumpSourceVisitor::visit( VariableDefinition& node )
     node.attributes()->accept( *this );
     m_stream << " ";
     node.identifier()->accept( *this );
-    node.colon()->accept( *this );
+    node.colonToken()->accept( *this );
     node.variableType()->accept( *this );
 }
 
