@@ -162,28 +162,38 @@ void RecursiveVisitor::visit( ValueLiteral& node )
 
 void RecursiveVisitor::visit( ReferenceLiteral& node )
 {
+    node.at()->accept( *this );
     node.identifier()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ListLiteral& node )
 {
+    node.leftBracket()->accept( *this );
     node.expressions()->accept( *this );
+    node.rightBracket()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RangeLiteral& node )
 {
+    node.leftBracket()->accept( *this );
     node.left()->accept( *this );
+    node.dotdot()->accept( *this );
     node.right()->accept( *this );
+    node.rightBracket()->accept( *this );
 }
 
 void RecursiveVisitor::visit( TupleLiteral& node )
 {
+    node.leftBracket()->accept( *this );
     node.expressions()->accept( *this );
+    node.rightBracket()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RecordLiteral& node )
 {
+    node.leftBracket()->accept( *this );
     node.namedExpressions()->accept( *this );
+    node.rightBracket()->accept( *this );
 }
 
 //
