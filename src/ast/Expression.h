@@ -119,8 +119,16 @@ namespace libcasm_fe
 
             const Expressions::Ptr& arguments( void ) const;
 
+            void setLeftBracketToken( const Token::Ptr& leftBracketToken );
+            const Token::Ptr& leftBracketToken( void ) const;
+
+            void setRightBracketToken( const Token::Ptr& rightBracketToken );
+            const Token::Ptr& rightBracketToken( void ) const;
+
           private:
             const Expressions::Ptr m_arguments;
+            Token::Ptr m_leftBracketToken;
+            Token::Ptr m_rightBracketToken;
         };
 
         class DirectCallExpression : public CallExpression
@@ -208,11 +216,14 @@ namespace libcasm_fe
 
             MethodCallExpression(
                 const Expression::Ptr& object,
+                const Token::Ptr& dotToken,
                 const Identifier::Ptr& methodName,
                 const Expressions::Ptr& arguments );
 
             const Expression::Ptr& object( void ) const;
             const Identifier::Ptr& methodName( void ) const;
+
+            const Token::Ptr& dotToken( void ) const;
 
             void setMethodType( MethodType methodType );
             MethodType methodType( void ) const;
@@ -252,6 +263,7 @@ namespace libcasm_fe
           private:
             Expression::Ptr m_object;
             Identifier::Ptr m_methodName;
+            const Token::Ptr m_dotToken;
             MethodType m_methodType;
             libcasm_ir::Value::ID m_targetBuiltinId;
             libcasm_ir::RelationType::Ptr m_targetBuiltinType;

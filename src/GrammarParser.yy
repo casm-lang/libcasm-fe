@@ -255,7 +255,6 @@ END       0 "end of file"
 %type <UpdateRules::Ptr> Initializers MaybeInitializers MaybeInitially
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
-%type <Expressions::Ptr> Arguments
 %type <VariableDefinitions::Ptr> Parameters MaybeParameters AttributedVariables
 %type <VariableBinding::Ptr> VariableBinding
 %type <VariableBindings::Ptr> VariableBindings
@@ -971,9 +970,18 @@ DirectCallExpression
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
   }
-| IdentifierPath Arguments
+| IdentifierPath LPAREN RPAREN
   {
-      $$ = Ast::make< DirectCallExpression >( @$, $1, $2 );
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< DirectCallExpression >( @$, $1, arguments );
+      $$->setLeftBracketToken( $2 );
+      $$->setRightBracketToken( $3 );
+  }
+| IdentifierPath LPAREN Terms RPAREN
+  {
+      $$ = Ast::make< DirectCallExpression >( @$, $1, $3 );
+      $$->setLeftBracketToken( $2 );
+      $$->setRightBracketToken( $4 );
   }
 ;
 
@@ -981,14 +989,21 @@ DirectCallExpression
 MethodCallExpression
 : SimpleOrClaspedTerm DOT Identifier %prec CALL_WITHOUT_ARGS
   {
-      // TODO: FIXME: @ppaulweber: handle token $2
       const auto arguments = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< MethodCallExpression >( @$, $1, $3, arguments );
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $2, $3, arguments );
   }
-| SimpleOrClaspedTerm DOT Identifier Arguments
+| SimpleOrClaspedTerm DOT Identifier LPAREN RPAREN
   {
-      // TODO: FIXME: @ppaulweber: handle token $2
-      $$ = Ast::make< MethodCallExpression >( @$, $1, $3, $4 );
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $2, $3, arguments );
+      $$->setLeftBracketToken( $4 );
+      $$->setRightBracketToken( $5 );
+  }
+| SimpleOrClaspedTerm DOT Identifier LPAREN Terms RPAREN
+  {
+      $$ = Ast::make< MethodCallExpression >( @$, $1, $2, $3, $5 );
+      $$->setLeftBracketToken( $4 );
+      $$->setRightBracketToken( $6 );
   }
 ;
 
@@ -1002,9 +1017,18 @@ LiteralCallExpression
 
 
 IndirectCallExpression
-: CallExpression Arguments
+: CallExpression LPAREN RPAREN
   {
-      $$ = Ast::make< IndirectCallExpression >( @$, $1, $2 );
+      const auto arguments = Ast::make< Expressions >( @$ );
+      $$ = Ast::make< IndirectCallExpression >( @$, $1, arguments );
+      $$->setLeftBracketToken( $2 );
+      $$->setRightBracketToken( $3 );
+  }
+| CallExpression LPAREN Terms RPAREN
+  {
+      $$ = Ast::make< IndirectCallExpression >( @$, $1, $3 );
+      $$->setLeftBracketToken( $2 );
+      $$->setRightBracketToken( $4 );
   }
 ;
 
@@ -1438,30 +1462,6 @@ FixedSizedType
       $$ = Ast::make< FixedSizedType >( @$, $1, $2, $3 );
   }
 ;
-
-
-//
-// Arguments
-//
-
-Arguments
-: LPAREN Terms RPAREN
-  {
-      // TODO: FIXME: @ppaulweber: token handling of $1 and $3
-      $$ = $2;
-  }
-| LPAREN error RPAREN // error recovery
-  {
-      $$ = nullptr;
-  }
-| LPAREN RPAREN
-  {
-      // TODO: FIXME: @ppaulweber: token handling of $1 and $2
-      const auto expressions = Ast::make< Expressions >( @$ );
-      $$ = expressions;
-  }
-;
-
 
 
 //

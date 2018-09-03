@@ -205,7 +205,9 @@ void RecursiveVisitor::visit( DirectCallExpression& node )
     node.leftBrace()->accept( *this );
 
     node.identifier()->accept( *this );
+    node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
 
     node.rightBrace()->accept( *this );
 }
@@ -216,8 +218,11 @@ void RecursiveVisitor::visit( MethodCallExpression& node )
     node.leftBrace()->accept( *this );
 
     node.object()->accept( *this );
+    node.dotToken()->accept( *this );
     node.methodName()->accept( *this );
+    node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
 
     node.rightBrace()->accept( *this );
 }
@@ -240,7 +245,9 @@ void RecursiveVisitor::visit( IndirectCallExpression& node )
     node.leftBrace()->accept( *this );
 
     node.expression()->accept( *this );
+    node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
 
     node.rightBrace()->accept( *this );
 }

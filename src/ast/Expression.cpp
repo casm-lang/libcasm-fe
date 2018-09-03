@@ -143,12 +143,38 @@ void NamedExpression::accept( Visitor& visitor )
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
 , m_arguments( arguments )
+, m_leftBracketToken()
+, m_rightBracketToken()
 {
+    m_leftBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+    m_rightBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 }
 
 const Expressions::Ptr& CallExpression::arguments( void ) const
 {
     return m_arguments;
+}
+
+void CallExpression::setLeftBracketToken( const Token::Ptr& leftBracketToken )
+{
+    assert( m_leftBracketToken->token() == Grammar::Token::UNRESOLVED );
+    m_leftBracketToken = leftBracketToken;
+}
+
+const Token::Ptr& CallExpression::leftBracketToken( void ) const
+{
+    return m_leftBracketToken;
+}
+
+void CallExpression::setRightBracketToken( const Token::Ptr& rightBracketToken )
+{
+    assert( m_rightBracketToken->token() == Grammar::Token::UNRESOLVED );
+    m_rightBracketToken = rightBracketToken;
+}
+
+const Token::Ptr& CallExpression::rightBracketToken( void ) const
+{
+    return m_rightBracketToken;
 }
 
 //
@@ -283,11 +309,13 @@ void DirectCallExpression::accept( Visitor& visitor )
 
 MethodCallExpression::MethodCallExpression(
     const Expression::Ptr& object,
+    const Token::Ptr& dotToken,
     const Identifier::Ptr& methodName,
     const Expressions::Ptr& arguments )
 : CallExpression( Node::ID::METHOD_CALL_EXPRESSION, arguments )
 , m_object( object )
 , m_methodName( methodName )
+, m_dotToken( dotToken )
 , m_methodType( MethodType::UNKNOWN )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 , m_targetBuiltinType( nullptr )
@@ -302,6 +330,11 @@ const Expression::Ptr& MethodCallExpression::object( void ) const
 const Identifier::Ptr& MethodCallExpression::methodName( void ) const
 {
     return m_methodName;
+}
+
+const Token::Ptr& MethodCallExpression::dotToken( void ) const
+{
+    return m_dotToken;
 }
 
 void MethodCallExpression::setMethodType( MethodType methodType )
