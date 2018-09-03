@@ -244,15 +244,15 @@ AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 
 void AstDumpSourceVisitor::visit( HeaderDefinition& node )
 {
-    dumpAttributes( *node.attributes() );
+    node.attributes()->accept( *this );
     m_stream << " ";
     node.identifier()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( VariableDefinition& node )
 {
-    node.comma()->accept( *this );
-    dumpAttributes( *node.attributes() );
+    node.delimiter()->accept( *this );
+    node.attributes()->accept( *this );
     m_stream << " ";
     node.identifier()->accept( *this );
     node.colon()->accept( *this );
@@ -261,12 +261,11 @@ void AstDumpSourceVisitor::visit( VariableDefinition& node )
 
 void AstDumpSourceVisitor::visit( FunctionDefinition& node )
 {
-    m_stream << m_indentation;
-    dumpAttributes( *node.attributes() );
+    node.attributes()->accept( *this );
     m_stream << "\n" << m_indentation << "function ";
     node.identifier()->accept( *this );
     m_stream << " : ";
-    dumpNodes( *node.argumentTypes(), " * " );
+    node.argumentTypes()->accept( *this );
     m_stream << " -> ";
     node.returnType()->accept( *this );
 
@@ -447,9 +446,14 @@ void AstDumpSourceVisitor::visit( MethodCallExpression& node )
 
 void AstDumpSourceVisitor::visit( LiteralCallExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.object()->accept( *this );
-    m_stream << ".";
+    node.dot()->accept( *this );
     node.literal()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
@@ -463,79 +467,122 @@ void AstDumpSourceVisitor::visit( IndirectCallExpression& node )
 
 void AstDumpSourceVisitor::visit( TypeCastingExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.fromExpression()->accept( *this );
-    m_stream << " as ";
+    node.as()->accept( *this );
     node.asType()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( UnaryExpression& node )
 {
-    m_stream << ir::Value::token( node.op() );
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.operation()->accept( *this );
     node.expression()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( BinaryExpression& node )
 {
-    m_stream << "(";
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.left()->accept( *this );
-    m_stream << " " << ir::Value::token( node.op() ) << " ";
+    node.operation()->accept( *this );
     node.right()->accept( *this );
-    m_stream << ")";
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( LetExpression& node )
 {
-    m_stream << "let ";
-    dumpNodes( *node.variableBindings(), ", " );
-    m_stream << " in ";
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.let()->accept( *this );
+    node.variableBindings()->accept( *this );
+    node.in()->accept( *this );
     node.expression()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( ConditionalExpression& node )
 {
-    m_stream << "if ";
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.ifToken()->accept( *this );
     node.condition()->accept( *this );
-    m_stream << " then ";
+    node.thenToken()->accept( *this );
     node.thenExpression()->accept( *this );
-    m_stream << " else ";
+    node.elseToken()->accept( *this );
     node.elseExpression()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( ChooseExpression& node )
 {
-    m_stream << "choose ";
-    dumpNodes( *node.variables(), ", " );
-    m_stream << " in ";
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.chooseToken()->accept( *this );
+    node.variables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
-    m_stream << " do ";
+    node.doToken()->accept( *this );
     node.expression()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( UniversalQuantifierExpression& node )
 {
-    m_stream << "forall ";
-    dumpNodes( *node.predicateVariables(), ", " );
-    m_stream << " in ";
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.quantifierToken()->accept( *this );
+    node.predicateVariables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
-    m_stream << " holds ";
+    node.doToken()->accept( *this );
     node.proposition()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( ExistentialQuantifierExpression& node )
 {
-    m_stream << "exists ";
-    dumpNodes( *node.predicateVariables(), ", " );
-    m_stream << " in ";
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.quantifierToken()->accept( *this );
+    node.predicateVariables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
-    m_stream << " with ";
+    node.doToken()->accept( *this );
     node.proposition()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( CardinalityExpression& node )
 {
-    m_stream << "| ";
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.leftVerticalBar()->accept( *this );
     node.expression()->accept( *this );
-    m_stream << " |";
+    node.rightVerticalBar()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( SkipRule& node )
@@ -678,61 +725,55 @@ void AstDumpSourceVisitor::visit( WhileRule& node )
 
 void AstDumpSourceVisitor::visit( UnresolvedType& node )
 {
+    node.delimiter()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( BasicType& node )
 {
+    node.delimiter()->accept( *this );
     node.name()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( ComposedType& node )
 {
-    m_stream << "(";
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
     if( not node.isNamed() )
     {
-        dumpNodes( *node.subTypes(), ", " );
+        node.subTypes()->accept( *this );
     }
     else
     {
-        u1 firstNode = true;
-        for( std::size_t index = 0; index < node.subTypes()->size(); index++ )
-        {
-            if( not firstNode )
-            {
-                m_stream << ", ";
-            }
-            ( *node.subTypeIdentifiers() )[ index ]->accept( *this );
-            m_stream << " : ";
-            ( *node.subTypes() )[ index ]->accept( *this );
-            firstNode = false;
-        }
+        node.subTypeIdentifiers()->accept( *this );
     }
-    m_stream << ")";
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( TemplateType& node )
 {
+    node.delimiter()->accept( *this );
     node.name()->accept( *this );
-    m_stream << "<";
-    dumpNodes( *node.subTypes(), ", " );
-    m_stream << ">";
-}
-
-void AstDumpSourceVisitor::visit( FixedSizedType& node )
-{
-    node.name()->accept( *this );
-    m_stream << "<";
-    node.size()->accept( *this );
-    m_stream << ">";
+    node.leftBrace()->accept( *this );
+    node.subTypes()->accept( *this );
+    node.rightBrace()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( RelationType& node )
 {
-    m_stream << "<";
-    dumpNodes( *node.argumentTypes(), " * " );
-    m_stream << " -> ";
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+    node.argumentTypes()->accept( *this );
+    node.maps()->accept( *this );
     node.returnType()->accept( *this );
-    m_stream << ">";
+    node.rightBrace()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( FixedSizedType& node )
+{
+    node.delimiter()->accept( *this );
+    node.name()->accept( *this );
+    node.mark()->accept( *this );
+    node.size()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( BasicAttribute& node )
@@ -778,7 +819,7 @@ void AstDumpSourceVisitor::visit( DefaultCase& node )
 
 void AstDumpSourceVisitor::visit( VariableBinding& node )
 {
-    node.comma()->accept( *this );
+    node.delimiter()->accept( *this );
     node.variable()->accept( *this );
     node.equal()->accept( *this );
     node.expression()->accept( *this );

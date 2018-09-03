@@ -98,10 +98,10 @@ VariableDefinition::VariableDefinition(
 : Definition( Node::ID::VARIABLE_DEFINITION, identifier )
 , m_variableType( variableType )
 , m_colon( colon )
-, m_comma()
+, m_delimiter()
 , m_localIndex( 0 )
 {
-    m_comma = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
+    m_delimiter = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
     setProperty( libcasm_ir::Property::PURE );
@@ -117,15 +117,15 @@ const Token::Ptr& VariableDefinition::colon( void ) const
     return m_colon;
 }
 
-void VariableDefinition::setComma( const Token::Ptr& comma )
+void VariableDefinition::setDelimiter( const Token::Ptr& delimiter )
 {
-    assert( m_comma->token() == Grammar::Token::UNRESOLVED );
-    m_comma = comma;
+    assert( m_delimiter->token() == Grammar::Token::UNRESOLVED );
+    m_delimiter = delimiter;
 }
 
-const Token::Ptr& VariableDefinition::comma( void ) const
+const Token::Ptr& VariableDefinition::delimiter( void ) const
 {
-    return m_comma;
+    return m_delimiter;
 }
 
 void VariableDefinition::setLocalIndex( std::size_t localIndex )

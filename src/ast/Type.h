@@ -45,6 +45,7 @@
 #define _LIBCASM_FE_TYPE_H_
 
 #include <libcasm-fe/ast/Expression>
+#include <libcasm-fe/ast/Token>
 
 namespace libcasm_fe
 {
@@ -59,8 +60,12 @@ namespace libcasm_fe
 
             const IdentifierPath::Ptr& name( void ) const;
 
+            void setDelimiter( const Token::Ptr& delimiter );
+            const Token::Ptr& delimiter( void ) const;
+
           private:
             const IdentifierPath::Ptr m_name;
+            Token::Ptr m_delimiter;
         };
 
         using Types = NodeList< Type >;
@@ -90,16 +95,26 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< ComposedType >;
 
-            ComposedType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes );
+            ComposedType(
+                const IdentifierPath::Ptr& identifier,
+                const Token::Ptr& leftBrace,
+                const Types::Ptr& subTypes,
+                const Token::Ptr& rightBrace );
 
             ComposedType(
                 const IdentifierPath::Ptr& identifier,
+                const Token::Ptr& leftBrace,
                 const Types::Ptr& subTypes,
-                const Identifiers::Ptr& subTypeIdentifiers );
+                const Identifiers::Ptr& subTypeIdentifiers,
+                const Token::Ptr& rightBrace );
 
             const Types::Ptr& subTypes( void ) const;
 
             const Identifiers::Ptr& subTypeIdentifiers( void ) const;
+
+            const Token::Ptr& leftBrace( void ) const;
+
+            const Token::Ptr& rightBrace( void ) const;
 
             u1 isNamed( void ) const;
 
@@ -108,6 +123,8 @@ namespace libcasm_fe
           private:
             const Types::Ptr m_subTypes;
             const Identifiers::Ptr m_subTypeIdentifiers;
+            const Token::Ptr m_leftBrace;
+            const Token::Ptr m_rightBrace;
         };
 
         class TemplateType final : public Type
@@ -115,29 +132,24 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< TemplateType >;
 
-            TemplateType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes );
+            TemplateType(
+                const IdentifierPath::Ptr& identifier,
+                const Token::Ptr& leftBrace,
+                const Types::Ptr& subTypes,
+                const Token::Ptr& rightBrace );
 
             const Types::Ptr& subTypes( void ) const;
+
+            const Token::Ptr& leftBrace( void ) const;
+
+            const Token::Ptr& rightBrace( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Types::Ptr m_subTypes;
-        };
-
-        class FixedSizedType final : public Type
-        {
-          public:
-            using Ptr = std::shared_ptr< FixedSizedType >;
-
-            FixedSizedType( const IdentifierPath::Ptr& identifier, const Expression::Ptr& size );
-
-            const Expression::Ptr& size( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Expression::Ptr m_size;
+            const Token::Ptr m_leftBrace;
+            const Token::Ptr m_rightBrace;
         };
 
         class RelationType final : public Type
@@ -147,17 +159,51 @@ namespace libcasm_fe
 
             RelationType(
                 const IdentifierPath::Ptr& identifier,
+                const Token::Ptr& leftBrace,
                 const Types::Ptr& argumentTypes,
-                const Type::Ptr& returnType );
+                const Token::Ptr& maps,
+                const Type::Ptr& returnType,
+                const Token::Ptr& rightBrace );
 
             const Types::Ptr& argumentTypes( void ) const;
+
             const Type::Ptr& returnType( void ) const;
+
+            const Token::Ptr& leftBrace( void ) const;
+
+            const Token::Ptr& rightBrace( void ) const;
+
+            const Token::Ptr& maps( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Types::Ptr m_argumentTypes;
             const Type::Ptr m_returnType;
+            const Token::Ptr m_leftBrace;
+            const Token::Ptr m_rightBrace;
+            const Token::Ptr m_maps;
+        };
+
+        class FixedSizedType final : public Type
+        {
+          public:
+            using Ptr = std::shared_ptr< FixedSizedType >;
+
+            FixedSizedType(
+                const IdentifierPath::Ptr& identifier,
+                const Token::Ptr& mark,
+                const Expression::Ptr& size );
+
+            const Expression::Ptr& size( void ) const;
+
+            const Token::Ptr& mark( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_size;
+            const Token::Ptr m_mark;
         };
     }
 }

@@ -51,15 +51,20 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+//
+//
+// Definitions
+//
+
 void RecursiveVisitor::visit( HeaderDefinition& node )
 {
-    node.identifier()->accept( *this );
     node.attributes()->accept( *this );
+    node.identifier()->accept( *this );
 }
 
 void RecursiveVisitor::visit( VariableDefinition& node )
 {
-    node.comma()->accept( *this );
+    node.delimiter()->accept( *this );
     node.attributes()->accept( *this );
     node.identifier()->accept( *this );
     node.colon()->accept( *this );
@@ -121,6 +126,11 @@ void RecursiveVisitor::visit( InvariantDefinition& node )
     node.attributes()->accept( *this );
 }
 
+//
+//
+// Literals
+//
+
 void RecursiveVisitor::visit( UndefLiteral& node )
 {
 }
@@ -155,92 +165,193 @@ void RecursiveVisitor::visit( RecordLiteral& node )
     node.namedExpressions()->accept( *this );
 }
 
+//
+//
+// Expressions
+//
+
 void RecursiveVisitor::visit( NamedExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.identifier()->accept( *this );
+    node.colon()->accept( *this );
     node.expression()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DirectCallExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.identifier()->accept( *this );
     node.arguments()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( MethodCallExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.object()->accept( *this );
     node.methodName()->accept( *this );
     node.arguments()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( LiteralCallExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.object()->accept( *this );
+    node.dot()->accept( *this );
     node.literal()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IndirectCallExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.expression()->accept( *this );
     node.arguments()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( TypeCastingExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.fromExpression()->accept( *this );
+    node.as()->accept( *this );
     node.asType()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UnaryExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.operation()->accept( *this );
     node.expression()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( BinaryExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
     node.left()->accept( *this );
+    node.operation()->accept( *this );
     node.right()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( LetExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.let()->accept( *this );
     node.variableBindings()->accept( *this );
+    node.in()->accept( *this );
     node.expression()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ConditionalExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.ifToken()->accept( *this );
     node.condition()->accept( *this );
+    node.thenToken()->accept( *this );
     node.thenExpression()->accept( *this );
+    node.elseToken()->accept( *this );
     node.elseExpression()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ChooseExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.chooseToken()->accept( *this );
     node.variables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
+    node.doToken()->accept( *this );
     node.expression()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UniversalQuantifierExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.quantifierToken()->accept( *this );
     node.predicateVariables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
+    node.doToken()->accept( *this );
     node.proposition()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ExistentialQuantifierExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.quantifierToken()->accept( *this );
     node.predicateVariables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
+    node.doToken()->accept( *this );
     node.proposition()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( CardinalityExpression& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
+
+    node.leftVerticalBar()->accept( *this );
     node.expression()->accept( *this );
+    node.rightVerticalBar()->accept( *this );
+
+    node.rightBrace()->accept( *this );
 }
+
+//
+//
+// Rules
+//
 
 void RecursiveVisitor::visit( SkipRule& node )
 {
@@ -312,44 +423,71 @@ void RecursiveVisitor::visit( WhileRule& node )
     node.rule()->accept( *this );
 }
 
+//
+//
+// Types
+//
+
 void RecursiveVisitor::visit( UnresolvedType& node )
 {
+    node.delimiter()->accept( *this );
     node.name()->accept( *this );
 }
 
 void RecursiveVisitor::visit( BasicType& node )
 {
+    node.delimiter()->accept( *this );
     node.name()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ComposedType& node )
 {
+    node.delimiter()->accept( *this );
+    node.leftBrace()->accept( *this );
     node.name()->accept( *this );
-    if( node.isNamed() )
+    if( not node.isNamed() )
+    {
+        node.subTypes()->accept( *this );
+    }
+    else
     {
         node.subTypeIdentifiers()->accept( *this );
     }
-    node.subTypes()->accept( *this );
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( TemplateType& node )
 {
+    node.delimiter()->accept( *this );
     node.name()->accept( *this );
+    node.leftBrace()->accept( *this );
     node.subTypes()->accept( *this );
-}
-
-void RecursiveVisitor::visit( FixedSizedType& node )
-{
-    node.name()->accept( *this );
-    node.size()->accept( *this );
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RelationType& node )
 {
+    node.delimiter()->accept( *this );
     node.name()->accept( *this );
+    node.leftBrace()->accept( *this );
     node.argumentTypes()->accept( *this );
+    node.maps()->accept( *this );
     node.returnType()->accept( *this );
+    node.rightBrace()->accept( *this );
 }
+
+void RecursiveVisitor::visit( FixedSizedType& node )
+{
+    node.delimiter()->accept( *this );
+    node.name()->accept( *this );
+    node.mark()->accept( *this );
+    node.size()->accept( *this );
+}
+
+//
+//
+// Attributes
+//
 
 void RecursiveVisitor::visit( BasicAttribute& node )
 {
@@ -365,6 +503,11 @@ void RecursiveVisitor::visit( ExpressionAttribute& node )
     node.expression()->accept( *this );
     node.rightBrace()->accept( *this );
 }
+
+//
+//
+// Others
+//
 
 void RecursiveVisitor::visit( Identifier& node )
 {
@@ -389,7 +532,7 @@ void RecursiveVisitor::visit( DefaultCase& node )
 
 void RecursiveVisitor::visit( VariableBinding& node )
 {
-    node.comma()->accept( *this );
+    node.delimiter()->accept( *this );
     node.variable()->accept( *this );
     node.equal()->accept( *this );
     node.expression()->accept( *this );

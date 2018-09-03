@@ -59,7 +59,46 @@ using namespace Ast;
 
 Expression::Expression( Node::ID id )
 : TypedPropertyNode( id )
+, m_leftBrace()
+, m_rightBrace()
+, m_delimiter()
 {
+    m_leftBrace = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
+    m_rightBrace = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
+    m_delimiter = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
+}
+
+void Expression::setLeftBrace( const Token::Ptr& leftBrace )
+{
+    assert( m_leftBrace->token() == Grammar::Token::UNRESOLVED );
+    m_leftBrace = leftBrace;
+}
+
+const Token::Ptr& Expression::leftBrace( void ) const
+{
+    return m_leftBrace;
+}
+
+void Expression::setRightBrace( const Token::Ptr& rightBrace )
+{
+    assert( m_rightBrace->token() == Grammar::Token::UNRESOLVED );
+    m_rightBrace = rightBrace;
+}
+
+const Token::Ptr& Expression::rightBrace( void ) const
+{
+    return m_rightBrace;
+}
+
+void Expression::setDelimiter( const Token::Ptr& delimiter )
+{
+    assert( m_delimiter->token() == Grammar::Token::UNRESOLVED );
+    m_delimiter = delimiter;
+}
+
+const Token::Ptr& Expression::delimiter( void ) const
+{
+    return m_delimiter;
 }
 
 //
@@ -68,10 +107,11 @@ Expression::Expression( Node::ID id )
 //
 
 NamedExpression::NamedExpression(
-    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
+    const Identifier::Ptr& identifier, const Token::Ptr& colon, const Expression::Ptr& expression )
 : Expression( Node::ID::NAMED_EXPRESSION )
 , m_identifier( identifier )
 , m_expression( expression )
+, m_colon( colon )
 {
 }
 
@@ -83,6 +123,11 @@ const Identifier::Ptr& NamedExpression::identifier( void ) const
 const Expression::Ptr& NamedExpression::expression( void ) const
 {
     return m_expression;
+}
+
+const Token::Ptr& NamedExpression::colon( void ) const
+{
+    return m_colon;
 }
 
 void NamedExpression::accept( Visitor& visitor )
@@ -345,10 +390,13 @@ void MethodCallExpression::accept( Visitor& visitor )
 //
 
 LiteralCallExpression::LiteralCallExpression(
-    const Expression::Ptr& object, const std::shared_ptr< Literal >& literal )
+    const Expression::Ptr& object,
+    const Token::Ptr& dot,
+    const std::shared_ptr< Literal >& literal )
 : Expression( Node::ID::LITERAL_CALL_EXPRESSION )
 , m_object( object )
 , m_literal( literal )
+, m_dot( dot )
 {
 }
 
@@ -360,6 +408,11 @@ const Expression::Ptr& LiteralCallExpression::object( void ) const
 const std::shared_ptr< Literal >& LiteralCallExpression::literal( void ) const
 {
     return m_literal;
+}
+
+const Token::Ptr& LiteralCallExpression::dot( void ) const
+{
+    return m_dot;
 }
 
 void LiteralCallExpression::accept( Visitor& visitor )
@@ -405,10 +458,11 @@ void IndirectCallExpression::accept( Visitor& visitor )
 //
 
 TypeCastingExpression::TypeCastingExpression(
-    const Expression::Ptr& fromExpression, const Type::Ptr& asType )
+    const Expression::Ptr& fromExpression, const Token::Ptr& as, const Type::Ptr& asType )
 : CallExpression( Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
 , m_fromExpression( fromExpression )
 , m_asType( asType )
+, m_as( as )
 , m_castingType( CastingType::UNKNOWN )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 , m_targetBuiltinType( nullptr )
@@ -423,6 +477,11 @@ const Expression::Ptr& TypeCastingExpression::fromExpression( void ) const
 const Type::Ptr& TypeCastingExpression::asType( void ) const
 {
     return m_asType;
+}
+
+const Token::Ptr& TypeCastingExpression::as( void ) const
+{
+    return m_as;
 }
 
 void TypeCastingExpression::setCastingType( CastingType castingType )
@@ -497,10 +556,12 @@ void TypeCastingExpression::accept( Visitor& visitor )
 // UnaryExpression
 //
 
-UnaryExpression::UnaryExpression( const Expression::Ptr& expression, libcasm_ir::Value::ID op )
+UnaryExpression::UnaryExpression(
+    const Token::Ptr& operation, const Expression::Ptr& expression, libcasm_ir::Value::ID op )
 : Expression( Node::ID::UNARY_EXPRESSION )
 , m_op( op )
 , m_expression( expression )
+, m_operation( operation )
 {
 }
 
@@ -514,6 +575,11 @@ const Expression::Ptr& UnaryExpression::expression( void ) const
     return m_expression;
 }
 
+const Token::Ptr& UnaryExpression::operation( void ) const
+{
+    return m_operation;
+}
+
 void UnaryExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -525,11 +591,15 @@ void UnaryExpression::accept( Visitor& visitor )
 //
 
 BinaryExpression::BinaryExpression(
-    const Expression::Ptr& left, const Expression::Ptr& right, libcasm_ir::Value::ID op )
+    const Expression::Ptr& left,
+    const Token::Ptr& operation,
+    const Expression::Ptr& right,
+    libcasm_ir::Value::ID op )
 : Expression( Node::ID::BINARY_EXPRESSION )
 , m_op( op )
 , m_left( left )
 , m_right( right )
+, m_operation( operation )
 {
 }
 
@@ -546,6 +616,11 @@ const Expression::Ptr& BinaryExpression::left( void ) const
 const Expression::Ptr& BinaryExpression::right( void ) const
 {
     return m_right;
+}
+
+const Token::Ptr& BinaryExpression::operation( void ) const
+{
+    return m_operation;
 }
 
 void BinaryExpression::accept( Visitor& visitor )
@@ -566,9 +641,9 @@ VariableBinding::VariableBinding(
 , m_variable( variable )
 , m_expression( expression )
 , m_equal( equal )
-, m_comma()
+, m_delimiter()
 {
-    m_comma = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
+    m_delimiter = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 const VariableDefinition::Ptr& VariableBinding::variable( void ) const
@@ -586,15 +661,15 @@ const Token::Ptr& VariableBinding::equal( void ) const
     return m_equal;
 }
 
-void VariableBinding::setComma( const Token::Ptr& comma )
+void VariableBinding::setDelimiter( const Token::Ptr& delimiter )
 {
-    assert( m_comma->token() == Grammar::Token::UNRESOLVED );
-    m_comma = comma;
+    assert( m_delimiter->token() == Grammar::Token::UNRESOLVED );
+    m_delimiter = delimiter;
 }
 
-const Token::Ptr& VariableBinding::comma( void ) const
+const Token::Ptr& VariableBinding::delimiter( void ) const
 {
-    return m_comma;
+    return m_delimiter;
 }
 
 void VariableBinding::accept( Visitor& visitor )
@@ -608,10 +683,15 @@ void VariableBinding::accept( Visitor& visitor )
 //
 
 LetExpression::LetExpression(
-    const VariableBindings::Ptr& variableBindings, const Expression::Ptr& expression )
+    const Token::Ptr& let,
+    const VariableBindings::Ptr& variableBindings,
+    const Token::Ptr& in,
+    const Expression::Ptr& expression )
 : Expression( Node::ID::LET_EXPRESSION )
 , m_variableBindings( variableBindings )
 , m_expression( expression )
+, m_let( let )
+, m_in( in )
 {
 }
 
@@ -625,6 +705,16 @@ const Expression::Ptr& LetExpression::expression( void ) const
     return m_expression;
 }
 
+const Token::Ptr& LetExpression::let( void ) const
+{
+    return m_let;
+}
+
+const Token::Ptr& LetExpression::in(void)const
+{
+    return m_in;
+}
+
 void LetExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -636,13 +726,19 @@ void LetExpression::accept( Visitor& visitor )
 //
 
 ConditionalExpression::ConditionalExpression(
+    const Token::Ptr& ifToken,
     const Expression::Ptr& condition,
+    const Token::Ptr& thenToken,
     const Expression::Ptr& thenExpression,
+    const Token::Ptr& elseToken,
     const Expression::Ptr& elseExpression )
 : Expression( Node::ID::CONDITIONAL_EXPRESSION )
 , m_condition( condition )
 , m_thenExpression( thenExpression )
 , m_elseExpression( elseExpression )
+, m_ifToken( ifToken )
+, m_thenToken( thenToken )
+, m_elseToken( elseToken )
 {
 }
 
@@ -661,6 +757,21 @@ const Expression::Ptr& ConditionalExpression::elseExpression( void ) const
     return m_elseExpression;
 }
 
+const Token::Ptr& ConditionalExpression::ifToken( void ) const
+{
+    return m_ifToken;
+}
+
+const Token::Ptr& ConditionalExpression::thenToken( void ) const
+{
+    return m_thenToken;
+}
+
+const Token::Ptr& ConditionalExpression::elseToken( void ) const
+{
+    return m_elseToken;
+}
+
 void ConditionalExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -672,13 +783,19 @@ void ConditionalExpression::accept( Visitor& visitor )
 //
 
 ChooseExpression::ChooseExpression(
+    const Token::Ptr& chooseToken,
     const VariableDefinitions::Ptr& variables,
+    const Token::Ptr& inToken,
     const Expression::Ptr& universe,
+    const Token::Ptr& doToken,
     const Expression::Ptr& expression )
 : Expression( Node::ID::CHOOSE_EXPRESSION )
 , m_variables( variables )
 , m_universe( universe )
 , m_expression( expression )
+, m_chooseToken( chooseToken )
+, m_inToken( inToken )
+, m_doToken( doToken )
 {
 }
 
@@ -697,6 +814,21 @@ const Expression::Ptr& ChooseExpression::expression( void ) const
     return m_expression;
 }
 
+const Token::Ptr& ChooseExpression::chooseToken( void ) const
+{
+    return m_chooseToken;
+}
+
+const Token::Ptr& ChooseExpression::inToken( void ) const
+{
+    return m_inToken;
+}
+
+const Token::Ptr& ChooseExpression::doToken( void ) const
+{
+    return m_doToken;
+}
+
 void ChooseExpression::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -709,13 +841,19 @@ void ChooseExpression::accept( Visitor& visitor )
 
 QuantifierExpression::QuantifierExpression(
     Node::ID id,
+    const Token::Ptr& quantifierToken,
     const VariableDefinitions::Ptr& predicateVariables,
+    const Token::Ptr& inToken,
     const Expression::Ptr& universe,
+    const Token::Ptr& doToken,
     const Expression::Ptr& proposition )
 : Expression( id )
 , m_predicateVariables( predicateVariables )
 , m_universe( universe )
 , m_proposition( proposition )
+, m_quantifierToken( quantifierToken )
+, m_inToken( inToken )
+, m_doToken( doToken )
 {
 }
 
@@ -734,17 +872,41 @@ const Expression::Ptr& QuantifierExpression::proposition( void ) const
     return m_proposition;
 }
 
+const Token::Ptr& QuantifierExpression::quantifierToken( void ) const
+{
+    return m_quantifierToken;
+}
+
+const Token::Ptr& QuantifierExpression::inToken( void ) const
+{
+    return m_inToken;
+}
+
+const Token::Ptr& QuantifierExpression::doToken( void ) const
+{
+    return m_doToken;
+}
+
 //
 //
 // UniversalQuantifierExpression
 //
 
 UniversalQuantifierExpression::UniversalQuantifierExpression(
+    const Token::Ptr& forallToken,
     const std::shared_ptr< VariableDefinitions >& predicateVariables,
+    const Token::Ptr& inToken,
     const Expression::Ptr& universe,
+    const Token::Ptr& holdsToken,
     const Expression::Ptr& proposition )
 : QuantifierExpression(
-      Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION, predicateVariables, universe, proposition )
+      Node::ID::UNIVERSAL_QUANTIFIER_EXPRESSION,
+      forallToken,
+      predicateVariables,
+      inToken,
+      universe,
+      holdsToken,
+      proposition )
 {
 }
 
@@ -759,11 +921,20 @@ void UniversalQuantifierExpression::accept( Visitor& visitor )
 //
 
 ExistentialQuantifierExpression::ExistentialQuantifierExpression(
+    const Token::Ptr& existsToken,
     const std::shared_ptr< VariableDefinitions >& predicateVariables,
+    const Token::Ptr& inToken,
     const Expression::Ptr& universe,
+    const Token::Ptr& withToken,
     const Expression::Ptr& proposition )
 : QuantifierExpression(
-      Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION, predicateVariables, universe, proposition )
+      Node::ID::EXISTENTIAL_QUANTIFIER_EXPRESSION,
+      existsToken,
+      predicateVariables,
+      inToken,
+      universe,
+      withToken,
+      proposition )
 {
 }
 
@@ -777,16 +948,31 @@ void ExistentialQuantifierExpression::accept( Visitor& visitor )
 // CardinalityExpression
 //
 
-CardinalityExpression::CardinalityExpression( const Expression::Ptr& expression )
+CardinalityExpression::CardinalityExpression(
+    const Token::Ptr& leftVerticalBar,
+    const Expression::Ptr& expression,
+    const Token::Ptr& rightVerticalBar )
 : CallExpression( Node::ID::CARDINALITY_EXPRESSION, std::make_shared< Expressions >() )
 , m_expression( expression )
 , m_cardinalityType( CardinalityType::UNKNOWN )
+, m_leftVerticalBar( leftVerticalBar )
+, m_rightVerticalBar( rightVerticalBar )
 {
 }
 
 const Expression::Ptr& CardinalityExpression::expression( void ) const
 {
     return m_expression;
+}
+
+const Token::Ptr& CardinalityExpression::leftVerticalBar( void ) const
+{
+    return m_leftVerticalBar;
+}
+
+const Token::Ptr& CardinalityExpression::rightVerticalBar( void ) const
+{
+    return m_rightVerticalBar;
 }
 
 void CardinalityExpression::setCardinalityType( const CardinalityType cardinalityType )

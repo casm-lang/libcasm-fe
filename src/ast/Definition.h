@@ -106,8 +106,8 @@ namespace libcasm_fe
 
             const Token::Ptr& colon( void ) const;
 
-            void setComma( const Token::Ptr& comma );
-            const Token::Ptr& comma( void ) const;
+            void setDelimiter( const Token::Ptr& delimiter );
+            const Token::Ptr& delimiter( void ) const;
 
             /**
              * Sets the frame local index of the variable.
@@ -122,7 +122,7 @@ namespace libcasm_fe
           private:
             const Type::Ptr m_variableType;
             Token::Ptr m_colon;
-            Token::Ptr m_comma;
+            Token::Ptr m_delimiter;
             std::size_t m_localIndex;
         };
 

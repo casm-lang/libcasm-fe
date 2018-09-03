@@ -445,7 +445,8 @@ ProgramFunctionDefinition
       const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
           @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
 
-      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, $2 );
+      const auto unresolvedToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
+      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, unresolvedToken, $2 );
 
       auto initializers = Ast::make< UpdateRules >( @$ );
       initializers->add( Ast::make< UpdateRule >( @$, program, ruleReference ) );
@@ -768,6 +769,7 @@ Terms
 : Terms COMMA Term
   {
       auto expressions = $1;
+      $3->setDelimiter( $2 );
       expressions->add( $3 );
       $$ = expressions;
   }
@@ -847,7 +849,7 @@ SimpleOrClaspedTerm
   }
 | MINUS SimpleOrClaspedTerm %prec UMINUS
   {
-      $$ = Ast::make< UnaryExpression >( @$, $2, libcasm_ir::Value::INV_INSTRUCTION );
+      $$ = Ast::make< UnaryExpression >( @$, $1, $2, libcasm_ir::Value::INV_INSTRUCTION );
   }
 ;
 
@@ -859,75 +861,75 @@ SimpleOrClaspedTerm
 OperatorExpression
 : Term PLUS Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::ADD_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::ADD_INSTRUCTION );
   }
 | Term MINUS Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::SUB_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::SUB_INSTRUCTION );
   }
 | Term ASTERIX Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MUL_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::MUL_INSTRUCTION );
   }
 | Term SLASH Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::DIV_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::DIV_INSTRUCTION );
   }
 | Term PERCENT Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::MOD_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::MOD_INSTRUCTION );
   }
 | Term CARET Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::POW_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::POW_INSTRUCTION );
   }
 | Term NEQUAL Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::NEQ_INSTRUCTION );
   }
 | Term EQUAL Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::EQU_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::EQU_INSTRUCTION );
   }
 | Term LESSER Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LTH_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::LTH_INSTRUCTION );
   }
 | Term GREATER Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GTH_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::GTH_INSTRUCTION );
   }
 | Term LESSEQ Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::LEQ_INSTRUCTION );
   }
 | Term GREATEREQ Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::GEQ_INSTRUCTION );
   }
 | Term OR Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::OR_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::OR_INSTRUCTION );
   }
 | Term XOR Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::XOR_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::XOR_INSTRUCTION );
   }
 | Term AND Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::AND_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::AND_INSTRUCTION );
   }
 | Term ARROW Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::IMP_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::IMP_INSTRUCTION );
   }
 | Term IMPLIES Term
   {
-      $$ = Ast::make< BinaryExpression >( @$, $1, $3, libcasm_ir::Value::IMP_INSTRUCTION );
+      $$ = Ast::make< BinaryExpression >( @$, $1, $2, $3, libcasm_ir::Value::IMP_INSTRUCTION );
   }
 | NOT Term
   {
-      $$ = Ast::make< UnaryExpression >( @$, $2, libcasm_ir::Value::NOT_INSTRUCTION );
+      $$ = Ast::make< UnaryExpression >( @$, $1, $2, libcasm_ir::Value::NOT_INSTRUCTION );
   }
 ;
 
@@ -977,7 +979,7 @@ MethodCallExpression
 LiteralCallExpression
 : SimpleOrClaspedTerm DOT IntegerLiteral
   {
-      $$ = Ast::make< LiteralCallExpression >( @$, $1, $3 );
+      $$ = Ast::make< LiteralCallExpression >( @$, $1, $2, $3 );
   }
 ;
 
@@ -993,7 +995,7 @@ IndirectCallExpression
 TypeCastingExpression
 : SimpleOrClaspedTerm AS Type
   {
-      $$ = Ast::make< TypeCastingExpression >( @$, $1, $3 );
+      $$ = Ast::make< TypeCastingExpression >( @$, $1, $2, $3 );
   }
 ;
 
@@ -1001,7 +1003,7 @@ TypeCastingExpression
 LetExpression
 : LET VariableBindings IN Term
   {
-      $$ = Ast::make< LetExpression >( @$, $2, $4 );
+      $$ = Ast::make< LetExpression >( @$, $1, $2, $3, $4 );
   }
 ;
 
@@ -1009,7 +1011,7 @@ LetExpression
 ConditionalExpression
 : IF Term THEN Term ELSE Term
   {
-      $$ = Ast::make< ConditionalExpression >( @$, $2, $4, $6 );
+      $$ = Ast::make< ConditionalExpression >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 
@@ -1017,7 +1019,7 @@ ConditionalExpression
 ChooseExpression
 : CHOOSE AttributedVariables IN Term DO Term
   {
-      $$ = Ast::make< ChooseExpression >( @$, $2, $4, $6 );
+      $$ = Ast::make< ChooseExpression >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 
@@ -1025,7 +1027,7 @@ ChooseExpression
 UniversalQuantifierExpression
 : FORALL AttributedVariables IN Term HOLDS Term
   {
-      $$ = Ast::make< UniversalQuantifierExpression >( @$, $2, $4, $6 );
+      $$ = Ast::make< UniversalQuantifierExpression >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 
@@ -1033,7 +1035,7 @@ UniversalQuantifierExpression
 ExistentialQuantifierExpression
 : EXISTS AttributedVariables IN Term WITH Term
   {
-      $$ = Ast::make< ExistentialQuantifierExpression >( @$, $2, $4, $6 );
+      $$ = Ast::make< ExistentialQuantifierExpression >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 
@@ -1041,7 +1043,7 @@ ExistentialQuantifierExpression
 CardinalityExpression
 : VERTICAL_BAR SimpleOrClaspedTerm VERTICAL_BAR
   {
-      $$ = Ast::make< CardinalityExpression >( @$, $2 );
+      $$ = Ast::make< CardinalityExpression >( @$, $1, $2, $3 );
   }
 ;
 
@@ -1220,7 +1222,7 @@ StringLiteral
 ReferenceLiteral
 : AT IdentifierPath
   {
-      $$ = Ast::make< ReferenceLiteral >( @$, $2 );
+      $$ = Ast::make< ReferenceLiteral >( @$, $1, $2 );
   }
 ;
 
@@ -1230,10 +1232,14 @@ ListLiteral
   {
       const auto expressions = Ast::make< Expressions >( @$ );
       $$ = Ast::make< ListLiteral >( @$, expressions );
+      $$->setLeftBracket( $1 );
+      $$->setRightBracket( $2 );
   }
 | LSQPAREN Terms RSQPAREN
   {
       $$ = Ast::make< ListLiteral >( @$, $2 );
+      $$->setLeftBracket( $1 );
+      $$->setRightBracket( $3 );
   }
 | LSQPAREN error RSQPAREN // error recovery
   {
@@ -1245,7 +1251,9 @@ ListLiteral
 RangeLiteral
 : LSQPAREN Term DOTDOT Term RSQPAREN
   {
-      $$ = Ast::make< RangeLiteral >( @$, $2, $4 );
+      $$ = Ast::make< RangeLiteral >( @$, $2, $3, $4 );
+      $$->setLeftBracket( $1 );
+      $$->setRightBracket( $5 );
   }
 ;
 
@@ -1253,14 +1261,19 @@ TupleLiteral
 : LPAREN Terms COMMA Term RPAREN
   {
       const auto expressions = $2;
+      $4->setDelimiter( $3 );
       expressions->add( $4 );
       $$ = Ast::make< TupleLiteral >( @$, expressions );
+      $$->setLeftBracket( $1 );
+      $$->setRightBracket( $5 );
   }
 
 RecordLiteral
 : LPAREN Assignments RPAREN
   {
       $$ = Ast::make< RecordLiteral >( @$, $2 );
+      $$->setLeftBracket( $1 );
+      $$->setRightBracket( $3 );
   }
 ;
 
@@ -1268,6 +1281,7 @@ Assignments
 : Assignments COMMA Assignment
   {
       auto assignments = $1;
+      $3->setDelimiter( $2 );
       assignments->add( $3 );
       $$ = assignments;
   }
@@ -1282,7 +1296,7 @@ Assignments
 Assignment
 : Identifier COLON Term
   {
-      $$ = Ast::make< NamedExpression >( @$, $1, $3 );
+      $$ = Ast::make< NamedExpression >( @$, $1, $2, $3 );
   }
 ;
 
@@ -1295,6 +1309,7 @@ Types
 : Types COMMA Type
   {
       auto types = $1;
+      $3->setDelimiter( $2 );
       types->add( $3 );
       $$ = types;
   }
@@ -1355,8 +1370,10 @@ TupleType
   {
       const auto identifier = Ast::make< Identifier >( @$, "Tuple" );
       auto subTypes = $2;
+      $4->setDelimiter( $3 );
       subTypes->add( $4 );
-      $$ = Ast::make< ComposedType >( @$, asIdentifierPath( identifier ), subTypes );
+      $$ = Ast::make< ComposedType >
+          ( @$, asIdentifierPath( identifier ), $1, subTypes, $5 );
   }
 ;
 
@@ -1365,6 +1382,7 @@ RecordType
   {
       const auto identifier = Ast::make< Identifier >( @$, "Record" );
       auto namedSubTypes = $2;
+      $4->setDelimiter( $3 );
       namedSubTypes->add( $4 );
 
       auto identifiers = Ast::make< Identifiers >( @$ );
@@ -1375,7 +1393,8 @@ RecordType
           subTypes->add( namedSubType->variableType() );
       }
 
-      $$ = Ast::make< ComposedType >( @$, asIdentifierPath( identifier ), subTypes, identifiers );
+      $$ = Ast::make< ComposedType >
+          ( @$, asIdentifierPath( identifier ), $1, subTypes, identifiers, $5 );
   }
 ;
 
@@ -1383,7 +1402,7 @@ RecordType
 TemplateType
 : IdentifierPath LESSER Types GREATER
   {
-      $$ = Ast::make< TemplateType >( @$, $1, $3 );
+      $$ = Ast::make< TemplateType >( @$, $1, $2, $3, $4 );
   }
 ;
 
@@ -1391,7 +1410,7 @@ TemplateType
 RelationType
 : IdentifierPath LESSER MaybeFunctionParameters MAPS Type GREATER
   {
-      $$ = Ast::make< RelationType >( @$, $1, $3, $5 );
+      $$ = Ast::make< RelationType >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 
@@ -1399,7 +1418,7 @@ RelationType
 FixedSizedType
 : IdentifierPath MARK Term
   {
-      $$ = Ast::make< FixedSizedType >( @$, $1, $3 );
+      $$ = Ast::make< FixedSizedType >( @$, $1, $2, $3 );
   }
 ;
 
@@ -1411,6 +1430,7 @@ FixedSizedType
 Arguments
 : LPAREN Terms RPAREN
   {
+      // TODO: FIXME: @ppaulweber: token handling of $1 and $3
       $$ = $2;
   }
 | LPAREN error RPAREN // error recovery
@@ -1419,6 +1439,7 @@ Arguments
   }
 | LPAREN RPAREN
   {
+      // TODO: FIXME: @ppaulweber: token handling of $1 and $2
       const auto expressions = Ast::make< Expressions >( @$ );
       $$ = expressions;
   }
@@ -1434,6 +1455,7 @@ FunctionParameters
 : FunctionParameters ASTERIX Type
   {
       auto types = $1;
+      $3->setDelimiter( $2 );
       types->add( $3 );
       $$ = types;
   }
@@ -1462,6 +1484,7 @@ Parameters
 : Parameters COMMA TypedAttributedVariable
   {
       auto parameters = $1;
+      $3->setDelimiter( $2 );
       parameters->add( $3 );
       $$ = parameters;
   }
@@ -1477,6 +1500,7 @@ Parameters
 MaybeParameters
 : LPAREN Parameters RPAREN
   {
+      // TODO: FIXME: @ppaulweber: token handling of $1 and $3
       $$ = $2;
   }
 | LPAREN error RPAREN // error recovery
@@ -1497,6 +1521,7 @@ MaybeParameters
 MaybeDefined
 : DEFINED LCURPAREN Term RCURPAREN
   {
+      // TODO: FIXME: @ppaulweber: token handling of $1, $2, and $4
       $$ = $3;
   }
 | %empty
@@ -1509,6 +1534,7 @@ MaybeDefined
 MaybeInitially
 : INITIALLY LCURPAREN MaybeInitializers RCURPAREN
   {
+      // TODO: FIXME: @ppaulweber: token handling of $1, $2, and $4
       $$ = $3;
   }
 | %empty
@@ -1521,6 +1547,7 @@ MaybeInitially
 Initializers
 : Initializers COMMA Initializer
   {
+      // TODO: FIXME: @ppaulweber: token handling of $2
       auto initializers = $1;
       initializers->add( $3 );
       $$ = initializers;
@@ -1544,6 +1571,7 @@ Initializer
   }
 | LPAREN Term RPAREN MAPS Term
   {
+      // TODO: FIXME: @ppaulweber: token handling of $1, $3, and $4
       auto arguments = Ast::make< Expressions >( @$ );
       arguments->add( $2 );
 
@@ -1553,6 +1581,7 @@ Initializer
   }
 | TupleLiteral MAPS Term
   {
+      // TODO: FIXME: @ppaulweber: token handling of $2
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1->expressions() );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
@@ -1625,7 +1654,7 @@ AttributedVariables
 : AttributedVariables COMMA AttributedVariable
   {
       auto variables = $1;
-      $3->setComma( $2 );
+      $3->setDelimiter( $2 );
       variables->add( $3 );
       $$ = variables;
   }
@@ -1642,7 +1671,7 @@ TypedVariables
 : TypedVariables COMMA TypedVariable
   {
       auto typedVariables = $1;
-      $3->setComma( $2 );
+      $3->setDelimiter( $2 );
       typedVariables->add( $3 );
       $$ = typedVariables;
   }
@@ -1700,7 +1729,7 @@ VariableBindings
 : VariableBindings COMMA VariableBinding
   {
       auto variableBindings = $1;
-      $3->setComma( $2 );
+      $3->setDelimiter( $2 );
       variableBindings->add( $3 );
       $$ = variableBindings;
   }

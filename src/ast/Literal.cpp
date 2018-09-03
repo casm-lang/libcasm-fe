@@ -43,6 +43,8 @@
 
 #include "Literal.h"
 
+#include "../various/GrammarToken.h"
+
 #include "Definition.h"
 #include "Type.h"
 
@@ -51,7 +53,33 @@ using namespace Ast;
 
 Literal::Literal( Node::ID id )
 : Expression( id )
+, m_leftBracket()
+, m_rightBracket()
 {
+    m_leftBracket = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
+    m_rightBracket = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
+}
+
+void Literal::setLeftBracket( const Token::Ptr& leftBracket )
+{
+    assert( m_leftBracket->token() == Grammar::Token::UNRESOLVED );
+    m_leftBracket = leftBracket;
+}
+
+const Token::Ptr& Literal::leftBracket( void ) const
+{
+    return m_leftBracket;
+}
+
+void Literal::setRightBracket( const Token::Ptr& rightBracket )
+{
+    assert( m_rightBracket->token() == Grammar::Token::UNRESOLVED );
+    m_rightBracket = rightBracket;
+}
+
+const Token::Ptr& Literal::rightBracket( void ) const
+{
+    return m_rightBracket;
 }
 
 //
@@ -107,9 +135,10 @@ void ValueLiteral::accept( Visitor& visitor )
 // ReferenceLiteral
 //
 
-ReferenceLiteral::ReferenceLiteral( const IdentifierPath::Ptr& identifier )
+ReferenceLiteral::ReferenceLiteral( const Token::Ptr& at, const IdentifierPath::Ptr& identifier )
 : Literal( Node::ID::REFERENCE_LITERAL )
 , m_identifier( identifier )
+, m_at( at )
 , m_referenceType( ReferenceType::UNKNOWN )
 , m_reference( nullptr )
 , m_builtinId( libcasm_ir::Value::ID::_SIZE_ )
@@ -118,9 +147,14 @@ ReferenceLiteral::ReferenceLiteral( const IdentifierPath::Ptr& identifier )
     setProperty( libcasm_ir::Property::PURE );
 }
 
-const IdentifierPath::Ptr& ReferenceLiteral::identifier() const
+const IdentifierPath::Ptr& ReferenceLiteral::identifier( void ) const
 {
     return m_identifier;
+}
+
+const Token::Ptr& ReferenceLiteral::at( void ) const
+{
+    return m_at;
 }
 
 void ReferenceLiteral::setReferenceType( ReferenceType referenceType )
@@ -190,10 +224,12 @@ void ListLiteral::accept( Visitor& visitor )
 // RangeLiteral
 //
 
-RangeLiteral::RangeLiteral( const Expression::Ptr& left, const Expression::Ptr& right )
+RangeLiteral::RangeLiteral(
+    const Expression::Ptr& left, const Token::Ptr& dotdot, const Expression::Ptr& right )
 : Literal( Node::ID::RANGE_LITERAL )
 , m_left( left )
 , m_right( right )
+, m_dotdot( dotdot )
 {
 }
 
@@ -205,6 +241,11 @@ const Expression::Ptr& RangeLiteral::left( void ) const
 const Expression::Ptr& RangeLiteral::right( void ) const
 {
     return m_right;
+}
+
+const Token::Ptr& RangeLiteral::dotdot( void ) const
+{
+    return m_dotdot;
 }
 
 void RangeLiteral::accept( Visitor& visitor )
