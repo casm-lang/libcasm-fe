@@ -223,6 +223,12 @@ namespace libcasm_fe
 
             const Token::Ptr& assignmentToken( void ) const;
 
+            void setLeftBracketToken( const Token::Ptr& leftBracketToken );
+            const Token::Ptr& leftBracketToken( void ) const;
+
+            void setRightBracketToken( const Token::Ptr& rightBracketToken );
+            const Token::Ptr& rightBracketToken( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
@@ -232,6 +238,8 @@ namespace libcasm_fe
             const Token::Ptr m_derivedToken;
             const Token::Ptr m_mapsToken;
             const Token::Ptr m_assignmentToken;
+            Token::Ptr m_leftBracketToken;
+            Token::Ptr m_rightBracketToken;
         };
 
         class RuleDefinition final : public Definition
@@ -259,6 +267,12 @@ namespace libcasm_fe
 
             const Token::Ptr& assignmentToken( void ) const;
 
+            void setLeftBracketToken( const Token::Ptr& leftBracketToken );
+            const Token::Ptr& leftBracketToken( void ) const;
+
+            void setRightBracketToken( const Token::Ptr& rightBracketToken );
+            const Token::Ptr& rightBracketToken( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
@@ -268,6 +282,8 @@ namespace libcasm_fe
             const Token::Ptr m_ruleToken;
             const Token::Ptr m_mapsToken;
             const Token::Ptr m_assignmentToken;
+            Token::Ptr m_leftBracketToken;
+            Token::Ptr m_rightBracketToken;
         };
 
         class EnumeratorDefinition final : public Definition

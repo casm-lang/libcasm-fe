@@ -396,23 +396,46 @@ EnumerationDefinition
 
 
 DerivedDefinition
-: DERIVED Identifier MaybeParameters MAPS Type EQUAL Term
+: DERIVED Identifier MAPS Type EQUAL Term
   {
-      $$ = Ast::make< DerivedDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
+      const auto params = Ast::make< NodeList< VariableDefinition > >( @$ );
+      $$ = Ast::make< DerivedDefinition >( @$, $1, $2, params, $3, $4, $5, $6 );
+  }
+| DERIVED Identifier LPAREN Parameters RPAREN MAPS Type EQUAL Term
+  {
+      $$ = Ast::make< DerivedDefinition >( @$, $1, $2, $4, $6, $7, $8, $9 );
+      $$->setLeftBracketToken( $3 );
+      $$->setRightBracketToken( $5 );
   }
 ;
 
 
 RuleDefinition
-: RULE Identifier MaybeParameters EQUAL Rule
+: RULE Identifier EQUAL Rule
   {
-      const auto unresolvedToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
-      const auto voidType = createVoidType( @$ );
-      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $3, unresolvedToken, voidType, $4, $5 );
+      const auto params = Ast::make< NodeList< VariableDefinition > >( @$ );
+      const auto mToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
+      const auto vType = createVoidType( @$ );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, params, mToken, vType, $3, $4 );
   }
-| RULE Identifier MaybeParameters MAPS Type EQUAL Rule
+| RULE Identifier MAPS Type EQUAL Rule
   {
-      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
+      const auto params = Ast::make< NodeList< VariableDefinition > >( @$ );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, params, $3, $4, $5, $6 );
+  }
+| RULE Identifier LPAREN Parameters RPAREN EQUAL Rule
+  {
+      const auto mToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
+      const auto vType = createVoidType( @$ );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, mToken, vType, $6, $7 );
+      $$->setLeftBracketToken( $3 );
+      $$->setRightBracketToken( $5 );
+  }
+| RULE Identifier LPAREN Parameters RPAREN MAPS Type EQUAL Rule
+  {
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, $6, $7, $8, $9 );
+      $$->setLeftBracketToken( $3 );
+      $$->setRightBracketToken( $5 );
   }
 ;
 
@@ -1510,23 +1533,6 @@ Parameters
       auto parameters = Ast::make< NodeList< VariableDefinition > >( @$ );
       parameters->add( $1 );
       $$ = parameters;
-  }
-;
-
-
-MaybeParameters
-: LPAREN Parameters RPAREN
-  {
-      // TODO: FIXME: @ppaulweber: token handling of $1 and $3
-      $$ = $2;
-  }
-| LPAREN error RPAREN // error recovery
-  {
-      $$ = nullptr;
-  }
-| %empty
-  {
-      $$ = Ast::make< NodeList< VariableDefinition > >( @$ );
   }
 ;
 

@@ -90,7 +90,9 @@ void RecursiveVisitor::visit( DerivedDefinition& node )
     node.attributes()->accept( *this );
     node.derivedToken()->accept( *this );
     node.identifier()->accept( *this );
+    node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
     node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
     node.assignmentToken()->accept( *this );
@@ -102,7 +104,9 @@ void RecursiveVisitor::visit( RuleDefinition& node )
     node.attributes()->accept( *this );
     node.ruleToken()->accept( *this );
     node.identifier()->accept( *this );
+    node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
     node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
     node.assignmentToken()->accept( *this );

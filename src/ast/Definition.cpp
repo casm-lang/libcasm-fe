@@ -324,7 +324,12 @@ DerivedDefinition::DerivedDefinition(
 , m_derivedToken( derivedToken )
 , m_mapsToken( mapsToken )
 , m_assignmentToken( assignmentToken )
+, m_leftBracketToken()
+, m_rightBracketToken()
 {
+    m_leftBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+    m_rightBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
 }
 
@@ -358,6 +363,28 @@ const Token::Ptr& DerivedDefinition::assignmentToken( void ) const
     return m_assignmentToken;
 }
 
+void DerivedDefinition::setLeftBracketToken( const Token::Ptr& leftBracketToken )
+{
+    assert( m_leftBracketToken->token() == Grammar::Token::UNRESOLVED );
+    m_leftBracketToken = leftBracketToken;
+}
+
+const Token::Ptr& DerivedDefinition::leftBracketToken( void ) const
+{
+    return m_leftBracketToken;
+}
+
+void DerivedDefinition::setRightBracketToken( const Token::Ptr& rightBracketToken )
+{
+    assert( m_rightBracketToken->token() == Grammar::Token::UNRESOLVED );
+    m_rightBracketToken = rightBracketToken;
+}
+
+const Token::Ptr& DerivedDefinition::rightBracketToken( void ) const
+{
+    return m_rightBracketToken;
+}
+
 void DerivedDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -383,7 +410,11 @@ RuleDefinition::RuleDefinition(
 , m_ruleToken( ruleToken )
 , m_mapsToken( mapsToken )
 , m_assignmentToken( assignmentToken )
+, m_leftBracketToken()
+, m_rightBracketToken()
 {
+    m_leftBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+    m_rightBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 }
 
 const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments( void ) const
@@ -414,6 +445,28 @@ const Token::Ptr& RuleDefinition::mapsToken( void ) const
 const Token::Ptr& RuleDefinition::assignmentToken( void ) const
 {
     return m_assignmentToken;
+}
+
+void RuleDefinition::setLeftBracketToken( const Token::Ptr& leftBracketToken )
+{
+    assert( m_leftBracketToken->token() == Grammar::Token::UNRESOLVED );
+    m_leftBracketToken = leftBracketToken;
+}
+
+const Token::Ptr& RuleDefinition::leftBracketToken( void ) const
+{
+    return m_leftBracketToken;
+}
+
+void RuleDefinition::setRightBracketToken( const Token::Ptr& rightBracketToken )
+{
+    assert( m_rightBracketToken->token() == Grammar::Token::UNRESOLVED );
+    m_rightBracketToken = rightBracketToken;
+}
+
+const Token::Ptr& RuleDefinition::rightBracketToken( void ) const
+{
+    return m_rightBracketToken;
 }
 
 void RuleDefinition::accept( Visitor& visitor )
