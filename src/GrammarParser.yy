@@ -838,6 +838,8 @@ SimpleOrClaspedTerm
 : LPAREN Term RPAREN
   {
       $$ = $2;
+      $$->setLeftBrace( $1 );
+      $$->setRightBrace( $3 );
   }
 | LPAREN error RPAREN // error recovery
   {
@@ -857,6 +859,7 @@ SimpleOrClaspedTerm
   }
 | PLUS SimpleOrClaspedTerm %prec UPLUS
   {
+      // TODO: FIXME: @ppaulweber: handle token $1
       $$ = $2;
   }
 | MINUS SimpleOrClaspedTerm %prec UMINUS
@@ -978,11 +981,13 @@ DirectCallExpression
 MethodCallExpression
 : SimpleOrClaspedTerm DOT Identifier %prec CALL_WITHOUT_ARGS
   {
+      // TODO: FIXME: @ppaulweber: handle token $2
       const auto arguments = Ast::make< Expressions >( @$ );
       $$ = Ast::make< MethodCallExpression >( @$, $1, $3, arguments );
   }
 | SimpleOrClaspedTerm DOT Identifier Arguments
   {
+      // TODO: FIXME: @ppaulweber: handle token $2
       $$ = Ast::make< MethodCallExpression >( @$, $1, $3, $4 );
   }
 ;
