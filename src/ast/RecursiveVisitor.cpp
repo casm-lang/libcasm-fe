@@ -43,6 +43,7 @@
 
 #include "RecursiveVisitor.h"
 
+#include "../various/GrammarToken.h"
 #include "Definition.h"
 #include "Expression.h"
 #include "Literal.h"
@@ -355,60 +356,100 @@ void RecursiveVisitor::visit( CardinalityExpression& node )
 
 void RecursiveVisitor::visit( SkipRule& node )
 {
+    node.skipToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ConditionalRule& node )
 {
+    node.ifToken()->accept( *this );
     node.condition()->accept( *this );
+    node.thenToken()->accept( *this );
     node.thenRule()->accept( *this );
+    node.elseToken()->accept( *this );
     node.elseRule()->accept( *this );
+}
+
+void RecursiveVisitor::visit( DefaultCase& node )
+{
+    node.labelToken()->accept( *this );
+    node.colonToken()->accept( *this );
+    node.rule()->accept( *this );
+}
+
+void RecursiveVisitor::visit( ExpressionCase& node )
+{
+    node.expression()->accept( *this );
+    node.colonToken()->accept( *this );
+    node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( CaseRule& node )
 {
+    node.caseToken()->accept( *this );
     node.expression()->accept( *this );
+    node.ofToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
     node.cases()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( LetRule& node )
 {
+    node.letToken()->accept( *this );
     node.variableBindings()->accept( *this );
+    node.inToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ForallRule& node )
 {
+    node.forallToken()->accept( *this );
     node.variables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
-    node.condition()->accept( *this );
+    if( node.withToken()->token() != Grammar::Token::UNRESOLVED )
+    {
+        node.withToken()->accept( *this );
+        node.condition()->accept( *this );
+    }
+    node.doToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ChooseRule& node )
 {
+    node.chooseToken()->accept( *this );
     node.variables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
+    node.doToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IterateRule& node )
 {
+    node.iterateToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( BlockRule& node )
 {
+    node.leftBraceToken()->accept( *this );
     node.rules()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( SequenceRule& node )
 {
+    node.leftBraceToken()->accept( *this );
     node.rules()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UpdateRule& node )
 {
     node.function()->accept( *this );
+    node.updateToken()->accept( *this );
     node.expression()->accept( *this );
 }
 
@@ -419,7 +460,9 @@ void RecursiveVisitor::visit( CallRule& node )
 
 void RecursiveVisitor::visit( WhileRule& node )
 {
+    node.whileToken()->accept( *this );
     node.condition()->accept( *this );
+    node.doToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
@@ -517,17 +560,6 @@ void RecursiveVisitor::visit( Identifier& node )
 void RecursiveVisitor::visit( IdentifierPath& node )
 {
     node.identifiers()->accept( *this );
-}
-
-void RecursiveVisitor::visit( ExpressionCase& node )
-{
-    node.expression()->accept( *this );
-    node.rule()->accept( *this );
-}
-
-void RecursiveVisitor::visit( DefaultCase& node )
-{
-    node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( VariableBinding& node )

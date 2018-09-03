@@ -525,6 +525,22 @@ InvariantDefinition
 // Rules
 //
 
+Rules
+: Rules Rule
+  {
+      auto rules = $1;
+      rules->add( $2 );
+      $$ = rules;
+  }
+| Rule
+  {
+      auto rules = Ast::make< Rules >( @$ );
+      rules->add( $1 );
+      $$ = rules;
+  }
+;
+
+
 Rule
 : SkipRule
   {
@@ -577,26 +593,10 @@ Rule
 ;
 
 
-Rules
-: Rules Rule
-  {
-      auto rules = $1;
-      rules->add( $2 );
-      $$ = rules;
-  }
-| Rule
-  {
-      auto rules = Ast::make< Rules >( @$ );
-      rules->add( $1 );
-      $$ = rules;
-  }
-;
-
-
 SkipRule
 : SKIP
   {
-      $$ = Ast::make< SkipRule >( @$ );
+      $$ = Ast::make< SkipRule >( @$, $1 );
   }
 ;
 
@@ -604,11 +604,11 @@ SkipRule
 ConditionalRule
 : IF Term THEN Rule
   {
-      $$ = Ast::make< ConditionalRule >( @$, $2, $4 );
+      $$ = Ast::make< ConditionalRule >( @$, $1, $2, $3, $4 );
   }
 | IF Term THEN Rule ELSE Rule
   {
-      $$ = Ast::make< ConditionalRule >( @$, $2, $4, $6 );
+      $$ = Ast::make< ConditionalRule >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 
@@ -616,27 +616,11 @@ ConditionalRule
 CaseRule
 : CASE Term OF LCURPAREN CaseLabels RCURPAREN
   {
-      $$ = Ast::make< CaseRule >( @$, $2, $5 );
+      $$ = Ast::make< CaseRule >( @$, $1, $2, $3, $4, $5, $6 );
   }
 | CASE Term OF LCURPAREN error RCURPAREN // error recovery
   {
       $$ = nullptr;
-  }
-;
-
-
-CaseLabel
-: DEFAULT COLON Rule
-  {
-      $$ = Ast::make< DefaultCase >( @$, $3 );
-  }
-| UNDERLINE COLON Rule
-  {
-      $$ = Ast::make< DefaultCase >( @$, $3 );
-  }
-| Term COLON Rule
-  {
-      $$ = Ast::make< ExpressionCase >( @$, $1, $3 );
   }
 ;
 
@@ -657,10 +641,26 @@ CaseLabels
 ;
 
 
+CaseLabel
+: DEFAULT COLON Rule
+  {
+      $$ = Ast::make< DefaultCase >( @$, $1, $2, $3 );
+  }
+| UNDERLINE COLON Rule
+  {
+      $$ = Ast::make< DefaultCase >( @$, $1, $2, $3 );
+  }
+| Term COLON Rule
+  {
+      $$ = Ast::make< ExpressionCase >( @$, $1, $2, $3 );
+  }
+;
+
+
 LetRule
 : LET VariableBindings IN Rule
   {
-      $$ = Ast::make< LetRule >( @$, $2, $4 );
+      $$ = Ast::make< LetRule >( @$, $1, $2, $3, $4 );
   }
 ;
 
@@ -668,11 +668,11 @@ LetRule
 ForallRule
 : FORALL AttributedVariables IN Term DO Rule
   {
-      $$ = Ast::make< ForallRule >( @$, $2, $4, $6 );
+      $$ = Ast::make< ForallRule >( @$, $1, $2, $3, $4, $5, $6 );
   }
 | FORALL AttributedVariables IN Term WITH Term DO Rule
   {
-      $$ = Ast::make< ForallRule >( @$, $2, $4, $6, $8 );
+      $$ = Ast::make< ForallRule >( @$, $1, $2, $3, $4, $5, $6, $7, $8 );
   }
 ;
 
@@ -680,7 +680,7 @@ ForallRule
 ChooseRule
 : CHOOSE AttributedVariables IN Term DO Rule
   {
-      $$ = Ast::make< ChooseRule >( @$, $2, $4, $6 );
+      $$ = Ast::make< ChooseRule >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 
@@ -688,7 +688,7 @@ ChooseRule
 IterateRule
 : ITERATE Rule
   {
-      $$ = Ast::make< IterateRule >( @$, $2 );
+      $$ = Ast::make< IterateRule >( @$, $1, $2 );
   }
 ;
 
@@ -696,11 +696,11 @@ IterateRule
 BlockRule
 : LCURPAREN Rules RCURPAREN
   {
-      $$ = Ast::make< BlockRule >( @$, $2 );
+      $$ = Ast::make< BlockRule >( @$, $1, $2, $3 );
   }
 | PAR Rules ENDPAR
   {
-      $$ = Ast::make< BlockRule >( @$, $2 );
+      $$ = Ast::make< BlockRule >( @$, $1, $2, $3 );
   }
 | LCURPAREN error RCURPAREN // error recovery
   {
@@ -718,11 +718,11 @@ BlockRule
 SequenceRule
 : SEQ_BRACKET Rules ENDSEQ_BRACKET
   {
-      $$ = Ast::make< SequenceRule >( @$, $2 );
+      $$ = Ast::make< SequenceRule >( @$, $1, $2, $3 );
   }
 | SEQ Rules ENDSEQ
   {
-      $$ = Ast::make< SequenceRule >( @$, $2 );
+      $$ = Ast::make< SequenceRule >( @$, $1, $2, $3 );
   }
 | SEQ_BRACKET error ENDSEQ_BRACKET // error recovery
   {
@@ -740,7 +740,7 @@ SequenceRule
 UpdateRule
 : DirectCallExpression UPDATE Term
   {
-      $$ = Ast::make< UpdateRule >( @$, $1, $3 );
+      $$ = Ast::make< UpdateRule >( @$, $1, $2, $3 );
   }
 ;
 
@@ -756,7 +756,7 @@ CallRule
 WhileRule
 : WHILE Term DO Rule
   {
-      $$ = Ast::make< WhileRule >( @$, $2, $4 );
+      $$ = Ast::make< WhileRule >( @$, $1, $2, $3, $4 );
   }
 ;
 
