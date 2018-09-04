@@ -356,7 +356,7 @@ namespace libcasm_fe
             const Token::Ptr m_assignmentToken;
         };
 
-        class InvariantDefinition final : public Definition
+        < < < < < < HEAD class InvariantDefinition final : public Definition
         {
           public:
             using Ptr = std::shared_ptr< InvariantDefinition >;
@@ -370,6 +370,45 @@ namespace libcasm_fe
 
           private:
             const Expression::Ptr m_expression;
+        };
+
+        class InitDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< InitDefinition >;
+
+            InitDefinition( const Token::Ptr& initToken, const IdentifierPath::Ptr& initPath );
+
+            InitDefinition(
+                const Token::Ptr& initToken,
+                const Token::Ptr& leftBraceToken,
+                const NodeList< UpdateRule >::Ptr& initializers,
+                const Token::Ptr& rightBraceToken );
+
+            const IdentifierPath::Ptr& initPath( void ) const;
+
+            const NodeList< UpdateRule >::Ptr& initializers( void ) const;
+
+            const Token::Ptr& initToken( void ) const;
+
+            const Token::Ptr& leftBraceToken( void ) const;
+
+            const Token::Ptr& rightBraceToken( void ) const;
+
+            void setProgramFunction( const FunctionDefinition::Ptr& programFunction );
+            const FunctionDefinition::Ptr& programFunction( void ) const;
+
+            u1 isSingleAgent( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const IdentifierPath::Ptr m_initPath;
+            const NodeList< UpdateRule >::Ptr m_initializers;
+            const Token::Ptr m_initToken;
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
+            FunctionDefinition::Ptr m_programFunction;
         };
     }
 }

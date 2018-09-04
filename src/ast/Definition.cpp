@@ -59,10 +59,9 @@ Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 : TypedPropertyNode( type )
 , m_identifier( identifier )
 , m_attributes( std::make_shared< Attributes >() )
-, m_delimiter()
+, m_delimiter( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
 , m_maxNumberOfLocals( 0 )
 {
-    m_delimiter = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 const Identifier::Ptr& Definition::identifier( void ) const
@@ -324,12 +323,9 @@ DerivedDefinition::DerivedDefinition(
 , m_derivedToken( derivedToken )
 , m_mapsToken( mapsToken )
 , m_assignmentToken( assignmentToken )
-, m_leftBracketToken()
-, m_rightBracketToken()
+, m_leftBracketToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+, m_rightBracketToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
 {
-    m_leftBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-    m_rightBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
 }
 
@@ -410,11 +406,9 @@ RuleDefinition::RuleDefinition(
 , m_ruleToken( ruleToken )
 , m_mapsToken( mapsToken )
 , m_assignmentToken( assignmentToken )
-, m_leftBracketToken()
-, m_rightBracketToken()
+, m_leftBracketToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+, m_rightBracketToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
 {
-    m_leftBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-    m_rightBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 }
 
 const NodeList< VariableDefinition >::Ptr& RuleDefinition::arguments( void ) const
@@ -594,6 +588,83 @@ const Expression::Ptr& InvariantDefinition::expression( void ) const
 }
 
 void InvariantDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
+// InitDefinition
+//
+
+InitDefinition::InitDefinition( const Token::Ptr& initToken, const IdentifierPath::Ptr& initPath )
+: Definition( Node::ID::INIT_DEFINITION, std::make_shared< Identifier >( "$init$" ) )
+, m_initPath( initPath )
+, m_initializers( std::make_shared< NodeList< UpdateRule > >() )
+, m_initToken( initToken )
+, m_leftBraceToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+, m_rightBraceToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+, m_programFunction( nullptr )
+{
+}
+
+InitDefinition::InitDefinition(
+    const Token::Ptr& initToken,
+    const Token::Ptr& leftBraceToken,
+    const NodeList< UpdateRule >::Ptr& initializers,
+    const Token::Ptr& rightBraceToken )
+: Definition( Node::ID::INIT_DEFINITION, std::make_shared< Identifier >( "$init$" ) )
+, m_initPath( nullptr )
+, m_initializers( initializers )
+, m_initToken( initToken )
+, m_leftBraceToken( leftBraceToken )
+, m_rightBraceToken( rightBraceToken )
+, m_programFunction( nullptr )
+{
+}
+
+const IdentifierPath::Ptr& InitDefinition::initPath( void ) const
+{
+    return m_initPath;
+}
+
+const NodeList< UpdateRule >::Ptr& InitDefinition::initializers( void ) const
+{
+    return m_initializers;
+}
+
+const Token::Ptr& InitDefinition::initToken( void ) const
+{
+    return m_initToken;
+}
+
+const Token::Ptr& InitDefinition::leftBraceToken( void ) const
+{
+    return m_leftBraceToken;
+}
+
+const Token::Ptr& InitDefinition::rightBraceToken( void ) const
+{
+    return m_rightBraceToken;
+}
+
+void InitDefinition::setProgramFunction( const FunctionDefinition::Ptr& programFunction )
+{
+    assert( m_programFunction == nullptr );
+    m_programFunction = programFunction;
+}
+
+const FunctionDefinition::Ptr& InitDefinition::programFunction( void ) const
+{
+    return m_programFunction;
+}
+
+u1 InitDefinition::isSingleAgent( void ) const
+{
+    return m_initPath != nullptr;
+}
+
+void InitDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

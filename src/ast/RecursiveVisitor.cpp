@@ -63,6 +63,23 @@ void RecursiveVisitor::visit( HeaderDefinition& node )
     node.headerToken()->accept( *this );
 }
 
+void RecursiveVisitor::visit( InitDefinition& node )
+{
+    node.attributes()->accept( *this );
+    node.initToken()->accept( *this );
+    if( node.isSingleAgent() )
+    {
+        node.initPath()->accept( *this );
+    }
+    else
+    {
+        node.leftBraceToken()->accept( *this );
+        node.initializers()->accept( *this );
+        node.rightBraceToken()->accept( *this );
+    }
+    node.programFunction()->accept( *this );
+}
+
 void RecursiveVisitor::visit( VariableDefinition& node )
 {
     node.delimiter()->accept( *this );

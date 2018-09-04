@@ -77,8 +77,7 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
   public:
     explicit AstDumpSourceVisitor( std::ostream& stream );
 
-    void visit( InvariantDefinition& node ) override;
-
+    void visit( InitDefinition& node ) override;
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
     void visit( UnresolvedType& node ) override;
@@ -94,17 +93,20 @@ AstDumpSourceVisitor::AstDumpSourceVisitor( std::ostream& stream )
 {
 }
 
-void AstDumpSourceVisitor::visit( InvariantDefinition& node )
+void AstDumpSourceVisitor::visit( InitDefinition& node )
 {
-    m_stream << m_indentation;
-    dumpAttributes( *node.attributes() );
-    m_stream << "\n" << m_indentation << "invariant ";
-    node.identifier()->accept( *this );
-    m_stream << " =\n" << m_indentation;
-
-    const Indentation::NextLevel level( m_indentation );
-    m_stream << m_indentation;
-    node.expression()->accept( *this );
+    node.attributes()->accept( *this );
+    node.initToken()->accept( *this );
+    if( node.isSingleAgent() )
+    {
+        node.initPath()->accept( *this );
+    }
+    else
+    {
+        node.leftBraceToken()->accept( *this );
+        node.initializers()->accept( *this );
+        node.rightBraceToken()->accept( *this );
+    }
 }
 
 void AstDumpSourceVisitor::visit( UndefLiteral& node )
@@ -167,12 +169,8 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 
     AstDumpSourceVisitor visitor{ outputStream };
 
-    for( const auto& definition : *specification->definitions() )
-    {
-        outputStream << "\n";
-        definition->accept( visitor );
-        outputStream << "\n";
-    }
+    specification->header()->accept( visitor );
+    specification->definitions()->accept( visitor );
 
     return true;
 }

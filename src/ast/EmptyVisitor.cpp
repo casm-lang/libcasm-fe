@@ -54,6 +54,10 @@ void EmptyVisitor::visit( HeaderDefinition& )
 {
 }
 
+void EmptyVisitor::visit( InitDefinition& )
+{
+}
+
 void EmptyVisitor::visit( VariableDefinition& )
 {
 }

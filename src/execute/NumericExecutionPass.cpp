@@ -1606,6 +1606,7 @@ class StateInitializationVisitor final : public EmptyVisitor
 
     void visit( Specification& node );
 
+    void visit( InitDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
 
   private:
@@ -1633,6 +1634,11 @@ void StateInitializationVisitor::visit( Specification& node )
     auto updateSet = m_updateSetManager.currentUpdateSet();
     m_globalState.fireUpdateSet( updateSet );
     m_updateSetManager.clear();
+}
+
+void StateInitializationVisitor::visit( InitDefinition& node )
+{
+    node.programFunction()->accept( *this );
 }
 
 void StateInitializationVisitor::visit( FunctionDefinition& node )

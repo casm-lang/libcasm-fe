@@ -175,6 +175,7 @@ END       0 "end of file"
 %type <Definition::Ptr> Definition AttributedDefinition
 %type <Definitions::Ptr> Definitions
 %type <HeaderDefinition::Ptr> Header
+%type <InitDefinition::Ptr> InitDefinition
 %type <VariableDefinition::Ptr> Variable TypedVariable AttributedVariable TypedAttributedVariable
 %type <VariableDefinitions::Ptr> TypedVariables
 %type <FunctionDefinition::Ptr> FunctionDefinition
@@ -248,11 +249,10 @@ END       0 "end of file"
 %type <ExpressionAttribute::Ptr> ExpressionAttribute
 
 // other
-%type <FunctionDefinition::Ptr> ProgramFunctionDefinition
 %type <Case::Ptr> CaseLabel
 %type <Cases::Ptr> CaseLabels
 %type <UpdateRule::Ptr> Initializer
-%type <UpdateRules::Ptr> Initializers MaybeInitializers MaybeInitially
+%type <UpdateRules::Ptr> Initializers MaybeInitially
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <VariableDefinitions::Ptr> Parameters MaybeParameters AttributedVariables
@@ -360,7 +360,11 @@ AttributedDefinition
 
 
 Definition
-: EnumerationDefinition
+: InitDefinition
+  {
+      $$ = $1;
+  }
+| EnumerationDefinition
   {
       $$ = $1;
   }
@@ -383,6 +387,49 @@ Definition
 | InvariantDefinition
   {
       $$ = $1;
+  }
+;
+
+
+InitDefinition
+: INIT IdentifierPath
+  {
+      $$ = Ast::make< InitDefinition >( @$, $1, $2 );
+
+      const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
+      auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
+          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
+      singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
+
+      auto programFunction = createProgramFunction( @$ );
+      auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      programArguments->add( singleAgent );
+      const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
+          @$, asIdentifierPath( programFunction->identifier() ), programArguments );
+
+      const auto unresolvedToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
+      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, unresolvedToken, $2 );
+
+      auto initializers = Ast::make< UpdateRules >( @$ );
+      initializers->add( Ast::make< UpdateRule >( @$, program, ruleReference ) );
+      programFunction->setInitializers( initializers );
+      $$->setProgramFunction( programFunction );
+  }
+| INIT LCURPAREN Initializers RCURPAREN
+  {
+      $$ = Ast::make< InitDefinition >( @$, $1, $2, $3, $4 );
+
+      auto programFunction = createProgramFunction( @$ );
+      // apply the name of the program declaration to the initializer functions
+      auto initializers = $3;
+      for( auto& initializer : *initializers )
+      {
+          initializer->function()->setIdentifier(
+              asIdentifierPath( programFunction->identifier() ) );
+      }
+      programFunction->setInitializers( initializers );
+      $$->setProgramFunction( programFunction );
   }
 ;
 
@@ -452,54 +499,6 @@ FunctionDefinition
           initializer->function()->setIdentifier( asIdentifierPath( $2 ) );
       }
       $$->setInitializers( initializers );
-  }
-| ProgramFunctionDefinition
-  {
-      // TODO: FIXME: @ppaulweber: split up into an InitDefinition Ast::Node
-      $$ = $1; // `init` special case
-  }
-;
-
-
-ProgramFunctionDefinition
-: INIT IdentifierPath
-  {
-      // TODO: FIXME: @ppaulweber: handle token $1
-      const auto singleAgentIdentifier = Ast::make< Identifier >( @$, "$" );
-      auto singleAgentArguments = libcasm_fe::Ast::make< Expressions >( @$ );
-      const auto singleAgent = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
-      singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
-
-      auto programDefinition = createProgramFunction( @$ );
-      auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
-      programArguments->add( singleAgent );
-      const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( programDefinition->identifier() ), programArguments );
-
-      const auto unresolvedToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
-      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, unresolvedToken, $2 );
-
-      auto initializers = Ast::make< UpdateRules >( @$ );
-      initializers->add( Ast::make< UpdateRule >( @$, program, ruleReference ) );
-      programDefinition->setInitializers( initializers );
-
-      $$ = programDefinition;
-  }
-| INIT LCURPAREN MaybeInitializers RCURPAREN
-  {
-      // TODO: FIXME: @ppaulweber: handle token $1, $2, and $4
-      auto programDefinition = createProgramFunction( @$ );
-
-      // apply the name of the program declaration to the initializer functions
-      auto initializers = $3;
-      for (auto& initializer : *initializers) {
-          initializer->function()->setIdentifier(
-              asIdentifierPath( programDefinition->identifier() ) );
-      }
-      programDefinition->setInitializers( initializers );
-
-      $$ = programDefinition;
   }
 ;
 
@@ -1555,7 +1554,7 @@ MaybeDefined
 
 
 MaybeInitially
-: INITIALLY LCURPAREN MaybeInitializers RCURPAREN
+: INITIALLY LCURPAREN Initializers RCURPAREN
   {
       // TODO: FIXME: @ppaulweber: token handling of $1, $2, and $4
       $$ = $3;
@@ -1608,18 +1607,6 @@ Initializer
       // the unknown function identifier will be replaced in FunctionDefinition
       const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1->expressions() );
       $$ = Ast::make< UpdateRule >( @$, function, $3 );
-  }
-;
-
-
-MaybeInitializers
-: Initializers
-  {
-      $$ = $1;
-  }
-| %empty
-  {
-      $$ = Ast::make< UpdateRules >( @$ );
   }
 ;
 

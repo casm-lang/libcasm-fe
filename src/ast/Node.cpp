@@ -77,6 +77,10 @@ std::string Node::description( void ) const
         {
             return "header";
         }
+        case ID::INIT_DEFINITION:
+        {
+            return "variable";
+        }
         case ID::VARIABLE_DEFINITION:
         {
             return "variable";
