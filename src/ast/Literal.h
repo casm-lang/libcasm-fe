@@ -114,7 +114,8 @@ namespace libcasm_fe
 
             using Ptr = std::shared_ptr< ReferenceLiteral >;
 
-            explicit ReferenceLiteral( const Token::Ptr& at, const IdentifierPath::Ptr& identifier );
+            explicit ReferenceLiteral(
+                const Token::Ptr& at, const IdentifierPath::Ptr& identifier );
 
             const IdentifierPath::Ptr& identifier( void ) const;
 

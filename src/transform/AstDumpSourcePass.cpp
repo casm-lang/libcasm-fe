@@ -171,7 +171,8 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 
     specification->header()->accept( visitor );
     specification->definitions()->accept( visitor );
-    outputStream << "\n";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
+    outputStream
+        << "\n";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
 
     return true;
 }
