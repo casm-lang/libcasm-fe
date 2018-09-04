@@ -59,46 +59,55 @@ using namespace Ast;
 
 Expression::Expression( Node::ID id )
 : TypedPropertyNode( id )
-, m_leftBrace()
-, m_rightBrace()
-, m_delimiter()
+, m_delimiterToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
 {
-    m_leftBrace = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
-    m_rightBrace = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
-    m_delimiter = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
-void Expression::setLeftBrace( const Token::Ptr& leftBrace )
+void Expression::setDelimiterToken( const Token::Ptr& delimiterToken )
 {
-    assert( m_leftBrace->token() == Grammar::Token::UNRESOLVED );
-    m_leftBrace = leftBrace;
+    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
+    m_delimiterToken = delimiterToken;
 }
 
-const Token::Ptr& Expression::leftBrace( void ) const
+const Token::Ptr& Expression::delimiterToken( void ) const
 {
-    return m_leftBrace;
+    return m_delimiterToken;
 }
 
-void Expression::setRightBrace( const Token::Ptr& rightBrace )
+//
+//
+// EmbracedExpression
+//
+
+EmbracedExpression::EmbracedExpression(
+    const Token::Ptr& leftBraceToken,
+    const Expression::Ptr& expression,
+    const Token::Ptr& rightBraceToken )
+: Expression( Node::ID::EMBRACED_EXPRESSION )
+, m_expression( expression )
+, m_leftBraceToken( leftBraceToken )
+, m_rightBraceToken( rightBraceToken )
 {
-    assert( m_rightBrace->token() == Grammar::Token::UNRESOLVED );
-    m_rightBrace = rightBrace;
 }
 
-const Token::Ptr& Expression::rightBrace( void ) const
+const Expression::Ptr& EmbracedExpression::expression( void ) const
 {
-    return m_rightBrace;
+    return m_expression;
 }
 
-void Expression::setDelimiter( const Token::Ptr& delimiter )
+const Token::Ptr& EmbracedExpression::leftBraceToken( void ) const
 {
-    assert( m_delimiter->token() == Grammar::Token::UNRESOLVED );
-    m_delimiter = delimiter;
+    return m_leftBraceToken;
 }
 
-const Token::Ptr& Expression::delimiter( void ) const
+const Token::Ptr& EmbracedExpression::rightBraceToken( void ) const
 {
-    return m_delimiter;
+    return m_rightBraceToken;
+}
+
+void EmbracedExpression::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
 }
 
 //
@@ -143,11 +152,9 @@ void NamedExpression::accept( Visitor& visitor )
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
 , m_arguments( arguments )
-, m_leftBracketToken()
-, m_rightBracketToken()
+, m_leftBracketToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+, m_rightBracketToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
 {
-    m_leftBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-    m_rightBracketToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 }
 
 const Expressions::Ptr& CallExpression::arguments( void ) const
@@ -491,11 +498,11 @@ void IndirectCallExpression::accept( Visitor& visitor )
 //
 
 TypeCastingExpression::TypeCastingExpression(
-    const Expression::Ptr& fromExpression, const Token::Ptr& as, const Type::Ptr& asType )
+    const Expression::Ptr& fromExpression, const Token::Ptr& asToken, const Type::Ptr& asType )
 : CallExpression( Node::ID::TYPE_CASTING_EXPRESSION, std::make_shared< Expressions >() )
 , m_fromExpression( fromExpression )
 , m_asType( asType )
-, m_as( as )
+, m_asToken( asToken )
 , m_castingType( CastingType::UNKNOWN )
 , m_targetBuiltinId( libcasm_ir::Value::ID::_SIZE_ )
 , m_targetBuiltinType( nullptr )
@@ -512,12 +519,12 @@ const Type::Ptr& TypeCastingExpression::asType( void ) const
     return m_asType;
 }
 
-const Token::Ptr& TypeCastingExpression::as( void ) const
+const Token::Ptr& TypeCastingExpression::asToken( void ) const
 {
-    return m_as;
+    return m_asToken;
 }
 
-void TypeCastingExpression::setCastingType( CastingType castingType )
+void TypeCastingExpression::setCastingType( const CastingType castingType )
 {
     m_castingType = castingType;
 }
@@ -590,11 +597,11 @@ void TypeCastingExpression::accept( Visitor& visitor )
 //
 
 UnaryExpression::UnaryExpression(
-    const Token::Ptr& operation, const Expression::Ptr& expression, libcasm_ir::Value::ID op )
+    const Token::Ptr& operationToken, const Expression::Ptr& expression, libcasm_ir::Value::ID op )
 : Expression( Node::ID::UNARY_EXPRESSION )
 , m_op( op )
 , m_expression( expression )
-, m_operation( operation )
+, m_operationToken( operationToken )
 {
 }
 
@@ -608,9 +615,9 @@ const Expression::Ptr& UnaryExpression::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& UnaryExpression::operation( void ) const
+const Token::Ptr& UnaryExpression::operationToken( void ) const
 {
-    return m_operation;
+    return m_operationToken;
 }
 
 void UnaryExpression::accept( Visitor& visitor )
@@ -625,14 +632,14 @@ void UnaryExpression::accept( Visitor& visitor )
 
 BinaryExpression::BinaryExpression(
     const Expression::Ptr& left,
-    const Token::Ptr& operation,
+    const Token::Ptr& operationToken,
     const Expression::Ptr& right,
     libcasm_ir::Value::ID op )
 : Expression( Node::ID::BINARY_EXPRESSION )
 , m_op( op )
 , m_left( left )
 , m_right( right )
-, m_operation( operation )
+, m_operationToken( operationToken )
 {
 }
 
@@ -651,9 +658,9 @@ const Expression::Ptr& BinaryExpression::right( void ) const
     return m_right;
 }
 
-const Token::Ptr& BinaryExpression::operation( void ) const
+const Token::Ptr& BinaryExpression::operationToken( void ) const
 {
-    return m_operation;
+    return m_operationToken;
 }
 
 void BinaryExpression::accept( Visitor& visitor )
@@ -674,9 +681,8 @@ VariableBinding::VariableBinding(
 , m_variable( variable )
 , m_expression( expression )
 , m_equal( equal )
-, m_delimiter()
+, m_delimiterToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
 {
-    m_delimiter = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 const VariableDefinition::Ptr& VariableBinding::variable( void ) const
@@ -694,15 +700,15 @@ const Token::Ptr& VariableBinding::equal( void ) const
     return m_equal;
 }
 
-void VariableBinding::setDelimiter( const Token::Ptr& delimiter )
+void VariableBinding::setDelimiterToken( const Token::Ptr& delimiterToken )
 {
-    assert( m_delimiter->token() == Grammar::Token::UNRESOLVED );
-    m_delimiter = delimiter;
+    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
+    m_delimiterToken = delimiterToken;
 }
 
-const Token::Ptr& VariableBinding::delimiter( void ) const
+const Token::Ptr& VariableBinding::delimiterToken( void ) const
 {
-    return m_delimiter;
+    return m_delimiterToken;
 }
 
 void VariableBinding::accept( Visitor& visitor )
@@ -716,15 +722,15 @@ void VariableBinding::accept( Visitor& visitor )
 //
 
 LetExpression::LetExpression(
-    const Token::Ptr& let,
+    const Token::Ptr& letToken,
     const VariableBindings::Ptr& variableBindings,
-    const Token::Ptr& in,
+    const Token::Ptr& inToken,
     const Expression::Ptr& expression )
 : Expression( Node::ID::LET_EXPRESSION )
 , m_variableBindings( variableBindings )
 , m_expression( expression )
-, m_let( let )
-, m_in( in )
+, m_letToken( letToken )
+, m_inToken( inToken )
 {
 }
 
@@ -738,14 +744,14 @@ const Expression::Ptr& LetExpression::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& LetExpression::let( void ) const
+const Token::Ptr& LetExpression::letToken( void ) const
 {
-    return m_let;
+    return m_letToken;
 }
 
-const Token::Ptr& LetExpression::in(void)const
+const Token::Ptr& LetExpression::inToken( void ) const
 {
-    return m_in;
+    return m_inToken;
 }
 
 void LetExpression::accept( Visitor& visitor )
@@ -982,14 +988,14 @@ void ExistentialQuantifierExpression::accept( Visitor& visitor )
 //
 
 CardinalityExpression::CardinalityExpression(
-    const Token::Ptr& leftVerticalBar,
+    const Token::Ptr& leftVerticalBarToken,
     const Expression::Ptr& expression,
-    const Token::Ptr& rightVerticalBar )
+    const Token::Ptr& rightVerticalBarToken )
 : CallExpression( Node::ID::CARDINALITY_EXPRESSION, std::make_shared< Expressions >() )
 , m_expression( expression )
 , m_cardinalityType( CardinalityType::UNKNOWN )
-, m_leftVerticalBar( leftVerticalBar )
-, m_rightVerticalBar( rightVerticalBar )
+, m_leftVerticalBarToken( leftVerticalBarToken )
+, m_rightVerticalBarToken( rightVerticalBarToken )
 {
 }
 
@@ -998,14 +1004,14 @@ const Expression::Ptr& CardinalityExpression::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& CardinalityExpression::leftVerticalBar( void ) const
+const Token::Ptr& CardinalityExpression::leftVerticalBarToken( void ) const
 {
-    return m_leftVerticalBar;
+    return m_leftVerticalBarToken;
 }
 
-const Token::Ptr& CardinalityExpression::rightVerticalBar( void ) const
+const Token::Ptr& CardinalityExpression::rightVerticalBarToken( void ) const
 {
-    return m_rightVerticalBar;
+    return m_rightVerticalBarToken;
 }
 
 void CardinalityExpression::setCardinalityType( const CardinalityType cardinalityType )

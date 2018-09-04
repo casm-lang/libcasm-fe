@@ -79,7 +79,7 @@ std::string Node::description( void ) const
         }
         case ID::INIT_DEFINITION:
         {
-            return "variable";
+            return "init";
         }
         case ID::VARIABLE_DEFINITION:
         {
@@ -141,6 +141,10 @@ std::string Node::description( void ) const
         case ID::RECORD_LITERAL:
         {
             return "record";
+        }
+        case ID::EMBRACED_EXPRESSION:
+        {
+            return "embraced expression";
         }
         case ID::NAMED_EXPRESSION:
         {

@@ -60,12 +60,12 @@ namespace libcasm_fe
 
             const IdentifierPath::Ptr& name( void ) const;
 
-            void setDelimiter( const Token::Ptr& delimiter );
-            const Token::Ptr& delimiter( void ) const;
+            void setDelimiterToken( const Token::Ptr& delimiterToken );
+            const Token::Ptr& delimiterToken( void ) const;
 
           private:
             const IdentifierPath::Ptr m_name;
-            Token::Ptr m_delimiter;
+            Token::Ptr m_delimiterToken;
         };
 
         using Types = NodeList< Type >;

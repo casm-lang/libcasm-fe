@@ -127,6 +127,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( TupleLiteral& node ) override;
     void visit( RecordLiteral& node ) override;
 
+    void visit( EmbracedExpression& node ) override;
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
@@ -329,6 +330,13 @@ void AstDumpDotVisitor::visit( RecordLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RecordLiteral" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( EmbracedExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "EmbracedExpression" );
     RecursiveVisitor::visit( node );
 }
 

@@ -67,22 +67,38 @@ namespace libcasm_fe
 
             explicit Expression( Node::ID id );
 
-            void setLeftBrace( const Token::Ptr& leftBrace );
-            const Token::Ptr& leftBrace( void ) const;
-
-            void setRightBrace( const Token::Ptr& rightBrace );
-            const Token::Ptr& rightBrace( void ) const;
-
-            void setDelimiter( const Token::Ptr& delimiter );
-            const Token::Ptr& delimiter( void ) const;
+            void setDelimiterToken( const Token::Ptr& delimiterToken );
+            const Token::Ptr& delimiterToken( void ) const;
 
           private:
-            Token::Ptr m_leftBrace;
-            Token::Ptr m_rightBrace;
-            Token::Ptr m_delimiter;
+            Token::Ptr m_delimiterToken;
         };
 
         using Expressions = NodeList< Expression >;
+
+        class EmbracedExpression final : public Expression
+        {
+          public:
+            using Ptr = std::shared_ptr< EmbracedExpression >;
+
+            explicit EmbracedExpression(
+                const Token::Ptr& leftBraceToken,
+                const Expression::Ptr& expression,
+                const Token::Ptr& rightBraceToken );
+
+            const Expression::Ptr& expression( void ) const;
+
+            const Token::Ptr& leftBraceToken( void ) const;
+
+            const Token::Ptr& rightBraceToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_expression;
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
+        };
 
         class NamedExpression final : public Expression
         {
@@ -325,14 +341,14 @@ namespace libcasm_fe
 
             TypeCastingExpression(
                 const Expression::Ptr& fromExpression,
-                const Token::Ptr& as,
+                const Token::Ptr& asToken,
                 const std::shared_ptr< Type >& asType );
 
             const Expression::Ptr& fromExpression( void ) const;
 
             const std::shared_ptr< Type >& asType( void ) const;
 
-            const Token::Ptr& as( void ) const;
+            const Token::Ptr& asToken( void ) const;
 
             void setCastingType( const CastingType castingType );
             CastingType castingType( void ) const;
@@ -371,7 +387,7 @@ namespace libcasm_fe
           private:
             const Expression::Ptr m_fromExpression;
             const std::shared_ptr< Type > m_asType;
-            const Token::Ptr m_as;
+            const Token::Ptr m_asToken;
             CastingType m_castingType;
             libcasm_ir::Value::ID m_targetBuiltinId;
             libcasm_ir::RelationType::Ptr m_targetBuiltinType;
@@ -384,20 +400,20 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< UnaryExpression >;
 
             UnaryExpression(
-                const Token::Ptr& operation,
+                const Token::Ptr& operationToken,
                 const Expression::Ptr& expression,
                 libcasm_ir::Value::ID op );
 
             libcasm_ir::Value::ID op( void ) const;
             const Expression::Ptr& expression( void ) const;
-            const Token::Ptr& operation( void ) const;
+            const Token::Ptr& operationToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const libcasm_ir::Value::ID m_op;
             const Expression::Ptr m_expression;
-            const Token::Ptr m_operation;
+            const Token::Ptr m_operationToken;
         };
 
         class BinaryExpression final : public Expression
@@ -407,14 +423,14 @@ namespace libcasm_fe
 
             BinaryExpression(
                 const Expression::Ptr& left,
-                const Token::Ptr& operation,
+                const Token::Ptr& operationToken,
                 const Expression::Ptr& right,
                 const libcasm_ir::Value::ID op );
 
             libcasm_ir::Value::ID op( void ) const;
             const Expression::Ptr& left( void ) const;
             const Expression::Ptr& right( void ) const;
-            const Token::Ptr& operation( void ) const;
+            const Token::Ptr& operationToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -422,7 +438,7 @@ namespace libcasm_fe
             const libcasm_ir::Value::ID m_op;
             const Expression::Ptr m_left;
             const Expression::Ptr m_right;
-            const Token::Ptr m_operation;
+            const Token::Ptr m_operationToken;
         };
 
         class VariableBinding : public Node
@@ -440,8 +456,8 @@ namespace libcasm_fe
 
             const Token::Ptr& equal( void ) const;
 
-            void setDelimiter( const Token::Ptr& delimiter );
-            const Token::Ptr& delimiter( void ) const;
+            void setDelimiterToken( const Token::Ptr& delimiterToken );
+            const Token::Ptr& delimiterToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -449,7 +465,7 @@ namespace libcasm_fe
             const std::shared_ptr< VariableDefinition > m_variable;
             const Expression::Ptr m_expression;
             const Token::Ptr m_equal;
-            Token::Ptr m_delimiter;
+            Token::Ptr m_delimiterToken;
         };
 
         using VariableBindings = NodeList< VariableBinding >;
@@ -460,25 +476,25 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< LetExpression >;
 
             LetExpression(
-                const Token::Ptr& let,
+                const Token::Ptr& letToken,
                 const VariableBindings::Ptr& variableBindings,
-                const Token::Ptr& in,
+                const Token::Ptr& inToken,
                 const Expression::Ptr& expression );
 
             const VariableBindings::Ptr& variableBindings( void ) const;
             const Expression::Ptr& expression( void ) const;
 
-            const Token::Ptr& let( void ) const;
+            const Token::Ptr& letToken( void ) const;
 
-            const Token::Ptr& in(void)const;
+            const Token::Ptr& inToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const VariableBindings::Ptr m_variableBindings;
             const Expression::Ptr m_expression;
-            const Token::Ptr m_let;
-            const Token::Ptr m_in;
+            const Token::Ptr m_letToken;
+            const Token::Ptr m_inToken;
         };
 
         class ConditionalExpression final : public Expression
@@ -626,14 +642,14 @@ namespace libcasm_fe
             };
 
             CardinalityExpression(
-                const Token::Ptr& leftVerticalBar,
+                const Token::Ptr& leftVerticalBarToken,
                 const Expression::Ptr& expression,
-                const Token::Ptr& rightVerticalBar );
+                const Token::Ptr& rightVerticalBarToken );
 
             const Expression::Ptr& expression( void ) const;
 
-            const Token::Ptr& leftVerticalBar( void ) const;
-            const Token::Ptr& rightVerticalBar( void ) const;
+            const Token::Ptr& leftVerticalBarToken( void ) const;
+            const Token::Ptr& rightVerticalBarToken( void ) const;
 
             void setCardinalityType( CardinalityType cardinalityType );
             CardinalityType cardinalityType( void ) const;
@@ -659,8 +675,8 @@ namespace libcasm_fe
 
           private:
             const Expression::Ptr m_expression;
-            const Token::Ptr m_leftVerticalBar;
-            const Token::Ptr m_rightVerticalBar;
+            const Token::Ptr m_leftVerticalBarToken;
+            const Token::Ptr m_rightVerticalBarToken;
             CardinalityType m_cardinalityType;
             libcasm_ir::Value::ID m_targetBuiltinId;
             libcasm_ir::RelationType::Ptr m_targetBuiltinType;

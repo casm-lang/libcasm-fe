@@ -61,9 +61,8 @@ static IdentifierPath::Ptr createUnresolvedIdentifierPath( void )
 Type::Type( Node::ID id, const IdentifierPath::Ptr& name )
 : TypedNode( id )
 , m_name( name )
-, m_delimiter()
+, m_delimiterToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
 {
-    m_delimiter = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 const IdentifierPath::Ptr& Type::name( void ) const
@@ -71,15 +70,15 @@ const IdentifierPath::Ptr& Type::name( void ) const
     return m_name;
 }
 
-void Type::setDelimiter( const Token::Ptr& delimiter )
+void Type::setDelimiterToken( const Token::Ptr& delimiterToken )
 {
-    assert( m_delimiter->token() == Grammar::Token::UNRESOLVED );
-    m_delimiter = delimiter;
+    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
+    m_delimiterToken = delimiterToken;
 }
 
-const Token::Ptr& Type::delimiter( void ) const
+const Token::Ptr& Type::delimiterToken( void ) const
 {
-    return m_delimiter;
+    return m_delimiterToken;
 }
 
 //

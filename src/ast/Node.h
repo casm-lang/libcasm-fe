@@ -87,6 +87,7 @@ namespace libcasm_fe
                 RECORD_LITERAL,
 
                 // expressions
+                EMBRACED_EXPRESSION,
                 NAMED_EXPRESSION,
                 DIRECT_CALL_EXPRESSION,
                 METHOD_CALL_EXPRESSION,

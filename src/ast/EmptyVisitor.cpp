@@ -118,6 +118,10 @@ void EmptyVisitor::visit( RecordLiteral& )
 {
 }
 
+void EmptyVisitor::visit( EmbracedExpression& )
+{
+}
+
 void EmptyVisitor::visit( NamedExpression& )
 {
 }

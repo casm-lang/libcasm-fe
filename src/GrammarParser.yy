@@ -255,7 +255,7 @@ END       0 "end of file"
 %type <UpdateRules::Ptr> Initializers MaybeInitially
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
-%type <VariableDefinitions::Ptr> Parameters MaybeParameters AttributedVariables
+%type <VariableDefinitions::Ptr> Parameters AttributedVariables
 %type <VariableBinding::Ptr> VariableBinding
 %type <VariableBindings::Ptr> VariableBindings
 
@@ -525,7 +525,7 @@ Enumerators
 : Enumerators COMMA EnumeratorDefinition
   {
       auto enumerators = $1;
-      $3->setDelimiter( $2 );
+      $3->setDelimiterToken( $2 );
       enumerators->add( $3 );
       $$ = enumerators;
   }
@@ -802,7 +802,7 @@ Terms
 : Terms COMMA Term
   {
       auto expressions = $1;
-      $3->setDelimiter( $2 );
+      $3->setDelimiterToken( $2 );
       expressions->add( $3 );
       $$ = expressions;
   }
@@ -858,9 +858,7 @@ Term
 SimpleOrClaspedTerm
 : LPAREN Term RPAREN
   {
-      $$ = $2;
-      $$->setLeftBrace( $1 );
-      $$->setRightBrace( $3 );
+      $$ = Ast::make< Ast::EmbracedExpression >( @$, $1, $2, $3 );
   }
 | LPAREN error RPAREN // error recovery
   {
@@ -880,8 +878,8 @@ SimpleOrClaspedTerm
   }
 | PLUS SimpleOrClaspedTerm %prec UPLUS
   {
-      // TODO: FIXME: @ppaulweber: handle token $1
-      $$ = $2;
+      const auto uToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
+      $$ = Ast::make< Ast::EmbracedExpression >( @$, $1, $2, uToken );
   }
 | MINUS SimpleOrClaspedTerm %prec UMINUS
   {
@@ -1324,7 +1322,7 @@ TupleLiteral
 : LPAREN Terms COMMA Term RPAREN
   {
       const auto expressions = $2;
-      $4->setDelimiter( $3 );
+      $4->setDelimiterToken( $3 );
       expressions->add( $4 );
       $$ = Ast::make< TupleLiteral >( @$, expressions );
       $$->setLeftBracket( $1 );
@@ -1344,7 +1342,7 @@ Assignments
 : Assignments COMMA Assignment
   {
       auto assignments = $1;
-      $3->setDelimiter( $2 );
+      $3->setDelimiterToken( $2 );
       assignments->add( $3 );
       $$ = assignments;
   }
@@ -1372,7 +1370,7 @@ Types
 : Types COMMA Type
   {
       auto types = $1;
-      $3->setDelimiter( $2 );
+      $3->setDelimiterToken( $2 );
       types->add( $3 );
       $$ = types;
   }
@@ -1433,7 +1431,7 @@ TupleType
   {
       const auto identifier = Ast::make< Identifier >( @$, "Tuple" );
       auto subTypes = $2;
-      $4->setDelimiter( $3 );
+      $4->setDelimiterToken( $3 );
       subTypes->add( $4 );
       $$ = Ast::make< ComposedType >
           ( @$, asIdentifierPath( identifier ), $1, subTypes, $5 );
@@ -1445,7 +1443,7 @@ RecordType
   {
       const auto identifier = Ast::make< Identifier >( @$, "Record" );
       auto namedSubTypes = $2;
-      $4->setDelimiter( $3 );
+      $4->setDelimiterToken( $3 );
       namedSubTypes->add( $4 );
 
       auto identifiers = Ast::make< Identifiers >( @$ );
@@ -1494,7 +1492,7 @@ FunctionParameters
 : FunctionParameters ASTERIX Type
   {
       auto types = $1;
-      $3->setDelimiter( $2 );
+      $3->setDelimiterToken( $2 );
       types->add( $3 );
       $$ = types;
   }
@@ -1523,7 +1521,7 @@ Parameters
 : Parameters COMMA TypedAttributedVariable
   {
       auto parameters = $1;
-      $3->setDelimiter( $2 );
+      $3->setDelimiterToken( $2 );
       parameters->add( $3 );
       $$ = parameters;
   }
@@ -1664,7 +1662,7 @@ AttributedVariables
 : AttributedVariables COMMA AttributedVariable
   {
       auto variables = $1;
-      $3->setDelimiter( $2 );
+      $3->setDelimiterToken( $2 );
       variables->add( $3 );
       $$ = variables;
   }
@@ -1681,7 +1679,7 @@ TypedVariables
 : TypedVariables COMMA TypedVariable
   {
       auto typedVariables = $1;
-      $3->setDelimiter( $2 );
+      $3->setDelimiterToken( $2 );
       typedVariables->add( $3 );
       $$ = typedVariables;
   }
@@ -1739,7 +1737,7 @@ VariableBindings
 : VariableBindings COMMA VariableBinding
   {
       auto variableBindings = $1;
-      $3->setDelimiter( $2 );
+      $3->setDelimiterToken( $2 );
       variableBindings->add( $3 );
       $$ = variableBindings;
   }

@@ -59,7 +59,7 @@ Definition::Definition( Node::ID type, const Identifier::Ptr& identifier )
 : TypedPropertyNode( type )
 , m_identifier( identifier )
 , m_attributes( std::make_shared< Attributes >() )
-, m_delimiter( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+, m_delimiterToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
 , m_maxNumberOfLocals( 0 )
 {
 }
@@ -79,15 +79,15 @@ const Attributes::Ptr& Definition::attributes( void ) const
     return m_attributes;
 }
 
-void Definition::setDelimiter( const Token::Ptr& delimiter )
+void Definition::setDelimiterToken( const Token::Ptr& delimiterToken )
 {
-    assert( m_delimiter->token() == Grammar::Token::UNRESOLVED );
-    m_delimiter = delimiter;
+    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
+    m_delimiterToken = delimiterToken;
 }
 
-const Token::Ptr& Definition::delimiter( void ) const
+const Token::Ptr& Definition::delimiterToken( void ) const
 {
-    return m_delimiter;
+    return m_delimiterToken;
 }
 
 void Definition::setMaximumNumberOfLocals( std::size_t maxNumberOfLocals )

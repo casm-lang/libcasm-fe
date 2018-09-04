@@ -319,6 +319,7 @@ class ExecutionVisitor final : public EmptyVisitor
 
     void visit( BasicType& node ) override;
 
+    void visit( EmbracedExpression& node ) override;
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
@@ -686,9 +687,15 @@ void ExecutionVisitor::visit( BasicType& node )
     m_evaluationStack.push( IR::RangeConstant( rangeType, range ) );
 }
 
-void ExecutionVisitor::visit( NamedExpression& node )
+void ExecutionVisitor::visit( EmbracedExpression& node )
 {
     // just evaluate the named expression and push it to the stack
+    node.expression()->accept( *this );
+}
+
+void ExecutionVisitor::visit( NamedExpression& node )
+{
+    // just evaluate the embraced expression and push it to the stack
     node.expression()->accept( *this );
 }
 

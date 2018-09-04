@@ -66,8 +66,8 @@ namespace libcasm_fe
             void setAttributes( const Attributes::Ptr& attributes );
             const Attributes::Ptr& attributes( void ) const;
 
-            void setDelimiter( const Token::Ptr& delimiter );
-            const Token::Ptr& delimiter( void ) const;
+            void setDelimiterToken( const Token::Ptr& delimiterToken );
+            const Token::Ptr& delimiterToken( void ) const;
 
             /**
              * Sets the number of required frame local slots.
@@ -80,7 +80,7 @@ namespace libcasm_fe
           private:
             const Identifier::Ptr m_identifier;
             Attributes::Ptr m_attributes;
-            Token::Ptr m_delimiter;
+            Token::Ptr m_delimiterToken;
             std::size_t m_maxNumberOfLocals;
         };
 
