@@ -78,6 +78,7 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
     explicit AstDumpSourceVisitor( std::ostream& stream );
 
     void visit( InitDefinition& node ) override;
+    void visit( EmbracedExpression& node ) override;
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
     void visit( UnresolvedType& node ) override;
@@ -107,6 +108,15 @@ void AstDumpSourceVisitor::visit( InitDefinition& node )
         node.initializers()->accept( *this );
         node.rightBraceToken()->accept( *this );
     }
+}
+
+void AstDumpSourceVisitor::visit( EmbracedExpression& node )
+{
+    if( node.leftBraceToken()->token() == Grammar::Token::UNRESOLVED )
+    {
+        return;
+    }
+    RecursiveVisitor::visit( node );
 }
 
 void AstDumpSourceVisitor::visit( UndefLiteral& node )

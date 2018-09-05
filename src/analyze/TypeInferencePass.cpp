@@ -422,6 +422,10 @@ void TypeInferenceVisitor::visit( ReferenceLiteral& node )
 
 void TypeInferenceVisitor::visit( EmbracedExpression& node )
 {
+    for( const auto typeId : m_typeIDs[&node ] )
+    {
+        m_typeIDs[ node.expression().get() ].emplace( typeId );
+    }
     RecursiveVisitor::visit( node );
     node.setType( node.expression()->type() );
 }

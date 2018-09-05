@@ -1541,12 +1541,13 @@ Parameters
 MaybeDefined
 : DEFINED LCURPAREN Term RCURPAREN
   {
-      // TODO: FIXME: @ppaulweber: token handling of $1, $2, and $4
-      $$ = $3;
+      $$ = Ast::make< EmbracedExpression >( @$, $2, $3, $4 );
+      $$->setDelimiterToken( $1 );
   }
 | %empty
   {
-      $$ = Ast::make< UndefLiteral >( @$ );
+      const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+      $$ = Ast::make< EmbracedExpression >( @$, uToken, Ast::make< UndefLiteral >( @$ ), uToken );
   }
 ;
 
@@ -1567,8 +1568,8 @@ MaybeInitially
 Initializers
 : Initializers COMMA Initializer
   {
-      // TODO: FIXME: @ppaulweber: token handling of $2
       auto initializers = $1;
+      // TODO: FIXME: @ppaulweber: token handling of $2
       initializers->add( $3 );
       $$ = initializers;
   }
