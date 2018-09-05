@@ -103,7 +103,8 @@ namespace libcasm_fe
 
             void visit( UnresolvedType& node ) override;
             void visit( BasicType& node ) override;
-            void visit( ComposedType& node ) override;
+            void visit( TupleType& node ) override;
+            void visit( RecordType& node ) override;
             void visit( TemplateType& node ) override;
             void visit( FixedSizedType& node ) override;
             void visit( RelationType& node ) override;

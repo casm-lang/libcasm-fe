@@ -51,12 +51,15 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class VariableDefinition;
+        using VariableDefinitions = NodeList< VariableDefinition >;
+
         class Type : public TypedNode
         {
           public:
             using Ptr = std::shared_ptr< Type >;
 
-            Type( Node::ID id, const IdentifierPath::Ptr& name );
+            Type( const Node::ID id, const IdentifierPath::Ptr& name );
 
             const IdentifierPath::Ptr& name( void ) const;
 
@@ -90,99 +93,106 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
         };
 
-        class ComposedType final : public Type
+        class EmbracedType : public Type
         {
           public:
-            using Ptr = std::shared_ptr< ComposedType >;
+            using Ptr = std::shared_ptr< EmbracedType >;
 
-            ComposedType(
-                const IdentifierPath::Ptr& identifier,
-                const Token::Ptr& leftBrace,
-                const Types::Ptr& subTypes,
-                const Token::Ptr& rightBrace );
+            EmbracedType(
+                const Node::ID id,
+                const IdentifierPath::Ptr& name,
+                const Token::Ptr& leftBraceToken,
+                const Token::Ptr& rightBraceToken );
 
-            ComposedType(
-                const IdentifierPath::Ptr& identifier,
-                const Token::Ptr& leftBrace,
+            const Token::Ptr& leftBraceToken( void ) const;
+
+            const Token::Ptr& rightBraceToken( void ) const;
+
+          private:
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
+        };
+
+        class TupleType final : public EmbracedType
+        {
+          public:
+            using Ptr = std::shared_ptr< TupleType >;
+
+            TupleType(
+                const Token::Ptr& leftBraceToken,
                 const Types::Ptr& subTypes,
-                const Identifiers::Ptr& subTypeIdentifiers,
-                const Token::Ptr& rightBrace );
+                const Token::Ptr& rightBraceToken );
 
             const Types::Ptr& subTypes( void ) const;
-
-            const Identifiers::Ptr& subTypeIdentifiers( void ) const;
-
-            const Token::Ptr& leftBrace( void ) const;
-
-            const Token::Ptr& rightBrace( void ) const;
-
-            u1 isNamed( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Types::Ptr m_subTypes;
-            const Identifiers::Ptr m_subTypeIdentifiers;
-            const Token::Ptr m_leftBrace;
-            const Token::Ptr m_rightBrace;
         };
 
-        class TemplateType final : public Type
+        class RecordType final : public EmbracedType
+        {
+          public:
+            using Ptr = std::shared_ptr< RecordType >;
+
+            RecordType(
+                const Token::Ptr& leftBraceToken,
+                const std::shared_ptr< VariableDefinitions >& namedSubTypes,
+                const Token::Ptr& rightBraceToken );
+
+            const std::shared_ptr< VariableDefinitions >& namedSubTypes( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const std::shared_ptr< VariableDefinitions > m_namedSubTypes;
+        };
+
+        class TemplateType final : public EmbracedType
         {
           public:
             using Ptr = std::shared_ptr< TemplateType >;
 
             TemplateType(
                 const IdentifierPath::Ptr& identifier,
-                const Token::Ptr& leftBrace,
+                const Token::Ptr& leftBraceToken,
                 const Types::Ptr& subTypes,
-                const Token::Ptr& rightBrace );
+                const Token::Ptr& rightBraceToken );
 
             const Types::Ptr& subTypes( void ) const;
-
-            const Token::Ptr& leftBrace( void ) const;
-
-            const Token::Ptr& rightBrace( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Types::Ptr m_subTypes;
-            const Token::Ptr m_leftBrace;
-            const Token::Ptr m_rightBrace;
         };
 
-        class RelationType final : public Type
+        class RelationType final : public EmbracedType
         {
           public:
             using Ptr = std::shared_ptr< RelationType >;
 
             RelationType(
                 const IdentifierPath::Ptr& identifier,
-                const Token::Ptr& leftBrace,
+                const Token::Ptr& leftBraceToken,
                 const Types::Ptr& argumentTypes,
-                const Token::Ptr& maps,
+                const Token::Ptr& mapsToken,
                 const Type::Ptr& returnType,
-                const Token::Ptr& rightBrace );
+                const Token::Ptr& rightBraceToken );
 
             const Types::Ptr& argumentTypes( void ) const;
 
             const Type::Ptr& returnType( void ) const;
 
-            const Token::Ptr& leftBrace( void ) const;
-
-            const Token::Ptr& rightBrace( void ) const;
-
-            const Token::Ptr& maps( void ) const;
+            const Token::Ptr& mapsToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Types::Ptr m_argumentTypes;
             const Type::Ptr m_returnType;
-            const Token::Ptr m_leftBrace;
-            const Token::Ptr m_rightBrace;
-            const Token::Ptr m_maps;
+            const Token::Ptr m_mapsToken;
         };
 
         class FixedSizedType final : public Type
@@ -192,18 +202,18 @@ namespace libcasm_fe
 
             FixedSizedType(
                 const IdentifierPath::Ptr& identifier,
-                const Token::Ptr& mark,
+                const Token::Ptr& markToken,
                 const Expression::Ptr& size );
 
             const Expression::Ptr& size( void ) const;
 
-            const Token::Ptr& mark( void ) const;
+            const Token::Ptr& markToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Expression::Ptr m_size;
-            const Token::Ptr m_mark;
+            const Token::Ptr m_markToken;
         };
     }
 }

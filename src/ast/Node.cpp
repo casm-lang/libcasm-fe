@@ -258,9 +258,13 @@ std::string Node::description( void ) const
         {
             return "basic type";
         }
-        case ID::COMPOSED_TYPE:
+        case ID::TUPLE_TYPE:
         {
-            return "composed type";
+            return "tuple type";
+        }
+        case ID::RECORD_TYPE:
+        {
+            return "record type";
         }
         case ID::TEMPLATE_TYPE:
         {

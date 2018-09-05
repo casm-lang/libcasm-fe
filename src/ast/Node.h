@@ -120,7 +120,8 @@ namespace libcasm_fe
                 // types
                 UNRESOLVED_TYPE,
                 BASIC_TYPE,
-                COMPOSED_TYPE,
+                TUPLE_TYPE,
+                RECORD_TYPE,
                 TEMPLATE_TYPE,
                 FIXED_SIZED_TYPE,
                 RELATION_TYPE,

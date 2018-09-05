@@ -237,7 +237,8 @@ END       0 "end of file"
 %type <libcasm_fe::Ast::Type::Ptr> Type
 %type <Types::Ptr> Types
 %type <BasicType::Ptr> BasicType
-%type <ComposedType::Ptr> ComposedType TupleType RecordType
+%type <TupleType::Ptr> TupleType
+%type <RecordType::Ptr> RecordType
 %type <TemplateType::Ptr> TemplateType
 %type <RelationType::Ptr> RelationType
 %type <FixedSizedType::Ptr> FixedSizedType
@@ -454,6 +455,10 @@ DerivedDefinition
       $$->setLeftBracketToken( $3 );
       $$->setRightBracketToken( $5 );
   }
+| DERIVED Identifier LPAREN error RPAREN MAPS Type EQUAL Term // error recovery
+  {
+      $$ = nullptr;
+  }
 ;
 
 
@@ -483,6 +488,14 @@ RuleDefinition
       $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, $6, $7, $8, $9 );
       $$->setLeftBracketToken( $3 );
       $$->setRightBracketToken( $5 );
+  }
+| RULE Identifier LPAREN error RPAREN EQUAL Rule // error recovery
+  {
+      $$ = nullptr;
+  }
+| RULE Identifier LPAREN error RPAREN MAPS Type EQUAL Rule // error recovery
+  {
+      $$ = nullptr;
   }
 ;
 
@@ -1003,6 +1016,10 @@ DirectCallExpression
       $$->setLeftBracketToken( $2 );
       $$->setRightBracketToken( $4 );
   }
+| IdentifierPath LPAREN error RPAREN // error recovery
+  {
+      $$ = nullptr;
+  }
 ;
 
 
@@ -1024,6 +1041,10 @@ MethodCallExpression
       $$ = Ast::make< MethodCallExpression >( @$, $1, $2, $3, $5 );
       $$->setLeftBracketToken( $4 );
       $$->setRightBracketToken( $6 );
+  }
+| SimpleOrClaspedTerm DOT Identifier LPAREN error RPAREN // error recovery
+  {
+      $$ = nullptr;
   }
 ;
 
@@ -1049,6 +1070,10 @@ IndirectCallExpression
       $$ = Ast::make< IndirectCallExpression >( @$, $1, $3 );
       $$->setLeftBracketToken( $2 );
       $$->setRightBracketToken( $4 );
+  }
+| CallExpression LPAREN error RPAREN // error recovery
+  {
+      $$ = nullptr;
   }
 ;
 
@@ -1382,13 +1407,16 @@ Types
   }
 ;
 
-
 Type
 : BasicType
   {
       $$ = $1;
   }
-| ComposedType
+| TupleType
+  {
+      $$ = $1;
+  }
+| RecordType
   {
       $$ = $1;
   }
@@ -1415,47 +1443,24 @@ BasicType
 ;
 
 
-ComposedType
-: TupleType
-  {
-      $$ = $1;
-  }
-| RecordType
-  {
-      $$ = $1;
-  }
-;
-
 TupleType
 : LPAREN Types COMMA Type RPAREN
   {
-      const auto identifier = Ast::make< Identifier >( @$, "Tuple" );
       auto subTypes = $2;
       $4->setDelimiterToken( $3 );
       subTypes->add( $4 );
-      $$ = Ast::make< ComposedType >
-          ( @$, asIdentifierPath( identifier ), $1, subTypes, $5 );
+      $$ = Ast::make< TupleType >( @$, $1, subTypes, $5 );
   }
 ;
+
 
 RecordType
 : LPAREN TypedVariables COMMA TypedVariable RPAREN
   {
-      const auto identifier = Ast::make< Identifier >( @$, "Record" );
       auto namedSubTypes = $2;
       $4->setDelimiterToken( $3 );
       namedSubTypes->add( $4 );
-
-      auto identifiers = Ast::make< Identifiers >( @$ );
-      auto subTypes = Ast::make< Types >( @$ );
-      for( const auto& namedSubType : *namedSubTypes )
-      {
-          identifiers->add( namedSubType->identifier() );
-          subTypes->add( namedSubType->variableType() );
-      }
-
-      $$ = Ast::make< ComposedType >
-          ( @$, asIdentifierPath( identifier ), $1, subTypes, identifiers, $5 );
+      $$ = Ast::make< RecordType >( @$, $1, namedSubTypes, $5 );
   }
 ;
 

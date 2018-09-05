@@ -98,7 +98,8 @@ namespace libcasm_fe
 
         class UnresolvedType;
         class BasicType;
-        class ComposedType;
+        class TupleType;
+        class RecordType;
         class TemplateType;
         class FixedSizedType;
         class RelationType;
@@ -171,7 +172,8 @@ namespace libcasm_fe
 
             virtual void visit( UnresolvedType& node ) = 0;
             virtual void visit( BasicType& node ) = 0;
-            virtual void visit( ComposedType& node ) = 0;
+            virtual void visit( TupleType& node ) = 0;
+            virtual void visit( RecordType& node ) = 0;
             virtual void visit( TemplateType& node ) = 0;
             virtual void visit( FixedSizedType& node ) = 0;
             virtual void visit( RelationType& node ) = 0;

@@ -489,47 +489,47 @@ void RecursiveVisitor::visit( BasicType& node )
     node.name()->accept( *this );
 }
 
-void RecursiveVisitor::visit( ComposedType& node )
+void RecursiveVisitor::visit( TupleType& node )
 {
     node.delimiterToken()->accept( *this );
-    node.leftBrace()->accept( *this );
-    node.name()->accept( *this );
-    if( not node.isNamed() )
-    {
-        node.subTypes()->accept( *this );
-    }
-    else
-    {
-        node.subTypeIdentifiers()->accept( *this );
-    }
-    node.rightBrace()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.subTypes()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+}
+
+void RecursiveVisitor::visit( RecordType& node )
+{
+    node.delimiterToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.namedSubTypes()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( TemplateType& node )
 {
     node.delimiterToken()->accept( *this );
     node.name()->accept( *this );
-    node.leftBrace()->accept( *this );
+    node.leftBraceToken()->accept( *this );
     node.subTypes()->accept( *this );
-    node.rightBrace()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RelationType& node )
 {
     node.delimiterToken()->accept( *this );
     node.name()->accept( *this );
-    node.leftBrace()->accept( *this );
+    node.leftBraceToken()->accept( *this );
     node.argumentTypes()->accept( *this );
-    node.maps()->accept( *this );
+    node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
-    node.rightBrace()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( FixedSizedType& node )
 {
     node.delimiterToken()->accept( *this );
     node.name()->accept( *this );
-    node.mark()->accept( *this );
+    node.markToken()->accept( *this );
     node.size()->accept( *this );
 }
 

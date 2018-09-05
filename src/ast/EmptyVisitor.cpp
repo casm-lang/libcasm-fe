@@ -234,7 +234,11 @@ void EmptyVisitor::visit( BasicType& )
 {
 }
 
-void EmptyVisitor::visit( ComposedType& )
+void EmptyVisitor::visit( TupleType& )
+{
+}
+
+void EmptyVisitor::visit( RecordType& )
 {
 }
 

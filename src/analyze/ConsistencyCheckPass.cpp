@@ -116,7 +116,8 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( UpdateRule& node ) override;
 
     void visit( BasicType& node ) override;
-    void visit( ComposedType& node ) override;
+    void visit( TupleType& node ) override;
+    void visit( RecordType& node ) override;
     void visit( TemplateType& node ) override;
     void visit( FixedSizedType& node ) override;
     void visit( RelationType& node ) override;
@@ -449,7 +450,13 @@ void ConsistencyCheckVisitor::visit( BasicType& node )
     verifyHasType( node );
 }
 
-void ConsistencyCheckVisitor::visit( ComposedType& node )
+void ConsistencyCheckVisitor::visit( TupleType& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( RecordType& node )
 {
     RecursiveVisitor::visit( node );
     verifyHasType( node );
