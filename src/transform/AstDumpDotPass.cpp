@@ -110,6 +110,8 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
     void visit( HeaderDefinition& node ) override;
     void visit( InitDefinition& node ) override;
+    void visit( InitiallyDefinition& node ) override;
+    void visit( InitializerDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -226,7 +228,36 @@ void AstDumpDotVisitor::visit( InitDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "InitDefinition" );
+    node.initToken()->accept( *this );
+    if( node.isSingleAgent() )
+    {
+        node.initPath()->accept( *this );
+    }
+    else
+    {
+        node.leftBraceToken()->accept( *this );
+        node.initializers()->accept( *this );
+        node.rightBraceToken()->accept( *this );
+    }
+}
+
+void AstDumpDotVisitor::visit( InitiallyDefinition& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "InitiallyDefinition" );
     RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( InitializerDefinition& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "InitializerDefinition" );
+    node.attributes()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.arguments()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+    node.mapsToken()->accept( *this );
+    node.value()->accept( *this );
 }
 
 void AstDumpDotVisitor::visit( VariableDefinition& node )

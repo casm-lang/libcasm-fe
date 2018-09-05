@@ -81,6 +81,14 @@ std::string Node::description( void ) const
         {
             return "init";
         }
+        case ID::INITIALLY_DEFINITION:
+        {
+            return "initially";
+        }
+        case ID::INITIALZER_DEFINITION:
+        {
+            return "initialzer";
+        }
         case ID::VARIABLE_DEFINITION:
         {
             return "variable";

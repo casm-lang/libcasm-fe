@@ -55,6 +55,8 @@ namespace libcasm_fe
           public:
             void visit( HeaderDefinition& node ) override;
             void visit( InitDefinition& node ) override;
+            void visit( InitiallyDefinition& node ) override;
+            void visit( InitializerDefinition& node ) override;
             void visit( VariableDefinition& node ) override;
             void visit( FunctionDefinition& node ) override;
             void visit( DerivedDefinition& node ) override;

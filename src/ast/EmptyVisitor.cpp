@@ -58,6 +58,14 @@ void EmptyVisitor::visit( InitDefinition& )
 {
 }
 
+void EmptyVisitor::visit( InitiallyDefinition& )
+{
+}
+
+void EmptyVisitor::visit( InitializerDefinition& )
+{
+}
+
 void EmptyVisitor::visit( VariableDefinition& )
 {
 }

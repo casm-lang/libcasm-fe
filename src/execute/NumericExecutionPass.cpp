@@ -302,6 +302,7 @@ class ExecutionVisitor final : public EmptyVisitor
 
     void execute( const Definition::Ptr& definition );
 
+    void visit( InitializerDefinition& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -475,6 +476,12 @@ void ExecutionVisitor::execute( const Definition::Ptr& definition )
         makeFrame( nullptr, definition.get(), definition->maximumNumberOfLocals() ) );
     definition->accept( *this );
     m_frameStack.pop();
+}
+
+void ExecutionVisitor::visit( InitializerDefinition& node )
+{
+    // just evaluate the encapsulated update rule
+    node.updateRule()->accept( *this );
 }
 
 void ExecutionVisitor::visit( VariableDefinition& node )
@@ -1612,7 +1619,6 @@ class StateInitializationVisitor final : public EmptyVisitor
     StateInitializationVisitor( ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
     void visit( Specification& node );
-
     void visit( InitDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
 

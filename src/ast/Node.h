@@ -68,6 +68,8 @@ namespace libcasm_fe
                 // definitions
                 HEADER_DEFINITION,
                 INIT_DEFINITION,
+                INITIALLY_DEFINITION,
+                INITIALZER_DEFINITION,
                 VARIABLE_DEFINITION,
                 FUNCTION_DEFINITION,
                 DERIVED_DEFINITION,

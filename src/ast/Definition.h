@@ -54,6 +54,9 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class Expression;
+        using Expressions = NodeList< Expression >;
+
         class Definition : public TypedPropertyNode
         {
           public:
@@ -99,6 +102,71 @@ namespace libcasm_fe
 
           private:
             const Token::Ptr m_headerToken;
+        };
+
+        class InitializerDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< InitializerDefinition >;
+
+            InitializerDefinition(
+                const Token::Ptr& leftBraceToken,
+                const std::shared_ptr< Expressions >& arguments,
+                const Token::Ptr& rightBraceToken,
+                const Token::Ptr& mapsToken,
+                const std::shared_ptr< Expression >& value );
+
+            const std::shared_ptr< Expressions >& arguments( void ) const;
+
+            const std::shared_ptr< Expression >& value( void ) const;
+
+            const UpdateRule::Ptr& updateRule( void ) const;
+
+            const Token::Ptr& leftBraceToken( void ) const;
+
+            const Token::Ptr& rightBraceToken( void ) const;
+
+            const Token::Ptr& mapsToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const std::shared_ptr< Expressions > m_arguments;
+            const std::shared_ptr< Expression > m_value;
+            const UpdateRule::Ptr m_updateRule;
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
+            const Token::Ptr m_mapsToken;
+        };
+
+        using InitializerDefinitions = NodeList< InitializerDefinition >;
+
+        class InitiallyDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< InitiallyDefinition >;
+
+            InitiallyDefinition(
+                const Token::Ptr& initiallyToken,
+                const Token::Ptr& leftBraceToken,
+                const InitializerDefinitions::Ptr& initializers,
+                const Token::Ptr& rightBraceToken );
+
+            const InitializerDefinitions::Ptr& initializers( void ) const;
+
+            const Token::Ptr& initiallyToken( void ) const;
+
+            const Token::Ptr& leftBraceToken( void ) const;
+
+            const Token::Ptr& rightBraceToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const InitializerDefinitions::Ptr m_initializers;
+            const Token::Ptr m_initiallyToken;
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
         };
 
         class VariableDefinition final : public Definition
@@ -162,6 +230,7 @@ namespace libcasm_fe
             bool isProgram( void ) const;
 
             const Types::Ptr& argumentTypes( void ) const;
+
             const Type::Ptr& returnType( void ) const;
 
             const Token::Ptr& functionToken( void ) const;
@@ -177,8 +246,8 @@ namespace libcasm_fe
             void setSymbolic( u1 symbolic );
             u1 symbolic( void ) const;
 
-            void setInitializers( const NodeList< UpdateRule >::Ptr& initializers );
-            const NodeList< UpdateRule >::Ptr& initializers( void ) const;
+            void setInitializers( const InitializerDefinitions::Ptr& initializers );
+            const InitializerDefinitions::Ptr& initializers( void ) const;
 
             void setDefaultValue( const Expression::Ptr& defaultValue );
             const Expression::Ptr& defaultValue( void ) const;
@@ -193,7 +262,7 @@ namespace libcasm_fe
             const Token::Ptr m_mapsToken;
             Classification m_classification;
             u1 m_symbolic;
-            NodeList< UpdateRule >::Ptr m_initializers;
+            InitializerDefinitions::Ptr m_initializers;
             Expression::Ptr m_defaultValue;
             const bool m_isProgram;
         };
@@ -382,12 +451,12 @@ namespace libcasm_fe
             InitDefinition(
                 const Token::Ptr& initToken,
                 const Token::Ptr& leftBraceToken,
-                const NodeList< UpdateRule >::Ptr& initializers,
+                const InitializerDefinitions::Ptr& initializers,
                 const Token::Ptr& rightBraceToken );
 
             const IdentifierPath::Ptr& initPath( void ) const;
 
-            const NodeList< UpdateRule >::Ptr& initializers( void ) const;
+            const InitializerDefinitions::Ptr& initializers( void ) const;
 
             const Token::Ptr& initToken( void ) const;
 
@@ -404,7 +473,7 @@ namespace libcasm_fe
 
           private:
             const IdentifierPath::Ptr m_initPath;
-            const NodeList< UpdateRule >::Ptr m_initializers;
+            const InitializerDefinitions::Ptr m_initializers;
             const Token::Ptr m_initToken;
             const Token::Ptr m_leftBraceToken;
             const Token::Ptr m_rightBraceToken;

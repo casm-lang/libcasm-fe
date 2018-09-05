@@ -252,8 +252,9 @@ END       0 "end of file"
 // other
 %type <Case::Ptr> CaseLabel
 %type <Cases::Ptr> CaseLabels
-%type <UpdateRule::Ptr> Initializer
-%type <UpdateRules::Ptr> Initializers MaybeInitially
+%type <InitiallyDefinition::Ptr> MaybeInitially
+%type <InitializerDefinition::Ptr> Initializer
+%type <InitializerDefinitions::Ptr> Initializers
 %type <Expression::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <VariableDefinitions::Ptr> Parameters AttributedVariables
@@ -406,14 +407,22 @@ InitDefinition
       auto programFunction = createProgramFunction( @$ );
       auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       programArguments->add( singleAgent );
-      const auto program = libcasm_fe::Ast::make< DirectCallExpression >(
-          @$, asIdentifierPath( programFunction->identifier() ), programArguments );
 
-      const auto unresolvedToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
-      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, unresolvedToken, $2 );
+      const auto uToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
+      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, uToken, $2 );
+      const auto initializers = Ast::make< InitializerDefinitions >( @$ );
+      const auto initializer = Ast::make< InitializerDefinition >(
+          @$, uToken, programArguments, uToken, uToken, ruleReference );
+      initializers->add( initializer );
 
-      auto initializers = Ast::make< UpdateRules >( @$ );
-      initializers->add( Ast::make< UpdateRule >( @$, program, ruleReference ) );
+      // apply the name of the program declaration to the initializer functions
+      for( auto& initializer : *initializers )
+      {
+          initializer->updateRule()->function()->setIdentifier(
+              asIdentifierPath( programFunction->identifier() ) );
+          initializer->updateRule()->setSourceLocation( @$ );
+      }
+
       programFunction->setInitializers( initializers );
       $$->setProgramFunction( programFunction );
   }
@@ -422,13 +431,16 @@ InitDefinition
       $$ = Ast::make< InitDefinition >( @$, $1, $2, $3, $4 );
 
       auto programFunction = createProgramFunction( @$ );
+
       // apply the name of the program declaration to the initializer functions
       auto initializers = $3;
       for( auto& initializer : *initializers )
       {
-          initializer->function()->setIdentifier(
+          initializer->updateRule()->function()->setIdentifier(
               asIdentifierPath( programFunction->identifier() ) );
+          initializer->updateRule()->setSourceLocation( @$ );
       }
+
       programFunction->setInitializers( initializers );
       $$->setProgramFunction( programFunction );
   }
@@ -507,11 +519,12 @@ FunctionDefinition
       $$->setDefaultValue( $7 );
 
       // apply the name of the function declaration to the initializer functions
-      auto initializers = $8;
-      for (auto& initializer : *initializers) {
-          initializer->function()->setIdentifier( asIdentifierPath( $2 ) );
+      auto initially = $8;
+      for (auto& initializer : *initially->initializers()) {
+          initializer->updateRule()->function()->setIdentifier( asIdentifierPath( $2 ) );
+          initializer->updateRule()->setSourceLocation( @$ );
       }
-      $$->setInitializers( initializers );
+      $$->setInitializers( initially->initializers() );
   }
 ;
 
@@ -1560,12 +1573,13 @@ MaybeDefined
 MaybeInitially
 : INITIALLY LCURPAREN Initializers RCURPAREN
   {
-      // TODO: FIXME: @ppaulweber: token handling of $1, $2, and $4
-      $$ = $3;
+      $$ = Ast::make< InitiallyDefinition >( @$, $1, $2, $3, $4 );
   }
 | %empty
   {
-      $$ = Ast::make< UpdateRules >( @$ );
+      const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+      const auto initializers = Ast::make< InitializerDefinitions >( @$ );
+      $$ = Ast::make< InitiallyDefinition >( @$, uToken, uToken, initializers, uToken );
   }
 ;
 
@@ -1574,13 +1588,13 @@ Initializers
 : Initializers COMMA Initializer
   {
       auto initializers = $1;
-      // TODO: FIXME: @ppaulweber: token handling of $2
+      $3->setDelimiterToken( $2 );
       initializers->add( $3 );
       $$ = initializers;
   }
 | Initializer
   {
-      auto initializers = Ast::make< UpdateRules >( @$ );
+      auto initializers = Ast::make< InitializerDefinitions >( @$ );
       initializers->add( $1 );
       $$ = initializers;
   }
@@ -1590,27 +1604,22 @@ Initializers
 Initializer
 : Term
   {
-      // the unknown function identifier will be replaced in FunctionDefinition
       const auto arguments = Ast::make< Expressions >( @$ );
-      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
-      $$ = Ast::make< UpdateRule >( @$, function, $1 );
+      const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+      $$ = Ast::make< InitializerDefinition >( @$, uToken, arguments, uToken, uToken, $1 );
   }
 | LPAREN Term RPAREN MAPS Term
   {
-      // TODO: FIXME: @ppaulweber: token handling of $1, $3, and $4
       auto arguments = Ast::make< Expressions >( @$ );
       arguments->add( $2 );
-
-      // the unknown function identifier will be replaced in FunctionDefinition
-      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, arguments );
-      $$ = Ast::make< UpdateRule >( @$, function, $5 );
+      $$ = Ast::make< InitializerDefinition >( @$, $1, arguments, $3, $4, $5 );
   }
 | TupleLiteral MAPS Term
   {
-      // TODO: FIXME: @ppaulweber: token handling of $2
-      // the unknown function identifier will be replaced in FunctionDefinition
-      const auto function = Ast::make< DirectCallExpression >( @$, nullptr, $1->expressions() );
-      $$ = Ast::make< UpdateRule >( @$, function, $3 );
+      const auto arguments = $1->expressions();
+      const auto lbToken = $1->leftBracket();
+      const auto rbToken = $1->rightBracket();
+      $$ = Ast::make< InitializerDefinition >( @$, lbToken, arguments, rbToken, $2, $3 );
   }
 ;
 
