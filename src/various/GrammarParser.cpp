@@ -3841,7 +3841,7 @@ namespace libcasm_fe {
   case 186:
 #line 1714 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
-      yylhs.value.as< Expression::Ptr > () = Ast::make< EmbracedExpression >( yylhs.location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Expression::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
+      yylhs.value.as< Expression::Ptr > () = Ast::make< EmbracedExpression >( yystack_[1].location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Expression::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
       yylhs.value.as< Expression::Ptr > ()->setDelimiterToken( yystack_[3].value.as< Ast::Token::Ptr > () );
   }
 #line 3848 "GrammarParser.cpp" // lalr1.cc:856
