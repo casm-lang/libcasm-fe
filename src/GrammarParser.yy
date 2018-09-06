@@ -96,6 +96,8 @@
     #undef yylex
     #define yylex m_lexer.nextToken
 
+    static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+
     static BasicType::Ptr createVoidType( SourceLocation& sourceLocation )
     {
         const auto type = libstdhl::Memory::get< libcasm_ir::VoidType >();
@@ -134,16 +136,7 @@
 
         const auto program = Ast::make< Identifier >( sourceLocation, "program" );
         return Ast::make< FunctionDefinition >(
-            sourceLocation,
-            std::make_shared< Token >(
-                Grammar::Token::UNRESOLVED ),
-            program,
-            std::make_shared< Token >(
-                Grammar::Token::UNRESOLVED ),
-            argTypes,
-            std::make_shared< Token >(
-                Grammar::Token::UNRESOLVED ),
-            ruleRefType );
+            sourceLocation, uToken, program, uToken, argTypes, uToken, ruleRefType );
     }
 
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
@@ -408,7 +401,6 @@ InitDefinition
       auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       programArguments->add( singleAgent );
 
-      const auto uToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
       const auto ruleReference = Ast::make< ReferenceLiteral >( @$, uToken, $2 );
       const auto initializers = Ast::make< InitializerDefinitions >( @$ );
       const auto initializer = Ast::make< InitializerDefinition >(
@@ -476,9 +468,8 @@ RuleDefinition
 : RULE Identifier EQUAL Rule
   {
       const auto params = Ast::make< NodeList< VariableDefinition > >( @$ );
-      const auto mToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
       const auto vType = createVoidType( @$ );
-      $$ = Ast::make< RuleDefinition >( @$, $1, $2, params, mToken, vType, $3, $4 );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, params, uToken, vType, $3, $4 );
   }
 | RULE Identifier MAPS Type EQUAL Rule
   {
@@ -487,9 +478,8 @@ RuleDefinition
   }
 | RULE Identifier LPAREN Parameters RPAREN EQUAL Rule
   {
-      const auto mToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
       const auto vType = createVoidType( @$ );
-      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, mToken, vType, $6, $7 );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, uToken, vType, $6, $7 );
       $$->setLeftBracketToken( $3 );
       $$->setRightBracketToken( $5 );
   }
@@ -902,7 +892,6 @@ SimpleOrClaspedTerm
   }
 | PLUS SimpleOrClaspedTerm %prec UPLUS
   {
-      const auto uToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
       $$ = Ast::make< Ast::EmbracedExpression >( @$, $1, $2, uToken );
   }
 | MINUS SimpleOrClaspedTerm %prec UMINUS
@@ -1562,7 +1551,6 @@ MaybeDefined
   }
 | %empty
   {
-      const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
       $$ = Ast::make< EmbracedExpression >( @$, uToken, Ast::make< UndefLiteral >( @$ ), uToken );
   }
 ;
@@ -1575,7 +1563,6 @@ MaybeInitially
   }
 | %empty
   {
-      const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
       const auto initializers = Ast::make< InitializerDefinitions >( @$ );
       $$ = Ast::make< InitiallyDefinition >( @$, uToken, uToken, initializers, uToken );
   }
@@ -1603,7 +1590,6 @@ Initializer
 : Term
   {
       const auto arguments = Ast::make< Expressions >( @$ );
-      const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
       $$ = Ast::make< InitializerDefinition >( @$, uToken, arguments, uToken, uToken, $1 );
       $$->updateRule()->setSourceLocation( @$ );
       $$->updateRule()->function()->setSourceLocation( @$ );
@@ -1670,9 +1656,8 @@ Variable
   }
 | Identifier
   {
-      const auto unresolvedToken = Ast::make< Ast::Token >( @$, Grammar::Token::UNRESOLVED );
       const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
-      $$ = Ast::make< VariableDefinition >( @$, $1, unresolvedToken, unresolvedType );
+      $$ = Ast::make< VariableDefinition >( @$, $1, uToken, unresolvedType );
   }
 ;
 

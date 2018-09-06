@@ -50,6 +50,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+
 static const std::string DELIMITER( "::" );
 
 //
@@ -60,9 +62,8 @@ static const std::string DELIMITER( "::" );
 Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
 , m_name( name )
-, m_doubleColon()
+, m_doubleColon( uToken )
 {
-    m_doubleColon = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 const std::string& Identifier::name( void ) const

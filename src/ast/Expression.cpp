@@ -52,6 +52,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+
 //
 //
 // Expression
@@ -59,7 +61,7 @@ using namespace Ast;
 
 Expression::Expression( Node::ID id )
 : TypedPropertyNode( id )
-, m_delimiterToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+, m_delimiterToken( uToken )
 {
 }
 
@@ -152,8 +154,8 @@ void NamedExpression::accept( Visitor& visitor )
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
 , m_arguments( arguments )
-, m_leftBracketToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
-, m_rightBracketToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+, m_leftBracketToken( uToken )
+, m_rightBracketToken( uToken )
 {
 }
 
@@ -681,7 +683,7 @@ VariableBinding::VariableBinding(
 , m_variable( variable )
 , m_expression( expression )
 , m_equal( equal )
-, m_delimiterToken( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+, m_delimiterToken( uToken )
 {
 }
 

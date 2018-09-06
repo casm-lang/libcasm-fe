@@ -51,6 +51,8 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+
 //
 //
 // SkipRule
@@ -63,7 +65,7 @@ SkipRule::SkipRule( const Token::Ptr& skipToken )
 }
 
 SkipRule::SkipRule( void )
-: SkipRule( std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ) )
+: SkipRule( uToken )
 {
 }
 
@@ -104,13 +106,7 @@ ConditionalRule::ConditionalRule(
     const Expression::Ptr& condition,
     const Token::Ptr& thenToken,
     const Rule::Ptr& thenRule )
-: ConditionalRule(
-      ifToken,
-      condition,
-      thenToken,
-      thenRule,
-      std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ),
-      std::make_shared< SkipRule >() )
+: ConditionalRule( ifToken, condition, thenToken, thenRule, uToken, std::make_shared< SkipRule >() )
 {
 }
 
@@ -332,7 +328,7 @@ ForallRule::ForallRule(
       variables,
       inToken,
       universe,
-      std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ),
+      uToken,
       std::make_shared< ValueLiteral >(
           libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true ) ),
       doToken,
@@ -576,7 +572,7 @@ UpdateRule::UpdateRule(
 
 UpdateRule::UpdateRule(
     const DirectCallExpression::Ptr& function, const Expression::Ptr& expression )
-: UpdateRule( function, std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED ), expression )
+: UpdateRule( function, uToken, expression )
 {
 }
 

@@ -51,13 +51,13 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+
 Literal::Literal( Node::ID id )
 : Expression( id )
-, m_leftBracket()
-, m_rightBracket()
+, m_leftBracket( uToken )
+, m_rightBracket( uToken )
 {
-    m_leftBracket = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
-    m_rightBracket = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 void Literal::setLeftBracket( const Token::Ptr& leftBracket )

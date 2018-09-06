@@ -73,6 +73,8 @@ static libpass::PassRegistration< SymbolResolverPass > PASS(
     "ast-sym-resolve",
     0 );
 
+static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+
 class SymbolResolveVisitor final : public RecursiveVisitor
 {
   public:
@@ -315,12 +317,8 @@ void SymbolResolveVisitor::visit( DirectCallExpression& node )
         const auto agentEnumerators = std::make_shared< Enumerators >();
         agentEnumerators->add( agent );
         const auto agentEnum = std::make_shared< EnumerationDefinition >(
-            std::make_shared< Token >( Grammar::Token::UNRESOLVED ),
-            std::make_shared< Identifier >( AGENT ),
-            std::make_shared< Token >( Grammar::Token::UNRESOLVED ),
-            std::make_shared< Token >( Grammar::Token::UNRESOLVED ),
-            agentEnumerators,
-            std::make_shared< Token >( Grammar::Token::UNRESOLVED ) );
+            uToken, std::make_shared< Identifier >( AGENT ), uToken,
+            uToken, agentEnumerators, uToken );
 
         const auto kind = libstdhl::Memory::make< libcasm_ir::Enumeration >( AGENT );
         kind->add( SINGLE_AGENT_CONSTANT );

@@ -50,14 +50,14 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+
 Attribute::Attribute( Node::ID type, const Identifier::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
-, m_leftBrace()
-, m_rightBrace()
+, m_leftBrace( uToken )
+, m_rightBrace( uToken )
 {
-    m_leftBrace = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
-    m_rightBrace = Ast::make< Ast::Token >( sourceLocation(), Grammar::Token::UNRESOLVED );
 }
 
 const Identifier::Ptr& Attribute::identifier( void ) const
