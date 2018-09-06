@@ -420,7 +420,6 @@ InitDefinition
       {
           initializer->updateRule()->function()->setIdentifier(
               asIdentifierPath( programFunction->identifier() ) );
-          initializer->updateRule()->setSourceLocation( @$ );
       }
 
       programFunction->setInitializers( initializers );
@@ -438,7 +437,6 @@ InitDefinition
       {
           initializer->updateRule()->function()->setIdentifier(
               asIdentifierPath( programFunction->identifier() ) );
-          initializer->updateRule()->setSourceLocation( @$ );
       }
 
       programFunction->setInitializers( initializers );
@@ -520,9 +518,9 @@ FunctionDefinition
 
       // apply the name of the function declaration to the initializer functions
       auto initially = $8;
-      for (auto& initializer : *initially->initializers()) {
+      for( auto& initializer : *initially->initializers() )
+      {
           initializer->updateRule()->function()->setIdentifier( asIdentifierPath( $2 ) );
-          initializer->updateRule()->setSourceLocation( @$ );
       }
       $$->setInitializers( initially->initializers() );
   }
@@ -1607,12 +1605,16 @@ Initializer
       const auto arguments = Ast::make< Expressions >( @$ );
       const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
       $$ = Ast::make< InitializerDefinition >( @$, uToken, arguments, uToken, uToken, $1 );
+      $$->updateRule()->setSourceLocation( @$ );
+      $$->updateRule()->function()->setSourceLocation( @$ );
   }
 | LPAREN Term RPAREN MAPS Term
   {
       auto arguments = Ast::make< Expressions >( @$ );
       arguments->add( $2 );
       $$ = Ast::make< InitializerDefinition >( @$, $1, arguments, $3, $4, $5 );
+      $$->updateRule()->setSourceLocation( @$ );
+      $$->updateRule()->function()->setSourceLocation( @$ );
   }
 | TupleLiteral MAPS Term
   {
@@ -1620,6 +1622,8 @@ Initializer
       const auto lbToken = $1->leftBracket();
       const auto rbToken = $1->rightBracket();
       $$ = Ast::make< InitializerDefinition >( @$, lbToken, arguments, rbToken, $2, $3 );
+      $$->updateRule()->setSourceLocation( @$ );
+      $$->updateRule()->function()->setSourceLocation( @$ );
   }
 ;
 
