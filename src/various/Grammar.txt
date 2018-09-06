@@ -44,7 +44,8 @@ AttributedDefinition ::= Attributes Definition
 ===== Definition =====
 
 <code>
-Definition ::= EnumerationDefinition
+Definition ::= InitDefinition
+             | EnumerationDefinition
              | DerivedDefinition
              | RuleDefinition
              | FunctionDefinition
@@ -53,6 +54,16 @@ Definition ::= EnumerationDefinition
 </code>
 
 {{page>:grammar:Definition&noheader&nofooter}}
+
+
+===== InitDefinition =====
+
+<code>
+InitDefinition ::= "init" IdentifierPath
+                 | "init" "{" Initializers "}"
+</code>
+
+{{page>:grammar:InitDefinition&noheader&nofooter}}
 
 
 ===== EnumerationDefinition =====
@@ -67,7 +78,8 @@ EnumerationDefinition ::= "enumeration" Identifier "=" "{" Enumerators "}"
 ===== DerivedDefinition =====
 
 <code>
-DerivedDefinition ::= "derived" Identifier MaybeParameters "->" Type "=" Term
+DerivedDefinition ::= "derived" Identifier "->" Type "=" Term
+                    | "derived" Identifier "(" Parameters ")" "->" Type "=" Term
 </code>
 
 {{page>:grammar:DerivedDefinition&noheader&nofooter}}
@@ -76,8 +88,10 @@ DerivedDefinition ::= "derived" Identifier MaybeParameters "->" Type "=" Term
 ===== RuleDefinition =====
 
 <code>
-RuleDefinition ::= "rule" Identifier MaybeParameters "=" Rule
-                 | "rule" Identifier MaybeParameters "->" Type "=" Rule
+RuleDefinition ::= "rule" Identifier "=" Rule
+                 | "rule" Identifier "->" Type "=" Rule
+                 | "rule" Identifier "(" Parameters ")" "=" Rule
+                 | "rule" Identifier "(" Parameters ")" "->" Type "=" Rule
 </code>
 
 {{page>:grammar:RuleDefinition&noheader&nofooter}}
@@ -87,20 +101,9 @@ RuleDefinition ::= "rule" Identifier MaybeParameters "=" Rule
 
 <code>
 FunctionDefinition ::= "function" Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
-                     | ProgramFunctionDefinition
 </code>
 
 {{page>:grammar:FunctionDefinition&noheader&nofooter}}
-
-
-===== ProgramFunctionDefinition =====
-
-<code>
-ProgramFunctionDefinition ::= "init" IdentifierPath
-                            | "init" "{" MaybeInitializers "}"
-</code>
-
-{{page>:grammar:ProgramFunctionDefinition&noheader&nofooter}}
 
 
 ===== EnumeratorDefinition =====
@@ -141,6 +144,16 @@ InvariantDefinition ::= "invariant" Identifier "=" Term
 {{page>:grammar:InvariantDefinition&noheader&nofooter}}
 
 
+===== Rules =====
+
+<code>
+Rules ::= Rules Rule
+        | Rule
+</code>
+
+{{page>:grammar:Rules&noheader&nofooter}}
+
+
 ===== Rule =====
 
 <code>
@@ -159,16 +172,6 @@ Rule ::= SkipRule
 </code>
 
 {{page>:grammar:Rule&noheader&nofooter}}
-
-
-===== Rules =====
-
-<code>
-Rules ::= Rules Rule
-        | Rule
-</code>
-
-{{page>:grammar:Rules&noheader&nofooter}}
 
 
 ===== SkipRule =====
@@ -199,6 +202,16 @@ CaseRule ::= "case" Term "of" "{" CaseLabels "}"
 {{page>:grammar:CaseRule&noheader&nofooter}}
 
 
+===== CaseLabels =====
+
+<code>
+CaseLabels ::= CaseLabels CaseLabel
+             | CaseLabel
+</code>
+
+{{page>:grammar:CaseLabels&noheader&nofooter}}
+
+
 ===== CaseLabel =====
 
 <code>
@@ -208,16 +221,6 @@ CaseLabel ::= "default" ":" Rule
 </code>
 
 {{page>:grammar:CaseLabel&noheader&nofooter}}
-
-
-===== CaseLabels =====
-
-<code>
-CaseLabels ::= CaseLabels CaseLabel
-             | CaseLabel
-</code>
-
-{{page>:grammar:CaseLabels&noheader&nofooter}}
 
 
 ===== LetRule =====
@@ -386,7 +389,8 @@ CallExpression ::= DirectCallExpression
 
 <code>
 DirectCallExpression ::= IdentifierPath
-                       | IdentifierPath Arguments
+                       | IdentifierPath "(" ")"
+                       | IdentifierPath "(" Terms ")"
 </code>
 
 {{page>:grammar:DirectCallExpression&noheader&nofooter}}
@@ -396,7 +400,8 @@ DirectCallExpression ::= IdentifierPath
 
 <code>
 MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
-                       | SimpleOrClaspedTerm "." Identifier Arguments
+                       | SimpleOrClaspedTerm "." Identifier "(" ")"
+                       | SimpleOrClaspedTerm "." Identifier "(" Terms ")"
 </code>
 
 {{page>:grammar:MethodCallExpression&noheader&nofooter}}
@@ -414,7 +419,8 @@ LiteralCallExpression ::= SimpleOrClaspedTerm "." IntegerLiteral
 ===== IndirectCallExpression =====
 
 <code>
-IndirectCallExpression ::= CallExpression Arguments
+IndirectCallExpression ::= CallExpression "(" ")"
+                         | CallExpression "(" Terms ")"
 </code>
 
 {{page>:grammar:IndirectCallExpression&noheader&nofooter}}
@@ -647,7 +653,8 @@ Types ::= Types "," Type
 
 <code>
 Type ::= BasicType
-       | ComposedType
+       | TupleType
+       | RecordType
        | TemplateType
        | RelationType
        | FixedSizedType
@@ -663,16 +670,6 @@ BasicType ::= IdentifierPath
 </code>
 
 {{page>:grammar:BasicType&noheader&nofooter}}
-
-
-===== ComposedType =====
-
-<code>
-ComposedType ::= TupleType
-               | RecordType
-</code>
-
-{{page>:grammar:ComposedType&noheader&nofooter}}
 
 
 ===== TupleType =====
@@ -720,16 +717,6 @@ FixedSizedType ::= IdentifierPath "'" Term
 {{page>:grammar:FixedSizedType&noheader&nofooter}}
 
 
-===== Arguments =====
-
-<code>
-Arguments ::= "(" Terms ")"
-            | "(" ")"
-</code>
-
-{{page>:grammar:Arguments&noheader&nofooter}}
-
-
 ===== FunctionParameters =====
 
 <code>
@@ -760,16 +747,6 @@ Parameters ::= Parameters "," TypedAttributedVariable
 {{page>:grammar:Parameters&noheader&nofooter}}
 
 
-===== MaybeParameters =====
-
-<code>
-MaybeParameters ::= "(" Parameters ")"
-                  | null
-</code>
-
-{{page>:grammar:MaybeParameters&noheader&nofooter}}
-
-
 ===== MaybeDefined =====
 
 <code>
@@ -783,7 +760,7 @@ MaybeDefined ::= "defined" "{" Term "}"
 ===== MaybeInitially =====
 
 <code>
-MaybeInitially ::= "initially" "{" MaybeInitializers "}"
+MaybeInitially ::= "initially" "{" Initializers "}"
                  | null
 </code>
 
@@ -809,16 +786,6 @@ Initializer ::= Term
 </code>
 
 {{page>:grammar:Initializer&noheader&nofooter}}
-
-
-===== MaybeInitializers =====
-
-<code>
-MaybeInitializers ::= Initializers
-                    | null
-</code>
-
-{{page>:grammar:MaybeInitializers&noheader&nofooter}}
 
 
 ===== Identifier =====
@@ -900,15 +867,6 @@ TypedAttributedVariable ::= Attributes TypedVariable
 {{page>:grammar:TypedAttributedVariable&noheader&nofooter}}
 
 
-===== VariableBinding =====
-
-<code>
-VariableBinding ::= AttributedVariable "=" Term
-</code>
-
-{{page>:grammar:VariableBinding&noheader&nofooter}}
-
-
 ===== VariableBindings =====
 
 <code>
@@ -917,6 +875,15 @@ VariableBindings ::= VariableBindings "," VariableBinding
 </code>
 
 {{page>:grammar:VariableBindings&noheader&nofooter}}
+
+
+===== VariableBinding =====
+
+<code>
+VariableBinding ::= AttributedVariable "=" Term
+</code>
+
+{{page>:grammar:VariableBinding&noheader&nofooter}}
 
 
 ===== Attributes =====

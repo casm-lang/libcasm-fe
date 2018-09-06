@@ -53,13 +53,14 @@
     #include "ast/Definition.h"
     #include "ast/Expression.h"
     #include "ast/Rule.h"
+    #include "ast/Token.h"
 
     using namespace libcasm_fe;
     using namespace Ast;
 
     #define YY_NULLPTR nullptr
 
-#line 63 "GrammarParser.tab.h" // lalr1.cc:379
+#line 64 "GrammarParser.tab.h" // lalr1.cc:379
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -136,7 +137,7 @@
 
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:379
 namespace libcasm_fe {
-#line 140 "GrammarParser.tab.h" // lalr1.cc:379
+#line 141 "GrammarParser.tab.h" // lalr1.cc:379
 
 
 
@@ -303,49 +304,118 @@ namespace libcasm_fe {
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
+      // "CASM"
+      // "init"
+      // "derived"
+      // "enumeration"
+      // "rule"
+      // "using"
+      // "invariant"
+      // "function"
+      // "initially"
+      // "defined"
+      // "seq"
+      // "endseq"
+      // "par"
+      // "endpar"
+      // "skip"
+      // "let"
+      // "in"
+      // "forall"
+      // "choose"
+      // "iterate"
+      // "do"
+      // "if"
+      // "then"
+      // "else"
+      // "case"
+      // "of"
+      // "default"
+      // "holds"
+      // "exists"
+      // "with"
+      // "as"
+      // "while"
+      // "undef"
+      // "false"
+      // "true"
+      // "and"
+      // "or"
+      // "xor"
+      // "implies"
+      // "not"
+      // "+"
+      // "-"
+      // "="
+      // "("
+      // ")"
+      // "["
+      // "]"
+      // "{"
+      // "}"
+      // ":"
+      // "::"
+      // "_"
+      // "|"
+      // "@"
+      // ","
+      // "<"
+      // ">"
+      // "*"
+      // "/"
+      // "%"
+      // "^"
+      // "'"
+      // ".."
+      // "."
+      // "->"
+      // "=>"
+      // ":="
+      // "!="
+      // "<="
+      // ">="
+      // "{|"
+      // "|}"
+      char dummy1[sizeof(Ast::Token::Ptr)];
+
       // Attribute
-      char dummy1[sizeof(Attribute::Ptr)];
+      char dummy2[sizeof(Attribute::Ptr)];
 
       // Attributes
-      char dummy2[sizeof(Attributes::Ptr)];
+      char dummy3[sizeof(Attributes::Ptr)];
 
       // BasicAttribute
-      char dummy3[sizeof(BasicAttribute::Ptr)];
+      char dummy4[sizeof(BasicAttribute::Ptr)];
 
       // BasicType
-      char dummy4[sizeof(BasicType::Ptr)];
+      char dummy5[sizeof(BasicType::Ptr)];
 
       // BlockRule
-      char dummy5[sizeof(BlockRule::Ptr)];
+      char dummy6[sizeof(BlockRule::Ptr)];
 
       // CallExpression
-      char dummy6[sizeof(CallExpression::Ptr)];
+      char dummy7[sizeof(CallExpression::Ptr)];
 
       // CallRule
-      char dummy7[sizeof(CallRule::Ptr)];
+      char dummy8[sizeof(CallRule::Ptr)];
 
       // CardinalityExpression
-      char dummy8[sizeof(CardinalityExpression::Ptr)];
+      char dummy9[sizeof(CardinalityExpression::Ptr)];
 
       // CaseLabel
-      char dummy9[sizeof(Case::Ptr)];
+      char dummy10[sizeof(Case::Ptr)];
 
       // CaseRule
-      char dummy10[sizeof(CaseRule::Ptr)];
+      char dummy11[sizeof(CaseRule::Ptr)];
 
       // CaseLabels
-      char dummy11[sizeof(Cases::Ptr)];
+      char dummy12[sizeof(Cases::Ptr)];
 
       // ChooseExpression
-      char dummy12[sizeof(ChooseExpression::Ptr)];
+      char dummy13[sizeof(ChooseExpression::Ptr)];
 
       // ChooseRule
-      char dummy13[sizeof(ChooseRule::Ptr)];
-
-      // ComposedType
-      // TupleType
-      // RecordType
-      char dummy14[sizeof(ComposedType::Ptr)];
+      char dummy14[sizeof(ChooseRule::Ptr)];
 
       // ConditionalExpression
       char dummy15[sizeof(ConditionalExpression::Ptr)];
@@ -388,7 +458,6 @@ namespace libcasm_fe {
       char dummy26[sizeof(ExpressionAttribute::Ptr)];
 
       // Terms
-      // Arguments
       char dummy27[sizeof(Expressions::Ptr)];
 
       // FixedSizedType
@@ -398,7 +467,6 @@ namespace libcasm_fe {
       char dummy29[sizeof(ForallRule::Ptr)];
 
       // FunctionDefinition
-      // ProgramFunctionDefinition
       char dummy30[sizeof(FunctionDefinition::Ptr)];
 
       // Header
@@ -413,97 +481,109 @@ namespace libcasm_fe {
       // IndirectCallExpression
       char dummy34[sizeof(IndirectCallExpression::Ptr)];
 
+      // InitDefinition
+      char dummy35[sizeof(InitDefinition::Ptr)];
+
+      // Initializer
+      char dummy36[sizeof(InitializerDefinition::Ptr)];
+
+      // Initializers
+      char dummy37[sizeof(InitializerDefinitions::Ptr)];
+
+      // MaybeInitially
+      char dummy38[sizeof(InitiallyDefinition::Ptr)];
+
       // InvariantDefinition
-      char dummy35[sizeof(InvariantDefinition::Ptr)];
+      char dummy39[sizeof(InvariantDefinition::Ptr)];
 
       // IterateRule
-      char dummy36[sizeof(IterateRule::Ptr)];
+      char dummy40[sizeof(IterateRule::Ptr)];
 
       // LetExpression
-      char dummy37[sizeof(LetExpression::Ptr)];
+      char dummy41[sizeof(LetExpression::Ptr)];
 
       // LetRule
-      char dummy38[sizeof(LetRule::Ptr)];
+      char dummy42[sizeof(LetRule::Ptr)];
 
       // ListLiteral
-      char dummy39[sizeof(ListLiteral::Ptr)];
+      char dummy43[sizeof(ListLiteral::Ptr)];
 
       // Literal
-      char dummy40[sizeof(Literal::Ptr)];
+      char dummy44[sizeof(Literal::Ptr)];
 
       // LiteralCallExpression
-      char dummy41[sizeof(LiteralCallExpression::Ptr)];
+      char dummy45[sizeof(LiteralCallExpression::Ptr)];
 
       // MethodCallExpression
-      char dummy42[sizeof(MethodCallExpression::Ptr)];
+      char dummy46[sizeof(MethodCallExpression::Ptr)];
 
       // Assignment
-      char dummy43[sizeof(NamedExpression::Ptr)];
+      char dummy47[sizeof(NamedExpression::Ptr)];
 
       // Assignments
-      char dummy44[sizeof(NamedExpressions::Ptr)];
+      char dummy48[sizeof(NamedExpressions::Ptr)];
 
       // RangeLiteral
-      char dummy45[sizeof(RangeLiteral::Ptr)];
+      char dummy49[sizeof(RangeLiteral::Ptr)];
 
       // RecordLiteral
-      char dummy46[sizeof(RecordLiteral::Ptr)];
+      char dummy50[sizeof(RecordLiteral::Ptr)];
+
+      // RecordType
+      char dummy51[sizeof(RecordType::Ptr)];
 
       // ReferenceLiteral
-      char dummy47[sizeof(ReferenceLiteral::Ptr)];
+      char dummy52[sizeof(ReferenceLiteral::Ptr)];
 
       // RelationType
-      char dummy48[sizeof(RelationType::Ptr)];
+      char dummy53[sizeof(RelationType::Ptr)];
 
       // Rule
-      char dummy49[sizeof(Rule::Ptr)];
+      char dummy54[sizeof(Rule::Ptr)];
 
       // RuleDefinition
-      char dummy50[sizeof(RuleDefinition::Ptr)];
+      char dummy55[sizeof(RuleDefinition::Ptr)];
 
       // Rules
-      char dummy51[sizeof(Rules::Ptr)];
+      char dummy56[sizeof(Rules::Ptr)];
 
       // SequenceRule
-      char dummy52[sizeof(SequenceRule::Ptr)];
+      char dummy57[sizeof(SequenceRule::Ptr)];
 
       // SkipRule
-      char dummy53[sizeof(SkipRule::Ptr)];
+      char dummy58[sizeof(SkipRule::Ptr)];
 
       // Specification
-      char dummy54[sizeof(Specification::Ptr)];
+      char dummy59[sizeof(Specification::Ptr)];
 
       // TemplateType
-      char dummy55[sizeof(TemplateType::Ptr)];
+      char dummy60[sizeof(TemplateType::Ptr)];
 
       // TupleLiteral
-      char dummy56[sizeof(TupleLiteral::Ptr)];
+      char dummy61[sizeof(TupleLiteral::Ptr)];
+
+      // TupleType
+      char dummy62[sizeof(TupleType::Ptr)];
 
       // TypeCastingExpression
-      char dummy57[sizeof(TypeCastingExpression::Ptr)];
+      char dummy63[sizeof(TypeCastingExpression::Ptr)];
 
       // Types
       // FunctionParameters
       // MaybeFunctionParameters
-      char dummy58[sizeof(Types::Ptr)];
+      char dummy64[sizeof(Types::Ptr)];
 
       // UndefinedLiteral
-      char dummy59[sizeof(UndefLiteral::Ptr)];
+      char dummy65[sizeof(UndefLiteral::Ptr)];
 
       // UniversalQuantifierExpression
-      char dummy60[sizeof(UniversalQuantifierExpression::Ptr)];
+      char dummy66[sizeof(UniversalQuantifierExpression::Ptr)];
 
       // UpdateRule
-      // Initializer
-      char dummy61[sizeof(UpdateRule::Ptr)];
-
-      // MaybeInitially
-      // Initializers
-      // MaybeInitializers
-      char dummy62[sizeof(UpdateRules::Ptr)];
+      char dummy67[sizeof(UpdateRule::Ptr)];
 
       // UsingDefinition
-      char dummy63[sizeof(UsingDefinition::Ptr)];
+      char dummy68[sizeof(UsingDefinition::Ptr)];
 
       // BooleanLiteral
       // IntegerLiteral
@@ -511,31 +591,30 @@ namespace libcasm_fe {
       // DecimalLiteral
       // BinaryLiteral
       // StringLiteral
-      char dummy64[sizeof(ValueLiteral::Ptr)];
+      char dummy69[sizeof(ValueLiteral::Ptr)];
 
       // VariableBinding
-      char dummy65[sizeof(VariableBinding::Ptr)];
+      char dummy70[sizeof(VariableBinding::Ptr)];
 
       // VariableBindings
-      char dummy66[sizeof(VariableBindings::Ptr)];
+      char dummy71[sizeof(VariableBindings::Ptr)];
 
       // Variable
       // TypedVariable
       // AttributedVariable
       // TypedAttributedVariable
-      char dummy67[sizeof(VariableDefinition::Ptr)];
+      char dummy72[sizeof(VariableDefinition::Ptr)];
 
       // Parameters
-      // MaybeParameters
       // AttributedVariables
       // TypedVariables
-      char dummy68[sizeof(VariableDefinitions::Ptr)];
+      char dummy73[sizeof(VariableDefinitions::Ptr)];
 
       // WhileRule
-      char dummy69[sizeof(WhileRule::Ptr)];
+      char dummy74[sizeof(WhileRule::Ptr)];
 
       // Type
-      char dummy70[sizeof(libcasm_fe::Ast::Type::Ptr)];
+      char dummy75[sizeof(libcasm_fe::Ast::Type::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -544,7 +623,7 @@ namespace libcasm_fe {
       // "decimal"
       // "string"
       // "identifier"
-      char dummy71[sizeof(std::string)];
+      char dummy76[sizeof(std::string)];
 };
 
     /// Symbol semantic values.
@@ -689,6 +768,8 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const Ast::Token::Ptr v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const Attribute::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Attributes::Ptr v, const location_type& l);
@@ -714,8 +795,6 @@ namespace libcasm_fe {
   basic_symbol (typename Base::kind_type t, const ChooseExpression::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const ComposedType::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr v, const location_type& l);
 
@@ -757,6 +836,14 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const IndirectCallExpression::Ptr v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const InitDefinition::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const InitializerDefinition::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const InitializerDefinitions::Ptr v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const InitiallyDefinition::Ptr v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const InvariantDefinition::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const IterateRule::Ptr v, const location_type& l);
@@ -781,6 +868,8 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const RecordLiteral::Ptr v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const RecordType::Ptr v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const ReferenceLiteral::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const RelationType::Ptr v, const location_type& l);
@@ -801,6 +890,8 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const TupleLiteral::Ptr v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const TupleType::Ptr v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const TypeCastingExpression::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Types::Ptr v, const location_type& l);
@@ -810,8 +901,6 @@ namespace libcasm_fe {
   basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const UpdateRules::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const UsingDefinition::Ptr v, const location_type& l);
 
@@ -904,291 +993,291 @@ namespace libcasm_fe {
 
     static inline
     symbol_type
-    make_CASM (const location_type& l);
+    make_CASM (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_INIT (const location_type& l);
+    make_INIT (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_DERIVED (const location_type& l);
+    make_DERIVED (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ENUMERATION (const location_type& l);
+    make_ENUMERATION (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_RULE (const location_type& l);
+    make_RULE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_USING (const location_type& l);
+    make_USING (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_INVARIANT (const location_type& l);
+    make_INVARIANT (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_FUNCTION (const location_type& l);
+    make_FUNCTION (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_INITIALLY (const location_type& l);
+    make_INITIALLY (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_DEFINED (const location_type& l);
+    make_DEFINED (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_SEQ (const location_type& l);
+    make_SEQ (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ENDSEQ (const location_type& l);
+    make_ENDSEQ (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_PAR (const location_type& l);
+    make_PAR (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ENDPAR (const location_type& l);
+    make_ENDPAR (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_SKIP (const location_type& l);
+    make_SKIP (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_LET (const location_type& l);
+    make_LET (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_IN (const location_type& l);
+    make_IN (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_FORALL (const location_type& l);
+    make_FORALL (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_CHOOSE (const location_type& l);
+    make_CHOOSE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ITERATE (const location_type& l);
+    make_ITERATE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_DO (const location_type& l);
+    make_DO (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_IF (const location_type& l);
+    make_IF (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_THEN (const location_type& l);
+    make_THEN (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ELSE (const location_type& l);
+    make_ELSE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_CASE (const location_type& l);
+    make_CASE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_OF (const location_type& l);
+    make_OF (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_DEFAULT (const location_type& l);
+    make_DEFAULT (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_HOLDS (const location_type& l);
+    make_HOLDS (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_EXISTS (const location_type& l);
+    make_EXISTS (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_WITH (const location_type& l);
+    make_WITH (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_AS (const location_type& l);
+    make_AS (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_WHILE (const location_type& l);
+    make_WHILE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_UNDEF (const location_type& l);
+    make_UNDEF (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_FALSE (const location_type& l);
+    make_FALSE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_TRUE (const location_type& l);
+    make_TRUE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_AND (const location_type& l);
+    make_AND (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_OR (const location_type& l);
+    make_OR (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_XOR (const location_type& l);
+    make_XOR (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_IMPLIES (const location_type& l);
+    make_IMPLIES (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_NOT (const location_type& l);
+    make_NOT (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_PLUS (const location_type& l);
+    make_PLUS (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_MINUS (const location_type& l);
+    make_MINUS (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_EQUAL (const location_type& l);
+    make_EQUAL (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_LPAREN (const location_type& l);
+    make_LPAREN (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_RPAREN (const location_type& l);
+    make_RPAREN (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_LSQPAREN (const location_type& l);
+    make_LSQPAREN (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_RSQPAREN (const location_type& l);
+    make_RSQPAREN (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_LCURPAREN (const location_type& l);
+    make_LCURPAREN (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_RCURPAREN (const location_type& l);
+    make_RCURPAREN (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_COLON (const location_type& l);
+    make_COLON (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_DOUBLECOLON (const location_type& l);
+    make_DOUBLECOLON (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_UNDERLINE (const location_type& l);
+    make_UNDERLINE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_VERTICAL_BAR (const location_type& l);
+    make_VERTICAL_BAR (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_AT (const location_type& l);
+    make_AT (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_COMMA (const location_type& l);
+    make_COMMA (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_LESSER (const location_type& l);
+    make_LESSER (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_GREATER (const location_type& l);
+    make_GREATER (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ASTERIX (const location_type& l);
+    make_ASTERIX (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_SLASH (const location_type& l);
+    make_SLASH (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_PERCENT (const location_type& l);
+    make_PERCENT (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_CARET (const location_type& l);
+    make_CARET (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_MARK (const location_type& l);
+    make_MARK (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_DOTDOT (const location_type& l);
+    make_DOTDOT (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_DOT (const location_type& l);
+    make_DOT (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_MAPS (const location_type& l);
+    make_MAPS (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ARROW (const location_type& l);
+    make_ARROW (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_UPDATE (const location_type& l);
+    make_UPDATE (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_NEQUAL (const location_type& l);
+    make_NEQUAL (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_LESSEQ (const location_type& l);
+    make_LESSEQ (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_GREATEREQ (const location_type& l);
+    make_GREATEREQ (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_SEQ_BRACKET (const location_type& l);
+    make_SEQ_BRACKET (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_ENDSEQ_BRACKET (const location_type& l);
+    make_ENDSEQ_BRACKET (const Ast::Token::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
@@ -1240,7 +1329,7 @@ namespace libcasm_fe {
 
 
     /// Build a parser object.
-    Parser (Logger& log_yyarg, Lexer& lexer_yyarg, Specification& specification_yyarg);
+    Parser (Logger& m_log_yyarg, Lexer& m_lexer_yyarg, Specification& m_specification_yyarg);
     virtual ~Parser ();
 
     /// Parse.
@@ -1445,8 +1534,8 @@ namespace libcasm_fe {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 2437,     ///< Last index in yytable_.
-      yynnts_ = 95,  ///< Number of nonterminal symbols.
+      yylast_ = 2703,     ///< Last index in yytable_.
+      yynnts_ = 91,  ///< Number of nonterminal symbols.
       yyfinal_ = 13, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -1455,9 +1544,9 @@ namespace libcasm_fe {
 
 
     // User arguments.
-    Logger& log;
-    Lexer& lexer;
-    Specification& specification;
+    Logger& m_log;
+    Lexer& m_lexer;
+    Specification& m_specification;
   };
 
   // Symbol number corresponding to token number t.
@@ -1536,15 +1625,90 @@ namespace libcasm_fe {
   {
     switch (other.type_get ())
     {
-      case 179: // Attribute
+      case 3: // "CASM"
+      case 4: // "init"
+      case 5: // "derived"
+      case 6: // "enumeration"
+      case 7: // "rule"
+      case 8: // "using"
+      case 9: // "invariant"
+      case 10: // "function"
+      case 11: // "initially"
+      case 12: // "defined"
+      case 13: // "seq"
+      case 14: // "endseq"
+      case 15: // "par"
+      case 16: // "endpar"
+      case 17: // "skip"
+      case 18: // "let"
+      case 19: // "in"
+      case 20: // "forall"
+      case 21: // "choose"
+      case 22: // "iterate"
+      case 23: // "do"
+      case 24: // "if"
+      case 25: // "then"
+      case 26: // "else"
+      case 27: // "case"
+      case 28: // "of"
+      case 29: // "default"
+      case 30: // "holds"
+      case 31: // "exists"
+      case 32: // "with"
+      case 33: // "as"
+      case 34: // "while"
+      case 35: // "undef"
+      case 36: // "false"
+      case 37: // "true"
+      case 38: // "and"
+      case 39: // "or"
+      case 40: // "xor"
+      case 41: // "implies"
+      case 42: // "not"
+      case 43: // "+"
+      case 44: // "-"
+      case 45: // "="
+      case 46: // "("
+      case 47: // ")"
+      case 48: // "["
+      case 49: // "]"
+      case 50: // "{"
+      case 51: // "}"
+      case 52: // ":"
+      case 53: // "::"
+      case 54: // "_"
+      case 55: // "|"
+      case 56: // "@"
+      case 57: // ","
+      case 58: // "<"
+      case 59: // ">"
+      case 60: // "*"
+      case 61: // "/"
+      case 62: // "%"
+      case 63: // "^"
+      case 64: // "'"
+      case 65: // ".."
+      case 66: // "."
+      case 67: // "->"
+      case 68: // "=>"
+      case 69: // ":="
+      case 70: // "!="
+      case 71: // "<="
+      case 72: // ">="
+      case 73: // "{|"
+      case 74: // "|}"
+        value.copy< Ast::Token::Ptr > (other.value);
+        break;
+
+      case 175: // Attribute
         value.copy< Attribute::Ptr > (other.value);
         break;
 
-      case 178: // Attributes
+      case 174: // Attributes
         value.copy< Attributes::Ptr > (other.value);
         break;
 
-      case 180: // BasicAttribute
+      case 176: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (other.value);
         break;
 
@@ -1568,7 +1732,7 @@ namespace libcasm_fe {
         value.copy< CardinalityExpression::Ptr > (other.value);
         break;
 
-      case 107: // CaseLabel
+      case 108: // CaseLabel
         value.copy< Case::Ptr > (other.value);
         break;
 
@@ -1576,7 +1740,7 @@ namespace libcasm_fe {
         value.copy< CaseRule::Ptr > (other.value);
         break;
 
-      case 108: // CaseLabels
+      case 107: // CaseLabels
         value.copy< Cases::Ptr > (other.value);
         break;
 
@@ -1586,12 +1750,6 @@ namespace libcasm_fe {
 
       case 111: // ChooseRule
         value.copy< ChooseRule::Ptr > (other.value);
-        break;
-
-      case 152: // ComposedType
-      case 153: // TupleType
-      case 154: // RecordType
-        value.copy< ComposedType::Ptr > (other.value);
         break;
 
       case 129: // ConditionalExpression
@@ -1611,7 +1769,7 @@ namespace libcasm_fe {
         value.copy< Definitions::Ptr > (other.value);
         break;
 
-      case 94: // DerivedDefinition
+      case 95: // DerivedDefinition
         value.copy< DerivedDefinition::Ptr > (other.value);
         break;
 
@@ -1619,7 +1777,7 @@ namespace libcasm_fe {
         value.copy< DirectCallExpression::Ptr > (other.value);
         break;
 
-      case 93: // EnumerationDefinition
+      case 94: // EnumerationDefinition
         value.copy< EnumerationDefinition::Ptr > (other.value);
         break;
 
@@ -1638,20 +1796,19 @@ namespace libcasm_fe {
       case 119: // Term
       case 120: // SimpleOrClaspedTerm
       case 121: // OperatorExpression
-      case 163: // MaybeDefined
+      case 160: // MaybeDefined
         value.copy< Expression::Ptr > (other.value);
         break;
 
-      case 181: // ExpressionAttribute
+      case 177: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (other.value);
         break;
 
       case 118: // Terms
-      case 158: // Arguments
         value.copy< Expressions::Ptr > (other.value);
         break;
 
-      case 157: // FixedSizedType
+      case 156: // FixedSizedType
         value.copy< FixedSizedType::Ptr > (other.value);
         break;
 
@@ -1659,8 +1816,7 @@ namespace libcasm_fe {
         value.copy< ForallRule::Ptr > (other.value);
         break;
 
-      case 96: // FunctionDefinition
-      case 97: // ProgramFunctionDefinition
+      case 97: // FunctionDefinition
         value.copy< FunctionDefinition::Ptr > (other.value);
         break;
 
@@ -1668,16 +1824,32 @@ namespace libcasm_fe {
         value.copy< HeaderDefinition::Ptr > (other.value);
         break;
 
-      case 168: // Identifier
+      case 164: // Identifier
         value.copy< Identifier::Ptr > (other.value);
         break;
 
-      case 169: // IdentifierPath
+      case 165: // IdentifierPath
         value.copy< IdentifierPath::Ptr > (other.value);
         break;
 
       case 126: // IndirectCallExpression
         value.copy< IndirectCallExpression::Ptr > (other.value);
+        break;
+
+      case 93: // InitDefinition
+        value.copy< InitDefinition::Ptr > (other.value);
+        break;
+
+      case 163: // Initializer
+        value.copy< InitializerDefinition::Ptr > (other.value);
+        break;
+
+      case 162: // Initializers
+        value.copy< InitializerDefinitions::Ptr > (other.value);
+        break;
+
+      case 161: // MaybeInitially
+        value.copy< InitiallyDefinition::Ptr > (other.value);
         break;
 
       case 101: // InvariantDefinition
@@ -1728,23 +1900,27 @@ namespace libcasm_fe {
         value.copy< RecordLiteral::Ptr > (other.value);
         break;
 
+      case 153: // RecordType
+        value.copy< RecordType::Ptr > (other.value);
+        break;
+
       case 142: // ReferenceLiteral
         value.copy< ReferenceLiteral::Ptr > (other.value);
         break;
 
-      case 156: // RelationType
+      case 155: // RelationType
         value.copy< RelationType::Ptr > (other.value);
         break;
 
-      case 102: // Rule
+      case 103: // Rule
         value.copy< Rule::Ptr > (other.value);
         break;
 
-      case 95: // RuleDefinition
+      case 96: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (other.value);
         break;
 
-      case 103: // Rules
+      case 102: // Rules
         value.copy< Rules::Ptr > (other.value);
         break;
 
@@ -1760,7 +1936,7 @@ namespace libcasm_fe {
         value.copy< Specification::Ptr > (other.value);
         break;
 
-      case 155: // TemplateType
+      case 154: // TemplateType
         value.copy< TemplateType::Ptr > (other.value);
         break;
 
@@ -1768,13 +1944,17 @@ namespace libcasm_fe {
         value.copy< TupleLiteral::Ptr > (other.value);
         break;
 
+      case 152: // TupleType
+        value.copy< TupleType::Ptr > (other.value);
+        break;
+
       case 127: // TypeCastingExpression
         value.copy< TypeCastingExpression::Ptr > (other.value);
         break;
 
       case 149: // Types
-      case 159: // FunctionParameters
-      case 160: // MaybeFunctionParameters
+      case 157: // FunctionParameters
+      case 158: // MaybeFunctionParameters
         value.copy< Types::Ptr > (other.value);
         break;
 
@@ -1787,14 +1967,7 @@ namespace libcasm_fe {
         break;
 
       case 115: // UpdateRule
-      case 166: // Initializer
         value.copy< UpdateRule::Ptr > (other.value);
-        break;
-
-      case 164: // MaybeInitially
-      case 165: // Initializers
-      case 167: // MaybeInitializers
-        value.copy< UpdateRules::Ptr > (other.value);
         break;
 
       case 100: // UsingDefinition
@@ -1810,25 +1983,24 @@ namespace libcasm_fe {
         value.copy< ValueLiteral::Ptr > (other.value);
         break;
 
-      case 176: // VariableBinding
+      case 173: // VariableBinding
         value.copy< VariableBinding::Ptr > (other.value);
         break;
 
-      case 177: // VariableBindings
+      case 172: // VariableBindings
         value.copy< VariableBindings::Ptr > (other.value);
         break;
 
-      case 170: // Variable
-      case 173: // TypedVariable
-      case 174: // AttributedVariable
-      case 175: // TypedAttributedVariable
+      case 166: // Variable
+      case 169: // TypedVariable
+      case 170: // AttributedVariable
+      case 171: // TypedAttributedVariable
         value.copy< VariableDefinition::Ptr > (other.value);
         break;
 
-      case 161: // Parameters
-      case 162: // MaybeParameters
-      case 171: // AttributedVariables
-      case 172: // TypedVariables
+      case 159: // Parameters
+      case 167: // AttributedVariables
+      case 168: // TypedVariables
         value.copy< VariableDefinitions::Ptr > (other.value);
         break;
 
@@ -1865,15 +2037,90 @@ namespace libcasm_fe {
     (void) v;
     switch (this->type_get ())
     {
-      case 179: // Attribute
+      case 3: // "CASM"
+      case 4: // "init"
+      case 5: // "derived"
+      case 6: // "enumeration"
+      case 7: // "rule"
+      case 8: // "using"
+      case 9: // "invariant"
+      case 10: // "function"
+      case 11: // "initially"
+      case 12: // "defined"
+      case 13: // "seq"
+      case 14: // "endseq"
+      case 15: // "par"
+      case 16: // "endpar"
+      case 17: // "skip"
+      case 18: // "let"
+      case 19: // "in"
+      case 20: // "forall"
+      case 21: // "choose"
+      case 22: // "iterate"
+      case 23: // "do"
+      case 24: // "if"
+      case 25: // "then"
+      case 26: // "else"
+      case 27: // "case"
+      case 28: // "of"
+      case 29: // "default"
+      case 30: // "holds"
+      case 31: // "exists"
+      case 32: // "with"
+      case 33: // "as"
+      case 34: // "while"
+      case 35: // "undef"
+      case 36: // "false"
+      case 37: // "true"
+      case 38: // "and"
+      case 39: // "or"
+      case 40: // "xor"
+      case 41: // "implies"
+      case 42: // "not"
+      case 43: // "+"
+      case 44: // "-"
+      case 45: // "="
+      case 46: // "("
+      case 47: // ")"
+      case 48: // "["
+      case 49: // "]"
+      case 50: // "{"
+      case 51: // "}"
+      case 52: // ":"
+      case 53: // "::"
+      case 54: // "_"
+      case 55: // "|"
+      case 56: // "@"
+      case 57: // ","
+      case 58: // "<"
+      case 59: // ">"
+      case 60: // "*"
+      case 61: // "/"
+      case 62: // "%"
+      case 63: // "^"
+      case 64: // "'"
+      case 65: // ".."
+      case 66: // "."
+      case 67: // "->"
+      case 68: // "=>"
+      case 69: // ":="
+      case 70: // "!="
+      case 71: // "<="
+      case 72: // ">="
+      case 73: // "{|"
+      case 74: // "|}"
+        value.copy< Ast::Token::Ptr > (v);
+        break;
+
+      case 175: // Attribute
         value.copy< Attribute::Ptr > (v);
         break;
 
-      case 178: // Attributes
+      case 174: // Attributes
         value.copy< Attributes::Ptr > (v);
         break;
 
-      case 180: // BasicAttribute
+      case 176: // BasicAttribute
         value.copy< BasicAttribute::Ptr > (v);
         break;
 
@@ -1897,7 +2144,7 @@ namespace libcasm_fe {
         value.copy< CardinalityExpression::Ptr > (v);
         break;
 
-      case 107: // CaseLabel
+      case 108: // CaseLabel
         value.copy< Case::Ptr > (v);
         break;
 
@@ -1905,7 +2152,7 @@ namespace libcasm_fe {
         value.copy< CaseRule::Ptr > (v);
         break;
 
-      case 108: // CaseLabels
+      case 107: // CaseLabels
         value.copy< Cases::Ptr > (v);
         break;
 
@@ -1915,12 +2162,6 @@ namespace libcasm_fe {
 
       case 111: // ChooseRule
         value.copy< ChooseRule::Ptr > (v);
-        break;
-
-      case 152: // ComposedType
-      case 153: // TupleType
-      case 154: // RecordType
-        value.copy< ComposedType::Ptr > (v);
         break;
 
       case 129: // ConditionalExpression
@@ -1940,7 +2181,7 @@ namespace libcasm_fe {
         value.copy< Definitions::Ptr > (v);
         break;
 
-      case 94: // DerivedDefinition
+      case 95: // DerivedDefinition
         value.copy< DerivedDefinition::Ptr > (v);
         break;
 
@@ -1948,7 +2189,7 @@ namespace libcasm_fe {
         value.copy< DirectCallExpression::Ptr > (v);
         break;
 
-      case 93: // EnumerationDefinition
+      case 94: // EnumerationDefinition
         value.copy< EnumerationDefinition::Ptr > (v);
         break;
 
@@ -1967,20 +2208,19 @@ namespace libcasm_fe {
       case 119: // Term
       case 120: // SimpleOrClaspedTerm
       case 121: // OperatorExpression
-      case 163: // MaybeDefined
+      case 160: // MaybeDefined
         value.copy< Expression::Ptr > (v);
         break;
 
-      case 181: // ExpressionAttribute
+      case 177: // ExpressionAttribute
         value.copy< ExpressionAttribute::Ptr > (v);
         break;
 
       case 118: // Terms
-      case 158: // Arguments
         value.copy< Expressions::Ptr > (v);
         break;
 
-      case 157: // FixedSizedType
+      case 156: // FixedSizedType
         value.copy< FixedSizedType::Ptr > (v);
         break;
 
@@ -1988,8 +2228,7 @@ namespace libcasm_fe {
         value.copy< ForallRule::Ptr > (v);
         break;
 
-      case 96: // FunctionDefinition
-      case 97: // ProgramFunctionDefinition
+      case 97: // FunctionDefinition
         value.copy< FunctionDefinition::Ptr > (v);
         break;
 
@@ -1997,16 +2236,32 @@ namespace libcasm_fe {
         value.copy< HeaderDefinition::Ptr > (v);
         break;
 
-      case 168: // Identifier
+      case 164: // Identifier
         value.copy< Identifier::Ptr > (v);
         break;
 
-      case 169: // IdentifierPath
+      case 165: // IdentifierPath
         value.copy< IdentifierPath::Ptr > (v);
         break;
 
       case 126: // IndirectCallExpression
         value.copy< IndirectCallExpression::Ptr > (v);
+        break;
+
+      case 93: // InitDefinition
+        value.copy< InitDefinition::Ptr > (v);
+        break;
+
+      case 163: // Initializer
+        value.copy< InitializerDefinition::Ptr > (v);
+        break;
+
+      case 162: // Initializers
+        value.copy< InitializerDefinitions::Ptr > (v);
+        break;
+
+      case 161: // MaybeInitially
+        value.copy< InitiallyDefinition::Ptr > (v);
         break;
 
       case 101: // InvariantDefinition
@@ -2057,23 +2312,27 @@ namespace libcasm_fe {
         value.copy< RecordLiteral::Ptr > (v);
         break;
 
+      case 153: // RecordType
+        value.copy< RecordType::Ptr > (v);
+        break;
+
       case 142: // ReferenceLiteral
         value.copy< ReferenceLiteral::Ptr > (v);
         break;
 
-      case 156: // RelationType
+      case 155: // RelationType
         value.copy< RelationType::Ptr > (v);
         break;
 
-      case 102: // Rule
+      case 103: // Rule
         value.copy< Rule::Ptr > (v);
         break;
 
-      case 95: // RuleDefinition
+      case 96: // RuleDefinition
         value.copy< RuleDefinition::Ptr > (v);
         break;
 
-      case 103: // Rules
+      case 102: // Rules
         value.copy< Rules::Ptr > (v);
         break;
 
@@ -2089,7 +2348,7 @@ namespace libcasm_fe {
         value.copy< Specification::Ptr > (v);
         break;
 
-      case 155: // TemplateType
+      case 154: // TemplateType
         value.copy< TemplateType::Ptr > (v);
         break;
 
@@ -2097,13 +2356,17 @@ namespace libcasm_fe {
         value.copy< TupleLiteral::Ptr > (v);
         break;
 
+      case 152: // TupleType
+        value.copy< TupleType::Ptr > (v);
+        break;
+
       case 127: // TypeCastingExpression
         value.copy< TypeCastingExpression::Ptr > (v);
         break;
 
       case 149: // Types
-      case 159: // FunctionParameters
-      case 160: // MaybeFunctionParameters
+      case 157: // FunctionParameters
+      case 158: // MaybeFunctionParameters
         value.copy< Types::Ptr > (v);
         break;
 
@@ -2116,14 +2379,7 @@ namespace libcasm_fe {
         break;
 
       case 115: // UpdateRule
-      case 166: // Initializer
         value.copy< UpdateRule::Ptr > (v);
-        break;
-
-      case 164: // MaybeInitially
-      case 165: // Initializers
-      case 167: // MaybeInitializers
-        value.copy< UpdateRules::Ptr > (v);
         break;
 
       case 100: // UsingDefinition
@@ -2139,25 +2395,24 @@ namespace libcasm_fe {
         value.copy< ValueLiteral::Ptr > (v);
         break;
 
-      case 176: // VariableBinding
+      case 173: // VariableBinding
         value.copy< VariableBinding::Ptr > (v);
         break;
 
-      case 177: // VariableBindings
+      case 172: // VariableBindings
         value.copy< VariableBindings::Ptr > (v);
         break;
 
-      case 170: // Variable
-      case 173: // TypedVariable
-      case 174: // AttributedVariable
-      case 175: // TypedAttributedVariable
+      case 166: // Variable
+      case 169: // TypedVariable
+      case 170: // AttributedVariable
+      case 171: // TypedAttributedVariable
         value.copy< VariableDefinition::Ptr > (v);
         break;
 
-      case 161: // Parameters
-      case 162: // MaybeParameters
-      case 171: // AttributedVariables
-      case 172: // TypedVariables
+      case 159: // Parameters
+      case 167: // AttributedVariables
+      case 168: // TypedVariables
         value.copy< VariableDefinitions::Ptr > (v);
         break;
 
@@ -2191,6 +2446,13 @@ namespace libcasm_fe {
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const location_type& l)
     : Base (t)
     , value ()
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Ast::Token::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
     , location (l)
   {}
 
@@ -2280,13 +2542,6 @@ namespace libcasm_fe {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ComposedType::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2433,6 +2688,34 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitDefinition::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitializerDefinition::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitializerDefinitions::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitiallyDefinition::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InvariantDefinition::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -2517,6 +2800,13 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RecordType::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ReferenceLiteral::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -2587,6 +2877,13 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TupleType::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TypeCastingExpression::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -2616,13 +2913,6 @@ namespace libcasm_fe {
 
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UpdateRules::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -2715,15 +3005,90 @@ namespace libcasm_fe {
     // Type destructor.
   switch (yytype)
     {
-      case 179: // Attribute
+      case 3: // "CASM"
+      case 4: // "init"
+      case 5: // "derived"
+      case 6: // "enumeration"
+      case 7: // "rule"
+      case 8: // "using"
+      case 9: // "invariant"
+      case 10: // "function"
+      case 11: // "initially"
+      case 12: // "defined"
+      case 13: // "seq"
+      case 14: // "endseq"
+      case 15: // "par"
+      case 16: // "endpar"
+      case 17: // "skip"
+      case 18: // "let"
+      case 19: // "in"
+      case 20: // "forall"
+      case 21: // "choose"
+      case 22: // "iterate"
+      case 23: // "do"
+      case 24: // "if"
+      case 25: // "then"
+      case 26: // "else"
+      case 27: // "case"
+      case 28: // "of"
+      case 29: // "default"
+      case 30: // "holds"
+      case 31: // "exists"
+      case 32: // "with"
+      case 33: // "as"
+      case 34: // "while"
+      case 35: // "undef"
+      case 36: // "false"
+      case 37: // "true"
+      case 38: // "and"
+      case 39: // "or"
+      case 40: // "xor"
+      case 41: // "implies"
+      case 42: // "not"
+      case 43: // "+"
+      case 44: // "-"
+      case 45: // "="
+      case 46: // "("
+      case 47: // ")"
+      case 48: // "["
+      case 49: // "]"
+      case 50: // "{"
+      case 51: // "}"
+      case 52: // ":"
+      case 53: // "::"
+      case 54: // "_"
+      case 55: // "|"
+      case 56: // "@"
+      case 57: // ","
+      case 58: // "<"
+      case 59: // ">"
+      case 60: // "*"
+      case 61: // "/"
+      case 62: // "%"
+      case 63: // "^"
+      case 64: // "'"
+      case 65: // ".."
+      case 66: // "."
+      case 67: // "->"
+      case 68: // "=>"
+      case 69: // ":="
+      case 70: // "!="
+      case 71: // "<="
+      case 72: // ">="
+      case 73: // "{|"
+      case 74: // "|}"
+        value.template destroy< Ast::Token::Ptr > ();
+        break;
+
+      case 175: // Attribute
         value.template destroy< Attribute::Ptr > ();
         break;
 
-      case 178: // Attributes
+      case 174: // Attributes
         value.template destroy< Attributes::Ptr > ();
         break;
 
-      case 180: // BasicAttribute
+      case 176: // BasicAttribute
         value.template destroy< BasicAttribute::Ptr > ();
         break;
 
@@ -2747,7 +3112,7 @@ namespace libcasm_fe {
         value.template destroy< CardinalityExpression::Ptr > ();
         break;
 
-      case 107: // CaseLabel
+      case 108: // CaseLabel
         value.template destroy< Case::Ptr > ();
         break;
 
@@ -2755,7 +3120,7 @@ namespace libcasm_fe {
         value.template destroy< CaseRule::Ptr > ();
         break;
 
-      case 108: // CaseLabels
+      case 107: // CaseLabels
         value.template destroy< Cases::Ptr > ();
         break;
 
@@ -2765,12 +3130,6 @@ namespace libcasm_fe {
 
       case 111: // ChooseRule
         value.template destroy< ChooseRule::Ptr > ();
-        break;
-
-      case 152: // ComposedType
-      case 153: // TupleType
-      case 154: // RecordType
-        value.template destroy< ComposedType::Ptr > ();
         break;
 
       case 129: // ConditionalExpression
@@ -2790,7 +3149,7 @@ namespace libcasm_fe {
         value.template destroy< Definitions::Ptr > ();
         break;
 
-      case 94: // DerivedDefinition
+      case 95: // DerivedDefinition
         value.template destroy< DerivedDefinition::Ptr > ();
         break;
 
@@ -2798,7 +3157,7 @@ namespace libcasm_fe {
         value.template destroy< DirectCallExpression::Ptr > ();
         break;
 
-      case 93: // EnumerationDefinition
+      case 94: // EnumerationDefinition
         value.template destroy< EnumerationDefinition::Ptr > ();
         break;
 
@@ -2817,20 +3176,19 @@ namespace libcasm_fe {
       case 119: // Term
       case 120: // SimpleOrClaspedTerm
       case 121: // OperatorExpression
-      case 163: // MaybeDefined
+      case 160: // MaybeDefined
         value.template destroy< Expression::Ptr > ();
         break;
 
-      case 181: // ExpressionAttribute
+      case 177: // ExpressionAttribute
         value.template destroy< ExpressionAttribute::Ptr > ();
         break;
 
       case 118: // Terms
-      case 158: // Arguments
         value.template destroy< Expressions::Ptr > ();
         break;
 
-      case 157: // FixedSizedType
+      case 156: // FixedSizedType
         value.template destroy< FixedSizedType::Ptr > ();
         break;
 
@@ -2838,8 +3196,7 @@ namespace libcasm_fe {
         value.template destroy< ForallRule::Ptr > ();
         break;
 
-      case 96: // FunctionDefinition
-      case 97: // ProgramFunctionDefinition
+      case 97: // FunctionDefinition
         value.template destroy< FunctionDefinition::Ptr > ();
         break;
 
@@ -2847,16 +3204,32 @@ namespace libcasm_fe {
         value.template destroy< HeaderDefinition::Ptr > ();
         break;
 
-      case 168: // Identifier
+      case 164: // Identifier
         value.template destroy< Identifier::Ptr > ();
         break;
 
-      case 169: // IdentifierPath
+      case 165: // IdentifierPath
         value.template destroy< IdentifierPath::Ptr > ();
         break;
 
       case 126: // IndirectCallExpression
         value.template destroy< IndirectCallExpression::Ptr > ();
+        break;
+
+      case 93: // InitDefinition
+        value.template destroy< InitDefinition::Ptr > ();
+        break;
+
+      case 163: // Initializer
+        value.template destroy< InitializerDefinition::Ptr > ();
+        break;
+
+      case 162: // Initializers
+        value.template destroy< InitializerDefinitions::Ptr > ();
+        break;
+
+      case 161: // MaybeInitially
+        value.template destroy< InitiallyDefinition::Ptr > ();
         break;
 
       case 101: // InvariantDefinition
@@ -2907,23 +3280,27 @@ namespace libcasm_fe {
         value.template destroy< RecordLiteral::Ptr > ();
         break;
 
+      case 153: // RecordType
+        value.template destroy< RecordType::Ptr > ();
+        break;
+
       case 142: // ReferenceLiteral
         value.template destroy< ReferenceLiteral::Ptr > ();
         break;
 
-      case 156: // RelationType
+      case 155: // RelationType
         value.template destroy< RelationType::Ptr > ();
         break;
 
-      case 102: // Rule
+      case 103: // Rule
         value.template destroy< Rule::Ptr > ();
         break;
 
-      case 95: // RuleDefinition
+      case 96: // RuleDefinition
         value.template destroy< RuleDefinition::Ptr > ();
         break;
 
-      case 103: // Rules
+      case 102: // Rules
         value.template destroy< Rules::Ptr > ();
         break;
 
@@ -2939,7 +3316,7 @@ namespace libcasm_fe {
         value.template destroy< Specification::Ptr > ();
         break;
 
-      case 155: // TemplateType
+      case 154: // TemplateType
         value.template destroy< TemplateType::Ptr > ();
         break;
 
@@ -2947,13 +3324,17 @@ namespace libcasm_fe {
         value.template destroy< TupleLiteral::Ptr > ();
         break;
 
+      case 152: // TupleType
+        value.template destroy< TupleType::Ptr > ();
+        break;
+
       case 127: // TypeCastingExpression
         value.template destroy< TypeCastingExpression::Ptr > ();
         break;
 
       case 149: // Types
-      case 159: // FunctionParameters
-      case 160: // MaybeFunctionParameters
+      case 157: // FunctionParameters
+      case 158: // MaybeFunctionParameters
         value.template destroy< Types::Ptr > ();
         break;
 
@@ -2966,14 +3347,7 @@ namespace libcasm_fe {
         break;
 
       case 115: // UpdateRule
-      case 166: // Initializer
         value.template destroy< UpdateRule::Ptr > ();
-        break;
-
-      case 164: // MaybeInitially
-      case 165: // Initializers
-      case 167: // MaybeInitializers
-        value.template destroy< UpdateRules::Ptr > ();
         break;
 
       case 100: // UsingDefinition
@@ -2989,25 +3363,24 @@ namespace libcasm_fe {
         value.template destroy< ValueLiteral::Ptr > ();
         break;
 
-      case 176: // VariableBinding
+      case 173: // VariableBinding
         value.template destroy< VariableBinding::Ptr > ();
         break;
 
-      case 177: // VariableBindings
+      case 172: // VariableBindings
         value.template destroy< VariableBindings::Ptr > ();
         break;
 
-      case 170: // Variable
-      case 173: // TypedVariable
-      case 174: // AttributedVariable
-      case 175: // TypedAttributedVariable
+      case 166: // Variable
+      case 169: // TypedVariable
+      case 170: // AttributedVariable
+      case 171: // TypedAttributedVariable
         value.template destroy< VariableDefinition::Ptr > ();
         break;
 
-      case 161: // Parameters
-      case 162: // MaybeParameters
-      case 171: // AttributedVariables
-      case 172: // TypedVariables
+      case 159: // Parameters
+      case 167: // AttributedVariables
+      case 168: // TypedVariables
         value.template destroy< VariableDefinitions::Ptr > ();
         break;
 
@@ -3050,15 +3423,90 @@ namespace libcasm_fe {
     super_type::move (s);
     switch (this->type_get ())
     {
-      case 179: // Attribute
+      case 3: // "CASM"
+      case 4: // "init"
+      case 5: // "derived"
+      case 6: // "enumeration"
+      case 7: // "rule"
+      case 8: // "using"
+      case 9: // "invariant"
+      case 10: // "function"
+      case 11: // "initially"
+      case 12: // "defined"
+      case 13: // "seq"
+      case 14: // "endseq"
+      case 15: // "par"
+      case 16: // "endpar"
+      case 17: // "skip"
+      case 18: // "let"
+      case 19: // "in"
+      case 20: // "forall"
+      case 21: // "choose"
+      case 22: // "iterate"
+      case 23: // "do"
+      case 24: // "if"
+      case 25: // "then"
+      case 26: // "else"
+      case 27: // "case"
+      case 28: // "of"
+      case 29: // "default"
+      case 30: // "holds"
+      case 31: // "exists"
+      case 32: // "with"
+      case 33: // "as"
+      case 34: // "while"
+      case 35: // "undef"
+      case 36: // "false"
+      case 37: // "true"
+      case 38: // "and"
+      case 39: // "or"
+      case 40: // "xor"
+      case 41: // "implies"
+      case 42: // "not"
+      case 43: // "+"
+      case 44: // "-"
+      case 45: // "="
+      case 46: // "("
+      case 47: // ")"
+      case 48: // "["
+      case 49: // "]"
+      case 50: // "{"
+      case 51: // "}"
+      case 52: // ":"
+      case 53: // "::"
+      case 54: // "_"
+      case 55: // "|"
+      case 56: // "@"
+      case 57: // ","
+      case 58: // "<"
+      case 59: // ">"
+      case 60: // "*"
+      case 61: // "/"
+      case 62: // "%"
+      case 63: // "^"
+      case 64: // "'"
+      case 65: // ".."
+      case 66: // "."
+      case 67: // "->"
+      case 68: // "=>"
+      case 69: // ":="
+      case 70: // "!="
+      case 71: // "<="
+      case 72: // ">="
+      case 73: // "{|"
+      case 74: // "|}"
+        value.move< Ast::Token::Ptr > (s.value);
+        break;
+
+      case 175: // Attribute
         value.move< Attribute::Ptr > (s.value);
         break;
 
-      case 178: // Attributes
+      case 174: // Attributes
         value.move< Attributes::Ptr > (s.value);
         break;
 
-      case 180: // BasicAttribute
+      case 176: // BasicAttribute
         value.move< BasicAttribute::Ptr > (s.value);
         break;
 
@@ -3082,7 +3530,7 @@ namespace libcasm_fe {
         value.move< CardinalityExpression::Ptr > (s.value);
         break;
 
-      case 107: // CaseLabel
+      case 108: // CaseLabel
         value.move< Case::Ptr > (s.value);
         break;
 
@@ -3090,7 +3538,7 @@ namespace libcasm_fe {
         value.move< CaseRule::Ptr > (s.value);
         break;
 
-      case 108: // CaseLabels
+      case 107: // CaseLabels
         value.move< Cases::Ptr > (s.value);
         break;
 
@@ -3100,12 +3548,6 @@ namespace libcasm_fe {
 
       case 111: // ChooseRule
         value.move< ChooseRule::Ptr > (s.value);
-        break;
-
-      case 152: // ComposedType
-      case 153: // TupleType
-      case 154: // RecordType
-        value.move< ComposedType::Ptr > (s.value);
         break;
 
       case 129: // ConditionalExpression
@@ -3125,7 +3567,7 @@ namespace libcasm_fe {
         value.move< Definitions::Ptr > (s.value);
         break;
 
-      case 94: // DerivedDefinition
+      case 95: // DerivedDefinition
         value.move< DerivedDefinition::Ptr > (s.value);
         break;
 
@@ -3133,7 +3575,7 @@ namespace libcasm_fe {
         value.move< DirectCallExpression::Ptr > (s.value);
         break;
 
-      case 93: // EnumerationDefinition
+      case 94: // EnumerationDefinition
         value.move< EnumerationDefinition::Ptr > (s.value);
         break;
 
@@ -3152,20 +3594,19 @@ namespace libcasm_fe {
       case 119: // Term
       case 120: // SimpleOrClaspedTerm
       case 121: // OperatorExpression
-      case 163: // MaybeDefined
+      case 160: // MaybeDefined
         value.move< Expression::Ptr > (s.value);
         break;
 
-      case 181: // ExpressionAttribute
+      case 177: // ExpressionAttribute
         value.move< ExpressionAttribute::Ptr > (s.value);
         break;
 
       case 118: // Terms
-      case 158: // Arguments
         value.move< Expressions::Ptr > (s.value);
         break;
 
-      case 157: // FixedSizedType
+      case 156: // FixedSizedType
         value.move< FixedSizedType::Ptr > (s.value);
         break;
 
@@ -3173,8 +3614,7 @@ namespace libcasm_fe {
         value.move< ForallRule::Ptr > (s.value);
         break;
 
-      case 96: // FunctionDefinition
-      case 97: // ProgramFunctionDefinition
+      case 97: // FunctionDefinition
         value.move< FunctionDefinition::Ptr > (s.value);
         break;
 
@@ -3182,16 +3622,32 @@ namespace libcasm_fe {
         value.move< HeaderDefinition::Ptr > (s.value);
         break;
 
-      case 168: // Identifier
+      case 164: // Identifier
         value.move< Identifier::Ptr > (s.value);
         break;
 
-      case 169: // IdentifierPath
+      case 165: // IdentifierPath
         value.move< IdentifierPath::Ptr > (s.value);
         break;
 
       case 126: // IndirectCallExpression
         value.move< IndirectCallExpression::Ptr > (s.value);
+        break;
+
+      case 93: // InitDefinition
+        value.move< InitDefinition::Ptr > (s.value);
+        break;
+
+      case 163: // Initializer
+        value.move< InitializerDefinition::Ptr > (s.value);
+        break;
+
+      case 162: // Initializers
+        value.move< InitializerDefinitions::Ptr > (s.value);
+        break;
+
+      case 161: // MaybeInitially
+        value.move< InitiallyDefinition::Ptr > (s.value);
         break;
 
       case 101: // InvariantDefinition
@@ -3242,23 +3698,27 @@ namespace libcasm_fe {
         value.move< RecordLiteral::Ptr > (s.value);
         break;
 
+      case 153: // RecordType
+        value.move< RecordType::Ptr > (s.value);
+        break;
+
       case 142: // ReferenceLiteral
         value.move< ReferenceLiteral::Ptr > (s.value);
         break;
 
-      case 156: // RelationType
+      case 155: // RelationType
         value.move< RelationType::Ptr > (s.value);
         break;
 
-      case 102: // Rule
+      case 103: // Rule
         value.move< Rule::Ptr > (s.value);
         break;
 
-      case 95: // RuleDefinition
+      case 96: // RuleDefinition
         value.move< RuleDefinition::Ptr > (s.value);
         break;
 
-      case 103: // Rules
+      case 102: // Rules
         value.move< Rules::Ptr > (s.value);
         break;
 
@@ -3274,7 +3734,7 @@ namespace libcasm_fe {
         value.move< Specification::Ptr > (s.value);
         break;
 
-      case 155: // TemplateType
+      case 154: // TemplateType
         value.move< TemplateType::Ptr > (s.value);
         break;
 
@@ -3282,13 +3742,17 @@ namespace libcasm_fe {
         value.move< TupleLiteral::Ptr > (s.value);
         break;
 
+      case 152: // TupleType
+        value.move< TupleType::Ptr > (s.value);
+        break;
+
       case 127: // TypeCastingExpression
         value.move< TypeCastingExpression::Ptr > (s.value);
         break;
 
       case 149: // Types
-      case 159: // FunctionParameters
-      case 160: // MaybeFunctionParameters
+      case 157: // FunctionParameters
+      case 158: // MaybeFunctionParameters
         value.move< Types::Ptr > (s.value);
         break;
 
@@ -3301,14 +3765,7 @@ namespace libcasm_fe {
         break;
 
       case 115: // UpdateRule
-      case 166: // Initializer
         value.move< UpdateRule::Ptr > (s.value);
-        break;
-
-      case 164: // MaybeInitially
-      case 165: // Initializers
-      case 167: // MaybeInitializers
-        value.move< UpdateRules::Ptr > (s.value);
         break;
 
       case 100: // UsingDefinition
@@ -3324,25 +3781,24 @@ namespace libcasm_fe {
         value.move< ValueLiteral::Ptr > (s.value);
         break;
 
-      case 176: // VariableBinding
+      case 173: // VariableBinding
         value.move< VariableBinding::Ptr > (s.value);
         break;
 
-      case 177: // VariableBindings
+      case 172: // VariableBindings
         value.move< VariableBindings::Ptr > (s.value);
         break;
 
-      case 170: // Variable
-      case 173: // TypedVariable
-      case 174: // AttributedVariable
-      case 175: // TypedAttributedVariable
+      case 166: // Variable
+      case 169: // TypedVariable
+      case 170: // AttributedVariable
+      case 171: // TypedAttributedVariable
         value.move< VariableDefinition::Ptr > (s.value);
         break;
 
-      case 161: // Parameters
-      case 162: // MaybeParameters
-      case 171: // AttributedVariables
-      case 172: // TypedVariables
+      case 159: // Parameters
+      case 167: // AttributedVariables
+      case 168: // TypedVariables
         value.move< VariableDefinitions::Ptr > (s.value);
         break;
 
@@ -3439,435 +3895,435 @@ namespace libcasm_fe {
   }
 
   Parser::symbol_type
-  Parser::make_CASM (const location_type& l)
+  Parser::make_CASM (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::CASM, l);
+    return symbol_type (token::CASM, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_INIT (const location_type& l)
+  Parser::make_INIT (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::INIT, l);
+    return symbol_type (token::INIT, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_DERIVED (const location_type& l)
+  Parser::make_DERIVED (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::DERIVED, l);
+    return symbol_type (token::DERIVED, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_ENUMERATION (const location_type& l)
+  Parser::make_ENUMERATION (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::ENUMERATION, l);
+    return symbol_type (token::ENUMERATION, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_RULE (const location_type& l)
+  Parser::make_RULE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::RULE, l);
+    return symbol_type (token::RULE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_USING (const location_type& l)
+  Parser::make_USING (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::USING, l);
+    return symbol_type (token::USING, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_INVARIANT (const location_type& l)
+  Parser::make_INVARIANT (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::INVARIANT, l);
+    return symbol_type (token::INVARIANT, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_FUNCTION (const location_type& l)
+  Parser::make_FUNCTION (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::FUNCTION, l);
+    return symbol_type (token::FUNCTION, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_INITIALLY (const location_type& l)
+  Parser::make_INITIALLY (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::INITIALLY, l);
+    return symbol_type (token::INITIALLY, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_DEFINED (const location_type& l)
+  Parser::make_DEFINED (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::DEFINED, l);
+    return symbol_type (token::DEFINED, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_SEQ (const location_type& l)
+  Parser::make_SEQ (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::SEQ, l);
+    return symbol_type (token::SEQ, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_ENDSEQ (const location_type& l)
+  Parser::make_ENDSEQ (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::ENDSEQ, l);
+    return symbol_type (token::ENDSEQ, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_PAR (const location_type& l)
+  Parser::make_PAR (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::PAR, l);
+    return symbol_type (token::PAR, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_ENDPAR (const location_type& l)
+  Parser::make_ENDPAR (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::ENDPAR, l);
+    return symbol_type (token::ENDPAR, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_SKIP (const location_type& l)
+  Parser::make_SKIP (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::SKIP, l);
+    return symbol_type (token::SKIP, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_LET (const location_type& l)
+  Parser::make_LET (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::LET, l);
+    return symbol_type (token::LET, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_IN (const location_type& l)
+  Parser::make_IN (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::IN, l);
+    return symbol_type (token::IN, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_FORALL (const location_type& l)
+  Parser::make_FORALL (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::FORALL, l);
+    return symbol_type (token::FORALL, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_CHOOSE (const location_type& l)
+  Parser::make_CHOOSE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::CHOOSE, l);
+    return symbol_type (token::CHOOSE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_ITERATE (const location_type& l)
+  Parser::make_ITERATE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::ITERATE, l);
+    return symbol_type (token::ITERATE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_DO (const location_type& l)
+  Parser::make_DO (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::DO, l);
+    return symbol_type (token::DO, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_IF (const location_type& l)
+  Parser::make_IF (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::IF, l);
+    return symbol_type (token::IF, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_THEN (const location_type& l)
+  Parser::make_THEN (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::THEN, l);
+    return symbol_type (token::THEN, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_ELSE (const location_type& l)
+  Parser::make_ELSE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::ELSE, l);
+    return symbol_type (token::ELSE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_CASE (const location_type& l)
+  Parser::make_CASE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::CASE, l);
+    return symbol_type (token::CASE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_OF (const location_type& l)
+  Parser::make_OF (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::OF, l);
+    return symbol_type (token::OF, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_DEFAULT (const location_type& l)
+  Parser::make_DEFAULT (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::DEFAULT, l);
+    return symbol_type (token::DEFAULT, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_HOLDS (const location_type& l)
+  Parser::make_HOLDS (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::HOLDS, l);
+    return symbol_type (token::HOLDS, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_EXISTS (const location_type& l)
+  Parser::make_EXISTS (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::EXISTS, l);
+    return symbol_type (token::EXISTS, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_WITH (const location_type& l)
+  Parser::make_WITH (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::WITH, l);
+    return symbol_type (token::WITH, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_AS (const location_type& l)
+  Parser::make_AS (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::AS, l);
+    return symbol_type (token::AS, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_WHILE (const location_type& l)
+  Parser::make_WHILE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::WHILE, l);
+    return symbol_type (token::WHILE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_UNDEF (const location_type& l)
+  Parser::make_UNDEF (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::UNDEF, l);
+    return symbol_type (token::UNDEF, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_FALSE (const location_type& l)
+  Parser::make_FALSE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::FALSE, l);
+    return symbol_type (token::FALSE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_TRUE (const location_type& l)
+  Parser::make_TRUE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::TRUE, l);
+    return symbol_type (token::TRUE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_AND (const location_type& l)
+  Parser::make_AND (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::AND, l);
+    return symbol_type (token::AND, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_OR (const location_type& l)
+  Parser::make_OR (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::OR, l);
+    return symbol_type (token::OR, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_XOR (const location_type& l)
+  Parser::make_XOR (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::XOR, l);
+    return symbol_type (token::XOR, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_IMPLIES (const location_type& l)
+  Parser::make_IMPLIES (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::IMPLIES, l);
+    return symbol_type (token::IMPLIES, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_NOT (const location_type& l)
+  Parser::make_NOT (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::NOT, l);
+    return symbol_type (token::NOT, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_PLUS (const location_type& l)
+  Parser::make_PLUS (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::PLUS, l);
+    return symbol_type (token::PLUS, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_MINUS (const location_type& l)
+  Parser::make_MINUS (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::MINUS, l);
+    return symbol_type (token::MINUS, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_EQUAL (const location_type& l)
+  Parser::make_EQUAL (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::EQUAL, l);
+    return symbol_type (token::EQUAL, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_LPAREN (const location_type& l)
+  Parser::make_LPAREN (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::LPAREN, l);
+    return symbol_type (token::LPAREN, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_RPAREN (const location_type& l)
+  Parser::make_RPAREN (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::RPAREN, l);
+    return symbol_type (token::RPAREN, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_LSQPAREN (const location_type& l)
+  Parser::make_LSQPAREN (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::LSQPAREN, l);
+    return symbol_type (token::LSQPAREN, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_RSQPAREN (const location_type& l)
+  Parser::make_RSQPAREN (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::RSQPAREN, l);
+    return symbol_type (token::RSQPAREN, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_LCURPAREN (const location_type& l)
+  Parser::make_LCURPAREN (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::LCURPAREN, l);
+    return symbol_type (token::LCURPAREN, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_RCURPAREN (const location_type& l)
+  Parser::make_RCURPAREN (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::RCURPAREN, l);
+    return symbol_type (token::RCURPAREN, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_COLON (const location_type& l)
+  Parser::make_COLON (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::COLON, l);
+    return symbol_type (token::COLON, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_DOUBLECOLON (const location_type& l)
+  Parser::make_DOUBLECOLON (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::DOUBLECOLON, l);
+    return symbol_type (token::DOUBLECOLON, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_UNDERLINE (const location_type& l)
+  Parser::make_UNDERLINE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::UNDERLINE, l);
+    return symbol_type (token::UNDERLINE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_VERTICAL_BAR (const location_type& l)
+  Parser::make_VERTICAL_BAR (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::VERTICAL_BAR, l);
+    return symbol_type (token::VERTICAL_BAR, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_AT (const location_type& l)
+  Parser::make_AT (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::AT, l);
+    return symbol_type (token::AT, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_COMMA (const location_type& l)
+  Parser::make_COMMA (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::COMMA, l);
+    return symbol_type (token::COMMA, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_LESSER (const location_type& l)
+  Parser::make_LESSER (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::LESSER, l);
+    return symbol_type (token::LESSER, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_GREATER (const location_type& l)
+  Parser::make_GREATER (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::GREATER, l);
+    return symbol_type (token::GREATER, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_ASTERIX (const location_type& l)
+  Parser::make_ASTERIX (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::ASTERIX, l);
+    return symbol_type (token::ASTERIX, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_SLASH (const location_type& l)
+  Parser::make_SLASH (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::SLASH, l);
+    return symbol_type (token::SLASH, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_PERCENT (const location_type& l)
+  Parser::make_PERCENT (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::PERCENT, l);
+    return symbol_type (token::PERCENT, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_CARET (const location_type& l)
+  Parser::make_CARET (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::CARET, l);
+    return symbol_type (token::CARET, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_MARK (const location_type& l)
+  Parser::make_MARK (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::MARK, l);
+    return symbol_type (token::MARK, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_DOTDOT (const location_type& l)
+  Parser::make_DOTDOT (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::DOTDOT, l);
+    return symbol_type (token::DOTDOT, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_DOT (const location_type& l)
+  Parser::make_DOT (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::DOT, l);
+    return symbol_type (token::DOT, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_MAPS (const location_type& l)
+  Parser::make_MAPS (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::MAPS, l);
+    return symbol_type (token::MAPS, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_ARROW (const location_type& l)
+  Parser::make_ARROW (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::ARROW, l);
+    return symbol_type (token::ARROW, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_UPDATE (const location_type& l)
+  Parser::make_UPDATE (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::UPDATE, l);
+    return symbol_type (token::UPDATE, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_NEQUAL (const location_type& l)
+  Parser::make_NEQUAL (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::NEQUAL, l);
+    return symbol_type (token::NEQUAL, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_LESSEQ (const location_type& l)
+  Parser::make_LESSEQ (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::LESSEQ, l);
+    return symbol_type (token::LESSEQ, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_GREATEREQ (const location_type& l)
+  Parser::make_GREATEREQ (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::GREATEREQ, l);
+    return symbol_type (token::GREATEREQ, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_SEQ_BRACKET (const location_type& l)
+  Parser::make_SEQ_BRACKET (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::SEQ_BRACKET, l);
+    return symbol_type (token::SEQ_BRACKET, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_ENDSEQ_BRACKET (const location_type& l)
+  Parser::make_ENDSEQ_BRACKET (const Ast::Token::Ptr& v, const location_type& l)
   {
-    return symbol_type (token::ENDSEQ_BRACKET, l);
+    return symbol_type (token::ENDSEQ_BRACKET, v, l);
   }
 
   Parser::symbol_type
@@ -3945,7 +4401,7 @@ namespace libcasm_fe {
 
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:379
 } // libcasm_fe
-#line 3949 "GrammarParser.tab.h" // lalr1.cc:379
+#line 4405 "GrammarParser.tab.h" // lalr1.cc:379
 
 
 
