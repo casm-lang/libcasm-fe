@@ -425,7 +425,7 @@ namespace libcasm_fe
             const Token::Ptr m_assignmentToken;
         };
 
-        < < < < < < HEAD class InvariantDefinition final : public Definition
+        class InvariantDefinition final : public Definition
         {
           public:
             using Ptr = std::shared_ptr< InvariantDefinition >;
