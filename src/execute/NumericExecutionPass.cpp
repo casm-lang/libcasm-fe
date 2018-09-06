@@ -669,8 +669,11 @@ void ExecutionVisitor::visit( DirectCallExpression& node )
         case DirectCallExpression::TargetType::RULE:
         {
             const auto& definition = node.targetDefinition();
+            const auto evaluateUpdateLocation = m_evaluateUpdateLocation;
+            m_evaluateUpdateLocation = false;
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
+            m_evaluateUpdateLocation = evaluateUpdateLocation;
             definition->accept( *this );
             m_frameStack.pop();
             break;
