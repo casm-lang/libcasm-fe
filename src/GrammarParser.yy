@@ -1557,7 +1557,7 @@ Parameters
 MaybeDefined
 : DEFINED LCURPAREN Term RCURPAREN
   {
-      $$ = Ast::make< EmbracedExpression >( @$, $2, $3, $4 );
+      $$ = Ast::make< EmbracedExpression >( @3, $2, $3, $4 );
       $$->setDelimiterToken( $1 );
   }
 | %empty
