@@ -47,6 +47,8 @@
 
 * libcasm-fe
 
+[[https://gitter.im/casm-lang/libcasm-fe][https://badges.gitter.im/casm-lang/libcasm-fe.png]]
+
 To build `libcasm-fe` you'll need
 
 - make, cmake and a C++ compiler with C++11 support (gcc >= 5, clang >= 3.5)
