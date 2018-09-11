@@ -42,6 +42,9 @@
 # 
 [[https://github.com/casm-lang/casm-lang.logo/raw/master/etc/headline.png]]
 
+#+options: toc:nil
+
+
 * libcasm-fe
 
 To build `libcasm-fe` you'll need
