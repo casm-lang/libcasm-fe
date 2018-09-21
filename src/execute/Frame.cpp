@@ -213,6 +213,13 @@ static std::string generateCalleeTraceLine( Frame* frame, const SourceLocation& 
             }
             break;
         }
+        case Node::ID::INVARIANT_DEFINITION:
+        {
+            const auto invariant = callee->ptr< InvariantDefinition >();
+            type = "Invariant";
+            name = invariant->identifier()->name();
+            break;
+        }
         default:
         {
             type = callee->description();
