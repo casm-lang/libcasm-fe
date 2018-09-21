@@ -70,13 +70,13 @@ grammar: $(GRAMMAR)
 
 
 %/src/various/GrammarLexer.cpp: src/various/GrammarLexer.cpp
-	mkdir -p `dirname $@`
+	mkdir -p "`dirname $@`"
 	cp -f $< $@
 
 src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
-	mkdir -p `dirname obj/$<`
+	mkdir -p "`dirname obj/$<`"
 	head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	cat $(filter %.hpp,$^) | sed "/^\/\//d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$< 
+	cat "$(filter %.hpp,$^)" | sed "/^\/\//d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$<
 	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
 	sed -i "/^{{grammartoken}}/d" obj/$<
 	$(LX) $(LFLAGS) -o $@ obj/$<
@@ -84,20 +84,20 @@ src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
 
 
 %/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp
-	mkdir -p `dirname $@`
+	mkdir -p "`dirname $@`"
 	cp -f $< $@
 
 src/various/GrammarParser.cpp: src/GrammarParser.yy src/GrammarToken.hpp
-	etc/script.sh generate-parser `pwd`/$< `pwd`/obj/$< $(filter %.hpp,$^)
+	etc/script.sh generate-parser "`pwd`/$<" "`pwd`/obj/$< $(filter %.hpp,$^)"
 	cd src/various && $(YC) $(YF) -b src/various/ --output GrammarParser.cpp --defines=GrammarParser.tab.h ../../obj/$<
 
 
 %/src/various/GrammarToken.h: src/various/GrammarToken.h
-	mkdir -p `dirname $@`
-	cp -f $< $@
+	mkdir -p "`dirname $@`"
+	cp -f "$<" "$@"
 
 src/various/GrammarToken.h: src/GrammarToken.hpp
-	etc/script.sh generate-token `pwd`/$< `pwd`/$@
+	etc/script.sh generate-token "`pwd`/$<" "`pwd`/$@"
 
 
 src/various/GrammarParser.output: src/various/GrammarParser.cpp
