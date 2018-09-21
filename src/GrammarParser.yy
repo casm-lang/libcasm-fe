@@ -248,7 +248,7 @@ END       0 "end of file"
 %type <InitiallyDefinition::Ptr> MaybeInitially
 %type <InitializerDefinition::Ptr> Initializer
 %type <InitializerDefinitions::Ptr> Initializers
-%type <Expression::Ptr> MaybeDefined
+%type <Defined::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <VariableDefinitions::Ptr> Parameters AttributedVariables
 %type <VariableBinding::Ptr> VariableBinding
@@ -504,7 +504,7 @@ FunctionDefinition
 : FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
       $$ = Ast::make< FunctionDefinition >( @$, $1, $2, $3, $4, $5, $6 );
-      $$->setDefaultValue( $7 );
+      $$->setDefaultValue( $7->expression() );
 
       // apply the name of the function declaration to the initializer functions
       auto initially = $8;
@@ -1546,12 +1546,11 @@ Parameters
 MaybeDefined
 : DEFINED LCURPAREN Term RCURPAREN
   {
-      $$ = Ast::make< EmbracedExpression >( @3, $2, $3, $4 );
-      $$->setDelimiterToken( $1 );
+      $$ = Ast::make< Defined >( @$, $1, $2, $3, $4 );
   }
 | %empty
   {
-      $$ = Ast::make< EmbracedExpression >( @$, uToken, Ast::make< UndefLiteral >( @$ ), uToken );
+      $$ = Ast::make< Defined >( @$, uToken, uToken, Ast::make< UndefLiteral >( @$ ), uToken );
   }
 ;
 

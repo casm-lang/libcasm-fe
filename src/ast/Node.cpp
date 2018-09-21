@@ -294,6 +294,12 @@ std::string Node::description( void ) const
         {
             return "expression attribute";
         }
+        // helper
+        case ID::DEFINED:
+        {
+            return "defined";
+        }
+        // other
         case ID::NODE_LIST:
         {
             return "node list";

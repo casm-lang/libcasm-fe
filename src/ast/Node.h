@@ -132,6 +132,9 @@ namespace libcasm_fe
                 BASIC_ATTRIBUTE,
                 EXPRESSION_ATTRIBUTE,
 
+                // helper
+                DEFINED,
+
                 // other
                 NODE_LIST,
                 IDENTIFIER,

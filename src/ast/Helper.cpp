@@ -89,6 +89,37 @@ const Token::Ptr& Helper::delimiterToken( void ) const
 
 //
 //
+// Defined
+//
+
+Defined::Defined(
+    const Token::Ptr& definedToken,
+    const Token::Ptr& leftBraceToken,
+    const Expression::Ptr& expression,
+    const Token::Ptr& rightBraceToken )
+: Helper( Node::ID::DEFINED, leftBraceToken, rightBraceToken )
+, m_expression( expression )
+, m_definedToken( definedToken )
+{
+}
+
+const Expression::Ptr& Defined::expression( void ) const
+{
+    return m_expression;
+}
+
+const Token::Ptr& Defined::definedToken( void ) const
+{
+    return m_definedToken;
+}
+
+void Defined::accept( Visitor& visitor )
+{
+    // visitor.visit( *this ); // TODO: FIXME: @ppaulweber
+}
+
+//
+//
 // InitializerDefinition
 //
 

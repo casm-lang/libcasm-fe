@@ -74,6 +74,28 @@ namespace libcasm_fe
             Token::Ptr m_delimiterToken;
         };
 
+        class Defined final : public Helper
+        {
+          public:
+            using Ptr = std::shared_ptr< Defined >;
+
+            Defined(
+                const Token::Ptr& definedToken,
+                const Token::Ptr& leftBraceToken,
+                const Expression::Ptr& expression,
+                const Token::Ptr& rightBraceToken );
+
+            const Expression::Ptr& expression( void ) const;
+
+            const Token::Ptr& definedToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Expression::Ptr m_expression;
+            const Token::Ptr m_definedToken;
+        };
+
         class InitializerDefinition final : public Helper
         {
           public:
