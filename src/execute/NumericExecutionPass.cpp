@@ -300,6 +300,8 @@ class ExecutionVisitor final : public EmptyVisitor
      */
     void execute( const ReferenceConstant& value );
 
+    void execute( const Definition::Ptr& definition );
+
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -463,8 +465,14 @@ void ExecutionVisitor::execute( const ReferenceConstant& value )
     const auto& rule = std::static_pointer_cast< RuleDefinition >( literal->reference() );
     assert( ( rule->arguments()->size() == 0 ) && "Only parameter-less rules are supported" );
 
-    m_frameStack.push( makeFrame( nullptr, rule.get(), rule->maximumNumberOfLocals() ) );
-    rule->accept( *this );
+    execute( rule );
+}
+
+void ExecutionVisitor::execute( const Definition::Ptr& definition )
+{
+    m_frameStack.push(
+        makeFrame( nullptr, definition.get(), definition->maximumNumberOfLocals() ) );
+    definition->accept( *this );
     m_frameStack.pop();
 }
 
@@ -1975,7 +1983,7 @@ void InvariantChecker::check( const Specification& specification )
             continue;
         }
 
-        definition->accept( visitor );
+        visitor.execute( definition );
     }
 }
 

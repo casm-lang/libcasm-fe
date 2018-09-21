@@ -76,6 +76,7 @@ class FrameSizeDeterminationVisitor final : public RecursiveVisitor
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( InvariantDefinition& node ) override;
 
     void visit( LetExpression& node ) override;
     void visit( ChooseExpression& node ) override;
@@ -165,6 +166,22 @@ void FrameSizeDeterminationVisitor::visit( RuleDefinition& node )
     m_log.debug(
         { node.sourceLocation() },
         "rule '" + node.identifier()->name() + "' requires space for " +
+            std::to_string( m_maxNumberOfLocals ) + " locals" );
+#endif
+}
+
+void FrameSizeDeterminationVisitor::visit( InvariantDefinition& node )
+{
+    m_maxNumberOfLocals = 0;
+
+    node.expression()->accept( *this );
+
+    node.setMaximumNumberOfLocals( m_maxNumberOfLocals );
+
+#ifndef NDEBUG
+    m_log.debug(
+        { node.sourceLocation() },
+        "invariant '" + node.identifier()->name() + "' requires space for " +
             std::to_string( m_maxNumberOfLocals ) + " locals" );
 #endif
 }
