@@ -120,16 +120,16 @@ void Defined::accept( Visitor& visitor )
 
 //
 //
-// InitializerDefinition
+// Initializer
 //
 
-InitializerDefinition::InitializerDefinition(
+Initializer::Initializer(
     const Token::Ptr& leftBraceToken,
     const Expressions::Ptr& arguments,
     const Token::Ptr& rightBraceToken,
     const Token::Ptr& mapsToken,
     const Expression::Ptr& value )
-: Helper( Node::ID::INITIALZER_DEFINITION, leftBraceToken, rightBraceToken )
+: Helper( Node::ID::INITIALIZER, leftBraceToken, rightBraceToken )
 , m_arguments( arguments )
 , m_value( value )
 , m_updateRule( std::make_shared< UpdateRule >(
@@ -138,27 +138,27 @@ InitializerDefinition::InitializerDefinition(
 {
 }
 
-const Expressions::Ptr& InitializerDefinition::arguments( void ) const
+const Expressions::Ptr& Initializer::arguments( void ) const
 {
     return m_arguments;
 }
 
-const Expression::Ptr& InitializerDefinition::value( void ) const
+const Expression::Ptr& Initializer::value( void ) const
 {
     return m_value;
 }
 
-const UpdateRule::Ptr& InitializerDefinition::updateRule( void ) const
+const UpdateRule::Ptr& Initializer::updateRule( void ) const
 {
     return m_updateRule;
 }
 
-const Token::Ptr& InitializerDefinition::mapsToken( void ) const
+const Token::Ptr& Initializer::mapsToken( void ) const
 {
     return m_mapsToken;
 }
 
-void InitializerDefinition::accept( Visitor& visitor )
+void Initializer::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
@@ -171,7 +171,7 @@ void InitializerDefinition::accept( Visitor& visitor )
 InitiallyDefinition::InitiallyDefinition(
     const Token::Ptr& initiallyToken,
     const Token::Ptr& leftBraceToken,
-    const InitializerDefinitions::Ptr& initializers,
+    const Initializers::Ptr& initializers,
     const Token::Ptr& rightBraceToken )
 : Helper( Node::ID::INITIALLY_DEFINITION, leftBraceToken, rightBraceToken )
 , m_initializers( initializers )
@@ -179,7 +179,7 @@ InitiallyDefinition::InitiallyDefinition(
 {
 }
 
-const InitializerDefinitions::Ptr& InitiallyDefinition::initializers( void ) const
+const Initializers::Ptr& InitiallyDefinition::initializers( void ) const
 {
     return m_initializers;
 }

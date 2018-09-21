@@ -302,7 +302,7 @@ class ExecutionVisitor final : public EmptyVisitor
 
     void execute( const Definition::Ptr& definition );
 
-    void visit( InitializerDefinition& node ) override;
+    void visit( Initializer& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -478,7 +478,7 @@ void ExecutionVisitor::execute( const Definition::Ptr& definition )
     m_frameStack.pop();
 }
 
-void ExecutionVisitor::visit( InitializerDefinition& node )
+void ExecutionVisitor::visit( Initializer& node )
 {
     // just evaluate the encapsulated update rule
     node.updateRule()->accept( *this );

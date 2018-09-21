@@ -69,7 +69,6 @@ namespace libcasm_fe
                 HEADER_DEFINITION,
                 INIT_DEFINITION,
                 INITIALLY_DEFINITION,
-                INITIALZER_DEFINITION,
                 VARIABLE_DEFINITION,
                 FUNCTION_DEFINITION,
                 DERIVED_DEFINITION,
@@ -134,6 +133,7 @@ namespace libcasm_fe
 
                 // helper
                 DEFINED,
+                INITIALIZER,
 
                 // other
                 NODE_LIST,

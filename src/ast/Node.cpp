@@ -85,10 +85,6 @@ std::string Node::description( void ) const
         {
             return "initially";
         }
-        case ID::INITIALZER_DEFINITION:
-        {
-            return "initialzer";
-        }
         case ID::VARIABLE_DEFINITION:
         {
             return "variable";
@@ -298,6 +294,10 @@ std::string Node::description( void ) const
         case ID::DEFINED:
         {
             return "defined";
+        }
+        case ID::INITIALIZER:
+        {
+            return "initializer";
         }
         // other
         case ID::NODE_LIST:

@@ -77,7 +77,7 @@ void RecursiveVisitor::visit( InitiallyDefinition& node )
     node.rightBraceToken()->accept( *this );
 }
 
-void RecursiveVisitor::visit( InitializerDefinition& node )
+void RecursiveVisitor::visit( Initializer& node )
 {
     node.updateRule()->accept( *this );
 }

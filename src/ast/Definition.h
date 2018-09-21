@@ -185,8 +185,8 @@ namespace libcasm_fe
             void setSymbolic( u1 symbolic );
             u1 symbolic( void ) const;
 
-            void setInitializers( const InitializerDefinitions::Ptr& initializers );
-            const InitializerDefinitions::Ptr& initializers( void ) const;
+            void setInitializers( const Initializers::Ptr& initializers );
+            const Initializers::Ptr& initializers( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -199,7 +199,7 @@ namespace libcasm_fe
             const Token::Ptr m_mapsToken;
             Classification m_classification;
             u1 m_symbolic;
-            InitializerDefinitions::Ptr m_initializers;
+            Initializers::Ptr m_initializers;
             const bool m_isProgram;
         };
 
@@ -387,12 +387,12 @@ namespace libcasm_fe
             InitDefinition(
                 const Token::Ptr& initToken,
                 const Token::Ptr& leftBraceToken,
-                const InitializerDefinitions::Ptr& initializers,
+                const Initializers::Ptr& initializers,
                 const Token::Ptr& rightBraceToken );
 
             const IdentifierPath::Ptr& initPath( void ) const;
 
-            const InitializerDefinitions::Ptr& initializers( void ) const;
+            const Initializers::Ptr& initializers( void ) const;
 
             const Token::Ptr& initToken( void ) const;
 
@@ -409,7 +409,7 @@ namespace libcasm_fe
 
           private:
             const IdentifierPath::Ptr m_initPath;
-            const InitializerDefinitions::Ptr m_initializers;
+            const Initializers::Ptr m_initializers;
             const Token::Ptr m_initToken;
             const Token::Ptr m_leftBraceToken;
             const Token::Ptr m_rightBraceToken;

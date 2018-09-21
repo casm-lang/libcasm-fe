@@ -249,8 +249,8 @@ END       0 "end of file"
 %type <Case::Ptr> CaseLabel
 %type <Cases::Ptr> CaseLabels
 %type <InitiallyDefinition::Ptr> MaybeInitially
-%type <InitializerDefinition::Ptr> Initializer
-%type <InitializerDefinitions::Ptr> Initializers
+%type <Initializer::Ptr> Initializer
+%type <Initializers::Ptr> Initializers
 %type <Defined::Ptr> MaybeDefined
 %type <Types::Ptr> FunctionParameters MaybeFunctionParameters
 %type <VariableDefinitions::Ptr> Parameters AttributedVariables
@@ -405,8 +405,8 @@ InitDefinition
       programArguments->add( singleAgent );
 
       const auto ruleReference = Ast::make< ReferenceLiteral >( @$, uToken, $2 );
-      const auto initializers = Ast::make< InitializerDefinitions >( @$ );
-      const auto initializer = Ast::make< InitializerDefinition >(
+      const auto initializers = Ast::make< Initializers >( @$ );
+      const auto initializer = Ast::make< Initializer >(
           @$, uToken, programArguments, uToken, uToken, ruleReference );
       initializers->add( initializer );
 
@@ -1564,7 +1564,7 @@ MaybeInitially
   }
 | %empty
   {
-      const auto initializers = Ast::make< InitializerDefinitions >( @$ );
+      const auto initializers = Ast::make< Initializers >( @$ );
       $$ = Ast::make< InitiallyDefinition >( @$, uToken, uToken, initializers, uToken );
   }
 ;
@@ -1580,7 +1580,7 @@ Initializers
   }
 | Initializer
   {
-      auto initializers = Ast::make< InitializerDefinitions >( @$ );
+      auto initializers = Ast::make< Initializers >( @$ );
       initializers->add( $1 );
       $$ = initializers;
   }
@@ -1591,7 +1591,7 @@ Initializer
 : Term
   {
       const auto arguments = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< InitializerDefinition >( @$, uToken, arguments, uToken, uToken, $1 );
+      $$ = Ast::make< Initializer >( @$, uToken, arguments, uToken, uToken, $1 );
       $$->updateRule()->setSourceLocation( @$ );
       $$->updateRule()->function()->setSourceLocation( @$ );
   }
@@ -1599,7 +1599,7 @@ Initializer
   {
       auto arguments = Ast::make< Expressions >( @$ );
       arguments->add( $2 );
-      $$ = Ast::make< InitializerDefinition >( @$, $1, arguments, $3, $4, $5 );
+      $$ = Ast::make< Initializer >( @$, $1, arguments, $3, $4, $5 );
       $$->updateRule()->setSourceLocation( @$ );
       $$->updateRule()->function()->setSourceLocation( @$ );
   }
@@ -1608,7 +1608,7 @@ Initializer
       const auto arguments = $1->expressions();
       const auto lbToken = $1->leftBracket();
       const auto rbToken = $1->rightBracket();
-      $$ = Ast::make< InitializerDefinition >( @$, lbToken, arguments, rbToken, $2, $3 );
+      $$ = Ast::make< Initializer >( @$, lbToken, arguments, rbToken, $2, $3 );
       $$->updateRule()->setSourceLocation( @$ );
       $$->updateRule()->function()->setSourceLocation( @$ );
   }

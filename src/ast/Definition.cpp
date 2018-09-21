@@ -189,7 +189,7 @@ FunctionDefinition::FunctionDefinition(
 , m_colonToken( colonToken )
 , m_classification( Classification::UNKNOWN )
 , m_symbolic( false )
-, m_initializers( std::make_shared< InitializerDefinitions >() )
+, m_initializers( std::make_shared< Initializers >() )
 , m_isProgram( identifier->name() == "program" )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
@@ -289,12 +289,12 @@ u1 FunctionDefinition::symbolic( void ) const
     return m_symbolic;
 }
 
-void FunctionDefinition::setInitializers( const InitializerDefinitions::Ptr& initializers )
+void FunctionDefinition::setInitializers( const Initializers::Ptr& initializers )
 {
     m_initializers = initializers;
 }
 
-const InitializerDefinitions::Ptr& FunctionDefinition::initializers( void ) const
+const Initializers::Ptr& FunctionDefinition::initializers( void ) const
 {
     return m_initializers;
 }
@@ -601,7 +601,7 @@ void InvariantDefinition::accept( Visitor& visitor )
 InitDefinition::InitDefinition( const Token::Ptr& initToken, const IdentifierPath::Ptr& initPath )
 : Definition( Node::ID::INIT_DEFINITION, initDefinitionIdentifier )
 , m_initPath( initPath )
-, m_initializers( std::make_shared< InitializerDefinitions >() )
+, m_initializers( std::make_shared< Initializers >() )
 , m_initToken( initToken )
 , m_leftBraceToken( unresolvedToken )
 , m_rightBraceToken( unresolvedToken )
@@ -612,7 +612,7 @@ InitDefinition::InitDefinition( const Token::Ptr& initToken, const IdentifierPat
 InitDefinition::InitDefinition(
     const Token::Ptr& initToken,
     const Token::Ptr& leftBraceToken,
-    const InitializerDefinitions::Ptr& initializers,
+    const Initializers::Ptr& initializers,
     const Token::Ptr& rightBraceToken )
 : Definition( Node::ID::INIT_DEFINITION, initDefinitionIdentifier )
 , m_initPath( nullptr )
@@ -629,7 +629,7 @@ const IdentifierPath::Ptr& InitDefinition::initPath( void ) const
     return m_initPath;
 }
 
-const InitializerDefinitions::Ptr& InitDefinition::initializers( void ) const
+const Initializers::Ptr& InitDefinition::initializers( void ) const
 {
     return m_initializers;
 }

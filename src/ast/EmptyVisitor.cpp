@@ -62,7 +62,7 @@ void EmptyVisitor::visit( InitiallyDefinition& )
 {
 }
 
-void EmptyVisitor::visit( InitializerDefinition& )
+void EmptyVisitor::visit( Initializer& )
 {
 }
 

@@ -96,12 +96,12 @@ namespace libcasm_fe
             const Token::Ptr m_definedToken;
         };
 
-        class InitializerDefinition final : public Helper
+        class Initializer final : public Helper
         {
           public:
-            using Ptr = std::shared_ptr< InitializerDefinition >;
+            using Ptr = std::shared_ptr< Initializer >;
 
-            InitializerDefinition(
+            Initializer(
                 const Token::Ptr& leftBraceToken,
                 const Expressions::Ptr& arguments,
                 const Token::Ptr& rightBraceToken,
@@ -125,7 +125,7 @@ namespace libcasm_fe
             const Token::Ptr m_mapsToken;
         };
 
-        using InitializerDefinitions = NodeList< InitializerDefinition >;
+        using Initializers = NodeList< Initializer >;
 
         class InitiallyDefinition final : public Helper
         {
@@ -135,17 +135,17 @@ namespace libcasm_fe
             InitiallyDefinition(
                 const Token::Ptr& initiallyToken,
                 const Token::Ptr& leftBraceToken,
-                const InitializerDefinitions::Ptr& initializers,
+                const Initializers::Ptr& initializers,
                 const Token::Ptr& rightBraceToken );
 
-            const InitializerDefinitions::Ptr& initializers( void ) const;
+            const Initializers::Ptr& initializers( void ) const;
 
             const Token::Ptr& initiallyToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const InitializerDefinitions::Ptr m_initializers;
+            const Initializers::Ptr m_initializers;
             const Token::Ptr m_initiallyToken;
         };
     }
