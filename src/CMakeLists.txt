@@ -59,6 +59,7 @@ add_library( ${PROJECT}-cpp OBJECT
   ast/Definition.cpp
   ast/EmptyVisitor.cpp
   ast/Expression.cpp
+  ast/Helper.cpp
   ast/Identifier.cpp
   ast/Literal.cpp
   ast/Node.cpp
@@ -250,6 +251,7 @@ ecm_generate_headers( ${PROJECT}_AST_HEADERS_CPP
     Definition
     EmptyVisitor
     Expression
+    Helper
     Identifier
     Literal
     Node

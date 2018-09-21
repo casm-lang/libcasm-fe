@@ -45,6 +45,7 @@
 #define _LIBCASM_FE_DEFINITION_H_
 
 #include <libcasm-fe/ast/Attribute>
+#include <libcasm-fe/ast/Helper>
 #include <libcasm-fe/ast/Node>
 #include <libcasm-fe/ast/Rule>
 #include <libcasm-fe/ast/Token>
@@ -102,71 +103,6 @@ namespace libcasm_fe
 
           private:
             const Token::Ptr m_headerToken;
-        };
-
-        class InitializerDefinition final : public Definition
-        {
-          public:
-            using Ptr = std::shared_ptr< InitializerDefinition >;
-
-            InitializerDefinition(
-                const Token::Ptr& leftBraceToken,
-                const std::shared_ptr< Expressions >& arguments,
-                const Token::Ptr& rightBraceToken,
-                const Token::Ptr& mapsToken,
-                const std::shared_ptr< Expression >& value );
-
-            const std::shared_ptr< Expressions >& arguments( void ) const;
-
-            const std::shared_ptr< Expression >& value( void ) const;
-
-            const UpdateRule::Ptr& updateRule( void ) const;
-
-            const Token::Ptr& leftBraceToken( void ) const;
-
-            const Token::Ptr& rightBraceToken( void ) const;
-
-            const Token::Ptr& mapsToken( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const std::shared_ptr< Expressions > m_arguments;
-            const std::shared_ptr< Expression > m_value;
-            const UpdateRule::Ptr m_updateRule;
-            const Token::Ptr m_leftBraceToken;
-            const Token::Ptr m_rightBraceToken;
-            const Token::Ptr m_mapsToken;
-        };
-
-        using InitializerDefinitions = NodeList< InitializerDefinition >;
-
-        class InitiallyDefinition final : public Definition
-        {
-          public:
-            using Ptr = std::shared_ptr< InitiallyDefinition >;
-
-            InitiallyDefinition(
-                const Token::Ptr& initiallyToken,
-                const Token::Ptr& leftBraceToken,
-                const InitializerDefinitions::Ptr& initializers,
-                const Token::Ptr& rightBraceToken );
-
-            const InitializerDefinitions::Ptr& initializers( void ) const;
-
-            const Token::Ptr& initiallyToken( void ) const;
-
-            const Token::Ptr& leftBraceToken( void ) const;
-
-            const Token::Ptr& rightBraceToken( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const InitializerDefinitions::Ptr m_initializers;
-            const Token::Ptr m_initiallyToken;
-            const Token::Ptr m_leftBraceToken;
-            const Token::Ptr m_rightBraceToken;
         };
 
         class VariableDefinition final : public Definition

@@ -228,6 +228,7 @@ void AstDumpDotVisitor::visit( InitDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "InitDefinition" );
+    node.attributes()->accept( *this );
     node.initToken()->accept( *this );
     if( node.isSingleAgent() )
     {
@@ -252,7 +253,6 @@ void AstDumpDotVisitor::visit( InitializerDefinition& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "InitializerDefinition" );
-    node.attributes()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.arguments()->accept( *this );
     node.rightBraceToken()->accept( *this );

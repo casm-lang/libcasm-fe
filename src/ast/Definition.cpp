@@ -43,10 +43,10 @@
 
 #include "Definition.h"
 
-#include "../various/GrammarToken.h"
-
 #include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Literal>
+
+#include "../various/GrammarToken.h"
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -54,11 +54,6 @@ using namespace Ast;
 static const auto unresolvedToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 
 static const auto initDefinitionIdentifier = std::make_shared< Identifier >( "$init$" );
-
-static const auto initiallyDefinitionIdentifier = std::make_shared< Identifier >( "$initially$" );
-
-static const auto initializerDefinitionIdentifier =
-    std::make_shared< Identifier >( "$initializer$" );
 
 //
 //
@@ -127,106 +122,6 @@ const Token::Ptr& HeaderDefinition::headerToken( void ) const
 }
 
 void HeaderDefinition::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-//
-//
-// InitializerDefinition
-//
-
-InitializerDefinition::InitializerDefinition(
-    const Token::Ptr& leftBraceToken,
-    const std::shared_ptr< Expressions >& arguments,
-    const Token::Ptr& rightBraceToken,
-    const Token::Ptr& mapsToken,
-    const std::shared_ptr< Expression >& value )
-: Definition( Node::ID::INITIALZER_DEFINITION, initializerDefinitionIdentifier )
-, m_arguments( arguments )
-, m_value( value )
-, m_updateRule( std::make_shared< UpdateRule >(
-      std::make_shared< DirectCallExpression >( nullptr, arguments ), value ) )
-, m_leftBraceToken( leftBraceToken )
-, m_rightBraceToken( rightBraceToken )
-, m_mapsToken( mapsToken )
-{
-}
-
-const std::shared_ptr< Expressions >& InitializerDefinition::arguments( void ) const
-{
-    return m_arguments;
-}
-
-const std::shared_ptr< Expression >& InitializerDefinition::value( void ) const
-{
-    return m_value;
-}
-
-const UpdateRule::Ptr& InitializerDefinition::updateRule( void ) const
-{
-    return m_updateRule;
-}
-
-const Token::Ptr& InitializerDefinition::mapsToken( void ) const
-{
-    return m_mapsToken;
-}
-
-const Token::Ptr& InitializerDefinition::leftBraceToken( void ) const
-{
-    return m_leftBraceToken;
-}
-
-const Token::Ptr& InitializerDefinition::rightBraceToken( void ) const
-{
-    return m_rightBraceToken;
-}
-
-void InitializerDefinition::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-//
-//
-// InitiallyDefinition
-//
-
-InitiallyDefinition::InitiallyDefinition(
-    const Token::Ptr& initiallyToken,
-    const Token::Ptr& leftBraceToken,
-    const InitializerDefinitions::Ptr& initializers,
-    const Token::Ptr& rightBraceToken )
-: Definition( Node::ID::INITIALLY_DEFINITION, initiallyDefinitionIdentifier )
-, m_initializers( initializers )
-, m_initiallyToken( initiallyToken )
-, m_leftBraceToken( leftBraceToken )
-, m_rightBraceToken( rightBraceToken )
-{
-}
-
-const InitializerDefinitions::Ptr& InitiallyDefinition::initializers( void ) const
-{
-    return m_initializers;
-}
-
-const Token::Ptr& InitiallyDefinition::initiallyToken( void ) const
-{
-    return m_initiallyToken;
-}
-
-const Token::Ptr& InitiallyDefinition::leftBraceToken( void ) const
-{
-    return m_leftBraceToken;
-}
-
-const Token::Ptr& InitiallyDefinition::rightBraceToken( void ) const
-{
-    return m_rightBraceToken;
-}
-
-void InitiallyDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
