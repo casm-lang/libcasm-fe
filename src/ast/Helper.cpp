@@ -54,6 +54,41 @@ static const auto unresolvedToken = std::make_shared< Ast::Token >( Grammar::Tok
 
 //
 //
+// Helper
+//
+
+Helper::Helper(
+    const Node::ID id, const Token::Ptr& leftBraceToken, const Token::Ptr& rightBraceToken )
+: Node( id )
+, m_leftBraceToken( leftBraceToken )
+, m_rightBraceToken( rightBraceToken )
+, m_delimiterToken( unresolvedToken )
+{
+}
+
+const Token::Ptr& Helper::leftBraceToken( void ) const
+{
+    return m_leftBraceToken;
+}
+
+const Token::Ptr& Helper::rightBraceToken( void ) const
+{
+    return m_rightBraceToken;
+}
+
+void Helper::setDelimiterToken( const Token::Ptr& delimiterToken )
+{
+    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
+    m_delimiterToken = delimiterToken;
+}
+
+const Token::Ptr& Helper::delimiterToken( void ) const
+{
+    return m_delimiterToken;
+}
+
+//
+//
 // InitializerDefinition
 //
 
@@ -63,15 +98,12 @@ InitializerDefinition::InitializerDefinition(
     const Token::Ptr& rightBraceToken,
     const Token::Ptr& mapsToken,
     const Expression::Ptr& value )
-: Node( Node::ID::INITIALZER_DEFINITION )
+: Helper( Node::ID::INITIALZER_DEFINITION, leftBraceToken, rightBraceToken )
 , m_arguments( arguments )
 , m_value( value )
 , m_updateRule( std::make_shared< UpdateRule >(
       std::make_shared< DirectCallExpression >( nullptr, arguments ), value ) )
-, m_leftBraceToken( leftBraceToken )
-, m_rightBraceToken( rightBraceToken )
 , m_mapsToken( mapsToken )
-, m_delimiterToken( unresolvedToken )
 {
 }
 
@@ -95,27 +127,6 @@ const Token::Ptr& InitializerDefinition::mapsToken( void ) const
     return m_mapsToken;
 }
 
-const Token::Ptr& InitializerDefinition::leftBraceToken( void ) const
-{
-    return m_leftBraceToken;
-}
-
-const Token::Ptr& InitializerDefinition::rightBraceToken( void ) const
-{
-    return m_rightBraceToken;
-}
-
-void InitializerDefinition::setDelimiterToken( const Token::Ptr& delimiterToken )
-{
-    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
-    m_delimiterToken = delimiterToken;
-}
-
-const Token::Ptr& InitializerDefinition::delimiterToken( void ) const
-{
-    return m_delimiterToken;
-}
-
 void InitializerDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
@@ -131,11 +142,9 @@ InitiallyDefinition::InitiallyDefinition(
     const Token::Ptr& leftBraceToken,
     const InitializerDefinitions::Ptr& initializers,
     const Token::Ptr& rightBraceToken )
-: Node( Node::ID::INITIALLY_DEFINITION )
+: Helper( Node::ID::INITIALLY_DEFINITION, leftBraceToken, rightBraceToken )
 , m_initializers( initializers )
 , m_initiallyToken( initiallyToken )
-, m_leftBraceToken( leftBraceToken )
-, m_rightBraceToken( rightBraceToken )
 {
 }
 
@@ -147,16 +156,6 @@ const InitializerDefinitions::Ptr& InitiallyDefinition::initializers( void ) con
 const Token::Ptr& InitiallyDefinition::initiallyToken( void ) const
 {
     return m_initiallyToken;
-}
-
-const Token::Ptr& InitiallyDefinition::leftBraceToken( void ) const
-{
-    return m_leftBraceToken;
-}
-
-const Token::Ptr& InitiallyDefinition::rightBraceToken( void ) const
-{
-    return m_rightBraceToken;
 }
 
 void InitiallyDefinition::accept( Visitor& visitor )

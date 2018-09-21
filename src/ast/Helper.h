@@ -53,7 +53,28 @@ namespace libcasm_fe
 {
     namespace Ast
     {
-        class InitializerDefinition final : public Node
+        class Helper : public Node
+        {
+          public:
+            Helper(
+                const Node::ID id,
+                const Token::Ptr& leftBraceToken,
+                const Token::Ptr& rightBraceToken );
+
+            const Token::Ptr& leftBraceToken( void ) const;
+
+            const Token::Ptr& rightBraceToken( void ) const;
+
+            void setDelimiterToken( const Token::Ptr& delimiterToken );
+            const Token::Ptr& delimiterToken( void ) const;
+
+          private:
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
+            Token::Ptr m_delimiterToken;
+        };
+
+        class InitializerDefinition final : public Helper
         {
           public:
             using Ptr = std::shared_ptr< InitializerDefinition >;
@@ -71,14 +92,7 @@ namespace libcasm_fe
 
             const UpdateRule::Ptr& updateRule( void ) const;
 
-            const Token::Ptr& leftBraceToken( void ) const;
-
-            const Token::Ptr& rightBraceToken( void ) const;
-
             const Token::Ptr& mapsToken( void ) const;
-
-            void setDelimiterToken( const Token::Ptr& delimiterToken );
-            const Token::Ptr& delimiterToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -86,15 +100,12 @@ namespace libcasm_fe
             const Expressions::Ptr m_arguments;
             const Expression::Ptr m_value;
             const UpdateRule::Ptr m_updateRule;
-            const Token::Ptr m_leftBraceToken;
-            const Token::Ptr m_rightBraceToken;
             const Token::Ptr m_mapsToken;
-            Token::Ptr m_delimiterToken;
         };
 
         using InitializerDefinitions = NodeList< InitializerDefinition >;
 
-        class InitiallyDefinition final : public Node
+        class InitiallyDefinition final : public Helper
         {
           public:
             using Ptr = std::shared_ptr< InitiallyDefinition >;
@@ -109,17 +120,11 @@ namespace libcasm_fe
 
             const Token::Ptr& initiallyToken( void ) const;
 
-            const Token::Ptr& leftBraceToken( void ) const;
-
-            const Token::Ptr& rightBraceToken( void ) const;
-
             void accept( Visitor& visitor ) override final;
 
           private:
             const InitializerDefinitions::Ptr m_initializers;
             const Token::Ptr m_initiallyToken;
-            const Token::Ptr m_leftBraceToken;
-            const Token::Ptr m_rightBraceToken;
         };
     }
 }
