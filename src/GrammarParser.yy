@@ -135,8 +135,11 @@
         argTypes->add( agentType );
 
         const auto program = Ast::make< Identifier >( sourceLocation, "program" );
+        const auto defined = Ast::make< Defined >(
+            sourceLocation, uToken, uToken, Ast::make< UndefLiteral >( sourceLocation ), uToken );
+
         return Ast::make< FunctionDefinition >(
-            sourceLocation, uToken, program, uToken, argTypes, uToken, ruleRefType );
+            sourceLocation, uToken, program, uToken, argTypes, uToken, ruleRefType, defined );
     }
 
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
@@ -503,8 +506,7 @@ RuleDefinition
 FunctionDefinition
 : FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
-      $$ = Ast::make< FunctionDefinition >( @$, $1, $2, $3, $4, $5, $6 );
-      $$->setDefaultValue( $7->expression() );
+      $$ = Ast::make< FunctionDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
 
       // apply the name of the function declaration to the initializer functions
       auto initially = $8;

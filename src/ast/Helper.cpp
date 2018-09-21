@@ -115,7 +115,7 @@ const Token::Ptr& Defined::definedToken( void ) const
 
 void Defined::accept( Visitor& visitor )
 {
-    // visitor.visit( *this ); // TODO: FIXME: @ppaulweber
+    visitor.visit( *this );
 }
 
 //

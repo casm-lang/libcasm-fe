@@ -178,17 +178,18 @@ FunctionDefinition::FunctionDefinition(
     const Token::Ptr& colonToken,
     const Types::Ptr& argumentTypes,
     const Token::Ptr& mapsToken,
-    const Type::Ptr& returnType )
+    const Type::Ptr& returnType,
+    const Defined::Ptr& defined )
 : Definition( Node::ID::FUNCTION_DEFINITION, identifier )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
+, m_defined( defined )
 , m_functionToken( functionToken )
 , m_mapsToken( mapsToken )
 , m_colonToken( colonToken )
 , m_classification( Classification::UNKNOWN )
 , m_symbolic( false )
 , m_initializers( std::make_shared< InitializerDefinitions >() )
-, m_defaultValue( std::make_shared< UndefLiteral >() )
 , m_isProgram( identifier->name() == "program" )
 {
     setProperty( libcasm_ir::Property::SIDE_EFFECT_FREE );
@@ -222,6 +223,11 @@ const Token::Ptr& FunctionDefinition::colonToken( void ) const
 const Token::Ptr& FunctionDefinition::mapsToken( void ) const
 {
     return m_mapsToken;
+}
+
+const Defined::Ptr& FunctionDefinition::defined( void ) const
+{
+    return m_defined;
 }
 
 void FunctionDefinition::setClassification( FunctionDefinition::Classification classification )
@@ -291,16 +297,6 @@ void FunctionDefinition::setInitializers( const InitializerDefinitions::Ptr& ini
 const InitializerDefinitions::Ptr& FunctionDefinition::initializers( void ) const
 {
     return m_initializers;
-}
-
-void FunctionDefinition::setDefaultValue( const Expression::Ptr& defaultValue )
-{
-    m_defaultValue = defaultValue;
-}
-
-const Expression::Ptr& FunctionDefinition::defaultValue( void ) const
-{
-    return m_defaultValue;
 }
 
 void FunctionDefinition::accept( Visitor& visitor )

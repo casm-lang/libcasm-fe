@@ -528,7 +528,7 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
             }
         }
 
-        node.defaultValue()->accept( *this );  // return value already on stack
+        node.defined()->expression()->accept( *this );  // return value already on stack
     }
 }
 

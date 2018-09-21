@@ -212,12 +212,16 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     node.setType( type );
 
     auto& returnType = *node.returnType()->type();
-    m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
-    node.defaultValue()->accept( *this );
 
-    if( node.defaultValue()->type() and node.defaultValue()->type() != node.returnType()->type() )
+    // annotate the defined expression (default value/expression) with the return type
+    m_typeIDs[ node.defined()->expression().get() ].emplace( returnType.id() );
+    node.defined()->expression()->accept( *this );
+
+    if( node.defined()->expression()->type() and
+        node.defined()->expression()->type() != node.returnType()->type() )
     {
-        if( node.defaultValue()->type()->isInteger() == node.returnType()->type()->isInteger() )
+        if( node.defined()->expression()->type()->isInteger() ==
+            node.returnType()->type()->isInteger() )
         {
             // relaxation: mixed ranged and non-ranged integer types are allowed and checked in a
             // later pass or step!
@@ -225,9 +229,10 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
         else
         {
             m_log.error(
-                { node.defaultValue()->sourceLocation(), node.returnType()->sourceLocation() },
+                { node.defined()->expression()->sourceLocation(),
+                  node.returnType()->sourceLocation() },
                 "type mismatch: type of default value was '" +
-                    node.defaultValue()->type()->description() + "', function expects '" +
+                    node.defined()->expression()->type()->description() + "', function expects '" +
                     node.returnType()->type()->description() + "'",
                 Code::TypeInferenceFunctionDefaultValueTypeMismatch );
         }

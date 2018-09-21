@@ -101,7 +101,7 @@ void RecursiveVisitor::visit( FunctionDefinition& node )
     node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
     node.initializers()->accept( *this );
-    node.defaultValue()->accept( *this );
+    node.defined()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DerivedDefinition& node )
@@ -553,6 +553,19 @@ void RecursiveVisitor::visit( ExpressionAttribute& node )
     node.identifier()->accept( *this );
     node.expression()->accept( *this );
     node.rightBrace()->accept( *this );
+}
+
+//
+//
+// Helper
+//
+
+void RecursiveVisitor::visit( Defined& node )
+{
+    node.definedToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.expression()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 //

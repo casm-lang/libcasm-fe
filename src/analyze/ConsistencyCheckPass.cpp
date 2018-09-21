@@ -167,7 +167,7 @@ void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
     node.identifier()->accept( *this );
     node.argumentTypes()->accept( *this );
     node.returnType()->accept( *this );
-    node.defaultValue()->accept( *this );
+    node.defined()->accept( *this );
     node.attributes()->accept( *this );
 
     if( node.isProgram() )

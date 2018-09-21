@@ -270,6 +270,10 @@ void EmptyVisitor::visit( ExpressionAttribute& )
 {
 }
 
+void EmptyVisitor::visit( Defined& )
+{
+}
+
 void EmptyVisitor::visit( Identifier& )
 {
 }
