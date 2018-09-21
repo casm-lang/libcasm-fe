@@ -892,7 +892,7 @@ SimpleOrClaspedTerm
   }
 | PLUS SimpleOrClaspedTerm %prec UPLUS
   {
-      $$ = Ast::make< Ast::EmbracedExpression >( @$, $1, $2, uToken );
+      $$ = Ast::make< UnaryExpression >( @$, $1, $2, libcasm_ir::Value::ADD_INSTRUCTION );
   }
 | MINUS SimpleOrClaspedTerm %prec UMINUS
   {

@@ -929,11 +929,21 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
 {
+    if( node.op() == libcasm_ir::Value::ADD_INSTRUCTION )
+    {
+        // add unary expression (e.g. '+4') will not be annotated,
+        // just visit sub-nodes, propagate the expression type to this node and return
+        RecursiveVisitor::visit( node );
+        node.setType( node.expression()->type() );
+        return;
+    }
+
     const auto* annotation = annotate( node, { node.expression() } );
 
     RecursiveVisitor::visit( node );
 
     const auto description = "unary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+
     inference( description, annotation, node, { node.expression() } );
 
     RecursiveVisitor::visit( node );

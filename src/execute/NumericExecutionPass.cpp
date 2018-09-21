@@ -891,6 +891,14 @@ void ExecutionVisitor::visit( TypeCastingExpression& node )
 void ExecutionVisitor::visit( UnaryExpression& node )
 {
     node.expression()->accept( *this );
+
+    if( node.op() == libcasm_ir::Value::ADD_INSTRUCTION )
+    {
+        // add unary expression (e.g. '+4') will not be executed,
+        // just return without touching the unary expression value on the stack
+        return;
+    }
+
     auto& value = m_evaluationStack.top();
 
     try
