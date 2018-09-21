@@ -320,7 +320,7 @@ void TypeInferenceVisitor::visit( InvariantDefinition& node )
         *node.expression(),
         libcasm_ir::Type::Kind::BOOLEAN,
         "expression",
-        Code::TypeInferenceConditionalRuleInvalidConditionType );
+        Code::TypeInferenceInvariantDefinitionInvalidExpressionType );
 }
 
 void TypeInferenceVisitor::visit( UndefLiteral& node )

@@ -221,6 +221,8 @@ namespace libcasm_fe
 
         TypeInferenceWhileRuleInvalidConditionType = 0x1501,
 
+        TypeInferenceInvariantDefinitionInvalidExpressionType = 0x1502,
+
         TypeInferenceInvalidMethodCallExpression = 0x1900,
         TypeInferenceInvalidIndirectCallExpression = 0x1901,
         TypeInferenceInvalidLiteralCallExpression = 0x1a00,
