@@ -81,7 +81,7 @@ std::string Node::description( void ) const
         {
             return "init";
         }
-        case ID::INITIALLY_DEFINITION:
+        case ID::INITIALLY:
         {
             return "initially";
         }

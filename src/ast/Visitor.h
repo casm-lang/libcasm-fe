@@ -50,7 +50,7 @@ namespace libcasm_fe
     {
         class HeaderDefinition;
         class InitDefinition;
-        class InitiallyDefinition;
+        class Initially;
         class Initializer;
         class VariableDefinition;
         class FunctionDefinition;
@@ -128,7 +128,7 @@ namespace libcasm_fe
 
             virtual void visit( HeaderDefinition& node ) = 0;
             virtual void visit( InitDefinition& node ) = 0;
-            virtual void visit( InitiallyDefinition& node ) = 0;
+            virtual void visit( Initially& node ) = 0;
             virtual void visit( Initializer& node ) = 0;
             virtual void visit( VariableDefinition& node ) = 0;
             virtual void visit( FunctionDefinition& node ) = 0;

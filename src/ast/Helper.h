@@ -127,12 +127,12 @@ namespace libcasm_fe
 
         using Initializers = NodeList< Initializer >;
 
-        class InitiallyDefinition final : public Helper
+        class Initially final : public Helper
         {
           public:
-            using Ptr = std::shared_ptr< InitiallyDefinition >;
+            using Ptr = std::shared_ptr< Initially >;
 
-            InitiallyDefinition(
+            Initially(
                 const Token::Ptr& initiallyToken,
                 const Token::Ptr& leftBraceToken,
                 const Initializers::Ptr& initializers,

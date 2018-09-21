@@ -69,7 +69,7 @@ void RecursiveVisitor::visit( InitDefinition& node )
     node.programFunction()->accept( *this );
 }
 
-void RecursiveVisitor::visit( InitiallyDefinition& node )
+void RecursiveVisitor::visit( Initially& node )
 {
     node.initiallyToken()->accept( *this );
     node.leftBraceToken()->accept( *this );

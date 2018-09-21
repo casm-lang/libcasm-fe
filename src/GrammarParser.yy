@@ -248,7 +248,7 @@ END       0 "end of file"
 // other
 %type <Case::Ptr> CaseLabel
 %type <Cases::Ptr> CaseLabels
-%type <InitiallyDefinition::Ptr> MaybeInitially
+%type <Initially::Ptr> MaybeInitially
 %type <Initializer::Ptr> Initializer
 %type <Initializers::Ptr> Initializers
 %type <Defined::Ptr> MaybeDefined
@@ -1560,12 +1560,12 @@ MaybeDefined
 MaybeInitially
 : INITIALLY LCURPAREN Initializers RCURPAREN
   {
-      $$ = Ast::make< InitiallyDefinition >( @$, $1, $2, $3, $4 );
+      $$ = Ast::make< Initially >( @$, $1, $2, $3, $4 );
   }
 | %empty
   {
       const auto initializers = Ast::make< Initializers >( @$ );
-      $$ = Ast::make< InitiallyDefinition >( @$, uToken, uToken, initializers, uToken );
+      $$ = Ast::make< Initially >( @$, uToken, uToken, initializers, uToken );
   }
 ;
 

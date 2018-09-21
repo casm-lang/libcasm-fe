@@ -165,31 +165,31 @@ void Initializer::accept( Visitor& visitor )
 
 //
 //
-// InitiallyDefinition
+// Initially
 //
 
-InitiallyDefinition::InitiallyDefinition(
+Initially::Initially(
     const Token::Ptr& initiallyToken,
     const Token::Ptr& leftBraceToken,
     const Initializers::Ptr& initializers,
     const Token::Ptr& rightBraceToken )
-: Helper( Node::ID::INITIALLY_DEFINITION, leftBraceToken, rightBraceToken )
+: Helper( Node::ID::INITIALLY, leftBraceToken, rightBraceToken )
 , m_initializers( initializers )
 , m_initiallyToken( initiallyToken )
 {
 }
 
-const Initializers::Ptr& InitiallyDefinition::initializers( void ) const
+const Initializers::Ptr& Initially::initializers( void ) const
 {
     return m_initializers;
 }
 
-const Token::Ptr& InitiallyDefinition::initiallyToken( void ) const
+const Token::Ptr& Initially::initiallyToken( void ) const
 {
     return m_initiallyToken;
 }
 
-void InitiallyDefinition::accept( Visitor& visitor )
+void Initially::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
