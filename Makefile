@@ -74,11 +74,7 @@ grammar: $(GRAMMAR)
 	cp -f $< $@
 
 src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
-	mkdir -p "`dirname obj/$<`"
-	head -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat  > obj/$<
-	cat "$(filter %.hpp,$^)" | sed "/^\/\//d" | sed "s/[A-Za-z_]*[ ]* \"/\"/g"  >> obj/$<
-	tail -n +`grep -n "{{grammartoken}}" $< | grep -o "[0-9]*"` $< | cat >> obj/$<
-	sed -i "/^{{grammartoken}}/d" obj/$<
+	etc/script.sh generate-lexer "`pwd`/$<" "`pwd`/obj/$< $(filter %.hpp,$^)"
 	$(LX) $(LFLAGS) -o $@ obj/$<
 	sed -i "s/#define yyFlexLexer yyFlexLexer//g" $@
 

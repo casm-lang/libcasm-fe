@@ -42,86 +42,86 @@
 //
 
 
-CASM            "CASM"          { YY_TOKEN_ACTION( CASM ) }
-INIT            "init"          { YY_TOKEN_ACTION( INIT ) }
+CASM            "CASM"
+INIT            "init"
 
-DERIVED         "derived"       { YY_TOKEN_ACTION( DERIVED ) }
-ENUMERATION     "enumeration"   { YY_TOKEN_ACTION( ENUMERATION ) }
-RULE            "rule"          { YY_TOKEN_ACTION( RULE ) }
-USING           "using"         { YY_TOKEN_ACTION( USING ) }
-INVARIANT       "invariant"     { YY_TOKEN_ACTION( INVARIANT ) }
+DERIVED         "derived"
+ENUMERATION     "enumeration"
+RULE            "rule"
+USING           "using"
+INVARIANT       "invariant"
 
-FUNCTION        "function"      { YY_TOKEN_ACTION( FUNCTION ) }
-INITIALLY       "initially"     { YY_TOKEN_ACTION( INITIALLY ) }
-DEFINED         "defined"       { YY_TOKEN_ACTION( DEFINED ) }
+FUNCTION        "function"
+INITIALLY       "initially"
+DEFINED         "defined"
 
-SEQ             "seq"           { YY_TOKEN_ACTION( SEQ ) }
-ENDSEQ          "endseq"        { YY_TOKEN_ACTION( ENDSEQ ) }
-PAR             "par"           { YY_TOKEN_ACTION( PAR ) }
-ENDPAR          "endpar"        { YY_TOKEN_ACTION( ENDPAR ) }
+SEQ             "seq"
+ENDSEQ          "endseq"
+PAR             "par"
+ENDPAR          "endpar"
 
-SKIP            "skip"          { YY_TOKEN_ACTION( SKIP ) }
-LET             "let"           { YY_TOKEN_ACTION( LET ) }
-IN              "in"            { YY_TOKEN_ACTION( IN ) }
-FORALL          "forall"        { YY_TOKEN_ACTION( FORALL ) }
-CHOOSE          "choose"        { YY_TOKEN_ACTION( CHOOSE ) }
-ITERATE         "iterate"       { YY_TOKEN_ACTION( ITERATE ) }
-DO              "do"            { YY_TOKEN_ACTION( DO ) }
-IF              "if"            { YY_TOKEN_ACTION( IF ) }
-THEN            "then"          { YY_TOKEN_ACTION( THEN ) }
-ELSE            "else"          { YY_TOKEN_ACTION( ELSE ) }
-CASE            "case"          { YY_TOKEN_ACTION( CASE ) }
-OF              "of"            { YY_TOKEN_ACTION( OF ) }
-DEFAULT         "default"       { YY_TOKEN_ACTION( DEFAULT ) }
-HOLDS           "holds"         { YY_TOKEN_ACTION( HOLDS ) }
-EXISTS          "exists"        { YY_TOKEN_ACTION( EXISTS ) }
-WITH            "with"          { YY_TOKEN_ACTION( WITH ) }
-AS              "as"            { YY_TOKEN_ACTION( AS ) }
-WHILE           "while"         { YY_TOKEN_ACTION( WHILE ) }
+SKIP            "skip"
+LET             "let"
+IN              "in"
+FORALL          "forall"
+CHOOSE          "choose"
+ITERATE         "iterate"
+DO              "do"
+IF              "if"
+THEN            "then"
+ELSE            "else"
+CASE            "case"
+OF              "of"
+DEFAULT         "default"
+HOLDS           "holds"
+EXISTS          "exists"
+WITH            "with"
+AS              "as"
+WHILE           "while"
 
-UNDEF           "undef"         { YY_TOKEN_ACTION( UNDEF ) }
-FALSE           "false"         { YY_TOKEN_ACTION( FALSE ) }
-TRUE            "true"          { YY_TOKEN_ACTION( TRUE ) }
+UNDEF           "undef"
+FALSE           "false"
+TRUE            "true"
 
-AND             "and"           { YY_TOKEN_ACTION( AND ) }
-OR              "or"            { YY_TOKEN_ACTION( OR ) }
-XOR             "xor"           { YY_TOKEN_ACTION( XOR ) }
-IMPLIES         "implies"       { YY_TOKEN_ACTION( IMPLIES ) }
-NOT             "not"           { YY_TOKEN_ACTION( NOT ) }
+AND             "and"
+OR              "or"
+XOR             "xor"
+IMPLIES         "implies"
+NOT             "not"
 
-PLUS            "+"             { YY_TOKEN_ACTION( PLUS ) }
-MINUS           "-"             { YY_TOKEN_ACTION( MINUS ) }
-EQUAL           "="             { YY_TOKEN_ACTION( EQUAL ) }
-LPAREN          "("             { YY_TOKEN_ACTION( LPAREN ) }
-RPAREN          ")"             { YY_TOKEN_ACTION( RPAREN ) }
-LSQPAREN        "["             { YY_TOKEN_ACTION( LSQPAREN ) }
-RSQPAREN        "]"             { YY_TOKEN_ACTION( RSQPAREN ) }
-LCURPAREN       "{"             { YY_TOKEN_ACTION( LCURPAREN ) }
-RCURPAREN       "}"             { YY_TOKEN_ACTION( RCURPAREN ) }
-COLON           ":"             { YY_TOKEN_ACTION( COLON ) }
-DOUBLECOLON     "::"            { YY_TOKEN_ACTION( DOUBLECOLON ) }
-UNDERLINE       "_"             { YY_TOKEN_ACTION( UNDERLINE ) }
-VERTICAL_BAR    "|"             { YY_TOKEN_ACTION( VERTICAL_BAR ) }
-AT              "@"             { YY_TOKEN_ACTION( AT ) }
-COMMA           ","             { YY_TOKEN_ACTION( COMMA ) }
-LESSER          "<"             { YY_TOKEN_ACTION( LESSER ) }
-GREATER         ">"             { YY_TOKEN_ACTION( GREATER ) }
-ASTERIX         "*"             { YY_TOKEN_ACTION( ASTERIX ) }
-SLASH           "/"             { YY_TOKEN_ACTION( SLASH ) }
-PERCENT         "%"             { YY_TOKEN_ACTION( PERCENT ) }
-CARET           "^"             { YY_TOKEN_ACTION( CARET ) }
-MARK            "'"             { YY_TOKEN_ACTION( MARK ) }
+PLUS            "+"
+MINUS           "-"
+EQUAL           "="
+LPAREN          "("
+RPAREN          ")"
+LSQPAREN        "["
+RSQPAREN        "]"
+LCURPAREN       "{"
+RCURPAREN       "}"
+COLON           ":"
+DOUBLECOLON     "::"
+UNDERLINE       "_"
+VERTICAL_BAR    "|"
+AT              "@"
+COMMA           ","
+LESSER          "<"
+GREATER         ">"
+ASTERIX         "*"
+SLASH           "/"
+PERCENT         "%"
+CARET           "^"
+MARK            "'"
 
-DOTDOT          ".."            { YY_TOKEN_ACTION( DOTDOT ) }
-DOT             "."             { YY_TOKEN_ACTION( DOT ) }
-MAPS            "->"            { YY_TOKEN_ACTION( MAPS ) }
-ARROW           "=>"            { YY_TOKEN_ACTION( ARROW ) }
-UPDATE          ":="            { YY_TOKEN_ACTION( UPDATE ) }
-NEQUAL          "!="            { YY_TOKEN_ACTION( NEQUAL ) }
-LESSEQ          "<="            { YY_TOKEN_ACTION( LESSEQ ) }
-GREATEREQ       ">="            { YY_TOKEN_ACTION( GREATEREQ ) }
-SEQ_BRACKET     "{|"            { YY_TOKEN_ACTION( SEQ_BRACKET ) }
-ENDSEQ_BRACKET  "|}"            { YY_TOKEN_ACTION( ENDSEQ_BRACKET ) }
+DOTDOT          ".."
+DOT             "."
+MAPS            "->"
+ARROW           "=>"
+UPDATE          ":="
+NEQUAL          "!="
+LESSEQ          "<="
+GREATEREQ       ">="
+SEQ_BRACKET     "{|"
+ENDSEQ_BRACKET  "|}"
 
 
 //  
