@@ -2172,7 +2172,7 @@ namespace libcasm_fe {
           switch (yyn)
             {
   case 2:
-#line 460 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 448 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       m_specification.setHeader( yystack_[1].value.as< HeaderDefinition::Ptr > () );
       m_specification.setDefinitions( yystack_[0].value.as< Definitions::Ptr > () );
@@ -2181,7 +2181,7 @@ namespace libcasm_fe {
     break;
 
   case 3:
-#line 469 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 457 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto definition = Ast::make< HeaderDefinition >( yylhs.location, yystack_[0].value.as< Ast::Token::Ptr > () );
       definition->setAttributes( yystack_[1].value.as< Attributes::Ptr > () );
@@ -2191,7 +2191,7 @@ namespace libcasm_fe {
     break;
 
   case 4:
-#line 475 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 463 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< HeaderDefinition::Ptr > () = Ast::make< HeaderDefinition >( yylhs.location, yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -2199,7 +2199,7 @@ namespace libcasm_fe {
     break;
 
   case 5:
-#line 483 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 471 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto definitions = yystack_[1].value.as< Definitions::Ptr > ();
       definitions->add( yystack_[0].value.as< Definition::Ptr > () );
@@ -2209,7 +2209,7 @@ namespace libcasm_fe {
     break;
 
   case 6:
-#line 489 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 477 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto definitions = Ast::make< Definitions >( yylhs.location );
       definitions->add( yystack_[0].value.as< Definition::Ptr > () );
@@ -2219,7 +2219,7 @@ namespace libcasm_fe {
     break;
 
   case 7:
-#line 499 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 487 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto definition = yystack_[0].value.as< Definition::Ptr > ();
       definition->setAttributes( yystack_[1].value.as< Attributes::Ptr > () );
@@ -2229,7 +2229,7 @@ namespace libcasm_fe {
     break;
 
   case 8:
-#line 505 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 493 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Definition::Ptr > () = yystack_[0].value.as< Definition::Ptr > ();
   }
@@ -2237,7 +2237,7 @@ namespace libcasm_fe {
     break;
 
   case 9:
-#line 509 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 497 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Definition::Ptr > () = nullptr;
   }
@@ -2245,7 +2245,7 @@ namespace libcasm_fe {
     break;
 
   case 10:
-#line 517 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 505 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Definition::Ptr > () = yystack_[0].value.as< InitDefinition::Ptr > ();
   }
@@ -2253,7 +2253,7 @@ namespace libcasm_fe {
     break;
 
   case 11:
-#line 521 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 509 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Definition::Ptr > () = yystack_[0].value.as< EnumerationDefinition::Ptr > ();
   }
@@ -2261,7 +2261,7 @@ namespace libcasm_fe {
     break;
 
   case 12:
-#line 525 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 513 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Definition::Ptr > () = yystack_[0].value.as< DerivedDefinition::Ptr > ();
   }
@@ -2269,7 +2269,7 @@ namespace libcasm_fe {
     break;
 
   case 13:
-#line 529 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 517 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Definition::Ptr > () = yystack_[0].value.as< RuleDefinition::Ptr > ();
   }
@@ -2277,7 +2277,7 @@ namespace libcasm_fe {
     break;
 
   case 14:
-#line 533 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 521 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Definition::Ptr > () = yystack_[0].value.as< FunctionDefinition::Ptr > ();
   }
@@ -2285,7 +2285,7 @@ namespace libcasm_fe {
     break;
 
   case 15:
-#line 537 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 525 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Definition::Ptr > () = yystack_[0].value.as< UsingDefinition::Ptr > ();
   }
@@ -2293,7 +2293,7 @@ namespace libcasm_fe {
     break;
 
   case 16:
-#line 541 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 529 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Definition::Ptr > () = yystack_[0].value.as< InvariantDefinition::Ptr > ();
   }
@@ -2301,7 +2301,7 @@ namespace libcasm_fe {
     break;
 
   case 17:
-#line 549 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 537 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< InitDefinition::Ptr > () = Ast::make< InitDefinition >( yylhs.location, yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< IdentifierPath::Ptr > () );
 
@@ -2335,7 +2335,7 @@ namespace libcasm_fe {
     break;
 
   case 18:
-#line 579 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 567 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< InitDefinition::Ptr > () = Ast::make< InitDefinition >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Initializers::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
 
@@ -2356,7 +2356,7 @@ namespace libcasm_fe {
     break;
 
   case 19:
-#line 600 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 588 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< EnumerationDefinition::Ptr > () = Ast::make< EnumerationDefinition >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< Identifier::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Enumerators::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -2364,7 +2364,7 @@ namespace libcasm_fe {
     break;
 
   case 20:
-#line 608 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 596 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto params = Ast::make< NodeList< VariableDefinition > >( yylhs.location );
       yylhs.value.as< DerivedDefinition::Ptr > () = Ast::make< DerivedDefinition >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< Identifier::Ptr > (), params, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
@@ -2373,7 +2373,7 @@ namespace libcasm_fe {
     break;
 
   case 21:
-#line 613 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 601 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< DerivedDefinition::Ptr > () = Ast::make< DerivedDefinition >( yylhs.location, yystack_[8].value.as< Ast::Token::Ptr > (), yystack_[7].value.as< Identifier::Ptr > (), yystack_[5].value.as< VariableDefinitions::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
       yylhs.value.as< DerivedDefinition::Ptr > ()->setLeftBracketToken( yystack_[6].value.as< Ast::Token::Ptr > () );
@@ -2383,7 +2383,7 @@ namespace libcasm_fe {
     break;
 
   case 22:
-#line 619 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 607 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< DerivedDefinition::Ptr > () = nullptr;
   }
@@ -2391,7 +2391,7 @@ namespace libcasm_fe {
     break;
 
   case 23:
-#line 627 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 615 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto params = Ast::make< NodeList< VariableDefinition > >( yylhs.location );
       const auto vType = createVoidType( yylhs.location );
@@ -2401,7 +2401,7 @@ namespace libcasm_fe {
     break;
 
   case 24:
-#line 633 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 621 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto params = Ast::make< NodeList< VariableDefinition > >( yylhs.location );
       yylhs.value.as< RuleDefinition::Ptr > () = Ast::make< RuleDefinition >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< Identifier::Ptr > (), params, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
@@ -2410,7 +2410,7 @@ namespace libcasm_fe {
     break;
 
   case 25:
-#line 638 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 626 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto vType = createVoidType( yylhs.location );
       yylhs.value.as< RuleDefinition::Ptr > () = Ast::make< RuleDefinition >( yylhs.location, yystack_[6].value.as< Ast::Token::Ptr > (), yystack_[5].value.as< Identifier::Ptr > (), yystack_[3].value.as< VariableDefinitions::Ptr > (), uToken, vType, yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
@@ -2421,7 +2421,7 @@ namespace libcasm_fe {
     break;
 
   case 26:
-#line 645 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 633 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< RuleDefinition::Ptr > () = Ast::make< RuleDefinition >( yylhs.location, yystack_[8].value.as< Ast::Token::Ptr > (), yystack_[7].value.as< Identifier::Ptr > (), yystack_[5].value.as< VariableDefinitions::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
       yylhs.value.as< RuleDefinition::Ptr > ()->setLeftBracketToken( yystack_[6].value.as< Ast::Token::Ptr > () );
@@ -2431,7 +2431,7 @@ namespace libcasm_fe {
     break;
 
   case 27:
-#line 651 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 639 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< RuleDefinition::Ptr > () = nullptr;
   }
@@ -2439,7 +2439,7 @@ namespace libcasm_fe {
     break;
 
   case 28:
-#line 655 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 643 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< RuleDefinition::Ptr > () = nullptr;
   }
@@ -2447,7 +2447,7 @@ namespace libcasm_fe {
     break;
 
   case 29:
-#line 663 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 651 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< FunctionDefinition::Ptr > () = Ast::make< FunctionDefinition >( yylhs.location, yystack_[7].value.as< Ast::Token::Ptr > (), yystack_[6].value.as< Identifier::Ptr > (), yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< Types::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< libcasm_fe::Ast::Type::Ptr > (), yystack_[1].value.as< Defined::Ptr > () );
 
@@ -2463,7 +2463,7 @@ namespace libcasm_fe {
     break;
 
   case 30:
-#line 679 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 667 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< EnumeratorDefinition::Ptr > () = Ast::make< EnumeratorDefinition >( yylhs.location, yystack_[0].value.as< Identifier::Ptr > () );
   }
@@ -2471,7 +2471,7 @@ namespace libcasm_fe {
     break;
 
   case 31:
-#line 683 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 671 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto enumerator = Ast::make< EnumeratorDefinition >( yylhs.location, yystack_[0].value.as< Identifier::Ptr > () );
       enumerator->setAttributes( yystack_[1].value.as< Attributes::Ptr > () );
@@ -2481,7 +2481,7 @@ namespace libcasm_fe {
     break;
 
   case 32:
-#line 689 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 677 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< EnumeratorDefinition::Ptr > () = nullptr;
   }
@@ -2489,7 +2489,7 @@ namespace libcasm_fe {
     break;
 
   case 33:
-#line 697 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 685 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto enumerators = yystack_[2].value.as< Enumerators::Ptr > ();
       yystack_[0].value.as< EnumeratorDefinition::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -2500,7 +2500,7 @@ namespace libcasm_fe {
     break;
 
   case 34:
-#line 704 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 692 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto enumerators = Ast::make< Enumerators >( yylhs.location );
       enumerators->add( yystack_[0].value.as< EnumeratorDefinition::Ptr > () );
@@ -2510,7 +2510,7 @@ namespace libcasm_fe {
     break;
 
   case 35:
-#line 714 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 702 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< UsingDefinition::Ptr > () = Ast::make< UsingDefinition >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Identifier::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< libcasm_fe::Ast::Type::Ptr > () );
   }
@@ -2518,7 +2518,7 @@ namespace libcasm_fe {
     break;
 
   case 36:
-#line 722 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 710 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< InvariantDefinition::Ptr > () = Ast::make< InvariantDefinition >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Identifier::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -2526,7 +2526,7 @@ namespace libcasm_fe {
     break;
 
   case 37:
-#line 734 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 722 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto rules = yystack_[1].value.as< Rules::Ptr > ();
       rules->add( yystack_[0].value.as< Rule::Ptr > () );
@@ -2536,7 +2536,7 @@ namespace libcasm_fe {
     break;
 
   case 38:
-#line 740 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 728 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto rules = Ast::make< Rules >( yylhs.location );
       rules->add( yystack_[0].value.as< Rule::Ptr > () );
@@ -2546,7 +2546,7 @@ namespace libcasm_fe {
     break;
 
   case 39:
-#line 750 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 738 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< SkipRule::Ptr > ();
   }
@@ -2554,7 +2554,7 @@ namespace libcasm_fe {
     break;
 
   case 40:
-#line 754 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 742 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< ConditionalRule::Ptr > ();
   }
@@ -2562,7 +2562,7 @@ namespace libcasm_fe {
     break;
 
   case 41:
-#line 758 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 746 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< CaseRule::Ptr > ();
   }
@@ -2570,7 +2570,7 @@ namespace libcasm_fe {
     break;
 
   case 42:
-#line 762 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 750 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< LetRule::Ptr > ();
   }
@@ -2578,7 +2578,7 @@ namespace libcasm_fe {
     break;
 
   case 43:
-#line 766 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 754 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< ForallRule::Ptr > ();
   }
@@ -2586,7 +2586,7 @@ namespace libcasm_fe {
     break;
 
   case 44:
-#line 770 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 758 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< ChooseRule::Ptr > ();
   }
@@ -2594,7 +2594,7 @@ namespace libcasm_fe {
     break;
 
   case 45:
-#line 774 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 762 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< IterateRule::Ptr > ();
   }
@@ -2602,7 +2602,7 @@ namespace libcasm_fe {
     break;
 
   case 46:
-#line 778 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 766 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< BlockRule::Ptr > ();
   }
@@ -2610,7 +2610,7 @@ namespace libcasm_fe {
     break;
 
   case 47:
-#line 782 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 770 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< SequenceRule::Ptr > ();
   }
@@ -2618,7 +2618,7 @@ namespace libcasm_fe {
     break;
 
   case 48:
-#line 786 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 774 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< UpdateRule::Ptr > ();
   }
@@ -2626,7 +2626,7 @@ namespace libcasm_fe {
     break;
 
   case 49:
-#line 790 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 778 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< CallRule::Ptr > ();
   }
@@ -2634,7 +2634,7 @@ namespace libcasm_fe {
     break;
 
   case 50:
-#line 794 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 782 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Rule::Ptr > () = yystack_[0].value.as< WhileRule::Ptr > ();
   }
@@ -2642,7 +2642,7 @@ namespace libcasm_fe {
     break;
 
   case 51:
-#line 802 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 790 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< SkipRule::Ptr > () = Ast::make< SkipRule >( yylhs.location, yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -2650,7 +2650,7 @@ namespace libcasm_fe {
     break;
 
   case 52:
-#line 810 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 798 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ConditionalRule::Ptr > () = Ast::make< ConditionalRule >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2658,7 +2658,7 @@ namespace libcasm_fe {
     break;
 
   case 53:
-#line 814 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 802 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ConditionalRule::Ptr > () = Ast::make< ConditionalRule >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< Expression::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Rule::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2666,7 +2666,7 @@ namespace libcasm_fe {
     break;
 
   case 54:
-#line 822 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 810 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< CaseRule::Ptr > () = Ast::make< CaseRule >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< Expression::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Cases::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -2674,7 +2674,7 @@ namespace libcasm_fe {
     break;
 
   case 55:
-#line 826 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 814 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< CaseRule::Ptr > () = nullptr;
   }
@@ -2682,7 +2682,7 @@ namespace libcasm_fe {
     break;
 
   case 56:
-#line 834 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 822 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto cases = yystack_[1].value.as< Cases::Ptr > ();
       cases->add( yystack_[0].value.as< Case::Ptr > () );
@@ -2692,7 +2692,7 @@ namespace libcasm_fe {
     break;
 
   case 57:
-#line 840 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 828 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto cases = Ast::make< Cases >( yylhs.location );
       cases->add( yystack_[0].value.as< Case::Ptr > () );
@@ -2702,7 +2702,7 @@ namespace libcasm_fe {
     break;
 
   case 58:
-#line 850 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 838 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Case::Ptr > () = Ast::make< DefaultCase >( yylhs.location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2710,7 +2710,7 @@ namespace libcasm_fe {
     break;
 
   case 59:
-#line 854 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 842 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Case::Ptr > () = Ast::make< DefaultCase >( yylhs.location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2718,7 +2718,7 @@ namespace libcasm_fe {
     break;
 
   case 60:
-#line 858 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 846 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Case::Ptr > () = Ast::make< ExpressionCase >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2726,7 +2726,7 @@ namespace libcasm_fe {
     break;
 
   case 61:
-#line 866 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 854 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< LetRule::Ptr > () = Ast::make< LetRule >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< VariableBindings::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2734,7 +2734,7 @@ namespace libcasm_fe {
     break;
 
   case 62:
-#line 874 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 862 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ForallRule::Ptr > () = Ast::make< ForallRule >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< VariableDefinitions::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2742,7 +2742,7 @@ namespace libcasm_fe {
     break;
 
   case 63:
-#line 878 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 866 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ForallRule::Ptr > () = Ast::make< ForallRule >( yylhs.location, yystack_[7].value.as< Ast::Token::Ptr > (), yystack_[6].value.as< VariableDefinitions::Ptr > (), yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< Expression::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2750,7 +2750,7 @@ namespace libcasm_fe {
     break;
 
   case 64:
-#line 886 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 874 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ChooseRule::Ptr > () = Ast::make< ChooseRule >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< VariableDefinitions::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2758,7 +2758,7 @@ namespace libcasm_fe {
     break;
 
   case 65:
-#line 894 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 882 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< IterateRule::Ptr > () = Ast::make< IterateRule >( yylhs.location, yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2766,7 +2766,7 @@ namespace libcasm_fe {
     break;
 
   case 66:
-#line 902 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 890 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< BlockRule::Ptr > () = Ast::make< BlockRule >( yylhs.location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Rules::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -2774,7 +2774,7 @@ namespace libcasm_fe {
     break;
 
   case 67:
-#line 906 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 894 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< BlockRule::Ptr > () = Ast::make< BlockRule >( yylhs.location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Rules::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -2782,7 +2782,7 @@ namespace libcasm_fe {
     break;
 
   case 68:
-#line 910 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 898 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< BlockRule::Ptr > () = nullptr;
       yyerrok;
@@ -2791,7 +2791,7 @@ namespace libcasm_fe {
     break;
 
   case 69:
-#line 915 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 903 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< BlockRule::Ptr > () = nullptr;
       yyerrok;
@@ -2800,7 +2800,7 @@ namespace libcasm_fe {
     break;
 
   case 70:
-#line 924 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 912 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< SequenceRule::Ptr > () = Ast::make< SequenceRule >( yylhs.location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Rules::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -2808,7 +2808,7 @@ namespace libcasm_fe {
     break;
 
   case 71:
-#line 928 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 916 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< SequenceRule::Ptr > () = Ast::make< SequenceRule >( yylhs.location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Rules::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -2816,7 +2816,7 @@ namespace libcasm_fe {
     break;
 
   case 72:
-#line 932 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 920 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< SequenceRule::Ptr > () = nullptr;
       yyerrok;
@@ -2825,7 +2825,7 @@ namespace libcasm_fe {
     break;
 
   case 73:
-#line 937 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 925 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< SequenceRule::Ptr > () = nullptr;
       yyerrok;
@@ -2834,7 +2834,7 @@ namespace libcasm_fe {
     break;
 
   case 74:
-#line 946 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 934 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< UpdateRule::Ptr > () = Ast::make< UpdateRule >( yylhs.location, yystack_[2].value.as< DirectCallExpression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -2842,7 +2842,7 @@ namespace libcasm_fe {
     break;
 
   case 75:
-#line 954 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 942 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< CallRule::Ptr > () = Ast::make< CallRule >( yylhs.location, yystack_[0].value.as< CallExpression::Ptr > () );
   }
@@ -2850,7 +2850,7 @@ namespace libcasm_fe {
     break;
 
   case 76:
-#line 962 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 950 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< WhileRule::Ptr > () = Ast::make< WhileRule >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Rule::Ptr > () );
   }
@@ -2858,7 +2858,7 @@ namespace libcasm_fe {
     break;
 
   case 77:
-#line 974 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 962 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto expressions = yystack_[2].value.as< Expressions::Ptr > ();
       yystack_[0].value.as< Expression::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -2869,7 +2869,7 @@ namespace libcasm_fe {
     break;
 
   case 78:
-#line 981 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 969 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto expressions = Ast::make< Expressions >( yylhs.location );
       expressions->add( yystack_[0].value.as< Expression::Ptr > () );
@@ -2879,7 +2879,7 @@ namespace libcasm_fe {
     break;
 
   case 79:
-#line 991 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 979 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
      yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< Expression::Ptr > ();
   }
@@ -2887,7 +2887,7 @@ namespace libcasm_fe {
     break;
 
   case 80:
-#line 995 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 983 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< TypeCastingExpression::Ptr > ();
   }
@@ -2895,7 +2895,7 @@ namespace libcasm_fe {
     break;
 
   case 81:
-#line 999 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 987 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< Expression::Ptr > ();
   }
@@ -2903,7 +2903,7 @@ namespace libcasm_fe {
     break;
 
   case 82:
-#line 1003 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 991 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< LetExpression::Ptr > ();
   }
@@ -2911,7 +2911,7 @@ namespace libcasm_fe {
     break;
 
   case 83:
-#line 1007 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 995 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< ConditionalExpression::Ptr > ();
   }
@@ -2919,7 +2919,7 @@ namespace libcasm_fe {
     break;
 
   case 84:
-#line 1011 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 999 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< ChooseExpression::Ptr > ();
   }
@@ -2927,7 +2927,7 @@ namespace libcasm_fe {
     break;
 
   case 85:
-#line 1015 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1003 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< UniversalQuantifierExpression::Ptr > ();
   }
@@ -2935,7 +2935,7 @@ namespace libcasm_fe {
     break;
 
   case 86:
-#line 1019 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1007 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< ExistentialQuantifierExpression::Ptr > ();
   }
@@ -2943,7 +2943,7 @@ namespace libcasm_fe {
     break;
 
   case 87:
-#line 1023 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1011 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< CardinalityExpression::Ptr > ();
   }
@@ -2951,7 +2951,7 @@ namespace libcasm_fe {
     break;
 
   case 88:
-#line 1031 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1019 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< Ast::EmbracedExpression >( yylhs.location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Expression::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -2959,7 +2959,7 @@ namespace libcasm_fe {
     break;
 
   case 89:
-#line 1035 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1023 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = nullptr;
   }
@@ -2967,7 +2967,7 @@ namespace libcasm_fe {
     break;
 
   case 90:
-#line 1039 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1027 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< CallExpression::Ptr > ();
   }
@@ -2975,7 +2975,7 @@ namespace libcasm_fe {
     break;
 
   case 91:
-#line 1043 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1031 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< LiteralCallExpression::Ptr > ();
   }
@@ -2983,7 +2983,7 @@ namespace libcasm_fe {
     break;
 
   case 92:
-#line 1047 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1035 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = yystack_[0].value.as< Literal::Ptr > ();
   }
@@ -2991,7 +2991,7 @@ namespace libcasm_fe {
     break;
 
   case 93:
-#line 1051 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1039 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< UnaryExpression >( yylhs.location, yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::ADD_INSTRUCTION );
   }
@@ -2999,7 +2999,7 @@ namespace libcasm_fe {
     break;
 
   case 94:
-#line 1055 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1043 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< UnaryExpression >( yylhs.location, yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::INV_INSTRUCTION );
   }
@@ -3007,7 +3007,7 @@ namespace libcasm_fe {
     break;
 
   case 95:
-#line 1067 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1055 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::ADD_INSTRUCTION );
   }
@@ -3015,7 +3015,7 @@ namespace libcasm_fe {
     break;
 
   case 96:
-#line 1071 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1059 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::SUB_INSTRUCTION );
   }
@@ -3023,7 +3023,7 @@ namespace libcasm_fe {
     break;
 
   case 97:
-#line 1075 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1063 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::MUL_INSTRUCTION );
   }
@@ -3031,7 +3031,7 @@ namespace libcasm_fe {
     break;
 
   case 98:
-#line 1079 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1067 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::DIV_INSTRUCTION );
   }
@@ -3039,7 +3039,7 @@ namespace libcasm_fe {
     break;
 
   case 99:
-#line 1083 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1071 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::MOD_INSTRUCTION );
   }
@@ -3047,7 +3047,7 @@ namespace libcasm_fe {
     break;
 
   case 100:
-#line 1087 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1075 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::POW_INSTRUCTION );
   }
@@ -3055,7 +3055,7 @@ namespace libcasm_fe {
     break;
 
   case 101:
-#line 1091 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1079 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::NEQ_INSTRUCTION );
   }
@@ -3063,7 +3063,7 @@ namespace libcasm_fe {
     break;
 
   case 102:
-#line 1095 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1083 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::EQU_INSTRUCTION );
   }
@@ -3071,7 +3071,7 @@ namespace libcasm_fe {
     break;
 
   case 103:
-#line 1099 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1087 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::LTH_INSTRUCTION );
   }
@@ -3079,7 +3079,7 @@ namespace libcasm_fe {
     break;
 
   case 104:
-#line 1103 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1091 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::GTH_INSTRUCTION );
   }
@@ -3087,7 +3087,7 @@ namespace libcasm_fe {
     break;
 
   case 105:
-#line 1107 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1095 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::LEQ_INSTRUCTION );
   }
@@ -3095,7 +3095,7 @@ namespace libcasm_fe {
     break;
 
   case 106:
-#line 1111 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1099 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::GEQ_INSTRUCTION );
   }
@@ -3103,7 +3103,7 @@ namespace libcasm_fe {
     break;
 
   case 107:
-#line 1115 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1103 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::OR_INSTRUCTION );
   }
@@ -3111,7 +3111,7 @@ namespace libcasm_fe {
     break;
 
   case 108:
-#line 1119 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1107 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::XOR_INSTRUCTION );
   }
@@ -3119,7 +3119,7 @@ namespace libcasm_fe {
     break;
 
   case 109:
-#line 1123 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1111 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::AND_INSTRUCTION );
   }
@@ -3127,7 +3127,7 @@ namespace libcasm_fe {
     break;
 
   case 110:
-#line 1127 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1115 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::IMP_INSTRUCTION );
   }
@@ -3135,7 +3135,7 @@ namespace libcasm_fe {
     break;
 
   case 111:
-#line 1131 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1119 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< BinaryExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::IMP_INSTRUCTION );
   }
@@ -3143,7 +3143,7 @@ namespace libcasm_fe {
     break;
 
   case 112:
-#line 1135 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1123 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Expression::Ptr > () = Ast::make< UnaryExpression >( yylhs.location, yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > (), libcasm_ir::Value::NOT_INSTRUCTION );
   }
@@ -3151,7 +3151,7 @@ namespace libcasm_fe {
     break;
 
   case 113:
-#line 1143 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1131 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< CallExpression::Ptr > () = yystack_[0].value.as< DirectCallExpression::Ptr > ();
   }
@@ -3159,7 +3159,7 @@ namespace libcasm_fe {
     break;
 
   case 114:
-#line 1147 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1135 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< CallExpression::Ptr > () = yystack_[0].value.as< MethodCallExpression::Ptr > ();
   }
@@ -3167,7 +3167,7 @@ namespace libcasm_fe {
     break;
 
   case 115:
-#line 1151 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1139 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< CallExpression::Ptr > () = yystack_[0].value.as< IndirectCallExpression::Ptr > ();
   }
@@ -3175,7 +3175,7 @@ namespace libcasm_fe {
     break;
 
   case 116:
-#line 1159 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1147 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as< DirectCallExpression::Ptr > () = Ast::make< DirectCallExpression >( yylhs.location, yystack_[0].value.as< IdentifierPath::Ptr > (), arguments );
@@ -3184,7 +3184,7 @@ namespace libcasm_fe {
     break;
 
   case 117:
-#line 1164 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1152 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as< DirectCallExpression::Ptr > () = Ast::make< DirectCallExpression >( yylhs.location, yystack_[2].value.as< IdentifierPath::Ptr > (), arguments );
@@ -3195,7 +3195,7 @@ namespace libcasm_fe {
     break;
 
   case 118:
-#line 1171 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1159 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< DirectCallExpression::Ptr > () = Ast::make< DirectCallExpression >( yylhs.location, yystack_[3].value.as< IdentifierPath::Ptr > (), yystack_[1].value.as< Expressions::Ptr > () );
       yylhs.value.as< DirectCallExpression::Ptr > ()->setLeftBracketToken( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -3205,7 +3205,7 @@ namespace libcasm_fe {
     break;
 
   case 119:
-#line 1177 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1165 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< DirectCallExpression::Ptr > () = nullptr;
   }
@@ -3213,7 +3213,7 @@ namespace libcasm_fe {
     break;
 
   case 120:
-#line 1185 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1173 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as< MethodCallExpression::Ptr > () = Ast::make< MethodCallExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Identifier::Ptr > (), arguments );
@@ -3222,7 +3222,7 @@ namespace libcasm_fe {
     break;
 
   case 121:
-#line 1190 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1178 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as< MethodCallExpression::Ptr > () = Ast::make< MethodCallExpression >( yylhs.location, yystack_[4].value.as< Expression::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Identifier::Ptr > (), arguments );
@@ -3233,7 +3233,7 @@ namespace libcasm_fe {
     break;
 
   case 122:
-#line 1197 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1185 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< MethodCallExpression::Ptr > () = Ast::make< MethodCallExpression >( yylhs.location, yystack_[5].value.as< Expression::Ptr > (), yystack_[4].value.as< Ast::Token::Ptr > (), yystack_[3].value.as< Identifier::Ptr > (), yystack_[1].value.as< Expressions::Ptr > () );
       yylhs.value.as< MethodCallExpression::Ptr > ()->setLeftBracketToken( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -3243,7 +3243,7 @@ namespace libcasm_fe {
     break;
 
   case 123:
-#line 1203 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1191 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< MethodCallExpression::Ptr > () = nullptr;
   }
@@ -3251,7 +3251,7 @@ namespace libcasm_fe {
     break;
 
   case 124:
-#line 1211 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1199 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< LiteralCallExpression::Ptr > () = Ast::make< LiteralCallExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< ValueLiteral::Ptr > () );
   }
@@ -3259,7 +3259,7 @@ namespace libcasm_fe {
     break;
 
   case 125:
-#line 1219 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1207 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as< IndirectCallExpression::Ptr > () = Ast::make< IndirectCallExpression >( yylhs.location, yystack_[2].value.as< CallExpression::Ptr > (), arguments );
@@ -3270,7 +3270,7 @@ namespace libcasm_fe {
     break;
 
   case 126:
-#line 1226 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1214 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< IndirectCallExpression::Ptr > () = Ast::make< IndirectCallExpression >( yylhs.location, yystack_[3].value.as< CallExpression::Ptr > (), yystack_[1].value.as< Expressions::Ptr > () );
       yylhs.value.as< IndirectCallExpression::Ptr > ()->setLeftBracketToken( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -3280,7 +3280,7 @@ namespace libcasm_fe {
     break;
 
   case 127:
-#line 1232 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1220 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< IndirectCallExpression::Ptr > () = nullptr;
   }
@@ -3288,7 +3288,7 @@ namespace libcasm_fe {
     break;
 
   case 128:
-#line 1240 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1228 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< TypeCastingExpression::Ptr > () = Ast::make< TypeCastingExpression >( yylhs.location, yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< libcasm_fe::Ast::Type::Ptr > () );
   }
@@ -3296,7 +3296,7 @@ namespace libcasm_fe {
     break;
 
   case 129:
-#line 1248 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1236 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< LetExpression::Ptr > () = Ast::make< LetExpression >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< VariableBindings::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -3304,7 +3304,7 @@ namespace libcasm_fe {
     break;
 
   case 130:
-#line 1256 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1244 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ConditionalExpression::Ptr > () = Ast::make< ConditionalExpression >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< Expression::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -3312,7 +3312,7 @@ namespace libcasm_fe {
     break;
 
   case 131:
-#line 1264 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1252 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ChooseExpression::Ptr > () = Ast::make< ChooseExpression >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< VariableDefinitions::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -3320,7 +3320,7 @@ namespace libcasm_fe {
     break;
 
   case 132:
-#line 1272 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1260 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< UniversalQuantifierExpression::Ptr > () = Ast::make< UniversalQuantifierExpression >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< VariableDefinitions::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -3328,7 +3328,7 @@ namespace libcasm_fe {
     break;
 
   case 133:
-#line 1280 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1268 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ExistentialQuantifierExpression::Ptr > () = Ast::make< ExistentialQuantifierExpression >( yylhs.location, yystack_[5].value.as< Ast::Token::Ptr > (), yystack_[4].value.as< VariableDefinitions::Ptr > (), yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Expression::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -3336,7 +3336,7 @@ namespace libcasm_fe {
     break;
 
   case 134:
-#line 1288 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1276 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< CardinalityExpression::Ptr > () = Ast::make< CardinalityExpression >( yylhs.location, yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Expression::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -3344,7 +3344,7 @@ namespace libcasm_fe {
     break;
 
   case 135:
-#line 1301 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1289 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< UndefLiteral::Ptr > ();
   }
@@ -3352,7 +3352,7 @@ namespace libcasm_fe {
     break;
 
   case 136:
-#line 1305 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1293 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< ValueLiteral::Ptr > ();
   }
@@ -3360,7 +3360,7 @@ namespace libcasm_fe {
     break;
 
   case 137:
-#line 1309 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1297 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< ValueLiteral::Ptr > ();
   }
@@ -3368,7 +3368,7 @@ namespace libcasm_fe {
     break;
 
   case 138:
-#line 1313 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1301 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< ValueLiteral::Ptr > ();
   }
@@ -3376,7 +3376,7 @@ namespace libcasm_fe {
     break;
 
   case 139:
-#line 1317 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1305 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< ValueLiteral::Ptr > ();
   }
@@ -3384,7 +3384,7 @@ namespace libcasm_fe {
     break;
 
   case 140:
-#line 1321 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1309 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< ValueLiteral::Ptr > ();
   }
@@ -3392,7 +3392,7 @@ namespace libcasm_fe {
     break;
 
   case 141:
-#line 1325 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1313 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< ValueLiteral::Ptr > ();
   }
@@ -3400,7 +3400,7 @@ namespace libcasm_fe {
     break;
 
   case 142:
-#line 1329 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1317 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< ReferenceLiteral::Ptr > ();
   }
@@ -3408,7 +3408,7 @@ namespace libcasm_fe {
     break;
 
   case 143:
-#line 1333 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1321 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< ListLiteral::Ptr > ();
   }
@@ -3416,7 +3416,7 @@ namespace libcasm_fe {
     break;
 
   case 144:
-#line 1337 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1325 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< RangeLiteral::Ptr > ();
   }
@@ -3424,7 +3424,7 @@ namespace libcasm_fe {
     break;
 
   case 145:
-#line 1341 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1329 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< TupleLiteral::Ptr > ();
   }
@@ -3432,7 +3432,7 @@ namespace libcasm_fe {
     break;
 
   case 146:
-#line 1345 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1333 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Literal::Ptr > () = yystack_[0].value.as< RecordLiteral::Ptr > ();
   }
@@ -3440,7 +3440,7 @@ namespace libcasm_fe {
     break;
 
   case 147:
-#line 1353 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1341 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< UndefLiteral::Ptr > () = Ast::make< UndefLiteral >( yylhs.location );
   }
@@ -3448,7 +3448,7 @@ namespace libcasm_fe {
     break;
 
   case 148:
-#line 1361 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1349 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
       yylhs.value.as< ValueLiteral::Ptr > () = Ast::make< ValueLiteral >( yylhs.location, value );
@@ -3457,7 +3457,7 @@ namespace libcasm_fe {
     break;
 
   case 149:
-#line 1366 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1354 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( false );
       yylhs.value.as< ValueLiteral::Ptr > () = Ast::make< ValueLiteral >( yylhs.location, value );
@@ -3466,7 +3466,7 @@ namespace libcasm_fe {
     break;
 
   case 150:
-#line 1375 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1363 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       try
       {
@@ -3482,7 +3482,7 @@ namespace libcasm_fe {
     break;
 
   case 151:
-#line 1391 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1379 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       try
       {
@@ -3498,7 +3498,7 @@ namespace libcasm_fe {
     break;
 
   case 152:
-#line 1407 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1395 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       try
       {
@@ -3514,7 +3514,7 @@ namespace libcasm_fe {
     break;
 
   case 153:
-#line 1423 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1411 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       try
       {
@@ -3530,7 +3530,7 @@ namespace libcasm_fe {
     break;
 
   case 154:
-#line 1435 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1423 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       try
       {
@@ -3546,7 +3546,7 @@ namespace libcasm_fe {
     break;
 
   case 155:
-#line 1451 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1439 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       try
       {
@@ -3562,7 +3562,7 @@ namespace libcasm_fe {
     break;
 
   case 156:
-#line 1467 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1455 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ReferenceLiteral::Ptr > () = Ast::make< ReferenceLiteral >( yylhs.location, yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< IdentifierPath::Ptr > () );
   }
@@ -3570,7 +3570,7 @@ namespace libcasm_fe {
     break;
 
   case 157:
-#line 1475 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1463 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto expressions = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as< ListLiteral::Ptr > () = Ast::make< ListLiteral >( yylhs.location, expressions );
@@ -3581,7 +3581,7 @@ namespace libcasm_fe {
     break;
 
   case 158:
-#line 1482 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1470 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ListLiteral::Ptr > () = Ast::make< ListLiteral >( yylhs.location, yystack_[1].value.as< Expressions::Ptr > () );
       yylhs.value.as< ListLiteral::Ptr > ()->setLeftBracket( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -3591,7 +3591,7 @@ namespace libcasm_fe {
     break;
 
   case 159:
-#line 1488 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1476 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ListLiteral::Ptr > () = nullptr;
   }
@@ -3599,7 +3599,7 @@ namespace libcasm_fe {
     break;
 
   case 160:
-#line 1496 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1484 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< RangeLiteral::Ptr > () = Ast::make< RangeLiteral >( yylhs.location, yystack_[3].value.as< Expression::Ptr > (), yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Expression::Ptr > () );
       yylhs.value.as< RangeLiteral::Ptr > ()->setLeftBracket( yystack_[4].value.as< Ast::Token::Ptr > () );
@@ -3609,7 +3609,7 @@ namespace libcasm_fe {
     break;
 
   case 161:
-#line 1505 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1493 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto expressions = yystack_[3].value.as< Expressions::Ptr > ();
       yystack_[1].value.as< Expression::Ptr > ()->setDelimiterToken( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -3622,7 +3622,7 @@ namespace libcasm_fe {
     break;
 
   case 162:
-#line 1516 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1504 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< RecordLiteral::Ptr > () = Ast::make< RecordLiteral >( yylhs.location, yystack_[1].value.as< NamedExpressions::Ptr > () );
       yylhs.value.as< RecordLiteral::Ptr > ()->setLeftBracket( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -3632,7 +3632,7 @@ namespace libcasm_fe {
     break;
 
   case 163:
-#line 1525 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1513 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto assignments = yystack_[2].value.as< NamedExpressions::Ptr > ();
       yystack_[0].value.as< NamedExpression::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -3643,7 +3643,7 @@ namespace libcasm_fe {
     break;
 
   case 164:
-#line 1532 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1520 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto assignments = Ast::make< NamedExpressions >( yylhs.location );
       assignments->add( yystack_[0].value.as< NamedExpression::Ptr > () );
@@ -3653,7 +3653,7 @@ namespace libcasm_fe {
     break;
 
   case 165:
-#line 1541 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1529 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< NamedExpression::Ptr > () = Ast::make< NamedExpression >( yylhs.location, yystack_[2].value.as< Identifier::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -3661,7 +3661,7 @@ namespace libcasm_fe {
     break;
 
   case 166:
-#line 1553 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1541 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto types = yystack_[2].value.as< Types::Ptr > ();
       yystack_[0].value.as< libcasm_fe::Ast::Type::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -3672,7 +3672,7 @@ namespace libcasm_fe {
     break;
 
   case 167:
-#line 1560 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1548 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto types = Ast::make< Types >( yylhs.location );
       types->add( yystack_[0].value.as< libcasm_fe::Ast::Type::Ptr > () );
@@ -3682,7 +3682,7 @@ namespace libcasm_fe {
     break;
 
   case 168:
-#line 1569 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1557 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as< BasicType::Ptr > ();
   }
@@ -3690,7 +3690,7 @@ namespace libcasm_fe {
     break;
 
   case 169:
-#line 1573 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1561 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as< TupleType::Ptr > ();
   }
@@ -3698,7 +3698,7 @@ namespace libcasm_fe {
     break;
 
   case 170:
-#line 1577 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1565 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as< RecordType::Ptr > ();
   }
@@ -3706,7 +3706,7 @@ namespace libcasm_fe {
     break;
 
   case 171:
-#line 1581 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1569 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as< TemplateType::Ptr > ();
   }
@@ -3714,7 +3714,7 @@ namespace libcasm_fe {
     break;
 
   case 172:
-#line 1585 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1573 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as< RelationType::Ptr > ();
   }
@@ -3722,7 +3722,7 @@ namespace libcasm_fe {
     break;
 
   case 173:
-#line 1589 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1577 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< libcasm_fe::Ast::Type::Ptr > () = yystack_[0].value.as< FixedSizedType::Ptr > ();
   }
@@ -3730,7 +3730,7 @@ namespace libcasm_fe {
     break;
 
   case 174:
-#line 1597 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1585 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< BasicType::Ptr > () = Ast::make< BasicType >( yylhs.location, yystack_[0].value.as< IdentifierPath::Ptr > () );
   }
@@ -3738,7 +3738,7 @@ namespace libcasm_fe {
     break;
 
   case 175:
-#line 1605 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1593 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto subTypes = yystack_[3].value.as< Types::Ptr > ();
       yystack_[1].value.as< libcasm_fe::Ast::Type::Ptr > ()->setDelimiterToken( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -3749,7 +3749,7 @@ namespace libcasm_fe {
     break;
 
   case 176:
-#line 1616 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1604 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto namedSubTypes = yystack_[3].value.as< VariableDefinitions::Ptr > ();
       yystack_[1].value.as< VariableDefinition::Ptr > ()->setDelimiterToken( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -3760,7 +3760,7 @@ namespace libcasm_fe {
     break;
 
   case 177:
-#line 1627 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1615 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< TemplateType::Ptr > () = Ast::make< TemplateType >( yylhs.location, yystack_[3].value.as< IdentifierPath::Ptr > (), yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Types::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -3768,7 +3768,7 @@ namespace libcasm_fe {
     break;
 
   case 178:
-#line 1635 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1623 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< RelationType::Ptr > () = Ast::make< RelationType >( yylhs.location, yystack_[5].value.as< IdentifierPath::Ptr > (), yystack_[4].value.as< Ast::Token::Ptr > (), yystack_[3].value.as< Types::Ptr > (), yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< libcasm_fe::Ast::Type::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -3776,7 +3776,7 @@ namespace libcasm_fe {
     break;
 
   case 179:
-#line 1643 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1631 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< FixedSizedType::Ptr > () = Ast::make< FixedSizedType >( yylhs.location, yystack_[2].value.as< IdentifierPath::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -3784,7 +3784,7 @@ namespace libcasm_fe {
     break;
 
   case 180:
-#line 1655 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1643 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto types = yystack_[2].value.as< Types::Ptr > ();
       yystack_[0].value.as< libcasm_fe::Ast::Type::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -3795,7 +3795,7 @@ namespace libcasm_fe {
     break;
 
   case 181:
-#line 1662 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1650 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto types = Ast::make< Types >( yylhs.location );
       types->add( yystack_[0].value.as< libcasm_fe::Ast::Type::Ptr > () );
@@ -3805,7 +3805,7 @@ namespace libcasm_fe {
     break;
 
   case 182:
-#line 1672 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1660 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Types::Ptr > () = yystack_[0].value.as< Types::Ptr > ();
   }
@@ -3813,7 +3813,7 @@ namespace libcasm_fe {
     break;
 
   case 183:
-#line 1676 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1664 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Types::Ptr > () = Ast::make< Types >( yylhs.location );
   }
@@ -3821,7 +3821,7 @@ namespace libcasm_fe {
     break;
 
   case 184:
-#line 1684 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1672 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto parameters = yystack_[2].value.as< VariableDefinitions::Ptr > ();
       yystack_[0].value.as< VariableDefinition::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -3832,7 +3832,7 @@ namespace libcasm_fe {
     break;
 
   case 185:
-#line 1691 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1679 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto parameters = Ast::make< NodeList< VariableDefinition > >( yylhs.location );
       parameters->add( yystack_[0].value.as< VariableDefinition::Ptr > () );
@@ -3842,7 +3842,7 @@ namespace libcasm_fe {
     break;
 
   case 186:
-#line 1705 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1693 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Defined::Ptr > () = Ast::make< Defined >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Expression::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -3850,7 +3850,7 @@ namespace libcasm_fe {
     break;
 
   case 187:
-#line 1709 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1697 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Defined::Ptr > () = Ast::make< Defined >( yylhs.location, uToken, uToken, Ast::make< UndefLiteral >( yylhs.location ), uToken );
   }
@@ -3858,7 +3858,7 @@ namespace libcasm_fe {
     break;
 
   case 188:
-#line 1717 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1705 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Initially::Ptr > () = Ast::make< Initially >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Ast::Token::Ptr > (), yystack_[1].value.as< Initializers::Ptr > (), yystack_[0].value.as< Ast::Token::Ptr > () );
   }
@@ -3866,7 +3866,7 @@ namespace libcasm_fe {
     break;
 
   case 189:
-#line 1721 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1709 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto initializers = Ast::make< Initializers >( yylhs.location );
       yylhs.value.as< Initially::Ptr > () = Ast::make< Initially >( yylhs.location, uToken, uToken, initializers, uToken );
@@ -3875,7 +3875,7 @@ namespace libcasm_fe {
     break;
 
   case 190:
-#line 1730 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1718 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto initializers = yystack_[2].value.as< Initializers::Ptr > ();
       yystack_[0].value.as< Initializer::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -3886,7 +3886,7 @@ namespace libcasm_fe {
     break;
 
   case 191:
-#line 1737 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1725 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto initializers = Ast::make< Initializers >( yylhs.location );
       initializers->add( yystack_[0].value.as< Initializer::Ptr > () );
@@ -3896,7 +3896,7 @@ namespace libcasm_fe {
     break;
 
   case 192:
-#line 1747 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1735 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto arguments = Ast::make< Expressions >( yylhs.location );
       yylhs.value.as< Initializer::Ptr > () = Ast::make< Initializer >( yylhs.location, uToken, arguments, uToken, uToken, yystack_[0].value.as< Expression::Ptr > () );
@@ -3907,7 +3907,7 @@ namespace libcasm_fe {
     break;
 
   case 193:
-#line 1754 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1742 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto arguments = Ast::make< Expressions >( yylhs.location );
       arguments->add( yystack_[3].value.as< Expression::Ptr > () );
@@ -3919,7 +3919,7 @@ namespace libcasm_fe {
     break;
 
   case 194:
-#line 1762 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1750 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto arguments = yystack_[2].value.as< TupleLiteral::Ptr > ()->expressions();
       const auto lbToken = yystack_[2].value.as< TupleLiteral::Ptr > ()->leftBracket();
@@ -3932,7 +3932,7 @@ namespace libcasm_fe {
     break;
 
   case 195:
-#line 1779 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1767 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Identifier::Ptr > () = Ast::make< Identifier >( yylhs.location, yystack_[0].value.as< std::string > () );
   }
@@ -3940,7 +3940,7 @@ namespace libcasm_fe {
     break;
 
   case 196:
-#line 1783 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1771 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Identifier::Ptr > () = Ast::make< Identifier >( yylhs.location, "in" );
   }
@@ -3948,7 +3948,7 @@ namespace libcasm_fe {
     break;
 
   case 197:
-#line 1791 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1779 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto path = yystack_[2].value.as< IdentifierPath::Ptr > ();
       yystack_[0].value.as< Identifier::Ptr > ()->setDoubleColon( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -3959,7 +3959,7 @@ namespace libcasm_fe {
     break;
 
   case 198:
-#line 1798 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1786 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< IdentifierPath::Ptr > () = Ast::make< IdentifierPath >( yylhs.location, yystack_[0].value.as< Identifier::Ptr > () );
   }
@@ -3967,7 +3967,7 @@ namespace libcasm_fe {
     break;
 
   case 199:
-#line 1810 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1798 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< VariableDefinition::Ptr > () = yystack_[0].value.as< VariableDefinition::Ptr > ();
   }
@@ -3975,7 +3975,7 @@ namespace libcasm_fe {
     break;
 
   case 200:
-#line 1814 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1802 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       const auto unresolvedType = Ast::make< UnresolvedType >( yylhs.location );
       yylhs.value.as< VariableDefinition::Ptr > () = Ast::make< VariableDefinition >( yylhs.location, yystack_[0].value.as< Identifier::Ptr > (), uToken, unresolvedType );
@@ -3984,7 +3984,7 @@ namespace libcasm_fe {
     break;
 
   case 201:
-#line 1823 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1811 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto variables = yystack_[2].value.as< VariableDefinitions::Ptr > ();
       yystack_[0].value.as< VariableDefinition::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -3995,7 +3995,7 @@ namespace libcasm_fe {
     break;
 
   case 202:
-#line 1830 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1818 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto variables = Ast::make< VariableDefinitions >( yylhs.location );
       variables->add( yystack_[0].value.as< VariableDefinition::Ptr > () );
@@ -4005,7 +4005,7 @@ namespace libcasm_fe {
     break;
 
   case 203:
-#line 1840 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1828 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto typedVariables = yystack_[2].value.as< VariableDefinitions::Ptr > ();
       yystack_[0].value.as< VariableDefinition::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -4016,7 +4016,7 @@ namespace libcasm_fe {
     break;
 
   case 204:
-#line 1847 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1835 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto typedVariables = Ast::make< VariableDefinitions >( yylhs.location );
       typedVariables->add( yystack_[0].value.as< VariableDefinition::Ptr > () );
@@ -4026,7 +4026,7 @@ namespace libcasm_fe {
     break;
 
   case 205:
-#line 1857 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1845 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto variable = Ast::make< VariableDefinition >( yylhs.location, yystack_[2].value.as< Identifier::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< libcasm_fe::Ast::Type::Ptr > () );
       yylhs.value.as< VariableDefinition::Ptr > () = variable;
@@ -4035,7 +4035,7 @@ namespace libcasm_fe {
     break;
 
   case 206:
-#line 1866 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1854 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto variable = yystack_[0].value.as< VariableDefinition::Ptr > ();
       variable->setAttributes( yystack_[1].value.as< Attributes::Ptr > () );
@@ -4045,7 +4045,7 @@ namespace libcasm_fe {
     break;
 
   case 207:
-#line 1872 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1860 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< VariableDefinition::Ptr > () = yystack_[0].value.as< VariableDefinition::Ptr > ();
   }
@@ -4053,7 +4053,7 @@ namespace libcasm_fe {
     break;
 
   case 208:
-#line 1880 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1868 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto variable = yystack_[0].value.as< VariableDefinition::Ptr > ();
       variable->setAttributes( yystack_[1].value.as< Attributes::Ptr > () );
@@ -4063,7 +4063,7 @@ namespace libcasm_fe {
     break;
 
   case 209:
-#line 1886 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1874 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< VariableDefinition::Ptr > () = yystack_[0].value.as< VariableDefinition::Ptr > ();
   }
@@ -4071,7 +4071,7 @@ namespace libcasm_fe {
     break;
 
   case 210:
-#line 1898 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1886 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto variableBindings = yystack_[2].value.as< VariableBindings::Ptr > ();
       yystack_[0].value.as< VariableBinding::Ptr > ()->setDelimiterToken( yystack_[1].value.as< Ast::Token::Ptr > () );
@@ -4082,7 +4082,7 @@ namespace libcasm_fe {
     break;
 
   case 211:
-#line 1905 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1893 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto variableBindings = Ast::make< VariableBindings >( yylhs.location );
       variableBindings->add( yystack_[0].value.as< VariableBinding::Ptr > () );
@@ -4092,7 +4092,7 @@ namespace libcasm_fe {
     break;
 
   case 212:
-#line 1914 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1902 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< VariableBinding::Ptr > () = Ast::make< VariableBinding >( yylhs.location, yystack_[2].value.as< VariableDefinition::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -4100,7 +4100,7 @@ namespace libcasm_fe {
     break;
 
   case 213:
-#line 1926 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1914 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto attributes = yystack_[1].value.as< Attributes::Ptr > ();
       attributes->add( yystack_[0].value.as< Attribute::Ptr > () );
@@ -4110,7 +4110,7 @@ namespace libcasm_fe {
     break;
 
   case 214:
-#line 1932 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1920 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto attributes = Ast::make< Attributes >( yylhs.location );
       attributes->add( yystack_[0].value.as< Attribute::Ptr > () );
@@ -4120,7 +4120,7 @@ namespace libcasm_fe {
     break;
 
   case 215:
-#line 1941 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1929 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto attribute = yystack_[1].value.as< BasicAttribute::Ptr > ();
       yystack_[1].value.as< BasicAttribute::Ptr > ()->setLeftBrace( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -4131,7 +4131,7 @@ namespace libcasm_fe {
     break;
 
   case 216:
-#line 1948 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1936 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       auto attribute = yystack_[1].value.as< ExpressionAttribute::Ptr > ();
       yystack_[1].value.as< ExpressionAttribute::Ptr > ()->setLeftBrace( yystack_[2].value.as< Ast::Token::Ptr > () );
@@ -4142,7 +4142,7 @@ namespace libcasm_fe {
     break;
 
   case 217:
-#line 1955 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1943 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< Attribute::Ptr > () = nullptr;
   }
@@ -4150,7 +4150,7 @@ namespace libcasm_fe {
     break;
 
   case 218:
-#line 1962 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1950 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< BasicAttribute::Ptr > () = Ast::make< BasicAttribute >( yylhs.location, yystack_[0].value.as< Identifier::Ptr > () );
   }
@@ -4158,7 +4158,7 @@ namespace libcasm_fe {
     break;
 
   case 219:
-#line 1969 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
+#line 1957 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
       yylhs.value.as< ExpressionAttribute::Ptr > () = Ast::make< ExpressionAttribute >( yylhs.location, yystack_[1].value.as< Identifier::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
@@ -5263,28 +5263,28 @@ namespace libcasm_fe {
   const unsigned short int
   Parser::yyrline_[] =
   {
-       0,   459,   459,   468,   474,   482,   488,   498,   504,   508,
-     516,   520,   524,   528,   532,   536,   540,   548,   578,   599,
-     607,   612,   618,   626,   632,   637,   644,   650,   654,   662,
-     678,   682,   688,   696,   703,   713,   721,   733,   739,   749,
-     753,   757,   761,   765,   769,   773,   777,   781,   785,   789,
-     793,   801,   809,   813,   821,   825,   833,   839,   849,   853,
-     857,   865,   873,   877,   885,   893,   901,   905,   909,   914,
-     923,   927,   931,   936,   945,   953,   961,   973,   980,   990,
-     994,   998,  1002,  1006,  1010,  1014,  1018,  1022,  1030,  1034,
-    1038,  1042,  1046,  1050,  1054,  1066,  1070,  1074,  1078,  1082,
-    1086,  1090,  1094,  1098,  1102,  1106,  1110,  1114,  1118,  1122,
-    1126,  1130,  1134,  1142,  1146,  1150,  1158,  1163,  1170,  1176,
-    1184,  1189,  1196,  1202,  1210,  1218,  1225,  1231,  1239,  1247,
-    1255,  1263,  1271,  1279,  1287,  1300,  1304,  1308,  1312,  1316,
-    1320,  1324,  1328,  1332,  1336,  1340,  1344,  1352,  1360,  1365,
-    1374,  1390,  1406,  1422,  1434,  1450,  1466,  1474,  1481,  1487,
-    1495,  1504,  1515,  1524,  1531,  1540,  1552,  1559,  1568,  1572,
-    1576,  1580,  1584,  1588,  1596,  1604,  1615,  1626,  1634,  1642,
-    1654,  1661,  1671,  1675,  1683,  1690,  1704,  1708,  1716,  1720,
-    1729,  1736,  1746,  1753,  1761,  1778,  1782,  1790,  1797,  1809,
-    1813,  1822,  1829,  1839,  1846,  1856,  1865,  1871,  1879,  1885,
-    1897,  1904,  1913,  1925,  1931,  1940,  1947,  1954,  1961,  1968
+       0,   447,   447,   456,   462,   470,   476,   486,   492,   496,
+     504,   508,   512,   516,   520,   524,   528,   536,   566,   587,
+     595,   600,   606,   614,   620,   625,   632,   638,   642,   650,
+     666,   670,   676,   684,   691,   701,   709,   721,   727,   737,
+     741,   745,   749,   753,   757,   761,   765,   769,   773,   777,
+     781,   789,   797,   801,   809,   813,   821,   827,   837,   841,
+     845,   853,   861,   865,   873,   881,   889,   893,   897,   902,
+     911,   915,   919,   924,   933,   941,   949,   961,   968,   978,
+     982,   986,   990,   994,   998,  1002,  1006,  1010,  1018,  1022,
+    1026,  1030,  1034,  1038,  1042,  1054,  1058,  1062,  1066,  1070,
+    1074,  1078,  1082,  1086,  1090,  1094,  1098,  1102,  1106,  1110,
+    1114,  1118,  1122,  1130,  1134,  1138,  1146,  1151,  1158,  1164,
+    1172,  1177,  1184,  1190,  1198,  1206,  1213,  1219,  1227,  1235,
+    1243,  1251,  1259,  1267,  1275,  1288,  1292,  1296,  1300,  1304,
+    1308,  1312,  1316,  1320,  1324,  1328,  1332,  1340,  1348,  1353,
+    1362,  1378,  1394,  1410,  1422,  1438,  1454,  1462,  1469,  1475,
+    1483,  1492,  1503,  1512,  1519,  1528,  1540,  1547,  1556,  1560,
+    1564,  1568,  1572,  1576,  1584,  1592,  1603,  1614,  1622,  1630,
+    1642,  1649,  1659,  1663,  1671,  1678,  1692,  1696,  1704,  1708,
+    1717,  1724,  1734,  1741,  1749,  1766,  1770,  1778,  1785,  1797,
+    1801,  1810,  1817,  1827,  1834,  1844,  1853,  1859,  1867,  1873,
+    1885,  1892,  1901,  1913,  1919,  1928,  1935,  1942,  1949,  1956
   };
 
   // Print the state stack on the debug stream.
@@ -5320,7 +5320,7 @@ namespace libcasm_fe {
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:1163
 } // libcasm_fe
 #line 5323 "GrammarParser.cpp" // lalr1.cc:1163
-#line 1974 "../../obj/src/GrammarParser.yy" // lalr1.cc:1164
+#line 1962 "../../obj/src/GrammarParser.yy" // lalr1.cc:1164
 
 
 void Parser::error( const SourceLocation& location, const std::string& message )
