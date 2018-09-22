@@ -565,7 +565,7 @@ UsingDefinition
 InvariantDefinition
 : INVARIANT Identifier EQUAL Term
   {
-      $$ = Ast::make< InvariantDefinition >( @$, $2, $4 );
+      $$ = Ast::make< InvariantDefinition >( @$, $1, $2, $3, $4 );
   }
 ;
 

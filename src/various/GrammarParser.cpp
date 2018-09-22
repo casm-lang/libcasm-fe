@@ -2520,7 +2520,7 @@ namespace libcasm_fe {
   case 36:
 #line 722 "../../obj/src/GrammarParser.yy" // lalr1.cc:856
     {
-      yylhs.value.as< InvariantDefinition::Ptr > () = Ast::make< InvariantDefinition >( yylhs.location, yystack_[2].value.as< Identifier::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
+      yylhs.value.as< InvariantDefinition::Ptr > () = Ast::make< InvariantDefinition >( yylhs.location, yystack_[3].value.as< Ast::Token::Ptr > (), yystack_[2].value.as< Identifier::Ptr > (), yystack_[1].value.as< Ast::Token::Ptr > (), yystack_[0].value.as< Expression::Ptr > () );
   }
 #line 2526 "GrammarParser.cpp" // lalr1.cc:856
     break;

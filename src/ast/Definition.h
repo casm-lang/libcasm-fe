@@ -367,14 +367,23 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< InvariantDefinition >;
 
             InvariantDefinition(
-                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
+                const Token::Ptr& invariantToken,
+                const Identifier::Ptr& identifier,
+                const Token::Ptr& assignmentToken,
+                const Expression::Ptr& expression );
 
             const Expression::Ptr& expression( void ) const;
+
+            const Token::Ptr& invariantToken( void ) const;
+
+            const Token::Ptr& assignmentToken( void ) const;
 
             void accept( Visitor& visitor ) override;
 
           private:
             const Expression::Ptr m_expression;
+            const Token::Ptr m_invariantToken;
+            const Token::Ptr m_assignmentToken;
         };
 
         class InitDefinition final : public Definition

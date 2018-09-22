@@ -576,16 +576,36 @@ void UsingDefinition::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
+//
+//
+// InvariantDefinition
+//
+
 InvariantDefinition::InvariantDefinition(
-    const Identifier::Ptr& identifier, const Expression::Ptr& expression )
+    const Token::Ptr& invariantToken,
+    const Identifier::Ptr& identifier,
+    const Token::Ptr& assignmentToken,
+    const Expression::Ptr& expression )
 : Definition( Node::ID::INVARIANT_DEFINITION, identifier )
 , m_expression( expression )
+, m_invariantToken( invariantToken )
+, m_assignmentToken( assignmentToken )
 {
 }
 
 const Expression::Ptr& InvariantDefinition::expression( void ) const
 {
     return m_expression;
+}
+
+const Token::Ptr& InvariantDefinition::invariantToken( void ) const
+{
+    return m_invariantToken;
+}
+
+const Token::Ptr& InvariantDefinition::assignmentToken( void ) const
+{
+    return m_assignmentToken;
 }
 
 void InvariantDefinition::accept( Visitor& visitor )
