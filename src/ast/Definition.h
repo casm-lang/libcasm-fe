@@ -260,6 +260,22 @@ namespace libcasm_fe
           private:
             const Type::Ptr m_type;
         };
+
+        class InvariantDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< InvariantDefinition >;
+
+            InvariantDefinition(
+                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
+
+            const Expression::Ptr& expression( void ) const;
+
+            void accept( Visitor& visitor ) override;
+
+          private:
+            const Expression::Ptr m_expression;
+        };
     }
 }
 

@@ -81,6 +81,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
+    void visit( InvariantDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ReferenceLiteral& node ) override;
@@ -307,6 +308,19 @@ void TypeInferenceVisitor::visit( RuleDefinition& node )
     node.setType( type );
 
     node.rule()->accept( *this );
+}
+
+void TypeInferenceVisitor::visit( InvariantDefinition& node )
+{
+    m_typeIDs[ node.expression().get() ].emplace( libcasm_ir::Type::Kind::BOOLEAN );
+
+    RecursiveVisitor::visit( node );
+
+    checkIfNodeHasTypeOfKind(
+        *node.expression(),
+        libcasm_ir::Type::Kind::BOOLEAN,
+        "expression",
+        Code::TypeInferenceInvariantDefinitionInvalidExpressionType );
 }
 
 void TypeInferenceVisitor::visit( UndefLiteral& node )

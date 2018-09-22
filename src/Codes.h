@@ -114,6 +114,13 @@ namespace libcasm_fe
 
         DerivedDefinitionExpressionInvalidProperty = 0xdede,
 
+        // --------------------------------------------------------- 4*** ...
+        // invariant errors
+        InvariantDefinitionInvalidExpression = 0x4e00,
+        InvariantDefinitionInvariantViolated = 0x4e01,
+
+        InvariantDefinitionExpressionInvalidProperty = 0x4e02,
+
         // --------------------------------------------------------- 5*** ...
         // rule errors
 
@@ -213,6 +220,8 @@ namespace libcasm_fe
         TypeInferenceConditionalRuleInvalidConditionType = 0x1500,
 
         TypeInferenceWhileRuleInvalidConditionType = 0x1501,
+
+        TypeInferenceInvariantDefinitionInvalidExpressionType = 0x1502,
 
         TypeInferenceInvalidMethodCallExpression = 0x1900,
         TypeInferenceInvalidIndirectCallExpression = 0x1901,

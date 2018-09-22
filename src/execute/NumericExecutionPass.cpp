@@ -300,11 +300,14 @@ class ExecutionVisitor final : public EmptyVisitor
      */
     void execute( const ReferenceConstant& value );
 
+    void execute( const Definition::Ptr& definition );
+
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
     void visit( RuleDefinition& node ) override;
     void visit( EnumeratorDefinition& node ) override;
+    void visit( InvariantDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -462,8 +465,14 @@ void ExecutionVisitor::execute( const ReferenceConstant& value )
     const auto& rule = std::static_pointer_cast< RuleDefinition >( literal->reference() );
     assert( ( rule->arguments()->size() == 0 ) && "Only parameter-less rules are supported" );
 
-    m_frameStack.push( makeFrame( nullptr, rule.get(), rule->maximumNumberOfLocals() ) );
-    rule->accept( *this );
+    execute( rule );
+}
+
+void ExecutionVisitor::execute( const Definition::Ptr& definition )
+{
+    m_frameStack.push(
+        makeFrame( nullptr, definition.get(), definition->maximumNumberOfLocals() ) );
+    definition->accept( *this );
     m_frameStack.pop();
 }
 
@@ -566,6 +575,29 @@ void ExecutionVisitor::visit( EnumeratorDefinition& node )
     assert( node.type()->isEnumeration() );
     const auto& enumType = std::static_pointer_cast< IR::EnumerationType >( node.type() );
     m_evaluationStack.push( IR::EnumerationConstant( enumType, node.identifier()->name() ) );
+}
+
+void ExecutionVisitor::visit( InvariantDefinition& node )
+{
+    node.expression()->accept( *this );
+    const auto result = m_evaluationStack.pop< IR::BooleanConstant >();
+
+    if( not result.defined() )
+    {
+        throw RuntimeException(
+            node.expression()->sourceLocation(),
+            "result must be true or false but was undefined",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::InvariantDefinitionInvalidExpression );
+    }
+    else if( result.value() == false )
+    {
+        throw RuntimeException(
+            node.sourceLocation(),
+            "invariant '" + node.identifier()->name() + "' violated",
+            m_frameStack.generateBacktrace( node.sourceLocation(), m_agentId ),
+            Code::InvariantDefinitionInvariantViolated );
+    }
 }
 
 void ExecutionVisitor::visit( UndefLiteral& node )
@@ -1919,6 +1951,42 @@ void AgentScheduler::fireUpdates( void )
     m_collectedUpdates.clear();
 }
 
+class InvariantChecker
+{
+  public:
+    InvariantChecker( ExecutionLocationRegistry& locationRegistry, const Storage& globalState );
+
+    void check( const Specification& specification );
+
+  private:
+    const Storage& m_globalState;
+    ExecutionLocationRegistry& m_locationRegistry;
+};
+
+InvariantChecker::InvariantChecker(
+    ExecutionLocationRegistry& locationRegistry, const Storage& globalState )
+: m_globalState( globalState )
+, m_locationRegistry( locationRegistry )
+{
+}
+
+void InvariantChecker::check( const Specification& specification )
+{
+    UpdateSetManager< ExecutionUpdateSet > updateSetManager;
+    ExecutionVisitor visitor(
+        m_locationRegistry, m_globalState, updateSetManager, ReferenceConstant() );
+
+    for( const auto& definition : *specification.definitions() )
+    {
+        if( definition->id() != Node::ID::INVARIANT_DEFINITION )
+        {
+            continue;
+        }
+
+        visitor.execute( definition );
+    }
+}
+
 void NumericExecutionPass::usage( libpass::PassUsage& pu )
 {
     pu.require< SourceToAstPass >();
@@ -1967,9 +2035,13 @@ u1 NumericExecutionPass::run( libpass::PassResult& pr )
         StateInitializationVisitor stateInitializationVisitor( locationRegistry, globalState );
         stateInitializationVisitor.visit( *specification );
 
+        InvariantChecker invariantChecker( locationRegistry, globalState );
+        invariantChecker.check( *specification );
+
         while( not scheduler.done() )
         {
             scheduler.step();
+            invariantChecker.check( *specification );
         }
 
         log.info(

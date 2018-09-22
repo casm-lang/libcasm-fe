@@ -87,6 +87,7 @@ class ConsistencyCheckVisitor final : public RecursiveVisitor
     void visit( EnumeratorDefinition& node ) override;
     void visit( EnumerationDefinition& node ) override;
     void visit( UsingDefinition& node ) override;
+    void visit( InvariantDefinition& node ) override;
 
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -204,6 +205,12 @@ void ConsistencyCheckVisitor::visit( UsingDefinition& node )
 {
     RecursiveVisitor::visit( node );
     verifyHasType( node );
+}
+
+void ConsistencyCheckVisitor::visit( InvariantDefinition& node )
+{
+    RecursiveVisitor::visit( node );
+    verifyHasTypeOfKind( *node.expression(), IR::Type::Kind::BOOLEAN );
 }
 
 void ConsistencyCheckVisitor::visit( UndefLiteral& node )

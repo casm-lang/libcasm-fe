@@ -49,6 +49,7 @@ Definition ::= EnumerationDefinition
              | RuleDefinition
              | FunctionDefinition
              | UsingDefinition
+             | InvariantDefinition
 </code>
 
 {{page>:grammar:Definition&noheader&nofooter}}
@@ -129,6 +130,15 @@ UsingDefinition ::= "using" Identifier "=" Type
 </code>
 
 {{page>:grammar:UsingDefinition&noheader&nofooter}}
+
+
+===== InvariantDefinition =====
+
+<code>
+InvariantDefinition ::= "invariant" Identifier "=" Term
+</code>
+
+{{page>:grammar:InvariantDefinition&noheader&nofooter}}
 
 
 ===== Rule =====
