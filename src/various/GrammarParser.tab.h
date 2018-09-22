@@ -423,167 +423,169 @@ namespace libcasm_fe {
       // ConditionalRule
       char dummy16[sizeof(ConditionalRule::Ptr)];
 
+      // MaybeDefined
+      char dummy17[sizeof(Defined::Ptr)];
+
       // AttributedDefinition
       // Definition
-      char dummy17[sizeof(Definition::Ptr)];
+      char dummy18[sizeof(Definition::Ptr)];
 
       // Definitions
-      char dummy18[sizeof(Definitions::Ptr)];
+      char dummy19[sizeof(Definitions::Ptr)];
 
       // DerivedDefinition
-      char dummy19[sizeof(DerivedDefinition::Ptr)];
+      char dummy20[sizeof(DerivedDefinition::Ptr)];
 
       // DirectCallExpression
-      char dummy20[sizeof(DirectCallExpression::Ptr)];
+      char dummy21[sizeof(DirectCallExpression::Ptr)];
 
       // EnumerationDefinition
-      char dummy21[sizeof(EnumerationDefinition::Ptr)];
+      char dummy22[sizeof(EnumerationDefinition::Ptr)];
 
       // EnumeratorDefinition
-      char dummy22[sizeof(EnumeratorDefinition::Ptr)];
+      char dummy23[sizeof(EnumeratorDefinition::Ptr)];
 
       // Enumerators
-      char dummy23[sizeof(Enumerators::Ptr)];
+      char dummy24[sizeof(Enumerators::Ptr)];
 
       // ExistentialQuantifierExpression
-      char dummy24[sizeof(ExistentialQuantifierExpression::Ptr)];
+      char dummy25[sizeof(ExistentialQuantifierExpression::Ptr)];
 
       // Term
       // SimpleOrClaspedTerm
       // OperatorExpression
-      // MaybeDefined
-      char dummy25[sizeof(Expression::Ptr)];
+      char dummy26[sizeof(Expression::Ptr)];
 
       // ExpressionAttribute
-      char dummy26[sizeof(ExpressionAttribute::Ptr)];
+      char dummy27[sizeof(ExpressionAttribute::Ptr)];
 
       // Terms
-      char dummy27[sizeof(Expressions::Ptr)];
+      char dummy28[sizeof(Expressions::Ptr)];
 
       // FixedSizedType
-      char dummy28[sizeof(FixedSizedType::Ptr)];
+      char dummy29[sizeof(FixedSizedType::Ptr)];
 
       // ForallRule
-      char dummy29[sizeof(ForallRule::Ptr)];
+      char dummy30[sizeof(ForallRule::Ptr)];
 
       // FunctionDefinition
-      char dummy30[sizeof(FunctionDefinition::Ptr)];
+      char dummy31[sizeof(FunctionDefinition::Ptr)];
 
       // Header
-      char dummy31[sizeof(HeaderDefinition::Ptr)];
+      char dummy32[sizeof(HeaderDefinition::Ptr)];
 
       // Identifier
-      char dummy32[sizeof(Identifier::Ptr)];
+      char dummy33[sizeof(Identifier::Ptr)];
 
       // IdentifierPath
-      char dummy33[sizeof(IdentifierPath::Ptr)];
+      char dummy34[sizeof(IdentifierPath::Ptr)];
 
       // IndirectCallExpression
-      char dummy34[sizeof(IndirectCallExpression::Ptr)];
+      char dummy35[sizeof(IndirectCallExpression::Ptr)];
 
       // InitDefinition
-      char dummy35[sizeof(InitDefinition::Ptr)];
+      char dummy36[sizeof(InitDefinition::Ptr)];
 
       // Initializer
-      char dummy36[sizeof(InitializerDefinition::Ptr)];
+      char dummy37[sizeof(Initializer::Ptr)];
 
       // Initializers
-      char dummy37[sizeof(InitializerDefinitions::Ptr)];
+      char dummy38[sizeof(Initializers::Ptr)];
 
       // MaybeInitially
-      char dummy38[sizeof(InitiallyDefinition::Ptr)];
+      char dummy39[sizeof(Initially::Ptr)];
 
       // InvariantDefinition
-      char dummy39[sizeof(InvariantDefinition::Ptr)];
+      char dummy40[sizeof(InvariantDefinition::Ptr)];
 
       // IterateRule
-      char dummy40[sizeof(IterateRule::Ptr)];
+      char dummy41[sizeof(IterateRule::Ptr)];
 
       // LetExpression
-      char dummy41[sizeof(LetExpression::Ptr)];
+      char dummy42[sizeof(LetExpression::Ptr)];
 
       // LetRule
-      char dummy42[sizeof(LetRule::Ptr)];
+      char dummy43[sizeof(LetRule::Ptr)];
 
       // ListLiteral
-      char dummy43[sizeof(ListLiteral::Ptr)];
+      char dummy44[sizeof(ListLiteral::Ptr)];
 
       // Literal
-      char dummy44[sizeof(Literal::Ptr)];
+      char dummy45[sizeof(Literal::Ptr)];
 
       // LiteralCallExpression
-      char dummy45[sizeof(LiteralCallExpression::Ptr)];
+      char dummy46[sizeof(LiteralCallExpression::Ptr)];
 
       // MethodCallExpression
-      char dummy46[sizeof(MethodCallExpression::Ptr)];
+      char dummy47[sizeof(MethodCallExpression::Ptr)];
 
       // Assignment
-      char dummy47[sizeof(NamedExpression::Ptr)];
+      char dummy48[sizeof(NamedExpression::Ptr)];
 
       // Assignments
-      char dummy48[sizeof(NamedExpressions::Ptr)];
+      char dummy49[sizeof(NamedExpressions::Ptr)];
 
       // RangeLiteral
-      char dummy49[sizeof(RangeLiteral::Ptr)];
+      char dummy50[sizeof(RangeLiteral::Ptr)];
 
       // RecordLiteral
-      char dummy50[sizeof(RecordLiteral::Ptr)];
+      char dummy51[sizeof(RecordLiteral::Ptr)];
 
       // RecordType
-      char dummy51[sizeof(RecordType::Ptr)];
+      char dummy52[sizeof(RecordType::Ptr)];
 
       // ReferenceLiteral
-      char dummy52[sizeof(ReferenceLiteral::Ptr)];
+      char dummy53[sizeof(ReferenceLiteral::Ptr)];
 
       // RelationType
-      char dummy53[sizeof(RelationType::Ptr)];
+      char dummy54[sizeof(RelationType::Ptr)];
 
       // Rule
-      char dummy54[sizeof(Rule::Ptr)];
+      char dummy55[sizeof(Rule::Ptr)];
 
       // RuleDefinition
-      char dummy55[sizeof(RuleDefinition::Ptr)];
+      char dummy56[sizeof(RuleDefinition::Ptr)];
 
       // Rules
-      char dummy56[sizeof(Rules::Ptr)];
+      char dummy57[sizeof(Rules::Ptr)];
 
       // SequenceRule
-      char dummy57[sizeof(SequenceRule::Ptr)];
+      char dummy58[sizeof(SequenceRule::Ptr)];
 
       // SkipRule
-      char dummy58[sizeof(SkipRule::Ptr)];
+      char dummy59[sizeof(SkipRule::Ptr)];
 
       // Specification
-      char dummy59[sizeof(Specification::Ptr)];
+      char dummy60[sizeof(Specification::Ptr)];
 
       // TemplateType
-      char dummy60[sizeof(TemplateType::Ptr)];
+      char dummy61[sizeof(TemplateType::Ptr)];
 
       // TupleLiteral
-      char dummy61[sizeof(TupleLiteral::Ptr)];
+      char dummy62[sizeof(TupleLiteral::Ptr)];
 
       // TupleType
-      char dummy62[sizeof(TupleType::Ptr)];
+      char dummy63[sizeof(TupleType::Ptr)];
 
       // TypeCastingExpression
-      char dummy63[sizeof(TypeCastingExpression::Ptr)];
+      char dummy64[sizeof(TypeCastingExpression::Ptr)];
 
       // Types
       // FunctionParameters
       // MaybeFunctionParameters
-      char dummy64[sizeof(Types::Ptr)];
+      char dummy65[sizeof(Types::Ptr)];
 
       // UndefinedLiteral
-      char dummy65[sizeof(UndefLiteral::Ptr)];
+      char dummy66[sizeof(UndefLiteral::Ptr)];
 
       // UniversalQuantifierExpression
-      char dummy66[sizeof(UniversalQuantifierExpression::Ptr)];
+      char dummy67[sizeof(UniversalQuantifierExpression::Ptr)];
 
       // UpdateRule
-      char dummy67[sizeof(UpdateRule::Ptr)];
+      char dummy68[sizeof(UpdateRule::Ptr)];
 
       // UsingDefinition
-      char dummy68[sizeof(UsingDefinition::Ptr)];
+      char dummy69[sizeof(UsingDefinition::Ptr)];
 
       // BooleanLiteral
       // IntegerLiteral
@@ -591,30 +593,30 @@ namespace libcasm_fe {
       // DecimalLiteral
       // BinaryLiteral
       // StringLiteral
-      char dummy69[sizeof(ValueLiteral::Ptr)];
+      char dummy70[sizeof(ValueLiteral::Ptr)];
 
       // VariableBinding
-      char dummy70[sizeof(VariableBinding::Ptr)];
+      char dummy71[sizeof(VariableBinding::Ptr)];
 
       // VariableBindings
-      char dummy71[sizeof(VariableBindings::Ptr)];
+      char dummy72[sizeof(VariableBindings::Ptr)];
 
       // Variable
       // TypedVariable
       // AttributedVariable
       // TypedAttributedVariable
-      char dummy72[sizeof(VariableDefinition::Ptr)];
+      char dummy73[sizeof(VariableDefinition::Ptr)];
 
       // Parameters
       // AttributedVariables
       // TypedVariables
-      char dummy73[sizeof(VariableDefinitions::Ptr)];
+      char dummy74[sizeof(VariableDefinitions::Ptr)];
 
       // WhileRule
-      char dummy74[sizeof(WhileRule::Ptr)];
+      char dummy75[sizeof(WhileRule::Ptr)];
 
       // Type
-      char dummy75[sizeof(libcasm_fe::Ast::Type::Ptr)];
+      char dummy76[sizeof(libcasm_fe::Ast::Type::Ptr)];
 
       // "binary"
       // "hexadecimal"
@@ -623,7 +625,7 @@ namespace libcasm_fe {
       // "decimal"
       // "string"
       // "identifier"
-      char dummy76[sizeof(std::string)];
+      char dummy77[sizeof(std::string)];
 };
 
     /// Symbol semantic values.
@@ -800,6 +802,8 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const Defined::Ptr v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const Definition::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const Definitions::Ptr v, const location_type& l);
@@ -838,11 +842,11 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const InitDefinition::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const InitializerDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Initializer::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const InitializerDefinitions::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Initializers::Ptr v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const InitiallyDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Initially::Ptr v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const InvariantDefinition::Ptr v, const location_type& l);
 
@@ -1760,6 +1764,10 @@ namespace libcasm_fe {
         value.copy< ConditionalRule::Ptr > (other.value);
         break;
 
+      case 160: // MaybeDefined
+        value.copy< Defined::Ptr > (other.value);
+        break;
+
       case 91: // AttributedDefinition
       case 92: // Definition
         value.copy< Definition::Ptr > (other.value);
@@ -1796,7 +1804,6 @@ namespace libcasm_fe {
       case 119: // Term
       case 120: // SimpleOrClaspedTerm
       case 121: // OperatorExpression
-      case 160: // MaybeDefined
         value.copy< Expression::Ptr > (other.value);
         break;
 
@@ -1841,15 +1848,15 @@ namespace libcasm_fe {
         break;
 
       case 163: // Initializer
-        value.copy< InitializerDefinition::Ptr > (other.value);
+        value.copy< Initializer::Ptr > (other.value);
         break;
 
       case 162: // Initializers
-        value.copy< InitializerDefinitions::Ptr > (other.value);
+        value.copy< Initializers::Ptr > (other.value);
         break;
 
       case 161: // MaybeInitially
-        value.copy< InitiallyDefinition::Ptr > (other.value);
+        value.copy< Initially::Ptr > (other.value);
         break;
 
       case 101: // InvariantDefinition
@@ -2172,6 +2179,10 @@ namespace libcasm_fe {
         value.copy< ConditionalRule::Ptr > (v);
         break;
 
+      case 160: // MaybeDefined
+        value.copy< Defined::Ptr > (v);
+        break;
+
       case 91: // AttributedDefinition
       case 92: // Definition
         value.copy< Definition::Ptr > (v);
@@ -2208,7 +2219,6 @@ namespace libcasm_fe {
       case 119: // Term
       case 120: // SimpleOrClaspedTerm
       case 121: // OperatorExpression
-      case 160: // MaybeDefined
         value.copy< Expression::Ptr > (v);
         break;
 
@@ -2253,15 +2263,15 @@ namespace libcasm_fe {
         break;
 
       case 163: // Initializer
-        value.copy< InitializerDefinition::Ptr > (v);
+        value.copy< Initializer::Ptr > (v);
         break;
 
       case 162: // Initializers
-        value.copy< InitializerDefinitions::Ptr > (v);
+        value.copy< Initializers::Ptr > (v);
         break;
 
       case 161: // MaybeInitially
-        value.copy< InitiallyDefinition::Ptr > (v);
+        value.copy< Initially::Ptr > (v);
         break;
 
       case 101: // InvariantDefinition
@@ -2562,6 +2572,13 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Defined::Ptr v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Definition::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
@@ -2695,21 +2712,21 @@ namespace libcasm_fe {
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitializerDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Initializer::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitializerDefinitions::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Initializers::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitiallyDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Initially::Ptr v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -3140,6 +3157,10 @@ namespace libcasm_fe {
         value.template destroy< ConditionalRule::Ptr > ();
         break;
 
+      case 160: // MaybeDefined
+        value.template destroy< Defined::Ptr > ();
+        break;
+
       case 91: // AttributedDefinition
       case 92: // Definition
         value.template destroy< Definition::Ptr > ();
@@ -3176,7 +3197,6 @@ namespace libcasm_fe {
       case 119: // Term
       case 120: // SimpleOrClaspedTerm
       case 121: // OperatorExpression
-      case 160: // MaybeDefined
         value.template destroy< Expression::Ptr > ();
         break;
 
@@ -3221,15 +3241,15 @@ namespace libcasm_fe {
         break;
 
       case 163: // Initializer
-        value.template destroy< InitializerDefinition::Ptr > ();
+        value.template destroy< Initializer::Ptr > ();
         break;
 
       case 162: // Initializers
-        value.template destroy< InitializerDefinitions::Ptr > ();
+        value.template destroy< Initializers::Ptr > ();
         break;
 
       case 161: // MaybeInitially
-        value.template destroy< InitiallyDefinition::Ptr > ();
+        value.template destroy< Initially::Ptr > ();
         break;
 
       case 101: // InvariantDefinition
@@ -3558,6 +3578,10 @@ namespace libcasm_fe {
         value.move< ConditionalRule::Ptr > (s.value);
         break;
 
+      case 160: // MaybeDefined
+        value.move< Defined::Ptr > (s.value);
+        break;
+
       case 91: // AttributedDefinition
       case 92: // Definition
         value.move< Definition::Ptr > (s.value);
@@ -3594,7 +3618,6 @@ namespace libcasm_fe {
       case 119: // Term
       case 120: // SimpleOrClaspedTerm
       case 121: // OperatorExpression
-      case 160: // MaybeDefined
         value.move< Expression::Ptr > (s.value);
         break;
 
@@ -3639,15 +3662,15 @@ namespace libcasm_fe {
         break;
 
       case 163: // Initializer
-        value.move< InitializerDefinition::Ptr > (s.value);
+        value.move< Initializer::Ptr > (s.value);
         break;
 
       case 162: // Initializers
-        value.move< InitializerDefinitions::Ptr > (s.value);
+        value.move< Initializers::Ptr > (s.value);
         break;
 
       case 161: // MaybeInitially
-        value.move< InitiallyDefinition::Ptr > (s.value);
+        value.move< Initially::Ptr > (s.value);
         break;
 
       case 101: // InvariantDefinition
@@ -4401,7 +4424,7 @@ namespace libcasm_fe {
 
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:379
 } // libcasm_fe
-#line 4405 "GrammarParser.tab.h" // lalr1.cc:379
+#line 4428 "GrammarParser.tab.h" // lalr1.cc:379
 
 
 
