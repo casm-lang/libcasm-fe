@@ -120,4 +120,4 @@ ci-git-access:
 	@echo "-- Git Access Configuration"
 	@git config --local url."git@github.com:".insteadOf "https://github.com/"
 	@eval $(ssh-agent -s)
-	@echo "$(GITHUB_TOKEN)" | tr -d '\r' | ssh-add - > /dev/null
+	@printf "$(GITHUB_TOKEN)" | ssh-add - >${DEVNUL}
