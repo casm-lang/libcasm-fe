@@ -49,11 +49,11 @@
         class SourceLocation;
     }
 
-    #include "Specification.h"
-    #include "ast/Definition.h"
-    #include "ast/Expression.h"
-    #include "ast/Rule.h"
-    #include "ast/Token.h"
+    #include <libcasm-fe/Specification>
+    #include <libcasm-fe/ast/Definition>
+    #include <libcasm-fe/ast/Expression>
+    #include <libcasm-fe/ast/Rule>
+    #include <libcasm-fe/ast/Token>
 
     using namespace libcasm_fe;
     using namespace Ast;
