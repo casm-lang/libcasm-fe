@@ -47,7 +47,7 @@ check_task:
     memory: 2
     cpu: 1
   env:
-    GITHUB_TOKEN: ENCRYPTED[c5141b4a2108afc4fb2b7757adafdbc1777e0a6c64419d4e174fbe2d5878a73a2517c1777bac29c88ff057cc70446dac]
+    GITHUB_TOKEN: ENCRYPTED[83504aea1d15c272ab610d23ca1e3881230b86861c7db5322033b02ad7661a6330b3184afd8c4e69e8f367e55eb7cdc0]
   matrix:
     env:
       B: "debug"
@@ -68,7 +68,7 @@ coverage_task:
     memory: 2
     cpu: 1
   env:
-    GITHUB_TOKEN: ENCRYPTED[c5141b4a2108afc4fb2b7757adafdbc1777e0a6c64419d4e174fbe2d5878a73a2517c1777bac29c88ff057cc70446dac]
+    GITHUB_TOKEN: ENCRYPTED[83504aea1d15c272ab610d23ca1e3881230b86861c7db5322033b02ad7661a6330b3184afd8c4e69e8f367e55eb7cdc0]
   matrix:
     env:
       B: "coverage"
@@ -91,7 +91,7 @@ linux_task:
     memory: 2
     cpu: 1
   env:
-    GITHUB_TOKEN: ENCRYPTED[c5141b4a2108afc4fb2b7757adafdbc1777e0a6c64419d4e174fbe2d5878a73a2517c1777bac29c88ff057cc70446dac]
+    GITHUB_TOKEN: ENCRYPTED[83504aea1d15c272ab610d23ca1e3881230b86861c7db5322033b02ad7661a6330b3184afd8c4e69e8f367e55eb7cdc0]
   matrix:
     env:
       B: "release"
@@ -113,7 +113,7 @@ darwin_task:
   osx_instance:
     image: high-sierra-xcode-9.4.1
   env:
-    GITHUB_TOKEN: ENCRYPTED[c5141b4a2108afc4fb2b7757adafdbc1777e0a6c64419d4e174fbe2d5878a73a2517c1777bac29c88ff057cc70446dac]
+    GITHUB_TOKEN: ENCRYPTED[83504aea1d15c272ab610d23ca1e3881230b86861c7db5322033b02ad7661a6330b3184afd8c4e69e8f367e55eb7cdc0]
   matrix:
     env:
       B: "release"
@@ -140,7 +140,7 @@ windows_task:
     os_version: 2016
     cpu: 1
   env:
-    GITHUB_TOKEN: ENCRYPTED[c5141b4a2108afc4fb2b7757adafdbc1777e0a6c64419d4e174fbe2d5878a73a2517c1777bac29c88ff057cc70446dac]
+    GITHUB_TOKEN: ENCRYPTED[83504aea1d15c272ab610d23ca1e3881230b86861c7db5322033b02ad7661a6330b3184afd8c4e69e8f367e55eb7cdc0]
   matrix:
     env:
       V: mingw64
