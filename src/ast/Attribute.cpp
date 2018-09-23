@@ -43,18 +43,48 @@
 
 #include "Attribute.h"
 
+#include "../various/GrammarToken.h"
+
+#include <cassert>
+
 using namespace libcasm_fe;
 using namespace Ast;
+
+static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 
 Attribute::Attribute( Node::ID type, const Identifier::Ptr& identifier )
 : Node( type )
 , m_identifier( identifier )
+, m_leftBrace( uToken )
+, m_rightBrace( uToken )
 {
 }
 
 const Identifier::Ptr& Attribute::identifier( void ) const
 {
     return m_identifier;
+}
+
+void Attribute::setLeftBrace( const Token::Ptr& leftBrace )
+{
+    assert( m_leftBrace->token() == Grammar::Token::UNRESOLVED );
+    m_leftBrace = leftBrace;
+}
+
+const Token::Ptr& Attribute::leftBrace( void ) const
+{
+    return m_leftBrace;
+}
+
+void Attribute::setRightBrace( const Token::Ptr& rightBrace )
+{
+    assert( m_rightBrace->token() == Grammar::Token::UNRESOLVED );
+    m_rightBrace = rightBrace;
+}
+
+const Token::Ptr& Attribute::rightBrace( void ) const
+{
+    return m_rightBrace;
 }
 
 BasicAttribute::BasicAttribute( const Identifier::Ptr& identifier )

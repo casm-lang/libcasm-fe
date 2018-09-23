@@ -48,8 +48,6 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-static const std::string DELIMITER( "::" );
-
 Node::Node( Node::ID id )
 : m_id( id )
 , m_sourceLocation()
@@ -78,6 +76,14 @@ std::string Node::description( void ) const
         case ID::HEADER_DEFINITION:
         {
             return "header";
+        }
+        case ID::INIT_DEFINITION:
+        {
+            return "init";
+        }
+        case ID::INITIALLY:
+        {
+            return "initially";
         }
         case ID::VARIABLE_DEFINITION:
         {
@@ -139,6 +145,10 @@ std::string Node::description( void ) const
         case ID::RECORD_LITERAL:
         {
             return "record";
+        }
+        case ID::EMBRACED_EXPRESSION:
+        {
+            return "embraced expression";
         }
         case ID::NAMED_EXPRESSION:
         {
@@ -252,9 +262,13 @@ std::string Node::description( void ) const
         {
             return "basic type";
         }
-        case ID::COMPOSED_TYPE:
+        case ID::TUPLE_TYPE:
         {
-            return "composed type";
+            return "tuple type";
+        }
+        case ID::RECORD_TYPE:
+        {
+            return "record type";
         }
         case ID::TEMPLATE_TYPE:
         {
@@ -276,6 +290,16 @@ std::string Node::description( void ) const
         {
             return "expression attribute";
         }
+        // helper
+        case ID::DEFINED:
+        {
+            return "defined";
+        }
+        case ID::INITIALIZER:
+        {
+            return "initializer";
+        }
+        // other
         case ID::NODE_LIST:
         {
             return "node list";
@@ -299,6 +323,10 @@ std::string Node::description( void ) const
         case ID::VARIABLE_BINDING:
         {
             return "variable binding";
+        }
+        case ID::TOKEN:
+        {
+            return "token";
         }
     }
 
@@ -354,101 +382,11 @@ const libcasm_ir::Properties& TypedPropertyNode::properties( void ) const
 }
 
 //
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
 //
-// Identifier
-//
-
-Identifier::Identifier( const std::string& name )
-: Node( Node::ID::IDENTIFIER )
-, m_name( name )
-{
-}
-
-const std::string& Identifier::name( void ) const
-{
-    return m_name;
-}
-
-void Identifier::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-IdentifierPath::IdentifierPath( const Identifier::Ptr& identifier, Type type )
-: Node( Node::ID::IDENTIFIER_PATH )
-, m_identifiers( Ast::make< Identifiers >( identifier->sourceLocation() ) )
-, m_type( type )
-{
-    m_identifiers->add( identifier );
-}
-
-IdentifierPath::IdentifierPath( const Identifiers::Ptr& identifiers, Type type )
-: Node( Node::ID::IDENTIFIER_PATH )
-, m_identifiers( identifiers )
-, m_type( type )
-{
-    assert( not identifiers->empty() && "identifiers must not be empty" );
-}
-
-void IdentifierPath::addIdentifier( const Identifier::Ptr& identifier )
-{
-    m_identifiers->add( identifier );
-}
-
-Identifiers::Ptr IdentifierPath::identifiers( void ) const
-{
-    return m_identifiers;
-}
-
-IdentifierPath::Type IdentifierPath::type( void ) const
-{
-    return m_type;
-}
-
-const std::string& IdentifierPath::baseName( void ) const
-{
-    assert( not m_identifiers->empty() );  // see ctor precondition
-    return m_identifiers->back()->name();
-}
-
-std::string IdentifierPath::baseDir( void ) const
-{
-    const auto& p = path();
-    const size_t lastDotPos = p.find_last_of( DELIMITER );
-    if( lastDotPos != std::string::npos )
-    {
-        return p.substr( 0, lastDotPos - DELIMITER.size() + 1 );
-    }
-    else
-    {
-        return std::string();
-    }
-}
-
-std::string IdentifierPath::path( void ) const
-{
-    std::string path;
-
-    if( m_type == Type::RELATIVE )
-    {
-        path += DELIMITER;
-    }
-
-    bool isFirstElement = true;
-    for( const auto& identifier : *m_identifiers )
-    {
-        if( not isFirstElement )
-        {
-            path += DELIMITER;
-        }
-        path += identifier->name();
-        isFirstElement = false;
-    }
-
-    return path;
-}
-
-void IdentifierPath::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}

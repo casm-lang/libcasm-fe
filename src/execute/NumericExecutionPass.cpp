@@ -302,6 +302,7 @@ class ExecutionVisitor final : public EmptyVisitor
 
     void execute( const Definition::Ptr& definition );
 
+    void visit( Initializer& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -319,6 +320,7 @@ class ExecutionVisitor final : public EmptyVisitor
 
     void visit( BasicType& node ) override;
 
+    void visit( EmbracedExpression& node ) override;
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
@@ -476,6 +478,12 @@ void ExecutionVisitor::execute( const Definition::Ptr& definition )
     m_frameStack.pop();
 }
 
+void ExecutionVisitor::visit( Initializer& node )
+{
+    // just evaluate the encapsulated update rule
+    node.updateRule()->accept( *this );
+}
+
 void ExecutionVisitor::visit( VariableDefinition& node )
 {
     const auto* frame = m_frameStack.top();
@@ -520,7 +528,7 @@ void ExecutionVisitor::visit( FunctionDefinition& node )
             }
         }
 
-        node.defaultValue()->accept( *this );  // return value already on stack
+        node.defined()->expression()->accept( *this );  // return value already on stack
     }
 }
 
@@ -686,9 +694,15 @@ void ExecutionVisitor::visit( BasicType& node )
     m_evaluationStack.push( IR::RangeConstant( rangeType, range ) );
 }
 
-void ExecutionVisitor::visit( NamedExpression& node )
+void ExecutionVisitor::visit( EmbracedExpression& node )
 {
     // just evaluate the named expression and push it to the stack
+    node.expression()->accept( *this );
+}
+
+void ExecutionVisitor::visit( NamedExpression& node )
+{
+    // just evaluate the embraced expression and push it to the stack
     node.expression()->accept( *this );
 }
 
@@ -877,6 +891,14 @@ void ExecutionVisitor::visit( TypeCastingExpression& node )
 void ExecutionVisitor::visit( UnaryExpression& node )
 {
     node.expression()->accept( *this );
+
+    if( node.op() == libcasm_ir::Value::ADD_INSTRUCTION )
+    {
+        // add unary expression (e.g. '+4') will not be executed,
+        // just return without touching the unary expression value on the stack
+        return;
+    }
+
     auto& value = m_evaluationStack.top();
 
     try
@@ -1605,7 +1627,7 @@ class StateInitializationVisitor final : public EmptyVisitor
     StateInitializationVisitor( ExecutionLocationRegistry& locationRegistry, Storage& globalState );
 
     void visit( Specification& node );
-
+    void visit( InitDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
 
   private:
@@ -1633,6 +1655,11 @@ void StateInitializationVisitor::visit( Specification& node )
     auto updateSet = m_updateSetManager.currentUpdateSet();
     m_globalState.fireUpdateSet( updateSet );
     m_updateSetManager.clear();
+}
+
+void StateInitializationVisitor::visit( InitDefinition& node )
+{
+    node.programFunction()->accept( *this );
 }
 
 void StateInitializationVisitor::visit( FunctionDefinition& node )

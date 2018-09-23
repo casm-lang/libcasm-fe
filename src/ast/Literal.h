@@ -45,6 +45,7 @@
 #define _LIBCASM_FE_LITERAL_H_
 
 #include <libcasm-fe/ast/Expression>
+#include <libcasm-fe/ast/Token>
 
 #include <libcasm-ir/Constant>
 
@@ -58,6 +59,16 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< Literal >;
 
             explicit Literal( Node::ID id );
+
+            void setLeftBracket( const Token::Ptr& leftBracket );
+            const Token::Ptr& leftBracket( void ) const;
+
+            void setRightBracket( const Token::Ptr& rightBracket );
+            const Token::Ptr& rightBracket( void ) const;
+
+          private:
+            Token::Ptr m_leftBracket;
+            Token::Ptr m_rightBracket;
         };
 
         using Literals = NodeList< Literal >;
@@ -103,9 +114,12 @@ namespace libcasm_fe
 
             using Ptr = std::shared_ptr< ReferenceLiteral >;
 
-            explicit ReferenceLiteral( const IdentifierPath::Ptr& identifier );
+            explicit ReferenceLiteral(
+                const Token::Ptr& at, const IdentifierPath::Ptr& identifier );
 
             const IdentifierPath::Ptr& identifier( void ) const;
+
+            const Token::Ptr& at( void ) const;
 
             void setReferenceType( ReferenceType referenceType );
             ReferenceType referenceType( void ) const;
@@ -120,6 +134,7 @@ namespace libcasm_fe
 
           private:
             const IdentifierPath::Ptr m_identifier;
+            const Token::Ptr m_at;
             ReferenceType m_referenceType;
             TypedNode::Ptr m_reference;
             libcasm_ir::Value::ID m_builtinId;
@@ -145,16 +160,21 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< RangeLiteral >;
 
-            RangeLiteral( const Expression::Ptr& left, const Expression::Ptr& right );
+            RangeLiteral(
+                const Expression::Ptr& left,
+                const Token::Ptr& dotdot,
+                const Expression::Ptr& right );
 
             const Expression::Ptr& left( void ) const;
             const Expression::Ptr& right( void ) const;
+            const Token::Ptr& dotdot( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Expression::Ptr m_left;
             const Expression::Ptr m_right;
+            const Token::Ptr m_dotdot;
         };
 
         class TupleLiteral final : public Literal

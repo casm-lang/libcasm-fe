@@ -125,7 +125,7 @@ void PropertyReviseVisitor::visit( FunctionDefinition& node )
     RecursiveVisitor::visit( node );
 
     checkIfPropertiesHold(
-        *node.defaultValue(),
+        *node.defined()->expression(),
         { Property::SIDE_EFFECT_FREE, Property::PURE },
         "default value of " + node.description() + " '" + node.identifier()->name() + "'",
         Code::FunctionDefinitionDefaultValueInvalidProperty );

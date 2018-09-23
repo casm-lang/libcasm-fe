@@ -45,14 +45,19 @@
 #define _LIBCASM_FE_DEFINITION_H_
 
 #include <libcasm-fe/ast/Attribute>
+#include <libcasm-fe/ast/Helper>
 #include <libcasm-fe/ast/Node>
 #include <libcasm-fe/ast/Rule>
+#include <libcasm-fe/ast/Token>
 #include <libcasm-fe/ast/Type>
 
 namespace libcasm_fe
 {
     namespace Ast
     {
+        class Expression;
+        using Expressions = NodeList< Expression >;
+
         class Definition : public TypedPropertyNode
         {
           public:
@@ -65,6 +70,9 @@ namespace libcasm_fe
             void setAttributes( const Attributes::Ptr& attributes );
             const Attributes::Ptr& attributes( void ) const;
 
+            void setDelimiterToken( const Token::Ptr& delimiterToken );
+            const Token::Ptr& delimiterToken( void ) const;
+
             /**
              * Sets the number of required frame local slots.
              *
@@ -76,6 +84,7 @@ namespace libcasm_fe
           private:
             const Identifier::Ptr m_identifier;
             Attributes::Ptr m_attributes;
+            Token::Ptr m_delimiterToken;
             std::size_t m_maxNumberOfLocals;
         };
 
@@ -86,9 +95,14 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< HeaderDefinition >;
 
-            HeaderDefinition( const SourceLocation& sourceLocation );
+            HeaderDefinition( const Token::Ptr& headerToken );
 
             void accept( Visitor& visitor ) override final;
+
+            const Token::Ptr& headerToken( void ) const;
+
+          private:
+            const Token::Ptr m_headerToken;
         };
 
         class VariableDefinition final : public Definition
@@ -96,9 +110,14 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< VariableDefinition >;
 
-            VariableDefinition( const Identifier::Ptr& identifier, const Type::Ptr& variableType );
+            VariableDefinition(
+                const Identifier::Ptr& identifier,
+                const Token::Ptr& colonToken,
+                const Type::Ptr& variableType );
 
             const Type::Ptr& variableType( void ) const;
+
+            const Token::Ptr& colonToken( void ) const;
 
             /**
              * Sets the frame local index of the variable.
@@ -112,6 +131,7 @@ namespace libcasm_fe
 
           private:
             const Type::Ptr m_variableType;
+            const Token::Ptr m_colonToken;
             std::size_t m_localIndex;
         };
 
@@ -136,14 +156,27 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< FunctionDefinition >;
 
             FunctionDefinition(
+                const Token::Ptr& functionToken,
                 const Identifier::Ptr& identifier,
+                const Token::Ptr& colonToken,
                 const Types::Ptr& argumentTypes,
-                const Type::Ptr& returnType );
+                const Token::Ptr& mapsToken,
+                const Type::Ptr& returnType,
+                const Defined::Ptr& defined );
 
             bool isProgram( void ) const;
 
             const Types::Ptr& argumentTypes( void ) const;
+
             const Type::Ptr& returnType( void ) const;
+
+            const Token::Ptr& functionToken( void ) const;
+
+            const Token::Ptr& colonToken( void ) const;
+
+            const Token::Ptr& mapsToken( void ) const;
+
+            const Defined::Ptr& defined( void ) const;
 
             void setClassification( Classification classification );
             Classification classification( void ) const;
@@ -152,21 +185,21 @@ namespace libcasm_fe
             void setSymbolic( u1 symbolic );
             u1 symbolic( void ) const;
 
-            void setInitializers( const NodeList< UpdateRule >::Ptr& initializers );
-            const NodeList< UpdateRule >::Ptr& initializers( void ) const;
-
-            void setDefaultValue( const Expression::Ptr& defaultValue );
-            const Expression::Ptr& defaultValue( void ) const;
+            void setInitializers( const Initializers::Ptr& initializers );
+            const Initializers::Ptr& initializers( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            Classification m_classification;
             const Types::Ptr m_argumentTypes;
             const Type::Ptr m_returnType;
+            const Defined::Ptr m_defined;
+            const Token::Ptr m_functionToken;
+            const Token::Ptr m_colonToken;
+            const Token::Ptr m_mapsToken;
+            Classification m_classification;
             u1 m_symbolic;
-            NodeList< UpdateRule >::Ptr m_initializers;
-            Expression::Ptr m_defaultValue;
+            Initializers::Ptr m_initializers;
             const bool m_isProgram;
         };
 
@@ -176,9 +209,12 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< DerivedDefinition >;
 
             DerivedDefinition(
+                const Token::Ptr& derivedToken,
                 const Identifier::Ptr& identifier,
                 const NodeList< VariableDefinition >::Ptr& arguments,
+                const Token::Ptr& mapsToken,
                 const Type::Ptr& returnType,
+                const Token::Ptr& assignmentToken,
                 const Expression::Ptr& expression );
 
             const NodeList< VariableDefinition >::Ptr& arguments( void ) const;
@@ -186,12 +222,29 @@ namespace libcasm_fe
             const Type::Ptr& returnType( void ) const;
             const Expression::Ptr& expression( void ) const;
 
+            const Token::Ptr& derivedToken( void ) const;
+
+            const Token::Ptr& mapsToken( void ) const;
+
+            const Token::Ptr& assignmentToken( void ) const;
+
+            void setLeftBracketToken( const Token::Ptr& leftBracketToken );
+            const Token::Ptr& leftBracketToken( void ) const;
+
+            void setRightBracketToken( const Token::Ptr& rightBracketToken );
+            const Token::Ptr& rightBracketToken( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             const NodeList< VariableDefinition >::Ptr m_arguments;
             const Type::Ptr m_returnType;
             const Expression::Ptr m_expression;
+            const Token::Ptr m_derivedToken;
+            const Token::Ptr m_mapsToken;
+            const Token::Ptr m_assignmentToken;
+            Token::Ptr m_leftBracketToken;
+            Token::Ptr m_rightBracketToken;
         };
 
         class RuleDefinition final : public Definition
@@ -200,9 +253,12 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< RuleDefinition >;
 
             RuleDefinition(
+                const Token::Ptr& ruleToken,
                 const Identifier::Ptr& identifier,
                 const NodeList< VariableDefinition >::Ptr& arguments,
+                const Token::Ptr& mapsToken,
                 const Type::Ptr& returnType,
+                const Token::Ptr& assignmentToken,
                 const Rule::Ptr& rule );
 
             const NodeList< VariableDefinition >::Ptr& arguments( void ) const;
@@ -210,12 +266,29 @@ namespace libcasm_fe
             const Type::Ptr& returnType( void ) const;
             const Rule::Ptr& rule( void ) const;
 
+            const Token::Ptr& ruleToken( void ) const;
+
+            const Token::Ptr& mapsToken( void ) const;
+
+            const Token::Ptr& assignmentToken( void ) const;
+
+            void setLeftBracketToken( const Token::Ptr& leftBracketToken );
+            const Token::Ptr& leftBracketToken( void ) const;
+
+            void setRightBracketToken( const Token::Ptr& rightBracketToken );
+            const Token::Ptr& rightBracketToken( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             const NodeList< VariableDefinition >::Ptr m_arguments;
             const Type::Ptr m_returnType;
             const Rule::Ptr m_rule;
+            const Token::Ptr m_ruleToken;
+            const Token::Ptr m_mapsToken;
+            const Token::Ptr m_assignmentToken;
+            Token::Ptr m_leftBracketToken;
+            Token::Ptr m_rightBracketToken;
         };
 
         class EnumeratorDefinition final : public Definition
@@ -236,14 +309,31 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< EnumerationDefinition >;
 
             EnumerationDefinition(
-                const Identifier::Ptr& identifier, const Enumerators::Ptr& enumerators );
+                const Token::Ptr& enumerationToken,
+                const Identifier::Ptr& identifier,
+                const Token::Ptr& assignmentToken,
+                const Token::Ptr& leftBraceToken,
+                const Enumerators::Ptr& enumerators,
+                const Token::Ptr& rightBraceToken );
 
             const Enumerators::Ptr& enumerators( void ) const;
+
+            const Token::Ptr& enumerationToken( void ) const;
+
+            const Token::Ptr& assignmentToken( void ) const;
+
+            const Token::Ptr& leftBraceToken( void ) const;
+
+            const Token::Ptr& rightBraceToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Enumerators::Ptr m_enumerators;
+            const Token::Ptr m_enumerationToken;
+            const Token::Ptr m_assignmentToken;
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
         };
 
         class UsingDefinition final : public Definition
@@ -251,14 +341,24 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< UsingDefinition >;
 
-            UsingDefinition( const Identifier::Ptr& identifier, const Type::Ptr& type );
+            UsingDefinition(
+                const Token::Ptr& usingToken,
+                const Identifier::Ptr& identifier,
+                const Token::Ptr& assignmentToken,
+                const Type::Ptr& type );
 
             const Type::Ptr& type( void ) const;
+
+            const Token::Ptr& usingToken( void ) const;
+
+            const Token::Ptr& assignmentToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Type::Ptr m_type;
+            const Token::Ptr m_usingToken;
+            const Token::Ptr m_assignmentToken;
         };
 
         class InvariantDefinition final : public Definition
@@ -267,14 +367,62 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< InvariantDefinition >;
 
             InvariantDefinition(
-                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
+                const Token::Ptr& invariantToken,
+                const Identifier::Ptr& identifier,
+                const Token::Ptr& assignmentToken,
+                const Expression::Ptr& expression );
 
             const Expression::Ptr& expression( void ) const;
+
+            const Token::Ptr& invariantToken( void ) const;
+
+            const Token::Ptr& assignmentToken( void ) const;
 
             void accept( Visitor& visitor ) override;
 
           private:
             const Expression::Ptr m_expression;
+            const Token::Ptr m_invariantToken;
+            const Token::Ptr m_assignmentToken;
+        };
+
+        class InitDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< InitDefinition >;
+
+            InitDefinition( const Token::Ptr& initToken, const IdentifierPath::Ptr& initPath );
+
+            InitDefinition(
+                const Token::Ptr& initToken,
+                const Token::Ptr& leftBraceToken,
+                const Initializers::Ptr& initializers,
+                const Token::Ptr& rightBraceToken );
+
+            const IdentifierPath::Ptr& initPath( void ) const;
+
+            const Initializers::Ptr& initializers( void ) const;
+
+            const Token::Ptr& initToken( void ) const;
+
+            const Token::Ptr& leftBraceToken( void ) const;
+
+            const Token::Ptr& rightBraceToken( void ) const;
+
+            void setProgramFunction( const FunctionDefinition::Ptr& programFunction );
+            const FunctionDefinition::Ptr& programFunction( void ) const;
+
+            u1 isSingleAgent( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const IdentifierPath::Ptr m_initPath;
+            const Initializers::Ptr m_initializers;
+            const Token::Ptr m_initToken;
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
+            FunctionDefinition::Ptr m_programFunction;
         };
     }
 }

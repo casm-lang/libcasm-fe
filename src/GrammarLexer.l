@@ -46,16 +46,21 @@
 #include "Codes.h"
 #include "Logger.h"
 #include "SourceLocation.h"
+#include "GrammarToken.h"
 
 using namespace libcasm_fe;
 
 #undef YY_DECL
 #define YY_DECL Parser::symbol_type Lexer::nextToken()
 
-#define yyterminate() return( Parser::make_END(loc) )
+#define yyterminate() return( Parser::make_END(m_loc) )
 
 // Code run each time a pattern is matched.
-#define YY_USER_ACTION loc.columns( yyleng );
+#define YY_USER_ACTION m_loc.columns( yyleng );
+
+// Code run each time a token is matched, see GrammarToken.hpp.
+#define YY_TOKEN_ACTION( TOKEN ) \
+    return Parser::make_##TOKEN( Ast::make< Ast::Token >( m_loc, Grammar::Token:: TOKEN ), m_loc );
 
 %}
 
@@ -75,128 +80,163 @@ using namespace libcasm_fe;
 %%
 %{
     // Code run each time yylex is called.
-    loc.step();
+    m_loc.step();
 %}
 
 0[bB][01][01\']*[01]* {
-    return Parser::make_BINARY( yytext + 2, loc );
+    return Parser::make_BINARY( yytext + 2, m_loc );
 }
 
 0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
-    return Parser::make_HEXADECIMAL( yytext + 2, loc );
+    return Parser::make_HEXADECIMAL( yytext + 2, m_loc );
 }
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
-    return Parser::make_RATIONAL( yytext + 2, loc );
+    return Parser::make_RATIONAL( yytext + 2, m_loc );
 }
 
 [0-9][0-9\']*[0-9]* {
-    return Parser::make_INTEGER( yytext, loc );
+    return Parser::make_INTEGER( yytext, m_loc );
 }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
-    return Parser::make_DECIMAL( yytext, loc );
+    return Parser::make_DECIMAL( yytext, m_loc );
 }
 
 {{grammartoken}}
 
 [a-zA-Z_][a-zA-Z0-9\_]* {
-    return Parser::make_IDENTIFIER( yytext, loc );
+    return Parser::make_IDENTIFIER( yytext, m_loc );
 }
 
-[ \t\r]+ { // ignore spaces
-    loc.step();
+[\x20]+ { // space
+    m_log.debug( {m_loc}, "span space: " + std::to_string( yyleng ) );
+    // TODO: @moiova add span space creation of length yyleng here
+    m_loc.step();
 }
 
-\n+ { // ignore newlines
-    loc.lines( yyleng );
-    loc.step();
+[\r]+ { // carriage return
+    m_log.debug( {m_loc}, "span carriage return: "+ std::to_string( yyleng ) );
+    // TODO: @moiova add span carriage return creation of length yyleng here
+    m_loc.step();
+}
+
+[\t]+ { // tabulator
+    m_log.debug( {m_loc}, "span tabulator: " + std::to_string( yyleng ) );
+    // TODO: @moiova add span tabulator creation of length yyleng here
+    m_loc.step();
+}
+
+[\n]+ { // newline
+    m_loc.lines( yyleng );
+    m_log.debug( {m_loc}, "span newline: " + std::to_string( yyleng ) );
+    // TODO: @moiova add span newline creation of length yyleng here
+    m_loc.step();
 }
 
 "//" { // single-line comments
+    m_strbuf.clear();
+    m_strbuf.append( yytext );
     BEGIN( LCOMMENT );
 }
-<LCOMMENT>.
+<LCOMMENT>. {
+    m_strbuf.append( yytext );
+}
 <LCOMMENT>\n {
+    unput( *yytext );
+    m_loc.columns( -1 );
+    m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "'" );
+    // TODO: @moiova add span single line comment creation of m_strbuf here
+    m_loc.step();
     BEGIN( INITIAL );
-    loc.lines( 1 );
-    loc.step();
 }
 <LCOMMENT><<EOF>> {
+    m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "' (EOF)" );
+    // TODO: @moiova add span single line comment creation of m_strbuf here
     BEGIN( INITIAL );
 }
 
 "/*" { // multi-line comments
+    m_strbuf.clear();
+    m_strbuf.append( yytext );
     BEGIN( COMMENT );
 }
 <COMMENT>"*/" {
+    m_strbuf.append( yytext );
+    m_log.debug( {m_loc}, "span comment ML '" + m_strbuf + "'" );
+    // TODO: @moiova add span single line comment creation of m_strbuf here
+    m_loc.step();
     BEGIN( INITIAL );
 }
 <COMMENT>\n {
-    loc.lines( 1 );
+    m_strbuf.append( yytext );
+    m_loc.lines( 1 );
 }
-<COMMENT>([^*\n]|\r)+|.
+<COMMENT>([^*\n]|\r)+|. {
+    m_strbuf.append( yytext );
+}
 <COMMENT><<EOF>> {
+    m_log.error( {m_loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
     BEGIN( INITIAL );
-    log.error( {loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
     yyterminate();
 }
 
 \" { // strings
+    m_strbuf.clear();
     BEGIN( STRING );
-    strbuf.clear();
 }
 <STRING>[^\\"\n]* { /* eat all tokens */
-    strbuf.append( yytext );
+    m_strbuf.append( yytext );
 }
 <STRING>\n {
-    loc.lines( 1 );
+    m_loc.lines( 1 );
 }
 <STRING>\\n {
-    strbuf.append( "\n" );
+    m_strbuf.append( "\n" );
 }
 <STRING>\\t {
-    strbuf.append( "\t" );
+    m_strbuf.append( "\t" );
 }
 <STRING>\\["\\] {
-    strbuf.append( yytext + 1 );
+    m_strbuf.append( yytext + 1 );
 }
 <STRING>\\. {
-    log.error( {loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
+    m_log.error( {m_loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
 }
 <STRING><<EOF>> {
+    m_log.error( {m_loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
     BEGIN( INITIAL );
-    log.error( {loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
     yyterminate();
 }
 <STRING>\" {
     BEGIN( INITIAL );
-    return Parser::make_STRING( strbuf, loc );
+    return Parser::make_STRING( m_strbuf, m_loc );
 }
 
 . {
-    log.error( {loc}, "unrecognized character `" + std::string( yytext ) + "`",
+    m_log.error( {m_loc}, "unrecognized character `" + std::string( yytext ) + "`",
         Code::SyntaxErrorUnrecognizedCharacter );
+    m_loc.step();
 }
 
 %%
 
 Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
 : yyFlexLexer( in, out )
-, log(log)
-, loc()
-, strbuf()
+, m_log( log )
+, m_loc()
+, m_strbuf()
 {
 }
 
 void Lexer::setFileName( const std::string& fileName )
 {
-    loc.begin.fileName = loc.end.fileName = std::make_shared< std::string >( fileName );
+    m_loc.begin.fileName = m_loc.end.fileName = std::make_shared< std::string >( fileName );
 }
 
 void Lexer::LexerError( const char* msg )
 {
-    log.error( {loc}, msg, Code::SyntaxError );
+    m_log.error( {m_loc}, msg, Code::SyntaxError );
 }
 
 //  

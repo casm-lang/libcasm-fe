@@ -43,6 +43,7 @@
 
 #include "RecursiveVisitor.h"
 
+#include "../various/GrammarToken.h"
 #include "Definition.h"
 #include "Expression.h"
 #include "Literal.h"
@@ -51,73 +52,126 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+//
+//
+// Definitions
+//
+
 void RecursiveVisitor::visit( HeaderDefinition& node )
 {
-    node.identifier()->accept( *this );
     node.attributes()->accept( *this );
+    node.headerToken()->accept( *this );
+}
+
+void RecursiveVisitor::visit( InitDefinition& node )
+{
+    node.attributes()->accept( *this );
+    node.programFunction()->accept( *this );
+}
+
+void RecursiveVisitor::visit( Initially& node )
+{
+    node.initiallyToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.initializers()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+}
+
+void RecursiveVisitor::visit( Initializer& node )
+{
+    node.updateRule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( VariableDefinition& node )
 {
-    node.identifier()->accept( *this );
-    node.variableType()->accept( *this );
+    node.delimiterToken()->accept( *this );
     node.attributes()->accept( *this );
+    node.identifier()->accept( *this );
+    node.colonToken()->accept( *this );
+    node.variableType()->accept( *this );
 }
 
 void RecursiveVisitor::visit( FunctionDefinition& node )
 {
+    node.attributes()->accept( *this );
+    node.functionToken()->accept( *this );
     node.identifier()->accept( *this );
+    node.colonToken()->accept( *this );
     node.argumentTypes()->accept( *this );
+    node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
     node.initializers()->accept( *this );
-    node.defaultValue()->accept( *this );
-    node.attributes()->accept( *this );
+    node.defined()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DerivedDefinition& node )
 {
-    node.identifier()->accept( *this );
-    node.arguments()->accept( *this );
-    node.returnType()->accept( *this );
-    node.expression()->accept( *this );
     node.attributes()->accept( *this );
+    node.derivedToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.leftBracketToken()->accept( *this );
+    node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
+    node.mapsToken()->accept( *this );
+    node.returnType()->accept( *this );
+    node.assignmentToken()->accept( *this );
+    node.expression()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RuleDefinition& node )
 {
-    node.identifier()->accept( *this );
-    node.arguments()->accept( *this );
-    node.returnType()->accept( *this );
-    node.rule()->accept( *this );
     node.attributes()->accept( *this );
+    node.ruleToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.leftBracketToken()->accept( *this );
+    node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
+    node.mapsToken()->accept( *this );
+    node.returnType()->accept( *this );
+    node.assignmentToken()->accept( *this );
+    node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( EnumeratorDefinition& node )
 {
-    node.identifier()->accept( *this );
+    node.delimiterToken()->accept( *this );
     node.attributes()->accept( *this );
+    node.identifier()->accept( *this );
 }
 
 void RecursiveVisitor::visit( EnumerationDefinition& node )
 {
-    node.identifier()->accept( *this );
-    node.enumerators()->accept( *this );
     node.attributes()->accept( *this );
+    node.enumerationToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.assignmentToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.enumerators()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UsingDefinition& node )
 {
-    node.identifier()->accept( *this );
-    node.type()->accept( *this );
     node.attributes()->accept( *this );
+    node.usingToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.assignmentToken()->accept( *this );
+    node.type()->accept( *this );
 }
 
 void RecursiveVisitor::visit( InvariantDefinition& node )
 {
-    node.identifier()->accept( *this );
-    node.expression()->accept( *this );
     node.attributes()->accept( *this );
+    node.invariantToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.assignmentToken()->accept( *this );
+    node.expression()->accept( *this );
 }
+
+//
+//
+// Literals
+//
 
 void RecursiveVisitor::visit( UndefLiteral& node )
 {
@@ -129,173 +183,283 @@ void RecursiveVisitor::visit( ValueLiteral& node )
 
 void RecursiveVisitor::visit( ReferenceLiteral& node )
 {
+    node.at()->accept( *this );
     node.identifier()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ListLiteral& node )
 {
+    node.leftBracket()->accept( *this );
     node.expressions()->accept( *this );
+    node.rightBracket()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RangeLiteral& node )
 {
+    node.leftBracket()->accept( *this );
     node.left()->accept( *this );
+    node.dotdot()->accept( *this );
     node.right()->accept( *this );
+    node.rightBracket()->accept( *this );
 }
 
 void RecursiveVisitor::visit( TupleLiteral& node )
 {
+    node.leftBracket()->accept( *this );
     node.expressions()->accept( *this );
+    node.rightBracket()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RecordLiteral& node )
 {
+    node.leftBracket()->accept( *this );
     node.namedExpressions()->accept( *this );
+    node.rightBracket()->accept( *this );
+}
+
+//
+//
+// Expressions
+//
+
+void RecursiveVisitor::visit( EmbracedExpression& node )
+{
+    node.delimiterToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.expression()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( NamedExpression& node )
 {
+    node.delimiterToken()->accept( *this );
     node.identifier()->accept( *this );
+    node.colon()->accept( *this );
     node.expression()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DirectCallExpression& node )
 {
+    node.delimiterToken()->accept( *this );
     node.identifier()->accept( *this );
+    node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( MethodCallExpression& node )
 {
+    node.delimiterToken()->accept( *this );
     node.object()->accept( *this );
+    node.dotToken()->accept( *this );
     node.methodName()->accept( *this );
+    node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( LiteralCallExpression& node )
 {
+    node.delimiterToken()->accept( *this );
     node.object()->accept( *this );
+    node.dot()->accept( *this );
     node.literal()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IndirectCallExpression& node )
 {
+    node.delimiterToken()->accept( *this );
     node.expression()->accept( *this );
+    node.leftBracketToken()->accept( *this );
     node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( TypeCastingExpression& node )
 {
+    node.delimiterToken()->accept( *this );
     node.fromExpression()->accept( *this );
+    node.asToken()->accept( *this );
     node.asType()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UnaryExpression& node )
 {
+    node.delimiterToken()->accept( *this );
+    node.operationToken()->accept( *this );
     node.expression()->accept( *this );
 }
 
 void RecursiveVisitor::visit( BinaryExpression& node )
 {
+    node.delimiterToken()->accept( *this );
     node.left()->accept( *this );
+    node.operationToken()->accept( *this );
     node.right()->accept( *this );
 }
 
 void RecursiveVisitor::visit( LetExpression& node )
 {
+    node.delimiterToken()->accept( *this );
+    node.letToken()->accept( *this );
     node.variableBindings()->accept( *this );
+    node.inToken()->accept( *this );
     node.expression()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ConditionalExpression& node )
 {
+    node.delimiterToken()->accept( *this );
+    node.ifToken()->accept( *this );
     node.condition()->accept( *this );
+    node.thenToken()->accept( *this );
     node.thenExpression()->accept( *this );
+    node.elseToken()->accept( *this );
     node.elseExpression()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ChooseExpression& node )
 {
+    node.delimiterToken()->accept( *this );
+    node.chooseToken()->accept( *this );
     node.variables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
+    node.doToken()->accept( *this );
     node.expression()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UniversalQuantifierExpression& node )
 {
+    node.delimiterToken()->accept( *this );
+    node.quantifierToken()->accept( *this );
     node.predicateVariables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
+    node.doToken()->accept( *this );
     node.proposition()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ExistentialQuantifierExpression& node )
 {
+    node.delimiterToken()->accept( *this );
+    node.quantifierToken()->accept( *this );
     node.predicateVariables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
+    node.doToken()->accept( *this );
     node.proposition()->accept( *this );
 }
 
 void RecursiveVisitor::visit( CardinalityExpression& node )
 {
+    node.delimiterToken()->accept( *this );
+    node.leftVerticalBarToken()->accept( *this );
     node.expression()->accept( *this );
+    node.rightVerticalBarToken()->accept( *this );
 }
+
+//
+//
+// Rules
+//
 
 void RecursiveVisitor::visit( SkipRule& node )
 {
+    node.skipToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ConditionalRule& node )
 {
+    node.ifToken()->accept( *this );
     node.condition()->accept( *this );
+    node.thenToken()->accept( *this );
     node.thenRule()->accept( *this );
+    node.elseToken()->accept( *this );
     node.elseRule()->accept( *this );
+}
+
+void RecursiveVisitor::visit( DefaultCase& node )
+{
+    node.labelToken()->accept( *this );
+    node.colonToken()->accept( *this );
+    node.rule()->accept( *this );
+}
+
+void RecursiveVisitor::visit( ExpressionCase& node )
+{
+    node.expression()->accept( *this );
+    node.colonToken()->accept( *this );
+    node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( CaseRule& node )
 {
+    node.caseToken()->accept( *this );
     node.expression()->accept( *this );
+    node.ofToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
     node.cases()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( LetRule& node )
 {
+    node.letToken()->accept( *this );
     node.variableBindings()->accept( *this );
+    node.inToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ForallRule& node )
 {
+    node.forallToken()->accept( *this );
     node.variables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
-    node.condition()->accept( *this );
+    if( node.withToken()->token() != Grammar::Token::UNRESOLVED )
+    {
+        node.withToken()->accept( *this );
+        node.condition()->accept( *this );
+    }
+    node.doToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ChooseRule& node )
 {
+    node.chooseToken()->accept( *this );
     node.variables()->accept( *this );
+    node.inToken()->accept( *this );
     node.universe()->accept( *this );
+    node.doToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IterateRule& node )
 {
+    node.iterateToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
 void RecursiveVisitor::visit( BlockRule& node )
 {
+    node.leftBraceToken()->accept( *this );
     node.rules()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( SequenceRule& node )
 {
+    node.leftBraceToken()->accept( *this );
     node.rules()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( UpdateRule& node )
 {
     node.function()->accept( *this );
+    node.updateToken()->accept( *this );
     node.expression()->accept( *this );
 }
 
@@ -306,62 +470,114 @@ void RecursiveVisitor::visit( CallRule& node )
 
 void RecursiveVisitor::visit( WhileRule& node )
 {
+    node.whileToken()->accept( *this );
     node.condition()->accept( *this );
+    node.doToken()->accept( *this );
     node.rule()->accept( *this );
 }
 
+//
+//
+// Types
+//
+
 void RecursiveVisitor::visit( UnresolvedType& node )
 {
+    node.delimiterToken()->accept( *this );
     node.name()->accept( *this );
 }
 
 void RecursiveVisitor::visit( BasicType& node )
 {
+    node.delimiterToken()->accept( *this );
     node.name()->accept( *this );
 }
 
-void RecursiveVisitor::visit( ComposedType& node )
+void RecursiveVisitor::visit( TupleType& node )
 {
-    node.name()->accept( *this );
-    if( node.isNamed() )
-    {
-        node.subTypeIdentifiers()->accept( *this );
-    }
+    node.delimiterToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
     node.subTypes()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+}
+
+void RecursiveVisitor::visit( RecordType& node )
+{
+    node.delimiterToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.namedSubTypes()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( TemplateType& node )
 {
+    node.delimiterToken()->accept( *this );
     node.name()->accept( *this );
+    node.leftBraceToken()->accept( *this );
     node.subTypes()->accept( *this );
-}
-
-void RecursiveVisitor::visit( FixedSizedType& node )
-{
-    node.name()->accept( *this );
-    node.size()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( RelationType& node )
 {
+    node.delimiterToken()->accept( *this );
     node.name()->accept( *this );
+    node.leftBraceToken()->accept( *this );
     node.argumentTypes()->accept( *this );
+    node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
+
+void RecursiveVisitor::visit( FixedSizedType& node )
+{
+    node.delimiterToken()->accept( *this );
+    node.name()->accept( *this );
+    node.markToken()->accept( *this );
+    node.size()->accept( *this );
+}
+
+//
+//
+// Attributes
+//
 
 void RecursiveVisitor::visit( BasicAttribute& node )
 {
+    node.leftBrace()->accept( *this );
     node.identifier()->accept( *this );
+    node.rightBrace()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ExpressionAttribute& node )
 {
+    node.leftBrace()->accept( *this );
     node.identifier()->accept( *this );
     node.expression()->accept( *this );
+    node.rightBrace()->accept( *this );
 }
+
+//
+//
+// Helper
+//
+
+void RecursiveVisitor::visit( Defined& node )
+{
+    node.definedToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.expression()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+}
+
+//
+//
+// Others
+//
 
 void RecursiveVisitor::visit( Identifier& node )
 {
+    node.doubleColon()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IdentifierPath& node )
@@ -369,21 +585,16 @@ void RecursiveVisitor::visit( IdentifierPath& node )
     node.identifiers()->accept( *this );
 }
 
-void RecursiveVisitor::visit( ExpressionCase& node )
-{
-    node.expression()->accept( *this );
-    node.rule()->accept( *this );
-}
-
-void RecursiveVisitor::visit( DefaultCase& node )
-{
-    node.rule()->accept( *this );
-}
-
 void RecursiveVisitor::visit( VariableBinding& node )
 {
+    node.delimiterToken()->accept( *this );
     node.variable()->accept( *this );
+    node.equal()->accept( *this );
     node.expression()->accept( *this );
+}
+
+void RecursiveVisitor::visit( Token& node )
+{
 }
 
 //

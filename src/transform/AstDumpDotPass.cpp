@@ -43,6 +43,8 @@
 
 #include "AstDumpDotPass.h"
 
+#include "../various/GrammarToken.h"
+
 #include <libcasm-fe/Logger>
 #include <libcasm-fe/Namespace>
 #include <libcasm-fe/Specification>
@@ -106,6 +108,10 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
     void visit( Specification& specification );
 
+    void visit( HeaderDefinition& node ) override;
+    void visit( InitDefinition& node ) override;
+    void visit( Initially& node ) override;
+    void visit( Initializer& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
     void visit( DerivedDefinition& node ) override;
@@ -123,6 +129,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( TupleLiteral& node ) override;
     void visit( RecordLiteral& node ) override;
 
+    void visit( EmbracedExpression& node ) override;
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
@@ -153,7 +160,8 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
     void visit( UnresolvedType& node ) override;
     void visit( BasicType& node ) override;
-    void visit( ComposedType& node ) override;
+    void visit( TupleType& node ) override;
+    void visit( RecordType& node ) override;
     void visit( TemplateType& node ) override;
     void visit( FixedSizedType& node ) override;
     void visit( RelationType& node ) override;
@@ -161,11 +169,14 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( BasicAttribute& node ) override;
     void visit( ExpressionAttribute& node ) override;
 
+    void visit( Defined& node ) override;
+
     void visit( Identifier& node ) override;
     void visit( IdentifierPath& node ) override;
     void visit( ExpressionCase& node ) override;
     void visit( DefaultCase& node ) override;
     void visit( VariableBinding& node ) override;
+    void visit( Token& node ) override;
 
   private:
     void dumpNode( const Node& node, const std::string& name );
@@ -206,6 +217,49 @@ void AstDumpDotVisitor::visit( Specification& specification )
     }
 
     m_stream << "}\n";
+}
+
+void AstDumpDotVisitor::visit( HeaderDefinition& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "HeaderDefinition" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( InitDefinition& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "InitDefinition" );
+    node.attributes()->accept( *this );
+    node.initToken()->accept( *this );
+    if( node.isSingleAgent() )
+    {
+        node.initPath()->accept( *this );
+    }
+    else
+    {
+        node.leftBraceToken()->accept( *this );
+        node.initializers()->accept( *this );
+        node.rightBraceToken()->accept( *this );
+    }
+}
+
+void AstDumpDotVisitor::visit( Initially& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "Initially" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( Initializer& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "Initializer" );
+    node.leftBraceToken()->accept( *this );
+    node.arguments()->accept( *this );
+    node.rightBraceToken()->accept( *this );
+    node.mapsToken()->accept( *this );
+    node.value()->accept( *this );
 }
 
 void AstDumpDotVisitor::visit( VariableDefinition& node )
@@ -310,6 +364,13 @@ void AstDumpDotVisitor::visit( RecordLiteral& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "RecordLiteral" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( EmbracedExpression& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "EmbracedExpression" );
     RecursiveVisitor::visit( node );
 }
 
@@ -499,6 +560,7 @@ void AstDumpDotVisitor::visit( UnresolvedType& node )
 {
     DotLink link( this, &node );
     dumpNode( node, "UnresolvedType" );
+    RecursiveVisitor::visit( node );
 }
 
 void AstDumpDotVisitor::visit( BasicType& node )
@@ -508,10 +570,17 @@ void AstDumpDotVisitor::visit( BasicType& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( ComposedType& node )
+void AstDumpDotVisitor::visit( TupleType& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "ComposedType" );
+    dumpNode( node, "TupleType" );
+    RecursiveVisitor::visit( node );
+}
+
+void AstDumpDotVisitor::visit( RecordType& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "RecordType" );
     RecursiveVisitor::visit( node );
 }
 
@@ -550,6 +619,13 @@ void AstDumpDotVisitor::visit( ExpressionAttribute& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( Defined& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "Defined" );
+    RecursiveVisitor::visit( node );
+}
+
 void AstDumpDotVisitor::visit( Identifier& node )
 {
     DotLink link( this, &node );
@@ -571,7 +647,7 @@ void AstDumpDotVisitor::visit( IdentifierPath& node )
             name = "Relative";
             break;
     }
-    name += " IdentifierPath";
+    name += "\nIdentifierPath";
 
     dumpNode( node, name );
     RecursiveVisitor::visit( node );
@@ -598,13 +674,30 @@ void AstDumpDotVisitor::visit( VariableBinding& node )
     RecursiveVisitor::visit( node );
 }
 
+void AstDumpDotVisitor::visit( Token& node )
+{
+    if( node.token() != Grammar::Token::UNRESOLVED )
+    {
+        DotLink link( this, &node );
+        dumpNode( node, "Token\n" + node.tokenString() );
+    }
+    RecursiveVisitor::visit( node );
+}
+
 void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
 {
     m_stream << "\"" << &node << "\" [label=\"" << name;
 
     dumpLabel( node );
 
-    m_stream << "\"];\n";
+    m_stream << "\"";
+
+    if( node.id() == Node::ID::TOKEN )
+    {
+        m_stream << " shape=box";
+    }
+
+    m_stream << "];\n";
 }
 
 void AstDumpDotVisitor::dumpNode( const TypedNode& node, const std::string& name )

@@ -49,6 +49,9 @@ namespace libcasm_fe
     namespace Ast
     {
         class HeaderDefinition;
+        class InitDefinition;
+        class Initially;
+        class Initializer;
         class VariableDefinition;
         class FunctionDefinition;
         class DerivedDefinition;
@@ -66,6 +69,7 @@ namespace libcasm_fe
         class TupleLiteral;
         class RecordLiteral;
 
+        class EmbracedExpression;
         class NamedExpression;
         class DirectCallExpression;
         class MethodCallExpression;
@@ -96,7 +100,8 @@ namespace libcasm_fe
 
         class UnresolvedType;
         class BasicType;
-        class ComposedType;
+        class TupleType;
+        class RecordType;
         class TemplateType;
         class FixedSizedType;
         class RelationType;
@@ -104,11 +109,14 @@ namespace libcasm_fe
         class BasicAttribute;
         class ExpressionAttribute;
 
+        class Defined;
+
         class Identifier;
         class IdentifierPath;
         class ExpressionCase;
         class DefaultCase;
         class VariableBinding;
+        class Token;
 
         /**
          * @extends CasmFE
@@ -119,6 +127,9 @@ namespace libcasm_fe
             virtual ~Visitor( void ) = default;
 
             virtual void visit( HeaderDefinition& node ) = 0;
+            virtual void visit( InitDefinition& node ) = 0;
+            virtual void visit( Initially& node ) = 0;
+            virtual void visit( Initializer& node ) = 0;
             virtual void visit( VariableDefinition& node ) = 0;
             virtual void visit( FunctionDefinition& node ) = 0;
             virtual void visit( DerivedDefinition& node ) = 0;
@@ -136,6 +147,7 @@ namespace libcasm_fe
             virtual void visit( TupleLiteral& node ) = 0;
             virtual void visit( RecordLiteral& node ) = 0;
 
+            virtual void visit( EmbracedExpression& node ) = 0;
             virtual void visit( NamedExpression& node ) = 0;
             virtual void visit( DirectCallExpression& node ) = 0;
             virtual void visit( MethodCallExpression& node ) = 0;
@@ -166,7 +178,8 @@ namespace libcasm_fe
 
             virtual void visit( UnresolvedType& node ) = 0;
             virtual void visit( BasicType& node ) = 0;
-            virtual void visit( ComposedType& node ) = 0;
+            virtual void visit( TupleType& node ) = 0;
+            virtual void visit( RecordType& node ) = 0;
             virtual void visit( TemplateType& node ) = 0;
             virtual void visit( FixedSizedType& node ) = 0;
             virtual void visit( RelationType& node ) = 0;
@@ -174,11 +187,14 @@ namespace libcasm_fe
             virtual void visit( BasicAttribute& node ) = 0;
             virtual void visit( ExpressionAttribute& node ) = 0;
 
+            virtual void visit( Defined& node ) = 0;
+
             virtual void visit( Identifier& node ) = 0;
             virtual void visit( IdentifierPath& node ) = 0;
             virtual void visit( ExpressionCase& node ) = 0;
             virtual void visit( DefaultCase& node ) = 0;
             virtual void visit( VariableBinding& node ) = 0;
+            virtual void visit( Token& node ) = 0;
         };
     }
 }

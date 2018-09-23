@@ -41,69 +41,40 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_ATTRIBUTE_H_
-#define _LIBCASM_FE_ATTRIBUTE_H_
+#ifndef _LIBCASM_FE_TOKEN_H_
+#define _LIBCASM_FE_TOKEN_H_
 
-#include <libcasm-fe/ast/Expression>
 #include <libcasm-fe/ast/Node>
-#include <libcasm-fe/ast/Token>
 
 namespace libcasm_fe
 {
+    namespace Grammar
+    {
+        enum class Token : u8;
+    }
+
     namespace Ast
     {
-        class Attribute : public Node
+        class Token final : public Node
         {
           public:
-            using Ptr = std::shared_ptr< Attribute >;
+            using Ptr = std::shared_ptr< Token >;
 
-            Attribute( Node::ID id, const Identifier::Ptr& identifier );
+            Token( const libcasm_fe::Grammar::Token token );
 
-            const Identifier::Ptr& identifier( void ) const;
+            libcasm_fe::Grammar::Token token( void ) const;
 
-            void setLeftBrace( const Token::Ptr& leftBrace );
-            const Token::Ptr& leftBrace( void ) const;
-
-            void setRightBrace( const Token::Ptr& rightBrace );
-            const Token::Ptr& rightBrace( void ) const;
-
-          private:
-            const Identifier::Ptr m_identifier;
-            Token::Ptr m_leftBrace;
-            Token::Ptr m_rightBrace;
-        };
-
-        using Attributes = NodeList< Attribute >;
-
-        class BasicAttribute final : public Attribute
-        {
-          public:
-            using Ptr = std::shared_ptr< BasicAttribute >;
-
-            explicit BasicAttribute( const Identifier::Ptr& identifier );
-
-            void accept( Visitor& visitor ) override final;
-        };
-
-        class ExpressionAttribute final : public Attribute
-        {
-          public:
-            using Ptr = std::shared_ptr< ExpressionAttribute >;
-
-            ExpressionAttribute(
-                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
-
-            const Expression::Ptr& expression( void ) const;
+            std::string tokenString( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
-            const Expression::Ptr m_expression;
+            libcasm_fe::Grammar::Token m_token;
         };
     }
 }
 
-#endif  // _LIBCASM_FE_ATTRIBUTE_H_
+#endif  // _LIBCASM_FE_TOKEN_H_
 
 //
 //  Local variables:

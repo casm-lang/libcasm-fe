@@ -67,6 +67,8 @@ namespace libcasm_fe
             {
                 // definitions
                 HEADER_DEFINITION,
+                INIT_DEFINITION,
+                INITIALLY,
                 VARIABLE_DEFINITION,
                 FUNCTION_DEFINITION,
                 DERIVED_DEFINITION,
@@ -86,6 +88,7 @@ namespace libcasm_fe
                 RECORD_LITERAL,
 
                 // expressions
+                EMBRACED_EXPRESSION,
                 NAMED_EXPRESSION,
                 DIRECT_CALL_EXPRESSION,
                 METHOD_CALL_EXPRESSION,
@@ -118,7 +121,8 @@ namespace libcasm_fe
                 // types
                 UNRESOLVED_TYPE,
                 BASIC_TYPE,
-                COMPOSED_TYPE,
+                TUPLE_TYPE,
+                RECORD_TYPE,
                 TEMPLATE_TYPE,
                 FIXED_SIZED_TYPE,
                 RELATION_TYPE,
@@ -127,6 +131,10 @@ namespace libcasm_fe
                 BASIC_ATTRIBUTE,
                 EXPRESSION_ATTRIBUTE,
 
+                // helper
+                DEFINED,
+                INITIALIZER,
+
                 // other
                 NODE_LIST,
                 IDENTIFIER,
@@ -134,6 +142,7 @@ namespace libcasm_fe
                 EXPRESSION_CASE,
                 DEFAULT_CASE,
                 VARIABLE_BINDING,
+                TOKEN,
             };
 
           public:
@@ -215,82 +224,6 @@ namespace libcasm_fe
           private:
             libcasm_ir::Properties m_properties;
         };
-
-        class Identifier final : public Node
-        {
-          public:
-            using Ptr = std::shared_ptr< Identifier >;
-
-            explicit Identifier( const std::string& name );
-
-            const std::string& name( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            std::string m_name;
-        };
-
-        using Identifiers = NodeList< Identifier >;
-
-        /**
-         * @brief An identifier path is an identifier + namespaces.
-         *
-         * The identifier path can either be absolute or relative. The string of
-         * a relative identifier path starts with a dot. All relative identifier
-         * paths will later be resolved and converted into absolute paths.
-         *
-         * An absolute path "Color.Red" will be splitted into the namespaces
-         * ["Color"] and identifier "Red". Furthermore the node will be marked
-         * as NamespaceType.ABSOLUTE.
-         *
-         * A relative path ".Red" will be splitted into the namespaces [] and
-         * identifier "Red". Furthermore the node will be marked as
-         * NamespaceType.RELATIVE.
-         */
-        class IdentifierPath final : public Node
-        {
-          public:
-            enum class Type
-            {
-                ABSOLUTE, /**< absolute namespace + identifier path */
-                RELATIVE, /**< path started with a dot, needs to be resolved */
-            };
-
-          public:
-            using Ptr = std::shared_ptr< IdentifierPath >;
-
-            IdentifierPath( const Identifier::Ptr& identifier, Type type = Type::ABSOLUTE );
-
-            /**
-             * @param identifiers A list of identifiers (must not be empty)
-             * @param type The type of the identifier path (default is ABSOLUTE)
-             */
-            IdentifierPath( const Identifiers::Ptr& identifiers, Type type = Type::ABSOLUTE );
-
-            void addIdentifier( const Identifier::Ptr& identifier );
-
-            Identifiers::Ptr identifiers( void ) const;
-            Type type( void ) const;
-
-            const std::string& baseName( void ) const;
-            std::string baseDir( void ) const;
-            std::string path( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Identifiers::Ptr m_identifiers;
-            const Type m_type;
-        };
-
-        template < typename T, typename... Args >
-        typename T::Ptr make( const SourceLocation& sourceLocation, Args&&... args )
-        {
-            auto node = std::make_shared< T >( std::forward< Args >( args )... );
-            node->setSourceLocation( sourceLocation );
-            return node;
-        }
     }
 }
 

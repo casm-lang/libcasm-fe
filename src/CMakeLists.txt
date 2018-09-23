@@ -57,13 +57,16 @@ add_library( ${PROJECT}-cpp OBJECT
 
   ast/Attribute.cpp
   ast/Definition.cpp
+  ast/EmptyVisitor.cpp
   ast/Expression.cpp
+  ast/Helper.cpp
+  ast/Identifier.cpp
   ast/Literal.cpp
   ast/Node.cpp
-  ast/Rule.cpp
-  ast/Type.cpp
   ast/RecursiveVisitor.cpp
-  ast/EmptyVisitor.cpp
+  ast/Rule.cpp
+  ast/Token.cpp
+  ast/Type.cpp
 
   analyze/ConsistencyCheckPass.cpp
   analyze/TypeCheckPass.cpp
@@ -248,10 +251,13 @@ ecm_generate_headers( ${PROJECT}_AST_HEADERS_CPP
     Definition
     EmptyVisitor
     Expression
+    Helper
+    Identifier
     Literal
     Node
     RecursiveVisitor
     Rule
+    Token
     Type
     Visitor
   PREFIX

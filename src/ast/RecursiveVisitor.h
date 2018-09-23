@@ -54,6 +54,9 @@ namespace libcasm_fe
         {
           public:
             void visit( HeaderDefinition& node ) override;
+            void visit( InitDefinition& node ) override;
+            void visit( Initially& node ) override;
+            void visit( Initializer& node ) override;
             void visit( VariableDefinition& node ) override;
             void visit( FunctionDefinition& node ) override;
             void visit( DerivedDefinition& node ) override;
@@ -71,6 +74,7 @@ namespace libcasm_fe
             void visit( TupleLiteral& node ) override;
             void visit( RecordLiteral& node ) override;
 
+            void visit( EmbracedExpression& node ) override;
             void visit( NamedExpression& node ) override;
             void visit( DirectCallExpression& node ) override;
             void visit( MethodCallExpression& node ) override;
@@ -101,7 +105,8 @@ namespace libcasm_fe
 
             void visit( UnresolvedType& node ) override;
             void visit( BasicType& node ) override;
-            void visit( ComposedType& node ) override;
+            void visit( TupleType& node ) override;
+            void visit( RecordType& node ) override;
             void visit( TemplateType& node ) override;
             void visit( FixedSizedType& node ) override;
             void visit( RelationType& node ) override;
@@ -109,11 +114,14 @@ namespace libcasm_fe
             void visit( BasicAttribute& node ) override;
             void visit( ExpressionAttribute& node ) override;
 
+            void visit( Defined& node ) override;
+
             void visit( Identifier& node ) override;
             void visit( IdentifierPath& node ) override;
             void visit( ExpressionCase& node ) override;
             void visit( DefaultCase& node ) override;
             void visit( VariableBinding& node ) override;
+            void visit( Token& node ) override;
         };
     }
 }

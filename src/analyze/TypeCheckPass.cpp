@@ -74,7 +74,8 @@ class TypeCheckVisitor final : public RecursiveVisitor
     void visit( UsingDefinition& node ) override;
 
     void visit( BasicType& node ) override;
-    void visit( ComposedType& node ) override;
+    void visit( TupleType& node ) override;
+    void visit( RecordType& node ) override;
     void visit( TemplateType& node ) override;
     void visit( RelationType& node ) override;
     void visit( FixedSizedType& node ) override;
@@ -165,7 +166,7 @@ void TypeCheckVisitor::visit( BasicType& node )
     }
 }
 
-void TypeCheckVisitor::visit( ComposedType& node )
+void TypeCheckVisitor::visit( TupleType& node )
 {
     RecursiveVisitor::visit( node );
 
@@ -174,51 +175,52 @@ void TypeCheckVisitor::visit( ComposedType& node )
         return;
     }
 
-    const auto& name = node.name()->path();
-
     libcasm_ir::Types subTypeList;
     for( auto subType : *node.subTypes() )
     {
         if( not subType->type() )
         {
-            m_log.info(
-                { subType->sourceLocation() }, "TODO: '" + name + "' has a non-typed sub-type" );
+            // early return, due to partial sub-types
             return;
         }
 
         subTypeList.add( subType->type() );
     }
 
-    if( name == TypeInfo::TYPE_NAME_TUPLE )
-    {
-        assert( subTypeList.size() >= 2 );  // constrain from parser
-        assert( not node.isNamed() );       // constrain from parser
+    assert( subTypeList.size() >= 2 );  // constrain from parser
 
-        const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
-        node.setType( type );
+    const auto type = libstdhl::Memory::make< libcasm_ir::TupleType >( subTypeList );
+    node.setType( type );
+}
+
+void TypeCheckVisitor::visit( RecordType& node )
+{
+    RecursiveVisitor::visit( node );
+
+    if( node.type() )
+    {
+        return;
     }
-    else if( name == TypeInfo::TYPE_NAME_RECORD )
-    {
-        assert( subTypeList.size() >= 2 );  // constrain from parser
-        assert( node.isNamed() );           // constrain from parser
 
-        std::vector< std::string > recordIdentifiers;
-        for( const auto& subTypeIdentifier : *node.subTypeIdentifiers() )
+    libcasm_ir::Types subTypeList;
+    std::vector< std::string > recordIdentifiers;
+    for( const auto& namedSubType : *node.namedSubTypes() )
+    {
+        if( not namedSubType->variableType()->type() )
         {
-            recordIdentifiers.emplace_back( subTypeIdentifier->name() );
+            // early return, due to partial sub-types
+            return;
         }
 
-        const auto type =
-            libstdhl::Memory::make< libcasm_ir::RecordType >( subTypeList, recordIdentifiers );
-        node.setType( type );
+        subTypeList.add( namedSubType->variableType()->type() );
+        recordIdentifiers.emplace_back( namedSubType->identifier()->name() );
     }
-    else
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "unknown composed type '" + name + "' found",
-            Code::TypeAnnotationInvalidComposedTypeName );
-    }
+
+    assert( subTypeList.size() >= 2 );  // constrain from parser
+
+    const auto type =
+        libstdhl::Memory::make< libcasm_ir::RecordType >( subTypeList, recordIdentifiers );
+    node.setType( type );
 }
 
 void TypeCheckVisitor::visit( TemplateType& node )

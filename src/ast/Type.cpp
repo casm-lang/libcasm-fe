@@ -43,17 +43,34 @@
 
 #include "Type.h"
 
+#include "../various/GrammarToken.h"
+
+#include <libcasm-fe/ast/Definition>
+
 using namespace libcasm_fe;
 using namespace Ast;
 
-static IdentifierPath::Ptr createUnresolvedIdentifierPath( void )
+static IdentifierPath::Ptr asIdentifierPath( const std::string& name )
 {
-    return std::make_shared< IdentifierPath >( std::make_shared< Identifier >( "$unresolved$" ) );
+    const auto identifier = std::make_shared< Identifier >( name );
+    return std::make_shared< IdentifierPath >( identifier );
 }
 
-Type::Type( Node::ID id, const IdentifierPath::Ptr& name )
+static const auto UnresolvedIdentifierPath = asIdentifierPath( "$unresolved$" );
+static const auto TupleTypeIdentifierPath = asIdentifierPath( "$tuple$" );
+static const auto RecordTypeIdentifierPath = asIdentifierPath( "$record$" );
+
+static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+
+//
+//
+// Type
+//
+
+Type::Type( const Node::ID id, const IdentifierPath::Ptr& name )
 : TypedNode( id )
 , m_name( name )
+, m_delimiterToken( uToken )
 {
 }
 
@@ -62,8 +79,24 @@ const IdentifierPath::Ptr& Type::name( void ) const
     return m_name;
 }
 
+void Type::setDelimiterToken( const Token::Ptr& delimiterToken )
+{
+    assert( m_delimiterToken->token() == Grammar::Token::UNRESOLVED );
+    m_delimiterToken = delimiterToken;
+}
+
+const Token::Ptr& Type::delimiterToken( void ) const
+{
+    return m_delimiterToken;
+}
+
+//
+//
+// UnresolvedType
+//
+
 UnresolvedType::UnresolvedType( void )
-: Type( Node::ID::UNRESOLVED_TYPE, createUnresolvedIdentifierPath() )
+: Type( Node::ID::UNRESOLVED_TYPE, UnresolvedIdentifierPath )
 {
 }
 
@@ -71,6 +104,11 @@ void UnresolvedType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// BasicType
+//
 
 BasicType::BasicType( const IdentifierPath::Ptr& identifier )
 : Type( Node::ID::BASIC_TYPE, identifier )
@@ -82,45 +120,91 @@ void BasicType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-ComposedType::ComposedType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
-: ComposedType( identifier, subTypes, nullptr )
+//
+//
+// EmbracedType
+//
+
+EmbracedType::EmbracedType(
+    const Node::ID id,
+    const IdentifierPath::Ptr& name,
+    const Token::Ptr& leftBraceToken,
+    const Token::Ptr& rightBraceToken )
+: Type( id, name )
+, m_leftBraceToken( leftBraceToken )
+, m_rightBraceToken( rightBraceToken )
 {
 }
 
-ComposedType::ComposedType(
-    const IdentifierPath::Ptr& identifier,
+const Token::Ptr& EmbracedType::leftBraceToken( void ) const
+{
+    return m_leftBraceToken;
+}
+
+const Token::Ptr& EmbracedType::rightBraceToken( void ) const
+{
+    return m_rightBraceToken;
+}
+
+//
+//
+// TupleType
+//
+
+TupleType::TupleType(
+    const Token::Ptr& leftBraceToken,
     const Types::Ptr& subTypes,
-    const Identifiers::Ptr& subTypeIdentifiers )
-: Type( Node::ID::COMPOSED_TYPE, identifier )
+    const Token::Ptr& rightBraceToken )
+: EmbracedType( Node::ID::TUPLE_TYPE, TupleTypeIdentifierPath, leftBraceToken, rightBraceToken )
 , m_subTypes( subTypes )
-, m_subTypeIdentifiers( subTypeIdentifiers )
 {
-    assert( subTypes );
-    assert( not subTypeIdentifiers or subTypes->size() == subTypeIdentifiers->size() );
 }
 
-const Types::Ptr& ComposedType::subTypes( void ) const
+const Types::Ptr& TupleType::subTypes( void ) const
 {
     return m_subTypes;
 }
 
-const Identifiers::Ptr& ComposedType::subTypeIdentifiers( void ) const
-{
-    return m_subTypeIdentifiers;
-}
-
-u1 ComposedType::isNamed( void ) const
-{
-    return m_subTypeIdentifiers != nullptr;
-}
-
-void ComposedType::accept( Visitor& visitor )
+void TupleType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
 
-TemplateType::TemplateType( const IdentifierPath::Ptr& identifier, const Types::Ptr& subTypes )
-: Type( Node::ID::TEMPLATE_TYPE, identifier )
+//
+//
+// RecordType
+//
+
+RecordType::RecordType(
+    const Token::Ptr& leftBraceToken,
+    const VariableDefinitions::Ptr& namedSubTypes,
+    const Token::Ptr& rightBraceToken )
+: EmbracedType( Node::ID::RECORD_TYPE, RecordTypeIdentifierPath, leftBraceToken, rightBraceToken )
+, m_namedSubTypes( namedSubTypes )
+{
+}
+
+const VariableDefinitions::Ptr& RecordType::namedSubTypes( void ) const
+{
+    return m_namedSubTypes;
+}
+
+void RecordType::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//
+// TemplateType
+//
+
+TemplateType::TemplateType(
+    const IdentifierPath::Ptr& identifier,
+    const Token::Ptr& leftBraceToken,
+    const Types::Ptr& subTypes,
+    const Token::Ptr& rightBraceToken )
+: EmbracedType( Node::ID::TEMPLATE_TYPE, identifier, leftBraceToken, rightBraceToken )
 , m_subTypes( subTypes )
 {
 }
@@ -135,29 +219,22 @@ void TemplateType::accept( Visitor& visitor )
     visitor.visit( *this );
 }
 
-FixedSizedType::FixedSizedType( const IdentifierPath::Ptr& identifier, const Expression::Ptr& size )
-: Type( Node::ID::FIXED_SIZED_TYPE, identifier )
-, m_size( size )
-{
-}
-
-const Expression::Ptr& FixedSizedType::size( void ) const
-{
-    return m_size;
-}
-
-void FixedSizedType::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
+//
+//
+// RelationType
+//
 
 RelationType::RelationType(
     const IdentifierPath::Ptr& identifier,
+    const Token::Ptr& leftBraceToken,
     const Types::Ptr& argumentTypes,
-    const Type::Ptr& returnType )
-: Type( Node::ID::RELATION_TYPE, identifier )
+    const Token::Ptr& mapsToken,
+    const Type::Ptr& returnType,
+    const Token::Ptr& rightBraceToken )
+: EmbracedType( Node::ID::RELATION_TYPE, identifier, leftBraceToken, rightBraceToken )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
+, m_mapsToken( mapsToken )
 {
 }
 
@@ -171,7 +248,52 @@ const Type::Ptr& RelationType::returnType( void ) const
     return m_returnType;
 }
 
+const Token::Ptr& RelationType::mapsToken( void ) const
+{
+    return m_mapsToken;
+}
+
 void RelationType::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }
+
+//
+//
+// FixedSizeType
+//
+
+FixedSizedType::FixedSizedType(
+    const IdentifierPath::Ptr& identifier,
+    const Token::Ptr& markToken,
+    const Expression::Ptr& size )
+: Type( Node::ID::FIXED_SIZED_TYPE, identifier )
+, m_size( size )
+, m_markToken( markToken )
+{
+}
+
+const Expression::Ptr& FixedSizedType::size( void ) const
+{
+    return m_size;
+}
+
+const Token::Ptr& FixedSizedType::markToken( void ) const
+{
+    return m_markToken;
+}
+
+void FixedSizedType::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

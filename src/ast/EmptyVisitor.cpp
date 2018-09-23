@@ -54,6 +54,18 @@ void EmptyVisitor::visit( HeaderDefinition& )
 {
 }
 
+void EmptyVisitor::visit( InitDefinition& )
+{
+}
+
+void EmptyVisitor::visit( Initially& )
+{
+}
+
+void EmptyVisitor::visit( Initializer& )
+{
+}
+
 void EmptyVisitor::visit( VariableDefinition& )
 {
 }
@@ -111,6 +123,10 @@ void EmptyVisitor::visit( TupleLiteral& )
 }
 
 void EmptyVisitor::visit( RecordLiteral& )
+{
+}
+
+void EmptyVisitor::visit( EmbracedExpression& )
 {
 }
 
@@ -226,7 +242,11 @@ void EmptyVisitor::visit( BasicType& )
 {
 }
 
-void EmptyVisitor::visit( ComposedType& )
+void EmptyVisitor::visit( TupleType& )
+{
+}
+
+void EmptyVisitor::visit( RecordType& )
 {
 }
 
@@ -250,6 +270,10 @@ void EmptyVisitor::visit( ExpressionAttribute& )
 {
 }
 
+void EmptyVisitor::visit( Defined& )
+{
+}
+
 void EmptyVisitor::visit( Identifier& )
 {
 }
@@ -267,6 +291,10 @@ void EmptyVisitor::visit( DefaultCase& )
 }
 
 void EmptyVisitor::visit( VariableBinding& )
+{
+}
+
+void EmptyVisitor::visit( Token& )
 {
 }
 

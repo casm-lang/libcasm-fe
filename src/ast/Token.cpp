@@ -41,69 +41,38 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_ATTRIBUTE_H_
-#define _LIBCASM_FE_ATTRIBUTE_H_
+#include "Token.h"
 
-#include <libcasm-fe/ast/Expression>
-#include <libcasm-fe/ast/Node>
-#include <libcasm-fe/ast/Token>
+#include "../various/GrammarToken.h"
 
-namespace libcasm_fe
+using namespace libcasm_fe;
+using namespace Ast;
+
+//
+//
+// Token
+//
+
+Token::Token( const libcasm_fe::Grammar::Token token )
+: Node( Node::ID::TOKEN )
+, m_token( token )
 {
-    namespace Ast
-    {
-        class Attribute : public Node
-        {
-          public:
-            using Ptr = std::shared_ptr< Attribute >;
-
-            Attribute( Node::ID id, const Identifier::Ptr& identifier );
-
-            const Identifier::Ptr& identifier( void ) const;
-
-            void setLeftBrace( const Token::Ptr& leftBrace );
-            const Token::Ptr& leftBrace( void ) const;
-
-            void setRightBrace( const Token::Ptr& rightBrace );
-            const Token::Ptr& rightBrace( void ) const;
-
-          private:
-            const Identifier::Ptr m_identifier;
-            Token::Ptr m_leftBrace;
-            Token::Ptr m_rightBrace;
-        };
-
-        using Attributes = NodeList< Attribute >;
-
-        class BasicAttribute final : public Attribute
-        {
-          public:
-            using Ptr = std::shared_ptr< BasicAttribute >;
-
-            explicit BasicAttribute( const Identifier::Ptr& identifier );
-
-            void accept( Visitor& visitor ) override final;
-        };
-
-        class ExpressionAttribute final : public Attribute
-        {
-          public:
-            using Ptr = std::shared_ptr< ExpressionAttribute >;
-
-            ExpressionAttribute(
-                const Identifier::Ptr& identifier, const Expression::Ptr& expression );
-
-            const Expression::Ptr& expression( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Expression::Ptr m_expression;
-        };
-    }
 }
 
-#endif  // _LIBCASM_FE_ATTRIBUTE_H_
+libcasm_fe::Grammar::Token Token::token( void ) const
+{
+    return m_token;
+}
+
+std::string Token::tokenString( void ) const
+{
+    return libcasm_fe::Grammar::tokenAsString( m_token );
+}
+
+void Token::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
 
 //
 //  Local variables:

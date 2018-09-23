@@ -90,6 +90,7 @@ class TypeInferenceVisitor final : public RecursiveVisitor
     void visit( TupleLiteral& node ) override;
     void visit( RecordLiteral& node ) override;
 
+    void visit( EmbracedExpression& node ) override;
     void visit( NamedExpression& node ) override;
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
@@ -211,12 +212,16 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
     node.setType( type );
 
     auto& returnType = *node.returnType()->type();
-    m_typeIDs[ node.defaultValue().get() ].emplace( returnType.id() );
-    node.defaultValue()->accept( *this );
 
-    if( node.defaultValue()->type() and node.defaultValue()->type() != node.returnType()->type() )
+    // annotate the defined expression (default value/expression) with the return type
+    m_typeIDs[ node.defined()->expression().get() ].emplace( returnType.id() );
+    node.defined()->expression()->accept( *this );
+
+    if( node.defined()->expression()->type() and
+        node.defined()->expression()->type() != node.returnType()->type() )
     {
-        if( node.defaultValue()->type()->isInteger() == node.returnType()->type()->isInteger() )
+        if( node.defined()->expression()->type()->isInteger() ==
+            node.returnType()->type()->isInteger() )
         {
             // relaxation: mixed ranged and non-ranged integer types are allowed and checked in a
             // later pass or step!
@@ -224,9 +229,10 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
         else
         {
             m_log.error(
-                { node.defaultValue()->sourceLocation(), node.returnType()->sourceLocation() },
+                { node.defined()->expression()->sourceLocation(),
+                  node.returnType()->sourceLocation() },
                 "type mismatch: type of default value was '" +
-                    node.defaultValue()->type()->description() + "', function expects '" +
+                    node.defined()->expression()->type()->description() + "', function expects '" +
                     node.returnType()->type()->description() + "'",
                 Code::TypeInferenceFunctionDefaultValueTypeMismatch );
         }
@@ -417,6 +423,16 @@ void TypeInferenceVisitor::visit( ReferenceLiteral& node )
             assert( !" unknown reference type! " );
         }
     }
+}
+
+void TypeInferenceVisitor::visit( EmbracedExpression& node )
+{
+    for( const auto typeId : m_typeIDs[&node ] )
+    {
+        m_typeIDs[ node.expression().get() ].emplace( typeId );
+    }
+    RecursiveVisitor::visit( node );
+    node.setType( node.expression()->type() );
 }
 
 void TypeInferenceVisitor::visit( NamedExpression& node )
@@ -918,11 +934,21 @@ void TypeInferenceVisitor::visit( TypeCastingExpression& node )
 
 void TypeInferenceVisitor::visit( UnaryExpression& node )
 {
+    if( node.op() == libcasm_ir::Value::ADD_INSTRUCTION )
+    {
+        // add unary expression (e.g. '+4') will not be annotated,
+        // just visit sub-nodes, propagate the expression type to this node and return
+        RecursiveVisitor::visit( node );
+        node.setType( node.expression()->type() );
+        return;
+    }
+
     const auto* annotation = annotate( node, { node.expression() } );
 
     RecursiveVisitor::visit( node );
 
     const auto description = "unary operator '" + libcasm_ir::Value::token( node.op() ) + "'";
+
     inference( description, annotation, node, { node.expression() } );
 
     RecursiveVisitor::visit( node );
