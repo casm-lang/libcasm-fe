@@ -119,7 +119,7 @@ ci-fetch: ci-git-access
 ci-git-access:
 	@echo "-- Git Access Configuration"
 	@git config --local url."git@github.com:".insteadOf "https://github.com/"
-	@mkdir -p .attic
 	@eval $(ssh-agent -s)
-	@echo "$(GITHUB_TOKEN)" > .attic/key
+	@mkdir -p .attic
+	@echo $(GITHUB_TOKEN) | sed "s/$ /\n/g" | sed "s/.$//g" > .attic/key
 	@ssh-add .attic/key
