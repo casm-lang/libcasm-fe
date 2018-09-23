@@ -46,6 +46,8 @@ check_task:
     image: casmlang/container.linux
     memory: 2
     cpu: 1
+  env:
+    GITHUB_TOKEN: ENCRYPTED[9db3e1a742a01d70cee0a9203ca024a3d0577e8d85715f048dd8fe6087eb35020d473a3d68e3af9a3b7aa4c83b8ba1b3]
   matrix:
     env:
       B: "debug"
@@ -65,6 +67,8 @@ coverage_task:
     image: casmlang/container.linux
     memory: 2
     cpu: 1
+  env:
+    GITHUB_TOKEN: ENCRYPTED[9db3e1a742a01d70cee0a9203ca024a3d0577e8d85715f048dd8fe6087eb35020d473a3d68e3af9a3b7aa4c83b8ba1b3]
   matrix:
     env:
       B: "coverage"
@@ -86,6 +90,8 @@ linux_task:
     image: casmlang/container.linux
     memory: 2
     cpu: 1
+  env:
+    GITHUB_TOKEN: ENCRYPTED[9db3e1a742a01d70cee0a9203ca024a3d0577e8d85715f048dd8fe6087eb35020d473a3d68e3af9a3b7aa4c83b8ba1b3]
   matrix:
     env:
       B: "release"
@@ -106,6 +112,8 @@ darwin_task:
   depends_on: check
   osx_instance:
     image: high-sierra-xcode-9.4.1
+  env:
+    GITHUB_TOKEN: ENCRYPTED[9db3e1a742a01d70cee0a9203ca024a3d0577e8d85715f048dd8fe6087eb35020d473a3d68e3af9a3b7aa4c83b8ba1b3]
   matrix:
     env:
       B: "release"
@@ -131,6 +139,8 @@ windows_task:
     image: casmlang/container.windows
     os_version: 2016
     cpu: 1
+  env:
+    GITHUB_TOKEN: ENCRYPTED[9db3e1a742a01d70cee0a9203ca024a3d0577e8d85715f048dd8fe6087eb35020d473a3d68e3af9a3b7aa4c83b8ba1b3]
   matrix:
     env:
       V: mingw64
