@@ -46,6 +46,7 @@
 
 #include <libcasm-fe/allocator/BlockAllocator>
 
+#include <algorithm>
 #include <cstring>
 #include <functional>
 
