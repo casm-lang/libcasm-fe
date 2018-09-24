@@ -120,5 +120,6 @@ ci-git-access:
 	@echo "-- Git Access Configuration"
 	@git config --global url."git@github.com:".insteadOf "https://github.com/"
 	@mkdir -p .attic
-	@echo "$(LALA)" | sed 's/;/\n/g' > .attic/key
+	@printf "%s" "$(LALA)" | sed 's/;/\n/g' > .attic/key
+	@chmod 600 .attic/key
 	@export GIT_SSH_COMMAND='ssh -i .attic/key'
