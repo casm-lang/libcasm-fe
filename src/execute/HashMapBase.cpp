@@ -395,22 +395,22 @@ namespace details
 void HashMapPerformanceStatistics::probedOnSearch( std::size_t probeSequenceLength ) const
 {
     m_longestSearchProbeSequenceLength =
-        std::max( m_longestSearchProbeSequenceLength, probeSequenceLength );
+        libstdhl::Math::max( m_longestSearchProbeSequenceLength, probeSequenceLength );
     m_cumulativeSearchProbeSequenceLength += probeSequenceLength;
 
-    overallStatistics().m_longestSearchProbeSequenceLength =
-        std::max( overallStatistics().m_longestSearchProbeSequenceLength, probeSequenceLength );
+    overallStatistics().m_longestSearchProbeSequenceLength = libstdhl::Math::max(
+        overallStatistics().m_longestSearchProbeSequenceLength, probeSequenceLength );
     overallStatistics().m_cumulativeSearchProbeSequenceLength += probeSequenceLength;
 }
 
 void HashMapPerformanceStatistics::probedOnInsert( std::size_t probeSequenceLength ) const
 {
     m_longestInsertProbeSequenceLength =
-        std::max( m_longestInsertProbeSequenceLength, probeSequenceLength );
+        libstdhl::Math::max( m_longestInsertProbeSequenceLength, probeSequenceLength );
     m_cumulativeInsertProbeSequenceLength += probeSequenceLength;
 
-    overallStatistics().m_longestInsertProbeSequenceLength =
-        std::max( overallStatistics().m_longestInsertProbeSequenceLength, probeSequenceLength );
+    overallStatistics().m_longestInsertProbeSequenceLength = libstdhl::Math::max(
+        overallStatistics().m_longestInsertProbeSequenceLength, probeSequenceLength );
     overallStatistics().m_cumulativeInsertProbeSequenceLength += probeSequenceLength;
 }
 

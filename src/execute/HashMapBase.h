@@ -46,7 +46,8 @@
 
 #include <libcasm-fe/allocator/BlockAllocator>
 
-#include <algorithm>
+#include <libstdhl/Math>
+
 #include <cstring>
 #include <functional>
 
@@ -248,7 +249,7 @@ class HashMapBase
     explicit HashMapBase( std::size_t initialCapacity )
     : m_buckets( nullptr )
     , m_size( 0UL )
-    , m_capacity( std::max( initialCapacity, 1UL ) )
+    , m_capacity( libstdhl::Math::max( initialCapacity, 1UL ) )
     , m_lastEntry( nullptr )
 #ifdef HASH_MAP_PERF
     , m_performanceStatistics()
@@ -447,7 +448,7 @@ class HashMapBase
         }
         else
         {
-            m_capacity = std::max( n, m_capacity );
+            m_capacity = libstdhl::Math::max( n, m_capacity );
         }
     }
 
