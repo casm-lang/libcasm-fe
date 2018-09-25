@@ -249,7 +249,7 @@ class HashMapBase
     explicit HashMapBase( std::size_t initialCapacity )
     : m_buckets( nullptr )
     , m_size( 0UL )
-    , m_capacity( libstdhl::Math::max( initialCapacity, 1UL ) )
+    , m_capacity( libstdhl::Math::max( initialCapacity, 1 ) )
     , m_lastEntry( nullptr )
 #ifdef HASH_MAP_PERF
     , m_performanceStatistics()
