@@ -69,7 +69,7 @@ class UpdateSetManagerTest : public ::testing::Test
 
 TEST_F( UpdateSetManagerTest, lookupShouldReturnEmptyOptionalWhenNoUpdateSetExists )
 {
-    EXPECT_THROW( manager->lookup( 42UL ).value(), std::experimental::bad_optional_access );
+    EXPECT_THROW( manager->lookup( 42UL ).value(), std::logic_error );
 }
 
 TEST_F( UpdateSetManagerTest, forkAndMerge )
