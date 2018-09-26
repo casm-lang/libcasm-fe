@@ -44,7 +44,8 @@
 #ifndef _LIBCASM_FE_LOCATION_REGISTRY_H_
 #define _LIBCASM_FE_LOCATION_REGISTRY_H_
 
-#include <experimental/optional>
+#include <libstdhl/Optional>
+
 #include <unordered_set>
 
 /*struct LocationRegistryDetails
@@ -213,7 +214,7 @@ class LocationRegistry
      * @return The location for the given function-arguments pair, if the
      *         location exists.
      */
-    std::experimental::optional< Location > lookup(
+    libstdhl::Optional< Location > lookup(
         const Function& function, const Arguments& arguments ) const noexcept
     {
         const auto it = m_locations.find( { function, arguments } );
@@ -222,7 +223,7 @@ class LocationRegistry
             return Location( &*it );
         }
 
-        return std::experimental::nullopt;
+        return {};
     }
 
   protected:

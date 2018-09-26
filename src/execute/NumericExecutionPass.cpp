@@ -209,7 +209,7 @@ class Storage
 
     void set( const Location& location, const Value& value );
     void remove( const Location& location );
-    std::experimental::optional< Value > get( const Location& location ) const;
+    libstdhl::Optional< Value > get( const Location& location ) const;
 
     const ExecutionFunctionState& programState( void ) const;
 
@@ -264,7 +264,7 @@ void Storage::remove( const Location& location )
     }
 }
 
-std::experimental::optional< Storage::Value > Storage::get( const Location& location ) const
+libstdhl::Optional< Storage::Value > Storage::get( const Location& location ) const
 {
     if( location.function()->isProgram() )
     {

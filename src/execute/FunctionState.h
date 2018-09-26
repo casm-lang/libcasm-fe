@@ -46,7 +46,7 @@
 
 #include <libcasm-fe/execute/ProbingHashMap>
 
-#include <experimental/optional>
+#include <libstdhl/Optional>
 
 /*struct FunctionStateDetails
 {
@@ -143,7 +143,7 @@ class FunctionState
      *
      * @return The function value for the \a location if an value exists.
      */
-    std::experimental::optional< Value > get( const Location& location ) const noexcept
+    libstdhl::Optional< Value > get( const Location& location ) const noexcept
     {
         const auto it = m_state.find( location );
         if( it != m_state.end() )
@@ -151,7 +151,7 @@ class FunctionState
             return it.value();
         }
 
-        return std::experimental::nullopt;
+        return {};
     }
 
     /**
