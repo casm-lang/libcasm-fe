@@ -162,7 +162,7 @@ class LocationRegistry
      * @param initialSize The number of locations the registry should be able to
      *                    handle without resizing
      */
-    explicit LocationRegistry( std::size_t initialSize = 100UL )
+    explicit LocationRegistry( std::size_t initialSize = 100 )
     : m_locations()
     {
         m_locations.reserve( initialSize );

@@ -1178,7 +1178,7 @@ void ExecutionVisitor::visit( LetRule& node )
 
 void ExecutionVisitor::visit( ForallRule& node )
 {
-    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
 
     node.universe()->accept( *this );
     const auto universe = m_evaluationStack.pop();
@@ -1248,13 +1248,13 @@ void ExecutionVisitor::visit( ChooseRule& node )
 
 void ExecutionVisitor::visit( IterateRule& node )
 {
-    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100UL );
+    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100 );
 
     while( true )
     {
         // uses a new parallel update set on each iteration only to check if the
         // current iteration actually produced any updates
-        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100UL );
+        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100 );
         node.rule()->accept( *this );
         if( hasEmptyUpdateSet() )
         {
@@ -1278,7 +1278,7 @@ void ExecutionVisitor::visit( IterateRule& node )
 
 void ExecutionVisitor::visit( BlockRule& node )
 {
-    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
     node.rules()->accept( *this );
 
     try
@@ -1293,7 +1293,7 @@ void ExecutionVisitor::visit( BlockRule& node )
 
 void ExecutionVisitor::visit( SequenceRule& node )
 {
-    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Sequential, 100 );
     node.rules()->accept( *this );
 
     try
@@ -1372,7 +1372,7 @@ void ExecutionVisitor::visit( CallRule& node )
 
 void ExecutionVisitor::visit( WhileRule& node )
 {
-    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100UL );
+    Transaction seqTrans( &m_updateSetManager, Semantics::Sequential, 100 );
 
     while( true )
     {
@@ -1394,7 +1394,7 @@ void ExecutionVisitor::visit( WhileRule& node )
 
         // uses a new parallel update set on each iteration only to check if the
         // current iteration actually produced any updates
-        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100UL );
+        Transaction parTrans( &m_updateSetManager, Semantics::Parallel, 100 );
         node.rule()->accept( *this );
         if( hasEmptyUpdateSet() )
         {
@@ -1647,7 +1647,7 @@ StateInitializationVisitor::StateInitializationVisitor(
 
 void StateInitializationVisitor::visit( Specification& node )
 {
-    m_updateSetManager.fork( Semantics::Sequential, 100UL );
+    m_updateSetManager.fork( Semantics::Sequential, 100 );
 
     node.header()->accept( *this );
     node.definitions()->accept( *this );
@@ -1664,7 +1664,7 @@ void StateInitializationVisitor::visit( InitDefinition& node )
 
 void StateInitializationVisitor::visit( FunctionDefinition& node )
 {
-    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
     ExecutionVisitor executionVisitor(
         m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );
     node.initializers()->accept( executionVisitor );
@@ -1707,7 +1707,7 @@ Agent::Agent(
 
 void Agent::run( void )
 {
-    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100UL );
+    Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
     ExecutionVisitor executionVisitor(
         m_locationRegistry, m_globalState, m_updateSetManager, m_agentId );
     executionVisitor.execute( m_rule );
@@ -1856,7 +1856,7 @@ AgentScheduler::AgentScheduler( ExecutionLocationRegistry& locationRegistry, Sto
 , m_locationRegistry( locationRegistry )
 , m_collectedUpdates()
 , m_done( false )
-, m_stepCounter( 0UL )
+, m_stepCounter( 0 )
 {
 }
 
