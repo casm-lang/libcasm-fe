@@ -65,9 +65,9 @@ namespace details
 
     std::size_t nextPrime( std::size_t n ) noexcept
     {
-        static const std::size_t unfoldedPrimes[] = { 2, 2, 3, 5, 5, 7, 7, 11, 11, 11, 11, 13, 13 };
+        static constexpr std::size_t unfoldedPrimes[] = { 2, 2, 3, 5, 5, 7, 7, 11, 11, 11, 11, 13, 13 };
 
-        static const std::size_t primes[] = {
+        static constexpr std::size_t primes[] = {
             17ULL,
             19ULL,
             23ULL,
