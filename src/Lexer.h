@@ -71,6 +71,18 @@ namespace libcasm_fe
         SourceLocation m_loc;
         std::string m_strbuf;
     };
+
+    namespace Grammar
+    {
+        enum class Span
+        {
+            SPACE,
+            NEWLINE,
+            TABULATOR,
+            LCOMMENT,
+            BCOMMENT,
+        };
+    }
 }
 
 #endif  // _LIBCASM_FE_LEXER_H_
