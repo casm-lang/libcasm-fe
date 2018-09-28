@@ -40,6 +40,7 @@
 #   not obliged to do so. If you do not wish to do so, delete this exception
 #   statement from your version.
 #
+
 linux_task:
   container:
     image: casmlang/container.linux
@@ -112,15 +113,14 @@ windows_task:
       V: mingw64
       B: "debug"
       C: "gcc"
+  setup_script:
+    - setx PATH C:\msys2\%V%\bin;%PATH% /m
+    - cp C:\msys2\usr\include\FlexLexer.h C:\msys2\%V%\include
   fetch_script:
-    - set PATH=C:\msys2\%V%\bin;%PATH%
     - make ci-fetch
   build_script:
-    - set PATH=C:\msys2\%V%\bin;%PATH%
     - make ci-build
   test_script:
-    - set PATH=C:\msys2\%V%\bin;%PATH%
     - make ci-test
   benchmark_script:
-    - set PATH=C:\msys2\%V%\bin;%PATH%
     - make ci-benchmark
