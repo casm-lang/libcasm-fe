@@ -60,6 +60,11 @@ static const std::string DELIMITER( "::" );
 // Identifier
 //
 
+Identifier::Identifier( void )
+: Identifier( std::string() )
+{
+}
+
 Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
 , m_name( name )
