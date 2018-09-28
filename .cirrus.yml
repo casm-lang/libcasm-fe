@@ -113,8 +113,6 @@ windows_task:
       V: mingw64
       B: "debug"
       C: "gcc"
-  setup_script:
-    - copy /Y "C:\msys2\usr\include\FlexLexer.h" "C:\msys2\%V%\include"
   fetch_script:
     - set PATH=C:\msys2\%V%\bin;%PATH%
     - make ci-fetch
