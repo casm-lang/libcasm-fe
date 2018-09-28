@@ -118,6 +118,10 @@ std::string Node::description( void ) const
         {
             return "invariant";
         }
+        case ID::IMPORT_DEFINITION:
+        {
+            return "import";
+        }
             // literals
         case ID::UNDEF_LITERAL:
         {

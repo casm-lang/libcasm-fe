@@ -54,6 +54,7 @@ Definition ::= InitDefinition
              | FunctionDefinition
              | UsingDefinition
              | InvariantDefinition
+             | ImportDefinition
 #+end_src
 
 #+html: {{page>.:grammar:Definition&noheader&nofooter}}
@@ -145,6 +146,16 @@ InvariantDefinition ::= "invariant" Identifier "=" Term
 #+end_src
 
 #+html: {{page>.:grammar:InvariantDefinition&noheader&nofooter}}
+
+
+** ImportDefinition
+
+#+begin_src
+ImportDefinition ::= "import" IdentifierPath
+                   | "import" IdentifierPath "as" Identifier
+#+end_src
+
+#+html: {{page>.:grammar:ImportDefinition&noheader&nofooter}}
 
 
 ** Rules

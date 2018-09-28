@@ -425,6 +425,32 @@ namespace libcasm_fe
             const Token::Ptr m_rightBraceToken;
             FunctionDefinition::Ptr m_programFunction;
         };
+
+        class ImportDefinition final : public Definition
+        {
+          public:
+            using Ptr = std::shared_ptr< ImportDefinition >;
+
+            ImportDefinition( const Token::Ptr& importToken, const IdentifierPath::Ptr& path );
+
+            ImportDefinition(
+                const Token::Ptr& importToken,
+                const IdentifierPath::Ptr& path,
+                const Token::Ptr& asToken,
+                const Identifier::Ptr& identifier );
+
+            const IdentifierPath::Ptr& path( void ) const;
+
+            const Token::Ptr& importToken( void ) const;
+            const Token::Ptr& asToken( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const IdentifierPath::Ptr m_path;
+            const Token::Ptr m_importToken;
+            const Token::Ptr m_asToken;
+        };
     }
 }
 

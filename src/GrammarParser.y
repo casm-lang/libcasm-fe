@@ -185,6 +185,7 @@ END       0 "end of file"
 %type <EnumerationDefinition::Ptr> EnumerationDefinition
 %type <UsingDefinition::Ptr> UsingDefinition
 %type <InvariantDefinition::Ptr> InvariantDefinition
+%type <ImportDefinition::Ptr> ImportDefinition
 
 // literals
 %type <Literal::Ptr> Literal
@@ -390,6 +391,10 @@ Definition
   {
       $$ = $1;
   }
+| ImportDefinition
+  {
+      $$ = $1;
+  }
 ;
 
 
@@ -567,6 +572,18 @@ InvariantDefinition
 : INVARIANT Identifier EQUAL Term
   {
       $$ = Ast::make< InvariantDefinition >( @$, $1, $2, $3, $4 );
+  }
+;
+
+
+ImportDefinition
+: IMPORT IdentifierPath
+  {
+      $$ = Ast::make< ImportDefinition >( @$, $1, $2 );
+  }
+| IMPORT IdentifierPath AS Identifier
+  {
+      $$ = Ast::make< ImportDefinition >( @$, $1, $2, $3, $4 );
   }
 ;
 

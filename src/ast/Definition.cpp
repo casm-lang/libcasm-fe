@@ -688,6 +688,48 @@ void InitDefinition::accept( Visitor& visitor )
 }
 
 //
+//
+// ImportDefinition
+//
+
+ImportDefinition::ImportDefinition( const Token::Ptr& importToken, const IdentifierPath::Ptr& path )
+: ImportDefinition( importToken, path, unresolvedToken, std::make_shared< Identifier >() )
+{
+}
+
+ImportDefinition::ImportDefinition(
+    const Token::Ptr& importToken,
+    const IdentifierPath::Ptr& path,
+    const Token::Ptr& asToken,
+    const Identifier::Ptr& identifier )
+: Definition( Node::ID::IMPORT_DEFINITION, identifier )
+, m_path( path )
+, m_importToken( importToken )
+, m_asToken( asToken )
+{
+}
+
+const IdentifierPath::Ptr& ImportDefinition::path( void ) const
+{
+    return m_path;
+}
+
+const Token::Ptr& ImportDefinition::importToken( void ) const
+{
+    return m_importToken;
+}
+
+const Token::Ptr& ImportDefinition::asToken( void ) const
+{
+    return m_asToken;
+}
+
+void ImportDefinition::accept( Visitor& visitor )
+{
+    visitor.visit( *this );
+}
+
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil

@@ -169,6 +169,18 @@ void RecursiveVisitor::visit( InvariantDefinition& node )
     node.expression()->accept( *this );
 }
 
+void RecursiveVisitor::visit( ImportDefinition& node )
+{
+    node.attributes()->accept( *this );
+    node.importToken()->accept( *this );
+    node.path()->accept( *this );
+    if( node.asToken()->token() != Grammar::Token::UNRESOLVED )
+    {
+        node.asToken()->accept( *this );
+        node.identifier()->accept( *this );
+    }
+}
+
 //
 //
 // Literals
