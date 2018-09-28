@@ -43,6 +43,8 @@
 
 #include "HashMapBase.h"
 
+#include <array>
+
 #ifdef HASH_MAP_PERF
 #include <iostream>
 #endif
@@ -65,9 +67,18 @@ namespace details
 
     std::size_t nextPrime( std::size_t n ) noexcept
     {
-        static constexpr std::size_t unfoldedPrimes[] = { 2, 2, 3, 5, 5, 7, 7, 11, 11, 11, 11, 13, 13 };
+        static constexpr std::size_t unfoldedPrimesSize = 15;
+        static constexpr std::array< std::size_t, unfoldedPrimesSize > unfoldedPrimes = {
+            2, 2, 3, 5, 5, 7, 7, 11, 11, 11, 11, 13, 13
+        };
 
-        static constexpr std::size_t primes[] = {
+#if __SIZEOF_SIZE_T__ <= 4
+        static constexpr std::size_t primesSize = 250;
+#else
+        static constexpr std::size_t primesSize = 300;
+#endif
+
+        static constexpr std::array< std::size_t, primesSize > primes = {
             17ULL,
             19ULL,
             23ULL,
@@ -371,13 +382,10 @@ namespace details
 #endif
         };
 
-        constexpr auto unfoldedPrimesCount = sizeof( unfoldedPrimes ) / sizeof( char );
-        constexpr auto primesCount = sizeof( primes ) / sizeof( unsigned long );
+        static const auto firstPrime = primes.cbegin();
+        static const auto lastPrime = primes.cend();
 
-        constexpr auto firstPrime = primes;
-        constexpr auto lastPrime = primes + primesCount - 1;
-
-        if( n < unfoldedPrimesCount )
+        if( n < unfoldedPrimesSize )
         {
             return unfoldedPrimes[ n ];
         }
