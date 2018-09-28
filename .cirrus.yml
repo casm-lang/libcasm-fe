@@ -114,8 +114,8 @@ windows_task:
       B: "debug"
       C: "gcc"
   setup_script:
-    - setx PATH C:\msys2\%V%\bin;%PATH% /m
-    - cp C:\msys2\usr\include\FlexLexer.h C:\msys2\%V%\include
+    - setx PATH "C:\msys2\%V%\bin;%PATH%" /M
+    - copy /Y "C:\msys2\usr\include\FlexLexer.h" "C:\msys2\%V%\include"
   fetch_script:
     - make ci-fetch
   build_script:
