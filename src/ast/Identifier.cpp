@@ -78,6 +78,11 @@ const std::string& Identifier::name( void ) const
     return m_name;
 }
 
+bool Identifier::empty( void ) const
+{
+    return m_name.empty();
+}
+
 void Identifier::setDoubleColon( const Token::Ptr& doubleColon )
 {
     assert( m_doubleColon->token() == Grammar::Token::UNRESOLVED );

@@ -61,6 +61,7 @@ namespace libcasm_fe
             explicit Identifier( const std::string& name );
 
             const std::string& name( void ) const;
+            bool empty( void ) const;
 
             void setDoubleColon( const Token::Ptr& doubleColon );
             const Token::Ptr& doubleColon( void ) const;
