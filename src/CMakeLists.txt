@@ -66,6 +66,7 @@ add_library( ${PROJECT}-cpp OBJECT
   ast/Node.cpp
   ast/RecursiveVisitor.cpp
   ast/Rule.cpp
+  ast/Span.cpp
   ast/Token.cpp
   ast/Type.cpp
 
@@ -258,6 +259,7 @@ ecm_generate_headers( ${PROJECT}_AST_HEADERS_CPP
     Node
     RecursiveVisitor
     Rule
+    Span
     Token
     Type
     Visitor

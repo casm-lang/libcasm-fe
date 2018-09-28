@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2018 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
@@ -41,51 +41,42 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LEXER_H_
-#define _LIBCASM_FE_LEXER_H_
+#include "Span.h"
 
-#include <string>
+using namespace libcasm_fe;
+using namespace Ast;
 
-#include "various/FlexLexer.h"
-#include "various/GrammarParser.tab.h"
+//
+//
+// Span
+//
 
-namespace libcasm_fe
+Span::Span( const Grammar::Span kind, const std::size_t length )
+: Node( Node::ID::SPAN )
+, m_kind( kind )
+, m_length( length )
 {
-    class Logger;
-    class SourceLocation;
-
-    class Lexer : public yyFlexLexer
-    {
-      public:
-        Lexer( Logger& log, std::istream& in, std::ostream& out );
-
-        void setFileName( const std::string& fileName );
-
-        Parser::symbol_type nextToken();
-
-      protected:
-        void LexerError( const char* msg ) override;
-
-      private:
-        Logger& m_log;
-        SourceLocation m_loc;
-        std::string m_strbuf;
-    };
-
-    namespace Grammar
-    {
-        enum class Span
-        {
-            SPACE,
-            NEWLINE,
-            TABULATOR,
-            LCOMMENT,
-            BCOMMENT,
-        };
-    }
 }
 
-#endif  // _LIBCASM_FE_LEXER_H_
+const Grammar::Span Span::kind( void ) const
+{
+    return m_kind;
+}
+
+const std::size_t Span::length( void )
+{
+    return m_length;
+}
+
+std::string Span::toString( void ) const
+{
+    return " ";  // TODO: FIXME: @moiova
+}
+
+void Span::accept( Visitor& visitor )
+{
+    // visitor.visit( *this ); // TODO: FIXME: @moiova
+}
 
 //
 //  Local variables:

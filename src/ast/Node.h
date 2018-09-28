@@ -143,6 +143,7 @@ namespace libcasm_fe
                 DEFAULT_CASE,
                 VARIABLE_BINDING,
                 TOKEN,
+                SPAN,
             };
 
           public:

@@ -328,6 +328,10 @@ std::string Node::description( void ) const
         {
             return "token";
         }
+        case ID::SPAN:
+        {
+            return "span";
+        }
     }
 
     assert( !" internal error! " );
