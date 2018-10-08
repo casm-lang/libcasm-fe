@@ -60,6 +60,11 @@ package_git_submodule( libcasm-ir master REQUIRED obj   ../casm-ir lib/casm-ir )
 package_git_submodule( libcasm-rt master REQUIRED obj   ../casm-rt lib/casm-rt )
 package_git_submodule( libgtest   master REQUIRED build ../gtest   lib/gtest   )
 package_git_submodule( libhayai   master REQUIRED build ../hayai   lib/hayai   )
+package_git_deps(
+  libstdhl>libpass
+  libpass>libcasm-ir
+  libcasm-ir>libcasm-rt
+  )
 
 find_package( Threads REQUIRED )
 
