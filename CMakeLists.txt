@@ -78,16 +78,6 @@ add_subdirectory( etc
   EXCLUDE_FROM_ALL
   )
 
-add_custom_target( ${PROJECT}-deps
-  DEPENDS
-    libgtest
-    libhayai
-    libstdhl
-    libpass
-    libcasm-ir
-    libcasm-rt
-  )
-
 
 #
 # grammar
