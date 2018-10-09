@@ -50,7 +50,14 @@ namespace libcasm_fe
 {
     namespace Grammar
     {
-        enum class Span : u8;
+        enum class Span
+        {
+            SPACE,
+            NEWLINE,
+            TABULATOR,
+            LCOMMENT,
+            BCOMMENT,
+        };
     }
 
     namespace Ast

@@ -43,8 +43,51 @@
 
 #include "Span.h"
 
+#include <libstdhl/File>
+
+#include <iostream>
+
 using namespace libcasm_fe;
 using namespace Ast;
+
+static inline std::string readRange( const std::string& filename, const u32 lineNum, const std::string& startString, const std::size_t& length )
+{
+    std::string range;
+    std::size_t pos = 0;
+    std::string line = libstdhl::File::readLine( filename, lineNum);
+
+    if (startString != "\n")
+    {
+        pos = line.find( startString );
+    }
+
+    if (startString == "//" )
+    {
+        range = line.substr( pos, length+2 );
+    }
+    else if ( startString == "/*" ) 
+    {
+        // std::size_t tempPos = line.find( '\n' ); // get the position of the first new line in the block comment
+        // std::size_t endPos = tempPos - pos;
+        range = line.substr( pos );
+    }
+    else if ( startString == "*/" )
+    {
+        range = line.substr( 0, pos ) + "*/";
+    }
+
+    else // ( startString == "\n" ) 
+    {
+        range = "\n" + line.substr( pos );
+    }
+    // else
+    // {
+    //     std::size_t startStringLength = startString.length();
+    //     range = line.substr( pos, length +  startStringLength);
+    // }
+    
+    return range;
+}
 
 //
 //
@@ -70,7 +113,51 @@ const std::size_t Span::length( void )
 
 std::string Span::toString( void ) const
 {
-    return " ";  // TODO: FIXME: @moiova
+    switch ( m_kind ) {
+        case Grammar::Span::SPACE:
+        {
+            return std::string(m_length, ' '); // concatenates and returns a number of spaces equal to m_length
+        }
+        case Grammar::Span::NEWLINE:
+        {
+            return std::string(m_length, '\n');
+        }
+        case Grammar::Span::TABULATOR:
+        {
+            return std::string(m_length, '\t');
+        }
+        case Grammar::Span::LCOMMENT:
+        {
+            return readRange(*sourceLocation().begin.fileName, sourceLocation().begin.line, "//", m_length);
+
+        }
+        case Grammar::Span::BCOMMENT:
+        {
+            std::cerr << "endLine******* " << sourceLocation().end.line << '\n';
+            std::string concat;
+            std::size_t currentLine = sourceLocation().begin.line; // the line where the block comment starts
+            std::size_t endLine = sourceLocation().end.line;
+
+            concat = readRange(*sourceLocation().begin.fileName, currentLine, "/*", m_length);
+            currentLine++;
+
+            for ( ; currentLine < endLine; currentLine++ ) 
+            {
+                concat += readRange(*sourceLocation().begin.fileName, currentLine, "\n", m_length);
+            }
+
+            if (sourceLocation().begin.line != endLine) 
+            {
+                // insert a new line before the string range, if the block comment is on more than one line
+                concat += "\n" + readRange(*sourceLocation().begin.fileName, currentLine, "*/", m_length);
+            }
+            
+            return concat;
+        }
+    }
+
+    assert( " error! " );
+    return std::string();
 }
 
 void Span::accept( Visitor& visitor )
