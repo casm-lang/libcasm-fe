@@ -89,7 +89,6 @@ static inline std::string readRange( const std::string& filename, const u32 line
     return range;
 }
 
-
 //
 //
 // Span
@@ -130,10 +129,10 @@ std::string Span::toString( void ) const
         case Grammar::Span::LCOMMENT:
         {
             return readRange(*sourceLocation().begin.fileName, sourceLocation().begin.line, "//", length());
-
         }
         case Grammar::Span::BCOMMENT:
         {
+
             std::string concat;
             std::size_t currentLine = sourceLocation().begin.line; // the line where the block comment starts
             std::size_t endLine = sourceLocation().end.line;
