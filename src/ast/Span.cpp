@@ -106,50 +106,49 @@ const Grammar::Span Span::kind( void ) const
     return m_kind;
 }
 
-const std::size_t Span::length( void )
+const std::size_t Span::length( void ) const
 {
     return m_length;
 }
 
 std::string Span::toString( void ) const
 {
-    switch ( m_kind ) {
+    switch ( kind() ) {
         case Grammar::Span::SPACE:
         {
-            return std::string(m_length, ' '); // concatenates and returns a number of spaces equal to m_length
+            return std::string(length(), ' ');
         }
         case Grammar::Span::NEWLINE:
         {
-            return std::string(m_length, '\n');
+            return std::string(length(), '\n');
         }
         case Grammar::Span::TABULATOR:
         {
-            return std::string(m_length, '\t');
+            return std::string(length(), '\t');
         }
         case Grammar::Span::LCOMMENT:
         {
-            return readRange(*sourceLocation().begin.fileName, sourceLocation().begin.line, "//", m_length);
+            return readRange(*sourceLocation().begin.fileName, sourceLocation().begin.line, "//", length());
 
         }
         case Grammar::Span::BCOMMENT:
         {
-            std::cerr << "endLine******* " << sourceLocation().end.line << '\n';
             std::string concat;
             std::size_t currentLine = sourceLocation().begin.line; // the line where the block comment starts
             std::size_t endLine = sourceLocation().end.line;
 
-            concat = readRange(*sourceLocation().begin.fileName, currentLine, "/*", m_length);
+            concat = readRange(*sourceLocation().begin.fileName, currentLine, "/*", length());
             currentLine++;
 
             for ( ; currentLine < endLine; currentLine++ ) 
             {
-                concat += readRange(*sourceLocation().begin.fileName, currentLine, "\n", m_length);
+                concat += readRange(*sourceLocation().begin.fileName, currentLine, "\n", length());
             }
 
             if (sourceLocation().begin.line != endLine) 
             {
                 // insert a new line before the string range, if the block comment is on more than one line
-                concat += "\n" + readRange(*sourceLocation().begin.fileName, currentLine, "*/", m_length);
+                concat += "\n" + readRange(*sourceLocation().begin.fileName, currentLine, "*/", length());
             }
             
             return concat;

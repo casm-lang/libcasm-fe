@@ -70,7 +70,7 @@ namespace libcasm_fe
 
             const Grammar::Span kind( void ) const;
 
-            const std::size_t length( void );
+            const std::size_t length( void ) const;
 
             std::string toString( void ) const;
 
