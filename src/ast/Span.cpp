@@ -132,7 +132,6 @@ std::string Span::toString( void ) const
         }
         case Grammar::Span::BCOMMENT:
         {
-
             std::string concat;
             std::size_t currentLine = sourceLocation().begin.line; // the line where the block comment starts
             std::size_t endLine = sourceLocation().end.line;
