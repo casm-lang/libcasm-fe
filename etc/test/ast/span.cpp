@@ -112,8 +112,6 @@ TEST( AstSpan, BlockComment )
     auto span = std::make_shared< Span >( Grammar::Span::BCOMMENT, 17 );
     span->setSourceLocation(loc);
 
-    std::cerr << "*************" << loc << '\n';
-
     EXPECT_EQ( span->kind(), Grammar::Span::BCOMMENT );
     EXPECT_EQ( span->length(), 17 );
     EXPECT_STREQ( span->toString().c_str(), "/*test\ntest2\n   test3*/" );
