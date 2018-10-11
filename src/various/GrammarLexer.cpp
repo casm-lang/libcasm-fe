@@ -300,7 +300,7 @@ typedef flex_uint8_t YY_CHAR;
 
 #define yytext_ptr yytext
 
-#include <FlexLexer.h>
+#include "FlexLexer.h"
 
 int yyFlexLexer::yywrap() { return 1; }
 int yyFlexLexer::yylex()
@@ -630,12 +630,12 @@ static const flex_int16_t yy_chk[456] =
 //  statement from your version.
 //
 
-#include "Lexer.h"
+#include "../../src/Lexer.h"
 
-#include "Codes.h"
-#include "Logger.h"
-#include "SourceLocation.h"
-#include "GrammarToken.h"
+#include <libcasm-fe/Codes>
+#include <libcasm-fe/Logger>
+#include "various/GrammarToken.h"
+#include "../../src/SourceLocation.h"
 
 using namespace libcasm_fe;
 

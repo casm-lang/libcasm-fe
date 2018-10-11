@@ -44,7 +44,8 @@
 #ifndef _LIBCASM_FE_LOCATION_REGISTRY_H_
 #define _LIBCASM_FE_LOCATION_REGISTRY_H_
 
-#include <experimental/optional>
+#include <libstdhl/Optional>
+
 #include <unordered_set>
 
 /*struct LocationRegistryDetails
@@ -161,7 +162,7 @@ class LocationRegistry
      * @param initialSize The number of locations the registry should be able to
      *                    handle without resizing
      */
-    explicit LocationRegistry( std::size_t initialSize = 100UL )
+    explicit LocationRegistry( std::size_t initialSize = 100 )
     : m_locations()
     {
         m_locations.reserve( initialSize );
@@ -213,7 +214,7 @@ class LocationRegistry
      * @return The location for the given function-arguments pair, if the
      *         location exists.
      */
-    std::experimental::optional< Location > lookup(
+    libstdhl::Optional< Location > lookup(
         const Function& function, const Arguments& arguments ) const noexcept
     {
         const auto it = m_locations.find( { function, arguments } );
@@ -222,7 +223,7 @@ class LocationRegistry
             return Location( &*it );
         }
 
-        return std::experimental::nullopt;
+        return {};
     }
 
   protected:

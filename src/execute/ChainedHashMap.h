@@ -127,7 +127,7 @@ class ChainedHashMap final : public HashMapBase< Details >
         }
 
 #ifdef HASH_MAP_PERF
-        std::size_t distance = 0UL;
+        std::size_t distance = 0;
 #endif
 
         const auto bucket = bucketAt( hashCode );

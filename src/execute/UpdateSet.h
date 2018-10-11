@@ -48,8 +48,9 @@
 #include <libcasm-fe/execute/ProbingHashMap>
 #include <libcasm-fe/execute/RobinHoodHashMap>
 
+#include <libstdhl/Optional>
+
 #include <algorithm>
-#include <experimental/optional>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -247,14 +248,14 @@ class UpdateSet
      *
      * @return The update value for the \a location if an update exists.
      */
-    virtual std::experimental::optional< Value > lookup( const Location& location ) const noexcept
+    virtual libstdhl::Optional< Value > lookup( const Location& location ) const noexcept
     {
         if( m_parent )
         {
             return m_parent->lookup( location );
         }
 
-        return std::experimental::nullopt;
+        return {};
     }
 
     /**
@@ -361,7 +362,7 @@ class UpdateSet
      *
      * @return The update value for the \a location if an update exists.
      */
-    std::experimental::optional< Value > get( const Location& location ) const noexcept
+    libstdhl::Optional< Value > get( const Location& location ) const noexcept
     {
         const auto it = m_set.find( location );
         if( it != m_set.end() )
@@ -369,7 +370,7 @@ class UpdateSet
             return it.value();
         }
 
-        return std::experimental::nullopt;
+        return {};
     }
 
   protected:
@@ -427,7 +428,7 @@ class SequentialUpdateSet final : public UpdateSet< Details >
      *
      * @return The update value for the \a location if an update exists.
      */
-    std::experimental::optional< Value > lookup( const Location& location ) const noexcept override
+    libstdhl::Optional< Value > lookup( const Location& location ) const noexcept override
     {
         const auto it = Super::m_set.find( location );
         if( it != Super::m_set.end() )
@@ -542,11 +543,11 @@ class UpdateSetManager
      *
      * @return The update value for the \a location if an update exists.
      */
-    std::experimental::optional< Value > lookup( const Location& location ) const noexcept
+    libstdhl::Optional< Value > lookup( const Location& location ) const noexcept
     {
         if( m_updateSets.empty() )
         {
-            return std::experimental::nullopt;
+            return {};
         }
         else
         {

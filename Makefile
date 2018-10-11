@@ -44,8 +44,11 @@
 TARGET = libcasm-fe
 
 FORMAT  = src
-FORMAT += src/*
-FORMAT += src/*/*
+FORMAT += src/allocator
+FORMAT += src/analyze
+FORMAT += src/ast
+FORMAT += src/execute
+FORMAT += src/transform
 FORMAT += etc
 FORMAT += etc/*
 FORMAT += etc/*/*
@@ -77,6 +80,7 @@ src/various/GrammarLexer.cpp: src/GrammarLexer.l src/GrammarToken.hpp
 	etc/script.sh generate-lexer "`pwd`/$<" "`pwd`/obj/$< $(filter %.hpp,$^)"
 	$(LX) $(LFLAGS) -o $@ obj/$<
 	sed -i "s/#define yyFlexLexer yyFlexLexer//g" $@
+	sed -i "s/#include <FlexLexer\.h>/#include \"FlexLexer\.h\"/g" $@
 
 
 %/src/various/GrammarParser.cpp: src/various/GrammarParser.cpp
@@ -110,3 +114,10 @@ src/various/Grammar.txt: src/various/GrammarParser.xml src/GrammarLexer.l
 	@sed -i "s/\"decimal\"/\"`grep DECIMAL src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
 	@sed -i "s/\"identifier\"/\"`grep IDENTIFIER src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
 	@sed -i "s/\"string\"/'\"'.*'\"'/g" $@
+
+ci-fetch: ci-git-access
+
+ci-git-access:
+	@echo "-- Git Access Configuration"
+	@git config --global \
+	url."https://$(GITHUB_TOKEN)@github.com/".insteadOf "https://github.com/"

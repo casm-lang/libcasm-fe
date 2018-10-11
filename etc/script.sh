@@ -63,6 +63,8 @@ function generate_token
     echo "" >> $dst
     echo "#include <libcasm-fe/CasmFE>" >> $dst
     echo "" >> $dst
+    echo "#include <cassert>" >> $dst
+    echo "" >> $dst
     echo "namespace libcasm_fe" >> $dst
     echo "{" >> $dst
     echo "    namespace Grammar" >> $dst
@@ -114,6 +116,8 @@ function generate_token
     done
 
     echo "            }" >> $dst
+    echo "            assert( !\"internal error\" );" >> $dst
+    echo "            return std::string();" >> $dst
     echo "        }" >> $dst
     echo "    };" >> $dst
     echo "}" >> $dst

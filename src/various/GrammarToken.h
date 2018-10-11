@@ -46,6 +46,8 @@
 
 #include <libcasm-fe/CasmFE>
 
+#include <cassert>
+
 namespace libcasm_fe
 {
     namespace Grammar
@@ -424,6 +426,8 @@ namespace libcasm_fe
                     return "|}";
                 }
             }
+            assert( !"internal error" );
+            return std::string();
         }
     };
 }

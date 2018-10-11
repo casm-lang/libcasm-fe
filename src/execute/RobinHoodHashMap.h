@@ -124,7 +124,7 @@ class RobinHoodHashMap final : public HashMapBase< Details >
         const auto capacity = HashMap::m_capacity;
         const auto initialIndex = HashingStrategy::compress( hashCode, capacity );
 
-        for( auto distance = 0UL;; ++distance )
+        for( std::size_t distance = 0;; ++distance )
         {
             assert( distance < capacity );
 
@@ -163,7 +163,7 @@ class RobinHoodHashMap final : public HashMapBase< Details >
         const auto capacity = HashMap::m_capacity;
         auto initialIndex = HashingStrategy::compress( hashCode, capacity );
 
-        for( auto distance = 0UL;; ++distance )
+        for( std::size_t distance = 0;; ++distance )
         {
             assert( distance < capacity );
 

@@ -55,6 +55,8 @@
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
+#include <libstdhl/Math>
+
 #include <unordered_map>
 
 using namespace libcasm_fe;
@@ -258,7 +260,7 @@ void FrameSizeDeterminationVisitor::pushLocal( VariableDefinition& variable )
     variable.setLocalIndex( localIndex );
 
     ++m_numberOfLocals;
-    m_maxNumberOfLocals = std::max( m_maxNumberOfLocals, m_numberOfLocals );
+    m_maxNumberOfLocals = libstdhl::Math::max( m_maxNumberOfLocals, m_numberOfLocals );
 }
 
 void FrameSizeDeterminationVisitor::pushLocals( VariableDefinitions& variables )

@@ -73,8 +73,26 @@ class MemoryPool
         }
         else
         {
-            return aligned_alloc( BlockSize, BlockSize );
+            return aligned_malloc( BlockSize, BlockSize );
         }
+    }
+
+    inline void* aligned_malloc( const std::size_t alignment, const std::size_t size ) const
+    {
+        void* ptr = nullptr;
+#if defined( __APPLE__ )
+        // IEEE Std 1003.1-2001
+        if( posix_memalign( &ptr, alignment, size ) != 0 )
+        {
+            // an error occurred during aligned memory allocation
+            return nullptr;
+        }
+#elif defined( _WIN32 ) or defined( WIN32 )
+        ptr = _aligned_malloc( size, alignment );
+#else
+        ptr = aligned_alloc( alignment, size );
+#endif
+        return ptr;
     }
 
     /**

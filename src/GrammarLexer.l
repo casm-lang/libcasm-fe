@@ -41,12 +41,12 @@
 //  statement from your version.
 //
 
-#include "Lexer.h"
+#include "../../src/Lexer.h"
 
-#include "Codes.h"
-#include "Logger.h"
-#include "SourceLocation.h"
-#include "GrammarToken.h"
+#include <libcasm-fe/Codes>
+#include <libcasm-fe/Logger>
+#include "various/GrammarToken.h"
+#include "../../src/SourceLocation.h"
 
 using namespace libcasm_fe;
 

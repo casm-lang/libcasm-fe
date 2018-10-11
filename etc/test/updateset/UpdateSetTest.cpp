@@ -41,7 +41,7 @@
 //  statement from your version.
 //
 
-#include "main.h"
+#include "../main.h"
 
 #include <memory>
 
@@ -211,7 +211,7 @@ TEST( UpdateSetTest, lookupShouldReturnEmptyOptionalWhenUpdateDoesNotExist )
     const auto seqUpdateSet =
         std::unique_ptr< TestUpdateSet >( new SequentialUpdateSet< UpdateSetDetails >( 10UL ) );
 
-    EXPECT_THROW( seqUpdateSet->lookup( 42UL ).value(), std::experimental::bad_optional_access );
+    EXPECT_THROW( seqUpdateSet->lookup( 42UL ).value(), std::logic_error );
 }
 
 TEST( UpdateSetTest, parallelUpdateSetsShouldThrowIfAddingUpdatesWithSameLocationButDifferentValue )

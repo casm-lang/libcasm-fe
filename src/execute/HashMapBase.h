@@ -46,6 +46,8 @@
 
 #include <libcasm-fe/allocator/BlockAllocator>
 
+#include <libstdhl/Math>
+
 #include <cstring>
 #include <functional>
 
@@ -159,16 +161,16 @@ class HashMapPerformanceStatistics
     static HashMapPerformanceStatistics& overallStatistics();
 
   private:
-    mutable std::size_t m_longestSearchProbeSequenceLength = 0UL;
-    mutable std::size_t m_cumulativeSearchProbeSequenceLength = 0UL;
-    mutable std::size_t m_longestInsertProbeSequenceLength = 0UL;
-    mutable std::size_t m_cumulativeInsertProbeSequenceLength = 0UL;
-    mutable std::size_t m_numberOfSearches = 0UL;
-    mutable std::size_t m_numberOfInsertions = 0UL;
-    mutable std::size_t m_numberOfResizes = 0UL;
-    mutable std::size_t m_numberOfUnsuccessfulSearches = 0UL;
-    mutable std::size_t m_numberOfReads = 0UL;
-    mutable std::size_t m_numberOfWrites = 0UL;
+    mutable std::size_t m_longestSearchProbeSequenceLength = 0;
+    mutable std::size_t m_cumulativeSearchProbeSequenceLength = 0;
+    mutable std::size_t m_longestInsertProbeSequenceLength = 0;
+    mutable std::size_t m_cumulativeInsertProbeSequenceLength = 0;
+    mutable std::size_t m_numberOfSearches = 0;
+    mutable std::size_t m_numberOfInsertions = 0;
+    mutable std::size_t m_numberOfResizes = 0;
+    mutable std::size_t m_numberOfUnsuccessfulSearches = 0;
+    mutable std::size_t m_numberOfReads = 0;
+    mutable std::size_t m_numberOfWrites = 0;
 };
 
 std::ostream& operator<<( std::ostream& stream, const HashMapPerformanceStatistics& statistics );
@@ -240,14 +242,14 @@ class HashMapBase
 
   public:
     explicit HashMapBase()
-    : HashMapBase( 1UL )
+    : HashMapBase( 1 )
     {
     }
 
     explicit HashMapBase( std::size_t initialCapacity )
     : m_buckets( nullptr )
-    , m_size( 0UL )
-    , m_capacity( std::max( initialCapacity, 1UL ) )
+    , m_size( 0 )
+    , m_capacity( libstdhl::Math::max( initialCapacity, static_cast< std::size_t >( 1 ) ) )
     , m_lastEntry( nullptr )
 #ifdef HASH_MAP_PERF
     , m_performanceStatistics()
@@ -296,7 +298,7 @@ class HashMapBase
 
     constexpr bool empty() const noexcept
     {
-        return m_size == 0UL;
+        return m_size == 0;
     }
 
     constexpr std::size_t size() const noexcept
@@ -441,12 +443,12 @@ class HashMapBase
         {
             if( needsResizing( n ) )
             {
-                resize( HashingStrategy::initialSize( n / maximumLoadFactor() + 1UL ) );
+                resize( HashingStrategy::initialSize( n / maximumLoadFactor() + 1 ) );
             }
         }
         else
         {
-            m_capacity = std::max( n, m_capacity );
+            m_capacity = libstdhl::Math::max( n, m_capacity );
         }
     }
 
@@ -465,7 +467,7 @@ class HashMapBase
 
         std::memset( m_buckets, 0, sizeof( Bucket ) * m_capacity );
 
-        m_size = 0UL;
+        m_size = 0;
         m_lastEntry = nullptr;
 
         assert( empty() );

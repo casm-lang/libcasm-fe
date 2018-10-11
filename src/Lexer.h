@@ -44,9 +44,9 @@
 #ifndef _LIBCASM_FE_LEXER_H_
 #define _LIBCASM_FE_LEXER_H_
 
-#include <FlexLexer.h>
 #include <string>
 
+#include "various/FlexLexer.h"
 #include "various/GrammarParser.tab.h"
 
 namespace libcasm_fe

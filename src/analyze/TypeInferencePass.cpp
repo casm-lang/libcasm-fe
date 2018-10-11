@@ -1366,7 +1366,7 @@ void TypeInferenceVisitor::visit( CardinalityExpression& node )
 
     // if it is a IR built-in, we can annotate it and due to the annotation, we can infer the
     // resulting type of this expression
-    const auto expression = { node.expression() };
+    const std::vector< Expression::Ptr > expression = { node.expression() };
     inference( description, annotate( node, expression ), node, expression );
 
     if( not node.type() )

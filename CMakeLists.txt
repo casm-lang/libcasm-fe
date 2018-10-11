@@ -45,10 +45,10 @@ set( PROJECT libcasm-fe )
 
 cmake_minimum_required( VERSION ${CMAKE_VERSION} )
 
-project( ${PROJECT} LANGUAGES C CXX )
+project( ${PROJECT} LANGUAGES CXX )
 set( CMAKE_CXX_STANDARD 14 )
+set( CMAKE_CXX_EXTENSIONS OFF )
 set( CMAKE_VERSION 3.2 )
-set( CMAKE_INCLUDE_CURRENT_DIR ON )
 set( CMAKE_MODULE_PATH ${${PROJECT}_SOURCE_DIR}/.cmake )
 
 include( LibPackage )
@@ -60,6 +60,11 @@ package_git_submodule( libcasm-ir master REQUIRED obj   ../casm-ir lib/casm-ir )
 package_git_submodule( libcasm-rt master REQUIRED obj   ../casm-rt lib/casm-rt )
 package_git_submodule( libgtest   master REQUIRED build ../gtest   lib/gtest   )
 package_git_submodule( libhayai   master REQUIRED build ../hayai   lib/hayai   )
+package_git_deps(
+  libstdhl>libpass
+  libpass>libcasm-ir
+  libcasm-ir>libcasm-rt
+  )
 
 find_package( Threads REQUIRED )
 
@@ -73,23 +78,6 @@ add_subdirectory( etc
   EXCLUDE_FROM_ALL
   )
 
-add_custom_target( ${PROJECT}-sync
-  COMMAND
-    make sync > ${PROJECT_BINARY_DIR}/CMakeSync 2>&1
-  DEPENDS
-    libgtest
-    libhayai
-    libstdhl
-    libpass
-    libcasm-ir
-    libcasm-rt
-  WORKING_DIRECTORY
-    ${PROJECT_SOURCE_DIR}
-  )
-
-add_dependencies( ${PROJECT}-cpp
-  ${PROJECT}-sync
-  )
 
 #
 # grammar
