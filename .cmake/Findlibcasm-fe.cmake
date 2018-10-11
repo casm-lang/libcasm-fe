@@ -42,7 +42,7 @@
 #
 
 # LIBCASM_FE_FOUND        - system has found the package
-# LIBCASM_FE_INCLUDE_DIRS - the package include directories
+# LIBCASM_FE_INCLUDE_DIR  - the package include directory
 # LIBCASM_FE_LIBRARY      - the package library
 
 include( LibPackage )
@@ -71,11 +71,7 @@ set( LIBCASM_FE_PROCESS_LIBS     LIBCASM_FE_LIBRARY )
 
 libfind_process( LIBCASM_FE )
 
-if( EXISTS "${LIBCASM_FE_INCLUDE_DIR}" AND
-    EXISTS "${LIBCASM_FE_LIBRARY}" AND
-    ${LIBCASM_FE_INCLUDE_DIR} AND
-    ${LIBCASM_FE_LIBRARY}
-    )
+if( EXISTS "${LIBCASM_FE_LIBRARY}" AND ${LIBCASM_FE_LIBRARY} )
   set( LIBCASM_FE_FOUND TRUE PARENT_SCOPE )
 else()
   set( LIBCASM_FE_FOUND FALSE PARENT_SCOPE )
