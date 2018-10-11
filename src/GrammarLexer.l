@@ -48,6 +48,8 @@
 #include "various/GrammarToken.h"
 #include "../../src/SourceLocation.h"
 
+#include <libcasm-fe/ast/Span>
+
 using namespace libcasm_fe;
 
 #undef YY_DECL
@@ -110,23 +112,25 @@ using namespace libcasm_fe;
 }
 
 [\x20]+ { // space
-    // TODO: @moiova add span space creation of length yyleng here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::SPACE, yyleng);
+    // TODO: FIXME: @moiova: handle this span object
     m_loc.step();
 }
 
 [\r]+ { // carriage return
-    // TODO: @moiova add span carriage return creation of length yyleng here
     m_loc.step();
 }
 
 [\t]+ { // tabulator
-    // TODO: @moiova add span tabulator creation of length yyleng here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::TABULATOR, yyleng );
+    // TODO: FIXME: @moiova: handle this span object
     m_loc.step();
 }
 
 [\n]+ { // newline
     m_loc.lines( yyleng );
-    // TODO: @moiova add span newline creation of length yyleng here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::NEWLINE, yyleng );
+    // TODO: FIXME: @moiova: handle this span object
     m_loc.step();
 }
 
@@ -141,12 +145,14 @@ using namespace libcasm_fe;
 <LCOMMENT>\n {
     unput( *yytext );
     m_loc.columns( -1 );
-    // TODO: @moiova add span single line comment creation of m_strbuf here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+    // TODO: FIXME: @moiova: handle this span object
     m_loc.step();
     BEGIN( INITIAL );
 }
 <LCOMMENT><<EOF>> {
-    // TODO: @moiova add span single line comment creation of m_strbuf here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+    // TODO: FIXME: @moiova: handle this span object
     BEGIN( INITIAL );
 }
 
@@ -157,7 +163,8 @@ using namespace libcasm_fe;
 }
 <COMMENT>"*/" {
     m_strbuf.append( yytext );
-    // TODO: @moiova add span single line comment creation of m_strbuf here
+    const auto span = Ast::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
+    // TODO: FIXME: @moiova: handle this span object
     m_loc.step();
     BEGIN( INITIAL );
 }
