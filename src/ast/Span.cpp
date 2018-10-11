@@ -126,11 +126,11 @@ std::string Span::toString( void ) const
         {
             return std::string(length(), '\t');
         }
-        case Grammar::Span::LCOMMENT:
+        case Grammar::Span::INLINE_COMMENT:
         {
             return readRange(*sourceLocation().begin.fileName, sourceLocation().begin.line, "//", length());
         }
-        case Grammar::Span::BCOMMENT:
+        case Grammar::Span::BLOCK_COMMENT:
         {
             std::string concat;
             std::size_t currentLine = sourceLocation().begin.line; // the line where the block comment starts

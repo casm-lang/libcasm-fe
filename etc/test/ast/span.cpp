@@ -88,10 +88,10 @@ TEST( AstSpan, LineComment )
     const auto end = SourcePosition(filename, 2, 10);
     const auto loc = SourceLocation( begin, end );
 
-    auto span = std::make_shared< Span >( Grammar::Span::LCOMMENT, 4 );
+    auto span = std::make_shared< Span >( Grammar::Span::INLINE_COMMENT, 4 );
     span->setSourceLocation(loc);
 
-    EXPECT_EQ( span->kind(), Grammar::Span::LCOMMENT );
+    EXPECT_EQ( span->kind(), Grammar::Span::INLINE_COMMENT );
     EXPECT_EQ( span->length(), 4 );
     EXPECT_STREQ( span->toString().c_str(), "//test" );
 
@@ -109,10 +109,10 @@ TEST( AstSpan, BlockComment )
     const auto end = SourcePosition(filename, 4, 10);
     const auto loc = SourceLocation( begin, end );
 
-    auto span = std::make_shared< Span >( Grammar::Span::BCOMMENT, 17 );
+    auto span = std::make_shared< Span >( Grammar::Span::BLOCK_COMMENT, 17 );
     span->setSourceLocation(loc);
 
-    EXPECT_EQ( span->kind(), Grammar::Span::BCOMMENT );
+    EXPECT_EQ( span->kind(), Grammar::Span::BLOCK_COMMENT );
     EXPECT_EQ( span->length(), 17 );
     EXPECT_STREQ( span->toString().c_str(), "/*test\ntest2\n   test3*/" );
 
@@ -130,10 +130,10 @@ TEST( AstSpan, BlockCommentOneLine )
     const auto end = SourcePosition(filename, 1, 6);
     const auto loc = SourceLocation( begin, end );
 
-    auto span = std::make_shared< Span >( Grammar::Span::BCOMMENT, 17 );
+    auto span = std::make_shared< Span >( Grammar::Span::BLOCK_COMMENT, 17 );
     span->setSourceLocation(loc);
 
-    EXPECT_EQ( span->kind(), Grammar::Span::BCOMMENT );
+    EXPECT_EQ( span->kind(), Grammar::Span::BLOCK_COMMENT );
     EXPECT_EQ( span->length(), 17 );
     EXPECT_STREQ( span->toString().c_str(), "/*test*/" ); // "block comment" with only one line
 

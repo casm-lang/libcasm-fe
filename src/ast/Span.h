@@ -55,8 +55,8 @@ namespace libcasm_fe
             SPACE,
             NEWLINE,
             TABULATOR,
-            LCOMMENT,
-            BCOMMENT,
+            INLINE_COMMENT,
+            BLOCK_COMMENT,
         };
     }
 
