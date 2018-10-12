@@ -432,10 +432,7 @@ namespace libcasm_fe
             UpdateRule(
                 const DirectCallExpression::Ptr& function, const Expression::Ptr& expression );
 
-            UpdateRule(
-                const MethodCallExpression::Ptr& function, const Expression::Ptr& expression );
-
-            const CallExpression::Ptr& function( void ) const;
+            const DirectCallExpression::Ptr& function( void ) const;
             const Expression::Ptr& expression( void ) const;
 
             const Token::Ptr& updateToken( void ) const;
@@ -443,7 +440,7 @@ namespace libcasm_fe
             void accept( Visitor& visitor ) override final;
 
           private:
-            const CallExpression::Ptr m_function;
+            const DirectCallExpression::Ptr m_function;
             const Expression::Ptr m_expression;
             const Token::Ptr m_updateToken;
         };

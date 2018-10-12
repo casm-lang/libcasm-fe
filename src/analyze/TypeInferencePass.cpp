@@ -1760,21 +1760,21 @@ void TypeInferenceVisitor::visit( ChooseRule& node )
 
 void TypeInferenceVisitor::visit( UpdateRule& node )
 {
-    const auto& func = node.function();
-    const auto& expr = node.expression();
+    auto& func = *node.function();
+    auto& expr = *node.expression();
 
-    func->accept( *this );
+    func.accept( *this );
 
-    if( func->type() )
+    if( func.type() )
     {
-        m_typeIDs[ expr.get() ].emplace( func->type()->id() );
+        m_typeIDs[&expr ].emplace( func.type()->id() );
     }
 
-    expr->accept( *this );
+    node.expression()->accept( *this );
 
     assignment(
-        *func,
-        *expr,
+        func,
+        expr,
         "updated function",
         "updating expression",
         Code::TypeInferenceUpdateRuleTypesMismatch );
@@ -2310,8 +2310,6 @@ class CallTargetCheckVisitor final : public RecursiveVisitor
   public:
     CallTargetCheckVisitor( libcasm_fe::Logger& log );
 
-    void visit( UpdateRule& node ) override;
-
     void visit( DirectCallExpression& node ) override;
     void visit( MethodCallExpression& node ) override;
 
@@ -2324,40 +2322,6 @@ CallTargetCheckVisitor::CallTargetCheckVisitor( libcasm_fe::Logger& log )
 {
 }
 
-void CallTargetCheckVisitor::visit( UpdateRule& node )
-{
-    const auto& func = node.function();
-
-    if( func->id() == Node::ID::DIRECT_CALL_EXPRESSION )
-    {
-        const auto& funcDirectCall = std::static_pointer_cast< DirectCallExpression >( func );
-        const auto& funcName = funcDirectCall->identifier()->path();
-        if( funcDirectCall->targetType() == DirectCallExpression::TargetType::BUILTIN )
-        {
-            m_log.error(
-                { func->sourceLocation() },
-                "performing update rule on built-in '" + funcName + "' is not allowed",
-                Code::TypeInferenceUpdateRuleFunctionIsBuiltin );
-            return;
-        }
-    }
-    else if( func->id() == Node::ID::METHOD_CALL_EXPRESSION )
-    {
-        const auto& funcMethodCall = std::static_pointer_cast< MethodCallExpression >( func );
-        const auto funcName = funcMethodCall->methodName()->name();
-        if( funcMethodCall->methodType() == MethodCallExpression::MethodType::BUILTIN )
-        {
-            m_log.error(
-                { func->sourceLocation() },
-                "performing update rule on built-in '" + funcName + "' is not allowed",
-                Code::TypeInferenceUpdateRuleFunctionIsBuiltin );
-            return;
-        }
-    }
-
-    RecursiveVisitor::visit( node );
-}
-
 void CallTargetCheckVisitor::visit( DirectCallExpression& node )
 {
     if( node.targetType() == DirectCallExpression::TargetType::UNKNOWN )
@@ -2367,8 +2331,6 @@ void CallTargetCheckVisitor::visit( DirectCallExpression& node )
             "unknown symbol '" + node.identifier()->path() + "' found",
             Code::SymbolIsUnknown );
     }
-
-    RecursiveVisitor::visit( node );
 }
 
 void CallTargetCheckVisitor::visit( MethodCallExpression& node )
@@ -2380,8 +2342,6 @@ void CallTargetCheckVisitor::visit( MethodCallExpression& node )
             "unknown method '" + node.methodName()->name() + "' found",
             Code::MethodIsUnknown );
     }
-
-    RecursiveVisitor::visit( node );
 }
 
 void TypeInferencePass::usage( libpass::PassUsage& pu )

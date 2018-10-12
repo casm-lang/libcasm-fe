@@ -409,9 +409,8 @@ InitDefinition
       // apply the name of the program declaration to the initializer functions
       for( auto& initializer : *initializers )
       {
-          // TODO: FIXME: @ppaulweber: ENABLE THIS AFTER REBASE
-          // initializer->updateRule()->function()->setIdentifier(
-          //     asIdentifierPath( programFunction->identifier() ) );
+          initializer->updateRule()->function()->setIdentifier(
+              asIdentifierPath( programFunction->identifier() ) );
       }
 
       programFunction->setInitializers( initializers );
@@ -427,9 +426,8 @@ InitDefinition
       auto initializers = $3;
       for( auto& initializer : *initializers )
       {
-          // TODO: FIXME: @ppaulweber: ENABLE THIS AFTER REBASE
-          // initializer->updateRule()->function()->setIdentifier(
-          //     asIdentifierPath( programFunction->identifier() ) );
+          initializer->updateRule()->function()->setIdentifier(
+              asIdentifierPath( programFunction->identifier() ) );
       }
 
       programFunction->setInitializers( initializers );
@@ -510,8 +508,7 @@ FunctionDefinition
       const auto initially = $$->initially();
       for( auto& initializer : *initially->initializers() )
       {
-          // TODO: FIXME: @ppaulweber: ENABLE THIS AFTER REBASE
-          // initializer->updateRule()->function()->setIdentifier( IdentifierPath::fromIdentifier( $2 ) );
+          initializer->updateRule()->function()->setIdentifier( asIdentifierPath( $2 ) );
       }
   }
 ;
@@ -1011,9 +1008,10 @@ UpdateRule
   }
 | MethodCallExpression UPDATE Term
   {
-      const auto function = $1;
-      function->setMethodType( MethodCallExpression::MethodType::FUNCTION );
-      $$ = Ast::make< UpdateRule >( @$, function, $3 );
+      // TODO: FIXME: @ppaulweber: change UpdateRule to support MethodCallExpression as well
+      // const auto function = $1;
+      // function->setMethodType( MethodCallExpression::MethodType::FUNCTION );
+      // $$ = Ast::make< UpdateRule >( @$, function, $3 );
   }
 ;
 

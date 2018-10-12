@@ -393,49 +393,23 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
 
     node.expression()->accept( *this );
 
-    FunctionDefinition::Ptr functionDefinition = nullptr;
-    std::string functionName = "";
-    const auto& function = node.function();
-    assert( function->id() == Node::ID::DIRECT_CALL_EXPRESSION );
-    const auto& directCallfunction = std::static_pointer_cast< DirectCallExpression >( function );
-
-    if( directCallfunction->targetType() != DirectCallExpression::TargetType::FUNCTION )
+    const auto& func = node.function();
+    if( func->targetType() != DirectCallExpression::TargetType::FUNCTION )
     {
-        const auto& funcDirectCall = std::static_pointer_cast< DirectCallExpression >( function );
-        functionDefinition = funcDirectCall->targetDefinition()->ptr< FunctionDefinition >();
-        functionName = funcDirectCall->identifier()->path();
-        if( funcDirectCall->targetType() != DirectCallExpression::TargetType::FUNCTION )
-        {
-            m_log.error(
-                { funcDirectCall->sourceLocation() },
-                "updating " + funcDirectCall->targetTypeName() + " '" + functionName +
-                    "' is not allowed, only function symbols are allowed",
-                Code::UpdateRuleFunctionSymbolIsInvalid );
-            return;
-        }
-    }
-    else
-    {
-        assert( function->id() == Node::ID::METHOD_CALL_EXPRESSION );
-        const auto& funcMethodCall = std::static_pointer_cast< MethodCallExpression >( function );
-        functionDefinition = funcMethodCall->targetDefinition()->ptr< FunctionDefinition >();
-        functionName =
-            funcMethodCall->type()->description() + "::" + funcMethodCall->methodName()->name();
-        if( funcMethodCall->methodType() != MethodCallExpression::MethodType::FUNCTION )
-        {
-            m_log.error(
-                { funcMethodCall->sourceLocation() },
-                "updating " + funcMethodCall->methodTypeName() + " '" + functionName +
-                    "' is not allowed, only function symbols are allowed",
-                Code::UpdateRuleFunctionSymbolIsInvalid );
-            return;
-        }
+        m_log.error(
+            { func->sourceLocation() },
+            "updating " + func->targetTypeName() + " '" + func->identifier()->path() +
+                "' is not allowed, only function symbols are allowed",
+            Code::UpdateRuleFunctionSymbolIsInvalid );
+        return;
     }
 
-    function->arguments()->accept( *this );
+    func->arguments()->accept( *this );
+
+    const auto& def = func->targetDefinition()->ptr< FunctionDefinition >();
 
     bool updatesAllowed;
-    switch( functionDefinition->classification() )
+    switch( def->classification() )
     {
         case FunctionDefinition::Classification::IN:  // [fallthrough]
         case FunctionDefinition::Classification::STATIC:
@@ -452,16 +426,16 @@ void ConsistencyCheckVisitor::visit( UpdateRule& node )
     if( not updatesAllowed )
     {
         m_log.error(
-            { function->sourceLocation() },
-            "updating function '" + functionName + "' is not allowed, it is classified as '" +
-                functionDefinition->classificationName() + "' ",
+            { func->sourceLocation() },
+            "updating function '" + func->identifier()->path() +
+                "' is not allowed, it is classified as '" + def->classificationName() + "' ",
             Code::UpdateRuleInvalidClassifier );
 
         m_log.info(
-            { functionDefinition->sourceLocation() },
-            "function '" + functionName + "' is classified as '" +
-                functionDefinition->classificationName() + "', incorrect usage in line " +
-                std::to_string( function->sourceLocation().begin.line ) );
+            { def->sourceLocation() },
+            "function '" + func->identifier()->path() + "' is classified as '" +
+                def->classificationName() + "', incorrect usage in line " +
+                std::to_string( func->sourceLocation().begin.line ) );
     }
 }
 
