@@ -53,6 +53,8 @@ namespace libcasm_fe
 {
     namespace Ast
     {
+        class Definition;
+
         class Literal : public Expression
         {
           public:
@@ -124,8 +126,8 @@ namespace libcasm_fe
             void setReferenceType( ReferenceType referenceType );
             ReferenceType referenceType( void ) const;
 
-            void setReference( const TypedNode::Ptr& reference );
-            const TypedNode::Ptr& reference( void ) const;
+            void setReference( const std::shared_ptr< Definition >& reference );
+            const std::shared_ptr< Definition >& reference( void ) const;
 
             void setBuiltinId( libcasm_ir::Value::ID builtinId );
             libcasm_ir::Value::ID builtinId( void ) const;
@@ -136,7 +138,7 @@ namespace libcasm_fe
             const IdentifierPath::Ptr m_identifier;
             const Token::Ptr m_at;
             ReferenceType m_referenceType;
-            TypedNode::Ptr m_reference;
+            std::shared_ptr< Definition > m_reference;
             libcasm_ir::Value::ID m_builtinId;
         };
 

@@ -167,12 +167,12 @@ ReferenceLiteral::ReferenceType ReferenceLiteral::referenceType( void ) const
     return m_referenceType;
 }
 
-void ReferenceLiteral::setReference( const TypedNode::Ptr& reference )
+void ReferenceLiteral::setReference( const Definition::Ptr& reference )
 {
     m_reference = reference;
 }
 
-const TypedNode::Ptr& ReferenceLiteral::reference( void ) const
+const Definition::Ptr& ReferenceLiteral::reference( void ) const
 {
     assert(
         ( m_referenceType != ReferenceType::BUILTIN ) and

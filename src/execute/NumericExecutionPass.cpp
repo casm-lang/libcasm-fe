@@ -843,7 +843,7 @@ void ExecutionVisitor::visit( IndirectCallExpression& node )
         case ReferenceLiteral::ReferenceType::DERIVED:   // [[fallthrough]]
         case ReferenceLiteral::ReferenceType::RULE:
         {
-            const auto& definition = std::static_pointer_cast< Definition >( literal->reference() );
+            const auto& definition = literal->reference();
             m_frameStack.push(
                 makeFrame( &node, definition.get(), definition->maximumNumberOfLocals() ) );
             definition->accept( *this );

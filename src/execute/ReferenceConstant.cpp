@@ -43,7 +43,7 @@
 
 #include "ReferenceConstant.h"
 
-#include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Definition>
 
 using namespace libcasm_fe;
 
@@ -80,7 +80,7 @@ std::size_t ReferenceConstant::hash( void ) const
 {
     if( defined() )
     {
-        return std::hash< Ast::TypedNode* >()( value()->reference().get() );
+        return std::hash< Ast::Definition* >()( value()->reference().get() );
     }
     else
     {
