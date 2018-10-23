@@ -60,6 +60,9 @@ namespace libcasm_fe
 
             explicit Literal( Node::ID id );
 
+            void setSpans( const Spans::Ptr& spans );
+            const Spans::Ptr& spans( void ) const;
+
             void setLeftBracket( const Token::Ptr& leftBracket );
             const Token::Ptr& leftBracket( void ) const;
 
@@ -69,6 +72,7 @@ namespace libcasm_fe
           private:
             Token::Ptr m_leftBracket;
             Token::Ptr m_rightBracket;
+            Spans::Ptr m_spans;
         };
 
         using Literals = NodeList< Literal >;

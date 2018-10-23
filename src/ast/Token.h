@@ -45,6 +45,7 @@
 #define _LIBCASM_FE_TOKEN_H_
 
 #include <libcasm-fe/ast/Node>
+#include <libcasm-fe/ast/Span>
 
 namespace libcasm_fe
 {
@@ -64,12 +65,16 @@ namespace libcasm_fe
 
             libcasm_fe::Grammar::Token token( void ) const;
 
+            void setSpans( const Spans::Ptr& spans );
+            const Spans::Ptr& spans( void ) const;
+
             std::string tokenString( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             libcasm_fe::Grammar::Token m_token;
+            Spans::Ptr m_spans;
         };
     }
 }

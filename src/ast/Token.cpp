@@ -56,12 +56,23 @@ using namespace Ast;
 Token::Token( const libcasm_fe::Grammar::Token token )
 : Node( Node::ID::TOKEN )
 , m_token( token )
+, m_spans()
 {
 }
 
 libcasm_fe::Grammar::Token Token::token( void ) const
 {
     return m_token;
+}
+
+void Token::setSpans( const Spans::Ptr& spans )
+{
+    m_spans = spans;
+}
+
+const Spans::Ptr& Token::spans( void ) const
+{
+    return m_spans;
 }
 
 std::string Token::tokenString( void ) const

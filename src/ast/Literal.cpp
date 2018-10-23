@@ -57,7 +57,18 @@ Literal::Literal( Node::ID id )
 : Expression( id )
 , m_leftBracket( uToken )
 , m_rightBracket( uToken )
+, m_spans()
 {
+}
+
+void Literal::setSpans( const Spans::Ptr& spans )
+{
+    m_spans = spans;
+}
+
+const Spans::Ptr& Literal::spans( void ) const
+{
+    return m_spans;
 }
 
 void Literal::setLeftBracket( const Token::Ptr& leftBracket )

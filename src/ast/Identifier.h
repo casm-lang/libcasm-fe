@@ -63,11 +63,15 @@ namespace libcasm_fe
             void setDoubleColon( const Token::Ptr& doubleColon );
             const Token::Ptr& doubleColon( void ) const;
 
+            void setSpans( const Spans::Ptr& spans );
+            const Spans::Ptr& spans( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             std::string m_name;
             Token::Ptr m_doubleColon;
+            Spans::Ptr m_spans;
         };
 
         using Identifiers = NodeList< Identifier >;

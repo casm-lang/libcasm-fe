@@ -1198,6 +1198,7 @@ UndefinedLiteral
 : UNDEF
   {
       $$ = Ast::make< UndefLiteral >( @$ );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
 ;
 
@@ -1207,11 +1208,13 @@ BooleanLiteral
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
       $$ = Ast::make< ValueLiteral >( @$, value );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
 | FALSE
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( false );
       $$ = Ast::make< ValueLiteral >( @$, value );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
 ;
 
@@ -1223,6 +1226,7 @@ IntegerLiteral
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::IntegerConstant >( $1, libstdhl::Type::DECIMAL );
           $$ = Ast::make< ValueLiteral >( @$, value );
+          $$->setSpans( m_lexer.fetchSpansAndReset() );
       }
       catch( const std::domain_error& e )
       {
@@ -1239,6 +1243,8 @@ RationalLiteral
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::RationalConstant >( $1 );
           $$ = Ast::make< ValueLiteral >( @$, value );
+          $$->setSpans( m_lexer.fetchSpansAndReset() );
+
       }
       catch( const std::domain_error& e )
       {
@@ -1255,6 +1261,8 @@ DecimalLiteral
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( $1 );
           $$ = Ast::make< ValueLiteral >( @$, value );
+          $$->setSpans( m_lexer.fetchSpansAndReset() );
+
       }
       catch( const std::domain_error& e )
       {
@@ -1271,6 +1279,7 @@ BinaryLiteral
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( $1, libstdhl::Type::BINARY );
           $$ = Ast::make< ValueLiteral >( @$, value );
+          $$->setSpans( m_lexer.fetchSpansAndReset() );
       }
       catch( const std::domain_error& e )
       {
@@ -1283,6 +1292,7 @@ BinaryLiteral
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( $1, libstdhl::Type::HEXADECIMAL );
           $$ = Ast::make< ValueLiteral >( @$, value );
+          $$->setSpans( m_lexer.fetchSpansAndReset() );
       }
       catch( const std::domain_error& e )
       {
@@ -1299,6 +1309,7 @@ StringLiteral
       {
           const auto value = libstdhl::Memory::get< libcasm_ir::StringConstant >( $1 );
           $$ = Ast::make< ValueLiteral >( @$, value );
+          $$->setSpans( m_lexer.fetchSpansAndReset() );
       }
       catch( const std::domain_error& e )
       {
@@ -1624,10 +1635,12 @@ Identifier
 : IDENTIFIER
   {
       $$ = Ast::make< Identifier >( @$, $1 );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
 | IN // allow in keyword as identifier
   {
       $$ = Ast::make< Identifier >( @$, "in" );
+      $$->setSpans( m_lexer.fetchSpansAndReset() );
   }
 ;
 

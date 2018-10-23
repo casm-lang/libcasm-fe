@@ -63,6 +63,7 @@ Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
 , m_name( name )
 , m_doubleColon( uToken )
+, m_spans()
 {
 }
 
@@ -80,6 +81,16 @@ void Identifier::setDoubleColon( const Token::Ptr& doubleColon )
 const Token::Ptr& Identifier::doubleColon( void ) const
 {
     return m_doubleColon;
+}
+
+void Identifier::setSpans( const Spans::Ptr& spans )
+{
+    m_spans = spans;
+}
+
+const Spans::Ptr& Identifier::spans( void ) const
+{
+    return m_spans;
 }
 
 void Identifier::accept( Visitor& visitor )

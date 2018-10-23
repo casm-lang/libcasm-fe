@@ -62,7 +62,9 @@ using namespace libcasm_fe;
 
 // Code run each time a token is matched, see GrammarToken.hpp.
 #define YY_TOKEN_ACTION( TOKEN ) \
-    return Parser::make_##TOKEN( Ast::make< Ast::Token >( m_loc, Grammar::Token:: TOKEN ), m_loc );
+    auto token = Ast::make< Ast::Token >( m_loc, Grammar::Token:: TOKEN ); \
+    token->setSpans( fetchSpansAndReset() ); \
+    return Parser::make_##TOKEN( token, m_loc );
 
 %}
 
@@ -113,7 +115,7 @@ using namespace libcasm_fe;
 
 [\x20]+ { // space
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::SPACE, yyleng);
-    // TODO: FIXME: @moiova: handle this span object
+    m_spans->add(span);
     m_loc.step();
 }
 
@@ -123,14 +125,14 @@ using namespace libcasm_fe;
 
 [\t]+ { // tabulator
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::TABULATOR, yyleng );
-    // TODO: FIXME: @moiova: handle this span object
+    m_spans->add(span);
     m_loc.step();
 }
 
 [\n]+ { // newline
     m_loc.lines( yyleng );
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::NEWLINE, yyleng );
-    // TODO: FIXME: @moiova: handle this span object
+    m_spans->add(span);
     m_loc.step();
 }
 
@@ -146,13 +148,13 @@ using namespace libcasm_fe;
     unput( *yytext );
     m_loc.columns( -1 );
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
-    // TODO: FIXME: @moiova: handle this span object
+    m_spans->add(span);
     m_loc.step();
     BEGIN( INITIAL );
 }
 <LCOMMENT><<EOF>> {
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
-    // TODO: FIXME: @moiova: handle this span object
+    m_spans->add(span);
     BEGIN( INITIAL );
 }
 
@@ -164,7 +166,7 @@ using namespace libcasm_fe;
 <COMMENT>"*/" {
     m_strbuf.append( yytext );
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::BLOCK_COMMENT, m_strbuf.length() );
-    // TODO: FIXME: @moiova: handle this span object
+    m_spans->add(span);
     m_loc.step();
     BEGIN( INITIAL );
 }
@@ -226,12 +228,20 @@ Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
 , m_log( log )
 , m_loc()
 , m_strbuf()
+, m_spans( std::make_shared <Spans> () )
 {
 }
 
 void Lexer::setFileName( const std::string& fileName )
 {
     m_loc.begin.fileName = m_loc.end.fileName = std::make_shared< std::string >( fileName );
+}
+
+const Spans::Ptr& Lexer::fetchSpansAndReset( void )
+{
+    const auto currentSpans = m_spans;
+    m_spans = std::make_shared<Spans>();
+    return currentSpans;
 }
 
 void Lexer::LexerError( const char* msg )

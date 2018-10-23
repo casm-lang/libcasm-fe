@@ -46,6 +46,7 @@
 
 #include <string>
 
+#include <libcasm-fe/ast/Span>
 #include "various/FlexLexer.h"
 #include "various/GrammarParser.tab.h"
 
@@ -63,6 +64,8 @@ namespace libcasm_fe
 
         Parser::symbol_type nextToken();
 
+        const Spans::Ptr& fetchSpansAndReset( void );
+
       protected:
         void LexerError( const char* msg ) override;
 
@@ -70,6 +73,7 @@ namespace libcasm_fe
         Logger& m_log;
         SourceLocation m_loc;
         std::string m_strbuf;
+        Spans::Ptr m_spans;
     };
 }
 
