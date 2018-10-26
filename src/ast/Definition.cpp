@@ -692,15 +692,44 @@ void InvariantDefinition::accept( Visitor& visitor )
 //
 
 StructureDefinition::StructureDefinition(
-    const Identifier::Ptr& identifier, const FunctionDefinitions::Ptr& functions )
+    const Token::Ptr structureToken,
+    const Identifier::Ptr& identifier,
+    const Token::Ptr assignmentToken,
+    const Token::Ptr leftBraceToken,
+    const FunctionDefinitions::Ptr& functions,
+    const Token::Ptr rightBraceToken )
 : Definition( Node::ID::STRUCTURE_DEFINITION, identifier )
 , m_functions( functions )
+, m_structureToken( structureToken )
+, m_assignmentToken( assignmentToken )
+, m_leftBraceToken( leftBraceToken )
+, m_rightBraceToken( rightBraceToken )
 {
 }
 
 const FunctionDefinitions::Ptr& StructureDefinition::functions( void ) const
 {
     return m_functions;
+}
+
+const Token::Ptr StructureDefinition::structureToken( void ) const
+{
+    return m_structureToken;
+}
+
+const Token::Ptr StructureDefinition::assignmentToken( void ) const
+{
+    return m_assignmentToken;
+}
+
+const Token::Ptr StructureDefinition::leftBraceToken( void ) const
+{
+    return m_leftBraceToken;
+}
+
+const Token::Ptr StructureDefinition::rightBraceToken( void ) const
+{
+    return m_rightBraceToken;
 }
 
 void StructureDefinition::accept( Visitor& visitor )

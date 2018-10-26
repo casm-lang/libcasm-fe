@@ -596,8 +596,7 @@ ImportDefinition
 StructureDefinition
 : STRUCTURE Identifier EQUAL LCURPAREN StructureDefinitionList RCURPAREN
   {
-      // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, $4, and $6
-      $$ = Ast::make< StructureDefinition >( @$, $2, $5 );
+      $$ = Ast::make< StructureDefinition >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 

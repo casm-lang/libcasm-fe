@@ -209,10 +209,13 @@ void RecursiveVisitor::visit( ImportDefinition& node )
 
 void RecursiveVisitor::visit( StructureDefinition& node )
 {
-    // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
-    node.identifier()->accept( *this );
-    node.functions()->accept( *this );
     node.attributes()->accept( *this );
+    node.structureToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.assignmentToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.functions()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( FeatureDefinition& node )
