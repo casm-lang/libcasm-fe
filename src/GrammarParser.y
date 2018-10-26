@@ -1555,6 +1555,8 @@ StructureLiteral
 : BasicType LPAREN RPAREN
   {
       $$ = Ast::make< StructureLiteral >( @$, $1 );
+      $$->setLeftBracket( $2 );
+      $$->setRightBracket( $3 );
   }
 ;
 

@@ -301,6 +301,13 @@ void RecursiveVisitor::visit( RecordLiteral& node )
     node.rightBracket()->accept( *this );
 }
 
+void RecursiveVisitor::visit( StructureLiteral& node )
+{
+    node.type()->accept( *this );
+    node.leftBracket()->accept( *this );
+    node.rightBracket()->accept( *this );
+}
+
 //
 //
 // Expressions
@@ -312,11 +319,6 @@ void RecursiveVisitor::visit( EmbracedExpression& node )
     node.leftBraceToken()->accept( *this );
     node.expression()->accept( *this );
     node.rightBraceToken()->accept( *this );
-}
-
-void RecursiveVisitor::visit( StructureLiteral& node )
-{
-    node.type()->accept( *this );
 }
 
 void RecursiveVisitor::visit( NamedExpression& node )
