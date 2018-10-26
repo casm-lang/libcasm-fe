@@ -119,11 +119,13 @@ void EmbracedExpression::accept( Visitor& visitor )
 //
 
 NamedExpression::NamedExpression(
-    const Identifier::Ptr& identifier, const Token::Ptr& colon, const Expression::Ptr& expression )
+    const Identifier::Ptr& identifier,
+    const Token::Ptr& colonToken,
+    const Expression::Ptr& expression )
 : Expression( Node::ID::NAMED_EXPRESSION )
 , m_identifier( identifier )
 , m_expression( expression )
-, m_colon( colon )
+, m_colonToken( colonToken )
 {
 }
 
@@ -137,9 +139,9 @@ const Expression::Ptr& NamedExpression::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& NamedExpression::colon( void ) const
+const Token::Ptr& NamedExpression::colonToken( void ) const
 {
-    return m_colon;
+    return m_colonToken;
 }
 
 void NamedExpression::accept( Visitor& visitor )
@@ -434,12 +436,12 @@ void MethodCallExpression::accept( Visitor& visitor )
 
 LiteralCallExpression::LiteralCallExpression(
     const Expression::Ptr& object,
-    const Token::Ptr& dot,
+    const Token::Ptr& dotToken,
     const std::shared_ptr< Literal >& literal )
 : Expression( Node::ID::LITERAL_CALL_EXPRESSION )
 , m_object( object )
 , m_literal( literal )
-, m_dot( dot )
+, m_dotToken( dotToken )
 {
 }
 
@@ -453,9 +455,9 @@ const std::shared_ptr< Literal >& LiteralCallExpression::literal( void ) const
     return m_literal;
 }
 
-const Token::Ptr& LiteralCallExpression::dot( void ) const
+const Token::Ptr& LiteralCallExpression::dotToken( void ) const
 {
-    return m_dot;
+    return m_dotToken;
 }
 
 void LiteralCallExpression::accept( Visitor& visitor )
@@ -678,12 +680,12 @@ void BinaryExpression::accept( Visitor& visitor )
 
 VariableBinding::VariableBinding(
     const VariableDefinition::Ptr& variable,
-    const Token::Ptr& equal,
+    const Token::Ptr& equalToken,
     const Expression::Ptr& expression )
 : Node( Node::ID::VARIABLE_BINDING )
 , m_variable( variable )
 , m_expression( expression )
-, m_equal( equal )
+, m_equalToken( equalToken )
 , m_delimiterToken( Token::unresolved() )
 {
 }
@@ -698,9 +700,9 @@ const Expression::Ptr& VariableBinding::expression( void ) const
     return m_expression;
 }
 
-const Token::Ptr& VariableBinding::equal( void ) const
+const Token::Ptr& VariableBinding::equalToken( void ) const
 {
-    return m_equal;
+    return m_equalToken;
 }
 
 void VariableBinding::setDelimiterToken( const Token::Ptr& delimiterToken )

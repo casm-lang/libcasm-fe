@@ -109,21 +109,21 @@ namespace libcasm_fe
 
             explicit NamedExpression(
                 const Identifier::Ptr& identifier,
-                const Token::Ptr& colon,
+                const Token::Ptr& colonToken,
                 const Expression::Ptr& expression );
 
             const Identifier::Ptr& identifier( void ) const;
 
             const Expression::Ptr& expression( void ) const;
 
-            const Token::Ptr& colon( void ) const;
+            const Token::Ptr& colonToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Identifier::Ptr m_identifier;
             const Expression::Ptr m_expression;
-            const Token::Ptr m_colon;
+            const Token::Ptr m_colonToken;
         };
 
         using NamedExpressions = NodeList< NamedExpression >;
@@ -295,20 +295,20 @@ namespace libcasm_fe
 
             LiteralCallExpression(
                 const Expression::Ptr& object,
-                const Token::Ptr& dot,
+                const Token::Ptr& dotToken,
                 const std::shared_ptr< Literal >& literal );
 
             const Expression::Ptr& object( void ) const;
             const std::shared_ptr< Literal >& literal( void ) const;
 
-            const Token::Ptr& dot( void ) const;
+            const Token::Ptr& dotToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Expression::Ptr m_object;
             const std::shared_ptr< Literal > m_literal;
-            const Token::Ptr m_dot;
+            const Token::Ptr m_dotToken;
         };
 
         class IndirectCallExpression final : public CallExpression
@@ -450,13 +450,13 @@ namespace libcasm_fe
 
             VariableBinding(
                 const std::shared_ptr< VariableDefinition >& variable,
-                const Token::Ptr& equal,
+                const Token::Ptr& equalToken,
                 const Expression::Ptr& expression );
 
             const std::shared_ptr< VariableDefinition >& variable( void ) const;
             const Expression::Ptr& expression( void ) const;
 
-            const Token::Ptr& equal( void ) const;
+            const Token::Ptr& equalToken( void ) const;
 
             void setDelimiterToken( const Token::Ptr& delimiterToken );
             const Token::Ptr& delimiterToken( void ) const;
@@ -466,7 +466,7 @@ namespace libcasm_fe
           private:
             const std::shared_ptr< VariableDefinition > m_variable;
             const Expression::Ptr m_expression;
-            const Token::Ptr m_equal;
+            const Token::Ptr m_equalToken;
             Token::Ptr m_delimiterToken;
         };
 

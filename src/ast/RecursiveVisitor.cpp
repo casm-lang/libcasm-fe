@@ -320,7 +320,7 @@ void RecursiveVisitor::visit( NamedExpression& node )
 {
     node.delimiterToken()->accept( *this );
     node.identifier()->accept( *this );
-    node.colon()->accept( *this );
+    node.colonToken()->accept( *this );
     node.expression()->accept( *this );
 }
 
@@ -348,7 +348,7 @@ void RecursiveVisitor::visit( LiteralCallExpression& node )
 {
     node.delimiterToken()->accept( *this );
     node.object()->accept( *this );
-    node.dot()->accept( *this );
+    node.dotToken()->accept( *this );
     node.literal()->accept( *this );
 }
 
@@ -684,7 +684,7 @@ void RecursiveVisitor::visit( VariableBinding& node )
 {
     node.delimiterToken()->accept( *this );
     node.variable()->accept( *this );
-    node.equal()->accept( *this );
+    node.equalToken()->accept( *this );
     node.expression()->accept( *this );
 }
 
