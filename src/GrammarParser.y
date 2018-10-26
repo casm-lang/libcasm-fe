@@ -597,7 +597,7 @@ StructureDefinition
 : STRUCTURE Identifier EQUAL LCURPAREN StructureDefinitionList RCURPAREN
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, $4, and $6
-      // $$ = Ast::make< StructureDefinition >( @$, $2, $5 );
+      $$ = Ast::make< StructureDefinition >( @$, $2, $5 );
   }
 ;
 
@@ -1553,13 +1553,9 @@ RecordLiteral
 //
 
 StructureLiteral
-: BasicType TupleLiteral
+: BasicType LPAREN RPAREN
   {
-      $$ = Ast::make< StructureLiteral >( @$, $1, $2 );
-  }
-| BasicType RecordLiteral
-  {
-      $$ = Ast::make< StructureLiteral >( @$, $1, $2 );
+      $$ = Ast::make< StructureLiteral >( @$, $1 );
   }
 ;
 

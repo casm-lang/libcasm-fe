@@ -226,17 +226,14 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< StructureLiteral >;
 
-            StructureLiteral( const Type::Ptr& type, const Literal::Ptr& literal );
+            StructureLiteral( const Type::Ptr& type );
 
             const Type::Ptr& type( void ) const;
-
-            const Literal::Ptr& literal( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Type::Ptr m_type;
-            const Literal::Ptr m_literal;
         };
     }
 }

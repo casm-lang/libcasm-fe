@@ -729,54 +729,6 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         return;
     }
 
-    const auto& methodType = node.object()->type()->result().description();
-
-    const auto identifierMethodType = std::make_shared< Identifier >( methodType );
-    const auto identifierMethodName = std::make_shared< Identifier >( methodName );
-    auto identifierPath = IdentifierPath( identifierMethodType );
-    identifierPath.addIdentifier( identifierMethodName );
-
-    try
-    {
-        const auto& symbol = m_symboltable.findSymbol( identifierPath );
-
-        switch( symbol->id() )
-        {
-            case Node::ID::FUNCTION_DEFINITION:
-            {
-                node.setMethodType( MethodCallExpression::MethodType::FUNCTION );
-                break;
-            }
-            default:
-            {
-                throw std::domain_error( "invalid symbol '" + symbol->description() + "'" );
-                break;
-            }
-        }
-
-        node.setTargetDefinition( symbol );
-
-        // make sure that the definition has been typed
-        const auto& definition = node.targetDefinition();
-        assert( definition );
-        definition->accept( *this );
-
-        const auto& arguments = *node.arguments();
-        const auto& argumentTypes = definition->type()->arguments();
-        for( std::size_t i = 0; i < arguments.size(); i++ )
-        {
-            m_typeIDs[ arguments.at( i ).get() ].emplace( argumentTypes.at( i )->id() );
-        }
-
-        node.setType( definition->type() );
-    }
-    catch( const std::domain_error& e )
-    {
-        m_log.error(
-            { node.sourceLocation() },
-            "type '" + methodType + "' does not have a symbol '" + methodName + "'" );
-    }
-
     std::vector< Expression::Ptr > methodCallArguments;
     methodCallArguments.reserve( 1 + node.arguments()->size() );
     methodCallArguments.emplace_back( node.object() );  // pass object instance as first argument
@@ -797,6 +749,10 @@ void TypeInferenceVisitor::visit( MethodCallExpression& node )
         try
         {
             const auto& nspace = m_symboltable.findNamespace( methodType );
+            if( not nspace )
+            {
+                throw std::domain_error( "invalid type namespace '" + methodType + "'" );
+            }
             const auto& symbol = nspace->findSymbol( methodName );
 
             switch( symbol->id() )
