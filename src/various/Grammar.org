@@ -767,8 +767,7 @@ RecordLiteral ::= "(" Assignments ")"
 ** StructureLiteral
 
 #+begin_src
-StructureLiteral ::= BasicType TupleLiteral
-                   | BasicType RecordLiteral
+StructureLiteral ::= BasicType "(" ")"
 #+end_src
 
 #+html: {{page>.:grammar:StructureLiteral&noheader&nofooter}}
