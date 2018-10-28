@@ -1,6 +1,9 @@
+
+#+options: toc:nil
+
 * Syntax
 
-{{page>:grammar:readme&noheader&nofooter}}
+#+html: {{page>:grammar:readme&noheader&nofooter}}
 
 ** Specification
 
@@ -8,7 +11,7 @@
 Specification ::= Header Definitions
 #+end_src
 
-{{page>:grammar:Specification&noheader&nofooter}}
+#+html: {{page>:grammar:Specification&noheader&nofooter}}
 
 
 ** Header
@@ -18,7 +21,7 @@ Header ::= Attributes "CASM"
          | "CASM"
 #+end_src
 
-{{page>:grammar:Header&noheader&nofooter}}
+#+html: {{page>:grammar:Header&noheader&nofooter}}
 
 
 ** Definitions
@@ -28,7 +31,7 @@ Definitions ::= Definitions AttributedDefinition
               | AttributedDefinition
 #+end_src
 
-{{page>:grammar:Definitions&noheader&nofooter}}
+#+html: {{page>:grammar:Definitions&noheader&nofooter}}
 
 
 ** AttributedDefinition
@@ -38,7 +41,7 @@ AttributedDefinition ::= Attributes Definition
                        | Definition
 #+end_src
 
-{{page>:grammar:AttributedDefinition&noheader&nofooter}}
+#+html: {{page>:grammar:AttributedDefinition&noheader&nofooter}}
 
 
 ** Definition
@@ -53,7 +56,7 @@ Definition ::= InitDefinition
              | InvariantDefinition
 #+end_src
 
-{{page>:grammar:Definition&noheader&nofooter}}
+#+html: {{page>:grammar:Definition&noheader&nofooter}}
 
 
 ** InitDefinition
@@ -63,7 +66,7 @@ InitDefinition ::= "init" IdentifierPath
                  | "init" "{" Initializers "}"
 #+end_src
 
-{{page>:grammar:InitDefinition&noheader&nofooter}}
+#+html: {{page>:grammar:InitDefinition&noheader&nofooter}}
 
 
 ** EnumerationDefinition
@@ -72,7 +75,7 @@ InitDefinition ::= "init" IdentifierPath
 EnumerationDefinition ::= "enumeration" Identifier "=" "{" Enumerators "}"
 #+end_src
 
-{{page>:grammar:EnumerationDefinition&noheader&nofooter}}
+#+html: {{page>:grammar:EnumerationDefinition&noheader&nofooter}}
 
 
 ** DerivedDefinition
@@ -82,7 +85,7 @@ DerivedDefinition ::= "derived" Identifier "->" Type "=" Term
                     | "derived" Identifier "(" Parameters ")" "->" Type "=" Term
 #+end_src
 
-{{page>:grammar:DerivedDefinition&noheader&nofooter}}
+#+html: {{page>:grammar:DerivedDefinition&noheader&nofooter}}
 
 
 ** RuleDefinition
@@ -94,7 +97,7 @@ RuleDefinition ::= "rule" Identifier "=" Rule
                  | "rule" Identifier "(" Parameters ")" "->" Type "=" Rule
 #+end_src
 
-{{page>:grammar:RuleDefinition&noheader&nofooter}}
+#+html: {{page>:grammar:RuleDefinition&noheader&nofooter}}
 
 
 ** FunctionDefinition
@@ -103,7 +106,7 @@ RuleDefinition ::= "rule" Identifier "=" Rule
 FunctionDefinition ::= "function" Identifier ":" MaybeFunctionParameters "->" Type MaybeDefined MaybeInitially
 #+end_src
 
-{{page>:grammar:FunctionDefinition&noheader&nofooter}}
+#+html: {{page>:grammar:FunctionDefinition&noheader&nofooter}}
 
 
 ** EnumeratorDefinition
@@ -113,7 +116,7 @@ EnumeratorDefinition ::= Identifier
                        | Attributes Identifier
 #+end_src
 
-{{page>:grammar:EnumeratorDefinition&noheader&nofooter}}
+#+html: {{page>:grammar:EnumeratorDefinition&noheader&nofooter}}
 
 
 ** Enumerators
@@ -123,7 +126,7 @@ Enumerators ::= Enumerators "," EnumeratorDefinition
               | EnumeratorDefinition
 #+end_src
 
-{{page>:grammar:Enumerators&noheader&nofooter}}
+#+html: {{page>:grammar:Enumerators&noheader&nofooter}}
 
 
 ** UsingDefinition
@@ -132,7 +135,7 @@ Enumerators ::= Enumerators "," EnumeratorDefinition
 UsingDefinition ::= "using" Identifier "=" Type
 #+end_src
 
-{{page>:grammar:UsingDefinition&noheader&nofooter}}
+#+html: {{page>:grammar:UsingDefinition&noheader&nofooter}}
 
 
 ** InvariantDefinition
@@ -141,7 +144,7 @@ UsingDefinition ::= "using" Identifier "=" Type
 InvariantDefinition ::= "invariant" Identifier "=" Term
 #+end_src
 
-{{page>:grammar:InvariantDefinition&noheader&nofooter}}
+#+html: {{page>:grammar:InvariantDefinition&noheader&nofooter}}
 
 
 ** Rules
@@ -151,7 +154,7 @@ Rules ::= Rules Rule
         | Rule
 #+end_src
 
-{{page>:grammar:Rules&noheader&nofooter}}
+#+html: {{page>:grammar:Rules&noheader&nofooter}}
 
 
 ** Rule
@@ -171,7 +174,7 @@ Rule ::= SkipRule
        | WhileRule
 #+end_src
 
-{{page>:grammar:Rule&noheader&nofooter}}
+#+html: {{page>:grammar:Rule&noheader&nofooter}}
 
 
 ** SkipRule
@@ -180,7 +183,7 @@ Rule ::= SkipRule
 SkipRule ::= "skip"
 #+end_src
 
-{{page>:grammar:SkipRule&noheader&nofooter}}
+#+html: {{page>:grammar:SkipRule&noheader&nofooter}}
 
 
 ** ConditionalRule
@@ -190,7 +193,7 @@ ConditionalRule ::= "if" Term "then" Rule
                   | "if" Term "then" Rule "else" Rule
 #+end_src
 
-{{page>:grammar:ConditionalRule&noheader&nofooter}}
+#+html: {{page>:grammar:ConditionalRule&noheader&nofooter}}
 
 
 ** CaseRule
@@ -199,7 +202,7 @@ ConditionalRule ::= "if" Term "then" Rule
 CaseRule ::= "case" Term "of" "{" CaseLabels "}"
 #+end_src
 
-{{page>:grammar:CaseRule&noheader&nofooter}}
+#+html: {{page>:grammar:CaseRule&noheader&nofooter}}
 
 
 ** CaseLabels
@@ -209,7 +212,7 @@ CaseLabels ::= CaseLabels CaseLabel
              | CaseLabel
 #+end_src
 
-{{page>:grammar:CaseLabels&noheader&nofooter}}
+#+html: {{page>:grammar:CaseLabels&noheader&nofooter}}
 
 
 ** CaseLabel
@@ -220,7 +223,7 @@ CaseLabel ::= "default" ":" Rule
             | Term ":" Rule
 #+end_src
 
-{{page>:grammar:CaseLabel&noheader&nofooter}}
+#+html: {{page>:grammar:CaseLabel&noheader&nofooter}}
 
 
 ** LetRule
@@ -229,7 +232,7 @@ CaseLabel ::= "default" ":" Rule
 LetRule ::= "let" VariableBindings "in" Rule
 #+end_src
 
-{{page>:grammar:LetRule&noheader&nofooter}}
+#+html: {{page>:grammar:LetRule&noheader&nofooter}}
 
 
 ** ForallRule
@@ -239,7 +242,7 @@ ForallRule ::= "forall" AttributedVariables "in" Term "do" Rule
              | "forall" AttributedVariables "in" Term "with" Term "do" Rule
 #+end_src
 
-{{page>:grammar:ForallRule&noheader&nofooter}}
+#+html: {{page>:grammar:ForallRule&noheader&nofooter}}
 
 
 ** ChooseRule
@@ -248,7 +251,7 @@ ForallRule ::= "forall" AttributedVariables "in" Term "do" Rule
 ChooseRule ::= "choose" AttributedVariables "in" Term "do" Rule
 #+end_src
 
-{{page>:grammar:ChooseRule&noheader&nofooter}}
+#+html: {{page>:grammar:ChooseRule&noheader&nofooter}}
 
 
 ** IterateRule
@@ -257,7 +260,7 @@ ChooseRule ::= "choose" AttributedVariables "in" Term "do" Rule
 IterateRule ::= "iterate" Rule
 #+end_src
 
-{{page>:grammar:IterateRule&noheader&nofooter}}
+#+html: {{page>:grammar:IterateRule&noheader&nofooter}}
 
 
 ** BlockRule
@@ -267,7 +270,7 @@ BlockRule ::= "{" Rules "}"
             | "par" Rules "endpar"
 #+end_src
 
-{{page>:grammar:BlockRule&noheader&nofooter}}
+#+html: {{page>:grammar:BlockRule&noheader&nofooter}}
 
 
 ** SequenceRule
@@ -277,7 +280,7 @@ SequenceRule ::= "{|" Rules "|}"
                | "seq" Rules "endseq"
 #+end_src
 
-{{page>:grammar:SequenceRule&noheader&nofooter}}
+#+html: {{page>:grammar:SequenceRule&noheader&nofooter}}
 
 
 ** UpdateRule
@@ -286,7 +289,7 @@ SequenceRule ::= "{|" Rules "|}"
 UpdateRule ::= DirectCallExpression ":=" Term
 #+end_src
 
-{{page>:grammar:UpdateRule&noheader&nofooter}}
+#+html: {{page>:grammar:UpdateRule&noheader&nofooter}}
 
 
 ** CallRule
@@ -295,7 +298,7 @@ UpdateRule ::= DirectCallExpression ":=" Term
 CallRule ::= CallExpression
 #+end_src
 
-{{page>:grammar:CallRule&noheader&nofooter}}
+#+html: {{page>:grammar:CallRule&noheader&nofooter}}
 
 
 ** WhileRule
@@ -304,7 +307,7 @@ CallRule ::= CallExpression
 WhileRule ::= "while" Term "do" Rule
 #+end_src
 
-{{page>:grammar:WhileRule&noheader&nofooter}}
+#+html: {{page>:grammar:WhileRule&noheader&nofooter}}
 
 
 ** Terms
@@ -314,7 +317,7 @@ Terms ::= Terms "," Term
         | Term
 #+end_src
 
-{{page>:grammar:Terms&noheader&nofooter}}
+#+html: {{page>:grammar:Terms&noheader&nofooter}}
 
 
 ** Term
@@ -331,7 +334,7 @@ Term ::= SimpleOrClaspedTerm
        | CardinalityExpression
 #+end_src
 
-{{page>:grammar:Term&noheader&nofooter}}
+#+html: {{page>:grammar:Term&noheader&nofooter}}
 
 
 ** SimpleOrClaspedTerm
@@ -345,7 +348,7 @@ SimpleOrClaspedTerm ::= "(" Term ")"
                       | "-" SimpleOrClaspedTerm
 #+end_src
 
-{{page>:grammar:SimpleOrClaspedTerm&noheader&nofooter}}
+#+html: {{page>:grammar:SimpleOrClaspedTerm&noheader&nofooter}}
 
 
 ** OperatorExpression
@@ -371,7 +374,7 @@ OperatorExpression ::= Term "+" Term
                      | "not" Term
 #+end_src
 
-{{page>:grammar:OperatorExpression&noheader&nofooter}}
+#+html: {{page>:grammar:OperatorExpression&noheader&nofooter}}
 
 
 ** CallExpression
@@ -382,7 +385,7 @@ CallExpression ::= DirectCallExpression
                  | IndirectCallExpression
 #+end_src
 
-{{page>:grammar:CallExpression&noheader&nofooter}}
+#+html: {{page>:grammar:CallExpression&noheader&nofooter}}
 
 
 ** DirectCallExpression
@@ -393,7 +396,7 @@ DirectCallExpression ::= IdentifierPath
                        | IdentifierPath "(" Terms ")"
 #+end_src
 
-{{page>:grammar:DirectCallExpression&noheader&nofooter}}
+#+html: {{page>:grammar:DirectCallExpression&noheader&nofooter}}
 
 
 ** MethodCallExpression
@@ -404,7 +407,7 @@ MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
                        | SimpleOrClaspedTerm "." Identifier "(" Terms ")"
 #+end_src
 
-{{page>:grammar:MethodCallExpression&noheader&nofooter}}
+#+html: {{page>:grammar:MethodCallExpression&noheader&nofooter}}
 
 
 ** LiteralCallExpression
@@ -413,7 +416,7 @@ MethodCallExpression ::= SimpleOrClaspedTerm "." Identifier
 LiteralCallExpression ::= SimpleOrClaspedTerm "." IntegerLiteral
 #+end_src
 
-{{page>:grammar:LiteralCallExpression&noheader&nofooter}}
+#+html: {{page>:grammar:LiteralCallExpression&noheader&nofooter}}
 
 
 ** IndirectCallExpression
@@ -423,7 +426,7 @@ IndirectCallExpression ::= CallExpression "(" ")"
                          | CallExpression "(" Terms ")"
 #+end_src
 
-{{page>:grammar:IndirectCallExpression&noheader&nofooter}}
+#+html: {{page>:grammar:IndirectCallExpression&noheader&nofooter}}
 
 
 ** TypeCastingExpression
@@ -432,7 +435,7 @@ IndirectCallExpression ::= CallExpression "(" ")"
 TypeCastingExpression ::= SimpleOrClaspedTerm "as" Type
 #+end_src
 
-{{page>:grammar:TypeCastingExpression&noheader&nofooter}}
+#+html: {{page>:grammar:TypeCastingExpression&noheader&nofooter}}
 
 
 ** LetExpression
@@ -441,7 +444,7 @@ TypeCastingExpression ::= SimpleOrClaspedTerm "as" Type
 LetExpression ::= "let" VariableBindings "in" Term
 #+end_src
 
-{{page>:grammar:LetExpression&noheader&nofooter}}
+#+html: {{page>:grammar:LetExpression&noheader&nofooter}}
 
 
 ** ConditionalExpression
@@ -450,7 +453,7 @@ LetExpression ::= "let" VariableBindings "in" Term
 ConditionalExpression ::= "if" Term "then" Term "else" Term
 #+end_src
 
-{{page>:grammar:ConditionalExpression&noheader&nofooter}}
+#+html: {{page>:grammar:ConditionalExpression&noheader&nofooter}}
 
 
 ** ChooseExpression
@@ -459,7 +462,7 @@ ConditionalExpression ::= "if" Term "then" Term "else" Term
 ChooseExpression ::= "choose" AttributedVariables "in" Term "do" Term
 #+end_src
 
-{{page>:grammar:ChooseExpression&noheader&nofooter}}
+#+html: {{page>:grammar:ChooseExpression&noheader&nofooter}}
 
 
 ** UniversalQuantifierExpression
@@ -468,7 +471,7 @@ ChooseExpression ::= "choose" AttributedVariables "in" Term "do" Term
 UniversalQuantifierExpression ::= "forall" AttributedVariables "in" Term "holds" Term
 #+end_src
 
-{{page>:grammar:UniversalQuantifierExpression&noheader&nofooter}}
+#+html: {{page>:grammar:UniversalQuantifierExpression&noheader&nofooter}}
 
 
 ** ExistentialQuantifierExpression
@@ -477,7 +480,7 @@ UniversalQuantifierExpression ::= "forall" AttributedVariables "in" Term "holds"
 ExistentialQuantifierExpression ::= "exists" AttributedVariables "in" Term "with" Term
 #+end_src
 
-{{page>:grammar:ExistentialQuantifierExpression&noheader&nofooter}}
+#+html: {{page>:grammar:ExistentialQuantifierExpression&noheader&nofooter}}
 
 
 ** CardinalityExpression
@@ -486,7 +489,7 @@ ExistentialQuantifierExpression ::= "exists" AttributedVariables "in" Term "with
 CardinalityExpression ::= "|" SimpleOrClaspedTerm "|"
 #+end_src
 
-{{page>:grammar:CardinalityExpression&noheader&nofooter}}
+#+html: {{page>:grammar:CardinalityExpression&noheader&nofooter}}
 
 
 ** Literal
@@ -506,7 +509,7 @@ Literal ::= UndefinedLiteral
           | RecordLiteral
 #+end_src
 
-{{page>:grammar:Literal&noheader&nofooter}}
+#+html: {{page>:grammar:Literal&noheader&nofooter}}
 
 
 ** UndefinedLiteral
@@ -515,7 +518,7 @@ Literal ::= UndefinedLiteral
 UndefinedLiteral ::= "undef"
 #+end_src
 
-{{page>:grammar:UndefinedLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:UndefinedLiteral&noheader&nofooter}}
 
 
 ** BooleanLiteral
@@ -525,7 +528,7 @@ BooleanLiteral ::= "true"
                  | "false"
 #+end_src
 
-{{page>:grammar:BooleanLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:BooleanLiteral&noheader&nofooter}}
 
 
 ** IntegerLiteral
@@ -534,7 +537,7 @@ BooleanLiteral ::= "true"
 IntegerLiteral ::= "[0-9][0-9']*[0-9]*"
 #+end_src
 
-{{page>:grammar:IntegerLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:IntegerLiteral&noheader&nofooter}}
 
 
 ** RationalLiteral
@@ -543,7 +546,7 @@ IntegerLiteral ::= "[0-9][0-9']*[0-9]*"
 RationalLiteral ::= "0[rR][0-9][0-9']*[0-9]*(/[0-9][0-9']*[0-9]*)?"
 #+end_src
 
-{{page>:grammar:RationalLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:RationalLiteral&noheader&nofooter}}
 
 
 ** DecimalLiteral
@@ -552,7 +555,7 @@ RationalLiteral ::= "0[rR][0-9][0-9']*[0-9]*(/[0-9][0-9']*[0-9]*)?"
 DecimalLiteral ::= "0[xX][0-9a-fA-F][0-9a-fA-F']*[0-9a-fA-F]*"
 #+end_src
 
-{{page>:grammar:DecimalLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:DecimalLiteral&noheader&nofooter}}
 
 
 ** BinaryLiteral
@@ -562,7 +565,7 @@ BinaryLiteral ::= "0[bB][01][01']*[01]*"
                 | "0[xX][0-9a-fA-F][0-9a-fA-F']*[0-9a-fA-F]*"
 #+end_src
 
-{{page>:grammar:BinaryLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:BinaryLiteral&noheader&nofooter}}
 
 
 ** StringLiteral
@@ -571,7 +574,7 @@ BinaryLiteral ::= "0[bB][01][01']*[01]*"
 StringLiteral ::= '"'.*'"'
 #+end_src
 
-{{page>:grammar:StringLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:StringLiteral&noheader&nofooter}}
 
 
 ** ReferenceLiteral
@@ -580,7 +583,7 @@ StringLiteral ::= '"'.*'"'
 ReferenceLiteral ::= "@" IdentifierPath
 #+end_src
 
-{{page>:grammar:ReferenceLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:ReferenceLiteral&noheader&nofooter}}
 
 
 ** ListLiteral
@@ -590,7 +593,7 @@ ListLiteral ::= "[" "]"
               | "[" Terms "]"
 #+end_src
 
-{{page>:grammar:ListLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:ListLiteral&noheader&nofooter}}
 
 
 ** RangeLiteral
@@ -599,7 +602,7 @@ ListLiteral ::= "[" "]"
 RangeLiteral ::= "[" Term ".." Term "]"
 #+end_src
 
-{{page>:grammar:RangeLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:RangeLiteral&noheader&nofooter}}
 
 
 ** TupleLiteral
@@ -608,7 +611,7 @@ RangeLiteral ::= "[" Term ".." Term "]"
 TupleLiteral ::= "(" Terms "," Term ")"
 #+end_src
 
-{{page>:grammar:TupleLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:TupleLiteral&noheader&nofooter}}
 
 
 ** RecordLiteral
@@ -617,7 +620,7 @@ TupleLiteral ::= "(" Terms "," Term ")"
 RecordLiteral ::= "(" Assignments ")"
 #+end_src
 
-{{page>:grammar:RecordLiteral&noheader&nofooter}}
+#+html: {{page>:grammar:RecordLiteral&noheader&nofooter}}
 
 
 ** Assignments
@@ -627,7 +630,7 @@ Assignments ::= Assignments "," Assignment
               | Assignment
 #+end_src
 
-{{page>:grammar:Assignments&noheader&nofooter}}
+#+html: {{page>:grammar:Assignments&noheader&nofooter}}
 
 
 ** Assignment
@@ -636,7 +639,7 @@ Assignments ::= Assignments "," Assignment
 Assignment ::= Identifier ":" Term
 #+end_src
 
-{{page>:grammar:Assignment&noheader&nofooter}}
+#+html: {{page>:grammar:Assignment&noheader&nofooter}}
 
 
 ** Types
@@ -646,7 +649,7 @@ Types ::= Types "," Type
         | Type
 #+end_src
 
-{{page>:grammar:Types&noheader&nofooter}}
+#+html: {{page>:grammar:Types&noheader&nofooter}}
 
 
 ** Type
@@ -660,7 +663,7 @@ Type ::= BasicType
        | FixedSizedType
 #+end_src
 
-{{page>:grammar:Type&noheader&nofooter}}
+#+html: {{page>:grammar:Type&noheader&nofooter}}
 
 
 ** BasicType
@@ -669,7 +672,7 @@ Type ::= BasicType
 BasicType ::= IdentifierPath
 #+end_src
 
-{{page>:grammar:BasicType&noheader&nofooter}}
+#+html: {{page>:grammar:BasicType&noheader&nofooter}}
 
 
 ** TupleType
@@ -678,7 +681,7 @@ BasicType ::= IdentifierPath
 TupleType ::= "(" Types "," Type ")"
 #+end_src
 
-{{page>:grammar:TupleType&noheader&nofooter}}
+#+html: {{page>:grammar:TupleType&noheader&nofooter}}
 
 
 ** RecordType
@@ -687,7 +690,7 @@ TupleType ::= "(" Types "," Type ")"
 RecordType ::= "(" TypedVariables "," TypedVariable ")"
 #+end_src
 
-{{page>:grammar:RecordType&noheader&nofooter}}
+#+html: {{page>:grammar:RecordType&noheader&nofooter}}
 
 
 ** TemplateType
@@ -696,7 +699,7 @@ RecordType ::= "(" TypedVariables "," TypedVariable ")"
 TemplateType ::= IdentifierPath "<" Types ">"
 #+end_src
 
-{{page>:grammar:TemplateType&noheader&nofooter}}
+#+html: {{page>:grammar:TemplateType&noheader&nofooter}}
 
 
 ** RelationType
@@ -705,7 +708,7 @@ TemplateType ::= IdentifierPath "<" Types ">"
 RelationType ::= IdentifierPath "<" MaybeFunctionParameters "->" Type ">"
 #+end_src
 
-{{page>:grammar:RelationType&noheader&nofooter}}
+#+html: {{page>:grammar:RelationType&noheader&nofooter}}
 
 
 ** FixedSizedType
@@ -714,7 +717,7 @@ RelationType ::= IdentifierPath "<" MaybeFunctionParameters "->" Type ">"
 FixedSizedType ::= IdentifierPath "'" Term
 #+end_src
 
-{{page>:grammar:FixedSizedType&noheader&nofooter}}
+#+html: {{page>:grammar:FixedSizedType&noheader&nofooter}}
 
 
 ** FunctionParameters
@@ -724,7 +727,7 @@ FunctionParameters ::= FunctionParameters "*" Type
                      | Type
 #+end_src
 
-{{page>:grammar:FunctionParameters&noheader&nofooter}}
+#+html: {{page>:grammar:FunctionParameters&noheader&nofooter}}
 
 
 ** MaybeFunctionParameters
@@ -734,7 +737,7 @@ MaybeFunctionParameters ::= FunctionParameters
                           | null
 #+end_src
 
-{{page>:grammar:MaybeFunctionParameters&noheader&nofooter}}
+#+html: {{page>:grammar:MaybeFunctionParameters&noheader&nofooter}}
 
 
 ** Parameters
@@ -744,7 +747,7 @@ Parameters ::= Parameters "," TypedAttributedVariable
              | TypedAttributedVariable
 #+end_src
 
-{{page>:grammar:Parameters&noheader&nofooter}}
+#+html: {{page>:grammar:Parameters&noheader&nofooter}}
 
 
 ** MaybeDefined
@@ -754,7 +757,7 @@ MaybeDefined ::= "defined" "{" Term "}"
                | null
 #+end_src
 
-{{page>:grammar:MaybeDefined&noheader&nofooter}}
+#+html: {{page>:grammar:MaybeDefined&noheader&nofooter}}
 
 
 ** MaybeInitially
@@ -764,7 +767,7 @@ MaybeInitially ::= "initially" "{" Initializers "}"
                  | null
 #+end_src
 
-{{page>:grammar:MaybeInitially&noheader&nofooter}}
+#+html: {{page>:grammar:MaybeInitially&noheader&nofooter}}
 
 
 ** Initializers
@@ -774,7 +777,7 @@ Initializers ::= Initializers "," Initializer
                | Initializer
 #+end_src
 
-{{page>:grammar:Initializers&noheader&nofooter}}
+#+html: {{page>:grammar:Initializers&noheader&nofooter}}
 
 
 ** Initializer
@@ -785,7 +788,7 @@ Initializer ::= Term
               | TupleLiteral "->" Term
 #+end_src
 
-{{page>:grammar:Initializer&noheader&nofooter}}
+#+html: {{page>:grammar:Initializer&noheader&nofooter}}
 
 
 ** Identifier
@@ -795,7 +798,7 @@ Identifier ::= "[a-zA-Z_][a-zA-Z0-9_]*"
              | "in"
 #+end_src
 
-{{page>:grammar:Identifier&noheader&nofooter}}
+#+html: {{page>:grammar:Identifier&noheader&nofooter}}
 
 
 ** IdentifierPath
@@ -805,7 +808,7 @@ IdentifierPath ::= IdentifierPath "::" Identifier
                  | Identifier
 #+end_src
 
-{{page>:grammar:IdentifierPath&noheader&nofooter}}
+#+html: {{page>:grammar:IdentifierPath&noheader&nofooter}}
 
 
 ** Variable
@@ -815,7 +818,7 @@ Variable ::= TypedVariable
            | Identifier
 #+end_src
 
-{{page>:grammar:Variable&noheader&nofooter}}
+#+html: {{page>:grammar:Variable&noheader&nofooter}}
 
 
 ** AttributedVariables
@@ -825,7 +828,7 @@ AttributedVariables ::= AttributedVariables "," AttributedVariable
                       | AttributedVariable
 #+end_src
 
-{{page>:grammar:AttributedVariables&noheader&nofooter}}
+#+html: {{page>:grammar:AttributedVariables&noheader&nofooter}}
 
 
 ** TypedVariables
@@ -835,7 +838,7 @@ TypedVariables ::= TypedVariables "," TypedVariable
                  | TypedVariable
 #+end_src
 
-{{page>:grammar:TypedVariables&noheader&nofooter}}
+#+html: {{page>:grammar:TypedVariables&noheader&nofooter}}
 
 
 ** TypedVariable
@@ -844,7 +847,7 @@ TypedVariables ::= TypedVariables "," TypedVariable
 TypedVariable ::= Identifier ":" Type
 #+end_src
 
-{{page>:grammar:TypedVariable&noheader&nofooter}}
+#+html: {{page>:grammar:TypedVariable&noheader&nofooter}}
 
 
 ** AttributedVariable
@@ -854,7 +857,7 @@ AttributedVariable ::= Attributes Variable
                      | Variable
 #+end_src
 
-{{page>:grammar:AttributedVariable&noheader&nofooter}}
+#+html: {{page>:grammar:AttributedVariable&noheader&nofooter}}
 
 
 ** TypedAttributedVariable
@@ -864,7 +867,7 @@ TypedAttributedVariable ::= Attributes TypedVariable
                           | TypedVariable
 #+end_src
 
-{{page>:grammar:TypedAttributedVariable&noheader&nofooter}}
+#+html: {{page>:grammar:TypedAttributedVariable&noheader&nofooter}}
 
 
 ** VariableBindings
@@ -874,7 +877,7 @@ VariableBindings ::= VariableBindings "," VariableBinding
                    | VariableBinding
 #+end_src
 
-{{page>:grammar:VariableBindings&noheader&nofooter}}
+#+html: {{page>:grammar:VariableBindings&noheader&nofooter}}
 
 
 ** VariableBinding
@@ -883,7 +886,7 @@ VariableBindings ::= VariableBindings "," VariableBinding
 VariableBinding ::= AttributedVariable "=" Term
 #+end_src
 
-{{page>:grammar:VariableBinding&noheader&nofooter}}
+#+html: {{page>:grammar:VariableBinding&noheader&nofooter}}
 
 
 ** Attributes
@@ -893,7 +896,7 @@ Attributes ::= Attributes Attribute
              | Attribute
 #+end_src
 
-{{page>:grammar:Attributes&noheader&nofooter}}
+#+html: {{page>:grammar:Attributes&noheader&nofooter}}
 
 
 ** Attribute
@@ -903,7 +906,7 @@ Attribute ::= "[" BasicAttribute "]"
             | "[" ExpressionAttribute "]"
 #+end_src
 
-{{page>:grammar:Attribute&noheader&nofooter}}
+#+html: {{page>:grammar:Attribute&noheader&nofooter}}
 
 
 ** BasicAttribute
@@ -912,7 +915,7 @@ Attribute ::= "[" BasicAttribute "]"
 BasicAttribute ::= Identifier
 #+end_src
 
-{{page>:grammar:BasicAttribute&noheader&nofooter}}
+#+html: {{page>:grammar:BasicAttribute&noheader&nofooter}}
 
 
 ** ExpressionAttribute
@@ -921,5 +924,5 @@ BasicAttribute ::= Identifier
 ExpressionAttribute ::= Identifier Term
 #+end_src
 
-{{page>:grammar:ExpressionAttribute&noheader&nofooter}}
+#+html: {{page>:grammar:ExpressionAttribute&noheader&nofooter}}
 
