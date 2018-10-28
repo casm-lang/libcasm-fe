@@ -1,4 +1,4 @@
-// A Bison parser, made by GNU Bison 3.0.5.
+// A Bison parser, made by GNU Bison 3.1.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
@@ -40,7 +40,7 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 63 "../../obj/src/GrammarParser.yy" // lalr1.cc:379
+#line 63 "../../obj/src/GrammarParser.yy" // lalr1.cc:380
 
     namespace libcasm_fe
     {
@@ -60,7 +60,7 @@
 
     #define YY_NULLPTR nullptr
 
-#line 64 "GrammarParser.tab.h" // lalr1.cc:379
+#line 64 "GrammarParser.tab.h" // lalr1.cc:380
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -111,7 +111,7 @@
 # define YYUSE(E) /* empty */
 #endif
 
-#if defined __GNUC__ && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
+#if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
 # define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN \
     _Pragma ("GCC diagnostic push") \
@@ -130,14 +130,21 @@
 # define YY_INITIAL_VALUE(Value) /* Nothing. */
 #endif
 
+# ifndef YY_NULLPTR
+#  if defined __cplusplus && 201103L <= __cplusplus
+#   define YY_NULLPTR nullptr
+#  else
+#   define YY_NULLPTR 0
+#  endif
+# endif
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 1
 #endif
 
-#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:379
+#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:380
 namespace libcasm_fe {
-#line 141 "GrammarParser.tab.h" // lalr1.cc:379
+#line 148 "GrammarParser.tab.h" // lalr1.cc:380
 
 
 
@@ -154,7 +161,8 @@ namespace libcasm_fe {
 
     /// Empty construction.
     variant ()
-      : yytypeid_ (YY_NULLPTR)
+      : yybuffer_ ()
+      , yytypeid_ (YY_NULLPTR)
     {}
 
     /// Construct and fill.
@@ -180,7 +188,7 @@ namespace libcasm_fe {
       YYASSERT (!yytypeid_);
       YYASSERT (sizeof (T) <= S);
       yytypeid_ = & typeid (T);
-      return *new (yyas_<T> ()) T;
+      return *new (yyas_<T> ()) T ();
     }
 
     /// Instantiate a \a T in here from \a t.
@@ -199,6 +207,7 @@ namespace libcasm_fe {
     T&
     as ()
     {
+      YYASSERT (yytypeid_);
       YYASSERT (*yytypeid_ == typeid (T));
       YYASSERT (sizeof (T) <= S);
       return *yyas_<T> ();
@@ -209,6 +218,7 @@ namespace libcasm_fe {
     const T&
     as () const
     {
+      YYASSERT (yytypeid_);
       YYASSERT (*yytypeid_ == typeid (T));
       YYASSERT (sizeof (T) <= S);
       return *yyas_<T> ();
@@ -770,159 +780,159 @@ namespace libcasm_fe {
 
   basic_symbol (typename Base::kind_type t, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Ast::Token::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Ast::Token::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Attribute::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Attribute::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Attributes::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Attributes::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const BasicAttribute::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const BasicAttribute::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const BasicType::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const BasicType::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const BlockRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const BlockRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const CallExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const CallExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const CallRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const CallRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const CardinalityExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const CardinalityExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Case::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Case::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const CaseRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const CaseRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Cases::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Cases::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ChooseExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ChooseExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Defined::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Defined::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Definition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Definition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Definitions::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Definitions::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const DerivedDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const DerivedDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const DirectCallExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const DirectCallExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const EnumerationDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const EnumerationDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const EnumeratorDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const EnumeratorDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Enumerators::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Enumerators::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ExistentialQuantifierExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ExistentialQuantifierExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Expression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Expression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ExpressionAttribute::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ExpressionAttribute::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Expressions::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Expressions::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const FixedSizedType::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const FixedSizedType::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ForallRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ForallRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const FunctionDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const FunctionDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const HeaderDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const HeaderDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Identifier::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Identifier::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const IndirectCallExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const IndirectCallExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const InitDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const InitDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Initializer::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Initializer::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Initializers::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Initializers::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Initially::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Initially::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const InvariantDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const InvariantDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const IterateRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const IterateRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const LetExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const LetExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const LetRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const LetRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ListLiteral::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ListLiteral::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Literal::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Literal::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const LiteralCallExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const LiteralCallExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const MethodCallExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const MethodCallExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const NamedExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const NamedExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const NamedExpressions::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const NamedExpressions::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const RangeLiteral::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const RangeLiteral::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const RecordLiteral::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const RecordLiteral::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const RecordType::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const RecordType::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ReferenceLiteral::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ReferenceLiteral::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const RelationType::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const RelationType::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Rule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Rule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Rules::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Rules::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const SequenceRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const SequenceRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const SkipRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const SkipRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Specification::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Specification::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const TemplateType::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const TemplateType::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const TupleLiteral::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const TupleLiteral::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const TupleType::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const TupleType::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const TypeCastingExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const TypeCastingExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const Types::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const Types::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const UndefLiteral::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const UndefLiteral::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const UsingDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const UsingDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const ValueLiteral::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const ValueLiteral::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const VariableBinding::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const VariableBinding::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const VariableBindings::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const VariableBindings::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const VariableDefinitions::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const VariableDefinitions::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const WhileRule::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const WhileRule::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const libcasm_fe::Ast::Type::Ptr v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const libcasm_fe::Ast::Type::Ptr& v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const std::string& v, const location_type& l);
 
 
       /// Constructor for symbols with semantic value.
@@ -1389,8 +1399,8 @@ namespace libcasm_fe {
     /// \param yyvalue   the value to check
     static bool yy_table_value_is_error_ (int yyvalue);
 
-    static const short int yypact_ninf_;
-    static const short int yytable_ninf_;
+    static const short yypact_ninf_;
+    static const short yytable_ninf_;
 
     /// Convert a scanner token number \a t to a symbol number.
     static token_number_type yytranslate_ (token_type t);
@@ -1398,7 +1408,7 @@ namespace libcasm_fe {
     // Tables.
   // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
   // STATE-NUM.
-  static const short int yypact_[];
+  static const short yypact_[];
 
   // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
   // Performed when YYTABLE does not specify something else to do.  Zero
@@ -1406,17 +1416,17 @@ namespace libcasm_fe {
   static const unsigned char yydefact_[];
 
   // YYPGOTO[NTERM-NUM].
-  static const short int yypgoto_[];
+  static const short yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
-  static const short int yydefgoto_[];
+  static const short yydefgoto_[];
 
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
   // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const short int yytable_[];
+  static const short yytable_[];
 
-  static const short int yycheck_[];
+  static const short yycheck_[];
 
   // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
   // symbol of state STATE-NUM.
@@ -1437,7 +1447,7 @@ namespace libcasm_fe {
     static const char* const yytname_[];
 #if YYDEBUG
   // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-  static const unsigned short int yyrline_[];
+  static const unsigned short yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
     virtual void yy_reduce_print_ (int r);
     /// Print the state stack on the debug stream.
@@ -1502,7 +1512,7 @@ namespace libcasm_fe {
       typedef basic_symbol<by_state> super_type;
       /// Construct an empty symbol.
       stack_symbol_type ();
-      /// Copy construct.
+      /// Copy construct (for efficiency).
       stack_symbol_type (const stack_symbol_type& that);
       /// Steal the contents from \a sym to build this.
       stack_symbol_type (state_type s, symbol_type& sym);
@@ -1619,6 +1629,7 @@ namespace libcasm_fe {
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol ()
     : value ()
+    , location ()
   {}
 
   template <typename Base>
@@ -2455,544 +2466,543 @@ namespace libcasm_fe {
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const location_type& l)
     : Base (t)
-    , value ()
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Ast::Token::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Ast::Token::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Attribute::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Attribute::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Attributes::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Attributes::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BasicAttribute::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BasicAttribute::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BasicType::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BasicType::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BlockRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const BlockRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CallExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CallExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CallRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CallRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CardinalityExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CardinalityExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Case::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Case::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CaseRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const CaseRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Cases::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Cases::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ChooseExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ChooseExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ChooseRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ConditionalExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ConditionalRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Defined::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Defined::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Definition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Definition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Definitions::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Definitions::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const DerivedDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const DerivedDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const DirectCallExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const DirectCallExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const EnumerationDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const EnumerationDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const EnumeratorDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const EnumeratorDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Enumerators::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Enumerators::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExistentialQuantifierExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExistentialQuantifierExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Expression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Expression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExpressionAttribute::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ExpressionAttribute::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Expressions::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Expressions::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FixedSizedType::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FixedSizedType::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ForallRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ForallRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FunctionDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const FunctionDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const HeaderDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const HeaderDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Identifier::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Identifier::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IdentifierPath::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IndirectCallExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IndirectCallExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InitDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Initializer::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Initializer::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Initializers::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Initializers::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Initially::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Initially::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InvariantDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const InvariantDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IterateRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const IterateRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LetExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LetExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LetRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LetRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ListLiteral::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ListLiteral::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Literal::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Literal::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LiteralCallExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const LiteralCallExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const MethodCallExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const MethodCallExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const NamedExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const NamedExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const NamedExpressions::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const NamedExpressions::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RangeLiteral::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RangeLiteral::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RecordLiteral::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RecordLiteral::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RecordType::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RecordType::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ReferenceLiteral::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ReferenceLiteral::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RelationType::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RelationType::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Rule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Rule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const RuleDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Rules::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Rules::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SequenceRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SequenceRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SkipRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const SkipRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Specification::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Specification::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TemplateType::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TemplateType::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TupleLiteral::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TupleLiteral::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TupleType::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TupleType::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TypeCastingExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const TypeCastingExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Types::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const Types::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UndefLiteral::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UndefLiteral::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UniversalQuantifierExpression::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UpdateRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UsingDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const UsingDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ValueLiteral::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const ValueLiteral::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableBinding::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableBinding::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableBindings::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableBindings::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableDefinition::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableDefinitions::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const VariableDefinitions::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const WhileRule::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const WhileRule::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const libcasm_fe::Ast::Type::Ptr v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const libcasm_fe::Ast::Type::Ptr& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l)
+  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string& v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -3895,7 +3905,7 @@ namespace libcasm_fe {
     // YYTOKNUM[NUM] -- (External) token number corresponding to the
     // (internal) symbol number NUM (which must be that of a token).  */
     static
-    const unsigned short int
+    const unsigned short
     yytoken_number_[] =
     {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
@@ -4422,9 +4432,9 @@ namespace libcasm_fe {
   }
 
 
-#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:379
+#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:380
 } // libcasm_fe
-#line 4428 "GrammarParser.tab.h" // lalr1.cc:379
+#line 4438 "GrammarParser.tab.h" // lalr1.cc:380
 
 
 
