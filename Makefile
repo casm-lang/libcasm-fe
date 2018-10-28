@@ -66,10 +66,10 @@ YF  = -Wall -v -g -x
 GRAMMAR  = $(OBJ)/src/various/GrammarParser.cpp
 GRAMMAR += $(OBJ)/src/various/GrammarLexer.cpp
 GRAMMAR += $(OBJ)/src/various/GrammarToken.h
-GRAMMAR += src/various/Grammar.txt
+GRAMMAR += src/various/Grammar.org
 
 grammar: $(GRAMMAR)
-.PHONY: grammar src/various/Grammar.txt
+.PHONY: grammar src/various/Grammar.org
 
 
 %/src/various/GrammarLexer.cpp: src/various/GrammarLexer.cpp
@@ -104,8 +104,8 @@ src/various/GrammarParser.output: src/various/GrammarParser.cpp
 src/various/GrammarParser.dot:    src/various/GrammarParser.cpp
 src/various/GrammarParser.xml:    src/various/GrammarParser.cpp
 
-src/various/Grammar.txt: src/various/GrammarParser.xml src/GrammarLexer.l
-	@xsltproc ../stdhl/src/xsl/bison/xml2dw.xsl $< > $@
+src/various/Grammar.org: src/various/GrammarParser.xml src/GrammarLexer.l
+	@xsltproc ../stdhl/src/xsl/bison/xml2org.xsl $< > $@
 	@sed -i "/ error/d" $@
 	@sed -i "s/\"binary\"/\"`grep BINARY src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
 	@sed -i "s/\"hexadecimal\"/\"`grep HEXADECIMAL src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
