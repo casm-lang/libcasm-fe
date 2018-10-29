@@ -3,7 +3,7 @@
 
 * Syntax
 
-#+html: {{page>.:grammar:readme&noheader&nofooter}}
+#+html: {{page>.:grammar:README&noheader&nofooter}}
 
 ** Specification
 
