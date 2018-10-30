@@ -110,6 +110,33 @@ const Grammar::Span Span::kind( void ) const
     return m_kind;
 }
 
+std::string Span::kindName( void ) const
+{
+    switch( kind() )
+    {
+        case Grammar::Span::SPACE:
+        {
+            return "space";
+        }
+        case Grammar::Span::NEWLINE:
+        {
+            return "newline";
+        }
+        case Grammar::Span::TABULATOR:
+        {
+            return "tabulator";
+        }
+        case Grammar::Span::INLINE_COMMENT:
+        {
+            return "inline comment";
+        }
+        case Grammar::Span::BLOCK_COMMENT:
+        {
+            return "block comment";
+        }
+    }
+}
+
 const std::size_t Span::length( void ) const
 {
     return m_length;
