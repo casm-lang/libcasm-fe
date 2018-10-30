@@ -58,7 +58,7 @@ Definition ::= InitDefinition
              | ImportDefinition
              | StructureDefinition
              | FeatureDefinition
-             | ImplementationDefinition
+             | ImplementDefinition
 #+end_src
 
 #+html: {{page>.:grammar:Definition&noheader&nofooter}}
@@ -184,7 +184,7 @@ StructureDefinition ::= "structure" Identifier "=" "{" StructureDefinitionList "
 ** StructureDefinitionElement
 
 #+begin_src
-StructureDefinitionElement ::= "[" Attributes "]" FunctionDefinition
+StructureDefinitionElement ::= Attributes FunctionDefinition
                              | FunctionDefinition
 #+end_src
 
@@ -213,11 +213,11 @@ FeatureDefinition ::= "feature" Identifier "=" "{" FeatureDefinitionList "}"
 ** FeatureDefinitionElement
 
 #+begin_src
-FeatureDefinitionElement ::= "[" Attributes "]" Declaration
+FeatureDefinitionElement ::= Attributes Declaration
                            | Declaration
-                           | "[" Attributes "]" DerivedDefinition
+                           | Attributes DerivedDefinition
                            | DerivedDefinition
-                           | "[" Attributes "]" RuleDefinition
+                           | Attributes RuleDefinition
                            | RuleDefinition
 #+end_src
 
@@ -234,36 +234,36 @@ FeatureDefinitionList ::= FeatureDefinitionList FeatureDefinitionElement
 #+html: {{page>.:grammar:FeatureDefinitionList&noheader&nofooter}}
 
 
-** ImplementationDefinition
+** ImplementDefinition
 
 #+begin_src
-ImplementationDefinition ::= "implements" IdentifierPath "for" Identifier "=" "{" ImplementationDefinitionList "}"
-                           | "implements" Identifier "=" "{" ImplementationDefinitionList "}"
+ImplementDefinition ::= "implement" IdentifierPath "for" Identifier "=" "{" ImplementDefinitionList "}"
+                      | "implement" Identifier "=" "{" ImplementDefinitionList "}"
 #+end_src
 
-#+html: {{page>.:grammar:ImplementationDefinition&noheader&nofooter}}
+#+html: {{page>.:grammar:ImplementDefinition&noheader&nofooter}}
 
 
-** ImplementationDefinitionElement
+** ImplementDefinitionElement
 
 #+begin_src
-ImplementationDefinitionElement ::= "[" Attributes "]" DerivedDefinition
-                                  | DerivedDefinition
-                                  | "[" Attributes "]" RuleDefinition
-                                  | RuleDefinition
+ImplementDefinitionElement ::= Attributes DerivedDefinition
+                             | DerivedDefinition
+                             | Attributes RuleDefinition
+                             | RuleDefinition
 #+end_src
 
-#+html: {{page>.:grammar:ImplementationDefinitionElement&noheader&nofooter}}
+#+html: {{page>.:grammar:ImplementDefinitionElement&noheader&nofooter}}
 
 
-** ImplementationDefinitionList
+** ImplementDefinitionList
 
 #+begin_src
-ImplementationDefinitionList ::= ImplementationDefinitionList ImplementationDefinitionElement
-                               | ImplementationDefinitionElement
+ImplementDefinitionList ::= ImplementDefinitionList ImplementDefinitionElement
+                          | ImplementDefinitionElement
 #+end_src
 
-#+html: {{page>.:grammar:ImplementationDefinitionList&noheader&nofooter}}
+#+html: {{page>.:grammar:ImplementDefinitionList&noheader&nofooter}}
 
 
 ** Declaration

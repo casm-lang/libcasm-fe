@@ -427,7 +427,7 @@ namespace libcasm_fe {
       // "import"
       // "structure"
       // "feature"
-      // "implements"
+      // "implement"
       // "for"
       // "this"
       // "function"
@@ -551,12 +551,12 @@ namespace libcasm_fe {
       // AttributedDefinition
       // Definition
       // FeatureDefinitionElement
-      // ImplementationDefinitionElement
+      // ImplementDefinitionElement
       char dummy19[sizeof (Definition::Ptr)];
 
       // Definitions
       // FeatureDefinitionList
-      // ImplementationDefinitionList
+      // ImplementDefinitionList
       char dummy20[sizeof (Definitions::Ptr)];
 
       // DerivedDefinition
@@ -617,8 +617,8 @@ namespace libcasm_fe {
       // IdentifierPath
       char dummy37[sizeof (IdentifierPath::Ptr)];
 
-      // ImplementationDefinition
-      char dummy38[sizeof (ImplementationDefinition::Ptr)];
+      // ImplementDefinition
+      char dummy38[sizeof (ImplementDefinition::Ptr)];
 
       // ImportDefinition
       char dummy39[sizeof (ImportDefinition::Ptr)];
@@ -839,7 +839,7 @@ namespace libcasm_fe {
     IMPORT = 265,                  // "import"
     STRUCTURE = 266,               // "structure"
     FEATURE = 267,                 // "feature"
-    IMPLEMENTS = 268,              // "implements"
+    IMPLEMENT = 268,               // "implement"
     FOR = 269,                     // "for"
     THIS = 270,                    // "this"
     FUNCTION = 271,                // "function"
@@ -950,7 +950,7 @@ namespace libcasm_fe {
         S_IMPORT = 10,                           // "import"
         S_STRUCTURE = 11,                        // "structure"
         S_FEATURE = 12,                          // "feature"
-        S_IMPLEMENTS = 13,                       // "implements"
+        S_IMPLEMENT = 13,                        // "implement"
         S_FOR = 14,                              // "for"
         S_THIS = 15,                             // "this"
         S_FUNCTION = 16,                         // "function"
@@ -1053,9 +1053,9 @@ namespace libcasm_fe {
         S_FeatureDefinition = 113,               // FeatureDefinition
         S_FeatureDefinitionElement = 114,        // FeatureDefinitionElement
         S_FeatureDefinitionList = 115,           // FeatureDefinitionList
-        S_ImplementationDefinition = 116,        // ImplementationDefinition
-        S_ImplementationDefinitionElement = 117, // ImplementationDefinitionElement
-        S_ImplementationDefinitionList = 118,    // ImplementationDefinitionList
+        S_ImplementDefinition = 116,             // ImplementDefinition
+        S_ImplementDefinitionElement = 117,      // ImplementDefinitionElement
+        S_ImplementDefinitionList = 118,         // ImplementDefinitionList
         S_Declaration = 119,                     // Declaration
         S_Rules = 120,                           // Rules
         S_Rule = 121,                            // Rule
@@ -1184,7 +1184,7 @@ namespace libcasm_fe {
       case symbol_kind::S_IMPORT: // "import"
       case symbol_kind::S_STRUCTURE: // "structure"
       case symbol_kind::S_FEATURE: // "feature"
-      case symbol_kind::S_IMPLEMENTS: // "implements"
+      case symbol_kind::S_IMPLEMENT: // "implement"
       case symbol_kind::S_FOR: // "for"
       case symbol_kind::S_THIS: // "this"
       case symbol_kind::S_FUNCTION: // "function"
@@ -1326,13 +1326,13 @@ namespace libcasm_fe {
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
       case symbol_kind::S_FeatureDefinitionElement: // FeatureDefinitionElement
-      case symbol_kind::S_ImplementationDefinitionElement: // ImplementationDefinitionElement
+      case symbol_kind::S_ImplementDefinitionElement: // ImplementDefinitionElement
         value.move< Definition::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_Definitions: // Definitions
       case symbol_kind::S_FeatureDefinitionList: // FeatureDefinitionList
-      case symbol_kind::S_ImplementationDefinitionList: // ImplementationDefinitionList
+      case symbol_kind::S_ImplementDefinitionList: // ImplementDefinitionList
         value.move< Definitions::Ptr > (std::move (that.value));
         break;
 
@@ -1411,8 +1411,8 @@ namespace libcasm_fe {
         value.move< IdentifierPath::Ptr > (std::move (that.value));
         break;
 
-      case symbol_kind::S_ImplementationDefinition: // ImplementationDefinition
-        value.move< ImplementationDefinition::Ptr > (std::move (that.value));
+      case symbol_kind::S_ImplementDefinition: // ImplementDefinition
+        value.move< ImplementDefinition::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_ImportDefinition: // ImportDefinition
@@ -2163,13 +2163,13 @@ namespace libcasm_fe {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, ImplementationDefinition::Ptr&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, ImplementDefinition::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const ImplementationDefinition::Ptr& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const ImplementDefinition::Ptr& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -2866,7 +2866,7 @@ switch (yykind)
       case symbol_kind::S_IMPORT: // "import"
       case symbol_kind::S_STRUCTURE: // "structure"
       case symbol_kind::S_FEATURE: // "feature"
-      case symbol_kind::S_IMPLEMENTS: // "implements"
+      case symbol_kind::S_IMPLEMENT: // "implement"
       case symbol_kind::S_FOR: // "for"
       case symbol_kind::S_THIS: // "this"
       case symbol_kind::S_FUNCTION: // "function"
@@ -3008,13 +3008,13 @@ switch (yykind)
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
       case symbol_kind::S_FeatureDefinitionElement: // FeatureDefinitionElement
-      case symbol_kind::S_ImplementationDefinitionElement: // ImplementationDefinitionElement
+      case symbol_kind::S_ImplementDefinitionElement: // ImplementDefinitionElement
         value.template destroy< Definition::Ptr > ();
         break;
 
       case symbol_kind::S_Definitions: // Definitions
       case symbol_kind::S_FeatureDefinitionList: // FeatureDefinitionList
-      case symbol_kind::S_ImplementationDefinitionList: // ImplementationDefinitionList
+      case symbol_kind::S_ImplementDefinitionList: // ImplementDefinitionList
         value.template destroy< Definitions::Ptr > ();
         break;
 
@@ -3093,8 +3093,8 @@ switch (yykind)
         value.template destroy< IdentifierPath::Ptr > ();
         break;
 
-      case symbol_kind::S_ImplementationDefinition: // ImplementationDefinition
-        value.template destroy< ImplementationDefinition::Ptr > ();
+      case symbol_kind::S_ImplementDefinition: // ImplementDefinition
+        value.template destroy< ImplementDefinition::Ptr > ();
         break;
 
       case symbol_kind::S_ImportDefinition: // ImportDefinition
@@ -3677,16 +3677,16 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_IMPLEMENTS (Ast::Token::Ptr v, location_type l)
+      make_IMPLEMENT (Ast::Token::Ptr v, location_type l)
       {
-        return symbol_type (token::IMPLEMENTS, std::move (v), std::move (l));
+        return symbol_type (token::IMPLEMENT, std::move (v), std::move (l));
       }
 #else
       static
       symbol_type
-      make_IMPLEMENTS (const Ast::Token::Ptr& v, const location_type& l)
+      make_IMPLEMENT (const Ast::Token::Ptr& v, const location_type& l)
       {
-        return symbol_type (token::IMPLEMENTS, v, l);
+        return symbol_type (token::IMPLEMENT, v, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -5204,7 +5204,7 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 2875,     ///< Last index in yytable_.
+      yylast_ = 2891,     ///< Last index in yytable_.
       yynnts_ = 108,  ///< Number of nonterminal symbols.
       yyfinal_ = 13 ///< Termination state number.
     };
@@ -5293,7 +5293,7 @@ switch (yykind)
       case symbol_kind::S_IMPORT: // "import"
       case symbol_kind::S_STRUCTURE: // "structure"
       case symbol_kind::S_FEATURE: // "feature"
-      case symbol_kind::S_IMPLEMENTS: // "implements"
+      case symbol_kind::S_IMPLEMENT: // "implement"
       case symbol_kind::S_FOR: // "for"
       case symbol_kind::S_THIS: // "this"
       case symbol_kind::S_FUNCTION: // "function"
@@ -5435,13 +5435,13 @@ switch (yykind)
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
       case symbol_kind::S_FeatureDefinitionElement: // FeatureDefinitionElement
-      case symbol_kind::S_ImplementationDefinitionElement: // ImplementationDefinitionElement
+      case symbol_kind::S_ImplementDefinitionElement: // ImplementDefinitionElement
         value.copy< Definition::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_Definitions: // Definitions
       case symbol_kind::S_FeatureDefinitionList: // FeatureDefinitionList
-      case symbol_kind::S_ImplementationDefinitionList: // ImplementationDefinitionList
+      case symbol_kind::S_ImplementDefinitionList: // ImplementDefinitionList
         value.copy< Definitions::Ptr > (YY_MOVE (that.value));
         break;
 
@@ -5520,8 +5520,8 @@ switch (yykind)
         value.copy< IdentifierPath::Ptr > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_ImplementationDefinition: // ImplementationDefinition
-        value.copy< ImplementationDefinition::Ptr > (YY_MOVE (that.value));
+      case symbol_kind::S_ImplementDefinition: // ImplementDefinition
+        value.copy< ImplementDefinition::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_ImportDefinition: // ImportDefinition
@@ -5769,7 +5769,7 @@ switch (yykind)
       case symbol_kind::S_IMPORT: // "import"
       case symbol_kind::S_STRUCTURE: // "structure"
       case symbol_kind::S_FEATURE: // "feature"
-      case symbol_kind::S_IMPLEMENTS: // "implements"
+      case symbol_kind::S_IMPLEMENT: // "implement"
       case symbol_kind::S_FOR: // "for"
       case symbol_kind::S_THIS: // "this"
       case symbol_kind::S_FUNCTION: // "function"
@@ -5911,13 +5911,13 @@ switch (yykind)
       case symbol_kind::S_AttributedDefinition: // AttributedDefinition
       case symbol_kind::S_Definition: // Definition
       case symbol_kind::S_FeatureDefinitionElement: // FeatureDefinitionElement
-      case symbol_kind::S_ImplementationDefinitionElement: // ImplementationDefinitionElement
+      case symbol_kind::S_ImplementDefinitionElement: // ImplementDefinitionElement
         value.move< Definition::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_Definitions: // Definitions
       case symbol_kind::S_FeatureDefinitionList: // FeatureDefinitionList
-      case symbol_kind::S_ImplementationDefinitionList: // ImplementationDefinitionList
+      case symbol_kind::S_ImplementDefinitionList: // ImplementDefinitionList
         value.move< Definitions::Ptr > (YY_MOVE (s.value));
         break;
 
@@ -5996,8 +5996,8 @@ switch (yykind)
         value.move< IdentifierPath::Ptr > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_ImplementationDefinition: // ImplementationDefinition
-        value.move< ImplementationDefinition::Ptr > (YY_MOVE (s.value));
+      case symbol_kind::S_ImplementDefinition: // ImplementDefinition
+        value.move< ImplementDefinition::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_ImportDefinition: // ImportDefinition

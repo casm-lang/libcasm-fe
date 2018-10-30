@@ -134,7 +134,7 @@
       <rule number="20" usefulness="useful">
         <lhs>Definition</lhs>
         <rhs>
-          <symbol>ImplementationDefinition</symbol>
+          <symbol>ImplementDefinition</symbol>
         </rhs>
       </rule>
       <rule number="21" usefulness="useful">
@@ -385,9 +385,7 @@
       <rule number="46" usefulness="useful">
         <lhs>StructureDefinitionElement</lhs>
         <rhs>
-          <symbol>&quot;[&quot;</symbol>
           <symbol>Attributes</symbol>
-          <symbol>&quot;]&quot;</symbol>
           <symbol>FunctionDefinition</symbol>
         </rhs>
       </rule>
@@ -424,9 +422,7 @@
       <rule number="51" usefulness="useful">
         <lhs>FeatureDefinitionElement</lhs>
         <rhs>
-          <symbol>&quot;[&quot;</symbol>
           <symbol>Attributes</symbol>
-          <symbol>&quot;]&quot;</symbol>
           <symbol>Declaration</symbol>
         </rhs>
       </rule>
@@ -439,9 +435,7 @@
       <rule number="53" usefulness="useful">
         <lhs>FeatureDefinitionElement</lhs>
         <rhs>
-          <symbol>&quot;[&quot;</symbol>
           <symbol>Attributes</symbol>
-          <symbol>&quot;]&quot;</symbol>
           <symbol>DerivedDefinition</symbol>
         </rhs>
       </rule>
@@ -454,9 +448,7 @@
       <rule number="55" usefulness="useful">
         <lhs>FeatureDefinitionElement</lhs>
         <rhs>
-          <symbol>&quot;[&quot;</symbol>
           <symbol>Attributes</symbol>
-          <symbol>&quot;]&quot;</symbol>
           <symbol>RuleDefinition</symbol>
         </rhs>
       </rule>
@@ -480,70 +472,66 @@
         </rhs>
       </rule>
       <rule number="59" usefulness="useful">
-        <lhs>ImplementationDefinition</lhs>
+        <lhs>ImplementDefinition</lhs>
         <rhs>
-          <symbol>&quot;implements&quot;</symbol>
+          <symbol>&quot;implement&quot;</symbol>
           <symbol>IdentifierPath</symbol>
           <symbol>&quot;for&quot;</symbol>
           <symbol>Identifier</symbol>
           <symbol>&quot;=&quot;</symbol>
           <symbol>&quot;{&quot;</symbol>
-          <symbol>ImplementationDefinitionList</symbol>
+          <symbol>ImplementDefinitionList</symbol>
           <symbol>&quot;}&quot;</symbol>
         </rhs>
       </rule>
       <rule number="60" usefulness="useful">
-        <lhs>ImplementationDefinition</lhs>
+        <lhs>ImplementDefinition</lhs>
         <rhs>
-          <symbol>&quot;implements&quot;</symbol>
+          <symbol>&quot;implement&quot;</symbol>
           <symbol>Identifier</symbol>
           <symbol>&quot;=&quot;</symbol>
           <symbol>&quot;{&quot;</symbol>
-          <symbol>ImplementationDefinitionList</symbol>
+          <symbol>ImplementDefinitionList</symbol>
           <symbol>&quot;}&quot;</symbol>
         </rhs>
       </rule>
       <rule number="61" usefulness="useful">
-        <lhs>ImplementationDefinitionElement</lhs>
+        <lhs>ImplementDefinitionElement</lhs>
         <rhs>
-          <symbol>&quot;[&quot;</symbol>
           <symbol>Attributes</symbol>
-          <symbol>&quot;]&quot;</symbol>
           <symbol>DerivedDefinition</symbol>
         </rhs>
       </rule>
       <rule number="62" usefulness="useful">
-        <lhs>ImplementationDefinitionElement</lhs>
+        <lhs>ImplementDefinitionElement</lhs>
         <rhs>
           <symbol>DerivedDefinition</symbol>
         </rhs>
       </rule>
       <rule number="63" usefulness="useful">
-        <lhs>ImplementationDefinitionElement</lhs>
+        <lhs>ImplementDefinitionElement</lhs>
         <rhs>
-          <symbol>&quot;[&quot;</symbol>
           <symbol>Attributes</symbol>
-          <symbol>&quot;]&quot;</symbol>
           <symbol>RuleDefinition</symbol>
         </rhs>
       </rule>
       <rule number="64" usefulness="useful">
-        <lhs>ImplementationDefinitionElement</lhs>
+        <lhs>ImplementDefinitionElement</lhs>
         <rhs>
           <symbol>RuleDefinition</symbol>
         </rhs>
       </rule>
       <rule number="65" usefulness="useful">
-        <lhs>ImplementationDefinitionList</lhs>
+        <lhs>ImplementDefinitionList</lhs>
         <rhs>
-          <symbol>ImplementationDefinitionList</symbol>
-          <symbol>ImplementationDefinitionElement</symbol>
+          <symbol>ImplementDefinitionList</symbol>
+          <symbol>ImplementDefinitionElement</symbol>
         </rhs>
       </rule>
       <rule number="66" usefulness="useful">
-        <lhs>ImplementationDefinitionList</lhs>
+        <lhs>ImplementDefinitionList</lhs>
         <rhs>
-          <symbol>ImplementationDefinitionElement</symbol>
+          <symbol>ImplementDefinitionElement</symbol>
         </rhs>
       </rule>
       <rule number="67" usefulness="useful">
@@ -2014,7 +2002,7 @@
       <terminal symbol-number="10" token-number="265" name="&quot;import&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
       <terminal symbol-number="11" token-number="266" name="&quot;structure&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
       <terminal symbol-number="12" token-number="267" name="&quot;feature&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
-      <terminal symbol-number="13" token-number="268" name="&quot;implements&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
+      <terminal symbol-number="13" token-number="268" name="&quot;implement&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
       <terminal symbol-number="14" token-number="269" name="&quot;for&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
       <terminal symbol-number="15" token-number="270" name="&quot;this&quot;" type="Ast::Token::Ptr" usefulness="unused-in-grammar"/>
       <terminal symbol-number="16" token-number="271" name="&quot;function&quot;" type="Ast::Token::Ptr" usefulness="useful"/>
@@ -2119,9 +2107,9 @@
       <nonterminal symbol-number="113" name="FeatureDefinition" type="FeatureDefinition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="114" name="FeatureDefinitionElement" type="Definition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="115" name="FeatureDefinitionList" type="Definitions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="116" name="ImplementationDefinition" type="ImplementationDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="117" name="ImplementationDefinitionElement" type="Definition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="118" name="ImplementationDefinitionList" type="Definitions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="116" name="ImplementDefinition" type="ImplementDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="117" name="ImplementDefinitionElement" type="Definition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="118" name="ImplementDefinitionList" type="Definitions::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="119" name="Declaration" type="DeclarationDefinition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="120" name="Rules" type="Rules::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="121" name="Rule" type="Rule::Ptr" usefulness="useful"/>
@@ -2350,7 +2338,7 @@
           <transition type="shift" symbol="&quot;import&quot;" state="21"/>
           <transition type="shift" symbol="&quot;structure&quot;" state="22"/>
           <transition type="shift" symbol="&quot;feature&quot;" state="23"/>
-          <transition type="shift" symbol="&quot;implements&quot;" state="24"/>
+          <transition type="shift" symbol="&quot;implement&quot;" state="24"/>
           <transition type="shift" symbol="&quot;function&quot;" state="25"/>
           <transition type="shift" symbol="&quot;[&quot;" state="2"/>
           <transition type="goto" symbol="Definitions" state="26"/>
@@ -2367,7 +2355,7 @@
           <transition type="goto" symbol="ImportDefinition" state="37"/>
           <transition type="goto" symbol="StructureDefinition" state="38"/>
           <transition type="goto" symbol="FeatureDefinition" state="39"/>
-          <transition type="goto" symbol="ImplementationDefinition" state="40"/>
+          <transition type="goto" symbol="ImplementDefinition" state="40"/>
           <transition type="goto" symbol="Attributes" state="41"/>
           <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
@@ -2962,7 +2950,7 @@
           <transition type="shift" symbol="&quot;import&quot;" state="21"/>
           <transition type="shift" symbol="&quot;structure&quot;" state="22"/>
           <transition type="shift" symbol="&quot;feature&quot;" state="23"/>
-          <transition type="shift" symbol="&quot;implements&quot;" state="24"/>
+          <transition type="shift" symbol="&quot;implement&quot;" state="24"/>
           <transition type="shift" symbol="&quot;function&quot;" state="25"/>
           <transition type="shift" symbol="&quot;[&quot;" state="2"/>
           <transition type="goto" symbol="AttributedDefinition" state="114"/>
@@ -2978,7 +2966,7 @@
           <transition type="goto" symbol="ImportDefinition" state="37"/>
           <transition type="goto" symbol="StructureDefinition" state="38"/>
           <transition type="goto" symbol="FeatureDefinition" state="39"/>
-          <transition type="goto" symbol="ImplementationDefinition" state="40"/>
+          <transition type="goto" symbol="ImplementDefinition" state="40"/>
           <transition type="goto" symbol="Attributes" state="41"/>
           <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
@@ -3240,7 +3228,7 @@
           <transition type="shift" symbol="&quot;import&quot;" state="21"/>
           <transition type="shift" symbol="&quot;structure&quot;" state="22"/>
           <transition type="shift" symbol="&quot;feature&quot;" state="23"/>
-          <transition type="shift" symbol="&quot;implements&quot;" state="24"/>
+          <transition type="shift" symbol="&quot;implement&quot;" state="24"/>
           <transition type="shift" symbol="&quot;function&quot;" state="25"/>
           <transition type="shift" symbol="&quot;[&quot;" state="2"/>
           <transition type="goto" symbol="Definition" state="115"/>
@@ -3255,7 +3243,7 @@
           <transition type="goto" symbol="ImportDefinition" state="37"/>
           <transition type="goto" symbol="StructureDefinition" state="38"/>
           <transition type="goto" symbol="FeatureDefinition" state="39"/>
-          <transition type="goto" symbol="ImplementationDefinition" state="40"/>
+          <transition type="goto" symbol="ImplementDefinition" state="40"/>
           <transition type="goto" symbol="Attribute" state="43"/>
         </transitions>
         <errors/>
@@ -4654,7 +4642,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -4773,7 +4761,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -5255,7 +5243,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -5561,7 +5549,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
           </lookaheads>
@@ -5648,7 +5636,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
             <symbol>&quot;::&quot;</symbol>
@@ -5682,7 +5670,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
           </lookaheads>
@@ -5731,7 +5719,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
           </lookaheads>
@@ -6126,7 +6114,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -6240,7 +6228,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -6345,7 +6333,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -6727,7 +6715,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -12786,7 +12774,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -12916,7 +12904,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -13049,7 +13037,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -13184,7 +13172,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -13300,7 +13288,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -13433,7 +13421,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -13571,7 +13559,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -13704,7 +13692,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -13837,7 +13825,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -13962,7 +13950,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -14095,7 +14083,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -14228,7 +14216,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -14361,7 +14349,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -14502,7 +14490,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -14625,7 +14613,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -14761,7 +14749,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -14894,7 +14882,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -15162,7 +15150,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -15281,7 +15269,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -17831,7 +17819,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -17913,7 +17901,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -17986,7 +17974,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -18132,7 +18120,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
           </lookaheads>
@@ -18205,14 +18193,21 @@
         <item rule-number="47" dot="0"/>
         <item rule-number="48" dot="0"/>
         <item rule-number="49" dot="0"/>
+        <item rule-number="256" dot="0"/>
+        <item rule-number="257" dot="0"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;function&quot;" state="25"/>
-          <transition type="shift" symbol="&quot;[&quot;" state="368"/>
-          <transition type="goto" symbol="FunctionDefinition" state="369"/>
-          <transition type="goto" symbol="StructureDefinitionElement" state="370"/>
-          <transition type="goto" symbol="StructureDefinitionList" state="371"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="goto" symbol="FunctionDefinition" state="368"/>
+          <transition type="goto" symbol="StructureDefinitionElement" state="369"/>
+          <transition type="goto" symbol="StructureDefinitionList" state="370"/>
+          <transition type="goto" symbol="Attributes" state="371"/>
+          <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -18242,17 +18237,24 @@
         <item rule-number="58" dot="0"/>
         <item rule-number="67" dot="0"/>
         <item rule-number="68" dot="0"/>
+        <item rule-number="256" dot="0"/>
+        <item rule-number="257" dot="0"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;derived&quot;" state="372"/>
           <transition type="shift" symbol="&quot;rule&quot;" state="373"/>
-          <transition type="shift" symbol="&quot;[&quot;" state="374"/>
-          <transition type="goto" symbol="DerivedDefinition" state="375"/>
-          <transition type="goto" symbol="RuleDefinition" state="376"/>
-          <transition type="goto" symbol="FeatureDefinitionElement" state="377"/>
-          <transition type="goto" symbol="FeatureDefinitionList" state="378"/>
-          <transition type="goto" symbol="Declaration" state="379"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="goto" symbol="DerivedDefinition" state="374"/>
+          <transition type="goto" symbol="RuleDefinition" state="375"/>
+          <transition type="goto" symbol="FeatureDefinitionElement" state="376"/>
+          <transition type="goto" symbol="FeatureDefinitionList" state="377"/>
+          <transition type="goto" symbol="Declaration" state="378"/>
+          <transition type="goto" symbol="Attributes" state="379"/>
+          <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -18278,16 +18280,23 @@
         <item rule-number="64" dot="0"/>
         <item rule-number="65" dot="0"/>
         <item rule-number="66" dot="0"/>
+        <item rule-number="256" dot="0"/>
+        <item rule-number="257" dot="0"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;derived&quot;" state="16"/>
           <transition type="shift" symbol="&quot;rule&quot;" state="18"/>
-          <transition type="shift" symbol="&quot;[&quot;" state="380"/>
-          <transition type="goto" symbol="DerivedDefinition" state="381"/>
-          <transition type="goto" symbol="RuleDefinition" state="382"/>
-          <transition type="goto" symbol="ImplementationDefinitionElement" state="383"/>
-          <transition type="goto" symbol="ImplementationDefinitionList" state="384"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="goto" symbol="DerivedDefinition" state="380"/>
+          <transition type="goto" symbol="RuleDefinition" state="381"/>
+          <transition type="goto" symbol="ImplementDefinitionElement" state="382"/>
+          <transition type="goto" symbol="ImplementDefinitionList" state="383"/>
+          <transition type="goto" symbol="Attributes" state="384"/>
+          <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -18458,7 +18467,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -21558,27 +21567,6 @@
 
     <state number="368">
       <itemset>
-        <item rule-number="46" dot="1"/>
-        <item rule-number="256" dot="0"/>
-        <item rule-number="257" dot="0"/>
-        <item rule-number="258" dot="0"/>
-        <item rule-number="259" dot="0"/>
-        <item rule-number="260" dot="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
-          <transition type="goto" symbol="Attributes" state="437"/>
-          <transition type="goto" symbol="Attribute" state="6"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="369">
-      <itemset>
         <item rule-number="47" dot="1"/>
       </itemset>
       <actions>
@@ -21591,7 +21579,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="370">
+    <state number="369">
       <itemset>
         <item rule-number="49" dot="1"/>
       </itemset>
@@ -21605,21 +21593,50 @@
       <solved-conflicts/>
     </state>
 
-    <state number="371">
+    <state number="370">
       <itemset>
         <item rule-number="33" dot="0"/>
         <item rule-number="45" dot="5"/>
         <item rule-number="46" dot="0"/>
         <item rule-number="47" dot="0"/>
         <item rule-number="48" dot="1"/>
+        <item rule-number="256" dot="0"/>
+        <item rule-number="257" dot="0"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;function&quot;" state="25"/>
-          <transition type="shift" symbol="&quot;[&quot;" state="368"/>
-          <transition type="shift" symbol="&quot;}&quot;" state="438"/>
-          <transition type="goto" symbol="FunctionDefinition" state="369"/>
-          <transition type="goto" symbol="StructureDefinitionElement" state="439"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="shift" symbol="&quot;}&quot;" state="437"/>
+          <transition type="goto" symbol="FunctionDefinition" state="368"/>
+          <transition type="goto" symbol="StructureDefinitionElement" state="438"/>
+          <transition type="goto" symbol="Attributes" state="371"/>
+          <transition type="goto" symbol="Attribute" state="6"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="371">
+      <itemset>
+        <item rule-number="33" dot="0"/>
+        <item rule-number="46" dot="1"/>
+        <item rule-number="256" dot="1"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="&quot;function&quot;" state="25"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="goto" symbol="FunctionDefinition" state="439"/>
+          <transition type="goto" symbol="Attribute" state="43"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21674,29 +21691,6 @@
 
     <state number="374">
       <itemset>
-        <item rule-number="51" dot="1"/>
-        <item rule-number="53" dot="1"/>
-        <item rule-number="55" dot="1"/>
-        <item rule-number="256" dot="0"/>
-        <item rule-number="257" dot="0"/>
-        <item rule-number="258" dot="0"/>
-        <item rule-number="259" dot="0"/>
-        <item rule-number="260" dot="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
-          <transition type="goto" symbol="Attributes" state="442"/>
-          <transition type="goto" symbol="Attribute" state="6"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="375">
-      <itemset>
         <item rule-number="54" dot="1"/>
       </itemset>
       <actions>
@@ -21709,7 +21703,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="376">
+    <state number="375">
       <itemset>
         <item rule-number="56" dot="1"/>
       </itemset>
@@ -21723,7 +21717,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="377">
+    <state number="376">
       <itemset>
         <item rule-number="58" dot="1"/>
       </itemset>
@@ -21737,7 +21731,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="378">
+    <state number="377">
       <itemset>
         <item rule-number="24" dot="0"/>
         <item rule-number="25" dot="0"/>
@@ -21758,17 +21752,24 @@
         <item rule-number="57" dot="1"/>
         <item rule-number="67" dot="0"/>
         <item rule-number="68" dot="0"/>
+        <item rule-number="256" dot="0"/>
+        <item rule-number="257" dot="0"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;derived&quot;" state="372"/>
           <transition type="shift" symbol="&quot;rule&quot;" state="373"/>
-          <transition type="shift" symbol="&quot;[&quot;" state="374"/>
-          <transition type="shift" symbol="&quot;}&quot;" state="443"/>
-          <transition type="goto" symbol="DerivedDefinition" state="375"/>
-          <transition type="goto" symbol="RuleDefinition" state="376"/>
-          <transition type="goto" symbol="FeatureDefinitionElement" state="444"/>
-          <transition type="goto" symbol="Declaration" state="379"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="shift" symbol="&quot;}&quot;" state="442"/>
+          <transition type="goto" symbol="DerivedDefinition" state="374"/>
+          <transition type="goto" symbol="RuleDefinition" state="375"/>
+          <transition type="goto" symbol="FeatureDefinitionElement" state="443"/>
+          <transition type="goto" symbol="Declaration" state="378"/>
+          <transition type="goto" symbol="Attributes" state="379"/>
+          <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21776,7 +21777,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="379">
+    <state number="378">
       <itemset>
         <item rule-number="52" dot="1"/>
       </itemset>
@@ -21790,21 +21791,36 @@
       <solved-conflicts/>
     </state>
 
-    <state number="380">
+    <state number="379">
       <itemset>
-        <item rule-number="61" dot="1"/>
-        <item rule-number="63" dot="1"/>
-        <item rule-number="256" dot="0"/>
-        <item rule-number="257" dot="0"/>
+        <item rule-number="24" dot="0"/>
+        <item rule-number="25" dot="0"/>
+        <item rule-number="26" dot="0"/>
+        <item rule-number="27" dot="0"/>
+        <item rule-number="28" dot="0"/>
+        <item rule-number="29" dot="0"/>
+        <item rule-number="30" dot="0"/>
+        <item rule-number="31" dot="0"/>
+        <item rule-number="32" dot="0"/>
+        <item rule-number="51" dot="1"/>
+        <item rule-number="53" dot="1"/>
+        <item rule-number="55" dot="1"/>
+        <item rule-number="67" dot="0"/>
+        <item rule-number="68" dot="0"/>
+        <item rule-number="256" dot="1"/>
         <item rule-number="258" dot="0"/>
         <item rule-number="259" dot="0"/>
         <item rule-number="260" dot="0"/>
       </itemset>
       <actions>
         <transitions>
+          <transition type="shift" symbol="&quot;derived&quot;" state="372"/>
+          <transition type="shift" symbol="&quot;rule&quot;" state="373"/>
           <transition type="shift" symbol="&quot;[&quot;" state="2"/>
-          <transition type="goto" symbol="Attributes" state="445"/>
-          <transition type="goto" symbol="Attribute" state="6"/>
+          <transition type="goto" symbol="DerivedDefinition" state="444"/>
+          <transition type="goto" symbol="RuleDefinition" state="445"/>
+          <transition type="goto" symbol="Declaration" state="446"/>
+          <transition type="goto" symbol="Attribute" state="43"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21812,7 +21828,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="381">
+    <state number="380">
       <itemset>
         <item rule-number="62" dot="1"/>
       </itemset>
@@ -21826,7 +21842,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="382">
+    <state number="381">
       <itemset>
         <item rule-number="64" dot="1"/>
       </itemset>
@@ -21840,7 +21856,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="383">
+    <state number="382">
       <itemset>
         <item rule-number="66" dot="1"/>
       </itemset>
@@ -21854,7 +21870,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="384">
+    <state number="383">
       <itemset>
         <item rule-number="24" dot="0"/>
         <item rule-number="25" dot="0"/>
@@ -21871,16 +21887,56 @@
         <item rule-number="63" dot="0"/>
         <item rule-number="64" dot="0"/>
         <item rule-number="65" dot="1"/>
+        <item rule-number="256" dot="0"/>
+        <item rule-number="257" dot="0"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;derived&quot;" state="16"/>
           <transition type="shift" symbol="&quot;rule&quot;" state="18"/>
-          <transition type="shift" symbol="&quot;[&quot;" state="380"/>
-          <transition type="shift" symbol="&quot;}&quot;" state="446"/>
-          <transition type="goto" symbol="DerivedDefinition" state="381"/>
-          <transition type="goto" symbol="RuleDefinition" state="382"/>
-          <transition type="goto" symbol="ImplementationDefinitionElement" state="447"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="shift" symbol="&quot;}&quot;" state="447"/>
+          <transition type="goto" symbol="DerivedDefinition" state="380"/>
+          <transition type="goto" symbol="RuleDefinition" state="381"/>
+          <transition type="goto" symbol="ImplementDefinitionElement" state="448"/>
+          <transition type="goto" symbol="Attributes" state="384"/>
+          <transition type="goto" symbol="Attribute" state="6"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="384">
+      <itemset>
+        <item rule-number="24" dot="0"/>
+        <item rule-number="25" dot="0"/>
+        <item rule-number="26" dot="0"/>
+        <item rule-number="27" dot="0"/>
+        <item rule-number="28" dot="0"/>
+        <item rule-number="29" dot="0"/>
+        <item rule-number="30" dot="0"/>
+        <item rule-number="31" dot="0"/>
+        <item rule-number="32" dot="0"/>
+        <item rule-number="61" dot="1"/>
+        <item rule-number="63" dot="1"/>
+        <item rule-number="256" dot="1"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="&quot;derived&quot;" state="16"/>
+          <transition type="shift" symbol="&quot;rule&quot;" state="18"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="goto" symbol="DerivedDefinition" state="449"/>
+          <transition type="goto" symbol="RuleDefinition" state="450"/>
+          <transition type="goto" symbol="Attribute" state="43"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21894,7 +21950,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;{&quot;" state="448"/>
+          <transition type="shift" symbol="&quot;{&quot;" state="451"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -21927,7 +21983,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="449"/>
+          <transition type="goto" symbol="Type" state="452"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -21968,7 +22024,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="450"/>
+          <transition type="goto" symbol="Type" state="453"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -22104,7 +22160,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="451"/>
+          <transition type="goto" symbol="Term" state="454"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -22263,7 +22319,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="452"/>
+          <transition type="goto" symbol="Term" state="455"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -22422,7 +22478,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="453"/>
+          <transition type="goto" symbol="Term" state="456"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -22581,7 +22637,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="454"/>
+          <transition type="goto" symbol="Term" state="457"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -22674,7 +22730,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="455"/>
+          <transition type="goto" symbol="Type" state="458"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -22703,7 +22759,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
           <transition type="goto" symbol="Identifier" state="250"/>
-          <transition type="goto" symbol="TypedVariable" state="456"/>
+          <transition type="goto" symbol="TypedVariable" state="459"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -22718,8 +22774,8 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;,&quot;" state="457"/>
-          <transition type="shift" symbol="&quot;&gt;&quot;" state="458"/>
+          <transition type="shift" symbol="&quot;,&quot;" state="460"/>
+          <transition type="shift" symbol="&quot;&gt;&quot;" state="461"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -22760,7 +22816,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;-&gt;&quot;" state="459"/>
+          <transition type="shift" symbol="&quot;-&gt;&quot;" state="462"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -22800,7 +22856,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -22905,7 +22961,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;)&quot;" state="460"/>
+          <transition type="shift" symbol="&quot;)&quot;" state="463"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -22934,7 +22990,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;)&quot;" state="461"/>
+          <transition type="shift" symbol="&quot;)&quot;" state="464"/>
           <transition type="shift" symbol="&quot;,&quot;" state="204"/>
         </transitions>
         <errors/>
@@ -23063,7 +23119,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="462"/>
+          <transition type="goto" symbol="Term" state="465"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -23127,7 +23183,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="463"/>
+          <transition type="goto" symbol="Type" state="466"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -23168,7 +23224,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="464"/>
+          <transition type="goto" symbol="Type" state="467"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -23213,7 +23269,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
@@ -23299,7 +23355,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;[&quot;" state="2"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="EnumeratorDefinition" state="465"/>
+          <transition type="goto" symbol="EnumeratorDefinition" state="468"/>
           <transition type="goto" symbol="Identifier" state="339"/>
           <transition type="goto" symbol="Attributes" state="340"/>
           <transition type="goto" symbol="Attribute" state="6"/>
@@ -23522,7 +23578,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="466"/>
+          <transition type="goto" symbol="Rule" state="469"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -23607,7 +23663,7 @@
           <transition type="goto" symbol="RelationType" state="230"/>
           <transition type="goto" symbol="FixedSizedType" state="231"/>
           <transition type="goto" symbol="FunctionParameters" state="299"/>
-          <transition type="goto" symbol="MaybeFunctionParameters" state="467"/>
+          <transition type="goto" symbol="MaybeFunctionParameters" state="470"/>
           <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="232"/>
         </transitions>
@@ -23747,7 +23803,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="468"/>
+          <transition type="goto" symbol="Rule" state="471"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -23813,7 +23869,7 @@
           <transition type="shift" symbol="&quot;[&quot;" state="2"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
           <transition type="goto" symbol="Identifier" state="348"/>
-          <transition type="goto" symbol="AttributedLocalFunctionDefinition" state="469"/>
+          <transition type="goto" symbol="AttributedLocalFunctionDefinition" state="472"/>
           <transition type="goto" symbol="LocalFunctionDefinition" state="351"/>
           <transition type="goto" symbol="Attributes" state="352"/>
           <transition type="goto" symbol="Attribute" state="6"/>
@@ -23959,7 +24015,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="470"/>
+          <transition type="goto" symbol="Term" state="473"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -24118,7 +24174,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="471"/>
+          <transition type="goto" symbol="Term" state="474"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -24286,7 +24342,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="472"/>
+          <transition type="goto" symbol="Rule" state="475"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -24337,7 +24393,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;{&quot;" state="473"/>
+          <transition type="shift" symbol="&quot;{&quot;" state="476"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -24473,7 +24529,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="474"/>
+          <transition type="goto" symbol="Rule" state="477"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -24588,7 +24644,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -24693,7 +24749,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -24911,7 +24967,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="475"/>
+          <transition type="goto" symbol="Rule" state="478"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -24980,7 +25036,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="476"/>
+          <transition type="goto" symbol="Type" state="479"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -25124,7 +25180,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="477"/>
+          <transition type="goto" symbol="Rule" state="480"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -25193,7 +25249,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="478"/>
+          <transition type="goto" symbol="Type" state="481"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -25225,26 +25281,6 @@
 
     <state number="437">
       <itemset>
-        <item rule-number="46" dot="2"/>
-        <item rule-number="256" dot="1"/>
-        <item rule-number="258" dot="0"/>
-        <item rule-number="259" dot="0"/>
-        <item rule-number="260" dot="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
-          <transition type="shift" symbol="&quot;]&quot;" state="479"/>
-          <transition type="goto" symbol="Attribute" state="43"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="438">
-      <itemset>
         <item rule-number="45" dot="6"/>
       </itemset>
       <actions>
@@ -25257,7 +25293,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="439">
+    <state number="438">
       <itemset>
         <item rule-number="48" dot="2"/>
       </itemset>
@@ -25266,6 +25302,20 @@
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="48" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="439">
+      <itemset>
+        <item rule-number="46" dot="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="46" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
@@ -25281,7 +25331,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;(&quot;" state="171"/>
-          <transition type="shift" symbol="&quot;:&quot;" state="480"/>
+          <transition type="shift" symbol="&quot;:&quot;" state="482"/>
           <transition type="shift" symbol="&quot;-&gt;&quot;" state="172"/>
         </transitions>
         <errors/>
@@ -25304,7 +25354,7 @@
         <transitions>
           <transition type="shift" symbol="&quot;=&quot;" state="174"/>
           <transition type="shift" symbol="&quot;(&quot;" state="175"/>
-          <transition type="shift" symbol="&quot;:&quot;" state="481"/>
+          <transition type="shift" symbol="&quot;:&quot;" state="483"/>
           <transition type="shift" symbol="&quot;-&gt;&quot;" state="176"/>
         </transitions>
         <errors/>
@@ -25314,28 +25364,6 @@
     </state>
 
     <state number="442">
-      <itemset>
-        <item rule-number="51" dot="2"/>
-        <item rule-number="53" dot="2"/>
-        <item rule-number="55" dot="2"/>
-        <item rule-number="256" dot="1"/>
-        <item rule-number="258" dot="0"/>
-        <item rule-number="259" dot="0"/>
-        <item rule-number="260" dot="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
-          <transition type="shift" symbol="&quot;]&quot;" state="482"/>
-          <transition type="goto" symbol="Attribute" state="43"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="443">
       <itemset>
         <item rule-number="50" dot="6"/>
       </itemset>
@@ -25349,7 +25377,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="444">
+    <state number="443">
       <itemset>
         <item rule-number="57" dot="2"/>
       </itemset>
@@ -25363,28 +25391,49 @@
       <solved-conflicts/>
     </state>
 
-    <state number="445">
+    <state number="444">
       <itemset>
-        <item rule-number="61" dot="2"/>
-        <item rule-number="63" dot="2"/>
-        <item rule-number="256" dot="1"/>
-        <item rule-number="258" dot="0"/>
-        <item rule-number="259" dot="0"/>
-        <item rule-number="260" dot="0"/>
+        <item rule-number="53" dot="2"/>
       </itemset>
       <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
-          <transition type="shift" symbol="&quot;]&quot;" state="483"/>
-          <transition type="goto" symbol="Attribute" state="43"/>
-        </transitions>
+        <transitions/>
         <errors/>
-        <reductions/>
+        <reductions>
+          <reduction symbol="$default" rule="53" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="445">
+      <itemset>
+        <item rule-number="55" dot="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="55" enabled="true"/>
+        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
 
     <state number="446">
+      <itemset>
+        <item rule-number="51" dot="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="51" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="447">
       <itemset>
         <item rule-number="60" dot="6"/>
       </itemset>
@@ -25398,7 +25447,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="447">
+    <state number="448">
       <itemset>
         <item rule-number="65" dot="2"/>
       </itemset>
@@ -25412,7 +25461,35 @@
       <solved-conflicts/>
     </state>
 
-    <state number="448">
+    <state number="449">
+      <itemset>
+        <item rule-number="61" dot="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="61" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="450">
+      <itemset>
+        <item rule-number="63" dot="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="63" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="451">
       <itemset>
         <item rule-number="24" dot="0"/>
         <item rule-number="25" dot="0"/>
@@ -25430,16 +25507,23 @@
         <item rule-number="64" dot="0"/>
         <item rule-number="65" dot="0"/>
         <item rule-number="66" dot="0"/>
+        <item rule-number="256" dot="0"/>
+        <item rule-number="257" dot="0"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;derived&quot;" state="16"/>
           <transition type="shift" symbol="&quot;rule&quot;" state="18"/>
-          <transition type="shift" symbol="&quot;[&quot;" state="380"/>
-          <transition type="goto" symbol="DerivedDefinition" state="381"/>
-          <transition type="goto" symbol="RuleDefinition" state="382"/>
-          <transition type="goto" symbol="ImplementationDefinitionElement" state="383"/>
-          <transition type="goto" symbol="ImplementationDefinitionList" state="484"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="goto" symbol="DerivedDefinition" state="380"/>
+          <transition type="goto" symbol="RuleDefinition" state="381"/>
+          <transition type="goto" symbol="ImplementDefinitionElement" state="382"/>
+          <transition type="goto" symbol="ImplementDefinitionList" state="484"/>
+          <transition type="goto" symbol="Attributes" state="384"/>
+          <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -25447,7 +25531,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="449">
+    <state number="452">
       <itemset>
         <item rule-number="217" dot="3"/>
       </itemset>
@@ -25461,7 +25545,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="450">
+    <state number="453">
       <itemset>
         <item rule-number="33" dot="6"/>
         <item rule-number="223" dot="0"/>
@@ -25478,7 +25562,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;=&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
@@ -25499,7 +25583,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="451">
+    <state number="454">
       <itemset>
         <item rule-number="130" dot="1"/>
         <item rule-number="131" dot="1"/>
@@ -25531,7 +25615,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -25631,7 +25715,7 @@
       </solved-conflicts>
     </state>
 
-    <state number="452">
+    <state number="455">
       <itemset>
         <item rule-number="130" dot="1"/>
         <item rule-number="131" dot="1"/>
@@ -25663,7 +25747,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -25763,7 +25847,7 @@
       </solved-conflicts>
     </state>
 
-    <state number="453">
+    <state number="456">
       <itemset>
         <item rule-number="130" dot="1"/>
         <item rule-number="131" dot="1"/>
@@ -25795,7 +25879,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -25895,7 +25979,7 @@
       </solved-conflicts>
     </state>
 
-    <state number="454">
+    <state number="457">
       <itemset>
         <item rule-number="130" dot="1"/>
         <item rule-number="131" dot="1"/>
@@ -25927,7 +26011,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;defined&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
@@ -26027,7 +26111,7 @@
       </solved-conflicts>
     </state>
 
-    <state number="455">
+    <state number="458">
       <itemset>
         <item rule-number="203" dot="3">
           <lookaheads>
@@ -26048,7 +26132,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="456">
+    <state number="459">
       <itemset>
         <item rule-number="213" dot="4"/>
         <item rule-number="240" dot="3">
@@ -26069,7 +26153,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="457">
+    <state number="460">
       <itemset>
         <item rule-number="203" dot="2"/>
         <item rule-number="205" dot="0"/>
@@ -26110,7 +26194,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="458">
+    <state number="461">
       <itemset>
         <item rule-number="214" dot="4"/>
       </itemset>
@@ -26124,7 +26208,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="459">
+    <state number="462">
       <itemset>
         <item rule-number="205" dot="0"/>
         <item rule-number="206" dot="0"/>
@@ -26165,7 +26249,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="460">
+    <state number="463">
       <itemset>
         <item rule-number="158" dot="6"/>
       </itemset>
@@ -26179,7 +26263,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="461">
+    <state number="464">
       <itemset>
         <item rule-number="157" dot="6"/>
       </itemset>
@@ -26193,7 +26277,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="462">
+    <state number="465">
       <itemset>
         <item rule-number="130" dot="1"/>
         <item rule-number="131" dot="1"/>
@@ -26247,7 +26331,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="463">
+    <state number="466">
       <itemset>
         <item rule-number="26" dot="7"/>
       </itemset>
@@ -26261,7 +26345,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="464">
+    <state number="467">
       <itemset>
         <item rule-number="25" dot="7"/>
       </itemset>
@@ -26275,7 +26359,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="465">
+    <state number="468">
       <itemset>
         <item rule-number="37" dot="3"/>
       </itemset>
@@ -26289,7 +26373,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="466">
+    <state number="469">
       <itemset>
         <item rule-number="94" dot="4"/>
       </itemset>
@@ -26303,7 +26387,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="467">
+    <state number="470">
       <itemset>
         <item rule-number="255" dot="3"/>
       </itemset>
@@ -26317,7 +26401,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="468">
+    <state number="471">
       <itemset>
         <item rule-number="95" dot="4"/>
       </itemset>
@@ -26331,7 +26415,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="469">
+    <state number="472">
       <itemset>
         <item rule-number="250" dot="3"/>
       </itemset>
@@ -26345,7 +26429,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="470">
+    <state number="473">
       <itemset>
         <item rule-number="96" dot="4"/>
         <item rule-number="97" dot="4"/>
@@ -26395,7 +26479,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="471">
+    <state number="474">
       <itemset>
         <item rule-number="98" dot="4"/>
         <item rule-number="130" dot="1"/>
@@ -26443,7 +26527,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="472">
+    <state number="475">
       <itemset>
         <item rule-number="85" dot="4">
           <lookaheads>
@@ -26458,7 +26542,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;seq&quot;</symbol>
             <symbol>&quot;endseq&quot;</symbol>
@@ -26516,7 +26600,7 @@
       </solved-conflicts>
     </state>
 
-    <state number="473">
+    <state number="476">
       <itemset>
         <item rule-number="87" dot="4"/>
         <item rule-number="88" dot="4"/>
@@ -26686,7 +26770,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="474">
+    <state number="477">
       <itemset>
         <item rule-number="111" dot="4"/>
       </itemset>
@@ -26700,7 +26784,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="475">
+    <state number="478">
       <itemset>
         <item rule-number="31" dot="7"/>
       </itemset>
@@ -26714,7 +26798,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="476">
+    <state number="479">
       <itemset>
         <item rule-number="32" dot="7"/>
       </itemset>
@@ -26728,7 +26812,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="477">
+    <state number="480">
       <itemset>
         <item rule-number="29" dot="7"/>
       </itemset>
@@ -26742,7 +26826,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="478">
+    <state number="481">
       <itemset>
         <item rule-number="30" dot="7"/>
       </itemset>
@@ -26756,25 +26840,62 @@
       <solved-conflicts/>
     </state>
 
-    <state number="479">
+    <state number="482">
       <itemset>
-        <item rule-number="33" dot="0"/>
-        <item rule-number="46" dot="3"/>
+        <item rule-number="67" dot="3"/>
+        <item rule-number="205" dot="0"/>
+        <item rule-number="206" dot="0"/>
+        <item rule-number="207" dot="0"/>
+        <item rule-number="208" dot="0"/>
+        <item rule-number="209" dot="0"/>
+        <item rule-number="210" dot="0"/>
+        <item rule-number="211" dot="0"/>
+        <item rule-number="212" dot="0"/>
+        <item rule-number="213" dot="0"/>
+        <item rule-number="214" dot="0"/>
+        <item rule-number="215" dot="0"/>
+        <item rule-number="216" dot="0"/>
+        <item rule-number="217" dot="0"/>
+        <item rule-number="218" dot="0"/>
+        <item rule-number="219" dot="0"/>
+        <item rule-number="220" dot="0">
+          <lookaheads>
+            <symbol>&quot;-&gt;&quot;</symbol>
+          </lookaheads>
+        </item>
+        <item rule-number="232" dot="0"/>
+        <item rule-number="233" dot="0"/>
+        <item rule-number="234" dot="0"/>
+        <item rule-number="235" dot="0"/>
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;function&quot;" state="25"/>
-          <transition type="goto" symbol="FunctionDefinition" state="506"/>
+          <transition type="shift" symbol="&quot;in&quot;" state="8"/>
+          <transition type="shift" symbol="&quot;(&quot;" state="224"/>
+          <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
+          <transition type="goto" symbol="Type" state="298"/>
+          <transition type="goto" symbol="BasicType" state="226"/>
+          <transition type="goto" symbol="TupleType" state="227"/>
+          <transition type="goto" symbol="RecordType" state="228"/>
+          <transition type="goto" symbol="TemplateType" state="229"/>
+          <transition type="goto" symbol="RelationType" state="230"/>
+          <transition type="goto" symbol="FixedSizedType" state="231"/>
+          <transition type="goto" symbol="FunctionParameters" state="299"/>
+          <transition type="goto" symbol="MaybeFunctionParameters" state="506"/>
+          <transition type="goto" symbol="Identifier" state="96"/>
+          <transition type="goto" symbol="IdentifierPath" state="232"/>
         </transitions>
         <errors/>
-        <reductions/>
+        <reductions>
+          <reduction symbol="$default" rule="220" enabled="true"/>
+        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
 
-    <state number="480">
+    <state number="483">
       <itemset>
-        <item rule-number="67" dot="3"/>
+        <item rule-number="68" dot="3"/>
         <item rule-number="205" dot="0"/>
         <item rule-number="206" dot="0"/>
         <item rule-number="207" dot="0"/>
@@ -26825,117 +26946,6 @@
       <solved-conflicts/>
     </state>
 
-    <state number="481">
-      <itemset>
-        <item rule-number="68" dot="3"/>
-        <item rule-number="205" dot="0"/>
-        <item rule-number="206" dot="0"/>
-        <item rule-number="207" dot="0"/>
-        <item rule-number="208" dot="0"/>
-        <item rule-number="209" dot="0"/>
-        <item rule-number="210" dot="0"/>
-        <item rule-number="211" dot="0"/>
-        <item rule-number="212" dot="0"/>
-        <item rule-number="213" dot="0"/>
-        <item rule-number="214" dot="0"/>
-        <item rule-number="215" dot="0"/>
-        <item rule-number="216" dot="0"/>
-        <item rule-number="217" dot="0"/>
-        <item rule-number="218" dot="0"/>
-        <item rule-number="219" dot="0"/>
-        <item rule-number="220" dot="0">
-          <lookaheads>
-            <symbol>&quot;-&gt;&quot;</symbol>
-          </lookaheads>
-        </item>
-        <item rule-number="232" dot="0"/>
-        <item rule-number="233" dot="0"/>
-        <item rule-number="234" dot="0"/>
-        <item rule-number="235" dot="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;in&quot;" state="8"/>
-          <transition type="shift" symbol="&quot;(&quot;" state="224"/>
-          <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="298"/>
-          <transition type="goto" symbol="BasicType" state="226"/>
-          <transition type="goto" symbol="TupleType" state="227"/>
-          <transition type="goto" symbol="RecordType" state="228"/>
-          <transition type="goto" symbol="TemplateType" state="229"/>
-          <transition type="goto" symbol="RelationType" state="230"/>
-          <transition type="goto" symbol="FixedSizedType" state="231"/>
-          <transition type="goto" symbol="FunctionParameters" state="299"/>
-          <transition type="goto" symbol="MaybeFunctionParameters" state="508"/>
-          <transition type="goto" symbol="Identifier" state="96"/>
-          <transition type="goto" symbol="IdentifierPath" state="232"/>
-        </transitions>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="220" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="482">
-      <itemset>
-        <item rule-number="24" dot="0"/>
-        <item rule-number="25" dot="0"/>
-        <item rule-number="26" dot="0"/>
-        <item rule-number="27" dot="0"/>
-        <item rule-number="28" dot="0"/>
-        <item rule-number="29" dot="0"/>
-        <item rule-number="30" dot="0"/>
-        <item rule-number="31" dot="0"/>
-        <item rule-number="32" dot="0"/>
-        <item rule-number="51" dot="3"/>
-        <item rule-number="53" dot="3"/>
-        <item rule-number="55" dot="3"/>
-        <item rule-number="67" dot="0"/>
-        <item rule-number="68" dot="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;derived&quot;" state="372"/>
-          <transition type="shift" symbol="&quot;rule&quot;" state="373"/>
-          <transition type="goto" symbol="DerivedDefinition" state="509"/>
-          <transition type="goto" symbol="RuleDefinition" state="510"/>
-          <transition type="goto" symbol="Declaration" state="511"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="483">
-      <itemset>
-        <item rule-number="24" dot="0"/>
-        <item rule-number="25" dot="0"/>
-        <item rule-number="26" dot="0"/>
-        <item rule-number="27" dot="0"/>
-        <item rule-number="28" dot="0"/>
-        <item rule-number="29" dot="0"/>
-        <item rule-number="30" dot="0"/>
-        <item rule-number="31" dot="0"/>
-        <item rule-number="32" dot="0"/>
-        <item rule-number="61" dot="3"/>
-        <item rule-number="63" dot="3"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;derived&quot;" state="16"/>
-          <transition type="shift" symbol="&quot;rule&quot;" state="18"/>
-          <transition type="goto" symbol="DerivedDefinition" state="512"/>
-          <transition type="goto" symbol="RuleDefinition" state="513"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
     <state number="484">
       <itemset>
         <item rule-number="24" dot="0"/>
@@ -26953,16 +26963,23 @@
         <item rule-number="63" dot="0"/>
         <item rule-number="64" dot="0"/>
         <item rule-number="65" dot="1"/>
+        <item rule-number="256" dot="0"/>
+        <item rule-number="257" dot="0"/>
+        <item rule-number="258" dot="0"/>
+        <item rule-number="259" dot="0"/>
+        <item rule-number="260" dot="0"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;derived&quot;" state="16"/>
           <transition type="shift" symbol="&quot;rule&quot;" state="18"/>
-          <transition type="shift" symbol="&quot;[&quot;" state="380"/>
-          <transition type="shift" symbol="&quot;}&quot;" state="514"/>
-          <transition type="goto" symbol="DerivedDefinition" state="381"/>
-          <transition type="goto" symbol="RuleDefinition" state="382"/>
-          <transition type="goto" symbol="ImplementationDefinitionElement" state="447"/>
+          <transition type="shift" symbol="&quot;[&quot;" state="2"/>
+          <transition type="shift" symbol="&quot;}&quot;" state="508"/>
+          <transition type="goto" symbol="DerivedDefinition" state="380"/>
+          <transition type="goto" symbol="RuleDefinition" state="381"/>
+          <transition type="goto" symbol="ImplementDefinitionElement" state="448"/>
+          <transition type="goto" symbol="Attributes" state="384"/>
+          <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -26976,7 +26993,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;{&quot;" state="515"/>
+          <transition type="shift" symbol="&quot;{&quot;" state="509"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -27001,7 +27018,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
@@ -27010,8 +27027,8 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;=&quot;" state="516"/>
-          <transition type="goto" symbol="MaybeInitially" state="517"/>
+          <transition type="shift" symbol="&quot;=&quot;" state="510"/>
+          <transition type="goto" symbol="MaybeInitially" state="511"/>
         </transitions>
         <errors/>
         <reductions>
@@ -27069,7 +27086,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;&gt;&quot;" state="518"/>
+          <transition type="shift" symbol="&quot;&gt;&quot;" state="512"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -27197,7 +27214,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="519"/>
+          <transition type="goto" symbol="Term" state="513"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -27356,7 +27373,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="520"/>
+          <transition type="goto" symbol="Term" state="514"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -27420,7 +27437,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="521"/>
+          <transition type="goto" symbol="Type" state="515"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -27564,7 +27581,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="522"/>
+          <transition type="goto" symbol="Rule" state="516"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -27728,7 +27745,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="523"/>
+          <transition type="goto" symbol="Term" state="517"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -27895,7 +27912,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="524"/>
+          <transition type="goto" symbol="Rule" state="518"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -28067,7 +28084,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="525"/>
+          <transition type="goto" symbol="Rule" state="519"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -28117,7 +28134,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;}&quot;" state="526"/>
+          <transition type="shift" symbol="&quot;}&quot;" state="520"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -28131,7 +28148,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;:&quot;" state="527"/>
+          <transition type="shift" symbol="&quot;:&quot;" state="521"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -28145,7 +28162,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;:&quot;" state="528"/>
+          <transition type="shift" symbol="&quot;:&quot;" state="522"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -28269,7 +28286,7 @@
           <transition type="shift" symbol="&quot;-&quot;" state="55"/>
           <transition type="shift" symbol="&quot;(&quot;" state="56"/>
           <transition type="shift" symbol="&quot;[&quot;" state="57"/>
-          <transition type="shift" symbol="&quot;}&quot;" state="529"/>
+          <transition type="shift" symbol="&quot;}&quot;" state="523"/>
           <transition type="shift" symbol="&quot;_&quot;" state="500"/>
           <transition type="shift" symbol="&quot;|&quot;" state="58"/>
           <transition type="shift" symbol="&quot;@&quot;" state="59"/>
@@ -28280,7 +28297,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="CaseLabel" state="530"/>
+          <transition type="goto" symbol="CaseLabel" state="524"/>
           <transition type="goto" symbol="Term" state="503"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
@@ -28364,7 +28381,7 @@
           <transition type="shift" symbol="&quot;+&quot;" state="147"/>
           <transition type="shift" symbol="&quot;-&quot;" state="148"/>
           <transition type="shift" symbol="&quot;=&quot;" state="149"/>
-          <transition type="shift" symbol="&quot;:&quot;" state="531"/>
+          <transition type="shift" symbol="&quot;:&quot;" state="525"/>
           <transition type="shift" symbol="&quot;&lt;&quot;" state="150"/>
           <transition type="shift" symbol="&quot;&gt;&quot;" state="151"/>
           <transition type="shift" symbol="&quot;*&quot;" state="152"/>
@@ -28510,7 +28527,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="532"/>
+          <transition type="goto" symbol="Rule" state="526"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -28682,7 +28699,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="533"/>
+          <transition type="goto" symbol="Rule" state="527"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -28728,25 +28745,25 @@
 
     <state number="506">
       <itemset>
-        <item rule-number="46" dot="4"/>
+        <item rule-number="67" dot="4"/>
       </itemset>
       <actions>
-        <transitions/>
+        <transitions>
+          <transition type="shift" symbol="&quot;-&gt;&quot;" state="528"/>
+        </transitions>
         <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="46" enabled="true"/>
-        </reductions>
+        <reductions/>
       </actions>
       <solved-conflicts/>
     </state>
 
     <state number="507">
       <itemset>
-        <item rule-number="67" dot="4"/>
+        <item rule-number="68" dot="4"/>
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;-&gt;&quot;" state="534"/>
+          <transition type="shift" symbol="&quot;-&gt;&quot;" state="529"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -28755,90 +28772,6 @@
     </state>
 
     <state number="508">
-      <itemset>
-        <item rule-number="68" dot="4"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="&quot;-&gt;&quot;" state="535"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="509">
-      <itemset>
-        <item rule-number="53" dot="4"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="53" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="510">
-      <itemset>
-        <item rule-number="55" dot="4"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="55" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="511">
-      <itemset>
-        <item rule-number="51" dot="4"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="51" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="512">
-      <itemset>
-        <item rule-number="61" dot="4"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="61" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="513">
-      <itemset>
-        <item rule-number="63" dot="4"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="63" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="514">
       <itemset>
         <item rule-number="59" dot="8"/>
       </itemset>
@@ -28852,7 +28785,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="515">
+    <state number="509">
       <itemset>
         <item rule-number="114" dot="0"/>
         <item rule-number="115" dot="0"/>
@@ -28972,7 +28905,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Term" state="536"/>
+          <transition type="goto" symbol="Term" state="530"/>
           <transition type="goto" symbol="SimpleOrClaspedTerm" state="67"/>
           <transition type="goto" symbol="OperatorExpression" state="68"/>
           <transition type="goto" symbol="CallExpression" state="69"/>
@@ -29011,13 +28944,13 @@
       <solved-conflicts/>
     </state>
 
-    <state number="516">
+    <state number="510">
       <itemset>
         <item rule-number="225" dot="1"/>
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;{&quot;" state="537"/>
+          <transition type="shift" symbol="&quot;{&quot;" state="531"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -29025,7 +28958,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="517">
+    <state number="511">
       <itemset>
         <item rule-number="33" dot="8"/>
       </itemset>
@@ -29039,7 +28972,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="518">
+    <state number="512">
       <itemset>
         <item rule-number="215" dot="6"/>
       </itemset>
@@ -29053,7 +28986,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="519">
+    <state number="513">
       <itemset>
         <item rule-number="26" dot="9">
           <lookaheads>
@@ -29068,7 +29001,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
@@ -29120,7 +29053,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="520">
+    <state number="514">
       <itemset>
         <item rule-number="25" dot="9">
           <lookaheads>
@@ -29135,7 +29068,7 @@
             <symbol>&quot;import&quot;</symbol>
             <symbol>&quot;structure&quot;</symbol>
             <symbol>&quot;feature&quot;</symbol>
-            <symbol>&quot;implements&quot;</symbol>
+            <symbol>&quot;implement&quot;</symbol>
             <symbol>&quot;function&quot;</symbol>
             <symbol>&quot;[&quot;</symbol>
             <symbol>&quot;}&quot;</symbol>
@@ -29187,7 +29120,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="521">
+    <state number="515">
       <itemset>
         <item rule-number="223" dot="0"/>
         <item rule-number="224" dot="0">
@@ -29202,7 +29135,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="&quot;defined&quot;" state="485"/>
-          <transition type="goto" symbol="MaybeDefined" state="538"/>
+          <transition type="goto" symbol="MaybeDefined" state="532"/>
         </transitions>
         <errors/>
         <reductions>
@@ -29212,7 +29145,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="522">
+    <state number="516">
       <itemset>
         <item rule-number="96" dot="6"/>
       </itemset>
@@ -29226,7 +29159,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="523">
+    <state number="517">
       <itemset>
         <item rule-number="97" dot="6"/>
         <item rule-number="130" dot="1"/>
@@ -29249,7 +29182,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;do&quot;" state="539"/>
+          <transition type="shift" symbol="&quot;do&quot;" state="533"/>
           <transition type="shift" symbol="&quot;and&quot;" state="143"/>
           <transition type="shift" symbol="&quot;or&quot;" state="144"/>
           <transition type="shift" symbol="&quot;xor&quot;" state="145"/>
@@ -29274,7 +29207,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="524">
+    <state number="518">
       <itemset>
         <item rule-number="98" dot="6"/>
       </itemset>
@@ -29288,7 +29221,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="525">
+    <state number="519">
       <itemset>
         <item rule-number="86" dot="6"/>
       </itemset>
@@ -29302,7 +29235,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="526">
+    <state number="520">
       <itemset>
         <item rule-number="88" dot="6"/>
       </itemset>
@@ -29316,7 +29249,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="527">
+    <state number="521">
       <itemset>
         <item rule-number="71" dot="0"/>
         <item rule-number="72" dot="0"/>
@@ -29444,7 +29377,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="540"/>
+          <transition type="goto" symbol="Rule" state="534"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -29488,7 +29421,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="528">
+    <state number="522">
       <itemset>
         <item rule-number="71" dot="0"/>
         <item rule-number="72" dot="0"/>
@@ -29616,7 +29549,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="541"/>
+          <transition type="goto" symbol="Rule" state="535"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -29660,7 +29593,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="529">
+    <state number="523">
       <itemset>
         <item rule-number="87" dot="6"/>
       </itemset>
@@ -29674,7 +29607,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="530">
+    <state number="524">
       <itemset>
         <item rule-number="89" dot="2"/>
       </itemset>
@@ -29688,7 +29621,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="531">
+    <state number="525">
       <itemset>
         <item rule-number="71" dot="0"/>
         <item rule-number="72" dot="0"/>
@@ -29816,7 +29749,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="542"/>
+          <transition type="goto" symbol="Rule" state="536"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -29860,7 +29793,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="532">
+    <state number="526">
       <itemset>
         <item rule-number="32" dot="9"/>
       </itemset>
@@ -29874,7 +29807,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="533">
+    <state number="527">
       <itemset>
         <item rule-number="30" dot="9"/>
       </itemset>
@@ -29888,7 +29821,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="534">
+    <state number="528">
       <itemset>
         <item rule-number="67" dot="5"/>
         <item rule-number="205" dot="0"/>
@@ -29913,7 +29846,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="543"/>
+          <transition type="goto" symbol="Type" state="537"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -29929,7 +29862,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="535">
+    <state number="529">
       <itemset>
         <item rule-number="68" dot="5"/>
         <item rule-number="205" dot="0"/>
@@ -29954,7 +29887,7 @@
           <transition type="shift" symbol="&quot;in&quot;" state="8"/>
           <transition type="shift" symbol="&quot;(&quot;" state="224"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Type" state="544"/>
+          <transition type="goto" symbol="Type" state="538"/>
           <transition type="goto" symbol="BasicType" state="226"/>
           <transition type="goto" symbol="TupleType" state="227"/>
           <transition type="goto" symbol="RecordType" state="228"/>
@@ -29970,7 +29903,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="536">
+    <state number="530">
       <itemset>
         <item rule-number="130" dot="1"/>
         <item rule-number="131" dot="1"/>
@@ -30000,7 +29933,7 @@
           <transition type="shift" symbol="&quot;+&quot;" state="147"/>
           <transition type="shift" symbol="&quot;-&quot;" state="148"/>
           <transition type="shift" symbol="&quot;=&quot;" state="149"/>
-          <transition type="shift" symbol="&quot;}&quot;" state="545"/>
+          <transition type="shift" symbol="&quot;}&quot;" state="539"/>
           <transition type="shift" symbol="&quot;&lt;&quot;" state="150"/>
           <transition type="shift" symbol="&quot;&gt;&quot;" state="151"/>
           <transition type="shift" symbol="&quot;*&quot;" state="152"/>
@@ -30018,7 +29951,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="537">
+    <state number="531">
       <itemset>
         <item rule-number="114" dot="0"/>
         <item rule-number="115" dot="0"/>
@@ -30173,7 +30106,7 @@
           <transition type="goto" symbol="RecordLiteral" state="93"/>
           <transition type="goto" symbol="StructureLiteral" state="94"/>
           <transition type="goto" symbol="BasicType" state="95"/>
-          <transition type="goto" symbol="Initializers" state="546"/>
+          <transition type="goto" symbol="Initializers" state="540"/>
           <transition type="goto" symbol="Initializer" state="170"/>
           <transition type="goto" symbol="Identifier" state="96"/>
           <transition type="goto" symbol="IdentifierPath" state="97"/>
@@ -30184,7 +30117,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="538">
+    <state number="532">
       <itemset>
         <item rule-number="225" dot="0"/>
         <item rule-number="226" dot="0">
@@ -30197,8 +30130,8 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;=&quot;" state="516"/>
-          <transition type="goto" symbol="MaybeInitially" state="547"/>
+          <transition type="shift" symbol="&quot;=&quot;" state="510"/>
+          <transition type="goto" symbol="MaybeInitially" state="541"/>
         </transitions>
         <errors/>
         <reductions>
@@ -30208,7 +30141,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="539">
+    <state number="533">
       <itemset>
         <item rule-number="71" dot="0"/>
         <item rule-number="72" dot="0"/>
@@ -30336,7 +30269,7 @@
           <transition type="shift" symbol="&quot;decimal&quot;" state="64"/>
           <transition type="shift" symbol="&quot;string&quot;" state="65"/>
           <transition type="shift" symbol="&quot;identifier&quot;" state="9"/>
-          <transition type="goto" symbol="Rule" state="548"/>
+          <transition type="goto" symbol="Rule" state="542"/>
           <transition type="goto" symbol="SkipRule" state="270"/>
           <transition type="goto" symbol="ConditionalRule" state="271"/>
           <transition type="goto" symbol="CaseRule" state="272"/>
@@ -30380,7 +30313,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="540">
+    <state number="534">
       <itemset>
         <item rule-number="91" dot="3"/>
       </itemset>
@@ -30394,7 +30327,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="541">
+    <state number="535">
       <itemset>
         <item rule-number="92" dot="3"/>
       </itemset>
@@ -30408,7 +30341,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="542">
+    <state number="536">
       <itemset>
         <item rule-number="93" dot="3"/>
       </itemset>
@@ -30422,7 +30355,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="543">
+    <state number="537">
       <itemset>
         <item rule-number="67" dot="6"/>
       </itemset>
@@ -30436,7 +30369,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="544">
+    <state number="538">
       <itemset>
         <item rule-number="68" dot="6"/>
       </itemset>
@@ -30450,7 +30383,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="545">
+    <state number="539">
       <itemset>
         <item rule-number="223" dot="4"/>
       </itemset>
@@ -30464,14 +30397,14 @@
       <solved-conflicts/>
     </state>
 
-    <state number="546">
+    <state number="540">
       <itemset>
         <item rule-number="225" dot="3"/>
         <item rule-number="227" dot="1"/>
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="&quot;}&quot;" state="549"/>
+          <transition type="shift" symbol="&quot;}&quot;" state="543"/>
           <transition type="shift" symbol="&quot;,&quot;" state="247"/>
         </transitions>
         <errors/>
@@ -30480,7 +30413,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="547">
+    <state number="541">
       <itemset>
         <item rule-number="255" dot="7"/>
       </itemset>
@@ -30494,7 +30427,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="548">
+    <state number="542">
       <itemset>
         <item rule-number="97" dot="8"/>
       </itemset>
@@ -30508,7 +30441,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="549">
+    <state number="543">
       <itemset>
         <item rule-number="225" dot="4"/>
       </itemset>

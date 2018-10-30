@@ -66,7 +66,7 @@ namespace libcasm_fe
             /*  8 */ IMPORT,
             /*  9 */ STRUCTURE,
             /* 10 */ FEATURE,
-            /* 11 */ IMPLEMENTS,
+            /* 11 */ IMPLEMENT,
             /* 12 */ FOR,
             /* 13 */ THIS,
             /* 14 */ FUNCTION,
@@ -184,9 +184,9 @@ namespace libcasm_fe
                 {
                     return "feature";
                 }
-                case /* 11 */ Token::IMPLEMENTS:
+                case /* 11 */ Token::IMPLEMENT:
                 {
-                    return "implements";
+                    return "implement";
                 }
                 case /* 12 */ Token::FOR:
                 {
