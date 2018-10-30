@@ -53,6 +53,14 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
+static IdentifierPath::Ptr asIdentifierPath( const std::string& name )
+{
+    const auto identifier = std::make_shared< Identifier >( name );
+    return std::make_shared< IdentifierPath >( identifier );
+}
+
+static const auto unresolvedIdentifierPath = asIdentifierPath( "$unresolved$" );
+
 static const auto unresolvedToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 
 static const auto initDefinitionIdentifier = std::make_shared< Identifier >( "$init$" );
@@ -794,12 +802,41 @@ void FeatureDefinition::accept( Visitor& visitor )
 //
 
 ImplementDefinition::ImplementDefinition(
+    const Token::Ptr implementToken,
     const IdentifierPath::Ptr& feature,
+    const Token::Ptr forToken,
     const Identifier::Ptr& identifier,
-    const Definitions::Ptr& definitions )
+    const Token::Ptr assignmentToken,
+    const Token::Ptr leftBraceToken,
+    const Definitions::Ptr& definitions,
+    const Token::Ptr rightBraceToken )
 : Definition( Node::ID::IMPLEMENTATION_DEFINITION, identifier )
 , m_feature( feature )
 , m_definitions( definitions )
+, m_implementToken( implementToken )
+, m_forToken( forToken )
+, m_assignmentToken( assignmentToken )
+, m_leftBraceToken( leftBraceToken )
+, m_rightBraceToken( rightBraceToken )
+{
+}
+
+ImplementDefinition::ImplementDefinition(
+    const Token::Ptr implementToken,
+    const Identifier::Ptr& identifier,
+    const Token::Ptr assignmentToken,
+    const Token::Ptr leftBraceToken,
+    const Definitions::Ptr& definitions,
+    const Token::Ptr rightBraceToken )
+: ImplementDefinition(
+      implementToken,
+      unresolvedIdentifierPath,
+      unresolvedToken,
+      identifier,
+      assignmentToken,
+      leftBraceToken,
+      definitions,
+      rightBraceToken )
 {
 }
 
@@ -811,6 +848,31 @@ const IdentifierPath::Ptr& ImplementDefinition::feature( void ) const
 const Definitions::Ptr& ImplementDefinition::definitions( void ) const
 {
     return m_definitions;
+}
+
+const Token::Ptr ImplementDefinition::implementToken( void ) const
+{
+    return m_implementToken;
+}
+
+const Token::Ptr ImplementDefinition::forToken( void ) const
+{
+    return m_forToken;
+}
+
+const Token::Ptr ImplementDefinition::assignmentToken( void ) const
+{
+    return m_assignmentToken;
+}
+
+const Token::Ptr ImplementDefinition::leftBraceToken( void ) const
+{
+    return m_leftBraceToken;
+}
+
+const Token::Ptr ImplementDefinition::rightBraceToken( void ) const
+{
+    return m_rightBraceToken;
 }
 
 void ImplementDefinition::accept( Visitor& visitor )

@@ -700,13 +700,11 @@ FeatureDefinitionList
 ImplementDefinition
 : IMPLEMENT IdentifierPath FOR Identifier EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
   {
-      $$ = Ast::make< ImplementDefinition >( @$, $2, $4, $7 );
+      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6, $7, $8 );
   }
 | IMPLEMENT Identifier EQUAL LCURPAREN ImplementDefinitionList RCURPAREN
   {
-      const auto name = Ast::make< Identifier >( @$, "" );
-      const auto path = asIdentifierPath( name );
-      $$ = Ast::make< ImplementDefinition >( @$, path, $2, $5 );
+      $$ = Ast::make< ImplementDefinition >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 

@@ -500,19 +500,47 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< ImplementDefinition >;
 
             ImplementDefinition(
+                const Token::Ptr implementToken,
                 const IdentifierPath::Ptr& feature,
+                const Token::Ptr forToken,
                 const Identifier::Ptr& identifier,
-                const Definitions::Ptr& definitions );
+                const Token::Ptr assignmentToken,
+                const Token::Ptr leftBraceToken,
+                const Definitions::Ptr& definitions,
+                const Token::Ptr rightBraceToken );
+
+            ImplementDefinition(
+                const Token::Ptr implementToken,
+                const Identifier::Ptr& identifier,
+                const Token::Ptr assignmentToken,
+                const Token::Ptr leftBraceToken,
+                const Definitions::Ptr& definitions,
+                const Token::Ptr rightBraceToken );
 
             const IdentifierPath::Ptr& feature( void ) const;
 
             const Definitions::Ptr& definitions( void ) const;
+
+            const Token::Ptr implementToken( void ) const;
+
+            const Token::Ptr forToken( void ) const;
+
+            const Token::Ptr assignmentToken( void ) const;
+
+            const Token::Ptr leftBraceToken( void ) const;
+
+            const Token::Ptr rightBraceToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const IdentifierPath::Ptr m_feature;
             const Definitions::Ptr m_definitions;
+            const Token::Ptr m_implementToken;
+            const Token::Ptr m_forToken;
+            const Token::Ptr m_assignmentToken;
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
         };
 
         class DeclarationDefinition final : public Definition
