@@ -55,7 +55,7 @@ INVARIANT       "invariant"
 IMPORT          "import"
 STRUCTURE       "structure"
 FEATURE         "feature"
-IMPLEMENTS      "implements"
+IMPLEMENT       "implement"
 FOR             "for"
 THIS            "this"
 

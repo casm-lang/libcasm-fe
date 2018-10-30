@@ -790,10 +790,10 @@ void FeatureDefinition::accept( Visitor& visitor )
 
 //
 //
-// ImplementationDefinition
+// ImplementDefinition
 //
 
-ImplementationDefinition::ImplementationDefinition(
+ImplementDefinition::ImplementDefinition(
     const IdentifierPath::Ptr& feature,
     const Identifier::Ptr& identifier,
     const Definitions::Ptr& definitions )
@@ -803,17 +803,17 @@ ImplementationDefinition::ImplementationDefinition(
 {
 }
 
-const IdentifierPath::Ptr& ImplementationDefinition::feature( void ) const
+const IdentifierPath::Ptr& ImplementDefinition::feature( void ) const
 {
     return m_feature;
 }
 
-const Definitions::Ptr& ImplementationDefinition::definitions( void ) const
+const Definitions::Ptr& ImplementDefinition::definitions( void ) const
 {
     return m_definitions;
 }
 
-void ImplementationDefinition::accept( Visitor& visitor )
+void ImplementDefinition::accept( Visitor& visitor )
 {
     visitor.visit( *this );
 }

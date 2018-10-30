@@ -66,7 +66,7 @@ namespace libcasm_fe
         class ImportDefinition;
         class StructureDefinition;
         class FeatureDefinition;
-        class ImplementationDefinition;
+        class ImplementDefinition;
         class DeclarationDefinition;
 
         class UndefLiteral;
@@ -153,7 +153,7 @@ namespace libcasm_fe
             virtual void visit( ImportDefinition& node ) = 0;
             virtual void visit( StructureDefinition& node ) = 0;
             virtual void visit( FeatureDefinition& node ) = 0;
-            virtual void visit( ImplementationDefinition& node ) = 0;
+            virtual void visit( ImplementDefinition& node ) = 0;
             virtual void visit( DeclarationDefinition& node ) = 0;
 
             virtual void visit( UndefLiteral& node ) = 0;

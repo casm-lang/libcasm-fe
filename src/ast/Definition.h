@@ -494,12 +494,12 @@ namespace libcasm_fe
             const Token::Ptr m_rightBraceToken;
         };
 
-        class ImplementationDefinition final : public Definition
+        class ImplementDefinition final : public Definition
         {
           public:
-            using Ptr = std::shared_ptr< ImplementationDefinition >;
+            using Ptr = std::shared_ptr< ImplementDefinition >;
 
-            ImplementationDefinition(
+            ImplementDefinition(
                 const IdentifierPath::Ptr& feature,
                 const Identifier::Ptr& identifier,
                 const Definitions::Ptr& definitions );

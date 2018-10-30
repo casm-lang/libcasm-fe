@@ -229,7 +229,7 @@ void RecursiveVisitor::visit( FeatureDefinition& node )
     node.rightBraceToken()->accept( *this );
 }
 
-void RecursiveVisitor::visit( ImplementationDefinition& node )
+void RecursiveVisitor::visit( ImplementDefinition& node )
 {
     // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
     node.identifier()->accept( *this );
