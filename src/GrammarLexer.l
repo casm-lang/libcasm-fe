@@ -223,31 +223,7 @@ using namespace libcasm_fe;
 
 %%
 
-Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
-: yyFlexLexer( in, out )
-, m_log( log )
-, m_loc()
-, m_strbuf()
-, m_spans( std::make_shared <Spans> () )
-{
-}
 
-void Lexer::setFileName( const std::string& fileName )
-{
-    m_loc.begin.fileName = m_loc.end.fileName = std::make_shared< std::string >( fileName );
-}
-
-const Spans::Ptr& Lexer::fetchSpansAndReset( void )
-{
-    const auto currentSpans = m_spans;
-    m_spans = std::make_shared<Spans>();
-    return currentSpans;
-}
-
-void Lexer::LexerError( const char* msg )
-{
-    m_log.error( {m_loc}, msg, Code::SyntaxError );
-}
 
 //  
 //  Local variables:

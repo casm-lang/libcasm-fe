@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2018 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
@@ -41,43 +41,37 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_LEXER_H_
-#define _LIBCASM_FE_LEXER_H_
+#include "Lexer.h"
 
-#include <string>
+#include <libcasm-fe/Logger>
 
-#include <libcasm-fe/ast/Span>
-#include "various/FlexLexer.h"
-#include "various/GrammarParser.tab.h"
+using namespace libcasm_fe;
 
-namespace libcasm_fe
+Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
+: yyFlexLexer( in, out )
+, m_log( log )
+, m_loc()
+, m_strbuf()
+, m_spans( std::make_shared <Spans> () )
 {
-    class Logger;
-    class SourceLocation;
-
-    class Lexer : public yyFlexLexer
-    {
-      public:
-        Lexer( Logger& log, std::istream& in, std::ostream& out );
-
-        void setFileName( const std::string& fileName );
-
-        Parser::symbol_type nextToken();
-
-        Spans::Ptr fetchSpansAndReset( void );
-
-      protected:
-        void LexerError( const char* msg ) override;
-
-      private:
-        Logger& m_log;
-        SourceLocation m_loc;
-        std::string m_strbuf;
-        Spans::Ptr m_spans;
-    };
 }
 
-#endif  // _LIBCASM_FE_LEXER_H_
+void Lexer::setFileName( const std::string& fileName )
+{
+    m_loc.begin.fileName = m_loc.end.fileName = std::make_shared< std::string >( fileName );
+}
+
+Spans::Ptr Lexer::fetchSpansAndReset( void )
+{
+    const auto currentSpans = m_spans;
+    m_spans = std::make_shared<Spans>();
+    return currentSpans;
+}
+
+void Lexer::LexerError( const char* msg )
+{
+    m_log.error( {m_loc}, msg, Code::SyntaxError );
+}
 
 //
 //  Local variables:

@@ -51,6 +51,7 @@ include_directories(
 
 add_library( ${PROJECT}-cpp OBJECT
   Exception.cpp
+  Lexer.cpp
   Logger.cpp
   Namespace.cpp
   Specification.cpp
