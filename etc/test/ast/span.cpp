@@ -78,65 +78,64 @@ TEST( AstSpan, Tabulator )
 
 TEST( AstSpan, LineComment )
 {
-    const auto filename = std::make_shared<std::string>(TEST_NAME + ".txt");
+    const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
 
     auto file = libstdhl::File::open( *filename, std::fstream::out );
     file << "\n    //test\n\n";
     file.close();
 
-    const auto begin = SourcePosition(filename, 2, 6);
-    const auto end = SourcePosition(filename, 2, 10);
+    const auto begin = SourcePosition( filename, 2, 6 );
+    const auto end = SourcePosition( filename, 2, 10 );
     const auto loc = SourceLocation( begin, end );
 
     auto span = std::make_shared< Span >( Grammar::Span::INLINE_COMMENT, 4 );
-    span->setSourceLocation(loc);
+    span->setSourceLocation( loc );
 
     EXPECT_EQ( span->kind(), Grammar::Span::INLINE_COMMENT );
     EXPECT_EQ( span->length(), 4 );
     EXPECT_STREQ( span->toString().c_str(), "//test" );
 
-    libstdhl::File::remove(*filename);
+    libstdhl::File::remove( *filename );
 }
 
 TEST( AstSpan, BlockComment )
 {
-    const auto filename = std::make_shared<std::string>(TEST_NAME + ".txt");
+    const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
     auto file = libstdhl::File::open( *filename, std::fstream::out );
     file << "\n    /*test\ntest2\n   test3\n*/\n";
     file.close();
 
-    const auto begin = SourcePosition(filename, 2, 6);
-    const auto end = SourcePosition(filename, 4, 10);
+    const auto begin = SourcePosition( filename, 2, 6 );
+    const auto end = SourcePosition( filename, 4, 10 );
     const auto loc = SourceLocation( begin, end );
 
     auto span = std::make_shared< Span >( Grammar::Span::BLOCK_COMMENT, 17 );
-    span->setSourceLocation(loc);
+    span->setSourceLocation( loc );
 
     EXPECT_EQ( span->kind(), Grammar::Span::BLOCK_COMMENT );
     EXPECT_EQ( span->length(), 17 );
     EXPECT_STREQ( span->toString().c_str(), "/*test\ntest2\n   test3*/" );
 
-    libstdhl::File::remove(*filename);
+    libstdhl::File::remove( *filename );
 }
 
 TEST( AstSpan, BlockCommentOneLine )
 {
-    const auto filename = std::make_shared<std::string>(TEST_NAME + ".txt");
+    const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
     auto file = libstdhl::File::open( *filename, std::fstream::out );
     file << "/*test*/";
     file.close();
 
-    const auto begin = SourcePosition(filename, 1, 2);
-    const auto end = SourcePosition(filename, 1, 6);
+    const auto begin = SourcePosition( filename, 1, 2 );
+    const auto end = SourcePosition( filename, 1, 6 );
     const auto loc = SourceLocation( begin, end );
 
     auto span = std::make_shared< Span >( Grammar::Span::BLOCK_COMMENT, 17 );
-    span->setSourceLocation(loc);
+    span->setSourceLocation( loc );
 
     EXPECT_EQ( span->kind(), Grammar::Span::BLOCK_COMMENT );
     EXPECT_EQ( span->length(), 17 );
-    EXPECT_STREQ( span->toString().c_str(), "/*test*/" ); // "block comment" with only one line
+    EXPECT_STREQ( span->toString().c_str(), "/*test*/" );  // "block comment" with only one line
 
-    libstdhl::File::remove(*filename);
+    libstdhl::File::remove( *filename );
 }
-

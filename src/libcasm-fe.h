@@ -45,7 +45,6 @@
 #define _LIBCASM_FE_H_
 
 #include <libcasm-fe/Version>
-#include <libcasm-fe/ast/Span>
 #include <libcasm-fe/analyze/AttributionPass>
 #include <libcasm-fe/analyze/ConsistencyCheckPass>
 #include <libcasm-fe/analyze/FrameSizeDeterminationPass>
@@ -55,6 +54,7 @@
 #include <libcasm-fe/analyze/SymbolResolverPass>
 #include <libcasm-fe/analyze/TypeCheckPass>
 #include <libcasm-fe/analyze/TypeInferencePass>
+#include <libcasm-fe/ast/Span>
 #include <libcasm-fe/execute/NumericExecutionPass>
 #include <libcasm-fe/execute/UpdateSet>
 //#include <libcasm-fe/execute/SymbolicExecutionPass>
