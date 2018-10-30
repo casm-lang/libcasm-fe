@@ -63,7 +63,7 @@ Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
 , m_name( name )
 , m_doubleColon( uToken )
-, m_spans()
+, m_spans( std::make_shared< Spans >() )
 {
 }
 

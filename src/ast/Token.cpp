@@ -56,7 +56,7 @@ using namespace Ast;
 Token::Token( const libcasm_fe::Grammar::Token token )
 : Node( Node::ID::TOKEN )
 , m_token( token )
-, m_spans()
+, m_spans( std::make_shared< Spans >() )
 {
 }
 

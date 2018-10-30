@@ -57,7 +57,7 @@ Literal::Literal( Node::ID id )
 : Expression( id )
 , m_leftBracket( uToken )
 , m_rightBracket( uToken )
-, m_spans()
+, m_spans( std::make_shared< Spans >() )
 {
 }
 
