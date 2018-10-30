@@ -83,7 +83,7 @@ namespace libcasm_fe
                 IMPORT_DEFINITION,
                 STRUCTURE_DEFINITION,
                 FEATURE_DEFINITION,
-                IMPLEMENTATION_DEFINITION,
+                IMPLEMENT_DEFINITION,
                 DECLARATION_DEFINITION,
 
                 // literals

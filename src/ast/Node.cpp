@@ -135,9 +135,9 @@ std::string Node::description( void ) const
         {
             return "feature";
         }
-        case ID::IMPLEMENTATION_DEFINITION:
+        case ID::IMPLEMENT_DEFINITION:
         {
-            return "implementation";
+            return "implement";
         }
         case ID::DECLARATION_DEFINITION:
         {

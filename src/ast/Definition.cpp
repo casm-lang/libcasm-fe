@@ -810,7 +810,7 @@ ImplementDefinition::ImplementDefinition(
     const Token::Ptr leftBraceToken,
     const Definitions::Ptr& definitions,
     const Token::Ptr rightBraceToken )
-: Definition( Node::ID::IMPLEMENTATION_DEFINITION, identifier )
+: Definition( Node::ID::IMPLEMENT_DEFINITION, identifier )
 , m_feature( feature )
 , m_definitions( definitions )
 , m_implementToken( implementToken )
