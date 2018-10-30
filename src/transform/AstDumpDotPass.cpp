@@ -177,6 +177,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( DefaultCase& node ) override;
     void visit( VariableBinding& node ) override;
     void visit( Token& node ) override;
+    void visit( Span& node ) override;
 
   private:
     void dumpNode( const Node& node, const std::string& name );
@@ -680,7 +681,15 @@ void AstDumpDotVisitor::visit( Token& node )
     {
         DotLink link( this, &node );
         dumpNode( node, "Token\n" + node.tokenString() );
+        RecursiveVisitor::visit( node );
     }
+}
+
+void AstDumpDotVisitor::visit( Span& node )
+{
+    DotLink link( this, &node );
+    dumpNode( node, "Span\n" + node.kindName() + " " + std::to_string( node.length() ) );
+
     RecursiveVisitor::visit( node );
 }
 
