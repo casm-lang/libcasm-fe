@@ -50,33 +50,37 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-static inline std::string readRange( const std::string& filename, const u32 lineNum, const std::string& startString, const std::size_t& length )
+static inline std::string readRange(
+    const std::string& filename,
+    const u32 lineNum,
+    const std::string& startString,
+    const std::size_t& length )
 {
     std::string range;
     std::size_t pos = 0;
-    std::string line = libstdhl::File::readLine( filename, lineNum);
+    std::string line = libstdhl::File::readLine( filename, lineNum );
 
-    if (startString != "\n")
+    if( startString != "\n" )
     {
         pos = line.find( startString );
     }
 
-    if (startString == "//" )
+    if( startString == "//" )
     {
-        range = line.substr( pos, length+2 );
+        range = line.substr( pos, length + 2 );
     }
-    else if ( startString == "/*" ) 
+    else if( startString == "/*" )
     {
-        // std::size_t tempPos = line.find( '\n' ); // get the position of the first new line in the block comment
-        // std::size_t endPos = tempPos - pos;
+        // std::size_t tempPos = line.find( '\n' ); // get the position of the first new line in the
+        // block comment std::size_t endPos = tempPos - pos;
         range = line.substr( pos );
     }
-    else if ( startString == "*/" )
+    else if( startString == "*/" )
     {
         range = line.substr( 0, pos ) + "*/";
     }
 
-    else // ( startString == "\n" ) 
+    else  // ( startString == "\n" )
     {
         range = "\n" + line.substr( pos );
     }
@@ -85,7 +89,7 @@ static inline std::string readRange( const std::string& filename, const u32 line
     //     std::size_t startStringLength = startString.length();
     //     range = line.substr( pos, length +  startStringLength);
     // }
-    
+
     return range;
 }
 
@@ -113,43 +117,50 @@ const std::size_t Span::length( void ) const
 
 std::string Span::toString( void ) const
 {
-    switch ( kind() ) {
+    switch( kind() )
+    {
         case Grammar::Span::SPACE:
         {
-            return std::string(length(), ' ');
+            return std::string( length(), ' ' );
         }
         case Grammar::Span::NEWLINE:
         {
-            return std::string(length(), '\n');
+            return std::string( length(), '\n' );
         }
         case Grammar::Span::TABULATOR:
         {
-            return std::string(length(), '\t');
+            return std::string( length(), '\t' );
         }
         case Grammar::Span::INLINE_COMMENT:
         {
-            return readRange(*sourceLocation().begin.fileName, sourceLocation().begin.line, "//", length());
+            return readRange(
+                *sourceLocation().begin.fileName, sourceLocation().begin.line, "//", length() );
         }
         case Grammar::Span::BLOCK_COMMENT:
         {
             std::string concat;
-            std::size_t currentLine = sourceLocation().begin.line; // the line where the block comment starts
+            std::size_t currentLine =
+                sourceLocation().begin.line;  // the line where the block comment starts
             std::size_t endLine = sourceLocation().end.line;
 
-            concat = readRange(*sourceLocation().begin.fileName, currentLine, "/*", length());
+            concat = readRange( *sourceLocation().begin.fileName, currentLine, "/*", length() );
             currentLine++;
 
-            for ( ; currentLine < endLine; currentLine++ ) 
+            for( ; currentLine < endLine; currentLine++ )
             {
-                concat += readRange(*sourceLocation().begin.fileName, currentLine, "\n", length());
+                concat +=
+                    readRange( *sourceLocation().begin.fileName, currentLine, "\n", length() );
             }
 
-            if (sourceLocation().begin.line != endLine) 
+            if( sourceLocation().begin.line != endLine )
             {
-                // insert a new line before the string range, if the block comment is on more than one line
-                concat += "\n" + readRange(*sourceLocation().begin.fileName, currentLine, "*/", length());
+                // insert a new line before the string range, if the block comment is on more than
+                // one line
+                concat +=
+                    "\n" +
+                    readRange( *sourceLocation().begin.fileName, currentLine, "*/", length() );
             }
-            
+
             return concat;
         }
     }
@@ -160,7 +171,7 @@ std::string Span::toString( void ) const
 
 void Span::accept( Visitor& visitor )
 {
-    // visitor.visit( *this ); // TODO: FIXME: @moiova
+    visitor.visit( *this );
 }
 
 //

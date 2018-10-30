@@ -597,6 +597,10 @@ void RecursiveVisitor::visit( Token& node )
 {
 }
 
+void RecursiveVisitor::visit( Span& node )
+{
+}
+
 //
 //  Local variables:
 //  mode: c++

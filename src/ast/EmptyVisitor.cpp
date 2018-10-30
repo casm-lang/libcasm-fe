@@ -298,6 +298,10 @@ void EmptyVisitor::visit( Token& )
 {
 }
 
+void EmptyVisitor::visit( Span& )
+{
+}
+
 //
 //  Local variables:
 //  mode: c++
