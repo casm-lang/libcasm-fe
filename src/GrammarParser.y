@@ -602,10 +602,10 @@ StructureDefinition
 
 
 StructureDefinitionElement
-: LSQPAREN Attributes RSQPAREN FunctionDefinition
+: Attributes FunctionDefinition
   {
-      auto definition = $4;
-      definition->setAttributes( $2 );
+      auto definition = $2;
+      definition->setAttributes( $1 );
       $$ = definition;
   }
 | FunctionDefinition
@@ -644,30 +644,30 @@ FeatureDefinition
 
 
 FeatureDefinitionElement
-: LSQPAREN Attributes RSQPAREN Declaration
+: Attributes Declaration
   {
-      auto definition = $4;
-      definition->setAttributes( $2 );
+      auto definition = $2;
+      definition->setAttributes( $1 );
       $$ = definition;
   }
 | Declaration
   {
       $$ = $1;
   }
-| LSQPAREN Attributes RSQPAREN DerivedDefinition
+| Attributes DerivedDefinition
   {
-      auto definition = $4;
-      definition->setAttributes( $2 );
+      auto definition = $2;
+      definition->setAttributes( $1 );
       $$ = definition;
   }
 | DerivedDefinition
   {
       $$ = $1;
   }
-| LSQPAREN Attributes RSQPAREN RuleDefinition
+| Attributes RuleDefinition
   {
-      auto definition = $4;
-      definition->setAttributes( $2 );
+      auto definition = $2;
+      definition->setAttributes( $1 );
       $$ = definition;
   }
 | RuleDefinition
@@ -712,20 +712,20 @@ ImplementationDefinition
 
 
 ImplementationDefinitionElement
-: LSQPAREN Attributes RSQPAREN DerivedDefinition
+: Attributes DerivedDefinition
   {
-      auto definition = $4;
-      definition->setAttributes( $2 );
+      auto definition = $2;
+      definition->setAttributes( $1 );
       $$ = definition;
   }
 | DerivedDefinition
   {
       $$ = $1;
   }
-| LSQPAREN Attributes RSQPAREN RuleDefinition
+| Attributes RuleDefinition
   {
-      auto definition = $4;
-      definition->setAttributes( $2 );
+      auto definition = $2;
+      definition->setAttributes( $1 );
       $$ = definition;
   }
 | RuleDefinition
