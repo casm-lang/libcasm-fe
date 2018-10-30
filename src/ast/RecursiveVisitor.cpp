@@ -175,10 +175,12 @@ void RecursiveVisitor::visit( InvariantDefinition& node )
 
 void RecursiveVisitor::visit( UndefLiteral& node )
 {
+    node.spans()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ValueLiteral& node )
 {
+    node.spans()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ReferenceLiteral& node )
@@ -578,6 +580,7 @@ void RecursiveVisitor::visit( Defined& node )
 void RecursiveVisitor::visit( Identifier& node )
 {
     node.doubleColon()->accept( *this );
+    node.spans()->accept( *this );
 }
 
 void RecursiveVisitor::visit( IdentifierPath& node )
@@ -595,6 +598,7 @@ void RecursiveVisitor::visit( VariableBinding& node )
 
 void RecursiveVisitor::visit( Token& node )
 {
+    node.spans()->accept( *this );
 }
 
 void RecursiveVisitor::visit( Span& node )
