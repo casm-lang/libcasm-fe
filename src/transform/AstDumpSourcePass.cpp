@@ -85,6 +85,7 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
     void visit( UnresolvedType& node ) override;
     void visit( Identifier& node ) override;
     void visit( Token& node ) override;
+    void visit( Span& node ) override;
 
   private:
     std::ostream& m_stream;
@@ -131,12 +132,14 @@ void AstDumpSourceVisitor::visit( EmbracedExpression& node )
 
 void AstDumpSourceVisitor::visit( UndefLiteral& node )
 {
+    RecursiveVisitor::visit( node );
     m_stream << "undef";
 }
 
 void AstDumpSourceVisitor::visit( ValueLiteral& node )
 {
     const auto value_is_string = node.value()->type().isString();
+    RecursiveVisitor::visit( node );
 
     if( value_is_string )
     {
@@ -148,7 +151,6 @@ void AstDumpSourceVisitor::visit( ValueLiteral& node )
     {
         m_stream << "\"";
     }
-    m_stream << " ";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
 }
 
 void AstDumpSourceVisitor::visit( UnresolvedType& node )
@@ -157,9 +159,8 @@ void AstDumpSourceVisitor::visit( UnresolvedType& node )
 
 void AstDumpSourceVisitor::visit( Identifier& node )
 {
-    node.doubleColon()->accept( *this );
+    RecursiveVisitor::visit( node );
     m_stream << node.name();
-    m_stream << " ";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
 }
 
 void AstDumpSourceVisitor::visit( Token& node )
@@ -168,8 +169,14 @@ void AstDumpSourceVisitor::visit( Token& node )
     {
         return;
     }
+    RecursiveVisitor::visit( node );
     m_stream << node.tokenString();
-    m_stream << " ";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
+}
+
+void AstDumpSourceVisitor::visit( Span& node )
+{
+    RecursiveVisitor::visit( node );
+    m_stream << node.toString();
 }
 
 void AstDumpSourcePass::usage( libpass::PassUsage& pu )
@@ -191,8 +198,6 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 
     specification->header()->accept( visitor );
     specification->definitions()->accept( visitor );
-    outputStream
-        << "\n";  // TODO: FIXME: @ppaulweber: remove this when spans (space etc.) are ready
 
     return true;
 }
