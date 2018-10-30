@@ -743,15 +743,44 @@ void StructureDefinition::accept( Visitor& visitor )
 //
 
 FeatureDefinition::FeatureDefinition(
-    const Identifier::Ptr& identifier, const Definitions::Ptr& definitions )
+    const Token::Ptr featureToken,
+    const Identifier::Ptr& identifier,
+    const Token::Ptr assignmentToken,
+    const Token::Ptr leftBraceToken,
+    const Definitions::Ptr& definitions,
+    const Token::Ptr rightBraceToken )
 : Definition( Node::ID::FEATURE_DEFINITION, identifier )
 , m_definitions( definitions )
+, m_featureToken( featureToken )
+, m_assignmentToken( assignmentToken )
+, m_leftBraceToken( leftBraceToken )
+, m_rightBraceToken( rightBraceToken )
 {
 }
 
 const Definitions::Ptr& FeatureDefinition::definitions( void ) const
 {
     return m_definitions;
+}
+
+const Token::Ptr FeatureDefinition::featureToken( void ) const
+{
+    return m_featureToken;
+}
+
+const Token::Ptr FeatureDefinition::assignmentToken( void ) const
+{
+    return m_assignmentToken;
+}
+
+const Token::Ptr FeatureDefinition::leftBraceToken( void ) const
+{
+    return m_leftBraceToken;
+}
+
+const Token::Ptr FeatureDefinition::rightBraceToken( void ) const
+{
+    return m_rightBraceToken;
 }
 
 void FeatureDefinition::accept( Visitor& visitor )

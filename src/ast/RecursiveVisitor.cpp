@@ -220,14 +220,18 @@ void RecursiveVisitor::visit( StructureDefinition& node )
 
 void RecursiveVisitor::visit( FeatureDefinition& node )
 {
-    // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
-    node.identifier()->accept( *this );
-    node.definitions()->accept( *this );
     node.attributes()->accept( *this );
+    node.featureToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.assignmentToken()->accept( *this );
+    node.leftBraceToken()->accept( *this );
+    node.definitions()->accept( *this );
+    node.rightBraceToken()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ImplementationDefinition& node )
 {
+    // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
     node.identifier()->accept( *this );
     node.feature()->accept( *this );
     node.definitions()->accept( *this );

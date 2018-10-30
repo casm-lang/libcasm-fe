@@ -467,14 +467,31 @@ namespace libcasm_fe
             using Ptr = std::shared_ptr< FeatureDefinition >;
 
             FeatureDefinition(
-                const Identifier::Ptr& identifier, const Definitions::Ptr& definitions );
+                const Token::Ptr featureToken,
+                const Identifier::Ptr& identifier,
+                const Token::Ptr assignmentToken,
+                const Token::Ptr leftBraceToken,
+                const Definitions::Ptr& definitions,
+                const Token::Ptr rightBraceToken );
 
             const Definitions::Ptr& definitions( void ) const;
+
+            const Token::Ptr featureToken( void ) const;
+
+            const Token::Ptr assignmentToken( void ) const;
+
+            const Token::Ptr leftBraceToken( void ) const;
+
+            const Token::Ptr rightBraceToken( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
           private:
             const Definitions::Ptr m_definitions;
+            const Token::Ptr m_featureToken;
+            const Token::Ptr m_assignmentToken;
+            const Token::Ptr m_leftBraceToken;
+            const Token::Ptr m_rightBraceToken;
         };
 
         class ImplementationDefinition final : public Definition
