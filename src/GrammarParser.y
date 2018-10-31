@@ -600,21 +600,6 @@ StructureDefinition
   }
 ;
 
-
-StructureDefinitionElement
-: Attributes FunctionDefinition
-  {
-      auto definition = $2;
-      definition->setAttributes( $1 );
-      $$ = definition;
-  }
-| FunctionDefinition
-  {
-      $$ = $1;
-  }
-;
-
-
 StructureDefinitionList
 : StructureDefinitionList StructureDefinitionElement
   {
@@ -627,6 +612,19 @@ StructureDefinitionList
       auto functions = Ast::make< FunctionDefinitions >( @$ );
       functions->add( $1 );
       $$ = functions;
+  }
+;
+
+StructureDefinitionElement
+: Attributes FunctionDefinition
+  {
+      auto definition = $2;
+      definition->setAttributes( $1 );
+      $$ = definition;
+  }
+| FunctionDefinition
+  {
+      $$ = $1;
   }
 ;
 
