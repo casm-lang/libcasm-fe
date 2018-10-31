@@ -1048,8 +1048,8 @@ namespace libcasm_fe {
         S_InvariantDefinition = 108,             // InvariantDefinition
         S_ImportDefinition = 109,                // ImportDefinition
         S_StructureDefinition = 110,             // StructureDefinition
-        S_StructureDefinitionElement = 111,      // StructureDefinitionElement
-        S_StructureDefinitionList = 112,         // StructureDefinitionList
+        S_StructureDefinitionList = 111,         // StructureDefinitionList
+        S_StructureDefinitionElement = 112,      // StructureDefinitionElement
         S_FeatureDefinition = 113,               // FeatureDefinition
         S_FeatureDefinitionElement = 114,        // FeatureDefinitionElement
         S_FeatureDefinitionList = 115,           // FeatureDefinitionList
@@ -5204,7 +5204,7 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 2891,     ///< Last index in yytable_.
+      yylast_ = 2911,     ///< Last index in yytable_.
       yynnts_ = 108,  ///< Number of nonterminal symbols.
       yyfinal_ = 13 ///< Termination state number.
     };

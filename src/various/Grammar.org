@@ -181,16 +181,6 @@ StructureDefinition ::= "structure" Identifier "=" "{" StructureDefinitionList "
 #+html: {{page>.:grammar:StructureDefinition&noheader&nofooter}}
 
 
-** StructureDefinitionElement
-
-#+begin_src
-StructureDefinitionElement ::= Attributes FunctionDefinition
-                             | FunctionDefinition
-#+end_src
-
-#+html: {{page>.:grammar:StructureDefinitionElement&noheader&nofooter}}
-
-
 ** StructureDefinitionList
 
 #+begin_src
@@ -199,6 +189,16 @@ StructureDefinitionList ::= StructureDefinitionList StructureDefinitionElement
 #+end_src
 
 #+html: {{page>.:grammar:StructureDefinitionList&noheader&nofooter}}
+
+
+** StructureDefinitionElement
+
+#+begin_src
+StructureDefinitionElement ::= Attributes FunctionDefinition
+                             | FunctionDefinition
+#+end_src
+
+#+html: {{page>.:grammar:StructureDefinitionElement&noheader&nofooter}}
 
 
 ** FeatureDefinition

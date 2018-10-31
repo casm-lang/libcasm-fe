@@ -69,11 +69,11 @@ Grammar
 
    45 StructureDefinition: "structure" Identifier "=" "{" StructureDefinitionList "}"
 
-   46 StructureDefinitionElement: Attributes FunctionDefinition
-   47                           | FunctionDefinition
+   46 StructureDefinitionList: StructureDefinitionList StructureDefinitionElement
+   47                        | StructureDefinitionElement
 
-   48 StructureDefinitionList: StructureDefinitionList StructureDefinitionElement
-   49                        | StructureDefinitionElement
+   48 StructureDefinitionElement: Attributes FunctionDefinition
+   49                           | FunctionDefinition
 
    50 FeatureDefinition: "feature" Identifier "=" "{" FeatureDefinitionList "}"
 
@@ -506,7 +506,7 @@ Nonterminals, with rules where they appear
         on right: 12 55 56 63 64
     FunctionDefinition <FunctionDefinition::Ptr> (103)
         on left: 33
-        on right: 13 46 47
+        on right: 13 48 49
     EnumeratorDefinition <EnumeratorDefinition::Ptr> (104)
         on left: 34 35 36
         on right: 37 38
@@ -528,12 +528,12 @@ Nonterminals, with rules where they appear
     StructureDefinition <StructureDefinition::Ptr> (110)
         on left: 45
         on right: 18
-    StructureDefinitionElement <FunctionDefinition::Ptr> (111)
+    StructureDefinitionList <FunctionDefinitions::Ptr> (111)
         on left: 46 47
-        on right: 48 49
-    StructureDefinitionList <FunctionDefinitions::Ptr> (112)
+        on right: 45 46
+    StructureDefinitionElement <FunctionDefinition::Ptr> (112)
         on left: 48 49
-        on right: 45 48
+        on right: 46 47
     FeatureDefinition <FeatureDefinition::Ptr> (113)
         on left: 50
         on right: 19
@@ -788,7 +788,7 @@ Nonterminals, with rules where they appear
         on right: 252 253
     Attributes <Attributes::Ptr> (197)
         on left: 256 257
-        on right: 2 6 35 46 51 53 55 61 63 243 245 252 256
+        on right: 2 6 35 48 51 53 55 61 63 243 245 252 256
     Attribute <Attribute::Ptr> (198)
         on left: 258 259 260
         on right: 256 257
@@ -7038,8 +7038,8 @@ State 294
     "["         shift, and go to state 2
 
     FunctionDefinition          go to state 368
-    StructureDefinitionElement  go to state 369
-    StructureDefinitionList     go to state 370
+    StructureDefinitionList     go to state 369
+    StructureDefinitionElement  go to state 370
     Attributes                  go to state 371
     Attribute                   go to state 6
 
@@ -8745,22 +8745,15 @@ State 367
 
 State 368
 
-   47 StructureDefinitionElement: FunctionDefinition •
+   49 StructureDefinitionElement: FunctionDefinition •
 
-    $default  reduce using rule 47 (StructureDefinitionElement)
+    $default  reduce using rule 49 (StructureDefinitionElement)
 
 
 State 369
 
-   49 StructureDefinitionList: StructureDefinitionElement •
-
-    $default  reduce using rule 49 (StructureDefinitionList)
-
-
-State 370
-
    45 StructureDefinition: "structure" Identifier "=" "{" StructureDefinitionList • "}"
-   48 StructureDefinitionList: StructureDefinitionList • StructureDefinitionElement
+   46 StructureDefinitionList: StructureDefinitionList • StructureDefinitionElement
 
     "function"  shift, and go to state 25
     "["         shift, and go to state 2
@@ -8772,9 +8765,16 @@ State 370
     Attribute                   go to state 6
 
 
+State 370
+
+   47 StructureDefinitionList: StructureDefinitionElement •
+
+    $default  reduce using rule 47 (StructureDefinitionList)
+
+
 State 371
 
-   46 StructureDefinitionElement: Attributes • FunctionDefinition
+   48 StructureDefinitionElement: Attributes • FunctionDefinition
   256 Attributes: Attributes • Attribute
 
     "function"  shift, and go to state 25
@@ -10338,16 +10338,16 @@ State 437
 
 State 438
 
-   48 StructureDefinitionList: StructureDefinitionList StructureDefinitionElement •
+   46 StructureDefinitionList: StructureDefinitionList StructureDefinitionElement •
 
-    $default  reduce using rule 48 (StructureDefinitionList)
+    $default  reduce using rule 46 (StructureDefinitionList)
 
 
 State 439
 
-   46 StructureDefinitionElement: Attributes FunctionDefinition •
+   48 StructureDefinitionElement: Attributes FunctionDefinition •
 
-    $default  reduce using rule 46 (StructureDefinitionElement)
+    $default  reduce using rule 48 (StructureDefinitionElement)
 
 
 State 440

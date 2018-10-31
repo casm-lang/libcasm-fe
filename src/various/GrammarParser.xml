@@ -383,29 +383,29 @@
         </rhs>
       </rule>
       <rule number="46" usefulness="useful">
-        <lhs>StructureDefinitionElement</lhs>
-        <rhs>
-          <symbol>Attributes</symbol>
-          <symbol>FunctionDefinition</symbol>
-        </rhs>
-      </rule>
-      <rule number="47" usefulness="useful">
-        <lhs>StructureDefinitionElement</lhs>
-        <rhs>
-          <symbol>FunctionDefinition</symbol>
-        </rhs>
-      </rule>
-      <rule number="48" usefulness="useful">
         <lhs>StructureDefinitionList</lhs>
         <rhs>
           <symbol>StructureDefinitionList</symbol>
           <symbol>StructureDefinitionElement</symbol>
         </rhs>
       </rule>
-      <rule number="49" usefulness="useful">
+      <rule number="47" usefulness="useful">
         <lhs>StructureDefinitionList</lhs>
         <rhs>
           <symbol>StructureDefinitionElement</symbol>
+        </rhs>
+      </rule>
+      <rule number="48" usefulness="useful">
+        <lhs>StructureDefinitionElement</lhs>
+        <rhs>
+          <symbol>Attributes</symbol>
+          <symbol>FunctionDefinition</symbol>
+        </rhs>
+      </rule>
+      <rule number="49" usefulness="useful">
+        <lhs>StructureDefinitionElement</lhs>
+        <rhs>
+          <symbol>FunctionDefinition</symbol>
         </rhs>
       </rule>
       <rule number="50" usefulness="useful">
@@ -2102,8 +2102,8 @@
       <nonterminal symbol-number="108" name="InvariantDefinition" type="InvariantDefinition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="109" name="ImportDefinition" type="ImportDefinition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="110" name="StructureDefinition" type="StructureDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="111" name="StructureDefinitionElement" type="FunctionDefinition::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="112" name="StructureDefinitionList" type="FunctionDefinitions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="111" name="StructureDefinitionList" type="FunctionDefinitions::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="112" name="StructureDefinitionElement" type="FunctionDefinition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="113" name="FeatureDefinition" type="FeatureDefinition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="114" name="FeatureDefinitionElement" type="Definition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="115" name="FeatureDefinitionList" type="Definitions::Ptr" usefulness="useful"/>
@@ -18204,8 +18204,8 @@
           <transition type="shift" symbol="&quot;function&quot;" state="25"/>
           <transition type="shift" symbol="&quot;[&quot;" state="2"/>
           <transition type="goto" symbol="FunctionDefinition" state="368"/>
-          <transition type="goto" symbol="StructureDefinitionElement" state="369"/>
-          <transition type="goto" symbol="StructureDefinitionList" state="370"/>
+          <transition type="goto" symbol="StructureDefinitionList" state="369"/>
+          <transition type="goto" symbol="StructureDefinitionElement" state="370"/>
           <transition type="goto" symbol="Attributes" state="371"/>
           <transition type="goto" symbol="Attribute" state="6"/>
         </transitions>
@@ -21567,20 +21567,6 @@
 
     <state number="368">
       <itemset>
-        <item rule-number="47" dot="1"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="47" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="369">
-      <itemset>
         <item rule-number="49" dot="1"/>
       </itemset>
       <actions>
@@ -21593,13 +21579,13 @@
       <solved-conflicts/>
     </state>
 
-    <state number="370">
+    <state number="369">
       <itemset>
         <item rule-number="33" dot="0"/>
         <item rule-number="45" dot="5"/>
-        <item rule-number="46" dot="0"/>
-        <item rule-number="47" dot="0"/>
-        <item rule-number="48" dot="1"/>
+        <item rule-number="46" dot="1"/>
+        <item rule-number="48" dot="0"/>
+        <item rule-number="49" dot="0"/>
         <item rule-number="256" dot="0"/>
         <item rule-number="257" dot="0"/>
         <item rule-number="258" dot="0"/>
@@ -21622,10 +21608,24 @@
       <solved-conflicts/>
     </state>
 
+    <state number="370">
+      <itemset>
+        <item rule-number="47" dot="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="47" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
     <state number="371">
       <itemset>
         <item rule-number="33" dot="0"/>
-        <item rule-number="46" dot="1"/>
+        <item rule-number="48" dot="1"/>
         <item rule-number="256" dot="1"/>
         <item rule-number="258" dot="0"/>
         <item rule-number="259" dot="0"/>
@@ -25295,20 +25295,6 @@
 
     <state number="438">
       <itemset>
-        <item rule-number="48" dot="2"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="48" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="439">
-      <itemset>
         <item rule-number="46" dot="2"/>
       </itemset>
       <actions>
@@ -25316,6 +25302,20 @@
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="46" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="439">
+      <itemset>
+        <item rule-number="48" dot="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="48" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
