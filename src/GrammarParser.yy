@@ -161,7 +161,7 @@ END       0 "end of file"
 %token <std::string> RATIONAL    "rational"
 %token <std::string> DECIMAL     "decimal"
 %token <std::string> STRING      "string"
-%token <std::string> IDENTIFIER  "identifier"
+%token <Identifier::Ptr>  IDENTIFIER  "identifier"
 
 %type <Specification::Ptr> Specification
 
@@ -1634,8 +1634,7 @@ Initializer
 Identifier
 : IDENTIFIER
   {
-      $$ = Ast::make< Identifier >( @$, $1 );
-      $$->setSpans( m_lexer.fetchSpansAndReset() );
+      $$ = $1;
   }
 | IN // allow in keyword as identifier
   {

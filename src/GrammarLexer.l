@@ -110,7 +110,9 @@ using namespace libcasm_fe;
 {{grammartoken}}
 
 [a-zA-Z_][a-zA-Z0-9\_]* {
-    return Parser::make_IDENTIFIER( yytext, m_loc );
+    const auto identifier = Ast::make< Identifier >( m_loc, yytext );
+    identifier->setSpans( fetchSpansAndReset() );
+    return Parser::make_IDENTIFIER( identifier, m_loc );
 }
 
 [\x20]+ { // space
