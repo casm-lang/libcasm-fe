@@ -1198,7 +1198,7 @@ UndefinedLiteral
 : UNDEF
   {
       $$ = Ast::make< UndefLiteral >( @$ );
-      $$->setSpans( m_lexer.fetchSpansAndReset() );
+      $$->setSpans( $1->spans() );
   }
 ;
 
@@ -1208,13 +1208,13 @@ BooleanLiteral
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( true );
       $$ = Ast::make< ValueLiteral >( @$, value );
-      $$->setSpans( m_lexer.fetchSpansAndReset() );
+      $$->setSpans( $1->spans() );
   }
 | FALSE
   {
       const auto value = libstdhl::Memory::get< libcasm_ir::BooleanConstant >( false );
       $$ = Ast::make< ValueLiteral >( @$, value );
-      $$->setSpans( m_lexer.fetchSpansAndReset() );
+      $$->setSpans( $1->spans() );
   }
 ;
 
