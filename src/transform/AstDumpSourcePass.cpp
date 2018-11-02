@@ -198,6 +198,7 @@ u1 AstDumpSourcePass::run( libpass::PassResult& pr )
 
     specification->header()->accept( visitor );
     specification->definitions()->accept( visitor );
+    specification->spans()->accept( visitor );
 
     return true;
 }
