@@ -215,6 +215,7 @@ void AstDumpDotVisitor::visit( Specification& specification )
 
         specification.header()->accept( *this );
         specification.definitions()->accept( *this );
+        specification.spans()->accept( *this );
     }
 
     m_stream << "}\n";
