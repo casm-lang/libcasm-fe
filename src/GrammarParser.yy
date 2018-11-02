@@ -306,6 +306,7 @@ Specification
   {
       m_specification.setHeader( $1 );
       m_specification.setDefinitions( $2 );
+      m_specification.setSpans( m_lexer.fetchSpansAndReset() );
   }
 ;
 
