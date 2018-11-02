@@ -62,7 +62,7 @@ using namespace libcasm_fe;
 
 // Code run each time a token is matched, see GrammarToken.hpp.
 #define YY_TOKEN_ACTION( TOKEN ) \
-    auto token = Ast::make< Ast::Token >( m_loc, Grammar::Token:: TOKEN ); \
+    const auto token = Ast::make< Ast::Token >( m_loc, Grammar::Token:: TOKEN ); \
     token->setSpans( fetchSpansAndReset() ); \
     return Parser::make_##TOKEN( token, m_loc );
 
