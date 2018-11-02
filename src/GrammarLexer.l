@@ -96,7 +96,19 @@ using namespace libcasm_fe;
 }
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
-    return Parser::make_RATIONAL( yytext + 2, m_loc );
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::RationalConstant >( yytext + 2 );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_RATIONAL( valueLiteral, m_loc );
 }
 
 [0-9][0-9\']*[0-9]* {

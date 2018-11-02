@@ -158,7 +158,7 @@ END       0 "end of file"
 %token <std::string> BINARY      "binary"
 %token <std::string> HEXADECIMAL "hexadecimal"
 %token <ValueLiteral::Ptr> INTEGER     "integer"
-%token <std::string> RATIONAL    "rational"
+%token <ValueLiteral::Ptr> RATIONAL    "rational"
 %token <std::string> DECIMAL     "decimal"
 %token <std::string> STRING      "string"
 %token <Identifier::Ptr>  IDENTIFIER  "identifier"
@@ -1230,17 +1230,7 @@ IntegerLiteral
 RationalLiteral
 : RATIONAL
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::RationalConstant >( $1 );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-          $$->setSpans( m_lexer.fetchSpansAndReset() );
-
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 ;
 
