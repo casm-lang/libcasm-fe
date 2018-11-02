@@ -159,7 +159,7 @@ END       0 "end of file"
 %token <std::string> HEXADECIMAL "hexadecimal"
 %token <ValueLiteral::Ptr> INTEGER     "integer"
 %token <ValueLiteral::Ptr> RATIONAL    "rational"
-%token <std::string> DECIMAL     "decimal"
+%token <ValueLiteral::Ptr> DECIMAL     "decimal"
 %token <std::string> STRING      "string"
 %token <Identifier::Ptr>  IDENTIFIER  "identifier"
 
@@ -1238,17 +1238,7 @@ RationalLiteral
 DecimalLiteral
 : DECIMAL
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( $1 );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-          $$->setSpans( m_lexer.fetchSpansAndReset() );
-
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 ;
 

@@ -127,7 +127,19 @@ using namespace libcasm_fe;
 }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
-    return Parser::make_DECIMAL( yytext, m_loc );
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::DecimalConstant >( yytext );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_DECIMAL( valueLiteral, m_loc );
 }
 
 {{grammartoken}}
