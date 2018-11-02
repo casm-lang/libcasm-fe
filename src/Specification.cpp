@@ -50,6 +50,7 @@ Specification::Specification( void )
 , m_name()
 , m_header()
 , m_definitions()
+, m_spans( std::make_shared< Ast::Spans >() )
 , m_symboltable( std::make_shared< Namespace >() )
 {
 }
@@ -92,6 +93,16 @@ void Specification::setDefinitions( const Ast::Definitions::Ptr& definitions )
 const Ast::Definitions::Ptr& Specification::definitions( void ) const
 {
     return m_definitions;
+}
+
+void Specification::setSpans( const Ast::Spans::Ptr& spans )
+{
+    m_spans = spans;
+}
+
+const Ast::Spans::Ptr& Specification::spans( void ) const
+{
+    return m_spans;
 }
 
 const Namespace::Ptr& Specification::symboltable( void ) const
