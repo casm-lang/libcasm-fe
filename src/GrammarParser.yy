@@ -156,7 +156,7 @@ END       0 "end of file"
 {{grammartoken}}
 
 %token <std::string> BINARY      "binary"
-%token <std::string> HEXADECIMAL "hexadecimal"
+%token <ValueLiteral::Ptr> HEXADECIMAL "hexadecimal"
 %token <ValueLiteral::Ptr> INTEGER     "integer"
 %token <ValueLiteral::Ptr> RATIONAL    "rational"
 %token <ValueLiteral::Ptr> DECIMAL     "decimal"
@@ -1259,16 +1259,7 @@ BinaryLiteral
   }
 | HEXADECIMAL
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( $1, libstdhl::Type::HEXADECIMAL );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-          $$->setSpans( m_lexer.fetchSpansAndReset() );
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 ;
 

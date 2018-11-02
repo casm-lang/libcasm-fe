@@ -92,7 +92,18 @@ using namespace libcasm_fe;
 }
 
 0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
-    return Parser::make_HEXADECIMAL( yytext + 2, m_loc );
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::HEXADECIMAL );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_HEXADECIMAL( valueLiteral, m_loc );
 }
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
