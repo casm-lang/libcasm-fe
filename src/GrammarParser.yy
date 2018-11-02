@@ -160,7 +160,7 @@ END       0 "end of file"
 %token <ValueLiteral::Ptr> INTEGER     "integer"
 %token <ValueLiteral::Ptr> RATIONAL    "rational"
 %token <ValueLiteral::Ptr> DECIMAL     "decimal"
-%token <std::string> STRING      "string"
+%token <ValueLiteral::Ptr> STRING      "string"
 %token <Identifier::Ptr>  IDENTIFIER  "identifier"
 
 %type <Specification::Ptr> Specification
@@ -1258,16 +1258,7 @@ BinaryLiteral
 StringLiteral
 : STRING
   {
-      try
-      {
-          const auto value = libstdhl::Memory::get< libcasm_ir::StringConstant >( $1 );
-          $$ = Ast::make< ValueLiteral >( @$, value );
-          $$->setSpans( m_lexer.fetchSpansAndReset() );
-      }
-      catch( const std::domain_error& e )
-      {
-          throw syntax_error( @$, e.what() );
-      }
+      $$ = $1;
   }
 ;
 

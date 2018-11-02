@@ -271,7 +271,18 @@ using namespace libcasm_fe;
 }
 <STRING>\" {
     BEGIN( INITIAL );
-    return Parser::make_STRING( m_strbuf, m_loc );
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::StringConstant >( m_strbuf );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_STRING( valueLiteral, m_loc );
 }
 
 . {
