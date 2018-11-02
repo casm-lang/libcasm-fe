@@ -88,7 +88,18 @@ using namespace libcasm_fe;
 %}
 
 0[bB][01][01\']*[01]* {
-    return Parser::make_BINARY( yytext + 2, m_loc );
+    ValueLiteral::Ptr valueLiteral = nullptr;
+    try
+    {
+        const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::BINARY );
+        valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
+        valueLiteral->setSpans( fetchSpansAndReset() );
+    }
+    catch( const std::domain_error& e )
+    {
+        throw Parser::syntax_error( m_loc, e.what() );
+    }
+    return Parser::make_BINARY( valueLiteral, m_loc );
 }
 
 0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
