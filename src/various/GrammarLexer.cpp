@@ -1257,25 +1257,22 @@ case 79:
 YY_RULE_SETUP
 #line 184 "obj/src/GrammarLexer.l"
 { // space
-    m_log.debug( {m_loc}, "span space: " + std::to_string( yyleng ) );
     // TODO: @moiova add span space creation of length yyleng here
     m_loc.step();
 }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 190 "obj/src/GrammarLexer.l"
+#line 189 "obj/src/GrammarLexer.l"
 { // carriage return
-    m_log.debug( {m_loc}, "span carriage return: "+ std::to_string( yyleng ) );
     // TODO: @moiova add span carriage return creation of length yyleng here
     m_loc.step();
 }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 196 "obj/src/GrammarLexer.l"
+#line 194 "obj/src/GrammarLexer.l"
 { // tabulator
-    m_log.debug( {m_loc}, "span tabulator: " + std::to_string( yyleng ) );
     // TODO: @moiova add span tabulator creation of length yyleng here
     m_loc.step();
 }
@@ -1283,17 +1280,16 @@ YY_RULE_SETUP
 case 82:
 /* rule 82 can match eol */
 YY_RULE_SETUP
-#line 202 "obj/src/GrammarLexer.l"
+#line 199 "obj/src/GrammarLexer.l"
 { // newline
     m_loc.lines( yyleng );
-    m_log.debug( {m_loc}, "span newline: " + std::to_string( yyleng ) );
     // TODO: @moiova add span newline creation of length yyleng here
     m_loc.step();
 }
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 209 "obj/src/GrammarLexer.l"
+#line 205 "obj/src/GrammarLexer.l"
 { // single-line comments
     m_strbuf.clear();
     m_strbuf.append( yytext );
@@ -1302,7 +1298,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 214 "obj/src/GrammarLexer.l"
+#line 210 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( yytext );
 }
@@ -1310,27 +1306,25 @@ YY_RULE_SETUP
 case 85:
 /* rule 85 can match eol */
 YY_RULE_SETUP
-#line 217 "obj/src/GrammarLexer.l"
+#line 213 "obj/src/GrammarLexer.l"
 {
     unput( *yytext );
     m_loc.columns( -1 );
-    m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "'" );
     // TODO: @moiova add span single line comment creation of m_strbuf here
     m_loc.step();
     BEGIN( INITIAL );
 }
 	YY_BREAK
 case YY_STATE_EOF(LCOMMENT):
-#line 225 "obj/src/GrammarLexer.l"
+#line 220 "obj/src/GrammarLexer.l"
 {
-    m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "' (EOF)" );
     // TODO: @moiova add span single line comment creation of m_strbuf here
     BEGIN( INITIAL );
 }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 231 "obj/src/GrammarLexer.l"
+#line 225 "obj/src/GrammarLexer.l"
 { // multi-line comments
     m_strbuf.clear();
     m_strbuf.append( yytext );
@@ -1339,10 +1333,9 @@ YY_RULE_SETUP
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 236 "obj/src/GrammarLexer.l"
+#line 230 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( yytext );
-    m_log.debug( {m_loc}, "span comment ML '" + m_strbuf + "'" );
     // TODO: @moiova add span single line comment creation of m_strbuf here
     m_loc.step();
     BEGIN( INITIAL );
@@ -1351,7 +1344,7 @@ YY_RULE_SETUP
 case 88:
 /* rule 88 can match eol */
 YY_RULE_SETUP
-#line 243 "obj/src/GrammarLexer.l"
+#line 236 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( yytext );
     m_loc.lines( 1 );
@@ -1359,13 +1352,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 247 "obj/src/GrammarLexer.l"
+#line 240 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( yytext );
 }
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 250 "obj/src/GrammarLexer.l"
+#line 243 "obj/src/GrammarLexer.l"
 {
     m_log.error( {m_loc}, "multiline comment not terminated", Code::SyntaxErrorUnclosedComment );
     BEGIN( INITIAL );
@@ -1374,7 +1367,7 @@ case YY_STATE_EOF(COMMENT):
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 256 "obj/src/GrammarLexer.l"
+#line 249 "obj/src/GrammarLexer.l"
 { // strings
     m_strbuf.clear();
     BEGIN( STRING );
@@ -1382,7 +1375,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 260 "obj/src/GrammarLexer.l"
+#line 253 "obj/src/GrammarLexer.l"
 { /* eat all tokens */
     m_strbuf.append( yytext );
 }
@@ -1390,41 +1383,41 @@ YY_RULE_SETUP
 case 92:
 /* rule 92 can match eol */
 YY_RULE_SETUP
-#line 263 "obj/src/GrammarLexer.l"
+#line 256 "obj/src/GrammarLexer.l"
 {
     m_loc.lines( 1 );
 }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 266 "obj/src/GrammarLexer.l"
+#line 259 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( "\n" );
 }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 269 "obj/src/GrammarLexer.l"
+#line 262 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( "\t" );
 }
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 272 "obj/src/GrammarLexer.l"
+#line 265 "obj/src/GrammarLexer.l"
 {
     m_strbuf.append( yytext + 1 );
 }
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 275 "obj/src/GrammarLexer.l"
+#line 268 "obj/src/GrammarLexer.l"
 {
     m_log.error( {m_loc}, "unrecognized escape sequence", Code::SyntaxErrorUnrecognizedCharacter );
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 278 "obj/src/GrammarLexer.l"
+#line 271 "obj/src/GrammarLexer.l"
 {
     m_log.error( {m_loc}, "string not terminated", Code::SyntaxErrorUnclosedString );
     BEGIN( INITIAL );
@@ -1433,7 +1426,7 @@ case YY_STATE_EOF(STRING):
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 283 "obj/src/GrammarLexer.l"
+#line 276 "obj/src/GrammarLexer.l"
 {
     BEGIN( INITIAL );
     return Parser::make_STRING( m_strbuf, m_loc );
@@ -1441,7 +1434,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 288 "obj/src/GrammarLexer.l"
+#line 281 "obj/src/GrammarLexer.l"
 {
     m_log.error( {m_loc}, "unrecognized character `" + std::string( yytext ) + "`",
         Code::SyntaxErrorUnrecognizedCharacter );
@@ -1450,10 +1443,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 294 "obj/src/GrammarLexer.l"
+#line 287 "obj/src/GrammarLexer.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1456 "src/various/GrammarLexer.cpp"
+#line 1449 "src/various/GrammarLexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2417,7 +2410,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 294 "obj/src/GrammarLexer.l"
+#line 287 "obj/src/GrammarLexer.l"
 
 
 Lexer::Lexer( Logger& log, std::istream& in, std::ostream& out )
