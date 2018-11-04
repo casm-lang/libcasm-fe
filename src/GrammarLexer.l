@@ -110,26 +110,22 @@ using namespace libcasm_fe;
 }
 
 [\x20]+ { // space
-    m_log.debug( {m_loc}, "span space: " + std::to_string( yyleng ) );
     // TODO: @moiova add span space creation of length yyleng here
     m_loc.step();
 }
 
 [\r]+ { // carriage return
-    m_log.debug( {m_loc}, "span carriage return: "+ std::to_string( yyleng ) );
     // TODO: @moiova add span carriage return creation of length yyleng here
     m_loc.step();
 }
 
 [\t]+ { // tabulator
-    m_log.debug( {m_loc}, "span tabulator: " + std::to_string( yyleng ) );
     // TODO: @moiova add span tabulator creation of length yyleng here
     m_loc.step();
 }
 
 [\n]+ { // newline
     m_loc.lines( yyleng );
-    m_log.debug( {m_loc}, "span newline: " + std::to_string( yyleng ) );
     // TODO: @moiova add span newline creation of length yyleng here
     m_loc.step();
 }
@@ -145,13 +141,11 @@ using namespace libcasm_fe;
 <LCOMMENT>\n {
     unput( *yytext );
     m_loc.columns( -1 );
-    m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "'" );
     // TODO: @moiova add span single line comment creation of m_strbuf here
     m_loc.step();
     BEGIN( INITIAL );
 }
 <LCOMMENT><<EOF>> {
-    m_log.debug( {m_loc}, "span comment SL '" + m_strbuf + "' (EOF)" );
     // TODO: @moiova add span single line comment creation of m_strbuf here
     BEGIN( INITIAL );
 }
@@ -163,7 +157,6 @@ using namespace libcasm_fe;
 }
 <COMMENT>"*/" {
     m_strbuf.append( yytext );
-    m_log.debug( {m_loc}, "span comment ML '" + m_strbuf + "'" );
     // TODO: @moiova add span single line comment creation of m_strbuf here
     m_loc.step();
     BEGIN( INITIAL );
