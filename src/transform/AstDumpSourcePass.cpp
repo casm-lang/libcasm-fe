@@ -79,6 +79,7 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
 
     void visit( InitDefinition& node ) override;
     void visit( Initializer& node ) override;
+    void visit( RuleDefinition& node ) override;
     void visit( EmbracedExpression& node ) override;
     void visit( UndefLiteral& node ) override;
     void visit( ValueLiteral& node ) override;
@@ -120,6 +121,23 @@ void AstDumpSourceVisitor::visit( Initializer& node )
     node.rightBraceToken()->accept( *this );
     node.mapsToken()->accept( *this );
     node.value()->accept( *this );
+}
+
+void AstDumpSourceVisitor::visit( RuleDefinition& node )
+{
+    node.attributes()->accept( *this );
+    node.ruleToken()->accept( *this );
+    node.identifier()->accept( *this );
+    node.leftBracketToken()->accept( *this );
+    node.arguments()->accept( *this );
+    node.rightBracketToken()->accept( *this );
+    node.mapsToken()->accept( *this );
+    if( node.mapsToken()->token() != Grammar::Token::UNRESOLVED )
+    {
+        node.returnType()->accept( *this );
+    }
+    node.assignmentToken()->accept( *this );
+    node.rule()->accept( *this );
 }
 
 void AstDumpSourceVisitor::visit( EmbracedExpression& node )
