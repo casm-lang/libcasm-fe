@@ -87,6 +87,7 @@ class AstDumpSourceVisitor final : public RecursiveVisitor
     void visit( Identifier& node ) override;
     void visit( Token& node ) override;
     void visit( Span& node ) override;
+    void visit( Defined& node ) override;
 
   private:
     std::ostream& m_stream;
@@ -196,6 +197,15 @@ void AstDumpSourceVisitor::visit( Span& node )
 {
     RecursiveVisitor::visit( node );
     m_stream << node.toString();
+}
+
+void AstDumpSourceVisitor::visit( Defined& node )
+{
+    if( node.definedToken()->token() == Grammar::Token::UNRESOLVED )
+    {
+        return;
+    }
+    RecursiveVisitor::visit( node );
 }
 
 void AstDumpSourcePass::usage( libpass::PassUsage& pu )
