@@ -302,6 +302,8 @@ class ExecutionVisitor final : public EmptyVisitor
 
     void execute( const Definition::Ptr& definition );
 
+    void visit( Initially& node ) override;
+
     void visit( Initializer& node ) override;
     void visit( VariableDefinition& node ) override;
     void visit( FunctionDefinition& node ) override;
@@ -476,6 +478,12 @@ void ExecutionVisitor::execute( const Definition::Ptr& definition )
         makeFrame( nullptr, definition.get(), definition->maximumNumberOfLocals() ) );
     definition->accept( *this );
     m_frameStack.pop();
+}
+
+void ExecutionVisitor::visit( Initially& node )
+{
+    // just evaluate the encapsulated initializers
+    node.initializers()->accept( *this );
 }
 
 void ExecutionVisitor::visit( Initializer& node )
@@ -1667,7 +1675,7 @@ void StateInitializationVisitor::visit( FunctionDefinition& node )
     Transaction transaction( &m_updateSetManager, Semantics::Parallel, 100 );
     ExecutionVisitor executionVisitor(
         m_locationRegistry, m_globalState, m_updateSetManager, ReferenceConstant() );
-    node.initializers()->accept( executionVisitor );
+    node.initially()->accept( executionVisitor );
     transaction.merge();
 }
 

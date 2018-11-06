@@ -162,7 +162,8 @@ namespace libcasm_fe
                 const Types::Ptr& argumentTypes,
                 const Token::Ptr& mapsToken,
                 const Type::Ptr& returnType,
-                const Defined::Ptr& defined );
+                const Defined::Ptr& defined,
+                const Initially::Ptr& initially );
 
             bool isProgram( void ) const;
 
@@ -178,15 +179,14 @@ namespace libcasm_fe
 
             const Defined::Ptr& defined( void ) const;
 
+            const Initially::Ptr& initially( void ) const;
+
             void setClassification( Classification classification );
             Classification classification( void ) const;
             std::string classificationName( void ) const;
 
             void setSymbolic( u1 symbolic );
             u1 symbolic( void ) const;
-
-            void setInitializers( const Initializers::Ptr& initializers );
-            const Initializers::Ptr& initializers( void ) const;
 
             void accept( Visitor& visitor ) override final;
 
@@ -199,7 +199,7 @@ namespace libcasm_fe
             const Token::Ptr m_mapsToken;
             Classification m_classification;
             u1 m_symbolic;
-            Initializers::Ptr m_initializers;
+            Initially::Ptr m_initially;
             const bool m_isProgram;
         };
 

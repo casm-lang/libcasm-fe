@@ -114,6 +114,7 @@ void AstDumpSourceVisitor::visit( InitDefinition& node )
 
 void AstDumpSourceVisitor::visit( Initializer& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBraceToken()->accept( *this );
     node.arguments()->accept( *this );
     node.rightBraceToken()->accept( *this );

@@ -225,7 +225,7 @@ void AstToCasmIRVisitor::visit( FunctionDefinition& node )
         // node.attributes()->accept( *this ); // TODO
 
         m_init_flag = true;
-        node.initializers()->accept( *this );
+        node.initially()->accept( *this );
         m_init_flag = false;
     }
 }

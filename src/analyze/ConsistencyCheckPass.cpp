@@ -161,7 +161,7 @@ void ConsistencyCheckVisitor::visit( VariableDefinition& node )
 void ConsistencyCheckVisitor::visit( FunctionDefinition& node )
 {
     m_functionInitially = true;
-    node.initializers()->accept( *this );
+    node.initially()->accept( *this );
     m_functionInitially = false;
 
     node.identifier()->accept( *this );

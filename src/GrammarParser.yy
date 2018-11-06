@@ -127,7 +127,7 @@
         return node;
     }
 
-    static FunctionDefinition::Ptr createProgramFunction( SourceLocation& sourceLocation )
+    static FunctionDefinition::Ptr createProgramFunction( SourceLocation& sourceLocation, const Initializers::Ptr& initializers )
     {
         const auto agentType = createAgentType( sourceLocation );
         const auto ruleRefType = createRuleRefType( sourceLocation );
@@ -139,8 +139,10 @@
         const auto defined = Ast::make< Defined >(
             sourceLocation, uToken, uToken, Ast::make< UndefLiteral >( sourceLocation ), uToken );
 
+        const auto initially = Ast::make< Initially >( sourceLocation, uToken, uToken, initializers, uToken );
+
         return Ast::make< FunctionDefinition >(
-            sourceLocation, uToken, program, uToken, argTypes, uToken, ruleRefType, defined );
+            sourceLocation, uToken, program, uToken, argTypes, uToken, ruleRefType, defined, initially );
     }
 
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
@@ -402,12 +404,12 @@ InitDefinition
           @$, asIdentifierPath( singleAgentIdentifier ), singleAgentArguments );
       singleAgent->setTargetType( DirectCallExpression::TargetType::CONSTANT );
 
-      auto programFunction = createProgramFunction( @$ );
-      auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
+      const auto initializers = Ast::make< Initializers >( @$ );
+      const auto programFunction = createProgramFunction( @$, initializers );
+      const auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       programArguments->add( singleAgent );
 
       const auto ruleReference = Ast::make< ReferenceLiteral >( @$, uToken, $2 );
-      const auto initializers = Ast::make< Initializers >( @$ );
       const auto initializer = Ast::make< Initializer >(
           @$, uToken, programArguments, uToken, uToken, ruleReference );
       initializers->add( initializer );
@@ -419,24 +421,22 @@ InitDefinition
               asIdentifierPath( programFunction->identifier() ) );
       }
 
-      programFunction->setInitializers( initializers );
       $$->setProgramFunction( programFunction );
   }
 | INIT LCURPAREN Initializers RCURPAREN
   {
       $$ = Ast::make< InitDefinition >( @$, $1, $2, $3, $4 );
 
-      auto programFunction = createProgramFunction( @$ );
+      const auto programFunction = createProgramFunction( @$, $3 );
 
       // apply the name of the program declaration to the initializer functions
-      auto initializers = $3;
+      const auto initializers = programFunction->initially()->initializers();
       for( auto& initializer : *initializers )
       {
           initializer->updateRule()->function()->setIdentifier(
               asIdentifierPath( programFunction->identifier() ) );
       }
 
-      programFunction->setInitializers( initializers );
       $$->setProgramFunction( programFunction );
   }
 ;
@@ -508,15 +508,14 @@ RuleDefinition
 FunctionDefinition
 : FUNCTION Identifier COLON MaybeFunctionParameters MAPS Type MaybeDefined MaybeInitially
   {
-      $$ = Ast::make< FunctionDefinition >( @$, $1, $2, $3, $4, $5, $6, $7 );
+      $$ = Ast::make< FunctionDefinition >( @$, $1, $2, $3, $4, $5, $6, $7, $8 );
 
       // apply the name of the function declaration to the initializer functions
-      auto initially = $8;
+      const auto initially = $$->initially();
       for( auto& initializer : *initially->initializers() )
       {
           initializer->updateRule()->function()->setIdentifier( asIdentifierPath( $2 ) );
       }
-      $$->setInitializers( initially->initializers() );
   }
 ;
 

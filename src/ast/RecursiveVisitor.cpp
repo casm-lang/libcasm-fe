@@ -100,8 +100,8 @@ void RecursiveVisitor::visit( FunctionDefinition& node )
     node.argumentTypes()->accept( *this );
     node.mapsToken()->accept( *this );
     node.returnType()->accept( *this );
-    node.initializers()->accept( *this );
     node.defined()->accept( *this );
+    node.initially()->accept( *this );
 }
 
 void RecursiveVisitor::visit( DerivedDefinition& node )

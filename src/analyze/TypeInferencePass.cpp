@@ -238,7 +238,7 @@ void TypeInferenceVisitor::visit( FunctionDefinition& node )
         }
     }
 
-    node.initializers()->accept( *this );
+    node.initially()->accept( *this );
 }
 
 void TypeInferenceVisitor::visit( DerivedDefinition& node )
