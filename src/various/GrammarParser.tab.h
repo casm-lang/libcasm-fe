@@ -484,6 +484,7 @@ namespace libcasm_fe {
       // Header
       char dummy32[sizeof(HeaderDefinition::Ptr)];
 
+      // "identifier"
       // Identifier
       char dummy33[sizeof(Identifier::Ptr)];
 
@@ -597,6 +598,12 @@ namespace libcasm_fe {
       // UsingDefinition
       char dummy69[sizeof(UsingDefinition::Ptr)];
 
+      // "binary"
+      // "hexadecimal"
+      // "integer"
+      // "rational"
+      // "decimal"
+      // "string"
       // BooleanLiteral
       // IntegerLiteral
       // RationalLiteral
@@ -627,15 +634,6 @@ namespace libcasm_fe {
 
       // Type
       char dummy76[sizeof(libcasm_fe::Ast::Type::Ptr)];
-
-      // "binary"
-      // "hexadecimal"
-      // "integer"
-      // "rational"
-      // "decimal"
-      // "string"
-      // "identifier"
-      char dummy77[sizeof(std::string)];
 };
 
     /// Symbol semantic values.
@@ -931,8 +929,6 @@ namespace libcasm_fe {
   basic_symbol (typename Base::kind_type t, const WhileRule::Ptr& v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const libcasm_fe::Ast::Type::Ptr& v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const std::string& v, const location_type& l);
 
 
       /// Constructor for symbols with semantic value.
@@ -1295,31 +1291,31 @@ namespace libcasm_fe {
 
     static inline
     symbol_type
-    make_BINARY (const std::string& v, const location_type& l);
+    make_BINARY (const ValueLiteral::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_HEXADECIMAL (const std::string& v, const location_type& l);
+    make_HEXADECIMAL (const ValueLiteral::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_INTEGER (const std::string& v, const location_type& l);
+    make_INTEGER (const ValueLiteral::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_RATIONAL (const std::string& v, const location_type& l);
+    make_RATIONAL (const ValueLiteral::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_DECIMAL (const std::string& v, const location_type& l);
+    make_DECIMAL (const ValueLiteral::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_STRING (const std::string& v, const location_type& l);
+    make_STRING (const ValueLiteral::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
-    make_IDENTIFIER (const std::string& v, const location_type& l);
+    make_IDENTIFIER (const Identifier::Ptr& v, const location_type& l);
 
     static inline
     symbol_type
@@ -1842,6 +1838,7 @@ namespace libcasm_fe {
         value.copy< HeaderDefinition::Ptr > (other.value);
         break;
 
+      case 81: // "identifier"
       case 164: // Identifier
         value.copy< Identifier::Ptr > (other.value);
         break;
@@ -1992,6 +1989,12 @@ namespace libcasm_fe {
         value.copy< UsingDefinition::Ptr > (other.value);
         break;
 
+      case 75: // "binary"
+      case 76: // "hexadecimal"
+      case 77: // "integer"
+      case 78: // "rational"
+      case 79: // "decimal"
+      case 80: // "string"
       case 136: // BooleanLiteral
       case 137: // IntegerLiteral
       case 138: // RationalLiteral
@@ -2028,16 +2031,6 @@ namespace libcasm_fe {
 
       case 150: // Type
         value.copy< libcasm_fe::Ast::Type::Ptr > (other.value);
-        break;
-
-      case 75: // "binary"
-      case 76: // "hexadecimal"
-      case 77: // "integer"
-      case 78: // "rational"
-      case 79: // "decimal"
-      case 80: // "string"
-      case 81: // "identifier"
-        value.copy< std::string > (other.value);
         break;
 
       default:
@@ -2257,6 +2250,7 @@ namespace libcasm_fe {
         value.copy< HeaderDefinition::Ptr > (v);
         break;
 
+      case 81: // "identifier"
       case 164: // Identifier
         value.copy< Identifier::Ptr > (v);
         break;
@@ -2407,6 +2401,12 @@ namespace libcasm_fe {
         value.copy< UsingDefinition::Ptr > (v);
         break;
 
+      case 75: // "binary"
+      case 76: // "hexadecimal"
+      case 77: // "integer"
+      case 78: // "rational"
+      case 79: // "decimal"
+      case 80: // "string"
       case 136: // BooleanLiteral
       case 137: // IntegerLiteral
       case 138: // RationalLiteral
@@ -2443,16 +2443,6 @@ namespace libcasm_fe {
 
       case 150: // Type
         value.copy< libcasm_fe::Ast::Type::Ptr > (v);
-        break;
-
-      case 75: // "binary"
-      case 76: // "hexadecimal"
-      case 77: // "integer"
-      case 78: // "rational"
-      case 79: // "decimal"
-      case 80: // "string"
-      case 81: // "identifier"
-        value.copy< std::string > (v);
         break;
 
       default:
@@ -3001,13 +2991,6 @@ namespace libcasm_fe {
     , location (l)
   {}
 
-  template <typename Base>
-  Parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string& v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
 
   template <typename Base>
   Parser::basic_symbol<Base>::~basic_symbol ()
@@ -3234,6 +3217,7 @@ namespace libcasm_fe {
         value.template destroy< HeaderDefinition::Ptr > ();
         break;
 
+      case 81: // "identifier"
       case 164: // Identifier
         value.template destroy< Identifier::Ptr > ();
         break;
@@ -3384,6 +3368,12 @@ namespace libcasm_fe {
         value.template destroy< UsingDefinition::Ptr > ();
         break;
 
+      case 75: // "binary"
+      case 76: // "hexadecimal"
+      case 77: // "integer"
+      case 78: // "rational"
+      case 79: // "decimal"
+      case 80: // "string"
       case 136: // BooleanLiteral
       case 137: // IntegerLiteral
       case 138: // RationalLiteral
@@ -3420,16 +3410,6 @@ namespace libcasm_fe {
 
       case 150: // Type
         value.template destroy< libcasm_fe::Ast::Type::Ptr > ();
-        break;
-
-      case 75: // "binary"
-      case 76: // "hexadecimal"
-      case 77: // "integer"
-      case 78: // "rational"
-      case 79: // "decimal"
-      case 80: // "string"
-      case 81: // "identifier"
-        value.template destroy< std::string > ();
         break;
 
       default:
@@ -3655,6 +3635,7 @@ namespace libcasm_fe {
         value.move< HeaderDefinition::Ptr > (s.value);
         break;
 
+      case 81: // "identifier"
       case 164: // Identifier
         value.move< Identifier::Ptr > (s.value);
         break;
@@ -3805,6 +3786,12 @@ namespace libcasm_fe {
         value.move< UsingDefinition::Ptr > (s.value);
         break;
 
+      case 75: // "binary"
+      case 76: // "hexadecimal"
+      case 77: // "integer"
+      case 78: // "rational"
+      case 79: // "decimal"
+      case 80: // "string"
       case 136: // BooleanLiteral
       case 137: // IntegerLiteral
       case 138: // RationalLiteral
@@ -3841,16 +3828,6 @@ namespace libcasm_fe {
 
       case 150: // Type
         value.move< libcasm_fe::Ast::Type::Ptr > (s.value);
-        break;
-
-      case 75: // "binary"
-      case 76: // "hexadecimal"
-      case 77: // "integer"
-      case 78: // "rational"
-      case 79: // "decimal"
-      case 80: // "string"
-      case 81: // "identifier"
-        value.move< std::string > (s.value);
         break;
 
       default:
@@ -4360,43 +4337,43 @@ namespace libcasm_fe {
   }
 
   Parser::symbol_type
-  Parser::make_BINARY (const std::string& v, const location_type& l)
+  Parser::make_BINARY (const ValueLiteral::Ptr& v, const location_type& l)
   {
     return symbol_type (token::BINARY, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_HEXADECIMAL (const std::string& v, const location_type& l)
+  Parser::make_HEXADECIMAL (const ValueLiteral::Ptr& v, const location_type& l)
   {
     return symbol_type (token::HEXADECIMAL, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_INTEGER (const std::string& v, const location_type& l)
+  Parser::make_INTEGER (const ValueLiteral::Ptr& v, const location_type& l)
   {
     return symbol_type (token::INTEGER, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_RATIONAL (const std::string& v, const location_type& l)
+  Parser::make_RATIONAL (const ValueLiteral::Ptr& v, const location_type& l)
   {
     return symbol_type (token::RATIONAL, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_DECIMAL (const std::string& v, const location_type& l)
+  Parser::make_DECIMAL (const ValueLiteral::Ptr& v, const location_type& l)
   {
     return symbol_type (token::DECIMAL, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_STRING (const std::string& v, const location_type& l)
+  Parser::make_STRING (const ValueLiteral::Ptr& v, const location_type& l)
   {
     return symbol_type (token::STRING, v, l);
   }
 
   Parser::symbol_type
-  Parser::make_IDENTIFIER (const std::string& v, const location_type& l)
+  Parser::make_IDENTIFIER (const Identifier::Ptr& v, const location_type& l)
   {
     return symbol_type (token::IDENTIFIER, v, l);
   }
@@ -4434,7 +4411,7 @@ namespace libcasm_fe {
 
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:380
 } // libcasm_fe
-#line 4438 "GrammarParser.tab.h" // lalr1.cc:380
+#line 4415 "GrammarParser.tab.h" // lalr1.cc:380
 
 
 
