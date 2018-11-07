@@ -107,12 +107,12 @@ src/various/GrammarParser.xml:    src/various/GrammarParser.cpp
 src/various/Grammar.org: src/various/GrammarParser.xml src/GrammarLexer.l
 	@xsltproc ../stdhl/src/xsl/bison/xml2org.xsl $< > $@
 	@sed -i "/ error/d" $@
-	@sed -i "s/\"binary\"/\"`grep _BINARY src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
-	@sed -i "s/\"hexadecimal\"/\"`grep _HEXADECIMAL src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
-	@sed -i "s/\"integer\"/\"`grep _INTEGER src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
-	@sed -i "s/\"rational\"/\"`grep _RATIONAL src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
-	@sed -i "s/\"decimal\"/\"`grep _DECIMAL src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
-	@sed -i "s/\"identifier\"/\"`grep _IDENTIFIER src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
+	@sed -i "s/\"binary\"/\"`grep '// BINARY' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
+	@sed -i "s/\"hexadecimal\"/\"`grep '// HEXADECIMAL' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
+	@sed -i "s/\"integer\"/\"`grep '// INTEGER' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
+	@sed -i "s/\"rational\"/\"`grep '// RATIONAL' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
+	@sed -i "s/\"decimal\"/\"`grep '// DECIMAL' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
+	@sed -i "s/\"identifier\"/\"`grep '// IDENTIFIER' src/GrammarLexer.l -B 1 | head -n 1 | sed 's/ {//g' | sed 's/\n//g' | sed 's/\r//g'`\"/g" $@
 	@sed -i "s/\"string\"/'\"'.*'\"'/g" $@
 
 ci-fetch: ci-git-access

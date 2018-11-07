@@ -88,6 +88,7 @@ using namespace libcasm_fe;
 %}
 
 0[bB][01][01\']*[01]* {
+    // BINARY
     ValueLiteral::Ptr valueLiteral = nullptr;
     try
     {
@@ -103,6 +104,7 @@ using namespace libcasm_fe;
 }
 
 0[xX][0-9a-fA-F][0-9a-fA-F\']*[0-9a-fA-F]* {
+    // HEXADECIMAL
     ValueLiteral::Ptr valueLiteral = nullptr;
     try
     {
@@ -118,6 +120,7 @@ using namespace libcasm_fe;
 }
 
 0[rR][0-9][0-9\']*[0-9]*(\/[0-9][0-9\']*[0-9]*)? {
+    // RATIONAL
     ValueLiteral::Ptr valueLiteral = nullptr;
     try
     {
@@ -134,6 +137,7 @@ using namespace libcasm_fe;
 }
 
 [0-9][0-9\']*[0-9]* {
+    // INTEGER
     ValueLiteral::Ptr valueLiteral = nullptr;
     try
     {
@@ -149,6 +153,7 @@ using namespace libcasm_fe;
 }
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)? {
+    // DECIMAL
     ValueLiteral::Ptr valueLiteral = nullptr;
     try
     {
@@ -167,6 +172,7 @@ using namespace libcasm_fe;
 {{grammartoken}}
 
 [a-zA-Z_][a-zA-Z0-9\_]* {
+    // IDENTIFIER
     const auto identifier = Ast::make< Identifier >( m_loc, yytext );
     identifier->setSpans( fetchSpansAndReset() );
     return Parser::make_IDENTIFIER( identifier, m_loc );
@@ -292,8 +298,6 @@ using namespace libcasm_fe;
 }
 
 %%
-
-
 
 //  
 //  Local variables:
