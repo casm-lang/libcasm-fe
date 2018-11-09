@@ -142,30 +142,33 @@ void ValueLiteral::setRadix( const libstdhl::Type::Radix radix )
     m_radix = radix;
 }
 
-libstdhl::Type::Radix ValueLiteral::radix ( void ) const
+libstdhl::Type::Radix ValueLiteral::radix( void ) const
 {
     return m_radix;
 }
 
-std::string ValueLiteral::toString ( void ) const
+std::string ValueLiteral::toString( void ) const
 {
     if( value()->type().isString() )
     {
         return "\"" + value()->name() + "\"";
     }
-    else if ( value()->type().isBinary() )
+    else if( value()->type().isBinary() )
     {
         std::string tmp = "";
-        if (radix() == libstdhl::Type::Radix::HEXADECIMAL)
+        if( radix() == libstdhl::Type::Radix::HEXADECIMAL )
         {
             tmp = "0x";
         }
-        else if(radix() == libstdhl::Type::Radix::BINARY)
+        else if( radix() == libstdhl::Type::Radix::BINARY )
         {
             tmp = "0b";
         }
         std::string val = value()->data().to_string( radix() );
-        std::string pad( ( sourceLocation().end.column - sourceLocation().begin.column ) - tmp.length() - val.length(), '0' );
+        std::string pad(
+            ( sourceLocation().end.column - sourceLocation().begin.column ) - tmp.length() -
+                val.length(),
+            '0' );
         return tmp + pad + val;
     }
     else

@@ -100,7 +100,7 @@ namespace libcasm_fe
 
             void setRadix( const libstdhl::Type::Radix radix );
 
-            libstdhl::Type::Radix radix ( void ) const;
+            libstdhl::Type::Radix radix( void ) const;
 
             std::string toString( void ) const;
 
