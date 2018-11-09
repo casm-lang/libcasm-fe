@@ -53,6 +53,7 @@ include_directories(
 add_library( ${PROJECT}-test OBJECT
   main.cpp
   ast/NodeTest.cpp
+  ast/literal.cpp
   ast/span.cpp
   main.cpp
 #  numeric/expression_evaluation.cpp  # TODO: FIXME: PPA: EPE we should enable this test ASAP
