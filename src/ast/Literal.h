@@ -98,10 +98,17 @@ namespace libcasm_fe
 
             void setValue( const libcasm_ir::Constant::Ptr& value );
 
+            void setRadix( const libstdhl::Type::Radix radix );
+
+            libstdhl::Type::Radix radix ( void ) const;
+
+            std::string toString( void ) const;
+
             void accept( Visitor& visitor ) override final;
 
           private:
             libcasm_ir::Constant::Ptr m_value;
+            libstdhl::Type::Radix m_radix;
         };
 
         class ReferenceLiteral final : public Literal

@@ -158,19 +158,8 @@ void AstDumpSourceVisitor::visit( UndefLiteral& node )
 
 void AstDumpSourceVisitor::visit( ValueLiteral& node )
 {
-    const auto value_is_string = node.value()->type().isString();
     RecursiveVisitor::visit( node );
-
-    if( value_is_string )
-    {
-        m_stream << "\"";
-    }
-    m_stream << node.value()->name();
-
-    if( value_is_string )
-    {
-        m_stream << "\"";
-    }
+    m_stream << node.toString();
 }
 
 void AstDumpSourceVisitor::visit( UnresolvedType& node )

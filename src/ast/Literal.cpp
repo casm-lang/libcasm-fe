@@ -118,6 +118,7 @@ void UndefLiteral::accept( Visitor& visitor )
 ValueLiteral::ValueLiteral( const libcasm_ir::Constant::Ptr& value )
 : Literal( Node::ID::VALUE_LITERAL )
 , m_value( value )
+, m_radix( libstdhl::Type::Radix::DECIMAL )
 {
     Expression::setType( value->type().ptr_type() );
 
@@ -134,6 +135,43 @@ void ValueLiteral::setValue( const libcasm_ir::Constant::Ptr& value )
 {
     m_value = value;
     Expression::setType( m_value->type().ptr_type() );
+}
+
+void ValueLiteral::setRadix( const libstdhl::Type::Radix radix )
+{
+    m_radix = radix;
+}
+
+libstdhl::Type::Radix ValueLiteral::radix ( void ) const
+{
+    return m_radix;
+}
+
+std::string ValueLiteral::toString ( void ) const
+{
+    if( value()->type().isString() )
+    {
+        return "\"" + value()->name() + "\"";
+    }
+    else if ( value()->type().isBinary() )
+    {
+        std::string tmp = "";
+        if (radix() == libstdhl::Type::Radix::HEXADECIMAL)
+        {
+            tmp = "0x";
+        }
+        else if(radix() == libstdhl::Type::Radix::BINARY)
+        {
+            tmp = "0b";
+        }
+        std::string val = value()->data().to_string( radix() );
+        std::string pad( ( sourceLocation().end.column - sourceLocation().begin.column ) - tmp.length() - val.length(), '0' );
+        return tmp + pad + val;
+    }
+    else
+    {
+        return value()->name();
+    }
 }
 
 void ValueLiteral::accept( Visitor& visitor )

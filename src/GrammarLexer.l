@@ -95,6 +95,7 @@ using namespace libcasm_fe;
         const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::BINARY );
         valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
+        valueLiteral->setRadix( libstdhl::Type::Radix::BINARY );
     }
     catch( const std::domain_error& e )
     {
@@ -111,6 +112,7 @@ using namespace libcasm_fe;
         const auto value = libstdhl::Memory::get< libcasm_ir::BinaryConstant >( yytext + 2, libstdhl::Type::HEXADECIMAL );
         valueLiteral = Ast::make< ValueLiteral >( m_loc, value );
         valueLiteral->setSpans( fetchSpansAndReset() );
+        valueLiteral->setRadix( libstdhl::Type::Radix::HEXADECIMAL );
     }
     catch( const std::domain_error& e )
     {
