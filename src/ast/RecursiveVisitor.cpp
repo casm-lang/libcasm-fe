@@ -175,22 +175,26 @@ void RecursiveVisitor::visit( InvariantDefinition& node )
 
 void RecursiveVisitor::visit( UndefLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.spans()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ValueLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.spans()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ReferenceLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.at()->accept( *this );
     node.identifier()->accept( *this );
 }
 
 void RecursiveVisitor::visit( ListLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBracket()->accept( *this );
     node.expressions()->accept( *this );
     node.rightBracket()->accept( *this );
@@ -198,6 +202,7 @@ void RecursiveVisitor::visit( ListLiteral& node )
 
 void RecursiveVisitor::visit( RangeLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBracket()->accept( *this );
     node.left()->accept( *this );
     node.dotdot()->accept( *this );
@@ -207,6 +212,7 @@ void RecursiveVisitor::visit( RangeLiteral& node )
 
 void RecursiveVisitor::visit( TupleLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBracket()->accept( *this );
     node.expressions()->accept( *this );
     node.rightBracket()->accept( *this );
@@ -214,6 +220,7 @@ void RecursiveVisitor::visit( TupleLiteral& node )
 
 void RecursiveVisitor::visit( RecordLiteral& node )
 {
+    node.delimiterToken()->accept( *this );
     node.leftBracket()->accept( *this );
     node.namedExpressions()->accept( *this );
     node.rightBracket()->accept( *this );
