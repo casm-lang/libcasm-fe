@@ -48,6 +48,9 @@
 #include "Definition.h"
 #include "Type.h"
 
+#include <libstdhl/File>
+#include <libstdhl/String>
+
 using namespace libcasm_fe;
 using namespace Ast;
 
@@ -149,32 +152,11 @@ libstdhl::Type::Radix ValueLiteral::radix( void ) const
 
 std::string ValueLiteral::toString( void ) const
 {
-    if( value()->type().isString() )
-    {
-        return "\"" + value()->name() + "\"";
-    }
-    else if( value()->type().isBinary() )
-    {
-        std::string tmp = "";
-        if( radix() == libstdhl::Type::Radix::HEXADECIMAL )
-        {
-            tmp = "0x";
-        }
-        else if( radix() == libstdhl::Type::Radix::BINARY )
-        {
-            tmp = "0b";
-        }
-        std::string val = value()->data().to_string( radix() );
-        std::string pad(
-            ( sourceLocation().end.column - sourceLocation().begin.column ) - tmp.length() -
-                val.length(),
-            '0' );
-        return tmp + pad + val;
-    }
-    else
-    {
-        return value()->name();
-    }
+    std::string line =
+        libstdhl::File::readLine( *sourceLocation().begin.fileName, sourceLocation().begin.line );
+    return line.substr(
+        sourceLocation().begin.column - 1,
+        sourceLocation().end.column - sourceLocation().begin.column );
 }
 
 void ValueLiteral::accept( Visitor& visitor )
