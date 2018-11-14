@@ -152,11 +152,10 @@ libstdhl::Type::Radix ValueLiteral::radix( void ) const
 
 std::string ValueLiteral::toString( void ) const
 {
-    std::string line =
-        libstdhl::File::readLine( *sourceLocation().begin.fileName, sourceLocation().begin.line );
-    return line.substr(
-        sourceLocation().begin.column - 1,
-        sourceLocation().end.column - sourceLocation().begin.column );
+    const auto& begin = sourceLocation().begin;
+    const auto& end = sourceLocation().end;
+    const auto line = libstdhl::File::readLine( *begin.fileName, begin.line );
+    return line.substr( begin.column - 1, end.column - begin.column );
 }
 
 void ValueLiteral::accept( Visitor& visitor )
