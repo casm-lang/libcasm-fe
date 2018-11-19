@@ -754,15 +754,11 @@ ImplementDefinitionList
 Declaration
 : DERIVED Identifier COLON MaybeFunctionParameters MAPS Type
   {
-      // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
-      $$ = Ast::make< Declaration >
-          ( @$, $2, $4, $6, Declaration::Kind::DERIVED );
+      $$ = Ast::make< Declaration >( @$, $1, $2, $3, $4, $5, $6 );
   }
 | RULE Identifier COLON MaybeFunctionParameters MAPS Type
   {
-      // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
-      $$ = Ast::make< Declaration >
-          ( @$, $2, $4, $6, Declaration::Kind::RULE );
+      $$ = Ast::make< Declaration >( @$, $1, $2, $3, $4, $5, $6 );
   }
 ;
 

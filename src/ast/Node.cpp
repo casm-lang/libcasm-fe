@@ -139,7 +139,7 @@ std::string Node::description( void ) const
         {
             return "implement";
         }
-        case ID::DECLARATION_DEFINITION:
+        case ID::DECLARATION:
         {
             return "declaration";
         }

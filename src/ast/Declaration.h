@@ -62,14 +62,22 @@ namespace libcasm_fe
             };
 
             Declaration(
+                const Token::Ptr& kindToken,
                 const Identifier::Ptr& identifier,
+                const Token::Ptr& colonToken,
                 const Types::Ptr& argumentTypes,
-                const Type::Ptr& returnType,
-                const Kind kind );
+                const Token::Ptr& mapsToken,
+                const Type::Ptr& returnType );
 
             const Types::Ptr& argumentTypes( void ) const;
 
             const Type::Ptr& returnType( void ) const;
+
+            const Token::Ptr& kindToken( void ) const;
+
+            const Token::Ptr& colonToken( void ) const;
+
+            const Token::Ptr& mapsToken( void ) const;
 
             Kind kind( void ) const;
 
@@ -80,6 +88,9 @@ namespace libcasm_fe
           private:
             const Types::Ptr m_argumentTypes;
             const Type::Ptr m_returnType;
+            const Token::Ptr m_kindToken;
+            const Token::Ptr m_colonToken;
+            const Token::Ptr m_mapsToken;
             const Kind m_kind;
         };
 

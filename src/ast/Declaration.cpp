@@ -43,6 +43,8 @@
 
 #include "Declaration.h"
 
+#include "../various/GrammarToken.h"
+
 #include <cassert>
 
 using namespace libcasm_fe;
@@ -54,15 +56,24 @@ using namespace Ast;
 //
 
 Declaration::Declaration(
+    const Token::Ptr& kindToken,
     const Identifier::Ptr& identifier,
+    const Token::Ptr& colonToken,
     const Types::Ptr& argumentTypes,
-    const Type::Ptr& returnType,
-    const Declaration::Kind kind )
-: Definition( Node::ID::DECLARATION_DEFINITION, identifier )
+    const Token::Ptr& mapsToken,
+    const Type::Ptr& returnType )
+: Definition( Node::ID::DECLARATION, identifier )
 , m_argumentTypes( argumentTypes )
 , m_returnType( returnType )
-, m_kind( kind )
+, m_kindToken( kindToken )
+, m_colonToken( colonToken )
+, m_mapsToken( mapsToken )
+, m_kind(
+      kindToken->token() == Grammar::Token::DERIVED ? Declaration::Kind::DERIVED
+                                                    : Declaration::Kind::RULE )
 {
+    assert( kindToken );
+    assert( kindToken->token() == Grammar::Token::RULE and m_kind == Declaration::Kind::RULE );
 }
 
 const Types::Ptr& Declaration::argumentTypes( void ) const
@@ -96,6 +107,21 @@ std::string Declaration::kindName( void ) const
 
     assert( !" internal error! " );
     return std::string();
+}
+
+const Token::Ptr& Declaration::kindToken( void ) const
+{
+    return m_kindToken;
+}
+
+const Token::Ptr& Declaration::colonToken( void ) const
+{
+    return m_colonToken;
+}
+
+const Token::Ptr& Declaration::mapsToken( void ) const
+{
+    return m_mapsToken;
 }
 
 void Declaration::accept( Visitor& visitor )

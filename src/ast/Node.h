@@ -84,7 +84,7 @@ namespace libcasm_fe
                 STRUCTURE_DEFINITION,
                 FEATURE_DEFINITION,
                 IMPLEMENT_DEFINITION,
-                DECLARATION_DEFINITION,
+                DECLARATION,
 
                 // literals
                 UNDEF_LITERAL,
