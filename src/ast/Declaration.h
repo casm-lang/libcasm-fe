@@ -1,12 +1,10 @@
 //
-//  Copyright (C) 2014-2021 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2018 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
-//                Jakob Moosbrugger
 //                Florian Hahn
-//                Ioan Molnar
 //                <https://github.com/casm-lang/libcasm-fe>
 //
 //  This file is part of libcasm-fe.
@@ -43,75 +41,53 @@
 //  statement from your version.
 //
 
-#ifndef _LIBCASM_FE_SPECIFICATION_H_
-#define _LIBCASM_FE_SPECIFICATION_H_
+#ifndef _LIBCASM_FE_DECLARATION_H_
+#define _LIBCASM_FE_DECLARATION_H_
 
-#include <libcasm-fe/Namespace>
-#include <libcasm-fe/ast/Declaration>
 #include <libcasm-fe/ast/Definition>
-#include <libcasm-fe/ast/Expression>
-#include <libcasm-fe/ast/Literal>
-#include <libcasm-fe/ast/Node>
-#include <libcasm-fe/ast/Rule>
-#include <libcasm-fe/ast/Span>
-
-#include <libstdhl/std/rfc3986>
 
 namespace libcasm_fe
 {
-    class Specification
+    namespace Ast
     {
-      public:
-        static const std::string& fileExtension( void );
-
-        enum class AsmType
+        class Declaration final : public Definition
         {
-            SYNCHRONOUS,  // lock-step
-            ASYNCHRONOUS  // randomly pick a single agent
+          public:
+            using Ptr = std::shared_ptr< Declaration >;
+
+            enum class Kind
+            {
+                DERIVED,
+                RULE
+            };
+
+            Declaration(
+                const Identifier::Ptr& identifier,
+                const Types::Ptr& argumentTypes,
+                const Type::Ptr& returnType,
+                const Kind kind );
+
+            const Types::Ptr& argumentTypes( void ) const;
+
+            const Type::Ptr& returnType( void ) const;
+
+            Kind kind( void ) const;
+
+            std::string kindName( void ) const;
+
+            void accept( Visitor& visitor ) override final;
+
+          private:
+            const Types::Ptr m_argumentTypes;
+            const Type::Ptr m_returnType;
+            const Kind m_kind;
         };
 
-      public:
-        using Ptr = std::shared_ptr< Specification >;
-
-        explicit Specification( void );
-
-        void setAsmType( const AsmType asmType );
-        AsmType asmType( void ) const;
-
-        void setLocation( const libstdhl::Standard::RFC3986::URI::Ptr& location );
-
-        const libstdhl::Standard::RFC3986::URI::Ptr& location( void ) const;
-
-        const std::string& name( void ) const;
-
-        void setHeader( const Ast::HeaderDefinition::Ptr& header );
-
-        const Ast::HeaderDefinition::Ptr& header( void ) const;
-
-        void setDefinitions( const Ast::Definitions::Ptr& definitions );
-
-        const Ast::Definitions::Ptr& definitions( void ) const;
-
-        void setSpans( const Ast::Spans::Ptr& spans );
-
-        const Ast::Spans::Ptr& spans( void ) const;
-
-        void setSymboltable( const Namespace::Ptr& symboltable );
-
-        const Namespace::Ptr& symboltable( void ) const;
-
-      private:
-        AsmType m_asmType;
-        std::string m_name;
-        libstdhl::Standard::RFC3986::URI::Ptr m_location;
-        Ast::HeaderDefinition::Ptr m_header;
-        Ast::Definitions::Ptr m_definitions;
-        Ast::Spans::Ptr m_spans;
-        Namespace::Ptr m_symboltable;
-    };
+        using Declarations = NodeList< Declaration >;
+    }
 }
 
-#endif  // _LIBCASM_FE_SPECIFICATION_H_
+#endif  // _LIBCASM_FE_DECLARATION_H_
 
 //
 //  Local variables:

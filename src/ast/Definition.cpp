@@ -882,61 +882,6 @@ void ImplementDefinition::accept( Visitor& visitor )
 
 //
 //
-// Declaration
-//
-
-Declaration::Declaration(
-    const Identifier::Ptr& identifier,
-    const Types::Ptr& argumentTypes,
-    const Type::Ptr& returnType,
-    const Declaration::Kind kind )
-: Definition( Node::ID::DECLARATION_DEFINITION, identifier )
-, m_argumentTypes( argumentTypes )
-, m_returnType( returnType )
-, m_kind( kind )
-{
-}
-
-const Types::Ptr& Declaration::argumentTypes( void ) const
-{
-    return m_argumentTypes;
-}
-
-const Type::Ptr& Declaration::returnType( void ) const
-{
-    return m_returnType;
-}
-
-Declaration::Kind Declaration::kind( void ) const
-{
-    return m_kind;
-}
-
-std::string Declaration::kindName( void ) const
-{
-    switch( kind() )
-    {
-        case Declaration::Kind::DERIVED:
-        {
-            return "derived";
-        }
-        case Declaration::Kind::RULE:
-        {
-            return "rule";
-        }
-    }
-
-    assert( !" internal error! " );
-    return std::string();
-}
-
-void Declaration::accept( Visitor& visitor )
-{
-    visitor.visit( *this );
-}
-
-//
-//
 // InitDefinition
 //
 

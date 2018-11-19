@@ -46,10 +46,8 @@
 #include "RecursiveVisitor.h"
 
 #include "../various/GrammarToken.h"
-#include "Definition.h"
-#include "Expression.h"
-#include "Literal.h"
-#include "Rule.h"
+
+#include <libcasm-fe/Specification>
 
 using namespace libcasm_fe;
 using namespace Ast;

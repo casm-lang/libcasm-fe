@@ -543,41 +543,6 @@ namespace libcasm_fe
             const Token::Ptr m_rightBraceToken;
         };
 
-        class Declaration final : public Definition
-        {
-          public:
-            using Ptr = std::shared_ptr< Declaration >;
-
-            enum class Kind
-            {
-                DERIVED,
-                RULE
-            };
-
-            Declaration(
-                const Identifier::Ptr& identifier,
-                const Types::Ptr& argumentTypes,
-                const Type::Ptr& returnType,
-                const Kind kind );
-
-            const Types::Ptr& argumentTypes( void ) const;
-
-            const Type::Ptr& returnType( void ) const;
-
-            Kind kind( void ) const;
-
-            std::string kindName( void ) const;
-
-            void accept( Visitor& visitor ) override final;
-
-          private:
-            const Types::Ptr m_argumentTypes;
-            const Type::Ptr m_returnType;
-            const Kind m_kind;
-        };
-
-        using Declarations = NodeList< Declaration >;
-
         class InitDefinition final : public Definition
         {
           public:

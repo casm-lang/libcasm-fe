@@ -62,6 +62,7 @@ add_library( ${PROJECT}-cpp OBJECT
   TypeInfo.cpp
 
   ast/Attribute.cpp
+  ast/Declaration.cpp
   ast/Definition.cpp
   ast/EmptyVisitor.cpp
   ast/Expression.cpp
@@ -307,6 +308,7 @@ ecm_generate_headers( ${PROJECT}_AST_HEADERS_CPP
     CAMELCASE
   HEADER_NAMES
     Attribute
+    Declaration
     Definition
     EmptyVisitor
     Expression
