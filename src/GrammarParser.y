@@ -152,7 +152,7 @@ END       0 "end of file"
 %type <ImplementDefinition::Ptr> ImplementDefinition
 %type <Definition::Ptr> ImplementDefinitionElement
 %type <Definitions::Ptr> ImplementDefinitionList
-%type <DeclarationDefinition::Ptr> Declaration
+%type <Declaration::Ptr> Declaration
 
 // literals
 %type <Literal::Ptr> Literal
@@ -748,21 +748,21 @@ ImplementDefinitionList
 
 //
 //
-// DeclarationDefinition
+// Declaration
 //
 
 Declaration
 : DERIVED Identifier COLON MaybeFunctionParameters MAPS Type
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
-      $$ = Ast::make< DeclarationDefinition >
-          ( @$, $2, $4, $6, DeclarationDefinition::Kind::DERIVED );
+      $$ = Ast::make< Declaration >
+          ( @$, $2, $4, $6, Declaration::Kind::DERIVED );
   }
 | RULE Identifier COLON MaybeFunctionParameters MAPS Type
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
-      $$ = Ast::make< DeclarationDefinition >
-          ( @$, $2, $4, $6, DeclarationDefinition::Kind::RULE );
+      $$ = Ast::make< Declaration >
+          ( @$, $2, $4, $6, Declaration::Kind::RULE );
   }
 ;
 

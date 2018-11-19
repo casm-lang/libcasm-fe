@@ -543,10 +543,10 @@ namespace libcasm_fe
             const Token::Ptr m_rightBraceToken;
         };
 
-        class DeclarationDefinition final : public Definition
+        class Declaration final : public Definition
         {
           public:
-            using Ptr = std::shared_ptr< DeclarationDefinition >;
+            using Ptr = std::shared_ptr< Declaration >;
 
             enum class Kind
             {
@@ -554,7 +554,7 @@ namespace libcasm_fe
                 RULE
             };
 
-            DeclarationDefinition(
+            Declaration(
                 const Identifier::Ptr& identifier,
                 const Types::Ptr& argumentTypes,
                 const Type::Ptr& returnType,
@@ -576,7 +576,7 @@ namespace libcasm_fe
             const Kind m_kind;
         };
 
-        using DeclarationDefinitions = NodeList< DeclarationDefinition >;
+        using Declarations = NodeList< Declaration >;
 
         class InitDefinition final : public Definition
         {

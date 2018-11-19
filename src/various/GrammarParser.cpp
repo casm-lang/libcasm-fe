@@ -366,7 +366,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Declaration: // Declaration
-        value.YY_MOVE_OR_COPY< DeclarationDefinition::Ptr > (YY_MOVE (that.value));
+        value.YY_MOVE_OR_COPY< Declaration::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_MaybeDefined: // MaybeDefined
@@ -828,7 +828,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Declaration: // Declaration
-        value.move< DeclarationDefinition::Ptr > (YY_MOVE (that.value));
+        value.move< Declaration::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_MaybeDefined: // MaybeDefined
@@ -1290,7 +1290,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Declaration: // Declaration
-        value.copy< DeclarationDefinition::Ptr > (that.value);
+        value.copy< Declaration::Ptr > (that.value);
         break;
 
       case symbol_kind::S_MaybeDefined: // MaybeDefined
@@ -1751,7 +1751,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Declaration: // Declaration
-        value.move< DeclarationDefinition::Ptr > (that.value);
+        value.move< Declaration::Ptr > (that.value);
         break;
 
       case symbol_kind::S_MaybeDefined: // MaybeDefined
@@ -2457,7 +2457,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Declaration: // Declaration
-        yylhs.value.emplace< DeclarationDefinition::Ptr > ();
+        yylhs.value.emplace< Declaration::Ptr > ();
         break;
 
       case symbol_kind::S_MaybeDefined: // MaybeDefined
@@ -3265,7 +3265,7 @@ namespace libcasm_fe {
   case 52: // FeatureDefinitionElement: Attributes Declaration
 #line 801 "../../obj/src/GrammarParser.y"
   {
-      auto definition = yystack_[0].value.as < DeclarationDefinition::Ptr > ();
+      auto definition = yystack_[0].value.as < Declaration::Ptr > ();
       definition->setAttributes( yystack_[1].value.as < Attributes::Ptr > () );
       yylhs.value.as < Definition::Ptr > () = definition;
   }
@@ -3275,7 +3275,7 @@ namespace libcasm_fe {
   case 53: // FeatureDefinitionElement: Declaration
 #line 807 "../../obj/src/GrammarParser.y"
   {
-      yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < DeclarationDefinition::Ptr > ();
+      yylhs.value.as < Definition::Ptr > () = yystack_[0].value.as < Declaration::Ptr > ();
   }
 #line 3281 "GrammarParser.cpp"
     break;
@@ -3412,8 +3412,8 @@ namespace libcasm_fe {
 #line 911 "../../obj/src/GrammarParser.y"
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
-      yylhs.value.as < DeclarationDefinition::Ptr > () = Ast::make< DeclarationDefinition >
-          ( yylhs.location, yystack_[4].value.as < Identifier::Ptr > (), yystack_[2].value.as < Types::Ptr > (), yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > (), DeclarationDefinition::Kind::DERIVED );
+      yylhs.value.as < Declaration::Ptr > () = Ast::make< Declaration >
+          ( yylhs.location, yystack_[4].value.as < Identifier::Ptr > (), yystack_[2].value.as < Types::Ptr > (), yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > (), Declaration::Kind::DERIVED );
   }
 #line 3419 "GrammarParser.cpp"
     break;
@@ -3422,8 +3422,8 @@ namespace libcasm_fe {
 #line 917 "../../obj/src/GrammarParser.y"
   {
       // TODO: FIXME: @ppaulweber: handle AST keyword tokens $1, $3, and $5
-      yylhs.value.as < DeclarationDefinition::Ptr > () = Ast::make< DeclarationDefinition >
-          ( yylhs.location, yystack_[4].value.as < Identifier::Ptr > (), yystack_[2].value.as < Types::Ptr > (), yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > (), DeclarationDefinition::Kind::RULE );
+      yylhs.value.as < Declaration::Ptr > () = Ast::make< Declaration >
+          ( yylhs.location, yystack_[4].value.as < Identifier::Ptr > (), yystack_[2].value.as < Types::Ptr > (), yystack_[0].value.as < libcasm_fe::Ast::Type::Ptr > (), Declaration::Kind::RULE );
   }
 #line 3429 "GrammarParser.cpp"
     break;

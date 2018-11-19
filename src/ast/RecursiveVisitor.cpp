@@ -242,7 +242,7 @@ void RecursiveVisitor::visit( ImplementDefinition& node )
     node.rightBraceToken()->accept( *this );
 }
 
-void RecursiveVisitor::visit( DeclarationDefinition& node )
+void RecursiveVisitor::visit( Declaration& node )
 {
     // TODO: FIXME: @ppaulweber: call token methods to accept this visitor
     node.identifier()->accept( *this );

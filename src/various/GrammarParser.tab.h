@@ -543,7 +543,7 @@ namespace libcasm_fe {
       char dummy16[sizeof (ConditionalRule::Ptr)];
 
       // Declaration
-      char dummy17[sizeof (DeclarationDefinition::Ptr)];
+      char dummy17[sizeof (Declaration::Ptr)];
 
       // MaybeDefined
       char dummy18[sizeof (Defined::Ptr)];
@@ -1316,7 +1316,7 @@ namespace libcasm_fe {
         break;
 
       case symbol_kind::S_Declaration: // Declaration
-        value.move< DeclarationDefinition::Ptr > (std::move (that.value));
+        value.move< Declaration::Ptr > (std::move (that.value));
         break;
 
       case symbol_kind::S_MaybeDefined: // MaybeDefined
@@ -1869,13 +1869,13 @@ namespace libcasm_fe {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, DeclarationDefinition::Ptr&& v, location_type&& l)
+      basic_symbol (typename Base::kind_type t, Declaration::Ptr&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
         , location (std::move (l))
       {}
 #else
-      basic_symbol (typename Base::kind_type t, const DeclarationDefinition::Ptr& v, const location_type& l)
+      basic_symbol (typename Base::kind_type t, const Declaration::Ptr& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -2998,7 +2998,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Declaration: // Declaration
-        value.template destroy< DeclarationDefinition::Ptr > ();
+        value.template destroy< Declaration::Ptr > ();
         break;
 
       case symbol_kind::S_MaybeDefined: // MaybeDefined
@@ -5425,7 +5425,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Declaration: // Declaration
-        value.copy< DeclarationDefinition::Ptr > (YY_MOVE (that.value));
+        value.copy< Declaration::Ptr > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_MaybeDefined: // MaybeDefined
@@ -5901,7 +5901,7 @@ switch (yykind)
         break;
 
       case symbol_kind::S_Declaration: // Declaration
-        value.move< DeclarationDefinition::Ptr > (YY_MOVE (s.value));
+        value.move< Declaration::Ptr > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_MaybeDefined: // MaybeDefined

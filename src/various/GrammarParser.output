@@ -552,7 +552,7 @@ Nonterminals, with rules where they appear
     ImplementDefinitionList <Definitions::Ptr> (118)
         on left: 65 66
         on right: 59 60 65
-    Declaration <DeclarationDefinition::Ptr> (119)
+    Declaration <Declaration::Ptr> (119)
         on left: 67 68
         on right: 51 52
     Rules <Rules::Ptr> (120)

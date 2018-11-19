@@ -120,7 +120,7 @@ void EmptyVisitor::visit( ImplementDefinition& )
 {
 }
 
-void EmptyVisitor::visit( DeclarationDefinition& )
+void EmptyVisitor::visit( Declaration& )
 {
 }
 

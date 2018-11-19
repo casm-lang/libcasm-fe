@@ -2110,7 +2110,7 @@
       <nonterminal symbol-number="116" name="ImplementDefinition" type="ImplementDefinition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="117" name="ImplementDefinitionElement" type="Definition::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="118" name="ImplementDefinitionList" type="Definitions::Ptr" usefulness="useful"/>
-      <nonterminal symbol-number="119" name="Declaration" type="DeclarationDefinition::Ptr" usefulness="useful"/>
+      <nonterminal symbol-number="119" name="Declaration" type="Declaration::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="120" name="Rules" type="Rules::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="121" name="Rule" type="Rule::Ptr" usefulness="useful"/>
       <nonterminal symbol-number="122" name="SkipRule" type="SkipRule::Ptr" usefulness="useful"/>

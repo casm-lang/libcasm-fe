@@ -128,7 +128,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     void visit( StructureDefinition& node ) override;
     void visit( FeatureDefinition& node ) override;
     void visit( ImplementDefinition& node ) override;
-    void visit( DeclarationDefinition& node ) override;
+    void visit( Declaration& node ) override;
 
     void visit( ValueLiteral& node ) override;
     void visit( ReferenceLiteral& node ) override;
@@ -353,10 +353,10 @@ void AstDumpDotVisitor::visit( ImplementDefinition& node )
     RecursiveVisitor::visit( node );
 }
 
-void AstDumpDotVisitor::visit( DeclarationDefinition& node )
+void AstDumpDotVisitor::visit( Declaration& node )
 {
     DotLink link( this, &node );
-    dumpNode( node, "DeclarationDefinition" );
+    dumpNode( node, "Declaration" );
     RecursiveVisitor::visit( node );
 }
 
