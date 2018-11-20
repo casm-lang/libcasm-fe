@@ -73,7 +73,10 @@ Declaration::Declaration(
                                                     : Declaration::Kind::RULE )
 {
     assert( kindToken );
-    assert( kindToken->token() == Grammar::Token::RULE and m_kind == Declaration::Kind::RULE );
+    assert(
+        ( kindToken->token() == Grammar::Token::DERIVED and
+          m_kind == Declaration::Kind::DERIVED ) or
+        ( kindToken->token() == Grammar::Token::RULE and m_kind == Declaration::Kind::RULE ) );
 }
 
 const Types::Ptr& Declaration::argumentTypes( void ) const
