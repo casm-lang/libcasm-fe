@@ -45,6 +45,8 @@
 
 #include "Node.h"
 
+#include <libcasm-fe/ast/Declaration>
+
 #include <cassert>
 
 using namespace libcasm_fe;
@@ -141,7 +143,8 @@ std::string Node::description( void ) const
         }
         case ID::DECLARATION:
         {
-            return "declaration";
+            const auto& declaration = static_cast< const Declaration& >( *this );
+            return declaration.kindName() + " declaration";
         }
         // literals
         case ID::UNDEF_LITERAL:
