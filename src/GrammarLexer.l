@@ -212,12 +212,35 @@ using namespace libcasm_fe;
     m_strbuf.append( yytext );
 }
 <LCOMMENT>\n {
-    unput( *yytext );
-    m_loc.columns( -1 );
-    const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
-    m_spans->add(span);
-    m_loc.step();
-    BEGIN( INITIAL );
+    m_loc.lines( yyleng );
+    m_strbuf.append( yytext );
+    const auto firstCharacter = yyinput();
+    if( firstCharacter != '/' )
+    {
+        unput( firstCharacter );
+        const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+        m_spans->add( span );
+        m_loc.step();
+        BEGIN( INITIAL );
+    }
+    else
+    {
+        const auto secondCharacter = yyinput();
+        if( secondCharacter != '/' )
+        {
+            unput( secondCharacter );
+            unput( firstCharacter );
+            const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
+            m_spans->add( span );
+            m_loc.step();
+            BEGIN( INITIAL );
+        }
+        else
+        {
+            m_strbuf.append( std::to_string( firstCharacter ));
+            m_strbuf.append( std::to_string( secondCharacter ));
+        }
+    }
 }
 <LCOMMENT><<EOF>> {
     const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );

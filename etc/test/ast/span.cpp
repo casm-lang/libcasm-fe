@@ -76,24 +76,46 @@ TEST( AstSpan, Tabulator )
     EXPECT_STREQ( span->toString().c_str(), "\t\t\t" );
 }
 
-TEST( AstSpan, LineComment )
+TEST( AstSpan, LineComment_single )
 {
     const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
 
     auto file = libstdhl::File::open( *filename, std::fstream::out );
-    file << "\n    //test\n\n";
+    file << "\n    //test\n\n   ";
     file.close();
 
-    const auto begin = SourcePosition( filename, 2, 6 );
-    const auto end = SourcePosition( filename, 2, 10 );
+    const auto begin = SourcePosition( filename, 2, 5 );
+    const auto end = SourcePosition( filename, 3, 1 );
     const auto loc = SourceLocation( begin, end );
 
-    auto span = std::make_shared< Span >( Grammar::Span::INLINE_COMMENT, 4 );
+    auto span = std::make_shared< Span >( Grammar::Span::INLINE_COMMENT, 7 );
     span->setSourceLocation( loc );
 
     EXPECT_EQ( span->kind(), Grammar::Span::INLINE_COMMENT );
-    EXPECT_EQ( span->length(), 4 );
-    EXPECT_STREQ( span->toString().c_str(), "//test" );
+    EXPECT_EQ( span->length(), 7 );
+    EXPECT_STREQ( span->toString().c_str(), "//test\n" );
+
+    libstdhl::File::remove( *filename );
+}
+
+TEST( AstSpan, LineComment_compound )
+{
+    const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
+
+    auto file = libstdhl::File::open( *filename, std::fstream::out );
+    file << "\n    //test\n//test2\n\n   ";
+    file.close();
+
+    const auto begin = SourcePosition( filename, 2, 5 );
+    const auto end = SourcePosition( filename, 4, 1 );
+    const auto loc = SourceLocation( begin, end );
+
+    auto span = std::make_shared< Span >( Grammar::Span::INLINE_COMMENT, 15 );
+    span->setSourceLocation( loc );
+
+    EXPECT_EQ( span->kind(), Grammar::Span::INLINE_COMMENT );
+    EXPECT_EQ( span->length(), 15 );
+    EXPECT_STREQ( span->toString().c_str(), "//test\n//test2\n" );
 
     libstdhl::File::remove( *filename );
 }
@@ -102,19 +124,19 @@ TEST( AstSpan, BlockComment )
 {
     const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
     auto file = libstdhl::File::open( *filename, std::fstream::out );
-    file << "\n    /*test\ntest2\n   test3\n*/\n";
+    file << "\n    /*test\ntest2\n   test3\n*/\n    ";
     file.close();
 
-    const auto begin = SourcePosition( filename, 2, 6 );
-    const auto end = SourcePosition( filename, 4, 10 );
+    const auto begin = SourcePosition( filename, 2, 5 );
+    const auto end = SourcePosition( filename, 5, 3 );
     const auto loc = SourceLocation( begin, end );
 
-    auto span = std::make_shared< Span >( Grammar::Span::BLOCK_COMMENT, 17 );
+    auto span = std::make_shared< Span >( Grammar::Span::BLOCK_COMMENT, 24 );
     span->setSourceLocation( loc );
 
     EXPECT_EQ( span->kind(), Grammar::Span::BLOCK_COMMENT );
-    EXPECT_EQ( span->length(), 17 );
-    EXPECT_STREQ( span->toString().c_str(), "/*test\ntest2\n   test3*/" );
+    EXPECT_EQ( span->length(), 24 );
+    EXPECT_STREQ( span->toString().c_str(), "/*test\ntest2\n   test3\n*/" );
 
     libstdhl::File::remove( *filename );
 }
@@ -123,18 +145,18 @@ TEST( AstSpan, BlockCommentOneLine )
 {
     const auto filename = std::make_shared< std::string >( TEST_NAME + ".txt" );
     auto file = libstdhl::File::open( *filename, std::fstream::out );
-    file << "/*test*/";
+    file << " /*test*/ ";
     file.close();
 
     const auto begin = SourcePosition( filename, 1, 2 );
-    const auto end = SourcePosition( filename, 1, 6 );
+    const auto end = SourcePosition( filename, 1, 10 );
     const auto loc = SourceLocation( begin, end );
 
-    auto span = std::make_shared< Span >( Grammar::Span::BLOCK_COMMENT, 17 );
+    auto span = std::make_shared< Span >( Grammar::Span::BLOCK_COMMENT, 8 );
     span->setSourceLocation( loc );
 
     EXPECT_EQ( span->kind(), Grammar::Span::BLOCK_COMMENT );
-    EXPECT_EQ( span->length(), 17 );
+    EXPECT_EQ( span->length(), 8 );
     EXPECT_STREQ( span->toString().c_str(), "/*test*/" );  // "block comment" with only one line
 
     libstdhl::File::remove( *filename );
