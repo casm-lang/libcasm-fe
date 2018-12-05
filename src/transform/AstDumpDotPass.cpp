@@ -827,12 +827,12 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     return true;
 }
 
-void AstDumpDotPass::setDumpSpan( u1 enable )
+void AstDumpDotPass::setDumpSpan( const u1 enable )
 {
     m_dumpSpan = enable;
 }
 
-const u1 AstDumpDotPass::dumpSpan( void ) const
+u1 AstDumpDotPass::dumpSpan( void ) const
 {
     return m_dumpSpan;
 }
