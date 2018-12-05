@@ -59,6 +59,12 @@ namespace libcasm_fe
         void usage( libpass::PassUsage& pu ) override;
 
         u1 run( libpass::PassResult& pr ) override;
+
+        void setDumpSpan( u1 enable );
+        const u1 dumpSpan( void ) const;
+
+      private:
+        u1 m_dumpSpan = false;
     };
 }
 

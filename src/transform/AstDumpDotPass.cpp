@@ -102,7 +102,7 @@ class AstDumpDotVisitor final : public RecursiveVisitor
     };
 
   public:
-    AstDumpDotVisitor( std::ostream& stream );
+    AstDumpDotVisitor( std::ostream& stream, const u1 dumpSpan );
 
     void setDumpNodeLocation( u1 dumpNodeLocation );
 
@@ -189,12 +189,14 @@ class AstDumpDotVisitor final : public RecursiveVisitor
 
   private:
     std::ostream& m_stream;
+    const u1 m_dumpSpan;
     std::stack< void* > m_parentNodes; /**< holds the parent nodes of DotLink */
     u1 m_dumpNodeLocation = false;     /**< dump node source code location */
 };
 
-AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream )
+AstDumpDotVisitor::AstDumpDotVisitor( std::ostream& stream, const u1 dumpSpan )
 : m_stream( stream )
+, m_dumpSpan( dumpSpan )
 , m_parentNodes()
 , m_dumpNodeLocation( false )
 {
@@ -689,10 +691,12 @@ void AstDumpDotVisitor::visit( Token& node )
 
 void AstDumpDotVisitor::visit( Span& node )
 {
-    DotLink link( this, &node );
-    dumpNode( node, "Span\n" + node.kindName() + " " + std::to_string( node.length() ) );
-
-    RecursiveVisitor::visit( node );
+    if( m_dumpSpan )
+    {
+        DotLink link( this, &node );
+        dumpNode( node, "Span\n" + node.kindName() + " " + std::to_string( node.length() ) );
+        RecursiveVisitor::visit( node );
+    }
 }
 
 void AstDumpDotVisitor::dumpNode( const Node& node, const std::string& name )
@@ -794,7 +798,7 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     const auto printDotGraph = [&]( std::ostream& out ) {
         out << "digraph \"main\" {\n";
 
-        AstDumpDotVisitor visitor{ out };
+        AstDumpDotVisitor visitor{ out, dumpSpan() };
         visitor.setDumpNodeLocation( dumpNodeLocation );
 
         visitor.visit( *specification );
@@ -823,6 +827,15 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     return true;
 }
 
+void AstDumpDotPass::setDumpSpan( u1 enable )
+{
+    m_dumpSpan = enable;
+}
+
+const u1 AstDumpDotPass::dumpSpan( void ) const
+{
+    return m_dumpSpan;
+}
 //
 //  Local variables:
 //  mode: c++
