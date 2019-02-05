@@ -48,12 +48,13 @@
 
 #include <libpass/PassLogger>
 
+#include <libstdhl/SourceLocation>
+
 #include <string>
 #include <vector>
 
 namespace libcasm_fe
 {
-    class SourceLocation;
     class Exception;
 
     class Logger : public libpass::PassLogger
@@ -63,22 +64,26 @@ namespace libcasm_fe
 
         using libpass::PassLogger::error;
         void error(
-            const std::vector< SourceLocation >& locations,
+            const std::vector< libstdhl::SourceLocation >& locations,
             const std::string& message,
             Code errorCode = Code::Unspecified );
         void error( const Exception& exception );
 
         using libpass::PassLogger::warning;
-        void warning( const std::vector< SourceLocation >& locations, const std::string& message );
+        void warning(
+            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
 
         using libpass::PassLogger::info;
-        void info( const std::vector< SourceLocation >& locations, const std::string& message );
+        void info(
+            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
 
         using libpass::PassLogger::hint;
-        void hint( const std::vector< SourceLocation >& locations, const std::string& message );
+        void hint(
+            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
 
         using libpass::PassLogger::debug;
-        void debug( const std::vector< SourceLocation >& locations, const std::string& message );
+        void debug(
+            const std::vector< libstdhl::SourceLocation >& locations, const std::string& message );
     };
 }
 

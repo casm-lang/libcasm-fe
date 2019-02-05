@@ -59,12 +59,12 @@ Node::ID Node::id( void ) const
     return m_id;
 }
 
-void Node::setSourceLocation( const SourceLocation& sourceLocation )
+void Node::setSourceLocation( const libstdhl::SourceLocation& sourceLocation )
 {
     m_sourceLocation = sourceLocation;
 }
 
-const SourceLocation& Node::sourceLocation( void ) const
+const libstdhl::SourceLocation& Node::sourceLocation( void ) const
 {
     return m_sourceLocation;
 }

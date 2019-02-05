@@ -43,9 +43,8 @@
 
 #include "../main.h"
 
-#include <libcasm-fe/SourceLocation>
-
 #include <libstdhl/File>
+#include <libstdhl/SourceLocation>
 
 #include <memory>
 

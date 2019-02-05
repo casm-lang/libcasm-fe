@@ -123,7 +123,6 @@ ecm_generate_headers( ${PROJECT}_HEADERS_CPP
     Exception
     Logger
     Namespace
-    SourceLocation
     Specification
     TypeInfo
   PREFIX

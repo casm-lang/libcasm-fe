@@ -1,5 +1,5 @@
 %{
-//  Copyright (C) 2014-2018 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
@@ -45,10 +45,11 @@
 
 #include <libcasm-fe/Codes>
 #include <libcasm-fe/Logger>
-#include "various/GrammarToken.h"
-#include "../../src/SourceLocation.h"
-
 #include <libcasm-fe/ast/Span>
+
+#include "various/GrammarToken.h"
+
+#include <libstdhl/SourceLocation>
 
 using namespace libcasm_fe;
 

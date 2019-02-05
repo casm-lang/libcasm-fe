@@ -46,17 +46,18 @@
 using namespace libcasm_fe;
 
 Exception::Exception( const std::string& msg, Code errorCode )
-: Exception( SourceLocation(), msg, errorCode )
+: Exception( libstdhl::SourceLocation(), msg, errorCode )
 {
 }
 
-Exception::Exception( const SourceLocation& location, const std::string& msg, Code errorCode )
+Exception::Exception(
+    const libstdhl::SourceLocation& location, const std::string& msg, Code errorCode )
 : Exception( location, msg, {}, errorCode )
 {
 }
 
 Exception::Exception(
-    const SourceLocation& location,
+    const libstdhl::SourceLocation& location,
     const std::string& msg,
     const std::vector< std::string >& backtrace,
     Code errorCode )
@@ -68,13 +69,15 @@ Exception::Exception(
 }
 
 Exception::Exception(
-    const std::vector< SourceLocation >& locations, const std::string& msg, Code errorCode )
+    const std::vector< libstdhl::SourceLocation >& locations,
+    const std::string& msg,
+    Code errorCode )
 : Exception( locations, msg, {}, errorCode )
 {
 }
 
 Exception::Exception(
-    const std::vector< SourceLocation >& locations,
+    const std::vector< libstdhl::SourceLocation >& locations,
     const std::string& msg,
     const std::vector< std::string >& backtrace,
     Code errorCode )
@@ -90,7 +93,7 @@ const char* Exception::what( void ) const noexcept
     return m_msg.c_str();
 }
 
-const std::vector< SourceLocation >& Exception::locations( void ) const noexcept
+const std::vector< libstdhl::SourceLocation >& Exception::locations( void ) const noexcept
 {
     return m_locations;
 }

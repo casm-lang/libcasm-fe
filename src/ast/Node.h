@@ -45,13 +45,13 @@
 #define _LIBCASM_FE_NODE_H_
 
 #include <libcasm-fe/CasmFE>
-#include <libcasm-fe/SourceLocation>
 #include <libcasm-fe/ast/Visitor>
 
 #include <libcasm-ir/Property>
 #include <libcasm-ir/Type>
 
 #include <libstdhl/List>
+#include <libstdhl/SourceLocation>
 
 namespace libcasm_fe
 {
@@ -154,8 +154,8 @@ namespace libcasm_fe
 
             ID id( void ) const;
 
-            void setSourceLocation( const SourceLocation& sourceLocation );
-            const SourceLocation& sourceLocation( void ) const;
+            void setSourceLocation( const libstdhl::SourceLocation& sourceLocation );
+            const libstdhl::SourceLocation& sourceLocation( void ) const;
 
             /**
              * @return A short description about the node type.
@@ -172,7 +172,7 @@ namespace libcasm_fe
 
           private:
             const ID m_id;
-            SourceLocation m_sourceLocation;
+            libstdhl::SourceLocation m_sourceLocation;
         };
 
         template < typename T >

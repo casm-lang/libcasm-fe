@@ -47,13 +47,15 @@
 #include <string>
 
 #include <libcasm-fe/ast/Span>
+
 #include "various/FlexLexer.h"
 #include "various/GrammarParser.tab.h"
+
+#include <libstdhl/SourceLocation>
 
 namespace libcasm_fe
 {
     class Logger;
-    class SourceLocation;
 
     class Lexer : public yyFlexLexer
     {
@@ -71,7 +73,7 @@ namespace libcasm_fe
 
       private:
         Logger& m_log;
-        SourceLocation m_loc;
+        libstdhl::SourceLocation m_loc;
         std::string m_strbuf;
         Spans::Ptr m_spans;
     };

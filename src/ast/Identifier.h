@@ -128,7 +128,7 @@ namespace libcasm_fe
         };
 
         template < typename T, typename... Args >
-        typename T::Ptr make( const SourceLocation& sourceLocation, Args&&... args )
+        typename T::Ptr make( const libstdhl::SourceLocation& sourceLocation, Args&&... args )
         {
             auto node = std::make_shared< T >( std::forward< Args >( args )... );
             node->setSourceLocation( sourceLocation );

@@ -43,47 +43,10 @@
 
 #include "Span.h"
 
-#include <libstdhl/File>
-
-#include <iostream>
+#include <libstdhl/SourceLocation>
 
 using namespace libcasm_fe;
 using namespace Ast;
-
-static inline std::string readRange( const SourceLocation& sourceLocation )
-{
-    std::string range = "";
-    const auto beginL = sourceLocation.begin.line;
-    const auto endL = sourceLocation.end.line;
-
-    for( auto pos = beginL; pos <= endL; pos++ )
-    {
-        auto line = libstdhl::File::readLine( *sourceLocation.fileName(), pos );
-        if( pos == beginL and pos == endL )
-        {
-            line = line.substr(
-                sourceLocation.begin.column - 1,
-                sourceLocation.end.column - sourceLocation.begin.column );
-        }
-        else if( pos == beginL )
-        {
-            line = line.substr( sourceLocation.begin.column - 1 );
-        }
-        else if( pos == endL )
-        {
-            line = line.substr( 0, sourceLocation.end.column - 1 );
-        }
-
-        range += line;
-
-        if( pos != endL )
-        {
-            range += "\n";
-        }
-    }
-
-    return range;
-}
 
 //
 //
@@ -152,11 +115,11 @@ std::string Span::toString( void ) const
         }
         case Grammar::Span::INLINE_COMMENT:
         {
-            return readRange( sourceLocation() );
+            return sourceLocation().read();
         }
         case Grammar::Span::BLOCK_COMMENT:
         {
-            return readRange( sourceLocation() );
+            return sourceLocation().read();
         }
     }
 

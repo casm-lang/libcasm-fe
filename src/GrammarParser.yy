@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 2014-2018 CASM Organization <https://casm-lang.org>
+//  Copyright (C) 2014-2019 CASM Organization <https://casm-lang.org>
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
@@ -51,7 +51,7 @@
 
 %define api.token.constructor
 %define api.value.type variant
-%define api.location.type {SourceLocation}
+%define api.location.type {libstdhl::SourceLocation}
 
 %define parse.assert
 %define parse.trace
@@ -65,7 +65,6 @@
     {
         class Lexer;
         class Logger;
-        class SourceLocation;
     }
 
     #include <libcasm-fe/Specification>
@@ -73,6 +72,8 @@
     #include <libcasm-fe/ast/Expression>
     #include <libcasm-fe/ast/Rule>
     #include <libcasm-fe/ast/Token>
+
+    #include <libstdhl/SourceLocation>
 
     using namespace libcasm_fe;
     using namespace Ast;
@@ -88,7 +89,7 @@
 {
     #include <libcasm-fe/Exception>
     #include <libcasm-fe/Logger>
-    #include "../../src/SourceLocation.h"
+
     #include "../../src/Lexer.h"
     #include "../../src/various/GrammarToken.h"
 
@@ -99,7 +100,7 @@
 
     static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 
-    static BasicType::Ptr createVoidType( SourceLocation& sourceLocation )
+    static BasicType::Ptr createVoidType( libstdhl::SourceLocation& sourceLocation )
     {
         const auto type = libstdhl::Memory::get< libcasm_ir::VoidType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
@@ -109,7 +110,7 @@
         return node;
     }
 
-    static BasicType::Ptr createRuleRefType( SourceLocation& sourceLocation )
+    static BasicType::Ptr createRuleRefType( libstdhl::SourceLocation& sourceLocation )
     {
         const auto type = libstdhl::Memory::get< libcasm_ir::RuleReferenceType >();
         const auto name = Ast::make< Identifier >( sourceLocation, type->description() );
@@ -119,7 +120,7 @@
         return node;
     }
 
-    static BasicType::Ptr createAgentType( SourceLocation& sourceLocation )
+    static BasicType::Ptr createAgentType( libstdhl::SourceLocation& sourceLocation )
     {
         const auto name = Ast::make< Identifier >( sourceLocation, "Agent" );
         const auto path = Ast::make< IdentifierPath >( sourceLocation, name );
@@ -127,7 +128,7 @@
         return node;
     }
 
-    static FunctionDefinition::Ptr createProgramFunction( SourceLocation& sourceLocation, const Initializers::Ptr& initializers )
+    static FunctionDefinition::Ptr createProgramFunction( libstdhl::SourceLocation& sourceLocation, const Initializers::Ptr& initializers )
     {
         const auto agentType = createAgentType( sourceLocation );
         const auto ruleRefType = createRuleRefType( sourceLocation );
@@ -1775,7 +1776,7 @@ ExpressionAttribute
 
 %%
 
-void Parser::error( const SourceLocation& location, const std::string& message )
+void Parser::error( const libstdhl::SourceLocation& location, const std::string& message )
 {
     m_log.error( {location}, message, Code::SyntaxError );
 }
