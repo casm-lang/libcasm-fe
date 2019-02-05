@@ -50,7 +50,6 @@
     {
         class Lexer;
         class Logger;
-        class SourceLocation;
     }
 
     #include <libcasm-fe/Specification>
@@ -59,12 +58,14 @@
     #include <libcasm-fe/ast/Rule>
     #include <libcasm-fe/ast/Token>
 
+    #include <libstdhl/SourceLocation>
+
     using namespace libcasm_fe;
     using namespace Ast;
 
     #define YY_NULLPTR nullptr
 
-#line 68 "GrammarParser.tab.h" // lalr1.cc:403
+#line 69 "GrammarParser.tab.h" // lalr1.cc:403
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -158,7 +159,7 @@
 
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
 namespace libcasm_fe {
-#line 162 "GrammarParser.tab.h" // lalr1.cc:403
+#line 163 "GrammarParser.tab.h" // lalr1.cc:403
 
   /// A stack with random access from its top.
   template <typename T, typename S = std::vector<T> >
@@ -821,7 +822,7 @@ namespace libcasm_fe {
     typedef YYSTYPE semantic_type;
 #endif
     /// Symbol locations.
-    typedef SourceLocation location_type;
+    typedef libstdhl::SourceLocation location_type;
 
     /// Syntax errors thrown from user actions.
     struct syntax_error : std::runtime_error
@@ -4194,7 +4195,7 @@ namespace libcasm_fe {
 
 #line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
 } // libcasm_fe
-#line 4198 "GrammarParser.tab.h" // lalr1.cc:403
+#line 4199 "GrammarParser.tab.h" // lalr1.cc:403
 
 
 
