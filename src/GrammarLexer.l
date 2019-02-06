@@ -218,7 +218,11 @@ using namespace libcasm_fe;
     const auto firstCharacter = yyinput();
     if( firstCharacter != '/' )
     {
-        unput( firstCharacter );
+        if( firstCharacter )
+        {
+            unput( firstCharacter );
+        }
+
         const auto span = Ast::make< Span >( m_loc, Grammar::Span::INLINE_COMMENT, m_strbuf.length() );
         m_spans->add( span );
         m_loc.step();
