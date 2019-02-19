@@ -90,7 +90,7 @@ char NumericExecutionPass::id = 0;
 static libpass::PassRegistration< NumericExecutionPass > PASS(
     "NumericExecutionPass",
     "execute numerically over the AST input specification",
-    "ast-exec-num",
+    "ast-exec",
     0 );
 
 class ConstantStack : public Stack< IR::Constant >
