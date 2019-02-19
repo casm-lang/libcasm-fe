@@ -57,6 +57,8 @@
 #include <libpass/PassResult>
 #include <libpass/PassUsage>
 
+#include <libstdhl/File>
+
 #include <fstream>
 #include <iostream>
 #include <stack>
@@ -68,7 +70,7 @@ char AstDumpDotPass::id = 0;
 
 static libpass::PassRegistration< AstDumpDotPass > PASS(
     "AstDumpDotPass",
-    "generates a DOT graph of the AST and dumps it to './out/*' for now",
+    "generates DOT graph of the AST and dumps to specified output path",
     "ast-dump",
     0 );
 
@@ -790,10 +792,7 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
     const auto& data = pr.output< SourceToAstPass >();
     const auto& specification = data->specification();
 
-    const auto previousPass = libpass::PassRegistry::passInfo( pr.previousPass() );
-    const std::string outputFilePath =
-        "./obj/out." + previousPass.name() + ".dot";  // TODO: add command-line switch
-    const u1 dumpNodeLocation = true;                 // TODO: add command-line switch
+    const u1 dumpNodeLocation = true;  // TODO: add command-line switch
 
     const auto printDotGraph = [&]( std::ostream& out ) {
         out << "digraph \"main\" {\n";
@@ -806,13 +805,29 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
         out << "}\n";
     };
 
-    if( outputFilePath == "stdout" )
+    if( outputPath() == "" )
     {
+        log.debug( "writing dot graph to 'stdout'" );
         printDotGraph( std::cout );
     }
     else
     {
-        log.debug( "writing dot graph to '" + outputFilePath + "'" );
+        const auto previousPass = libpass::PassRegistry::passInfo( pr.previousPass() );
+        const std::string outputFile = specification->name() + "." + previousPass.name() + ".dot";
+
+        if( not libstdhl::File::Path::exists( outputPath() ) )
+        {
+            try
+            {
+                libstdhl::File::Path::create( outputPath() );
+            }
+            catch( const std::domain_error& e )
+            {
+                log.error( e.what() );
+            }
+        }
+
+        const auto outputFilePath = outputPath() + "/" + outputFile;
 
         std::ofstream dotFile( outputFilePath );
         if( not dotFile.is_open() )
@@ -821,10 +836,21 @@ u1 AstDumpDotPass::run( libpass::PassResult& pr )
             return false;
         }
 
+        log.debug( "writing dot graph to '" + outputFilePath + "'" );
         printDotGraph( dotFile );
     }
 
     return true;
+}
+
+void AstDumpDotPass::setOutputPath( const std::string& outputPath )
+{
+    m_outputPath = outputPath;
+}
+
+const std::string& AstDumpDotPass::outputPath( void ) const
+{
+    return m_outputPath;
 }
 
 void AstDumpDotPass::setDumpSpan( const u1 enable )
