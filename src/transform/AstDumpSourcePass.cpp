@@ -69,7 +69,7 @@ char AstDumpSourcePass::id = 0;
 static libpass::PassRegistration< AstDumpSourcePass > PASS(
     "AstDumpSourcePass",
     "outputs the parsed AST as a CASM input specification to stdout",
-    "ast-dump",
+    "ast-emit",
     0 );
 
 class AstDumpSourceVisitor final : public RecursiveVisitor
