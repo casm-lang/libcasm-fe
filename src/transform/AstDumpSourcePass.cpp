@@ -68,7 +68,7 @@ char AstDumpSourcePass::id = 0;
 
 static libpass::PassRegistration< AstDumpSourcePass > PASS(
     "AstDumpSourcePass",
-    "outputs the parsed AST as a CASM input specification to stdout",
+    "generates CASM specification of the AST and emits to specified output path",
     "ast-emit",
     0 );
 
