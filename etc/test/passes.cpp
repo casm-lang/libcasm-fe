@@ -52,13 +52,16 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-static const std::string source =
-    "CASM\n"
-    "\n"
-    "init test\n"
-    "\n"
-    "rule test = skip\n"
-    "\n";
+static const auto source = R"***(
+CASM
+
+init test_skip
+
+rule test_skip = skip
+
+rule test_update_program_self_undef = program( self ) := undef
+
+)***";
 
 #define SOURCE_TEST( SCOPE, PASS, CONTENT, STATUS, DESCRIPTION, CONFIG )                       \
     TEST( libcasm_fe, SCOPE##_##PASS##DESCRIPTION )                                            \
