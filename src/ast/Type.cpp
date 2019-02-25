@@ -46,6 +46,7 @@
 #include "../various/GrammarToken.h"
 
 #include <libcasm-fe/ast/Definition>
+#include <libcasm-fe/ast/Token>
 
 using namespace libcasm_fe;
 using namespace Ast;
@@ -60,8 +61,6 @@ static const auto UnresolvedIdentifierPath = asIdentifierPath( "$unresolved$" );
 static const auto TupleTypeIdentifierPath = asIdentifierPath( "$tuple$" );
 static const auto RecordTypeIdentifierPath = asIdentifierPath( "$record$" );
 
-static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
 //
 //
 // Type
@@ -70,7 +69,7 @@ static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRES
 Type::Type( const Node::ID id, const IdentifierPath::Ptr& name )
 : TypedNode( id )
 , m_name( name )
-, m_delimiterToken( uToken )
+, m_delimiterToken( Token::unresolved() )
 {
 }
 

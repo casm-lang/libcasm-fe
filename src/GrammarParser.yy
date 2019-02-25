@@ -98,8 +98,6 @@
     #undef yylex
     #define yylex m_lexer.nextToken
 
-    static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
     static BasicType::Ptr createVoidType( libstdhl::SourceLocation& sourceLocation )
     {
         const auto type = libstdhl::Memory::get< libcasm_ir::VoidType >();
@@ -138,12 +136,12 @@
 
         const auto program = Ast::make< Identifier >( sourceLocation, "program" );
         const auto defined = Ast::make< Defined >(
-            sourceLocation, uToken, uToken, Ast::make< UndefLiteral >( sourceLocation ), uToken );
+            sourceLocation, Token::unresolved(), Token::unresolved(), Ast::make< UndefLiteral >( sourceLocation ), Token::unresolved() );
 
-        const auto initially = Ast::make< Initially >( sourceLocation, uToken, uToken, initializers, uToken );
+        const auto initially = Ast::make< Initially >( sourceLocation, Token::unresolved(), Token::unresolved(), initializers, Token::unresolved() );
 
         return Ast::make< FunctionDefinition >(
-            sourceLocation, uToken, program, uToken, argTypes, uToken, ruleRefType, defined, initially );
+            sourceLocation, Token::unresolved(), program, Token::unresolved(), argTypes, Token::unresolved(), ruleRefType, defined, initially );
     }
 
     static IdentifierPath::Ptr asIdentifierPath( const Identifier::Ptr& identifier )
@@ -410,9 +408,9 @@ InitDefinition
       const auto programArguments = libcasm_fe::Ast::make< Expressions >( @$ );
       programArguments->add( singleAgent );
 
-      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, uToken, $2 );
+      const auto ruleReference = Ast::make< ReferenceLiteral >( @$, Token::unresolved(), $2 );
       const auto initializer = Ast::make< Initializer >(
-          @$, uToken, programArguments, uToken, uToken, ruleReference );
+          @$, Token::unresolved(), programArguments, Token::unresolved(), Token::unresolved(), ruleReference );
       initializers->add( initializer );
 
       // apply the name of the program declaration to the initializer functions
@@ -475,7 +473,7 @@ RuleDefinition
   {
       const auto params = Ast::make< NodeList< VariableDefinition > >( @$ );
       const auto vType = createVoidType( @$ );
-      $$ = Ast::make< RuleDefinition >( @$, $1, $2, params, uToken, vType, $3, $4 );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, params, Token::unresolved(), vType, $3, $4 );
   }
 | RULE Identifier MAPS Type EQUAL Rule
   {
@@ -485,7 +483,7 @@ RuleDefinition
 | RULE Identifier LPAREN Parameters RPAREN EQUAL Rule
   {
       const auto vType = createVoidType( @$ );
-      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, uToken, vType, $6, $7 );
+      $$ = Ast::make< RuleDefinition >( @$, $1, $2, $4, Token::unresolved(), vType, $6, $7 );
       $$->setLeftBracketToken( $3 );
       $$->setRightBracketToken( $5 );
   }
@@ -1509,7 +1507,7 @@ MaybeDefined
   }
 | %empty
   {
-      $$ = Ast::make< Defined >( @$, uToken, uToken, Ast::make< UndefLiteral >( @$ ), uToken );
+      $$ = Ast::make< Defined >( @$, Token::unresolved(), Token::unresolved(), Ast::make< UndefLiteral >( @$ ), Token::unresolved() );
   }
 ;
 
@@ -1522,7 +1520,7 @@ MaybeInitially
 | %empty
   {
       const auto initializers = Ast::make< Initializers >( @$ );
-      $$ = Ast::make< Initially >( @$, uToken, uToken, initializers, uToken );
+      $$ = Ast::make< Initially >( @$, Token::unresolved(), Token::unresolved(), initializers, Token::unresolved() );
   }
 ;
 
@@ -1548,7 +1546,7 @@ Initializer
 : Term
   {
       const auto arguments = Ast::make< Expressions >( @$ );
-      $$ = Ast::make< Initializer >( @$, uToken, arguments, uToken, uToken, $1 );
+      $$ = Ast::make< Initializer >( @$, Token::unresolved(), arguments, Token::unresolved(), Token::unresolved(), $1 );
       $$->updateRule()->setSourceLocation( @$ );
       $$->updateRule()->function()->setSourceLocation( @$ );
   }
@@ -1616,7 +1614,7 @@ Variable
 | Identifier
   {
       const auto unresolvedType = Ast::make< UnresolvedType >( @$ );
-      $$ = Ast::make< VariableDefinition >( @$, $1, uToken, unresolvedType );
+      $$ = Ast::make< VariableDefinition >( @$, $1, Token::unresolved(), unresolvedType );
   }
 ;
 

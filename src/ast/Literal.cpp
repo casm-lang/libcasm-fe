@@ -45,6 +45,8 @@
 
 #include "../various/GrammarToken.h"
 
+#include <libcasm-fe/ast/Token>
+
 #include "Definition.h"
 #include "Type.h"
 
@@ -54,12 +56,10 @@
 using namespace libcasm_fe;
 using namespace Ast;
 
-static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
-
 Literal::Literal( Node::ID id )
 : Expression( id )
-, m_leftBracket( uToken )
-, m_rightBracket( uToken )
+, m_leftBracket( Token::unresolved() )
+, m_rightBracket( Token::unresolved() )
 , m_spans( std::make_shared< Spans >() )
 {
 }

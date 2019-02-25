@@ -43,14 +43,14 @@
 
 #include "Identifier.h"
 
+#include <libcasm-fe/ast/Token>
+
 #include "../various/GrammarToken.h"
 
 #include <cassert>
 
 using namespace libcasm_fe;
 using namespace Ast;
-
-static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 
 static const std::string DELIMITER( "::" );
 
@@ -62,7 +62,7 @@ static const std::string DELIMITER( "::" );
 Identifier::Identifier( const std::string& name )
 : Node( Node::ID::IDENTIFIER )
 , m_name( name )
-, m_doubleColon( uToken )
+, m_doubleColon( Token::unresolved() )
 , m_spans( std::make_shared< Spans >() )
 {
 }

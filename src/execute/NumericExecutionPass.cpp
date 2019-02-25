@@ -88,10 +88,7 @@ namespace RT = libcasm_rt;
 char NumericExecutionPass::id = 0;
 
 static libpass::PassRegistration< NumericExecutionPass > PASS(
-    "NumericExecutionPass",
-    "execute numerically over the AST input specification",
-    "ast-exec",
-    0 );
+    "NumericExecutionPass", "execute numerically over the AST input specification", "ast-exec", 0 );
 
 class ConstantStack : public Stack< IR::Constant >
 {

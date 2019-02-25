@@ -53,6 +53,12 @@ using namespace Ast;
 // Token
 //
 
+const Token::Ptr& Token::unresolved( void )
+{
+    static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
+    return uToken;
+}
+
 Token::Token( const libcasm_fe::Grammar::Token token )
 : Node( Node::ID::TOKEN )
 , m_token( token )

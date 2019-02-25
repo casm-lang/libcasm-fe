@@ -61,6 +61,8 @@ namespace libcasm_fe
           public:
             using Ptr = std::shared_ptr< Token >;
 
+            static const Token::Ptr& unresolved( void );
+
             Token( const libcasm_fe::Grammar::Token token );
 
             libcasm_fe::Grammar::Token token( void ) const;

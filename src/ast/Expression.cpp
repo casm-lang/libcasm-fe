@@ -47,12 +47,11 @@
 
 #include <libcasm-fe/ast/Definition>
 #include <libcasm-fe/ast/Literal>
+#include <libcasm-fe/ast/Token>
 #include <libcasm-fe/ast/Type>
 
 using namespace libcasm_fe;
 using namespace Ast;
-
-static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRESOLVED );
 
 //
 //
@@ -61,7 +60,7 @@ static const auto uToken = std::make_shared< Ast::Token >( Grammar::Token::UNRES
 
 Expression::Expression( Node::ID id )
 : TypedPropertyNode( id )
-, m_delimiterToken( uToken )
+, m_delimiterToken( Token::unresolved() )
 {
 }
 
@@ -154,8 +153,8 @@ void NamedExpression::accept( Visitor& visitor )
 CallExpression::CallExpression( Node::ID id, const Expressions::Ptr& arguments )
 : Expression( id )
 , m_arguments( arguments )
-, m_leftBracketToken( uToken )
-, m_rightBracketToken( uToken )
+, m_leftBracketToken( Token::unresolved() )
+, m_rightBracketToken( Token::unresolved() )
 {
 }
 
@@ -683,7 +682,7 @@ VariableBinding::VariableBinding(
 , m_variable( variable )
 , m_expression( expression )
 , m_equal( equal )
-, m_delimiterToken( uToken )
+, m_delimiterToken( Token::unresolved() )
 {
 }
 
