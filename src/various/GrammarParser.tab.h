@@ -44,7 +44,7 @@
 #ifndef YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 # define YY_YY_GRAMMARPARSER_TAB_H_INCLUDED
 // //                    "%code requires" blocks.
-#line 63 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
+#line 64 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
 
     namespace libcasm_fe
     {
@@ -157,7 +157,7 @@
 # define YYDEBUG 1
 #endif
 
-#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
+#line 50 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
 namespace libcasm_fe {
 #line 163 "GrammarParser.tab.h" // lalr1.cc:403
 
@@ -4193,7 +4193,7 @@ namespace libcasm_fe {
   }
 
 
-#line 49 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
+#line 50 "../../obj/src/GrammarParser.yy" // lalr1.cc:403
 } // libcasm_fe
 #line 4199 "GrammarParser.tab.h" // lalr1.cc:403
 
